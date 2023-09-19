@@ -29,7 +29,7 @@
     assert.equal(circle.getRadiusX(), 10);
     assert.equal(circle.getRadiusY(), 10);
 
-    circle.scale(2);
+    circle.scale(2, 2);
 
     assert.equal(circle.getRadiusX(), 20);
     assert.equal(circle.getRadiusY(), 20);
@@ -256,13 +256,13 @@
   QUnit.test('cloning and radius, width, height', function(assert) {
     var done = assert.async();
     var circle = new fabric.Circle({ radius: 10, strokeWidth: 0});
-    circle.scale(2);
+    circle.scale(2, 2);
 
     circle.clone().then(function(clone) {
       assert.equal(clone.width, 20);
-      assert.equal(clone.getScaledWidth(), 40);
       assert.equal(clone.height, 20);
-      assert.equal(clone.getScaledHeight(), 40);
+      assert.equal(clone.scaleX, 2);
+      assert.equal(clone.scaleY, 2);
       assert.equal(clone.radius, 10);
       done();
     });

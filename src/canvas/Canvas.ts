@@ -1107,7 +1107,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           !(target as IText).isEditing &&
           target !== this._activeObject))
     ) {
-      const p = this.getPointer(e);
+      const p = this.getPointer(e, true);
       this._groupSelector = {
         x: p.x,
         y: p.y,
@@ -1121,14 +1121,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
-      const corner = target._findTargetCorner(
-        this.getPointer(e, true),
-        isTouchEvent(e)
-      );
+      const pointer = this.getPointer(e, true);
+      const corner = target._findTargetCorner(pointer, isTouchEvent(e));
       if (target === this._activeObject && (corner || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
         const control = target.controls[corner],
-          pointer = this.getPointer(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {
@@ -1163,7 +1160,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
     this._pointer = this.getPointer(e, true);
-    this._absolutePointer = this.restorePointerVpt(this._pointer);
+    this._absolutePointer = sendPointToPlane(
+      this._pointer,
+      undefined,
+      this.viewportTransform
+    );
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
@@ -1207,7 +1208,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     // We initially clicked in an empty area, so we draw a box for multiple selection
     if (groupSelector) {
-      const pointer = this.getPointer(e);
+      const pointer = this.getPointer(e, true);
 
       groupSelector.deltaX = pointer.x - groupSelector.x;
       groupSelector.deltaY = pointer.y - groupSelector.y;
@@ -1355,51 +1356,33 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event fired on mousemove
    */
   _transformObject(e: TPointerEvent) {
-    const pointer = this.getPointer(e),
-      transform = this._currentTransform!,
-      target = transform.target,
-      //  transform pointer to target's containing coordinate plane
-      //  both pointer and object should agree on every point
-      localPointer = target.group
-        ? sendPointToPlane(
-            pointer,
-            undefined,
-            target.group.calcTransformMatrix()
-          )
-        : pointer;
-    // seems used only here.
-    // @TODO: investigate;
-    transform.reset = false;
-    transform.shiftKey = e.shiftKey;
-    transform.altKey = !!this.centeredKey && e[this.centeredKey];
-
-    this._performTransformAction(e, transform, localPointer);
-    transform.actionPerformed && this.requestRenderAll();
+    this._performTransformAction(
+      e,
+      Object.assign(this._currentTransform!, {
+        shiftKey: e.shiftKey,
+        altKey: !!this.centeredKey && e[this.centeredKey],
+      })
+    ) && this.requestRenderAll();
   }
 
   /**
    * @private
    */
-  _performTransformAction(
-    e: TPointerEvent,
-    transform: Transform,
-    pointer: Point
-  ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
+  _performTransformAction(e: TPointerEvent, transform: Transform) {
+    const { action, actionHandler } = transform;
     let actionPerformed = false;
-    // this object could be created from the function in the control handlers
-
     if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
+      const pointer = this.getPointer(e, true);
+      actionPerformed = actionHandler(e, transform, pointer.x, pointer.y);
+      transform.lastX = pointer.x;
+      transform.lastY = pointer.y;
     }
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);
     }
-    transform.actionPerformed = transform.actionPerformed || actionPerformed;
+    return (transform.actionPerformed =
+      transform.actionPerformed || actionPerformed);
   }
 
   /**

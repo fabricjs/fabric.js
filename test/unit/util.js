@@ -408,11 +408,23 @@
 
   QUnit.test('multiplyTransformMatrices', function(assert) {
     assert.ok(typeof fabric.util.multiplyTransformMatrices === 'function');
-    var m1 = [1, 1, 1, 1, 1, 1], m2 = [1, 1, 1, 1, 1, 1], m3;
-    m3 = fabric.util.multiplyTransformMatrices(m1, m2);
-    assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
-    m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
-    assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
+    const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];
+    assert.deepEqual(fabric.util.multiplyTransformMatrices(m1, m2), [
+      23,
+      34,
+      31,
+      46,
+      160,
+      240
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrices(m1, m2, true), [
+      23,
+      34,
+      31,
+      46,
+      0,
+      0
+    ]);
   });
 
   QUnit.test('multiplyTransformMatrixArray', function (assert) {
@@ -825,33 +837,12 @@
     assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
   });
 
-  QUnit.test('transformPointRelativeToCanvas', function(assert) {
-    assert.ok(typeof fabric.util.transformPointRelativeToCanvas === 'function');
-    var point = new fabric.Point(2, 2);
-    var matrix = [3, 0, 0, 2, 10, 4];
-    var canvas = {
-      viewportTransform: matrix
-    }
-    var transformPoint = fabric.util.transformPoint;
-    var invertTransform = fabric.util.invertTransform;
-    var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
-    var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
-    assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
-    assert.deepEqual(p, transformPoint(point, matrix));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
-    assert.deepEqual(p, point);
-    p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
-    assert.deepEqual(p, point);
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling');
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', true);
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
-    });
+  QUnit.test('sendVectorToPlane', function (assert) {
+    assert.ok(typeof fabric.util.sendVectorToPlane === 'function');
+    assert.deepEqual(
+      fabric.util.sendVectorToPlane(new fabric.Point(1, 1), [0.5, 0, 0, 1, 500, 600], [1, 0, 0, 0.5, 200, -600]),
+      new fabric.Point(0.5, 2)
+    );
   });
 
   QUnit.test('sendObjectToPlane', function (assert) {

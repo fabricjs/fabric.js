@@ -1,8 +1,19 @@
-import { config } from '../config';
-import { SHARED_ATTRIBUTES } from '../parser/attributes';
-import { parseAttributes } from '../parser/parseAttributes';
+import { classRegistry } from '../ClassRegistry';
+import type { ObjectEvents } from '../EventTypeDefs';
 import type { XY } from '../Point';
 import { Point } from '../Point';
+import { config } from '../config';
+import { LEFT, TOP } from '../constants';
+import { SHARED_ATTRIBUTES } from '../parser/attributes';
+import { parseAttributes } from '../parser/parseAttributes';
+import type { CSSRules } from '../parser/typedefs';
+import type {
+  TBBox,
+  TClassProperties,
+  TOptions,
+  TSVGReviver,
+} from '../typedefs';
+import { cloneDeep } from '../util/internals/cloneDeep';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import { toFixed } from '../util/misc/toFixed';
 import {
@@ -11,24 +22,13 @@ import {
   makePathSimpler,
   parsePath,
 } from '../util/path';
-import { classRegistry } from '../ClassRegistry';
-import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type {
   TComplexPathData,
   TPathSegmentInfo,
   TSimplePathData,
 } from '../util/path/typedefs';
+import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { ObjectEvents } from '../EventTypeDefs';
-import type {
-  TBBox,
-  TClassProperties,
-  TSVGReviver,
-  TOptions,
-} from '../typedefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER, LEFT, TOP } from '../constants';
-import type { CSSRules } from '../parser/typedefs';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -80,9 +80,14 @@ export class Path<
     { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super(options as Props);
-    this._setPath(path || [], true);
+    const pathTL = this._setPath(path || [], true);
     typeof left === 'number' && this.set(LEFT, left);
     typeof top === 'number' && this.set(TOP, top);
+    // this.setRelativeXY(
+    //   new Point(left ?? pathTL.x, top ?? pathTL.y),
+    //   typeof left === 'number' ? this.originX : 'left',
+    //   typeof top === 'number' ? this.originY : 'top'
+    // );
   }
 
   /**
@@ -301,7 +306,7 @@ export class Path<
     this.set({ width, height, pathOffset });
     // using pathOffset because it match the use case.
     // if pathOffset change here we need to use left + width/2 , top + height/2
-    adjustPosition && this.setPositionByOrigin(pathOffset, CENTER, CENTER);
+    adjustPosition && this.setRelativeCenterPoint(pathOffset);
   }
 
   _calcBoundsFromPath(): TBBox {

@@ -30,6 +30,8 @@ import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
+import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
 import type { StylePropertiesType } from './constants';
 import {
@@ -1860,24 +1862,19 @@ export class Text<
         fontSize,
         ...restOfOptions,
       }),
-      textHeightScaleFactor = text.getScaledHeight() / text.height,
+      sizeInParent = sizeAfterTransform(text.width, text.height, text),
+      textHeightScaleFactor = sizeInParent.y / text.height,
       lineHeightDiff =
         (text.height + text.strokeWidth) * text.lineHeight - text.height,
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getScaledHeight() + scaledDiff;
+      textHeight = sizeInParent.y + scaledDiff;
 
-    let offX = 0;
     /*
       Adjust positioning:
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
         fabric output by default at top, left.
     */
-    if (textAnchor === CENTER) {
-      offX = text.getScaledWidth() / 2;
-    }
-    if (textAnchor === RIGHT) {
-      offX = text.getScaledWidth();
-    }
+    const offX = sizeInParent.x * (resolveOrigin(textAnchor) + 0.5);
     text.set({
       left: text.left - offX,
       top:

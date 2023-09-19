@@ -1,25 +1,17 @@
+import { BBox } from '../BBox/BBox';
 import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
-import type { TAxis, TAxisKey } from '../typedefs';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
-import {
-  findCornerQuadrant,
-  getLocalPoint,
-  isLocked,
-  NOT_ALLOWED_CURSOR,
-} from './util';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { TAxis, TAxisKey, TOriginX, TOriginY } from '../typedefs';
+import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
+import { createVector, dotProduct, getUnitVector } from '../util/misc/vectors';
+import { NOT_ALLOWED_CURSOR, findCornerQuadrant, isLocked } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
-import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { CENTER } from '../constants';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -76,133 +68,91 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
   return `${skewMap[n]}-resize`;
 };
 
-/**
- * Since skewing is applied before scaling, calculations are done in a scaleless plane
- * @see https://github.com/fabricjs/fabric.js/pull/8380
- */
-function skewObject(
+function getSkewingDirection(
   axis: TAxis,
-  { target, ex, ey, skewingSide, ...transform }: SkewTransform,
+  target: FabricObject,
+  transform: { originX: TOriginX; originY: TOriginY },
   pointer: Point
 ) {
-  const { skew: skewKey } = AXIS_KEYS[axis],
-    offset = pointer
-      .subtract(new Point(ex, ey))
-      .divide(new Point(target.scaleX, target.scaleY))[axis],
-    skewingBefore = target[skewKey],
-    skewingStart = transform[skewKey],
-    shearingStart = Math.tan(degreesToRadians(skewingStart)),
-    // let a, b be the size of target
-    // let a' be the value of a after applying skewing
-    // then:
-    // a' = a + b * skewA => skewA = (a' - a) / b
-    // the value b is tricky since skewY is applied before skewX
-    b =
-      axis === 'y'
-        ? target._getTransformedDimensions({
-            scaleX: 1,
-            scaleY: 1,
-            // since skewY is applied before skewX, b (=width) is not affected by skewX
-            skewX: 0,
-          }).x
-        : target._getTransformedDimensions({
-            scaleX: 1,
-            scaleY: 1,
-          }).y;
-
-  const shearing =
-    (2 * offset * skewingSide) /
-      // we max out fractions to safeguard from asymptotic behavior
-      Math.max(b, 1) +
-    // add starting state
-    shearingStart;
-
-  const skewing = radiansToDegrees(Math.atan(shearing));
-
-  target.set(skewKey, skewing);
-  const changed = skewingBefore !== target[skewKey];
-
-  if (changed && axis === 'y') {
-    // we don't want skewing to affect scaleX
-    // so we factor it by the inverse skewing diff to make it seem unchanged to the viewer
-    const { skewX, scaleX } = target,
-      dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }),
-      dimAfter = target._getTransformedDimensions(),
-      compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
-    compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * scaleX);
-  }
-
-  return changed;
-}
-
-/**
- * Wrapped Action handler for skewing on a given axis, takes care of the
- * skew direction and determines the correct transform origin for the anchor point
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if some change happened
- */
-function skewHandler(
-  axis: TAxis,
-  eventData: TPointerEvent,
-  transform: Transform,
-  x: number,
-  y: number
-) {
-  const { target } = transform,
-    {
-      counterAxis,
-      origin: originKey,
-      lockSkewing: lockSkewingKey,
-      skew: skewKey,
-      flip: flipKey,
-    } = AXIS_KEYS[axis];
-  if (isLocked(target, lockSkewingKey)) {
-    return false;
-  }
-
-  const { origin: counterOriginKey, flip: counterFlipKey } =
-      AXIS_KEYS[counterAxis],
-    counterOriginFactor =
-      resolveOrigin(transform[counterOriginKey]) *
-      (target[counterFlipKey] ? -1 : 1),
+  const { counterAxis } = AXIS_KEYS[axis];
+  const { origin: counterOriginKey } = AXIS_KEYS[counterAxis],
+    counterOriginFactor = resolveOrigin(transform[counterOriginKey]),
     // if the counter origin is top/left (= -0.5) then we are skewing x/y values on the bottom/right side of target respectively.
     // if the counter origin is bottom/right (= 0.5) then we are skewing x/y values on the top/left side of target respectively.
     // skewing direction on the top/left side of target is OPPOSITE to the direction of the movement of the pointer,
     // so we factor skewing direction by this value.
-    skewingSide = (-Math.sign(counterOriginFactor) *
-      (target[flipKey] ? -1 : 1)) as 1 | -1,
+    skewingSide = -Math.sign(counterOriginFactor) as 1 | -1,
     skewingDirection =
-      ((target[skewKey] === 0 &&
-        // in case skewing equals 0 we use the pointer offset from target center to determine the direction of skewing
-        getLocalPoint(transform, CENTER, CENTER, x, y)[axis] > 0) ||
-      // in case target has skewing we use that as the direction
-      target[skewKey] > 0
-        ? 1
-        : -1) * skewingSide,
+      Math.sign(pointer.subtract(target.getCenterPoint())[axis]) * skewingSide,
     // anchor to the opposite side of the skewing direction
-    // normalize value from [-1, 1] to origin value [0, 1]
-    origin = -skewingDirection * 0.5 + 0.5;
+    skewingOrigin = -skewingDirection * 0.5;
 
-  const finalHandler = wrapWithFireEvent<SkewTransform>(
-    'skewing',
-    wrapWithFixedAnchor((eventData, transform, x, y) =>
-      skewObject(axis, transform, new Point(x, y))
-    )
+  const origin = resolveOriginPoint(transform.originX, transform.originY);
+  origin[axis] = skewingOrigin;
+  return {
+    origin,
+    skewingSide,
+  };
+}
+
+function skewObject(
+  axis: TAxis,
+  eventData: TPointerEvent,
+  { target, lastX, lastY, originX, originY }: Transform,
+  x: number,
+  y: number
+) {
+  const { lockSkewing: lockSkewingKey } = AXIS_KEYS[axis];
+  if (isLocked(target, lockSkewingKey)) {
+    return false;
+  }
+  const pointer = new Point(x, y);
+  const { origin: skewingOrigin, skewingSide } = getSkewingDirection(
+    axis,
+    target,
+    { originX, originY },
+    pointer
   );
-
-  return finalHandler(
-    eventData,
+  const transformed = BBox.transformed(target);
+  const { tl, tr, bl } = transformed.getCoords();
+  const tSides = {
+    x: createVector(tl, tr),
+    y: createVector(tl, bl),
+  };
+  const offset = dotProduct(
+    pointer.subtract(new Point(lastX, lastY)),
+    tSides[axis]
+  );
+  const shearing = 2 * offset * skewingSide;
+  const didChange = target.shearSidesBy(
+    [tSides.x, tSides.y],
+    [
+      axis === 'y'
+        ? getUnitVector(tSides.y).scalarMultiply(shearing)
+        : new Point(),
+      axis === 'x'
+        ? getUnitVector(tSides.x).scalarMultiply(shearing)
+        : new Point(),
+    ],
     {
-      ...transform,
-      [originKey]: origin,
-      skewingSide,
-    },
-    x,
-    y
+      originX: skewingOrigin.x + 0.5,
+      originY: skewingOrigin.y + 0.5,
+      inViewport: true,
+    }
+  );
+  // we anchor to the origin of the transformed bbox
+  target.setCoords();
+  const position = transformed.pointFromOrigin(
+    // resolveOriginPoint(originX, originY)
+    skewingOrigin
+  );
+  const origin = target.bbox.pointToOrigin(position).scalarAdd(0.5);
+  return (
+    target.translateTo(position.x, position.y, {
+      originX: origin.x,
+      originY: origin.y,
+      inViewport: true,
+    }) || didChange
   );
 }
 
@@ -215,14 +165,10 @@ function skewHandler(
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export const skewHandlerX: TransformActionHandler = (
-  eventData,
-  transform,
-  x,
-  y
-) => {
-  return skewHandler('x', eventData, transform, x, y);
-};
+export const skewHandlerX: TransformActionHandler = wrapWithFireEvent(
+  'skewing',
+  skewObject.bind(null, 'x')
+);
 
 /**
  * Wrapped Action handler for skewing on the Y axis, takes care of the
@@ -233,11 +179,7 @@ export const skewHandlerX: TransformActionHandler = (
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export const skewHandlerY: TransformActionHandler = (
-  eventData,
-  transform,
-  x,
-  y
-) => {
-  return skewHandler('y', eventData, transform, x, y);
-};
+export const skewHandlerY: TransformActionHandler = wrapWithFireEvent(
+  'skewing',
+  skewObject.bind(null, 'y')
+);

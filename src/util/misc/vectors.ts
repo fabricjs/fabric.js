@@ -2,7 +2,6 @@ import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import type { TRadian } from '../../typedefs';
 
-const unitVectorX = new Point(1, 0);
 const zero = new Point();
 
 /**
@@ -31,21 +30,37 @@ export const createVector = (from: XY, to: XY): Point =>
 export const magnitude = (point: Point) => point.distanceFrom(zero);
 
 /**
+ * Dot product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number}
+ */
+export const dot = (a: Point, b: Point) => a.x * b.x + a.y * b.y;
+
+/**
+ * Cross product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number} the magnitude of Z vector
+ */
+export const det = (a: Point, b: Point) => a.x * b.y - a.y * b.x;
+
+/**
  * Calculates the angle between 2 vectors
  * @param {Point} a
  * @param {Point} b
  * @returns the angle in radians from `a` to `b`
  */
-export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian =>
-  Math.atan2(crossProduct(a, b), dotProduct(a, b)) as TRadian;
+export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian => {
+  return Math.atan2(det(a, b), dot(a, b)) as TRadian;
+};
 
 /**
  * Calculates the angle between the x axis and the vector
  * @param {Point} v
  * @returns the angle in radians of `v`
  */
-export const calcVectorRotation = (v: Point) =>
-  calcAngleBetweenVectors(unitVectorX, v);
+export const calcVectorRotation = (v: XY) => Math.atan2(v.y, v.x) as TRadian;
 
 /**
  * @param {Point} v
@@ -53,6 +68,36 @@ export const calcVectorRotation = (v: Point) =>
  */
 export const getUnitVector = (v: Point): Point =>
   v.eq(zero) ? v : v.scalarDivide(magnitude(v));
+
+export const dotProduct = (v: Point, onto: Point) => {
+  const size = magnitude(v);
+  const baseSize = magnitude(onto);
+  return size && baseSize ? dot(v, onto) / baseSize : 0;
+};
+
+/**
+ * @param {Point} A
+ * @param {Point} B
+ * @param {Point} C
+ * @returns {{ vector: Point, angle: TRadian}} vector representing the bisector of A and A's angle
+ */
+export const getBisector = (A: Point, B: Point, C: Point) => {
+  const AB = createVector(A, B),
+    AC = createVector(A, C),
+    alpha = calcAngleBetweenVectors(AB, AC);
+  return {
+    vector: getUnitVector(rotateVector(AB, alpha / 2)),
+    angle: alpha,
+  };
+};
+
+/**
+ * @param {Point} v
+ * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
+ * @returns {Point} the unit orthogonal vector
+ */
+export const getOrthogonalVector = (v: Point, counterClockwise = true): Point =>
+  new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1);
 
 /**
  * @param {Point} v
@@ -62,25 +107,7 @@ export const getUnitVector = (v: Point): Point =>
 export const getOrthonormalVector = (
   v: Point,
   counterClockwise = true
-): Point =>
-  getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));
-
-/**
- * Cross product of two vectors in 2D
- * @param {Point} a
- * @param {Point} b
- * @returns {number} the magnitude of Z vector
- */
-export const crossProduct = (a: Point, b: Point): number =>
-  a.x * b.y - a.y * b.x;
-
-/**
- * Dot product of two vectors in 2D
- * @param {Point} a
- * @param {Point} b
- * @returns {number}
- */
-export const dotProduct = (a: Point, b: Point): number => a.x * b.x + a.y * b.y;
+): Point => getUnitVector(getOrthogonalVector(v, counterClockwise));
 
 /**
  * Checks if the vector is between two others. It is considered
@@ -93,8 +120,8 @@ export const dotProduct = (a: Point, b: Point): number => a.x * b.x + a.y * b.y;
  */
 export const isBetweenVectors = (t: Point, a: Point, b: Point): boolean => {
   if (t.eq(a) || t.eq(b)) return true;
-  const AxB = crossProduct(a, b),
-    AxT = crossProduct(a, t),
-    BxT = crossProduct(b, t);
+  const AxB = det(a, b),
+    AxT = det(a, t),
+    BxT = det(b, t);
   return AxB >= 0 ? AxT >= 0 && BxT <= 0 : !(AxT <= 0 && BxT >= 0);
 };

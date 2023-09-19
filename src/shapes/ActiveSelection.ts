@@ -144,6 +144,12 @@ export class ActiveSelection extends Group {
     return false;
   }
 
+  drawObject(ctx: CanvasRenderingContext2D) {
+    this._renderBackground(ctx);
+    this._objects.forEach((object) => object.render(ctx));
+    this._drawClipPath(ctx, this.clipPath);
+  }
+
   _applyLayoutStrategy(context: LayoutContext): void {
     super._applyLayoutStrategy(context);
     if (this._objects.length === 0) {

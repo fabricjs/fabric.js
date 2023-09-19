@@ -1,23 +1,23 @@
+import { classRegistry } from '../ClassRegistry';
+import type { ObjectEvents } from '../EventTypeDefs';
+import type { XY } from '../Point';
+import { Point } from '../Point';
 import { config } from '../config';
+import { LEFT, TOP } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import { parsePointsAttribute } from '../parser/parsePointsAttribute';
-import type { XY } from '../Point';
-import { Point } from '../Point';
+import type { CSSRules } from '../parser/typedefs';
 import type { Abortable, TClassProperties, TOptions } from '../typedefs';
-import { classRegistry } from '../ClassRegistry';
+import { cloneDeep } from '../util/internals/cloneDeep';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
-import { calcDimensionsMatrix, transformPoint } from '../util/misc/matrix';
+import { calcDimensionsMatrix } from '../util/misc/matrix';
 import { projectStrokeOnPoints } from '../util/misc/projectStroke';
 import type { TProjectStrokeOnPointsOptions } from '../util/misc/projectStroke/types';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { ObjectEvents } from '../EventTypeDefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER, LEFT, TOP } from '../constants';
-import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   exactBoundingBox: false,
@@ -158,7 +158,7 @@ export class Polyline<
       // Remove scale effect, since it's applied after
       matrix = calcDimensionsMatrix({ ...options, scaleX: 1, scaleY: 1 }),
       bboxNoStroke = makeBoundingBoxFromPoints(
-        this.points.map((p) => transformPoint(p, matrix, true))
+        this.points.map((p) => new Point(p).transform(matrix, true))
       ),
       offsetX = bbox.left + bbox.width / 2,
       offsetY = bbox.top + bbox.height / 2,
@@ -198,60 +198,9 @@ export class Polyline<
       this._calcDimensions();
     this.set({ width, height, pathOffset, strokeOffset, strokeDiff });
     adjustPosition &&
-      this.setPositionByOrigin(
-        new Point(left + width / 2, top + height / 2),
-        CENTER,
-        CENTER
+      this.setRelativeCenterPoint(
+        new Point(left + width / 2, top + height / 2)
       );
-  }
-
-  /**
-   * @override stroke is taken in account in size
-   */
-  _getNonTransformedDimensions() {
-    return this.exactBoundingBox
-      ? // TODO: fix this
-        new Point(this.width, this.height)
-      : super._getNonTransformedDimensions();
-  }
-
-  /**
-   * @override stroke and skewing are taken into account when projecting stroke on points,
-   * therefore we don't want the default calculation to account for skewing as well.
-   * Though it is possible to pass `width` and `height` in `options`, doing so is very strange, use with discretion.
-   *
-   * @private
-   */
-  _getTransformedDimensions(options: any = {}) {
-    if (this.exactBoundingBox) {
-      let size: Point;
-      /* When `strokeUniform = true`, any changes to the properties require recalculating the `width` and `height` because 
-        the stroke projections are affected. 
-        When `strokeUniform = false`, we don't need to recalculate for scale transformations, as the effect of scale on 
-        projections follows a linear function (e.g. scaleX of 2 just multiply width by 2)*/
-      if (
-        Object.keys(options).some(
-          (key) =>
-            this.strokeUniform ||
-            (this.constructor as typeof Polyline).layoutProperties.includes(
-              key as keyof TProjectStrokeOnPointsOptions
-            )
-        )
-      ) {
-        const { width, height } = this._calcDimensions(options);
-        size = new Point(options.width ?? width, options.height ?? height);
-      } else {
-        size = new Point(
-          options.width ?? this.width,
-          options.height ?? this.height
-        );
-      }
-      return size.multiply(
-        new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY)
-      );
-    } else {
-      return super._getTransformedDimensions(options);
-    }
   }
 
   /**

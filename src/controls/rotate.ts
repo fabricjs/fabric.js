@@ -2,6 +2,8 @@ import type {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import type { TRadian } from '../typedefs';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -42,18 +44,16 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   x,
   y
 ) => {
-  const pivotPoint = target.translateToOriginPoint(
-    target.getRelativeCenterPoint(),
-    originX,
-    originY
-  );
-
   if (isLocked(target, 'lockRotation')) {
     return false;
   }
 
-  const lastAngle = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
-    curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
+  const pivotPoint = sendPointToPlane(
+    target.getXY(originX, originY),
+    target.getViewportTransform()
+  );
+  const lastAngle: TRadian = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
+    curAngle: TRadian = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
   let angle = radiansToDegrees(curAngle - lastAngle + theta);
 
   if (target.snapAngle && target.snapAngle > 0) {
@@ -69,16 +69,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
     }
   }
 
-  // normalize angle to positive value
-  if (angle < 0) {
-    angle = 360 + angle;
-  }
-  angle %= 360;
-
-  const hasRotated = target.angle !== angle;
-  // TODO: why aren't we using set?
-  target.angle = angle;
-  return hasRotated;
+  return target.rotate(angle, { originX, originY, inViewport: true });
 };
 
 export const rotationWithSnapping = wrapWithFireEvent(

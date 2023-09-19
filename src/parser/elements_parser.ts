@@ -10,7 +10,6 @@ import {
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
-import { CENTER } from '../constants';
 import { getGradientDefs } from './getGradientDefs';
 import { getCSSRules } from './getCSSRules';
 import type { LoadImageOptions } from '../util';
@@ -170,23 +169,16 @@ export class ElementsParser {
       if (clipPath.clipPath) {
         await this.resolveClipPath(clipPath, clipPathOwner);
       }
-      const { scaleX, scaleY, angle, skewX, translateX, translateY } =
-        qrDecompose(gTransform);
-      clipPath.set({
-        flipX: false,
-        flipY: false,
-      });
-      clipPath.set({
-        scaleX,
-        scaleY,
-        angle,
-        skewX,
-        skewY: 0,
-      });
-      clipPath.setPositionByOrigin(
-        new Point(translateX, translateY),
-        CENTER,
-        CENTER
+      const options = qrDecompose(gTransform);
+      clipPath.flipX = false;
+      clipPath.flipY = false;
+      clipPath.set('scaleX', options.scaleX);
+      clipPath.set('scaleY', options.scaleY);
+      clipPath.angle = options.angle;
+      clipPath.skewX = options.skewX;
+      clipPath.skewY = 0;
+      clipPath.setRelativeCenterPoint(
+        new Point(options.translateX, options.translateY)
       );
       obj.clipPath = clipPath;
     } else {

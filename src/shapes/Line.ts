@@ -8,7 +8,7 @@ import { isFiller } from '../util/typeAssertions';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { makeBoundingBoxFromPoints } from '../util';
-import { CENTER, LEFT, TOP } from '../constants';
+import { LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
 // @TODO this code is terrible and Line should be a special case of polyline.
@@ -92,7 +92,7 @@ export class Line<
       { x: x2, y: y2 },
     ]);
     const position = new Point(left + width / 2, top + height / 2);
-    this.setPositionByOrigin(position, CENTER, CENTER);
+    this.setRelativeCenterPoint(position);
   }
 
   /**
@@ -164,23 +164,6 @@ export class Line<
       ...super.toObject(propertiesToInclude),
       ...this.calcLinePoints(),
     };
-  }
-
-  /*
-   * Calculate object dimensions from its properties
-   * @private
-   */
-  _getNonTransformedDimensions(): Point {
-    const dim = super._getNonTransformedDimensions();
-    if (this.strokeLineCap === 'butt') {
-      if (this.width === 0) {
-        dim.y -= this.strokeWidth;
-      }
-      if (this.height === 0) {
-        dim.x -= this.strokeWidth;
-      }
-    }
-    return dim;
   }
 
   /**

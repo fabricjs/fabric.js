@@ -1,8 +1,7 @@
 import { iMatrix } from '../../constants';
-import type { Point } from '../../Point';
+import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/Object';
 import type { TMat2D } from '../../typedefs';
-import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
 
@@ -20,6 +19,31 @@ export const calcPlaneChangeMatrix = (
   to: TMat2D = iMatrix
 ) => multiplyTransformMatrices(invertTransform(to), from);
 
+export const calcBaseChangeMatrix = (
+  from: [Point, Point] | undefined,
+  to: [Point, Point],
+  destinationCenter: Point = new Point()
+) => {
+  const [a, b, c, d] = multiplyTransformMatrices(
+    [to[0].x, to[0].y, to[1].x, to[1].y, 0, 0],
+    from
+      ? invertTransform([from[0].x, from[0].y, from[1].x, from[1].y, 0, 0])
+      : iMatrix,
+    true
+  );
+  return [a, b, c, d, destinationCenter.x, destinationCenter.y] as TMat2D;
+};
+
+export const send2DToPlane = (
+  point: Point,
+  from: TMat2D = iMatrix,
+  to: TMat2D = iMatrix,
+  isVector = false
+): Point =>
+  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
+  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
+  point.transform(calcPlaneChangeMatrix(from, to), isVector);
+
 /**
  * Sends a point from the source coordinate plane to the destination coordinate plane.\
  * From the canvas/viewer's perspective the point remains unchanged.
@@ -31,7 +55,6 @@ export const calcPlaneChangeMatrix = (
  * var sentPoint2 = sendPointToPlane(new Point(50, 50), iMatrix, group.calcTransformMatrix());
  * console.log(sentPoint1, sentPoint2) //  both points print (0,0) which is the center of group
  *
- * @see {transformPointRelativeToCanvas} for transforming relative to canvas
  * @param {Point} point
  * @param {TMat2D} [from] plane matrix containing object. Passing `undefined` is equivalent to passing the identity matrix, which means `point` exists in the canvas coordinate plane.
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `undefined` means `point` should be sent to the canvas coordinate plane.
@@ -39,49 +62,22 @@ export const calcPlaneChangeMatrix = (
  */
 export const sendPointToPlane = (
   point: Point,
-  from: TMat2D = iMatrix,
-  to: TMat2D = iMatrix
-): Point =>
-  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
-  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
-  point.transform(calcPlaneChangeMatrix(from, to));
+  from?: TMat2D,
+  to?: TMat2D
+): Point => send2DToPlane(point, from, to);
 
 /**
- * Transform point relative to canvas.
- * From the viewport/viewer's perspective the point remains unchanged.
- *
- * `child` relation means `point` exists in the coordinate plane created by `canvas`.
- * In other words point is measured according to canvas' top left corner
- * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corner.
- *
- * `sibling` relation means `point` exists in the same coordinate plane as canvas.
- * In other words they both relate to the same (0,0) and agree on every point, which is how an event relates to canvas.
- *
- * @param {Point} point
- * @param {StaticCanvas} canvas
- * @param {'sibling'|'child'} relationBefore current relation of point to canvas
- * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
- * @returns {Point} transformed point
+ * @see {@link sendPointToPlane}
+ * @param vector
+ * @param from
+ * @param to
+ * @returns
  */
-export const transformPointRelativeToCanvas = (
-  point: Point,
-  canvas: StaticCanvas,
-  relationBefore: ObjectRelation,
-  relationAfter: ObjectRelation
-): Point => {
-  // is this still needed with TS?
-  if (relationBefore !== 'child' && relationBefore !== 'sibling') {
-    throw new Error(`fabric.js: received bad argument ${relationBefore}`);
-  }
-  if (relationAfter !== 'child' && relationAfter !== 'sibling') {
-    throw new Error(`fabric.js: received bad argument ${relationAfter}`);
-  }
-  if (relationBefore === relationAfter) {
-    return point;
-  }
-  const t = canvas.viewportTransform;
-  return point.transform(relationAfter === 'child' ? invertTransform(t) : t);
-};
+export const sendVectorToPlane = (
+  vector: Point,
+  from?: TMat2D,
+  to?: TMat2D
+): Point => send2DToPlane(vector, from, to, true);
 
 /**
  *

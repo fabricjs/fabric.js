@@ -316,7 +316,7 @@
     var canvasEl = canvas.getElement();
     var eventStub = {
       clientX: text.width,
-      clientY: text.oCoords.mr.corner.tl.y + 1,
+      clientY: text.controlCoords.mr.corner.tl.y + 1,
       type: 'mousedown',
       target: canvas.upperCanvasEl
     };
@@ -343,7 +343,7 @@
     var canvasEl = canvas.getElement();
     var eventStub = {
       clientX: text.left,
-      clientY: text.oCoords.ml.corner.tl.y + 2,
+      clientY: text.controlCoords.ml.corner.tl.y + 2,
       type: 'mousedown',
       target: canvas.upperCanvasEl
     };

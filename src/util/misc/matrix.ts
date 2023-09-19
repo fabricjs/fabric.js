@@ -1,7 +1,7 @@
-import { iMatrix } from '../../constants';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import type { TDegree, TRadian, TMat2D } from '../../typedefs';
+import { iMatrix } from '../../constants';
+import type { TDegree, TMat2D, TRadian } from '../../typedefs';
 import { cos } from './cos';
 import { degreesToRadians, radiansToDegrees } from './radiansDegreesConversion';
 import { sin } from './sin';
@@ -32,8 +32,10 @@ export type TQrDecomposeOut = Required<
   Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
 >;
 
-export const isIdentityMatrix = (mat: TMat2D) =>
-  mat.every((value, index) => value === iMatrix[index]);
+export const isIdentityMatrix = (mat: TMat2D) => isMatrixEqual(mat, iMatrix);
+
+export const isMatrixEqual = (a: TMat2D, b: TMat2D) =>
+  a.every((value, index) => value === b[index]);
 
 /**
  * Apply transform t to point p
@@ -154,7 +156,9 @@ export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
  * A matrix in the form of
  * [cos(a) -sin(a) -x*cos(a)+y*sin(a)+x]
  * [sin(a)  cos(a) -x*sin(a)-y*cos(a)+y]
- * [0       0      1                 ]
+ * [0       0      1                   ]
+ *
+ * See @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate for more details
  *
  *
  * @param {TDegree} angle rotation in degrees
@@ -162,10 +166,15 @@ export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
  * @returns {TMat2D} matrix
  */
 export function createRotateMatrix(
-  { angle = 0 }: TRotateMatrixArgs = {},
+  {
+    rotation,
+    angle,
+  }:
+    | { rotation?: TRadian; angle?: never }
+    | { rotation?: never; angle?: TDegree } = {},
   { x = 0, y = 0 }: Partial<XY> = {}
 ): TMat2D {
-  const angleRadiant = degreesToRadians(angle),
+  const angleRadiant = rotation ?? (angle ? degreesToRadians(angle) : 0),
     cosValue = cos(angleRadiant),
     sinValue = sin(angleRadiant);
   return [
@@ -250,6 +259,22 @@ export const createSkewYMatrix = (skewValue: TDegree): TMat2D => [
   0,
   0,
 ];
+
+export const calcShearMatrix = ({
+  skewX,
+  skewY,
+  shearX,
+  shearY,
+}: {
+  skewX?: TDegree;
+  skewY?: TDegree;
+  shearX?: number;
+  shearY?: number;
+}) =>
+  multiplyTransformMatrices(
+    [1, 0, shearX ?? (skewX ? Math.tan(degreesToRadians(skewX)) : 0), 1, 0, 0],
+    [1, shearY ?? (skewY ? Math.tan(degreesToRadians(skewY)) : 0), 0, 1, 0, 0]
+  );
 
 /**
  * Returns a transform matrix starting from an object of the same kind of

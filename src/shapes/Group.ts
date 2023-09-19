@@ -1,10 +1,10 @@
-import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
+import { classRegistry } from '../ClassRegistry';
 import { createCollectionMixin } from '../Collection';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
+import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { cos } from '../util/misc/cos';
-import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
+import type { TClassProperties, TOptions, TSVGReviver } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
+import { cos } from '../util/misc/cos';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -16,15 +16,15 @@ import {
 } from '../util/misc/objectEnlive';
 import { applyTransformToObject } from '../util/misc/objectTransforms';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
-import { Rect } from './Rect';
-import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import { CENTER } from '../constants';
+import { Rect } from './Rect';
 
 export type LayoutContextType =
   | 'initialization'
+  | 'viewport'
   | 'object_modified'
   | 'added'
   | 'removed'
@@ -320,6 +320,11 @@ export class Group extends createCollectionMixin(
       this.forEachObject((object) => {
         object._set(key, value);
       });
+      // layout in case children need viewport coords
+      value &&
+        this._applyLayoutStrategy({
+          type: 'viewport',
+        });
     }
     if (key === 'layout' && prev !== value) {
       this._applyLayoutStrategy({
@@ -409,6 +414,18 @@ export class Group extends createCollectionMixin(
       object.group.remove(object);
     }
     this._enterGroup(object, removeParentTransform);
+    this.interactive && this._watchObject(true, object);
+    const activeObject =
+      this.canvas &&
+      this.canvas.getActiveObject &&
+      this.canvas.getActiveObject();
+    // if we are adding the activeObject in a group
+    if (
+      activeObject &&
+      (activeObject === object || object.isDescendantOf(activeObject))
+    ) {
+      this._activeObjects.push(object);
+    }
     return true;
   }
 
@@ -431,18 +448,6 @@ export class Group extends createCollectionMixin(
     this._shouldSetNestedCoords() && object.setCoords();
     object._set('group', this);
     object._set('canvas', this.canvas);
-    this.interactive && this._watchObject(true, object);
-    const activeObject =
-      this.canvas &&
-      this.canvas.getActiveObject &&
-      this.canvas.getActiveObject();
-    // if we are adding the activeObject in a group
-    if (
-      activeObject &&
-      (activeObject === object || object.isDescendantOf(activeObject))
-    ) {
-      this._activeObjects.push(object);
-    }
   }
 
   /**
@@ -452,6 +457,12 @@ export class Group extends createCollectionMixin(
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    this._watchObject(false, object);
+    const index =
+      this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
+    if (index > -1) {
+      this._activeObjects.splice(index, 1);
+    }
     object._set('canvas', undefined);
   }
 
@@ -471,12 +482,6 @@ export class Group extends createCollectionMixin(
         )
       );
       object.setCoords();
-    }
-    this._watchObject(false, object);
-    const index =
-      this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
-    if (index > -1) {
-      this._activeObjects.splice(index, 1);
     }
   }
 
@@ -530,20 +535,22 @@ export class Group extends createCollectionMixin(
    */
   drawObject(ctx: CanvasRenderingContext2D) {
     this._renderBackground(ctx);
-    for (let i = 0; i < this._objects.length; i++) {
+    const preserve = this.canvas?.preserveObjectStacking;
+    this._objects.forEach((object) => {
       // TODO: handle rendering edge case somehow
-      if (
-        this.canvas?.preserveObjectStacking &&
-        this._objects[i].group !== this
-      ) {
+      if (preserve && object.group !== this) {
         ctx.save();
         ctx.transform(...invertTransform(this.calcTransformMatrix()));
-        this._objects[i].render(ctx);
+        object.render(ctx);
         ctx.restore();
-      } else if (this._objects[i].group === this) {
-        this._objects[i].render(ctx);
+      } else if (
+        object.group === this &&
+        (preserve || !this._activeObjects.includes(object))
+        // && (!object.skipOffscreen || object.isOverlapping(this))
+      ) {
+        object.render(ctx);
       }
-    }
+    });
     this._drawClipPath(ctx, this.clipPath);
   }
 
@@ -642,7 +649,7 @@ export class Group extends createCollectionMixin(
         this._adjustObjectPosition(this.clipPath as FabricObject, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
-        this.setPositionByOrigin(newCenter, CENTER, CENTER);
+        this.setRelativeCenterPoint(newCenter);
         initialTransform && this.set(initialTransform);
         this.setCoords();
       }
@@ -707,18 +714,22 @@ export class Group extends createCollectionMixin(
       layoutDirective === 'fit-content' ||
       layoutDirective === 'fit-content-lazy' ||
       (layoutDirective === 'fixed' &&
-        (context.type === 'initialization' || context.type === 'imperative'))
+        (context.type === 'initialization' ||
+          context.type === 'viewport' ||
+          context.type === 'imperative'))
     ) {
       return this.prepareBoundingBox(layoutDirective, objects, context);
     } else if (layoutDirective === 'clip-path' && this.clipPath) {
       const clipPath = this.clipPath;
-      const clipPathSizeAfter = clipPath._getTransformedDimensions();
+      const clipPathSizeAfter = clipPath.getDimensionsVectorForLayout();
       if (
         clipPath.absolutePositioned &&
-        (context.type === 'initialization' || context.type === 'layout_change')
+        (context.type === 'initialization' ||
+          context.type === 'viewport' ||
+          context.type === 'layout_change')
       ) {
         //  we want the center point to exist in group's containing plane
-        let clipPathCenter = clipPath.getCenterPoint();
+        let clipPathCenter = clipPath.getRelativeCenterPoint();
         if (this.group) {
           //  send point from canvas plane to group's containing plane
           const inv = invertTransform(this.group.calcTransformMatrix());
@@ -741,6 +752,7 @@ export class Group extends createCollectionMixin(
           );
         if (
           context.type === 'initialization' ||
+          context.type === 'viewport' ||
           context.type === 'layout_change'
         ) {
           const bbox =
@@ -836,20 +848,10 @@ export class Group extends createCollectionMixin(
         resolveOrigin(this.originY)
       ),
       size = new Point(width, height),
-      strokeWidthVector = this._getTransformedDimensions({
-        width: 0,
-        height: 0,
-      }),
-      sizeAfter = this._getTransformedDimensions({
-        width: width,
-        height: height,
-        strokeWidth: 0,
-      }),
-      bboxSizeAfter = this._getTransformedDimensions({
-        width: bbox.width,
-        height: bbox.height,
-        strokeWidth: 0,
-      }),
+      // TODO: should probably be removed
+      strokeWidthVector = new Point(),
+      sizeAfter = new Point(width, height),
+      bboxSizeAfter = new Point(w, h),
       rotationCorrection = new Point(0, 0);
 
     //  calculate center and correction
@@ -912,7 +914,7 @@ export class Group extends createCollectionMixin(
     const objectBounds: Point[] = [];
     objects.forEach((object) => {
       const objCenter = object.getRelativeCenterPoint();
-      let sizeVector = object._getTransformedDimensions().scalarDivide(2);
+      let sizeVector = object.getDimensionsVectorForLayout().scalarDivide(2);
       if (object.angle) {
         const rad = degreesToRadians(object.angle),
           sine = Math.abs(sin(rad)),

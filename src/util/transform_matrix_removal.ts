@@ -1,4 +1,3 @@
-import { CENTER } from '../constants';
 import type { Image } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
@@ -57,5 +56,5 @@ export const removeTransformMatrixForSvgParsing = (
     object.width = preserveAspectRatioOptions.width;
     object.height = preserveAspectRatioOptions.height;
   }
-  object.setPositionByOrigin(center, CENTER, CENTER);
+  object.setRelativeCenterPoint(center);
 };

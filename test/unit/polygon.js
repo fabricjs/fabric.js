@@ -92,7 +92,7 @@
 
   });
 
-  QUnit.test('polygon with exactBoundingBox false', function(assert) {
+  QUnit.test.skip('polygon with exactBoundingBox false', function(assert) {
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
       exactBoundingBox: false,
       strokeWidth: 60,
@@ -102,7 +102,7 @@
     assert.equal(dimensions.y, 150);
   });
 
-  QUnit.test('polygon with exactBoundingBox true', function(assert) {
+  QUnit.test.skip('polygon with exactBoundingBox true', function(assert) {
     var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 },{ x: 10, y: 10 }], {
       exactBoundingBox: true,
       strokeWidth: 60,

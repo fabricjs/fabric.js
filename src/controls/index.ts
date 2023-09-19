@@ -1,4 +1,4 @@
-export { changeWidth } from './changeWidth';
+export { changeWidth, changeHeight } from './resize';
 export { renderCircleControl, renderSquareControl } from './controlRendering';
 export * from './commonControls';
 export { dragHandler } from './drag';
@@ -17,6 +17,5 @@ export {
   scalingYOrSkewingX,
 } from './scaleSkew';
 export { skewCursorStyleHandler, skewHandlerX, skewHandlerY } from './skew';
-export { getLocalPoint } from './util';
 export { wrapWithFireEvent } from './wrapWithFireEvent';
 export { wrapWithFixedAnchor } from './wrapWithFixedAnchor';

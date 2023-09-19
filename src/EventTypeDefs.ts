@@ -3,7 +3,6 @@ import type { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import type { Group } from './shapes/Group';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
-import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './canvas/Canvas';
 import type { IText } from './shapes/IText/IText';
 import type { StaticCanvas } from './canvas/StaticCanvas';
@@ -46,20 +45,15 @@ export type ControlCallback<R = void> = (
 export type ControlCursorCallback = ControlCallback<string>;
 
 /**
- * relative to target's containing coordinate plane
- * both agree on every point
+ * relative to the viewport
  */
 export type Transform = {
   target: FabricObject;
   action: string;
   actionHandler?: TransformActionHandler;
-  corner: string | 0;
-  scaleX: number;
-  scaleY: number;
-  skewX: number;
-  skewY: number;
-  offsetX: number;
-  offsetY: number;
+  actionPerformed: boolean;
+  corner: string;
+  control?: Control;
   originX: TOriginX;
   originY: TOriginY;
   ex: number;
@@ -67,17 +61,8 @@ export type Transform = {
   lastX: number;
   lastY: number;
   theta: TRadian;
-  width: number;
-  height: number;
   shiftKey: boolean;
   altKey: boolean;
-  original: ReturnType<typeof saveObjectTransform> & {
-    originX: TOriginX;
-    originY: TOriginY;
-  };
-  // @TODO: investigate if this reset is really needed
-  reset?: boolean;
-  actionPerformed: boolean;
 };
 
 export interface TEvent<E extends Event = TPointerEvent> {

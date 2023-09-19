@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { halfPI } from '../constants';
 import type {
   ControlActionHandler,
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
+import type { TControlCoord } from '../shapes/Object/InteractiveObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TDegree, TMat2D } from '../typedefs';
-import { cos } from '../util/misc/cos';
+import { mapValues } from '../util/internals';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { sin } from '../util/misc/sin';
 import type { ControlRenderingStyleOverride } from './controlRendering';
 import { renderCircleControl, renderSquareControl } from './controlRendering';
 
@@ -169,7 +168,7 @@ export class Control {
    */
   declare mouseUpHandler?: ControlActionHandler;
 
-  shouldActivate(controlKey: string, fabricObject: InteractiveFabricObject) {
+  shouldActivate(controlKey: string, fabricObject: FabricObject) {
     // TODO: locking logic can be handled here instead of in the control handler logic
     return (
       fabricObject.canvas?.getActiveObject() === fabricObject &&
@@ -186,7 +185,7 @@ export class Control {
    */
   getActionHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     control: Control
   ): TransformActionHandler | undefined {
     return this.actionHandler;
@@ -201,7 +200,7 @@ export class Control {
    */
   getMouseDownHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     control: Control
   ): ControlActionHandler | undefined {
     return this.mouseDownHandler;
@@ -217,7 +216,7 @@ export class Control {
    */
   getMouseUpHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     control: Control
   ): ControlActionHandler | undefined {
     return this.mouseUpHandler;
@@ -235,7 +234,7 @@ export class Control {
   cursorStyleHandler(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: InteractiveFabricObject
+    fabricObject: FabricObject
   ) {
     return control.cursorStyle;
   }
@@ -250,7 +249,7 @@ export class Control {
   getActionName(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: InteractiveFabricObject
+    fabricObject: FabricObject
   ) {
     return control.actionName;
   }
@@ -261,7 +260,7 @@ export class Control {
    * @param {String} controlKey key where the control is memorized on the
    * @return {Boolean}
    */
-  getVisibility(fabricObject: InteractiveFabricObject, controlKey: string) {
+  getVisibility(fabricObject: FabricObject, controlKey: string) {
     return fabricObject._controlsVisibility?.[controlKey] ?? this.visible;
   }
 
@@ -270,24 +269,49 @@ export class Control {
    * @param {Boolean} visibility for the object
    * @return {Void}
    */
-  setVisibility(
-    visibility: boolean,
-    name: string,
-    fabricObject: InteractiveFabricObject
-  ) {
+  setVisibility(visibility: boolean, name: string, fabricObject: FabricObject) {
     this.visible = visibility;
   }
 
   positionHandler(
     dim: Point,
     finalMatrix: TMat2D,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: FabricObject,
     currentControl: Control
   ) {
-    return new Point(
-      this.x * dim.x + this.offsetX,
-      this.y * dim.y + this.offsetY
-    ).transform(finalMatrix);
+    // // legacy
+    // return new Point(
+    //   this.x * dim.x + this.offsetX,
+    //   this.y * dim.y + this.offsetY
+    // ).transform(finalMatrix);
+
+    const bbox = fabricObject.bbox;
+    const rotation = bbox.getRotation();
+    return new Point(this.x, this.y)
+      .transform(bbox.getTransformation())
+      .add(new Point(this.offsetX, 0).rotate(rotation.x))
+      .add(new Point(0, this.offsetY).rotate(rotation.y));
+  }
+
+  /**
+   *
+   * @param position control center, result of {@link positionHandler}
+   * @param dim
+   * @param finalMatrix
+   * @param fabricObject
+   * @param currentControl
+   * @returns
+   */
+  connectionPositionHandler(
+    position: Point,
+    fabricObject: FabricObject,
+    currentControl: Control
+  ) {
+    const bbox = fabricObject.bbox;
+    return {
+      from: new Point(this.x, this.y).transform(bbox.getTransformation()),
+      to: position,
+    };
   }
 
   /**
@@ -306,80 +330,103 @@ export class Control {
     centerY: number,
     isTouch: boolean
   ) {
-    let cosHalfOffset, sinHalfOffset, cosHalfOffsetComp, sinHalfOffsetComp;
-    const xSize = isTouch ? this.touchSizeX : this.sizeX,
-      ySize = isTouch ? this.touchSizeY : this.sizeY;
-    if (xSize && ySize && xSize !== ySize) {
-      // handle rectangular corners
-      const controlTriangleAngle = Math.atan2(ySize, xSize);
-      const cornerHypotenuse = Math.sqrt(xSize * xSize + ySize * ySize) / 2;
-      const newTheta = controlTriangleAngle - degreesToRadians(objectAngle);
-      const newThetaComp =
-        halfPI - controlTriangleAngle - degreesToRadians(objectAngle);
-      cosHalfOffset = cornerHypotenuse * cos(newTheta);
-      sinHalfOffset = cornerHypotenuse * sin(newTheta);
-      // use complementary angle for two corners
-      cosHalfOffsetComp = cornerHypotenuse * cos(newThetaComp);
-      sinHalfOffsetComp = cornerHypotenuse * sin(newThetaComp);
-    } else {
-      // handle square corners
-      // use default object corner size unless size is defined
-      const cornerSize = xSize && ySize ? xSize : objectCornerSize;
-      const cornerHypotenuse = cornerSize * Math.SQRT1_2;
-      // complementary angles are equal since they're both 45 degrees
-      const newTheta = degreesToRadians(45 - objectAngle);
-      cosHalfOffset = cosHalfOffsetComp = cornerHypotenuse * cos(newTheta);
-      sinHalfOffset = sinHalfOffsetComp = cornerHypotenuse * sin(newTheta);
-    }
+    const size = isTouch
+      ? new Point(
+          this.touchSizeX || objectCornerSize,
+          this.touchSizeY || objectCornerSize
+        )
+      : new Point(
+          this.sizeX || objectCornerSize,
+          this.sizeY || objectCornerSize
+        );
+    const rotation = degreesToRadians(objectAngle);
+    const center = new Point(centerX, centerY);
+    return mapValues(
+      {
+        tl: new Point(-0.5, -0.5),
+        tr: new Point(0.5, -0.5),
+        bl: new Point(-0.5, 0.5),
+        br: new Point(0.5, 0.5),
+      },
+      (origin) => origin.multiply(size).rotate(rotation).add(center)
+    );
+  }
 
-    return {
-      tl: new Point(centerX - sinHalfOffsetComp, centerY - cosHalfOffsetComp),
-      tr: new Point(centerX + cosHalfOffset, centerY - sinHalfOffset),
-      bl: new Point(centerX - cosHalfOffset, centerY + sinHalfOffset),
-      br: new Point(centerX + sinHalfOffsetComp, centerY + cosHalfOffsetComp),
-    };
+  /**
+   * Override to customize connection line rendering
+   * @param ctx
+   * @param from the value returned from {@link connectionPositionHandler}
+   * @param to the control
+   * @param styleOverride
+   * @param fabricObject
+   */
+  renderConnection(
+    ctx: CanvasRenderingContext2D,
+    { from, to }: { from: Point; to: Point },
+    styleOverride: Pick<
+      ControlRenderingStyleOverride,
+      'borderColor' | 'borderDashArray'
+    > = {},
+    fabricObject: FabricObject
+  ) {
+    ctx.save();
+    ctx.strokeStyle = styleOverride.borderColor || fabricObject.borderColor;
+    fabricObject._setLineDash(
+      ctx,
+      styleOverride.borderDashArray || fabricObject.borderDashArray
+    );
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
   }
 
   /**
    * Render function for the control.
    * When this function runs the context is unscaled. unrotate. Just retina scaled.
-   * all the functions will have to translate to the point left,top before starting Drawing
+   * all the functions will have to translate to the control center ({@link x}, {@link y}) before starting drawing
    * if they want to draw a control where the position is detected.
-   * left and top are the result of the positionHandler function
+   * @see {@link renderControl} for customization of rendering
    * @param {RenderingContext2D} ctx the context where the control will be drawn
-   * @param {Number} left position of the canvas where we are about to render the control.
-   * @param {Number} top position of the canvas where we are about to render the control.
+   * @param {number} x control center x, result of {@link positionHandler}
+   * @param {number} y control center y, result of {@link positionHandler}
    * @param {Object} styleOverride
    * @param {FabricObject} fabricObject the object where the control is about to be rendered
    */
   render(
     ctx: CanvasRenderingContext2D,
-    left: number,
-    top: number,
-    styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: InteractiveFabricObject
+    x: number,
+    y: number,
+    styleOverride: ControlRenderingStyleOverride = {},
+    fabricObject: FabricObject
   ) {
-    styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
       case 'circle':
-        renderCircleControl.call(
-          this,
-          ctx,
-          left,
-          top,
-          styleOverride,
-          fabricObject
-        );
+        renderCircleControl.call(this, ctx, x, y, styleOverride, fabricObject);
         break;
       default:
-        renderSquareControl.call(
-          this,
-          ctx,
-          left,
-          top,
-          styleOverride,
-          fabricObject
-        );
+        renderSquareControl.call(this, ctx, x, y, styleOverride, fabricObject);
     }
+  }
+
+  /**
+   * In charge of rendering all control visuals
+   * @param {RenderingContext2D} ctx the retina scaled context where the control will be drawn
+   * @param {Point} position coordinate where the control center should be, returned by {@link positionHandler}
+   * @param {Object} styleOverride
+   * @param {FabricObject} fabricObject the object where the control is about to be rendered
+   */
+  renderControl(
+    ctx: CanvasRenderingContext2D,
+    { position, connection }: TControlCoord,
+    styleOverride: ControlRenderingStyleOverride = {},
+    fabricObject: FabricObject
+  ) {
+    if (this.withConnection) {
+      this.renderConnection(ctx, connection, styleOverride, fabricObject);
+    }
+    this.render(ctx, position.x, position.y, styleOverride, fabricObject);
   }
 }

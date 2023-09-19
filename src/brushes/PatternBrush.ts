@@ -1,4 +1,4 @@
-import { Pattern } from '../Pattern';
+import { Pattern } from '../Pattern/Pattern';
 import { createCanvasElement } from '../util/misc/dom';
 import type { Canvas } from '../canvas/Canvas';
 import { PencilBrush } from './PencilBrush';
@@ -58,7 +58,7 @@ export class PatternBrush extends PencilBrush {
    */
   createPath(pathData: TSimplePathData) {
     const path = super.createPath(pathData),
-      topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+      topLeft = path.getXY('left', 'top');
 
     path.stroke = new Pattern({
       source: this.source || this.getPatternSrc(),

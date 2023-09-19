@@ -1,21 +1,15 @@
-import { Point } from '../Point';
-import { Control } from './Control';
-import type { TMat2D } from '../typedefs';
-import { CENTER, iMatrix } from '../constants';
-import type { Polyline } from '../shapes/Polyline';
-import { multiplyTransformMatrices } from '../util/misc/matrix';
 import type {
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { getLocalPoint } from './util';
+import { Point } from '../Point';
+import type { Polyline } from '../shapes/Polyline';
+import type { TMat2D } from '../typedefs';
+import { sendPointToPlane } from '../util';
+import { Control } from './Control';
 
 type TTransformAnchor = Transform & { pointIndex: number };
-
-const getSize = (poly: Polyline) => {
-  return new Point(poly.width, poly.height);
-};
 
 /**
  * This function locates the controls.
@@ -23,14 +17,9 @@ const getSize = (poly: Polyline) => {
  */
 const factoryPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
-    const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
-      y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
-    return new Point(x, y).transform(
-      multiplyTransformMatrices(
-        polyObject.canvas?.viewportTransform ?? iMatrix,
-        polyObject.calcTransformMatrix()
-      )
-    );
+    return new Point(polyObject.points[pointIndex])
+      .subtract(polyObject.pathOffset)
+      .transform(polyObject.calcTransformMatrixInViewport());
   };
 };
 
@@ -49,18 +38,13 @@ const polyActionHandler = (
 ) => {
   const poly = transform.target as Polyline,
     pointIndex = transform.pointIndex,
-    mouseLocalPosition = getLocalPoint(transform, CENTER, CENTER, x, y),
-    polygonBaseSize = getSize(poly),
-    size = poly._getTransformedDimensions(),
-    sizeFactor = polygonBaseSize.divide(size),
-    adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+    positionInPlane = sendPointToPlane(
+      new Point(x, y),
+      undefined,
+      poly.calcTransformMatrixInViewport()
+    );
 
-  const finalPointPosition = mouseLocalPosition
-    .multiply(adjustFlip)
-    .multiply(sizeFactor)
-    .add(poly.pathOffset);
-
-  poly.points[pointIndex] = finalPointPosition;
+  poly.points[pointIndex] = positionInPlane.add(poly.pathOffset);
   poly.setDimensions();
 
   return true;
@@ -80,25 +64,18 @@ const anchorWrapper = (
     y: number
   ) {
     const poly = transform.target as Polyline,
-      anchorPoint = new Point(
-        poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]
-      ),
-      anchorPointInParentPlane = anchorPoint
+      anchorIndex = (pointIndex > 0 ? pointIndex : poly.points.length) - 1,
+      originBefore = new Point(poly.points[anchorIndex])
         .subtract(poly.pathOffset)
-        .transform(poly.calcOwnMatrix()),
-      actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
-      adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+        .transform(poly.calcTransformMatrix());
 
-    const newPositionNormalized = anchorPoint
+    const actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y);
+
+    const offset = new Point(poly.points[anchorIndex])
       .subtract(poly.pathOffset)
-      .divide(poly._getNonTransformedDimensions())
-      .multiply(adjustFlip);
-
-    poly.setPositionByOrigin(
-      anchorPointInParentPlane,
-      newPositionNormalized.x + 0.5,
-      newPositionNormalized.y + 0.5
-    );
+      .transform(poly.calcTransformMatrix())
+      .subtract(originBefore);
+    poly.translate(-offset.x, -offset.y, false);
 
     return actionPerformed;
   };

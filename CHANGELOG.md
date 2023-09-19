@@ -2,6 +2,9 @@
 
 ## [next]
 
+- fix(): redo object geometry [#8767](https://github.com/fabricjs/fabric.js/pull/8767)
+- refactor(): Control connection rendering moved to control [#8745](https://github.com/fabricjs/fabric.js/issues/8745)
+- chore(TS): Group types [#8807](https://github.com/fabricjs/fabric.js/pull/8807)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
 

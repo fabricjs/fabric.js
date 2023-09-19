@@ -1,24 +1,23 @@
-import { Point } from '../../Point';
-import type { TCornerPoint, TDegree } from '../../typedefs';
-import { FabricObject } from './Object';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import type { TQrDecomposeOut } from '../../util/misc/matrix';
-import {
-  createRotateMatrix,
-  createTranslateMatrix,
-  multiplyTransformMatrices,
-  qrDecompose,
-} from '../../util/misc/matrix';
-import type { Control } from '../../controls/Control';
-import { sizeAfterTransform } from '../../util/misc/objectTransforms';
+import { BBox } from '../../BBox/BBox';
+import { PlaneBBox } from '../../BBox/PlaneBBox';
 import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type { Point } from '../../Point';
 import type { Canvas } from '../../canvas/Canvas';
-import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
-import type { FabricObjectProps } from './types/FabricObjectProps';
-import type { TFabricObjectProps, SerializedObjectProps } from './types';
+import type { Control } from '../../controls/Control';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
+import type { TCornerPoint, TDegree } from '../../typedefs';
+import { mapValues } from '../../util/internals';
+import { FabricObject as BaseFabricObject } from './Object';
+import type {
+  FabricObjectProps,
+  SerializedObjectProps,
+  TFabricObjectProps,
+} from './types';
 
-type TOCoord = Point & {
+export type TControlCoord = {
+  position: Point;
+  connection: { from: Point; to: Point };
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
@@ -51,14 +50,15 @@ export class InteractiveFabricObject<
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends BaseFabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
-  declare centeredScaling: false;
+  declare centeredScaling: boolean;
 
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
+  declare centeredRotation: boolean;
 
   declare lockMovementX: boolean;
   declare lockMovementY: boolean;
@@ -102,7 +102,7 @@ export class InteractiveFabricObject<
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
    */
-  declare oCoords: Record<string, TOCoord>;
+  declare controlCoords: Record<string, TControlCoord>;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -186,7 +186,7 @@ export class InteractiveFabricObject<
    * @private
    * @param {Object} pointer The pointer indicating the mouse position
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
-   * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
+   * @return {String} corner code (tl, tr, bl, br, etc.), or an empty string if nothing is found.
    */
   _findTargetCorner(pointer: Point, forTouch = false): string {
     if (!this.hasControls || !this.canvas) {
@@ -195,34 +195,24 @@ export class InteractiveFabricObject<
 
     this.__corner = undefined;
     // had to keep the reverse loop because was breaking tests
-    const cornerEntries = Object.entries(this.oCoords);
+    const cornerEntries = Object.entries(this.controlCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
-      const [key, corner] = cornerEntries[i];
-      if (this.controls[key].shouldActivate(key, this)) {
-        const lines = this._getImageLines(
-          forTouch ? corner.touchCorner : corner.corner
-        );
-        const xPoints = this._findCrossPoints(pointer, lines);
-        if (xPoints !== 0 && xPoints % 2 === 1) {
-          this.__corner = key;
-          return key;
-        }
+      const [key, coord] = cornerEntries[i];
+      if (
+        this.controls[key].shouldActivate(
+          key,
+          // @ts-expect-error FabricObject this
+          this
+        ) &&
+        PlaneBBox.build(
+          forTouch ? coord.touchCorner : coord.corner
+        ).containsPoint(pointer)
+      ) {
+        this.__corner = key;
+        return key;
       }
-
-      // // debugging
-      //
-      // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
+
     return '';
   }
 
@@ -231,95 +221,76 @@ export class InteractiveFabricObject<
    * This basically just delegates to each control positionHandler
    * WARNING: changing what is passed to positionHandler is a breaking change, since position handler
    * is a public api and should be done just if extremely necessary
-   * @return {Record<string, TOCoord>}
+   * @return {Record<string, TControlCoord>}
    */
-  calcOCoords(): Record<string, TOCoord> {
-    const vpt = this.getViewportTransform(),
-      center = this.getCenterPoint(),
-      tMatrix = createTranslateMatrix(center.x, center.y),
-      rMatrix = createRotateMatrix({
-        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
-      }),
-      positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
-      finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / vpt[0],
-        0,
-        0,
-        1 / vpt[3],
-        0,
-        0,
-      ]),
-      transformOptions = this.group
-        ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
-      coords: Record<string, TOCoord> = {};
-
-    this.forEachControl((control, key) => {
-      const position = control.positionHandler(dim, finalMatrix, this, control);
-      // coords[key] are sometimes used as points. Those are points to which we add
-      // the property corner and touchCorner from `_calcCornerCoords`.
-      // don't remove this assign for an object spread.
-      coords[key] = Object.assign(
-        position,
-        this._calcCornerCoords(control, position)
+  protected calcControlCoords(): Record<string, TControlCoord> {
+    const legacyBBox = BBox.legacy(this);
+    const coords = mapValues(this.controls, (control) => {
+      const position = control.positionHandler(
+        legacyBBox.getBBoxVector(),
+        legacyBBox.getTransformation(),
+        // @ts-expect-error FabricObject this
+        this,
+        control
       );
+      return {
+        position,
+        connection: control.connectionPositionHandler(
+          position,
+          // @ts-expect-error FabricObject this
+          this,
+          control
+        ),
+        // Sets the coordinates that determine the interaction area of each control
+        // note: if we would switch to ROUND corner area, all of this would disappear.
+        // everything would resolve to a single point and a pythagorean theorem for the distance
+        // @todo evaluate simplification of code switching to circle interaction area at runtime
+        corner: control.calcCornerCoords(
+          legacyBBox.angle,
+          this.cornerSize,
+          position.x,
+          position.y,
+          false
+        ),
+        touchCorner: control.calcCornerCoords(
+          legacyBBox.angle,
+          this.touchCornerSize,
+          position.x,
+          position.y,
+          true
+        ),
+      };
     });
 
-    // debug code
-    /*
-      const canvas = this.canvas;
-      setTimeout(function () {
-      if (!canvas) return;
-        canvas.contextTop.clearRect(0, 0, 700, 700);
-        canvas.contextTop.fillStyle = 'green';
-        Object.keys(coords).forEach(function(key) {
-          const control = coords[key];
-          canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-        });
-      } 50);
-    */
+    // // debug code
+    // setTimeout(() => {
+    //   const canvas = this.canvas;
+    //   if (!canvas) return;
+    //   const ctx = canvas.contextTop;
+    //   // canvas.clearContext(ctx);
+    //   ctx.fillStyle = 'cyan';
+    //   Object.keys(coords).forEach((key) => {
+    //     Object.keys(coords[key].corner).forEach((k) => {
+    //       const control = coords[key].corner[k];
+    //       ctx.beginPath();
+    //       ctx.ellipse(control.x, control.y, 3, 3, 0, 0, 360);
+    //       ctx.closePath();
+    //       ctx.fill();
+    //     });
+    //   });
+    // }, 50);
+
     return coords;
   }
 
   /**
-   * Sets the coordinates that determine the interaction area of each control
-   * note: if we would switch to ROUND corner area, all of this would disappear.
-   * everything would resolve to a single point and a pythagorean theorem for the distance
-   * @todo evaluate simplification of code switching to circle interaction area at runtime
-   * @private
-   */
-  private _calcCornerCoords(control: Control, position: Point) {
-    const corner = control.calcCornerCoords(
-      this.angle,
-      this.cornerSize,
-      position.x,
-      position.y,
-      false
-    );
-    const touchCorner = control.calcCornerCoords(
-      this.angle,
-      this.touchCornerSize,
-      position.x,
-      position.y,
-      true
-    );
-    return { corner, touchCorner };
-  }
-
-  /**
-   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * oCoords are used to find the corners
-   * aCoords are used to quickly find an object on the canvas
-   * lineCoords are used to quickly find object during pointer events.
+   * Sets corner and controls position coordinates based on current angle, dimensions and position.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords(): void {
     super.setCoords();
-    // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-    this.oCoords = this.calcOCoords();
+    this.controlCoords = this.calcControlCoords();
   }
 
   /**
@@ -327,16 +298,14 @@ export class InteractiveFabricObject<
    * with the control, the control's key and the object that is calling the iterator
    * @param {Function} fn function to iterate over the controls over
    */
-  forEachControl(
+  forEachControl<R>(
     fn: (
       control: Control,
       key: string,
       fabricObject: InteractiveFabricObject
-    ) => any
-  ) {
-    for (const i in this.controls) {
-      fn(this.controls[i], i, this);
-    }
+    ) => R
+  ): Record<string, R> {
+    return mapValues(this.controls, (value, key) => fn(value, key, this));
   }
 
   /**
@@ -357,15 +326,28 @@ export class InteractiveFabricObject<
       return;
     }
     ctx.save();
-    const center = this.getRelativeCenterPoint(),
-      wh = this._calculateCurrentDimensions(),
-      vpt = this.getViewportTransform();
-    ctx.translate(center.x, center.y);
-    ctx.scale(1 / vpt[0], 1 / vpt[3]);
-    ctx.rotate(degreesToRadians(this.angle));
+    this.bbox.sendToCanvas().transform(ctx);
     ctx.fillStyle = this.selectionBackgroundColor;
-    ctx.fillRect(-wh.x / 2, -wh.y / 2, wh.x, wh.y);
+    ctx.fillRect(-0.5, -0.5, 1, 1);
     ctx.restore();
+  }
+
+  /**
+   * @public override this function in order to customize the drawing of the control box, e.g. rounded corners, different border style.
+   * @param {CanvasRenderingContext2D} ctx ctx is not transformed, only retina scaled
+   * @param {Point} size the control box size used
+   */
+  strokeBorders(ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    this.bbox.transform(ctx);
+    ctx.beginPath();
+    ctx.moveTo(-0.5, -0.5);
+    ctx.lineTo(0.5, -0.5);
+    ctx.lineTo(0.5, 0.5);
+    ctx.lineTo(-0.5, 0.5);
+    ctx.closePath();
+    ctx.restore();
+    ctx.stroke();
   }
 
   /**
@@ -373,32 +355,38 @@ export class InteractiveFabricObject<
    * @param {CanvasRenderingContext2D} ctx ctx is rotated and translated so that (0,0) is at object's center
    * @param {Point} size the control box size used
    */
-  strokeBorders(ctx: CanvasRenderingContext2D, size: Point): void {
-    ctx.strokeRect(-size.x / 2, -size.y / 2, size.x, size.y);
+  strokeBordersLegacy(ctx: CanvasRenderingContext2D, size: Point) {
+    // ctx.strokeRect(-size.x / 2, -size.y / 2, size.x, size.y);
   }
 
   /**
-   * @private
+   * Draws borders of an object's bounding box.
+   * Requires public properties: width, height
+   * Requires public options: padding, borderColor
    * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Point} size
-   * @param {TStyleOverride} styleOverride object to override the object style
+   * @param {object} options object representing current object parameters
+   * @param {TStyleOverride} [styleOverride] object to override the object style
    */
-  _drawBorders(
+  drawBorders(
     ctx: CanvasRenderingContext2D,
-    size: Point,
-    styleOverride: TStyleOverride = {}
+    styleOverride: TStyleOverride
   ): void {
-    const options = {
-      hasControls: this.hasControls,
+    const { borderColor, borderDashArray } = {
       borderColor: this.borderColor,
       borderDashArray: this.borderDashArray,
       ...styleOverride,
     };
     ctx.save();
-    ctx.strokeStyle = options.borderColor;
-    this._setLineDash(ctx, options.borderDashArray);
-    this.strokeBorders(ctx, size);
-    options.hasControls && this.drawControlsConnectingLines(ctx, size);
+    ctx.strokeStyle = borderColor;
+    this._setLineDash(ctx, borderDashArray);
+    ctx.lineWidth = this.borderScaleFactor;
+    // TODO: remove legacy?
+    ctx.save();
+    const legacy = BBox.legacy(this);
+    legacy.transform(ctx);
+    this.strokeBordersLegacy(ctx, legacy.getBBoxVector());
+    ctx.restore();
+    this.strokeBorders(ctx);
     ctx.restore();
   }
 
@@ -414,94 +402,16 @@ export class InteractiveFabricObject<
     styleOverride: TStyleOverride = {}
   ) {
     const { hasBorders, hasControls } = this;
-    const styleOptions = {
+    const { hasBorders: shouldDrawBorders, hasControls: shouldDrawControls } = {
       hasBorders,
       hasControls,
       ...styleOverride,
     };
-    const vpt = this.getViewportTransform(),
-      shouldDrawBorders = styleOptions.hasBorders,
-      shouldDrawControls = styleOptions.hasControls;
-    const matrix = multiplyTransformMatrices(vpt, this.calcTransformMatrix());
-    const options = qrDecompose(matrix);
     ctx.save();
-    ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    }
-    if (this.flipX) {
-      options.angle -= 180;
-    }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
-    shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
+    ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+    shouldDrawBorders && this.drawBorders(ctx, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();
-  }
-
-  /**
-   * Draws borders of an object's bounding box.
-   * Requires public properties: width, height
-   * Requires public options: padding, borderColor
-   * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {object} options object representing current object parameters
-   * @param {TStyleOverride} [styleOverride] object to override the object style
-   */
-  drawBorders(
-    ctx: CanvasRenderingContext2D,
-    options: TQrDecomposeOut,
-    styleOverride: TStyleOverride
-  ): void {
-    let size;
-    if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(this.width, this.height, options),
-        stroke = (
-          this.strokeUniform
-            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            : // this is extremely confusing. options comes from the upper function
-              // and is the qrDecompose of a matrix that takes in account zoom too
-              new Point(options.scaleX, options.scaleY)
-        ).scalarMultiply(this.strokeWidth);
-      size = bbox
-        .add(stroke)
-        .scalarAdd(this.borderScaleFactor)
-        .scalarAdd(this.padding * 2);
-    } else {
-      size = this._calculateCurrentDimensions().scalarAdd(
-        this.borderScaleFactor
-      );
-    }
-    this._drawBorders(ctx, size, styleOverride);
-  }
-
-  /**
-   * Draws lines from a borders of an object's bounding box to controls that have `withConnection` property set.
-   * Requires public properties: width, height
-   * Requires public options: padding, borderColor
-   * @param {CanvasRenderingContext2D} ctx Context to draw on
-   * @param {Point} size object size x = width, y = height
-   */
-  drawControlsConnectingLines(
-    ctx: CanvasRenderingContext2D,
-    size: Point
-  ): void {
-    let shouldStroke = false;
-
-    ctx.beginPath();
-    this.forEachControl((control, key) => {
-      // in this moment, the ctx is centered on the object.
-      // width and height of the above function are the size of the bbox.
-      if (control.withConnection && control.getVisibility(this, key)) {
-        // reset movement for each control
-        shouldStroke = true;
-        ctx.moveTo(control.x * size.x, control.y * size.y);
-        ctx.lineTo(
-          control.x * size.x + control.offsetX,
-          control.y * size.y + control.offsetY
-        );
-      }
-    });
-    shouldStroke && ctx.stroke();
   }
 
   /**
@@ -532,9 +442,20 @@ export class InteractiveFabricObject<
     this._setLineDash(ctx, options.cornerDashArray);
     this.setCoords();
     this.forEachControl((control, key) => {
-      if (control.getVisibility(this, key)) {
-        const p = this.oCoords[key];
-        control.render(ctx, p.x, p.y, options, this);
+      if (
+        control.getVisibility(
+          // @ts-expect-error FabricObject this
+          this,
+          key
+        )
+      ) {
+        control.renderControl(
+          ctx,
+          this.controlCoords[key],
+          options,
+          // @ts-expect-error FabricObject this
+          this
+        );
       }
     });
     ctx.restore();
@@ -549,7 +470,11 @@ export class InteractiveFabricObject<
   isControlVisible(controlKey: string): boolean {
     return (
       this.controls[controlKey] &&
-      this.controls[controlKey].getVisibility(this, controlKey)
+      this.controls[controlKey].getVisibility(
+        // @ts-expect-error FabricObject this
+        this,
+        controlKey
+      )
     );
   }
 
@@ -617,7 +542,7 @@ export class InteractiveFabricObject<
    * try to to deselect this object. If the function returns true, the process is cancelled
    * @param {Object} [options] options sent from the upper functions
    * @param {TPointerEvent} [options.e] event if the process is generated by an event
-   * @param {FabricObject} [options.object] next object we are setting as active, and reason why
+   * @param {BaseFabricObject} [options.object] next object we are setting as active, and reason why
    * this is being deselected
    */
   onDeselect(options?: {

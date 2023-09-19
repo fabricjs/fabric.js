@@ -1,19 +1,16 @@
 import type {
+  BasicTransformEvent,
   TPointerEvent,
   Transform,
   TransformAction,
-  BasicTransformEvent,
 } from '../EventTypeDefs';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
+import { PIBy4, twoMathPi } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TOriginX, TOriginY } from '../typedefs';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
+import { resolveOrigin, resolveOriginPoint } from '../util/misc/resolveOrigin';
+import { calcVectorRotation } from '../util/misc/vectors';
 import type { Control } from './Control';
-import { CENTER } from '../constants';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -41,8 +38,14 @@ export const getActionFromCorner = (
  * @param {Object} transform transform data
  * @return {Boolean} true if transform is centered
  */
-export function isTransformCentered(transform: Transform) {
-  return transform.originX === CENTER && transform.originY === CENTER;
+export function isTransformCentered({
+  originX,
+  originY,
+}: {
+  originX: TOriginX;
+  originY: TOriginY;
+}) {
+  return resolveOriginPoint(originX, originY).eq(new Point());
 }
 
 export function invertOrigin(origin: TOriginX | TOriginY) {
@@ -84,72 +87,8 @@ export function findCornerQuadrant(
   fabricObject: FabricObject,
   control: Control
 ) {
-  //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle(),
-    cornerAngle =
-      angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
-  return Math.round((cornerAngle % 360) / 45);
-}
-
-/**
- * @returns the normalized point (rotated relative to center) in local coordinates
- */
-function normalizePoint(
-  target: FabricObject,
-  point: Point,
-  originX: TOriginX,
-  originY: TOriginY
-): Point {
-  const center = target.getRelativeCenterPoint(),
-    p =
-      typeof originX !== 'undefined' && typeof originY !== 'undefined'
-        ? target.translateToGivenOrigin(
-            center,
-            CENTER,
-            CENTER,
-            originX,
-            originY
-          )
-        : new Point(target.left, target.top),
-    p2 = target.angle
-      ? point.rotate(-degreesToRadians(target.angle), center)
-      : point;
-  return p2.subtract(p);
-}
-
-/**
- * Transforms a point to the offset from the given origin
- * @param {Object} transform
- * @param {String} originX
- * @param {String} originY
- * @param {number} x
- * @param {number} y
- * @return {Fabric.Point} the normalized point
- */
-export function getLocalPoint(
-  { target, corner }: Transform,
-  originX: TOriginX,
-  originY: TOriginY,
-  x: number,
-  y: number
-) {
-  const control = target.controls[corner],
-    zoom = target.canvas?.getZoom() || 1,
-    padding = target.padding / zoom,
-    localPoint = normalizePoint(target, new Point(x, y), originX, originY);
-  if (localPoint.x >= padding) {
-    localPoint.x -= padding;
-  }
-  if (localPoint.x <= -padding) {
-    localPoint.x += padding;
-  }
-  if (localPoint.y >= padding) {
-    localPoint.y -= padding;
-  }
-  if (localPoint.y <= padding) {
-    localPoint.y += padding;
-  }
-  localPoint.x -= control.offsetX;
-  localPoint.y -= control.offsetY;
-  return localPoint;
+  const rotation = calcVectorRotation(
+    fabricObject.bbox.vectorFromOrigin(new Point(control))
+  );
+  return Math.round(((rotation + twoMathPi) % twoMathPi) / PIBy4);
 }

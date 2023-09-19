@@ -1,24 +1,24 @@
-import { config } from '../config';
-import { CENTER, VERSION } from '../constants';
-import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
-import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
-import type { Pattern } from '../Pattern';
+import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
+import type { Pattern } from '../Pattern/Pattern';
 import { Point } from '../Point';
+import { config } from '../config';
+import { CENTER, VERSION } from '../constants';
+import type { Gradient } from '../gradient/Gradient';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type {
   Abortable,
   Constructor,
-  TCornerPoint,
   TDataUrlOptions,
   TFiller,
   TMat2D,
-  TSize,
+  TOptions,
   TSVGReviver,
+  TSize,
   TToCanvasElementOptions,
   TValidToObjectMethod,
-  TOptions,
 } from '../typedefs';
 import {
   cancelAnimFrame,
@@ -43,7 +43,6 @@ import {
 } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
-import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 
@@ -115,15 +114,6 @@ export class StaticCanvas<
   declare allowTouchScrolling: boolean;
 
   declare viewportTransform: TMat2D;
-  /**
-   * Describe canvas element extension over design
-   * properties are tl,tr,bl,br.
-   * if canvas is not zoomed/panned those points are the four corner of canvas
-   * if canvas is viewportTransformed you those points indicate the extension
-   * of canvas element in plain untrasformed coordinates
-   * The coordinates get updated with @method calcViewportBoundaries.
-   */
-  declare vptCoords: TCornerPoint;
 
   /**
    * A reference to the canvas actual HTMLCanvasElement.
@@ -186,7 +176,6 @@ export class StaticCanvas<
       height: this.height || this.elements.lower.el.height || 0,
     });
     this.viewportTransform = [...this.viewportTransform];
-    this.calcViewportBoundaries();
   }
 
   protected initElements(el?: string | HTMLCanvasElement) {
@@ -376,7 +365,6 @@ export class StaticCanvas<
     if (overlayObject) {
       overlayObject.setCoords();
     }
-    this.calcViewportBoundaries();
     this.renderOnAddRemove && this.requestRenderAll();
   }
 
@@ -507,28 +495,25 @@ export class StaticCanvas<
   }
 
   /**
-   * Calculate the position of the 4 corner of canvas with current viewportTransform.
-   * helps to determinate when an object is in the current rendering viewport using
-   * object absolute coordinates ( aCoords )
-   * @return {Object} points.tl
-   * @chainable
+   * Describe the visible bounding box of the canvas
+   * if canvas is **NOT** transformed the points are equal to the four corners of the `HTMLCanvasElement`
+   * if canvas is transformed the points describe the distance from canvas origin,
+   * `tl` being the viewport origin which is the `tl` corner of the `HTMLCanvasElement`.
    */
-  calcViewportBoundaries(): TCornerPoint {
-    const width = this.width,
-      height = this.height,
-      iVpt = invertTransform(this.viewportTransform),
-      a = transformPoint({ x: 0, y: 0 }, iVpt),
-      b = transformPoint({ x: width, y: height }, iVpt),
-      // we don't support vpt flipping
-      // but the code is robust enough to mostly work with flipping
+  getViewportBBox() {
+    // we don't support vpt flipping
+    // but the code is robust enough to mostly work with flipping
+    const iVpt = invertTransform(this.viewportTransform),
+      a = new Point().transform(iVpt),
+      b = new Point(this.width, this.height).transform(iVpt),
       min = a.min(b),
       max = a.max(b);
-    return (this.vptCoords = {
+    return {
       tl: min,
       tr: new Point(max.x, min.y),
       bl: new Point(min.x, max.y),
       br: max,
-    });
+    };
   }
 
   cancelRequestedRender() {
@@ -554,7 +539,6 @@ export class StaticCanvas<
 
     const v = this.viewportTransform,
       path = this.clipPath;
-    this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
     // @ts-expect-error node-canvas stuff
@@ -620,9 +604,11 @@ export class StaticCanvas<
    * @param {Array} objects to render
    */
   _renderObjects(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
-    for (let i = 0, len = objects.length; i < len; ++i) {
-      objects[i] && objects[i].render(ctx);
-    }
+    objects.forEach((object) => {
+      object &&
+        (!this.skipOffscreen || !object.skipOffscreen || object.isOnScreen()) &&
+        object.render(ctx);
+    });
   }
 
   /**
@@ -1422,12 +1408,10 @@ export class StaticCanvas<
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
-    this.calcViewportBoundaries();
     this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
     this.width = originalWidth;
     this.height = originalHeight;
-    this.calcViewportBoundaries();
     this.enableRetinaScaling = originalRetina;
     return canvasEl;
   }

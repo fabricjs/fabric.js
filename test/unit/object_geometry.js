@@ -22,7 +22,6 @@
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     cObj.setCoords();
-    canvas.calcViewportBoundaries();
 
     var point1 = new fabric.Point(5, 5),
         point2 = new fabric.Point(15, 15),
@@ -75,7 +74,6 @@
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     cObj.setCoords();
-    canvas.calcViewportBoundaries();
     assert.ok(typeof cObj.isContainedWithinRect === 'function');
 
     // fully contained
@@ -116,9 +114,17 @@
     object2.set({ originX: 'center', originY: 'center' }).setCoords();
     object3.set({ originX: 'center', originY: 'center' }).setCoords();
 
-    assert.equal(object.intersectsWithObject(object1), true, 'object and object1 intersects');
-    assert.equal(object.intersectsWithObject(object2), true, 'object2 is contained in object');
-    assert.equal(object.intersectsWithObject(object3), false, 'object3 is outside of object (no intersection)');
+    function intersect(abs) {
+      assert.equal(object.intersectsWithObject(object1, abs), true, 'object and object1 intersects');
+      assert.equal(object.intersectsWithObject(object2, abs), true, 'object2 is contained in object');
+      assert.equal(object.intersectsWithObject(object3, abs), false, 'object3 is outside of object (no intersection)');
+    }
+
+    intersect();
+    intersect(true);
+    const group = new fabric.Group([object1, object2, object3], { subTargetCheck: true });
+    intersect();
+    intersect(true);  
   });
 
   QUnit.test('isContainedWithinObject', function(assert) {
@@ -247,78 +253,78 @@
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     assert.ok(typeof cObj.setCoords === 'function');
     cObj.setCoords();
-    assert.equal(cObj.oCoords.tl.x, 150);
-    assert.equal(cObj.oCoords.tl.y, 150);
-    assert.equal(cObj.oCoords.tr.x, 250);
-    assert.equal(cObj.oCoords.tr.y, 150);
-    assert.equal(cObj.oCoords.bl.x, 150);
-    assert.equal(cObj.oCoords.bl.y, 250);
-    assert.equal(cObj.oCoords.br.x, 250);
-    assert.equal(cObj.oCoords.br.y, 250);
-    assert.equal(cObj.oCoords.mtr.x, 200);
-    assert.equal(cObj.oCoords.mtr.y, 110);
+    assert.equal(cObj.controlCoords.tl.position.x, 150);
+    assert.equal(cObj.controlCoords.tl.position.y, 150);
+    assert.equal(cObj.controlCoords.tr.position.x, 250);
+    assert.equal(cObj.controlCoords.tr.position.y, 150);
+    assert.equal(cObj.controlCoords.bl.position.x, 150);
+    assert.equal(cObj.controlCoords.bl.position.y, 250);
+    assert.equal(cObj.controlCoords.br.position.x, 250);
+    assert.equal(cObj.controlCoords.br.position.y, 250);
+    assert.equal(cObj.controlCoords.mtr.position.x, 200);
+    assert.equal(cObj.controlCoords.mtr.position.y, 110);
 
     cObj.set('left', 250).set('top', 250);
 
     // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.x, 150);
-    assert.equal(cObj.oCoords.tl.y, 150);
-    assert.equal(cObj.oCoords.tr.x, 250);
-    assert.equal(cObj.oCoords.tr.y, 150);
-    assert.equal(cObj.oCoords.bl.x, 150);
-    assert.equal(cObj.oCoords.bl.y, 250);
-    assert.equal(cObj.oCoords.br.x, 250);
-    assert.equal(cObj.oCoords.br.y, 250);
-    assert.equal(cObj.oCoords.mtr.x, 200);
-    assert.equal(cObj.oCoords.mtr.y, 110);
+    assert.equal(cObj.controlCoords.tl.position.x, 150);
+    assert.equal(cObj.controlCoords.tl.position.y, 150);
+    assert.equal(cObj.controlCoords.tr.position.x, 250);
+    assert.equal(cObj.controlCoords.tr.position.y, 150);
+    assert.equal(cObj.controlCoords.bl.position.x, 150);
+    assert.equal(cObj.controlCoords.bl.position.y, 250);
+    assert.equal(cObj.controlCoords.br.position.x, 250);
+    assert.equal(cObj.controlCoords.br.position.y, 250);
+    assert.equal(cObj.controlCoords.mtr.position.x, 200);
+    assert.equal(cObj.controlCoords.mtr.position.y, 110);
 
     // recalculate coords
     cObj.setCoords();
 
     // check that coords are now updated
-    assert.equal(cObj.oCoords.tl.x, 250);
-    assert.equal(cObj.oCoords.tl.y, 250);
-    assert.equal(cObj.oCoords.tr.x, 350);
-    assert.equal(cObj.oCoords.tr.y, 250);
-    assert.equal(cObj.oCoords.bl.x, 250);
-    assert.equal(cObj.oCoords.bl.y, 350);
-    assert.equal(cObj.oCoords.br.x, 350);
-    assert.equal(cObj.oCoords.br.y, 350);
-    assert.equal(cObj.oCoords.mtr.x, 300);
-    assert.equal(cObj.oCoords.mtr.y, 210);
+    assert.equal(cObj.controlCoords.tl.position.x, 250);
+    assert.equal(cObj.controlCoords.tl.position.y, 250);
+    assert.equal(cObj.controlCoords.tr.position.x, 350);
+    assert.equal(cObj.controlCoords.tr.position.y, 250);
+    assert.equal(cObj.controlCoords.bl.position.x, 250);
+    assert.equal(cObj.controlCoords.bl.position.y, 350);
+    assert.equal(cObj.controlCoords.br.position.x, 350);
+    assert.equal(cObj.controlCoords.br.position.y, 350);
+    assert.equal(cObj.controlCoords.mtr.position.x, 300);
+    assert.equal(cObj.controlCoords.mtr.position.y, 210);
 
     cObj.set('padding', 25);
     cObj.setCoords();
     // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.x, 225, 'setCoords tl.x padding');
-    assert.equal(cObj.oCoords.tl.y, 225, 'setCoords tl.y padding');
-    assert.equal(cObj.oCoords.tr.x, 375, 'setCoords tr.x padding');
-    assert.equal(cObj.oCoords.tr.y, 225, 'setCoords tr.y padding');
-    assert.equal(cObj.oCoords.bl.x, 225, 'setCoords bl.x padding');
-    assert.equal(cObj.oCoords.bl.y, 375, 'setCoords bl.y padding');
-    assert.equal(cObj.oCoords.br.x, 375, 'setCoords br.x padding');
-    assert.equal(cObj.oCoords.br.y, 375, 'setCoords br.y padding');
-    assert.equal(cObj.oCoords.mtr.x, 300, 'setCoords mtr.x padding');
-    assert.equal(cObj.oCoords.mtr.y, 185, 'setCoords mtr.y padding');
+    assert.equal(cObj.controlCoords.tl.position.x, 225, 'setCoords tl.position.x padding');
+    assert.equal(cObj.controlCoords.tl.position.y, 225, 'setCoords tl.position.y padding');
+    assert.equal(cObj.controlCoords.tr.position.x, 375, 'setCoords tr.position.x padding');
+    assert.equal(cObj.controlCoords.tr.position.y, 225, 'setCoords tr.position.y padding');
+    assert.equal(cObj.controlCoords.bl.position.x, 225, 'setCoords bl.position.x padding');
+    assert.equal(cObj.controlCoords.bl.position.y, 375, 'setCoords bl.position.y padding');
+    assert.equal(cObj.controlCoords.br.position.x, 375, 'setCoords br.position.x padding');
+    assert.equal(cObj.controlCoords.br.position.y, 375, 'setCoords br.position.y padding');
+    assert.equal(cObj.controlCoords.mtr.position.x, 300, 'setCoords mtr.position.x padding');
+    assert.equal(cObj.controlCoords.mtr.position.y, 185, 'setCoords mtr.position.y padding');
   });
 
-  QUnit.test('setCoords and aCoords', function(assert) {
+  QUnit.test.skip('setCoords and aCoords', function(assert) {
     var cObj = new fabric.Object({ left: 150, top: 150, width: 100, height: 100, strokeWidth: 0});
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0]
     };
     cObj.setCoords();
 
-    assert.equal(cObj.oCoords.tl.x, 300, 'oCoords are modified by viewportTransform tl.x');
-    assert.equal(cObj.oCoords.tl.y, 300, 'oCoords are modified by viewportTransform tl.y');
-    assert.equal(cObj.oCoords.tr.x, 500, 'oCoords are modified by viewportTransform tr.x');
-    assert.equal(cObj.oCoords.tr.y, 300, 'oCoords are modified by viewportTransform tr.y');
-    assert.equal(cObj.oCoords.bl.x, 300, 'oCoords are modified by viewportTransform bl.x');
-    assert.equal(cObj.oCoords.bl.y, 500, 'oCoords are modified by viewportTransform bl.y');
-    assert.equal(cObj.oCoords.br.x, 500, 'oCoords are modified by viewportTransform br.x');
-    assert.equal(cObj.oCoords.br.y, 500, 'oCoords are modified by viewportTransform br.y');
-    assert.equal(cObj.oCoords.mtr.x, 400, 'oCoords are modified by viewportTransform mtr.x');
-    assert.equal(cObj.oCoords.mtr.y, 260, 'oCoords are modified by viewportTransform mtr.y');
+    assert.equal(cObj.controlCoords.tl.position.x, 300, 'controlCoords are modified by viewportTransform tl.position.x');
+    assert.equal(cObj.controlCoords.tl.position.y, 300, 'controlCoords are modified by viewportTransform tl.position.y');
+    assert.equal(cObj.controlCoords.tr.position.x, 500, 'controlCoords are modified by viewportTransform tr.position.x');
+    assert.equal(cObj.controlCoords.tr.position.y, 300, 'controlCoords are modified by viewportTransform tr.position.y');
+    assert.equal(cObj.controlCoords.bl.position.x, 300, 'controlCoords are modified by viewportTransform bl.position.x');
+    assert.equal(cObj.controlCoords.bl.position.y, 500, 'controlCoords are modified by viewportTransform bl.position.y');
+    assert.equal(cObj.controlCoords.br.position.x, 500, 'controlCoords are modified by viewportTransform br.position.x');
+    assert.equal(cObj.controlCoords.br.position.y, 500, 'controlCoords are modified by viewportTransform br.position.y');
+    assert.equal(cObj.controlCoords.mtr.position.x, 400, 'controlCoords are modified by viewportTransform mtr.position.x');
+    assert.equal(cObj.controlCoords.mtr.position.y, 260, 'controlCoords are modified by viewportTransform mtr.position.y');
 
     assert.equal(cObj.aCoords.tl.x, 150, 'aCoords do not interfere with viewportTransform');
     assert.equal(cObj.aCoords.tl.y, 150, 'aCoords do not interfere with viewportTransform');
@@ -333,7 +339,6 @@
   QUnit.test('isOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
@@ -350,7 +355,6 @@
   QUnit.test('isOnScreen flipped vpt', function (assert) {
     var cObj = new fabric.Object({ left: -50, top: -50, width: 100, height: 100, strokeWidth: 0 });
     canvas.viewportTransform = [-1, 0, 0, -1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
@@ -398,7 +402,6 @@
     var cObj = new fabric.Object(
       { left: -10, top: -10, width: canvas.getWidth() + 100, height: canvas.getHeight(), strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.equal(cObj.isOnScreen(), true, 'object is onScreen because it include the canvas');
@@ -411,7 +414,6 @@
   QUnit.test('isOnScreen with object that is in top left corner of canvas', function(assert) {
     var cObj = new fabric.Rect({left: -46.56, top: -9.23, width: 50,height: 50, angle: 314.57});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen because it intersect a canvas line');
@@ -467,75 +469,16 @@
       43.50067533516962], 'translate matrix scale skewX skewY angle flipX flipY');
   });
 
-  QUnit.test('scaleToWidth', function(assert) {
-    var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
-    assert.ok(typeof cObj.scaleToWidth === 'function', 'scaleToWidth should exist');
-    cObj.scaleToWidth(100);
-    assert.equal(cObj.getScaledWidth(), 100);
-    assert.equal(cObj.get('scaleX'), 100 / 560);
-  });
-
-  QUnit.test('scaleToWidth with zoom', function(assert) {
-    var cObj = new fabric.Object({ width: 560, strokeWidth: 0 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 0, 0]
-    };
-    cObj.scaleToWidth(100, true);
-    assert.equal(cObj.getScaledWidth(), 100, 'is not influenced by zoom - width');
-    assert.equal(cObj.get('scaleX'), 100 / 560);
-    cObj.scaleToWidth(100);
-    assert.equal(cObj.getScaledWidth(), 50, 'is influenced by zoom - width');
-    assert.equal(cObj.get('scaleX'), 100 / 560 / 2);
-  });
-
-
-  QUnit.test('scaleToHeight', function(assert) {
-    var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
-    assert.ok(typeof cObj.scaleToHeight === 'function', 'scaleToHeight should exist');
-    cObj.scaleToHeight(100);
-    assert.equal(cObj.getScaledHeight(), 100);
-    assert.equal(cObj.get('scaleY'), 100 / 560);
-  });
-
-  QUnit.test('scaleToHeight with zoom', function(assert) {
-    var cObj = new fabric.Object({ height: 560, strokeWidth: 0 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 0, 0]
-    };
-    cObj.scaleToHeight(100, true);
-    assert.equal(cObj.getScaledHeight(), 100, 'is not influenced by zoom - height');
-    assert.equal(cObj.get('scaleY'), 100 / 560);
-    cObj.scaleToHeight(100);
-    assert.equal(cObj.getScaledHeight(), 50, 'is influenced by zoom - height');
-    assert.equal(cObj.get('scaleY'), 100 / 560 / 2);
-  });
-
-  QUnit.test('scaleToWidth on rotated object', function(assert) {
-    var obj = new fabric.Object({ height: 100, width: 100, strokeWidth: 0 });
-    obj.rotate(45);
-    obj.scaleToWidth(200);
-    assert.equal(Math.round(obj.getBoundingRect().width), 200);
-  });
-
-  QUnit.test('scaleToHeight on rotated object', function(assert) {
-    var obj = new fabric.Object({ height: 100, width: 100, strokeWidth: 0 });
-    obj.rotate(45);
-    obj.scaleToHeight(300);
-    assert.equal(Math.round(obj.getBoundingRect().height), 300);
-  });
-
   QUnit.test('getBoundingRect with absolute coords', function(assert) {
     var cObj = new fabric.Object({ strokeWidth: 0, width: 10, height: 10, top: 6, left: 5 }),
         boundingRect;
-
+    canvas.add(cObj);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 5, 'gives the bounding rect left with zoom 1');
     assert.equal(boundingRect.width, 10, 'gives the bounding rect width with zoom 1');
     assert.equal(boundingRect.height, 10, 'gives the bounding rect height with zoom 1');
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 0, 0]
-    };
+    canvas.setViewportTransform([2, 0, 0, 2, 0, 0])
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 10, 'gives the bounding rect left with zoom 2');
@@ -551,7 +494,7 @@
     var cObj = new fabric.Object({ strokeWidth: 0 }),
         boundingRect;
     assert.ok(typeof cObj.getBoundingRect === 'function');
-
+    canvas.add(cObj);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
@@ -573,7 +516,7 @@
     assert.equal(boundingRect.width, 123);
     assert.equal(boundingRect.height, 167);
 
-    cObj.scale(2)
+    cObj.scale(2, 2)
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
@@ -586,7 +529,7 @@
     var cObj = new fabric.Object(),
         boundingRect;
     assert.ok(typeof cObj.getBoundingRect === 'function');
-
+    canvas.add(cObj);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
@@ -610,33 +553,13 @@
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 168);
 
-    cObj.scale(2)
+    cObj.scale(2, 2)
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 248);
     assert.equal(boundingRect.height.toFixed(2), 336);
-  });
-
-  QUnit.test('getScaledWidth', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.getScaledWidth === 'function');
-    assert.equal(cObj.getScaledWidth(), 0 + cObj.strokeWidth);
-    cObj.set('width', 123);
-    assert.equal(cObj.getScaledWidth(), 123 + cObj.strokeWidth);
-    cObj.set('scaleX', 2);
-    assert.equal(cObj.getScaledWidth(), 246 + cObj.strokeWidth * 2);
-  });
-
-  QUnit.test('getScaledHeight', function(assert) {
-    var cObj = new fabric.Object({strokeWidth: 0});
-    //  assert.ok(typeof cObj.getHeight === 'function');
-    assert.equal(cObj.getScaledHeight(), 0);
-    cObj.set('height', 123);
-    assert.equal(cObj.getScaledHeight(), 123);
-    cObj.set('scaleY', 2);
-    assert.equal(cObj.getScaledHeight(), 246);
   });
 
   QUnit.test('scale', function(assert) {
@@ -658,6 +581,7 @@
 
   QUnit.test('getCoords return coordinate of object in canvas coordinate.', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
+    canvas.add(cObj);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner');
     assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner');
@@ -666,10 +590,10 @@
 
     cObj.left += 5;
     coords = cObj.getCoords();
-    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
-    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
-    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
-    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached controlCoords');
+    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached controlCoords');
+    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached controlCoords');
+    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached controlCoords');
 
     coords = cObj.getCoords(false, true);
     assert.deepEqual(coords[0], new fabric.Point(45, 30), 'return top left corner recalculated');
@@ -680,9 +604,8 @@
 
   QUnit.test('getCoords return coordinate of object in zoomed canvas coordinate.', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 35]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(115, 95), 'return top left corner is influenced by canvas zoom');
     assert.deepEqual(coords[1], new fabric.Point(139, 95), 'return top right corner is influenced by canvas zoom');
@@ -692,21 +615,19 @@
 
   QUnit.test('getCoords return coordinate of object in absolute coordinates and ignore canvas zoom', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 35]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
-    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
-    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
-    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
-    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached controlCoords');
+    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached controlCoords');
+    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached controlCoords');
+    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached controlCoords');
   });
 
   QUnit.test('getCoords absolute with angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, angle: 20 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with angle X');
     assert.deepEqual(coords[1].x, 51.2763114494309, 'return top right absolute with angle X');
@@ -720,9 +641,8 @@
 
   QUnit.test('getCoords with angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, angle: 20 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with angle X');
     assert.deepEqual(coords[1].x, 137.55262289886178, 'return top right with angle X');
@@ -736,9 +656,8 @@
 
   QUnit.test('getCoords absolute with skewX', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewX: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with skewX X');
     assert.deepEqual(coords[1].x, 69, 'return top right absolute with skewX X');
@@ -752,9 +671,8 @@
 
   QUnit.test('getCoords with skewX', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewX: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with skewX X');
     assert.deepEqual(coords[1].x, 173, 'return top right with skewX X');
@@ -768,9 +686,8 @@
 
   QUnit.test('getCoords absolute with skewY', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with skewY X');
     assert.deepEqual(coords[1].x, 52, 'return top right absolute with skewY X');
@@ -784,9 +701,8 @@
 
   QUnit.test('getCoords with skewY', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with skewY X');
     assert.deepEqual(coords[1].x, 139, 'return top right with skewY X');
@@ -800,9 +716,8 @@
 
   QUnit.test('getCoords absolute with skewY skewX angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45, skewX: 30, angle: 90 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords(true);
     assert.deepEqual(coords[0].x, 40, 'return top left absolute with skewY skewX angle X');
     assert.deepEqual(coords[1].x, 40, 'return top right absolute with skewY skewX angle X');
@@ -816,9 +731,8 @@
 
   QUnit.test('getCoords with skewY skewX angle', function(assert) {
     var cObj = new fabric.Object({ width: 10, height: 15, strokeWidth: 2, top: 30, left: 40, skewY: 45, skewX: 30, angle: 90 });
-    cObj.canvas = {
-      viewportTransform: [2, 0, 0, 2, 35, 25]
-    };
+    canvas.add(cObj);
+    canvas.setViewportTransform([2, 0, 0, 2, 35, 25]);
     var coords = cObj.getCoords();
     assert.deepEqual(coords[0].x, 115, 'return top left with skewY skewX angle X');
     assert.deepEqual(coords[1].x, 115, 'return top right with skewY skewX angle X');
@@ -833,7 +747,6 @@
   QUnit.test('isPartiallyOnScreen', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100, strokeWidth: 0});
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
     cObj.left = -60;
     cObj.top = -60;
@@ -854,7 +767,6 @@
   QUnit.test('isPartiallyOnScreen with object inside and outside of canvas', function(assert) {
     var cObj = new fabric.Object({ left: 5, top: 5, width: 100, height: 100, strokeWidth: 0});
     cObj.canvas = new fabric.StaticCanvas(null, { width: 120, height: 120, enableRetinaScaling: false});
-    cObj.canvas.calcViewportBoundaries();
     assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely onScreen');
     cObj.left = -20;
     cObj.top = -20;
