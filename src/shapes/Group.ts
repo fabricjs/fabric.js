@@ -20,7 +20,7 @@ import type {
   LayoutAfterEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
-import { ClipPathLayout, FixedLayout } from '../LayoutManager';
+import { FixedLayout } from '../LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -134,9 +134,7 @@ export class Group
     (
       layoutManager ||
       // legacy
-      new LayoutManager(
-        this.clipPath ? new ClipPathLayout() : new FixedLayout()
-      )
+      new LayoutManager(new FixedLayout())
     ).performLayout({
       type: 'initialization',
       objectsRelativeToGroup,

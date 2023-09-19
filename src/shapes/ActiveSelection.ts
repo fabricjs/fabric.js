@@ -3,6 +3,7 @@ import { classRegistry } from '../ClassRegistry';
 import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
+import { LayoutManager } from '../LayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -24,8 +25,6 @@ export interface ActiveSelectionOptions extends GroupProps {
  * })
  */
 export class ActiveSelection extends Group {
-  declare _objects: FabricObject[];
-
   /**
    * controls how selected objects are added during a multiselection event
    * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
@@ -37,6 +36,21 @@ export class ActiveSelection extends Group {
   multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
+
+  /**
+   * @override {@link layoutManager}
+   */
+  constructor(
+    objects: FabricObject[] = [],
+    options: Partial<ActiveSelectionOptions> = {},
+    objectsRelativeToGroup?: boolean
+  ) {
+    super(
+      objects,
+      { layoutManager: new LayoutManager(), ...options },
+      objectsRelativeToGroup
+    );
+  }
 
   /**
    * @private

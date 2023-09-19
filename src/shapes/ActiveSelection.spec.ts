@@ -1,8 +1,17 @@
+import { FitContentLayout } from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
 import { ActiveSelection } from './ActiveSelection';
 import { FabricObject } from './Object/FabricObject';
 
 describe('ActiveSelection', () => {
+  it('should set the layoutManager in the constructor', () => {
+    const activeSelection = new ActiveSelection();
+    expect(activeSelection.layoutManager).toBeDefined();
+    expect(activeSelection.layoutManager?.strategy).toBeInstanceOf(
+      FitContentLayout
+    );
+  });
+
   it('clearing active selection objects resets transform', () => {
     const obj = new FabricObject({
       left: 100,
