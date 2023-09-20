@@ -4,8 +4,9 @@ import path from 'path';
 import imports from '../imports';
 import { JSDOM } from 'jsdom';
 
-export default () => {
+export default (testConfig: () => any = () => {}) => {
   test.beforeEach(async ({ page }, { file }) => {
+    await page.exposeFunction('testConfig', testConfig);
     await page.goto('/e2e/site');
     // expose imports for consumption
     page.addScriptTag({

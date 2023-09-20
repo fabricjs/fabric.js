@@ -25,9 +25,17 @@ export class CanvasUtil {
     return this.page.keyboard.press(`${modifier}+KeyV`);
   }
 
-  screenshot(options: LocatorScreenshotOptions = {}) {
+  screenshot({
+    element = 'wrapper',
+    ...options
+  }: LocatorScreenshotOptions & { element?: 'wrapper' | 'top' | 'main' } = {}) {
+    const selector = {
+      wrapper: `canvas_wrapper=${this.selector}`,
+      top: `canvas_top=${this.selector}`,
+      main: this.selector,
+    }[element];
     return this.page
-      .locator(`canvas_wrapper=${this.selector}`)
+      .locator(selector)
       .screenshot({ omitBackground: true, ...options });
   }
 

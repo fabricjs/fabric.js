@@ -9,7 +9,7 @@ setup();
 test('TEST NAME', async ({ page }, config) => {
   await test.step('browser', async () => {
     expect(
-      await new CanvasUtil(page).screenshot(),
+      await new CanvasUtil(page).screenshot({ element: 'main' }),
       'browser snapshot'
     ).toMatchSnapshot({
       name: 'textbox.png',
