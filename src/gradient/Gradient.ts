@@ -24,6 +24,7 @@ import type { StaticCanvas } from '../canvas/StaticCanvas';
 import {
   createScaleMatrix,
   createTranslateMatrix,
+  magnitude,
   multiplyTransformMatrixArray,
 } from '../util';
 import { Point } from '../Point';
@@ -327,8 +328,15 @@ export class Gradient<
       gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
     } else {
       const { r1, r2 } = this.coords as GradientCoords<'radial'>;
-      const r = new Point(r1, r2).transform(transform, true);
-      gradient = ctx.createRadialGradient(p1.x, p1.y, r.x, p2.x, p2.y, r.y);
+      const hypot = magnitude(new Point(1, 0).transform(transform, true));
+      gradient = ctx.createRadialGradient(
+        p1.x,
+        p1.y,
+        r1 * hypot,
+        p2.x,
+        p2.y,
+        r2 * hypot
+      );
     }
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
