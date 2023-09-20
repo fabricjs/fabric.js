@@ -3,6 +3,9 @@
 ## [next]
 
 - fix(): gradient transform + rm workarounds [#9359](https://github.com/fabricjs/fabric.js/pull/9359)
+  **BREAKING**:
+  - `toLive(ctx)` => `toLive(ctx, target)`
+  - rm(): `_applyPatternGradientTransformText`, `_applyPatternGradientTransform`
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
 
