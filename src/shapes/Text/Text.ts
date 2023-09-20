@@ -13,7 +13,6 @@ import type {
   Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
-  TFiller,
   TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
@@ -42,9 +41,6 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
-import { isFiller } from '../../util/typeAssertions';
-import type { Gradient } from '../../gradient/Gradient';
-import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1232,104 +1228,6 @@ export class Text<
   }
 
   /**
-   * This function try to patch the missing gradientTransform on canvas gradients.
-   * transforming a context to transform the gradient, is going to transform the stroke too.
-   * we want to transform the gradient but not the stroke operation, so we create
-   * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-   * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
-   * is limited.
-   * @private
-   * @param {TFiller} filler a fabric gradient instance
-   * @return {CanvasPattern} a pattern to use as fill/stroke style
-   */
-  _applyPatternGradientTransformText(filler: TFiller) {
-    const pCanvas = createCanvasElement(),
-      // TODO: verify compatibility with strokeUniform
-      width = this.width + this.strokeWidth,
-      height = this.height + this.strokeWidth,
-      pCtx = pCanvas.getContext('2d')!;
-    pCanvas.width = width;
-    pCanvas.height = height;
-    pCtx.beginPath();
-    pCtx.moveTo(0, 0);
-    pCtx.lineTo(width, 0);
-    pCtx.lineTo(width, height);
-    pCtx.lineTo(0, height);
-    pCtx.closePath();
-    pCtx.translate(width / 2, height / 2);
-    pCtx.fillStyle = filler.toLive(pCtx)!;
-    this._applyPatternGradientTransform(pCtx, filler);
-    pCtx.fill();
-    return pCtx.createPattern(pCanvas, 'no-repeat')!;
-  }
-
-  handleFiller<T extends 'fill' | 'stroke'>(
-    ctx: CanvasRenderingContext2D,
-    property: `${T}Style`,
-    filler: TFiller | string
-  ): { offsetX: number; offsetY: number } {
-    let offsetX: number, offsetY: number;
-    if (isFiller(filler)) {
-      if (
-        (filler as Gradient<'linear'>).gradientUnits === 'percentage' ||
-        (filler as Gradient<'linear'>).gradientTransform ||
-        (filler as Pattern).patternTransform
-      ) {
-        // need to transform gradient in a pattern.
-        // this is a slow process. If you are hitting this codepath, and the object
-        // is not using caching, you should consider switching it on.
-        // we need a canvas as big as the current object caching canvas.
-        offsetX = -this.width / 2;
-        offsetY = -this.height / 2;
-        ctx.translate(offsetX, offsetY);
-        ctx[property] = this._applyPatternGradientTransformText(filler);
-        return { offsetX, offsetY };
-      } else {
-        // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx)!;
-        return this._applyPatternGradientTransform(ctx, filler);
-      }
-    } else {
-      // is a color
-      ctx[property] = filler;
-    }
-    return { offsetX: 0, offsetY: 0 };
-  }
-
-  /**
-   * This function prepare the canvas for a stroke style, and stroke and strokeWidth
-   * need to be sent in as defined
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {CompleteTextStyleDeclaration} style with stroke and strokeWidth defined
-   * @returns
-   */
-  _setStrokeStyles(
-    ctx: CanvasRenderingContext2D,
-    {
-      stroke,
-      strokeWidth,
-    }: Pick<CompleteTextStyleDeclaration, 'stroke' | 'strokeWidth'>
-  ) {
-    ctx.lineWidth = strokeWidth;
-    ctx.lineCap = this.strokeLineCap;
-    ctx.lineDashOffset = this.strokeDashOffset;
-    ctx.lineJoin = this.strokeLineJoin;
-    ctx.miterLimit = this.strokeMiterLimit;
-    return this.handleFiller(ctx, 'strokeStyle', stroke!);
-  }
-
-  /**
-   * This function prepare the canvas for a ill style, and fill
-   * need to be sent in as defined
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {CompleteTextStyleDeclaration} style with ill defined
-   * @returns
-   */
-  _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
-    return this.handleFiller(ctx, 'fillStyle', fill!);
-  }
-
-  /**
    * @private
    * @param {String} method
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -1370,21 +1268,19 @@ export class Text<
     }
 
     if (shouldFill) {
-      const fillOffsets = this._setFillStyles(ctx, fullDecl);
-      ctx.fillText(
-        _char,
-        left - fillOffsets.offsetX,
-        top - fillOffsets.offsetY
-      );
+      this._setFillStyles(ctx, fullDecl);
+      ctx.fillText(_char, left, top);
     }
 
     if (shouldStroke) {
-      const strokeOffsets = this._setStrokeStyles(ctx, fullDecl);
-      ctx.strokeText(
-        _char,
-        left - strokeOffsets.offsetX,
-        top - strokeOffsets.offsetY
-      );
+      this._setStrokeStyles(ctx, {
+        strokeLineCap: this.strokeLineCap,
+        strokeDashOffset: this.strokeDashOffset,
+        strokeLineJoin: this.strokeLineJoin,
+        strokeMiterLimit: this.strokeMiterLimit,
+        ...fullDecl,
+      });
+      ctx.strokeText(_char, left, top);
     }
 
     ctx.restore();

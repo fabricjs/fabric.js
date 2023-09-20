@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
+import type { StaticCanvas } from 'fabric/node';
 import setup from '../../setup';
 import { CanvasUtil } from '../../utils/CanvasUtil';
-import { createNodeSnapshot } from '../../utils/createNodeSnapshot';
 import { render } from './common';
 
 setup();
@@ -9,7 +9,7 @@ setup();
 test('TEST NAME', async ({ page }, config) => {
   await test.step('browser', async () => {
     expect(
-      await new CanvasUtil(page).screenshot(),
+      await new CanvasUtil(page).screenshot({ element: 'main' }),
       'browser snapshot'
     ).toMatchSnapshot({
       name: 'textbox.png',
@@ -21,7 +21,9 @@ test('TEST NAME', async ({ page }, config) => {
     // we want the browser snapshot of a test to be committed and not the node snapshot
     config.config.updateSnapshots = 'none';
     expect(
-      await createNodeSnapshot(render),
+      ((await render(await import('../../..'))).canvas as StaticCanvas)
+        .getNodeCanvas()
+        .toBuffer(),
       'node snapshot should match browser snapshot'
     ).toMatchSnapshot({ name: 'textbox.png', maxDiffPixelRatio: 0.05 });
   });

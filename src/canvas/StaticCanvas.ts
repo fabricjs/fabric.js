@@ -1,7 +1,6 @@
 import { config } from '../config';
 import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
-import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
@@ -641,7 +640,6 @@ export class StaticCanvas<
     if (!fill && !object) {
       return;
     }
-    const isAFiller = isFiller(fill);
     if (fill) {
       ctx.save();
       ctx.beginPath();
@@ -650,15 +648,9 @@ export class StaticCanvas<
       ctx.lineTo(this.width, this.height);
       ctx.lineTo(0, this.height);
       ctx.closePath();
-      ctx.fillStyle = isAFiller ? fill.toLive(ctx /* this */)! : fill;
+      ctx.fillStyle = isFiller(fill) ? fill.toLive(ctx, this) : fill;
       if (needsVpt) {
         ctx.transform(...v);
-      }
-      if (isAFiller) {
-        ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
-        const m = ((fill as Gradient<'linear'>).gradientTransform ||
-          (fill as Pattern).patternTransform) as TMat2D;
-        m && ctx.transform(...m);
       }
       ctx.fill();
       ctx.restore();

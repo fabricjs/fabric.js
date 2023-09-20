@@ -1,7 +1,7 @@
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import type { FabricObject } from '../shapes/Object/FabricObject';
+import { FabricObject } from '../shapes/Object/Object';
 import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
@@ -20,6 +20,14 @@ import type {
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { isPath } from '../util/typeAssertions';
+import type { StaticCanvas } from '../canvas/StaticCanvas';
+import {
+  createScaleMatrix,
+  createTranslateMatrix,
+  magnitude,
+  multiplyTransformMatrixArray,
+} from '../util';
+import { Point } from '../Point';
 
 /**
  * Gradient class
@@ -295,19 +303,41 @@ export class Gradient<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
    */
-  toLive(ctx: CanvasRenderingContext2D): CanvasGradient {
-    const coords = this.coords as GradientCoords<'radial'>;
-    const gradient =
-      this.type === 'linear'
-        ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
-        : ctx.createRadialGradient(
-            coords.x1,
-            coords.y1,
-            coords.r1,
-            coords.x2,
-            coords.y2,
-            coords.r2
-          );
+  toLive(
+    ctx: CanvasRenderingContext2D,
+    target: StaticCanvas | FabricObject
+  ): CanvasGradient {
+    const { offsetX = 0, offsetY = 0 } = this;
+    const { x, y } =
+      // correct rendering position from object rendering origin (center) to tl
+      target instanceof FabricObject
+        ? { x: -target.width / 2, y: -target.height / 2 }
+        : { x: 0, y: 0 };
+    const transform = multiplyTransformMatrixArray([
+      this.gradientTransform,
+      createTranslateMatrix(offsetX + x, offsetY + y),
+      this.gradientUnits === 'percentage' &&
+        createScaleMatrix(target.width, target.height),
+    ]);
+    const { x1, y1, x2, y2 } = this.coords;
+    const p1 = new Point(x1, y1).transform(transform);
+    const p2 = new Point(x2, y2).transform(transform);
+
+    let gradient: CanvasGradient;
+    if (this.type === 'linear') {
+      gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+    } else {
+      const { r1, r2 } = this.coords as GradientCoords<'radial'>;
+      const hypot = magnitude(new Point(1, 0).transform(transform, true));
+      gradient = ctx.createRadialGradient(
+        p1.x,
+        p1.y,
+        r1 * hypot,
+        p2.x,
+        p2.y,
+        r2 * hypot
+      );
+    }
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(

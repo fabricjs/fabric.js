@@ -11,6 +11,9 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
+import { createTranslateMatrix, multiplyTransformMatrixArray } from '../util';
+import type { StaticCanvas } from '../canvas/StaticCanvas';
+import { FabricObject } from '../shapes/Object/Object';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -125,7 +128,10 @@ export class Pattern {
    * @param {CanvasRenderingContext2D} ctx Context to create pattern
    * @return {CanvasPattern}
    */
-  toLive(ctx: CanvasRenderingContext2D): CanvasPattern | null {
+  toLive(
+    ctx: CanvasRenderingContext2D,
+    target: StaticCanvas | FabricObject
+  ): CanvasPattern | '' {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source ||
@@ -135,10 +141,27 @@ export class Pattern {
           this.source.naturalWidth === 0 ||
           this.source.naturalHeight === 0))
     ) {
-      return null;
+      return '';
     }
 
-    return ctx.createPattern(this.source, this.repeat)!;
+    const pattern = ctx.createPattern(this.source, this.repeat)!;
+    const { patternTransform, offsetX = 0, offsetY = 0 } = this;
+    const { x, y } =
+      // correct rendering position from object rendering origin (center) to tl
+      target instanceof FabricObject
+        ? { x: -target.width / 2, y: -target.height / 2 }
+        : { x: 0, y: 0 };
+    if (patternTransform || offsetX || offsetY || x || y) {
+      pattern.setTransform(
+        new DOMMatrix(
+          multiplyTransformMatrixArray([
+            patternTransform,
+            createTranslateMatrix(offsetX + x, offsetY + y),
+          ])
+        )
+      );
+    }
+    return pattern;
   }
 
   /**

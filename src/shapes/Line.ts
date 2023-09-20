@@ -131,11 +131,9 @@ export class Line<
     // make sure setting "fill" changes color of a line
     // (by copying fillStyle to strokeStyle, since line is stroked, not filled)
     const origStrokeStyle = ctx.strokeStyle;
-    if (isFiller(this.stroke)) {
-      ctx.strokeStyle = this.stroke.toLive(ctx)!;
-    } else {
-      ctx.strokeStyle = this.stroke ?? ctx.fillStyle;
-    }
+    ctx.strokeStyle = isFiller(this.stroke)
+      ? this.stroke.toLive(ctx, this)
+      : this.stroke ?? ctx.fillStyle;
     this.stroke && this._renderStroke(ctx);
     ctx.strokeStyle = origStrokeStyle;
   }
