@@ -306,7 +306,6 @@ export class Gradient<
     ctx: CanvasRenderingContext2D,
     target: StaticCanvas | FabricObject
   ): CanvasGradient {
-    const coords = this.coords as GradientCoords<'radial'>;
     const { offsetX = 0, offsetY = 0 } = this;
     const { x, y } =
       // correct rendering position from object rendering origin (center) to tl
@@ -327,6 +326,7 @@ export class Gradient<
       const p2 = new Point(x2, y2).transform(transform);
       gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
     } else {
+      const coords = this.coords as GradientCoords<'radial'>;
       gradient = ctx.createRadialGradient(
         coords.x1 + offsetX + x,
         coords.y1 + offsetY + y,

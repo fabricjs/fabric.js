@@ -47,7 +47,6 @@ import {
   fabricObjectDefaultValues,
   stateProperties,
 } from './defaultValues';
-import type { Gradient } from '../../gradient/Gradient';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
@@ -1029,7 +1028,7 @@ export class FabricObject<
   _setStrokeStyles(
     ctx: CanvasRenderingContext2D,
     decl: Pick<
-      this,
+      ObjectProps,
       | 'stroke'
       | 'strokeWidth'
       | 'strokeLineCap'
@@ -1049,7 +1048,10 @@ export class FabricObject<
     }
   }
 
-  _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
+  _setFillStyles(
+    ctx: CanvasRenderingContext2D,
+    { fill }: Pick<ObjectProps, 'fill'>
+  ) {
     if (fill) {
       ctx.fillStyle = isFiller(fill) ? fill.toLive(ctx, this) : fill;
     }
@@ -1184,58 +1186,6 @@ export class FabricObject<
     this._setStrokeStyles(ctx, this);
     ctx.stroke();
     ctx.restore();
-  }
-
-  /**
-   * This function try to patch the missing gradientTransform on canvas gradients.
-   * transforming a context to transform the gradient, is going to transform the stroke too.
-   * we want to transform the gradient but not the stroke operation, so we create
-   * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-   * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
-   * is limited.
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Gradient} filler
-   */
-  _applyPatternForTransformedGradient(
-    ctx: CanvasRenderingContext2D,
-    filler: TFiller
-  ) {
-    const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = createCanvasElement(),
-      retinaScaling = this.getCanvasRetinaScaling(),
-      width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
-    // in case width and height are less than 1px, we have to round up.
-    // since the pattern is no-repeat, this is fine
-    pCanvas.width = Math.ceil(width);
-    pCanvas.height = Math.ceil(height);
-    const pCtx = pCanvas.getContext('2d');
-    if (!pCtx) {
-      return;
-    }
-    pCtx.beginPath();
-    pCtx.moveTo(0, 0);
-    pCtx.lineTo(width, 0);
-    pCtx.lineTo(width, height);
-    pCtx.lineTo(0, height);
-    pCtx.closePath();
-    pCtx.translate(width / 2, height / 2);
-    pCtx.scale(
-      dims.zoomX / this.scaleX / retinaScaling,
-      dims.zoomY / this.scaleY / retinaScaling
-    );
-    pCtx.fillStyle = filler.toLive(ctx, this)!;
-    pCtx.fill();
-    ctx.translate(
-      -this.width / 2 - this.strokeWidth / 2,
-      -this.height / 2 - this.strokeWidth / 2
-    );
-    ctx.scale(
-      (retinaScaling * this.scaleX) / dims.zoomX,
-      (retinaScaling * this.scaleY) / dims.zoomY
-    );
-    ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
 
   /**
