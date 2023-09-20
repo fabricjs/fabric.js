@@ -1,6 +1,7 @@
 // first we set the env variable by importing the node env file
 import { getNodeCanvas } from './src/env/node';
 
+import { DOMMatrix } from 'canvas';
 import type { JpegConfig, PngConfig } from 'canvas';
 import {
   Canvas as CanvasBase,
@@ -9,6 +10,9 @@ import {
 import { FabricObject } from './src/shapes/Object/Object';
 
 FabricObject.ownDefaults.objectCaching = false;
+
+// @ts-expect-error global polyfill
+global.DOMMatrix = DOMMatrix;
 
 export * from './fabric';
 
