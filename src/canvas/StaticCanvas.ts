@@ -640,7 +640,6 @@ export class StaticCanvas<
     if (!fill && !object) {
       return;
     }
-    const isAFiller = isFiller(fill);
     if (fill) {
       ctx.save();
       ctx.beginPath();
@@ -649,7 +648,7 @@ export class StaticCanvas<
       ctx.lineTo(this.width, this.height);
       ctx.lineTo(0, this.height);
       ctx.closePath();
-      ctx.fillStyle = isAFiller ? fill.toLive(ctx, this)! : fill;
+      ctx.fillStyle = isFiller(fill) ? fill.toLive(ctx, this) : fill;
       if (needsVpt) {
         ctx.transform(...v);
       }

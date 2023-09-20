@@ -1045,22 +1045,13 @@ export class FabricObject<
       ctx.lineDashOffset = decl.strokeDashOffset;
       ctx.lineJoin = decl.strokeLineJoin;
       ctx.miterLimit = decl.strokeMiterLimit;
-      if (isFiller(stroke)) {
-        ctx.strokeStyle = stroke.toLive(ctx, this)!;
-      } else {
-        // is a color
-        ctx.strokeStyle = decl.stroke as string;
-      }
+      ctx.strokeStyle = isFiller(stroke) ? stroke.toLive(ctx, this) : stroke;
     }
   }
 
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
     if (fill) {
-      if (isFiller(fill)) {
-        ctx.fillStyle = fill.toLive(ctx, this)!;
-      } else {
-        ctx.fillStyle = fill;
-      }
+      ctx.fillStyle = isFiller(fill) ? fill.toLive(ctx, this) : fill;
     }
   }
 

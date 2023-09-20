@@ -1234,12 +1234,7 @@ export class Text<
     property: `${T}Style`,
     filler: TFiller | string
   ): { offsetX: number; offsetY: number } {
-    if (isFiller(filler)) {
-      ctx[property] = filler.toLive(ctx, this)!;
-    } else {
-      // is a color
-      ctx[property] = filler;
-    }
+    ctx[property] = isFiller(filler) ? filler.toLive(ctx, this) : filler;
     return { offsetX: 0, offsetY: 0 };
   }
 
