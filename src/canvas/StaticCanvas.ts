@@ -650,14 +650,13 @@ export class StaticCanvas<
       ctx.lineTo(this.width, this.height);
       ctx.lineTo(0, this.height);
       ctx.closePath();
-      ctx.fillStyle = isAFiller ? fill.toLive(ctx /* this */)! : fill;
+      ctx.fillStyle = isAFiller ? fill.toLive(ctx, this)! : fill;
       if (needsVpt) {
         ctx.transform(...v);
       }
       if (isAFiller) {
         ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
-        const m = ((fill as Gradient<'linear'>).gradientTransform ||
-          (fill as Pattern).patternTransform) as TMat2D;
+        const m = ((fill as Gradient<'linear'>).gradientTransform
         m && ctx.transform(...m);
       }
       ctx.fill();

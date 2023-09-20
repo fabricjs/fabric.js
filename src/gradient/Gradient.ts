@@ -2,7 +2,7 @@ import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { TMat2D } from '../typedefs';
+import type { TMat2D, TSize } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -295,10 +295,17 @@ export class Gradient<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
    */
-  toLive(ctx: CanvasRenderingContext2D): CanvasGradient {
+  toLive(ctx: CanvasRenderingContext2D, size: TSize): CanvasGradient {
     const coords = this.coords as GradientCoords<'radial'>;
     const gradient =
-      this.type === 'linear'
+      this.type === 'linear' && this.gradientUnits === 'percentage'
+        ? ctx.createLinearGradient(
+            coords.x1 * size.width,
+            coords.y1 * size.height,
+            coords.x2 * size.width,
+            coords.y2 * size.height
+          )
+        : this.type === 'linear'
         ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
         : ctx.createRadialGradient(
             coords.x1,

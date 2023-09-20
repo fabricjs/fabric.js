@@ -1047,11 +1047,7 @@ export class FabricObject<
       ctx.lineJoin = decl.strokeLineJoin;
       ctx.miterLimit = decl.strokeMiterLimit;
       if (isFiller(stroke)) {
-        if (
-          (stroke as Gradient<'linear'>).gradientUnits === 'percentage' ||
-          (stroke as Gradient<'linear'>).gradientTransform ||
-          (stroke as Pattern).patternTransform
-        ) {
+        if ((stroke as Gradient<'linear'>).gradientTransform) {
           // need to transform gradient in a pattern.
           // this is a slow process. If you are hitting this codepath, and the object
           // is not using caching, you should consider switching it on.
@@ -1059,7 +1055,7 @@ export class FabricObject<
           this._applyPatternForTransformedGradient(ctx, stroke);
         } else {
           // is a simple gradient or pattern
-          ctx.strokeStyle = stroke.toLive(ctx)!;
+          ctx.strokeStyle = stroke.toLive(ctx, this)!;
           this._applyPatternGradientTransform(ctx, stroke);
         }
       } else {
@@ -1072,7 +1068,7 @@ export class FabricObject<
   _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
     if (fill) {
       if (isFiller(fill)) {
-        ctx.fillStyle = fill.toLive(ctx)!;
+        ctx.fillStyle = fill.toLive(ctx, this)!;
         this._applyPatternGradientTransform(ctx, fill);
       } else {
         ctx.fillStyle = fill;
@@ -1155,17 +1151,11 @@ export class FabricObject<
     if (!isFiller(filler)) {
       return { offsetX: 0, offsetY: 0 };
     }
-    const t =
-      (filler as Gradient<'linear'>).gradientTransform ||
-      (filler as Pattern).patternTransform;
+    const t = (filler as Gradient<'linear'>).gradientTransform;
     const offsetX = -this.width / 2 + filler.offsetX || 0,
       offsetY = -this.height / 2 + filler.offsetY || 0;
 
-    if ((filler as Gradient<'linear'>).gradientUnits === 'percentage') {
-      ctx.transform(this.width, 0, 0, this.height, offsetX, offsetY);
-    } else {
-      ctx.transform(1, 0, 0, 1, offsetX, offsetY);
-    }
+    ctx.transform(1, 0, 0, 1, offsetX, offsetY);
     if (t) {
       ctx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
     }
@@ -1280,7 +1270,7 @@ export class FabricObject<
       dims.zoomY / this.scaleY / retinaScaling
     );
     this._applyPatternGradientTransform(pCtx, filler);
-    pCtx.fillStyle = filler.toLive(ctx)!;
+    pCtx.fillStyle = filler.toLive(ctx, this)!;
     pCtx.fill();
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,

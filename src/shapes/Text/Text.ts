@@ -44,7 +44,6 @@ import {
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
-import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1257,7 +1256,7 @@ export class Text<
     pCtx.lineTo(0, height);
     pCtx.closePath();
     pCtx.translate(width / 2, height / 2);
-    pCtx.fillStyle = filler.toLive(pCtx)!;
+    pCtx.fillStyle = filler.toLive(pCtx, this)!;
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fill();
     return pCtx.createPattern(pCanvas, 'no-repeat')!;
@@ -1270,11 +1269,7 @@ export class Text<
   ): { offsetX: number; offsetY: number } {
     let offsetX: number, offsetY: number;
     if (isFiller(filler)) {
-      if (
-        (filler as Gradient<'linear'>).gradientUnits === 'percentage' ||
-        (filler as Gradient<'linear'>).gradientTransform ||
-        (filler as Pattern).patternTransform
-      ) {
+      if ((filler as Gradient<'linear'>).gradientTransform) {
         // need to transform gradient in a pattern.
         // this is a slow process. If you are hitting this codepath, and the object
         // is not using caching, you should consider switching it on.
@@ -1286,7 +1281,7 @@ export class Text<
         return { offsetX, offsetY };
       } else {
         // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx)!;
+        ctx[property] = filler.toLive(ctx, this)!;
         return this._applyPatternGradientTransform(ctx, filler);
       }
     } else {

@@ -138,7 +138,10 @@ export class Pattern {
       return null;
     }
 
-    return ctx.createPattern(this.source, this.repeat)!;
+    const pattern = ctx.createPattern(this.source, this.repeat)!;
+    this.patternTransform &&
+      pattern.setTransform(new DOMMatrix(this.patternTransform));
+    return pattern;
   }
 
   /**
