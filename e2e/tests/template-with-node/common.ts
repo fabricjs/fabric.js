@@ -14,4 +14,5 @@ export function render(canvas: StaticCanvas, fabric: typeof import('fabric')) {
   canvas.add(textbox);
   canvas.centerObjectH(textbox);
   canvas.renderAll();
+  return { textbox };
 }

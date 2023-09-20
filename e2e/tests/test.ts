@@ -3,10 +3,13 @@
  */
 
 import type { Object as FabricObject } from 'fabric';
-import { Canvas } from 'fabric';
+import { Canvas, type StaticCanvas } from 'fabric';
 import * as fabric from 'fabric';
 
-const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
+const canvasMap = (window.canvasMap = new Map<
+  HTMLCanvasElement,
+  Canvas | StaticCanvas
+>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
 
 type AsyncReturnValue<T> = T | Promise<T>;
@@ -33,7 +36,7 @@ export function before(
    * @returns a map of objects for playwright to access during tests
    */
   cb: (canvas: HTMLCanvasElement) => AsyncReturnValue<{
-    canvas: Canvas;
+    canvas: Canvas | StaticCanvas;
     objects?: Record<string, FabricObject>;
   }>
 ) {
@@ -72,7 +75,7 @@ export function beforeAll(
 
 export function after(
   selector: string,
-  cb: (canvas: Canvas) => AsyncReturnValue<void>
+  cb: (canvas: Canvas | StaticCanvas) => AsyncReturnValue<void>
 ) {
   teardownTasks.push(() => {
     const el = document.querySelector<HTMLCanvasElement>(selector);

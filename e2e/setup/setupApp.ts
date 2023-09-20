@@ -4,6 +4,9 @@ import path from 'path';
 import imports from '../imports';
 import { JSDOM } from 'jsdom';
 
+/**
+ * @param {Function} [testConfig] pass data/config from the test to the browser
+ */
 export default (testConfig: () => any = () => {}) => {
   test.beforeEach(async ({ page }, { file }) => {
     await page.exposeFunction('testConfig', testConfig);

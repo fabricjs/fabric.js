@@ -2,13 +2,10 @@
  * Runs from both the browser and node
  */
 
-import type { StaticCanvas } from 'fabric';
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 export function render(
-  canvas: StaticCanvas,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   fabric: typeof import('fabric'),
-  { type }: { type: 'text' | 'rect' }
+  { type, el }: { type: 'text' | 'rect'; el?: HTMLCanvasElement }
 ) {
   const targets = new Array(8).fill(0).map((_, index) => {
     const angle = index * 45;
@@ -51,5 +48,14 @@ export function render(
         });
   });
 
+  const canvas = new fabric.StaticCanvas(el, {
+    width: 1000,
+    height: 400,
+    backgroundColor: 'white',
+    enableRetinaScaling: false,
+  });
   canvas.add(...targets);
+  canvas.renderAll();
+
+  return { canvas };
 }
