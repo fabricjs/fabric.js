@@ -24,6 +24,7 @@ import type { StaticCanvas } from '../canvas/StaticCanvas';
 import {
   createScaleMatrix,
   createTranslateMatrix,
+  magnitude,
   multiplyTransformMatrixArray,
 } from '../util';
 import { Point } from '../Point';
@@ -306,34 +307,35 @@ export class Gradient<
     ctx: CanvasRenderingContext2D,
     target: StaticCanvas | FabricObject
   ): CanvasGradient {
-    const coords = this.coords as GradientCoords<'radial'>;
     const { offsetX = 0, offsetY = 0 } = this;
     const { x, y } =
       // correct rendering position from object rendering origin (center) to tl
       target instanceof FabricObject
         ? { x: -target.width / 2, y: -target.height / 2 }
         : { x: 0, y: 0 };
+    const transform = multiplyTransformMatrixArray([
+      this.gradientTransform,
+      createTranslateMatrix(offsetX + x, offsetY + y),
+      this.gradientUnits === 'percentage' &&
+        createScaleMatrix(target.width, target.height),
+    ]);
+    const { x1, y1, x2, y2 } = this.coords;
+    const p1 = new Point(x1, y1).transform(transform);
+    const p2 = new Point(x2, y2).transform(transform);
 
     let gradient: CanvasGradient;
     if (this.type === 'linear') {
-      const transform = multiplyTransformMatrixArray([
-        this.gradientTransform,
-        createTranslateMatrix(offsetX + x, offsetY + y),
-        this.gradientUnits === 'percentage' &&
-          createScaleMatrix(target.width, target.height),
-      ]);
-      const { x1, y1, x2, y2 } = this.coords;
-      const p1 = new Point(x1, y1).transform(transform);
-      const p2 = new Point(x2, y2).transform(transform);
       gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
     } else {
+      const { r1, r2 } = this.coords as GradientCoords<'radial'>;
+      const hypot = magnitude(new Point(1, 0).transform(transform, true));
       gradient = ctx.createRadialGradient(
-        coords.x1 + offsetX + x,
-        coords.y1 + offsetY + y,
-        coords.r1,
-        coords.x2 + offsetX + x,
-        coords.y2 + offsetY + y,
-        coords.r2
+        p1.x,
+        p1.y,
+        r1 * hypot,
+        p2.x,
+        p2.y,
+        r2 * hypot
       );
     }
 

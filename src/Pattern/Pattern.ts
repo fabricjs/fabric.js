@@ -131,7 +131,7 @@ export class Pattern {
   toLive(
     ctx: CanvasRenderingContext2D,
     target: StaticCanvas | FabricObject
-  ): CanvasPattern | null {
+  ): CanvasPattern | '' {
     if (
       // if the image failed to load, return, and allow rest to continue loading
       !this.source ||
@@ -141,7 +141,7 @@ export class Pattern {
           this.source.naturalWidth === 0 ||
           this.source.naturalHeight === 0))
     ) {
-      return null;
+      return '';
     }
 
     const pattern = ctx.createPattern(this.source, this.repeat)!;

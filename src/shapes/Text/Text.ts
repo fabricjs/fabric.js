@@ -13,7 +13,6 @@ import type {
   Abortable,
   TCacheCanvasDimensions,
   TClassProperties,
-  TFiller,
   TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
@@ -42,7 +41,6 @@ import {
   JUSTIFY_RIGHT,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
-import { isFiller } from '../../util/typeAssertions';
 import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1229,53 +1227,6 @@ export class Text<
     ctx.restore();
   }
 
-  handleFiller<T extends 'fill' | 'stroke'>(
-    ctx: CanvasRenderingContext2D,
-    property: `${T}Style`,
-    filler: TFiller | string
-  ): { offsetX: number; offsetY: number } {
-    if (isFiller(filler)) {
-      ctx[property] = filler.toLive(ctx, this)!;
-    } else {
-      // is a color
-      ctx[property] = filler;
-    }
-    return { offsetX: 0, offsetY: 0 };
-  }
-
-  /**
-   * This function prepare the canvas for a stroke style, and stroke and strokeWidth
-   * need to be sent in as defined
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {CompleteTextStyleDeclaration} style with stroke and strokeWidth defined
-   * @returns
-   */
-  _setStrokeStyles(
-    ctx: CanvasRenderingContext2D,
-    {
-      stroke,
-      strokeWidth,
-    }: Pick<CompleteTextStyleDeclaration, 'stroke' | 'strokeWidth'>
-  ) {
-    ctx.lineWidth = strokeWidth;
-    ctx.lineCap = this.strokeLineCap;
-    ctx.lineDashOffset = this.strokeDashOffset;
-    ctx.lineJoin = this.strokeLineJoin;
-    ctx.miterLimit = this.strokeMiterLimit;
-    return this.handleFiller(ctx, 'strokeStyle', stroke!);
-  }
-
-  /**
-   * This function prepare the canvas for a ill style, and fill
-   * need to be sent in as defined
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {CompleteTextStyleDeclaration} style with ill defined
-   * @returns
-   */
-  _setFillStyles(ctx: CanvasRenderingContext2D, { fill }: Pick<this, 'fill'>) {
-    return this.handleFiller(ctx, 'fillStyle', fill!);
-  }
-
   /**
    * @private
    * @param {String} method
@@ -1317,21 +1268,19 @@ export class Text<
     }
 
     if (shouldFill) {
-      const fillOffsets = this._setFillStyles(ctx, fullDecl);
-      ctx.fillText(
-        _char,
-        left - fillOffsets.offsetX,
-        top - fillOffsets.offsetY
-      );
+      this._setFillStyles(ctx, fullDecl);
+      ctx.fillText(_char, left, top);
     }
 
     if (shouldStroke) {
-      const strokeOffsets = this._setStrokeStyles(ctx, fullDecl);
-      ctx.strokeText(
-        _char,
-        left - strokeOffsets.offsetX,
-        top - strokeOffsets.offsetY
-      );
+      this._setStrokeStyles(ctx, {
+        strokeLineCap: this.strokeLineCap,
+        strokeDashOffset: this.strokeDashOffset,
+        strokeLineJoin: this.strokeLineJoin,
+        strokeMiterLimit: this.strokeMiterLimit,
+        ...fullDecl,
+      });
+      ctx.strokeText(_char, left, top);
     }
 
     ctx.restore();
