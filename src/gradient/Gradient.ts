@@ -21,6 +21,12 @@ import type {
 import { classRegistry } from '../ClassRegistry';
 import { isPath } from '../util/typeAssertions';
 import type { StaticCanvas } from '../canvas/StaticCanvas';
+import {
+  createScaleMatrix,
+  createTranslateMatrix,
+  multiplyTransformMatrixArray,
+} from '../util';
+import { Point } from '../Point';
 
 /**
  * Gradient class
@@ -307,28 +313,29 @@ export class Gradient<
       target instanceof FabricObject
         ? { x: -target.width / 2, y: -target.height / 2 }
         : { x: 0, y: 0 };
-    const { x: sx, y: sy } =
-      target instanceof FabricObject
-        ? { x: target.width, y: target.height }
-        : { x: 0, y: 0 };
-    const gradient =
-      this.type === 'linear' && this.gradientUnits === 'percentage'
-        ? ctx.createLinearGradient(
-            coords.x1 * sx + offsetX + x,
-            coords.y1 * sy + offsetY + y,
-            coords.x2 * sx + offsetX + x,
-            coords.y2 * sy + offsetY + y
-          )
-        : this.type === 'linear'
-        ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
-        : ctx.createRadialGradient(
-            coords.x1 + offsetX + x,
-            coords.y1 + offsetY + y,
-            coords.r1,
-            coords.x2 + offsetX + x,
-            coords.y2 + offsetY + y,
-            coords.r2
-          );
+
+    let gradient: CanvasGradient;
+    if (this.type === 'linear') {
+      const transform = multiplyTransformMatrixArray([
+        this.gradientTransform,
+        createTranslateMatrix(offsetX + x, offsetY + y),
+        this.gradientUnits === 'percentage' &&
+          createScaleMatrix(target.width, target.height),
+      ]);
+      const { x1, y1, x2, y2 } = this.coords;
+      const p1 = new Point(x1, y1).transform(transform);
+      const p2 = new Point(x2, y2).transform(transform);
+      gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+    } else {
+      gradient = ctx.createRadialGradient(
+        coords.x1 + offsetX + x,
+        coords.y1 + offsetY + y,
+        coords.r1,
+        coords.x2 + offsetX + x,
+        coords.y2 + offsetY + y,
+        coords.r2
+      );
+    }
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(

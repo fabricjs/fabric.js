@@ -43,7 +43,6 @@ import {
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
-import type { Gradient } from '../../gradient/Gradient';
 import type { CSSRules } from '../../parser/typedefs';
 
 let measuringContext: CanvasRenderingContext2D | null;
@@ -1230,60 +1229,13 @@ export class Text<
     ctx.restore();
   }
 
-  /**
-   * This function try to patch the missing gradientTransform on canvas gradients.
-   * transforming a context to transform the gradient, is going to transform the stroke too.
-   * we want to transform the gradient but not the stroke operation, so we create
-   * a transformed gradient on a pattern and then we use the pattern instead of the gradient.
-   * this method has drawbacks: is slow, is in low resolution, needs a patch for when the size
-   * is limited.
-   * @private
-   * @param {TFiller} filler a fabric gradient instance
-   * @return {CanvasPattern} a pattern to use as fill/stroke style
-   */
-  _applyPatternGradientTransformText(filler: TFiller) {
-    const pCanvas = createCanvasElement(),
-      // TODO: verify compatibility with strokeUniform
-      width = this.width + this.strokeWidth,
-      height = this.height + this.strokeWidth,
-      pCtx = pCanvas.getContext('2d')!;
-    pCanvas.width = width;
-    pCanvas.height = height;
-    pCtx.beginPath();
-    pCtx.moveTo(0, 0);
-    pCtx.lineTo(width, 0);
-    pCtx.lineTo(width, height);
-    pCtx.lineTo(0, height);
-    pCtx.closePath();
-    pCtx.translate(width / 2, height / 2);
-    pCtx.fillStyle = filler.toLive(pCtx, this)!;
-    this._applyPatternGradientTransform(pCtx, filler);
-    pCtx.fill();
-    return pCtx.createPattern(pCanvas, 'no-repeat')!;
-  }
-
   handleFiller<T extends 'fill' | 'stroke'>(
     ctx: CanvasRenderingContext2D,
     property: `${T}Style`,
     filler: TFiller | string
   ): { offsetX: number; offsetY: number } {
-    let offsetX: number, offsetY: number;
     if (isFiller(filler)) {
-      if ((filler as Gradient<'linear'>).gradientTransform) {
-        // need to transform gradient in a pattern.
-        // this is a slow process. If you are hitting this codepath, and the object
-        // is not using caching, you should consider switching it on.
-        // we need a canvas as big as the current object caching canvas.
-        offsetX = -this.width / 2;
-        offsetY = -this.height / 2;
-        ctx.translate(offsetX, offsetY);
-        ctx[property] = this._applyPatternGradientTransformText(filler);
-        return { offsetX, offsetY };
-      } else {
-        // is a simple gradient or pattern
-        ctx[property] = filler.toLive(ctx, this)!;
-        return this._applyPatternGradientTransform(ctx, filler);
-      }
+      ctx[property] = filler.toLive(ctx, this)!;
     } else {
       // is a color
       ctx[property] = filler;

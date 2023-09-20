@@ -155,8 +155,8 @@ export class Pattern {
       pattern.setTransform(
         new DOMMatrix(
           multiplyTransformMatrixArray([
-            createTranslateMatrix(offsetX + x, offsetY + y),
             patternTransform,
+            createTranslateMatrix(offsetX + x, offsetY + y),
           ])
         )
       );

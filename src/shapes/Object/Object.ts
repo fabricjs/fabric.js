@@ -48,7 +48,6 @@ import {
   stateProperties,
 } from './defaultValues';
 import type { Gradient } from '../../gradient/Gradient';
-import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
@@ -1047,17 +1046,7 @@ export class FabricObject<
       ctx.lineJoin = decl.strokeLineJoin;
       ctx.miterLimit = decl.strokeMiterLimit;
       if (isFiller(stroke)) {
-        if ((stroke as Gradient<'linear'>).gradientTransform) {
-          // need to transform gradient in a pattern.
-          // this is a slow process. If you are hitting this codepath, and the object
-          // is not using caching, you should consider switching it on.
-          // we need a canvas as big as the current object caching canvas.
-          this._applyPatternForTransformedGradient(ctx, stroke);
-        } else {
-          // is a simple gradient or pattern
-          ctx.strokeStyle = stroke.toLive(ctx, this)!;
-          this._applyPatternGradientTransform(ctx, stroke);
-        }
+        ctx.strokeStyle = stroke.toLive(ctx, this)!;
       } else {
         // is a color
         ctx.strokeStyle = decl.stroke as string;
@@ -1069,7 +1058,6 @@ export class FabricObject<
     if (fill) {
       if (isFiller(fill)) {
         ctx.fillStyle = fill.toLive(ctx, this)!;
-        this._applyPatternGradientTransform(ctx, fill);
       } else {
         ctx.fillStyle = fill;
       }
@@ -1137,25 +1125,6 @@ export class FabricObject<
 
     ctx.shadowColor = '';
     ctx.shadowBlur = ctx.shadowOffsetX = ctx.shadowOffsetY = 0;
-  }
-
-  /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {TFiller} filler {@link Pattern} or {@link Gradient}
-   */
-  _applyPatternGradientTransform(
-    ctx: CanvasRenderingContext2D,
-    filler: TFiller
-  ) {
-    if (!isFiller(filler)) {
-      return { offsetX: 0, offsetY: 0 };
-    }
-    const t = (filler as Gradient<'linear'>).gradientTransform;
-    if (t) {
-      ctx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
-    }
-    return { offsetX: 0, offsetY: 0 };
   }
 
   /**
@@ -1265,7 +1234,6 @@ export class FabricObject<
       dims.zoomX / this.scaleX / retinaScaling,
       dims.zoomY / this.scaleY / retinaScaling
     );
-    this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fillStyle = filler.toLive(ctx, this)!;
     pCtx.fill();
     ctx.translate(

@@ -1,7 +1,6 @@
 import { config } from '../config';
 import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
-import type { Gradient } from '../gradient/Gradient';
 import { createCollectionMixin } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
@@ -653,10 +652,6 @@ export class StaticCanvas<
       ctx.fillStyle = isAFiller ? fill.toLive(ctx, this)! : fill;
       if (needsVpt) {
         ctx.transform(...v);
-      }
-      if (isAFiller) {
-        const m = (fill as Gradient<'linear'>).gradientTransform;
-        m && ctx.transform(...m);
       }
       ctx.fill();
       ctx.restore();
