@@ -1,8 +1,8 @@
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
-import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { TMat2D, TSize } from '../typedefs';
+import { FabricObject } from '../shapes/Object/Object';
+import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -20,6 +20,7 @@ import type {
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { isPath } from '../util/typeAssertions';
+import type { StaticCanvas } from '../canvas/StaticCanvas';
 
 /**
  * Gradient class
@@ -295,25 +296,37 @@ export class Gradient<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
    */
-  toLive(ctx: CanvasRenderingContext2D, size: TSize): CanvasGradient {
+  toLive(
+    ctx: CanvasRenderingContext2D,
+    target: StaticCanvas | FabricObject
+  ): CanvasGradient {
     const coords = this.coords as GradientCoords<'radial'>;
     const { offsetX = 0, offsetY = 0 } = this;
+    const { x, y } =
+      // correct rendering position from object rendering origin (center) to tl
+      target instanceof FabricObject
+        ? { x: -target.width / 2, y: -target.height / 2 }
+        : { x: 0, y: 0 };
+    const { x: sx, y: sy } =
+      target instanceof FabricObject
+        ? { x: target.width, y: target.height }
+        : { x: 0, y: 0 };
     const gradient =
       this.type === 'linear' && this.gradientUnits === 'percentage'
         ? ctx.createLinearGradient(
-            coords.x1 * size.width + offsetX,
-            coords.y1 * size.height + offsetY,
-            coords.x2 * size.width + offsetX,
-            coords.y2 * size.height + offsetY
+            coords.x1 * sx + offsetX + x,
+            coords.y1 * sy + offsetY + y,
+            coords.x2 * sx + offsetX + x,
+            coords.y2 * sy + offsetY + y
           )
         : this.type === 'linear'
         ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
         : ctx.createRadialGradient(
-            coords.x1 + offsetX,
-            coords.y1 + offsetY,
+            coords.x1 + offsetX + x,
+            coords.y1 + offsetY + y,
             coords.r1,
-            coords.x2 + offsetX,
-            coords.y2 + offsetY,
+            coords.x2 + offsetX + x,
+            coords.y2 + offsetY + y,
             coords.r2
           );
 

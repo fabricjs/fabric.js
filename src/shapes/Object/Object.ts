@@ -1152,14 +1152,10 @@ export class FabricObject<
       return { offsetX: 0, offsetY: 0 };
     }
     const t = (filler as Gradient<'linear'>).gradientTransform;
-    const offsetX = -this.width / 2,
-      offsetY = -this.height / 2;
-
-    ctx.transform(1, 0, 0, 1, offsetX, offsetY);
     if (t) {
       ctx.transform(t[0], t[1], t[2], t[3], t[4], t[5]);
     }
-    return { offsetX: offsetX, offsetY: offsetY };
+    return { offsetX: 0, offsetY: 0 };
   }
 
   /**
