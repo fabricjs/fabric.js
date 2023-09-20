@@ -655,7 +655,6 @@ export class StaticCanvas<
         ctx.transform(...v);
       }
       if (isAFiller) {
-        ctx.transform(1, 0, 0, 1, fill.offsetX || 0, fill.offsetY || 0);
         const m = ((fill as Gradient<'linear'>).gradientTransform
         m && ctx.transform(...m);
       }

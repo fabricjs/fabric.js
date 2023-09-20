@@ -11,6 +11,7 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
+import { createTranslateMatrix, multiplyTransformMatrixArray } from '../util';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -139,8 +140,17 @@ export class Pattern {
     }
 
     const pattern = ctx.createPattern(this.source, this.repeat)!;
-    this.patternTransform &&
-      pattern.setTransform(new DOMMatrix(this.patternTransform));
+    const { patternTransform, offsetX = 0, offsetY = 0 } = this;
+    if (patternTransform || offsetX || offsetY) {
+      pattern.setTransform(
+        new DOMMatrix(
+          multiplyTransformMatrixArray([
+            createTranslateMatrix(offsetX, offsetY),
+            patternTransform,
+          ])
+        )
+      );
+    }
     return pattern;
   }
 

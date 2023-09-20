@@ -297,22 +297,23 @@ export class Gradient<
    */
   toLive(ctx: CanvasRenderingContext2D, size: TSize): CanvasGradient {
     const coords = this.coords as GradientCoords<'radial'>;
+    const { offsetX = 0, offsetY = 0 } = this;
     const gradient =
       this.type === 'linear' && this.gradientUnits === 'percentage'
         ? ctx.createLinearGradient(
-            coords.x1 * size.width,
-            coords.y1 * size.height,
-            coords.x2 * size.width,
-            coords.y2 * size.height
+            coords.x1 * size.width + offsetX,
+            coords.y1 * size.height + offsetY,
+            coords.x2 * size.width + offsetX,
+            coords.y2 * size.height + offsetY
           )
         : this.type === 'linear'
         ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
         : ctx.createRadialGradient(
-            coords.x1,
-            coords.y1,
+            coords.x1 + offsetX,
+            coords.y1 + offsetY,
             coords.r1,
-            coords.x2,
-            coords.y2,
+            coords.x2 + offsetX,
+            coords.y2 + offsetY,
             coords.r2
           );
 
