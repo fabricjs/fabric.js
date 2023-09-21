@@ -29,6 +29,7 @@ import {
   multiplyTransformMatrixArray,
 } from '../util';
 import { Point } from '../Point';
+import { Line } from '../shapes/Line';
 
 /**
  * Gradient class
@@ -301,13 +302,14 @@ export class Gradient<
 
   /**
    * The gradient is applied from the starting point to the end point.
-   * This means that in order to transform the gradient we should transform the points orthogonally
+   * This means that in order to transform the gradient correctly we should transform the points orthogonally
+   * with the exception of {@link Line} which defines its plane the same as the gradient
    * @returns the transposed matrix rotated by -90°
    */
-  protected calcTransform() {
+  protected calcTransform(target: StaticCanvas | FabricObject) {
     const { gradientTransform: t } = this;
-    if (!t || isIdentityMatrix(t)) {
-      return;
+    if (!t || isIdentityMatrix(t) || target instanceof Line) {
+      return t;
     }
     const [a, b, c, d, e, f] = t;
     return [c, -a, d, -b, e, f] as TMat2D;
@@ -330,7 +332,7 @@ export class Gradient<
         : { x: 0, y: 0 };
     const transform = multiplyTransformMatrixArray([
       createTranslateMatrix(x, y),
-      this.calcTransform(),
+      this.calcTransform(target),
       createTranslateMatrix(offsetX, offsetY),
       this.gradientUnits === 'percentage' &&
         createScaleMatrix(target.width, target.height),
