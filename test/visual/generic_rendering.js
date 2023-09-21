@@ -62,8 +62,8 @@
     golden: 'generic1.png',
     newModule: 'Generic rendering',
     percentage: 0.09,
-    width: 150,
-    height: 60,
+    width: 140,
+    height: 40,
   });
 
   function renderStrokeWithNegativeScale(canvas, callback) {
@@ -176,10 +176,10 @@
     height: 210,
   });
 
-  function backgroundWithGradient(canvas, callback) {
-    var g = new fabric.Gradient({
+  function createGradient() {
+    return new fabric.Gradient({
       type: 'linear',
-      gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
+      gradientTransform: [0.4, -0.4, 0.2, 0.1, 150, 250],
       coords: {
         x1: 0,
         y1: 0,
@@ -199,7 +199,10 @@
         color: 'blue'
       }]
     });
-    canvas.set({ backgroundColor: g });
+  }
+
+  function backgroundWithGradient(canvas, callback) {
+    canvas.set({ backgroundColor: createGradient() });
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
   }
@@ -215,31 +218,7 @@
 
   function backgroundWithGradientZoom(canvas, callback) {
     canvas.setZoom(0.1);
-    var g = new fabric.Gradient({
-      type: 'linear',
-      gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 300,
-        y2: 0
-      },
-      colorStops: [{
-        offset: 0,
-        color: 'green'
-      },
-      {
-        offset: 0.5,
-        color: 'white'
-      },
-      {
-        offset: 1,
-        color: 'blue'
-      }]
-    });
-    canvas.set({ backgroundColor: g });
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    backgroundWithGradient(canvas, callback);
   }
 
   tests.push({
@@ -254,36 +233,27 @@
   function backgroundWithGradientNoVpt(canvas, callback) {
     canvas.setZoom(0.1);
     canvas.backgroundVpt = false;
-    var g = new fabric.Gradient({
-      type: 'linear',
-      gradientTransform: [0.4 , -0.4, 0.2, 0.1, 3, 5],
-      coords: {
-        x1: 0,
-        y1: 0,
-        x2: 200,
-        y2: 0
-      },
-      colorStops: [{
-        offset: 0,
-        color: 'green'
-      },
-      {
-        offset: 0.5,
-        color: 'white'
-      },
-      {
-        offset: 1,
-        color: 'blue'
-      }]
-    });
-    canvas.set({ backgroundColor: g });
-    canvas.renderAll();
-    callback(canvas.lowerCanvasEl);
+    backgroundWithGradient(canvas, callback);
   }
 
   tests.push({
     test: 'canvas can have a gradient background with zoom but being unaffected',
     code: backgroundWithGradientNoVpt,
+    golden: 'backgroundWithGradient.png',
+    percentage: 0.09,
+    width: 300,
+    height: 300,
+  });
+
+  function backgroundWithRectGradient(canvas, callback) {
+    canvas.add(new fabric.Rect({ width: 300, height: 400, fill: createGradient() }));
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'adding a rect with a gradient should render the same output as a gradient on the background',
+    code: backgroundWithRectGradient,
     golden: 'backgroundWithGradient.png',
     percentage: 0.09,
     width: 300,
@@ -519,8 +489,21 @@
     newModule: 'Gradient stroke',
     // loose diff because firefox
     percentage: 0.04,
-    width: 300,
-    height: 300,
+    width: 210,
+    height: 210,
+  });
+
+  tests.push({
+    test: 'Use the gradient strokeStyle for line(other shape is ok) - strict test (rotated for less whitespace)',
+    code: (canvas, callback) => {
+      canvas.setViewportTransform(fabric.util.createRotateMatrix({ angle: -45 }, { x: 10, y: 10 }));
+      gradientStroke(canvas, callback);
+    },
+    golden: 'gradientStroke1.png',
+    // loose diff because firefox
+    percentage: 0.04,
+    width: 290,
+    height: 20,
   });
 
   function textGradientFill(canvas, callback) {
@@ -559,6 +542,7 @@
     canvas.add(
       text
     );
+    canvas.setViewportTransform(fabric.util.createTranslateMatrix(-25, 25));
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
 
@@ -570,8 +554,8 @@
     golden: 'textGradientFill.png',
     newModule: 'Text gradient fill',
     percentage: 0.04,
-    width: 300,
-    height: 100,
+    width: 180,
+    height: 45,
   });
 
   function polygonAndPaths(canvas, callback) {
