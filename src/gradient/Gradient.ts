@@ -22,9 +22,9 @@ import { classRegistry } from '../ClassRegistry';
 import { isPath } from '../util/typeAssertions';
 import type { StaticCanvas } from '../canvas/StaticCanvas';
 import {
-  createRotateMatrix,
   createScaleMatrix,
   createTranslateMatrix,
+  isIdentityMatrix,
   magnitude,
   multiplyTransformMatrixArray,
 } from '../util';
@@ -300,6 +300,20 @@ export class Gradient<
   /* _TO_SVG_END_ */
 
   /**
+   * The gradient is applied from the starting point to the end point.
+   * This means that in order to transform the gradient we should transform the points orthogonally
+   * @returns the transposed matrix rotated by -90°
+   */
+  protected calcTransform() {
+    const { gradientTransform: t } = this;
+    if (!t || isIdentityMatrix(t)) {
+      return;
+    }
+    const [a, b, c, d, e, f] = t;
+    return [c, -a, d, -b, e, f] as TMat2D;
+  }
+
+  /**
    * Returns an instance of CanvasGradient
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @return {CanvasGradient}
@@ -314,15 +328,9 @@ export class Gradient<
       target instanceof FabricObject
         ? { x: -target.width / 2, y: -target.height / 2 }
         : { x: 0, y: 0 };
-    const [a, b, c, d, e, f] = this.gradientTransform || iMatrix;
-    const transpose: TMat2D = multiplyTransformMatrixArray([
-      createTranslateMatrix(e, f),
-      createRotateMatrix({ angle: -90 }),
-      [a, c, b, d, f, -e],
-    ]);
     const transform = multiplyTransformMatrixArray([
       createTranslateMatrix(x, y),
-      transpose,
+      this.calcTransform(),
       createTranslateMatrix(offsetX, offsetY),
       this.gradientUnits === 'percentage' &&
         createScaleMatrix(target.width, target.height),
