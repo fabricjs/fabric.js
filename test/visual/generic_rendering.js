@@ -210,7 +210,7 @@
   tests.push({
     test: 'canvas can have a gradient background',
     code: backgroundWithGradient,
-    golden: 'backgroundWithGradient.png',
+    golden: 'backgroundWithGradient1.png',
     percentage: 0.09,
     width: 300,
     height: 300,
@@ -239,14 +239,14 @@
   tests.push({
     test: 'canvas can have a gradient background with zoom but being unaffected',
     code: backgroundWithGradientNoVpt,
-    golden: 'backgroundWithGradient.png',
+    golden: 'backgroundWithGradient2.png',
     percentage: 0.09,
     width: 300,
     height: 300,
   });
 
   function backgroundWithRectGradient(canvas, callback) {
-    canvas.add(new fabric.Rect({ width: 300, height: 400, fill: createGradient() }));
+    canvas.add(new fabric.Rect({ width: 300, height: 300, fill: createGradient() }));
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
   }
@@ -254,7 +254,7 @@
   tests.push({
     test: 'adding a rect with a gradient should render the same output as a gradient on the background',
     code: backgroundWithRectGradient,
-    golden: 'backgroundWithGradient.png',
+    golden: 'backgroundWithGradient3.png',
     percentage: 0.09,
     width: 300,
     height: 300,
