@@ -13,6 +13,7 @@ import {
   createTranslateMatrix,
   isIdentityMatrix,
   multiplyTransformMatrixArray,
+  qrDecompose,
 } from '../util/misc/matrix';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -355,6 +356,15 @@ export class Gradient<
     const gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
     this.applyColorStops(gradient);
     return gradient;
+  }
+
+  needsPatternRendering() {
+    return (
+      this.type === 'radial' &&
+      this.gradientTransform &&
+      (this.gradientTransform[1] || this.gradientTransform[2]) &&
+      qrDecompose(this.gradientTransform).skewX
+    );
   }
 
   /**
