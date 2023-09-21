@@ -358,13 +358,14 @@ export class Gradient<
     return gradient;
   }
 
-  needsPatternRendering() {
+  requiresContextTransforming(target: StaticCanvas | FabricObject) {
     return (
       this.type === 'radial' &&
-      this.gradientTransform &&
-      (this.gradientTransform[0] !== this.gradientTransform[3] ||
-        ((this.gradientTransform[1] || this.gradientTransform[2]) &&
-          qrDecompose(this.gradientTransform).skewX))
+      (target.width !== target.height ||
+        (this.gradientTransform &&
+          (this.gradientTransform[0] !== this.gradientTransform[3] ||
+            ((this.gradientTransform[1] || this.gradientTransform[2]) &&
+              qrDecompose(this.gradientTransform).skewX))))
     );
   }
 

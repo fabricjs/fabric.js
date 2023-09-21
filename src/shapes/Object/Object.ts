@@ -51,6 +51,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import { getEnv } from '../../env';
+import { Gradient } from '../../gradient/Gradient';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -1044,6 +1045,12 @@ export class FabricObject<
       ctx.lineDashOffset = decl.strokeDashOffset;
       ctx.lineJoin = decl.strokeLineJoin;
       ctx.miterLimit = decl.strokeMiterLimit;
+      if (
+        stroke instanceof Gradient &&
+        stroke.requiresContextTransforming(this)
+      ) {
+        return;
+      }
       ctx.strokeStyle = isFiller(stroke) ? stroke.toLive(ctx, this) : stroke;
     }
   }
@@ -1053,6 +1060,9 @@ export class FabricObject<
     { fill }: Pick<ObjectProps, 'fill'>
   ) {
     if (fill) {
+      if (fill instanceof Gradient && fill.requiresContextTransforming(this)) {
+        return;
+      }
       ctx.fillStyle = isFiller(fill) ? fill.toLive(ctx, this) : fill;
     }
   }
