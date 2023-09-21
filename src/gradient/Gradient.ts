@@ -321,9 +321,9 @@ export class Gradient<
         createScaleMatrix(target.width, target.height),
     ]);
     const transpose: TMat2D = multiplyTransformMatrixArray([
-      createTranslateMatrix(-e, -f),
+      createTranslateMatrix(e, f),
       createRotateMatrix({ angle: -90 }),
-      [a, c, b, d, e, f],
+      [a, c, b, d, f, -e],
     ]);
     const { x1, y1, x2, y2 } = this.coords;
     const p1 = new Point(x1, y1).transform(transpose);
