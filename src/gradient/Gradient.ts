@@ -314,27 +314,30 @@ export class Gradient<
       target instanceof FabricObject
         ? { x: -target.width / 2, y: -target.height / 2 }
         : { x: 0, y: 0 };
-    const [a, b, c, d, e, f] = multiplyTransformMatrixArray([
-      this.gradientTransform,
-      createTranslateMatrix(offsetX + x, offsetY + y),
-      this.gradientUnits === 'percentage' &&
-        createScaleMatrix(target.width, target.height),
-    ]);
+    const [a, b, c, d, e, f] = this.gradientTransform || iMatrix;
     const transpose: TMat2D = multiplyTransformMatrixArray([
       createTranslateMatrix(e, f),
       createRotateMatrix({ angle: -90 }),
       [a, c, b, d, f, -e],
     ]);
+    const transform = multiplyTransformMatrixArray([
+      createTranslateMatrix(x, y),
+      transpose,
+      createTranslateMatrix(offsetX, offsetY),
+      this.gradientUnits === 'percentage' &&
+        createScaleMatrix(target.width, target.height),
+    ]);
+
     const { x1, y1, x2, y2 } = this.coords;
-    const p1 = new Point(x1, y1).transform(transpose);
-    const p2 = new Point(x2, y2).transform(transpose);
+    const p1 = new Point(x1, y1).transform(transform);
+    const p2 = new Point(x2, y2).transform(transform);
     console.log(p1, p2);
     let gradient: CanvasGradient;
     if (this.type === 'linear') {
       gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
     } else {
       const { r1, r2 } = this.coords as GradientCoords<'radial'>;
-      const hypot = magnitude(new Point(1, 0).transform(transpose, true));
+      const hypot = magnitude(new Point(1, 0).transform(transform, true));
       gradient = ctx.createRadialGradient(
         p1.x,
         p1.y,
