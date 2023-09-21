@@ -187,6 +187,10 @@ export class Path<
     this._renderPaintInOrder(ctx);
   }
 
+  shouldTransposeGradientTransform() {
+    return false;
+  }
+
   /**
    * Returns string representation of an instance
    * @return {string} string representation of an instance

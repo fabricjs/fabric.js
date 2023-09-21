@@ -1057,6 +1057,10 @@ export class FabricObject<
     }
   }
 
+  shouldTransposeGradientTransform() {
+    return true;
+  }
+
   _setClippingProperties(ctx: CanvasRenderingContext2D) {
     ctx.globalAlpha = 1;
     ctx.strokeStyle = 'transparent';

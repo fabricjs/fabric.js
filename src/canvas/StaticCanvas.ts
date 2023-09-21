@@ -624,6 +624,10 @@ export class StaticCanvas<
     }
   }
 
+  shouldTransposeGradientTransform() {
+    return true;
+  }
+
   /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on

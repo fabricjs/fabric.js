@@ -1,15 +1,27 @@
+import { classRegistry } from '../ClassRegistry';
+import { Point } from '../Point';
+import type { StaticCanvas } from '../canvas/StaticCanvas';
 import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import { FabricObject } from '../shapes/Object/Object';
 import type { TMat2D } from '../typedefs';
+
 import { uid } from '../util/internals/uid';
+import {
+  createScaleMatrix,
+  createTranslateMatrix,
+  isIdentityMatrix,
+  multiplyTransformMatrixArray,
+} from '../util/misc/matrix';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
+import { magnitude } from '../util/misc/vectors';
+import { isPath } from '../util/typeAssertions';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
+import { parseGradientUnits, parseType } from './parser/misc';
 import { parseColorStops } from './parser/parseColorStops';
 import { parseCoords } from './parser/parseCoords';
-import { parseType, parseGradientUnits } from './parser/misc';
 import type {
   ColorStop,
   GradientCoords,
@@ -18,18 +30,6 @@ import type {
   GradientUnits,
   SVGOptions,
 } from './typedefs';
-import { classRegistry } from '../ClassRegistry';
-import { isPath } from '../util/typeAssertions';
-import type { StaticCanvas } from '../canvas/StaticCanvas';
-import {
-  createScaleMatrix,
-  createTranslateMatrix,
-  isIdentityMatrix,
-  magnitude,
-  multiplyTransformMatrixArray,
-} from '../util';
-import { Point } from '../Point';
-import { Line } from '../shapes/Line';
 
 /**
  * Gradient class
@@ -314,12 +314,16 @@ export class Gradient<
   /**
    * The gradient is applied from the starting point to the end point.
    * This means that in order to transform the gradient correctly we should transform the points orthogonally
-   * with the exception of {@link Line} which defines its plane the same as the gradient
+   * with the exception of Path, Polys, Line that define its plane the same as the gradient
    * @returns the transposed matrix rotated by -90°
    */
   protected calcTransform(target: StaticCanvas | FabricObject) {
     const { gradientTransform: t } = this;
-    if (!t || isIdentityMatrix(t) || target instanceof Line) {
+    if (
+      !t ||
+      isIdentityMatrix(t) ||
+      !(target as FabricObject).shouldTransposeGradientTransform?.()
+    ) {
       return t;
     }
     const [a, b, c, d, e, f] = t;

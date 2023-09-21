@@ -79,6 +79,10 @@ export class Line<
     typeof top === 'number' && this.set(TOP, top);
   }
 
+  shouldTransposeGradientTransform() {
+    return false;
+  }
+
   /**
    * @private
    * @param {Object} [options] Options

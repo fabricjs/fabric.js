@@ -13,6 +13,10 @@ export class Polygon extends Polyline {
     };
   }
 
+  shouldTransposeGradientTransform() {
+    return false;
+  }
+
   protected isOpen() {
     return false;
   }
