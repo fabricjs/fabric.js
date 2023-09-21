@@ -300,6 +300,17 @@ export class Gradient<
   }
   /* _TO_SVG_END_ */
 
+  protected applyColorStops(gradient: CanvasGradient) {
+    this.colorStops.forEach(({ color, opacity, offset }) => {
+      gradient.addColorStop(
+        offset,
+        typeof opacity === 'number'
+          ? new Color(color).setAlpha(opacity).toRgba()
+          : color
+      );
+    });
+  }
+
   /**
    * The gradient is applied from the starting point to the end point.
    * This means that in order to transform the gradient correctly we should transform the points orthogonally
@@ -313,6 +324,33 @@ export class Gradient<
     }
     const [a, b, c, d, e, f] = t;
     return [c, -a, d, -b, e, f] as TMat2D;
+  }
+
+  protected createLinearGradient(
+    ctx: CanvasRenderingContext2D,
+    target: StaticCanvas | FabricObject
+  ) {
+    const { offsetX = 0, offsetY = 0 } = this;
+    const { x, y } =
+      // correct rendering position from object rendering origin (center) to tl
+      target instanceof FabricObject
+        ? { x: -target.width / 2, y: -target.height / 2 }
+        : { x: 0, y: 0 };
+
+    const transform = multiplyTransformMatrixArray([
+      createTranslateMatrix(x, y),
+      this.calcTransform(target),
+      createTranslateMatrix(offsetX, offsetY),
+      this.gradientUnits === 'percentage' &&
+        createScaleMatrix(target.width, target.height),
+    ]);
+
+    const { x1, y1, x2, y2 } = this.coords;
+    const p1 = new Point(x1, y1).transform(transform);
+    const p2 = new Point(x2, y2).transform(transform);
+    const gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+    this.applyColorStops(gradient);
+    return gradient;
   }
 
   /**
@@ -341,10 +379,9 @@ export class Gradient<
     const { x1, y1, x2, y2 } = this.coords;
     const p1 = new Point(x1, y1).transform(transform);
     const p2 = new Point(x2, y2).transform(transform);
-    console.log(p1, p2);
     let gradient: CanvasGradient;
     if (this.type === 'linear') {
-      gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+      gradient = this.createLinearGradient(ctx, target);
     } else {
       const { r1, r2 } = this.coords as GradientCoords<'radial'>;
       const hypot = magnitude(new Point(1, 0).transform(transform, true));
@@ -356,16 +393,8 @@ export class Gradient<
         p2.y,
         r2 * hypot
       );
+      this.applyColorStops(gradient);
     }
-
-    this.colorStops.forEach(({ color, opacity, offset }) => {
-      gradient.addColorStop(
-        offset,
-        typeof opacity !== 'undefined'
-          ? new Color(color).setAlpha(opacity).toRgba()
-          : color
-      );
-    });
 
     return gradient;
   }
