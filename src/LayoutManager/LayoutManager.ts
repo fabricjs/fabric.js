@@ -7,6 +7,14 @@ import { invertTransform } from '../util/misc/matrix';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
+import {
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_REMOVED,
+  LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_OBJECT_MODIFIED,
+  LAYOUT_TYPE_OBJECT_MODIFYING,
+} from './constants';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
 export class LayoutManager {
@@ -51,7 +59,7 @@ export class LayoutManager {
         this.performLayout({
           trigger: 'modified',
           e: { ...e, target: object },
-          type: 'object_modified',
+          type: LAYOUT_TYPE_OBJECT_MODIFIED,
           target,
         })
       ),
@@ -69,7 +77,7 @@ export class LayoutManager {
           this.performLayout({
             trigger: key,
             e: { ...e, target: object },
-            type: 'object_modifying',
+            type: LAYOUT_TYPE_OBJECT_MODIFYING,
             target,
           })
         )
@@ -98,10 +106,11 @@ export class LayoutManager {
     if (
       // subscribe only if instance is the target's `layoutManager`
       target.layoutManager === this &&
-      (context.type === 'initialization' || context.type === 'added')
+      (context.type === LAYOUT_TYPE_INITIALIZATION ||
+        context.type === LAYOUT_TYPE_ADDED)
     ) {
       context.targets.forEach((object) => this.subscribe(object, context));
-    } else if (context.type === 'removed') {
+    } else if (context.type === LAYOUT_TYPE_REMOVED) {
       context.targets.forEach((object) => this.unsubscribe(object, context));
     }
 
@@ -110,7 +119,7 @@ export class LayoutManager {
       context,
     });
 
-    if (context.type === 'imperative' && context.deep) {
+    if (context.type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
       const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
       target.forEachObject((object) => {
@@ -128,7 +137,7 @@ export class LayoutManager {
   ): Required<LayoutResult> | undefined {
     const { target } = context;
     const prevCenter =
-      context.type === 'initialization'
+      context.type === LAYOUT_TYPE_INITIALIZATION
         ? new Point()
         : target.getRelativeCenterPoint();
 
@@ -147,14 +156,15 @@ export class LayoutManager {
       relativeCorrection = new Point(),
     } = result;
     const offset =
-      context.type === 'initialization' && context.objectsRelativeToGroup
+      context.type === LAYOUT_TYPE_INITIALIZATION &&
+      context.objectsRelativeToGroup
         ? new Point()
         : prevCenter
             .subtract(nextCenter)
             .add(correction)
             .transform(
               // in `initialization` we do not account for target's transformation matrix
-              context.type === 'initialization'
+              context.type === LAYOUT_TYPE_INITIALIZATION
                 ? iMatrix
                 : invertTransform(target.calcOwnMatrix()),
               true
@@ -184,7 +194,7 @@ export class LayoutManager {
     this.layoutObjects(context, layoutResult);
     //  set position
     // in `initialization` we do not account for target's transformation matrix
-    if (context.type === 'initialization') {
+    if (context.type === LAYOUT_TYPE_INITIALIZATION) {
       // TODO: what about strokeWidth?
       target.set({
         left:
@@ -205,7 +215,8 @@ export class LayoutManager {
   ) {
     const { target } = context;
     //  adjust objects to account for new center
-    (context.type !== 'initialization' || !context.objectsRelativeToGroup) &&
+    (context.type !== LAYOUT_TYPE_INITIALIZATION ||
+      !context.objectsRelativeToGroup) &&
       target.forEachObject((object) => {
         object.group === target &&
           this.layoutObject(context, layoutResult, object);

@@ -3,6 +3,12 @@ import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
+import {
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_REMOVED,
+  LAYOUT_TYPE_IMPERATIVE,
+} from './constants';
 import type {
   LayoutContext,
   LayoutResult,
@@ -53,7 +59,7 @@ describe('Layout Manager', () => {
       const targets = [new Group([new FabricObject()]), new FabricObject()];
       const target = new Group(targets);
       manager.performLayout({
-        type: 'initialization',
+        type: LAYOUT_TYPE_INITIALIZATION,
         target,
         targets,
       });
@@ -61,7 +67,7 @@ describe('Layout Manager', () => {
       const context = {
         bubbles: true,
         strategy: manager.strategy,
-        type: 'initialization',
+        type: LAYOUT_TYPE_INITIALIZATION,
         target,
         targets,
         prevStrategy: undefined,
@@ -179,7 +185,7 @@ describe('Layout Manager', () => {
       const object = new FabricObject();
       const target = new Group([object]);
       manager.performLayout({
-        type: 'initialization',
+        type: LAYOUT_TYPE_INITIALIZATION,
         target,
         targets: [object],
       });
@@ -188,9 +194,9 @@ describe('Layout Manager', () => {
     });
 
     it.each([
-      { trigger: 'initialization', action: 'subscribe' },
-      { trigger: 'added', action: 'subscribe' },
-      { trigger: 'removed', action: 'unsubscribe' },
+      { trigger: LAYOUT_TYPE_INITIALIZATION, action: 'subscribe' },
+      { trigger: LAYOUT_TYPE_ADDED, action: 'subscribe' },
+      { trigger: LAYOUT_TYPE_REMOVED, action: 'unsubscribe' },
     ] as {
       trigger: LayoutTrigger;
       action: 'subscribe' | 'unsubscribe';
@@ -219,7 +225,7 @@ describe('Layout Manager', () => {
         const context: StrictLayoutContext = {
           bubbles: true,
           strategy: manager.strategy,
-          type: 'initialization',
+          type: LAYOUT_TYPE_INITIALIZATION,
           target,
           targets,
           prevStrategy: undefined,
@@ -250,7 +256,7 @@ describe('Layout Manager', () => {
       const context: StrictLayoutContext = {
         bubbles: true,
         strategy: manager.strategy,
-        type: 'imperative',
+        type: LAYOUT_TYPE_IMPERATIVE,
         deep: true,
         target,
         prevStrategy: undefined,
@@ -263,13 +269,13 @@ describe('Layout Manager', () => {
       expect(performLayout).toHaveBeenCalledTimes(2);
       expect(performLayout.mock.calls[0][0]).toMatchObject({
         bubbles: false,
-        type: 'imperative',
+        type: LAYOUT_TYPE_IMPERATIVE,
         deep: true,
         target: child,
       });
       expect(performLayout.mock.calls[1][0]).toMatchObject({
         bubbles: false,
-        type: 'imperative',
+        type: LAYOUT_TYPE_IMPERATIVE,
         deep: true,
         target: grandchild,
       });
@@ -278,9 +284,13 @@ describe('Layout Manager', () => {
 
   describe('getLayoutResult', () => {
     test.each([
-      { type: 'initialization', targets: [] },
-      { type: 'initialization', objectsRelativeToGroup: true, targets: [] },
-      { type: 'imperative' },
+      { type: LAYOUT_TYPE_INITIALIZATION, targets: [] },
+      {
+        type: LAYOUT_TYPE_INITIALIZATION,
+        objectsRelativeToGroup: true,
+        targets: [],
+      },
+      { type: LAYOUT_TYPE_IMPERATIVE },
     ] as const)('$type trigger', (options) => {
       const manager = new LayoutManager();
       jest.spyOn(manager.strategy, 'calcLayoutResult').mockReturnValue({
@@ -309,7 +319,7 @@ describe('Layout Manager', () => {
   describe('commitLayout', () => {
     const prepareTest = (
       contextOptions: {
-        type: 'initialization' | 'added';
+        type: INITIALIZATION | ADDED;
       } & Partial<LayoutContext>
     ) => {
       const lifecycle: jest.SpyInstance[] = [];
@@ -380,7 +390,7 @@ describe('Layout Manager', () => {
           mocks: { layoutObjects },
           targetMocks,
           lifecycle,
-        } = prepareTest({ type: 'initialization', ...pos });
+        } = prepareTest({ type: LAYOUT_TYPE_INITIALIZATION, ...pos });
         const {
           result: {
             size: { x: width, y: height },
@@ -411,7 +421,7 @@ describe('Layout Manager', () => {
         mocks: { layoutObjects },
         targetMocks,
         lifecycle,
-      } = prepareTest({ type: 'added' });
+      } = prepareTest({ type: LAYOUT_TYPE_ADDED });
       const {
         result: {
           size: { x: width, y: height },
@@ -466,7 +476,7 @@ describe('Layout Manager', () => {
         const context: StrictLayoutContext = {
           bubbles,
           strategy: manager.strategy,
-          type: 'added',
+          type: LAYOUT_TYPE_ADDED,
           target,
           targets,
           prevStrategy: undefined,
@@ -495,7 +505,7 @@ describe('Layout Manager', () => {
         bubbles &&
           expect(parentPerformLayout.mock.calls[0]).toMatchObject([
             {
-              type: 'added',
+              type: LAYOUT_TYPE_ADDED,
               targets,
               target: parent,
               path: [target],
@@ -519,7 +529,7 @@ describe('Layout Manager', () => {
       const context: StrictLayoutContext = {
         bubbles: true,
         strategy: manager.strategy,
-        type: 'removed',
+        type: LAYOUT_TYPE_REMOVED,
         target,
         targets,
         prevStrategy: undefined,
@@ -548,7 +558,7 @@ describe('Layout Manager', () => {
       const context: StrictLayoutContext = {
         bubbles: true,
         strategy: manager.strategy,
-        type: 'added',
+        type: LAYOUT_TYPE_ADDED,
         target,
         targets,
         prevStrategy: undefined,
@@ -566,7 +576,7 @@ describe('Layout Manager', () => {
 
       expect(grandParentPerformLayout.mock.calls[0]).toMatchObject([
         {
-          type: 'added',
+          type: LAYOUT_TYPE_ADDED,
           targets,
           target: grandParent,
           path: [target, parent],

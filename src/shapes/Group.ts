@@ -21,6 +21,12 @@ import type {
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
 import { FixedLayout } from '../LayoutManager';
+import {
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_REMOVED,
+} from '../LayoutManager/constants';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -136,7 +142,7 @@ export class Group
       // legacy
       new LayoutManager(new FixedLayout())
     ).performLayout({
-      type: 'initialization',
+      type: LAYOUT_TYPE_INITIALIZATION,
       objectsRelativeToGroup,
       target: this,
       targets: [...objects],
@@ -191,7 +197,7 @@ export class Group
   add(...objects: FabricObject[]) {
     const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
     const size = super.add(...allowedObjects);
-    this._onAfterObjectsChange('added', allowedObjects);
+    this._onAfterObjectsChange(LAYOUT_TYPE_ADDED, allowedObjects);
     return size;
   }
 
@@ -203,7 +209,7 @@ export class Group
   insertAt(index: number, ...objects: FabricObject[]) {
     const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
     const size = super.insertAt(index, ...allowedObjects);
-    this._onAfterObjectsChange('added', allowedObjects);
+    this._onAfterObjectsChange(LAYOUT_TYPE_ADDED, allowedObjects);
     return size;
   }
 
@@ -214,7 +220,7 @@ export class Group
    */
   remove(...objects: FabricObject[]) {
     const removed = super.remove(...objects);
-    this._onAfterObjectsChange('removed', removed);
+    this._onAfterObjectsChange(LAYOUT_TYPE_REMOVED, removed);
     return removed;
   }
 
@@ -487,7 +493,7 @@ export class Group
   }: ImperativeLayoutOptions = {}) {
     manager.performLayout({
       target: this,
-      type: 'imperative',
+      type: LAYOUT_TYPE_IMPERATIVE,
       strategy,
       ...rest,
     });

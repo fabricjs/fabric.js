@@ -9,14 +9,22 @@ import type { ITextEvents } from '../shapes/IText/ITextBehavior';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { LayoutManager } from './LayoutManager';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
+import type {
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_REMOVED,
+  LAYOUT_TYPE_OBJECT_MODIFIED,
+  LAYOUT_TYPE_OBJECT_MODIFYING,
+} from './constants';
 
 export type LayoutTrigger =
-  | 'initialization'
-  | 'object_modifying'
-  | 'object_modified'
-  | 'added'
-  | 'removed'
-  | 'imperative';
+  | typeof LAYOUT_TYPE_INITIALIZATION
+  | typeof LAYOUT_TYPE_OBJECT_MODIFYING
+  | typeof LAYOUT_TYPE_OBJECT_MODIFIED
+  | typeof LAYOUT_TYPE_ADDED
+  | typeof LAYOUT_TYPE_REMOVED
+  | typeof LAYOUT_TYPE_IMPERATIVE;
 
 export type LayoutStrategyResult = {
   /**
@@ -76,7 +84,7 @@ export type CommonLayoutContext = {
 };
 
 export type InitializationLayoutContext = CommonLayoutContext & {
-  type: 'initialization';
+  type: typeof LAYOUT_TYPE_INITIALIZATION;
   objectsRelativeToGroup?: boolean;
   targets: FabricObject[];
   x?: number;
@@ -84,19 +92,19 @@ export type InitializationLayoutContext = CommonLayoutContext & {
 };
 
 export type CollectionChangeLayoutContext = CommonLayoutContext & {
-  type: 'added' | 'removed';
+  type: typeof LAYOUT_TYPE_ADDED | typeof LAYOUT_TYPE_REMOVED;
   targets: FabricObject[];
 };
 
 export type ObjectModifiedLayoutContext = CommonLayoutContext & {
-  type: 'object_modified';
+  type: typeof LAYOUT_TYPE_OBJECT_MODIFIED;
   trigger: 'modified';
   e: ModifiedEvent;
 };
 
 export type ObjectModifyingLayoutContext =
   | CommonLayoutContext & {
-      type: 'object_modifying';
+      type: typeof LAYOUT_TYPE_OBJECT_MODIFYING;
     } & (
         | {
             trigger: TModificationEvents;
@@ -110,7 +118,7 @@ export type ObjectModifyingLayoutContext =
 
 export type ImperativeLayoutContext = CommonLayoutContext &
   ImperativeLayoutCommonOptions & {
-    type: 'imperative';
+    type: typeof LAYOUT_TYPE_IMPERATIVE;
   };
 
 export type LayoutContext =

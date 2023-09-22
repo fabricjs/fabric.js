@@ -4,6 +4,10 @@ import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 import { LayoutManager } from '../LayoutManager';
+import {
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_REMOVED,
+} from '../LayoutManager/constants';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -135,10 +139,10 @@ export class ActiveSelection extends Group {
         !groups.includes(object.group) &&
         groups.push(object.group);
     });
-    if (type === 'removed') {
+    if (type === LAYOUT_TYPE_REMOVED) {
       //  invalidate groups' layout and mark as dirty
       groups.forEach((group) => {
-        group._onAfterObjectsChange('added', targets);
+        group._onAfterObjectsChange(LAYOUT_TYPE_ADDED, targets);
       });
     } else {
       //  mark groups as dirty
