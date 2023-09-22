@@ -24,6 +24,7 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
+import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -1440,6 +1441,7 @@ export class StaticCanvas<
   dispose() {
     !this.disposed &&
       this.elements.cleanupDOM({ width: this.width, height: this.height });
+    runningAnimations.cancelByCanvas(this);
     this.disposed = true;
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
