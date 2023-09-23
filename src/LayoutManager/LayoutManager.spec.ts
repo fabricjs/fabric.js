@@ -319,7 +319,7 @@ describe('Layout Manager', () => {
   describe('commitLayout', () => {
     const prepareTest = (
       contextOptions: {
-        type: INITIALIZATION | ADDED;
+        type: typeof LAYOUT_TYPE_INITIALIZATION | typeof LAYOUT_TYPE_ADDED;
       } & Partial<LayoutContext>
     ) => {
       const lifecycle: jest.SpyInstance[] = [];
