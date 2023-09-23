@@ -18,7 +18,7 @@ import { Textbox } from '../shapes/Textbox';
 import { Triangle } from '../shapes/Triangle';
 import { createImage } from '../util';
 
-describe('Safeguarding from type', () => {
+describe('Safeguarding from the type property', () => {
   describe.each(
     (
       [
@@ -74,7 +74,7 @@ describe('Safeguarding from type', () => {
     test('constructor is safeguarded', async () => {
       const object = new Test(...args);
       expect(object.__options.type).toBeDefined();
-      // expect(object.type).toBeUndefined()
+      expect(object.type).toBeUndefined();
       expect(object.constructor.type).toBeDefined();
       expect(object.toObject().type).toBe(object.constructor.type);
     });

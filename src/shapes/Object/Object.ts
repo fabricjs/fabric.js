@@ -277,23 +277,6 @@ export class FabricObject<
   static type = 'FabricObject';
 
   /**
-   * Legacy identifier of the class. Prefer using utils like isType or instanceOf
-   * Will be removed in fabric 7 or 8.
-   * The setter exists because is very hard to catch all the ways in which a type value
-   * could be set in the instance
-   * @TODO add sustainable warning message
-   * @type string
-   * @deprecated
-   */
-  get type() {
-    throw new Error('get type');
-  }
-
-  set type(value) {
-    throw new Error('set type');
-  }
-
-  /**
    * Constructor
    * @param {Object} [options] Options object
    */
