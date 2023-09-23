@@ -401,7 +401,7 @@ export class BaseFilter {
   }
 
   static async fromObject(
-    { type, ...filterOptions }: Record<string, any>,
+    { type: _, ...filterOptions }: Record<string, any>,
     options?: Abortable
   ) {
     return new this(filterOptions);

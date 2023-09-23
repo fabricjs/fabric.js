@@ -86,7 +86,7 @@ export class MyFilter extends BaseFilter {
     gl.uniform1f(uniformLocations.uMyParameter, this.myParameter);
   }
 
-  static async fromObject(object: any) {
+  static async fromObject({ type: _, ...object }: any) {
     // or overide with custom logic if your filter needs to
     // deserialize something that is not a plain value
     return new this(object) as BaseFilter;

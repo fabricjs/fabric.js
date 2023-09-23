@@ -217,7 +217,7 @@ export class BlendImage extends BaseFilter {
    * @returns {Promise<BlendImage>}
    */
   static fromObject(
-    { type, image, ...filterOptions }: Record<string, any>,
+    { type: _, image, ...filterOptions }: Record<string, any>,
     options?: Abortable
   ) {
     return Image.fromObject(image, options).then(
