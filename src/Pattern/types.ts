@@ -13,5 +13,6 @@ type ExportedKeys =
 export type PatternOptions = Partial<Pick<Pattern, ExportedKeys>>;
 
 export type SerializedPatternOptions = PatternOptions & {
+  type: string;
   source: string;
 };

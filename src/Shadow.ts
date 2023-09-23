@@ -2,7 +2,7 @@ import { Color } from './color/Color';
 import { config } from './config';
 import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
-import type { TClassProperties } from './typedefs';
+import type { TClassProperties, TOptions } from './typedefs';
 import { uid } from './util/internals/uid';
 import { pickBy } from './util/misc/pick';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
@@ -92,7 +92,7 @@ export class Shadow {
   constructor(options: Partial<TClassProperties<Shadow>>);
   constructor(svgAttribute: string);
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
-    const { type: _, ...options }: Partial<TClassProperties<Shadow>> =
+    const { type: _, ...options }: TOptions<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
     Object.assign(this, {
       ...(this.constructor as typeof Shadow).ownDefaults,
@@ -192,8 +192,7 @@ export class Shadow {
    * @return {Object} Object representation of a shadow instance
    */
   toObject() {
-    const data: SerializedShadowOptions = {
-      type: (this.constructor as typeof Shadow).type,
+    const data: Omit<SerializedShadowOptions, 'type'> = {
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,
@@ -202,9 +201,12 @@ export class Shadow {
       nonScaling: this.nonScaling,
     };
     const defaults = Shadow.ownDefaults;
-    return !this.includeDefaultValues
-      ? pickBy(data, (value, key) => value !== defaults[key])
-      : data;
+    return {
+      type: (this.constructor as typeof Shadow).type,
+      ...(!this.includeDefaultValues
+        ? pickBy(data, (value, key) => value !== defaults[key])
+        : data),
+    };
   }
 
   /**

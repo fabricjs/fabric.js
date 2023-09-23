@@ -10,7 +10,6 @@ import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
-import type { Path } from '../shapes/Path';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -57,15 +56,6 @@ export const isTextObject = (
     ['Text', 'IText', 'Textbox'].some(
       (type) => type === (fabricObject.constructor as typeof FabricObject).type
     )
-  );
-};
-
-export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
-  // we could use instanceof but that would mean pulling in Text code for a simple check
-  // @todo discuss what to do and how to do
-  return (
-    !!fabricObject &&
-    (fabricObject.constructor as typeof FabricObject).type === 'Path'
   );
 };
 

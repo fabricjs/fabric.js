@@ -2,7 +2,7 @@ import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
-import type { TMat2D } from '../typedefs';
+import type { TMat2D, TSize } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
@@ -19,7 +19,7 @@ import type {
   SVGOptions,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { isPath } from '../util/typeAssertions';
+import type { XY } from '../Point';
 
 /**
  * Gradient class
@@ -170,7 +170,7 @@ export class Gradient<
    * @return {String} SVG representation of an gradient (linear/radial)
    */
   toSVG(
-    object: FabricObject,
+    { width, height, pathOffset }: TSize & { pathOffset?: XY },
     { additionalTransform: preTransform }: { additionalTransform?: string } = {}
   ) {
     const markup = [],
@@ -193,16 +193,16 @@ export class Gradient<
     let offsetX = -this.offsetX,
       offsetY = -this.offsetY;
     if (gradientUnits === 'objectBoundingBox') {
-      offsetX /= object.width;
-      offsetY /= object.height;
+      offsetX /= width;
+      offsetY /= height;
     } else {
-      offsetX += object.width / 2;
-      offsetY += object.height / 2;
+      offsetX += width / 2;
+      offsetY += height / 2;
     }
     // todo what about polygon/polyline?
-    if (isPath(object) && this.gradientUnits !== 'percentage') {
-      offsetX -= object.pathOffset.x;
-      offsetY -= object.pathOffset.y;
+    if (pathOffset && this.gradientUnits !== 'percentage') {
+      offsetX -= pathOffset.x;
+      offsetY -= pathOffset.y;
     }
     transform[4] -= offsetX;
     transform[5] -= offsetY;

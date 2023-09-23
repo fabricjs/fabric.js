@@ -1,5 +1,11 @@
 import { config } from '../config';
-import type { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
+import type {
+  Abortable,
+  TCrossOrigin,
+  TMat2D,
+  TOptions,
+  TSize,
+} from '../typedefs';
 import { ifNaN } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
@@ -75,7 +81,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor({ type: _, ...options }: PatternOptions = {}) {
+  constructor({ type: _, ...options }: TOptions<PatternOptions> = {}) {
     this.id = uid();
     Object.assign(this, options);
   }
