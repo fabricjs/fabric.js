@@ -50,8 +50,7 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import type { SerializedObjectProps } from './types/SerializedObjectProps';
-import type { ObjectProps } from './types/ObjectProps';
+import type { ObjectProps, SerializedObjectProps } from './types/ObjectProps';
 import { getEnv } from '../../env';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
