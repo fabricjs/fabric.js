@@ -36,6 +36,7 @@ module.exports = {
     ],
     'no-restricted-syntax': [
       'error',
+      // explore how to define the selector: https://astexplorer.net/
       {
         selector: '[callee.object.name="Math"][callee.property.name="hypot"]',
         message:
@@ -49,6 +50,10 @@ module.exports = {
       {
         selector: '[callee.object.name="console"]',
         message: 'Use the `log` util',
+      },
+      {
+        selector: 'NewExpression[callee.name="Error"]',
+        message: 'Use `FabricError`',
       },
     ],
   },
