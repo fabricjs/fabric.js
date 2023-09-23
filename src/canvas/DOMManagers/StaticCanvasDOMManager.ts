@@ -20,16 +20,17 @@ export class StaticCanvasDOMManager {
 
   lower: CanvasItem;
 
-  constructor(arg0: string | HTMLCanvasElement) {
+  constructor(arg0?: string | HTMLCanvasElement) {
     const el = this.createLowerCanvas(arg0);
     this.lower = { el, ctx: el.getContext('2d')! };
   }
 
-  protected createLowerCanvas(arg0: HTMLCanvasElement | string) {
+  protected createLowerCanvas(arg0?: HTMLCanvasElement | string) {
     // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
     const el = isHTMLCanvas(arg0)
       ? arg0
-      : (getFabricDocument().getElementById(arg0) as HTMLCanvasElement) ||
+      : (arg0 &&
+          (getFabricDocument().getElementById(arg0) as HTMLCanvasElement)) ||
         createCanvasElement();
     if (el.hasAttribute('data-fabric')) {
       /* _DEV_MODE_START_ */

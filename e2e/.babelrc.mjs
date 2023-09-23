@@ -1,8 +1,11 @@
 // https://github.com/viruscamp/babel-plugin-transform-imports#using-a-function-as-the-transformer
 
-const path = require('path');
+import path from 'path';
+import { createRequire } from 'module';
+
 const testsDir = path.resolve('./e2e/tests');
 const testsBuiltDir = path.resolve('./e2e/dist');
+const require = createRequire(process.cwd());
 
 function resolve(file) {
   const found = ['', '.ts', '/index.ts']
@@ -21,7 +24,7 @@ function resolve(file) {
   return require.resolve(found).replace(/\.ts$/, '.js');
 }
 
-module.exports = {
+export default {
   extends: '../.babelrcAlt',
   plugins: [
     [

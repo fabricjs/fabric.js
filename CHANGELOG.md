@@ -3,6 +3,21 @@
 ## [next]
 
 - fix(Canvas): `getPointer` bug, rm `_normalizePointer`, `restorePointerVpt` [#9175](https://github.com/fabricjs/fabric.js/pull/9175)
+- fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
+- fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
+- TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
+
+## [6.0.0-b13]
+
+- fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
+- Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
+- test(e2e): improve test case for line shifting and style with more colors [#9327](https://github.com/fabricjs/fabric.js/pull/9327)
+- test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
+- fix(ActiveSelection): make sure canvas is in charge of setting initial coords [#9322](https://github.com/fabricjs/fabric.js/pull/9322)
+- test(): Migrate json control tests [#9323](https://github.com/fabricjs/fabric.js/pull/9323)
+- fix() Textbox inputs with new lines, regression from #9097 [#9192](https://github.com/fabricjs/fabric.js/pull/9192)
+- docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
+- test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
 - fix(CanvasEvents): regression of `getPointer` usages + BREAKING: drop event data [#9186](https://github.com/fabricjs/fabric.js/pull/9186)
 - feat(Object): BREAKING rm \_setOriginToCenter and \_resetOrigin unuseful methods [#9179](https://github.com/fabricjs/fabric.js/pull/9179)
 - fix(ActiveSelection): reset positioning when cleared [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
