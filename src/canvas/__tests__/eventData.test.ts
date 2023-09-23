@@ -99,4 +99,31 @@ describe('Canvas event data', () => {
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     }
   );
+
+  test('getPointInScene', () => {
+    const canvas = new Canvas(undefined, {
+      enableRetinaScaling: true,
+      width: 200,
+      height: 200,
+    });
+    jest.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
+    const spy = jest.spyOn(canvas, 'getPointer');
+    jest.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
+      width: 500,
+      height: 500,
+    });
+    jest.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
+    jest.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
+    const ev = new MouseEvent('mousemove', {
+      clientX: 50,
+      clientY: 50,
+    });
+    const point = canvas.getPointInScene(ev);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenNthCalledWith(1, ev);
+    canvas._cacheTransformEventData(ev);
+    expect(point).toEqual(canvas['_absolutePointer']);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenNthCalledWith(2, ev, true);
+  });
 });
