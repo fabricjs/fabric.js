@@ -1,7 +1,9 @@
 export const log = (
   severity: 'log' | 'warn' | 'error',
   message: string | Error
-) => console[severity]('fabric', message);
+) =>
+  // eslint-disable-next-line no-restricted-syntax
+  console[severity]('fabric', message);
 
 export class FabricError extends Error {
   constructor(message?: string, options?: ErrorOptions) {

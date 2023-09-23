@@ -46,6 +46,10 @@ module.exports = {
         message:
           'Aliasing or destructing `Math` is not allowed due to restrictions on `Math.hypot` usage.',
       },
+      {
+        selector: '[callee.object.name="console"]',
+        message: 'Use the `log` util',
+      },
     ],
   },
 };
