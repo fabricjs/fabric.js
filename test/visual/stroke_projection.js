@@ -173,7 +173,7 @@ QUnit.module.skip('stroke projection', (hooks) => {
 
   for (let [caseName, casePoints] of Object.entries(generalCasesToTest)) {
     [fabric.Polyline, fabric.Polygon].forEach((builder) => {
-      const builderType = builder.prototype.type,
+      const builderType = builder.constructor.type,
         isPolygon = builderType === 'polygon',
         strokes = isPolygon
           ? ['miter', 'round', 'bevel']
@@ -259,7 +259,7 @@ QUnit.module.skip('stroke projection', (hooks) => {
   }
 
   [fabric.Polyline, fabric.Polygon].forEach((builder) => {
-    const builderType = builder.prototype.type,
+    const builderType = builder.constructor.type,
       isPolygon = builderType === 'polygon';
     ['square', 'round'].forEach((strokeLineCap) => {
       [true, false].forEach((strokeUniform) => {

@@ -53,7 +53,6 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import { getEnv } from '../../env';
-import { log } from '../../util/internals/console';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -288,6 +287,7 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
+    throw new Error('get type');
     const name = (this.constructor as typeof FabricObject).type;
     if (name === 'FabricObject') {
       return 'object';
@@ -296,14 +296,15 @@ export class FabricObject<
   }
 
   set type(value) {
-    log('warn', 'Setting type has no effect', value);
+    // log('warn', 'Setting type has no effect', value);
+    throw new Error('set type');
   }
 
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Props = {} as Props) {
+  constructor({ type: _, ...options }: Props = {} as Props) {
     super();
     Object.assign(
       this,
@@ -1455,18 +1456,6 @@ export class FabricObject<
       this.toCanvasElement(options),
       options.format || 'png',
       options.quality || 1
-    );
-  }
-
-  /**
-   * Returns true if any of the specified types is identical to the type of an instance
-   * @param {String} type Type to check against
-   * @return {Boolean}
-   */
-  isType(...types: string[]) {
-    return (
-      types.includes((this.constructor as typeof FabricObject).type) ||
-      types.includes(this.type)
     );
   }
 

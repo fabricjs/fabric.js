@@ -18,15 +18,6 @@ import { FabricError } from '../util/internals/console';
 
 export class BaseFilter {
   /**
-   * Filter type
-   * @param {String} type
-   * @default
-   */
-  get type(): string {
-    return (this.constructor as typeof BaseFilter).type;
-  }
-
-  /**
    * The class type. Used to identify which class this is.
    * This is used for serialization purposes and internally it can be used
    * to identify classes. As a developer you could use `instance of Class`
@@ -101,9 +92,9 @@ export class BaseFilter {
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new FabricError(
-        `Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(
-          vertexShader
-        )}`
+        `Vertex shader compile error for ${
+          (this.constructor as typeof BaseFilter).type
+        }: ${gl.getShaderInfoLog(vertexShader)}`
       );
     }
 
@@ -111,9 +102,9 @@ export class BaseFilter {
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new FabricError(
-        `Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(
-          fragmentShader
-        )}`
+        `Fragment shader compile error for ${
+          (this.constructor as typeof BaseFilter).type
+        }: ${gl.getShaderInfoLog(fragmentShader)}`
       );
     }
 
@@ -122,7 +113,9 @@ export class BaseFilter {
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new FabricError(
-        `Shader link error for "${this.type}" ${gl.getProgramInfoLog(program)}`
+        `Shader link error for "${
+          (this.constructor as typeof BaseFilter).type
+        }" ${gl.getProgramInfoLog(program)}`
       );
     }
 
@@ -282,7 +275,7 @@ export class BaseFilter {
    * @type string
    **/
   getCacheKey() {
-    return this.type;
+    return (this.constructor as typeof BaseFilter).type;
   }
 
   /**
@@ -393,7 +386,7 @@ export class BaseFilter {
   toObject() {
     const mainP = this.mainParameter;
     return {
-      type: this.type,
+      type: (this.constructor as typeof BaseFilter).type,
       ...(mainP ? { [mainP]: this[mainP] } : {}),
     };
   }

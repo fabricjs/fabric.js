@@ -66,7 +66,7 @@ export class BlendImage extends BaseFilter {
   static defaults = blendImageDefaultValues;
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${super.getCacheKey()}_${this.mode}`;
   }
 
   getFragmentSource(): string {
@@ -201,7 +201,7 @@ export class BlendImage extends BaseFilter {
    */
   toObject() {
     return {
-      type: this.type,
+      ...super.toObject(),
       image: this.image && this.image.toObject(),
       mode: this.mode,
       alpha: this.alpha,

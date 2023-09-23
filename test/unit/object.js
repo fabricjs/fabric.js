@@ -467,20 +467,6 @@
     assert.equal(objCanvas, cObj.canvas);
   });
 
-  QUnit.test('isType', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.isType === 'function');
-    assert.ok(cObj.isType('FabricObject'));
-    assert.ok(cObj.isType('object'));
-    assert.ok(!cObj.isType('Rect'));
-    cObj = new fabric.Rect();
-    assert.ok(cObj.isType('Rect'));
-    assert.ok(cObj.isType('rect'));
-    assert.ok(!cObj.isType('Object'));
-    assert.ok(cObj.isType('Object', 'Rect'));
-    assert.ok(!cObj.isType('Object', 'Circle'));
-  });
-
   QUnit.test('toggle', function(assert) {
     var object = new fabric.Object({ left: 100, top: 124, width: 210, height: 66 });
     assert.ok(typeof object.toggle === 'function');

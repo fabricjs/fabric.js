@@ -432,7 +432,7 @@
 
   function toDataURLWithFilter(fabricCanvas, callback) {
     fabricCanvas.loadFromJSON(canvasWithObjects).then(function () {
-      var dataurl = fabricCanvas.toDataURL({ filter: object => object.isType('Polygon', 'Rect') });
+      var dataurl = fabricCanvas.toDataURL({ filter: object => object instanceof fabric.Rect || object instanceof fabric.Polygon });
       callback(dataurl);
     });
   }

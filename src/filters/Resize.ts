@@ -122,8 +122,7 @@ export class Resize extends BaseFilter {
   }
 
   getCacheKey(this: ResizeDuringWEBGLResize): string {
-    const filterWindow = this.getFilterWindow();
-    return `${this.type}_${filterWindow}`;
+    return `${super.getCacheKey()}_${this.getFilterWindow()}`;
   }
 
   getFragmentSource(this: ResizeDuringWEBGLResize): string {
@@ -559,7 +558,7 @@ export class Resize extends BaseFilter {
    */
   toObject() {
     return {
-      type: this.type,
+      ...super.toObject(),
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       resizeType: this.resizeType,

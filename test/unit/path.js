@@ -155,8 +155,7 @@
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var opts = { ...REFERENCE_PATH_OBJECT };
-    delete opts.path;
+    const { type: __, path: _, ...opts } = { ...REFERENCE_PATH_OBJECT };
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
     makePathObject(function (cleanPath) {
@@ -171,8 +170,7 @@
     updatePath(path, REFERENCE_PATH_OBJECT.path, true);
     assert.deepEqual(path.toObject(), REFERENCE_PATH_OBJECT);
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
-    var opts = { ...REFERENCE_PATH_OBJECT };
-    delete opts.path;
+    const { type: __, path: _, ...opts } = { ...REFERENCE_PATH_OBJECT };
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
     makePathObject(function (cleanPath) {

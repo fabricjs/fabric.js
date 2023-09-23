@@ -69,7 +69,7 @@ export class BlendColor extends BaseFilter {
   static type = 'BlendColor';
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${super.getCacheKey()}_${this.mode}`;
   }
 
   protected getFragmentSource(): string {
@@ -208,7 +208,7 @@ export class BlendColor extends BaseFilter {
    */
   toObject() {
     return {
-      type: this.type,
+      ...super.toObject(),
       color: this.color,
       mode: this.mode,
       alpha: this.alpha,
