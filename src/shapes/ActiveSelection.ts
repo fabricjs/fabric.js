@@ -112,11 +112,10 @@ export class ActiveSelection extends Group {
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
     super._onAfterObjectsChange(type, targets);
-    const groups: Group[] = [];
+    const groups = new Set<Group>();
     targets.forEach((object) => {
-      object.group &&
-        !groups.includes(object.group) &&
-        groups.push(object.group);
+      const { parent } = object;
+      parent && groups.add(parent);
     });
     if (type === 'removed') {
       //  invalidate groups' layout and mark as dirty
