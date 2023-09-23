@@ -583,11 +583,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getCanvasPointFromEvent(e),
+          this.getPointInScene(e),
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getCanvasPointFromEvent(e);
+      : this.getPointInScene(e);
     const corner = target.getActiveControl() || '',
       control = !!corner && target.controls[corner],
       actionHandler =
@@ -702,7 +702,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return undefined;
     }
 
-    const pointer = this.getHTMLPointFromEvent(e),
+    const pointer = this.getPointFromViewport(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
@@ -846,14 +846,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * and it remains unchanged from the viewer's perspective.
    *
    * @example
-   * const pointInCanvasPlane = sendPointToPlane(
-   *  this.getHTMLPointFromEvent(e),
+   * const pointInScene = sendPointToPlane(
+   *  this.getPointFromViewport(e),
    *  undefined,
    *  canvas.viewportTransform
    * );
    *
    */
-  getHTMLPointFromEvent(e: TPointerEvent) {
+  getPointFromViewport(e: TPointerEvent) {
     if (this._pointer) {
       return this._pointer;
     }
@@ -861,19 +861,19 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * @returns point existing in the canvas plane (the same plane as the plane {@link FabricObject#getCenterPoint} exists in),
-   * relative to instance's `(0, 0)`.
+   * @returns point existing in the scene (the same plane as the plane {@link FabricObject#getCenterPoint} exists in),
+   * relative to the scene's origin point.
    * This means that changes to the {@link viewportTransform} do not change the values of the point,
    * however, from the viewer's perspective the point is changed.
    *
    * @example
-   * const pointInHTMLPlane = sendPointToPlane(
-   *  this.getCanvasPointFromEvent(e),
+   * const pointFromViewport = sendPointToPlane(
+   *  this.getPointInScene(e),
    *  canvas.viewportTransform
    * );
    *
    */
-  getCanvasPointFromEvent(e: TPointerEvent) {
+  getPointInScene(e: TPointerEvent) {
     if (this._absolutePointer) {
       return this._absolutePointer;
     }
@@ -884,7 +884,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Returns pointer relative to canvas.
    *
    * @deprecated This method is deprecated since v6 to protect you from misuse.
-   * Use {@link getHTMLPointFromEvent} or {@link getCanvasPointFromEvent} instead.
+   * Use {@link getPointFromViewport} or {@link getPointInScene} instead.
    *
    * @param {Event} e
    * @param {Boolean} inHTMLPlane

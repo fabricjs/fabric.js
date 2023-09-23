@@ -241,7 +241,7 @@ export abstract class ITextClickBehavior<
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.canvas!.getCanvasPointFromEvent(e)
+    const mouseOffset = this.canvas!.getPointInScene(e)
       .transform(invertTransform(this.calcTransformMatrix()))
       .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,
