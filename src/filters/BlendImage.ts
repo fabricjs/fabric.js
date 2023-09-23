@@ -1,5 +1,5 @@
 import { Image } from '../shapes/Image';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -218,7 +218,7 @@ export class BlendImage extends BaseFilter {
    */
   static fromObject(
     { type, image, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal }
+    options?: Abortable
   ) {
     return Image.fromObject(image, options).then(
       (enlivedImage) =>

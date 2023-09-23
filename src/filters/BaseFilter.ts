@@ -402,7 +402,7 @@ export class BaseFilter {
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    options: Abortable
+    options?: Abortable
   ) {
     return new this(filterOptions);
   }

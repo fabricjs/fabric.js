@@ -2,6 +2,7 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
+import type { Abortable } from '../typedefs';
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
@@ -61,10 +62,7 @@ export class Composed extends BaseFilter {
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<Composed>}
    */
-  static fromObject(
-    object: Record<string, any>,
-    options: { signal: AbortSignal }
-  ) {
+  static fromObject(object: Record<string, any>, options?: Abortable) {
     return Promise.all(
       ((object.subFilters || []) as ReturnType<BaseFilter['toObject']>[]).map(
         (filter) =>
