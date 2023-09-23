@@ -75,7 +75,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternOptions = {}) {
+  constructor({ type: _, ...options }: PatternOptions = {}) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -134,7 +134,7 @@ export class Pattern {
     const { repeat, crossOrigin } = this;
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
-      type: 'pattern',
+      type: (this.constructor as typeof Pattern).type,
       source: this.sourceToString(),
       repeat,
       crossOrigin,

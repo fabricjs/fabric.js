@@ -20,6 +20,7 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
 };
 
 export type SerializedShadowOptions = {
+  type: string;
   color: string;
   blur: number;
   offsetX: number;
@@ -29,6 +30,8 @@ export type SerializedShadowOptions = {
 };
 
 export class Shadow {
+  static type = 'Shadow';
+
   /**
    * Shadow color
    * @type String
@@ -89,14 +92,12 @@ export class Shadow {
   constructor(options: Partial<TClassProperties<Shadow>>);
   constructor(svgAttribute: string);
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
-    const options: Partial<TClassProperties<Shadow>> =
+    const { type: _, ...options }: Partial<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
-    Object.assign(this, (this.constructor as typeof Shadow).ownDefaults);
-    for (const prop in options) {
-      // @ts-expect-error for loops are so messy in TS
-      this[prop] = options[prop];
-    }
-
+    Object.assign(this, {
+      ...(this.constructor as typeof Shadow).ownDefaults,
+      ...options,
+    });
     this.id = uid();
   }
 
@@ -192,6 +193,7 @@ export class Shadow {
    */
   toObject() {
     const data: SerializedShadowOptions = {
+      type: (this.constructor as typeof Shadow).type,
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,
