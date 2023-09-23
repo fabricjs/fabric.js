@@ -205,7 +205,6 @@ export class InteractiveFabricObject<
           forTouch ? corner.touchCorner : corner.corner
         )
       ) {
-        // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
         return (this.__corner = key);
       }
     }
