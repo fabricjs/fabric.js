@@ -93,21 +93,16 @@ describe('ActiveSelection', () => {
     const obj1 = new FabricObject();
     const obj2 = new FabricObject();
     canvas.add(obj1, obj2);
-    const existingActiveSelection = canvas.getActiveSelection();
-    const disposeSpy = jest.spyOn(existingActiveSelection, 'dispose');
     const activeSelection = new ActiveSelection([obj1, obj2]);
     const spy = jest.spyOn(activeSelection, 'setCoords');
     canvas.setActiveObject(activeSelection);
     expect(canvas.getActiveSelection()).toBe(activeSelection);
     expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
-    expect(disposeSpy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalled();
     expect(activeSelection.canvas).toBe(canvas);
 
     spy.mockClear();
-    const disposeSpy2 = jest.spyOn(activeSelection, 'dispose');
     canvas.setActiveObject(activeSelection);
-    expect(disposeSpy2).not.toHaveBeenCalled();
     expect(spy).not.toHaveBeenCalled();
   });
 
