@@ -498,10 +498,12 @@ export class Textbox<
   /**
    * Detect if a line has a linebreak and so we need to account for it when moving
    * and counting style.
+   * This is important only for splitByGrapheme at the end of wrapping.
+   * If we are not wrapping the offset is always 1
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number) {
-    if (this.splitByGrapheme) {
+  missingNewlineOffset(lineIndex: number, skipWrapping?: boolean): 0 | 1 {
+    if (this.splitByGrapheme && !skipWrapping) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;
