@@ -288,15 +288,9 @@ export class FabricObject<
    */
   get type() {
     throw new Error('get type');
-    const name = (this.constructor as typeof FabricObject).type;
-    if (name === 'FabricObject') {
-      return 'object';
-    }
-    return name.toLowerCase();
   }
 
   set type(value) {
-    // log('warn', 'Setting type has no effect', value);
     throw new Error('set type');
   }
 
@@ -1556,11 +1550,11 @@ export class FabricObject<
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
-        const allOptions = { ...options, ...enlivedMap };
+        const allOptions = { type: _, ...options, ...enlivedMap };
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, type, ...rest } = allOptions;
+          const { [extraParam]: arg0, ...rest } = allOptions;
           // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {

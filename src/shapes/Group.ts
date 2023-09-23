@@ -1088,6 +1088,7 @@ export class Group extends createCollectionMixin(
    * @returns {Promise<Group>}
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
+    type: _,
     objects = [],
     ...options
   }: T) {

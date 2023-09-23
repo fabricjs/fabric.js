@@ -790,7 +790,7 @@ export class Image<
    * @returns {Promise<Image>}
    */
   static fromObject<T extends TOptions<SerializedImageProps>>(
-    { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
+    { type: _, filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
     options: Abortable = {}
   ) {
     return Promise.all([
