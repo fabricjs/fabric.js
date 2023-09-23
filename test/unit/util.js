@@ -825,35 +825,6 @@
     assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
   });
 
-  QUnit.test('transformPointRelativeToCanvas', function(assert) {
-    assert.ok(typeof fabric.util.transformPointRelativeToCanvas === 'function');
-    var point = new fabric.Point(2, 2);
-    var matrix = [3, 0, 0, 2, 10, 4];
-    var canvas = {
-      viewportTransform: matrix
-    }
-    var transformPoint = fabric.util.transformPoint;
-    var invertTransform = fabric.util.invertTransform;
-    var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
-    var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
-    assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
-    assert.deepEqual(p, transformPoint(point, matrix));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
-    assert.deepEqual(p, point);
-    p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
-    assert.deepEqual(p, point);
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling');
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', true);
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
-    });
-  });
-
   QUnit.test('sendObjectToPlane', function (assert) {
     assert.ok(typeof fabric.util.sendObjectToPlane === 'function');
     var m = [6, Math.SQRT1_2, 0, 3, 2, 1],
