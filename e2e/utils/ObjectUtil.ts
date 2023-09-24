@@ -30,7 +30,7 @@ export class ObjectUtil<T = FabricObject> {
 
   getObjectControlPoint(controlName: string) {
     return this.executeInBrowser(
-      (object, { controlName }) => object.oCoords[controlName],
+      (object, { controlName }) => object.controlCoords[controlName],
       { controlName }
     );
   }

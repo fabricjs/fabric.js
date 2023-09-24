@@ -102,7 +102,7 @@ export class InteractiveFabricObject<
    * The coordinates depends from the controls positionHandler and are used
    * to draw and locate controls
    */
-  declare oCoords: Record<string, TOCoord>;
+  declare controlCoords: Record<string, TOCoord>;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -194,7 +194,7 @@ export class InteractiveFabricObject<
     }
 
     this.__corner = undefined;
-    const cornerEntries = Object.entries(this.oCoords);
+    const cornerEntries = Object.entries(this.controlCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
       if (
@@ -220,7 +220,7 @@ export class InteractiveFabricObject<
    * is a public api and should be done just if extremely necessary
    * @return {Record<string, TOCoord>}
    */
-  calcOCoords(): Record<string, TOCoord> {
+  protected calcControlCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
       center = this.getCenterPoint(),
       tMatrix = createTranslateMatrix(center.x, center.y),
@@ -297,7 +297,7 @@ export class InteractiveFabricObject<
 
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * oCoords are used to find the corners
+   * controlCoords are used to find the corners
    * ownCoords are used to quickly find an object on the canvas
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    * @return {void}
@@ -305,7 +305,7 @@ export class InteractiveFabricObject<
   setCoords(): void {
     super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-    this.oCoords = this.calcOCoords();
+    this.controlCoords = this.calcControlCoords();
   }
 
   /**
@@ -519,7 +519,7 @@ export class InteractiveFabricObject<
     this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        const p = this.oCoords[key];
+        const p = this.controlCoords[key];
         control.render(ctx, p.x, p.y, options, this);
       }
     });
