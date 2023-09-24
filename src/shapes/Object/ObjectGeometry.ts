@@ -27,11 +27,7 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
-import {
-  type TBBoxLines,
-  findCrossPoints,
-  getImageLines,
-} from '../../util/intersection/findCrossPoint';
+import { cornerPointContainsPoint } from '../../util/intersection/findCrossPoint';
 
 type TMatrixCache = {
   key: string;
@@ -297,15 +293,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     absolute = false,
     calculate = false
   ): boolean {
-    const points = this.getCoords(absolute, calculate),
-      otherCoords = absolute ? other.aCoords : other.lineCoords,
-      // this is maybe an excessive optimization that makes the code
-      // unnecessarly ugly. this is the only use case of passing lines
-      // to containsPoint. This optimization should go away but can go away
-      // in its own pr.
-      lines = getImageLines(otherCoords);
+    const points = this.getCoords(absolute, calculate);
     for (let i = 0; i < 4; i++) {
-      if (!other.containsPoint(points[i], lines)) {
+      if (!other.containsPoint(points[i], absolute)) {
         return false;
       }
     }
@@ -346,21 +336,15 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   /**
    * Checks if point is inside the object
    * @param {Point} point Point to check against
-   * @param {Object} [lines] object returned from util getImageLines
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(
-    point: Point,
-    lines?: TBBoxLines,
-    absolute = false,
-    calculate = false
-  ): boolean {
-    const coords = this._getCoords(absolute, calculate),
-      xPoints = findCrossPoints(point, lines || getImageLines(coords));
-    // if xPoints is odd then point is inside the object
-    return xPoints !== 0 && xPoints % 2 === 1;
+  containsPoint(point: Point, absolute = false, calculate = false): boolean {
+    return cornerPointContainsPoint(
+      point,
+      this._getCoords(absolute, calculate)
+    );
   }
 
   /**
@@ -410,7 +394,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   ): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint, undefined, true, calculate);
+    return this.containsPoint(centerPoint, true, calculate);
   }
 
   /**

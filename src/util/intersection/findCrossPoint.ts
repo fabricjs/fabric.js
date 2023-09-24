@@ -21,7 +21,7 @@ export type TBBoxLines = {
  * @param {Object} lines Coordinates of the object being evaluated
  * @return {number} number of crossPoint
  */
-export const findCrossPoints = (point: XY, lines: TBBoxLines): number => {
+const findCrossPoints = (point: XY, lines: TBBoxLines): number => {
   let xcount = 0;
 
   for (const lineKey in lines) {
@@ -66,7 +66,7 @@ export const findCrossPoints = (point: XY, lines: TBBoxLines): number => {
  * @private
  * @param {Object} lineCoords or aCoords Coordinates of the object corners
  */
-export const getImageLines = ({ tl, tr, bl, br }: TCornerPoint): TBBoxLines => {
+const getImageLines = ({ tl, tr, bl, br }: TCornerPoint): TBBoxLines => {
   const lines = {
     topline: {
       o: tl,
