@@ -297,14 +297,10 @@ export class InteractiveFabricObject<
 
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * controlCoords are used to find the corners
-   * ownCoords are used to quickly find an object on the canvas
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-   * @return {void}
    */
   setCoords(): void {
     super.setCoords();
-    // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.controlCoords = this.calcControlCoords();
   }
 

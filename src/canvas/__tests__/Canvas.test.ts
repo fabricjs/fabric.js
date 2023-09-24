@@ -1,6 +1,6 @@
-import { iMatrix } from 'fabric/node';
-import { StaticCanvas } from '../StaticCanvas';
+import { iMatrix } from '../../constants';
 import { FabricObject } from '../../shapes/Object/FabricObject';
+import { StaticCanvas } from '../StaticCanvas';
 
 describe('Canvas', () => {
   it('setViewportTransform calls objects setCoords', () => {

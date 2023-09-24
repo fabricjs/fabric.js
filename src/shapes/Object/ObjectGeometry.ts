@@ -36,9 +36,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   declare padding: number;
 
   /**
-   * Describe object's corner position in canvas scene coordinates
-   * properties are `tl`, `tr`, `bl`, `br` and describe the four main corner.
-   * The coordinates get updated with @method setCoords.
+   * `tl`, `tr`, `bl`, `br` corners in the parent plane
+   * Updated by {@link setCoords}.
    */
   declare ownCoords: TCornerPoint;
 
@@ -187,22 +186,22 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * Checks if object intersects with an area formed by 2 points
-   * @param {Object} pointTL top-left point of area
-   * @param {Object} pointBR bottom-right point of area
+   * @param {ObjectGeometry} tl top-left point of area
+   * @param {ObjectGeometry} tr bottom-right point of area
    * @return {Boolean} true if object intersects with an area formed by 2 points
    */
-  intersectsWithRect(pointTL: Point, pointBR: Point): boolean {
+  intersectsWithRect(tl: Point, tr: Point): boolean {
     const intersection = Intersection.intersectPolygonRectangle(
       this.getCoords(),
-      pointTL,
-      pointBR
+      tl,
+      tr
     );
     return intersection.status === 'Intersection';
   }
 
   /**
    * Checks if object intersects with another object
-   * @param {Object} other Object to test
+   * @param {ObjectGeometry} other Object to test
    * @return {Boolean} true if object intersects with another object
    */
   intersectsWithObject(other: ObjectGeometry): boolean {
@@ -221,9 +220,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * Checks if object is fully contained within area of another object
-   * @param {Object} other Object to test
-   * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
+   * @param {ObjectGeometry} other Object to test
    * @return {Boolean} true if object is fully contained within area of another object
    */
   isContainedWithinObject(other: ObjectGeometry): boolean {
@@ -233,19 +230,17 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * Checks if object is fully contained within area formed by 2 points
-   * @param {Object} pointTL top-left point of area
-   * @param {Object} pointBR bottom-right point of area
-   * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored one
+   * @param {Point} tl top-left point of area
+   * @param {Point} br bottom-right point of area
    * @return {Boolean} true if object is fully contained within area formed by 2 points
    */
-  isContainedWithinRect(pointTL: Point, pointBR: Point): boolean {
+  isContainedWithinRect(tl: Point, br: Point): boolean {
     const boundingRect = this.getBoundingRect();
     return (
-      boundingRect.left >= pointTL.x &&
-      boundingRect.left + boundingRect.width <= pointBR.x &&
-      boundingRect.top >= pointTL.y &&
-      boundingRect.top + boundingRect.height <= pointBR.y
+      boundingRect.left >= tl.x &&
+      boundingRect.left + boundingRect.width <= br.x &&
+      boundingRect.top >= tl.y &&
+      boundingRect.top + boundingRect.height <= br.y
     );
   }
 
@@ -317,15 +312,15 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * Returns coordinates of object's bounding rectangle (left, top, width, height)
-   * the box is intended as aligned to axis of canvas.
-   * @return {Object} Object with left, top, width, height properties
+   * aligned to the canvas axis.
+   * @return {TBBox} Object with left, top, width, height properties
    */
   getBoundingRect(): TBBox {
     return makeBoundingBoxFromPoints(this.getCoords());
   }
 
   /**
-   * Returns width of an object's bounding box counting transformations
+   * Returns width of an object's bounding box accounting its own transformations
    * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
    * @return {Number} width value
    */
@@ -334,7 +329,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Returns height of an object bounding box counting transformations
+   * Returns height of an object bounding box accounting its own transformations
    * @todo shouldn't this account for group transform and return the actual size in canvas coordinate plane?
    * @return {Number} height value
    */
@@ -358,7 +353,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Returns the object angle relative to canvas counting also the group property
+   * Returns the object angle in the canvas scene plane accounting for group transformations
    * @returns {TDegree}
    */
   getTotalAngle(): TDegree {
@@ -398,7 +393,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
+   * Sets coordinates based on current angle, width and height, left and top.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    */
   setCoords(): void {

@@ -426,7 +426,7 @@
     groupObject.subTargetCheck = true;
 
     fabric.Group.fromObject(groupObject).then(function(newGroupFromObject) {
-      assert.ok(newGroupFromObject._objects[0].ownCoords, 'acoords are restored');
+      assert.ok(newGroupFromObject._objects[0].ownCoords, 'coords are restored');
       done();
     });
   });
