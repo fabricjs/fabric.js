@@ -28,7 +28,7 @@ import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
 import {
-  TBBoxLines,
+  type TBBoxLines,
   findCrossPoints,
   getImageLines,
 } from '../../util/intersection/findCrossPoint';
@@ -299,6 +299,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
+      // this is maybe an excessive optimization that makes the code
+      // unnecessarly ugly. this is the only use case of passing lines
+      // to containsPoint.
       lines = getImageLines(otherCoords);
     for (let i = 0; i < 4; i++) {
       if (!other.containsPoint(points[i], lines)) {
@@ -354,8 +357,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     calculate = false
   ): boolean {
     const coords = this._getCoords(absolute, calculate),
-      imageLines = lines || getImageLines(coords),
-      xPoints = findCrossPoints(point, imageLines);
+      xPoints = findCrossPoints(point, lines || getImageLines(coords));
     // if xPoints is odd then point is inside the object
     return xPoints !== 0 && xPoints % 2 === 1;
   }

@@ -52,7 +52,8 @@ export const findCrossPoints = (point: XY, lines: TBBoxLines): number => {
     if (xi >= point.x) {
       xcount += 1;
     }
-    // optimization 4: specific for square images
+    // optimization 4: specific for square images (square or rects?)
+    // todo remove this optimazion for
     if (xcount === 2) {
       break;
     }
@@ -101,4 +102,13 @@ export const getImageLines = ({ tl, tr, bl, br }: TCornerPoint): TBBoxLines => {
   // }
 
   return lines;
+};
+
+export const cornerPointContainsPoint = (
+  point: XY,
+  cornerPoint: TCornerPoint
+): boolean => {
+  const xPoints = findCrossPoints(point, getImageLines(cornerPoint));
+  // if xPoints is odd then point is inside the object
+  return xPoints !== 0 && xPoints % 2 === 1;
 };
