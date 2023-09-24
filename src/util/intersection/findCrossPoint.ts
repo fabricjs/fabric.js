@@ -1,6 +1,8 @@
 import type { XY } from '../../Point';
 import type { TCornerPoint } from '../../typedefs';
 
+// TODO: the file is to be REMOVED
+
 type TLineDescriptor = {
   o: XY;
   d: XY;
