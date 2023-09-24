@@ -285,7 +285,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * Checks if object is fully contained within area of another object
    * @param {Object} other Object to test
    * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of store ones
+   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is fully contained within area of another object
    */
   isContainedWithinObject(
@@ -295,6 +295,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   ): boolean {
     const points = this.getCoords(absolute, calculate);
     for (let i = 0; i < 4; i++) {
+      // bug/confusing: this containsPoint should receive 'calculate' as well.
+      // will come later because it needs to come with tests
       if (!other.containsPoint(points[i], absolute)) {
         return false;
       }
