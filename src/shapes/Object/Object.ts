@@ -1376,9 +1376,10 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
+    // skip canvas zoom and calculate with setCoords now.
+    this.setCoords();
+    const boundingRect = this.getBoundingRect();
     const el = createCanvasElement(),
-      // skip canvas zoom and calculate with setCoords now.
-      boundingRect = this.getBoundingRect(true, true),
       shadow = this.shadow,
       shadowOffset = new Point();
 

@@ -327,10 +327,10 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
         if (
           object.selectable &&
           object.visible &&
-          ((includeIntersecting && object.intersectsWithRect(tl, br, true)) ||
-            object.isContainedWithinRect(tl, br, true) ||
-            (includeIntersecting && object.containsPoint(tl, true)) ||
-            (includeIntersecting && object.containsPoint(br, true)))
+          ((includeIntersecting && object.intersectsWithRect(tl, br)) ||
+            object.isContainedWithinRect(tl, br) ||
+            (includeIntersecting && object.containsPoint(tl)) ||
+            (includeIntersecting && object.containsPoint(br)))
         ) {
           objects.push(object);
         }

@@ -773,8 +773,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj.visible &&
       obj.evented &&
       obj.containsPoint(
-        sendPointToPlane(pointer, undefined, this.viewportTransform),
-        true
+        sendPointToPlane(pointer, undefined, this.viewportTransform)
       )
     ) {
       if (
