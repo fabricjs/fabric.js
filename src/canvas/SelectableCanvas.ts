@@ -762,12 +762,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @param {FabricObject} obj Object to test against
+   * @param {Object} [pointer] point from viewport.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
-  _checkTarget(pointer: Point, obj: FabricObject): boolean {
+  _checkTarget(obj: FabricObject, pointer: Point): boolean {
     if (
       obj &&
       obj.visible &&
@@ -808,7 +808,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
       const target = objects[i];
-      if (this._checkTarget(pointer, target)) {
+      if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
             target._objects as FabricObject[],
