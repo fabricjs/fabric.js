@@ -301,7 +301,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       otherCoords = absolute ? other.aCoords : other.lineCoords,
       // this is maybe an excessive optimization that makes the code
       // unnecessarly ugly. this is the only use case of passing lines
-      // to containsPoint.
+      // to containsPoint. This optimization should go away but can go away
+      // in its own pr.
       lines = getImageLines(otherCoords);
     for (let i = 0; i < 4; i++) {
       if (!other.containsPoint(points[i], lines)) {
