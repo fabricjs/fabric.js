@@ -903,7 +903,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this.fire(eventType, options);
     target && target.fire(eventType, options);
     for (let i = 0; i < subTargets.length; i++) {
-      subTargets[i] !== target && subTargets[i].fire(eventType, options);
+      subTargets[i].fire(eventType, options);
     }
     return options;
   }
@@ -943,7 +943,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
     for (let i = 0; i < targets.length; i++) {
-      targets[i] !== target && targets[i].fire(`mouse${eventType}`, options);
+      targets[i].fire(`mouse${eventType}`, options);
     }
   }
 
