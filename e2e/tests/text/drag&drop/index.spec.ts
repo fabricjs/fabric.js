@@ -268,10 +268,10 @@ test('Disabling Drop', async ({ page }) => {
     a.executeInBrowser((text) => (text.canDrop = () => false));
     b.executeInBrowser((text) => (text.canDrop = () => false));
   });
-  await selectFabricInA(page);
-  await readEventStream(page);
 
   await test.step('drop A on self', async () => {
+    await selectFabricInA(page);
+    await readEventStream(page);
     await canvas.dragTo(canvas, {
       sourcePosition: {
         x: 130,
@@ -289,6 +289,8 @@ test('Disabling Drop', async ({ page }) => {
   });
 
   await test.step('drop A on B', async () => {
+    await selectFabricInA(page);
+    await readEventStream(page);
     await canvas.dragTo(canvas, {
       sourcePosition: {
         x: 130,
