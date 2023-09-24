@@ -49,7 +49,7 @@ export const toDataURL = (
 ) => canvasEl.toDataURL(`image/${format}`, quality);
 
 export const isHTMLCanvas = (
-  canvas: HTMLCanvasElement | string
+  canvas?: HTMLCanvasElement | string
 ): canvas is HTMLCanvasElement => {
   return !!canvas && (canvas as HTMLCanvasElement).getContext !== undefined;
 };
