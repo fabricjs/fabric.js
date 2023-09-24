@@ -17,6 +17,10 @@ import type { ControlRenderingStyleOverride } from '../../controls/controlRender
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import {
+  findCrossPoints,
+  getImageLines,
+} from '../../util/intersection/findCrossPoint';
 
 type TOCoord = Point & {
   corner: TCornerPoint;
@@ -199,10 +203,10 @@ export class InteractiveFabricObject<
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
       if (this.controls[key].shouldActivate(key, this)) {
-        const lines = this._getImageLines(
+        const lines = getImageLines(
           forTouch ? corner.touchCorner : corner.corner
         );
-        const xPoints = this._findCrossPoints(pointer, lines);
+        const xPoints = findCrossPoints(pointer, lines);
         if (xPoints !== 0 && xPoints % 2 === 1) {
           this.__corner = key;
           return key;
