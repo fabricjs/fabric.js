@@ -7,7 +7,8 @@ import type {
 } from '../EventTypeDefs';
 import { Point } from '../Point';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
-import type { TDegree, TMat2D } from '../typedefs';
+import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
+import { cornerPointContainsPoint } from '../util/intersection/findCrossPoint';
 import { cos } from '../util/misc/cos';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
@@ -169,11 +170,17 @@ export class Control {
    */
   declare mouseUpHandler?: ControlActionHandler;
 
-  shouldActivate(controlKey: string, fabricObject: InteractiveFabricObject) {
+  shouldActivate(
+    controlKey: string,
+    fabricObject: InteractiveFabricObject,
+    pointer: Point,
+    cornerPoint: TCornerPoint
+  ) {
     // TODO: locking logic can be handled here instead of in the control handler logic
     return (
       fabricObject.canvas?.getActiveObject() === fabricObject &&
-      fabricObject.isControlVisible(controlKey)
+      fabricObject.isControlVisible(controlKey) &&
+      cornerPointContainsPoint(pointer, cornerPoint)
     );
   }
 

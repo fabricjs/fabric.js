@@ -27,18 +27,11 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
-
-type TLineDescriptor = {
-  o: Point;
-  d: Point;
-};
-
-type TBBoxLines = {
-  topline: TLineDescriptor;
-  leftline: TLineDescriptor;
-  bottomline: TLineDescriptor;
-  rightline: TLineDescriptor;
-};
+import {
+  type TBBoxLines,
+  findCrossPoints,
+  getImageLines,
+} from '../../util/intersection/findCrossPoint';
 
 type TMatrixCache = {
   key: string;
@@ -306,7 +299,11 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   ): boolean {
     const points = this.getCoords(absolute, calculate),
       otherCoords = absolute ? other.aCoords : other.lineCoords,
-      lines = other._getImageLines(otherCoords);
+      // this is maybe an excessive optimization that makes the code
+      // unnecessarly ugly. this is the only use case of passing lines
+      // to containsPoint. This optimization should go away but can go away
+      // in its own pr.
+      lines = getImageLines(otherCoords);
     for (let i = 0; i < 4; i++) {
       if (!other.containsPoint(points[i], lines)) {
         return false;
@@ -349,7 +346,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   /**
    * Checks if point is inside the object
    * @param {Point} point Point to check against
-   * @param {Object} [lines] object returned from @method _getImageLines
+   * @param {Object} [lines] object returned from util getImageLines
    * @param {Boolean} [absolute] use coordinates without viewportTransform
    * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
@@ -361,8 +358,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     calculate = false
   ): boolean {
     const coords = this._getCoords(absolute, calculate),
-      imageLines = lines || this._getImageLines(coords),
-      xPoints = this._findCrossPoints(point, imageLines);
+      xPoints = findCrossPoints(point, lines || getImageLines(coords));
     // if xPoints is odd then point is inside the object
     return xPoints !== 0 && xPoints % 2 === 1;
   }
@@ -438,96 +434,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     return (
       allPointsAreOutside && this._containsCenterOfCanvas(tl, br, calculate)
     );
-  }
-
-  /**
-   * Method that returns an object with the object edges in it, given the coordinates of the corners
-   * @private
-   * @param {Object} lineCoords or aCoords Coordinates of the object corners
-   */
-  _getImageLines({ tl, tr, bl, br }: TCornerPoint): TBBoxLines {
-    const lines = {
-      topline: {
-        o: tl,
-        d: tr,
-      },
-      rightline: {
-        o: tr,
-        d: br,
-      },
-      bottomline: {
-        o: br,
-        d: bl,
-      },
-      leftline: {
-        o: bl,
-        d: tl,
-      },
-    };
-
-    // // debugging
-    // if (this.canvas.contextTop) {
-    //   this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-    //   this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-    //
-    //   this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-    //   this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-    //
-    //   this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-    //   this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-    //
-    //   this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-    //   this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
-    // }
-
-    return lines;
-  }
-
-  /**
-   * Helper method to determine how many cross points are between the 4 object edges
-   * and the horizontal line determined by a point on canvas
-   * @private
-   * @param {Point} point Point to check
-   * @param {Object} lines Coordinates of the object being evaluated
-   * @return {number} number of crossPoint
-   */
-  _findCrossPoints(point: Point, lines: TBBoxLines): number {
-    let xcount = 0;
-
-    for (const lineKey in lines) {
-      let xi;
-      const iLine = lines[lineKey as keyof TBBoxLines];
-      // optimization 1: line below point. no cross
-      if (iLine.o.y < point.y && iLine.d.y < point.y) {
-        continue;
-      }
-      // optimization 2: line above point. no cross
-      if (iLine.o.y >= point.y && iLine.d.y >= point.y) {
-        continue;
-      }
-      // optimization 3: vertical line case
-      if (iLine.o.x === iLine.d.x && iLine.o.x >= point.x) {
-        xi = iLine.o.x;
-      }
-      // calculate the intersection point
-      else {
-        const b1 = 0;
-        const b2 = (iLine.d.y - iLine.o.y) / (iLine.d.x - iLine.o.x);
-        const a1 = point.y - b1 * point.x;
-        const a2 = iLine.o.y - b2 * iLine.o.x;
-
-        xi = -(a1 - a2) / (b1 - b2);
-      }
-      // don't count xi < point.x cases
-      if (xi >= point.x) {
-        xcount += 1;
-      }
-      // optimization 4: specific for square images
-      if (xcount === 2) {
-        break;
-      }
-    }
-    return xcount;
   }
 
   /**

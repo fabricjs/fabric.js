@@ -2,6 +2,7 @@
 
 ## [next]
 
+- patch(Control): move hit detection to shouldActivate [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
