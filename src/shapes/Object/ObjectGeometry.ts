@@ -353,30 +353,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     this.setCoords();
   }
 
-  /**
-   * Scales an object to a given width, with respect to bounding box (scaling by x/y equally)
-   * @param {Number} value New width value
-   * @return {void}
-   */
-  scaleToWidth(value: number) {
-    // adjust to bounding rect factor so that rotated shapes would fit as well
-    const boundingRectFactor =
-      this.getBoundingRect().width / this.getScaledWidth();
-    return this.scale(value / this.width / boundingRectFactor);
-  }
-
-  /**
-   * Scales an object to a given height, with respect to bounding box (scaling by x/y equally)
-   * @param {Number} value New height value
-   * @return {void}
-   */
-  scaleToHeight(value: number) {
-    // adjust to bounding rect factor so that rotated shapes would fit as well
-    const boundingRectFactor =
-      this.getBoundingRect().height / this.getScaledHeight();
-    return this.scale(value / this.height / boundingRectFactor);
-  }
-
   getCanvasRetinaScaling() {
     return this.canvas?.getRetinaScaling() || 1;
   }
