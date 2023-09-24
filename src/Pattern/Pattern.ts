@@ -11,6 +11,7 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
+import { log } from '../util/internals/console';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -32,7 +33,7 @@ export class Pattern {
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**

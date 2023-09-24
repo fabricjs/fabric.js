@@ -5,6 +5,7 @@ import type { TMat2D } from '../../typedefs';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
+import { FabricError } from '../internals/console';
 
 export type ObjectRelation = 'sibling' | 'child';
 
@@ -71,10 +72,10 @@ export const transformPointRelativeToCanvas = (
 ): Point => {
   // is this still needed with TS?
   if (relationBefore !== 'child' && relationBefore !== 'sibling') {
-    throw new Error(`fabric.js: received bad argument ${relationBefore}`);
+    throw new FabricError(`received bad argument ${relationBefore}`);
   }
   if (relationAfter !== 'child' && relationAfter !== 'sibling') {
-    throw new Error(`fabric.js: received bad argument ${relationAfter}`);
+    throw new FabricError(`received bad argument ${relationAfter}`);
   }
   if (relationBefore === relationAfter) {
     return point;
