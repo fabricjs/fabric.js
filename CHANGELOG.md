@@ -3,6 +3,9 @@
 ## [next]
 
 - docs() enable typedocs to run again [#9356](https://github.com/fabricjs/fabric.js/pull/9356)
+- chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
+- feature(Object) BREAKING: Remove lines parameter from object.containsPoint [#9375](https://github.com/fabricjs/fabric.js/pull/9375)
+- patch(Control): move hit detection to shouldActivate [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
