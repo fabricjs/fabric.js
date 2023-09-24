@@ -72,7 +72,7 @@ describe('ActiveSelection', () => {
   });
 
   it('sets coords after attaching to canvas', () => {
-    const canvas = new Canvas(null, {
+    const canvas = new Canvas(undefined, {
       activeSelection: new ActiveSelection([
         new FabricObject({
           left: 100,
