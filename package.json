@@ -53,7 +53,7 @@
     "test:jest": "jest",
     "test": "npm run cli -- test",
     "sandbox": "npm run sandboxscript -- sandbox",
-    "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c chrome firefox",
+    "test:unit-browser": "npm run cli -- test --suite unit --launch --context chrome",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",

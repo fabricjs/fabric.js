@@ -194,7 +194,6 @@ export class InteractiveFabricObject<
     }
 
     this.__corner = undefined;
-    // had to keep the reverse loop because was breaking tests
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
@@ -209,21 +208,8 @@ export class InteractiveFabricObject<
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
         return (this.__corner = key);
       }
-
-      // // debugging needs rework
-      //
-      // this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-      //
-      // this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-      // this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
     }
+
     return '';
   }
 
