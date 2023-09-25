@@ -32,24 +32,26 @@
   });
 
   QUnit.module('isPointContained', () => {
-    QUnit.assert.isPointContained = function (T, A, B, infinite, expected, message) {
-      const actual = fabric.Intersection.isPointContained(T, A, B, infinite);
-      const reversed = fabric.Intersection.isPointContained(T, B, A, infinite);
+    QUnit.assert.isPointContained = function (T, A, B, type, expected, message) {
+      const actual = fabric.Intersection.isPointContained(T, A, B, type);
+      const reversed = fabric.Intersection.isPointContained(T, B, A, type);
       this.pushResult({
         expected,
         actual: actual,
         result: actual === expected,
         message
       });
-      this.pushResult({
+      type !== 'ray' && this.pushResult({
         expected,
         actual: reversed,
         result: reversed === expected,
         message: `${message} (reversed point order)`
       });
-      if (!infinite && expected) {
-        const actual = fabric.Intersection.isPointContained(T, A, B, true);
-        const reversed = fabric.Intersection.isPointContained(T, B, A, true);
+      if (type === 'segment' && expected) {
+        const actual = fabric.Intersection.isPointContained(T, A, B, 'line');
+        const reversed = fabric.Intersection.isPointContained(T, B, A, 'line');
+        const actual2 = fabric.Intersection.isPointContained(T, A, B, 'ray');
+        const reversed2 = fabric.Intersection.isPointContained(T, B, A, 'ray');
         this.pushResult({
           expected,
           actual: actual,
@@ -62,6 +64,18 @@
           result: reversed === expected,
           message: `${message} (reversed point order, infinite)`
         });
+        this.pushResult({
+          expected,
+          actual: actual2,
+          result: actual2 === expected,
+          message: `${message} (infinite)`
+        });
+        this.pushResult({
+          expected,
+          actual: reversed2,
+          result: reversed2 === expected,
+          message: `${message} (reversed point order, infinite)`
+        });
       }
     };
 
@@ -70,7 +84,7 @@
         new fabric.Point(10, 0),
         new fabric.Point(10, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         true,
         'same point'
       );
@@ -78,7 +92,7 @@
         new fabric.Point(10, 1),
         new fabric.Point(10, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         false,
         'not same point'
       );
@@ -86,7 +100,15 @@
         new fabric.Point(10, 1),
         new fabric.Point(10, 0),
         new fabric.Point(10, 0),
-        true,
+        'ray',
+        false,
+        'not same point, ray check'
+      );
+      assert.isPointContained(
+        new fabric.Point(10, 1),
+        new fabric.Point(10, 0),
+        new fabric.Point(10, 0),
+        'line',
         false,
         'not same point, infinite check'
       );
@@ -97,7 +119,7 @@
         new fabric.Point(5, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         true,
         'on edge'
       );
@@ -105,7 +127,7 @@
         new fabric.Point(10, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         true,
         'on edge'
       );
@@ -113,7 +135,7 @@
         new fabric.Point(7, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         true,
         'inside'
       );
@@ -121,7 +143,7 @@
         new fabric.Point(4.9, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         false,
         'on line but not in segment'
       );
@@ -129,7 +151,7 @@
         new fabric.Point(10.1, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         false,
         'on line but not in segment'
       );
@@ -137,7 +159,23 @@
         new fabric.Point(4.9, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
+        'ray',
+        false,
+        'on line, on the other side'
+      );
+      assert.isPointContained(
+        new fabric.Point(10.1, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        'ray',
         true,
+        'on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(4.9, 0),
+        new fabric.Point(5, 0),
+        new fabric.Point(10, 0),
+        'line',
         true,
         'on line'
       );
@@ -145,7 +183,7 @@
         new fabric.Point(10.1, 0),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        true,
+        'line',
         true,
         'on line'
       );
@@ -153,7 +191,7 @@
         new fabric.Point(1, 1),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        false,
+        'segment',
         false,
         'not inside'
       );
@@ -161,7 +199,7 @@
         new fabric.Point(1, 1),
         new fabric.Point(5, 0),
         new fabric.Point(10, 0),
-        true,
+        'line',
         false,
         'not on line'
       );
@@ -172,7 +210,7 @@
         new fabric.Point(0, 5),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        false,
+        'segment',
         true,
         'on edge'
       );
@@ -180,7 +218,7 @@
         new fabric.Point(0, 10),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        false,
+        'segment',
         true,
         'on edge'
       );
@@ -188,7 +226,7 @@
         new fabric.Point(0, 7),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        false,
+        'segment',
         true,
         'inside'
       );
@@ -196,7 +234,7 @@
         new fabric.Point(0, 4.9),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        false,
+        'segment',
         false,
         'on line but not in segment'
       );
@@ -204,7 +242,7 @@
         new fabric.Point(0, 10.1),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        false,
+        'segment',
         false,
         'on line but not in segment'
       );
@@ -212,7 +250,39 @@
         new fabric.Point(0, 4.9),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
+        'ray',
+        false,
+        'on line but not on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 4.9),
+        new fabric.Point(0, 10),
+        new fabric.Point(0, 5),
+        'ray',
         true,
+        'on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 10.1),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        'ray',
+        true,
+        'on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 10.1),
+        new fabric.Point(0, 10),
+        new fabric.Point(0, 5),
+        'ray',
+        false,
+        'on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 4.9),
+        new fabric.Point(0, 5),
+        new fabric.Point(0, 10),
+        'line',
         true,
         'on line'
       );
@@ -220,7 +290,7 @@
         new fabric.Point(0, 10.1),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        true,
+        'line',
         true,
         'on line'
       );
@@ -228,7 +298,7 @@
         new fabric.Point(1, 1),
         new fabric.Point(0, 5),
         new fabric.Point(0, 10),
-        false,
+        'segment',
         false,
         'not inside'
       );
@@ -247,7 +317,7 @@
         new fabric.Point(2, 1),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        false,
+        'segment',
         true,
         'on edge'
       );
@@ -255,7 +325,7 @@
         new fabric.Point(4, 2),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        false,
+        'segment',
         true,
         'on edge'
       );
@@ -263,7 +333,7 @@
         new fabric.Point(3, 1.5),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        false,
+        'segment',
         true,
         'inside'
       );
@@ -271,7 +341,7 @@
         new fabric.Point(0, 0),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        false,
+        'segment',
         false,
         'on line but not in segment'
       );
@@ -279,7 +349,7 @@
         new fabric.Point(6, 3),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        false,
+        'segment',
         false,
         'on line but not in segment'
       );
@@ -287,7 +357,39 @@
         new fabric.Point(0, 0),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
+        'ray',
+        false,
+        'on line but not on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 0),
+        new fabric.Point(4, 2),
+        new fabric.Point(2, 1),
+        'ray',
         true,
+        'on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(6, 3),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        'ray',
+        true,
+        'on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(6, 3),
+        new fabric.Point(4, 2),
+        new fabric.Point(2, 1),
+        'ray',
+        false,
+        'on line but not on ray'
+      );
+      assert.isPointContained(
+        new fabric.Point(0, 0),
+        new fabric.Point(2, 1),
+        new fabric.Point(4, 2),
+        'line',
         true,
         'on line'
       );
@@ -295,7 +397,7 @@
         new fabric.Point(6, 3),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        true,
+        'line',
         true,
         'on line'
       );
@@ -303,7 +405,7 @@
         new fabric.Point(1, 1),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        false,
+        'segment',
         false,
         'not inside'
       );
@@ -311,7 +413,7 @@
         new fabric.Point(1, 1),
         new fabric.Point(2, 1),
         new fabric.Point(4, 2),
-        true,
+        'line',
         false,
         'not on line'
       );
