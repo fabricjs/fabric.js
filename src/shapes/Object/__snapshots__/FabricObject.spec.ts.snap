@@ -1,0 +1,564 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Object setCoords 1`] = `
+{
+  "bl": {
+    "calls": [
+      [
+        30,
+        13,
+        -51,
+        235,
+        false,
+      ],
+      [
+        30,
+        24,
+        -51,
+        235,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": -60,
+            "y": 237,
+          },
+          "br": Point {
+            "x": -49,
+            "y": 244,
+          },
+          "tl": Point {
+            "x": -53,
+            "y": 226,
+          },
+          "tr": Point {
+            "x": -42,
+            "y": 233,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": -67,
+            "y": 239,
+          },
+          "br": Point {
+            "x": -47,
+            "y": 251,
+          },
+          "tl": Point {
+            "x": -55,
+            "y": 219,
+          },
+          "tr": Point {
+            "x": -35,
+            "y": 231,
+          },
+        },
+      },
+    ],
+  },
+  "br": {
+    "calls": [
+      [
+        30,
+        13,
+        81,
+        311,
+        false,
+      ],
+      [
+        30,
+        24,
+        81,
+        311,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 72,
+            "y": 313,
+          },
+          "br": Point {
+            "x": 83,
+            "y": 320,
+          },
+          "tl": Point {
+            "x": 78,
+            "y": 302,
+          },
+          "tr": Point {
+            "x": 90,
+            "y": 309,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 64,
+            "y": 315,
+          },
+          "br": Point {
+            "x": 85,
+            "y": 327,
+          },
+          "tl": Point {
+            "x": 76,
+            "y": 295,
+          },
+          "tr": Point {
+            "x": 97,
+            "y": 307,
+          },
+        },
+      },
+    ],
+  },
+  "mb": {
+    "calls": [
+      [
+        30,
+        13,
+        15,
+        273,
+        false,
+      ],
+      [
+        30,
+        24,
+        15,
+        273,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 6,
+            "y": 275,
+          },
+          "br": Point {
+            "x": 17,
+            "y": 282,
+          },
+          "tl": Point {
+            "x": 12,
+            "y": 264,
+          },
+          "tr": Point {
+            "x": 24,
+            "y": 271,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": -2,
+            "y": 277,
+          },
+          "br": Point {
+            "x": 19,
+            "y": 289,
+          },
+          "tl": Point {
+            "x": 10,
+            "y": 257,
+          },
+          "tr": Point {
+            "x": 31,
+            "y": 269,
+          },
+        },
+      },
+    ],
+  },
+  "ml": {
+    "calls": [
+      [
+        30,
+        13,
+        -0,
+        147,
+        false,
+      ],
+      [
+        30,
+        24,
+        -0,
+        147,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": -9,
+            "y": 150,
+          },
+          "br": Point {
+            "x": 2,
+            "y": 156,
+          },
+          "tl": Point {
+            "x": -3,
+            "y": 139,
+          },
+          "tr": Point {
+            "x": 8,
+            "y": 145,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": -17,
+            "y": 152,
+          },
+          "br": Point {
+            "x": 4,
+            "y": 164,
+          },
+          "tl": Point {
+            "x": -5,
+            "y": 131,
+          },
+          "tr": Point {
+            "x": 16,
+            "y": 143,
+          },
+        },
+      },
+    ],
+  },
+  "mr": {
+    "calls": [
+      [
+        30,
+        13,
+        131,
+        223,
+        false,
+      ],
+      [
+        30,
+        24,
+        131,
+        223,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 122,
+            "y": 226,
+          },
+          "br": Point {
+            "x": 134,
+            "y": 232,
+          },
+          "tl": Point {
+            "x": 129,
+            "y": 215,
+          },
+          "tr": Point {
+            "x": 140,
+            "y": 221,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 115,
+            "y": 228,
+          },
+          "br": Point {
+            "x": 136,
+            "y": 240,
+          },
+          "tl": Point {
+            "x": 127,
+            "y": 207,
+          },
+          "tr": Point {
+            "x": 148,
+            "y": 219,
+          },
+        },
+      },
+    ],
+  },
+  "mt": {
+    "calls": [
+      [
+        30,
+        13,
+        116,
+        98,
+        false,
+      ],
+      [
+        30,
+        24,
+        116,
+        98,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 107,
+            "y": 100,
+          },
+          "br": Point {
+            "x": 118,
+            "y": 107,
+          },
+          "tl": Point {
+            "x": 113,
+            "y": 89,
+          },
+          "tr": Point {
+            "x": 125,
+            "y": 96,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 99,
+            "y": 102,
+          },
+          "br": Point {
+            "x": 120,
+            "y": 114,
+          },
+          "tl": Point {
+            "x": 111,
+            "y": 82,
+          },
+          "tr": Point {
+            "x": 132,
+            "y": 94,
+          },
+        },
+      },
+    ],
+  },
+  "mtr": {
+    "calls": [
+      [
+        30,
+        13,
+        136,
+        63,
+        false,
+      ],
+      [
+        30,
+        24,
+        136,
+        63,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 127,
+            "y": 66,
+          },
+          "br": Point {
+            "x": 138,
+            "y": 72,
+          },
+          "tl": Point {
+            "x": 133,
+            "y": 54,
+          },
+          "tr": Point {
+            "x": 145,
+            "y": 61,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 119,
+            "y": 68,
+          },
+          "br": Point {
+            "x": 140,
+            "y": 80,
+          },
+          "tl": Point {
+            "x": 131,
+            "y": 47,
+          },
+          "tr": Point {
+            "x": 152,
+            "y": 59,
+          },
+        },
+      },
+    ],
+  },
+  "tl": {
+    "calls": [
+      [
+        30,
+        13,
+        50,
+        60,
+        false,
+      ],
+      [
+        30,
+        24,
+        50,
+        60,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 41,
+            "y": 62,
+          },
+          "br": Point {
+            "x": 52,
+            "y": 69,
+          },
+          "tl": Point {
+            "x": 48,
+            "y": 51,
+          },
+          "tr": Point {
+            "x": 59,
+            "y": 58,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 34,
+            "y": 64,
+          },
+          "br": Point {
+            "x": 54,
+            "y": 76,
+          },
+          "tl": Point {
+            "x": 46,
+            "y": 44,
+          },
+          "tr": Point {
+            "x": 66,
+            "y": 56,
+          },
+        },
+      },
+    ],
+  },
+  "tr": {
+    "calls": [
+      [
+        30,
+        13,
+        182,
+        136,
+        false,
+      ],
+      [
+        30,
+        24,
+        182,
+        136,
+        true,
+      ],
+    ],
+    "results": [
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 173,
+            "y": 138,
+          },
+          "br": Point {
+            "x": 184,
+            "y": 145,
+          },
+          "tl": Point {
+            "x": 179,
+            "y": 127,
+          },
+          "tr": Point {
+            "x": 191,
+            "y": 134,
+          },
+        },
+      },
+      {
+        "type": "return",
+        "value": {
+          "bl": Point {
+            "x": 165,
+            "y": 140,
+          },
+          "br": Point {
+            "x": 186,
+            "y": 152,
+          },
+          "tl": Point {
+            "x": 177,
+            "y": 120,
+          },
+          "tr": Point {
+            "x": 198,
+            "y": 132,
+          },
+        },
+      },
+    ],
+  },
+}
+`;
