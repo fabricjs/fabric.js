@@ -20,7 +20,7 @@ describe('Canvas event data', () => {
   };
 
   beforeEach(() => {
-    canvas = new Canvas(null);
+    canvas = new Canvas();
     spy = jest.spyOn(canvas, 'fire');
   });
 

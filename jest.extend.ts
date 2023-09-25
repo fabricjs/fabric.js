@@ -14,7 +14,7 @@ type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
 };
 
 export const roundSnapshotOptions = {
-  cloneDeepWith: (value) => {
+  cloneDeepWith: (value: any) => {
     if (typeof value === 'number') {
       return Math.round(value);
     }
@@ -23,6 +23,7 @@ export const roundSnapshotOptions = {
 
 expect.extend({
   toMatchSnapshot(
+    this: any,
     received: any,
     propertiesOrHint?: ExtendedOptions,
     hint?: string
@@ -43,6 +44,7 @@ expect.extend({
     );
   },
   toMatchObjectSnapshot(
+    this: any,
     received: FabricObject | Record<string, any>,
     {
       cloneDeepWith: customizer,

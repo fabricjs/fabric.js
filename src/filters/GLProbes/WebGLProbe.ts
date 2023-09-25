@@ -1,3 +1,4 @@
+import { log } from '../../util/internals/console';
 import { GLProbe } from './GLProbe';
 import type { GLPrecision } from './GLProbe';
 
@@ -37,7 +38,7 @@ export class WebGLProbe extends GLProbe {
       this.GLPrecision = (['highp', 'mediump', 'lowp'] as const).find(
         (precision) => this.testPrecision(gl, precision)
       );
-      console.log(`fabric: max texture size ${this.maxTextureSize}`);
+      log('log', `WebGL: max texture size ${this.maxTextureSize}`);
     }
   }
 
