@@ -330,19 +330,20 @@
 
     assert.ok(typeof group.containsPoint === 'function');
 
-    assert.ok(!group.containsPoint(new fabric.Point()));
+
+    assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
 
     group.scale(2);
-    assert.ok(group.containsPoint(new fabric.Point({ x: 50, y: 120 })));
-    assert.ok(group.containsPoint(new fabric.Point({ x: 100, y: 160 })));
-    assert.ok(!group.containsPoint(new fabric.Point()));
+    assert.ok(group.containsPoint(new fabric.Point( 50, 120 )));
+    assert.ok(group.containsPoint(new fabric.Point( 100, 160 )));
+    assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
 
     group.scale(1);
     group.padding = 30;
     group.setCoords();
-    assert.ok(group.containsPoint(new fabric.Point({ x: 50, y: 120 })));
-    assert.ok(!group.containsPoint(new fabric.Point({ x: 100, y: 170 })));
-    assert.ok(!group.containsPoint(new fabric.Point()));
+    assert.ok(group.containsPoint(new fabric.Point( 50, 120 )));
+    assert.ok(!group.containsPoint(new fabric.Point( 100, 170 )));
+    assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
   });
 
   QUnit.test('forEachObject', function(assert) {
