@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(Control): `calcCornerCoords` angle + calculation [#9377](https://github.com/fabricjs/fabric.js/pull/9377)
+- patch(): dep findCrossPoints in favor of `isPointInPolygon` [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
 - docs() enable typedocs to run again [#9356](https://github.com/fabricjs/fabric.js/pull/9356)
 - chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
 - feature(Object) BREAKING: Remove lines parameter from object.containsPoint [#9375](https://github.com/fabricjs/fabric.js/pull/9375)

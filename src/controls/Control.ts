@@ -4,6 +4,7 @@ import type {
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { Intersection } from '../Intersection';
 import { Point } from '../Point';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
 import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
@@ -176,13 +177,13 @@ export class Control {
     controlKey: string,
     fabricObject: InteractiveFabricObject,
     pointer: Point,
-    cornerPoint: TCornerPoint
+    { tl, tr, br, bl }: TCornerPoint
   ) {
     // TODO: locking logic can be handled here instead of in the control handler logic
     return (
       fabricObject.canvas?.getActiveObject() === fabricObject &&
       fabricObject.isControlVisible(controlKey) &&
-      cornerPointContainsPoint(pointer, cornerPoint)
+      Intersection.isPointInPolygon(pointer, [tl, tr, br, bl])
     );
   }
 
