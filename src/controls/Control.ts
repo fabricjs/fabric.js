@@ -311,7 +311,8 @@ export class Control {
     objectCornerSize: number,
     centerX: number,
     centerY: number,
-    isTouch: boolean
+    isTouch: boolean,
+    fabricObject: InteractiveFabricObject
   ) {
     let cosHalfOffset, sinHalfOffset, cosHalfOffsetComp, sinHalfOffsetComp;
     const xSize = isTouch ? this.touchSizeX : this.sizeX,
