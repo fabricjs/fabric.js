@@ -27,7 +27,6 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
-import { cornerPointContainsPoint } from '../../util/intersection/findCrossPoint';
 
 type TMatrixCache = {
   key: string;
@@ -343,10 +342,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(point: Point, absolute = false, calculate = false): boolean {
-    return cornerPointContainsPoint(
-      point,
-      this._getCoords(absolute, calculate)
-    );
+    const { tl, tr, br, bl } = this._getCoords(absolute, calculate);
+    return Intersection.isPointInPolygon(point, [tl, tr, br, bl]);
   }
 
   /**
