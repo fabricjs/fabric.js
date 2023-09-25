@@ -1,8 +1,4 @@
-import {
-  Object as FabricObject,
-  Point,
-  Intersection,
-} from '../../dist/index.mjs';
+import { Object as FabricObject, Point } from '../../dist/index.mjs';
 
 // OLD CODE FOR REFERENCE AND IMPLEMENTATION TEST
 
@@ -111,15 +107,6 @@ class Test1 extends FabricObject {
   }
 }
 
-class Test2 extends FabricObject {
-  containsPoint(point, absolute, calculate) {
-    return Intersection.isPointInPolygon(
-      point,
-      this.getCoords(absolute, calculate)
-    );
-  }
-}
-
 const rect1 = new Test1({
   left: 10,
   top: 10,
@@ -128,7 +115,7 @@ const rect1 = new Test1({
   angle: 15.5,
 });
 
-const rect2 = new Test2({
+const rect2 = new FabricObject({
   left: 10,
   top: 10,
   width: 10,
