@@ -196,7 +196,7 @@ export class Control {
     fabricObject: InteractiveFabricObject,
     control: Control
   ): TransformActionHandler | undefined {
-    return this.actionHandler.bind(this);
+    return this.actionHandler;
   }
 
   /**
@@ -211,7 +211,7 @@ export class Control {
     fabricObject: InteractiveFabricObject,
     control: Control
   ): ControlActionHandler | undefined {
-    return this.mouseDownHandler?.bind(this);
+    return this.mouseDownHandler;
   }
 
   /**
@@ -227,7 +227,7 @@ export class Control {
     fabricObject: InteractiveFabricObject,
     control: Control
   ): ControlActionHandler | undefined {
-    return this.mouseUpHandler?.bind(this);
+    return this.mouseUpHandler;
   }
 
   /**

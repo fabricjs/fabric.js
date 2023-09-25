@@ -1,3 +1,5 @@
+import { Canvas } from '../canvas/Canvas';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import { Control } from './Control';
 
 describe('Controls', () => {
@@ -12,17 +14,28 @@ describe('Controls', () => {
       mouseUpHandler,
     });
 
-    control.getActionHandler()();
-    expect(actionHandler.mock.contexts).toEqual([control]);
+    const target = new FabricObject({
+      controls: { test: control, test2: control },
+    });
+    jest.spyOn(target, '_findTargetCorner').mockReturnValue('test');
+    jest.spyOn(target, 'getActiveControl').mockReturnValue('test');
 
-    control.getMouseDownHandler()();
+    const canvas = new Canvas();
+    canvas.setActiveObject(target);
+
+    const downEvent = new MouseEvent('mousedown', { clientX: 0, clientY: 0 });
+    const moveEvent = new MouseEvent('mousemove', { clientX: 0, clientY: 0 });
+    const upEvent = new MouseEvent('mouseup', { clientX: 0, clientY: 0 });
+
+    canvas.getSelectionElement().dispatchEvent(downEvent);
+    // eslint-disable-next-line no-restricted-globals
+    const doc = document;
+    doc.dispatchEvent(moveEvent);
+    canvas._currentTransform!.corner = 'test2';
+    doc.dispatchEvent(upEvent);
+
     expect(mouseDownHandler.mock.contexts).toEqual([control]);
-
-    control.getMouseUpHandler()();
-    expect(mouseUpHandler.mock.contexts).toEqual([control]);
-
-    const b = new Control({ actionHandler });
-    expect(b.getMouseDownHandler()).toBeUndefined();
-    expect(b.getMouseUpHandler()).toBeUndefined();
+    expect(actionHandler.mock.contexts).toEqual([control]);
+    expect(mouseUpHandler.mock.contexts).toEqual([control, control]);
   });
 });
