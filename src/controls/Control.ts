@@ -14,7 +14,6 @@ import {
   createTranslateMatrix,
   multiplyTransformMatrixArray,
 } from '../util/misc/matrix';
-import { cornerPointContainsPoint } from '../util/intersection/findCrossPoint';
 import type { ControlRenderingStyleOverride } from './controlRendering';
 import { renderCircleControl, renderSquareControl } from './controlRendering';
 
