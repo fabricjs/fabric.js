@@ -89,9 +89,7 @@ export class Intersection {
    * @returns
    */
   static isPointInPolygon(point: Point, points: Point[]) {
-    const other = new Point(point).setX(
-      Math.min(point.x - 1, ...points.map((p) => p.x))
-    );
+    const other = new Point(Number.MAX_VALUE, point.y);
     let hits = 0;
     for (let index = 0; index < points.length; index++) {
       const inter = this.intersectSegmentSegment(
