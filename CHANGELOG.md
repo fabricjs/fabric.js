@@ -2,6 +2,15 @@
 
 ## [next]
 
+- BREAKING refactor(Geometry): rm line coords [#9373](https://github.com/fabricjs/fabric.js/pull/9373)
+  **BREAKING**:
+  - `oCoords` => `controlCoords`
+  - `aCoords` => `ownCoords`
+  - `calcOCoords` => `protected calcControlCoords`
+  - `calcACoords` => `protected calcCornerCoords`
+  - rm `_getCoords`, `_containsCenterOfCanvas`, `calcLineCoords`
+  - rm `absolute, calculate` for all geometry methods
+  - rm `scaleToWidth`, `scaleToHeight` because it is not supported under group and expectations are unclear regarding usage
 - fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
   **BREAKING**:
   - `Canvas#_checkTarget(point, object, pointFromViewport)` => `Canvas#_checkTarget(object, pointFromViewport)`
