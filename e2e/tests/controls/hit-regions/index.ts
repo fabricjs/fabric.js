@@ -23,6 +23,7 @@ beforeAll((canvas) => {
     controls,
     scaleY: 2,
     fill: 'blue',
+    padding: 10,
   });
   const group = new fabric.Group([rect], {
     angle: 30,
