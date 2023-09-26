@@ -429,8 +429,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @TODO this seems dumb that we treat controls with transparency. we can find controls
    * programmatically without painting them, the cache canvas optimization is always valid
    * @param {FabricObject} target Object to check
-   * @param {Number} x Left coordinate
-   * @param {Number} y Top coordinate
+   * @param {Number} x Left coordinate in viewport space
+   * @param {Number} y Top coordinate in viewport space
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
@@ -760,10 +760,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      obj.containsPoint(
-        sendPointToPlane(pointer, undefined, this.viewportTransform),
-        true
-      )
+      obj.containsPoint(this.restorePointerVpt(pointer), true)
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
@@ -834,6 +831,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Returns pointer coordinates without the effect of the viewport
+   * Takes a point in html canvas space and gives you back a point of the scene.
    * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
    * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
    */
