@@ -330,7 +330,6 @@
 
     assert.ok(typeof group.containsPoint === 'function');
 
-
     assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
 
     group.scale(2);
