@@ -18,7 +18,7 @@ import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 
-type TOCoord = Point & {
+export type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
@@ -278,15 +278,16 @@ export class InteractiveFabricObject<
    * @private
    */
   private _calcCornerCoords(control: Control, position: Point) {
+    const angle = this.getTotalAngle();
     const corner = control.calcCornerCoords(
-      this.angle,
+      angle,
       this.cornerSize,
       position.x,
       position.y,
       false
     );
     const touchCorner = control.calcCornerCoords(
-      this.angle,
+      angle,
       this.touchCornerSize,
       position.x,
       position.y,
