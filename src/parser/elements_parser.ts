@@ -1,6 +1,6 @@
 import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
-import { Image } from '../shapes/Image';
+import { FabricImage } from '../shapes/Image';
 import { classRegistry } from '../ClassRegistry';
 import {
   invertTransform,
@@ -77,7 +77,7 @@ export class ElementsParser {
       );
       this.resolveGradient(obj, el, 'fill');
       this.resolveGradient(obj, el, 'stroke');
-      if (obj instanceof Image && obj._originalElement) {
+      if (obj instanceof FabricImage && obj._originalElement) {
         removeTransformMatrixForSvgParsing(
           obj,
           obj.parsePreserveAspectRatioAttribute()
