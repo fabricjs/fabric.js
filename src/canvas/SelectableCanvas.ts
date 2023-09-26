@@ -17,7 +17,7 @@ import {
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { invertTransform } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -407,18 +407,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.renderTopLayer(ctx);
     // todo: how do i know if the after:render is for the top or normal contex?
     this.fire('after:render', { ctx });
-  }
-
-  /**
-   * Given a pointer on the canvas with a viewport applied,
-   * find out the pointer in object coordinates
-   * @private
-   */
-  _normalizePointer(object: FabricObject, pointer: Point): Point {
-    return transformPoint(
-      this.restorePointerVpt(pointer),
-      invertTransform(object.calcTransformMatrix())
-    );
   }
 
   /**
