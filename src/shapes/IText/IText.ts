@@ -204,12 +204,6 @@ export class IText<
 
   static type = 'IText';
 
-  get type() {
-    const type = super.type;
-    // backward compatibility
-    return type === 'itext' ? 'i-text' : type;
-  }
-
   /**
 
    * Constructor

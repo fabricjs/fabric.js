@@ -1086,16 +1086,16 @@ export class StaticCanvas<
         const fill = this[`${prop}Color`];
         if (isFiller(fill)) {
           const shouldTransform = this[`${prop}Vpt`],
-            vpt = this.viewportTransform,
-            object = {
-              // otherwise circular dependency
-              isType: () => false,
+            vpt = this.viewportTransform;
+          return fill.toSVG(
+            {
               width: this.width / (shouldTransform ? vpt[0] : 1),
               height: this.height / (shouldTransform ? vpt[3] : 1),
-            };
-          return fill.toSVG(object as FabricObject, {
-            additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
-          });
+            },
+            {
+              additionalTransform: shouldTransform ? matrixToSVG(vpt) : '',
+            }
+          );
         }
       })
       .join('');

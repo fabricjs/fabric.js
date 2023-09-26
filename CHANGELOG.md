@@ -9,6 +9,11 @@
 - chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
 - feature(Object) BREAKING: Remove lines parameter from object.containsPoint [#9375](https://github.com/fabricjs/fabric.js/pull/9375)
 - patch(Control): move hit detection to shouldActivate [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
+- refactor(v6): remove instance `type` property + `isType` [#9368](https://github.com/fabricjs/fabric.js/pull/9368)
+  **BREAKING**:
+  - rm `isType`, rm getObjects(...type) signature => getObjects()
+  - rm instance `type` property
+  - Serializable classes do not accept type as an option anymore, it will be discarded in the constructor. It is recommended **not** to use instance `type` property.
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)

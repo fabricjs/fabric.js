@@ -55,7 +55,7 @@ export class Grayscale extends BaseFilter {
   }
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${super.getCacheKey()}_${this.mode}`;
   }
 
   getFragmentSource() {

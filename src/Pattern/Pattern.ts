@@ -1,5 +1,11 @@
 import { config } from '../config';
-import type { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
+import type {
+  Abortable,
+  TCrossOrigin,
+  TMat2D,
+  TOptions,
+  TSize,
+} from '../typedefs';
 import { ifNaN } from '../util/internals';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
@@ -11,7 +17,6 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
-import { log } from '../util/internals/console';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -19,22 +24,6 @@ import { log } from '../util/internals/console';
  */
 export class Pattern {
   static type = 'Pattern';
-
-  /**
-   * Legacy identifier of the class. Prefer using this.constructor.type 'Pattern'
-   * or utils like isPattern, or instance of to indentify a pattern in your code.
-   * Will be removed in future versiones
-   * @TODO add sustainable warning message
-   * @type string
-   * @deprecated
-   */
-  get type() {
-    return 'pattern';
-  }
-
-  set type(value) {
-    log('warn', 'Setting type has no effect', value);
-  }
 
   /**
    * @type PatternRepeat
@@ -92,7 +81,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternOptions = {}) {
+  constructor({ type: _, ...options }: TOptions<PatternOptions> = {}) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -151,7 +140,7 @@ export class Pattern {
     const { repeat, crossOrigin } = this;
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
-      type: 'pattern',
+      type: (this.constructor as typeof Pattern).type,
       source: this.sourceToString(),
       repeat,
       crossOrigin,
@@ -192,8 +181,8 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: SerializedPatternOptions,
-    options: Abortable
+    { type: _, source, ...serialized }: SerializedPatternOptions,
+    options?: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

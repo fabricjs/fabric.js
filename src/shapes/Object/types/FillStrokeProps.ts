@@ -1,6 +1,6 @@
 import type { TFiller } from '../../../typedefs';
 
-export interface FillStrokeProps {
+export interface FillStrokeProps<Serialized extends boolean = false> {
   /**
    * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
    * @type String
@@ -14,7 +14,10 @@ export interface FillStrokeProps {
    * @type String
    * @default rgb(0,0,0)
    */
-  fill: ReturnType<TFiller['toObject']> | string | null;
+  fill:
+    | (Serialized extends true ? ReturnType<TFiller['toObject']> : TFiller)
+    | string
+    | null;
 
   /**
    * Fill rule used to fill an object
@@ -31,7 +34,10 @@ export interface FillStrokeProps {
    * @type String
    * @default null
    */
-  stroke: ReturnType<TFiller['toObject']> | string | null;
+  stroke:
+    | (Serialized extends true ? ReturnType<TFiller['toObject']> : TFiller)
+    | string
+    | null;
 
   /**
    * Width of a stroke used to render this object

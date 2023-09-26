@@ -10,7 +10,6 @@ import type { Text } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { IText } from '../shapes/IText/IText';
 import type { Textbox } from '../shapes/Textbox';
-import type { Path } from '../shapes/Path';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -41,7 +40,10 @@ export const isCollection = (
 export const isActiveSelection = (
   fabricObject?: FabricObject
 ): fabricObject is ActiveSelection => {
-  return !!fabricObject && fabricObject.isType('ActiveSelection');
+  return (
+    !!fabricObject &&
+    (fabricObject.constructor as typeof FabricObject).type === 'ActiveSelection'
+  );
 };
 
 export const isTextObject = (
@@ -49,13 +51,12 @@ export const isTextObject = (
 ): fabricObject is Text => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.isType('Text', 'IText', 'Textbox');
-};
-
-export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
-  // we could use instanceof but that would mean pulling in Text code for a simple check
-  // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.isType('Path');
+  return (
+    !!fabricObject &&
+    ['Text', 'IText', 'Textbox'].some(
+      (type) => type === (fabricObject.constructor as typeof FabricObject).type
+    )
+  );
 };
 
 export const isInteractiveTextObject = (
@@ -63,7 +64,12 @@ export const isInteractiveTextObject = (
 ): fabricObject is IText | Textbox => {
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.isType('IText', 'Textbox');
+  return (
+    !!fabricObject &&
+    ['IText', 'Textbox'].some(
+      (type) => type === (fabricObject.constructor as typeof FabricObject).type
+    )
+  );
 };
 
 export const isFabricObjectCached = (

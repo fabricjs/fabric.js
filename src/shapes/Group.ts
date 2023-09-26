@@ -170,7 +170,7 @@ export class Group extends createCollectionMixin(
    */
   constructor(
     objects: FabricObject[] = [],
-    options: Partial<GroupProps> = {},
+    { type: _, ...options }: TOptions<GroupProps> = {},
     objectsRelativeToGroup?: boolean
   ) {
     super();
@@ -1088,6 +1088,7 @@ export class Group extends createCollectionMixin(
    * @returns {Promise<Group>}
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
+    type: _,
     objects = [],
     ...options
   }: T) {

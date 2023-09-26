@@ -1,5 +1,5 @@
 import { Image } from '../shapes/Image';
-import type { TClassProperties } from '../typedefs';
+import type { Abortable, TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -66,7 +66,7 @@ export class BlendImage extends BaseFilter {
   static defaults = blendImageDefaultValues;
 
   getCacheKey() {
-    return `${this.type}_${this.mode}`;
+    return `${super.getCacheKey()}_${this.mode}`;
   }
 
   getFragmentSource(): string {
@@ -201,7 +201,7 @@ export class BlendImage extends BaseFilter {
    */
   toObject() {
     return {
-      type: this.type,
+      ...super.toObject(),
       image: this.image && this.image.toObject(),
       mode: this.mode,
       alpha: this.alpha,
@@ -217,8 +217,8 @@ export class BlendImage extends BaseFilter {
    * @returns {Promise<BlendImage>}
    */
   static fromObject(
-    { type, image, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal }
+    { type: _, image, ...filterOptions }: Record<string, any>,
+    options?: Abortable
   ) {
     return Image.fromObject(image, options).then(
       (enlivedImage) =>

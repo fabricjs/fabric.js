@@ -2,7 +2,7 @@ import { Color } from './color/Color';
 import { config } from './config';
 import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
-import type { TClassProperties } from './typedefs';
+import type { TClassProperties, TOptions } from './typedefs';
 import { uid } from './util/internals/uid';
 import { pickBy } from './util/misc/pick';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
@@ -20,6 +20,7 @@ export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
 };
 
 export type SerializedShadowOptions = {
+  type: string;
   color: string;
   blur: number;
   offsetX: number;
@@ -29,6 +30,8 @@ export type SerializedShadowOptions = {
 };
 
 export class Shadow {
+  static type = 'Shadow';
+
   /**
    * Shadow color
    * @type String
@@ -89,14 +92,12 @@ export class Shadow {
   constructor(options: Partial<TClassProperties<Shadow>>);
   constructor(svgAttribute: string);
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
-    const options: Partial<TClassProperties<Shadow>> =
+    const { type: _, ...options }: TOptions<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
-    Object.assign(this, (this.constructor as typeof Shadow).ownDefaults);
-    for (const prop in options) {
-      // @ts-expect-error for loops are so messy in TS
-      this[prop] = options[prop];
-    }
-
+    Object.assign(this, {
+      ...(this.constructor as typeof Shadow).ownDefaults,
+      ...options,
+    });
     this.id = uid();
   }
 
@@ -191,7 +192,7 @@ export class Shadow {
    * @return {Object} Object representation of a shadow instance
    */
   toObject() {
-    const data: SerializedShadowOptions = {
+    const data: Omit<SerializedShadowOptions, 'type'> = {
       color: this.color,
       blur: this.blur,
       offsetX: this.offsetX,
@@ -200,9 +201,16 @@ export class Shadow {
       nonScaling: this.nonScaling,
     };
     const defaults = Shadow.ownDefaults;
-    return !this.includeDefaultValues
-      ? pickBy(data, (value, key) => value !== defaults[key])
-      : data;
+    return {
+      type: (this.constructor as typeof Shadow).type,
+      ...(!this.includeDefaultValues
+        ? pickBy(data, (value, key) => value !== defaults[key])
+        : data),
+    };
+  }
+
+  static fromObject({ type: _, ...options }: Partial<SerializedShadowOptions>) {
+    return new this(options);
   }
 
   /**

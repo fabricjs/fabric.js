@@ -50,10 +50,8 @@ import {
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
-import type { SerializedObjectProps } from './types/SerializedObjectProps';
-import type { ObjectProps } from './types/ObjectProps';
+import type { ObjectProps, SerializedObjectProps } from './types/ObjectProps';
 import { getEnv } from '../../env';
-import { log } from '../../util/internals/console';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -279,31 +277,10 @@ export class FabricObject<
   static type = 'FabricObject';
 
   /**
-   * Legacy identifier of the class. Prefer using utils like isType or instanceOf
-   * Will be removed in fabric 7 or 8.
-   * The setter exists because is very hard to catch all the ways in which a type value
-   * could be set in the instance
-   * @TODO add sustainable warning message
-   * @type string
-   * @deprecated
-   */
-  get type() {
-    const name = (this.constructor as typeof FabricObject).type;
-    if (name === 'FabricObject') {
-      return 'object';
-    }
-    return name.toLowerCase();
-  }
-
-  set type(value) {
-    log('warn', 'Setting type has no effect', value);
-  }
-
-  /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Props = {} as Props) {
+  constructor({ type: _, ...options }: Props = {} as Props) {
     super();
     Object.assign(
       this,
@@ -1459,18 +1436,6 @@ export class FabricObject<
   }
 
   /**
-   * Returns true if any of the specified types is identical to the type of an instance
-   * @param {String} type Type to check against
-   * @return {Boolean}
-   */
-  isType(...types: string[]) {
-    return (
-      types.includes((this.constructor as typeof FabricObject).type) ||
-      types.includes(this.type)
-    );
-  }
-
-  /**
    * Returns complexity of an instance
    * @return {Number} complexity of this instance (is 1 unless subclassed)
    */
@@ -1565,20 +1530,19 @@ export class FabricObject<
     object: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
-    return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
-      (enlivedMap) => {
-        const allOptions = { ...options, ...enlivedMap };
-        // from the resulting enlived options, extract options.extraParam to arg0
-        // to avoid accidental overrides later
-        if (extraParam) {
-          const { [extraParam]: arg0, type, ...rest } = allOptions;
-          // @ts-expect-error different signature
-          return new this(arg0, rest);
-        } else {
-          return new this(allOptions);
-        }
+    const { type: _, ...data } = cloneDeep(object);
+    return enlivenObjectEnlivables<any>(data, options).then((enlivedMap) => {
+      const allOptions = { ...options, ...data, ...enlivedMap };
+      // from the resulting enlived options, extract options.extraParam to arg0
+      // to avoid accidental overrides later
+      if (extraParam) {
+        const { [extraParam]: arg0, ...rest } = allOptions;
+        // @ts-expect-error different signature
+        return new this(arg0, rest);
+      } else {
+        return new this(allOptions);
       }
-    ) as Promise<S>;
+    }) as Promise<S>;
   }
 
   /**

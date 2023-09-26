@@ -65,7 +65,7 @@ export class Convolute extends BaseFilter {
   static defaults = convoluteDefaultValues;
 
   getCacheKey() {
-    return `${this.type}_${Math.sqrt(this.matrix.length)}_${
+    return `${super.getCacheKey()}_${Math.sqrt(this.matrix.length)}_${
       this.opaque ? 1 : 0
     }` as keyof typeof fragmentSource;
   }
