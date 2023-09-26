@@ -59,7 +59,7 @@
 
     assert.ok(polygon instanceof fabric.Polygon);
     assert.ok(polygon instanceof fabric.Polyline);
-    assert.ok(polygon instanceof fabric.Object);
+    assert.ok(polygon instanceof fabric.FabricObject);
 
     assert.equal(polygon.constructor.type, 'Polygon');
     assert.deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);

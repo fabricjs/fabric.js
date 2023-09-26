@@ -102,7 +102,7 @@
     fabric.Rect.fromObject(toObject).then(function(rect) {
       assert.ok(rect.clipPath instanceof fabric.Circle, 'clipPath is enlived');
       assert.equal(rect.clipPath.radius, 50, 'radius is restored correctly');
-      assert.ok(rect.clipPath.clipPath instanceof fabric.Text, 'nested clipPath is enlived');
+      assert.ok(rect.clipPath.clipPath instanceof fabric.FabricText, 'nested clipPath is enlived');
       assert.equal(rect.clipPath.clipPath.text, 'clipPath', 'instance is restored correctly');
       done();
     });
@@ -117,7 +117,7 @@
     fabric.Rect.fromObject(toObject).then(function(rect) {
       assert.ok(rect.clipPath instanceof fabric.Circle, 'clipPath is enlived');
       assert.equal(rect.clipPath.radius, 50, 'radius is restored correctly');
-      assert.ok(rect.clipPath.clipPath instanceof fabric.Text, 'neted clipPath is enlived');
+      assert.ok(rect.clipPath.clipPath instanceof fabric.FabricText, 'neted clipPath is enlived');
       assert.equal(rect.clipPath.clipPath.text, 'clipPath', 'instance is restored correctly');
       assert.equal(rect.clipPath.clipPath.inverted, true, 'instance inverted is restored correctly');
       assert.equal(rect.clipPath.clipPath.absolutePositioned, true, 'instance absolutePositioned is restored correctly');

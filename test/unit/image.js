@@ -115,8 +115,8 @@
     assert.ok(fabric.Image);
 
     createImageObject(function(image) {
-      assert.ok(image instanceof fabric.Image);
-      assert.ok(image instanceof fabric.Object);
+      assert.ok(image instanceof fabric.FabricImage);
+      assert.ok(image instanceof fabric.FabricObject);
 
       assert.equal(image.constructor.type, 'Image');
 
@@ -443,7 +443,7 @@
     createImageObject(function(image) {
       assert.ok(typeof image.clone === 'function');
       image.clone().then(function(clone) {
-        assert.ok(clone instanceof fabric.Image);
+        assert.ok(clone instanceof fabric.FabricImage);
         assert.deepEqual(clone.toObject(), image.toObject(), 'clone and original image are equal');
         done();
       });
@@ -467,7 +467,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromObject === 'function');
     fabric.Image.fromObject({ ...REFERENCE_IMG_OBJECT, src: IMG_SRC }).then(function (instance) {
-      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance instanceof fabric.FabricImage);
       done();
     });
   });
@@ -488,7 +488,7 @@
       }
     };
     fabric.Image.fromObject(obj).then(function(instance){
-      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance instanceof fabric.FabricImage);
       assert.ok(instance.clipPath instanceof fabric.Rect);
       assert.ok(Array.isArray(instance.filters), 'should enliven filters');
       assert.equal(instance.filters.length, 1, 'should enliven filters');
@@ -536,7 +536,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
     fabric.Image.fromURL(IMG_SRC).then(function(instance) {
-      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance instanceof fabric.FabricImage);
       assert.sameImageObject(REFERENCE_IMG_OBJECT, instance.toObject());
       done();
     });
@@ -548,7 +548,7 @@
     fabric.Image.fromURL(IMG_SRC, {
       crossOrigin: 'use-credentials',
     }).then(function(instance) {
-      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance instanceof fabric.FabricImage);
       assert.sameImageObject({ ...REFERENCE_IMG_OBJECT, crossOrigin: 'use-credentials' }, instance.toObject());
       done();
     });
@@ -558,7 +558,7 @@
     var done = assert.async();
     assert.ok(typeof fabric.Image.fromURL === 'function');
     fabric.Image.fromURL(IMG_URL_NON_EXISTING, function(instance) {
-      assert.ok(instance instanceof fabric.Image);
+      assert.ok(instance instanceof fabric.FabricImage);
     }).catch(function(e) {
       assert.ok(e instanceof Error);
       done();
@@ -579,7 +579,7 @@
     });
 
     fabric.Image.fromElement(imageEl).then((imgObject)=> {
-      assert.ok(imgObject instanceof fabric.Image);
+      assert.ok(imgObject instanceof fabric.FabricImage);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.getSrc(), IMAGE_DATA_URL, 'src of an object');
@@ -602,7 +602,7 @@
     });
 
     fabric.Image.fromElement(imageEl).then((imgObject)=> {
-      assert.ok(imgObject instanceof fabric.Image);
+      assert.ok(imgObject instanceof fabric.FabricImage);
       assert.deepEqual(imgObject.get('imageSmoothing'), false, 'imageSmoothing set to false');
       done();
     });
@@ -623,7 +623,7 @@
 
     fabric.Image.fromElement(imageEl).then((imgObject)=> {
       fabric.util.removeTransformMatrixForSvgParsing(imgObject, imgObject.parsePreserveAspectRatioAttribute());
-      assert.ok(imgObject instanceof fabric.Image);
+      assert.ok(imgObject instanceof fabric.FabricImage);
       assert.deepEqual(imgObject.get('width'), 14, 'width of an object');
       assert.deepEqual(imgObject.get('height'), 17, 'height of an object');
       assert.deepEqual(imgObject.get('scaleX'), 10, 'scaleX compensate the width');

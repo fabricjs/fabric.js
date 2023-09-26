@@ -45,7 +45,7 @@
     var line = new fabric.Line([10, 11, 20, 21]);
 
     assert.ok(line instanceof fabric.Line);
-    assert.ok(line instanceof fabric.Object);
+    assert.ok(line instanceof fabric.FabricObject);
 
     assert.equal(line.constructor.type, 'Line');
 
