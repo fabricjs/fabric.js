@@ -2,6 +2,9 @@
 
 ## [next]
 
+- fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
+  **BREAKING**:
+  - `Canvas#_checkTarget(point, object, pointFromViewport)` => `Canvas#_checkTarget(object, pointFromViewport)`
 - fix(Canvas): avoid firing event twice when working with nested objects [#9329](https://github.com/fabricjs/fabric.js/pull/9329)
 - fix(Control): `calcCornerCoords` angle + calculation [#9377](https://github.com/fabricjs/fabric.js/pull/9377)
 - patch(): dep findCrossPoints in favor of `isPointInPolygon` [#9374](https://github.com/fabricjs/fabric.js/pull/9374)

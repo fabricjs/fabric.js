@@ -17,7 +17,7 @@ import {
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { invertTransform } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -410,18 +410,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Given a pointer on the canvas with a viewport applied,
-   * find out the pointer in object coordinates
-   * @private
-   */
-  _normalizePointer(object: FabricObject, pointer: Point): Point {
-    return transformPoint(
-      this.restorePointerVpt(pointer),
-      invertTransform(object.calcTransformMatrix())
-    );
-  }
-
-  /**
    * Set the canvas tolerance value for pixel taret find.
    * Use only integer numbers.
    * @private
@@ -441,8 +429,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @TODO this seems dumb that we treat controls with transparency. we can find controls
    * programmatically without painting them, the cache canvas optimization is always valid
    * @param {FabricObject} target Object to check
-   * @param {Number} x Left coordinate
-   * @param {Number} y Top coordinate
+   * @param {Number} x Left coordinate in viewport space
+   * @param {Number} y Top coordinate in viewport space
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
@@ -762,30 +750,23 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
+   * @param {Object} [pointer] point from viewport.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
-  _checkTarget(
-    pointer: Point,
-    obj: FabricObject,
-    globalPointer: Point
-  ): boolean {
+  _checkTarget(obj: FabricObject, pointer: Point): boolean {
     if (
       obj &&
       obj.visible &&
       obj.evented &&
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(pointer)
+      obj.containsPoint(this.restorePointerVpt(pointer), true)
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
       ) {
-        if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
+        if (!this.isTargetTransparent(obj, pointer.x, pointer.y)) {
           return true;
         }
       } else {
@@ -807,17 +788,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer: Point
   ): FabricObject | undefined {
     // Cache all targets where their bounding box contains point.
-    let target,
-      i = objects.length;
+    let i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
-      const objToCheck = objects[i];
-      const pointerToUse = objToCheck.group
-        ? this._normalizePointer(objToCheck.group, pointer)
-        : pointer;
-      if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
-        target = objects[i];
+      const target = objects[i];
+      if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
             target._objects as FabricObject[],
@@ -825,10 +801,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           );
           subTarget && this.targets.push(subTarget);
         }
-        break;
+        return target;
       }
     }
-    return target;
   }
 
   /**
@@ -856,6 +831,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Returns pointer coordinates without the effect of the viewport
+   * Takes a point in html canvas space and gives you back a point of the scene.
    * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
    * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
    */

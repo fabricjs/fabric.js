@@ -200,7 +200,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * that are attached to the object instance
    * @return {Object} {tl, tr, br, bl} points
    */
-  _getCoords(absolute = false, calculate = false): TCornerPoint {
+  private _getCoords(absolute = false, calculate = false): TCornerPoint {
     if (calculate) {
       return absolute ? this.calcACoords() : this.calcLineCoords();
     }
@@ -293,14 +293,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     calculate = false
   ): boolean {
     const points = this.getCoords(absolute, calculate);
-    for (let i = 0; i < 4; i++) {
-      // bug/confusing: this containsPoint should receive 'calculate' as well.
-      // will come later because it needs to come with tests
-      if (!other.containsPoint(points[i], absolute)) {
-        return false;
-      }
-    }
-    return true;
+    calculate && other.getCoords(absolute, true);
+    return points.every((point) => other.containsPoint(point));
   }
 
   /**
@@ -342,8 +336,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(point: Point, absolute = false, calculate = false): boolean {
-    const { tl, tr, br, bl } = this._getCoords(absolute, calculate);
-    return Intersection.isPointInPolygon(point, [tl, tr, br, bl]);
+    return Intersection.isPointInPolygon(
+      point,
+      this.getCoords(absolute, calculate)
+    );
   }
 
   /**
