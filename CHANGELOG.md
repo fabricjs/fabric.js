@@ -2,6 +2,9 @@
 
 ## [next]
 
+- BREAKING refactor(Intersection): support ray intersection [#9371](https://github.com/fabricjs/fabric.js/pull/9371)
+  **BREAKING**
+  - `Intersection.intersectsLineLine(a1, a2, b1, b2, boolean, boolean)` => `Intersection.intersectsLineLine(a1, a2, b1, b2, LineType, LineType)`
 - patch(): dep findCrossPoints in favor of `isPointInPolygon` [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
 - docs() enable typedocs to run again [#9356](https://github.com/fabricjs/fabric.js/pull/9356)
 - chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
@@ -11,7 +14,7 @@
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
 
-## [6.0.0-b13]
+## [6.0.0-beta13]
 
 - fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
