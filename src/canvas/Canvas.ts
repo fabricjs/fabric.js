@@ -113,7 +113,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
+  constructor(el?: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
     // bind event handlers
     (
@@ -903,7 +903,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this.fire(eventType, options);
     target && target.fire(eventType, options);
     for (let i = 0; i < subTargets.length; i++) {
-      subTargets[i].fire(eventType, options);
+      subTargets[i] !== target && subTargets[i].fire(eventType, options);
     }
     return options;
   }
@@ -943,7 +943,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
     for (let i = 0; i < targets.length; i++) {
-      targets[i].fire(`mouse${eventType}`, options);
+      targets[i] !== target && targets[i].fire(`mouse${eventType}`, options);
     }
   }
 
