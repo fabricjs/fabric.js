@@ -18,7 +18,7 @@ import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 
-type TOCoord = Point & {
+export type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
