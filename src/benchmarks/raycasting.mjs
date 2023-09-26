@@ -1,5 +1,7 @@
 import { Object as FabricObject, Point } from '../../dist/index.mjs';
 
+// SWAPPING OF RAY CASTING LOGIC IN #9381
+
 // OLD CODE FOR REFERENCE AND IMPLEMENTATION TEST
 
 // type TLineDescriptor = {

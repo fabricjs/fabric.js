@@ -33,7 +33,7 @@ export class CanvasUtil {
 
   async executeInBrowser<C, R>(
     runInBrowser: (canvas: Canvas, context: C) => R,
-    context: C
+    context?: C
   ): Promise<R> {
     return (
       await this.page.evaluateHandle<Canvas>(
