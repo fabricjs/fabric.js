@@ -760,7 +760,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      obj.containsPoint(this.restorePointerVpt(pointer), true)
+      obj.containsPoint(this.restorePointerVpt(pointer))
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
