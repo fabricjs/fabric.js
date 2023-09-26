@@ -113,7 +113,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
+  constructor(el?: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
     // bind event handlers
     (

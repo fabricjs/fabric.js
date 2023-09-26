@@ -30,6 +30,7 @@ import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
+import { log } from '../util/internals/console';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -850,7 +851,7 @@ export class Image<
       options,
       parsedAttributes
     ).catch((err) => {
-      console.log(err);
+      log('log', 'Unable to parse Image', err);
       return null;
     });
   }

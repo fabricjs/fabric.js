@@ -24,6 +24,7 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
+import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -46,6 +47,7 @@ import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
+import { log, FabricError } from '../util/internals/console';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -171,7 +173,7 @@ export class StaticCanvas<
   }
 
   constructor(
-    el: string | HTMLCanvasElement,
+    el?: string | HTMLCanvasElement,
     options: TOptions<StaticCanvasOptions> = {}
   ) {
     super();
@@ -189,7 +191,7 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
   }
 
-  protected initElements(el: string | HTMLCanvasElement) {
+  protected initElements(el?: string | HTMLCanvasElement) {
     this.elements = new StaticCanvasDOMManager(el);
   }
 
@@ -213,12 +215,11 @@ export class StaticCanvas<
 
   _onObjectAdded(obj: FabricObject) {
     if (obj.canvas && (obj.canvas as StaticCanvas) !== this) {
-      /* _DEV_MODE_START_ */
-      console.warn(
-        'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+      log(
+        'warn',
+        'Canvas is trying to add an object that belongs to a different canvas.\n' +
           'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
       );
-      /* _DEV_MODE_END_ */
       obj.canvas.remove(obj);
     }
     obj._set('canvas', this);
@@ -1266,7 +1267,7 @@ export class StaticCanvas<
     { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
-      return Promise.reject(new Error('fabric.js: `json` is undefined'));
+      return Promise.reject(new FabricError('`json` is undefined'));
     }
 
     // parse json if it wasn't already
@@ -1440,6 +1441,7 @@ export class StaticCanvas<
   dispose() {
     !this.disposed &&
       this.elements.cleanupDOM({ width: this.width, height: this.height });
+    runningAnimations.cancelByCanvas(this);
     this.disposed = true;
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {
