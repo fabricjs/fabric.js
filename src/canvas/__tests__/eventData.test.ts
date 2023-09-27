@@ -332,7 +332,7 @@ describe('Event targets', () => {
       const activeSelection = new ActiveSelection();
       registerTestObjects({ subTarget, target, other, activeSelection });
 
-      const canvas = new Canvas(null, { activeSelection });
+      const canvas = new Canvas(undefined, { activeSelection });
       canvas.add(other, target);
       activeSelection.add(target, other);
       canvas.setActiveObject(activeSelection);
@@ -372,7 +372,7 @@ describe('Event targets', () => {
       });
       registerTestObjects({ rect, rectOver });
 
-      const canvas = new Canvas(null, { preserveObjectStacking: false });
+      const canvas = new Canvas(undefined, { preserveObjectStacking: false });
       canvas.add(rect, rectOver);
       canvas.setActiveObject(rect);
 
@@ -392,7 +392,7 @@ describe('Event targets', () => {
       });
       registerTestObjects({ rect, rectOver });
 
-      const canvas = new Canvas(null, { preserveObjectStacking: true });
+      const canvas = new Canvas(undefined, { preserveObjectStacking: true });
       canvas.add(rect, rectOver);
 
       const e = {
@@ -513,7 +513,7 @@ describe('Event targets', () => {
         group,
       });
 
-      const canvas = new Canvas(null, {
+      const canvas = new Canvas(undefined, {
         viewportTransform: [0.1, 0, 0, 0.1, 100, 200],
       });
       canvas.add(group);
@@ -567,7 +567,7 @@ describe('Event targets', () => {
         const group = new Group([rect, rect2], { subTargetCheck: true });
         registerTestObjects({ rect, rect2, group });
 
-        const canvas = new Canvas(null, { preserveObjectStacking });
+        const canvas = new Canvas(undefined, { preserveObjectStacking });
         canvas.add(group);
         canvas.setActiveObject(group);
 
@@ -669,7 +669,7 @@ describe('Event targets', () => {
           group3,
         });
 
-        const canvas = new Canvas(null, { perPixelTargetFind: true });
+        const canvas = new Canvas(undefined, { perPixelTargetFind: true });
         canvas.add(group3);
 
         return {
@@ -773,7 +773,7 @@ describe('Event targets', () => {
       });
       registerTestObjects({ rect1, rect2, rect3, activeSelection });
 
-      const canvas = new Canvas(null, { activeSelection });
+      const canvas = new Canvas(undefined, { activeSelection });
       canvas.add(rect1, rect2, rect3);
       canvas.setActiveObject(activeSelection);
 
@@ -828,7 +828,7 @@ describe('Event targets', () => {
       const activeSelection = new ActiveSelection([rect1, rect2]);
       registerTestObjects({ rect1, rect2, activeSelection });
 
-      const canvas = new Canvas(null, {
+      const canvas = new Canvas(undefined, {
         activeSelection,
         perPixelTargetFind: true,
         preserveObjectStacking: true,
