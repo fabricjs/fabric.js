@@ -84,7 +84,9 @@ test('Drag & Drop', async ({ page }) => {
     ).toMatchSnapshot({
       name: '1.drag-fabric-over-lor|em.png',
     });
-    await page.mouse.move(240, 140, { steps: 40 });
+    await page.mouse.move(400, 70, { steps: 10 });
+    await page.mouse.move(250, 130, { steps: 10 });
+    await page.mouse.move(240, 140, { steps: 10 });
     expect(
       await canvas.screenshot(),
       `2. before dropping "${dragA}" => "sandbox|" (A => A)`

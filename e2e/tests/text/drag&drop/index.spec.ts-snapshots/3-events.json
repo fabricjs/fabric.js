@@ -153,11 +153,11 @@
       "isClick": false,
       "pointer": {
         "x": 400,
-        "y": 69
+        "y": 70
       },
       "absolutePointer": {
         "x": 400,
-        "y": 69
+        "y": 70
       }
     },
     "b"
@@ -174,12 +174,12 @@
       "target": "a",
       "isClick": false,
       "pointer": {
-        "x": 254,
-        "y": 133
+        "x": 250,
+        "y": 130
       },
       "absolutePointer": {
-        "x": 254,
-        "y": 133
+        "x": 250,
+        "y": 130
       }
     },
     "a"
