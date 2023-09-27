@@ -10,7 +10,6 @@ import { iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
-import { cos } from '../../util/misc/cos';
 import {
   createRotateMatrix,
   createTranslateMatrix,
@@ -20,8 +19,6 @@ import {
   qrDecompose,
   transformPoint,
 } from '../../util/misc/matrix';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
-import { sin } from '../../util/misc/sin';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
@@ -283,7 +280,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Checks if object is fully contained within area formed by 2 points
+   * Checks if object is fully contained within area formed by 2 points, aligned with scene axis.
    * @param {Object} pointTL top-left point of area
    * @param {Object} pointBR bottom-right point of area
    * @param {Boolean} [calculate] use coordinates of current position instead of stored one
@@ -471,41 +468,41 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       : this.angle;
   }
 
-  /**
-   * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
-   * used for bounding box interactivity with the mouse
-   * @returns {TCornerPoint}
-   */
-  calcLineCoords(): TCornerPoint {
-    const vpt = this.getViewportTransform(),
-      padding = this.padding,
-      angle = degreesToRadians(this.getTotalAngle()),
-      cosP = cos(angle) * padding,
-      sinP = sin(angle) * padding,
-      cosPSinP = cosP + sinP,
-      cosPMinusSinP = cosP - sinP,
-      { tl, tr, bl, br } = this.calcACoords();
+  // /**
+  //  * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
+  //  * used for bounding box interactivity with the mouse
+  //  * @returns {TCornerPoint}
+  //  */
+  // calcLineCoords(): TCornerPoint {
+  //   const vpt = this.getViewportTransform(),
+  //     padding = this.padding,
+  //     angle = degreesToRadians(this.getTotalAngle()),
+  //     cosP = cos(angle) * padding,
+  //     sinP = sin(angle) * padding,
+  //     cosPSinP = cosP + sinP,
+  //     cosPMinusSinP = cosP - sinP,
+  //     { tl, tr, bl, br } = this.calcACoords();
 
-    const lineCoords: TCornerPoint = {
-      tl: transformPoint(tl, vpt),
-      tr: transformPoint(tr, vpt),
-      bl: transformPoint(bl, vpt),
-      br: transformPoint(br, vpt),
-    };
+  //   const lineCoords: TCornerPoint = {
+  //     tl: transformPoint(tl, vpt),
+  //     tr: transformPoint(tr, vpt),
+  //     bl: transformPoint(bl, vpt),
+  //     br: transformPoint(br, vpt),
+  //   };
 
-    if (padding) {
-      lineCoords.tl.x -= cosPMinusSinP;
-      lineCoords.tl.y -= cosPSinP;
-      lineCoords.tr.x += cosPSinP;
-      lineCoords.tr.y -= cosPMinusSinP;
-      lineCoords.bl.x -= cosPSinP;
-      lineCoords.bl.y += cosPMinusSinP;
-      lineCoords.br.x += cosPMinusSinP;
-      lineCoords.br.y += cosPSinP;
-    }
+  //   if (padding) {
+  //     lineCoords.tl.x -= cosPMinusSinP;
+  //     lineCoords.tl.y -= cosPSinP;
+  //     lineCoords.tr.x += cosPSinP;
+  //     lineCoords.tr.y -= cosPMinusSinP;
+  //     lineCoords.bl.x -= cosPSinP;
+  //     lineCoords.bl.y += cosPMinusSinP;
+  //     lineCoords.br.x += cosPMinusSinP;
+  //     lineCoords.br.y += cosPSinP;
+  //   }
 
-    return lineCoords;
-  }
+  //   return lineCoords;
+  // }
 
   /**
    * Retrieves viewportTransform from Object's canvas if possible
@@ -551,7 +548,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     this.aCoords = this.calcACoords();
     // in case we are in a group, for how the inner group target check works,
     // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
-    this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
+    // this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
   }
 
   transformMatrixKey(skipGroup = false): string {

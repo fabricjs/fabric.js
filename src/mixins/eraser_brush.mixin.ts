@@ -847,7 +847,7 @@ import { uid } from '../util/internals/uid';
         var tasks = canvas._objects.map(function (obj) {
           return (
             obj.erasable &&
-            obj.intersectsWithObject(path, true, true) &&
+            obj.intersectsWithObject(path, true) &&
             _this._addPathToObjectEraser(obj, path, context)
           );
         });

@@ -33,11 +33,12 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import { createCanvasElement } from '../util';
+import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
+import { Intersection } from '../Intersection';
 
 /**
  * Canvas class
@@ -749,7 +750,49 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Checks point is inside the object.
+   * Checks if the point is inside the object selection area including padding
+   * @param {FabricObject} obj Object to test against
+   * @param {Object} [pointer] point from viewport.
+   * @return {Boolean} true if point is contained within an area of given object
+   * @private
+   */
+  private _pointIsInObjectSelectionArea(obj: FabricObject, point: Point) {
+    // getCoords will already take care of group de-nesting
+    let coords = obj.getCoords();
+    const viewportZoom = this.getZoom();
+    const padding = obj.padding / viewportZoom;
+    if (padding) {
+      const [tl, tr, br, bl] = coords;
+      // what is the angle of the object?
+      // we could use getTotalAngle, but is way easier to look at it
+      // from how coords are oriented, since if something went wrong
+      // at least we are consistent.
+      const angleRadians = Math.atan2(tr.y - tl.y, tr.x - tl.y),
+        cosP = cos(angleRadians) * padding,
+        sinP = sin(angleRadians) * padding,
+        cosPSinP = cosP + sinP,
+        cosPMinusSinP = cosP - sinP;
+
+      coords = [
+        new Point(tl.x - cosPMinusSinP, tl.y - cosPSinP),
+        new Point(tr.x + cosPSinP, tr.y - cosPMinusSinP),
+        new Point(br.x + cosPMinusSinP, br.y + cosPSinP),
+        new Point(bl.x - cosPSinP, bl.y + cosPMinusSinP),
+      ];
+      // in case of padding we calculate the new coords on the fly.
+      // otherwise we have to maintain 2 sets of coordinates for everything.
+      // we can reiterate on storing those on something similar to lineCoords
+      // if this is slow, for now the semplification is large and doesn't impact
+      // rendering.
+      // the idea behind this is that outside target check we don't need ot know
+      // where those coords are
+    }
+    return Intersection.isPointInPolygon(point, coords);
+  }
+
+  /**
+   * Checks point is inside the object selection condition. Either area with padding
+   * or over pixels if perPixelTargetFind is enabled
    * @param {FabricObject} obj Object to test against
    * @param {Object} [pointer] point from viewport.
    * @return {Boolean} true if point is contained within an area of given object
@@ -760,7 +803,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      obj.containsPoint(this.restorePointerVpt(pointer))
+      this._pointIsInObjectSelectionArea(obj, this.restorePointerVpt(pointer))
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&

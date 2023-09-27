@@ -2,7 +2,7 @@
   var canvas = this.canvas = new fabric.StaticCanvas(null, {enableRetinaScaling: false});
   QUnit.module('fabric.ObjectGeometry');
 
-  QUnit.test('intersectsWithRectangle', function(assert) {
+  QUnit.test('intersectsWithRectangle without zoom', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
     cObj.setCoords();
     assert.ok(typeof cObj.intersectsWithRect === 'function');
@@ -16,7 +16,7 @@
     assert.ok(!cObj.intersectsWithRect(point3, point4));
   });
 
-  QUnit.test('intersectsWithRectangle absolute', function(assert) {
+  QUnit.test('intersectsWithRectangle with zoom', function(assert) {
     var cObj = new fabric.Rect({ left: 10, top: 10, width: 20, height: 20 });
     var absolute = true;
     canvas.add(cObj);
@@ -29,10 +29,8 @@
         point3 = new fabric.Point(25, 25),
         point4 = new fabric.Point(35, 35);
 
-    assert.ok(!cObj.intersectsWithRect(point1, point2), 'Does not intersect because there is a 2x zoom');
-    assert.ok(!cObj.intersectsWithRect(point3, point4), 'Does not intersect because there is a 2x zoom');
-    assert.ok(cObj.intersectsWithRect(point1, point2, absolute), 'absolute coordinates intersect');
-    assert.ok(cObj.intersectsWithRect(point3, point4, absolute), 'absolute coordinates intersect');
+    assert.ok(cObj.intersectsWithRect(point1, point2), 'Does intersect also with a 2x zoom');
+    assert.ok(cObj.intersectsWithRect(point3, point4), 'Does intersect also with a 2x zoom');
   });
 
   QUnit.test('intersectsWithObject', function(assert) {
@@ -69,7 +67,7 @@
     assert.ok(!cObj.isContainedWithinRect(new fabric.Point(100,100), new fabric.Point(110, 110)));
   });
 
-  QUnit.test('isContainedWithinRect absolute', function(assert) {
+  QUnit.test('isContainedWithinRect with zoom', function(assert) {
     var cObj = new fabric.Rect({ left: 20, top: 20, width: 10, height: 10 });
     var absolute = true;
     canvas.add(cObj);
@@ -216,31 +214,6 @@
     assert.equal(object.containsPoint(point4), false);
     // point5 is outside of object (top)
     assert.equal(object.containsPoint(point5), false);
-  });
-
-  QUnit.test('containsPoint with padding', function(assert) {
-    var object = new fabric.Object({ left: 40, top: 40, width: 40, height: 50, angle: 160, padding: 5 }),
-        point1 = new fabric.Point(30, 30),
-        point2 = new fabric.Point(10, 20),
-        point3 = new fabric.Point(65, 30),
-        point4 = new fabric.Point(45, 75),
-        point5 = new fabric.Point(10, 40),
-        point6 = new fabric.Point(30, 5);
-
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-
-    // point1 is contained in object
-    assert.equal(object.containsPoint(point1), true);
-    // point2 is contained in object (padding area)
-    assert.equal(object.containsPoint(point2), true);
-    // point2 is outside of object (right)
-    assert.equal(object.containsPoint(point3), false);
-    // point3 is outside of object (bottom)
-    assert.equal(object.containsPoint(point4), false);
-    // point4 is outside of object (left)
-    assert.equal(object.containsPoint(point5), false);
-    // point5 is outside of object (top)
-    assert.equal(object.containsPoint(point6), false);
   });
 
   QUnit.test('setCoords', function(assert) {
