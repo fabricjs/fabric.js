@@ -32,7 +32,7 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import { createCanvasElement, invertTransform } from '../util';
+import { createCanvasElement } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
@@ -428,8 +428,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @TODO this seems dumb that we treat controls with transparency. we can find controls
    * programmatically without painting them, the cache canvas optimization is always valid
    * @param {FabricObject} target Object to check
-   * @param {Number} x Left coordinate
-   * @param {Number} y Top coordinate
+   * @param {Number} x Left coordinate in viewport space
+   * @param {Number} y Top coordinate in viewport space
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
@@ -749,23 +749,25 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
+   * @param {Object} [pointer] point from viewport.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
-  _checkTarget(
-    pointer: Point,
-    obj: FabricObject,
-    globalPointer: Point
-  ): boolean {
-    if (obj && obj.visible && obj.evented && obj.containsPoint(pointer)) {
+  _checkTarget(obj: FabricObject, pointer: Point): boolean {
+    if (
+      obj &&
+      obj.visible &&
+      obj.evented &&
+      obj.containsPoint(
+        sendPointToPlane(pointer, undefined, this.viewportTransform)
+      )
+    ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
       ) {
-        if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
+        if (!this.isTargetTransparent(obj, pointer.x, pointer.y)) {
           return true;
         }
       } else {
@@ -787,22 +789,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer: Point
   ): FabricObject | undefined {
     // Cache all targets where their bounding box contains point.
-    let target,
-      i = objects.length;
+    let i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
-      const objToCheck = objects[i];
-      // this strange logic indicates a severe bug in containsPoint
-      const pointerToUse = objToCheck.group
-        ? sendPointToPlane(
-            pointer,
-            invertTransform(this.viewportTransform),
-            objToCheck.group.calcTransformMatrix()
-          )
-        : pointer;
-      if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
-        target = objects[i];
+      const target = objects[i];
+      if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
             target._objects as FabricObject[],
@@ -810,10 +802,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           );
           subTarget && this.targets.push(subTarget);
         }
-        break;
+        return target;
       }
     }
-    return target;
   }
 
   /**

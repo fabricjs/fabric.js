@@ -1,3 +1,4 @@
+import type { Canvas } from '../../canvas/Canvas';
 import '../../../jest.extend';
 import { Group } from '../Group';
 import { IText } from './IText';
@@ -28,7 +29,7 @@ describe('IText', () => {
         const getZoom = jest.fn().mockReturnValue(zoom);
         const mockContext = { fillRect };
         const mockCanvas = { contextTop: mockContext, getZoom };
-        jest.replaceProperty(text, 'canvas', mockCanvas);
+        jest.replaceProperty(text, 'canvas', mockCanvas as unknown as Canvas);
 
         text.renderCursorAt(1);
         const call = fillRect.mock.calls[0];

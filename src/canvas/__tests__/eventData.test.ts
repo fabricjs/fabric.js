@@ -1,7 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import '../../../jest.extend';
+import type { TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
+import { Group } from '../../shapes/Group';
 import { IText } from '../../shapes/IText/IText';
+import { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
@@ -20,7 +23,7 @@ describe('Canvas event data', () => {
   };
 
   beforeEach(() => {
-    canvas = new Canvas(null);
+    canvas = new Canvas();
     spy = jest.spyOn(canvas, 'fire');
   });
 
@@ -126,4 +129,23 @@ describe('Canvas event data', () => {
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenNthCalledWith(2, ev, true);
   });
+});
+
+it('A selected subtarget should not fire an event twice', () => {
+  const target = new FabricObject();
+  const group = new Group([target], {
+    subTargetCheck: true,
+    interactive: true,
+  });
+  const canvas = new Canvas(null);
+  canvas.add(group);
+  const targetSpy = jest.fn();
+  target.on('mousedown', targetSpy);
+  jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+  canvas.__onMouseDown({
+    target: canvas.getSelectionElement(),
+    clientX: 0,
+    clientY: 0,
+  } as unknown as TPointerEvent);
+  expect(targetSpy).toHaveBeenCalledTimes(1);
 });
