@@ -2,9 +2,7 @@
 
 ## [next]
 
-- fix(): Avoid firing twice in subselection + return correct subTarget [#9329](https://github.com/fabricjs/fabric.js/pull/9329)
-  **BREAKING**:
-  - `_searchPossibleTargets` => `findTargetsTraversal`, now returns an array of hits
+- test(): migrate hit tests to jest/playwright [#9333](https://github.com/fabricjs/fabric.js/pull/9333)
 - Breaking: Remove node 14 [#9383](https://github.com/fabricjs/fabric.js/pull/9383)
 - chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
 - fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
