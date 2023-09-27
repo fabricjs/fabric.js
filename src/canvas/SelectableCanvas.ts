@@ -811,7 +811,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
    * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of HTML point coordinates we want to check.
+   * @param {Point} [pointer] coordinates from viewport to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(
@@ -852,10 +852,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * @returns point existing in the scene (the same plane as the plane {@link FabricObject#getCenterPoint} exists in),
-   * relative to the scene's origin point.
+   * @returns point existing in the scene (the same plane as the plane {@link FabricObject#getCenterPoint} exists in).
    * This means that changes to the {@link viewportTransform} do not change the values of the point,
-   * however, from the viewer's perspective the point is changed.
+   * however, from the viewer's perspective, the point is changed.
    *
    * @example
    * const pointFromViewport = sendPointToPlane(
@@ -878,14 +877,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Use {@link getPointFromViewport} or {@link getPointInScene} instead.
    *
    * @param {Event} e
-   * @param {Boolean} inHTMLPlane
-   * `true` returns a point that from the viewer's perspective remains untouched
-   * by {@link viewportTransform} changes\
-   * `false` returns a point in the canvas plane,
-   * the same plane as the plane {@link FabricObject#getCenterPoint} exists in
+   * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, inHTMLPlane = false): Point {
+  getPointer(e: TPointerEvent, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
@@ -904,7 +899,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.calcOffset();
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
-    if (!inHTMLPlane) {
+    if (!fromViewport) {
       pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
