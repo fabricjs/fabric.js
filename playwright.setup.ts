@@ -66,7 +66,7 @@ export default async (config: PlaywrightTestConfig) => {
     `Successfully compiled ${tasks.length} files from ${path.relative(
       process.cwd(),
       src
-    )} with babel`
+    )} to ${path.relative(process.cwd(), dist)}`
   );
 
   // watch
@@ -76,10 +76,7 @@ export default async (config: PlaywrightTestConfig) => {
       { recursive: true, persistent: true },
       (type, filename) => {
         const file = path.join(src, filename);
-        if (shouldBuild(file)) {
-          rmSync(getDistFileName(file));
-          buildFile(file);
-        }
+        shouldBuild(file) && buildFile(file);
       }
     );
     process.once('exit', () => watcher.close());
