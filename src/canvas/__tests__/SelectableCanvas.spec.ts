@@ -1,5 +1,5 @@
-import { FabricObject } from '../shapes/Object/FabricObject';
-import { Canvas } from './Canvas';
+import { FabricObject } from '../../shapes/Object/FabricObject';
+import { Canvas } from '../Canvas';
 
 describe('Canvas', () => {
   describe('invalidating `_objectsToRender`', () => {
