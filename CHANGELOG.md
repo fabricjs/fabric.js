@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Canvas): invalidate `_objectsToRender` on stack change [#9387](https://github.com/fabricjs/fabric.js/pull/9387)
 - Breaking: Remove node 14 [#9383](https://github.com/fabricjs/fabric.js/pull/9383)
 - chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
 - fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
