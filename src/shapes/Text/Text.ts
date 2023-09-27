@@ -119,7 +119,7 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
-export class Text<
+export class FabricText<
     Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ObjectEvents = ObjectEvents
@@ -415,7 +415,7 @@ export class Text<
   static type = 'Text';
 
   static getDefaults() {
-    return { ...super.getDefaults(), ...Text.ownDefaults };
+    return { ...super.getDefaults(), ...FabricText.ownDefaults };
   }
 
   constructor(text: string, options: Props = {} as Props) {
@@ -1663,7 +1663,7 @@ export class Text<
       fontFamily.includes("'") ||
       fontFamily.includes('"') ||
       fontFamily.includes(',') ||
-      Text.genericFonts.includes(fontFamily.toLowerCase())
+      FabricText.genericFonts.includes(fontFamily.toLowerCase())
         ? fontFamily
         : `"${fontFamily}"`;
     return [
@@ -1748,7 +1748,7 @@ export class Text<
   }
 
   set(key: string | any, value?: any) {
-    const { textLayoutProperties } = this.constructor as typeof Text;
+    const { textLayoutProperties } = this.constructor as typeof FabricText;
     super.set(key, value);
     let needsDims = false;
     let isAddingPath = false;
@@ -1793,7 +1793,7 @@ export class Text<
   /* _FROM_SVG_START_ */
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Text.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link FabricText.fromElement})
    * @static
    * @memberOf Text
    * @see: http://www.w3.org/TR/SVG/text.html#TextElement
@@ -1813,7 +1813,7 @@ export class Text<
   );
 
   /**
-   * Returns Text instance from an SVG element (<b>not yet implemented</b>)
+   * Returns FabricText instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
    * @param {HTMLElement} element Element to parse
@@ -1826,7 +1826,7 @@ export class Text<
   ) {
     const parsedAttributes = parseAttributes(
       element,
-      Text.ATTRIBUTE_NAMES,
+      FabricText.ATTRIBUTE_NAMES,
       cssRules
     );
 
@@ -1892,13 +1892,14 @@ export class Text<
   /* _FROM_SVG_END_ */
 
   /**
-   * Returns Text instance from an object representation
+   * Returns FabricText instance from an object representation
    * @param {Object} object plain js Object to create an instance from
-   * @returns {Promise<Text>}
+   * @returns {Promise<FabricText>}
    */
-  static fromObject<T extends TOptions<SerializedTextProps>, S extends Text>(
-    object: T
-  ) {
+  static fromObject<
+    T extends TOptions<SerializedTextProps>,
+    S extends FabricText
+  >(object: T) {
     return this._fromObject<S>(
       {
         ...object,
@@ -1911,6 +1912,14 @@ export class Text<
   }
 }
 
-applyMixins(Text, [TextSVGExportMixin]);
-classRegistry.setClass(Text);
-classRegistry.setSVGClass(Text);
+applyMixins(FabricText, [TextSVGExportMixin]);
+classRegistry.setClass(FabricText);
+classRegistry.setSVGClass(FabricText);
+
+/**
+ * @deprecated The old fabric.Text class can't be imported as Text because of conflict with Web API.
+ * https://developer.mozilla.org/en-US/docs/Web/API/Text/Text
+ * For this reason it has been renamed to FabricText.
+ * Please use `import { FabricText }` in place of `import { Text as FabricText }`
+ */
+export class Text extends FabricText {}

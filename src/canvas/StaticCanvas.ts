@@ -47,6 +47,7 @@ import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
+import { log, FabricError } from '../util/internals/console';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -214,12 +215,11 @@ export class StaticCanvas<
 
   _onObjectAdded(obj: FabricObject) {
     if (obj.canvas && (obj.canvas as StaticCanvas) !== this) {
-      /* _DEV_MODE_START_ */
-      console.warn(
-        'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+      log(
+        'warn',
+        'Canvas is trying to add an object that belongs to a different canvas.\n' +
           'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
       );
-      /* _DEV_MODE_END_ */
       obj.canvas.remove(obj);
     }
     obj._set('canvas', this);
@@ -1267,7 +1267,7 @@ export class StaticCanvas<
     { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
-      return Promise.reject(new Error('fabric.js: `json` is undefined'));
+      return Promise.reject(new FabricError('`json` is undefined'));
     }
 
     // parse json if it wasn't already

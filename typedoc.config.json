@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "./tsconfig.json",
+  "include": ["fabric.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.spec.ts"]
+}

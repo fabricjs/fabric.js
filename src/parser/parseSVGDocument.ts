@@ -5,6 +5,7 @@ import { parseUseDirectives } from './parseUseDirectives';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
+import { log, SignalAbortedError } from '../util/internals/console';
 
 const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
@@ -39,7 +40,7 @@ export async function parseSVGDocument(
   { crossOrigin, signal }: LoadImageOptions = {}
 ): Promise<SVGParsingOutput> {
   if (signal && signal.aborted) {
-    console.log('`options.signal` is in `aborted` state');
+    log('log', new SignalAbortedError('parseSVGDocument'));
     // this is an unhappy path, we dont care about speed
     return createEmptyResponse();
   }

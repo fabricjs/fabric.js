@@ -5,6 +5,18 @@
 - fix(): Avoid firing twice in subselection + return correct subTarget [#9329](https://github.com/fabricjs/fabric.js/pull/9329)
   **BREAKING**:
   - `_searchPossibleTargets` => `findTargetsTraversal`, now returns an array of hits
+- Breaking: Remove node 14 [#9383](https://github.com/fabricjs/fabric.js/pull/9383)
+- chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
+- fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
+  **BREAKING**:
+  - `Canvas#_checkTarget(point, object, pointFromViewport)` => `Canvas#_checkTarget(object, pointFromViewport)`
+- fix(Canvas): avoid firing event twice when working with nested objects [#9329](https://github.com/fabricjs/fabric.js/pull/9329)
+- fix(Control): `calcCornerCoords` angle + calculation [#9377](https://github.com/fabricjs/fabric.js/pull/9377)
+- patch(): dep findCrossPoints in favor of `isPointInPolygon` [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
+- docs() enable typedocs to run again [#9356](https://github.com/fabricjs/fabric.js/pull/9356)
+- chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
+- feature(Object) BREAKING: Remove lines parameter from object.containsPoint [#9375](https://github.com/fabricjs/fabric.js/pull/9375)
+- patch(Control): move hit detection to shouldActivate [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)

@@ -53,7 +53,7 @@
     "test:jest": "jest",
     "test": "npm run cli -- test",
     "sandbox": "npm run sandboxscript -- sandbox",
-    "test:unit-browser": "npm run test -- -s unit -p 8080 -l -c chrome firefox",
+    "test:unit-browser": "npm run cli -- test --suite unit --launch --context chrome",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
@@ -92,7 +92,6 @@
     "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
-    "abort-controller": "^3.0.0",
     "auto-changelog": "^2.3.0",
     "axios": "^0.27.2",
     "babel-plugin-import-json-value": "^0.1.2",
@@ -123,13 +122,13 @@
     "source-map-support": "^0.5.21",
     "testem": "^3.8.0",
     "tslib": "^2.4.1",
-    "typedoc": "^0.24.8",
-    "typedoc-plugin-markdown": "^3.15.4",
+    "typedoc": "^0.25.1",
+    "typedoc-plugin-markdown": "3.16",
     "typescript": "^4.9.4",
     "v8-to-istanbul": "^9.1.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.20.0"
   },
   "module": "./dist/index.mjs",
   "main": "./dist/index.node.cjs",

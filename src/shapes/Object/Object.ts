@@ -41,7 +41,7 @@ import {
   isSerializableFiller,
   isTextObject,
 } from '../../util/typeAssertions';
-import type { Image } from '../Image';
+import type { FabricImage } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -53,6 +53,7 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import { getEnv } from '../../env';
+import { log } from '../../util/internals/console';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -295,7 +296,7 @@ export class FabricObject<
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**
@@ -512,7 +513,7 @@ export class FabricObject<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  protected toObject(propertiesToInclude: any[] = []): any {
+  toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -1332,9 +1333,9 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {Image} Object cloned as image.
+   * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): Image {
+  cloneAsImage(options: any): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
     const ImageClass = classRegistry.getClass('image');

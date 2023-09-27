@@ -32,7 +32,7 @@ describe('Canvas event data', () => {
   };
 
   beforeEach(() => {
-    canvas = new Canvas(null);
+    canvas = new Canvas();
     spy = jest.spyOn(canvas, 'fire');
   });
 
@@ -114,13 +114,13 @@ describe('Canvas event data', () => {
 });
 
 describe('Event targets', () => {
-  it.failing('A selected subtarget should not fire an event twice', () => {
+  it('A selected subtarget should not fire an event twice', () => {
     const target = new FabricObject();
     const group = new Group([target], {
       subTargetCheck: true,
       interactive: true,
     });
-    const canvas = new Canvas(null);
+    const canvas = new Canvas();
     canvas.add(group);
     const targetSpy = jest.fn();
     target.on('mousedown', targetSpy);
@@ -288,7 +288,7 @@ describe('Event targets', () => {
           parent,
         });
 
-        const canvas = new Canvas(null);
+        const canvas = new Canvas();
         canvas.add(parent);
 
         jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
@@ -314,7 +314,7 @@ describe('Event targets', () => {
       });
       registerTestObjects({ subTarget, target, parent });
 
-      const canvas = new Canvas(null);
+      const canvas = new Canvas();
       canvas.add(parent);
 
       jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
