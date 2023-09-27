@@ -344,6 +344,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     super._onObjectRemoved(obj);
   }
 
+  _onStackOrderChanged() {
+    this._objectsToRender = undefined;
+    super._onStackOrderChanged();
+  }
+
   /**
    * Divides objects in two groups, one to render immediately
    * and one to render as activeGroup.
