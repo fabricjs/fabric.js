@@ -3,6 +3,11 @@ import { Canvas } from '../Canvas';
 
 describe('Canvas', () => {
   describe('invalidating `_objectsToRender`', () => {
+    test('initial state', () => {
+      const canvas = new Canvas();
+      expect(canvas._objectsToRender).toBeUndefined();
+    });
+
     test('mousedown', () => {
       const canvas = new Canvas();
       canvas.add(new FabricObject({ width: 10, height: 10 }));
