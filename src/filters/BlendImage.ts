@@ -1,4 +1,4 @@
-import { Image } from '../shapes/Image';
+import { FabricImage } from '../shapes/Image';
 import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
@@ -51,7 +51,7 @@ export class BlendImage extends BaseFilter {
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    **/
-  declare image: Image;
+  declare image: FabricImage;
 
   declare mode: TBlendImageMode;
 
@@ -81,7 +81,7 @@ export class BlendImage extends BaseFilter {
     this.unbindAdditionalTexture(gl, gl.TEXTURE1);
   }
 
-  createTexture(backend: WebGLFilterBackend, image: Image) {
+  createTexture(backend: WebGLFilterBackend, image: FabricImage) {
     return backend.getCachedTexture(image.cacheKey, image.getElement());
   }
 
@@ -220,7 +220,7 @@ export class BlendImage extends BaseFilter {
     { type, image, ...filterOptions }: Record<string, any>,
     options: { signal: AbortSignal }
   ) {
-    return Image.fromObject(image, options).then(
+    return FabricImage.fromObject(image, options).then(
       (enlivedImage) =>
         new this({ ...filterOptions, image: enlivedImage }) as BaseFilter
     );

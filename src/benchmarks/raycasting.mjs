@@ -1,17 +1,20 @@
-import type { XY } from '../../Point';
-import type { TCornerPoint } from '../../typedefs';
+import { Object as FabricObject, Point } from '../../dist/index.mjs';
 
-type TLineDescriptor = {
-  o: XY;
-  d: XY;
-};
+// SWAPPING OF RAY CASTING LOGIC IN #9381
 
-export type TBBoxLines = {
-  topline: TLineDescriptor;
-  leftline: TLineDescriptor;
-  bottomline: TLineDescriptor;
-  rightline: TLineDescriptor;
-};
+// OLD CODE FOR REFERENCE AND IMPLEMENTATION TEST
+
+// type TLineDescriptor = {
+//   o: XY;
+//   d: XY;
+// };
+
+// type TBBoxLines = {
+//   topline: TLineDescriptor;
+//   leftline: TLineDescriptor;
+//   bottomline: TLineDescriptor;
+//   rightline: TLineDescriptor;
+// };
 
 /**
  * Helper method to determine how many cross points are between the 4 object edges
@@ -21,12 +24,12 @@ export type TBBoxLines = {
  * @param {Object} lines Coordinates of the object being evaluated
  * @return {number} number of crossPoint
  */
-const findCrossPoints = (point: XY, lines: TBBoxLines): number => {
+const findCrossPoints = (point, lines) => {
   let xcount = 0;
 
   for (const lineKey in lines) {
     let xi;
-    const iLine = lines[lineKey as keyof TBBoxLines];
+    const iLine = lines[lineKey];
     // optimization 1: line below point. no cross
     if (iLine.o.y < point.y && iLine.d.y < point.y) {
       continue;
@@ -66,7 +69,7 @@ const findCrossPoints = (point: XY, lines: TBBoxLines): number => {
  * @private
  * @param {Object} lineCoords or aCoords Coordinates of the object corners
  */
-const getImageLines = ({ tl, tr, bl, br }: TCornerPoint): TBBoxLines => {
+const getImageLines = ({ tl, tr, bl, br }) => {
   const lines = {
     topline: {
       o: tl,
@@ -86,29 +89,66 @@ const getImageLines = ({ tl, tr, bl, br }: TCornerPoint): TBBoxLines => {
     },
   };
 
-  // // debugging
-  // if (this.canvas.contextTop) {
-  //   this.canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
-  //   this.canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-  //
-  //   this.canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
-  //   this.canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-  //
-  //   this.canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
-  //   this.canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-  //
-  //   this.canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
-  //   this.canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
-  // }
-
   return lines;
 };
 
-export const cornerPointContainsPoint = (
-  point: XY,
-  cornerPoint: TCornerPoint
-): boolean => {
+export const cornerPointContainsPoint = (point, cornerPoint) => {
   const xPoints = findCrossPoints(point, getImageLines(cornerPoint));
   // if xPoints is odd then point is inside the object
   return xPoints !== 0 && xPoints % 2 === 1;
 };
+
+// END OF OLD CODE
+
+class Test1 extends FabricObject {
+  containsPoint(point, absolute, calculate) {
+    return cornerPointContainsPoint(
+      point,
+      this._getCoords(absolute, calculate)
+    );
+  }
+}
+
+const rect1 = new Test1({
+  left: 10,
+  top: 10,
+  width: 10,
+  height: 10,
+  angle: 15.5,
+});
+
+const rect2 = new FabricObject({
+  left: 10,
+  top: 10,
+  width: 10,
+  height: 10,
+  angle: 15.5,
+});
+
+const points = Array(1_000_000)
+  .fill(null)
+  .map((_) => new Point(Math.random() * 40, Math.random() * 40));
+
+const benchmark = (callback) => {
+  const start = Date.now();
+  callback();
+  return Date.now() - start;
+};
+
+const benchmark1 = benchmark(() => {
+  const newPoints = points.map((point) => ({ x: point.x, y: point.y }));
+  newPoints.forEach((point) => rect1.containsPoint(point));
+});
+
+const benchmark2 = benchmark(() => {
+  const newPoints = points.map((point) => new Point(point.x, point.y));
+  newPoints.forEach((point) => rect2.containsPoint(point));
+});
+
+// eslint-disable-next-line no-restricted-syntax
+console.log({
+  benchmark1,
+  benchmark2,
+  bench1_run: benchmark1 / points.length,
+  bench2_run: benchmark2 / points.length,
+});
