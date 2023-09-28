@@ -138,7 +138,7 @@ export class Control {
    */
   withConnection = false;
 
-  constructor(options: Partial<Control>) {
+  constructor(options?: Partial<Control>) {
     Object.assign(this, options);
   }
 
@@ -313,7 +313,8 @@ export class Control {
     objectCornerSize: number,
     centerX: number,
     centerY: number,
-    isTouch: boolean
+    isTouch: boolean,
+    fabricObject: InteractiveFabricObject
   ) {
     const t = multiplyTransformMatrixArray([
       createTranslateMatrix(centerX, centerY),

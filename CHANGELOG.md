@@ -2,6 +2,7 @@
 
 ## [next]
 
+- patch(Control): pass object to `calcCornerCoords` [#9376](https://github.com/fabricjs/fabric.js/pull/9376)
 - fix(Canvas): invalidate `_objectsToRender` on stack change [#9387](https://github.com/fabricjs/fabric.js/pull/9387)
 - ci(e2e): fix babel compiling error [#9388](https://github.com/fabricjs/fabric.js/pull/9388)
 - Breaking: Remove node 14 [#9383](https://github.com/fabricjs/fabric.js/pull/9383)
