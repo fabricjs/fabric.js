@@ -30,6 +30,7 @@ import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
+import { log } from '../util/internals/console';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -74,7 +75,7 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-export class Image<
+export class FabricImage<
     Props extends TOptions<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
@@ -83,7 +84,7 @@ export class Image<
   implements ImageProps
 {
   /**
-   * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
+   * When calling {@link FabricImage.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
@@ -182,7 +183,7 @@ export class Image<
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      ...Image.ownDefaults,
+      ...FabricImage.ownDefaults,
     };
   }
   /**
@@ -230,7 +231,7 @@ export class Image<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(Image.CSS_CANVAS);
+    element.classList.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -598,7 +599,7 @@ export class Image<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   drawCacheOnCanvas(
-    this: TCachedFabricObject<Image>,
+    this: TCachedFabricObject<FabricImage>,
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
@@ -764,7 +765,7 @@ export class Image<
   static CSS_CANVAS = 'canvas-img';
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link FabricImage.fromElement})
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
@@ -781,12 +782,12 @@ export class Image<
   ];
 
   /**
-   * Creates an instance of Image from its object representation
+   * Creates an instance of FabricImage from its object representation
    * @static
    * @param {Object} object Object to create an instance from
    * @param {object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<Image>}
+   * @returns {Promise<FabricImage>}
    */
   static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
@@ -815,20 +816,20 @@ export class Image<
    * @static
    * @param {String} url URL to create an image from
    * @param {LoadImageOptions} [options] Options object
-   * @returns {Promise<Image>}
+   * @returns {Promise<FabricImage>}
    */
   static fromURL<T extends TOptions<ImageProps>>(
     url: string,
     { crossOrigin = null, signal }: LoadImageOptions = {},
     imageOptions: T
-  ): Promise<Image> {
+  ): Promise<FabricImage> {
     return loadImage(url, { crossOrigin, signal }).then(
       (img) => new this(img, imageOptions)
     );
   }
 
   /**
-   * Returns {@link Image} instance from an SVG element
+   * Returns {@link FabricImage} instance from an SVG element
    * @static
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
@@ -850,11 +851,19 @@ export class Image<
       options,
       parsedAttributes
     ).catch((err) => {
-      console.log(err);
+      log('log', 'Unable to parse Image', err);
       return null;
     });
   }
 }
 
-classRegistry.setClass(Image);
-classRegistry.setSVGClass(Image);
+classRegistry.setClass(FabricImage);
+classRegistry.setSVGClass(FabricImage);
+
+/**
+ * @deprecated The old fabric.Image class can't be imported as Image because of conflict with Web API.
+ * https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image
+ * For this reason it has been renamed to FabricImage.
+ * Please use `import { FabricImage }` in place of `import { Image as FabricImage }`
+ */
+export class Image extends FabricImage {}

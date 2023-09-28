@@ -363,7 +363,7 @@ function assertDragEventStream(name, a, b) {
                         isClick: false,
                         previousTarget: undefined
                     },
-                    ...dragEvents.slice(0, 5).map(e => ({
+                    ...dragEvents.slice(0, 6).map(e => ({
                         e,
                         target: iText2,
                         type: 'dragover',
@@ -373,22 +373,22 @@ function assertDragEventStream(name, a, b) {
                         canDrop: true
                     })),
                     {
-                        e: dragEvents[5],
+                        e: dragEvents[6],
                         target: iText2,
                         type: 'dragleave',
                         subTargets: [],
                         dragSource: iText,
                         dropTarget: undefined,
                         canDrop: false,
-                        pointer: new fabric.Point(220, 0),
-                        absolutePointer: new fabric.Point(220, 0),
+                        pointer: new fabric.Point(220, -5),
+                        absolutePointer: new fabric.Point(220, -5),
                         isClick: false,
                         nextTarget: undefined
                     },
                 ]);
                 assert.deepEqual(renderEffects, [
-                    ...dragEvents.slice(0, 5).map(e => ({ e, source: iText, target: iText2 })),
-                    ...dragEvents.slice(5).map(e => ({ e, source: iText, target: undefined })),
+                    ...dragEvents.slice(0, 6).map(e => ({ e, source: iText, target: iText2 })),
+                    ...dragEvents.slice(6).map(e => ({ e, source: iText, target: undefined })),
                 ], 'render effects');
                 assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });

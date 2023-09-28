@@ -7,7 +7,7 @@ import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import type { TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
-import type { Text } from './Text';
+import type { FabricText } from './Text';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -23,13 +23,13 @@ function createSVGInlineRect(
 }
 
 export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
-  _toSVG(this: TextSVGExportMixin & Text): string[] {
+  _toSVG(this: TextSVGExportMixin & FabricText): string[] {
     const offsets = this._getSVGLeftTopOffsets(),
       textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(this: TextSVGExportMixin & Text, reviver: TSVGReviver): string {
+  toSVG(this: TextSVGExportMixin & FabricText, reviver: TSVGReviver): string {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
@@ -37,7 +37,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     });
   }
 
-  private _getSVGLeftTopOffsets(this: TextSVGExportMixin & Text) {
+  private _getSVGLeftTopOffsets(this: TextSVGExportMixin & FabricText) {
     return {
       textLeft: -this.width / 2,
       textTop: -this.height / 2,
@@ -46,7 +46,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _wrapSVGTextAndBg(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     {
       textBgRects,
       textSpans,
@@ -85,7 +85,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {Object}
    */
   private _getSVGTextAndBg(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     textTopOffset: number,
     textLeftOffset: number
   ) {
@@ -136,7 +136,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _createTextCharSpan(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     char: string,
     styleDecl: TextStyleDeclaration,
     left: number,
@@ -160,7 +160,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _setSVGTextLineText(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     textSpans: string[],
     lineIndex: number,
     textLeftOffset: number,
@@ -224,7 +224,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _setSVGTextLineBg(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     textBgRects: (string | number)[],
     i: number,
     leftOffset: number,
@@ -272,7 +272,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   /**
    * @deprecated unused
    */
-  _getSVGLineTopOffset(this: TextSVGExportMixin & Text, lineIndex: number) {
+  _getSVGLineTopOffset(
+    this: TextSVGExportMixin & FabricText,
+    lineIndex: number
+  ) {
     let lineTopOffset = 0,
       j;
     for (j = 0; j < lineIndex; j++) {
@@ -292,7 +295,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
-  getSvgStyles(this: TextSVGExportMixin & Text, skipShadow?: boolean) {
+  getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
     // @ts-expect-error TS doesn't respect this type casting
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
@@ -304,7 +307,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgSpanStyles(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     style: TextStyleDeclaration,
     useWhiteSpace?: boolean
   ) {
@@ -347,7 +350,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgTextDecoration(
-    this: TextSVGExportMixin & Text,
+    this: TextSVGExportMixin & FabricText,
     style: TextStyleDeclaration
   ) {
     return (['overline', 'underline', 'line-through'] as const)
