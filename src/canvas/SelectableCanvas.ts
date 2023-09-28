@@ -1186,7 +1186,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   destroy() {
     // dispose of active selection
-    const activeSelection = this._activeSelection!;
+    const activeSelection = this._activeSelection;
     activeSelection.removeAll();
     // @ts-expect-error disposing
     this._activeSelection = undefined;
