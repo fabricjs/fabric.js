@@ -468,42 +468,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       : this.angle;
   }
 
-  // /**
-  //  * return the coordinate of the 4 corners of the bounding box in HTMLCanvasElement coordinates
-  //  * used for bounding box interactivity with the mouse
-  //  * @returns {TCornerPoint}
-  //  */
-  // calcLineCoords(): TCornerPoint {
-  //   const vpt = this.getViewportTransform(),
-  //     padding = this.padding,
-  //     angle = degreesToRadians(this.getTotalAngle()),
-  //     cosP = cos(angle) * padding,
-  //     sinP = sin(angle) * padding,
-  //     cosPSinP = cosP + sinP,
-  //     cosPMinusSinP = cosP - sinP,
-  //     { tl, tr, bl, br } = this.calcACoords();
-
-  //   const lineCoords: TCornerPoint = {
-  //     tl: transformPoint(tl, vpt),
-  //     tr: transformPoint(tr, vpt),
-  //     bl: transformPoint(bl, vpt),
-  //     br: transformPoint(br, vpt),
-  //   };
-
-  //   if (padding) {
-  //     lineCoords.tl.x -= cosPMinusSinP;
-  //     lineCoords.tl.y -= cosPSinP;
-  //     lineCoords.tr.x += cosPSinP;
-  //     lineCoords.tr.y -= cosPMinusSinP;
-  //     lineCoords.bl.x -= cosPSinP;
-  //     lineCoords.bl.y += cosPMinusSinP;
-  //     lineCoords.br.x += cosPMinusSinP;
-  //     lineCoords.br.y += cosPSinP;
-  //   }
-
-  //   return lineCoords;
-  // }
-
   /**
    * Retrieves viewportTransform from Object's canvas if possible
    * @method getViewportTransform
@@ -546,9 +510,6 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    */
   setCoords(): void {
     this.aCoords = this.calcACoords();
-    // in case we are in a group, for how the inner group target check works,
-    // lineCoords are exactly aCoords. Since the vpt gets absorbed by the normalized pointer.
-    // this.lineCoords = this.group ? this.aCoords : this.calcLineCoords();
   }
 
   transformMatrixKey(skipGroup = false): string {
