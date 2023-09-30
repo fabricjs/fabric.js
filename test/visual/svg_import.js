@@ -1,10 +1,11 @@
 (function() {
-  fabric.enableGLFiltering = false;
-  fabric.isWebglSupported = false;
-  fabric.Object.prototype.objectCaching = true;
+  fabric.config.configure({
+    enableGLFiltering: false
+  });
+  fabric.Object.ownDefaults.objectCaching = true;
   var visualTestLoop;
   var getAsset;
-  if (fabric.isLikelyNode) {
+  if (isNode()) {
     visualTestLoop = global.visualTestLoop;
     getAsset = global.getAsset;
   }
@@ -19,7 +20,7 @@
     }
     var test = function(canvas, callback) {
       getAsset(svgName, function(err, string) {
-        fabric.loadSVGFromString(string, function(objects, options) {
+        fabric.loadSVGFromString(string).then(({ objects, options }) => {
           // something is disabling objectCaching and i cannot find where it is.
           var group = fabric.util.groupSVGElements(objects, options);
           canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
@@ -93,7 +94,12 @@
     'cs',
     'qt',
     'generic-path',
-    '177'
+    '177',
+    'polygons',
+    'polygons-rounded',
+    'light-bulb',
+    'accordion',
+    'car',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));

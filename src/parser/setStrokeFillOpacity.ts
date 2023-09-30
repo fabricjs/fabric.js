@@ -1,34 +1,41 @@
-//@ts-nocheck
-import { fabric } from '../../HEADER';
-import { Color } from '../color';
+import { Color } from '../color/Color';
 import { toFixed } from '../util/misc/toFixed';
-import { colorAttributes } from './constants';
+import { FabricObject } from '../shapes/Object/FabricObject';
+
+const colorAttributesMap = {
+  stroke: 'strokeOpacity',
+  fill: 'fillOpacity',
+};
 
 /**
  * @private
  * @param {Object} attributes Array of attributes to parse
  */
 
-export function setStrokeFillOpacity(attributes) {
-    for (const attr in colorAttributes) {
-
-        if (typeof attributes[colorAttributes[attr]] === 'undefined' || attributes[attr] === '') {
-            continue;
-        }
-
-        if (typeof attributes[attr] === 'undefined') {
-            if (!fabric.Object.prototype[attr]) {
-                continue;
-            }
-            attributes[attr] = fabric.Object.prototype[attr];
-        }
-
-        if (attributes[attr].indexOf('url(') === 0) {
-            continue;
-        }
-
-        const color = new Color(attributes[attr]);
-        attributes[attr] = color.setAlpha(toFixed(color.getAlpha() * attributes[colorAttributes[attr]], 2)).toRgba();
+export function setStrokeFillOpacity(
+  attributes: Record<string, any>
+): Record<string, any> {
+  const defaults = FabricObject.getDefaults();
+  Object.entries(colorAttributesMap).forEach(([attr, colorAttr]) => {
+    if (
+      typeof attributes[colorAttr] === 'undefined' ||
+      attributes[attr] === ''
+    ) {
+      return;
     }
-    return attributes;
+    if (typeof attributes[attr] === 'undefined') {
+      if (!defaults[attr]) {
+        return;
+      }
+      attributes[attr] = defaults[attr];
+    }
+    if (attributes[attr].indexOf('url(') === 0) {
+      return;
+    }
+    const color = new Color(attributes[attr]);
+    attributes[attr] = color
+      .setAlpha(toFixed(color.getAlpha() * attributes[colorAttr], 2))
+      .toRgba();
+  });
+  return attributes;
 }

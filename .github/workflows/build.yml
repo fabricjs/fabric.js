@@ -1,0 +1,88 @@
+name: '🩺'
+
+on:
+  pull_request:
+    branches: [master]
+    paths-ignore: [CHANGELOG.md]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Uglified build
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+      - run: npm run build
+  stats:
+    name: Build stats
+    runs-on: ubuntu-latest
+    env:
+      minified: dist/index.min.js
+      bundled: dist/index.mjs
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - run: npm ci
+      - name: build stats
+        run: npm run build
+      - name: persist
+        id: b
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return JSON.stringify({
+              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
+            });
+      - name: checkout src files
+        run: git checkout ${{ github.event.pull_request.base.sha }}
+      - name: upstream build stats
+        run: npm run build -- -s
+      - name: persist
+        id: a
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return JSON.stringify({
+              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
+            });
+      - name: process
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const res = await run_simple({
+              github,
+              context,
+              core,
+              a: JSON.parse('${{ steps.a.outputs.result }}'),
+              b: JSON.parse('${{ steps.b.outputs.result }}'),
+            });
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Linting
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+      - run: npm run lint
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prettier check
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+      - run: npm run prettier:check

@@ -1,0 +1,58 @@
+name: 🔓 Feature Request
+description: File a feature request
+title: '[Feature]: '
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thank you for wanting to contribute to this repository. 
+
+        Before you do, please ensure you are filing the ticket in the right
+        place. 
+
+        If you have a question use
+        [Discussions](https://github.com/fabricjs/fabric.js/discussions).
+
+        If you are interested in submitted a PR see [Pull Requests](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md#-pull-requests).         
+        We recommend submitting a feature request and waiting for approval **before** you begin coding new features.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: CheckList
+      description: >-
+        By submitting this ticket, you agree to follow our [Code of
+        Conduct](https://github.com/fabricjs/fabric.js/blob/master/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+        - label: >-
+            I have read and followed the [Contributing
+            Guide](https://github.com/fabricjs/fabric.js/blob/master/CONTRIBUTING.md)
+          required: true
+        - label: I have searched and referenced existing issues, feature requests and discussions
+          required: true
+        - label: I am filing a **FEATURE** request.
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        Detail your suggestion and the desired behavior.
+        Provide screenshots/screencasts if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current State
+      description: Detail current state/behavior and existing solutions/workarounds
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Provide additional context
+    validations:
+      required: false

@@ -1,0 +1,804 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`text imperative changes insertChars 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 0,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 7,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 13,
+        "left": 18,
+        "width": 13,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 31,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 10,
+        "left": 42,
+        "width": 10,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 51,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 58,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+      "e",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": {
+    "0": {
+      "0": {
+        "fill": "red",
+      },
+      "1": {
+        "fill": "red",
+      },
+      "2": {
+        "fill": "red",
+      },
+      "3": {
+        "fill": "yellow",
+      },
+      "4": {
+        "fill": "blue",
+      },
+      "5": {
+        "fill": "green",
+      },
+    },
+  },
+  "text": [
+    "t",
+    "a",
+    "b",
+    "e",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars 2`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [
+    {
+      "end": 3,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "yellow",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 6,
+      "start": 5,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
+  "text": "tabest",
+  "top": 0,
+  "type": "IText",
+  "width": 58,
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 0,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 7,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 13,
+        "left": 18,
+        "width": 13,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 10,
+        "left": 31,
+        "width": 10,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 40,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 47,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": {
+    "0": {
+      "0": {
+        "fill": "red",
+      },
+      "1": {
+        "fill": "red",
+      },
+      "2": {
+        "fill": "red",
+      },
+      "3": {
+        "fill": "blue",
+      },
+      "4": {
+        "fill": "green",
+      },
+    },
+  },
+  "text": [
+    "t",
+    "a",
+    "b",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 2`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [
+    {
+      "end": 3,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
+  "text": "tabst",
+  "top": 0,
+  "type": "IText",
+  "width": 47,
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 3`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 0,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 7,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 13,
+        "left": 18,
+        "width": 13,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 31,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+    ],
+  ],
+  "styles": {
+    "0": {
+      "0": {
+        "fill": "red",
+      },
+      "1": {
+        "fill": "red",
+      },
+      "2": {
+        "fill": "red",
+      },
+    },
+  },
+  "text": [
+    "t",
+    "a",
+    "b",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars and removes chars 4`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [
+    {
+      "end": 3,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+  ],
+  "text": "tab",
+  "top": 0,
+  "type": "IText",
+  "width": 31,
+}
+`;
+
+exports[`text imperative changes insertChars can accept some style for the new text 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 0,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 7,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 13,
+        "left": 18,
+        "width": 13,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 31,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 0,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 0,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 11,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 10,
+        "left": 22,
+        "width": 10,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 32,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 39,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+    ],
+    [],
+    [
+      "a",
+      "e",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": {
+    "0": {
+      "0": {
+        "fill": "red",
+      },
+      "1": {
+        "fill": "col1",
+      },
+      "2": {
+        "fill": "col2",
+      },
+    },
+    "1": {
+      "0": {
+        "fill": "col4",
+      },
+    },
+    "2": {
+      "0": {
+        "fill": "col5",
+      },
+      "1": {
+        "fill": "yellow",
+      },
+      "2": {
+        "fill": "blue",
+      },
+      "3": {
+        "fill": "green",
+      },
+    },
+  },
+  "text": [
+    "t",
+    "a",
+    "b",
+    "
+",
+    "
+",
+    "a",
+    "e",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars can accept some style for the new text 2`] = `
+{
+  "fontSize": 25,
+  "height": 93.79,
+  "left": 0,
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 2,
+      "start": 1,
+      "style": {
+        "fill": "col1",
+      },
+    },
+    {
+      "end": 3,
+      "start": 2,
+      "style": {
+        "fill": "col2",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "col5",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "yellow",
+      },
+    },
+    {
+      "end": 6,
+      "start": 5,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 7,
+      "start": 6,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
+  "text": "tab
+
+aest",
+  "top": 0,
+  "type": "IText",
+  "width": 39,
+}
+`;
+
+exports[`text imperative changes insertChars handles new lines correctly 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 0,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 7,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 13,
+        "left": 18,
+        "width": 13,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 31,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 0,
+        "width": 0,
+      },
+    ],
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 11,
+        "left": 0,
+        "width": 11,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 10,
+        "left": 11,
+        "width": 10,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 21,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 28,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "a",
+      "b",
+    ],
+    [],
+    [
+      "e",
+      "s",
+      "t",
+    ],
+  ],
+  "styles": {
+    "0": {
+      "0": {
+        "fill": "red",
+      },
+      "1": {
+        "fill": "red",
+      },
+      "2": {
+        "fill": "red",
+      },
+    },
+    "1": {
+      "0": {
+        "fill": "red",
+      },
+    },
+    "2": {
+      "0": {
+        "fill": "yellow",
+      },
+      "1": {
+        "fill": "blue",
+      },
+      "2": {
+        "fill": "green",
+      },
+    },
+  },
+  "text": [
+    "t",
+    "a",
+    "b",
+    "
+",
+    "
+",
+    "e",
+    "s",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes insertChars handles new lines correctly 2`] = `
+{
+  "fontSize": 25,
+  "height": 93.79,
+  "left": 0,
+  "styles": [
+    {
+      "end": 3,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 4,
+      "start": 3,
+      "style": {
+        "fill": "yellow",
+      },
+    },
+    {
+      "end": 5,
+      "start": 4,
+      "style": {
+        "fill": "blue",
+      },
+    },
+    {
+      "end": 6,
+      "start": 5,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
+  "text": "tab
+
+est",
+  "top": 0,
+  "type": "IText",
+  "width": 31,
+}
+`;
+
+exports[`text imperative changes removeChars 1`] = `
+{
+  "charBounds": [
+    [
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 0,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 7,
+        "left": 7,
+        "width": 7,
+      },
+      {
+        "deltaY": 0,
+        "height": 25,
+        "kernedWidth": 0,
+        "left": 14,
+        "width": 0,
+      },
+    ],
+  ],
+  "lines": [
+    [
+      "t",
+      "t",
+    ],
+  ],
+  "styles": {
+    "0": {
+      "0": {
+        "fill": "red",
+      },
+      "1": {
+        "fill": "green",
+      },
+    },
+  },
+  "text": [
+    "t",
+    "t",
+  ],
+}
+`;
+
+exports[`text imperative changes removeChars 2`] = `
+{
+  "fontSize": 25,
+  "height": 28.25,
+  "left": 0,
+  "styles": [
+    {
+      "end": 1,
+      "start": 0,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 2,
+      "start": 1,
+      "style": {
+        "fill": "green",
+      },
+    },
+  ],
+  "text": "tt",
+  "top": 0,
+  "type": "IText",
+  "width": 14,
+}
+`;

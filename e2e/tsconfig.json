@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "allowSyntheticDefaultImports": true,
+    /**
+     * A reflection of the configured imports used by test scripts
+     * **IMPORTANT**: be sure to keep this updated to reflect `./imports.ts` correctly
+     */
+    "paths": { "fabric": ["../dist"], "fabric/node": ["../dist/index.node"] },
+    "resolveJsonModule": true
+  }
+}

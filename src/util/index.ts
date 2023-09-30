@@ -1,164 +1,118 @@
-//@ts-nocheck
-import { fabric } from '../../HEADER'
-import './animate'; // optional animation
-import './animate_color'; // optional animation
-import './anim_ease'; // optional easing
-import './dom_event'; // optional interaction
-import './dom_misc';
-import './dom_request';
-import './dom_style';
-import * as arrayUtils from './lang_array';
-import './lang_class';
-import './lang_object';
-import './lang_string';
-import './misc/misc';
-import './path';
-
-fabric.util.array = arrayUtils;
-
-const {
-    cos,
-    sin,
-    getElementOffset,
-    removeFromArray,
-    toFixed,
-    transformPoint,
-    invertTransform,
-    getNodeCanvas,
-    createCanvasElement,
-    toDataURL,
-    multiplyTransformMatrices,
-    applyTransformToObject,
-    degreesToRadians,
-    enlivenObjects,
-    enlivenObjectEnlivables,
-    cleanUpJsdomNode,
-    loadImage,
-    setImageSmoothing,
-    getById,
-    addClass,
-    parsePreserveAspectRatioAttribute,
-    findScaleToFit,
-    findScaleToCover,
-    stylesFromArray,
-    stylesToArray,
-    hasStyleChanged,
-    getPathSegmentsInfo,
-    getPointOnPath,
-    string: {
-        graphemeSplit,
-        capitalize,
-        escapeXml
-    },
-    projectStrokeOnPoints,
-    array: {
-        min,
-        max
-    },
-    makePathSimpler,
-    parsePath,
-    joinPath,
-    getBoundsOfCurve,
-    limitDimsByArea,
-    capValue: clamp,
-    populateWithProperties,
-    qrDecompose,
-    saveObjectTransform,
-    resetObjectTransform,
-    object: {
-        clone,
-        extend
-    },
-    matrixToSVG,
-    sizeAfterTransform,
-    animate,
-    animateColor,
-    requestAnimFrame,
-    cancelAnimFrame,
-    rotateVector,
-    getRandomInt,
-    getSmoothPathFromPoints,
-    parseUnit,
-    toArray,
-    request,
-    addListener,
-    removeListener,
-    isTouchEvent,
-    sendPointToPlane,
-    radiansToDegrees,
-    setStyle,
-    calcRotateMatrix,
-    makeBoundingBoxFromPoints,
-    composeMatrix,
-    rotatePoint,
-} = fabric.util;
+export { cos } from './misc/cos';
+export { sin } from './misc/sin';
 export {
-    cos,
-    sin,
-    getElementOffset,
-    removeFromArray,
-    toFixed,
-    transformPoint,
-    invertTransform,
-    getNodeCanvas,
-    createCanvasElement,
-    toDataURL,
-    multiplyTransformMatrices,
-    applyTransformToObject,
-    degreesToRadians,
-    enlivenObjects,
-    enlivenObjectEnlivables,
-    cleanUpJsdomNode,
-    loadImage,
-    setImageSmoothing,
-    getById,
-    addClass,
-    parsePreserveAspectRatioAttribute,
-    findScaleToFit,
-    findScaleToCover,
-    stylesFromArray,
-    stylesToArray,
-    hasStyleChanged,
-    getPathSegmentsInfo,
-    getPointOnPath,
-    graphemeSplit,
-    capitalize,
-    escapeXml,
-    projectStrokeOnPoints,
-    min,
-    max,
-    makePathSimpler,
-    parsePath,
-    joinPath,
-    getBoundsOfCurve,
-    limitDimsByArea,
-    clamp,
-    populateWithProperties,
-    qrDecompose,
-    saveObjectTransform,
-    resetObjectTransform,
-    clone,
-    extend,
-    matrixToSVG,
-    sizeAfterTransform,
-    animate,
-    animateColor,
-    requestAnimFrame,
-    cancelAnimFrame,
-    rotateVector,
-    getRandomInt,
-    getSmoothPathFromPoints,
-    parseUnit,
-    toArray,
-    request,
-    addListener,
-    removeListener,
-    isTouchEvent,
-    sendPointToPlane,
-    radiansToDegrees,
-    setStyle,
-    calcRotateMatrix,
-    makeBoundingBoxFromPoints,
-    composeMatrix,
-    rotatePoint
-};
+  rotateVector,
+  createVector,
+  calcAngleBetweenVectors,
+  getUnitVector,
+  calcVectorRotation,
+  crossProduct,
+  dotProduct,
+  getOrthonormalVector,
+  isBetweenVectors,
+  magnitude,
+} from './misc/vectors';
+export {
+  degreesToRadians,
+  radiansToDegrees,
+} from './misc/radiansDegreesConversion';
+export { rotatePoint } from './misc/rotatePoint';
+export * from './misc/projectStroke';
+export type {
+  TComposeMatrixArgs,
+  TQrDecomposeOut,
+  TRotateMatrixArgs,
+  TScaleMatrixArgs,
+  TTranslateMatrixArgs,
+} from './misc/matrix';
+export {
+  transformPoint,
+  invertTransform,
+  composeMatrix,
+  qrDecompose,
+  createTranslateMatrix,
+  createRotateMatrix,
+  createScaleMatrix,
+  createSkewXMatrix,
+  createSkewYMatrix,
+  calcDimensionsMatrix,
+  multiplyTransformMatrices,
+  multiplyTransformMatrixArray,
+  isIdentityMatrix,
+} from './misc/matrix';
+export type { TextStyleArray } from './misc/textStyles';
+export {
+  stylesFromArray,
+  stylesToArray,
+  hasStyleChanged,
+} from './misc/textStyles';
+export {
+  createCanvasElement,
+  createImage,
+  copyCanvasElement,
+  toDataURL,
+} from './misc/dom';
+export { toFixed } from './misc/toFixed';
+export {
+  matrixToSVG,
+  parsePreserveAspectRatioAttribute,
+  parseUnit,
+  getSvgAttributes,
+} from './misc/svgParsing';
+export { groupSVGElements } from './misc/groupSVGElements';
+export { findScaleToFit, findScaleToCover } from './misc/findScaleTo';
+export { capValue } from './misc/capValue';
+export {
+  saveObjectTransform,
+  resetObjectTransform,
+  addTransformToObject,
+  applyTransformToObject,
+  removeTransformFromObject,
+  sizeAfterTransform,
+} from './misc/objectTransforms';
+export { makeBoundingBoxFromPoints } from './misc/boundingBoxFromPoints';
+export {
+  calcPlaneChangeMatrix,
+  sendPointToPlane,
+  transformPointRelativeToCanvas,
+  sendObjectToPlane,
+} from './misc/planeChange';
+export * as string from './lang_string';
+export type {
+  EnlivenObjectOptions,
+  LoadImageOptions,
+} from './misc/objectEnlive';
+export {
+  loadImage,
+  enlivenObjects,
+  enlivenObjectEnlivables,
+} from './misc/objectEnlive';
+export { pick } from './misc/pick';
+export * from './path/typedefs';
+export {
+  joinPath,
+  parsePath,
+  makePathSimpler,
+  getSmoothPathFromPoints,
+  getPathSegmentsInfo,
+  getBoundsOfCurve,
+  getPointOnPath,
+  transformPath,
+  getRegularPolygonPath,
+} from './path';
+export { setStyle } from './dom_style';
+export { isTouchEvent, getPointer } from './dom_event';
+export { isTransparent } from './misc/isTransparent';
+export { mergeClipPaths } from './misc/mergeClipPaths';
+export * from './animation';
+export * as ease from './animation/easing';
+export {
+  requestAnimFrame,
+  cancelAnimFrame,
+} from './animation/AnimationFrameProvider';
+export { removeFromArray } from './internals/removeFromArray';
+export { getRandomInt } from './internals/getRandomInt';
+export { request } from './internals/dom_request';
+
+// for test compatibility. We don't want to export it
+export { removeTransformMatrixForSvgParsing } from './transform_matrix_removal';

@@ -17,7 +17,7 @@
   QUnit.test('toObject with clipPath', function(assert) {
     var emptyObjectRepr = {
       version:                  fabric.version,
-      type:                     'object',
+      type:                     'FabricObject',
       originX:                  'left',
       originY:                  'top',
       left:                     0,
@@ -53,14 +53,16 @@
     assert.deepEqual(emptyObjectRepr, cObj.toObject());
 
     cObj.clipPath = new fabric.Object();
-    var expected = fabric.util.object.clone(emptyObjectRepr);
-    var expectedClipPath = fabric.util.object.clone(emptyObjectRepr);
-    expectedClipPath = fabric.util.object.extend(expectedClipPath, {
-      inverted: cObj.clipPath.inverted,
+
+    assert.deepEqual({
+      ...emptyObjectRepr,
+      clipPath: {
+        ...emptyObjectRepr,
+        inverted: cObj.clipPath.inverted,
       absolutePositioned: cObj.clipPath.absolutePositioned,
-    });
-    expected.clipPath = expectedClipPath;
-    assert.deepEqual(expected, cObj.toObject());
+      }
+    }, cObj.toObject());
+
     cObj.clipPath.excludeFromExport = true;
     assert.ok(cObj.toObject().clipPath === undefined);
   });
@@ -100,7 +102,7 @@
     fabric.Rect.fromObject(toObject).then(function(rect) {
       assert.ok(rect.clipPath instanceof fabric.Circle, 'clipPath is enlived');
       assert.equal(rect.clipPath.radius, 50, 'radius is restored correctly');
-      assert.ok(rect.clipPath.clipPath instanceof fabric.Text, 'nested clipPath is enlived');
+      assert.ok(rect.clipPath.clipPath instanceof fabric.FabricText, 'nested clipPath is enlived');
       assert.equal(rect.clipPath.clipPath.text, 'clipPath', 'instance is restored correctly');
       done();
     });
@@ -115,7 +117,7 @@
     fabric.Rect.fromObject(toObject).then(function(rect) {
       assert.ok(rect.clipPath instanceof fabric.Circle, 'clipPath is enlived');
       assert.equal(rect.clipPath.radius, 50, 'radius is restored correctly');
-      assert.ok(rect.clipPath.clipPath instanceof fabric.Text, 'neted clipPath is enlived');
+      assert.ok(rect.clipPath.clipPath instanceof fabric.FabricText, 'neted clipPath is enlived');
       assert.equal(rect.clipPath.clipPath.text, 'clipPath', 'instance is restored correctly');
       assert.equal(rect.clipPath.clipPath.inverted, true, 'instance inverted is restored correctly');
       assert.equal(rect.clipPath.clipPath.absolutePositioned, true, 'instance absolutePositioned is restored correctly');
@@ -133,52 +135,5 @@
     assert.equal(canvas.contextContainer.fillStyle, '#000000', 'fillStyle is reset');
     assert.equal(new fabric.Color(canvas.contextContainer.strokeStyle).getAlpha(), 0, 'stroke style is reset');
     assert.equal(canvas.contextContainer.globalAlpha, 1, 'globalAlpha is reset');
-  });
-
-  QUnit.test('clipPath caching detection', function(assert) {
-    var cObj = new fabric.Object();
-    var clipPath = new fabric.Object();
-    cObj.statefullCache = true;
-    cObj.saveState({ propertySet: 'cacheProperties' });
-    var change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, false, 'cache is clean');
-
-    cObj.clipPath = clipPath;
-    change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, true, 'cache is dirty');
-
-    cObj.saveState({ propertySet: 'cacheProperties' });
-
-    change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, false, 'cache is clean again');
-
-    cObj.clipPath.fill = 'red';
-    change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, true, 'cache change in clipPath is detected');
-  });
-
-  QUnit.test('clipPath caching detection with canvas object', function(assert) {
-    var canvas = new fabric.StaticCanvas(null, { renderOnAddRemove: false });
-    var cObj = new fabric.Rect();
-    var clipPath = new fabric.Rect();
-    canvas.add(cObj);
-    clipPath.canvas = canvas;
-    cObj.statefullCache = true;
-    cObj.saveState({ propertySet: 'cacheProperties' });
-    var change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, false, 'cache is clean - canvas');
-
-    cObj.clipPath = clipPath;
-    change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, true, 'cache is dirty - canvas');
-
-    cObj.saveState({ propertySet: 'cacheProperties' });
-
-    change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, false, 'cache is clean again - canvas');
-
-    cObj.clipPath.fill = 'red';
-    change = cObj.hasStateChanged('cacheProperties');
-    assert.equal(change, true, 'cache change in clipPath is detected - canvas');
   });
 })();
