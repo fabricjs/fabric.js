@@ -598,7 +598,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       control = !!corner && target.controls[corner],
       actionHandler =
         alreadySelected && control
-          ? control.getActionHandler(e, target, control)
+          ? control.getActionHandler(e, target, control)?.bind(control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
       origin = this._getOriginFromCorner(target, corner),
