@@ -5,7 +5,7 @@ import type {
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { FabricObject } from '../Object/FabricObject';
-import { Text } from '../Text/Text';
+import { FabricText } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
@@ -43,7 +43,7 @@ export abstract class ITextBehavior<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<Props, SProps, EventSpec> {
+> extends FabricText<Props, SProps, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;

@@ -27,7 +27,6 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
-import { cornerPointContainsPoint } from '../../util/intersection/findCrossPoint';
 
 type TMatrixCache = {
   key: string;
@@ -201,7 +200,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * that are attached to the object instance
    * @return {Object} {tl, tr, br, bl} points
    */
-  _getCoords(absolute = false, calculate = false): TCornerPoint {
+  private _getCoords(absolute = false, calculate = false): TCornerPoint {
     if (calculate) {
       return absolute ? this.calcACoords() : this.calcLineCoords();
     }
@@ -294,14 +293,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     calculate = false
   ): boolean {
     const points = this.getCoords(absolute, calculate);
-    for (let i = 0; i < 4; i++) {
-      // bug/confusing: this containsPoint should receive 'calculate' as well.
-      // will come later because it needs to come with tests
-      if (!other.containsPoint(points[i], absolute)) {
-        return false;
-      }
-    }
-    return true;
+    calculate && other.getCoords(absolute, true);
+    return points.every((point) => other.containsPoint(point));
   }
 
   /**
@@ -343,9 +336,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {Boolean} true if point is inside the object
    */
   containsPoint(point: Point, absolute = false, calculate = false): boolean {
-    return cornerPointContainsPoint(
+    return Intersection.isPointInPolygon(
       point,
-      this._getCoords(absolute, calculate)
+      this.getCoords(absolute, calculate)
     );
   }
 

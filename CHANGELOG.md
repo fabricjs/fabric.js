@@ -3,6 +3,17 @@
 ## [next]
 
 - patch(Coords): calc oCoords only with canvas ref [#9380](https://github.com/fabricjs/fabric.js/pull/9380)
+- patch(Control): pass object to `calcCornerCoords` [#9376](https://github.com/fabricjs/fabric.js/pull/9376)
+- fix(Canvas): invalidate `_objectsToRender` on stack change [#9387](https://github.com/fabricjs/fabric.js/pull/9387)
+- ci(e2e): fix babel compiling error [#9388](https://github.com/fabricjs/fabric.js/pull/9388)
+- Breaking: Remove node 14 [#9383](https://github.com/fabricjs/fabric.js/pull/9383)
+- chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
+- fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
+  **BREAKING**:
+  - `Canvas#_checkTarget(point, object, pointFromViewport)` => `Canvas#_checkTarget(object, pointFromViewport)`
+- fix(Canvas): avoid firing event twice when working with nested objects [#9329](https://github.com/fabricjs/fabric.js/pull/9329)
+- fix(Control): `calcCornerCoords` angle + calculation [#9377](https://github.com/fabricjs/fabric.js/pull/9377)
+- patch(): dep findCrossPoints in favor of `isPointInPolygon` [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
 - docs() enable typedocs to run again [#9356](https://github.com/fabricjs/fabric.js/pull/9356)
 - chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
 - feature(Object) BREAKING: Remove lines parameter from object.containsPoint [#9375](https://github.com/fabricjs/fabric.js/pull/9375)
