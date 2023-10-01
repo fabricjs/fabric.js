@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)
 - Breaking: Remove node 14 [#9383](https://github.com/fabricjs/fabric.js/pull/9383)
 - chore(): Rename exports that conflicts with JS/WEB api ( Object, Text, Image ). Kept backward compatibility with deprecation notice [#9172](https://github.com/fabricjs/fabric.js/pull/9172)
 - fix(Geometry): `containsPoint` [#9372](https://github.com/fabricjs/fabric.js/pull/9372)
