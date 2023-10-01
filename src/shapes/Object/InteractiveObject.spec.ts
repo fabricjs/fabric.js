@@ -1,11 +1,13 @@
 import { radiansToDegrees } from '../../util';
 import { Group } from '../Group';
+import { Canvas } from '../../canvas/Canvas';
 import { FabricObject } from './FabricObject';
 import type { TOCoord } from './InteractiveObject';
 
 describe('Object', () => {
   describe('setCoords for objects inside group with rotation', () => {
     it('all corners are rotated as much as the object total angle', () => {
+      const canvas = new Canvas();
       const object = new FabricObject({
         left: 25,
         top: 60,
@@ -21,6 +23,7 @@ describe('Object', () => {
         interactive: true,
         subTargetCheck: true,
       });
+      canvas.add(group);
       group.setCoords();
       const objectAngle = Math.round(object.getTotalAngle());
       expect(objectAngle).toEqual(35);
