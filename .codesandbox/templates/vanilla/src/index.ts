@@ -10,49 +10,6 @@ canvas.setDimensions({
   height: 500,
 });
 const textValue = 'fabric.js sandbox';
-const rect = new fabric.Rect({
-  width: 200,
-  height: 200,
-  padding: 30,
-  fill: 'green',
-});
-const rect2 = new fabric.Rect({
-  width: 200,
-  angle: 10,
-  top: 60,
-  left: 250,
-  height: 200,
-  padding: 5,
-  fill: 'yellow',
-});
-const rect3 = new fabric.Rect({
-  width: 200,
-  angle: 45,
-  left: 60,
-  top: 260,
-  height: 200,
-  padding: 0,
-  fill: 'purple',
-});
-
-[rect, rect2, rect3].forEach((obj => obj.on('mouseover', ({ e, target }) => {
-  obj?.opacity = 0.5;
-  obj.group?.set('dirty', true);
-  canvas.requestRenderAll();
-}));
-
-[rect, rect2, rect3].forEach((obj => obj.on('mouseout', ({ e, target }) => {
-  obj?.opacity = 1;
-  obj.group?.set('dirty', true);
-  canvas.requestRenderAll();
-}));
-
-// const group = new fabric.Group([rect, rect2, rect3], { subTargetCheck: true });
-// canvas.add(group);
-
-canvas.add(...[rect, rect2, rect3])
-
-
 const text = new fabric.Textbox(textValue, {
   originX: 'center',
   splitByGrapheme: true,
