@@ -214,10 +214,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @type FabricObject[]
    * @private
    */
-  _objectsToRender?: FabricObject[] = [];
+  _objectsToRender?: FabricObject[];
 
   /**
-   * hold a referenfce to a data structure that contains information
+   * hold a reference to a data structure that contains information
    * on the current on going transform
    * @type
    * @private
@@ -343,6 +343,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       this._hoveredTargets = [];
     }
     super._onObjectRemoved(obj);
+  }
+
+  _onStackOrderChanged() {
+    this._objectsToRender = undefined;
+    super._onStackOrderChanged();
   }
 
   /**
