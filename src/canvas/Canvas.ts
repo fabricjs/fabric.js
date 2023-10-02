@@ -1325,7 +1325,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const targetChanged = oldTarget !== target;
 
     if (oldTarget && targetChanged) {
-      const outOpt = {
+      const outOpt: CanvasEvents[typeof canvasOut] = {
         ...data,
         e,
         target: oldTarget,
@@ -1338,7 +1338,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       oldTarget.fire(targetOut, outOpt);
     }
     if (target && targetChanged) {
-      const inOpt: TPointerEventInfo = {
+      const inOpt: CanvasEvents[typeof canvasIn] = {
         ...data,
         e,
         target,

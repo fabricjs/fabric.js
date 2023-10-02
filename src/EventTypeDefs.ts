@@ -145,11 +145,11 @@ interface SimpleEventHandler<T extends Event = TPointerEvent>
 }
 
 interface InEvent {
-  previousTarget?: FabricObject;
+  previousTarget: FabricObject | undefined;
 }
 
 interface OutEvent {
-  nextTarget?: FabricObject;
+  nextTarget: FabricObject | undefined;
 }
 
 export interface DragEventData extends TEvent<DragEvent> {
