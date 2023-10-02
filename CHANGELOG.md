@@ -1,5 +1,7 @@
 # Changelog
 
+- fix(Canvas): `setActiveObject` should update `canvas#_activeSelection` [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
+
 ## [next]
 
 - patch(Coords): calc oCoords only with canvas ref [#9380](https://github.com/fabricjs/fabric.js/pull/9380)
