@@ -1322,7 +1322,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
       };
-      fireCanvas && this.fire(canvasIn, outOpt);
+      fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
     }
     if (target && targetChanged) {
@@ -1335,7 +1335,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
       };
-      fireCanvas && this.fire(canvasOut, inOpt);
+      fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
     }
   }
