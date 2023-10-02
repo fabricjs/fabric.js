@@ -309,7 +309,7 @@ export class InteractiveFabricObject<
   setCoords(): void {
     super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-    this.oCoords = this.calcOCoords();
+    this.canvas && (this.oCoords = this.calcOCoords());
   }
 
   /**

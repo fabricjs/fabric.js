@@ -1,8 +1,11 @@
 # Changelog
 
+- fix(Canvas): `setActiveObject` should update `canvas#_activeSelection` [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
+
 ## [next]
 
 - fix(Canvas): Fix canvas in out event firing being swapped [#9396](https://github.com/fabricjs/fabric.js/pull/9396)
+- patch(Coords): calc oCoords only with canvas ref [#9380](https://github.com/fabricjs/fabric.js/pull/9380)
 - patch(Control): pass object to `calcCornerCoords` [#9376](https://github.com/fabricjs/fabric.js/pull/9376)
 - fix(Canvas): invalidate `_objectsToRender` on stack change [#9387](https://github.com/fabricjs/fabric.js/pull/9387)
 - ci(e2e): fix babel compiling error [#9388](https://github.com/fabricjs/fabric.js/pull/9388)
@@ -18,6 +21,7 @@
 - chore(): cleanup logs and error messages [#9369](https://github.com/fabricjs/fabric.js/pull/9369)
 - feature(Object) BREAKING: Remove lines parameter from object.containsPoint [#9375](https://github.com/fabricjs/fabric.js/pull/9375)
 - patch(Control): move hit detection to shouldActivate [#9374](https://github.com/fabricjs/fabric.js/pull/9374)
+- fix(Control): method binding for mouseUpHandler, mouseDownHandler, and actionHandler [#9370](https://github.com/fabricjs/fabric.js/pull/9370)
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)

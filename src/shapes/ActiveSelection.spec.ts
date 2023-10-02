@@ -1,5 +1,6 @@
 import { Canvas } from '../canvas/Canvas';
 import { ActiveSelection } from './ActiveSelection';
+import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
 
 describe('ActiveSelection', () => {
@@ -85,5 +86,38 @@ describe('ActiveSelection', () => {
     });
     expect(canvas.getActiveSelection().lineCoords).toMatchSnapshot();
     expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
+  });
+
+  it('`setActiveObject` should update the active selection ref on canvas if it changed', () => {
+    const canvas = new Canvas(null);
+    const obj1 = new FabricObject();
+    const obj2 = new FabricObject();
+    canvas.add(obj1, obj2);
+    const activeSelection = new ActiveSelection([obj1, obj2]);
+    const spy = jest.spyOn(activeSelection, 'setCoords');
+    canvas.setActiveObject(activeSelection);
+    expect(canvas.getActiveSelection()).toBe(activeSelection);
+    expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
+    expect(spy).toHaveBeenCalled();
+    expect(activeSelection.canvas).toBe(canvas);
+
+    spy.mockClear();
+    canvas.setActiveObject(activeSelection);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('transferring an object between active selections keeps its owning group', () => {
+    const object = new FabricObject();
+    const group = new Group([object]);
+    const activeSelection1 = new ActiveSelection([object]);
+    const activeSelection2 = new ActiveSelection();
+    expect(object.group).toBe(activeSelection1);
+    expect(object.getParent(true)).toBe(group);
+    activeSelection2.add(object);
+    expect(object.group).toBe(activeSelection2);
+    expect(object.getParent(true)).toBe(group);
+    activeSelection2.removeAll();
+    expect(object.group).toBe(group);
+    expect(object.getParent(true)).toBe(group);
   });
 });

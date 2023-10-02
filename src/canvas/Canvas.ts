@@ -844,12 +844,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         this.setActiveObject(target, e);
         shouldRender = true;
       } else {
-        const control = target.controls[corner as string];
+        const control = target.controls[corner];
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getPointer(e);
-          mouseUpHandler(e, transform!, pointer.x, pointer.y);
+          mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
         }
       }
       target.isMoving = false;
@@ -871,7 +871,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           );
       pointer = pointer || this.getPointer(e);
       originalMouseUpHandler &&
-        originalMouseUpHandler(e, transform, pointer.x, pointer.y);
+        originalMouseUpHandler.call(
+          originalControl,
+          e,
+          transform,
+          pointer.x,
+          pointer.y
+        );
     }
     this._setCursorFromEvent(e, target);
     this._handleEvent(e, 'up', LEFT_CLICK, isClick);
@@ -1132,7 +1138,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {
-          mouseDownHandler(e, this._currentTransform!, pointer.x, pointer.y);
+          mouseDownHandler.call(
+            control,
+            e,
+            this._currentTransform!,
+            pointer.x,
+            pointer.y
+          );
         }
       }
     }
