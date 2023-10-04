@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
 - fix(Canvas): in/out event names were swapped [#9396](https://github.com/fabricjs/fabric.js/pull/9396)
 - fix(Canvas): `setActiveObject` should update `canvas#_activeSelection` [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
 - patch(Coords): calc oCoords only with canvas ref [#9380](https://github.com/fabricjs/fabric.js/pull/9380)
