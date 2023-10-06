@@ -21,7 +21,7 @@ const getSize = (poly: Polyline) => {
  * This function locates the controls.
  * It'll be used both for drawing and for interaction.
  */
-const factoryPolyPositionHandler = (pointIndex: number) => {
+export const createPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
       y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
@@ -41,7 +41,7 @@ const factoryPolyPositionHandler = (pointIndex: number) => {
  * and the current position in canvas coordinate `transform.target` is a reference to the
  * current object being transformed.
  */
-const polyActionHandler = (
+export const polyActionHandler = (
   eventData: TPointerEvent,
   transform: TTransformAnchor,
   x: number,
@@ -69,7 +69,7 @@ const polyActionHandler = (
 /**
  * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
  */
-const anchorWrapper = (
+export const factoryPolyActionHandler = (
   pointIndex: number,
   fn: TransformActionHandler<TTransformAnchor>
 ) => {
@@ -104,6 +104,9 @@ const anchorWrapper = (
   };
 };
 
+export const createPolyActionHandler = (pointIndex: number) =>
+  factoryPolyActionHandler(pointIndex, polyActionHandler);
+
 export function createPolyControls(
   poly: Polyline,
   options?: Partial<Control>
@@ -124,8 +127,8 @@ export function createPolyControls(
   ) {
     controls[`p${idx}`] = new Control({
       actionName: 'modifyPoly',
-      positionHandler: factoryPolyPositionHandler(idx),
-      actionHandler: anchorWrapper(idx, polyActionHandler),
+      positionHandler: createPolyPositionHandler(idx),
+      actionHandler: createPolyActionHandler(idx),
       ...options,
     });
   }
