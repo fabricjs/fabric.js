@@ -330,19 +330,19 @@
 
     assert.ok(typeof group.containsPoint === 'function');
 
-    assert.ok(!group.containsPoint({ x: 0, y: 0 }));
+    assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
 
     group.scale(2);
-    assert.ok(group.containsPoint({ x: 50, y: 120 }));
-    assert.ok(group.containsPoint({ x: 100, y: 160 }));
-    assert.ok(!group.containsPoint({ x: 0, y: 0 }));
+    assert.ok(group.containsPoint(new fabric.Point( 50, 120 )));
+    assert.ok(group.containsPoint(new fabric.Point( 100, 160 )));
+    assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
 
     group.scale(1);
     group.padding = 30;
     group.setCoords();
-    assert.ok(group.containsPoint({ x: 50, y: 120 }));
-    assert.ok(!group.containsPoint({ x: 100, y: 170 }));
-    assert.ok(!group.containsPoint({ x: 0, y: 0 }));
+    assert.ok(group.containsPoint(new fabric.Point( 50, 120 )));
+    assert.ok(!group.containsPoint(new fabric.Point( 100, 170 )));
+    assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));
   });
 
   QUnit.test('forEachObject', function(assert) {
@@ -741,9 +741,9 @@
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1]);
 
-    var coords = group.oCoords;
+    var coords = group.aCoords;
     group.add(rect2);
-    var newCoords = group.oCoords;
+    var newCoords = group.aCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
   });
 
@@ -781,9 +781,9 @@
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         group = new fabric.Group([rect1, rect2]);
 
-    var coords = group.oCoords;
+    var coords = group.aCoords;
     group.remove(rect2);
-    var newCoords = group.oCoords;
+    var newCoords = group.aCoords;
     assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
 

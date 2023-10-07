@@ -7,13 +7,14 @@ change-output.md
 before_commit
 /coverage/
 .idea/
-/dist/fabric.require.js
-/dist/fabric.min.js.gz
 /cli_output/
 /scripts/cli_cache.json
-/dist/
+**/dist/
 /lib/
 /test/
 .next/
 .parcel-cache/
 /docs/
+/e2e/test-results/
+/e2e/test-report/
+/e2e/tests/**/*-snapshots/*.json

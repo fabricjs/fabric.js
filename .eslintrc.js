@@ -36,6 +36,7 @@ module.exports = {
     ],
     'no-restricted-syntax': [
       'error',
+      // explore how to define the selector: https://astexplorer.net/
       {
         selector: '[callee.object.name="Math"][callee.property.name="hypot"]',
         message:
@@ -45,6 +46,14 @@ module.exports = {
         selector: 'VariableDeclarator[init.name="Math"]',
         message:
           'Aliasing or destructing `Math` is not allowed due to restrictions on `Math.hypot` usage.',
+      },
+      {
+        selector: '[callee.object.name="console"]',
+        message: 'Use the `log` util',
+      },
+      {
+        selector: 'NewExpression[callee.name="Error"]',
+        message: 'Use `FabricError`',
       },
     ],
   },

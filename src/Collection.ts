@@ -131,7 +131,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
 
     /**
      * Returns true if collection contains an object.\
-     * **Prefer using {@link `FabricObject#isDescendantOf`} for performance reasons**
+     * **Prefer using {@link FabricObject#isDescendantOf} for performance reasons**
      * instead of `a.contains(b)` use `b.isDescendantOf(a)`
      * @param {Object} object Object to check against
      * @param {Boolean} [deep=false] `true` to check all descendants, `false` to check only `_objects`
@@ -329,9 +329,8 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
           object.visible &&
           ((includeIntersecting && object.intersectsWithRect(tl, br, true)) ||
             object.isContainedWithinRect(tl, br, true) ||
-            (includeIntersecting &&
-              object.containsPoint(tl, undefined, true)) ||
-            (includeIntersecting && object.containsPoint(br, undefined, true)))
+            (includeIntersecting && object.containsPoint(tl, true)) ||
+            (includeIntersecting && object.containsPoint(br, true)))
         ) {
           objects.push(object);
         }

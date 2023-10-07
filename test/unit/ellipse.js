@@ -10,7 +10,7 @@
     var ellipse = new fabric.Ellipse();
 
     assert.ok(ellipse instanceof fabric.Ellipse, 'should inherit from fabric.Ellipse');
-    assert.ok(ellipse instanceof fabric.Object, 'should inherit from fabric.Object');
+    assert.ok(ellipse instanceof fabric.FabricObject, 'should inherit from fabric.Object');
 
     assert.equal(ellipse.constructor.type, 'Ellipse');
   });

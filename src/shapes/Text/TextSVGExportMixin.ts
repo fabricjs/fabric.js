@@ -1,13 +1,13 @@
-// @ts-nocheck
 import { config } from '../../config';
 import type { TSVGReviver } from '../../typedefs';
 import { escapeXml } from '../../util/lang_string';
-import { createSVGRect } from '../../util/misc/svgParsing';
+import { colorPropToSVG, createSVGRect } from '../../util/misc/svgParsing';
 import { hasStyleChanged } from '../../util/misc/textStyles';
 import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import type { TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
+import type { FabricText } from './Text';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -23,13 +23,13 @@ function createSVGInlineRect(
 }
 
 export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
-  _toSVG() {
+  _toSVG(this: TextSVGExportMixin & FabricText): string[] {
     const offsets = this._getSVGLeftTopOffsets(),
       textAndBg = this._getSVGTextAndBg(offsets.textTop, offsets.textLeft);
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(reviver: TSVGReviver) {
+  toSVG(this: TextSVGExportMixin & FabricText, reviver: TSVGReviver): string {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
@@ -37,7 +37,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     });
   }
 
-  private _getSVGLeftTopOffsets() {
+  private _getSVGLeftTopOffsets(this: TextSVGExportMixin & FabricText) {
     return {
       textLeft: -this.width / 2,
       textTop: -this.height / 2,
@@ -45,13 +45,16 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     };
   }
 
-  private _wrapSVGTextAndBg({
-    textBgRects,
-    textSpans,
-  }: {
-    textSpans: string[];
-    textBgRects: string[];
-  }) {
+  private _wrapSVGTextAndBg(
+    this: TextSVGExportMixin & FabricText,
+    {
+      textBgRects,
+      textSpans,
+    }: {
+      textSpans: string[];
+      textBgRects: string[];
+    }
+  ) {
     const noShadow = true,
       textDecoration = this.getSvgTextDecoration(this);
     return [
@@ -81,7 +84,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Number} textLeftOffset Text left offset
    * @return {Object}
    */
-  private _getSVGTextAndBg(textTopOffset: number, textLeftOffset: number) {
+  private _getSVGTextAndBg(
+    this: TextSVGExportMixin & FabricText,
+    textTopOffset: number,
+    textLeftOffset: number
+  ) {
     const textSpans: string[] = [],
       textBgRects: string[] = [];
     let height = textTopOffset,
@@ -129,6 +136,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _createTextCharSpan(
+    this: TextSVGExportMixin & FabricText,
     char: string,
     styleDecl: TextStyleDeclaration,
     left: number,
@@ -152,6 +160,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _setSVGTextLineText(
+    this: TextSVGExportMixin & FabricText,
     textSpans: string[],
     lineIndex: number,
     textLeftOffset: number,
@@ -215,6 +224,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   private _setSVGTextLineBg(
+    this: TextSVGExportMixin & FabricText,
     textBgRects: (string | number)[],
     i: number,
     leftOffset: number,
@@ -224,11 +234,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       heightOfLine = this.getHeightOfLine(i) / this.lineHeight;
     let boxWidth = 0,
       boxStart = 0,
-      charBox,
       currentColor,
       lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
     for (let j = 0; j < line.length; j++) {
-      charBox = this.__charBounds[i][j];
+      const { left, width, kernedWidth } = this.__charBounds[i][j];
       currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
       if (currentColor !== lastColor) {
         lastColor &&
@@ -241,11 +250,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
               heightOfLine
             )
           );
-        boxStart = charBox.left;
-        boxWidth = charBox.width;
+        boxStart = left;
+        boxWidth = width;
         lastColor = currentColor;
       } else {
-        boxWidth += charBox.kernedWidth;
+        boxWidth += kernedWidth;
       }
     }
     currentColor &&
@@ -263,13 +272,16 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   /**
    * @deprecated unused
    */
-  _getSVGLineTopOffset(lineIndex: number) {
+  _getSVGLineTopOffset(
+    this: TextSVGExportMixin & FabricText,
+    lineIndex: number
+  ) {
     let lineTopOffset = 0,
-      lastHeight = 0;
-    for (let j = 0; j < lineIndex; j++) {
+      j;
+    for (j = 0; j < lineIndex; j++) {
       lineTopOffset += this.getHeightOfLine(j);
     }
-    lastHeight = this.getHeightOfLine(j);
+    const lastHeight = this.getHeightOfLine(j);
     return {
       lineTop: lineTopOffset,
       offset:
@@ -283,7 +295,74 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
-  getSvgStyles(skipShadow?: boolean) {
+  getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
+    // @ts-expect-error TS doesn't respect this type casting
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
+  }
+
+  /**
+   * Returns styles-string for svg-export
+   * @param {Object} style the object from which to retrieve style properties
+   * @param {Boolean} useWhiteSpace a boolean to include an additional attribute in the style.
+   * @return {String}
+   */
+  getSvgSpanStyles(
+    this: TextSVGExportMixin & FabricText,
+    style: TextStyleDeclaration,
+    useWhiteSpace?: boolean
+  ) {
+    const {
+      fontFamily,
+      strokeWidth,
+      stroke,
+      fill,
+      fontSize,
+      fontStyle,
+      fontWeight,
+      deltaY,
+    } = style;
+
+    const textDecoration = this.getSvgTextDecoration(style);
+
+    return [
+      stroke ? colorPropToSVG('stroke', stroke) : '',
+      strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
+      fontFamily
+        ? `font-family: ${
+            !fontFamily.includes("'") && !fontFamily.includes('"')
+              ? `'${fontFamily}'`
+              : fontFamily
+          }; `
+        : '',
+      fontSize ? `font-size: ${fontSize}px; ` : '',
+      fontStyle ? `font-style: ${fontStyle}; ` : '',
+      fontWeight ? `font-weight: ${fontWeight}; ` : '',
+      textDecoration ? `text-decoration: ${textDecoration}; ` : textDecoration,
+      fill ? colorPropToSVG('fill', fill) : '',
+      deltaY ? `baseline-shift: ${-deltaY}; ` : '',
+      useWhiteSpace ? 'white-space: pre; ' : '',
+    ].join('');
+  }
+
+  /**
+   * Returns text-decoration property for svg-export
+   * @param {Object} style the object from which to retrieve style properties
+   * @return {String}
+   */
+  getSvgTextDecoration(
+    this: TextSVGExportMixin & FabricText,
+    style: TextStyleDeclaration
+  ) {
+    return (['overline', 'underline', 'line-through'] as const)
+      .filter(
+        (decoration) =>
+          style[
+            decoration.replace('-', '') as
+              | 'overline'
+              | 'underline'
+              | 'linethrough'
+          ]
+      )
+      .join(' ');
   }
 }

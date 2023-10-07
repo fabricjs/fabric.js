@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller } from '../../typedefs';
+import type { TFiller, TOptions } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -17,7 +17,6 @@ import {
   JUSTIFY_RIGHT,
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
-import type { TProps } from '../Object/types';
 
 type CursorBoundaries = {
   left: number;
@@ -104,7 +103,7 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  * ```
  */
 export class IText<
-    Props extends TProps<ITextProps> = Partial<ITextProps>,
+    Props extends TOptions<ITextProps> = Partial<ITextProps>,
     SProps extends SerializedITextProps = SerializedITextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
@@ -501,7 +500,7 @@ export class IText<
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
-      multiplier = this.scaleX * this.canvas!.getZoom(),
+      multiplier = this.getObjectScaling().x * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset =

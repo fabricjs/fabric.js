@@ -1,8 +1,28 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
+import type { GroupProps, LayoutContext } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
 
+export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
+
+export interface ActiveSelectionOptions extends GroupProps {
+  multiSelectionStacking: MultiSelectionStacking;
+}
+
+/**
+ * Used by Canvas to manage selection.
+ * Canvas accepts an `activeSelection` option allowing overriding and customization.
+ *
+ * @example
+ * class MyActiveSelection extends ActiveSelection {
+ *   ...
+ * }
+ *
+ * const canvas = new Canvas(el, {
+ *  activeSelection: new MyActiveSelection()
+ * })
+ */
 export class ActiveSelection extends Group {
   declare _objects: FabricObject[];
 
@@ -14,19 +34,9 @@ export class ActiveSelection extends Group {
    * @default `canvas-stacking`
    */
   // TODO FIX THIS WITH THE DEFAULTS LOGIC
-  multiSelectionStacking: 'canvas-stacking' | 'selection-order' =
-    'canvas-stacking';
+  multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
-
-  constructor(
-    objects?: FabricObject[],
-    options?: any,
-    objectsRelativeToGroup?: boolean
-  ) {
-    super(objects, options, objectsRelativeToGroup);
-    this.setCoords();
-  }
 
   /**
    * @private
@@ -76,7 +86,9 @@ export class ActiveSelection extends Group {
       //  save ref to group for later in order to return to it
       const parent = object.group;
       parent._exitGroup(object);
-      object.__owningGroup = parent;
+      // make sure we are setting the correct owning group
+      // in case `object` is transferred between active selections
+      !(parent instanceof ActiveSelection) && (object.__owningGroup = parent);
     }
     this._enterGroup(object, removeParentTransform);
     return true;
@@ -132,6 +144,25 @@ export class ActiveSelection extends Group {
   onDeselect() {
     this.removeAll();
     return false;
+  }
+
+  _applyLayoutStrategy(context: LayoutContext): void {
+    super._applyLayoutStrategy(context);
+    if (this._objects.length === 0) {
+      // in this case layout was skipped
+      // we reset transform for the next selection
+      Object.assign(this, {
+        left: 0,
+        top: 0,
+        angle: 0,
+        scaleX: 1,
+        scaleY: 1,
+        skewX: 0,
+        skewY: 0,
+        flipX: false,
+        flipY: false,
+      });
+    }
   }
 
   /**

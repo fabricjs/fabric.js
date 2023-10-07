@@ -5,15 +5,16 @@ import type {
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { FabricObject } from '../Object/FabricObject';
-import { Text } from '../Text/Text';
+import { FabricText } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import type { TProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
+import type { Canvas } from '../../canvas/Canvas';
 
 /**
  *  extend this regex to support non english languages
@@ -39,10 +40,10 @@ export type ITextEvents = ObjectEvents & {
 };
 
 export abstract class ITextBehavior<
-  Props extends TProps<TextProps> = Partial<TextProps>,
+  Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<Props, SProps, EventSpec> {
+> extends FabricText<Props, SProps, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;
@@ -404,7 +405,7 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * called by {@link canvas#textEditingManager}
+   * called by {@link Canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
     if (this.getActiveControl()) {

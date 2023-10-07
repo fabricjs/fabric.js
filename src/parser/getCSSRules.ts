@@ -5,7 +5,7 @@ import type { CSSRules } from './typedefs';
  * @param {HTMLElement} doc SVG document to parse
  * @return {Object} CSS rules of this document
  */
-export function getCSSRules(doc: HTMLElement) {
+export function getCSSRules(doc: Document) {
   const styles = doc.getElementsByTagName('style');
   let i;
   let len;

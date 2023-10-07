@@ -23,7 +23,7 @@ export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
   `,
 };
 
-type TResizeType = 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
+export type TResizeType = 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
 
 type ResizeDuring2DResize = Resize & {
   rcpScaleX: number;

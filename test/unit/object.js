@@ -24,7 +24,7 @@
     var cObj = new fabric.Object();
 
     assert.ok(cObj);
-    assert.ok(cObj instanceof fabric.Object);
+    assert.ok(cObj instanceof fabric.FabricObject);
     assert.ok(cObj.constructor === fabric.Object);
 
     assert.equal(cObj.constructor.type, 'FabricObject');
@@ -305,14 +305,6 @@
     assert.ok(typeof cObj.render === 'function');
   });
 
-  QUnit.test('rotate', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.rotate === 'function');
-    assert.equal(cObj.get('angle'), 0);
-    cObj.rotate(45);
-    assert.equal(cObj.get('angle'), 45);
-  });
-
   QUnit.test('scale', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.scale === 'function');
@@ -338,7 +330,7 @@
     assert.equal(cObj.get('angle'), 45);
   });
 
-  QUnit.test('rotate', function(assert) {
+  QUnit.test('rotate what?', function(assert) {
     var cObj = new fabric.Object();
     assert.equal(cObj.get('angle'), 0);
     assert.equal(cObj.set('angle', 45), cObj, 'chainable');
@@ -369,7 +361,7 @@
     assert.ok(typeof cObj.cloneAsImage === 'function');
     var image = cObj.cloneAsImage();
     assert.ok(image);
-    assert.ok(image instanceof fabric.Image);
+    assert.ok(image instanceof fabric.FabricImage);
     assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
@@ -378,7 +370,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var image = cObj.cloneAsImage({ enableRetinaScaling: true });
     assert.ok(image);
-    assert.ok(image instanceof fabric.Image);
+    assert.ok(image instanceof fabric.FabricImage);
     assert.equal(image.width, 200, 'the image has been scaled by retina');
   });
 

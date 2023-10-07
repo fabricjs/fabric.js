@@ -1,10 +1,12 @@
-// @ts-nocheck
-import type { TClassProperties } from '../typedefs';
+import type { TClassProperties, TOptions } from '../typedefs';
 import { IText } from './IText/IText';
 import { classRegistry } from '../ClassRegistry';
 import { createTextboxDefaultControls } from '../controls/commonControls';
 import { JUSTIFY } from './Text/constants';
 import type { TextStyleDeclaration } from './Text/StyledText';
+import type { SerializedITextProps, ITextProps } from './IText/IText';
+import type { ITextEvents } from './IText/ITextBehavior';
+import type { TextLinesInfo } from './Text/Text';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -20,11 +22,27 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
 
 export type GraphemeData = {
   wordsData: {
-    word: string;
+    word: string[];
     width: number;
   }[][];
   largestWordWidth: number;
 };
+
+export type StyleMap = Record<string, { line: number; offset: number }>;
+
+// @TODO this is not complete
+interface UniqueTextboxProps {
+  minWidth: number;
+  splitByGrapheme: boolean;
+  dynamicMinWidth: number;
+  _wordJoiners: RegExp;
+}
+
+export interface SerializedTextboxProps
+  extends SerializedITextProps,
+    Pick<UniqueTextboxProps, 'minWidth' | 'splitByGrapheme'> {}
+
+export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
 
 /**
  * Textbox class, based on IText, allows the user to resize the text rectangle
@@ -32,7 +50,14 @@ export type GraphemeData = {
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
  */
-export class Textbox extends IText {
+export class Textbox<
+    Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
+    SProps extends SerializedTextboxProps = SerializedTextboxProps,
+    EventSpec extends ITextEvents = ITextEvents
+  >
+  extends IText<Props, SProps, EventSpec>
+  implements UniqueTextboxProps
+{
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
@@ -56,6 +81,12 @@ export class Textbox extends IText {
    * @since 2.6.0
    */
   declare splitByGrapheme: boolean;
+
+  declare _wordJoiners: RegExp;
+
+  declare _styleMap: StyleMap;
+
+  declare isWrapping: boolean;
 
   static type = 'Textbox';
 
@@ -106,11 +137,11 @@ export class Textbox extends IText {
    * which is only sufficient for Text / IText
    * @private
    */
-  _generateStyleMap(textInfo) {
+  _generateStyleMap(textInfo: TextLinesInfo): StyleMap {
     let realLineCount = 0,
       realLineCharCount = 0,
       charCount = 0;
-    const map = {};
+    const map: StyleMap = {};
 
     for (let i = 0; i < textInfo.graphemeLines.length; i++) {
       if (textInfo.graphemeText[charCount] === '\n' && i > 0) {
@@ -141,7 +172,7 @@ export class Textbox extends IText {
    * @param {Number} lineIndex
    * @return {Boolean}
    */
-  styleHas(property, lineIndex: number): boolean {
+  styleHas(property: keyof TextStyleDeclaration, lineIndex: number): boolean {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (map) {
@@ -162,7 +193,7 @@ export class Textbox extends IText {
     }
     let offset = 0,
       nextLineIndex = lineIndex + 1,
-      nextOffset,
+      nextOffset: number,
       shouldLimit = false;
     const map = this._styleMap[lineIndex],
       mapNextLine = this._styleMap[lineIndex + 1];
@@ -181,7 +212,8 @@ export class Textbox extends IText {
         : { line: this.styles[lineIndex] };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
-        if (p2 >= offset && (!shouldLimit || p2 < nextOffset)) {
+        const p2Number = parseInt(p2, 10);
+        if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
           // eslint-disable-next-line no-unused-vars
           for (const p3 in obj[p1][p2]) {
             return false;
@@ -278,10 +310,10 @@ export class Textbox extends IText {
   _wrapText(lines: string[], desiredWidth: number): string[][] {
     this.isWrapping = true;
     // extract all thewords and the widths to optimally wrap lines.
-    const wordsData = this.getGraphemeDataForRender(lines);
+    const data = this.getGraphemeDataForRender(lines);
     const wrapped: string[][] = [];
-    for (let i = 0; i < lines.length; i++) {
-      wrapped.push(...this._wrapLine(i, desiredWidth, wordsData));
+    for (let i = 0; i < data.wordsData.length; i++) {
+      wrapped.push(...this._wrapLine(i, desiredWidth, data));
     }
     this.isWrapping = false;
     return wrapped;
@@ -302,22 +334,23 @@ export class Textbox extends IText {
 
     const data = lines.map((line, lineIndex) => {
       let offset = 0;
-      const words = splitByGrapheme
+      const wordsOrGraphemes = splitByGrapheme
         ? this.graphemeSplit(line)
         : this.wordSplit(line);
 
-      // fix a difference between split and graphemeSplit
-      if (words.length === 0) {
-        words.push([]);
+      if (wordsOrGraphemes.length === 0) {
+        return [{ word: [], width: 0 }];
       }
 
-      return words.map((word) => {
+      return wordsOrGraphemes.map((word: string) => {
         // if using splitByGrapheme words are already in graphemes.
-        word = splitByGrapheme ? word : this.graphemeSplit(word);
-        const width = this._measureWord(word, lineIndex, offset);
+        const graphemeArray = splitByGrapheme
+          ? [word]
+          : this.graphemeSplit(word);
+        const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + infix.length;
-        return { word, width };
+        offset += graphemeArray.length + infix.length;
+        return { word: graphemeArray, width };
       });
     });
 
@@ -339,7 +372,7 @@ export class Textbox extends IText {
    * @param {number} charOffset
    * @returns {number}
    */
-  _measureWord(word, lineIndex: number, charOffset = 0): number {
+  _measureWord(word: string[], lineIndex: number, charOffset = 0): number {
     let width = 0,
       prevGrapheme;
     const skipLeft = true;
@@ -383,14 +416,14 @@ export class Textbox extends IText {
     desiredWidth: number,
     { largestWordWidth, wordsData }: GraphemeData,
     reservedSpace = 0
-  ): Array<any> {
+  ): string[][] {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
       graphemeLines = [],
       infix = splitByGrapheme ? '' : ' ';
 
     let lineWidth = 0,
-      line = [],
+      line: string[] = [],
       // spaces in different languages?
       offset = 0,
       infixWidth = 0,
@@ -465,10 +498,12 @@ export class Textbox extends IText {
   /**
    * Detect if a line has a linebreak and so we need to account for it when moving
    * and counting style.
+   * This is important only for splitByGrapheme at the end of wrapping.
+   * If we are not wrapping the offset is always 1
    * @return Number
    */
-  missingNewlineOffset(lineIndex) {
-    if (this.splitByGrapheme) {
+  missingNewlineOffset(lineIndex: number, skipWrapping?: boolean): 0 | 1 {
+    if (this.splitByGrapheme && !skipWrapping) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;
@@ -498,14 +533,16 @@ export class Textbox extends IText {
   }
 
   _removeExtraneousStyles() {
-    const linesToKeep = {};
+    const linesToKeep = new Map();
     for (const prop in this._styleMap) {
-      if (this._textLines[prop]) {
-        linesToKeep[this._styleMap[prop].line] = 1;
+      const propNumber = parseInt(prop, 10);
+      if (this._textLines[propNumber]) {
+        const lineIndex = this._styleMap[prop].line;
+        linesToKeep.set(`${lineIndex}`, true);
       }
     }
     for (const prop in this.styles) {
-      if (!linesToKeep[prop]) {
+      if (!linesToKeep.has(prop)) {
         delete this.styles[prop];
       }
     }
@@ -517,10 +554,16 @@ export class Textbox extends IText {
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  toObject(propertiesToInclude?: Array<any>) {
-    return super.toObject(
-      ['minWidth', 'splitByGrapheme'].concat(propertiesToInclude)
-    );
+  // @ts-expect-error TS this typing limitations
+  toObject<
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
+    K extends keyof T = never
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
+    return super.toObject<T, K>([
+      'minWidth',
+      'splitByGrapheme',
+      ...propertiesToInclude,
+    ] as K[]) as Pick<T, K> & SProps;
   }
 }
 

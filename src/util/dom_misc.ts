@@ -4,12 +4,13 @@
  * @return {Object} Object with left/top values
  */
 export function getScrollLeftTop(element: HTMLElement | null) {
+  const doc = element && getDocumentFromElement(element);
   let left = 0,
     top = 0;
-  if (!element) {
+  if (!element || !doc) {
     return { left, top };
   }
-  const doc = getDocumentFromElement(element);
+
   const docElement = doc.documentElement,
     body = doc.body || {
       scrollLeft: 0,

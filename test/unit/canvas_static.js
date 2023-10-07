@@ -192,8 +192,6 @@
     var canvas = new fabric.StaticCanvas();
     assert.ok('backgroundColor' in canvas);
     assert.ok('overlayColor' in canvas);
-    assert.ok('backgroundImage' in canvas);
-    assert.ok('overlayImage' in canvas);
     assert.ok('includeDefaultValues' in canvas);
     assert.ok('renderOnAddRemove' in canvas);
     assert.ok('controlsAboveOverlay' in canvas);
@@ -1264,7 +1262,7 @@
     canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.backgroundColor, 'green');
-      assert.ok(canvas.backgroundImage instanceof fabric.Image);
+      assert.ok(canvas.backgroundImage instanceof fabric.FabricImage);
       done();
     });
   });
@@ -1329,7 +1327,7 @@
     var canvas3 = new fabric.StaticCanvas();
     var json = '{"clipPath": {"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"normal","fontFamily":"Delicious_500","fontStyle":"normal","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
     canvas3.loadFromJSON(json).then(function() {
-      assert.ok(canvas3.clipPath instanceof fabric.Text);
+      assert.ok(canvas3.clipPath instanceof fabric.FabricText);
       assert.equal(canvas3.clipPath.constructor.type, 'Text');
       done();
     });

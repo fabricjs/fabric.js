@@ -70,10 +70,6 @@ export const svgValidTagNames = [
     'vector-effect': 'strokeUniform',
     'image-rendering': 'imageSmoothing',
   },
-  colorAttributes = {
-    stroke: 'strokeOpacity',
-    fill: 'fillOpacity',
-  },
   fSize = 'font-size',
   cPath = 'clip-path';
 

@@ -182,11 +182,6 @@
     assert.equal(canvas.altActionKey, 'shiftKey', 'default is shift');
   });
 
-  QUnit.test('interactive', function(assert) {
-    assert.ok(typeof canvas.interactive === 'boolean');
-    assert.ok(canvas.interactive, 'default is true');
-  });
-
   QUnit.test('selection', function(assert) {
     assert.ok(typeof canvas.selection === 'boolean');
     assert.ok(canvas.selection, 'default is true');
@@ -397,7 +392,7 @@
     assert.equal(activeSelection[1], rect1, 'then rect1');
   });
 
-  QUnit.test('start multiselection: preserve', function (assert) {
+  QUnit.test('start multiselection: canvas-stacking', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
@@ -439,7 +434,6 @@
     updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
-
 
   QUnit.test('continuing multiselection respects order of objects', function (assert) {
     const rect1 = new fabric.Rect();
@@ -522,6 +516,19 @@
     canvas.add(rect1, rect2, rect3);
     updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+  });
+
+  QUnit.test('multiselection: selecting a target behind active selection', assert => {
+    const rect1 = new fabric.Rect({ left: 10, width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ width: 10, height: 10 });
+    const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
+    canvas.add(rect1, rect2, rect3);
+    initActiveSelection(canvas, rect1, rect3);
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'selected');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3], 'created');
+    canvas.__onMouseDown({ clientX: 7, clientY: 7, [canvas.selectionKey]: true });
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'added from behind active selection');
     assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
   });
 
@@ -1579,30 +1586,6 @@
       assert.equal(canvas.preserveObjectStacking, true);
       done();
     });
-  });
-
-
-  QUnit.test('normalize pointer', function(assert) {
-    assert.ok(typeof canvas._normalizePointer === 'function');
-    var pointer = new fabric.Point({ x: 10, y: 20 }),
-        object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
-        normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
-    assert.equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
-    object.angle = 90;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -15, 'should consider angle');
-    assert.equal(normalizedPointer.y, -25, 'should consider angle');
-    object.angle = 0;
-    object.scaleX = 2;
-    object.scaleY = 2;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -25, 'should consider scale');
-    assert.equal(normalizedPointer.y, -20, 'should consider scale');
-    object.skewX = 60;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x.toFixed(2), -33.66, 'should consider skewX');
-    assert.equal(normalizedPointer.y, -20, 'should not change');
   });
 
   QUnit.test('restorePointerVpt', function(assert) {

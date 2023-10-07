@@ -1,16 +1,16 @@
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
-import type { Text } from './Text';
+import type { FabricText } from './Text';
 import { pick } from '../../util';
 
-export type CompleteTextStyleDeclaration = Pick<Text, StylePropertiesType>;
+export type CompleteTextStyleDeclaration = Pick<
+  FabricText,
+  StylePropertiesType
+>;
 
 export type TextStyleDeclaration = Partial<CompleteTextStyleDeclaration>;
 
@@ -19,7 +19,7 @@ export type TextStyle = {
 };
 
 export abstract class StyledText<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -206,7 +206,7 @@ export abstract class StyledText<
     startIndex: number,
     endIndex?: number,
     complete?: boolean
-  ) {
+  ): TextStyleDeclaration[] {
     const styles: TextStyleDeclaration[] = [];
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
       styles.push(this.getStyleAtPosition(i, complete));

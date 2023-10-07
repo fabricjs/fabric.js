@@ -173,6 +173,33 @@ function assertCanvasDisposing(klass) {
         });
         animate();
     });
+
+    QUnit.test('disposing during animation should cancel it by target', function (assert) {
+        const done = assert.async();
+        const canvas = new klass(null, { renderOnAddRemove: false });
+        let called = 0;
+        const animate = () => fabric.util.animate({
+            target: canvas,
+            onChange() {
+                if (called === 1) {
+                    assert.equal(fabric.runningAnimations[0].target, canvas, 'should register the animation by target');
+                    canvas.dispose().then(() => {
+                        assert.deepEqual(fabric.runningAnimations, [], 'should cancel the animation');
+                        done();
+                    });
+                    assert.ok(canvas.disposed, 'should flag `disposed`');
+                }
+                called++;
+                canvas.contextTopDirty = true;
+                canvas.hasLostContext = true;
+                canvas.renderAll();
+            },
+            onComplete() {
+                animate();
+            }
+        });
+        animate();
+    });
 }
 
 function testStaticCanvasDisposing() {

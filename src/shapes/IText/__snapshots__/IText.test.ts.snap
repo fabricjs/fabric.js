@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IText cursor drawing width group scaled by 1 and rotated by 0 , text scaled by 1 and rotated by 0, and canvas zoomed by 1 1`] = `
+{
+  "height": "40.000",
+  "width": "100.000",
+}
+`;
+
+exports[`IText cursor drawing width group scaled by 1 and rotated by 0 , text scaled by 2 and rotated by 0, and canvas zoomed by 50 1`] = `
+{
+  "height": "40.000",
+  "width": "1.000",
+}
+`;
+
+exports[`IText cursor drawing width group scaled by 200 and rotated by 0 , text scaled by 1 and rotated by 0, and canvas zoomed by 0.005 1`] = `
+{
+  "height": "40.000",
+  "width": "100.000",
+}
+`;
+
+exports[`IText cursor drawing width group scaled by 200 and rotated by 0 , text scaled by 1 and rotated by 0, and canvas zoomed by 1 1`] = `
+{
+  "height": "40.000",
+  "width": "0.500",
+}
+`;
+
+exports[`IText cursor drawing width group scaled by 200 and rotated by 0 , text scaled by 2 and rotated by 90, and canvas zoomed by 0.005 1`] = `
+{
+  "height": "40.000",
+  "width": "50.000",
+}
+`;
+
+exports[`IText cursor drawing width group scaled by 200 and rotated by 30 , text scaled by 1 and rotated by 30, and canvas zoomed by 50 1`] = `
+{
+  "height": "40.000",
+  "width": "0.010",
+}
+`;
+
+exports[`IText cursor drawing width group scaled by 200 and rotated by 45 , text scaled by 2 and rotated by 0, and canvas zoomed by 1 1`] = `
+{
+  "height": "40.000",
+  "width": "0.250",
+}
+`;

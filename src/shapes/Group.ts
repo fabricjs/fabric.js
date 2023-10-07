@@ -1,10 +1,9 @@
-// @ts-nocheck
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import { cos } from '../util/misc/cos';
-import type { TClassProperties, TSVGReviver } from '../typedefs';
+import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
 import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
@@ -21,12 +20,9 @@ import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import { CENTER } from '../constants';
+import { log } from '../util/internals/console';
 
 export type LayoutContextType =
   | 'initialization'
@@ -81,6 +77,7 @@ export type LayoutResult = {
   correctionY?: number;
   width: number;
   height: number;
+  prevLayout?: LayoutStrategy;
 };
 
 export interface GroupOwnProps {
@@ -177,7 +174,7 @@ export class Group extends createCollectionMixin(
     objectsRelativeToGroup?: boolean
   ) {
     super();
-    this._objects = objects;
+    this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
     this.__objectMonitor = this.__objectMonitor.bind(this);
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
@@ -208,19 +205,17 @@ export class Group extends createCollectionMixin(
   canEnterGroup(object: FabricObject) {
     if (object === this || this.isDescendantOf(object)) {
       //  prevent circular object tree
-      /* _DEV_MODE_START_ */
-      console.error(
-        'fabric.Group: circular object trees are not supported, this call has no effect'
+      log(
+        'error',
+        'Group: circular object trees are not supported, this call has no effect'
       );
-      /* _DEV_MODE_END_ */
       return false;
     } else if (this._objects.indexOf(object) !== -1) {
       // is already in the objects array
-      /* _DEV_MODE_START_ */
-      console.error(
-        'fabric.Group: duplicate objects are not supported inside group, this call has no effect'
+      log(
+        'error',
+        'Group: duplicate objects are not supported inside group, this call has no effect'
       );
-      /* _DEV_MODE_END_ */
       return false;
     }
     return true;
@@ -318,7 +313,7 @@ export class Group extends createCollectionMixin(
    * @param {*} value
    */
   _set(key: string, value: any) {
-    const prev = this[key];
+    const prev = this[key as keyof this];
     super._set(key, value);
     if (key === 'canvas' && prev !== value) {
       this.forEachObject((object) => {
@@ -389,12 +384,16 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject} object
    */
   _watchObject(watch: boolean, object: FabricObject) {
-    const directive = watch ? 'on' : 'off';
+    const directive: 'on' | 'off' = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
+    // @ts-expect-error TS limitations
     object[directive]('changed', this.__objectMonitor);
+    // @ts-expect-error TS limitations
     object[directive]('modified', this.__objectMonitor);
+    // @ts-expect-error TS limitations
     object[directive]('selected', this.__objectSelectionTracker);
+    // @ts-expect-error TS limitations
     object[directive]('deselected', this.__objectSelectionDisposer);
   }
 
@@ -639,7 +638,7 @@ export class Group extends createCollectionMixin(
         this.layout !== 'clip-path' &&
         this.clipPath &&
         !this.clipPath.absolutePositioned &&
-        this._adjustObjectPosition(this.clipPath, diff);
+        this._adjustObjectPosition(this.clipPath as FabricObject, diff);
       if (!newCenter.eq(center) || initialTransform) {
         //  set position
         this.setPositionByOrigin(newCenter, CENTER, CENTER);
@@ -976,7 +975,7 @@ export class Group extends createCollectionMixin(
         obj.includeDefaultValues = _includeDefaultValues;
         const data = obj[method || 'toObject'](propertiesToInclude);
         obj.includeDefaultValues = originalDefaults;
-        //delete data.version;
+        // delete data.version;
         return data;
       });
   }
@@ -1000,7 +999,10 @@ export class Group extends createCollectionMixin(
         'interactive',
         ...propertiesToInclude,
       ]),
-      objects: this.__serializeObjects('toObject', propertiesToInclude),
+      objects: this.__serializeObjects(
+        'toObject',
+        propertiesToInclude as string[]
+      ),
     };
   }
 
@@ -1051,7 +1053,7 @@ export class Group extends createCollectionMixin(
    * Returns styles-string for svg-export, specific version for group
    * @return {String}
    */
-  getSvgStyles() {
+  getSvgStyles(): string {
     const opacity =
         typeof this.opacity !== 'undefined' && this.opacity !== 1
           ? `opacity: ${this.opacity};`
@@ -1065,7 +1067,7 @@ export class Group extends createCollectionMixin(
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {String} svg representation of an instance
    */
-  toClipPathSVG(reviver?: TSVGReviver) {
+  toClipPathSVG(reviver?: TSVGReviver): string {
     const svgString = [];
     const bg = this._createSVGBgRect(reviver);
     bg && svgString.push('\t', bg);
@@ -1085,7 +1087,7 @@ export class Group extends createCollectionMixin(
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject<T extends TProps<SerializedGroupProps>>({
+  static fromObject<T extends TOptions<SerializedGroupProps>>({
     objects = [],
     ...options
   }: T) {

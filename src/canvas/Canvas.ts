@@ -19,6 +19,7 @@ import {
   isFabricObjectWithDragSupport,
   isInteractiveTextObject,
 } from '../util/typeAssertions';
+import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -64,7 +65,7 @@ type TSyntheticEventContext = {
   drag: DragEventData;
 };
 
-export class Canvas extends SelectableCanvas {
+export class Canvas extends SelectableCanvas implements CanvasOptions {
   /**
    * Contains the id of the touch event that owns the fabric transform
    * @type Number
@@ -72,11 +73,6 @@ export class Canvas extends SelectableCanvas {
    */
   declare mainTouchId: null | number;
 
-  /**
-   * When the option is enabled, PointerEvent is used instead of TPointerEvent.
-   * @type Boolean
-   * @default
-   */
   declare enablePointerEvents: boolean;
 
   /**
@@ -117,7 +113,7 @@ export class Canvas extends SelectableCanvas {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
+  constructor(el?: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
     // bind event handlers
     (
@@ -249,8 +245,8 @@ export class Canvas extends SelectableCanvas {
     const shared = {
       e,
       isClick: false,
-      pointer: this.getPointer(e),
-      absolutePointer: this.getPointer(e, true),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     };
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
@@ -277,8 +273,8 @@ export class Canvas extends SelectableCanvas {
       this.fire('mouse:over', {
         e,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
@@ -516,7 +512,8 @@ export class Canvas extends SelectableCanvas {
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      pointer: this.getPointer(e),
+      pointer: this.getPointer(e, true),
+      absolutePointer: this.getPointer(e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -847,12 +844,12 @@ export class Canvas extends SelectableCanvas {
         this.setActiveObject(target, e);
         shouldRender = true;
       } else {
-        const control = target.controls[corner as string];
+        const control = target.controls[corner];
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getPointer(e);
-          mouseUpHandler(e, transform!, pointer.x, pointer.y);
+          mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
         }
       }
       target.isMoving = false;
@@ -874,7 +871,13 @@ export class Canvas extends SelectableCanvas {
           );
       pointer = pointer || this.getPointer(e);
       originalMouseUpHandler &&
-        originalMouseUpHandler(e, transform, pointer.x, pointer.y);
+        originalMouseUpHandler.call(
+          originalControl,
+          e,
+          transform,
+          pointer.x,
+          pointer.y
+        );
     }
     this._setCursorFromEvent(e, target);
     this._handleEvent(e, 'up', LEFT_CLICK, isClick);
@@ -906,7 +909,7 @@ export class Canvas extends SelectableCanvas {
     this.fire(eventType, options);
     target && target.fire(eventType, options);
     for (let i = 0; i < subTargets.length; i++) {
-      subTargets[i].fire(eventType, options);
+      subTargets[i] !== target && subTargets[i].fire(eventType, options);
     }
     return options;
   }
@@ -934,8 +937,8 @@ export class Canvas extends SelectableCanvas {
         subTargets: targets,
         button,
         isClick,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
         transform: this._currentTransform,
       };
     if (eventType === 'up') {
@@ -946,7 +949,7 @@ export class Canvas extends SelectableCanvas {
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
     for (let i = 0; i < targets.length; i++) {
-      targets[i].fire(`mouse${eventType}`, options);
+      targets[i] !== target && targets[i].fire(`mouse${eventType}`, options);
     }
   }
 
@@ -1002,6 +1005,7 @@ export class Canvas extends SelectableCanvas {
       this.discardActiveObject(e);
       this.requestRenderAll();
     }
+    // this is an absolute pointer, the naming is wrong
     const pointer = this.getPointer(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
@@ -1018,6 +1022,7 @@ export class Canvas extends SelectableCanvas {
       this.freeDrawingBrush &&
         this.freeDrawingBrush.onMouseMove(pointer, {
           e,
+          // this is an absolute pointer, the naming is wrong
           pointer,
         });
     }
@@ -1034,6 +1039,7 @@ export class Canvas extends SelectableCanvas {
     if (this.freeDrawingBrush) {
       this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
         e: e,
+        // this is an absolute pointer, the naming is wrong
         pointer: pointer,
       });
     } else {
@@ -1132,7 +1138,13 @@ export class Canvas extends SelectableCanvas {
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {
-          mouseDownHandler(e, this._currentTransform!, pointer.x, pointer.y);
+          mouseDownHandler.call(
+            control,
+            e,
+            this._currentTransform!,
+            pointer.x,
+            pointer.y
+          );
         }
       }
     }
@@ -1313,29 +1325,29 @@ export class Canvas extends SelectableCanvas {
     const targetChanged = oldTarget !== target;
 
     if (oldTarget && targetChanged) {
-      const outOpt = {
+      const outOpt: CanvasEvents[typeof canvasOut] = {
         ...data,
         e,
         target: oldTarget,
         nextTarget: target,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       };
-      fireCanvas && this.fire(canvasIn, outOpt);
+      fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
     }
     if (target && targetChanged) {
-      const inOpt: TPointerEventInfo = {
+      const inOpt: CanvasEvents[typeof canvasIn] = {
         ...data,
         e,
         target,
         previousTarget: oldTarget,
         isClick: false,
-        pointer: this.getPointer(e),
-        absolutePointer: this.getPointer(e, true),
+        pointer: this.getPointer(e, true),
+        absolutePointer: this.getPointer(e),
       };
-      fireCanvas && this.fire(canvasOut, inOpt);
+      fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
     }
   }
@@ -1485,11 +1497,13 @@ export class Canvas extends SelectableCanvas {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          // find target from active objects
-          target = this.searchPossibleTargets(
-            prevActiveObjects,
-            this.getPointer(e, true)
-          );
+          const pointer = this.getPointer(e, true);
+          target =
+            // first search active objects for a target to remove
+            this.searchPossibleTargets(prevActiveObjects, pointer) ||
+            //  if not found, search under active selection for a target to add
+            // `prevActiveObjects` will be searched but we already know they will not be found
+            this.searchPossibleTargets(this._objects, pointer);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;

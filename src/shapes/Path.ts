@@ -18,13 +18,14 @@ import type {
   TPathSegmentInfo,
   TSimplePathData,
 } from '../util/path/typedefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
+import type {
+  TBBox,
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+} from '../typedefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
@@ -47,7 +48,7 @@ export interface IPathBBox extends TBBox {
 }
 
 export class Path<
-  Props extends TProps<PathProps> = Partial<PathProps>,
+  Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -259,7 +260,7 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toClipPathSVG(reviver: TSVGReviver) {
+  toClipPathSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return (
       '\t' +
@@ -275,7 +276,7 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toSVG(reviver: TSVGReviver) {
+  toSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver: reviver,
@@ -401,7 +402,7 @@ export class Path<
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject<T extends TProps<SerializedPathProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedPathProps>>(object: T) {
     return this._fromObject<Path>(object, {
       extraParam: 'path',
     });

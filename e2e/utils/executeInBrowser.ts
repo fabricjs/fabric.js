@@ -1,23 +1,22 @@
+import type { Page } from '@playwright/test';
 import type { Canvas, Object as FabricObject } from 'fabric';
 
-export function executeInBrowser<C, R>(
+export async function executeInBrowser<C, R>(
+  page: Page,
   runInBrowser: (
-    context: C,
     testContext: {
-      getCanvas: (selector: string) => Canvas;
+      getCanvas: (selector?: string) => Canvas;
       getObject: (key: string) => FabricObject;
-    }
-  ) => R,
-  context: C
-): Promise<R> {
-  return this.page.evaluate(
-    ([runInBrowser, context]) => {
-      return eval(runInBrowser)(context, {
-        getCanvas: (selector) =>
-          canvasMap.get(document.querySelector(selector)),
-        getObject: (key) => objectMap.get(key),
-      });
     },
-    [runInBrowser.toString(), context] as const
-  );
+    context: C
+  ) => R,
+  context?: C
+): Promise<R> {
+  return (
+    await page.evaluateHandle(() => ({
+      getCanvas: (selector = '#canvas') =>
+        canvasMap.get(document.querySelector(selector)),
+      getObject: (key) => objectMap.get(key),
+    }))
+  ).evaluate(runInBrowser, context);
 }

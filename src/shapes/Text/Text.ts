@@ -14,6 +14,7 @@ import type {
   TCacheCanvasDimensions,
   TClassProperties,
   TFiller,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
@@ -29,11 +30,7 @@ import { cacheProperties } from '../Object/FabricObject';
 import type { Path } from '../Path';
 import { TextSVGExportMixin } from './TextSVGExportMixin';
 import { applyMixins } from '../../util/applyMixins';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
 import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
@@ -63,9 +60,16 @@ function getMeasuringContext() {
   return measuringContext;
 }
 
-type TPathSide = 'left' | 'right';
+export type TPathSide = 'left' | 'right';
 
-type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+export type TPathAlign = 'baseline' | 'center' | 'ascender' | 'descender';
+
+export type TextLinesInfo = {
+  lines: string[];
+  graphemeLines: string[][];
+  graphemeText: string[];
+  _unwrappedLines: string[][];
+};
 
 /**
  * Measure and return the info of a single grapheme.
@@ -115,8 +119,8 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
  * Text class
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
-export class Text<
-    Props extends TProps<TextProps> = Partial<TextProps>,
+export class FabricText<
+    Props extends TOptions<TextProps> = Partial<TextProps>,
     SProps extends SerializedTextProps = SerializedTextProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -360,8 +364,11 @@ export class Text<
 
   /**
    * contains characters bounding boxes
+   * This variable is considered to be protected.
+   * But for how mixins are implemented right now, we can't leave it private
+   * @protected
    */
-  protected __charBounds: GraphemeBBox[][] = [];
+  __charBounds: GraphemeBBox[][] = [];
 
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
@@ -408,7 +415,7 @@ export class Text<
   static type = 'Text';
 
   static getDefaults() {
-    return { ...super.getDefaults(), ...Text.ownDefaults };
+    return { ...super.getDefaults(), ...FabricText.ownDefaults };
   }
 
   constructor(text: string, options: Props = {} as Props) {
@@ -436,7 +443,7 @@ export class Text<
    * @private
    * Divides text into lines of text and lines of graphemes.
    */
-  _splitText() {
+  _splitText(): TextLinesInfo {
     const newLines = this._splitTextIntoLines(this.text);
     this.textLines = newLines.lines;
     this._textLines = newLines.graphemeLines;
@@ -522,11 +529,11 @@ export class Text<
   /**
    * Detect if a line has a linebreak and so we need to account for it when moving
    * and counting style.
-   * It return always for text and Itext.
+   * It return always 1 for text and Itext. Textbox has its own implementation
    * @return Number
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  missingNewlineOffset(lineIndex: number) {
+  missingNewlineOffset(lineIndex: number, skipWrapping?: boolean): 0 | 1;
+  missingNewlineOffset(lineIndex: number): 1 {
     return 1;
   }
 
@@ -545,7 +552,8 @@ export class Text<
           charIndex: selectionStart,
         };
       }
-      selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+      selectionStart -=
+        lines[i].length + this.missingNewlineOffset(i, skipWrapping);
     }
     return {
       lineIndex: i - 1,
@@ -1655,7 +1663,7 @@ export class Text<
       fontFamily.includes("'") ||
       fontFamily.includes('"') ||
       fontFamily.includes(',') ||
-      Text.genericFonts.includes(fontFamily.toLowerCase())
+      FabricText.genericFonts.includes(fontFamily.toLowerCase())
         ? fontFamily
         : `"${fontFamily}"`;
     return [
@@ -1705,7 +1713,7 @@ export class Text<
    * @param {String} text text to split
    * @returns  Lines in the text
    */
-  _splitTextIntoLines(text: string) {
+  _splitTextIntoLines(text: string): TextLinesInfo {
     const lines = text.split(this._reNewline),
       newLines = new Array<string[]>(lines.length),
       newLine = ['\n'];
@@ -1733,14 +1741,14 @@ export class Text<
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
-      ...super.toObject([...additionalProps, ...propertiesToInclude]),
+      ...super.toObject([...additionalProps, ...propertiesToInclude] as K[]),
       styles: stylesToArray(this.styles, this.text),
       ...(this.path ? { path: this.path.toObject() } : {}),
     };
   }
 
   set(key: string | any, value?: any) {
-    const { textLayoutProperties } = this.constructor as typeof Text;
+    const { textLayoutProperties } = this.constructor as typeof FabricText;
     super.set(key, value);
     let needsDims = false;
     let isAddingPath = false;
@@ -1785,7 +1793,7 @@ export class Text<
   /* _FROM_SVG_START_ */
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Text.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link FabricText.fromElement})
    * @static
    * @memberOf Text
    * @see: http://www.w3.org/TR/SVG/text.html#TextElement
@@ -1805,7 +1813,7 @@ export class Text<
   );
 
   /**
-   * Returns Text instance from an SVG element (<b>not yet implemented</b>)
+   * Returns FabricText instance from an SVG element (<b>not yet implemented</b>)
    * @static
    * @memberOf Text
    * @param {HTMLElement} element Element to parse
@@ -1818,7 +1826,7 @@ export class Text<
   ) {
     const parsedAttributes = parseAttributes(
       element,
-      Text.ATTRIBUTE_NAMES,
+      FabricText.ATTRIBUTE_NAMES,
       cssRules
     );
 
@@ -1884,13 +1892,14 @@ export class Text<
   /* _FROM_SVG_END_ */
 
   /**
-   * Returns Text instance from an object representation
+   * Returns FabricText instance from an object representation
    * @param {Object} object plain js Object to create an instance from
-   * @returns {Promise<Text>}
+   * @returns {Promise<FabricText>}
    */
-  static fromObject<T extends TProps<SerializedTextProps>, S extends Text>(
-    object: T
-  ) {
+  static fromObject<
+    T extends TOptions<SerializedTextProps>,
+    S extends FabricText
+  >(object: T) {
     return this._fromObject<S>(
       {
         ...object,
@@ -1903,6 +1912,14 @@ export class Text<
   }
 }
 
-applyMixins(Text, [TextSVGExportMixin]);
-classRegistry.setClass(Text);
-classRegistry.setSVGClass(Text);
+applyMixins(FabricText, [TextSVGExportMixin]);
+classRegistry.setClass(FabricText);
+classRegistry.setSVGClass(FabricText);
+
+/**
+ * @deprecated The old fabric.Text class can't be imported as Text because of conflict with Web API.
+ * https://developer.mozilla.org/en-US/docs/Web/API/Text/Text
+ * For this reason it has been renamed to FabricText.
+ * Please use `import { FabricText }` in place of `import { Text as FabricText }`
+ */
+export class Text extends FabricText {}

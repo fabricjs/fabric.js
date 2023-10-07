@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { applyViewboxTransform } from './applyViewboxTransform';
 import { svgValidTagNamesRegEx } from './constants';
 import { hasInvalidAncestor } from './hasInvalidAncestor';
@@ -6,8 +5,9 @@ import { parseUseDirectives } from './parseUseDirectives';
 import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
+import { log, SignalAbortedError } from '../util/internals/console';
 
-const isValidSvgTag = (el: HTMLElement) =>
+const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
 
 export const createEmptyResponse = (): SVGParsingOutput => ({
@@ -35,25 +35,26 @@ export const createEmptyResponse = (): SVGParsingOutput => ({
  * You may want to use it if you are trying to regroup the objects as they were originally grouped in the SVG. ( This was the reason why it was added )
  */
 export async function parseSVGDocument(
-  doc: HTMLElement,
+  doc: Document,
   reviver?: TSvgReviverCallback,
   { crossOrigin, signal }: LoadImageOptions = {}
 ): Promise<SVGParsingOutput> {
   if (signal && signal.aborted) {
-    console.log('`options.signal` is in `aborted` state');
+    log('log', new SignalAbortedError('parseSVGDocument'));
     // this is an unhappy path, we dont care about speed
     return createEmptyResponse();
   }
+  const documentElement = doc.documentElement;
   parseUseDirectives(doc);
 
-  const descendants = Array.from(doc.getElementsByTagName('*')),
+  const descendants = Array.from(documentElement.getElementsByTagName('*')),
     options = {
-      ...applyViewboxTransform(doc),
+      ...applyViewboxTransform(documentElement),
       crossOrigin,
       signal,
     };
 
-  const elements = descendants.filter(function (el) {
+  const elements = descendants.filter((el) => {
     applyViewboxTransform(el);
     return isValidSvgTag(el) && !hasInvalidAncestor(el); // http://www.w3.org/TR/SVG/struct.html#DefsElement
   });
@@ -79,10 +80,6 @@ export async function parseSVGDocument(
     elements,
     options,
     reviver,
-    {
-      crossOrigin,
-      signal,
-    },
     doc,
     localClipPaths
   );

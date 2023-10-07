@@ -3,7 +3,7 @@ import { expect } from '@playwright/test';
 import type { Object as FabricObject } from 'fabric';
 import type { before, beforeAll } from 'test';
 
-export class ObjectUtil {
+export class ObjectUtil<T = FabricObject> {
   constructor(
     readonly page: Page,
     /**
@@ -12,16 +12,16 @@ export class ObjectUtil {
     readonly objectId: string
   ) {}
 
-  executeInBrowser<C, R>(
-    runInBrowser: (object: FabricObject, context: C) => R,
+  async executeInBrowser<C, R>(
+    runInBrowser: (object: T, context: C) => R,
     context?: C
   ): Promise<R> {
-    return this.page.evaluate(
-      ([objectId, runInBrowser, context]) => {
-        return eval(runInBrowser)(objectMap.get(objectId), context);
-      },
-      [this.objectId, runInBrowser.toString(), context] as const
-    );
+    return (
+      await this.page.evaluateHandle<FabricObject>(
+        ([objectId]) => objectMap.get(objectId),
+        [this.objectId]
+      )
+    ).evaluate(runInBrowser, context);
   }
 
   getObjectCenter() {

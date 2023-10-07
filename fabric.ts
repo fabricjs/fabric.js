@@ -10,8 +10,14 @@ export * from './src/typedefs';
 export * from './src/EventTypeDefs';
 export { Observable } from './src/Observable';
 
+export type {
+  TCanvasSizeOptions,
+  TSVGExportOptions,
+} from './src/canvas/StaticCanvas';
+export type { StaticCanvasOptions } from './src/canvas/StaticCanvasOptions';
 export { StaticCanvas } from './src/canvas/StaticCanvas';
 export { Canvas } from './src/canvas/Canvas';
+export type { CanvasOptions } from './src/canvas/CanvasOptions';
 export { CanvasDOMManager } from './src/canvas/DOMManagers/CanvasDOMManager';
 export { StaticCanvasDOMManager } from './src/canvas/DOMManagers/StaticCanvasDOMManager';
 
@@ -35,36 +41,74 @@ export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
-export { FabricObject as Object } from './src/shapes/Object/FabricObject';
+export {
+  FabricObject,
+  _Object as Object,
+} from './src/shapes/Object/FabricObject';
+
 export type {
-  TProps,
   TFabricObjectProps,
   FabricObjectProps,
   SerializedObjectProps,
 } from './src/shapes/Object/types';
+export type { SerializedLineProps } from './src/shapes/Line';
 export { Line } from './src/shapes/Line';
+export type { CircleProps, SerializedCircleProps } from './src/shapes/Circle';
 export { Circle } from './src/shapes/Circle';
 export { Triangle } from './src/shapes/Triangle';
+export type {
+  EllipseProps,
+  SerializedEllipseProps,
+} from './src/shapes/Ellipse';
 export { Ellipse } from './src/shapes/Ellipse';
+export type { RectProps, SerializedRectProps } from './src/shapes/Rect';
 export { Rect } from './src/shapes/Rect';
+export type { PathProps, SerializedPathProps } from './src/shapes/Path';
 export { Path } from './src/shapes/Path';
+export type { SerializedPolylineProps } from './src/shapes/Polyline';
 export { Polyline } from './src/shapes/Polyline';
 export { Polygon } from './src/shapes/Polygon';
-export { Text } from './src/shapes/Text/Text';
+export type {
+  GraphemeBBox,
+  SerializedTextProps,
+  TPathAlign,
+  TPathSide,
+  TextProps,
+} from './src/shapes/Text/Text';
+export { Text, FabricText } from './src/shapes/Text/Text';
+export type {
+  ITextProps,
+  SerializedITextProps,
+} from './src/shapes/IText/IText';
 export { IText } from './src/shapes/IText/IText';
+export type {
+  GraphemeData,
+  SerializedTextboxProps,
+  TextboxProps,
+} from './src/shapes/Textbox';
 export { Textbox } from './src/shapes/Textbox';
 export type {
+  CompleteTextStyleDeclaration,
   TextStyleDeclaration,
   TextStyle,
 } from './src/shapes/Text/StyledText';
-export { Group } from './src/shapes/Group';
 export type {
-  GroupProps,
   GroupEvents,
+  GroupProps,
+  LayoutContext,
+  GroupOwnProps,
+  LayoutContextType,
+  LayoutResult,
+  LayoutStrategy,
   SerializedGroupProps,
 } from './src/shapes/Group';
+export { Group } from './src/shapes/Group';
+export type {
+  ActiveSelectionOptions,
+  MultiSelectionStacking,
+} from './src/shapes/ActiveSelection';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
-export { Image } from './src/shapes/Image';
+export { Image, FabricImage } from './src/shapes/Image';
 export type {
   ImageSource,
   SerializedImageProps,
@@ -74,7 +118,17 @@ export { createCollectionMixin } from './src/Collection';
 
 export * as util from './src/util';
 
-export * from './src/parser';
+export { loadSVGFromString } from './src/parser/loadSVGFromString';
+export { loadSVGFromURL } from './src/parser/loadSVGFromURL';
+export { parseSVGDocument } from './src/parser/parseSVGDocument';
+
+// todo convert tests to jest and stop exporting those.
+export { parseAttributes } from './src/parser/parseAttributes';
+export { parseStyleAttribute } from './src/parser/parseStyleAttribute';
+export { parsePointsAttribute } from './src/parser/parsePointsAttribute';
+export { parseTransformAttribute } from './src/parser/parseTransformAttribute';
+export { getCSSRules } from './src/parser/getCSSRules';
+export { parseFontDeclaration } from './src/parser/parseFontDeclaration';
 
 export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';

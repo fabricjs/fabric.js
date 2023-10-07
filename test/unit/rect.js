@@ -44,7 +44,7 @@
     var rect = new fabric.Rect();
 
     assert.ok(rect instanceof fabric.Rect);
-    assert.ok(rect instanceof fabric.Object);
+    assert.ok(rect instanceof fabric.FabricObject);
 
     assert.deepEqual(rect.constructor.type, 'Rect');
   });

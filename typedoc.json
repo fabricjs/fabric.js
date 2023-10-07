@@ -1,0 +1,11 @@
+{
+  // https://typedoc.org/options/
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["fabric.ts"],
+  "out": "docs",
+  "excludeExternals": true,
+  "tsconfig": "typedoc.config.json",
+  "hideBreadcrumbs": "true",
+  "publicPath": "/apidocs/",
+  "plugin": ["typedoc-plugin-markdown"]
+}

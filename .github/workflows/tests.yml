@@ -79,7 +79,7 @@ jobs:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [14.x, 16.x, 20.x]
+        node-version: [16.x, 20.x]
         suite: [unit, visual]
     steps:
       - uses: actions/checkout@v3
@@ -114,6 +114,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install
@@ -127,7 +129,7 @@ jobs:
         with:
           name: e2e-report
           path: ./e2e/test-report/
-      - name: Upload test coverage
+      - name: Upload Test Coverage
         uses: actions/upload-artifact@v3
         with:
           name: coverage-e2e
@@ -156,7 +158,8 @@ jobs:
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
-      - uses: ShaMan123/lcov-reporter-action@v1.1.1
+      - uses: ShaMan123/lcov-reporter-action@v1.2.2
+        if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
