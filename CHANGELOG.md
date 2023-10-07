@@ -3,7 +3,7 @@
 ## [next]
 
 - fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
-- CI(): fix build caching [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
+- CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
 - chore(): export poly control utils [#9400](https://github.com/fabricjs/fabric.js/pull/9400)
 - fix(Canvas): in/out event names were swapped [#9396](https://github.com/fabricjs/fabric.js/pull/9396)
 - fix(Canvas): `setActiveObject` should update `canvas#_activeSelection` [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
