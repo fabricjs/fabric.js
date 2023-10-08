@@ -820,6 +820,7 @@ export class StaticCanvas<
    * this alias is provided because if you call JSON.stringify on an instance,
    * the toJSON object will be invoked if it exists.
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} JSON compatible object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
@@ -830,8 +831,8 @@ export class StaticCanvas<
    * @example <caption>JSON without default values</caption>
    * var json = canvas.toJSON();
    */
-  toJSON() {
-    return this.toObject();
+  toJSON(propertiesToInclude?: string[]) {
+    return this.toObject(propertiesToInclude);
   }
 
   /**
