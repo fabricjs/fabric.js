@@ -141,18 +141,18 @@ export const matrixToSVG = (transform: TMat2D) =>
  */
 export const colorPropToSVG = (prop: string, value?: any) => {
   if (!value) {
-    return `${prop}: none; `;
+    return `${prop}="none" `;
   } else if (value.toLive) {
-    return `${prop}: url(#SVGID_${value.id}); `;
+    return `${prop}="url(#SVGID_${value.id})" `;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
 
-    let str = `${prop}: ${color.toRgb()}; `;
+    let str = `${prop}="${color.toRgb()}" `;
 
     if (opacity !== 1) {
       //change the color in rgb + opacity
-      str += `${prop}-opacity: ${opacity.toString()}; `;
+      str += `${prop}-opacity="${opacity.toString()}" `;
     }
     return str;
   }
