@@ -1,4 +1,3 @@
-import { url } from 'inspector';
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE, NONE } from '../../constants';
