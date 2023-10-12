@@ -1,3 +1,4 @@
+import { url } from 'inspector';
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE, NONE } from '../../constants';
@@ -82,6 +83,8 @@ export type MeetOrSlice = 'meet' | 'slice';
 
 export type MinMidMax = 'Min' | 'Mid' | 'Max' | 'none';
 
+export type ColorSeparator = ':' | '=';
+
 export type TPreserveArParsed = {
   meetOrSlice: MeetOrSlice;
   alignX: MinMidMax;
@@ -139,20 +142,20 @@ export const matrixToSVG = (transform: TMat2D) =>
  * @param value
  * @returns
  */
-export const colorPropToSVG = (prop: string, value?: any) => {
+export const colorPropToSVG = (prop: string, value?: any, separator: ColorSeparator = ':') => {
   if (!value) {
-    return `${prop}="none" `;
+    return separator === ':' ? `${prop}: none; ` : `${prop}="none" `;
   } else if (value.toLive) {
-    return `${prop}="url(#SVGID_${value.id})" `;
+    return separator === ':' ? `${prop}: url(#SVGID_${value.id}); ` : `${prop}="url(#SVGID_${value.id})" `;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
 
-    let str = `${prop}="${color.toRgb()}" `;
+    let str = separator === ':' ? `${prop}: ${color.toRgb()}; ` : `${prop}="${color.toRgb()}" `;
 
     if (opacity !== 1) {
       //change the color in rgb + opacity
-      str += `${prop}-opacity="${opacity.toString()}" `;
+      str += separator === ':' ? `${prop}-opacity: ${opacity.toString()}; ` : `${prop}-opacity="${opacity.toString()}" `;
     }
     return str;
   }
@@ -163,7 +166,7 @@ export const createSVGRect = (
   { left, top, width, height }: TBBox,
   precision = config.NUM_FRACTION_DIGITS
 ) => {
-  const svgColor = colorPropToSVG('fill', color);
+  const svgColor = colorPropToSVG('fill', color, '=');
   const [x, y, w, h] = [left, top, width, height].map((value) =>
     toFixed(value, precision)
   );

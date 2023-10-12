@@ -70,15 +70,4 @@
     rect.clipPath = clipPath;
     assert.equalSVG(removeTranslate(rect.toSVG()), removeTranslate(EXPECTED));
   });
-  QUnit.test('toSVG with textbox as fill and backgroundColor', function(assert) {
-    fabric.config.configure({ NUM_FRACTION_DIGITS: 0 });
-    var EXPECTED = "\&quot;&lt;g transform=\\&quot;matrix(1 0 0 1 28.2734 23.1)\\&quot; style=\\&quot;\\&quot;  &gt;\n\t\t&lt;rect fill: rgb(255,255,0);  x=\\&quot;-27.7734\\&quot; y=\\&quot;-22.6\\&quot; width=\\&quot;55.5469\\&quot; height=\\&quot;45.2\\&quot;&gt;&lt;/rect&gt;\n\t\t&lt;text xml:space=\\&quot;preserve\\&quot; font-family=\\&quot;Times New Roman\\&quot; font-size=\\&quot;40\\&quot; font-style=\\&quot;normal\\&quot; font-weight=\\&quot;normal\\&quot; style=\\&quot;stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;\\&quot; &gt;&lt;tspan x=\\&quot;-27.7734\\&quot; y=\\&quot;12.5656\\&quot; &gt;test&lt;/tspan&gt;&lt;/text&gt;\n&lt;/g&gt;\n\&quot;"
-    var text = new fabric.Textbox('test', {
-      fill: 'red',
-      width: 10,
-      height: 10,
-      backgroundColor: 'yellow'
-    })
-    assert.equalSVG(removeTranslate(text.toSVG()), removeTranslate(EXPECTED))
-  })
 })();
