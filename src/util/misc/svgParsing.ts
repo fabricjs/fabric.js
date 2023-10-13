@@ -82,8 +82,6 @@ export type MeetOrSlice = 'meet' | 'slice';
 
 export type MinMidMax = 'Min' | 'Mid' | 'Max' | 'none';
 
-export type ColorSeparator = ':' | '=';
-
 export type TPreserveArParsed = {
   meetOrSlice: MeetOrSlice;
   alignX: MinMidMax;
@@ -139,24 +137,37 @@ export const matrixToSVG = (transform: TMat2D) =>
  * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
  * @param prop
  * @param value
+ * @param {boolean} inlineStyle The default is inline style, the separator used is ":", The other is "="
  * @returns
  */
-export const colorPropToSVG = (prop: string, value?: any, separator: ColorSeparator = ':') => {
+export const colorPropToSVG = (
+  prop: string,
+  value?: any,
+  inlineStyle = true
+) => {
+  let colorValue;
+  let opacityValue;
   if (!value) {
-    return separator === ':' ? `${prop}: none; ` : `${prop}="none" `;
+    colorValue = 'none';
   } else if (value.toLive) {
-    return separator === ':' ? `${prop}: url(#SVGID_${value.id}); ` : `${prop}="url(#SVGID_${value.id})" `;
+    colorValue = `url(#SVGID_${value.id})`;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
 
-    let str = separator === ':' ? `${prop}: ${color.toRgb()}; ` : `${prop}="${color.toRgb()}" `;
-
+    colorValue = color.toRgb();
     if (opacity !== 1) {
-      //change the color in rgb + opacity
-      str += separator === ':' ? `${prop}-opacity: ${opacity.toString()}; ` : `${prop}-opacity="${opacity.toString()}" `;
+      opacityValue = opacity.toString();
     }
-    return str;
+  }
+  if (inlineStyle) {
+    return `${prop}: ${colorValue}; ${
+      opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ''
+    }`;
+  } else {
+    return `${prop}="${colorValue}" ${
+      opacityValue ? `${prop}-opacity="${opacityValue}" ` : ''
+    }`;
   }
 };
 
@@ -165,7 +176,7 @@ export const createSVGRect = (
   { left, top, width, height }: TBBox,
   precision = config.NUM_FRACTION_DIGITS
 ) => {
-  const svgColor = colorPropToSVG('fill', color, '=');
+  const svgColor = colorPropToSVG('fill', color, false);
   const [x, y, w, h] = [left, top, width, height].map((value) =>
     toFixed(value, precision)
   );
