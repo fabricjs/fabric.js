@@ -14,7 +14,7 @@ this is the call flow:
 
 performLayout -> onBeforeLayout -> getLayoutResult -> commitLayout -> onAfterLayout
 
-**Note**: the option `objectsRelativeToGroup` is related to restoring a group from serialization and should be removed. Object should be eventually normalized in the from Object function
+**Note**: the option `objectsRelativeToGroup` is related to restoring a group from serialization and should be removed. Object should be eventually normalized in the from Object function or we should ask why do we want to perform a layout if the group has been saved with the layout properties already calculated.
 
 ### type INITIALIZATION
 
