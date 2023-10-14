@@ -75,23 +75,26 @@ export abstract class LayoutStrategy {
     const { left, top, width, height } = makeBoundingBoxFromPoints(
       objects
         .map((object) => getObjectBounds(target, object))
-        .reduce((coords, curr) => coords.concat(curr), [])
+        .reduce<Point[]>((coords, curr) => coords.concat(curr), [])
     );
-    const size = new Point(width, height);
-    const origin = new Point(left, top);
-    const bboxCenter = origin.add(size.scalarDivide(2));
+    const bboxSize = new Point(width, height);
+    const bboxLeftTop = new Point(left, top);
+    const bboxCenter = bboxLeftTop.add(bboxSize.scalarDivide(2));
+
     if (context.type === LAYOUT_TYPE_INITIALIZATION) {
       const actualSize = this.getInitialSize(context, {
-        size,
+        size: bboxSize,
         center: bboxCenter,
       });
       const originFactor = new Point(
         -resolveOrigin(target.originX),
         -resolveOrigin(target.originY)
       );
-      const sizeCorrection = actualSize.subtract(size).multiply(originFactor);
+      const sizeCorrection = actualSize
+        .subtract(bboxSize)
+        .multiply(originFactor);
       // translate the layout origin from left top to target's origin
-      const center = origin.add(size.multiply(originFactor));
+      const center = bboxLeftTop.add(bboxSize.multiply(originFactor));
       return {
         // in `initialization` we do not account for target's transformation matrix
         center: center.add(sizeCorrection),
@@ -103,7 +106,7 @@ export abstract class LayoutStrategy {
       const center = bboxCenter.transform(target.calcOwnMatrix());
       return {
         center,
-        size,
+        size: bboxSize,
       };
     }
   }
