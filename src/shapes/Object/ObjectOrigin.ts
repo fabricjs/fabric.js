@@ -38,6 +38,7 @@ export class ObjectOrigin<EventSpec>
 
   /**
    * Calculate object bounding box dimensions from its properties scale, skew.
+   * This bounding box is aligned with object angle and not with canvas axis or screen.
    * @param {Object} [options]
    * @param {Number} [options.scaleX]
    * @param {Number} [options.scaleY]
