@@ -1,6 +1,8 @@
 # Layout manager
 
-## performLayout - Calculating the bounding box of a group
+Layout manager exposes a main public method that perform group layouting given a target group and target objects.
+
+## performLayout
 
 Each performLayout call gets a context, the context has always
 
@@ -8,11 +10,18 @@ Each performLayout call gets a context, the context has always
 - target, the group we are performing a layout onto and that will be modified
 - targets, the objects partecipating in the layout operation, that will be modified
 
-Other properties change with the type
+Other properties change with the type of performLayout
 
 this is the call flow:
 
 performLayout -> onBeforeLayout -> getLayoutResult -> commitLayout -> onAfterLayout
+
+The flow has the following goals/features:
+
+- alerting the user a layout ends and finish
+- subscribe to object events in order to continue layouting later
+- calculate group new size and position
+- move the objects to their new position relative to the group center.
 
 **Note**: the option `objectsRelativeToGroup` is related to restoring a group from serialization and should be removed. Object should be eventually normalized in the from Object function or we should ask why do we want to perform a layout if the group has been saved with the layout properties already calculated.
 
