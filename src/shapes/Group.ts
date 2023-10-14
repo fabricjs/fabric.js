@@ -84,7 +84,7 @@ export class Group
    */
   declare interactive: boolean;
 
-  layoutManager?: LayoutManager;
+  declare layoutManager?: LayoutManager;
 
   /**
    * Used internally to optimize performance
