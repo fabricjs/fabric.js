@@ -4,6 +4,7 @@ import { CENTER, iMatrix } from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
+import { resetObjectTransform } from '../util/misc/objectTransforms';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
@@ -18,8 +19,8 @@ import {
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
 export class LayoutManager {
-  private _prevLayoutStrategy?: LayoutStrategy;
-  private _subscriptions: Map<FabricObject, VoidFunction[]>;
+  private declare _prevLayoutStrategy?: LayoutStrategy;
+  private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
 
@@ -114,7 +115,7 @@ export class LayoutManager {
       context.targets.forEach((object) => this.unsubscribe(object, context));
     }
 
-    //  fire layout event (event will fire only for layouts after initialization layout)
+    // fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:before', {
       context,
     });
@@ -136,10 +137,6 @@ export class LayoutManager {
     context: StrictLayoutContext
   ): Required<LayoutResult> | undefined {
     const { target } = context;
-    const prevCenter =
-      context.type === LAYOUT_TYPE_INITIALIZATION
-        ? new Point()
-        : target.getRelativeCenterPoint();
 
     const result = context.strategy.calcLayoutResult(
       context,
@@ -149,6 +146,11 @@ export class LayoutManager {
     if (!result) {
       return;
     }
+
+    const prevCenter =
+      context.type === LAYOUT_TYPE_INITIALIZATION
+        ? new Point()
+        : target.getRelativeCenterPoint();
 
     const {
       center: nextCenter,
@@ -254,17 +256,9 @@ export class LayoutManager {
     } = context;
 
     if (strategy.shouldResetTransform(context)) {
-      Object.assign(target, {
-        left: 0,
-        top: 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        flipX: false,
-        flipY: false,
-      });
+      resetObjectTransform(target);
+      target.left = 0;
+      target.top = 0;
     }
 
     //  fire layout event (event will fire only for layouts after initialization layout)
