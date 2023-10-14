@@ -4,10 +4,13 @@ import type { TOptions } from '../../typedefs';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
-import type { Text } from './Text';
+import type { FabricText } from './Text';
 import { pick } from '../../util';
 
-export type CompleteTextStyleDeclaration = Pick<Text, StylePropertiesType>;
+export type CompleteTextStyleDeclaration = Pick<
+  FabricText,
+  StylePropertiesType
+>;
 
 export type TextStyleDeclaration = Partial<CompleteTextStyleDeclaration>;
 

@@ -187,7 +187,7 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
     },
   ],
   [
-    "drag:leave",
+    "drag:enter",
     {
       "absolutePointer": Point {
         "x": -30,
@@ -260,7 +260,7 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
     },
   ],
   [
-    "drag:leave",
+    "drag:enter",
     {
       "absolutePointer": Point {
         "x": -30,
@@ -571,6 +571,197 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
       "pointer": Point {
         "x": 50,
         "y": 50,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+]
+`;
+
+exports[`should fire mouse over/out events on target 1`] = `
+[
+  [
+    "mouseover",
+    {
+      "absolutePointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "previousTarget": undefined,
+      "target": "target",
+    },
+  ],
+  [
+    "mousemove",
+    {
+      "absolutePointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "subTargets": [],
+      "target": "target",
+      "transform": null,
+    },
+  ],
+  [
+    "mouseout",
+    {
+      "absolutePointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "nextTarget": undefined,
+      "pointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "target": "target",
+    },
+  ],
+]
+`;
+
+exports[`should fire mouse over/out events on target 2`] = `
+[
+  [
+    "mouse:move:before",
+    {
+      "absolutePointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+  [
+    "mouse:over",
+    {
+      "absolutePointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "previousTarget": undefined,
+      "target": "target",
+    },
+  ],
+  [
+    "mouse:move",
+    {
+      "absolutePointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "subTargets": [],
+      "target": "target",
+      "transform": null,
+    },
+  ],
+  [
+    "mouse:move:before",
+    {
+      "absolutePointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "subTargets": [],
+      "target": undefined,
+      "transform": null,
+    },
+  ],
+  [
+    "mouse:out",
+    {
+      "absolutePointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "nextTarget": undefined,
+      "pointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "target": "target",
+    },
+  ],
+  [
+    "mouse:move",
+    {
+      "absolutePointer": Point {
+        "x": 20,
+        "y": 20,
+      },
+      "button": 1,
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "isClick": false,
+      "pointer": Point {
+        "x": 20,
+        "y": 20,
       },
       "subTargets": [],
       "target": undefined,

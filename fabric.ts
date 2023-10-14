@@ -41,7 +41,11 @@ export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
-export { FabricObject as Object } from './src/shapes/Object/FabricObject';
+export {
+  FabricObject,
+  _Object as Object,
+} from './src/shapes/Object/FabricObject';
+
 export type {
   TFabricObjectProps,
   FabricObjectProps,
@@ -71,7 +75,7 @@ export type {
   TPathSide,
   TextProps,
 } from './src/shapes/Text/Text';
-export { Text } from './src/shapes/Text/Text';
+export { Text, FabricText } from './src/shapes/Text/Text';
 export type {
   ITextProps,
   SerializedITextProps,
@@ -101,7 +105,7 @@ export type {
   MultiSelectionStacking,
 } from './src/shapes/ActiveSelection';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
-export { Image } from './src/shapes/Image';
+export { Image, FabricImage } from './src/shapes/Image';
 export type {
   ImageSource,
   SerializedImageProps,

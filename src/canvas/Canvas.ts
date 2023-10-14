@@ -844,12 +844,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         this.setActiveObject(target, e);
         shouldRender = true;
       } else {
-        const control = target.controls[corner as string];
+        const control = target.controls[corner];
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getPointer(e);
-          mouseUpHandler(e, transform!, pointer.x, pointer.y);
+          mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
         }
       }
       target.isMoving = false;
@@ -871,7 +871,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           );
       pointer = pointer || this.getPointer(e);
       originalMouseUpHandler &&
-        originalMouseUpHandler(e, transform, pointer.x, pointer.y);
+        originalMouseUpHandler.call(
+          originalControl,
+          e,
+          transform,
+          pointer.x,
+          pointer.y
+        );
     }
     this._setCursorFromEvent(e, target);
     this._handleEvent(e, 'up', LEFT_CLICK, isClick);
@@ -903,7 +909,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this.fire(eventType, options);
     target && target.fire(eventType, options);
     for (let i = 0; i < subTargets.length; i++) {
-      subTargets[i].fire(eventType, options);
+      subTargets[i] !== target && subTargets[i].fire(eventType, options);
     }
     return options;
   }
@@ -943,7 +949,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
     for (let i = 0; i < targets.length; i++) {
-      targets[i].fire(`mouse${eventType}`, options);
+      targets[i] !== target && targets[i].fire(`mouse${eventType}`, options);
     }
   }
 
@@ -1132,7 +1138,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {
-          mouseDownHandler(e, this._currentTransform!, pointer.x, pointer.y);
+          mouseDownHandler.call(
+            control,
+            e,
+            this._currentTransform!,
+            pointer.x,
+            pointer.y
+          );
         }
       }
     }
@@ -1313,7 +1325,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const targetChanged = oldTarget !== target;
 
     if (oldTarget && targetChanged) {
-      const outOpt = {
+      const outOpt: CanvasEvents[typeof canvasOut] = {
         ...data,
         e,
         target: oldTarget,
@@ -1322,11 +1334,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
       };
-      fireCanvas && this.fire(canvasIn, outOpt);
+      fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
     }
     if (target && targetChanged) {
-      const inOpt: TPointerEventInfo = {
+      const inOpt: CanvasEvents[typeof canvasIn] = {
         ...data,
         e,
         target,
@@ -1335,7 +1347,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
       };
-      fireCanvas && this.fire(canvasOut, inOpt);
+      fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
     }
   }
