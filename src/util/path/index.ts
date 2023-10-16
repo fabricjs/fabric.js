@@ -895,6 +895,20 @@ export const parsePath = (pathString: string): TComplexPathData => {
   return res;
 };
 
+export const parsePathForIteration = (path: string | TSimplePathData) => {
+  const pathData = makePathSimpler(
+    Array.isArray(path) ? path : parsePath(path)
+  );
+  const data = getPathSegmentsInfo(pathData);
+  return {
+    path: pathData,
+    data,
+    length: data[data.length - 1]!.length,
+    getPointOnPath: (distance: number) =>
+      getPointOnPath(pathData, distance, data)!,
+  };
+};
+
 /**
  *
  * Converts points to a smooth SVG path

@@ -1,13 +1,19 @@
 import { Color } from '../../color/Color';
-import type { TRGBAColorSource } from '../../color/typedefs';
+import type { TColorArg, TRGBAColorSource } from '../../color/typedefs';
 import { halfPI } from '../../constants';
 import { capValue } from '../misc/capValue';
 import { AnimationBase } from './AnimationBase';
 import type {
-  ColorAnimationOptions,
+  TAnimationOptions,
   TEasingFunction,
   TOnAnimationChangeCallback,
 } from './types';
+
+export type ColorAnimationOptions = TAnimationOptions<
+  TColorArg,
+  string,
+  number[]
+>;
 
 const defaultColorEasing: TEasingFunction = (
   timeElapsed,

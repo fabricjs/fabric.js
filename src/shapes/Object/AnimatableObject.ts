@@ -1,14 +1,14 @@
 import type { TColorArg } from '../../color/typedefs';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type { TAnimation } from '../../util/animation/animate';
-import { animate, animateColor } from '../../util/animation/animate';
 import type {
-  AnimationOptions,
-  ArrayAnimationOptions,
-  ColorAnimationOptions,
-  ValueAnimationOptions,
-} from '../../util/animation/types';
+  AnimationOptionsRegistry,
+  AnimationRegistry,
+} from '../../util/animation/animate';
+import { animate, animateColor } from '../../util/animation/animate';
 import { StackedObject } from './StackedObject';
+
+export type AnimationTypeFromValue<T extends number | number[] | TColorArg> =
+  T extends TColorArg ? 'color' : T extends number[] ? 'array' : 'value';
 
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -22,23 +22,26 @@ export abstract class AnimatableObject<
   /**
    * Animates object's properties
    * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
-   * @param {Partial<AnimationOptions<T>>} options
+   * @param {Partial<AnimationOptionsRegistry[Anim]>} options
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
-   * @return {Record<string, TAnimation<T>>} map of animation contexts
+   * @return {Record<string, AnimationRegistry[Anim]>} map of animation contexts
    *
    * As object — multiple properties
    *
    * object.animate({ left: ..., top: ... });
    * object.animate({ left: ..., top: ... }, { duration: ... });
    */
-  animate<T extends number | number[] | TColorArg>(
+  animate<
+    T extends number | number[] | TColorArg,
+    Anim extends AnimationTypeFromValue<T>
+  >(
     animatable: Record<string, T>,
-    options?: Partial<AnimationOptions<T>>
-  ): Record<string, TAnimation<T>> {
+    options?: Partial<AnimationOptionsRegistry[Anim]>
+  ): Record<string, AnimationRegistry[Anim]> {
     return Object.entries(animatable).reduce((acc, [key, endValue]) => {
       acc[key] = this._animate(key, endValue, options);
       return acc;
-    }, {} as Record<string, TAnimation<T>>);
+    }, {} as Record<string, AnimationRegistry[Anim]>);
   }
 
   /**
@@ -47,11 +50,14 @@ export abstract class AnimatableObject<
    * @param {String} to Value to animate to
    * @param {Object} [options] Options object
    */
-  _animate<T extends number | number[] | TColorArg>(
+  _animate<
+    T extends number | number[] | TColorArg,
+    Anim extends AnimationTypeFromValue<T>
+  >(
     key: string,
     endValue: T,
-    options: Partial<AnimationOptions<T>> = {}
-  ): TAnimation<T> {
+    options: Partial<AnimationOptionsRegistry[Anim]> = {}
+  ): AnimationRegistry[Anim] {
     const path = key.split('.');
     const propIsColor = this.colorProperties.includes(path[path.length - 1]);
     const { easing, duration, abort, startValue, onChange, onComplete } =
@@ -90,14 +96,16 @@ export abstract class AnimatableObject<
           // @ts-expect-error generic callback arg0 is wrong
           onComplete(value, valueProgress, durationProgress);
       },
-    } as AnimationOptions<T>;
+    } as AnimationOptionsRegistry[Anim];
 
     return (
       propIsColor
-        ? animateColor(animationOptions as ColorAnimationOptions)
+        ? animateColor(animationOptions as AnimationOptionsRegistry['color'])
         : animate(
-            animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+            animationOptions as
+              | AnimationOptionsRegistry['array']
+              | AnimationOptionsRegistry['value']
           )
-    ) as TAnimation<T>;
+    ) as AnimationRegistry[Anim];
   }
 }
