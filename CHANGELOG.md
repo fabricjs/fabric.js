@@ -27,6 +27,7 @@
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
+- fix(Utils): fix exported svg color [#9408](https://github.com/fabricjs/fabric.js/pull/9408)
 
 ## [6.0.0-beta13]
 
