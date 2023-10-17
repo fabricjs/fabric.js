@@ -5,6 +5,8 @@ import { createVector } from './util/misc/vectors';
 
 export type IntersectionType = 'Intersection' | 'Coincident' | 'Parallel';
 
+export type LineType = 'line' | 'ray' | 'segment';
+
 export class Intersection {
   declare points: Point[];
 
@@ -16,7 +18,7 @@ export class Intersection {
   }
 
   /**
-   * Used to verify if a point is alredy in the collection
+   * Used to verify if a point is already in the collection
    * @param {Point} point
    * @returns {boolean}
    */
@@ -48,7 +50,7 @@ export class Intersection {
    * @param [infinite] if true checks if `T` is on the line defined by `A` and `B`
    * @returns true if `T` is contained
    */
-  static isPointContained(T: Point, A: Point, B: Point, infinite = false) {
+  static isPointContained(T: Point, A: Point, B: Point, type: LineType) {
     if (A.eq(B)) {
       // Edge case: the segment is a point, we check for coincidence,
       // infinite param has no meaning because there are infinite lines to consider
@@ -58,14 +60,22 @@ export class Intersection {
       // we first check if T.x has the same value, and then if T.y is contained between A.y and B.y
       return (
         T.x === A.x &&
-        (infinite || (T.y >= Math.min(A.y, B.y) && T.y <= Math.max(A.y, B.y)))
+        (type === 'line' ||
+          (type === 'ray' && (B.y > A.y ? T.y >= A.y : T.y <= A.y)) ||
+          (type === 'segment' &&
+            T.y >= Math.min(A.y, B.y) &&
+            T.y <= Math.max(A.y, B.y)))
       );
     } else if (A.y === B.y) {
       // Edge case: vertical line.
       // we first check if T.y has the same value, and then if T.x is contained between A.x and B.x
       return (
         T.y === A.y &&
-        (infinite || (T.x >= Math.min(A.x, B.x) && T.x <= Math.max(A.x, B.x)))
+        (type === 'line' ||
+          (type === 'ray' && (B.x > A.x ? T.x >= A.x : T.x <= A.x)) ||
+          (type === 'segment' &&
+            T.x >= Math.min(A.x, B.x) &&
+            T.x <= Math.max(A.x, B.x)))
       );
     } else {
       // Generic case: sloped line.
@@ -75,9 +85,9 @@ export class Intersection {
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
-      return infinite
+      return type === 'line'
         ? Math.abs(s.x) === Math.abs(s.y)
-        : s.x === s.y && s.x >= 0 && s.x <= 1;
+        : s.x === s.y && s.x >= 0 && (type === 'ray' || s.x <= 1);
     }
   }
 
@@ -89,21 +99,25 @@ export class Intersection {
    * @returns
    */
   static isPointInPolygon(point: Point, points: Point[]) {
-    const other = new Point(point).setX(
-      Math.min(point.x - 1, ...points.map((p) => p.x))
-    );
     let hits = 0;
+    const other = point.add(new Point(1, 0));
     for (let index = 0; index < points.length; index++) {
-      const inter = this.intersectSegmentSegment(
+      const inter = this.intersectLineLine(
         // polygon side
         points[index],
         points[(index + 1) % points.length],
         // ray
         point,
-        other
+        other,
+        'segment',
+        'ray'
       );
       if (inter.includes(point)) {
-        // point is on the polygon side
+        // point is on the polygon side so we return
+        // the ray casting algorithm is used to determine if a point is inside a polygon
+        // but not if it is on the one of the sides
+        // in this case the point will be considered as a hit, making the number of hits even
+        // the same as casting the ray from outside through this point
         return true;
       }
       hits += Number(inter.status === 'Intersection');
@@ -120,8 +134,8 @@ export class Intersection {
    * @param {Point} a2
    * @param {Point} b1
    * @param {Point} b2
-   * @param {boolean} [aInfinite=true] check segment intersection by passing `false`
-   * @param {boolean} [bInfinite=true] check segment intersection by passing `false`
+   * @param {LineType} [aType = 'line']
+   * @param {LineType} [bType = 'line']
    * @return {Intersection}
    */
   static intersectLineLine(
@@ -129,8 +143,8 @@ export class Intersection {
     a2: Point,
     b1: Point,
     b2: Point,
-    aInfinite = true,
-    bInfinite = true
+    aType: LineType = 'line',
+    bType: LineType = 'line'
   ): Intersection {
     const a2xa1x = a2.x - a1.x,
       a2ya1y = a2.y - a1.y,
@@ -145,8 +159,8 @@ export class Intersection {
       const ua = uaT / uB,
         ub = ubT / uB;
       if (
-        (aInfinite || (0 <= ua && ua <= 1)) &&
-        (bInfinite || (0 <= ub && ub <= 1))
+        (aType === 'line' || (0 <= ua && (aType === 'ray' || ua <= 1))) &&
+        (bType === 'line' || (0 <= ub && (bType === 'ray' || ub <= 1)))
       ) {
         return new Intersection('Intersection').append(
           new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y)
@@ -154,19 +168,17 @@ export class Intersection {
       } else {
         return new Intersection();
       }
+    } else if (uaT === 0 || ubT === 0) {
+      const segmentsCoincide =
+        aType === 'line' ||
+        bType === 'line' ||
+        Intersection.isPointContained(a1, b1, b2, bType) ||
+        Intersection.isPointContained(a2, b1, b2, bType) ||
+        Intersection.isPointContained(b1, a1, a2, aType) ||
+        Intersection.isPointContained(b2, a1, a2, aType);
+      return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
     } else {
-      if (uaT === 0 || ubT === 0) {
-        const segmentsCoincide =
-          aInfinite ||
-          bInfinite ||
-          Intersection.isPointContained(a1, b1, b2) ||
-          Intersection.isPointContained(a2, b1, b2) ||
-          Intersection.isPointContained(b1, a1, a2) ||
-          Intersection.isPointContained(b2, a1, a2);
-        return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
-      } else {
-        return new Intersection('Parallel');
-      }
+      return new Intersection('Parallel');
     }
   }
 
@@ -186,7 +198,7 @@ export class Intersection {
     l1: Point,
     l2: Point
   ): Intersection {
-    return Intersection.intersectLineLine(s1, s2, l1, l2, false, true);
+    return Intersection.intersectLineLine(s1, s2, l1, l2, 'segment', 'line');
   }
 
   /**
@@ -205,7 +217,7 @@ export class Intersection {
     b1: Point,
     b2: Point
   ): Intersection {
-    return Intersection.intersectLineLine(a1, a2, b1, b2, false, false);
+    return Intersection.intersectLineLine(a1, a2, b1, b2, 'segment', 'segment');
   }
 
   /**
@@ -218,14 +230,14 @@ export class Intersection {
    * @param {Point} a1 point on line
    * @param {Point} a2 other point on line
    * @param {Point[]} points polygon points
-   * @param {boolean} [infinite=true] check segment intersection by passing `false`
+   * @param {boolean} [type = 'line']
    * @return {Intersection}
    */
   static intersectLinePolygon(
     a1: Point,
     a2: Point,
     points: Point[],
-    infinite = true
+    type: LineType = 'line'
   ): Intersection {
     const result = new Intersection();
     const length = points.length;
@@ -233,7 +245,7 @@ export class Intersection {
     for (let i = 0, b1, b2, inter; i < length; i++) {
       b1 = points[i];
       b2 = points[(i + 1) % length];
-      inter = Intersection.intersectLineLine(a1, a2, b1, b2, infinite, false);
+      inter = Intersection.intersectLineLine(a1, a2, b1, b2, type, 'segment');
       if (inter.status === 'Coincident') {
         return inter;
       }
@@ -261,7 +273,7 @@ export class Intersection {
     a2: Point,
     points: Point[]
   ): Intersection {
-    return Intersection.intersectLinePolygon(a1, a2, points, false);
+    return Intersection.intersectLinePolygon(a1, a2, points, 'segment');
   }
 
   /**
