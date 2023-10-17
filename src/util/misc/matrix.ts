@@ -103,13 +103,16 @@ export const multiplyTransformMatrixArray = (
     iMatrix
   );
 
+export const calcPlaneRotation = ([a, b]: TMat2D) =>
+  Math.atan2(b, a) as TRadian;
+
 /**
  * Decomposes standard 2x3 matrix into transform components
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
  */
 export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
-  const angle = Math.atan2(a[1], a[0]),
+  const angle = calcPlaneRotation(a),
     denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
     scaleX = Math.sqrt(denom),
     scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
