@@ -72,8 +72,8 @@
     var text = createTextObject();
 
     assert.ok(text);
-    assert.ok(text instanceof fabric.Text);
-    assert.ok(text instanceof fabric.Object);
+    assert.ok(text instanceof fabric.FabricText);
+    assert.ok(text instanceof fabric.FabricObject);
 
     assert.equal(text.constructor.type, 'Text');
     assert.equal(text.get('text'), 'x');
@@ -194,7 +194,7 @@
     elText.textContent = 'x';
 
     fabric.Text.fromElement(elText, function(text) {
-      assert.ok(text instanceof fabric.Text);
+      assert.ok(text instanceof fabric.FabricText);
       var expectedObject = {
         ...REFERENCE_TEXT_OBJECT,
         left: 0,
@@ -236,7 +236,7 @@
       // temp workaround for text objects not obtaining width under node
       textWithAttrs.width = CHAR_WIDTH;
 
-      assert.ok(textWithAttrs instanceof fabric.Text);
+      assert.ok(textWithAttrs instanceof fabric.FabricText);
 
       var expectedObject = {
         ...REFERENCE_TEXT_OBJECT,

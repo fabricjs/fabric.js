@@ -28,7 +28,7 @@ export interface FabricObjectProps
    * @type Boolean
    * @default
    */
-  centeredScaling: false;
+  centeredScaling: boolean;
 
   /**
    * When true, this object will use center point as the origin of transformation
