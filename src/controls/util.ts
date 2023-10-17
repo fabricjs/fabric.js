@@ -81,7 +81,7 @@ export const commonEventInfo: TransformAction<
 export function findCornerQuadrant(
   fabricObject: FabricObject,
   control: Control
-) {
+): number {
   //  angle is relative to canvas plane
   const rotation = calcPlaneRotation(fabricObject.calcTransformMatrix()),
     cornerAngle = rotation + Math.atan2(control.y, control.x) + twoMathPi;
