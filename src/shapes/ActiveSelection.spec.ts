@@ -73,7 +73,7 @@ describe('ActiveSelection', () => {
   });
 
   it('sets coords after attaching to canvas', () => {
-    const canvas = new Canvas(null, {
+    const canvas = new Canvas(undefined, {
       activeSelection: new ActiveSelection([
         new FabricObject({
           left: 100,
@@ -86,6 +86,24 @@ describe('ActiveSelection', () => {
     });
     expect(canvas.getActiveSelection().lineCoords).toMatchSnapshot();
     expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
+  });
+
+  it('`setActiveObject` should update the active selection ref on canvas if it changed', () => {
+    const canvas = new Canvas();
+    const obj1 = new FabricObject();
+    const obj2 = new FabricObject();
+    canvas.add(obj1, obj2);
+    const activeSelection = new ActiveSelection([obj1, obj2]);
+    const spy = jest.spyOn(activeSelection, 'setCoords');
+    canvas.setActiveObject(activeSelection);
+    expect(canvas.getActiveSelection()).toBe(activeSelection);
+    expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
+    expect(spy).toHaveBeenCalled();
+    expect(activeSelection.canvas).toBe(canvas);
+
+    spy.mockClear();
+    canvas.setActiveObject(activeSelection);
+    expect(spy).not.toHaveBeenCalled();
   });
 
   test('adding and removing an object belonging to a group', () => {

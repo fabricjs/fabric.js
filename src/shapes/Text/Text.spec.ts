@@ -1,20 +1,20 @@
 import { roundSnapshotOptions } from '../../../jest.extend';
 import { cache } from '../../cache';
 import { config } from '../../config';
-import { Text } from './Text';
+import { FabricText } from './Text';
 
 afterEach(() => {
   config.restoreDefaults();
 });
 
-describe('Text', () => {
+describe('FabricText', () => {
   it('toObject', async () => {
-    expect(new Text('text')).toMatchObjectSnapshot();
+    expect(new FabricText('text').toObject()).toMatchObjectSnapshot();
   });
 
   it('fromObject', async () => {
-    expect((await Text.fromObject({ text: 'text' })).toObject()).toEqual(
-      new Text('text').toObject()
+    expect((await FabricText.fromObject({ text: 'text' })).toObject()).toEqual(
+      new FabricText('text').toObject()
     );
   });
 
@@ -22,7 +22,7 @@ describe('Text', () => {
     it('measuring', () => {
       cache.clearFontCache();
       const zwc = '\u200b';
-      const text = new Text('');
+      const text = new FabricText('');
       const style = text.getCompleteStyleDeclaration(0, 0);
       const measurement = text._measureChar('a', style, zwc, style);
       expect(measurement).toMatchSnapshot(roundSnapshotOptions);
@@ -30,13 +30,13 @@ describe('Text', () => {
     });
 
     it('splits into lines', () => {
-      const text = new Text('test foo bar-baz\nqux');
+      const text = new FabricText('test foo bar-baz\nqux');
       expect(text._splitTextIntoLines(text.text)).toMatchSnapshot();
     });
   });
 
   it('toSVG with NUM_FRACTION_DIGITS', async () => {
-    const text = await Text.fromObject({
+    const text = await FabricText.fromObject({
       text: 'xxxxxx',
       styles: [
         { fill: 'red' },
@@ -53,7 +53,7 @@ describe('Text', () => {
   });
 
   it('subscript/superscript', async () => {
-    const text = await Text.fromObject({
+    const text = await FabricText.fromObject({
       text: 'xxxxxx',
       styles: [
         { stroke: 'black', fill: 'blue' },

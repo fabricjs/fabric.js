@@ -14,6 +14,7 @@ import {
   vertexSource,
 } from './shaders/baseFilter';
 import type { Abortable } from '../typedefs';
+import { FabricError } from '../util/internals/console';
 
 export class BaseFilter {
   /**
@@ -92,12 +93,14 @@ export class BaseFilter {
     const program = gl.createProgram();
 
     if (!vertexShader || !fragmentShader || !program) {
-      throw new Error('Vertex, fragment shader or program creation error');
+      throw new FabricError(
+        'Vertex, fragment shader or program creation error'
+      );
     }
     gl.shaderSource(vertexShader, vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-      throw new Error(
+      throw new FabricError(
         `Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(
           vertexShader
         )}`
@@ -107,7 +110,7 @@ export class BaseFilter {
     gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-      throw new Error(
+      throw new FabricError(
         `Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(
           fragmentShader
         )}`
@@ -118,9 +121,8 @@ export class BaseFilter {
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      throw new Error(
-        // eslint-disable-next-line prefer-template
-        'Shader link error for "${this.type}" ' + gl.getProgramInfoLog(program)
+      throw new FabricError(
+        `Shader link error for "${this.type}" ${gl.getProgramInfoLog(program)}`
       );
     }
 

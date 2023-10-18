@@ -1,7 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import '../../../jest.extend';
+import type { TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
+import { Group } from '../../shapes/Group';
 import { IText } from '../../shapes/IText/IText';
+import { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
@@ -20,7 +23,7 @@ describe('Canvas event data', () => {
   };
 
   beforeEach(() => {
-    canvas = new Canvas(null);
+    canvas = new Canvas();
     spy = jest.spyOn(canvas, 'fire');
   });
 
@@ -99,4 +102,40 @@ describe('Canvas event data', () => {
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     }
   );
+});
+
+it('A selected subtarget should not fire an event twice', () => {
+  const target = new FabricObject();
+  const group = new Group([target], {
+    subTargetCheck: true,
+    interactive: true,
+  });
+  const canvas = new Canvas();
+  canvas.add(group);
+  const targetSpy = jest.fn();
+  target.on('mousedown', targetSpy);
+  jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+  canvas.__onMouseDown({
+    target: canvas.getSelectionElement(),
+    clientX: 0,
+    clientY: 0,
+  } as unknown as TPointerEvent);
+  expect(targetSpy).toHaveBeenCalledTimes(1);
+});
+
+it('should fire mouse over/out events on target', () => {
+  const target = new FabricObject({ width: 10, height: 10 });
+  const canvas = new Canvas();
+  canvas.add(target);
+
+  jest.spyOn(target, 'toJSON').mockReturnValue('target');
+
+  const targetSpy = jest.spyOn(target, 'fire');
+  const canvasSpy = jest.spyOn(canvas, 'fire');
+  const enter = new MouseEvent('mousemove', { clientX: 5, clientY: 5 });
+  const exit = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
+  canvas._onMouseMove(enter);
+  canvas._onMouseMove(exit);
+  expect(targetSpy.mock.calls).toMatchSnapshot();
+  expect(canvasSpy.mock.calls).toMatchSnapshot();
 });
