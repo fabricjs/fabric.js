@@ -4,6 +4,7 @@ import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
+  calcDimensionsMatrix,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
@@ -444,7 +445,11 @@ export class InteractiveFabricObject<
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(this.width, this.height, options),
+      const bbox = sizeAfterTransform(
+          this.width,
+          this.height,
+          calcDimensionsMatrix(options)
+        ),
         stroke = (
           this.strokeUniform
             ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)

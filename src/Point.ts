@@ -356,7 +356,7 @@ export class Point implements XY {
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
    */
-  rotate(radians: TRadian, origin: XY = originZero): Point {
+  rotate(radians: TRadian, origin: XY = ZERO): Point {
     // TODO benchmark and verify the add and subtract how much cost
     // and then in case early return if no origin is passed
     const sinus = sin(radians),
@@ -385,4 +385,4 @@ export class Point implements XY {
   }
 }
 
-const originZero = new Point(0, 0);
+export const ZERO = new Point(0, 0);

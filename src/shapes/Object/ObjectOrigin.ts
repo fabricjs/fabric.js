@@ -1,7 +1,7 @@
 import { Point } from '../../Point';
 import type { Group } from '../Group';
 import type { TDegree, TOriginX, TOriginY } from '../../typedefs';
-import { transformPoint } from '../../util/misc/matrix';
+import { calcDimensionsMatrix, transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
@@ -77,7 +77,11 @@ export class ObjectOrigin<EventSpec>
         dimY * dimOptions.scaleY
       );
     } else {
-      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
+      finalDimensions = sizeAfterTransform(
+        dimX,
+        dimY,
+        calcDimensionsMatrix(dimOptions)
+      );
     }
 
     return finalDimensions.scalarAdd(postScalingStrokeValue);

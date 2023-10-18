@@ -2,13 +2,10 @@ import * as fabric from 'fabric';
 import './styles.css';
 
 const el = document.getElementById('canvas');
-const canvas = (window.canvas = new fabric.Canvas(el));
-
-//  edit from here
-canvas.setDimensions({
+const canvas = (window.canvas = new fabric.Canvas(el, {
   width: window.document.body.clientWidth,
   height: window.innerHeight,
-});
+}));
 
 const rectWithStroke = new fabric.Rect({
   width: 200,
@@ -53,4 +50,18 @@ const skewedRect2 = new fabric.Rect({
   left: 200,
 });
 
-canvas.add(rectWithStroke, rectWithStrokeUniform, skewedRect, skewedRect2);
+const group = new fabric.Group(
+  [rectWithStroke, rectWithStrokeUniform, skewedRect, skewedRect2],
+  {
+    subTargetCheck: true,
+    interactive: true,
+    objectCaching: false,
+    layoutManager: new fabric.LayoutManager(),
+  }
+);
+
+canvas.on('after:render', ({ ctx }) => {
+  group._renderControls(ctx, { hasControls: false });
+});
+
+canvas.add(group);
