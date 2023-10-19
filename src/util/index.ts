@@ -74,6 +74,7 @@ export { makeBoundingBoxFromPoints } from './misc/boundingBoxFromPoints';
 export {
   calcPlaneChangeMatrix,
   sendPointToPlane,
+  sendVectorToPlane,
   transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './misc/planeChange';
