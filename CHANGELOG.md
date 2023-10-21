@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(parser): fix svg's with use tags containing bad href's not loading [#9109](https://github.com/fabricjs/fabric.js/issues/9109)
 - fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
 - CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
 - chore(): export poly control utils [#9400](https://github.com/fabricjs/fabric.js/pull/9400)

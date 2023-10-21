@@ -804,6 +804,20 @@
     });
   });
 
+  QUnit.test('parseSVGFromString with <use> containing bad reference', function(assert) {
+    var done = assert.async();
+    var string =
+      '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+      '<rect width="10" height="10" />' +
+      '<use href="#missing" x="50" y="50" ></use>' +
+      '</svg>';
+
+    fabric.loadSVGFromString(string).then(({ objects }) => {
+      assert.equal(objects[0].constructor.type, 'Rect');
+      done();
+    });
+  });
+
   QUnit.test('parseSVGFromString with <use/> having base64 image href', function(assert) {
     var done = assert.async();
     var string =
