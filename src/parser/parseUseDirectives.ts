@@ -1,5 +1,4 @@
 import { svgNS } from './constants';
-import { elementById } from './elementById';
 import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
 
@@ -17,7 +16,12 @@ export function parseUseDirectives(doc: Document) {
     const xlink = xlinkAttribute.slice(1);
     const x = el.getAttribute('x') || 0;
     const y = el.getAttribute('y') || 0;
-    let el2 = elementById(doc, xlink)!.cloneNode(true) as Element;
+    const el2Orig = doc.getElementById(xlink);
+    if (el2Orig === null) {
+      // if we can't find the target of the xlink, consider this use tag bad, similar to no xlink
+      return;
+    }
+    let el2 = el2Orig.cloneNode(true) as Element;
     let currentTrans =
       (el2.getAttribute('transform') || '') +
       ' translate(' +
