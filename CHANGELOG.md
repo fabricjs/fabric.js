@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
+- patch(Canvas): better respect of mouseup before [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
 
 ## [6.0.0-beta13]
 
