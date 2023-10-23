@@ -729,24 +729,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         activeObject === this.searchPossibleTargets([activeObject], pointer)
       ) {
         // active object is not an active selection
-        if (!this.preserveObjectStacking) {
-          return activeObject;
-        } else {
-          const subTargets = this.targets;
-          this.targets = [];
-          const target = this.searchPossibleTargets(this._objects, pointer);
-          if (
-            e[this.altSelectionKey as ModifierKey] &&
-            target &&
-            target !== activeObject
-          ) {
-            // alt selection: select active object even though it is not the top most target
-            // restore targets
-            this.targets = subTargets;
-            return activeObject;
-          }
-          return target;
-        }
+        return activeObject;
       }
     }
 
