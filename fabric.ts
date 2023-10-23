@@ -43,7 +43,13 @@ export { PatternBrush } from './src/brushes/PatternBrush';
 
 export {
   FabricObject,
-  _Object as Object,
+  /**
+   * @deprecated The old fabric.Object class can't be imported as Object because of conflict with the JS api
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+   * For this reason it has been renamed to FabricObject.
+   * Please use `import { FabricObject }` in place of `import { Object as FabricObject }`
+   */
+  FabricObject as Object,
 } from './src/shapes/Object/FabricObject';
 
 export type {
