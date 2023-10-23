@@ -788,9 +788,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   __onMouseUp(e: TPointerEvent) {
     const transform = this._currentTransform;
     this._cacheTransformEventData(e);
-    const target = this._target;
     const isClick = this._isClick;
     this._handleEvent(e, 'up:before');
+    const target = this._target;
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
     if (checkClick(e, RIGHT_CLICK)) {
