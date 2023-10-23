@@ -98,6 +98,11 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 21.0.0
+        - 20.8.1
+        - 20.8.0
+        - 20.7.0
+        - 20.6.1
         - 20.6.0
         - 20.5.1
         - 20.5.0
@@ -119,6 +124,9 @@ body:
         - 19.1.0
         - 19.0.1
         - 19.0.0
+        - 18.18.2
+        - 18.18.1
+        - 18.18.0
         - 18.17.1
         - 18.17.0
         - 18.16.1
