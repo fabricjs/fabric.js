@@ -805,6 +805,7 @@
   });
 
   QUnit.test('parseSVGFromString with <use> containing bad reference', function(assert) {
+    // in this case, ignore bad use but still load rest of svg
     var done = assert.async();
     var string =
       '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
@@ -814,6 +815,21 @@
 
     fabric.loadSVGFromString(string).then(({ objects }) => {
       assert.equal(objects[0].constructor.type, 'Rect');
+      done();
+    });
+  });
+
+  QUnit.test('parseSVGFromString with <use> containing bad clippath', function(assert) {
+    // in this case, ignore clippath but still load ignoring clippath
+    var done = assert.async();
+    var string =
+      `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <path id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+      <use clip-path="url(#myClip)" href="#heart" fill="red" />
+      </svg>`;
+
+    fabric.loadSVGFromString(string).then(({ objects }) => {
+      assert.equal(objects[0].constructor.type, 'Path');
       done();
     });
   });
