@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(parser): fix svg's with use tags containing bad href's not loading [#9109](https://github.com/fabricjs/fabric.js/issues/9109)
+- fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
 
 ## [6.0.0-beta13]
 
