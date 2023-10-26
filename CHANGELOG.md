@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(#9409): ellipse rendering edge case [#9443](https://github.com/fabricjs/fabric.js/pull/9443)
 - fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
 
 ## [6.0.0-beta13]
