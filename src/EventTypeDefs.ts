@@ -130,12 +130,9 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   target?: FabricObject;
   subTargets?: FabricObject[];
   button?: number;
-  isClick: boolean;
   pointer: Point;
   transform?: Transform | null;
   absolutePointer: Point;
-  currentSubTargets?: FabricObject[];
-  currentTarget?: FabricObject | null;
 }
 
 interface SimpleEventHandler<T extends Event = TPointerEvent>
@@ -211,10 +208,13 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | WithBeforeSuffix<'up'>
     | 'dblclick'}`,
   TPointerEventInfo
 > &
+  Record<
+    `${Prefix}${WithBeforeSuffix<'up'>}`,
+    TPointerEventInfo & { isClick: boolean }
+  > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
   Record<`${Prefix}over`, TPointerEventInfo & InEvent> &
   Record<`${Prefix}out`, TPointerEventInfo & OutEvent>;

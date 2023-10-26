@@ -4,7 +4,6 @@ import type {
   DragEventData,
   ObjectEvents,
   TPointerEvent,
-  TPointerEventInfo,
   TPointerEventNames,
   Transform,
 } from '../EventTypeDefs';
@@ -104,10 +103,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    */
   private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
-
-  declare currentTarget?: FabricObject;
-
-  declare currentSubTargets?: FabricObject[];
 
   private _isClick: boolean;
 
@@ -272,7 +267,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (!this._currentTransform && !this.findTarget(e)) {
       this.fire('mouse:over', {
         e,
-        isClick: false,
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
       });
@@ -786,23 +780,25 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
-    const transform = this._currentTransform;
     this._cacheTransformEventData(e);
-    const isClick = this._isClick;
     this._handleEvent(e, 'up:before');
+
+    const transform = this._currentTransform;
+    const isClick = this._isClick;
     const target = this._target;
+
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
     if (checkClick(e, RIGHT_CLICK)) {
       if (this.fireRightClick) {
-        this._handleEvent(e, 'up', RIGHT_CLICK, isClick);
+        this._handleEvent(e, 'up', RIGHT_CLICK);
       }
       return;
     }
 
     if (checkClick(e, MIDDLE_CLICK)) {
       if (this.fireMiddleClick) {
-        this._handleEvent(e, 'up', MIDDLE_CLICK, isClick);
+        this._handleEvent(e, 'up', MIDDLE_CLICK);
       }
       this._resetTransformEventData();
       return;
@@ -880,7 +876,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         );
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up', LEFT_CLICK, isClick);
+    this._handleEvent(e, 'up');
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
@@ -917,34 +913,29 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   /**
    * @private
    * Handle event firing for target and subtargets
-   * @param {Event} e event from mouse
-   * @param {String} eventType event to fire (up, down or move)
-   * @param {fabric.Object} targetObj receiving event
+   * @param {TPointerEvent} e event from mouse
+   * @param {TPointerEventNames} eventType
    * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
-   * @param {Boolean} isClick for left button only, indicates that the mouse up happened without move.
    */
-  _handleEvent(
+  _handleEvent<T extends TPointerEventNames>(
     e: TPointerEvent,
-    eventType: TPointerEventNames,
-    button = LEFT_CLICK,
-    isClick = false
+    eventType: T,
+    button = LEFT_CLICK
   ) {
     const target = this._target,
       targets = this.targets || [],
-      options: TPointerEventInfo = {
-        e: e,
-        target: target,
+      options: CanvasEvents[`mouse:${T}`] = {
+        e,
+        target,
         subTargets: targets,
         button,
-        isClick,
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
         transform: this._currentTransform,
-      };
-    if (eventType === 'up') {
-      options.currentTarget = this.findTarget(e);
-      options.currentSubTargets = this.targets;
-    }
+        ...(eventType === 'up:before' || eventType === 'up'
+          ? { isClick: this._isClick }
+          : {}),
+      } as CanvasEvents[`mouse:${T}`];
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);

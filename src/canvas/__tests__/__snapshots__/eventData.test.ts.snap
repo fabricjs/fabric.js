@@ -38,7 +38,6 @@ exports[`Canvas event data HTML event "dblclick" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -129,8 +128,6 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "y": -13,
       },
       "button": 1,
-      "currentSubTargets": [],
-      "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -375,7 +372,6 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -396,7 +392,6 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -446,7 +441,6 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -467,7 +461,6 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -518,7 +511,7 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
+      "isClick": true,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -536,8 +529,6 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "y": -13,
       },
       "button": 1,
-      "currentSubTargets": [],
-      "currentTarget": undefined,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -567,7 +558,6 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -612,7 +602,6 @@ exports[`should fire mouse over/out events on target 1`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
@@ -657,7 +646,6 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
@@ -697,7 +685,6 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
@@ -718,7 +705,6 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 20,
         "y": 20,
@@ -758,7 +744,6 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 20,
         "y": 20,
