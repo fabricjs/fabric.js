@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Canvas event data HTML event "contextmenu" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "contextmenu" should fire a corresponding canvas event 1`] = `
 [
   [
     "contextmenu:before",
@@ -25,7 +25,7 @@ exports[`Canvas event data HTML event "contextmenu" should fire a corresponding 
 ]
 `;
 
-exports[`Canvas event data HTML event "dblclick" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "dblclick" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:dblclick",
@@ -50,7 +50,7 @@ exports[`Canvas event data HTML event "dblclick" should fire a corresponding can
 ]
 `;
 
-exports[`Canvas event data HTML event "drag" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "drag" should fire a corresponding canvas event 1`] = `
 [
   [
     "dragstart",
@@ -75,7 +75,7 @@ exports[`Canvas event data HTML event "drag" should fire a corresponding canvas 
 ]
 `;
 
-exports[`Canvas event data HTML event "dragend" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "dragend" should fire a corresponding canvas event 1`] = `
 [
   [
     "dragstart",
@@ -161,7 +161,7 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
 ]
 `;
 
-exports[`Canvas event data HTML event "dragenter" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "dragenter" should fire a corresponding canvas event 1`] = `
 [
   [
     "dragstart",
@@ -207,7 +207,7 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
 ]
 `;
 
-exports[`Canvas event data HTML event "dragleave" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "dragleave" should fire a corresponding canvas event 1`] = `
 [
   [
     "dragstart",
@@ -232,7 +232,7 @@ exports[`Canvas event data HTML event "dragleave" should fire a corresponding ca
 ]
 `;
 
-exports[`Canvas event data HTML event "dragover" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "dragover" should fire a corresponding canvas event 1`] = `
 [
   [
     "dragstart",
@@ -282,7 +282,7 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
 ]
 `;
 
-exports[`Canvas event data HTML event "drop" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "drop" should fire a corresponding canvas event 1`] = `
 [
   [
     "dragstart",
@@ -359,7 +359,7 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
 ]
 `;
 
-exports[`Canvas event data HTML event "mousedown" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "mousedown" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:down:before",
@@ -404,7 +404,7 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseenter" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "mouseenter" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:over",
@@ -416,7 +416,6 @@ exports[`Canvas event data HTML event "mouseenter" should fire a corresponding c
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -426,9 +425,9 @@ exports[`Canvas event data HTML event "mouseenter" should fire a corresponding c
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseleave" should fire a corresponding canvas event with viewportTransform of %s 1`] = `[]`;
+exports[`Canvas event data HTML event "mouseleave" should fire a corresponding canvas event 1`] = `[]`;
 
-exports[`Canvas event data HTML event "mousemove" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "mousemove" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:move:before",
@@ -473,7 +472,7 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseout" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "mouseout" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:out",
@@ -496,9 +495,9 @@ exports[`Canvas event data HTML event "mouseout" should fire a corresponding can
 ]
 `;
 
-exports[`Canvas event data HTML event "mouseover" should fire a corresponding canvas event with viewportTransform of %s 1`] = `[]`;
+exports[`Canvas event data HTML event "mouseover" should fire a corresponding canvas event 1`] = `[]`;
 
-exports[`Canvas event data HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "mouseup" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:up:before",
@@ -545,7 +544,7 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
 ]
 `;
 
-exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas event with viewportTransform of %s 1`] = `
+exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas event 1`] = `
 [
   [
     "mouse:wheel",
