@@ -120,7 +120,7 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox
       - name: Run Playwright tests
         run: xvfb-run npm run test:e2e
       - name: Upload Test Output
