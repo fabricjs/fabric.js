@@ -6,7 +6,7 @@ on:
     paths-ignore: [CHANGELOG.md]
   pull_request_target:
     branches: [master]
-    types: [opened, edited]
+    paths-ignore: [CHANGELOG.md]
 
 jobs:
   build:
