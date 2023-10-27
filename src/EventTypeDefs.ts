@@ -129,7 +129,6 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   extends TEvent<E> {
   target?: FabricObject;
   subTargets?: FabricObject[];
-  button?: number;
   pointer: Point;
   transform?: Transform | null;
   absolutePointer: Point;

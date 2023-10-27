@@ -34,7 +34,6 @@ exports[`Canvas event data HTML event "dblclick" should fire a corresponding can
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -106,7 +105,6 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "currentSubTargets": [],
       "currentTarget": "Drag Target",
       "e": MouseEvent {
@@ -129,7 +127,6 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "currentSubTargets": [],
       "currentTarget": "Drag Target",
       "e": MouseEvent {
@@ -372,7 +369,6 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -392,7 +388,6 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -440,7 +435,6 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -460,7 +454,6 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -510,7 +503,6 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "currentSubTargets": [],
       "currentTarget": undefined,
       "e": MouseEvent {
@@ -533,7 +525,6 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "currentSubTargets": [],
       "currentTarget": undefined,
       "e": MouseEvent {
@@ -561,7 +552,6 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -605,7 +595,6 @@ exports[`should fire mouse over/out events on target 1`] = `
         "x": 5,
         "y": 5,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -649,7 +638,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 5,
         "y": 5,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -688,7 +676,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 5,
         "y": 5,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -708,7 +695,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 20,
         "y": 20,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -747,7 +733,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 20,
         "y": 20,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
