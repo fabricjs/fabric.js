@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): try pull_request_target event to give access to fork prs [#9455](https://github.com/fabricjs/fabric.js/pull/9455)
 - BREAKING refactor(Canvas): remove `button` property from mouse events
 - patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
 
