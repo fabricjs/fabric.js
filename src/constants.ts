@@ -15,10 +15,6 @@ export const ALIASING_LIMIT = 2;
 /* "magic number" for bezier approximations of arcs (http://itc.ktu.lt/itc354/Riskus354.pdf) */
 export const kRect = 1 - 0.5522847498;
 
-export const LEFT_CLICK = 0;
-export const MIDDLE_CLICK = 1;
-export const RIGHT_CLICK = 2;
-
 export const CENTER = 'center';
 export const LEFT = 'left';
 export const TOP = 'top';

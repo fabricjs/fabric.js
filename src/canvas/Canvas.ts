@@ -1,4 +1,4 @@
-import { MIDDLE_CLICK, NONE, RIGHT_CLICK } from '../constants';
+import { NONE } from '../constants';
 import type {
   CanvasEvents,
   DragEventData,
@@ -23,11 +23,6 @@ import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
-
-const FIRE_CLICK_EVENT_MAP = {
-  [MIDDLE_CLICK]: 'fireMiddleClick',
-  [RIGHT_CLICK]: 'fireRightClick',
-} as const;
 
 // just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
 // because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
@@ -790,8 +785,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
-    if ((e as MouseEvent).button) {
-      this[FIRE_CLICK_EVENT_MAP[(e as MouseEvent).button as 1 | 2]] &&
+    const { button } = e as MouseEvent;
+    if (button) {
+      ((this.fireMiddleClick && button === 1) ||
+        (this.fireRightClick && button === 2)) &&
         this._handleEvent(e, 'up');
       this._resetTransformEventData();
       return;
@@ -1046,10 +1043,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     let target: FabricObject | undefined = this._target;
 
     // if right/middle click just fire events
-    if ((e as MouseEvent).button) {
-      this[FIRE_CLICK_EVENT_MAP[(e as MouseEvent).button as 1 | 2]] &&
+    const { button } = e as MouseEvent;
+    if (button) {
+      ((this.fireMiddleClick && button === 1) ||
+        (this.fireRightClick && button === 2)) &&
         this._handleEvent(e, 'down');
-
       this._resetTransformEventData();
       return;
     }
