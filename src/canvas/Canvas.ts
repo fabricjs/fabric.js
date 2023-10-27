@@ -793,7 +793,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if ((e as MouseEvent).button) {
       this[FIRE_CLICK_EVENT_MAP[(e as MouseEvent).button as 1 | 2]] &&
         this._handleEvent(e, 'up');
-
       this._resetTransformEventData();
       return;
     }
