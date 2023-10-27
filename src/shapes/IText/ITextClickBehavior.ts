@@ -10,12 +10,10 @@ import { ITextKeyBehavior } from './ITextKeyBehavior';
 import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 
-// TODO: this code seems wrong.
-// e.button for a left click is `0` and so different than `1` is more
-// not a right click. PR 3888 introduced this code and was about left clicks.
-function notALeftClick(e: MouseEvent) {
-  return e.button && e.button !== 1;
-}
+/**
+ * `LEFT_CLICK === 0`
+ */
+const notALeftClick = (e: Event) => !!(e as MouseEvent).button;
 
 export abstract class ITextClickBehavior<
     Props extends TOptions<TextProps> = Partial<TextProps>,
@@ -134,7 +132,7 @@ export abstract class ITextClickBehavior<
     if (
       !this.canvas ||
       !this.editable ||
-      notALeftClick(e as MouseEvent) ||
+      notALeftClick(e) ||
       this.getActiveControl()
     ) {
       return;
@@ -166,7 +164,7 @@ export abstract class ITextClickBehavior<
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
   _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
+    if (!this.canvas || !this.editable || notALeftClick(e)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
@@ -195,7 +193,7 @@ export abstract class ITextClickBehavior<
       !this.editable ||
       (this.group && !this.group.interactive) ||
       (transform && transform.actionPerformed) ||
-      notALeftClick(e as MouseEvent) ||
+      notALeftClick(e) ||
       didDrag
     ) {
       return;
