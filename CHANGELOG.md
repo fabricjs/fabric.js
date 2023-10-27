@@ -2,10 +2,13 @@
 
 ## [next]
 
+## [6.0.0-beta14]
+
+- Fix(SVGParser) ignore missing xlink target issue on svg parsing (#9427) [#9109](https://github.com/fabricjs/fabric.js/issues/9109)
 - fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
 - patch(Canvas): better respect of mouseup before [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
 
-## [6.0.0-beta13]
+## [6.0.0-beta14]
 
 - fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
 - CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
