@@ -757,7 +757,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * Checks if the point is inside the object selection area including padding
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [pointer] point from viewport.
+   * @param {Object} [pointer] point in scene coordinates
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
@@ -772,7 +772,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       // we could use getTotalAngle, but is way easier to look at it
       // from how coords are oriented, since if something went wrong
       // at least we are consistent.
-      const angleRadians = Math.atan2(tr.y - tl.y, tr.x - tl.y),
+      const angleRadians = Math.atan2(tr.y - tl.y, tr.x - tl.x),
         cosP = cos(angleRadians) * padding,
         sinP = sin(angleRadians) * padding,
         cosPSinP = cosP + sinP,
