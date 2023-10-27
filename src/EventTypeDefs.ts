@@ -213,7 +213,11 @@ type TPointerEvents<Prefix extends string> = Record<
 > &
   Record<
     `${Prefix}${WithBeforeSuffix<'up'>}`,
-    TPointerEventInfo & { isClick: boolean }
+    TPointerEventInfo & {
+      isClick: boolean;
+      currentTarget?: FabricObject;
+      currentSubTargets: FabricObject[];
+    }
   > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
   Record<`${Prefix}over`, TPointerEventInfo & InEvent> &

@@ -933,7 +933,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         absolutePointer: this.getPointer(e),
         transform: this._currentTransform,
         ...(eventType === 'up:before' || eventType === 'up'
-          ? { isClick: this._isClick }
+          ? {
+              isClick: this._isClick,
+              currentTarget: this.findTarget(e),
+              currentSubTargets: this.targets,
+            }
           : {}),
       } as CanvasEvents[`mouse:${T}`];
     this.fire(`mouse:${eventType}`, options);
