@@ -294,7 +294,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  protected readonly _activeSelection: ActiveSelection;
+  protected _activeSelection: ActiveSelection;
 
   constructor(
     el?: string | HTMLCanvasElement,
@@ -1129,6 +1129,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     }
     this._activeObject = object;
 
+    if (object instanceof ActiveSelection && this._activeSelection !== object) {
+      this._activeSelection = object;
+      object.set('canvas', this);
+      object.setCoords();
+    }
+
     return true;
   }
 
@@ -1204,7 +1210,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   destroy() {
     // dispose of active selection
-    const activeSelection = this._activeSelection!;
+    const activeSelection = this._activeSelection;
     activeSelection.removeAll();
     // @ts-expect-error disposing
     this._activeSelection = undefined;

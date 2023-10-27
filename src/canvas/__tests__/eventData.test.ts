@@ -42,7 +42,7 @@ describe('Canvas event data', () => {
     'wheel',
     'contextmenu',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       canvas
@@ -53,7 +53,7 @@ describe('Canvas event data', () => {
   );
 
   // must call mousedown for mouseup to be listened to
-  test('HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s', () => {
+  test('HTML event "mouseup" should fire a corresponding canvas event', () => {
     canvas.setViewportTransform(genericVpt);
     canvas
       .getSelectionElement()
@@ -73,7 +73,7 @@ describe('Canvas event data', () => {
     'dragover',
     'drop',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       // select target and mock some essentials for events to fire
@@ -110,7 +110,7 @@ it('A selected subtarget should not fire an event twice', () => {
     subTargetCheck: true,
     interactive: true,
   });
-  const canvas = new Canvas(null);
+  const canvas = new Canvas();
   canvas.add(group);
   const targetSpy = jest.fn();
   target.on('mousedown', targetSpy);
@@ -121,4 +121,21 @@ it('A selected subtarget should not fire an event twice', () => {
     clientY: 0,
   } as unknown as TPointerEvent);
   expect(targetSpy).toHaveBeenCalledTimes(1);
+});
+
+it('should fire mouse over/out events on target', () => {
+  const target = new FabricObject({ width: 10, height: 10 });
+  const canvas = new Canvas();
+  canvas.add(target);
+
+  jest.spyOn(target, 'toJSON').mockReturnValue('target');
+
+  const targetSpy = jest.spyOn(target, 'fire');
+  const canvasSpy = jest.spyOn(canvas, 'fire');
+  const enter = new MouseEvent('mousemove', { clientX: 5, clientY: 5 });
+  const exit = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
+  canvas._onMouseMove(enter);
+  canvas._onMouseMove(exit);
+  expect(targetSpy.mock.calls).toMatchSnapshot();
+  expect(canvasSpy.mock.calls).toMatchSnapshot();
 });

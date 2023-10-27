@@ -86,7 +86,9 @@ export class ActiveSelection extends Group {
       //  save ref to group for later in order to return to it
       const parent = object.group;
       parent._exitGroup(object);
-      object.__owningGroup = parent;
+      // make sure we are setting the correct owning group
+      // in case `object` is transferred between active selections
+      !(parent instanceof ActiveSelection) && (object.__owningGroup = parent);
     }
     this._enterGroup(object, removeParentTransform);
     return true;

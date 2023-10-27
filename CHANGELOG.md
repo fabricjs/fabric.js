@@ -3,6 +3,21 @@
 ## [next]
 
 - BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)
+- BREAKING refactor(Canvas): remove `button` property from mouse events
+- patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
+
+## [6.0.0-beta15]
+
+- Fix(SVGParser) ignore missing xlink target issue on svg parsing (#9427) [#9109](https://github.com/fabricjs/fabric.js/issues/9109)
+- fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
+
+## [6.0.0-beta14]
+
+- fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
+- CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
+- chore(): export poly control utils [#9400](https://github.com/fabricjs/fabric.js/pull/9400)
+- fix(Canvas): in/out event names were swapped [#9396](https://github.com/fabricjs/fabric.js/pull/9396)
+- fix(Canvas): `setActiveObject` should update `canvas#_activeSelection` [#9336](https://github.com/fabricjs/fabric.js/pull/9336)
 - patch(Coords): calc oCoords only with canvas ref [#9380](https://github.com/fabricjs/fabric.js/pull/9380)
 - patch(Control): pass object to `calcCornerCoords` [#9376](https://github.com/fabricjs/fabric.js/pull/9376)
 - fix(Canvas): invalidate `_objectsToRender` on stack change [#9387](https://github.com/fabricjs/fabric.js/pull/9387)
@@ -23,8 +38,9 @@
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
+- fix(Utils): fix exported svg color [#9408](https://github.com/fabricjs/fabric.js/pull/9408)
 
-## [6.0.0-b13]
+## [6.0.0-beta13]
 
 - fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
