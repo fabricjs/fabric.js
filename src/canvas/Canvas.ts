@@ -1,4 +1,4 @@
-import { LEFT_CLICK, MIDDLE_CLICK, NONE, RIGHT_CLICK } from '../constants';
+import { NONE } from '../constants';
 import type {
   CanvasEvents,
   DragEventData,
@@ -23,10 +23,6 @@ import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
-
-function checkClick(e: TPointerEvent, value: number) {
-  return !!(e as MouseEvent).button && (e as MouseEvent).button === value - 1;
-}
 
 // just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
 // because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
@@ -789,17 +785,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
-    if (checkClick(e, RIGHT_CLICK)) {
-      if (this.fireRightClick) {
-        this._handleEvent(e, 'up', RIGHT_CLICK);
-      }
-      return;
-    }
-
-    if (checkClick(e, MIDDLE_CLICK)) {
-      if (this.fireMiddleClick) {
-        this._handleEvent(e, 'up', MIDDLE_CLICK);
-      }
+    const { button } = e as MouseEvent;
+    if (button) {
+      ((this.fireMiddleClick && button === 1) ||
+        (this.fireRightClick && button === 2)) &&
+        this._handleEvent(e, 'up');
       this._resetTransformEventData();
       return;
     }
@@ -915,20 +905,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * Handle event firing for target and subtargets
    * @param {TPointerEvent} e event from mouse
    * @param {TPointerEventNames} eventType
-   * @param {Number} [button] button used in the event 1 = left, 2 = middle, 3 = right
    */
-  _handleEvent<T extends TPointerEventNames>(
-    e: TPointerEvent,
-    eventType: T,
-    button = LEFT_CLICK
-  ) {
+  _handleEvent<T extends TPointerEventNames>(e: TPointerEvent, eventType: T) {
     const target = this._target,
       targets = this.targets || [],
       options: CanvasEvents[`mouse:${T}`] = {
         e,
         target,
         subTargets: targets,
-        button,
         pointer: this.getPointer(e, true),
         absolutePointer: this.getPointer(e),
         transform: this._currentTransform,
@@ -1055,19 +1039,16 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._isClick = true;
     this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
-    let target: FabricObject | undefined = this._target;
-    // if right click just fire events
-    if (checkClick(e, RIGHT_CLICK)) {
-      if (this.fireRightClick) {
-        this._handleEvent(e, 'down', RIGHT_CLICK);
-      }
-      return;
-    }
 
-    if (checkClick(e, MIDDLE_CLICK)) {
-      if (this.fireMiddleClick) {
-        this._handleEvent(e, 'down', MIDDLE_CLICK);
-      }
+    let target: FabricObject | undefined = this._target;
+
+    // if right/middle click just fire events
+    const { button } = e as MouseEvent;
+    if (button) {
+      ((this.fireMiddleClick && button === 1) ||
+        (this.fireRightClick && button === 2)) &&
+        this._handleEvent(e, 'down');
+      this._resetTransformEventData();
       return;
     }
 

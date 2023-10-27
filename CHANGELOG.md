@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING refactor(Canvas): remove `button` property from mouse events
 - patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
 
 ## [6.0.0-beta15]
