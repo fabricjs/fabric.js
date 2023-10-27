@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [master]
     types: [opened, edited]
+  pull_request_target:
+    branches: [master]
+    types: [opened, edited]
 
 jobs:
   changelog:
