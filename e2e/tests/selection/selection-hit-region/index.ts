@@ -13,7 +13,10 @@ beforeAll((canvas) => {
     width: 200,
     height: 200,
     padding: 30,
+    left: 40,
+    top: 50,
     fill: 'green',
+    opacity: 0.5,
   });
   const rect2 = new Rect({
     width: 200,
@@ -21,8 +24,9 @@ beforeAll((canvas) => {
     top: 60,
     left: 250,
     height: 200,
-    padding: 5,
-    fill: 'yellow',
+    padding: 6,
+    fill: 'blue',
+    opacity: 0.5,
   });
   const rect3 = new Rect({
     width: 200,
@@ -32,6 +36,7 @@ beforeAll((canvas) => {
     height: 200,
     padding: 0,
     fill: 'purple',
+    opacity: 0.5,
   });
 
   const group = new Group([rect, rect2, rect3], {
