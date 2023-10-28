@@ -14,30 +14,38 @@ import {
  * but also belong to the active selection.
  */
 export const getObjectBounds = (
-  group: Group,
+  destinationGroup: Group,
   object: FabricObject
 ): Point[] => {
+  const {
+    strokeUniform,
+    strokeWidth,
+    width,
+    height,
+    group: currentGroup,
+  } = object;
+  let objectCenter = object.getRelativeCenterPoint();
   const t =
-    object.group && object.group !== group
+    currentGroup && currentGroup !== destinationGroup
       ? calcPlaneChangeMatrix(
-          object.group.calcTransformMatrix(),
-          group.calcTransformMatrix()
+          currentGroup.calcTransformMatrix(),
+          destinationGroup.calcTransformMatrix()
         )
       : null;
-  const objectCenter = t
-    ? object.getRelativeCenterPoint().transform(t)
-    : object.getRelativeCenterPoint();
-  const strokeUniformVector = object.strokeUniform
+  if (t) {
+    objectCenter = objectCenter.transform(t);
+  }
+  const strokeUniformVector = strokeUniform
     ? sendVectorToPlane(
-        new Point(object.strokeWidth, object.strokeWidth),
+        new Point(strokeWidth, strokeWidth),
         undefined,
-        group.calcTransformMatrix()
+        destinationGroup.calcTransformMatrix()
       )
     : ZERO;
-  const scalingStrokeWidth = !object.strokeUniform ? object.strokeWidth : 0;
+  const scalingStrokeWidth = strokeUniform ? 0 : strokeWidth;
   const sizeVector = sizeAfterTransform(
-    object.width + scalingStrokeWidth,
-    object.height + scalingStrokeWidth,
+    width + scalingStrokeWidth,
+    height + scalingStrokeWidth,
     multiplyTransformMatrixArray([t, object.calcOwnMatrix()], true)
   )
     .add(strokeUniformVector)
