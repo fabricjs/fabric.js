@@ -1,6 +1,7 @@
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 import { Canvas } from './Canvas';
+import { Group } from '../shapes/Group';
 
 describe('Selectable Canvas', () => {
   describe('_pointIsInObjectSelectionArea', () => {
@@ -13,8 +14,6 @@ describe('Selectable Canvas', () => {
         angle: 0,
         padding: 0,
       });
-
-      object.set({ originX: 'left', originY: 'top' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -46,9 +45,9 @@ describe('Selectable Canvas', () => {
         height: 50,
         angle: 90,
         padding: 0,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -79,9 +78,9 @@ describe('Selectable Canvas', () => {
         padding: 0,
         scaleX: 2,
         scaleY: 2,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -113,9 +112,9 @@ describe('Selectable Canvas', () => {
         scaleX: 2,
         scaleY: 2,
         strokeWidth: 2,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -148,9 +147,9 @@ describe('Selectable Canvas', () => {
         scaleY: 2,
         strokeWidth: 2,
         strokeUniform: true,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -183,9 +182,9 @@ describe('Selectable Canvas', () => {
         scaleY: 2,
         strokeWidth: 2,
         strokeUniform: true,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -217,9 +216,9 @@ describe('Selectable Canvas', () => {
         scaleX: 2,
         scaleY: 2,
         strokeWidth: 2,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -248,9 +247,9 @@ describe('Selectable Canvas', () => {
         height: 50,
         padding: 5,
         strokeWidth: 2,
+        originX: 'center',
+        originY: 'center',
       });
-
-      object.set({ originX: 'center', originY: 'center' }).setCoords();
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       canvas.add(object);
@@ -269,6 +268,45 @@ describe('Selectable Canvas', () => {
       expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-7, -7);
+      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+    });
+    it('points and selection area, group transformation and padding', () => {
+      const object = new FabricObject({
+        left: 5,
+        top: 5,
+        width: 10,
+        height: 10,
+        padding: 5,
+        strokeWidth: 0,
+      });
+
+      const object2 = new FabricObject({
+        left: 35,
+        top: 35,
+        width: 10,
+        height: 10,
+        padding: 5,
+        strokeWidth: 0,
+      });
+
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      const group = new Group([object, object2], { scaleX: 2, scaleY: 2 });
+      canvas.add(group);
+
+      // point1 is contained in object top left
+      const point1 = new Point(5, 5);
+      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      // point2 is contained in object bottom right padding area
+      const point2 = new Point(35, 35);
+      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      // point3 is outside of object (bottom) because object is rotate
+      const point3 = new Point(20, 36);
+      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      // point4 is outside of object (right)
+      const point4 = new Point(36, 20);
+      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      // point5 is outside of object (top left)
+      const point5 = new Point(4, 4);
       expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
     });
   });
