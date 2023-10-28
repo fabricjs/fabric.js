@@ -6,101 +6,42 @@ const canvas = (window.canvas = new fabric.Canvas(el));
 
 //  edit from here
 canvas.setDimensions({
-  width: 900,
+  width: 500,
   height: 500,
 });
-
-var obj,
-  style = {
-    transparentCorners: false,
-    cornerStyle: 'rect',
-    cornerSize: 6,
-    cornerColor: 'blue',
-    cornerStrokeColor: 'white',
-  },
-  id = -1;
-
-var line = new fabric.Line([200, 340, 800, 340], {
-  fill: 'red',
-  stroke: 'red',
-  strokeWidth: 5,
-});
-canvas.add(line);
-
-var pts = [
-  {
-    x: 300,
-    y: 200,
-  },
-  {
-    x: 440,
-    y: 340,
-  },
-  {
-    x: 520,
-    y: 220,
-  },
-  {
-    x: 580,
-    y: 280,
-  },
-];
-
-var polyObj = new fabric.Polyline(pts, {
-  id: id++,
-  fill: 'transparent',
-  stroke: 'black',
-  strokeWidth: 5,
+const textValue = 'fabric.js sandbox';
+const text = new fabric.Textbox(textValue, {
   originX: 'center',
-  originY: 'center',
-  strokeUniform: true,
-  objectCaching: false,
-  //exactBoundingBox:true
+  splitByGrapheme: true,
+  width: 200,
+  top: 20,
+  styles: fabric.util.stylesFromArray(
+    [
+      {
+        style: {
+          fontWeight: 'bold',
+          fontSize: 64,
+        },
+        start: 0,
+        end: 9,
+      },
+    ],
+    textValue
+  ),
 });
-
-var polyObj2 = new fabric.Polyline(
-  pts.map((p) => ({ ...p })),
-  {
-    id: id++,
-    fill: 'transparent',
-    stroke: 'green',
-    strokeWidth: 5,
-    originX: 'center',
-    originY: 'center',
-    strokeUniform: false,
-    objectCaching: false,
-    //exactBoundingBox:true
-  }
-);
-
-const renderControl = (style) => {
-  return (ctx, left, top, styleOverride, fabricObject) => {
-    styleOverride = style || {};
-    fabric.Control.prototype.render.call(
-      this,
-      ctx,
-      left,
-      top,
-      styleOverride,
-      fabricObject
-    );
-  };
-};
-
-var controls = fabric.controlsUtils.createPolyControls(polyObj);
-var controls2 = fabric.controlsUtils.createPolyControls(polyObj2);
-for (const [key, value] of Object.entries(controls)) {
-  value.render = renderControl(style);
-  polyObj.controls[key] = value;
-  controls2[key].render = renderControl(style);
-  polyObj2.controls[key] = controls2[key];
+canvas.add(text);
+canvas.centerObjectH(text);
+function animate(toState) {
+  text.animate(
+    { scaleX: Math.max(toState, 0.1) * 2 },
+    {
+      onChange: () => canvas.renderAll(),
+      onComplete: () => animate(!toState),
+      duration: 1000,
+      easing: toState
+        ? fabric.util.ease.easeInOutQuad
+        : fabric.util.ease.easeInOutSine,
+    }
+  );
 }
-canvas.add(polyObj, polyObj2);
-
-canvas.on('selection:created', function () {
-  obj = canvas.getActiveObject();
-  console.log(`${obj.left}, ${obj.top}, ${obj.width}, ${obj.height}`);
-});
-canvas.on('selection:cleared', function () {
-  obj = '';
-});
+// animate(1);
