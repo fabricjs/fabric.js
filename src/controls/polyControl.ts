@@ -80,7 +80,11 @@ export const factoryPolyActionHandler = (
     y: number
   ) {
     const poly = transform.target as Polyline,
-      anchorPoint = new Point(
+      strokeWidth = poly.strokeWidth;
+    // do all calculation without strokeWidth
+    // to avoid scaling issues between dimensions and scaling factors.
+    poly.strokeWidth = 0;
+    const anchorPoint = new Point(
         poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]
       ),
       anchorPointInParentPlane = anchorPoint
@@ -99,7 +103,7 @@ export const factoryPolyActionHandler = (
       newPositionNormalized.x + 0.5,
       newPositionNormalized.y + 0.5
     );
-
+    poly.strokeWidth = strokeWidth;
     return actionPerformed;
   };
 };
