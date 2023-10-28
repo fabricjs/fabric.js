@@ -24,7 +24,6 @@ export const getObjectBounds = (
     height,
     group: currentGroup,
   } = object;
-  let objectCenter = object.getRelativeCenterPoint();
   const t =
     currentGroup && currentGroup !== destinationGroup
       ? calcPlaneChangeMatrix(
@@ -32,9 +31,9 @@ export const getObjectBounds = (
           destinationGroup.calcTransformMatrix()
         )
       : null;
-  if (t) {
-    objectCenter = objectCenter.transform(t);
-  }
+  const objectCenter = t
+    ? object.getRelativeCenterPoint().transform(t)
+    : object.getRelativeCenterPoint();
   const strokeUniformVector = strokeUniform
     ? sendVectorToPlane(
         new Point(strokeWidth, strokeWidth),
