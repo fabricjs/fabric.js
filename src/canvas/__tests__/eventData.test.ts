@@ -42,7 +42,7 @@ describe('Canvas event data', () => {
     'wheel',
     'contextmenu',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       canvas
@@ -53,7 +53,7 @@ describe('Canvas event data', () => {
   );
 
   // must call mousedown for mouseup to be listened to
-  test('HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s', () => {
+  test('HTML event "mouseup" should fire a corresponding canvas event', () => {
     canvas.setViewportTransform(genericVpt);
     canvas
       .getSelectionElement()
@@ -73,7 +73,7 @@ describe('Canvas event data', () => {
     'dragover',
     'drop',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       // select target and mock some essentials for events to fire

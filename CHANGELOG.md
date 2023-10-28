@@ -2,7 +2,17 @@
 
 ## [next]
 
-- patch(matrix): expose `calcPlaneRotation` [#9419](https://github.com/fabricjs/fabric.js/pull/9419)
+- feat(util): expose `calcPlaneRotation` [#9419](https://github.com/fabricjs/fabric.js/pull/9419)
+- refactor(Canvas): BREAKING remove button from mouse events, delegate to event.button property [#9449](https://github.com/fabricjs/fabric.js/pull/9449)
+- patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
+
+## [6.0.0-beta15]
+
+- Fix(SVGParser) ignore missing xlink target issue on svg parsing (#9427) [#9109](https://github.com/fabricjs/fabric.js/issues/9109)
+- fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
+
+## [6.0.0-beta14]
+
 - fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
 - CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
 - chore(): export poly control utils [#9400](https://github.com/fabricjs/fabric.js/pull/9400)
