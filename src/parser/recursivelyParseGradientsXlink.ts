@@ -1,5 +1,3 @@
-import { elementById } from './elementById';
-
 const gradientsAttrs = [
   'gradientTransform',
   'x1',
@@ -20,7 +18,7 @@ export function recursivelyParseGradientsXlink(
   gradient: Element
 ) {
   const xLink = gradient.getAttribute(xlinkAttr)?.slice(1) || '',
-    referencedGradient = elementById(doc, xLink);
+    referencedGradient = doc.getElementById(xLink);
   if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
     recursivelyParseGradientsXlink(doc, referencedGradient as Element);
   }

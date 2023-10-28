@@ -4,6 +4,16 @@
 
 - refactor(): Layout Manager [#9152](https://github.com/fabricjs/fabric.js/pull/9152)
   **BREAKING**: beta - group layout
+- BREAKING refactor(Canvas): remove `button` property from mouse events
+- patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
+
+## [6.0.0-beta15]
+
+- Fix(SVGParser) ignore missing xlink target issue on svg parsing (#9427) [#9109](https://github.com/fabricjs/fabric.js/issues/9109)
+- fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
+
+## [6.0.0-beta14]
+
 - fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
 - CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
 - chore(): export poly control utils [#9400](https://github.com/fabricjs/fabric.js/pull/9400)
@@ -29,6 +39,7 @@
 - fix(StaticCanvas): disposing animations [#9361](https://github.com/fabricjs/fabric.js/pull/9361)
 - fix(IText): cursor width under group [#9341](https://github.com/fabricjs/fabric.js/pull/9341)
 - TS(Canvas): constructor optional el [#9348](https://github.com/fabricjs/fabric.js/pull/9348)
+- fix(Utils): fix exported svg color [#9408](https://github.com/fabricjs/fabric.js/pull/9408)
 
 ## [6.0.0-beta13]
 
