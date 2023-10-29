@@ -39,7 +39,7 @@ test('polygon controls can modify polygon - exact false', async ({ page }) => {
   });
 });
 
-test.only('polygon controls can modify polygon - transform and strokeUniform', async ({
+test('polygon controls can modify polygon - transform and strokeUniform', async ({
   page,
 }) => {
   const canvasUtil = new CanvasUtil(page);
