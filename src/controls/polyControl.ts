@@ -82,7 +82,8 @@ export const factoryPolyActionHandler = (
     const poly = transform.target as Polyline,
       strokeWidth = poly.strokeWidth;
     // do all calculation without strokeWidth
-    // to avoid scaling issues between dimensions and scaling factors.
+    // to avoid scaling issues between dimensions and scaling factors
+    // when strokeUniform is set as true
     poly.strokeWidth = 0;
     const anchorPoint = new Point(
         poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]
