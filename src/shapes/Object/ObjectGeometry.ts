@@ -16,9 +16,14 @@ import {
   composeMatrix,
   invertTransform,
   multiplyTransformMatrices,
-  qrDecompose,
   transformPoint,
+  calcPlaneRotation,
 } from '../../util/misc/matrix';
+import {
+  degreesToRadians,
+  radiansToDegrees,
+} from '../../util/misc/radiansDegreesConversion';
+import { sin } from '../../util/misc/sin';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
@@ -464,7 +469,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    */
   getTotalAngle(): TDegree {
     return this.group
-      ? qrDecompose(this.calcTransformMatrix()).angle
+      ? radiansToDegrees(calcPlaneRotation(this.calcTransformMatrix()))
       : this.angle;
   }
 
