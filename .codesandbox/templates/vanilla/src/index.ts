@@ -1,48 +1,47 @@
 import * as fabric from 'fabric';
 import './styles.css';
 
-var canvas;
-
-canvas = new fabric.Canvas('canvas');
-
-var pts = [
-  {
-    x: 300,
-    y: 200,
-  },
-  {
-    x: 440,
-    y: 340,
-  },
-  {
-    x: 520,
-    y: 220,
-  },
-  {
-    x: 580,
-    y: 280,
-  },
-];
-
-var polyObj = new fabric.Polyline(pts, {
-  fill: 'transparent',
-  stroke: 'black',
-  strokeWidth: 10,
-  originX: 'center',
-  originY: 'center',
-  scaleX: 1.4,
-  scaleY: 1.1,
-  strokeUniform: false, // doesn't change
-  objectCaching: false,
-});
+const el = document.getElementById('canvas');
+const canvas = (window.canvas = new fabric.Canvas(el));
 
 //  edit from here
 canvas.setDimensions({
-  width: 900,
+  width: 500,
   height: 500,
 });
-
-canvas.add(polyObj);
-
-polyObj.skewX = 10;
-canvas.renderAll();
+const textValue = 'fabric.js sandbox';
+const text = new fabric.Textbox(textValue, {
+  originX: 'center',
+  splitByGrapheme: true,
+  width: 200,
+  top: 20,
+  styles: fabric.util.stylesFromArray(
+    [
+      {
+        style: {
+          fontWeight: 'bold',
+          fontSize: 64,
+        },
+        start: 0,
+        end: 9,
+      },
+    ],
+    textValue
+  ),
+});
+canvas.add(text);
+canvas.centerObjectH(text);
+function animate(toState) {
+  text.animate(
+    { scaleX: Math.max(toState, 0.1) * 2 },
+    {
+      onChange: () => canvas.renderAll(),
+      onComplete: () => animate(!toState),
+      duration: 1000,
+      easing: toState
+        ? fabric.util.ease.easeInOutQuad
+        : fabric.util.ease.easeInOutSine,
+    }
+  );
+}
+// animate(1);
