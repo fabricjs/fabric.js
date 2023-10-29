@@ -39,6 +39,53 @@ test('polygon controls can modify polygon - exact false', async ({ page }) => {
   });
 });
 
+test.only('polygon controls can modify polygon - transform and strokeUniform', async ({
+  page,
+}) => {
+  const canvasUtil = new CanvasUtil(page);
+  const starUtil = new ObjectUtil(page, 'star');
+
+  // notes with skewX is broken
+  await starUtil.executeInBrowser((object) => {
+    object.strokeUniform = true;
+    object.scaleX = 1.2;
+    object.scaleY = 0.9;
+    object.flipY = true;
+    object.setDimensions();
+    object.setCoords();
+    object.canvas.renderAll();
+  });
+
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
+    name: 'initial_with_transform.png',
+  });
+
+  const p2ControlPoint = await starUtil.getObjectControlPoint('p2');
+
+  // drag the p2 control
+  await page.mouse.move(p2ControlPoint.x, p2ControlPoint.y);
+  await page.mouse.down();
+  await page.mouse.move(p2ControlPoint.x + 300, p2ControlPoint.y + 100, {
+    steps: 40,
+  });
+  await page.mouse.up();
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
+    name: 'moved_controls_p2_with_transform.png',
+  });
+
+  // drag control p4 in the opposite direction
+  const p4ControlPoint = await starUtil.getObjectControlPoint('p4');
+  await page.mouse.move(p4ControlPoint.x, p4ControlPoint.y);
+  await page.mouse.down();
+  await page.mouse.move(p4ControlPoint.x - 300, p4ControlPoint.y - 100, {
+    steps: 40,
+  });
+  await page.mouse.up();
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
+    name: 'moved_controls_p4_with_trasnform.png',
+  });
+});
+
 test('polygon controls can modify polygon - exact true', async ({ page }) => {
   const canvasUtil = new CanvasUtil(page);
   const starUtil = new ObjectUtil(page, 'star');
