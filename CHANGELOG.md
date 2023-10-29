@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Polyline, Polygon): Fix wrong pathOffset for polyline with the normal bounding box calculation. [#9460](https://github.com/fabricjs/fabric.js/pull/9460)
 - feat(util): expose `calcPlaneRotation` [#9419](https://github.com/fabricjs/fabric.js/pull/9419)
 - refactor(Canvas): BREAKING remove button from mouse events, delegate to event.button property [#9449](https://github.com/fabricjs/fabric.js/pull/9449)
 - patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
