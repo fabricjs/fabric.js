@@ -8,7 +8,7 @@ setup();
 
 test.describe.configure({ mode: 'serial' });
 
-for (const splitByGrapheme of [true, false]) {
+for (const splitByGrapheme of [false, true]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
     context,
@@ -57,6 +57,8 @@ for (const splitByGrapheme of [true, false]) {
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: `2-before-deleting-${splitByGrapheme}.png`,
     });
+    // continuos line deletion are a part of the test,
+    // an old bug was shifting style and then deleting it all at once
     await canvasUtil.press('Backspace');
     await canvasUtil.press('Backspace');
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
@@ -66,11 +68,10 @@ for (const splitByGrapheme of [true, false]) {
     await canvasUtil.press('b');
     await canvasUtil.press('c');
     await canvasUtil.press('Enter');
-    await canvasUtil.press('Enter');
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `4-before-pasting-splitByGrapheme-${splitByGrapheme}.png`,
+      name: `4-after-typing-${splitByGrapheme}.png`,
     });
-    const pastePoint = await textBoxutil.getCanvasCursorPositionAt(36);
+    const pastePoint = await textBoxutil.getCanvasCursorPositionAt(35);
     await canvasUtil.click({
       position: pastePoint,
       delay: 200,
@@ -78,6 +79,28 @@ for (const splitByGrapheme of [true, false]) {
     await canvasUtil.ctrlV();
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: `5-after-pasting-splitByGrapheme-${splitByGrapheme}.png`,
+      maxDiffPixelRatio: 0.03,
+    });
+    // go back where we have 2 empty lines, after abc.
+    const clickPointEnd = await textBoxutil.getCanvasCursorPositionAt(20);
+    await canvasUtil.click({
+      position: clickPointEnd,
+      delay: 200,
+    });
+    await page.mouse.down();
+    await page.mouse.move(1, clickPointEnd.y + 150, { steps: 15 });
+    await page.mouse.up();
+    // we remove them because space is finishing
+    await canvasUtil.press('Backspace');
+    // lets click where style end to show that we can add new line without carrying over
+    const clickPointYellow = await textBoxutil.getCanvasCursorPositionAt(45);
+    await canvasUtil.click({
+      position: clickPointYellow,
+      delay: 200,
+    });
+    await canvasUtil.press('Enter');
+    await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      name: `6-after-adding-a-newline-splitByGrapheme-${splitByGrapheme}.png`,
       maxDiffPixelRatio: 0.03,
     });
   });

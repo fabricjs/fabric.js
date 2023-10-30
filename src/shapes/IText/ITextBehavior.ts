@@ -807,6 +807,7 @@ export abstract class ITextBehavior<
     const newLineStyles: { [index: number]: TextStyleDeclaration } = {};
     const originalLineLength = this._unwrappedTextLines[lineIndex].length;
     const isEndOfLine = originalLineLength === charIndex;
+
     let someStyleIsCarringOver = false;
     qty || (qty = 1);
     this.shiftLineStyles(lineIndex, qty);
