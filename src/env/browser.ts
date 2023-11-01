@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import { config } from '../config';
 import { WebGLProbe } from '../filters/GLProbes/WebGLProbe';
 import type { TCopyPasteData, TFabricEnv } from './types';
 
@@ -9,10 +8,8 @@ let initialized = false;
 let isTouchSupported: boolean;
 
 export const getEnv = (): TFabricEnv => {
-  if (!initialized) {
-    config.configure({
-      devicePixelRatio: window.devicePixelRatio || 1,
-    });
+
+  if (!initialized && typeof window !== 'undefined') {
     isTouchSupported =
       'ontouchstart' in window ||
       'ontouchstart' in document ||
