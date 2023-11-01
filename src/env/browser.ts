@@ -8,7 +8,6 @@ let initialized = false;
 let isTouchSupported: boolean;
 
 export const getEnv = (): TFabricEnv => {
-
   if (!initialized && typeof window !== 'undefined') {
     isTouchSupported =
       'ontouchstart' in window ||
