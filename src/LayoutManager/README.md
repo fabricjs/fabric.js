@@ -53,3 +53,29 @@ onAfterLayout will
 - fire an user event
 - reset the group transform if the group is empty ( why? )
 - bubble the performLayout to parent groups
+
+### notes
+
+- i can select an object in the group
+- i can select an object in the group and i can transform ( rotate, scale, resize, move, flip?, editText )
+- i can multiselect one more more objects inside the group
+- if i select object A, B i can't select any parent of A, B and this is blocked by the code so that the selection won't actually happen
+
+between 2 groups - multiselection
+
+- i can select object A and object B from 2 different groups
+- i can select object A and object B from 2 different groups and i can transform them as the single group case
+
+- a group with a single object and is interactivity needs to be defined.
+
+#### ADD REMOVE
+
+when i add an object to an existing group the object is added in the group so that the other objects do not move apparently, and the bounding box of the existing group is extended to cover the new object but it doesn't change its rotation.
+
+When we say group.remove(A) A is removed from the group and the transform state of A absorb the transform state of the group so that if added back to the scene its visual state doesn't change.
+
+A node can't be on two differnt trees.
+
+### Events
+
+Resolve the namespace off issue
