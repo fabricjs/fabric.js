@@ -5,6 +5,9 @@
 - refactor(): Layout Manager [#9152](https://github.com/fabricjs/fabric.js/pull/9152)
   **BREAKING**: beta - group layout
 - BREAKING refactor(Canvas): remove `button` property from mouse events
+- fix(Object): Fix detection of falsy shadows in Object.needsItsOwnCache method [#9469](https://github.com/fabricjs/fabric.js/pull/9469)
+- feat(util): expose `calcPlaneRotation` [#9419](https://github.com/fabricjs/fabric.js/pull/9419)
+- refactor(Canvas): BREAKING remove button from mouse events, delegate to event.button property [#9449](https://github.com/fabricjs/fabric.js/pull/9449)
 - patch(Canvas): move event mouse:up:before earlier in the logic for more control [#9434](https://github.com/fabricjs/fabric.js/pull/9434)
 
 ## [6.0.0-beta15]
