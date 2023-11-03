@@ -242,7 +242,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const target = this._hoveredTarget;
     const shared = {
       e,
-      isClick: false,
       ...getEventPoints(this, e),
     };
     this.fire('mouse:out', { ...shared, target });
@@ -1296,7 +1295,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         e,
         target: oldTarget,
         nextTarget: target,
-        isClick: false,
         ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasOut, outOpt);
@@ -1308,7 +1306,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         e,
         target,
         previousTarget: oldTarget,
-        isClick: false,
         ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasIn, inOpt);
@@ -1511,7 +1508,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * - selects objects that are contained in (and possibly intersecting) the selection bounding box
    * - sets the active object
    * ---
-   * runs on mouse up
+   * runs on mouse up after a mouse move
    */
   protected handleSelection(e: TPointerEvent) {
     if (!this.selection || !this._groupSelector) {
@@ -1522,8 +1519,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       point2 = point1.add(new Point(deltaX, deltaY)),
       tl = point1.min(point2),
       br = point1.max(point2),
-      size = br.subtract(tl),
-      isClick = point1.eq(point2);
+      size = br.subtract(tl);
 
     const collectedObjects = this.collectObjects(
       {
@@ -1535,13 +1531,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       { includeIntersecting: !this.selectionFullyContained }
     ) as FabricObject[];
 
-    const objects = isClick
-      ? collectedObjects[0]
-        ? [collectedObjects[0]]
-        : []
-      : collectedObjects.length > 1
-      ? collectedObjects.filter((object) => !object.onSelect({ e })).reverse()
-      : collectedObjects;
+    const objects =
+      collectedObjects.length > 1
+        ? collectedObjects.filter((object) => !object.onSelect({ e })).reverse()
+        : collectedObjects;
 
     // set active object
     if (objects.length === 1) {
