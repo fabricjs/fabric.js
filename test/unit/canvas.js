@@ -606,15 +606,16 @@
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 is set as activeObject');
   });
 
-  QUnit.test('handleSelection collect topmost object if no dragging occurs', function (assert) {
+  QUnit.test('handleSelection collects all intersecting objects', function (assert) {
     var rect1 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect2 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
     var rect3 = new fabric.Rect({ width: 10, height: 10, top: 0, left: 0 });
-    canvas.add(rect1, rect2, rect3);
+    var rect4 = new fabric.Rect({ width: 10, height: 10, top: 10, left: 10 });
+    canvas.add(rect1, rect2, rect3, rect4);
     setGroupSelector(canvas, { x: 1, y: 1, deltaX: 0, deltaY: 0 });
     assert.ok(canvas.handleSelection({}), 'selection occurred');
-    assert.equal(canvas.getActiveObjects().length, 1, 'a rect that contains all objects collects them all');
-    assert.equal(canvas.getActiveObjects()[0], rect3, 'rect3 is collected');
+    assert.equal(canvas.getActiveObjects().length, 3, 'a rect that contains all objects collects them all');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'rect4 is not collected');
   });
 
   QUnit.test('handleSelection does not collect objects that have onSelect returning true', function(assert) {
