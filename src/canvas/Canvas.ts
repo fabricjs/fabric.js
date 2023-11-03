@@ -24,6 +24,17 @@ import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 
+const getEventPoints = (canvas: Canvas, e: TPointerEvent) => {
+  const viewportPoint = canvas.getViewportPoint(e);
+  const scenePoint = canvas.getScenePoint(e);
+  return {
+    viewportPoint,
+    scenePoint,
+    pointer: viewportPoint,
+    absolutePointer: scenePoint,
+  };
+};
+
 // just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
 // because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
 // few bytes but why give it away.
@@ -236,8 +247,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const shared = {
       e,
       isClick: false,
-      pointer: this.getViewportPoint(e),
-      absolutePointer: this.getScenePoint(e),
+      ...getEventPoints(this, e),
     };
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
@@ -263,8 +273,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (!this._currentTransform && !this.findTarget(e)) {
       this.fire('mouse:over', {
         e,
-        pointer: this.getViewportPoint(e),
-        absolutePointer: this.getScenePoint(e),
+        ...getEventPoints(this, e),
       });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
@@ -502,8 +511,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      pointer: this.getViewportPoint(e),
-      absolutePointer: this.getScenePoint(e),
+      ...getEventPoints(this, e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -913,8 +921,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         e,
         target,
         subTargets: targets,
-        pointer: this.getViewportPoint(e),
-        absolutePointer: this.getScenePoint(e),
+        ...getEventPoints(this, e),
         transform: this._currentTransform,
         ...(eventType === 'up:before' || eventType === 'up'
           ? {
@@ -1312,8 +1319,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target: oldTarget,
         nextTarget: target,
         isClick: false,
-        pointer: this.getViewportPoint(e),
-        absolutePointer: this.getScenePoint(e),
+        ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
@@ -1325,8 +1331,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target,
         previousTarget: oldTarget,
         isClick: false,
-        pointer: this.getViewportPoint(e),
-        absolutePointer: this.getScenePoint(e),
+        ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
