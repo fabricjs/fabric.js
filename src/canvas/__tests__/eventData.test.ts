@@ -121,7 +121,7 @@ describe('Canvas event data', () => {
       clientX: 50,
       clientY: 50,
     });
-    const point = canvas.getPointInScene(ev);
+    const point = canvas.getScenePoint(ev);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenNthCalledWith(1, ev);
     canvas._cacheTransformEventData(ev);

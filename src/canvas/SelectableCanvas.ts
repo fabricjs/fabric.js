@@ -583,11 +583,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getPointInScene(e),
+          this.getScenePoint(e),
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getPointInScene(e);
+      : this.getScenePoint(e);
     const corner = target.getActiveControl() || '',
       control = !!corner && target.controls[corner],
       actionHandler =
@@ -702,7 +702,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return undefined;
     }
 
-    const pointer = this.getPointFromViewport(e),
+    const pointer = this.getViewportPoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
@@ -838,13 +838,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    *
    * @example
    * const pointInScene = sendPointToPlane(
-   *  this.getPointFromViewport(e),
+   *  this.getViewportPoint(e),
    *  undefined,
    *  canvas.viewportTransform
    * );
    *
    */
-  getPointFromViewport(e: TPointerEvent) {
+  getViewportPoint(e: TPointerEvent) {
     if (this._pointer) {
       return this._pointer;
     }
@@ -858,12 +858,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    *
    * @example
    * const pointFromViewport = sendPointToPlane(
-   *  this.getPointInScene(e),
+   *  this.getScenePoint(e),
    *  canvas.viewportTransform
    * );
    *
    */
-  getPointInScene(e: TPointerEvent) {
+  getScenePoint(e: TPointerEvent) {
     if (this._absolutePointer) {
       return this._absolutePointer;
     }
@@ -874,7 +874,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Returns pointer relative to canvas.
    *
    * @deprecated This method is deprecated since v6 to protect you from misuse.
-   * Use {@link getPointFromViewport} or {@link getPointInScene} instead.
+   * Use {@link getViewportPoint} or {@link getScenePoint} instead.
    *
    * @param {Event} e
    * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
