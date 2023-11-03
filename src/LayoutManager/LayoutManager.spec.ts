@@ -1,3 +1,4 @@
+import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Point } from '../Point';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
@@ -582,6 +583,44 @@ describe('Layout Manager', () => {
           path: [target, parent],
         },
       ]);
+    });
+    it('fires canvas events for a perform layout', () => {
+      const manager = new LayoutManager();
+      const targets = [
+        new Group([new FabricObject()], { layoutManager: manager }),
+        new FabricObject(),
+      ];
+      const target = new Group(targets, { layoutManager: manager });
+      const parent = new Group([target], { layoutManager: manager });
+      const grandParent = new Group([parent], { layoutManager: manager });
+      const canvas = new StaticCanvas(undefined, { renderOnAddRemove: false });
+      const commonContext = {
+        type: 'imperative',
+        strategy: manager.strategy,
+        prevStrategy: manager.strategy,
+        bubbles: true,
+        stopPropagation: expect.any(Function),
+      };
+      canvas.add(grandParent);
+      jest.spyOn(canvas, 'fire');
+      target.triggerLayout({
+        manager,
+      });
+      // first calls the event for the deep below target
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
+        target,
+        context: {
+          target,
+          ...commonContext,
+        },
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
+        target: parent,
+        context: {
+          target,
+          ...commonContext,
+        },
+      });
     });
   });
 
