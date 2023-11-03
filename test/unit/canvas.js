@@ -2029,7 +2029,7 @@
     };
     canvas.setActiveObject(rect);
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointFromViewport(eventStub)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
@@ -2045,7 +2045,7 @@
       target: canvas.upperCanvasEl
     };
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointFromViewport(eventStub)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, false);
     t = canvas._currentTransform;
@@ -2056,7 +2056,7 @@
 
     var alreadySelected = true;
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointFromViewport(eventStub)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
@@ -2074,7 +2074,7 @@
       shiftKey: true
     };
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointFromViewport(eventStub)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;

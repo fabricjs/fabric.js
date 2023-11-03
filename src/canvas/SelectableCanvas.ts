@@ -842,7 +842,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * and it remains unchanged from the viewer's perspective.
    *
    * @example
-   * const pointInScene = sendPointToPlane(
+   * const scenePoint = sendPointToPlane(
    *  this.getViewportPoint(e),
    *  undefined,
    *  canvas.viewportTransform
@@ -862,7 +862,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * however, from the viewer's perspective, the point is changed.
    *
    * @example
-   * const pointFromViewport = sendPointToPlane(
+   * const viewportPoint = sendPointToPlane(
    *  this.getScenePoint(e),
    *  canvas.viewportTransform
    * );

@@ -985,6 +985,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.discardActiveObject(e);
       this.requestRenderAll();
     }
+    // TODO: this is a scene point so it should be renamed
     const pointer = this.getScenePoint(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
@@ -1347,18 +1348,18 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event fired on mousemove
    */
   _transformObject(e: TPointerEvent) {
-    const pointer = this.getScenePoint(e),
+    const scenePoint = this.getScenePoint(e),
       transform = this._currentTransform!,
       target = transform.target,
       //  transform pointer to target's containing coordinate plane
       //  both pointer and object should agree on every point
       localPointer = target.group
         ? sendPointToPlane(
-            pointer,
+            scenePoint,
             undefined,
             target.group.calcTransformMatrix()
           )
-        : pointer;
+        : scenePoint;
     // seems used only here.
     // @TODO: investigate;
     transform.reset = false;

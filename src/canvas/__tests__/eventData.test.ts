@@ -103,7 +103,7 @@ describe('Canvas event data', () => {
     }
   );
 
-  test('getPointInScene', () => {
+  test('getScenePoint', () => {
     const canvas = new Canvas(undefined, {
       enableRetinaScaling: true,
       width: 200,
