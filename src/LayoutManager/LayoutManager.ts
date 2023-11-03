@@ -102,7 +102,7 @@ export class LayoutManager {
 
   protected onBeforeLayout(context: StrictLayoutContext) {
     const { target } = context;
-
+    const { canvas } = target;
     // handle layout triggers subscription
     if (
       // subscribe only if instance is the target's `layoutManager`
@@ -119,6 +119,11 @@ export class LayoutManager {
     target.fire('layout:before', {
       context,
     });
+    canvas &&
+      canvas.fire('object:layout:before', {
+        target,
+        context,
+      });
 
     if (context.type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
       const { strategy: _, ...tricklingContext } = context;
@@ -254,7 +259,7 @@ export class LayoutManager {
       prevStrategy: _,
       ...bubblingContext
     } = context;
-
+    const { canvas } = target;
     if (strategy.shouldResetTransform(context)) {
       resetObjectTransform(target);
       target.left = 0;
@@ -266,6 +271,12 @@ export class LayoutManager {
       context,
       result: layoutResult,
     });
+    canvas &&
+      canvas.fire('object:layout:after', {
+        context,
+        result: layoutResult,
+        target,
+      });
 
     //  bubble
     const parent = target.group;
