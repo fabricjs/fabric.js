@@ -98,7 +98,7 @@
   });
 
   QUnit.test('corner coords', function(assert) {
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0 });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0, canvas: {} });
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
@@ -151,7 +151,7 @@
     sharedControls.bl.sizeX = 30;
     sharedControls.bl.sizeY = 10;
 
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0, controls: sharedControls });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 10, height: 10, strokeWidth: 0, controls: sharedControls, canvas: {} });
     cObj.setCoords();
 
     assert.equal(cObj.oCoords.tl.corner.tl.x.toFixed(2), 3.5);
@@ -201,7 +201,7 @@
   });
 
   QUnit.test('_findTargetCorner', function(assert) {
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0, canvas: {}});
     assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
     cObj.setCoords();
     cObj.canvas = {
@@ -220,7 +220,7 @@
   });
 
   QUnit.test('_findTargetCorner for touches', function(assert) {
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0, canvas: {} });
     cObj.setCoords();
     cObj.canvas = {
       getActiveObject() { return cObj }
@@ -241,7 +241,7 @@
 
 
   QUnit.test('_findTargetCorner for non active object', function (assert) {
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0, canvas: {} });
     assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
     cObj.setCoords();
     cObj.canvas = {
@@ -251,7 +251,7 @@
   });
 
   QUnit.test('_findTargetCorner for non visible control', function (assert) {
-    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0 });
+    var cObj = new fabric.Object({ top: 10, left: 10, width: 30, height: 30, strokeWidth: 0, canvas: {} });
     assert.ok(typeof cObj._findTargetCorner === 'function', '_findTargetCorner should exist');
     cObj.setCoords();
     cObj.canvas = {

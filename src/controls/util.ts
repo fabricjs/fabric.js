@@ -83,7 +83,7 @@ export const commonEventInfo: TransformAction<
 export function findCornerQuadrant(
   fabricObject: FabricObject,
   control: Control
-) {
+): number {
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle(),
     cornerAngle =

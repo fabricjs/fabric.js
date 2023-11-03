@@ -55,7 +55,7 @@ export class InteractiveFabricObject<
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
-  declare centeredScaling: false;
+  declare centeredScaling: boolean;
 
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
@@ -284,14 +284,16 @@ export class InteractiveFabricObject<
       this.cornerSize,
       position.x,
       position.y,
-      false
+      false,
+      this
     );
     const touchCorner = control.calcCornerCoords(
       angle,
       this.touchCornerSize,
       position.x,
       position.y,
-      true
+      true,
+      this
     );
     return { corner, touchCorner };
   }
@@ -307,7 +309,7 @@ export class InteractiveFabricObject<
   setCoords(): void {
     super.setCoords();
     // set coordinates of the draggable boxes in the corners used to scale/rotate the image
-    this.oCoords = this.calcOCoords();
+    this.canvas && (this.oCoords = this.calcOCoords());
   }
 
   /**
