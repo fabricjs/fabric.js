@@ -587,40 +587,164 @@ describe('Layout Manager', () => {
     it('fires canvas events for a perform layout', () => {
       const manager = new LayoutManager();
       const targets = [
-        new Group([new FabricObject()], { layoutManager: manager }),
+        new Group([new FabricObject()], {
+          layoutManager: manager,
+          name: 'subTarget',
+        }),
         new FabricObject(),
       ];
-      const target = new Group(targets, { layoutManager: manager });
-      const parent = new Group([target], { layoutManager: manager });
-      const grandParent = new Group([parent], { layoutManager: manager });
+      const target = new Group(targets, {
+        layoutManager: manager,
+        name: 'target',
+      });
+      const parent = new Group([target], {
+        layoutManager: manager,
+        name: 'parent',
+      });
+      const grandParent = new Group([parent], {
+        layoutManager: manager,
+        name: 'grand',
+      });
       const canvas = new StaticCanvas(undefined, { renderOnAddRemove: false });
       const commonContext = {
         type: 'imperative',
         strategy: manager.strategy,
         prevStrategy: manager.strategy,
-        bubbles: true,
+        bubbles: false,
+        deep: false,
         stopPropagation: expect.any(Function),
       };
       canvas.add(grandParent);
       jest.spyOn(canvas, 'fire');
-      target.triggerLayout({
+      grandParent.triggerLayout({
         manager,
+        bubbles: false,
+        deep: false,
       });
       // first calls the event for the deep below target
       expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
-        target,
+        target: grandParent,
         context: {
-          target,
+          target: grandParent,
           ...commonContext,
         },
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:after', {
+        target: grandParent,
+        context: {
+          target: grandParent,
+          ...commonContext,
+          bubbles: false,
+        },
+        result: expect.any(Object),
+      });
+      expect(canvas.fire.mock.calls.length).toBe(2);
+    });
+    it('fires canvas events for a perform layout deep: true', () => {
+      const manager = new LayoutManager();
+      const targets = [
+        new Group([new FabricObject()], {
+          layoutManager: manager,
+          name: 'subTarget',
+        }),
+        new FabricObject(),
+      ];
+      const target = new Group(targets, {
+        layoutManager: manager,
+        name: 'target',
+      });
+      const parent = new Group([target], {
+        layoutManager: manager,
+        name: 'parent',
+      });
+      const grandParent = new Group([parent], {
+        layoutManager: manager,
+        name: 'grand',
+      });
+      const canvas = new StaticCanvas(undefined, {
+        renderOnAddRemove: false,
+      });
+      const commonContext = {
+        type: 'imperative',
+        strategy: manager.strategy,
+        prevStrategy: manager.strategy,
+        bubbles: false,
+        deep: true,
+        stopPropagation: expect.any(Function),
+      };
+      canvas.add(grandParent);
+      jest.spyOn(canvas, 'fire');
+      grandParent.triggerLayout({
+        manager,
+        bubbles: false,
+        deep: true,
+      });
+      // first calls the event for the deep below target
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
+        target: grandParent,
+        context: {
+          target: grandParent,
+          ...commonContext,
+        },
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:after', {
+        target: grandParent,
+        context: {
+          target: grandParent,
+          ...commonContext,
+          bubbles: false,
+        },
+        result: expect.any(Object),
       });
       expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
         target: parent,
         context: {
-          target,
+          target: parent,
           ...commonContext,
         },
       });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:after', {
+        target: parent,
+        context: {
+          target: parent,
+          ...commonContext,
+          bubbles: false,
+        },
+        result: expect.any(Object),
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
+        target: target,
+        context: {
+          target: target,
+          ...commonContext,
+        },
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:after', {
+        target: target,
+        context: {
+          target: target,
+          ...commonContext,
+          bubbles: false,
+        },
+        result: expect.any(Object),
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:before', {
+        target: targets[0],
+        context: {
+          target: targets[0],
+          ...commonContext,
+        },
+      });
+      expect(canvas.fire).toHaveBeenCalledWith('object:layout:after', {
+        target: targets[0],
+        context: {
+          target: targets[0],
+          ...commonContext,
+          bubbles: false,
+        },
+        result: expect.any(Object),
+      });
+      expect(canvas.fire.mock.calls.length).toBe(8);
     });
   });
 

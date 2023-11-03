@@ -115,6 +115,8 @@ export class LayoutManager {
       context.targets.forEach((object) => this.unsubscribe(object, context));
     }
 
+    console.log('calling for', target.name);
+
     // fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:before', {
       context,
