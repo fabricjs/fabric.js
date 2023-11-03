@@ -589,21 +589,17 @@ describe('Layout Manager', () => {
       const targets = [
         new Group([new FabricObject()], {
           layoutManager: manager,
-          name: 'subTarget',
         }),
         new FabricObject(),
       ];
       const target = new Group(targets, {
         layoutManager: manager,
-        name: 'target',
       });
       const parent = new Group([target], {
         layoutManager: manager,
-        name: 'parent',
       });
       const grandParent = new Group([parent], {
         layoutManager: manager,
-        name: 'grand',
       });
       const canvas = new StaticCanvas(undefined, { renderOnAddRemove: false });
       const commonContext = {
@@ -645,21 +641,17 @@ describe('Layout Manager', () => {
       const targets = [
         new Group([new FabricObject()], {
           layoutManager: manager,
-          name: 'subTarget',
         }),
         new FabricObject(),
       ];
       const target = new Group(targets, {
         layoutManager: manager,
-        name: 'target',
       });
       const parent = new Group([target], {
         layoutManager: manager,
-        name: 'parent',
       });
       const grandParent = new Group([parent], {
         layoutManager: manager,
-        name: 'grand',
       });
       const canvas = new StaticCanvas(undefined, {
         renderOnAddRemove: false,

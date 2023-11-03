@@ -114,9 +114,6 @@ export class LayoutManager {
     } else if (context.type === LAYOUT_TYPE_REMOVED) {
       context.targets.forEach((object) => this.unsubscribe(object, context));
     }
-
-    console.log('calling for', target.name);
-
     // fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:before', {
       context,
