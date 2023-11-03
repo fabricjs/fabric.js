@@ -271,7 +271,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(30, 15),
                         viewportPoint: new fabric.Point(30, 15),
                         scenePoint: new fabric.Point(30, 15),
-                        isClick: false,
                         previousTarget: undefined
                     },
                     ...dragEvents.slice(0, 32).map(e => ({
@@ -304,7 +303,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(123, 15),
                         viewportPoint: new fabric.Point(123, 15),
                         scenePoint: new fabric.Point(123, 15),
-                        isClick: false,
                         nextTarget: undefined
                     },
                     {
@@ -366,7 +364,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(210, 15),
                         viewportPoint: new fabric.Point(210, 15),
                         scenePoint: new fabric.Point(210, 15),
-                        isClick: false,
                         previousTarget: undefined
                     },
                     ...dragEvents.slice(0, 6).map(e => ({
@@ -390,7 +387,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(220, -5),
                         viewportPoint: new fabric.Point(220, -5),
                         scenePoint: new fabric.Point(220, -5),
-                        isClick: false,
                         nextTarget: undefined
                     },
                 ]);
@@ -466,8 +462,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(100, 15),
                         viewportPoint: new fabric.Point(100, 15),
                         scenePoint: new fabric.Point(100, 15),
-                        isClick: false,
-                        previousTarget: undefined
                     },
                     ...dragEvents.slice(0, 2).map(e => ({
                         e,
@@ -537,7 +531,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(230, 15),
                         viewportPoint: new fabric.Point(230, 15),
                         scenePoint: new fabric.Point(230, 15),
-                        isClick: false,
                         previousTarget: undefined
                     },
                     ...dragEvents.slice(0, 2).map(e => ({
@@ -600,7 +593,6 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(230, 15),
                         viewportPoint: new fabric.Point(230, 15),
                         scenePoint: new fabric.Point(230, 15),
-                        isClick: false,
                         previousTarget: undefined
                     },
                     ...dragEvents.slice(0, 2).map(e => ({
