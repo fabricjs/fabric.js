@@ -3,6 +3,19 @@ import { Rect } from '../Rect';
 import { FabricObject } from './Object';
 
 describe('Object', () => {
+  it('tests constructor & properties', () => {
+    expect(typeof FabricObject).toBe('function');
+    const cObj = new FabricObject();
+    expect(cObj).toBeDefined();
+    expect(cObj instanceof FabricObject).toBe(true);
+    expect(cObj.constructor).toBe(FabricObject);
+
+    expect((cObj.constructor as typeof FabricObject).type).toBe('FabricObject');
+    expect(cObj.includeDefaultValues).toBe(true);
+
+    //TODO: Add message 'object caching default value'
+    expect(cObj.objectCaching).toBe(true);
+  });
   it('rotate with centered rotation', () => {
     const fObj = new FabricObject({
       centeredRotation: true,

@@ -44,7 +44,38 @@ export interface DragMethods {
 
 export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
 
-const interactiveDefaults = {};
+const interactiveDefaults = {
+  noScaleCache: true,
+  centeredScaling: false,
+  lockMovementX: false,
+  lockMovementY: false,
+  lockRotation: false,
+  lockScalingX: false,
+  lockScalingY: false,
+  lockSkewingX: false,
+  lockSkewingY: false,
+  lockScalingFlip: false,
+  cornerSize: 13,
+  touchCornerSize: 24,
+  transparentCorners: true,
+  cornerColor: 'rgb(178,204,255)',
+  cornerStrokeColor: '',
+  cornerStyle: 'rect',
+  cornerDashArray: null,
+  hasControls: true,
+  borderColor: 'rgb(178,204,255)',
+  borderDashArray: null,
+  borderOpacityWhenMoving: 0.4,
+  borderScaleFactor: 1,
+  hasBorders: true,
+  selectionBackgroundColor: '',
+  selectable: true,
+  evented: true,
+  perPixelTargetFind: false,
+  activeOn: 'down',
+  hoverCursor: null,
+  moveCursor: null,
+};
 
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
