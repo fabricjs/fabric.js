@@ -37,10 +37,16 @@ export const sendPointToPlane = (
   point: Point,
   from: TMat2D = iMatrix,
   to: TMat2D = iMatrix
-): Point =>
-  //  we are actually looking for the transformation from the destination plane to the source plane (which is a linear mapping)
-  //  the object will exist on the destination plane and we want it to seem unchanged by it so we reverse the destination matrix (to) and then apply the source matrix (from)
-  point.transform(calcPlaneChangeMatrix(from, to));
+): Point => point.transform(calcPlaneChangeMatrix(from, to));
+
+/**
+ * See {@link sendPointToPlane}
+ */
+export const sendVectorToPlane = (
+  point: Point,
+  from: TMat2D = iMatrix,
+  to: TMat2D = iMatrix
+): Point => point.transform(calcPlaneChangeMatrix(from, to), true);
 
 /**
  *
