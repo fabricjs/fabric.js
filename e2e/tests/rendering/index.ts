@@ -10,7 +10,14 @@ beforeRenderTest(
   (canvas) => {
     const boundTests = renderTests.map((renderTest) => {
       return {
-        boundFunction: () => renderTest.renderFunction(canvas, fabric),
+        boundFunction: async () => {
+          canvas.clear();
+          canvas.setDimensions({
+            width: renderTest.size[0],
+            height: renderTest.size[1],
+          });
+          await renderTest.renderFunction(canvas, fabric);
+        },
         title: renderTest.title,
       };
     });

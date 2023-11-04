@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 import setup from '../../setup';
 import { CanvasUtil } from '../../utils/CanvasUtil';
-import { createNodeSnapshot } from '../../utils/createNodeSnapshot';
+import { TestingCanvas } from '../../utils/createNodeSnapshot';
 import { renderTests } from './renderingCases';
+import * as fabric from 'fabric/node';
 
 setup();
 
@@ -18,19 +19,28 @@ test('VISUAL RENDERING TESTS', async ({ page }, config) => {
         'browser snapshot'
       ).toMatchSnapshot({
         name: `${testCase.title}.png`,
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: testCase.percentage,
       });
     });
 
     await test.step('node', async () => {
       // we want the browser snapshot of a test to be committed and not the node snapshot
       config.config.updateSnapshots = 'none';
+      const canvas = new TestingCanvas(null, {
+        enableRetinaScaling: false,
+        renderOnAddRemove: false,
+        width: testCase.size[0],
+        height: testCase.size[1],
+      });
+      await testCase.renderFunction(canvas, fabric);
+      canvas.renderAll();
+      const buffer = canvas.getNodeCanvas().toBuffer();
       expect(
-        await createNodeSnapshot(testCase.renderFunction),
+        buffer,
         'node snapshot should match browser snapshot'
       ).toMatchSnapshot({
         name: `${testCase.title}.png`,
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: testCase.percentage,
       });
     });
   }
