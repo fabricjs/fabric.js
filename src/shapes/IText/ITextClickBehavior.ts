@@ -15,7 +15,7 @@ import type { TextProps, SerializedTextProps } from '../Text/Text';
 const notALeftClick = (e: Event) => !!(e as MouseEvent).button;
 
 export abstract class ITextClickBehavior<
-  Props extends TProps<TextProps> = Partial<TextProps>,
+  Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextKeyBehavior<Props, SProps, EventSpec> {
