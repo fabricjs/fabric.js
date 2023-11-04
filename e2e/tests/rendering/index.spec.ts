@@ -6,9 +6,13 @@ import { renderTests } from './renderingCases';
 
 setup();
 
-test('TEST NAME', async ({ page }, config) => {
+test('VISUAL RENDERING TESTS', async ({ page }, config) => {
   for (const testCase of renderTests) {
     await test.step('browser', async () => {
+      await page.evaluate(
+        (testTitle) => renderingTestMap.get(testTitle)(),
+        testCase.title
+      );
       expect(
         await new CanvasUtil(page).screenshot(),
         'browser snapshot'

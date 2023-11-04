@@ -27,13 +27,15 @@ export const renderTests = [
         },
         {
           x: 580,
-          y: 280,
+          y: 400,
         },
       ];
-      canvas.setDimensions({ width: 300, height: 200 });
+      canvas.setDimensions({ width: 450, height: 220 });
       const polygon = new fabric.Polygon(pts(), {
-        left: 0,
-        top: 0,
+        fill: 'blue',
+        skewX: 10,
+        strokeWidth: 2,
+        stroke: 'red',
       });
       canvas.add(polygon);
       canvas.centerObject(polygon);

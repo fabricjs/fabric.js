@@ -56,7 +56,7 @@ export function before(
   setupTasks.push(task);
 }
 
-export function beforeRenderTest(
+export async function beforeRenderTest(
   cb: (
     canvas: Canvas
   ) => AsyncReturnValue<{ title: string; boundFunction: () => void }[]>,
