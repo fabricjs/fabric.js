@@ -227,6 +227,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
+   * x, y, deltaX and deltaY are in scene plane
    * @type
    * @private
    */
@@ -807,7 +808,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      this._pointIsInObjectSelectionArea(obj, sendPointToPlane(pointer, undefined, this.viewportTransform))
+      this._pointIsInObjectSelectionArea(
+        obj,
+        sendPointToPlane(pointer, undefined, this.viewportTransform)
+      )
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
