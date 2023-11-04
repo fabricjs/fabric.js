@@ -129,9 +129,21 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   extends TEvent<E> {
   target?: FabricObject;
   subTargets?: FabricObject[];
-  pointer: Point;
   transform?: Transform | null;
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
+  pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
   absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
 }
 
 interface SimpleEventHandler<T extends Event = TPointerEvent>
@@ -158,8 +170,20 @@ export interface DragEventData extends TEvent<DragEvent> {
 }
 
 export interface DropEventData extends DragEventData {
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
   pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
   absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
 }
 
 interface DnDEvents {

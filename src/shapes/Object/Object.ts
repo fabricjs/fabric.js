@@ -845,7 +845,7 @@ export class FabricObject<
       this.paintFirst === 'stroke' &&
       this.hasFill() &&
       this.hasStroke() &&
-      typeof this.shadow === 'object'
+      !!this.shadow
     ) {
       return true;
     }
