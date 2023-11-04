@@ -17,7 +17,6 @@ import {
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
 import { isCollection } from '../util/typeAssertions';
-import { invertTransform } from '../util/misc/matrix';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -589,11 +588,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getPointer(e),
+          this.getScenePoint(e),
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getPointer(e);
+      : this.getScenePoint(e);
     const corner = target.getActiveControl() || '',
       control = !!corner && target.controls[corner],
       actionHandler =
@@ -708,7 +707,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return undefined;
     }
 
-    const pointer = this.getPointer(e, true),
+    const pointer = this.getViewportPoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
@@ -765,7 +764,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      obj.containsPoint(this.restorePointerVpt(pointer), true)
+      obj.containsPoint(
+        sendPointToPlane(pointer, undefined, this.viewportTransform),
+        true
+      )
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
@@ -815,7 +817,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
    * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
+   * @param {Point} [pointer] coordinates from viewport to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(
@@ -835,42 +837,56 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns pointer coordinates without the effect of the viewport
-   * Takes a point in html canvas space and gives you back a point of the scene.
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
+   * @returns point existing in the same plane as the {@link HTMLCanvasElement},
+   * `(0, 0)` being the top left corner of the {@link HTMLCanvasElement}.
+   * This means that changes to the {@link viewportTransform} do not change the values of the point
+   * and it remains unchanged from the viewer's perspective.
+   *
+   * @example
+   * const scenePoint = sendPointToPlane(
+   *  this.getViewportPoint(e),
+   *  undefined,
+   *  canvas.viewportTransform
+   * );
+   *
    */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
+  getViewportPoint(e: TPointerEvent) {
+    if (this._pointer) {
+      return this._pointer;
+    }
+    return this.getPointer(e, true);
   }
 
   /**
-   * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position.
-   * To interact with your shapes top and left you want to use ignoreVpt false
-   * most of the time, while ignoreVpt true will give you coordinates
-   * compatible with the object.oCoords system.
-   * of the time.
-   * @param {Event} e
-   * @param {Boolean} ignoreVpt
-   * @return {Point}
+   * @returns point existing in the scene (the same plane as the plane {@link FabricObject#getCenterPoint} exists in).
+   * This means that changes to the {@link viewportTransform} do not change the values of the point,
+   * however, from the viewer's perspective, the point is changed.
+   *
+   * @example
+   * const viewportPoint = sendPointToPlane(
+   *  this.getScenePoint(e),
+   *  canvas.viewportTransform
+   * );
+   *
    */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
-    // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !ignoreVpt) {
+  getScenePoint(e: TPointerEvent) {
+    if (this._absolutePointer) {
       return this._absolutePointer;
     }
-    if (this._pointer && ignoreVpt) {
-      return this._pointer;
-    }
+    return this.getPointer(e);
+  }
 
+  /**
+   * Returns pointer relative to canvas.
+   *
+   * @deprecated This method is deprecated since v6 to protect you from misuse.
+   * Use {@link getViewportPoint} or {@link getScenePoint} instead.
+   *
+   * @param {Event} e
+   * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
+   * @return {Point}
+   */
+  getPointer(e: TPointerEvent, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
@@ -889,8 +905,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.calcOffset();
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
-    if (!ignoreVpt) {
-      pointer = this.restorePointerVpt(pointer);
+    if (!fromViewport) {
+      pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
     const retinaScaling = this.getRetinaScaling();
