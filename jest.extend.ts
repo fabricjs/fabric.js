@@ -3,6 +3,7 @@ import { toMatchSnapshot } from 'jest-snapshot';
 import type { CloneDeepWithCustomizer } from 'lodash';
 import { cloneDeepWith } from 'lodash';
 import { FabricObject } from './src/shapes/Object/Object';
+import type { TMat2D } from './src/typedefs';
 
 type ExtendedOptions<T = unknown> =
   | {
@@ -78,6 +79,17 @@ expect.extend({
       hint
     );
   },
+  toEqualRoundedMatrix(actual: TMat2D, expected: TMat2D, precision = 10) {
+    const rounded = expected.map((x) => Math.round(x * precision) / precision);
+    return {
+      message: () => {
+        return `expected ${this.utils.printReceived(
+          actual
+        )} to be rounded to ${this.utils.printExpected(rounded)}`;
+      },
+      pass: actual.every((x, i) => Math.abs(x - rounded[i]) < 1),
+    };
+  },
 });
 
 // // written in official docs but DOESN'T work
@@ -103,6 +115,7 @@ declare global {
         propertiesOrHint?: ObjectOptions | string,
         hint?: string
       ): void;
+      toEqualRoundedMatrix(expected: TMat2D, precision?: number): void;
     }
     interface Matchers<R, T> {
       toMatchSnapshot<U extends { [P in keyof T]: any }>(
@@ -120,6 +133,7 @@ declare global {
         >,
         snapshotName?: string
       ): R;
+      toEqualRoundedMatrix(expected: TMat2D, precision?: number): R;
     }
   }
 }
