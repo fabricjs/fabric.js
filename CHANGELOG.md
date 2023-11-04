@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): `_isRetinaScaling` accessing wrong devicePixelRatio value [#9480](https://github.com/fabricjs/fabric.js/pull/9480)
 - refactor(Canvas): BREAKING deprecate `getPointer`, add new getScenePoint and getViewportPoint methods, removed `restorePointerVpt`, extended mouse events data [#9175](https://github.com/fabricjs/fabric.js/pull/9175)
 - fix(Object): Fix detection of falsy shadows in Object.needsItsOwnCache method [#9469](https://github.com/fabricjs/fabric.js/pull/9469)
 - feat(util): expose `calcPlaneRotation` [#9419](https://github.com/fabricjs/fabric.js/pull/9419)
