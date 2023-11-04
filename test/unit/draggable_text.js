@@ -269,6 +269,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(30, 15),
                         absolutePointer: new fabric.Point(30, 15),
+                        viewportPoint: new fabric.Point(30, 15),
+                        scenePoint: new fabric.Point(30, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -300,6 +302,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(123, 15),
                         absolutePointer: new fabric.Point(123, 15),
+                        viewportPoint: new fabric.Point(123, 15),
+                        scenePoint: new fabric.Point(123, 15),
                         isClick: false,
                         nextTarget: undefined
                     },
@@ -360,6 +364,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(210, 15),
                         absolutePointer: new fabric.Point(210, 15),
+                        viewportPoint: new fabric.Point(210, 15),
+                        scenePoint: new fabric.Point(210, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -382,6 +388,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(220, -5),
                         absolutePointer: new fabric.Point(220, -5),
+                        viewportPoint: new fabric.Point(220, -5),
+                        scenePoint: new fabric.Point(220, -5),
                         isClick: false,
                         nextTarget: undefined
                     },
@@ -456,6 +464,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(100, 15),
                         absolutePointer: new fabric.Point(100, 15),
+                        viewportPoint: new fabric.Point(100, 15),
+                        scenePoint: new fabric.Point(100, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -483,6 +493,8 @@ function assertDragEventStream(name, a, b) {
                         didDrop: true,
                         pointer: new fabric.Point(110, 15),
                         absolutePointer: new fabric.Point(110, 15),
+                        viewportPoint: new fabric.Point(110, 15),
+                        scenePoint: new fabric.Point(110, 15),
                     },
                     {
                         e: drop,
@@ -523,6 +535,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(230, 15),
                         absolutePointer: new fabric.Point(230, 15),
+                        viewportPoint: new fabric.Point(230, 15),
+                        scenePoint: new fabric.Point(230, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -550,6 +564,8 @@ function assertDragEventStream(name, a, b) {
                         didDrop: true,
                         absolutePointer: new fabric.Point(240, 15),
                         pointer: new fabric.Point(240, 15),
+                        viewportPoint: new fabric.Point(240, 15),
+                        scenePoint: new fabric.Point(240, 15),
                     },
                 ]);
                 assert.equal(fabric.getFabricDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
@@ -582,6 +598,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(230, 15),
                         absolutePointer: new fabric.Point(230, 15),
+                        viewportPoint: new fabric.Point(230, 15),
+                        scenePoint: new fabric.Point(230, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
