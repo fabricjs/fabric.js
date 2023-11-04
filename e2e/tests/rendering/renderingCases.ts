@@ -4,7 +4,32 @@
 
 import type { Canvas } from 'fabric';
 
-export const renderTests = [
+export type renderTestType = {
+  size: [number, number];
+  percentage: number;
+  title: string;
+  disabled?: 'node' | 'browser';
+  renderFunction: (
+    canvas: Canvas,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    fabric: typeof import('fabric')
+  ) => Promise<void>;
+};
+
+const emptyTest: renderTestType = {
+  size: [450, 220],
+  percentage: 0.05,
+  title: '',
+  renderFunction: async function render(
+    canvas: Canvas,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    fabric: typeof import('fabric')
+  ) {
+    // put render code here
+  },
+};
+
+export const renderTests: renderTestType[] = [
   {
     size: [450, 220],
     percentage: 0.05,
@@ -46,7 +71,7 @@ export const renderTests = [
   {
     percentage: 0.09,
     size: [150, 60],
-    title: 'Rect with strokeUniform: true',
+    title: 'Rect with strokeUniform true',
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -78,86 +103,80 @@ export const renderTests = [
       canvas.add(rect2);
     },
   },
+  {
+    size: [100, 100],
+    percentage: 0.011,
+    title: 'Rect with strokeUniform: true and negative scaling',
+    disabled: 'node',
+    renderFunction: async function render(
+      canvas: Canvas,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      fabric: typeof import('fabric')
+    ) {
+      const rect = new fabric.Rect({
+        width: 10,
+        height: 10,
+        fill: 'transparent',
+        stroke: 'blue',
+        strokeWidth: 15,
+        strokeUniform: true,
+        strokeDashArray: [2, 2],
+        top: 65,
+        left: 30,
+      });
+      // do not do this at init time or they will be positive
+      rect.scaleX = -2;
+      rect.scaleY = -4;
+
+      const rect2 = new fabric.Rect({
+        width: 10,
+        height: 10,
+        fill: 'transparent',
+        stroke: 'red',
+        strokeWidth: 15,
+        scaleX: -2,
+        scaleY: -4,
+        strokeDashArray: [2, 2],
+        strokeUniform: true,
+        top: 10,
+        left: 55,
+      });
+      canvas.add(rect, rect2);
+    },
+  },
+  {
+    size: [150, 60],
+    percentage: 0.09,
+    title: 'Rect DropShadow with nonScaling: true',
+    renderFunction: async function render(
+      canvas: Canvas,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      fabric: typeof import('fabric')
+    ) {
+      const obj = new fabric.Rect();
+      obj.set({
+        width: 10,
+        height: 10,
+        scaleX: 12,
+        scaleY: 3,
+        top: 10,
+        left: 5,
+        fill: '#f55',
+      });
+      obj.set(
+        'shadow',
+        new fabric.Shadow({
+          color: 'rgba(0,100,0,0.9)',
+          blur: 5,
+          offsetX: 8,
+          offsetY: 8,
+          nonScaling: true,
+        })
+      );
+      canvas.add(obj);
+    },
+  },
 ];
-
-// function renderStrokeWithNegativeScale(canvas, callback) {
-//   var rect = new fabric.Rect({
-//     width: 10,
-//     height: 10,
-//     fill: 'transparent',
-//     stroke: 'blue',
-//     strokeWidth: 15,
-//     strokeUniform: true,
-//     strokeDashArray: [2, 2],
-//     top: 65,
-//     left: 30,
-//   });
-//   // do not do this at init time or they will be positive
-//   rect.scaleX = -2;
-//   rect.scaleY = -4;
-
-//   var rect2 = new fabric.Rect({
-//     width: 10,
-//     height: 10,
-//     fill: 'transparent',
-//     stroke: 'red',
-//     strokeWidth: 15,
-//     scaleX: -2,
-//     scaleY: -4,
-//     strokeDashArray: [2, 2],
-//     strokeUniform: true,
-//     top: 10,
-//     left: 55,
-//   });
-//   canvas.add(rect, rect2);
-//   canvas.renderAll();
-//   callback(canvas.lowerCanvasEl);
-// }
-
-// tests.push({
-//   test: 'Rect with strokeUniform: true and negative scaling',
-//   code: renderStrokeWithNegativeScale,
-//   golden: 'strokeNegativeScale.png',
-//   percentage: 0.011,
-//   disabled: isNode(),
-//   width: 100,
-//   height: 100,
-// });
-
-// function shadownonscaling(canvas, callback) {
-//   var obj = new fabric.Rect();
-//   obj.set({
-//     width: 10,
-//     height: 10,
-//     scaleX: 12,
-//     scaleY: 3,
-//     top: 10,
-//     left: 5,
-//     fill: '#f55',
-//   });
-//   obj.set(
-//     'shadow',
-//     new fabric.Shadow({
-//       color: 'rgba(0,100,0,0.9)',
-//       blur: 5,
-//       offsetX: 8,
-//       offsetY: 8,
-//       nonScaling: true,
-//     })
-//   );
-//   canvas.add(obj);
-//   canvas.renderAll();
-//   callback(canvas.lowerCanvasEl);
-// }
-
-// tests.push({
-//   test: 'Rect DropShadow with nonScaling: true',
-//   code: shadownonscaling,
-//   golden: 'shadownonscaling.png',
-//   percentage: 0.09,
-//   width: 150,
-//   height: 60,
-// });
 
 // function polygonWithStroke(canvas, callback) {
 //   canvas.set({ backgroundColor: '#AAAA77' });
