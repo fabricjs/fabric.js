@@ -7,9 +7,10 @@ export type TCopyPasteData = {
   copiedTextStyle?: TextStyleDeclaration[];
 };
 export type TFabricEnv = {
-  document: Document;
-  window: (Window & typeof globalThis) | DOMWindow;
-  isTouchSupported: boolean;
+  readonly document: Document;
+  readonly window: (Window & typeof globalThis) | DOMWindow;
+  readonly devicePixelRatio: number;
+  readonly isTouchSupported: boolean;
   WebGLProbe: GLProbe;
   dispose(element: Element): void;
   copyPasteData: TCopyPasteData;

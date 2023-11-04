@@ -3,9 +3,7 @@ import type { Canvas as NodeCanvas } from 'canvas';
 import { JSDOM } from 'jsdom';
 // @ts-expect-error internal import
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
-import { config } from '../config';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
-import { setEnv } from './index';
 import type { TCopyPasteData, TFabricEnv } from './types';
 
 const { implForWrapper: jsdomImplForWrapper } = utils;
@@ -22,10 +20,6 @@ const { window: JSDOMWindow } = new JSDOM(
     pretendToBeVisual: true,
   }
 );
-
-config.configure({
-  devicePixelRatio: JSDOMWindow.devicePixelRatio || 1,
-});
 
 export const getNodeCanvas = (canvasEl: HTMLCanvasElement) => {
   const impl = jsdomImplForWrapper(canvasEl);
@@ -48,11 +42,12 @@ export const getEnv = (): TFabricEnv => {
   return {
     document: JSDOMWindow.document,
     window: JSDOMWindow,
+    get devicePixelRatio() {
+      return JSDOMWindow.devicePixelRatio || 1;
+    },
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
     dispose,
     copyPasteData,
   };
 };
-
-setEnv(getEnv());

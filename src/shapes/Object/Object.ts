@@ -52,7 +52,7 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
-import { getEnv } from '../../env';
+import { getDevicePixelRatio, getEnv } from '../../env';
 import { log } from '../../util/internals/console';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
@@ -1361,9 +1361,7 @@ export class FabricObject<
       originalGroup = this.group,
       originalShadow = this.shadow,
       abs = Math.abs,
-      retinaScaling = options.enableRetinaScaling
-        ? Math.max(config.devicePixelRatio, 1)
-        : 1,
+      retinaScaling = options.enableRetinaScaling ? getDevicePixelRatio() : 1,
       multiplier = (options.multiplier || 1) * retinaScaling;
     delete this.group;
     if (options.withoutTransform) {

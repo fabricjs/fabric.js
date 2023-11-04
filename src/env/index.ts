@@ -30,9 +30,14 @@ export const setEnv = (value: TFabricEnv) => {
   env = value;
 };
 
-export const getEnv = () => env || getBrowserEnv();
+/**
+ * In order to support SSR we **MUST** access the browser env only after the window has loaded
+ */
+export const getEnv = () => env || (env = getBrowserEnv());
 
 export const getFabricDocument = (): Document => getEnv().document;
 
 export const getFabricWindow = (): (Window & typeof globalThis) | DOMWindow =>
   getEnv().window;
+
+export const getDevicePixelRatio = () => Math.max(1, getEnv().devicePixelRatio);

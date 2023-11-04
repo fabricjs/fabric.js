@@ -23,12 +23,6 @@ class BaseConfiguration {
   DPI = 96;
 
   /**
-   * Device Pixel Ratio
-   * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
-   */
-  devicePixelRatio = 1;
-
-  /**
    * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
    * @since 1.7.14
    * @type Number
