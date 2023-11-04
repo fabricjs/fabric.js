@@ -44,4 +44,3 @@ export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
   // @todo discuss what to do and how to do
   return !!fabricObject && fabricObject.isType('Path');
 };
-
