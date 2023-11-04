@@ -1,11 +1,15 @@
-// @ts-nocheck
 import { getFabricDocument, getEnv } from '../env';
 import type { BaseFilter } from '../filters/BaseFilter';
 import { getFilterBackend } from '../filters/FilterBackend';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
-import type { TClassProperties, TSize } from '../typedefs';
-import type { Abortable } from '../typedefs';
+import type {
+  TClassProperties,
+  TCrossOrigin,
+  TSize,
+  Abortable,
+  TOptions,
+} from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
@@ -18,14 +22,15 @@ import {
 import { parsePreserveAspectRatioAttribute } from '../util/misc/svgParsing';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { NONE } from '../constants';
+import { getDocumentFromElement } from '../util/dom_misc';
+import type { CSSRules } from '../parser/typedefs';
+import type { Resize } from '../filters/Resize';
+import type { TCachedFabricObject } from './Object/Object';
+import { log } from '../util/internals/console';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -40,9 +45,8 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  crossOrigin: string | null;
   filters: BaseFilter[];
-  resizeFilter?: BaseFilter;
+  resizeFilter?: Resize;
 }
 
 export const imageDefaultValues: Partial<UniqueImageProps> &
@@ -57,7 +61,7 @@ export const imageDefaultValues: Partial<UniqueImageProps> &
 
 export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
-  crossOrigin: string | null;
+  crossOrigin: TCrossOrigin;
   filters: any[];
   resizeFilter?: any;
   cropX: number;
@@ -71,8 +75,8 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
-export class Image<
-    Props extends TProps<ImageProps> = Partial<ImageProps>,
+export class FabricImage<
+    Props extends TOptions<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -80,7 +84,7 @@ export class Image<
   implements ImageProps
 {
   /**
-   * When calling {@link Image.getSrc}, return value from element src with `element.getAttribute('src')`.
+   * When calling {@link FabricImage.getSrc}, return value from element src with `element.getAttribute('src')`.
    * This allows for relative urls as image src.
    * @since 2.7.0
    * @type Boolean
@@ -164,11 +168,13 @@ export class Image<
   protected declare src: string;
 
   declare filters: BaseFilter[];
-  declare resizeFilter: BaseFilter;
+  declare resizeFilter: Resize;
 
-  protected declare _element: ImageSource;
-  protected declare _originalElement: ImageSource;
-  protected declare _filteredEl: ImageSource;
+  declare _element: ImageSource;
+  declare _filteredEl?: HTMLCanvasElement;
+  declare _originalElement: ImageSource;
+
+  static type = 'Image';
 
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
@@ -177,7 +183,7 @@ export class Image<
   static getDefaults() {
     return {
       ...super.getDefaults(),
-      ...Image.ownDefaults,
+      ...FabricImage.ownDefaults,
     };
   }
   /**
@@ -197,7 +203,7 @@ export class Image<
     this.setElement(
       typeof arg0 === 'string'
         ? ((
-            (this.canvas && getElementDocument(this.canvas.getElement())) ||
+            (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
             getFabricDocument()
           ).getElementById(arg0) as ImageSource)
         : arg0,
@@ -225,7 +231,7 @@ export class Image<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(Image.CSS_CANVAS);
+    element.classList.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -355,12 +361,12 @@ export class Image<
    * of the instance
    */
   _toSVG() {
-    const imageMarkup = [],
+    const imageMarkup: string[] = [],
       element = this._element,
       x = -this.width / 2,
       y = -this.height / 2;
-    let svgString = [],
-      strokeSvg,
+    let svgString: string[] = [],
+      strokeSvg: string[] = [],
       clipPath = '',
       imageRendering = '';
     if (!element) {
@@ -384,46 +390,30 @@ export class Image<
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
     }
     if (!this.imageSmoothing) {
-      imageRendering = '" image-rendering="optimizeSpeed';
+      imageRendering = ' image-rendering="optimizeSpeed"';
     }
     imageMarkup.push(
       '\t<image ',
       'COMMON_PARTS',
-      'xlink:href="',
-      this.getSvgSrc(true),
-      '" x="',
-      x - this.cropX,
-      '" y="',
-      y - this.cropY,
-      // we're essentially moving origin of transformation from top/left corner to the center of the shape
-      // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
-      // so that object's center aligns with container's left/top
-      '" width="',
-      element.width || element.naturalWidth,
-      '" height="',
-      element.height || element.naturalHeight,
-      imageRendering,
-      '"',
-      clipPath,
-      '></image>\n'
+      `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${
+        y - this.cropY
+        // we're essentially moving origin of transformation from top/left corner to the center of the shape
+        // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
+        // so that object's center aligns with container's left/top
+      }" width="${
+        element.width || (element as HTMLImageElement).naturalWidth
+      }" height="${
+        element.height || (element as HTMLImageElement).naturalHeight
+      }"${imageRendering}${clipPath}></image>\n`
     );
 
     if (this.stroke || this.strokeDashArray) {
       const origFill = this.fill;
       this.fill = null;
       strokeSvg = [
-        '\t<rect ',
-        'x="',
-        x,
-        '" y="',
-        y,
-        '" width="',
-        this.width,
-        '" height="',
-        this.height,
-        '" style="',
-        this.getSvgStyles(),
-        '"/>\n',
+        `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
+          this.height
+        }" styles="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }
@@ -443,14 +433,14 @@ export class Image<
   getSrc(filtered?: boolean): string {
     const element = filtered ? this._element : this._originalElement;
     if (element) {
-      if (element.toDataURL) {
-        return element.toDataURL();
+      if ((element as HTMLCanvasElement).toDataURL) {
+        return (element as HTMLCanvasElement).toDataURL();
       }
 
       if (this.srcFromAttribute) {
-        return element.getAttribute('src');
+        return element.getAttribute('src') || '';
       } else {
-        return element.src;
+        return (element as HTMLImageElement).src;
       }
     } else {
       return this.src || '';
@@ -514,7 +504,7 @@ export class Image<
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
-      [filter],
+      [filter as BaseFilter],
       elementToFilter,
       sourceWidth,
       sourceHeight,
@@ -539,29 +529,35 @@ export class Image<
 
     if (filters.length === 0) {
       this._element = this._originalElement;
-      this._filteredEl = null;
+      // this is unsafe and needs to be rethinkend
+      this._filteredEl = undefined;
       this._filterScalingX = 1;
       this._filterScalingY = 1;
       return;
     }
 
     const imgElement = this._originalElement,
-      sourceWidth = imgElement.naturalWidth || imgElement.width,
-      sourceHeight = imgElement.naturalHeight || imgElement.height;
+      sourceWidth =
+        (imgElement as HTMLImageElement).naturalWidth || imgElement.width,
+      sourceHeight =
+        (imgElement as HTMLImageElement).naturalHeight || imgElement.height;
 
     if (this._element === this._originalElement) {
-      // if the element is the same we need to create a new element
+      // if the _element a reference to _originalElement
+      // we need to create a new element to host the filtered pixels
       const canvasEl = createCanvasElement();
       canvasEl.width = sourceWidth;
       canvasEl.height = sourceHeight;
       this._element = canvasEl;
       this._filteredEl = canvasEl;
-    } else {
-      // clear the existing element to get new filter data
-      // also dereference the eventual resized _element
+    } else if (this._filteredEl) {
+      // if the _element is it own element,
+      // and we also have a _filteredEl, then we clean up _filteredEl
+      // and we assign it to _element.
+      // in this way we invalidate the eventual old resize filtered element
       this._element = this._filteredEl;
       this._filteredEl
-        .getContext('2d')
+        .getContext('2d')!
         .clearRect(0, 0, sourceWidth, sourceHeight);
       // we also need to resize again at next renderAll, so remove saved _lastScaleX/Y
       this._lastScaleX = 1;
@@ -572,7 +568,7 @@ export class Image<
       this._originalElement,
       sourceWidth,
       sourceHeight,
-      this._element
+      this._element as HTMLCanvasElement
     );
     if (
       this._originalElement.width !== this._element.width ||
@@ -602,8 +598,12 @@ export class Image<
    * it will set the imageSmoothing for the draw operation
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawCacheOnCanvas(ctx: CanvasRenderingContext2D) {
+  drawCacheOnCanvas(
+    this: TCachedFabricObject<FabricImage>,
+    ctx: CanvasRenderingContext2D
+  ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
+    // @ts-expect-error TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 
@@ -634,8 +634,11 @@ export class Image<
       // crop values cannot be lesser than 0.
       cropX = Math.max(this.cropX, 0),
       cropY = Math.max(this.cropY, 0),
-      elWidth = elementToDraw.naturalWidth || elementToDraw.width,
-      elHeight = elementToDraw.naturalHeight || elementToDraw.height,
+      elWidth =
+        (elementToDraw as HTMLImageElement).naturalWidth || elementToDraw.width,
+      elHeight =
+        (elementToDraw as HTMLImageElement).naturalHeight ||
+        elementToDraw.height,
       sX = cropX * scaleX,
       sY = cropY * scaleY,
       // the width height cannot exceed element width/height, starting from the crop offset.
@@ -762,7 +765,7 @@ export class Image<
   static CSS_CANVAS = 'canvas-img';
 
   /**
-   * List of attribute names to account for when parsing SVG element (used by {@link Image.fromElement})
+   * List of attribute names to account for when parsing SVG element (used by {@link FabricImage.fromElement})
    * @static
    * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
@@ -779,28 +782,28 @@ export class Image<
   ];
 
   /**
-   * Creates an instance of Image from its object representation
+   * Creates an instance of FabricImage from its object representation
    * @static
    * @param {Object} object Object to create an instance from
    * @param {object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
-   * @returns {Promise<Image>}
+   * @returns {Promise<FabricImage>}
    */
-  static fromObject<T extends TProps<SerializedImageProps>>(
+  static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, ...object }: T,
     options: Abortable = {}
   ) {
     return Promise.all([
-      loadImage(src, { ...options, crossOrigin }),
-      f && enlivenObjects(f, options),
+      loadImage(src!, { ...options, crossOrigin }),
+      f && enlivenObjects<BaseFilter>(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects([rf], options),
+      rf && enlivenObjects<BaseFilter>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {
         ...object,
+        // TODO: this creates a difference between image creation and restoring from JSON
         src,
-        crossOrigin,
         filters,
         resizeFilter,
         ...hydratedProps,
@@ -813,34 +816,46 @@ export class Image<
    * @static
    * @param {String} url URL to create an image from
    * @param {LoadImageOptions} [options] Options object
-   * @returns {Promise<Image>}
+   * @returns {Promise<FabricImage>}
    */
-  static fromURL<T extends TProps<SerializedImageProps>>(
+  static fromURL<T extends TOptions<ImageProps>>(
     url: string,
-    options: T & LoadImageOptions = {}
-  ): Promise<Image> {
-    return loadImage(url, options).then((img) => new this(img, options));
+    { crossOrigin = null, signal }: LoadImageOptions = {},
+    imageOptions: T
+  ): Promise<FabricImage> {
+    return loadImage(url, { crossOrigin, signal }).then(
+      (img) => new this(img, imageOptions)
+    );
   }
 
   /**
-   * Returns {@link Image} instance from an SVG element
+   * Returns {@link FabricImage} instance from an SVG element
    * @static
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
-  static async fromElement(element: SVGElement, options: Abortable = {}) {
-    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES);
-    return this.fromURL(parsedAttributes['xlink:href'], {
-      ...options,
-      ...parsedAttributes,
-    }).catch((err) => {
-      console.log(err);
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable = {},
+    cssRules?: CSSRules
+  ) {
+    const parsedAttributes = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    );
+    return this.fromURL(
+      parsedAttributes['xlink:href'],
+      options,
+      parsedAttributes
+    ).catch((err) => {
+      log('log', 'Unable to parse Image', err);
       return null;
     });
   }
 }
 
-classRegistry.setClass(Image);
-classRegistry.setSVGClass(Image);
+classRegistry.setClass(FabricImage);
+classRegistry.setSVGClass(FabricImage);

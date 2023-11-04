@@ -120,7 +120,7 @@ export class DraggableTextDelegate {
       boundaries.top + boundaries.topOffset
     ).multiply(flipFactor);
     const pos = selectionPosition.transform(target.calcTransformMatrix());
-    const pointer = canvas.getPointer(e);
+    const pointer = canvas.getScenePoint(e);
     const diff = pointer.subtract(pos);
     const enableRetinaScaling = canvas._isRetinaScaling();
     const retinaScaling = target.getCanvasRetinaScaling();
@@ -206,7 +206,11 @@ export class DraggableTextDelegate {
    * @returns {boolean} determines whether {@link target} should/shouldn't become a drop target
    */
   canDrop(e: DragEvent): boolean {
-    if (this.target.editable && !this.target.__corner && !e.defaultPrevented) {
+    if (
+      this.target.editable &&
+      !this.target.getActiveControl() &&
+      !e.defaultPrevented
+    ) {
       if (this.isActive() && this.__dragStartSelection) {
         //  drag source trying to drop over itself
         //  allow dropping only outside of drag start selection

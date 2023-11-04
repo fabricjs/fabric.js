@@ -24,10 +24,10 @@
     var cObj = new fabric.Object();
 
     assert.ok(cObj);
-    assert.ok(cObj instanceof fabric.Object);
+    assert.ok(cObj instanceof fabric.FabricObject);
     assert.ok(cObj.constructor === fabric.Object);
 
-    assert.equal(cObj.constructor.name, 'FabricObject');
+    assert.equal(cObj.constructor.type, 'FabricObject');
     assert.equal(cObj.includeDefaultValues, true);
     assert.equal(cObj.selectable, true);
 
@@ -293,7 +293,7 @@
 
   QUnit.test('toString', function (assert) {
     class Moo extends fabric.Object {
-      static type = 'moo'
+      static type = 'Moo'
     }
     var cObj = new fabric.Object();
     assert.equal(cObj.toString(), '#<FabricObject>');
@@ -303,14 +303,6 @@
   QUnit.test('render', function(assert) {
     var cObj = new fabric.Object();
     assert.ok(typeof cObj.render === 'function');
-  });
-
-  QUnit.test('rotate', function(assert) {
-    var cObj = new fabric.Object();
-    assert.ok(typeof cObj.rotate === 'function');
-    assert.equal(cObj.get('angle'), 0);
-    cObj.rotate(45);
-    assert.equal(cObj.get('angle'), 45);
   });
 
   QUnit.test('scale', function(assert) {
@@ -338,7 +330,7 @@
     assert.equal(cObj.get('angle'), 45);
   });
 
-  QUnit.test('rotate', function(assert) {
+  QUnit.test('rotate what?', function(assert) {
     var cObj = new fabric.Object();
     assert.equal(cObj.get('angle'), 0);
     assert.equal(cObj.set('angle', 45), cObj, 'chainable');
@@ -369,7 +361,7 @@
     assert.ok(typeof cObj.cloneAsImage === 'function');
     var image = cObj.cloneAsImage();
     assert.ok(image);
-    assert.ok(image instanceof fabric.Image);
+    assert.ok(image instanceof fabric.FabricImage);
     assert.equal(image.width, 100, 'the image has same dimension of object');
   });
 
@@ -378,7 +370,7 @@
     fabric.config.configure({ devicePixelRatio: 2 });
     var image = cObj.cloneAsImage({ enableRetinaScaling: true });
     assert.ok(image);
-    assert.ok(image instanceof fabric.Image);
+    assert.ok(image instanceof fabric.FabricImage);
     assert.equal(image.width, 200, 'the image has been scaled by retina');
   });
 
@@ -1312,34 +1304,6 @@
     object.group = { isOnACache: function() { return false; }};
     assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group not cached, we cache anyway');
 
-  });
-  QUnit.test('needsItsOwnCache', function(assert) {
-    var object = new fabric.Object();
-    assert.equal(object.needsItsOwnCache(), false, 'default needsItsOwnCache is false');
-    object.clipPath = {};
-    assert.equal(object.needsItsOwnCache(), true, 'with a clipPath is true');
-    delete object.clipPath;
-
-    object.paintFirst = 'stroke';
-    object.stroke = 'black';
-    object.shadow = {};
-    assert.equal(object.needsItsOwnCache(), true, 'if stroke first will return true');
-
-    object.paintFirst = 'stroke';
-    object.stroke = 'black';
-    object.shadow = null;
-    assert.equal(object.needsItsOwnCache(), true, 'if stroke first will return false if no shadow');
-
-    object.paintFirst = 'stroke';
-    object.stroke = '';
-    object.shadow = {};
-    assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no stroke');
-
-    object.paintFirst = 'stroke';
-    object.stroke = 'black';
-    object.fill = '';
-    object.shadow = {};
-    assert.equal(object.needsItsOwnCache(), false, 'if stroke first will return false if no fill');
   });
   QUnit.test('hasStroke', function(assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100, strokeWidth: 3, stroke: 'black' });

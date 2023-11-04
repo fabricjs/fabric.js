@@ -16,7 +16,7 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
   container: HTMLDivElement;
 
   constructor(
-    arg0: string | HTMLCanvasElement,
+    arg0?: string | HTMLCanvasElement,
     {
       allowTouchScrolling = false,
       containerClass = '',
@@ -82,8 +82,8 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
   ) {
     setStyle(element, {
       position: 'absolute',
-      left: 0,
-      top: 0,
+      left: '0',
+      top: '0',
     });
     allowTouchScrolling(element, allow);
     makeElementUnselectable(element);

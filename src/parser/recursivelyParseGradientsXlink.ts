@@ -1,7 +1,3 @@
-//@ts-nocheck
-
-import { elementById } from './elementById';
-
 const gradientsAttrs = [
   'gradientTransform',
   'x1',
@@ -17,25 +13,27 @@ const gradientsAttrs = [
 ];
 const xlinkAttr = 'xlink:href';
 
-export function recursivelyParseGradientsXlink(doc, gradient) {
-  const xLink = gradient.getAttribute(xlinkAttr).slice(1),
-    referencedGradient = elementById(doc, xLink);
+export function recursivelyParseGradientsXlink(
+  doc: Document,
+  gradient: Element
+) {
+  const xLink = gradient.getAttribute(xlinkAttr)?.slice(1) || '',
+    referencedGradient = doc.getElementById(xLink);
   if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
-    recursivelyParseGradientsXlink(doc, referencedGradient);
+    recursivelyParseGradientsXlink(doc, referencedGradient as Element);
   }
-  gradientsAttrs.forEach(function (attr) {
-    if (
-      referencedGradient &&
-      !gradient.hasAttribute(attr) &&
-      referencedGradient.hasAttribute(attr)
-    ) {
-      gradient.setAttribute(attr, referencedGradient.getAttribute(attr));
-    }
-  });
-  if (!gradient.children.length) {
-    const referenceClone = referencedGradient.cloneNode(true);
-    while (referenceClone.firstChild) {
-      gradient.appendChild(referenceClone.firstChild);
+  if (referencedGradient) {
+    gradientsAttrs.forEach((attr) => {
+      const value = referencedGradient.getAttribute(attr);
+      if (!gradient.hasAttribute(attr) && value) {
+        gradient.setAttribute(attr, value);
+      }
+    });
+    if (!gradient.children.length) {
+      const referenceClone = referencedGradient.cloneNode(true);
+      while (referenceClone.firstChild) {
+        gradient.appendChild(referenceClone.firstChild);
+      }
     }
   }
   gradient.removeAttribute(xlinkAttr);

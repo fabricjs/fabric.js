@@ -18,6 +18,7 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   Abortable,
+  TOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -40,7 +41,7 @@ import {
   isSerializableFiller,
   isTextObject,
 } from '../../util/typeAssertions';
-import type { Image } from '../Image';
+import type { FabricImage } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -51,13 +52,13 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
-import type { TProps } from './types';
 import { getEnv } from '../../env';
+import { log } from '../../util/internals/console';
 
-export type TCachedFabricObject = FabricObject &
+export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
     Pick<
-      FabricObject,
+      T,
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'
@@ -98,7 +99,7 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -269,6 +270,15 @@ export class FabricObject<
   }
 
   /**
+   * The class type. Used to identify which class this is.
+   * This is used for serialization purposes and internally it can be used
+   * to identify classes. As a developer you could use `instance of Class`
+   * but to avoid importing all the code and blocking tree shaking we try
+   * to avoid doing that.
+   */
+  static type = 'FabricObject';
+
+  /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
    * The setter exists because is very hard to catch all the ways in which a type value
@@ -278,7 +288,7 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
-    const name = this.constructor.name;
+    const name = (this.constructor as typeof FabricObject).type;
     if (name === 'FabricObject') {
       return 'object';
     }
@@ -286,7 +296,7 @@ export class FabricObject<
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**
@@ -503,7 +513,7 @@ export class FabricObject<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  protected toObject(propertiesToInclude: any[] = []): any {
+  toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -515,7 +525,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.constructor.name,
+        type: (this.constructor as typeof FabricObject).type,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -609,7 +619,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${this.constructor.name}>`;
+    return `#<${(this.constructor as typeof FabricObject).type}>`;
   }
 
   /**
@@ -835,7 +845,7 @@ export class FabricObject<
       this.paintFirst === 'stroke' &&
       this.hasFill() &&
       this.hasStroke() &&
-      typeof this.shadow === 'object'
+      !!this.shadow
     ) {
       return true;
     }
@@ -1323,9 +1333,9 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {Image} Object cloned as image.
+   * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): Image {
+  cloneAsImage(options: any): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
     const ImageClass = classRegistry.getClass('image');
@@ -1404,7 +1414,7 @@ export class FabricObject<
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
-    // @ts-ignore this needs to be fixed somehow, or ignored globally
+    // @ts-expect-error this needs to be fixed somehow, or ignored globally
     canvas._objects = [this];
     this.set('canvas', canvas);
     this.setCoords();
@@ -1454,7 +1464,10 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.constructor.name) || types.includes(this.type);
+    return (
+      types.includes((this.constructor as typeof FabricObject).type) ||
+      types.includes(this.type)
+    );
   }
 
   /**
@@ -1479,18 +1492,28 @@ export class FabricObject<
    * @param {TDegree} angle Angle value (in degrees)
    */
   rotate(angle: TDegree) {
-    const shouldCenterOrigin =
-      (this.originX !== CENTER || this.originY !== CENTER) &&
-      this.centeredRotation;
+    const { centeredRotation, originX, originY } = this;
 
-    if (shouldCenterOrigin) {
-      this._setOriginToCenter();
+    if (centeredRotation) {
+      const { x, y } = this.getRelativeCenterPoint();
+      this.originX = CENTER;
+      this.originY = CENTER;
+      this.left = x;
+      this.top = y;
     }
 
     this.set('angle', angle);
 
-    if (shouldCenterOrigin) {
-      this._resetOrigin();
+    if (centeredRotation) {
+      const { x, y } = this.translateToOriginPoint(
+        this.getRelativeCenterPoint(),
+        originX,
+        originY
+      );
+      this.left = x;
+      this.top = y;
+      this.originX = originX;
+      this.originY = originY;
     }
   }
 
@@ -1565,7 +1588,7 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T extends TProps<SerializedObjectProps>>(
+  static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
     options?: Abortable
   ) {

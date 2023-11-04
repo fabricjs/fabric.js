@@ -269,6 +269,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(30, 15),
                         absolutePointer: new fabric.Point(30, 15),
+                        viewportPoint: new fabric.Point(30, 15),
+                        scenePoint: new fabric.Point(30, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -300,6 +302,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(123, 15),
                         absolutePointer: new fabric.Point(123, 15),
+                        viewportPoint: new fabric.Point(123, 15),
+                        scenePoint: new fabric.Point(123, 15),
                         isClick: false,
                         nextTarget: undefined
                     },
@@ -360,10 +364,12 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(210, 15),
                         absolutePointer: new fabric.Point(210, 15),
+                        viewportPoint: new fabric.Point(210, 15),
+                        scenePoint: new fabric.Point(210, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
-                    ...dragEvents.slice(0, 5).map(e => ({
+                    ...dragEvents.slice(0, 6).map(e => ({
                         e,
                         target: iText2,
                         type: 'dragover',
@@ -373,22 +379,24 @@ function assertDragEventStream(name, a, b) {
                         canDrop: true
                     })),
                     {
-                        e: dragEvents[5],
+                        e: dragEvents[6],
                         target: iText2,
                         type: 'dragleave',
                         subTargets: [],
                         dragSource: iText,
                         dropTarget: undefined,
                         canDrop: false,
-                        pointer: new fabric.Point(220, 0),
-                        absolutePointer: new fabric.Point(220, 0),
+                        pointer: new fabric.Point(220, -5),
+                        absolutePointer: new fabric.Point(220, -5),
+                        viewportPoint: new fabric.Point(220, -5),
+                        scenePoint: new fabric.Point(220, -5),
                         isClick: false,
                         nextTarget: undefined
                     },
                 ]);
                 assert.deepEqual(renderEffects, [
-                    ...dragEvents.slice(0, 5).map(e => ({ e, source: iText, target: iText2 })),
-                    ...dragEvents.slice(5).map(e => ({ e, source: iText, target: undefined })),
+                    ...dragEvents.slice(0, 6).map(e => ({ e, source: iText, target: iText2 })),
+                    ...dragEvents.slice(6).map(e => ({ e, source: iText, target: undefined })),
                 ], 'render effects');
                 assert.equal(fabric.getFabricDocument().activeElement, iText.hiddenTextarea, 'should have focused hiddenTextarea');
             });
@@ -456,6 +464,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(100, 15),
                         absolutePointer: new fabric.Point(100, 15),
+                        viewportPoint: new fabric.Point(100, 15),
+                        scenePoint: new fabric.Point(100, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -482,6 +492,9 @@ function assertDragEventStream(name, a, b) {
                         dropTarget: iText,
                         didDrop: true,
                         pointer: new fabric.Point(110, 15),
+                        absolutePointer: new fabric.Point(110, 15),
+                        viewportPoint: new fabric.Point(110, 15),
+                        scenePoint: new fabric.Point(110, 15),
                     },
                     {
                         e: drop,
@@ -522,6 +535,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(230, 15),
                         absolutePointer: new fabric.Point(230, 15),
+                        viewportPoint: new fabric.Point(230, 15),
+                        scenePoint: new fabric.Point(230, 15),
                         isClick: false,
                         previousTarget: undefined
                     },
@@ -547,7 +562,10 @@ function assertDragEventStream(name, a, b) {
                         dragSource: iText,
                         dropTarget: iText2,
                         didDrop: true,
+                        absolutePointer: new fabric.Point(240, 15),
                         pointer: new fabric.Point(240, 15),
+                        viewportPoint: new fabric.Point(240, 15),
+                        scenePoint: new fabric.Point(240, 15),
                     },
                 ]);
                 assert.equal(fabric.getFabricDocument().activeElement, iText2.hiddenTextarea, 'should have focused hiddenTextarea');
@@ -580,6 +598,8 @@ function assertDragEventStream(name, a, b) {
                         canDrop: false,
                         pointer: new fabric.Point(230, 15),
                         absolutePointer: new fabric.Point(230, 15),
+                        viewportPoint: new fabric.Point(230, 15),
+                        scenePoint: new fabric.Point(230, 15),
                         isClick: false,
                         previousTarget: undefined
                     },

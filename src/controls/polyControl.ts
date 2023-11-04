@@ -21,7 +21,7 @@ const getSize = (poly: Polyline) => {
  * This function locates the controls.
  * It'll be used both for drawing and for interaction.
  */
-const factoryPolyPositionHandler = (pointIndex: number) => {
+export const createPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
       y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
@@ -41,7 +41,7 @@ const factoryPolyPositionHandler = (pointIndex: number) => {
  * and the current position in canvas coordinate `transform.target` is a reference to the
  * current object being transformed.
  */
-const polyActionHandler = (
+export const polyActionHandler = (
   eventData: TPointerEvent,
   transform: TTransformAnchor,
   x: number,
@@ -69,7 +69,7 @@ const polyActionHandler = (
 /**
  * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
  */
-const anchorWrapper = (
+export const factoryPolyActionHandler = (
   pointIndex: number,
   fn: TransformActionHandler<TTransformAnchor>
 ) => {
@@ -80,31 +80,32 @@ const anchorWrapper = (
     y: number
   ) {
     const poly = transform.target as Polyline,
-      anchorIndex = (pointIndex > 0 ? pointIndex : poly.points.length) - 1,
-      pointInParentPlane = new Point(
-        poly.points[anchorIndex].x - poly.pathOffset.x,
-        poly.points[anchorIndex].y - poly.pathOffset.y
-      ).transform(poly.calcOwnMatrix()),
+      anchorPoint = new Point(
+        poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]
+      ),
+      anchorPointInParentPlane = anchorPoint
+        .subtract(poly.pathOffset)
+        .transform(poly.calcOwnMatrix()),
       actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
-      polygonBaseSize = getSize(poly),
       adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
-    const newPosition = new Point(
-      poly.points[anchorIndex].x,
-      poly.points[anchorIndex].y
-    )
+    const newPositionNormalized = anchorPoint
       .subtract(poly.pathOffset)
-      .divide(polygonBaseSize)
+      .divide(poly._getNonTransformedDimensions())
       .multiply(adjustFlip);
 
     poly.setPositionByOrigin(
-      pointInParentPlane,
-      newPosition.x + 0.5,
-      newPosition.y + 0.5
+      anchorPointInParentPlane,
+      newPositionNormalized.x + 0.5,
+      newPositionNormalized.y + 0.5
     );
+
     return actionPerformed;
   };
 };
+
+export const createPolyActionHandler = (pointIndex: number) =>
+  factoryPolyActionHandler(pointIndex, polyActionHandler);
 
 export function createPolyControls(
   poly: Polyline,
@@ -126,8 +127,8 @@ export function createPolyControls(
   ) {
     controls[`p${idx}`] = new Control({
       actionName: 'modifyPoly',
-      positionHandler: factoryPolyPositionHandler(idx),
-      actionHandler: anchorWrapper(idx, polyActionHandler),
+      positionHandler: createPolyPositionHandler(idx),
+      actionHandler: createPolyActionHandler(idx),
       ...options,
     });
   }

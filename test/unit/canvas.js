@@ -182,11 +182,6 @@
     assert.equal(canvas.altActionKey, 'shiftKey', 'default is shift');
   });
 
-  QUnit.test('interactive', function(assert) {
-    assert.ok(typeof canvas.interactive === 'boolean');
-    assert.ok(canvas.interactive, 'default is true');
-  });
-
   QUnit.test('selection', function(assert) {
     assert.ok(typeof canvas.selection === 'boolean');
     assert.ok(canvas.selection, 'default is true');
@@ -397,7 +392,7 @@
     assert.equal(activeSelection[1], rect1, 'then rect1');
   });
 
-  QUnit.test('start multiselection: preserve', function (assert) {
+  QUnit.test('start multiselection: canvas-stacking', function (assert) {
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
@@ -439,7 +434,6 @@
     updateActiveSelection(canvas, [rect1, rect2], rect3, 'selection-order');
     assert.equal(isFired, true, 'selected on rect3 fired');
   });
-
 
   QUnit.test('continuing multiselection respects order of objects', function (assert) {
     const rect1 = new fabric.Rect();
@@ -525,6 +519,19 @@
     assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
   });
 
+  QUnit.test('multiselection: selecting a target behind active selection', assert => {
+    const rect1 = new fabric.Rect({ left: 10, width: 10, height: 10 });
+    const rect2 = new fabric.Rect({ width: 10, height: 10 });
+    const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
+    canvas.add(rect1, rect2, rect3);
+    initActiveSelection(canvas, rect1, rect3);
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'selected');
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3], 'created');
+    canvas.__onMouseDown({ clientX: 7, clientY: 7, [canvas.selectionKey]: true });
+    assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'added from behind active selection');
+    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+  });
+
   QUnit.test('setActiveObject fires deselected', function(assert) {
     var isFired = false;
     var rect1 = new fabric.Rect();
@@ -576,7 +583,7 @@
     });
     canvas.__onMouseUp({ target: canvas.upperCanvasEl });
     assert.equal(isFired, true, 'selection created fired');
-    assert.equal(canvas.getActiveObject().constructor.name, 'ActiveSelection', 'an active selection is created');
+    assert.equal(canvas.getActiveObject().constructor.type, 'ActiveSelection', 'an active selection is created');
     assert.equal(canvas.getActiveObjects()[0], rect1, 'rect1 is first object');
     assert.equal(canvas.getActiveObjects()[1], rect2, 'rect2 is second object');
     assert.equal(canvas.getActiveObjects()[2], rect3, 'rect3 is third object');
@@ -1155,26 +1162,6 @@
     assert.equal(dataURL.substring(0, 21), 'data:image/png;base64');
   });
 
-  //  QUnit.test('getPointer', function(assert) {
-  //    var done = assert.async();
-  //    assert.ok(typeof canvas.getPointer === 'function');
-  //
-  //    fabric.util.addListener(upperCanvasEl, 'click', function(e) {
-  //       canvas.calcOffset();
-  //       var pointer = canvas.getPointer(e);
-  //       assert.equal(pointer.x, 101, 'pointer.x should be correct');
-  //       assert.equal(pointer.y, 102, 'pointer.y should be correct');
-  //
-  //       done();
-  //   });
-
-  //     setTimeout(function() {
-  //       simulateEvent(upperCanvasEl, 'click', {
-  //         pointerX: 101, pointerY: 102
-  //       });
-  //     }, 100);
-  // });
-
   QUnit.test('getCenter', function(assert) {
     assert.ok(typeof canvas.getCenter === 'function');
     var center = canvas.getCenter();
@@ -1258,7 +1245,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
   });
 
 
@@ -1311,7 +1298,7 @@
     var rect = makeRect();
     canvasWithClipPath.add(rect);
 
-    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvasWithClipPath.toObject().objects[0].type, rect.constructor.type);
   });
 
   QUnit.test('toDatalessObject', function(assert) {
@@ -1326,7 +1313,7 @@
     var rect = makeRect();
     canvas.add(rect);
 
-    assert.equal(canvas.toObject().objects[0].type, rect.constructor.name);
+    assert.equal(canvas.toObject().objects[0].type, rect.constructor.type);
     // TODO (kangax): need to test this method with fabric.Path to ensure that path is not populated
   });
 
@@ -1344,7 +1331,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1372,7 +1359,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1400,7 +1387,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1428,7 +1415,7 @@
     function reviver(obj, instance) {
       assert.deepEqual(obj, JSON.parse(PATH_OBJ_JSON));
 
-      if (instance.constructor.name === 'Path') {
+      if (instance.constructor.type === 'Path') {
         instance.customID = 'fabric_1';
       }
     }
@@ -1437,7 +1424,7 @@
       var obj = canvas.item(0);
 
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
-      assert.equal(obj.constructor.name, 'Path', 'first object is a path object');
+      assert.equal(obj.constructor.type, 'Path', 'first object is a path object');
       assert.equal(canvas.backgroundColor, '#ff5555', 'backgroundColor is populated properly');
       assert.equal(canvas.overlayColor, 'rgba(0,0,0,0.2)', 'overlayColor is populated properly');
 
@@ -1579,43 +1566,6 @@
       assert.equal(canvas.preserveObjectStacking, true);
       done();
     });
-  });
-
-
-  QUnit.test('normalize pointer', function(assert) {
-    assert.ok(typeof canvas._normalizePointer === 'function');
-    var pointer = new fabric.Point({ x: 10, y: 20 }),
-        object = makeRect({ top: 10, left: 10, width: 50, height: 50, strokeWidth: 0}),
-        normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -25, 'should be in top left corner of rect');
-    assert.equal(normalizedPointer.y, -15, 'should be in top left corner of rect');
-    object.angle = 90;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -15, 'should consider angle');
-    assert.equal(normalizedPointer.y, -25, 'should consider angle');
-    object.angle = 0;
-    object.scaleX = 2;
-    object.scaleY = 2;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x, -25, 'should consider scale');
-    assert.equal(normalizedPointer.y, -20, 'should consider scale');
-    object.skewX = 60;
-    normalizedPointer = canvas._normalizePointer(object, pointer);
-    assert.equal(normalizedPointer.x.toFixed(2), -33.66, 'should consider skewX');
-    assert.equal(normalizedPointer.y, -20, 'should not change');
-  });
-
-  QUnit.test('restorePointerVpt', function(assert) {
-    assert.ok(typeof canvas.restorePointerVpt === 'function');
-    var pointer = new fabric.Point({ x: 10, y: 20 }),
-        restoredPointer = canvas.restorePointerVpt(pointer);
-    assert.equal(restoredPointer.x, pointer.x, 'no changes if not vpt is set');
-    assert.equal(restoredPointer.y, pointer.y, 'no changes if not vpt is set');
-    canvas.viewportTransform = [2, 0, 0, 2, 50, -60];
-    restoredPointer = canvas.restorePointerVpt(pointer);
-    assert.equal(restoredPointer.x, -20, 'vpt changes restored');
-    assert.equal(restoredPointer.y, 40, 'vpt changes restored');
-    canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
   });
 
   // QUnit.test('loadFromJSON with backgroundImage', function(assert) {
@@ -2079,7 +2029,7 @@
     };
     canvas.setActiveObject(rect);
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
@@ -2095,7 +2045,7 @@
       target: canvas.upperCanvasEl
     };
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, false);
     t = canvas._currentTransform;
@@ -2106,7 +2056,7 @@
 
     var alreadySelected = true;
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
@@ -2124,7 +2074,7 @@
       shiftKey: true
     };
     rect.__corner = rect._findTargetCorner(
-      canvas.getPointer(eventStub, true)
+      canvas.getViewportPoint(eventStub)
     );
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;

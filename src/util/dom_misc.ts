@@ -3,10 +3,14 @@
  * @param {HTMLElement} element Element to operate on
  * @return {Object} Object with left/top values
  */
-export function getScrollLeftTop(element: HTMLElement) {
+export function getScrollLeftTop(element: HTMLElement | null) {
+  const doc = element && getDocumentFromElement(element);
   let left = 0,
     top = 0;
-  const doc = getDocumentFromElement(element);
+  if (!element || !doc) {
+    return { left, top };
+  }
+
   const docElement = doc.documentElement,
     body = doc.body || {
       scrollLeft: 0,
@@ -25,11 +29,11 @@ export function getScrollLeftTop(element: HTMLElement) {
       left = body.scrollLeft || docElement.scrollLeft || 0;
       top = body.scrollTop || docElement.scrollTop || 0;
     } else {
-      left += element.scrollLeft || 0;
-      top += element.scrollTop || 0;
+      left += element!.scrollLeft || 0;
+      top += element!.scrollTop || 0;
     }
 
-    if (element.nodeType === 1 && element.style.position === 'fixed') {
+    if (element!.nodeType === 1 && element!.style.position === 'fixed') {
       break;
     }
   }

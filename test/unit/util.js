@@ -513,6 +513,202 @@
     assert.ok(typeof fabric.util.getPointer === 'function', 'fabric.util.getPointer is a function');
   });
 
+  QUnit.test('isBetweenVectors', function(assert) {
+    assert.ok(typeof fabric.util.isBetweenVectors === 'function', 'fabric.util.isBetweenVectors is a function');
+
+    // Right angle
+    (function() {
+      const initialVector = new fabric.Point(1,0),
+        finalVector = new fabric.Point(0,1);
+      
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #1'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #2'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #3'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #4'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.99),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #5'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0, -0.01),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #6'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #7'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0, 1),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #8'
+      );
+    })();
+
+    // Acute angle
+    (function() {
+      const initialVector = new fabric.Point(1, 0),
+        finalVector = new fabric.Point(1, 0.5);
+      
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.25),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors acute angle #1'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #2'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #3'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #4'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.2),
+          initialVector,
+          finalVector 
+        ),
+        true,
+        'isBetweenVectors acute angle #5'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.6),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #6'
+      );
+    })();
+
+    // Obtuse angle
+    (function() {
+      const initialVector = new fabric.Point(1, 0.5),
+        finalVector = new fabric.Point(1, 0);
+      
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.25),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors obtuse angle #1'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors obtuse angle #2'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors obtuse angle #3'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors obtuse angle #4'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, -0.2),
+          initialVector,
+          finalVector 
+        ),
+        true,
+        'isBetweenVectors obtuse angle #5'
+      );
+    })();
+  });
+
   QUnit.test('rotateVector', function(assert) {
     assert.ok(typeof fabric.util.rotateVector === 'function');
   });
@@ -627,35 +823,6 @@
     sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, group, null, 'child');
     assert.deepEqual(sentPoint, new fabric.Point(0, 0));
     assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
-  });
-
-  QUnit.test('transformPointRelativeToCanvas', function(assert) {
-    assert.ok(typeof fabric.util.transformPointRelativeToCanvas === 'function');
-    var point = new fabric.Point(2, 2);
-    var matrix = [3, 0, 0, 2, 10, 4];
-    var canvas = {
-      viewportTransform: matrix
-    }
-    var transformPoint = fabric.util.transformPoint;
-    var invertTransform = fabric.util.invertTransform;
-    var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
-    var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
-    assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
-    assert.deepEqual(p, transformPoint(point, matrix));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
-    assert.deepEqual(p, point);
-    p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
-    assert.deepEqual(p, point);
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling');
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', true);
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
-    });
   });
 
   QUnit.test('sendObjectToPlane', function (assert) {

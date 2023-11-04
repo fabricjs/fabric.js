@@ -1,6 +1,6 @@
-import { LEFT } from '../../constants';
+import { LEFT, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
-import type { Text } from './Text';
+import type { FabricText } from './Text';
 
 const fontProperties = [
   'fontSize',
@@ -62,8 +62,8 @@ export const styleProperties: Readonly<StylePropertiesType[]> = [
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
 // this will be a separated effort
-export const textDefaultValues: Partial<TClassProperties<Text>> = {
-  _reNewline: /\r?\n/,
+export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
+  _reNewline: reNewline,
   _reSpacesAndTabs: /[ \t\r]/g,
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,
@@ -87,7 +87,7 @@ export const textDefaultValues: Partial<TClassProperties<Text>> = {
   textBackgroundColor: '',
   stroke: null,
   shadow: null,
-  path: null,
+  path: undefined,
   pathStartOffset: 0,
   pathSide: LEFT,
   pathAlign: 'baseline',

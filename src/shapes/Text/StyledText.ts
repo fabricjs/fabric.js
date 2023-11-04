@@ -1,22 +1,25 @@
 import type { ObjectEvents } from '../../EventTypeDefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from '../Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from '../Object/types';
+import type { TOptions } from '../../typedefs';
 import { FabricObject } from '../Object/FabricObject';
 import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
-import type { Text } from './Text';
+import type { FabricText } from './Text';
+import { pick } from '../../util';
 
-export type TextStyleDeclaration = Partial<Pick<Text, StylePropertiesType>>;
+export type CompleteTextStyleDeclaration = Pick<
+  FabricText,
+  StylePropertiesType
+>;
+
+export type TextStyleDeclaration = Partial<CompleteTextStyleDeclaration>;
 
 export type TextStyle = {
   [line: number | string]: { [char: number | string]: TextStyleDeclaration };
 };
 
 export abstract class StyledText<
-  Props extends TProps<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -178,21 +181,18 @@ export abstract class StyledText<
     }
   }
 
-  private _extendStyles(index: number, styles: TextStyleDeclaration) {
+  private _extendStyles(index: number, styles: TextStyleDeclaration): void {
     const { lineIndex, charIndex } = this.get2DCursorLocation(index);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
     }
 
-    if (!this._getStyleDeclaration(lineIndex, charIndex)) {
+    if (!Object.keys(this._getStyleDeclaration(lineIndex, charIndex)).length) {
       this._setStyleDeclaration(lineIndex, charIndex, {});
     }
 
-    return Object.assign(
-      this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styles
-    );
+    Object.assign(this._getStyleDeclaration(lineIndex, charIndex), styles);
   }
 
   /**
@@ -206,7 +206,7 @@ export abstract class StyledText<
     startIndex: number,
     endIndex?: number,
     complete?: boolean
-  ) {
+  ): TextStyleDeclaration[] {
     const styles: TextStyleDeclaration[] = [];
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
       styles.push(this.getStyleAtPosition(i, complete));
@@ -223,11 +223,9 @@ export abstract class StyledText<
    */
   getStyleAtPosition(position: number, complete?: boolean) {
     const { lineIndex, charIndex } = this.get2DCursorLocation(position);
-    return (
-      (complete
-        ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
-        : this._getStyleDeclaration(lineIndex, charIndex)) || {}
-    );
+    return complete
+      ? this.getCompleteStyleDeclaration(lineIndex, charIndex)
+      : this._getStyleDeclaration(lineIndex, charIndex);
   }
 
   /**
@@ -245,17 +243,18 @@ export abstract class StyledText<
   }
 
   /**
-   * get the reference, not a clone, of the style object for a given character
+   * get the reference, not a clone, of the style object for a given character,
+   * if not style is set for a pre det
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @return {Object} style object
+   * @return {Object} style object a REFERENCE to the existing one or a new empty object
    */
-  _getStyleDeclaration(lineIndex: number, charIndex: number) {
+  _getStyleDeclaration(
+    lineIndex: number,
+    charIndex: number
+  ): TextStyleDeclaration {
     const lineStyle = this.styles && this.styles[lineIndex];
-    if (!lineStyle) {
-      return null;
-    }
-    return lineStyle[charIndex];
+    return lineStyle ? lineStyle[charIndex] ?? {} : {};
   }
 
   /**
@@ -265,19 +264,15 @@ export abstract class StyledText<
    * @param {Number} charIndex position of the character on the line
    * @return {Object} style object
    */
-  getCompleteStyleDeclaration(lineIndex: number, charIndex: number) {
-    const style = this._getStyleDeclaration(lineIndex, charIndex) || {},
-      styleObject: TextStyleDeclaration = {},
-      styleProps = (this.constructor as typeof StyledText)._styleProperties;
-    for (let i = 0; i < styleProps.length; i++) {
-      const prop = styleProps[i];
-      // @ts-expect-error TS complains even when we serve everything on a silver plate.
-      styleObject[prop] =
-        typeof style[prop] === 'undefined'
-          ? this[prop as keyof this]
-          : style[prop];
-    }
-    return styleObject;
+  getCompleteStyleDeclaration(
+    lineIndex: number,
+    charIndex: number
+  ): CompleteTextStyleDeclaration {
+    return {
+      // @ts-expect-error readonly
+      ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
+      ...this._getStyleDeclaration(lineIndex, charIndex),
+    } as CompleteTextStyleDeclaration;
   }
 
   /**

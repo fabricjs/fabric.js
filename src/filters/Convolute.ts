@@ -60,6 +60,8 @@ export class Convolute extends BaseFilter {
    */
   declare matrix: number[];
 
+  static type = 'Convolute';
+
   static defaults = convoluteDefaultValues;
 
   getCacheKey() {

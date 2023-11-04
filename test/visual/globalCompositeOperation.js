@@ -144,6 +144,7 @@ QUnit.module('globalCompositeOperation', hooks => {
         return {
             test: operation,
             code: async (canvas, callback) => {
+                bg.canvas = canvas;
                 canvas.backgroundImage = bg;
                 canvas.add(createNew(operation), createPreview(operation));
                 canvas.renderAll();

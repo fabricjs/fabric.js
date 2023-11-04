@@ -5,7 +5,12 @@ export {
   createVector,
   calcAngleBetweenVectors,
   getUnitVector,
-  getBisector,
+  calcVectorRotation,
+  crossProduct,
+  dotProduct,
+  getOrthonormalVector,
+  isBetweenVectors,
+  magnitude,
 } from './misc/vectors';
 export {
   degreesToRadians,
@@ -13,6 +18,13 @@ export {
 } from './misc/radiansDegreesConversion';
 export { rotatePoint } from './misc/rotatePoint';
 export * from './misc/projectStroke';
+export type {
+  TComposeMatrixArgs,
+  TQrDecomposeOut,
+  TRotateMatrixArgs,
+  TScaleMatrixArgs,
+  TTranslateMatrixArgs,
+} from './misc/matrix';
 export {
   transformPoint,
   invertTransform,
@@ -62,7 +74,6 @@ export { makeBoundingBoxFromPoints } from './misc/boundingBoxFromPoints';
 export {
   calcPlaneChangeMatrix,
   sendPointToPlane,
-  transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './misc/planeChange';
 export * as string from './lang_string';
@@ -100,7 +111,7 @@ export {
 } from './animation/AnimationFrameProvider';
 export { removeFromArray } from './internals/removeFromArray';
 export { getRandomInt } from './internals/getRandomInt';
-export { request } from './dom_request';
+export { request } from './internals/dom_request';
 
 // for test compatibility. We don't want to export it
 export { removeTransformMatrixForSvgParsing } from './transform_matrix_removal';
