@@ -40,7 +40,7 @@
         QUnit.test('fabric pencil brush draw point', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getPointer({ ...e, clientX: 10, clientY: 10 });
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10 });
           brush.onMouseDown(pointer, { e });
           var pathData = brush.convertPointsToSVGPath(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
@@ -48,7 +48,7 @@
         QUnit.test('fabric pencil brush multiple points', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getPointer({ ...e, clientX: 10, clientY: 10 });
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10 });
           brush.onMouseDown(pointer, { e });
           brush.onMouseMove(pointer, { e });
           brush.onMouseMove(pointer, { e });
@@ -61,9 +61,9 @@
         QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getPointer({ ...e, clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ ...e, clientX: 15, clientY: 15});
-          var pointer3 = canvas.getPointer({ ...e, clientX: 20, clientY: 20});
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 15});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 20});
           brush.onMouseDown(pointer, { e });
           brush.onMouseMove(pointer2, { e });
           brush.onMouseMove(pointer3, { e });
@@ -80,11 +80,11 @@
         QUnit.test('fabric pencil brush multiple points outside canvas', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getPointer({ ...e, clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ ...e, clientX: 15, clientY: 100});
-          var pointer3 = canvas.getPointer({ ...e, clientX: 20, clientY: 160});
-          var pointer4 = canvas.getPointer({ ...e, clientX: 320, clientY: 100});
-          var pointer5 = canvas.getPointer({ ...e, clientX: 100, clientY: 100});
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 100});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 160});
+          var pointer4 = canvas.getScenePoint({ ...e, clientX: 320, clientY: 100});
+          var pointer5 = canvas.getScenePoint({ ...e, clientX: 100, clientY: 100});
           brush.onMouseDown(pointer, { e });
           brush.onMouseMove(pointer2, { e });
           brush.onMouseMove(pointer3, { e });
@@ -102,11 +102,11 @@
           var brush = new fabric.PencilBrush(canvas);
           brush.limitedToCanvasSize = true;
           const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getPointer({ ...e, clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ ...e, clientX: 15, clientY: 100});
-          var pointer3 = canvas.getPointer({ ...e, clientX: 20, clientY: 160});
-          var pointer4 = canvas.getPointer({ ...e, clientX: 320, clientY: 100});
-          var pointer5 = canvas.getPointer({ ...e, clientX: 100, clientY: 100});
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 100});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 160});
+          var pointer4 = canvas.getScenePoint({ ...e, clientX: 320, clientY: 100});
+          var pointer5 = canvas.getScenePoint({ ...e, clientX: 100, clientY: 100});
           brush.onMouseDown(pointer, { e });
           brush.onMouseMove(pointer2, { e });
           brush.onMouseMove(pointer3, { e });
@@ -133,9 +133,9 @@
           });
           var brush = new fabric.PencilBrush(canvas);
           const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getPointer({ ...e, clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ ...e, clientX: 15, clientY: 15});
-          var pointer3 = canvas.getPointer({ ...e, clientX: 20, clientY: 20});
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 15});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 20});
           brush.onMouseDown(pointer, { e });
           brush.onMouseMove(pointer2, { e });
           brush.onMouseMove(pointer3, { e });

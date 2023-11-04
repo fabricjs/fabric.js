@@ -24,6 +24,17 @@ import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 
+const getEventPoints = (canvas: Canvas, e: TPointerEvent) => {
+  const viewportPoint = canvas.getViewportPoint(e);
+  const scenePoint = canvas.getScenePoint(e);
+  return {
+    viewportPoint,
+    scenePoint,
+    pointer: viewportPoint,
+    absolutePointer: scenePoint,
+  };
+};
+
 // just to be clear, the utils are now deprecated and those are here exactly as minifier helpers
 // because el.addEventListener can't me be minified while a const yes and we use it 47 times in this file.
 // few bytes but why give it away.
@@ -236,8 +247,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const shared = {
       e,
       isClick: false,
-      pointer: this.getPointer(e, true),
-      absolutePointer: this.getPointer(e),
+      ...getEventPoints(this, e),
     };
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
@@ -263,8 +273,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (!this._currentTransform && !this.findTarget(e)) {
       this.fire('mouse:over', {
         e,
-        pointer: this.getPointer(e, true),
-        absolutePointer: this.getPointer(e),
+        ...getEventPoints(this, e),
       });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
@@ -392,7 +401,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this.targets = [];
     const target = this._searchPossibleTargets(
       this._objects,
-      this.getPointer(e, true)
+      this.getViewportPoint(e)
     );
     return {
       target,
@@ -502,8 +511,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      pointer: this.getPointer(e, true),
-      absolutePointer: this.getPointer(e),
+      ...getEventPoints(this, e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -819,7 +827,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     let pointer, corner;
     if (target) {
       corner = target._findTargetCorner(
-        this.getPointer(e, true),
+        this.getViewportPoint(e),
         isTouchEvent(e)
       );
       if (
@@ -834,7 +842,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
-          pointer = this.getPointer(e);
+          pointer = this.getScenePoint(e);
           mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
         }
       }
@@ -855,7 +863,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             transform.target,
             originalControl
           );
-      pointer = pointer || this.getPointer(e);
+      pointer = pointer || this.getScenePoint(e);
       originalMouseUpHandler &&
         originalMouseUpHandler.call(
           originalControl,
@@ -913,13 +921,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         e,
         target,
         subTargets: targets,
-        pointer: this.getPointer(e, true),
-        absolutePointer: this.getPointer(e),
+        ...getEventPoints(this, e),
         transform: this._currentTransform,
         ...(eventType === 'up:before' || eventType === 'up'
           ? {
               isClick: this._isClick,
               currentTarget: this.findTarget(e),
+              // set by the preceding `findTarget` call
               currentSubTargets: this.targets,
             }
           : {}),
@@ -984,8 +992,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.discardActiveObject(e);
       this.requestRenderAll();
     }
-    // this is an absolute pointer, the naming is wrong
-    const pointer = this.getPointer(e);
+    // TODO: this is a scene point so it should be renamed
+    const pointer = this.getScenePoint(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
     this._handleEvent(e, 'down');
@@ -997,7 +1005,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   _onMouseMoveInDrawingMode(e: TPointerEvent) {
     if (this._isCurrentlyDrawing) {
-      const pointer = this.getPointer(e);
+      const pointer = this.getScenePoint(e);
       this.freeDrawingBrush &&
         this.freeDrawingBrush.onMouseMove(pointer, {
           e,
@@ -1014,12 +1022,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mouseup
    */
   _onMouseUpInDrawingMode(e: TPointerEvent) {
-    const pointer = this.getPointer(e);
+    const pointer = this.getScenePoint(e);
     if (this.freeDrawingBrush) {
       this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
         e: e,
         // this is an absolute pointer, the naming is wrong
-        pointer: pointer,
+        pointer,
       });
     } else {
       this._isCurrentlyDrawing = false;
@@ -1089,7 +1097,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           !(target as IText).isEditing &&
           target !== this._activeObject))
     ) {
-      const p = this.getPointer(e);
+      const p = this.getScenePoint(e);
       this._groupSelector = {
         x: p.x,
         y: p.y,
@@ -1104,13 +1112,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         this.setActiveObject(target, e);
       }
       const corner = target._findTargetCorner(
-        this.getPointer(e, true),
+        this.getViewportPoint(e),
         isTouchEvent(e)
       );
       if (target === this._activeObject && (corner || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
         const control = target.controls[corner],
-          pointer = this.getPointer(e),
+          pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
         if (mouseDownHandler) {
@@ -1150,8 +1158,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _cacheTransformEventData(e: TPointerEvent) {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
-    this._pointer = this.getPointer(e, true);
-    this._absolutePointer = this.restorePointerVpt(this._pointer);
+    this._pointer = this.getViewportPoint(e);
+    this._absolutePointer = sendPointToPlane(
+      this._pointer,
+      undefined,
+      this.viewportTransform
+    );
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
@@ -1195,7 +1207,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     // We initially clicked in an empty area, so we draw a box for multiple selection
     if (groupSelector) {
-      const pointer = this.getPointer(e);
+      const pointer = this.getScenePoint(e);
 
       groupSelector.deltaX = pointer.x - groupSelector.x;
       groupSelector.deltaY = pointer.y - groupSelector.y;
@@ -1307,8 +1319,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target: oldTarget,
         nextTarget: target,
         isClick: false,
-        pointer: this.getPointer(e, true),
-        absolutePointer: this.getPointer(e),
+        ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
@@ -1320,8 +1331,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target,
         previousTarget: oldTarget,
         isClick: false,
-        pointer: this.getPointer(e, true),
-        absolutePointer: this.getPointer(e),
+        ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
@@ -1343,18 +1353,18 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event fired on mousemove
    */
   _transformObject(e: TPointerEvent) {
-    const pointer = this.getPointer(e),
+    const scenePoint = this.getScenePoint(e),
       transform = this._currentTransform!,
       target = transform.target,
       //  transform pointer to target's containing coordinate plane
       //  both pointer and object should agree on every point
       localPointer = target.group
         ? sendPointToPlane(
-            pointer,
+            scenePoint,
             undefined,
             target.group.calcTransformMatrix()
           )
-        : pointer;
+        : scenePoint;
     // seems used only here.
     // @TODO: investigate;
     transform.reset = false;
@@ -1412,7 +1422,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // here we call findTargetCorner always with undefined for the touch parameter.
         // we assume that if you are using a cursor you do not need to interact with
         // the bigger touch area.
-        target._findTargetCorner(this.getPointer(e, true));
+        target._findTargetCorner(this.getViewportPoint(e));
 
     if (!corner) {
       if ((target as Group).subTargetCheck) {
@@ -1473,7 +1483,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         const prevActiveObjects =
           activeSelection.getObjects() as FabricObject[];
         if (target === activeSelection) {
-          const pointer = this.getPointer(e, true);
+          const pointer = this.getViewportPoint(e);
           target =
             // first search active objects for a target to remove
             this.searchPossibleTargets(prevActiveObjects, pointer) ||
