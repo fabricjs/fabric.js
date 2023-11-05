@@ -19,11 +19,7 @@ import {
   transformPoint,
   calcPlaneRotation,
 } from '../../util/misc/matrix';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../../util/misc/radiansDegreesConversion';
-import { sin } from '../../util/misc/sin';
+import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
@@ -196,15 +192,11 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * return correct set of coordinates for intersection
-   * this will return either aCoords or lineCoords.
-   * @param {boolean} calculate will calculate the coords or use the one
+   * this will return aCoords.
    * that are attached to the object instance
    * @return {Object} {tl, tr, br, bl} points
    */
-  private _getCoords(calculate = false): TCornerPoint {
-    if (calculate) {
-      return this.calcACoords();
-    }
+  private _getCoords(): TCornerPoint {
     // swapped this double if in place of setCoords();
     if (!this.aCoords) {
       this.aCoords = this.calcACoords();
@@ -216,11 +208,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * return correct set of coordinates for intersection
    * this will return either aCoords or lineCoords.
    * The coords are returned in an array.
-   * @param {boolean} calculate will return aCoords if true or lineCoords
    * @return {Array} [tl, tr, br, bl] of points
    */
-  getCoords(calculate = false): Point[] {
-    const { tl, tr, br, bl } = this._getCoords(calculate);
+  getCoords(): Point[] {
+    const { tl, tr, br, bl } = this._getCoords();
     const coords = [tl, tr, br, bl];
     if (this.group) {
       const t = this.group.calcTransformMatrix();
@@ -233,15 +224,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * Checks if object intersects with an area formed by 2 points
    * @param {Object} pointTL top-left point of area
    * @param {Object} pointBR bottom-right point of area
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored one
    * @return {Boolean} true if object intersects with an area formed by 2 points
    */
-  intersectsWithRect(
-    pointTL: Point,
-    pointBR: Point,
-    calculate?: boolean
-  ): boolean {
-    const coords = this.getCoords(calculate),
+  intersectsWithRect(pointTL: Point, pointBR: Point): boolean {
+    const coords = this.getCoords(),
       intersection = Intersection.intersectPolygonRectangle(
         coords,
         pointTL,
@@ -253,34 +239,29 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   /**
    * Checks if object intersects with another object
    * @param {Object} other Object to test
-   * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of calculating them
    * @return {Boolean} true if object intersects with another object
    */
-  intersectsWithObject(other: ObjectGeometry, calculate = false): boolean {
+  intersectsWithObject(other: ObjectGeometry): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
-      this.getCoords(calculate),
-      other.getCoords(calculate)
+      this.getCoords(),
+      other.getCoords()
     );
 
     return (
       intersection.status === 'Intersection' ||
       intersection.status === 'Coincident' ||
-      other.isContainedWithinObject(this, calculate) ||
-      this.isContainedWithinObject(other, calculate)
+      other.isContainedWithinObject(this) ||
+      this.isContainedWithinObject(other)
     );
   }
 
   /**
    * Checks if object is fully contained within area of another object
    * @param {Object} other Object to test
-   * @param {Boolean} [absolute] use coordinates without viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is fully contained within area of another object
    */
-  isContainedWithinObject(other: ObjectGeometry, calculate = false): boolean {
-    const points = this.getCoords(calculate);
-    calculate && other.getCoords(true);
+  isContainedWithinObject(other: ObjectGeometry): boolean {
+    const points = this.getCoords();
     return points.every((point) => other.containsPoint(point));
   }
 
@@ -288,15 +269,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * Checks if object is fully contained within area formed by 2 points, aligned with scene axis.
    * @param {Object} pointTL top-left point of area
    * @param {Object} pointBR bottom-right point of area
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored one
    * @return {Boolean} true if object is fully contained within area formed by 2 points
    */
-  isContainedWithinRect(
-    pointTL: Point,
-    pointBR: Point,
-    calculate?: boolean
-  ): boolean {
-    const boundingRect = this.getBoundingRect(calculate);
+  isContainedWithinRect(pointTL: Point, pointBR: Point): boolean {
+    const boundingRect = this.getBoundingRect();
     return (
       boundingRect.left >= pointTL.x &&
       boundingRect.left + boundingRect.width <= pointBR.x &&
@@ -316,25 +292,23 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   /**
    * Checks if point is inside the object
    * @param {Point} point Point to check against
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if point is inside the object
    */
-  containsPoint(point: Point, calculate = false): boolean {
-    return Intersection.isPointInPolygon(point, this.getCoords(calculate));
+  containsPoint(point: Point): boolean {
+    return Intersection.isPointInPolygon(point, this.getCoords());
   }
 
   /**
    * Checks if object is contained within the canvas with current viewportTransform
    * the check is done stopping at first point that appears on screen
-   * @param {Boolean} [calculate] use coordinates of current position instead of .aCoords
    * @return {Boolean} true if object is fully or partially contained within canvas
    */
-  isOnScreen(calculate = false): boolean {
+  isOnScreen(): boolean {
     if (!this.canvas) {
       return false;
     }
     const { tl, br } = this.canvas.vptCoords;
-    const points = this.getCoords(calculate);
+    const points = this.getCoords();
     // if some point is on screen, the object is on screen.
     if (
       points.some(
@@ -348,10 +322,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       return true;
     }
     // no points on screen, check intersection with absolute coordinates
-    if (this.intersectsWithRect(tl, br, calculate)) {
+    if (this.intersectsWithRect(tl, br)) {
       return true;
     }
-    return this._containsCenterOfCanvas(tl, br, calculate);
+    return this._containsCenterOfCanvas(tl, br);
   }
 
   /**
@@ -360,50 +334,41 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @private
    * @param {Point} pointTL Top Left point
    * @param {Point} pointBR Top Right point
-   * @param {Boolean} calculate use coordinates of current position instead of stored ones
    * @return {Boolean} true if the object contains the point
    */
-  private _containsCenterOfCanvas(
-    pointTL: Point,
-    pointBR: Point,
-    calculate?: boolean
-  ): boolean {
+  private _containsCenterOfCanvas(pointTL: Point, pointBR: Point): boolean {
     // worst case scenario the object is so big that contains the screen
     const centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint, calculate);
+    return this.containsPoint(centerPoint);
   }
 
   /**
    * Checks if object is partially contained within the canvas with current viewportTransform
-   * @param {Boolean} [calculate] use coordinates of current position instead of stored ones
    * @return {Boolean} true if object is partially contained within canvas
    */
-  isPartiallyOnScreen(calculate?: boolean): boolean {
+  isPartiallyOnScreen(): boolean {
     if (!this.canvas) {
       return false;
     }
     const { tl, br } = this.canvas.vptCoords;
-    if (this.intersectsWithRect(tl, br, calculate)) {
+    if (this.intersectsWithRect(tl, br)) {
       return true;
     }
-    const allPointsAreOutside = this.getCoords(calculate).every(
+    const allPointsAreOutside = this.getCoords().every(
       (point) =>
         (point.x >= br.x || point.x <= tl.x) &&
         (point.y >= br.y || point.y <= tl.y)
     );
-    return (
-      allPointsAreOutside && this._containsCenterOfCanvas(tl, br, calculate)
-    );
+    return allPointsAreOutside && this._containsCenterOfCanvas(tl, br);
   }
 
   /**
    * Returns coordinates of object's bounding rectangle (left, top, width, height)
    * the box is intended as aligned to axis of canvas.
-   * @param {Boolean} [calculate] use coordinates of current position instead of .lineCoords / .aCoords
    * @return {Object} Object with left, top, width, height properties
    */
-  getBoundingRect(calculate?: boolean): TBBox {
-    return makeBoundingBoxFromPoints(this.getCoords(calculate));
+  getBoundingRect(): TBBox {
+    return makeBoundingBoxFromPoints(this.getCoords());
   }
 
   /**

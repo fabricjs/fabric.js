@@ -1376,9 +1376,9 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
+    this.setCoords();
     const el = createCanvasElement(),
-      // calculate with setCoords now.
-      boundingRect = this.getBoundingRect(true),
+      boundingRect = this.getBoundingRect(),
       shadow = this.shadow,
       shadowOffset = new Point();
 
