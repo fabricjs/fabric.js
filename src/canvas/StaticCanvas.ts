@@ -241,13 +241,6 @@ export class StaticCanvas<
 
   /**
    * @private
-   */
-  _isRetinaScaling() {
-    return config.devicePixelRatio > 1 && this.enableRetinaScaling;
-  }
-
-  /**
-   * @private
    * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    * @return {Number} retinaScaling if applied, otherwise 1;
    */

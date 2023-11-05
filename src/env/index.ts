@@ -1,14 +1,14 @@
 /**
  * This file is consumed by fabric.
  * The `./node` and `./browser` files define the env variable that is used by this module.
- * The `./node` module sets the env at import time.
  * The `./browser` module is defined to be the default env and doesn't set the env at all.
  * This is done in order to support isomorphic usage for browser and node applications
  * since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
  */
 
-import type { TFabricEnv } from './types';
+import { config } from '../config';
 import { getEnv as getBrowserEnv } from './browser';
+import type { TFabricEnv } from './types';
 import type { DOMWindow } from 'jsdom';
 
 let env: TFabricEnv;
@@ -40,4 +40,8 @@ export const getFabricDocument = (): Document => getEnv().document;
 export const getFabricWindow = (): (Window & typeof globalThis) | DOMWindow =>
   getEnv().window;
 
-export const getDevicePixelRatio = () => Math.max(1, getEnv().devicePixelRatio);
+/**
+ * @returns the config value if defined, fallbacks to the environment value
+ */
+export const getDevicePixelRatio = () =>
+  Math.max(config.devicePixelRatio ?? getEnv().devicePixelRatio, 1);
