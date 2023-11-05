@@ -311,8 +311,6 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * Given a bounding box, return all the objects of the collection that are contained in the bounding box.
      * If `includeIntersecting` is true, return also the objects that intersect the bounding box as well.
      * This is meant to work with selection. Is not a generic method.
-     *     /**
-     * Moves an object to specified level in stack of drawn objects
      * @param {TBBox} bbox a bounding box in scene coordinates
      * @param {{ includeIntersecting?: boolean }} options an object with includeIntersecting
      * @returns array of objects contained in the bounding box, ordered from top to bottom stacking wise
