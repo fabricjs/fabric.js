@@ -1,21 +1,47 @@
-import { StaticCanvas, Canvas, Text } from 'fabric';
+import * as fabric from 'fabric';
 import './styles.css';
 
-const c1 = document.getElementById('canvas1');
-const c2 = document.getElementById('canvas2');
+const el = document.getElementById('canvas');
+const canvas = (window.canvas = new fabric.Canvas(el));
 
-function prepareCanvas(el: HTMLCanvasElement) {
-  const canvas = new StaticCanvas(el, {
-    backgroundColor: '#e9e9e9',
-    enableRetinaScaling: true,
-  });
-  canvas.setDimensions({
-    width: 100,
-    height: 100,
-  });
-  canvas.add(new Text('Blur?'));
-  return canvas;
+//  edit from here
+canvas.setDimensions({
+  width: 500,
+  height: 500,
+});
+const textValue = 'fabric.js sandbox';
+const text = new fabric.Textbox(textValue, {
+  originX: 'center',
+  splitByGrapheme: true,
+  width: 200,
+  top: 20,
+  styles: fabric.util.stylesFromArray(
+    [
+      {
+        style: {
+          fontWeight: 'bold',
+          fontSize: 64,
+        },
+        start: 0,
+        end: 9,
+      },
+    ],
+    textValue
+  ),
+});
+canvas.add(text);
+canvas.centerObjectH(text);
+function animate(toState) {
+  text.animate(
+    { scaleX: Math.max(toState, 0.1) * 2 },
+    {
+      onChange: () => canvas.renderAll(),
+      onComplete: () => animate(!toState),
+      duration: 1000,
+      easing: toState
+        ? fabric.util.ease.easeInOutQuad
+        : fabric.util.ease.easeInOutSine,
+    }
+  );
 }
-
-// prepareCanvas(c1);
-prepareCanvas(c2);
+// animate(1);
