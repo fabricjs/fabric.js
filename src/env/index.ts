@@ -44,4 +44,4 @@ export const getFabricWindow = (): (Window & typeof globalThis) | DOMWindow =>
  * @returns the config value if defined, fallbacks to the environment value
  */
 export const getDevicePixelRatio = () =>
-  Math.max(config.devicePixelRatio ?? getEnv().devicePixelRatio, 1);
+  Math.max(config.devicePixelRatio ?? getFabricWindow().devicePixelRatio, 1);

@@ -9,7 +9,6 @@ export type TCopyPasteData = {
 export type TFabricEnv = {
   readonly document: Document;
   readonly window: (Window & typeof globalThis) | DOMWindow;
-  readonly devicePixelRatio: number;
   readonly isTouchSupported: boolean;
   WebGLProbe: GLProbe;
   dispose(element: Element): void;

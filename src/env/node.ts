@@ -42,9 +42,6 @@ export const getEnv = (): TFabricEnv => {
   return {
     document: JSDOMWindow.document,
     window: JSDOMWindow,
-    get devicePixelRatio() {
-      return JSDOMWindow.devicePixelRatio || 1;
-    },
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
     dispose,

@@ -8,12 +8,6 @@ export const getEnv = (): TFabricEnv => {
   return {
     document,
     window,
-    /**
-     * Must be a getter to support dpr changing when moving the browser between screens
-     */
-    get devicePixelRatio() {
-      return window.devicePixelRatio;
-    },
     isTouchSupported:
       'ontouchstart' in window ||
       'ontouchstart' in document ||
