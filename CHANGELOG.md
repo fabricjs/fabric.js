@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING: remove calculate true/false from the api. [#9483](https://github.com/fabricjs/fabric.js/pull/9483)
 - BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)
 - refactor(Canvas): BREAKING deprecate `getPointer`, add new getScenePoint and getViewportPoint methods, removed `restorePointerVpt`, extended mouse events data [#9175](https://github.com/fabricjs/fabric.js/pull/9175)
 - fix(Object): Fix detection of falsy shadows in Object.needsItsOwnCache method [#9469](https://github.com/fabricjs/fabric.js/pull/9469)
