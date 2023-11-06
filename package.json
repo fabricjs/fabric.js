@@ -124,6 +124,7 @@
     "tslib": "^2.4.1",
     "typedoc": "^0.25.3",
     "typedoc-plugin-markdown": "^3.17.0",
+    "typedoc-plugin-no-inherit": "^1.4.0",
     "typescript": "^4.9.4",
     "v8-to-istanbul": "^9.1.0"
   },

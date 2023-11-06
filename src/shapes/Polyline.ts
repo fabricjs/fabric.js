@@ -27,6 +27,9 @@ export interface SerializedPolylineProps extends SerializedObjectProps {
   points: XY[];
 }
 
+/**
+ * @noInheritDoc
+ */
 export class Polyline<
   Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
