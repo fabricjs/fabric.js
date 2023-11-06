@@ -633,7 +633,6 @@
     assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached aCoords');
     assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached aCoords');
 
-    // testing calculate here
     cObj.setCoords();
     coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(45, 30), 'return top left corner recalculated');

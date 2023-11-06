@@ -192,8 +192,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * return correct set of coordinates for intersection
-   * this will return aCoords.
    * that are attached to the object instance
+   * After an api semplification this method just return aCoords.
    * @return {Object} {tl, tr, br, bl} points
    */
   private _getCoords(): TCornerPoint {
