@@ -418,7 +418,7 @@
     });
   });
 
-  QUnit.test('fromObject restores oCoords', function(assert) {
+  QUnit.test('fromObject restores aCoords', function(assert) {
     var done = assert.async();
     var group = makeGroupWith2ObjectsWithOpacity();
 
@@ -426,8 +426,8 @@
     groupObject.subTargetCheck = true;
 
     fabric.Group.fromObject(groupObject).then(function(newGroupFromObject) {
-      assert.ok(newGroupFromObject._objects[0].lineCoords.tl, 'acoords 0 are restored');
-      assert.ok(newGroupFromObject._objects[1].lineCoords.tl, 'acoords 1 are restored');
+      assert.ok(newGroupFromObject._objects[0].aCoords.tl, 'acoords 0 are restored');
+      assert.ok(newGroupFromObject._objects[1].aCoords.tl, 'acoords 1 are restored');
       done();
     });
   });
