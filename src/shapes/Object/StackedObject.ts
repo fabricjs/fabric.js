@@ -44,14 +44,6 @@ export class StackedObject<
   declare parent?: Group;
 
   /**
-   * Returns instance's parent **EXCLUDING** `ActiveSelection`
-   * @param {boolean} [strict] exclude canvas as well
-   */
-  getParent<T extends boolean>(strict?: T): TAncestor | undefined {
-    return this.parent || (strict ? undefined : this.canvas);
-  }
-
-  /**
    * Checks if object is descendant of target
    * Should be used instead of {@link Group.contains} or {@link StaticCanvas.contains} for performance reasons
    * @param {TAncestor} target

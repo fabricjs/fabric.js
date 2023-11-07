@@ -647,7 +647,6 @@
     assert.ok(object.isDescendantOf(canvas));
     assert.ok(object.isDescendantOf(object) === false);
     object.parent = parent;
-    assert.equal(object.getParent(), parent);
     const activeSelection = new fabric.ActiveSelection([object], { canvas });
     assert.equal(object.group, activeSelection);
     assert.equal(object.parent, parent);
