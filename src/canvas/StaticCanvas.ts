@@ -2,7 +2,7 @@ import { config } from '../config';
 import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
-import { createCollectionMixin } from '../Collection';
+import { createCollectionMixin, isCollection } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
@@ -36,12 +36,7 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import {
-  isCollection,
-  isFiller,
-  isPattern,
-  isTextObject,
-} from '../util/typeAssertions';
+import { isFiller, isPattern, isTextObject } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';

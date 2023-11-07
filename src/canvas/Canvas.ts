@@ -14,10 +14,6 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import {
-  isFabricObjectWithDragSupport,
-  isInteractiveTextObject,
-} from '../util/typeAssertions';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
@@ -288,10 +284,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _onDragStart(e: DragEvent) {
     this._isClick = false;
     const activeObject = this.getActiveObject();
-    if (
-      isFabricObjectWithDragSupport(activeObject) &&
-      activeObject.onDragStart(e)
-    ) {
+    if (activeObject && activeObject.onDragStart(e)) {
       this._dragSource = activeObject;
       const options = { e, target: activeObject };
       this.fire('dragstart', options);
@@ -737,8 +730,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
         // we must not prevent the event's default behavior in order for the window to start dragging
-        (isFabricObjectWithDragSupport(activeObject) &&
-          !activeObject.shouldStartDragging())) &&
+        !activeObject.shouldStartDragging()) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
@@ -759,21 +751,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   _shouldRender(target: FabricObject | undefined) {
     const activeObject = this.getActiveObject();
-
     // if just one of them is available or if they are both but are different objects
-    if (
+    // this covers: switch of target, from target to no target, selection of target
+    // multiSelection with key and mouse
+    return (
       !!activeObject !== !!target ||
       (activeObject && target && activeObject !== target)
-    ) {
-      // this covers: switch of target, from target to no target, selection of target
-      // multiSelection with key and mouse
-      return true;
-    } else if (isInteractiveTextObject(activeObject)) {
-      // if we mouse up/down over a editing textbox a cursor change,
-      // there is no need to re render
-      return false;
-    }
-    return false;
+    );
   }
 
   /**
@@ -881,13 +865,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     target && (target.__corner = undefined);
     if (shouldRender) {
       this.requestRenderAll();
-    } else if (
-      !isClick &&
-      !(
-        isInteractiveTextObject(this._activeObject) &&
-        this._activeObject.isEditing
-      )
-    ) {
+    } else if (!isClick && !(this._activeObject as IText)?.isEditing) {
       this.renderTop();
     }
   }
@@ -1512,7 +1490,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {
-        isInteractiveTextObject(activeObject) && activeObject.exitEditing();
+        (activeObject as IText).exitEditing &&
+          (activeObject as IText).exitEditing();
         // add the active object and the target to the active selection and set it as the active object
         activeSelection.multiSelectAdd(activeObject, target);
         this._hoveredTarget = activeSelection;
