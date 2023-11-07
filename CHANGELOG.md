@@ -2,6 +2,9 @@
 
 ## [next]
 
+- fix(): transferring object between active selections, expose `FabricObject#parent`, rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
+  **BREAKING beta**:
+  - rm(): `getParent` => `FabricObject#parent`
 - chore(): remove some Type assertions [#8950](https://github.com/fabricjs/fabric.js/pull/8950)
 - chore(): expose `sendVectorToPlane` [#9479](https://github.com/fabricjs/fabric.js/pull/9479)
 - BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)
@@ -17,6 +20,18 @@
 - fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
 
 ## [6.0.0-beta14]
+
+- refactor(Group): `parent` + fix(ActiveSelection): transferring object [#9349](https://github.com/fabricjs/fabric.js/pull/9349)
+  **BREAKING beta**:
+  - rm(): `getParent` => `FabricObject#parent`
+
+## [6.0.0-beta13]
+
+- refactor(Group): `parent` + fix(ActiveSelection): transferring object [#9349](https://github.com/fabricjs/fabric.js/pull/9349)
+  **BREAKING beta**:
+  - rm(): `getParent` => `FabricObject#parent`
+
+## [6.0.0-beta13]
 
 - fix(Object): fixes centeredScaling prop type [#9401](https://github.com/fabricjs/fabric.js/pull/9401)
 - CI(): fix build caching + tests when merging to master [#9404](https://github.com/fabricjs/fabric.js/pull/9404)
@@ -133,7 +148,6 @@
 - chore(TS): Export more types [#8965](https://github.com/fabricjs/fabric.js/pull/8965)
 - BREAKING: fabric.util.makeElementSelectable / fabric.util.makeElementUnselectable are removed [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
 - refactor(): Canvas DOM delegation to utility class [#8930](https://github.com/fabricjs/fabric.js/pull/8930)
-- chore(): cleanup type assertions, expose `Object#parent` => rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
 
 ## [6.0.0-beta7]
 
@@ -141,7 +155,6 @@
 - chore(): swap commonly used string with constants [#8933](https://github.com/fabricjs/fabric.js/pull/8933)
 - chore(TS): Add more text types [#8941](https://github.com/fabricjs/fabric.js/pull/8941)
 - ci(): fix changelog action race condition [#8949](https://github.com/fabricjs/fabric.js/pull/8949)
-- chore(): cleanup type assertions, expose `Object#parent` => rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
 - ci(): automate PR changelog [#8938](https://github.com/fabricjs/fabric.js/pull/8938)
 - chore(): move canvas click handler to TextManager [#8939](https://github.com/fabricjs/fabric.js/pull/8939)
 - refactor(): write less bulky code [#8943](https://github.com/fabricjs/fabric.js/pull/8943)
