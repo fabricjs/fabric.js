@@ -628,35 +628,6 @@
     assert.ok(removedEventFired);
   });
 
-  QUnit.test('getParent', function (assert) {
-    const object = new fabric.Object();
-    const parent = new fabric.Object();
-    parent._exitGroup = () => { };
-    assert.ok(typeof object.getParent === 'function');
-    parent.canvas = canvas;
-    object.parent = parent;
-    assert.equal(object.getParent(), parent);
-    assert.equal(parent.getParent(), canvas);
-    const another = new fabric.Object();
-    object.parent = another;
-    object.parent.parent = parent;
-    assert.equal(object.getParent(), another);
-    assert.equal(another.getParent(), parent);
-    object.parent = undefined;
-    assert.equal(object.getParent(), undefined);
-    object.canvas = canvas;
-    assert.equal(object.getParent(), canvas);
-    object.parent = parent;
-    assert.equal(object.getParent(), parent);
-    const activeSelection = new fabric.ActiveSelection([object], { canvas });
-    assert.equal(object.group, activeSelection);
-    assert.equal(object.parent, parent);
-    assert.equal(object.canvas, canvas);
-    assert.equal(object.getParent(), parent);
-    object.parent = undefined;
-    assert.equal(object.getParent(), canvas);
-  });
-
   QUnit.test('isDescendantOf', function (assert) {
     const object = new fabric.Object();
     const parent = new fabric.Object();
@@ -681,10 +652,10 @@
     assert.equal(object.group, activeSelection);
     assert.equal(object.parent, parent);
     assert.equal(object.canvas, canvas);
-    assert.ok(object.isDescendantOf(parent), 'should recognize owning group');
+    assert.ok(object.isDescendantOf(parent), 'should recognize parent');
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
-    object.parent = undefined;
+    delete object.parent;
     assert.ok(!object.isDescendantOf(parent));
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');

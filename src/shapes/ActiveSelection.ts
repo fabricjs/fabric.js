@@ -79,12 +79,18 @@ export class ActiveSelection extends Group {
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-   * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    object.group?._exitGroup(object);
+    // make sure we exit the parent only once
+    if (object.parent && object.parent === object.group) {
+      // keep the object part of the parent
+      object.parent._exitGroup(object);
+    } else if (object.group && object.parent !== object.group) {
+      // in case `object` is transferred between active selections we remove it from the previous one
+      object.group.remove(object);
+    }
+
     this._enterGroup(object, removeParentTransform);
-    return true;
   }
 
   /**
@@ -95,6 +101,7 @@ export class ActiveSelection extends Group {
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    //  return to parent
     object.parent?._enterGroup(object, true);
   }
 
@@ -105,11 +112,10 @@ export class ActiveSelection extends Group {
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
     super._onAfterObjectsChange(type, targets);
-    const groups: Group[] = [];
+    const groups = new Set<Group>();
     targets.forEach((object) => {
-      object.group &&
-        !groups.includes(object.group) &&
-        groups.push(object.group);
+      const { parent } = object;
+      parent && groups.add(parent);
     });
     if (type === 'removed') {
       //  invalidate groups' layout and mark as dirty

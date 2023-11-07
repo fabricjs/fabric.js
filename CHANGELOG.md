@@ -20,6 +20,11 @@
 - fix(#9172): dep export `Object`, `Text`, `Image` [#9433](https://github.com/fabricjs/fabric.js/pull/9433)
 
 ## [6.0.0-beta14]
+- refactor(Group): `parent` + fix(ActiveSelection): transferring object [#9349](https://github.com/fabricjs/fabric.js/pull/9349)
+  **BREAKING beta**:
+  - rm(): `getParent` => `FabricObject#parent`
+
+## [6.0.0-beta13]
 
 - refactor(Group): `parent` + fix(ActiveSelection): transferring object [#9349](https://github.com/fabricjs/fabric.js/pull/9349)
   **BREAKING beta**:

@@ -81,7 +81,9 @@ export class StackedObject<
     let parent: TAncestor | undefined = this;
     do {
       parent =
-        parent instanceof StackedObject ? parent.getParent(strict) : undefined;
+        parent instanceof StackedObject
+          ? parent.parent ?? (!strict ? parent.canvas : undefined)
+          : undefined;
       parent && ancestors.push(parent);
     } while (parent);
     return ancestors as Ancestors<T>;
