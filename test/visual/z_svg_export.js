@@ -418,6 +418,22 @@
     height: 760,
   });
 
+  function multipleGradientsOffset(canvas, callback) {
+    fabric.loadSVGFromURL(getAssetName('svg_linear_8_gradient_offset')).then(({ objects }) => {
+      canvas.add(...objects);
+      toSVGCanvas(canvas, callback);
+    });
+  }
+
+  tests.push({
+    test: 'Multiple gradients import for offset',
+    code: multipleGradientsOffset,
+    golden: 'multipleGradientsOffset.png',
+    percentage: 0.06,
+    width: 450,
+    height: 200,
+  });
+
   function pathWithGradientSvg(canvas, callback) {
     var pathWithGradient = new fabric.Path('M 0 0 L 0 100 L 100 100 L 100 0 Z', {
       fill: new fabric.Gradient({
