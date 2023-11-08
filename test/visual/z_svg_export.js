@@ -431,7 +431,7 @@
     golden: 'multipleGradientsOffset.png',
     percentage: 0.06,
     width: 450,
-    height: 200,
+    height: 470,
   });
 
   function pathWithGradientSvg(canvas, callback) {
