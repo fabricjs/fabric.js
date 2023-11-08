@@ -3,7 +3,6 @@ import type { TFiller } from '../typedefs';
 import type { FabricText } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
-import type { Path } from '../shapes/Path';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -37,10 +36,4 @@ export const isTextObject = (
   // we could use instanceof but that would mean pulling in Text code for a simple check
   // @todo discuss what to do and how to do
   return !!fabricObject && fabricObject.isType('Text', 'IText', 'Textbox');
-};
-
-export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
-  // we could use instanceof but that would mean pulling in Text code for a simple check
-  // @todo discuss what to do and how to do
-  return !!fabricObject && fabricObject.isType('Path');
 };
