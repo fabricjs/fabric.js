@@ -19,7 +19,6 @@ import type {
   SVGOptions,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
-import { isPath } from '../util/typeAssertions';
 
 /**
  * Gradient class
@@ -199,8 +198,8 @@ export class Gradient<
       offsetX += object.width / 2;
       offsetY += object.height / 2;
     }
-    // todo what about polygon/polyline?
-    if (isPath(object) && this.gradientUnits !== 'percentage') {
+
+    if (object.pathOffset && this.gradientUnits !== 'percentage') {
       offsetX -= object.pathOffset.x;
       offsetY -= object.pathOffset.y;
     }

@@ -2,6 +2,7 @@
 
 ## [next]
 
+- DRAFT: SVG export and isPath removal [#9488](https://github.com/fabricjs/fabric.js/pull/9488)
 - chore(): remove some Type assertions [#8950](https://github.com/fabricjs/fabric.js/pull/8950)
 - chore(): expose `sendVectorToPlane` [#9479](https://github.com/fabricjs/fabric.js/pull/9479)
 - BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)

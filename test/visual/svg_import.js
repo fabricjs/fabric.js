@@ -100,6 +100,7 @@
     'light-bulb',
     'accordion',
     'car',
+    'svg_linear_8_gradient_offset',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
