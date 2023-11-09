@@ -87,13 +87,10 @@ export class InteractiveFabricObject<
   declare moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
-   * Describe object's corner position in canvas element coordinates.
-   * properties are depending on control keys and padding the main controls.
-   * each property is an object with x, y and corner.
-   * The `corner` property contains in a similar manner the 4 points of the
-   * interactive area of the corner.
-   * The coordinates depends from the controls positionHandler and are used
-   * to draw and locate controls
+   * The object's controls' position in viewport coordinates
+   * Calculated by {@link Control#positionHandler} and {@link Control#calcCornerCoords}, depending on {@link padding}.
+   * `corner/touchCorner` describe the 4 points forming the interactive area of the corner.
+   * Used to draw and locate controls.
    */
   declare oCoords: Record<string, TOCoord>;
 

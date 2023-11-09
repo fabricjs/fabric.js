@@ -179,7 +179,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * @return {Point[]} [tl, tr, br, bl]
+   * @return {Point[]} [tl, tr, br, bl] in the scene plane
    */
   getCoords(): Point[] {
     const { tl, tr, br, bl } =
