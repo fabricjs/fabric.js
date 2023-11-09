@@ -101,8 +101,9 @@ export const cornerPointContainsPoint = (point, cornerPoint) => {
 // END OF OLD CODE
 
 class Test1 extends FabricObject {
-  containsPoint(point, absolute, calculate) {
-    return cornerPointContainsPoint(point, this._getCoords(calculate));
+  containsPoint(point) {
+    const [tl, tr, br, bl] = this.getCoords();
+    return cornerPointContainsPoint(point, { tl, tr, br, bl });
   }
 }
 

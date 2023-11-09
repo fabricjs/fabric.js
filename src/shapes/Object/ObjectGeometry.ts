@@ -179,21 +179,11 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * After an api simplification this method just return aCoords.
-   * @return {TCornerPoint} {tl, tr, br, bl} points
-   */
-  private _getCoords(): TCornerPoint {
-    if (!this.aCoords) {
-      this.aCoords = this.calcACoords();
-    }
-    return this.aCoords;
-  }
-
-  /**
    * @return {Point[]} [tl, tr, br, bl]
    */
   getCoords(): Point[] {
-    const { tl, tr, br, bl } = this._getCoords();
+    const { tl, tr, br, bl } =
+      this.aCoords || (this.aCoords = this.calcACoords());
     const coords = [tl, tr, br, bl];
     if (this.group) {
       const t = this.group.calcTransformMatrix();
