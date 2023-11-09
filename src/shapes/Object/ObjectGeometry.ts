@@ -290,21 +290,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     if (this.intersectsWithRect(tl, br)) {
       return true;
     }
-    return this._containsCenterOfCanvas(tl, br);
-  }
-
-  /**
-   * Checks if the object contains the midpoint between canvas extremities
-   * Does not make sense outside the context of isOnScreen and isPartiallyOnScreen
-   * @private
-   * @param {Point} pointTL Top Left point
-   * @param {Point} pointBR Top Right point
-   * @return {Boolean} true if the object contains the point
-   */
-  private _containsCenterOfCanvas(pointTL: Point, pointBR: Point): boolean {
-    // worst case scenario the object is so big that contains the screen
-    const centerPoint = pointTL.midPointFrom(pointBR);
-    return this.containsPoint(centerPoint);
+    // check if the object is so big that it contains the entire viewport
+    return this.containsPoint(tl.midPointFrom(br));
   }
 
   /**
@@ -324,7 +311,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
         (point.x >= br.x || point.x <= tl.x) &&
         (point.y >= br.y || point.y <= tl.y)
     );
-    return allPointsAreOutside && this._containsCenterOfCanvas(tl, br);
+    // check if the object is so big that it contains the entire viewport
+    return allPointsAreOutside && this.containsPoint(tl.midPointFrom(br));
   }
 
   /**
