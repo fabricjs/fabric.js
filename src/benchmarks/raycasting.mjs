@@ -67,7 +67,7 @@ const findCrossPoints = (point, lines) => {
 /**
  * Method that returns an object with the object edges in it, given the coordinates of the corners
  * @private
- * @param {Object} lineCoords or aCoords Coordinates of the object corners
+ * @param {Object} aCoords Coordinates of the object corners
  */
 const getImageLines = ({ tl, tr, bl, br }) => {
   const lines = {

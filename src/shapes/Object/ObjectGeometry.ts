@@ -40,26 +40,14 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   declare padding: number;
 
   /**
-   * Describe object's corner position in canvas object absolute coordinates
-   * properties are tl,tr,bl,br and describe the four main corner.
-   * each property is an object with x, y, instance of Fabric.Point.
-   * The coordinates depends from this properties: width, height, scaleX, scaleY
-   * skewX, skewY, angle, strokeWidth, top, left.
-   * Those coordinates are useful to understand where an object is. They get updated
-   * with lineCoords or oCoords in interactive cases but they do not need to be updated when zoom or panning change.
-   * The coordinates get updated with @method setCoords.
-   * You can calculate them without updating with @method calcACoords();
+   * Describe object's corner position in scene coordinates.
+   * The coordinates are derived from the following:
+   * left, top, width, height, scaleX, scaleY, skewX, skewY, angle, strokeWidth.
+   * The coordinates do not depend on viewport changes.
+   * The coordinates get updated with {@link setCoords}.
+   * You can calculate them without updating with {@link calcACoords()}
    */
   declare aCoords: TACoords;
-
-  /**
-   * Describe object's corner position in canvas element coordinates.
-   * includes padding. Used of object detection.
-   * set and refreshed with setCoords.
-   * Those could go away
-   * @todo investigate how to get rid of those
-   */
-  declare lineCoords: TCornerPoint;
 
   /**
    * storage cache for object transform matrix
@@ -191,13 +179,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * return correct set of coordinates for intersection
-   * that are attached to the object instance
-   * After an api semplification this method just return aCoords.
-   * @return {Object} {tl, tr, br, bl} points
+   * After an api simplification this method just return aCoords.
+   * @return {TCornerPoint} {tl, tr, br, bl} points
    */
   private _getCoords(): TCornerPoint {
-    // swapped this double if in place of setCoords();
     if (!this.aCoords) {
       this.aCoords = this.calcACoords();
     }
@@ -205,10 +190,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * return correct set of coordinates for intersection
-   * this will return either aCoords or lineCoords.
-   * The coords are returned in an array.
-   * @return {Array} [tl, tr, br, bl] of points
+   * @return {Point[]} [tl, tr, br, bl]
    */
   getCoords(): Point[] {
     const { tl, tr, br, bl } = this._getCoords();
@@ -221,18 +203,14 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Checks if object intersects with an area formed by 2 points
-   * @param {Object} pointTL top-left point of area
-   * @param {Object} pointBR bottom-right point of area
-   * @return {Boolean} true if object intersects with an area formed by 2 points
+   * Checks if object intersects with the scene rect formed by {@link tl} and {@link br}
    */
-  intersectsWithRect(pointTL: Point, pointBR: Point): boolean {
-    const coords = this.getCoords(),
-      intersection = Intersection.intersectPolygonRectangle(
-        coords,
-        pointTL,
-        pointBR
-      );
+  intersectsWithRect(tl: Point, br: Point): boolean {
+    const intersection = Intersection.intersectPolygonRectangle(
+      this.getCoords(),
+      tl,
+      br
+    );
     return intersection.status === 'Intersection';
   }
 
@@ -266,18 +244,15 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Checks if object is fully contained within area formed by 2 points, aligned with scene axis.
-   * @param {Object} pointTL top-left point of area
-   * @param {Object} pointBR bottom-right point of area
-   * @return {Boolean} true if object is fully contained within area formed by 2 points
+   * Checks if object is fully contained within the scene rect formed by {@link tl} and {@link br}
    */
-  isContainedWithinRect(pointTL: Point, pointBR: Point): boolean {
-    const boundingRect = this.getBoundingRect();
+  isContainedWithinRect(tl: Point, br: Point): boolean {
+    const { left, top, width, height } = this.getBoundingRect();
     return (
-      boundingRect.left >= pointTL.x &&
-      boundingRect.left + boundingRect.width <= pointBR.x &&
-      boundingRect.top >= pointTL.y &&
-      boundingRect.top + boundingRect.height <= pointBR.y
+      left >= tl.x &&
+      left + width <= br.x &&
+      top >= tl.y &&
+      top + height <= br.y
     );
   }
 
@@ -439,9 +414,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Retrieves viewportTransform from Object's canvas if possible
-   * @method getViewportTransform
-   * @memberOf FabricObject.prototype
+   * Retrieves viewportTransform from Object's canvas if available
    * @return {TMat2D}
    */
   getViewportTransform(): TMat2D {
@@ -472,11 +445,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
 
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * aCoords are used to quickly find an object on the canvas
-   * lineCoords are used to quickly find object during pointer events.
+   * aCoords are used to quickly find an object on the canvas.
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
-   * @param {Boolean} [skipCorners] skip calculation of aCoord, lineCoords.
-   * @return {void}
    */
   setCoords(): void {
     this.aCoords = this.calcACoords();
