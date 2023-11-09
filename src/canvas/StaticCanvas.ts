@@ -509,10 +509,7 @@ export class StaticCanvas<
 
   /**
    * Calculate the position of the 4 corner of canvas with current viewportTransform.
-   * helps to determinate when an object is in the current rendering viewport using
-   * object absolute coordinates ( aCoords )
-   * @return {Object} points.tl
-   * @chainable
+   * helps to determinate when an object is in the current rendering viewport
    */
   calcViewportBoundaries(): TCornerPoint {
     const width = this.width,
