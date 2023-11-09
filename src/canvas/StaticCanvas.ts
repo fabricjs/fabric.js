@@ -112,13 +112,9 @@ export class StaticCanvas<
   declare allowTouchScrolling: boolean;
 
   declare viewportTransform: TMat2D;
+
   /**
-   * Describe canvas element extension over design
-   * properties are tl,tr,bl,br.
-   * if canvas is not zoomed/panned those points are the four corner of canvas
-   * if canvas is viewportTransformed you those points indicate the extension
-   * of canvas element in plain untrasformed coordinates
-   * The coordinates get updated with @method calcViewportBoundaries.
+   * The viewport bounding box in scene plane coordinates, see {@link calcViewportBoundaries}
    */
   declare vptCoords: TCornerPoint;
 
