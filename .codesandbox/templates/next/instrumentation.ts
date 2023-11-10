@@ -1,4 +1,4 @@
-import { appendFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 
 const PATH = './.instrumentation';
 
@@ -8,5 +8,5 @@ const PATH = './.instrumentation';
  * https://nextjs.org/docs/pages/building-your-application/optimizing/instrumentation
  */
 export function register() {
-  appendFileSync(PATH, `${Date.now()}\n`);
+  writeFileSync(PATH, Date.now().toString());
 }
