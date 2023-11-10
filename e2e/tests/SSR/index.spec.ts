@@ -1,36 +1,60 @@
 import { expect, test } from '@playwright/test';
-import type { ChildProcessWithoutNullStreams } from 'child_process';
-import { spawn } from 'child_process';
+import { exec, type ChildProcessWithoutNullStreams } from 'child_process';
 import { watch } from 'fs';
 import path from 'path';
+import setupCoverage from '../../setup/setupCoverage';
 
-// setup();
+setupCoverage();
 
-let task: ChildProcessWithoutNullStreams;
-test.beforeAll(({}, testInfo) => {
-  testInfo.setTimeout(60 * 1000);
-  task = spawn('npm start next -- --no-watch', {
-    stdio: 'pipe',
-    shell: true,
-    detached: true,
-    cwd: process.cwd(),
-  });
-  return new Promise<void>((resolve) => {
-    const watcher = watch(
-      path.resolve(process.cwd(), '.codesandbox', 'templates', 'next'),
-      (event, filename) => {
+test.describe('SSR', () => {
+  const PORT = 3000;
+  const nextTemplateDir = path.resolve(
+    process.cwd(),
+    '.codesandbox',
+    'templates',
+    'next'
+  );
+
+  let task: ChildProcessWithoutNullStreams;
+
+  test.beforeAll(({}, testInfo) => {
+    testInfo.setTimeout(60 * 1000);
+    task = exec(`npm start next -- -p ${PORT} --no-watch`, {
+      cwd: process.cwd(),
+    });
+    task.stdout.pipe(process.stdout);
+    task.stderr.pipe(process.stderr);
+    return new Promise<void>((resolve) => {
+      const watcher = watch(nextTemplateDir, (event, filename) => {
         if (filename === '.instrumentation') {
           watcher.close();
           resolve();
         }
-      }
-    );
+      });
+    });
   });
-});
-test.afterAll(() => task.kill(0));
 
-test('SSR with Next.js', async ({ page }) => {
-  await page.goto('http://localhost:3000/');
-  await page.waitForLoadState('load');
-  expect(await page.screenshot()).toMatchSnapshot();
+  test.afterAll(() => task.kill());
+
+  test('SSR with Next.js', async ({ page }) => {
+    await page.goto(`http://localhost:${PORT}/`);
+    await page.waitForLoadState('load');
+    await test.step('edit text', async () => {
+      await page
+        .locator('canvas')
+        .nth(1)
+        .dblclick({
+          position: {
+            x: 625,
+            y: 50,
+          },
+        });
+      await page.getByRole('textbox').press('Control+a');
+      await page
+        .getByRole('textbox')
+        .fill("fabric supports SSR!\nIsn't that amazing?!");
+      await page.waitForTimeout(50);
+      expect(await page.screenshot()).toMatchSnapshot();
+    });
+  });
 });
