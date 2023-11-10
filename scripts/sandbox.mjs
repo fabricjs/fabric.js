@@ -30,10 +30,24 @@ program
     '--no-watch',
     'use this option if you have another process watching fabric'
   )
-  .action(async (template, { watch }) => {
-    const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
-    startSandbox(pathToSandbox, watch);
-  });
+  .option('-l, --launch', 'launch a browser')
+  .option('-c, --code', 'launch VSCode')
+  .option('-p, --port <port>', 'the port to use')
+  .action(
+    async (
+      template,
+      { watch, port, launch: launchBrowser, code: launchVSCode }
+    ) => {
+      const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
+      startSandbox(pathToSandbox, {
+        template,
+        buildAndWatch: watch,
+        port,
+        launchBrowser,
+        launchVSCode,
+      });
+    }
+  );
 
 sandbox
   .command('deploy')
@@ -90,7 +104,9 @@ sandbox
     '--no-watch',
     'use this option if you have another process watching fabric'
   )
-  .action((template, destination, { watch }) => {
+  .option('-l, --launch', 'launch a browser')
+  .option('-p, --port <port>', 'the port to use')
+  .action((template, destination, { watch, port, launch: launchBrowser }) => {
     const templateDir = path.resolve(codesandboxTemplatesDir, template);
     fs.copySync(templateDir, destination, {
       filter: (src) => !ignore(templateDir, path.relative(templateDir, src)),
@@ -100,7 +116,14 @@ sandbox
         `> building ${chalk.bold(template)} sandbox`
       )} at ${chalk.cyanBright(destination)}`
     );
-    startSandbox(destination, watch, true);
+    startSandbox(destination, {
+      template,
+      buildAndWatch: watch,
+      installDeps: true,
+      port,
+      launchBrowser,
+      launchVSCode: true,
+    });
   });
 
 sandbox
@@ -117,33 +140,48 @@ sandbox
     '--no-watch',
     'use this option if you have another process watching fabric'
   )
-  .action(async (pathToSandbox, { template, watch }, context) => {
-    if (!fs.existsSync(pathToSandbox) && templates.includes(pathToSandbox)) {
-      const { confirm } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirm',
-          message: `Did you mean to run ${chalk.blue(
-            `npm run sandbox start -- -t ${pathToSandbox}\n`
-          )}?`,
-          default: true,
-        },
-      ]);
-      if (!confirm) {
+  .option('-l, --launch', 'launch a browser')
+  .option('-c, --code', 'launch VSCode')
+  .option('-p, --port <port>', 'the port to use')
+  .action(
+    async (
+      pathToSandbox,
+      { template, watch, port, launch: launchBrowser, code: launchVSCode },
+      context
+    ) => {
+      if (!fs.existsSync(pathToSandbox) && templates.includes(pathToSandbox)) {
+        const { confirm } = await inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'confirm',
+            message: `Did you mean to run ${chalk.blue(
+              `npm run sandbox start -- -t ${pathToSandbox}\n`
+            )}?`,
+            default: true,
+          },
+        ]);
+        if (!confirm) {
+          context.help({ error: true });
+          return;
+        }
+        template = pathToSandbox;
+        pathToSandbox = undefined;
+      } else if (!fs.existsSync(pathToSandbox)) {
+        console.log(chalk.blue('Did you mean to use the build command?'));
         context.help({ error: true });
         return;
       }
-      template = pathToSandbox;
-      pathToSandbox = undefined;
-    } else if (!fs.existsSync(pathToSandbox)) {
-      console.log(chalk.blue('Did you mean to use the build command?'));
-      context.help({ error: true });
-      return;
+      startSandbox(
+        pathToSandbox || path.resolve(codesandboxTemplatesDir, template),
+        {
+          template,
+          buildAndWatch: watch,
+          port,
+          launchBrowser,
+          launchVSCode,
+        }
+      );
     }
-    startSandbox(
-      pathToSandbox || path.resolve(codesandboxTemplatesDir, template),
-      watch
-    );
-  });
+  );
 
 program.parse(process.argv);

@@ -211,7 +211,7 @@ If you need to change test config ask for guidance.
 ### Starting an App
 
 ```bash
-npm start <template>
+npm start <template> -w -l
 npm start -- --help
 ```
 
@@ -229,7 +229,7 @@ Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information
 
 You can actively develop fabric online using [Github Codespaces][github_codespaces], [Gitpod][gitpod] or CodeSandbox:
 
-- After the Github Codespace has started run `npm start <template>` to start a prototyping app.
+- After the Github Codespace has started run `npm start <template> -w -l` to start a prototyping app.
 - Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
   `A service is available on port ...` popups will show up.
 - Codesandbox: _available soon_.

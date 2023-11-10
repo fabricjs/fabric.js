@@ -7,13 +7,29 @@ import { build } from '../scripts/build.mjs';
 import { subscribe } from '../scripts/buildLock.mjs';
 import { wd } from '../scripts/dirname.mjs';
 
+const TEMPLATE_PORTS = {
+  vanilla: 1234,
+  next: 3000,
+  node: 8080,
+};
+
 /**
  * Writes a timestamp in `package.json` file of `dest` dir
  * This is done to invoke the watcher watching `dest` and serving the app from it
  * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
  * @param {string} destination
  */
-export function startSandbox(destination, buildAndWatch, installDeps = false) {
+export function startSandbox(
+  destination,
+  {
+    template,
+    buildAndWatch = true,
+    installDeps = false,
+    port = TEMPLATE_PORTS[template] || 8000,
+    launchBrowser = false,
+    launchVSCode = false,
+  } = {}
+) {
   console.log(chalk.blue('\n> linking fabric'));
   cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
   cp.execSync('npm link fabric --include=dev --save', {
@@ -58,15 +74,21 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
     )
   );
 
-  try {
-    cp.exec('code .', { cwd: destination });
-  } catch (error) {
-    console.log('> failed to open VSCode');
+  if (launchVSCode) {
+    try {
+      cp.exec('code .', { cwd: destination });
+    } catch (error) {
+      console.log('> failed to open VSCode');
+    }
   }
 
-  return cp.spawn('npm run dev', {
+  const task = cp.spawn(`npm run dev -- -p ${port}`, {
     cwd: destination,
     stdio: 'inherit',
     shell: true,
   });
+
+  launchBrowser && cp.exec(`open-cli http://localhost:${port}/`);
+
+  return task;
 }

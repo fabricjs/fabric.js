@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "fabric on Vanilla.js",
   "scripts": {
-    "dev": "open-cli http://localhost:1234/ && parcel index.html",
+    "dev": "parcel index.html",
     "start": "parcel index.html",
     "build": "parcel build index.html"
   },
@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@parcel/transformer-typescript-tsc": "^2.7.0",
-    "open-cli": "^7.0.1",
     "parcel": "^2.9.3",
     "typescript": "^5.0.2"
   },

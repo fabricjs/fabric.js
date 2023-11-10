@@ -19,7 +19,7 @@ npm run sandbox
 ## Developing
 
 ```bash
-npm start <template>
+npm start <template> [-w/l/c/p]
 ```
 
 ### Start Flow
