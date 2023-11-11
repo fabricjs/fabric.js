@@ -1532,9 +1532,16 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     ) as FabricObject[];
 
     const objects =
-      collectedObjects.length > 1
+      // though this method runs only after mouse move the pointer could do a mouse up on the same position as mouse down
+      // should it be handled as is?
+      point1.eq(point2)
+        ? collectedObjects[0]
+          ? [collectedObjects[0]]
+          : []
+        : collectedObjects.length > 1
         ? collectedObjects.filter((object) => !object.onSelect({ e })).reverse()
-        : collectedObjects;
+        : // `setActiveObject` will call `onSelect(collectedObjects[0])` in this case
+          collectedObjects;
 
     // set active object
     if (objects.length === 1) {
