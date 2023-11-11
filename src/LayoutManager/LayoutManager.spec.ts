@@ -213,6 +213,8 @@ describe('Layout Manager', () => {
           new FabricObject(),
         ];
         const target = new Group(targets, { layoutManager: manager });
+        const canvasFire = jest.fn();
+        target.canvas = { fire: canvasFire };
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
           lifecycle.push(targetFire);
         });
@@ -239,6 +241,10 @@ describe('Layout Manager', () => {
         expect(lifecycle).toEqual([subscription, subscription, targetFire]);
         expect(targetFire).toBeCalledWith('layout:before', {
           context,
+        });
+        expect(canvasFire).toBeCalledWith('object:layout:before', {
+          context,
+          target,
         });
       }
     );
@@ -468,6 +474,9 @@ describe('Layout Manager', () => {
             lifecycle.push(parentPerformLayout);
           });
 
+        const canvasFire = jest.fn();
+        target.canvas = { fire: canvasFire };
+
         const shouldResetTransform = jest
           .spyOn(manager.strategy, 'shouldResetTransform')
           .mockImplementation(() => {
@@ -502,6 +511,11 @@ describe('Layout Manager', () => {
         expect(targetFire).toBeCalledWith('layout:after', {
           context,
           result: layoutResult,
+        });
+        expect(canvasFire).toBeCalledWith('object:layout:after', {
+          context,
+          result: layoutResult,
+          target,
         });
         bubbles &&
           expect(parentPerformLayout.mock.calls[0]).toMatchObject([
