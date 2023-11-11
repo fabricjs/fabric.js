@@ -21,7 +21,9 @@ test.describe('SSR', () => {
 
   test.beforeAll(async ({}, testInfo) => {
     testInfo.setTimeout(60 * 1000);
-    await killPort(PORT);
+    try {
+      await killPort(PORT);
+    } catch (error) {}
     // import `startSandbox` directly once ESM is supported
     // https://playwright.dev/docs/release-notes#improved-typescript-support
     const task = spawn(`npm start next -- -p ${PORT} --no-watch`, {
