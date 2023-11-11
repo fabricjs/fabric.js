@@ -29,10 +29,10 @@ test.describe('SSR', () => {
     const task = spawn(`npm start next -- -p ${PORT} --no-watch`, {
       cwd: process.cwd(),
       shell: true,
+      detached: true,
     });
-    task.stdout.pipe(process.stdout);
-    task.stderr.pipe(process.stderr);
     disposer = () => {
+      // windows will not be able to kill the detached task but `killPort` will free the port
       task.kill();
     };
     return new Promise<void>((resolve) => {
