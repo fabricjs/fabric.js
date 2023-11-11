@@ -1,6 +1,6 @@
 # Layout manager
 
-Layout manager exposes a main public method that perform group layouting given a target group and target objects.
+Layout manager exposes a main public method that performs group layout given a target group and target objects.
 
 ## performLayout
 
@@ -8,7 +8,7 @@ Each performLayout call gets a context, the context has always
 
 - type, a string used for behaviour switch
 - target, the group we are performing a layout onto and that will be modified
-- targets, the objects partecipating in the layout operation, that will be modified
+- targets, the objects participating in the layout operation, that will be modified
 
 Other properties change with the type of performLayout
 
@@ -19,11 +19,17 @@ performLayout -> onBeforeLayout -> getLayoutResult -> commitLayout -> onAfterLay
 The flow has the following goals/features:
 
 - alerting the user a layout ends and finish
-- subscribe to object events in order to continue layouting later
+- subscribe to object events in order to preform layout on change
 - calculate group new size and position
 - move the objects to their new position relative to the group center.
 
 **Note**: the option `objectsRelativeToGroup` is related to restoring a group from serialization and should be removed. Object should be eventually normalized in the from Object function or we should ask why do we want to perform a layout if the group has been saved with the layout properties already calculated.
+
+### Design Topics TBD
+
+- Should layout trigger also on changes to objects like `strokeWidth`, `fontSize` etc.?
+- Should changes to clip path perform layout in case of clip path layout strategy?
+- Should `layoutObjects`/`layoutObject` move from `LayoutManager` to `LayoutStrategy`? What about subscription logic?
 
 ### type INITIALIZATION
 
@@ -40,7 +46,7 @@ getLayoutResult will return an object that contains:
 - result of strategy.calcLayoutResult
 - nextCenter ( that is part of result, duplicate )
 - prevCenter 0,0 in case of INITIALIZATION
-- offset calculated with prevCenter, nextCenter and various switches ( needs semplification removing `objectsRelativeToGroup`)
+- offset calculated with prevCenter, nextCenter and various switches ( needs simplification removing `objectsRelativeToGroup`)
 
 commitLayout will get the above results and
 
@@ -74,7 +80,7 @@ when i add an object to an existing group the object is added in the group so th
 
 When we say group.remove(A) A is removed from the group and the transform state of A absorb the transform state of the group so that if added back to the scene its visual state doesn't change.
 
-A node can't be on two differnt trees.
+A node can't be on two different trees.
 
 ### Events
 

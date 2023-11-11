@@ -29,7 +29,7 @@ export class LayoutManager {
     this._subscriptions = new Map();
   }
 
-  performLayout(context: LayoutContext) {
+  public performLayout(context: LayoutContext) {
     const strictContext: StrictLayoutContext = {
       bubbles: true,
       strategy: this.strategy,

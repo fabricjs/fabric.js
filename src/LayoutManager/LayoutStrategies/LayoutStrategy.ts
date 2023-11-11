@@ -13,11 +13,30 @@ import type {
 } from '../types';
 import { getObjectBounds } from './utils';
 
+/**
+ * Exposes a main public method {@link calcLayoutResult} that is used by the `LayoutManager` to perform layout.
+ * Returning `undefined` signals the `LayoutManager` to skip the layout.
+ *
+ * In charge of calculating the bounding box of the passed objects.
+ */
 export abstract class LayoutStrategy {
   /**
    * override by subclass for persistence (TS does not support `static abstract`)
    */
   static type = 'strategy';
+
+  /**
+   * Used by the `LayoutManager` to perform layout
+   * @returns layout result **OR** `undefined` to skip layout
+   */
+  public calcLayoutResult(
+    context: StrictLayoutContext,
+    objects: FabricObject[]
+  ): LayoutStrategyResult | undefined {
+    if (this.shouldPerformLayout(context)) {
+      return this.calcBoundingBox(objects, context);
+    }
+  }
 
   shouldPerformLayout(context: StrictLayoutContext) {
     return (
@@ -47,15 +66,6 @@ export abstract class LayoutStrategy {
    */
   shouldResetTransform(context: StrictLayoutContext) {
     return context.target.size() === 0;
-  }
-
-  calcLayoutResult(
-    context: StrictLayoutContext,
-    objects: FabricObject[]
-  ): LayoutStrategyResult | undefined {
-    if (this.shouldPerformLayout(context)) {
-      return this.calcBoundingBox(objects, context);
-    }
   }
 
   /**

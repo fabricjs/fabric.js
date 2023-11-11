@@ -1,6 +1,9 @@
 import type { StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 
+/**
+ * Layout will adjust the bounding box to fit target's objects.
+ */
 export class FitContentLayout extends LayoutStrategy {
   static readonly type = 'fit-content';
 

@@ -6,6 +6,9 @@ import type {
 } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 
+/**
+ * Layout will keep target's initial size.
+ */
 export class FixedLayout extends LayoutStrategy {
   static readonly type = 'fixed';
 
