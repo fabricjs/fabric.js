@@ -2,12 +2,8 @@ import { iMatrix } from '../../constants';
 import type { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/Object';
 import type { TMat2D } from '../../typedefs';
-import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { invertTransform, multiplyTransformMatrices } from './matrix';
 import { applyTransformToObject } from './objectTransforms';
-import { FabricError } from '../internals/console';
-
-export type ObjectRelation = 'sibling' | 'child';
 
 /**
  * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
@@ -32,7 +28,6 @@ export const calcPlaneChangeMatrix = (
  * var sentPoint2 = sendPointToPlane(new Point(50, 50), iMatrix, group.calcTransformMatrix());
  * console.log(sentPoint1, sentPoint2) //  both points print (0,0) which is the center of group
  *
- * @see {transformPointRelativeToCanvas} for transforming relative to canvas
  * @param {Point} point
  * @param {TMat2D} [from] plane matrix containing object. Passing `undefined` is equivalent to passing the identity matrix, which means `point` exists in the canvas coordinate plane.
  * @param {TMat2D} [to] destination plane matrix to contain object. Passing `undefined` means `point` should be sent to the canvas coordinate plane.
@@ -45,50 +40,13 @@ export const sendPointToPlane = (
 ): Point => point.transform(calcPlaneChangeMatrix(from, to));
 
 /**
- * see {@link sendPointToPlane}
+ * See {@link sendPointToPlane}
  */
 export const sendVectorToPlane = (
-  vector: Point,
+  point: Point,
   from: TMat2D = iMatrix,
   to: TMat2D = iMatrix
-): Point => vector.transform(calcPlaneChangeMatrix(from, to), true);
-
-/**
- * Transform point relative to canvas.
- * From the viewport/viewer's perspective the point remains unchanged.
- *
- * `child` relation means `point` exists in the coordinate plane created by `canvas`.
- * In other words point is measured according to canvas' top left corner
- * meaning that if `point` is equal to (0,0) it is positioned at canvas' top left corner.
- *
- * `sibling` relation means `point` exists in the same coordinate plane as canvas.
- * In other words they both relate to the same (0,0) and agree on every point, which is how an event relates to canvas.
- *
- * @param {Point} point
- * @param {StaticCanvas} canvas
- * @param {'sibling'|'child'} relationBefore current relation of point to canvas
- * @param {'sibling'|'child'} relationAfter desired relation of point to canvas
- * @returns {Point} transformed point
- */
-export const transformPointRelativeToCanvas = (
-  point: Point,
-  canvas: StaticCanvas,
-  relationBefore: ObjectRelation,
-  relationAfter: ObjectRelation
-): Point => {
-  // is this still needed with TS?
-  if (relationBefore !== 'child' && relationBefore !== 'sibling') {
-    throw new FabricError(`received bad argument ${relationBefore}`);
-  }
-  if (relationAfter !== 'child' && relationAfter !== 'sibling') {
-    throw new FabricError(`received bad argument ${relationAfter}`);
-  }
-  if (relationBefore === relationAfter) {
-    return point;
-  }
-  const t = canvas.viewportTransform;
-  return point.transform(relationAfter === 'child' ? invertTransform(t) : t);
-};
+): Point => point.transform(calcPlaneChangeMatrix(from, to), true);
 
 /**
  *

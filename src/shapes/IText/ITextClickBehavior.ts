@@ -1,7 +1,6 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
@@ -16,13 +15,10 @@ import type { TextProps, SerializedTextProps } from '../Text/Text';
 const notALeftClick = (e: Event) => !!(e as MouseEvent).button;
 
 export abstract class ITextClickBehavior<
-    Props extends TOptions<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
-    EventSpec extends ITextEvents = ITextEvents
-  >
-  extends ITextKeyBehavior<Props, SProps, EventSpec>
-  implements DragMethods
-{
+  Props extends TOptions<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ITextEvents = ITextEvents
+> extends ITextKeyBehavior<Props, SProps, EventSpec> {
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
@@ -239,7 +235,7 @@ export abstract class ITextClickBehavior<
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.canvas!.getPointer(e)
+    const mouseOffset = this.canvas!.getScenePoint(e)
       .transform(invertTransform(this.calcTransformMatrix()))
       .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,

@@ -16,8 +16,7 @@ import {
 } from '../util/misc/objectTransforms';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
-import { isCollection } from '../util/typeAssertions';
-import { invertTransform } from '../util/misc/matrix';
+import { isCollection } from '../Collection';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -33,11 +32,12 @@ import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { ActiveSelection } from '../shapes/ActiveSelection';
-import { createCanvasElement } from '../util';
+import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
+import { Intersection } from '../Intersection';
 
 /**
  * Canvas class
@@ -227,6 +227,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
+   * x, y, deltaX and deltaY are in scene plane
    * @type
    * @private
    */
@@ -589,11 +590,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getPointer(e),
+          this.getScenePoint(e),
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getPointer(e);
+      : this.getScenePoint(e);
     const corner = target.getActiveControl() || '',
       control = !!corner && target.controls[corner],
       actionHandler =
@@ -708,7 +709,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       return undefined;
     }
 
-    const pointer = this.getPointer(e, true),
+    const pointer = this.getViewportPoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
@@ -754,7 +755,49 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Checks point is inside the object.
+   * Checks if the point is inside the object selection area including padding
+   * @param {FabricObject} obj Object to test against
+   * @param {Object} [pointer] point in scene coordinates
+   * @return {Boolean} true if point is contained within an area of given object
+   * @private
+   */
+  private _pointIsInObjectSelectionArea(obj: FabricObject, point: Point) {
+    // getCoords will already take care of group de-nesting
+    let coords = obj.getCoords();
+    const viewportZoom = this.getZoom();
+    const padding = obj.padding / viewportZoom;
+    if (padding) {
+      const [tl, tr, br, bl] = coords;
+      // what is the angle of the object?
+      // we could use getTotalAngle, but is way easier to look at it
+      // from how coords are oriented, since if something went wrong
+      // at least we are consistent.
+      const angleRadians = Math.atan2(tr.y - tl.y, tr.x - tl.x),
+        cosP = cos(angleRadians) * padding,
+        sinP = sin(angleRadians) * padding,
+        cosPSinP = cosP + sinP,
+        cosPMinusSinP = cosP - sinP;
+
+      coords = [
+        new Point(tl.x - cosPMinusSinP, tl.y - cosPSinP),
+        new Point(tr.x + cosPSinP, tr.y - cosPMinusSinP),
+        new Point(br.x + cosPMinusSinP, br.y + cosPSinP),
+        new Point(bl.x - cosPSinP, bl.y + cosPMinusSinP),
+      ];
+      // in case of padding we calculate the new coords on the fly.
+      // otherwise we have to maintain 2 sets of coordinates for everything.
+      // we can reiterate on storing those on something similar to lineCoords
+      // if this is slow, for now the semplification is large and doesn't impact
+      // rendering.
+      // the idea behind this is that outside target check we don't need ot know
+      // where those coords are
+    }
+    return Intersection.isPointInPolygon(point, coords);
+  }
+
+  /**
+   * Checks point is inside the object selection condition. Either area with padding
+   * or over pixels if perPixelTargetFind is enabled
    * @param {FabricObject} obj Object to test against
    * @param {Object} [pointer] point from viewport.
    * @return {Boolean} true if point is contained within an area of given object
@@ -765,7 +808,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      obj.containsPoint(this.restorePointerVpt(pointer), true)
+      this._pointIsInObjectSelectionArea(
+        obj,
+        sendPointToPlane(pointer, undefined, this.viewportTransform)
+      )
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
@@ -815,7 +861,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
    * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
+   * @param {Point} [pointer] coordinates from viewport to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(
@@ -835,42 +881,56 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns pointer coordinates without the effect of the viewport
-   * Takes a point in html canvas space and gives you back a point of the scene.
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
+   * @returns point existing in the same plane as the {@link HTMLCanvasElement},
+   * `(0, 0)` being the top left corner of the {@link HTMLCanvasElement}.
+   * This means that changes to the {@link viewportTransform} do not change the values of the point
+   * and it remains unchanged from the viewer's perspective.
+   *
+   * @example
+   * const scenePoint = sendPointToPlane(
+   *  this.getViewportPoint(e),
+   *  undefined,
+   *  canvas.viewportTransform
+   * );
+   *
    */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
+  getViewportPoint(e: TPointerEvent) {
+    if (this._pointer) {
+      return this._pointer;
+    }
+    return this.getPointer(e, true);
   }
 
   /**
-   * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position.
-   * To interact with your shapes top and left you want to use ignoreVpt false
-   * most of the time, while ignoreVpt true will give you coordinates
-   * compatible with the object.oCoords system.
-   * of the time.
-   * @param {Event} e
-   * @param {Boolean} ignoreVpt
-   * @return {Point}
+   * @returns point existing in the scene (the same plane as the plane {@link FabricObject#getCenterPoint} exists in).
+   * This means that changes to the {@link viewportTransform} do not change the values of the point,
+   * however, from the viewer's perspective, the point is changed.
+   *
+   * @example
+   * const viewportPoint = sendPointToPlane(
+   *  this.getScenePoint(e),
+   *  canvas.viewportTransform
+   * );
+   *
    */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
-    // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !ignoreVpt) {
+  getScenePoint(e: TPointerEvent) {
+    if (this._absolutePointer) {
       return this._absolutePointer;
     }
-    if (this._pointer && ignoreVpt) {
-      return this._pointer;
-    }
+    return this.getPointer(e);
+  }
 
+  /**
+   * Returns pointer relative to canvas.
+   *
+   * @deprecated This method is deprecated since v6 to protect you from misuse.
+   * Use {@link getViewportPoint} or {@link getScenePoint} instead.
+   *
+   * @param {Event} e
+   * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
+   * @return {Point}
+   */
+  getPointer(e: TPointerEvent, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
@@ -889,8 +949,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.calcOffset();
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
-    if (!ignoreVpt) {
-      pointer = this.restorePointerVpt(pointer);
+    if (!fromViewport) {
+      pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
     const retinaScaling = this.getRetinaScaling();

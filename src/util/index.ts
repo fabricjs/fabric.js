@@ -75,7 +75,6 @@ export {
   calcPlaneChangeMatrix,
   sendPointToPlane,
   sendVectorToPlane,
-  transformPointRelativeToCanvas,
   sendObjectToPlane,
 } from './misc/planeChange';
 export * as string from './lang_string';
