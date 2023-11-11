@@ -462,6 +462,7 @@ function assertDragEventStream(name, a, b) {
                         absolutePointer: new fabric.Point(100, 15),
                         viewportPoint: new fabric.Point(100, 15),
                         scenePoint: new fabric.Point(100, 15),
+                        previousTarget: undefined
                     },
                     ...dragEvents.slice(0, 2).map(e => ({
                         e,
