@@ -219,7 +219,6 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -302,7 +301,6 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -585,7 +583,6 @@ exports[`Canvas event data HTML event "mouseout" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
@@ -715,7 +712,6 @@ exports[`should fire mouse over/out events on target 1`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
@@ -769,7 +765,6 @@ exports[`should fire mouse over/out events on target 1`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "nextTarget": undefined,
       "pointer": Point {
         "x": 20,
@@ -828,7 +823,6 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
@@ -909,7 +903,6 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "nextTarget": undefined,
       "pointer": Point {
         "x": 20,
