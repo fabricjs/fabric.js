@@ -112,13 +112,9 @@ export class StaticCanvas<
   declare allowTouchScrolling: boolean;
 
   declare viewportTransform: TMat2D;
+
   /**
-   * Describe canvas element extension over design
-   * properties are tl,tr,bl,br.
-   * if canvas is not zoomed/panned those points are the four corner of canvas
-   * if canvas is viewportTransformed you those points indicate the extension
-   * of canvas element in plain untrasformed coordinates
-   * The coordinates get updated with @method calcViewportBoundaries.
+   * The viewport bounding box in scene plane coordinates, see {@link calcViewportBoundaries}
    */
   declare vptCoords: TCornerPoint;
 
@@ -504,10 +500,7 @@ export class StaticCanvas<
 
   /**
    * Calculate the position of the 4 corner of canvas with current viewportTransform.
-   * helps to determinate when an object is in the current rendering viewport using
-   * object absolute coordinates ( aCoords )
-   * @return {Object} points.tl
-   * @chainable
+   * helps to determinate when an object is in the current rendering viewport
    */
   calcViewportBoundaries(): TCornerPoint {
     const width = this.width,
