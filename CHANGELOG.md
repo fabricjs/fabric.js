@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING: remove calculate true/false from the api. [#9483](https://github.com/fabricjs/fabric.js/pull/9483)
 - chore(): remove some Type assertions [#8950](https://github.com/fabricjs/fabric.js/pull/8950)
 - chore(): expose `sendVectorToPlane` [#9479](https://github.com/fabricjs/fabric.js/pull/9479)
 - BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)
