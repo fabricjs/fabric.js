@@ -120,11 +120,11 @@ export class DraggableTextDelegate {
       boundaries.top + boundaries.topOffset
     ).multiply(flipFactor);
     const pos = selectionPosition.transform(target.calcTransformMatrix());
-    const pointer = canvas.getPointer(e);
+    const pointer = canvas.getScenePoint(e);
     const diff = pointer.subtract(pos);
     const enableRetinaScaling = canvas._isRetinaScaling();
     const retinaScaling = target.getCanvasRetinaScaling();
-    const bbox = target.getBoundingRect(true);
+    const bbox = target.getBoundingRect();
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
     const vpt = canvas.viewportTransform;
     const offset = correction.add(diff).transform(vpt, true);

@@ -2,6 +2,13 @@
 
 ## [next]
 
+- test(FabricObject): add a snapshot of the default values so that reordering and shuffling is verified. [#9492](https://github.com/fabricjs/fabric.js/pull/9492)
+- feat(FabricObject, Canvas) BREAKING: remove calculate true/false from the api. [#9483](https://github.com/fabricjs/fabric.js/pull/9483)
+- chore(): remove some Type assertions [#8950](https://github.com/fabricjs/fabric.js/pull/8950)
+- chore(): expose `sendVectorToPlane` [#9479](https://github.com/fabricjs/fabric.js/pull/9479)
+- feat(FabricObject, Canvas) BREAKING: remove absolute true/false from the api. [#9395](https://github.com/fabricjs/fabric.js/pull/9395)
+- refactor(Canvas): BREAKING deprecate `getPointer`, add new getScenePoint and getViewportPoint methods, removed `restorePointerVpt`, extended mouse events data [#9175](https://github.com/fabricjs/fabric.js/pull/9175)
+- chore(): rm isClick artifacts leftovers from #9434 [#9478](https://github.com/fabricjs/fabric.js/pull/9478)
 - fix(Object): Fix detection of falsy shadows in Object.needsItsOwnCache method [#9469](https://github.com/fabricjs/fabric.js/pull/9469)
 - feat(util): expose `calcPlaneRotation` [#9419](https://github.com/fabricjs/fabric.js/pull/9419)
 - refactor(Canvas): BREAKING remove button from mouse events, delegate to event.button property [#9449](https://github.com/fabricjs/fabric.js/pull/9449)

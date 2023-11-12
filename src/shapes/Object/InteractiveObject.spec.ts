@@ -4,11 +4,15 @@ import { Canvas } from '../../canvas/Canvas';
 import { FabricObject } from './FabricObject';
 import { InteractiveFabricObject, type TOCoord } from './InteractiveObject';
 
-describe('InteractiveObject', () => {
+describe('FabricObject', () => {
   it('tests constructor & properties', () => {
     const obj = new InteractiveFabricObject();
     expect(obj instanceof InteractiveFabricObject).toBe(true);
     expect(obj.selectable).toBe(true);
+  });
+  it('Interactive + BaseObject default values', () => {
+    const { controls, ...defaults } = FabricObject.getDefaults();
+    expect(defaults).toMatchSnapshot();
   });
   describe('setCoords for objects inside group with rotation', () => {
     it('all corners are rotated as much as the object total angle', () => {
