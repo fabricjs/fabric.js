@@ -4,7 +4,7 @@ import { Canvas } from '../../canvas/Canvas';
 import { FabricObject } from './FabricObject';
 import { InteractiveFabricObject, type TOCoord } from './InteractiveObject';
 
-describe('FabricObject', () => {
+describe('InteractiveObject', () => {
   it('tests constructor & properties', () => {
     const obj = new InteractiveFabricObject();
     expect(obj instanceof InteractiveFabricObject).toBe(true);

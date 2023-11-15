@@ -37,10 +37,12 @@ export const cacheProperties = [
 
 export const fabricObjectDefaultValues = {
   // coming from ObjectOrigin
+  // transforms apply translation, then rotation, scaling, flipping, skewing
   top: 0,
   left: 0,
   width: 0,
   height: 0,
+  angle: 0,
   flipX: false,
   flipY: false,
   scaleX: 1,
@@ -49,13 +51,10 @@ export const fabricObjectDefaultValues = {
   skewY: 0,
   originX: LEFT,
   originY: TOP,
-  angle: 0,
   strokeWidth: 1,
   strokeUniform: false,
   // coming from ObjectGeometry
   padding: 0,
-  // coming from AnimatableObject
-  colorProperties: ['fill', 'stroke', 'backgroundColor'],
   // FabricObject itself
   minScaleLimit: 0,
   opacity: 1,
@@ -81,3 +80,36 @@ export const fabricObjectDefaultValues = {
   centeredRotation: true,
   dirty: true,
 } as const;
+
+export const interactiveObjectDefaultValues = {
+  noScaleCache: true,
+  centeredScaling: false,
+  lockMovementX: false,
+  lockMovementY: false,
+  lockRotation: false,
+  lockScalingX: false,
+  lockScalingY: false,
+  lockSkewingX: false,
+  lockSkewingY: false,
+  lockScalingFlip: false,
+  cornerSize: 13,
+  touchCornerSize: 24,
+  transparentCorners: true,
+  cornerColor: 'rgb(178,204,255)',
+  cornerStrokeColor: '',
+  cornerStyle: 'rect',
+  cornerDashArray: null,
+  hasControls: true,
+  borderColor: 'rgb(178,204,255)',
+  borderDashArray: null,
+  borderOpacityWhenMoving: 0.4,
+  borderScaleFactor: 1,
+  hasBorders: true,
+  selectionBackgroundColor: '',
+  selectable: true,
+  evented: true,
+  perPixelTargetFind: false,
+  activeOn: 'down',
+  hoverCursor: null,
+  moveCursor: null,
+};

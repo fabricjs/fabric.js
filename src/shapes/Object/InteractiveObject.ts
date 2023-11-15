@@ -17,6 +17,7 @@ import type { ControlRenderingStyleOverride } from '../../controls/controlRender
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import { interactiveObjectDefaultValues } from './defaultValues';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
@@ -36,39 +37,6 @@ export type TStyleOverride = ControlRenderingStyleOverride &
       forActiveSelection: boolean;
     }
   >;
-
-const interactiveDefaults = {
-  noScaleCache: true,
-  centeredScaling: false,
-  lockMovementX: false,
-  lockMovementY: false,
-  lockRotation: false,
-  lockScalingX: false,
-  lockScalingY: false,
-  lockSkewingX: false,
-  lockSkewingY: false,
-  lockScalingFlip: false,
-  cornerSize: 13,
-  touchCornerSize: 24,
-  transparentCorners: true,
-  cornerColor: 'rgb(178,204,255)',
-  cornerStrokeColor: '',
-  cornerStyle: 'rect',
-  cornerDashArray: null,
-  hasControls: true,
-  borderColor: 'rgb(178,204,255)',
-  borderDashArray: null,
-  borderOpacityWhenMoving: 0.4,
-  borderScaleFactor: 1,
-  hasBorders: true,
-  selectionBackgroundColor: '',
-  selectable: true,
-  evented: true,
-  perPixelTargetFind: false,
-  activeOn: 'down',
-  hoverCursor: null,
-  moveCursor: null,
-};
 
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
@@ -166,7 +134,7 @@ export class InteractiveFabricObject<
 
   declare canvas?: Canvas;
 
-  static ownDefaults: Record<string, any> = interactiveDefaults;
+  static ownDefaults: Record<string, any> = interactiveObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {

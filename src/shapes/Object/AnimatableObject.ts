@@ -17,7 +17,7 @@ export abstract class AnimatableObject<
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  declare colorProperties: string[];
+  static colorProperties: string[] = ['fill', 'stroke', 'backgroundColor'];
 
   /**
    * Animates object's properties
