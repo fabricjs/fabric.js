@@ -71,7 +71,6 @@
     "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt"
   },
   "optionalDependencies": {
-    "canvas": "^2.11.2",
     "jsdom": "^20.0.1"
   },
   "devDependencies": {
