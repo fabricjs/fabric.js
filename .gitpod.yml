@@ -2,17 +2,17 @@
 
 tasks:
   - name: Build & Watch
-    init: npm install
+    init: npm install --include=dev
     command: npm run build -- -w -f
 
   - name: Node
-    init: npm install
-    command: npm start node -- --no-watch
+    init: npm install --include=dev
+    command: npm start node -- --no-watch -l
 
   - name: Next.js
-    init: npm install
-    command: npm start next -- --no-watch
+    init: npm install --include=dev
+    command: npm start next -- --no-watch -l
 
   - name: Vanilla
-    init: npm install
-    command: npm start vanilla -- --no-watch
+    init: npm install --include=dev
+    command: npm start vanilla -- --no-watch -l
