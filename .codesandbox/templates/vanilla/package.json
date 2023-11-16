@@ -11,9 +11,9 @@
     "fabric": "file:../../.."
   },
   "devDependencies": {
-    "@parcel/transformer-typescript-tsc": "^2.7.0",
-    "parcel": "^2.9.3",
-    "typescript": "^5.0.2"
+    "@parcel/transformer-typescript-tsc": "^2.10.3",
+    "parcel": "^2.10.3",
+    "typescript": "^5.2.2"
   },
   "keywords": [
     "vanilla",
