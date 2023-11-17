@@ -52,7 +52,15 @@ export const polyActionHandler = (
     mouseLocalPosition = getLocalPoint(transform, CENTER, CENTER, x, y),
     polygonBaseSize = getSize(poly),
     size = poly._getTransformedDimensions(),
-    sizeFactor = polygonBaseSize.divide(size),
+    // if poly has 0 width or 0 height, NaN's occur so guard for that case
+    sizeFactor = new Point(
+      !size.x || Number.isNaN(size.x)
+        ? 1 / poly.scaleX
+        : polygonBaseSize.x / size.x,
+      !size.y || Number.isNaN(size.y)
+        ? 1 / poly.scaleY
+        : polygonBaseSize.y / size.y
+    ),
     adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
   const finalPointPosition = mouseLocalPosition
@@ -89,9 +97,18 @@ export const factoryPolyActionHandler = (
       actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
       adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
 
+    // when poly has 0 width or 0 height, NaN's occur so give a value
+    const polyNonTransformedDims = poly._getNonTransformedDimensions();
+    if (!polyNonTransformedDims.x || Number.isNaN(polyNonTransformedDims.x)) {
+      polyNonTransformedDims.x = 1 / poly.scaleX;
+    }
+    if (!polyNonTransformedDims.y || Number.isNaN(polyNonTransformedDims.y)) {
+      polyNonTransformedDims.y = 1 / poly.scaleY;
+    }
+
     const newPositionNormalized = anchorPoint
       .subtract(poly.pathOffset)
-      .divide(poly._getNonTransformedDimensions())
+      .divide(polyNonTransformedDims)
       .multiply(adjustFlip);
 
     poly.setPositionByOrigin(
