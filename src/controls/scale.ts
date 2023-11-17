@@ -125,6 +125,14 @@ function scaleObject(
     scaleProportionally = scaleIsProportional(eventData, target),
     forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
   let newPoint, scaleX, scaleY, dim, signX, signY;
+  // in the case where the object has no width or no height, we need to use a small
+  // value or we get NaN values and odd behavior happens
+  if (target.height === 0) {
+    target.height = 1 / target.scaleY;
+  }
+  if (target.width === 0) {
+    target.width = 1 / target.scaleX;
+  }
 
   if (forbidScaling) {
     return false;
