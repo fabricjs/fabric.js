@@ -71,10 +71,6 @@
         });
         QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
-          const e = { target: canvas.upperCanvasEl };
-          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
-          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 15});
-          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 20});
           brush.onMouseDown(buildEvent(canvas, 10, 10));
           brush.onMouseMove(buildEvent(canvas, 15, 15));
           brush.onMouseMove(buildEvent(canvas, 20, 20));

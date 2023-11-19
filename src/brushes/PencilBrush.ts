@@ -6,7 +6,7 @@ import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { TSimplePathData } from '../util/path/typedefs';
-import { TBrushEventData } from './typedefs';
+import type { TBrushEventData } from './typedefs';
 
 /**
  * @private

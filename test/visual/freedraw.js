@@ -27,6 +27,7 @@ const buildEvent = (canvas, scenePoint) => {
   }
 
   function fireMouseUp(brush) {
+    const { canvas } = brush;
     brush.onMouseUp(buildEvent(canvas, points[points.length - 1]));
   }
 
