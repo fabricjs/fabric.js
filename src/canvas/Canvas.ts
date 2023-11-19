@@ -923,7 +923,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * because of some other event ( a press of key combination, or something that block the user UX )
    * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
    */
-  endCurrentTransform(e: TPointerEvent) {
+  endCurrentTransform(e?: TPointerEvent) {
     const transform = this._currentTransform;
     this._finalizeCurrentTransform(e);
     if (transform && transform.target) {
@@ -937,7 +937,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
    */
-  _finalizeCurrentTransform(e: TPointerEvent) {
+  _finalizeCurrentTransform(e?: TPointerEvent) {
     const transform = this._currentTransform!,
       target = transform.target,
       options = {
