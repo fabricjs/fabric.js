@@ -1,8 +1,8 @@
 import type { ModifierKey, TOptionalModifierKey } from '../EventTypeDefs';
+import type { BaseBrush } from '../brushes/BaseBrush';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { TOptions } from '../typedefs';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
-
 export interface CanvasTransformOptions {
   /**
    * When true, objects can be transformed by one side (unproportionately)
@@ -162,10 +162,11 @@ export interface CanvasCursorOptions {
 
   /**
    * Cursor value used during free drawing
+   * @deprecated use {@link BaseBrush#cursor} instead
    * @type String
    * @default crosshair
    */
-  freeDrawingCursor: CSSStyleDeclaration['cursor'];
+  freeDrawingCursor?: CSSStyleDeclaration['cursor'];
 
   /**
    * Cursor value used for disabled elements ( corners with disabled action )
@@ -283,7 +284,6 @@ export const canvasDefaults: TOptions<CanvasOptions> = {
   hoverCursor: 'move',
   moveCursor: 'move',
   defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
   notAllowedCursor: 'not-allowed',
 
   perPixelTargetFind: false,
