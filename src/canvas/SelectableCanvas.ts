@@ -651,7 +651,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @private
    * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
    */
-  _finalizeCurrentTransform(e?: TPointerEvent) {
+  endCurrentTransform(e?: TPointerEvent) {
     const transform = this._currentTransform!,
       target = transform.target,
       options = {
@@ -662,27 +662,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       };
 
     target.setCoords();
+    target.isMoving = false;
+    this._currentTransform = null;
 
     if (transform.actionPerformed) {
       this.fire('object:modified', options);
       target.fire('modified', options);
     }
-  }
-
-  /**
-   * End the current transform.
-   * You don't usually need to call this method unless you are interrupting a user initiated transform
-   * because of some other event ( a press of key combination, or something that block the user UX )
-   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
-   */
-  endCurrentTransform(e?: TPointerEvent) {
-    const transform = this._currentTransform;
-    this._finalizeCurrentTransform(e);
-    if (transform && transform.target) {
-      // this could probably go inside _finalizeCurrentTransform
-      transform.target.isMoving = false;
-    }
-    this._currentTransform = null;
   }
 
   /**
