@@ -86,13 +86,12 @@ export class SprayBrush extends BaseBrush {
     this.sprayChunk = [];
   }
 
-  onMouseDown(ev: TBrushEventData) {
-    super.onMouseDown(ev);
+  onMouseDown({ scenePoint }: TBrushEventData) {
     this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
 
-    this.addSprayChunk(ev.scenePoint);
+    this.addSprayChunk(scenePoint);
     this.renderChunck(this.sprayChunk);
   }
 

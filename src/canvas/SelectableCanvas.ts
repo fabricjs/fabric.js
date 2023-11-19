@@ -161,6 +161,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare hoverCursor: CSSStyleDeclaration['cursor'];
   declare moveCursor: CSSStyleDeclaration['cursor'];
   declare defaultCursor: CSSStyleDeclaration['cursor'];
+  /**
+   * @deprecated use {@link BaseBrush#cursor} instead
+   */
   declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
   declare notAllowedCursor: CSSStyleDeclaration['cursor'];
 

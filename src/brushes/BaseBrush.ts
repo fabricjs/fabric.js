@@ -3,7 +3,7 @@ import type { Point } from '../Point';
 import type { Shadow } from '../Shadow';
 import type { Canvas } from '../canvas/Canvas';
 import type { TBrushEventData } from './typedefs';
-import { TPointerEvent } from '../EventTypeDefs';
+import type { TPointerEvent } from '../EventTypeDefs';
 
 /**
  * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
@@ -67,6 +67,8 @@ export abstract class BaseBrush {
    */
   limitedToCanvasSize = false;
 
+  cursor: CSSStyleDeclaration['cursor'] = 'crosshair';
+
   declare canvas: Canvas;
 
   constructor(canvas: Canvas) {
@@ -75,7 +77,7 @@ export abstract class BaseBrush {
 
   abstract _render(): void;
 
-  discardActiveObjectOnMouseDown(e: TPointerEvent) {
+  enterDrawingMode(e: TPointerEvent) {
     const { canvas } = this;
     if (canvas.getActiveObject()) {
       canvas.discardActiveObject(e);
@@ -83,14 +85,12 @@ export abstract class BaseBrush {
     }
   }
 
-  onMouseDown(ev: TBrushEventData): void {
-    this.discardActiveObjectOnMouseDown(ev.e);
-  }
+  abstract onMouseDown(ev: TBrushEventData): void;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onMouseMove(ev: TBrushEventData): void {
     const { canvas } = this;
-    canvas.setCursor(canvas.freeDrawingCursor);
+    canvas.setCursor(canvas.freeDrawingCursor ?? this.cursor);
   }
 
   /**

@@ -61,13 +61,10 @@ export class PencilBrush extends BaseBrush {
     return midPoint;
   }
 
-  onMouseDown(ev: TBrushEventData) {
-    const { e, scenePoint } = ev;
+  onMouseDown({ e, scenePoint }: TBrushEventData) {
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
-
-    super.onMouseDown(ev);
 
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
     this._prepareForDrawing(scenePoint);

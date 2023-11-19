@@ -997,7 +997,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
 
     if (this.isDrawingMode && this.freeDrawingBrush) {
+      const isActive = this._isCurrentlyDrawing;
       this._isCurrentlyDrawing = true;
+      !isActive && this.freeDrawingBrush.enterDrawingMode(e);
       this.freeDrawingBrush.onMouseDown(buildEvent(this, e));
 
       this._handleEvent(e, 'down');

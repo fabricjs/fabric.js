@@ -44,12 +44,11 @@ export class CircleBrush extends BaseBrush {
     ctx.fill();
   }
 
-  onMouseDown(ev: TBrushEventData) {
-    super.onMouseDown(ev);
+  onMouseDown({ scenePoint }: TBrushEventData) {
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
-    this.drawDot(ev.scenePoint);
+    this.drawDot(scenePoint);
   }
 
   /**
