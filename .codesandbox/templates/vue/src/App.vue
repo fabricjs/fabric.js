@@ -4,17 +4,15 @@
 
 <script>
 import * as fabric from 'fabric';
-import { markRaw } from 'vue';
 
 export default {
   name: 'Canvas',
   mounted() {
-    const canvas = markRaw(
-      new fabric.Canvas(this.$refs.canvas, {
-        width: 500,
-        height: 500,
-      })
-    );
+    // Do we need to use https://vuejs.org/api/reactivity-advanced.html#markraw?
+    const canvas = new fabric.Canvas(this.$refs.canvas, {
+      width: 500,
+      height: 500,
+    });
 
     const textValue = 'fabric.js sandbox';
     const text = new fabric.Textbox(textValue, {
