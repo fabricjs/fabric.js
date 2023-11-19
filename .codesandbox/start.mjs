@@ -1,17 +1,12 @@
 import chalk from 'chalk';
 import cp from 'child_process';
 import fs from 'fs-extra';
+import getPort from 'get-port';
 import moment from 'moment';
 import path from 'node:path';
 import { build } from '../scripts/build.mjs';
 import { subscribe } from '../scripts/buildLock.mjs';
 import { wd } from '../scripts/dirname.mjs';
-
-const TEMPLATE_PORTS = {
-  vanilla: 1234,
-  next: 3000,
-  node: 8080,
-};
 
 /**
  * Writes a timestamp in `package.json` file of `dest` dir
@@ -19,13 +14,13 @@ const TEMPLATE_PORTS = {
  * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
  * @param {string} destination
  */
-export function startSandbox(
+export async function startSandbox(
   destination,
   {
     template,
     buildAndWatch = true,
     installDeps = false,
-    port = TEMPLATE_PORTS[template] || 8000,
+    port = 8000,
     launchBrowser = false,
     launchVSCode = false,
   } = {}
@@ -82,13 +77,14 @@ export function startSandbox(
     }
   }
 
-  const task = cp.spawn(`npm run dev -- -p ${port}`, {
+  const usePort = await getPort({ port: [port] });
+  const task = cp.spawn(`npm run dev -- --port ${usePort}`, {
     cwd: destination,
     stdio: 'inherit',
     shell: true,
   });
 
-  launchBrowser && cp.exec(`open-cli http://localhost:${port}/`);
+  launchBrowser && cp.exec(`open-cli http://localhost:${usePort}/`);
 
   return task;
 }
