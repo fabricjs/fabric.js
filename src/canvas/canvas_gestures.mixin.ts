@@ -153,9 +153,7 @@ Object.assign(Canvas.prototype, {
    */
   _scaleObjectBy: function (s, e) {
     const t = this._currentTransform;
-    const target = t.target;
     t.gestureScale = s;
-    target._scaling = true;
     return scalingEqually(e, t, 0, 0);
   },
 

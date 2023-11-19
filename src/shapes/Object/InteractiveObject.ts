@@ -123,16 +123,6 @@ export class InteractiveFabricObject<
    */
   declare isMoving?: boolean;
 
-  /**
-   * A boolean used from the gesture module to keep tracking of a scaling
-   * action when there is no scaling transform in place.
-   * This is an edge case and is used twice in all codebase.
-   * Probably added to keep track of some performance issues
-   * @TODO use git blame to investigate why it was added
-   * DON'T USE IT. WE WILL TRY TO REMOVE IT
-   */
-  declare _scaling?: boolean;
-
   declare canvas?: Canvas;
 
   static ownDefaults: Record<string, any> = interactiveDefaults;

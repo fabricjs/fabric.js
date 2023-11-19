@@ -947,10 +947,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         action: transform.action,
       };
 
-    if (target._scaling) {
-      target._scaling = false;
-    }
-
     target.setCoords();
 
     if (transform.actionPerformed) {
