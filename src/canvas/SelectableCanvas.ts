@@ -662,7 +662,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       };
 
     target.setCoords();
-    target.isMoving = false;
     this._currentTransform = null;
 
     if (transform.actionPerformed) {

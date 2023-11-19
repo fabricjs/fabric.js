@@ -205,7 +205,9 @@ export class ActiveSelection extends Group {
     childrenOverride?: ControlRenderingStyleOverride
   ) {
     ctx.save();
-    ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+    ctx.globalAlpha = this.isTransforming('drag')
+      ? this.borderOpacityWhenMoving
+      : 1;
     super._renderControls(ctx, styleOverride);
     const options = {
       hasControls: false,

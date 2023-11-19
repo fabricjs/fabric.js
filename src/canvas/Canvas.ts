@@ -829,7 +829,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
         }
       }
-      target.isMoving = false;
     }
     // if we are ending up a transform on a different control or a new object
     // fire the original mouse up from the corner that started the transform
@@ -1327,7 +1326,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       actionPerformed = actionHandler(e, transform, x, y);
     }
     if (action === 'drag' && actionPerformed) {
-      transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);
     }
     transform.actionPerformed = transform.actionPerformed || actionPerformed;

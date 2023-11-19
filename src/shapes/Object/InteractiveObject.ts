@@ -117,12 +117,6 @@ export class InteractiveFabricObject<
    */
   declare controls: TControlSet;
 
-  /**
-   * internal boolean to signal the code that the object is
-   * part of the move action.
-   */
-  declare isMoving?: boolean;
-
   declare canvas?: Canvas;
 
   static ownDefaults: Record<string, any> = interactiveDefaults;
@@ -155,6 +149,13 @@ export class InteractiveFabricObject<
 
   getActiveControl() {
     return this.__corner;
+  }
+
+  isTransforming(action: string) {
+    const transform = this.canvas?._currentTransform;
+    return (
+      transform && transform.action === action && transform.actionPerformed
+    );
   }
 
   /**
@@ -394,7 +395,9 @@ export class InteractiveFabricObject<
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;
     if (!this.group) {
-      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+      ctx.globalAlpha = this.isTransforming('drag')
+        ? this.borderOpacityWhenMoving
+        : 1;
     }
     if (this.flipX) {
       options.angle -= 180;
