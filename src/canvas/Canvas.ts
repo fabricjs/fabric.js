@@ -856,9 +856,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         );
     }
     this._setCursorFromEvent(e, target);
-    this._handleEvent(e, 'up');
+    this._handleEvent(e, 'up', { ...this.createEventData(e, 'up'), transform });
     this._groupSelector = null;
-    this._currentTransform = null;
     // reset the target information about which corner is selected
     target && (target.__corner = undefined);
     if (shouldRender) {
@@ -884,35 +883,47 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     return options;
   }
 
+  protected createEventData<T extends TPointerEventNames>(
+    e: TPointerEvent,
+    eventType: T
+  ) {
+    const target = this._target;
+    const subTargets = this.targets || [];
+    return {
+      e,
+      target,
+      subTargets,
+      ...getEventPoints(this, e),
+      transform: this._currentTransform,
+      ...(eventType === 'up:before' || eventType === 'up'
+        ? {
+            isClick: this._isClick,
+            currentTarget: this.findTarget(e),
+            // set by the preceding `findTarget` call
+            currentSubTargets: this.targets,
+          }
+        : {}),
+    } as CanvasEvents[`mouse:${T}`];
+  }
+
   /**
    * @private
    * Handle event firing for target and subtargets
    * @param {TPointerEvent} e event from mouse
    * @param {TPointerEventNames} eventType
    */
-  _handleEvent<T extends TPointerEventNames>(e: TPointerEvent, eventType: T) {
-    const target = this._target,
-      targets = this.targets || [],
-      options: CanvasEvents[`mouse:${T}`] = {
-        e,
-        target,
-        subTargets: targets,
-        ...getEventPoints(this, e),
-        transform: this._currentTransform,
-        ...(eventType === 'up:before' || eventType === 'up'
-          ? {
-              isClick: this._isClick,
-              currentTarget: this.findTarget(e),
-              // set by the preceding `findTarget` call
-              currentSubTargets: this.targets,
-            }
-          : {}),
-      } as CanvasEvents[`mouse:${T}`];
-    this.fire(`mouse:${eventType}`, options);
+  _handleEvent<T extends TPointerEventNames>(
+    e: TPointerEvent,
+    eventType: T,
+    eventData = this.createEventData(e, eventType)
+  ) {
+    const { target, subTargets = [] } = eventData;
+    this.fire(`mouse:${eventType}`, eventData);
     // this may be a little be more complicated of what we want to handle
-    target && target.fire(`mouse${eventType}`, options);
-    for (let i = 0; i < targets.length; i++) {
-      targets[i] !== target && targets[i].fire(`mouse${eventType}`, options);
+    target && target.fire(`mouse${eventType}`, eventData);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i] !== target &&
+        subTargets[i].fire(`mouse${eventType}`, eventData);
     }
   }
 

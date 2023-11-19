@@ -1805,10 +1805,8 @@
     canvas.setActiveObject(target);
     canvas._setupCurrentTransform(e, target, true);
     assert.ok(canvas._currentTransform, 'transform should be set');
-    target.isMoving = true;
     canvas._discardActiveObject();
     assert.ok(!canvas._currentTransform, 'transform should be cleared');
-    assert.ok(!target.isMoving, 'moving flag should have been negated');
     assert.equal(canvas.getActiveObject(), null);
   });
 

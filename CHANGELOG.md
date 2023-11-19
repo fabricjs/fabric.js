@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(): fire Poly control events [#9504](https://github.com/fabricjs/fabric.js/pull/9504)
+- fix(#9498): exception due to wrong type [#9500](https://github.com/fabricjs/fabric.js/pull/9500)
 - test(FabricObject): add a snapshot of the default values so that reordering and shuffling is verified. [#9492](https://github.com/fabricjs/fabric.js/pull/9492)
 - feat(FabricObject, Canvas) BREAKING: remove calculate true/false from the api. [#9483](https://github.com/fabricjs/fabric.js/pull/9483)
 - chore(): remove some Type assertions [#8950](https://github.com/fabricjs/fabric.js/pull/8950)

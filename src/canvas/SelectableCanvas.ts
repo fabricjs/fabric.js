@@ -577,7 +577,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
    */
   _setupCurrentTransform(
     e: TPointerEvent,
@@ -652,19 +652,23 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
    */
   endCurrentTransform(e?: TPointerEvent) {
-    const transform = this._currentTransform!,
-      target = transform.target,
-      options = {
-        e,
-        target,
-        transform,
-        action: transform.action,
-      };
+    const transform = this._currentTransform;
+    if (!transform) {
+      return;
+    }
+
+    const { target, action, actionPerformed } = transform;
+    const options = {
+      e,
+      target,
+      transform,
+      action,
+    };
 
     target.setCoords();
     this._currentTransform = null;
 
-    if (transform.actionPerformed) {
+    if (actionPerformed) {
       this.fire('object:modified', options);
       target.fire('modified', options);
     }
