@@ -1,4 +1,4 @@
-import type { ModifierKey, TEvent } from '../EventTypeDefs';
+import type { ModifierKey } from '../EventTypeDefs';
 import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { Path } from '../shapes/Path';
@@ -6,6 +6,7 @@ import { getSmoothPathFromPoints, joinPath } from '../util/path';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { TSimplePathData } from '../util/path/typedefs';
+import { TBrushEventData } from './typedefs';
 
 /**
  * @private
@@ -60,35 +61,40 @@ export class PencilBrush extends BaseBrush {
     return midPoint;
   }
 
-  /**
-   * Invoked on mouse down
-   * @param {Point} pointer
-   */
-  onMouseDown(pointer: Point, { e }: TEvent) {
+  onMouseDown(ev: TBrushEventData) {
+    const { e, scenePoint } = ev;
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
+
+    super.onMouseDown(ev);
+
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
-    this._prepareForDrawing(pointer);
+    this._prepareForDrawing(scenePoint);
     // capture coordinates immediately
     // this allows to draw dots (when movement never occurs)
-    this._addPoint(pointer);
+    this._addPoint(scenePoint);
     this._render();
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point, { e }: TEvent) {
+  onMouseMove(ev: TBrushEventData) {
+    const { e, scenePoint } = ev;
     if (!this.canvas._isMainEvent(e)) {
       return;
     }
+
     this.drawStraightLine = !!this.straightLineKey && e[this.straightLineKey];
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+
+    if (
+      this.limitedToCanvasSize === true &&
+      this._isOutSideCanvas(scenePoint)
+    ) {
       return;
     }
-    if (this._addPoint(pointer) && this._points.length > 1) {
+
+    super.onMouseMove(ev);
+
+    if (this._addPoint(scenePoint) && this._points.length > 1) {
       if (this.needsFullRender()) {
         // redraw curve
         // clear top canvas
@@ -115,10 +121,7 @@ export class PencilBrush extends BaseBrush {
     }
   }
 
-  /**
-   * Invoked on mouse up
-   */
-  onMouseUp({ e }: TEvent) {
+  onMouseUp({ e }: TBrushEventData) {
     if (!this.canvas._isMainEvent(e)) {
       return true;
     }

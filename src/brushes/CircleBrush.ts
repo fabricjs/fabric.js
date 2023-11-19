@@ -6,7 +6,7 @@ import { Group } from '../shapes/Group';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
-import type { CircleBrushPoint } from './typedefs';
+import type { CircleBrushPoint, TBrushEventData } from './typedefs';
 import { CENTER } from '../constants';
 
 export class CircleBrush extends BaseBrush {
@@ -44,14 +44,12 @@ export class CircleBrush extends BaseBrush {
     ctx.fill();
   }
 
-  /**
-   * Invoked on mouse down
-   */
-  onMouseDown(pointer: Point) {
+  onMouseDown(ev: TBrushEventData) {
+    super.onMouseDown(ev);
     this.points = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
-    this.drawDot(pointer);
+    this.drawDot(ev.scenePoint);
   }
 
   /**
@@ -68,26 +66,26 @@ export class CircleBrush extends BaseBrush {
     ctx.restore();
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point) {
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+  onMouseMove(ev: TBrushEventData) {
+    const { scenePoint } = ev;
+    if (
+      this.limitedToCanvasSize === true &&
+      this._isOutSideCanvas(scenePoint)
+    ) {
       return;
     }
+
+    super.onMouseMove(ev);
+
     if (this.needsFullRender()) {
       this.canvas.clearContext(this.canvas.contextTop);
-      this.addPoint(pointer);
+      this.addPoint(scenePoint);
       this._render();
     } else {
-      this.drawDot(pointer);
+      this.drawDot(scenePoint);
     }
   }
 
-  /**
-   * Invoked on mouse up
-   */
   onMouseUp() {
     const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;

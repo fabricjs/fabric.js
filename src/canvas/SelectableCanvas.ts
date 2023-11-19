@@ -894,7 +894,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * );
    *
    */
-  getViewportPoint(e: TPointerEvent) {
+  getViewportPoint(e: TPointerEvent | DragEvent) {
     if (this._pointer) {
       return this._pointer;
     }
@@ -913,7 +913,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * );
    *
    */
-  getScenePoint(e: TPointerEvent) {
+  getScenePoint(e: TPointerEvent | DragEvent) {
     if (this._absolutePointer) {
       return this._absolutePointer;
     }
@@ -930,7 +930,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, fromViewport = false): Point {
+  getPointer(e: TPointerEvent | DragEvent, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),

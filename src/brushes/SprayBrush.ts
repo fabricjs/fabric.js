@@ -5,7 +5,7 @@ import { Rect } from '../shapes/Rect';
 import { getRandomInt } from '../util/internals';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
-import type { SprayBrushPoint } from './typedefs';
+import type { SprayBrushPoint, TBrushEventData } from './typedefs';
 import { CENTER } from '../constants';
 
 /**
@@ -86,34 +86,30 @@ export class SprayBrush extends BaseBrush {
     this.sprayChunk = [];
   }
 
-  /**
-   * Invoked on mouse down
-   * @param {Point} pointer
-   */
-  onMouseDown(pointer: Point) {
+  onMouseDown(ev: TBrushEventData) {
+    super.onMouseDown(ev);
     this.sprayChunks = [];
     this.canvas.clearContext(this.canvas.contextTop);
     this._setShadow();
 
-    this.addSprayChunk(pointer);
+    this.addSprayChunk(ev.scenePoint);
     this.renderChunck(this.sprayChunk);
   }
 
-  /**
-   * Invoked on mouse move
-   * @param {Point} pointer
-   */
-  onMouseMove(pointer: Point) {
-    if (this.limitedToCanvasSize === true && this._isOutSideCanvas(pointer)) {
+  onMouseMove(ev: TBrushEventData) {
+    const { scenePoint } = ev;
+    if (
+      this.limitedToCanvasSize === true &&
+      this._isOutSideCanvas(scenePoint)
+    ) {
       return;
     }
-    this.addSprayChunk(pointer);
+
+    super.onMouseMove(ev);
+    this.addSprayChunk(scenePoint);
     this.renderChunck(this.sprayChunk);
   }
 
-  /**
-   * Invoked on mouse up
-   */
   onMouseUp() {
     const originalRenderOnAddRemove = this.canvas.renderOnAddRemove;
     this.canvas.renderOnAddRemove = false;

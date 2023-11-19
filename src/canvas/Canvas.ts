@@ -20,10 +20,27 @@ import { TextEditingManager } from './TextEditingManager';
 
 const addEventOptions = { passive: false } as EventListenerOptions;
 
-const getEventPoints = (canvas: Canvas, e: TPointerEvent) => {
+const buildEvent = (canvas: Canvas, e: TPointerEvent) => {
   const viewportPoint = canvas.getViewportPoint(e);
   const scenePoint = canvas.getScenePoint(e);
   return {
+    e,
+    viewportPoint,
+    scenePoint,
+  };
+};
+
+/**
+ * @deprecated use {@link buildEvent}
+ */
+const buildBackwardCompatEvent = <E extends TPointerEvent | DragEvent>(
+  canvas: Canvas,
+  e: E
+) => {
+  const viewportPoint = canvas.getViewportPoint(e);
+  const scenePoint = canvas.getScenePoint(e);
+  return {
+    e,
     viewportPoint,
     scenePoint,
     pointer: viewportPoint,
@@ -240,10 +257,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   private _onMouseOut(e: TPointerEvent) {
     const target = this._hoveredTarget;
-    const shared = {
-      e,
-      ...getEventPoints(this, e),
-    };
+    const shared = buildBackwardCompatEvent(this, e);
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
     target && target.fire('mouseout', { ...shared });
@@ -266,10 +280,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // as a long term fix we need to separate the action of finding a target with the
     // side effects we added to it.
     if (!this._currentTransform && !this.findTarget(e)) {
-      this.fire('mouse:over', {
-        e,
-        ...getEventPoints(this, e),
-      });
+      this.fire('mouse:over', buildBackwardCompatEvent(this, e));
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
@@ -499,11 +510,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _onDrop(e: DragEvent) {
     const { target, targets } = this.findDragTargets(e);
     const options = this._basicEventHandler('drop:before', {
-      e,
+      ...buildBackwardCompatEvent(this, e),
       target,
       subTargets: targets,
       dragSource: this._dragSource,
-      ...getEventPoints(this, e),
     });
     //  will be set by the drop target
     options.didDrop = false;
@@ -786,7 +796,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
 
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this._onMouseUpInDrawingMode(e);
+      this._isCurrentlyDrawing = this.freeDrawingBrush
+        ? !!this.freeDrawingBrush.onMouseUp(buildEvent(this, e))
+        : false;
+      this._handleEvent(e, 'up');
       return;
     }
 
@@ -895,10 +908,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const target = this._target,
       targets = this.targets || [],
       options: CanvasEvents[`mouse:${T}`] = {
-        e,
+        ...buildBackwardCompatEvent(this, e),
         target,
         subTargets: targets,
-        ...getEventPoints(this, e),
         transform: this._currentTransform,
         ...(eventType === 'up:before' || eventType === 'up'
           ? {
@@ -960,59 +972,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   }
 
   /**
-   * @private
-   * @param {Event} e Event object fired on mousedown
-   */
-  _onMouseDownInDrawingMode(e: TPointerEvent) {
-    this._isCurrentlyDrawing = true;
-    if (this.getActiveObject()) {
-      this.discardActiveObject(e);
-      this.requestRenderAll();
-    }
-    // TODO: this is a scene point so it should be renamed
-    const pointer = this.getScenePoint(e);
-    this.freeDrawingBrush &&
-      this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
-    this._handleEvent(e, 'down');
-  }
-
-  /**
-   * @private
-   * @param {Event} e Event object fired on mousemove
-   */
-  _onMouseMoveInDrawingMode(e: TPointerEvent) {
-    if (this._isCurrentlyDrawing) {
-      const pointer = this.getScenePoint(e);
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush.onMouseMove(pointer, {
-          e,
-          // this is an absolute pointer, the naming is wrong
-          pointer,
-        });
-    }
-    this.setCursor(this.freeDrawingCursor);
-    this._handleEvent(e, 'move');
-  }
-
-  /**
-   * @private
-   * @param {Event} e Event object fired on mouseup
-   */
-  _onMouseUpInDrawingMode(e: TPointerEvent) {
-    const pointer = this.getScenePoint(e);
-    if (this.freeDrawingBrush) {
-      this._isCurrentlyDrawing = !!this.freeDrawingBrush.onMouseUp({
-        e: e,
-        // this is an absolute pointer, the naming is wrong
-        pointer,
-      });
-    } else {
-      this._isCurrentlyDrawing = false;
-    }
-    this._handleEvent(e, 'up');
-  }
-
-  /**
    * Method that defines the actions when mouse is clicked on canvas.
    * The method inits the currentTransform parameters and renders all the
    * canvas so the current image can be placed on the top canvas and the rest
@@ -1037,8 +996,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       return;
     }
 
-    if (this.isDrawingMode) {
-      this._onMouseDownInDrawingMode(e);
+    if (this.isDrawingMode && this.freeDrawingBrush) {
+      this._isCurrentlyDrawing = true;
+      this.freeDrawingBrush.onMouseDown(buildEvent(this, e));
+
+      this._handleEvent(e, 'down');
       return;
     }
 
@@ -1172,7 +1134,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._cacheTransformEventData(e);
 
     if (this.isDrawingMode) {
-      this._onMouseMoveInDrawingMode(e);
+      this._isCurrentlyDrawing &&
+        this.freeDrawingBrush?.onMouseMove(buildEvent(this, e));
+
+      this._handleEvent(e, 'move');
       return;
     }
 
@@ -1292,10 +1257,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (oldTarget && targetChanged) {
       const outOpt: CanvasEvents[typeof canvasOut] = {
         ...data,
-        e,
+        ...buildBackwardCompatEvent(this, e),
         target: oldTarget,
         nextTarget: target,
-        ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
@@ -1303,10 +1267,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (target && targetChanged) {
       const inOpt: CanvasEvents[typeof canvasIn] = {
         ...data,
-        e,
+        ...buildBackwardCompatEvent(this, e),
         target,
         previousTarget: oldTarget,
-        ...getEventPoints(this, e),
       };
       fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);

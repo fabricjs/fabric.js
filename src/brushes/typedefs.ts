@@ -1,7 +1,10 @@
 import type { TEvent } from '../EventTypeDefs';
 import type { Point } from '../Point';
 
-export type TBrushEventData = TEvent & { pointer: Point };
+export interface TBrushEventData extends TEvent {
+  scenePoint: Point;
+  viewportPoint: Point;
+}
 
 export type CircleBrushPoint = {
   x: number;
