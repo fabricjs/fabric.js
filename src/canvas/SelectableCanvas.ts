@@ -648,6 +648,44 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
+   * @private
+   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  _finalizeCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform!,
+      target = transform.target,
+      options = {
+        e,
+        target,
+        transform,
+        action: transform.action,
+      };
+
+    target.setCoords();
+
+    if (transform.actionPerformed) {
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+    }
+  }
+
+  /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that block the user UX )
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  endCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._finalizeCurrentTransform(e);
+    if (transform && transform.target) {
+      // this could probably go inside _finalizeCurrentTransform
+      transform.target.isMoving = false;
+    }
+    this._currentTransform = null;
+  }
+
+  /**
    * Set the cursor type of the canvas element
    * @param {String} value Cursor type of the canvas element.
    * @see http://www.w3.org/TR/css3-ui/#cursor
@@ -1179,7 +1217,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         resetObjectTransform(this._activeSelection);
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
