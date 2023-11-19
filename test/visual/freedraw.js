@@ -1,23 +1,33 @@
-  function setBrush(canvas, brush) {
+  
+const buildEvent = (canvas, scenePoint) => {
+  return {
+    e: {
+      pointerId: 1,
+      target: canvas.upperCanvasEl
+    },
+    scenePoint,
+    viewportPoint: fabric.util.sendPointToPlane(scenePoint, canvas.viewportTransform)
+  };
+}
+
+  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
+    const { canvas } = brush;
     canvas.isDrawingMode = true;
     canvas.freeDrawingBrush = brush;
-  }
-  var options = { e: { pointerId: 1 } };
-  function pointDrawer(points, brush, fireUp = false, onMove = undefined) {
-    setBrush(brush.canvas, brush);
-    brush.onMouseDown(points[0], options);
+    brush.onMouseDown(buildEvent(canvas, points[0]));
     for (var i = 1; i < points.length; i++) {
       points[i].x = parseFloat(points[i].x);
       points[i].y = parseFloat(points[i].y);
-      brush.onMouseMove(points[i], options);
+      brush.onMouseMove(buildEvent(canvas, points[i]));
       onMove && onMove(points[i], i, points);
     }
     if (fireUp) {
-      brush.onMouseUp(options);
+      brush.onMouseUp(buildEvent(canvas, points[points.length - 1]));
     }
   }
+
   function fireMouseUp(brush) {
-    brush.onMouseUp(options);
+    brush.onMouseUp(buildEvent(canvas, points[points.length - 1]));
   }
 
   // function eraserDrawer(points, brush, fireUp = false) {
