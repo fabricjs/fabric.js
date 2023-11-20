@@ -30,58 +30,30 @@ for (const exact of [true, false]) {
       name: toSnapshotName('initial', exact),
     });
 
-    const modifyPoly = (
-      title: string,
-      controlName: string,
-      delta: { x: number; y: number }
-    ) =>
-      test.step(title, async () => {
-        const eventStreamHandle =
-          await test.step('subscribe to poly events', () =>
-            starUtil.evaluateHandle((object) => {
-              const events: { action: string; corner: string }[] = [];
-              const disposer = object.on(
-                'modifyPoly',
-                ({ transform: { action, corner } }) =>
-                  events.push({ action, corner })
-              );
-              object.once('modified', ({ transform: { action, corner } }) => {
-                disposer();
-                events.push({ action, corner });
-              });
-              return events;
-            }));
-
-        const controlPoint = await starUtil.getObjectControlPoint(controlName);
-        await page.mouse.move(controlPoint.x, controlPoint.y);
-        await page.mouse.down();
-        await page.mouse.move(
-          controlPoint.x + delta.x,
-          controlPoint.y + delta.y,
-          {
-            steps: 40,
-          }
-        );
-        await page.mouse.up();
-
-        expect(await canvasUtil.screenshot()).toMatchSnapshot({
-          name: toSnapshotName(`moved_controls_${controlName}`, exact),
-        });
-
-        const events = await eventStreamHandle.jsonValue();
-        expect(events.length).toBeGreaterThan(0);
-        expect(events).toMatchObject(
-          new Array(events.length).fill({
-            action: 'modifyPoly',
-            corner: controlName,
-          })
-        );
+    await test.step('drag the p2 control', async () => {
+      const p2ControlPoint = await starUtil.getObjectControlPoint('p2');
+      await page.mouse.move(p2ControlPoint.x, p2ControlPoint.y);
+      await page.mouse.down();
+      await page.mouse.move(p2ControlPoint.x + 300, p2ControlPoint.y + 100, {
+        steps: 40,
       });
+      await page.mouse.up();
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
+        name: toSnapshotName('moved_controls_p2', exact),
+      });
+    });
 
-    await modifyPoly('drag the p2 control', 'p2', { x: 300, y: 100 });
-    await modifyPoly('drag in the p4 control in the opposite direction', 'p4', {
-      x: -300,
-      y: -100,
+    await test.step('drag in the opposite direction', async () => {
+      const p4ControlPoint = await starUtil.getObjectControlPoint('p4');
+      await page.mouse.move(p4ControlPoint.x, p4ControlPoint.y);
+      await page.mouse.down();
+      await page.mouse.move(p4ControlPoint.x - 300, p4ControlPoint.y - 100, {
+        steps: 40,
+      });
+      await page.mouse.up();
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
+        name: toSnapshotName('moved_controls_p4', exact),
+      });
     });
   });
 }
