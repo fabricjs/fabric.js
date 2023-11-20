@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import cp from 'child_process';
 import fs from 'fs-extra';
-import getPort from 'get-port';
+import getPort from 'detect-port';
 import moment from 'moment';
 import path from 'node:path';
 import { build } from '../scripts/build.mjs';
@@ -77,7 +77,7 @@ export async function startSandbox(
     }
   }
 
-  const usePort = await getPort({ port: [port] });
+  const usePort = await getPort(port);
   const task = cp.spawn(`npm run dev -- --port ${usePort}`, {
     cwd: destination,
     stdio: 'inherit',
