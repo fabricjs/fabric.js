@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { Point } from '../Point';
 import { Canvas } from '../canvas/Canvas';
 import { Polygon } from '../shapes/Polygon';
