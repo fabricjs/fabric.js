@@ -14,5 +14,16 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": false,
     "source.removeUnusedImports": true
-  }
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "dist": true,
+    "website": true,
+    "coverage": true,
+    ".nyc_output": true,
+    "test/visual/assets": true
+  },
+  "search.useIgnoreFiles": true
 }
