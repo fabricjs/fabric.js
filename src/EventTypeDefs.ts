@@ -99,7 +99,8 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modifyPoly';
 
 export interface ModifiedEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
