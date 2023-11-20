@@ -1,18 +1,21 @@
 # https://www.gitpod.io/docs/config-gitpod-file
+# https://www.gitpod.io/docs/configure/workspaces/tasks#wait-for-commands-to-complete
 
 tasks:
   - name: Build & Watch
-    init: npm install --include=dev
+    init: |
+      npm install --include=dev
+      gp sync-done deps
     command: npm run build -- -w -f
 
   - name: Node
-    init: npm install --include=dev
-    command: npm start node -- --no-watch -l
+    init: gp sync-await deps
+    command: npm start node -- --no-watch
 
   - name: Next.js
-    init: npm install --include=dev
-    command: npm start next -- --no-watch -l
+    init: gp sync-await deps
+    command: npm start next -- --no-watch
 
   - name: Vanilla
-    init: npm install --include=dev
-    command: npm start vanilla -- --no-watch -l
+    init: gp sync-await deps
+    command: npm start vanilla -- --no-watch
