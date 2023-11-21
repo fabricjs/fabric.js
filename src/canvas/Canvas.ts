@@ -795,7 +795,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     let shouldRender = false;
     if (transform) {
-      this.endCurrentTransform(e);
+      this.endCurrentTransform(e, false);
       shouldRender = transform.actionPerformed;
     }
     if (!isClick) {

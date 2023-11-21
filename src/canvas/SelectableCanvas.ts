@@ -4,6 +4,7 @@ import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
   CanvasEvents,
+  ModifiedEvent,
   ModifierKey,
   TOptionalModifierKey,
   TPointerEvent,
@@ -650,16 +651,18 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   * @param {boolean} aborted flag passed down to the `modified` event indicating if the interaction was aborted
    */
-  endCurrentTransform(e?: TPointerEvent) {
+  endCurrentTransform(e?: TPointerEvent, aborted = true) {
     const transform = this._currentTransform;
     if (!transform) {
       return;
     }
 
     const { target, action, actionPerformed } = transform;
-    const options = {
+    const options: ModifiedEvent = {
       e,
+      aborted,
       target,
       transform,
       action,
@@ -1206,7 +1209,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         resetObjectTransform(this._activeSelection);
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        this.endCurrentTransform(e);
+        this.endCurrentTransform(e, true);
       }
       this._activeObject = undefined;
       return true;
