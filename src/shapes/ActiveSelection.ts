@@ -3,7 +3,6 @@ import { classRegistry } from '../ClassRegistry';
 import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
-import { LayoutManager } from '../LayoutManager';
 import {
   LAYOUT_TYPE_ADDED,
   LAYOUT_TYPE_REMOVED,
@@ -40,21 +39,6 @@ export class ActiveSelection extends Group {
   multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
 
   static type = 'ActiveSelection';
-
-  /**
-   * @override {@link layoutManager}
-   */
-  constructor(
-    objects: FabricObject[] = [],
-    options: Partial<ActiveSelectionOptions> = {},
-    objectsRelativeToGroup?: boolean
-  ) {
-    super(
-      objects,
-      { layoutManager: new LayoutManager(), ...options },
-      objectsRelativeToGroup
-    );
-  }
 
   /**
    * @private
