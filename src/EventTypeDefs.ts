@@ -57,7 +57,7 @@ export type Transform = {
   target: FabricObject;
   action: string;
   actionHandler?: TransformActionHandler;
-  corner: string | 0;
+  corner: string;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -103,7 +103,8 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modifyPoly';
 
 export interface ModifiedEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {

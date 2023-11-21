@@ -67,7 +67,7 @@ const findCrossPoints = (point, lines) => {
 /**
  * Method that returns an object with the object edges in it, given the coordinates of the corners
  * @private
- * @param {Object} lineCoords or aCoords Coordinates of the object corners
+ * @param {Object} aCoords Coordinates of the object corners
  */
 const getImageLines = ({ tl, tr, bl, br }) => {
   const lines = {
@@ -101,8 +101,9 @@ export const cornerPointContainsPoint = (point, cornerPoint) => {
 // END OF OLD CODE
 
 class Test1 extends FabricObject {
-  containsPoint(point, absolute, calculate) {
-    return cornerPointContainsPoint(point, this._getCoords(calculate));
+  containsPoint(point) {
+    const [tl, tr, br, bl] = this.getCoords();
+    return cornerPointContainsPoint(point, { tl, tr, br, bl });
   }
 }
 
