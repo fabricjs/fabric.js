@@ -21,7 +21,6 @@ import type {
   LayoutAfterEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
-import { FitContentLayout } from '../LayoutManager/LayoutStrategies/FitContentLayout';
 import {
   LAYOUT_TYPE_ADDED,
   LAYOUT_TYPE_IMPERATIVE,
@@ -139,7 +138,7 @@ export class Group
     // perform initial layout
     const layoutManager =
       // not destructured on purpose here.
-      options.layoutManager || new LayoutManager(new FitContentLayout());
+      options.layoutManager || new LayoutManager();
     layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       objectsRelativeToGroup,
