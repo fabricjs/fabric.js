@@ -4,7 +4,7 @@ import { Canvas } from './Canvas';
 import { Group } from '../shapes/Group';
 
 describe('Selectable Canvas', () => {
-  describe('_pointIsInObjectSelectionArea', () => {
+  describe('isPointInObjectSelectionArea', () => {
     it('points and selection area', () => {
       const object = new FabricObject({
         left: 40,
@@ -20,22 +20,22 @@ describe('Selectable Canvas', () => {
 
       // point1 is outside object because object starts at 40,40
       const point1 = new Point(30, 30);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(false);
       // point2 is contained in object
       const point2 = new Point(40, 40);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is contained of object
       const point3 = new Point(65, 50);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(true);
       // point4 is outside of object (bottom)
       const point4 = new Point(45, 95);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top)
       const point5 = new Point(50, 30);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
       // point6 is outside of object (right)
       const point6 = new Point(90, 45);
-      expect(canvas._pointIsInObjectSelectionArea(object, point6)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point6)).toBe(false);
     });
     it('points and selection area, with rotation', () => {
       const object = new FabricObject({
@@ -54,19 +54,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(0, 0);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right
       const point2 = new Point(50, 40);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(20, 41);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(51, 25);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-1, -1);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, with rotation and scaling', () => {
       const object = new FabricObject({
@@ -87,19 +87,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(0, 0);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right
       const point2 = new Point(100, 80);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(40, 82);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(102, 50);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-2, -2);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, with rotation and scaling and the strokeWidth', () => {
       const object = new FabricObject({
@@ -121,19 +121,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(-2, -2);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right
       const point2 = new Point(102, 82);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(40, 83);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(103, 50);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-3, -3);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, with rotation and scaling and the strokeWidth and strokeUniform', () => {
       const object = new FabricObject({
@@ -156,19 +156,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(-1, -1);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right
       const point2 = new Point(101, 81);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(40, 82);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(102, 50);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-2, -2);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, with rotation and scaling and the strokeWidth and strokeUniform and padding', () => {
       const object = new FabricObject({
@@ -191,19 +191,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(-6, -6);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right padding area
       const point2 = new Point(106, 86);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(40, 88);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(108, 50);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-7, -7);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, with rotation and scaling and the strokeWidth and padding', () => {
       const object = new FabricObject({
@@ -225,19 +225,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(-7, -7);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right padding area
       const point2 = new Point(107, 87);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(40, 88);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(107, 50);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-8, -8);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, with the strokeWidth and padding', () => {
       const object = new FabricObject({
@@ -256,19 +256,19 @@ describe('Selectable Canvas', () => {
 
       // point1 is contained in object top left
       const point1 = new Point(-6, -6);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
       // point2 is contained in object bottom right padding area
       const point2 = new Point(46, 56);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
       // point3 is outside of object (bottom) because object is rotate
       const point3 = new Point(20, 57);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
       // point4 is outside of object (right)
       const point4 = new Point(47, 20);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
       // point5 is outside of object (top left)
       const point5 = new Point(-7, -7);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
     it('points and selection area, group transformation and padding', () => {
       const object = new FabricObject({
@@ -296,10 +296,25 @@ describe('Selectable Canvas', () => {
       for (let y = -1; y <= 31; y++) {
         for (let x = -1; x <= 31; x++) {
           expect(
-            canvas['_pointIsInObjectSelectionArea'](object, new Point(x, y))
+            canvas.isPointInObjectSelectionArea(object, new Point(x, y))
           ).toBe(x >= 0 && x <= 30 && y >= 0 && y <= 30);
         }
       }
+      // point1 is contained in object top left
+      const point1 = new Point(5, 5);
+      expect(canvas.isPointInObjectSelectionArea(object, point1)).toBe(true);
+      // point2 is contained in object bottom right padding area
+      const point2 = new Point(35, 35);
+      expect(canvas.isPointInObjectSelectionArea(object, point2)).toBe(true);
+      // point3 is outside of object (bottom) because object is rotate
+      const point3 = new Point(20, 36);
+      expect(canvas.isPointInObjectSelectionArea(object, point3)).toBe(false);
+      // point4 is outside of object (right)
+      const point4 = new Point(36, 20);
+      expect(canvas.isPointInObjectSelectionArea(object, point4)).toBe(false);
+      // point5 is outside of object (top left)
+      const point5 = new Point(4, 4);
+      expect(canvas.isPointInObjectSelectionArea(object, point5)).toBe(false);
     });
   });
 });
