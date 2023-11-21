@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): `TextEditingManager` null exception + rename `_pointIsInObjectSelectionArea` [#9507](https://github.com/fabricjs/fabric.js/pull/9507)
 - fix(): fire Poly control events [#9504](https://github.com/fabricjs/fabric.js/pull/9504)
 - test(FabricObject): add a snapshot of the default values so that reordering and shuffling is verified. [#9492](https://github.com/fabricjs/fabric.js/pull/9492)
 - feat(FabricObject, Canvas) BREAKING: remove calculate true/false from the api. [#9483](https://github.com/fabricjs/fabric.js/pull/9483)
