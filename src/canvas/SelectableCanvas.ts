@@ -759,9 +759,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {FabricObject} obj Object to test against
    * @param {Object} [pointer] point in scene coordinates
    * @return {Boolean} true if point is contained within an area of given object
-   * @private
    */
-  private _pointIsInObjectSelectionArea(obj: FabricObject, point: Point) {
+  isPointInObjectSelectionArea(obj: FabricObject, point: Point) {
     // getCoords will already take care of group de-nesting
     let coords = obj.getCoords();
     const viewportZoom = this.getZoom();
@@ -808,7 +807,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      this._pointIsInObjectSelectionArea(
+      this.isPointInObjectSelectionArea(
         obj,
         sendPointToPlane(pointer, undefined, this.viewportTransform)
       )
