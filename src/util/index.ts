@@ -36,6 +36,7 @@ export {
   createSkewXMatrix,
   createSkewYMatrix,
   calcDimensionsMatrix,
+  calcPlaneRotation,
   multiplyTransformMatrices,
   multiplyTransformMatrixArray,
   isIdentityMatrix,
