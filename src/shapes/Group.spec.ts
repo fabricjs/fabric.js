@@ -1,4 +1,4 @@
-import { FixedLayout, LayoutManager } from '../LayoutManager';
+import { FixedLayout } from '../LayoutManager';
 import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
 
@@ -14,37 +14,23 @@ describe('Group', () => {
     expect(group._objects).toHaveLength(3);
   });
 
-  it.each([true, false])(
-    'triggerLayout should preform layout, layoutManager is defined %s',
-    (defined) => {
-      const manager = new LayoutManager();
-      const performLayout = jest.spyOn(manager, 'performLayout');
+  it('triggerLayout should preform layout, layoutManager is defined', () => {
+    const group = new Group();
+    expect(group.layoutManager).toBeDefined();
+    const performLayout = jest.spyOn(group.layoutManager, 'performLayout');
 
-      const group = new Group();
-      expect(group.layoutManager).toBeUndefined();
-      defined && (group.layoutManager = manager);
-
-      group.triggerLayout({ manager });
-      const fixedLayout = new FixedLayout();
-      group.triggerLayout({ manager, strategy: fixedLayout });
-      manager.strategy = new FixedLayout();
-      group.triggerLayout({ manager });
-      expect(performLayout).toHaveBeenCalledTimes(3);
-      expect(performLayout).toHaveBeenNthCalledWith(1, {
-        strategy: manager.strategy,
-        target: group,
-        type: 'imperative',
-      });
-      expect(performLayout).toHaveBeenNthCalledWith(2, {
-        strategy: fixedLayout,
-        target: group,
-        type: 'imperative',
-      });
-      expect(performLayout).toHaveBeenNthCalledWith(3, {
-        strategy: fixedLayout,
-        target: group,
-        type: 'imperative',
-      });
-    }
-  );
+    group.triggerLayout();
+    const fixedLayout = new FixedLayout();
+    group.triggerLayout({ strategy: fixedLayout });
+    expect(performLayout).toHaveBeenCalledTimes(2);
+    expect(performLayout).toHaveBeenNthCalledWith(1, {
+      target: group,
+      type: 'imperative',
+    });
+    expect(performLayout).toHaveBeenNthCalledWith(2, {
+      strategy: fixedLayout,
+      target: group,
+      type: 'imperative',
+    });
+  });
 });
