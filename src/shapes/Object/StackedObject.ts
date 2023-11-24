@@ -50,15 +50,14 @@ export class StackedObject<
    * @returns {boolean}
    */
   isDescendantOf(target: TAncestor): boolean {
+    const { parent, group } = this;
     return (
-      this.parent === target ||
-      this.group === target ||
+      parent === target ||
+      group === target ||
       this.canvas === target ||
       // walk up
-      (!!this.parent && this.parent.isDescendantOf(target)) ||
-      (!!this.group &&
-        this.group !== this.parent &&
-        this.group.isDescendantOf(target))
+      (!!parent && parent.isDescendantOf(target)) ||
+      (!!group && group !== parent && group.isDescendantOf(target))
     );
   }
 
