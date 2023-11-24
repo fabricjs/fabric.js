@@ -38,6 +38,7 @@
 
     assert.ok(group);
     assert.ok(group instanceof fabric.ActiveSelection, 'should be instance of fabric.ActiveSelection');
+    assert.ok(!group.item(0).parent, 'parent ref is undefined');
   });
 
   QUnit.test('toString', function(assert) {
