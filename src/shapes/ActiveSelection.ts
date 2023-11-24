@@ -76,20 +76,28 @@ export class ActiveSelection extends Group {
   }
 
   /**
+   * Change an object so that it can be part of an active selection.
+   * this method is called by multiselectAdd from canvas code.
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    // make sure we exit the parent only once
+    // This condition check that the object has currently a group, and the group
+    // is also its parent, meaning that is not in an active selection, but is
+    // in a normal group.
     if (object.parent && object.parent === object.group) {
-      // keep the object part of the parent
+      // Disconnect the object from the group functionalities, but keep the ref parent intact
+      // for later re-enter
       object.parent._exitGroup(object);
+      // in this case the object is probably inside an active selection.
     } else if (object.group && object.parent !== object.group) {
-      // in case `object` is transferred between active selections we remove it from the previous one
+      // in this case group.remove will also clear the old parent reference.
       object.group.remove(object);
     }
-
+    // enter the active selection from a render perspective
+    // the object will be in the objects array of both the ActiveSelection and the Group
+    // but referenced in the group's _activeObjects so that it won't be rendered twice.
     this._enterGroup(object, removeParentTransform);
   }
 
