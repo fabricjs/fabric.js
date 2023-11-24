@@ -87,13 +87,10 @@ export class InteractiveFabricObject<
   declare moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
-   * Describe object's corner position in canvas element coordinates.
-   * properties are depending on control keys and padding the main controls.
-   * each property is an object with x, y and corner.
-   * The `corner` property contains in a similar manner the 4 points of the
-   * interactive area of the corner.
-   * The coordinates depends from the controls positionHandler and are used
-   * to draw and locate controls
+   * The object's controls' position in viewport coordinates
+   * Calculated by {@link Control#positionHandler} and {@link Control#calcCornerCoords}, depending on {@link padding}.
+   * `corner/touchCorner` describe the 4 points forming the interactive area of the corner.
+   * Used to draw and locate controls.
    */
   declare oCoords: Record<string, TOCoord>;
 
@@ -292,16 +289,12 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * oCoords are used to find the corners
-   * aCoords are used to quickly find an object on the canvas
-   * lineCoords are used to quickly find object during pointer events.
+   * @override set controls' coordinates as well
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords(): void {
     super.setCoords();
-    // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.canvas && (this.oCoords = this.calcOCoords());
   }
 
