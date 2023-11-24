@@ -4,6 +4,8 @@ import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
+import { FixedLayout } from './LayoutStrategies/FixedLayout';
+
 import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_ADDED,
@@ -627,7 +629,6 @@ describe('Layout Manager', () => {
       canvas.add(grandParent);
       jest.spyOn(canvas, 'fire');
       grandParent.triggerLayout({
-        manager,
         bubbles: false,
         deep: false,
       });
@@ -681,7 +682,6 @@ describe('Layout Manager', () => {
       canvas.add(grandParent);
       jest.spyOn(canvas, 'fire');
       grandParent.triggerLayout({
-        manager,
         bubbles: false,
         deep: true,
       });
@@ -803,6 +803,7 @@ describe('Layout Manager', () => {
         width: 100,
         height: 300,
         strokeWidth: 0,
+        layoutManager: new LayoutManager(new FixedLayout()),
       });
       expect(group).toMatchObject({ width: 100, height: 300 });
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });

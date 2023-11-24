@@ -21,7 +21,6 @@ import type {
   LayoutAfterEvent,
 } from '../LayoutManager/types';
 import { LayoutManager } from '../LayoutManager/LayoutManager';
-import { FixedLayout } from '../LayoutManager';
 import {
   LAYOUT_TYPE_ADDED,
   LAYOUT_TYPE_IMPERATIVE,
@@ -46,7 +45,7 @@ export interface SerializedGroupProps
 }
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
-  layoutManager?: LayoutManager;
+  layoutManager: LayoutManager;
 }
 
 export const groupDefaultValues = {
@@ -84,7 +83,7 @@ export class Group
    */
   declare interactive: boolean;
 
-  declare layoutManager?: LayoutManager;
+  declare layoutManager: LayoutManager;
 
   /**
    * Used internally to optimize performance
@@ -116,7 +115,7 @@ export class Group
    */
   constructor(
     objects: FabricObject[] = [],
-    { layoutManager, ...options }: Partial<GroupProps> = {},
+    options: Partial<GroupProps> = {},
     objectsRelativeToGroup?: boolean
   ) {
     // @ts-expect-error options error
@@ -137,12 +136,10 @@ export class Group
     });
 
     // perform initial layout
-    this.layoutManager = layoutManager;
-    (
-      layoutManager ||
-      // legacy
-      new LayoutManager(new FixedLayout())
-    ).performLayout({
+    const layoutManager =
+      // not destructured on purpose here.
+      options.layoutManager || new LayoutManager();
+    layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       objectsRelativeToGroup,
       target: this,
@@ -150,6 +147,7 @@ export class Group
       x: options.left,
       y: options.top,
     });
+    this.layoutManager = layoutManager;
   }
 
   /**
@@ -246,7 +244,7 @@ export class Group
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
-    this.layoutManager?.performLayout({
+    this.layoutManager.performLayout({
       type,
       targets,
       target: this,
@@ -485,16 +483,11 @@ export class Group
       this.forEachObject((object) => object.setCoords());
   }
 
-  triggerLayout({
-    manager = this.layoutManager || new LayoutManager(),
-    strategy = manager.strategy,
-    ...rest
-  }: ImperativeLayoutOptions = {}) {
-    manager.performLayout({
+  triggerLayout(options: ImperativeLayoutOptions = {}) {
+    this.layoutManager.performLayout({
       target: this,
       type: LAYOUT_TYPE_IMPERATIVE,
-      strategy,
-      ...rest,
+      ...options,
     });
   }
 
@@ -564,7 +557,7 @@ export class Group
   }
 
   dispose() {
-    this.layoutManager?.unsubscribeTarget(this);
+    this.layoutManager.unsubscribeTarget(this);
     this._activeObjects = [];
     this.forEachObject((object) => {
       this._watchObject(false, object);
