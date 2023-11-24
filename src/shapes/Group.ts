@@ -273,12 +273,6 @@ export class Group extends createCollectionMixin(
     object.fire('added', { target: this });
   }
 
-  _onRelativeObjectAdded(object: FabricObject) {
-    this.enterGroup(object, false);
-    this.fire('object:added', { target: object });
-    object.fire('added', { target: this });
-  }
-
   /**
    * @private
    * @param {FabricObject} object
@@ -453,7 +447,11 @@ export class Group extends createCollectionMixin(
   }
 
   /**
-   * @private
+   * Executes the inner fabric logic of exiting a group.
+   * - Stop watching the object
+   * - Remove the object from the optimization map this._activeObjects
+   * - unset the group property of the object
+   * @protected
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
