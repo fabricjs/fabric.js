@@ -3,7 +3,6 @@ import type { Group } from '../Group';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
-import { isActiveSelection } from '../../util/typeAssertions';
 
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
@@ -42,18 +41,7 @@ export class StackedObject<
    * A reference to the parent of the object
    * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
    */
-  declare __owningGroup?: Group;
-
-  /**
-   * Returns instance's parent **EXCLUDING** `ActiveSelection`
-   * @param {boolean} [strict] exclude canvas as well
-   */
-  getParent<T extends boolean>(strict?: T): TAncestor | undefined {
-    return (
-      (isActiveSelection(this.group) ? this.__owningGroup : this.group) ||
-      (strict ? undefined : this.canvas)
-    );
-  }
+  declare parent?: Group;
 
   /**
    * Checks if object is descendant of target
@@ -62,13 +50,14 @@ export class StackedObject<
    * @returns {boolean}
    */
   isDescendantOf(target: TAncestor): boolean {
+    const { parent, group } = this;
     return (
-      this.__owningGroup === target ||
-      this.group === target ||
+      parent === target ||
+      group === target ||
       this.canvas === target ||
       // walk up
-      (!!this.__owningGroup && this.__owningGroup.isDescendantOf(target)) ||
-      (!!this.group && this.group.isDescendantOf(target))
+      (!!parent && parent.isDescendantOf(target)) ||
+      (!!group && group !== parent && group.isDescendantOf(target))
     );
   }
 
@@ -83,7 +72,9 @@ export class StackedObject<
     let parent: TAncestor | undefined = this;
     do {
       parent =
-        parent instanceof StackedObject ? parent.getParent(strict) : undefined;
+        parent instanceof StackedObject
+          ? parent.parent ?? (!strict ? parent.canvas : undefined)
+          : undefined;
       parent && ancestors.push(parent);
     } while (parent);
     return ancestors as Ancestors<T>;

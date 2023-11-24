@@ -2,7 +2,6 @@ import type { FabricObject } from '../shapes/Object/Object';
 import type { TFiller } from '../typedefs';
 import type { FabricText } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
-import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { Path } from '../shapes/Path';
 
 export const isFiller = (
@@ -23,12 +22,6 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
     (filler as Pattern).offsetX !== undefined &&
     (filler as Pattern).source !== undefined
   );
-};
-
-export const isActiveSelection = (
-  fabricObject?: FabricObject
-): fabricObject is ActiveSelection => {
-  return !!fabricObject && fabricObject.isType('ActiveSelection');
 };
 
 export const isTextObject = (

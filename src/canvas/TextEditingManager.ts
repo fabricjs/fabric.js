@@ -13,7 +13,8 @@ export class TextEditingManager {
 
   constructor(canvas: Canvas) {
     const cb = () => {
-      const { hiddenTextarea } = canvas.getActiveObject() as ITextBehavior;
+      const { hiddenTextarea } =
+        (canvas.getActiveObject() as ITextBehavior) || {};
       hiddenTextarea && hiddenTextarea.focus();
     };
     const el = canvas.upperCanvasEl;

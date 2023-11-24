@@ -88,12 +88,14 @@
 
     assert.ok(typeof group.remove === 'function');
     assert.ok(rect1.group === group, 'group should be referenced');
+    assert.ok(rect1.parent === group, 'parent should be referenced');
     group.on('object:removed', (opt) => {
       targets.push(opt.target);
     });
     rect1.on('removed', (opt) => {
       assert.equal(opt.target, group);
       assert.ok(rect1.group === undefined, 'group should not be referenced');
+      assert.ok(rect1.parent === undefined, 'parent should not be referenced');
       fired = true;
     });
     var removed = group.remove(rect2);
@@ -595,9 +597,12 @@
 
     assert.equal(firstObjInGroup.group, group);
     assert.equal(secondObjInGroup.group, group);
+    assert.equal(firstObjInGroup.parent, group);
+    assert.equal(secondObjInGroup.parent, group);
 
     group.remove(firstObjInGroup);
     assert.ok(typeof firstObjInGroup.group === 'undefined');
+    assert.ok(typeof firstObjInGroup.parent === 'undefined');
   });
 
   QUnit.test('insertAt', function (assert) {

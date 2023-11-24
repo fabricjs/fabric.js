@@ -328,14 +328,11 @@ export class Group
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-   * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    if (object.group) {
-      object.group.remove(object);
-    }
+    object.group && object.group.remove(object);
+    object._set('parent', this);
     this._enterGroup(object, removeParentTransform);
-    return true;
   }
 
   /**
@@ -378,11 +375,16 @@ export class Group
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    object._set('parent', undefined);
     object._set('canvas', undefined);
   }
 
   /**
-   * @private
+   * Executes the inner fabric logic of exiting a group.
+   * - Stop watching the object
+   * - Remove the object from the optimization map this._activeObjects
+   * - unset the group property of the object
+   * @protected
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
