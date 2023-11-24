@@ -397,7 +397,7 @@ export class Group extends createCollectionMixin(
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    object.group?.remove(object);
+    object.group && object.group.remove(object);
     object._set('parent', this);
     this._enterGroup(object, removeParentTransform);
   }
