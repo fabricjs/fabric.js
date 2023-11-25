@@ -70,6 +70,13 @@ export function scalingIsForbidden(
   if (lockY && by === 'y') {
     return true;
   }
+  // object disappears if scaling 0 sized object so forbid
+  if (fabricObject.width === 0 && by == 'x') {
+    return true;
+  }
+  if (fabricObject.height === 0 && by === 'y') {
+    return true;
+  }
   return false;
 }
 
@@ -125,14 +132,6 @@ function scaleObject(
     scaleProportionally = scaleIsProportional(eventData, target),
     forbidScaling = scalingIsForbidden(target, by, scaleProportionally);
   let newPoint, scaleX, scaleY, dim, signX, signY;
-  // in the case where the object has no width or no height, we need to use a small
-  // value or we get NaN values and odd behavior happens
-  if (target.height === 0) {
-    target.height = 1 / target.scaleY;
-  }
-  if (target.width === 0) {
-    target.width = 1 / target.scaleX;
-  }
 
   if (forbidScaling) {
     return false;
