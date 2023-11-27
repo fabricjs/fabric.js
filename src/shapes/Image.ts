@@ -821,7 +821,7 @@ export class FabricImage<
   static fromURL<T extends TOptions<ImageProps>>(
     url: string,
     { crossOrigin = null, signal }: LoadImageOptions = {},
-    imageOptions: T
+    imageOptions?: T
   ): Promise<FabricImage> {
     return loadImage(url, { crossOrigin, signal }).then(
       (img) => new this(img, imageOptions)
