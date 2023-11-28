@@ -589,7 +589,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     e: TPointerEvent,
     target: FabricObject,
     alreadySelected: boolean
-  ): Transform {
+  ): void {
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -649,8 +649,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       e,
       transform,
     });
-
-    return transform;
   }
 
   /**
