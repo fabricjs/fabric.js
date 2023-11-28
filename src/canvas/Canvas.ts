@@ -1085,27 +1085,27 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     if (target) {
       const alreadySelected = target === this._activeObject;
-      if (target.selectable && target.activeOn === 'down') {
-        this.setActiveObject(target, e);
-      }
       const corner = target._findTargetCorner(
         this.getViewportPoint(e),
         isTouchEvent(e)
       );
+
+      if (target.selectable && target.activeOn === 'down') {
+        this.setActiveObject(target, e);
+      }
+
       if (target === this._activeObject && (corner || !grouped)) {
-        this._setupCurrentTransform(e, target, alreadySelected);
-        const control = target.controls[corner],
-          pointer = this.getScenePoint(e),
-          mouseDownHandler =
-            control && control.getMouseDownHandler(e, target, control);
-        mouseDownHandler &&
-          mouseDownHandler.call(
-            control,
-            e,
-            this._currentTransform!,
-            pointer.x,
-            pointer.y
-          );
+        const { key, control } =
+          (alreadySelected && target.getActiveControl()) || {};
+        const transform = this.setupCurrentTransform(e, {
+          target,
+          key,
+          control,
+        });
+        const pointer = this.getScenePoint(e);
+        control
+          ?.getMouseDownHandler(e, target, control)
+          ?.call(control, e, transform, pointer.x, pointer.y);
       }
     }
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering

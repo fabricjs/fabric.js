@@ -47,7 +47,7 @@
         which: 1,
         target: canvas.upperCanvasEl
       };
-      canvas._setupCurrentTransform(e, rect);
+      canvas.setupCurrentTransform(e, { target: rect });
     }
     assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate for all corners');
     assert.equal(t, rect, 'before:transform should receive correct target');
@@ -65,7 +65,7 @@
         which: 1,
         target: canvas.upperCanvasEl
       };
-      canvas._setupCurrentTransform(e, rect);
+      canvas.setupCurrentTransform(e, { target: rect });
     }
     assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate when canvas is zoomed');
     assert.equal(t, rect, 'before:transform should receive correct target when canvas is zoomed');

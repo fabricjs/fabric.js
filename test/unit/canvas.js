@@ -1803,7 +1803,8 @@
     var target = makeRect();
     canvas.add(target);
     canvas.setActiveObject(target);
-    canvas._setupCurrentTransform(e, target, true);
+    target._findTargetCorner(canvas.getViewportPoint(e));
+    canvas.setupCurrentTransform(e, { target, ...target.getActiveControl() });
     assert.ok(canvas._currentTransform, 'transform should be set');
     target.isMoving = true;
     canvas._discardActiveObject();
@@ -2017,7 +2018,7 @@
   });
 
   QUnit.test('setupCurrentTransform', function(assert) {
-    assert.ok(typeof canvas._setupCurrentTransform === 'function');
+    assert.ok(typeof canvas.setupCurrentTransform === 'function');
 
     var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
     canvas.add(rect);
@@ -2028,10 +2029,10 @@
       target: canvas.upperCanvasEl
     };
     canvas.setActiveObject(rect);
-    rect.__corner = rect._findTargetCorner(
+    rect._findTargetCorner(
       canvas.getViewportPoint(eventStub)
     );
-    canvas._setupCurrentTransform(eventStub, rect);
+    canvas.setupCurrentTransform(eventStub, { target: rect });
     var t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'drag', 'should target inside rect and setup drag');
@@ -2044,21 +2045,20 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: canvas.upperCanvasEl
     };
-    rect.__corner = rect._findTargetCorner(
+    rect._findTargetCorner(
       canvas.getViewportPoint(eventStub)
     );
-    canvas._setupCurrentTransform(eventStub, rect, false);
+    canvas.setupCurrentTransform(eventStub, { target: rect });
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'drag', 'should setup drag since the object was not selected');
-    assert.equal(t.corner, 'tl', 'tl selected');
+    assert.equal(t.corner, '', 'should not setup corner since the object was not selected');
     assert.equal(t.shiftKey, undefined, 'shift was not pressed');
 
-    var alreadySelected = true;
-    rect.__corner = rect._findTargetCorner(
+    rect._findTargetCorner(
       canvas.getViewportPoint(eventStub)
     );
-    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
+    canvas.setupCurrentTransform(eventStub, { target: rect, ...rect.getActiveControl() });
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'scale', 'should target a corner and setup scale');
@@ -2073,10 +2073,10 @@
       target: canvas.upperCanvasEl,
       shiftKey: true
     };
-    rect.__corner = rect._findTargetCorner(
+    rect._findTargetCorner(
       canvas.getViewportPoint(eventStub)
     );
-    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
+    canvas.setupCurrentTransform(eventStub, { target: rect, ...rect.getActiveControl() });
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
     assert.equal(t.action, 'skewY', 'should target a corner and setup skew');
@@ -2090,7 +2090,7 @@
     //   clientY: canvasOffset.top + rect.oCoords.mtr.y,
     //   target: canvas.upperCanvasEl,
     // };
-    // canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
+    // canvas._setupCurrentTransform(eventStub, rect, true);
     // t = canvas._currentTransform;
     // assert.equal(t.target, rect, 'should have rect as a target');
     // assert.equal(t.action, 'mtr', 'should target a corner and setup rotate');
@@ -2111,7 +2111,7 @@
   //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
   //     target: canvas.upperCanvasEl,
   //   };
-  //   canvas._setupCurrentTransform(eventStub, rect);
+  //   canvas.setupCurrentTransform(eventStub, { target: rect });
   //   var rotated = canvas._rotateObject(30, 30, 'equally');
   //   assert.equal(rotated, true, 'return true if a rotation happened');
   //   rotated = canvas._rotateObject(30, 30);
@@ -2129,7 +2129,7 @@
   //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
   //     target: canvas.upperCanvasEl,
   //   };
-  //   canvas._setupCurrentTransform(eventStub, rect);
+  //   canvas.setupCurrentTransform(eventStub, { target: rect });
   //   assert.equal(rect.originX, 'right');
   //   assert.equal(rect.originY, 'bottom');
   // });
