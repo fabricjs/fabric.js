@@ -1340,9 +1340,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             target.group.calcTransformMatrix()
           )
         : scenePoint;
-    // seems used only here.
-    // @TODO: investigate;
-    transform.reset = false;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
 
