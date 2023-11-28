@@ -51,7 +51,7 @@ export type ControlCursorCallback = ControlCallback<string>;
  */
 export type Transform = {
   target: FabricObject;
-  action: string;
+  action?: string;
   actionHandler?: TransformActionHandler;
   corner: string;
   scaleX: number;
@@ -106,7 +106,7 @@ export interface ModifiedEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
   transform: Transform;
   target: FabricObject;
-  action: string;
+  action?: string;
 }
 
 type ModificationEventsSpec<

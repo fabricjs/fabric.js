@@ -156,7 +156,7 @@ export class InteractiveFabricObject<
     if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
       const target = targetCanvas._currentTransform.target,
         action = targetCanvas._currentTransform.action;
-      if (this === (target as unknown as this) && action.startsWith('scale')) {
+      if (this === (target as unknown as this) && action?.startsWith('scale')) {
         return false;
       }
     }
