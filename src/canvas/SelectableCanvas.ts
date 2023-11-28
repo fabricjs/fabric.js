@@ -582,16 +582,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
+   * @param {boolean} [alreadySelected] pass true to setup the active control
    */
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
     alreadySelected: boolean
-  ): void {
-    if (!target) {
-      return;
-    }
+  ): Transform {
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -647,8 +645,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       transform.originY = CENTER;
     }
     this._currentTransform = transform;
-    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
-    this._beforeTransform(e);
+    this.fire('before:transform', {
+      e,
+      transform,
+    });
+
+    return transform;
   }
 
   /**
