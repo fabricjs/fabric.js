@@ -1093,20 +1093,16 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         isTouchEvent(e)
       );
       if (target === this._activeObject && (corner || !grouped)) {
-        this._setupCurrentTransform(e, target, alreadySelected);
+        const transform =
+          this._setupCurrentTransform(e, target, alreadySelected) ||
+          // TODO: remove `_setupCurrentTransform(...args): void` backward compatibility
+          this._currentTransform;
         const control = target.controls[corner],
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
-        if (mouseDownHandler) {
-          mouseDownHandler.call(
-            control,
-            e,
-            this._currentTransform!,
-            pointer.x,
-            pointer.y
-          );
-        }
+        mouseDownHandler &&
+          mouseDownHandler.call(control, e, transform, pointer.x, pointer.y);
       }
     }
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
@@ -1144,17 +1140,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
-  }
-
-  /**
-   * @private
-   */
-  _beforeTransform(e: TPointerEvent) {
-    const t = this._currentTransform!;
-    this.fire('before:transform', {
-      e,
-      transform: t,
-    });
   }
 
   /**
