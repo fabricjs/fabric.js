@@ -75,8 +75,6 @@ export type Transform = {
     originX: TOriginX;
     originY: TOriginY;
   };
-  // @TODO: investigate if this reset is really needed
-  reset?: boolean;
   actionPerformed: boolean;
 };
 
