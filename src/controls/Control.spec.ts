@@ -16,9 +16,16 @@ describe('Controls', () => {
 
     const target = new FabricObject({
       controls: { test: control, test2: control },
+      canvas: new Canvas(),
     });
-    jest.spyOn(target, '_findTargetCorner').mockReturnValue('test');
-    jest.spyOn(target, 'getActiveControl').mockReturnValue('test');
+
+    target.setCoords();
+
+    jest
+      .spyOn(target, '_findTargetCorner')
+      .mockImplementation(function (this: FabricObject) {
+        return (this.__corner = 'test');
+      });
 
     const canvas = new Canvas();
     canvas.setActiveObject(target);

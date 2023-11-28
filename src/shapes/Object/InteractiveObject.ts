@@ -164,7 +164,14 @@ export class InteractiveFabricObject<
   }
 
   getActiveControl() {
-    return this.__corner;
+    const key = this.__corner;
+    return key
+      ? {
+          key,
+          control: this.controls[key],
+          coord: this.oCoords[key],
+        }
+      : undefined;
   }
 
   /**

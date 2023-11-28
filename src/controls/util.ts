@@ -25,7 +25,7 @@ export const NOT_ALLOWED_CURSOR = 'not-allowed';
  */
 export const getActionFromCorner = (
   alreadySelected: boolean,
-  corner: string,
+  corner: string | undefined,
   e: TPointerEvent,
   target: FabricObject
 ) => {
