@@ -604,8 +604,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           ? control.getActionHandler(e, target, control)?.bind(control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
       altKey = e[this.centeredKey as ModifierKey],
+      origin = this._shouldCenterTransform(target, action, altKey)
+        ? ({ x: CENTER, y: CENTER } as const)
+        : this._getOriginFromCorner(target, corner),
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
@@ -632,7 +634,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         width: target.width,
         height: target.height,
         shiftKey: e.shiftKey,
-        altKey: altKey,
+        altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
@@ -640,11 +642,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         },
       };
 
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = CENTER;
-      transform.originY = CENTER;
-    }
     this._currentTransform = transform;
+
     this.fire('before:transform', {
       e,
       transform,
