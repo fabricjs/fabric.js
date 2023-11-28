@@ -17,25 +17,24 @@ export type TOptionalModifierKey = ModifierKey | null | undefined;
 
 export type TPointerEvent = MouseEvent | TouchEvent | PointerEvent;
 
-export type TransformAction<T extends Transform = Transform, R = void> = (
-  eventData: TPointerEvent,
-  transform: T,
-  x: number,
-  y: number
-) => R;
+export type TransformAction<
+  T extends Required<Transform> = Required<Transform>,
+  R = void
+> = (eventData: TPointerEvent, transform: T, x: number, y: number) => R;
 
 /**
  * Control handlers that define a transformation
  * Those handlers run when the user starts a transform and during a transform
  */
-export type TransformActionHandler<T extends Transform = Transform> =
-  TransformAction<T, boolean>;
+export type TransformActionHandler<
+  T extends Required<Transform> = Required<Transform>
+> = TransformAction<T, boolean>;
 
 /**
  * Control handlers that run on control click/down/up
  * Those handlers run with or without a transform defined
  */
-export type ControlActionHandler = TransformAction<Transform, any>;
+export type ControlActionHandler = TransformAction<Required<Transform>, any>;
 
 export type ControlCallback<R = void> = (
   eventData: TPointerEvent,
@@ -53,7 +52,7 @@ export type Transform = {
   target: FabricObject;
   action?: string;
   actionHandler?: TransformActionHandler;
-  corner: string;
+  corner?: string;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -88,7 +87,7 @@ interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
 
 export interface BasicTransformEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
-  transform: Transform;
+  transform: Required<Transform>;
   pointer: Point;
 }
 

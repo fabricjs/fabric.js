@@ -598,7 +598,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           target.group.calcTransformMatrix()
         )
       : this.getScenePoint(e);
-    const { key: corner = '', control } = target.getActiveControl() || {},
+    const { key: corner, control } = target.getActiveControl() || {},
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)?.bind(control)

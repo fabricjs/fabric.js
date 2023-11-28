@@ -3,7 +3,7 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { Point } from '../Point';
 
-const createTransformData = (): Transform => {
+const createTransformData = () => {
   return {
     target: new FabricObject({
       width: 100,
@@ -17,7 +17,7 @@ const createTransformData = (): Transform => {
     }),
     originX: 'left',
     originY: 'top',
-  } as Transform;
+  } as Required<Transform>;
 };
 
 describe('wrapWithFixedAnchor', () => {
@@ -47,7 +47,7 @@ describe('wrapWithFixedAnchor', () => {
     expect(targetTopLeftCorner.y).toBe(-203);
     expect(targetTopLeftCorner.x).toBe(-152.5);
     const event = new MouseEvent('move');
-    wrappedAction(event, transformData as Transform, 0, 0);
+    wrappedAction(event, transformData, 0, 0);
     const newTargetTopLeftCorner = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,
@@ -91,7 +91,7 @@ describe('wrapWithFixedAnchor', () => {
     expect(targetTopLeftCorner.y).toBe(-203);
     expect(targetTopLeftCorner.x).toBe(-152.5);
     const event = new MouseEvent('move');
-    wrappedAction(event, transformData as Transform, 0, 0);
+    wrappedAction(event, transformData, 0, 0);
     const newTargetAnchorPosition = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,

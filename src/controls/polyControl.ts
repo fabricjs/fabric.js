@@ -14,7 +14,7 @@ import { wrapWithFireEvent } from './wrapWithFireEvent';
 
 const ACTION_NAME = 'modifyPoly';
 
-type TTransformAnchor = Transform & { pointIndex: number };
+type TTransformAnchor = Required<Transform> & { pointIndex: number };
 
 const getSize = (poly: Polyline) => {
   return new Point(poly.width, poly.height);
@@ -78,7 +78,7 @@ export const factoryPolyActionHandler = (
 ) => {
   return function (
     eventData: TPointerEvent,
-    transform: Transform,
+    transform: Required<Transform>,
     x: number,
     y: number
   ) {

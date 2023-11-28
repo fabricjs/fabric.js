@@ -21,7 +21,7 @@ import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { CENTER } from '../constants';
 
-export type SkewTransform = Transform & { skewingSide: -1 | 1 };
+export type SkewTransform = Required<Transform> & { skewingSide: -1 | 1 };
 
 const AXIS_KEYS: Record<
   TAxis,
@@ -148,7 +148,7 @@ function skewObject(
 function skewHandler(
   axis: TAxis,
   eventData: TPointerEvent,
-  transform: Transform,
+  transform: Required<Transform>,
   x: number,
   y: number
 ) {

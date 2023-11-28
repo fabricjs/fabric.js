@@ -835,6 +835,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // fire the original mouse up from the corner that started the transform
     if (
       transform &&
+      transform.corner &&
       (transform.target !== target || transform.corner !== corner)
     ) {
       const originalControl =
@@ -1348,7 +1349,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // this object could be created from the function in the control handlers
 
     if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
+      actionPerformed = actionHandler(
+        e,
+        transform as Required<Transform>,
+        x,
+        y
+      );
     }
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;

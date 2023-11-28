@@ -6,7 +6,7 @@ import type { Transform, TransformActionHandler } from '../EventTypeDefs';
  * @param {Function} actionHandler the function to wrap
  * @return {Function} a function with an action handler signature
  */
-export function wrapWithFixedAnchor<T extends Transform>(
+export function wrapWithFixedAnchor<T extends Required<Transform>>(
   actionHandler: TransformActionHandler<T>
 ) {
   return ((eventData, transform, x, y) => {

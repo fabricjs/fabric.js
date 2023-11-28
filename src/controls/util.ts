@@ -63,7 +63,7 @@ export const isLocked = (
 ) => target[lockingKey];
 
 export const commonEventInfo: TransformAction<
-  Transform,
+  Required<Transform>,
   BasicTransformEvent
 > = (eventData, transform, x, y) => {
   return {
@@ -127,7 +127,7 @@ function normalizePoint(
  * @return {Fabric.Point} the normalized point
  */
 export function getLocalPoint(
-  { target, corner }: Transform,
+  { target, corner }: Required<Transform>,
   originX: TOriginX,
   originY: TOriginY,
   x: number,

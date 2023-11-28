@@ -18,7 +18,7 @@ import {
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
-type ScaleTransform = Transform & {
+type ScaleTransform = Required<Transform> & {
   gestureScale?: number;
   signX?: number;
   signY?: number;
