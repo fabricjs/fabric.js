@@ -551,12 +551,17 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   _getOriginFromCorner(
     target: FabricObject,
-    controlName: string
+    controlName: string | undefined
   ): { x: TOriginX; y: TOriginY } {
     const origin = {
       x: target.originX,
       y: target.originY,
     };
+
+    if (!controlName) {
+      return origin;
+    }
+
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -595,8 +600,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           target.group.calcTransformMatrix()
         )
       : this.getScenePoint(e);
-    const corner = target.getActiveControl() || '',
-      control = !!corner && target.controls[corner],
+    const { key: corner = '', control } = target.getActiveControl() || {},
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)?.bind(control)
@@ -610,7 +614,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
        **/
       transform: Transform = {
         target: target,
-        action: action,
+        action,
         actionHandler,
         actionPerformed: false,
         corner,
