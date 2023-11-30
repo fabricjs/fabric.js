@@ -11,6 +11,7 @@ export class ValueAnimation extends AnimationBase<number> {
       ...otherOptions,
       startValue,
       byValue: endValue - startValue,
+      endValue,
     });
   }
 

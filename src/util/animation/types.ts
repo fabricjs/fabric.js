@@ -100,6 +100,7 @@ export type TBaseAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
 > & {
   startValue: T;
   byValue: T;
+  endValue: T;
 };
 
 export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<

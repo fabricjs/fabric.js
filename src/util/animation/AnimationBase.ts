@@ -29,6 +29,13 @@ export abstract class AnimationBase<
   private declare readonly _abort: TAbortCallback<T>;
 
   /**
+   * The animation promise resolving with the actual duration or rejecting if aborted
+   */
+  readonly promise: Promise<number>;
+  private declare resolve: (duration: number) => void;
+  private declare reject: () => void;
+
+  /**
    * Used to register the animation to a target object
    * so that it can be cancelled within the object context
    */
@@ -56,6 +63,7 @@ export abstract class AnimationBase<
   constructor({
     startValue,
     byValue,
+    endValue,
     duration = 500,
     delay = 0,
     easing = defaultEasing,
@@ -76,10 +84,14 @@ export abstract class AnimationBase<
     this._abort = abort;
     this.target = target;
 
-    this.startValue = startValue;
-    this.byValue = byValue;
+    this.startValue = Object.freeze(startValue);
+    this.byValue = Object.freeze(byValue);
+    this.endValue = Object.freeze(endValue);
     this.value = this.startValue;
-    this.endValue = Object.freeze(this.calculate(this.duration).value);
+    this.promise = new Promise<number>((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
   }
 
   get state() {
@@ -102,11 +114,13 @@ export abstract class AnimationBase<
 
   start() {
     if (
+      this.duration <= 0 ||
       this.byValue === 0 ||
       (Array.isArray(this.byValue) &&
         this.byValue.every((value) => value === 0))
     ) {
       // if `byValue` is 0 move to `completed`
+      this.value = this.endValue;
       this.durationProgress = this.valueProgress = 1;
       this._state = 'completed';
       this._onComplete(
@@ -114,6 +128,7 @@ export abstract class AnimationBase<
         this.valueProgress,
         this.durationProgress
       );
+      this.resolve(0);
       return;
     }
 
@@ -127,7 +142,7 @@ export abstract class AnimationBase<
 
     this.register();
 
-    // setTimeout(cb, 0) will run cb on the next frame, causing a delay
+    // `setTimeout(cb, 0)` will run cb on the next frame, causing a delay
     // we don't want that
     if (this.delay > 0) {
       setTimeout(() => requestAnimFrame(firstTick), this.delay);
@@ -151,6 +166,7 @@ export abstract class AnimationBase<
     ) {
       this._state = 'aborted';
       this.unregister();
+      this.reject();
     } else if (durationMs >= this.duration) {
       this.durationProgress = this.valueProgress = 1;
       this._onChange(this.endValue, this.valueProgress, this.durationProgress);
@@ -161,6 +177,7 @@ export abstract class AnimationBase<
         this.durationProgress
       );
       this.unregister();
+      this.resolve(durationMs);
     } else {
       this._onChange(this.value, this.valueProgress, this.durationProgress);
       requestAnimFrame(this.tick);
@@ -178,5 +195,6 @@ export abstract class AnimationBase<
   abort() {
     this._state = 'aborted';
     this.unregister();
+    this.reject();
   }
 }

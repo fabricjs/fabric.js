@@ -44,6 +44,7 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
       byValue: endColor.map(
         (value, i) => value - startColor[i]
       ) as TRGBAColorSource,
+      endValue: endColor,
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),
