@@ -101,6 +101,22 @@ export abstract class AnimationBase<
   };
 
   start() {
+    if (
+      this.byValue === 0 ||
+      (Array.isArray(this.byValue) &&
+        this.byValue.every((value) => value === 0))
+    ) {
+      // if `byValue` is 0 move to `completed`
+      this.durationProgress = this.valueProgress = 1;
+      this._state = 'completed';
+      this._onComplete(
+        this.endValue,
+        this.valueProgress,
+        this.durationProgress
+      );
+      return;
+    }
+
     const firstTick: FrameRequestCallback = (timestamp) => {
       if (this._state !== 'pending') return;
       this.startTime = timestamp || +new Date();
