@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Animation): safeguard zero values, fix rounding issue, expose `promise` property [#9518](https://github.com/fabricjs/fabric.js/pull/9518)
 - fix(): transferring object between active selections, expose `FabricObject#parent`, rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
   **BREAKING beta**:
   - rm(): `getParent` => `FabricObject#parent`
