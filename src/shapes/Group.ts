@@ -643,17 +643,23 @@ export class Group
     return Promise.all([
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
-    ]).then(
-      ([objects, hydratedOptions]) =>
-        new this(
-          objects,
-          {
-            ...options,
-            ...hydratedOptions,
-          },
-          true
-        )
-    );
+    ]).then(([objects, hydratedOptions]) => {
+      const restoredGroup = new this(
+        objects,
+        {
+          ...options,
+          ...hydratedOptions,
+        },
+        true
+      );
+      if (!options.strategy) {
+        // restore the old save width/height killed by the
+        // default layour manager
+        restoredGroup.width = options.width;
+        restoredGroup.height = options.height;
+      }
+      return restoredGroup;
+    });
   }
 }
 
