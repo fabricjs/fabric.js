@@ -990,8 +990,8 @@
       0.2696723314583158,
       -0.41255083562929973,
       0.37782470175621224,
-      -153.32445710769997,
-      1.7932869074173539,
+      -149.58276216465225,
+      -0.7631646697634125
     ]);
     assert.equal(result.inverted, false, 'the final clipPathB is not inverted')
     assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
@@ -1005,12 +1005,12 @@
     var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
     var resultingMatrix = result.clipPath.calcTransformMatrix();
     var expectedMatrix = roundArray([
-      1.1335,
-      -0.8090,
-      1.2377,
-      1.7634,
-      171.5698,
-      -127.2043,
+      1.1334741052686363,
+      -0.8090169943749471,
+      1.237652506887899,
+      1.7633557568774187,
+      170.49272017489145,
+      -119.66926584287677
     ]);
     assert.equal(result.inverted, false, 'the final clipPathA is not inverted')
     assert.equal(result.clipPath, clipPathA, 'clipPathA is the final clipPath');

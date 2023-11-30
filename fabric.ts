@@ -119,14 +119,11 @@ export type {
 export type {
   GroupEvents,
   GroupProps,
-  LayoutContext,
   GroupOwnProps,
-  LayoutContextType,
-  LayoutResult,
-  LayoutStrategy,
   SerializedGroupProps,
 } from './src/shapes/Group';
 export { Group } from './src/shapes/Group';
+export * from './src/LayoutManager';
 export type {
   ActiveSelectionOptions,
   MultiSelectionStacking,
