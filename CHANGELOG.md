@@ -2,9 +2,9 @@
 
 ## [next]
 
-- fix(): transferring object between active selections, expose `FabricObject#parent`, rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
-  **BREAKING beta**:
-  - rm(): `getParent` => `FabricObject#parent`
+- refactor(): Layout Manager [#9152](https://github.com/fabricjs/fabric.js/pull/9152)
+- refactor(): transferring object between active selections, expose `FabricObject#parent`, rm `isActiveSelection` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
+- refactor(): **BREAKING beta** `getParent` => `FabricObject#parent` [#8951](https://github.com/fabricjs/fabric.js/pull/8951)
 - fix(): fire Poly control events [#9504](https://github.com/fabricjs/fabric.js/pull/9504)
 - test(FabricObject): add a snapshot of the default values so that reordering and shuffling is verified. [#9492](https://github.com/fabricjs/fabric.js/pull/9492)
 - feat(FabricObject, Canvas) BREAKING: remove calculate true/false from the api. [#9483](https://github.com/fabricjs/fabric.js/pull/9483)

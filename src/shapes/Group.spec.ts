@@ -1,3 +1,4 @@
+import { FixedLayout } from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
 import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
@@ -14,6 +15,25 @@ describe('Group', () => {
     expect(group._objects).toHaveLength(3);
   });
 
+  it('triggerLayout should preform layout, layoutManager is defined', () => {
+    const group = new Group();
+    expect(group.layoutManager).toBeDefined();
+    const performLayout = jest.spyOn(group.layoutManager, 'performLayout');
+
+    group.triggerLayout();
+    const fixedLayout = new FixedLayout();
+    group.triggerLayout({ strategy: fixedLayout });
+    expect(performLayout).toHaveBeenCalledTimes(2);
+    expect(performLayout).toHaveBeenNthCalledWith(1, {
+      target: group,
+      type: 'imperative',
+    });
+    expect(performLayout).toHaveBeenNthCalledWith(2, {
+      strategy: fixedLayout,
+      target: group,
+      type: 'imperative',
+    });
+  });
   test('adding and removing an object', () => {
     const object = new FabricObject();
     const group = new Group([object]);
