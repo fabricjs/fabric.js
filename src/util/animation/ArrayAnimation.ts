@@ -11,6 +11,7 @@ export class ArrayAnimation extends AnimationBase<number[]> {
       ...options,
       startValue,
       byValue: endValue.map((value, i) => value - startValue[i]),
+      endValue,
     });
   }
   protected calculate(timeElapsed: number) {
