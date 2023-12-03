@@ -5,6 +5,7 @@ import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
 import { resetObjectTransform } from '../util/misc/objectTransforms';
+import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import {
@@ -195,10 +196,19 @@ export class LayoutManager {
     this.layoutObjects(context, layoutResult);
     //  set position
     // in `initialization` we do not account for target's transformation matrix
-    target.setPositionByOrigin(nextCenter, CENTER, CENTER);
-    // invalidate
-    target.setCoords();
-    target.set({ dirty: true });
+    if (context.type === LAYOUT_TYPE_INITIALIZATION) {
+      // TODO: what about strokeWidth?
+      target.set({
+        left:
+          context.x ?? nextCenter.x + size.x * resolveOrigin(target.originX),
+        top: context.y ?? nextCenter.y + size.y * resolveOrigin(target.originY),
+      });
+    } else {
+      target.setPositionByOrigin(nextCenter, CENTER, CENTER);
+      // invalidate
+      target.setCoords();
+      target.set({ dirty: true });
+    }
   }
 
   protected layoutObjects(

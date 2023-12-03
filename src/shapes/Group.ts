@@ -139,15 +139,10 @@ export class Group
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
       targets: [...objects],
+      x: options.left,
+      y: options.top,
     });
     this.layoutManager = layoutManager;
-    if (left !== undefined) {
-      this.left = left;
-    }
-    if (top !== undefined) {
-      this.top = top;
-    }
-    this.setCoords();
   }
 
   /**
