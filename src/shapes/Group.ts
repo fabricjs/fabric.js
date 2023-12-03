@@ -113,9 +113,8 @@ export class Group
    * @param {Object} [options] Options object
    */
   constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
-    const { left, top, ...restOptions } = options;
     // @ts-expect-error options error
-    super(restOptions);
+    super(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
@@ -642,7 +641,7 @@ export class Group
       // create a group with the objects around the old center
       const restoredGroup = new this(objects);
       // now assign the old properties of the group
-      Object.assign(restoredGroup, {
+      restoredGroup.set({
         ...options,
         ...hydratedOptions,
       });
