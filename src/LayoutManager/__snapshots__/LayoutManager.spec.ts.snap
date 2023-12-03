@@ -69,38 +69,3 @@ exports[`Layout Manager getLayoutResult initialization trigger 1`] = `
   },
 }
 `;
-
-exports[`Layout Manager getLayoutResult initialization trigger 2`] = `
-{
-  "nextCenter": Point {
-    "x": 50,
-    "y": 100,
-  },
-  "offset": Point {
-    "x": 0,
-    "y": 0,
-  },
-  "prevCenter": Point {
-    "x": 0,
-    "y": 0,
-  },
-  "result": {
-    "center": Point {
-      "x": 50,
-      "y": 100,
-    },
-    "correction": Point {
-      "x": 10,
-      "y": 20,
-    },
-    "relativeCorrection": Point {
-      "x": -30,
-      "y": -40,
-    },
-    "size": Point {
-      "x": 200,
-      "y": 250,
-    },
-  },
-}
-`;
