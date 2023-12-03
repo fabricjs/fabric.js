@@ -111,15 +111,11 @@ export class Group
    *
    * @param {FabricObject[]} [objects] instance objects
    * @param {Object} [options] Options object
-   * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
    */
-  constructor(
-    objects: FabricObject[] = [],
-    options: Partial<GroupProps> = {},
-    objectsRelativeToGroup?: boolean
-  ) {
+  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
+    const { left, top, ...restOptions } = options;
     // @ts-expect-error options error
-    super(options);
+    super(restOptions);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
@@ -141,13 +137,17 @@ export class Group
       options.layoutManager || new LayoutManager();
     layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
-      objectsRelativeToGroup,
       target: this,
       targets: [...objects],
-      x: options.left,
-      y: options.top,
     });
     this.layoutManager = layoutManager;
+    if (left !== undefined) {
+      this.left = left;
+    }
+    if (top !== undefined) {
+      this.top = top;
+    }
+    this.setCoords();
   }
 
   /**
@@ -644,20 +644,14 @@ export class Group
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      const restoredGroup = new this(
-        objects,
-        {
-          ...options,
-          ...hydratedOptions,
-        },
-        true
-      );
-      if (!options.strategy) {
-        // restore the old save width/height killed by the
-        // default layour manager
-        restoredGroup.width = options.width;
-        restoredGroup.height = options.height;
-      }
+      // create a group with the objects around the old center
+      const restoredGroup = new this(objects);
+      // now assign the old properties of the group
+      Object.assign(restoredGroup, {
+        ...options,
+        ...hydratedOptions,
+      });
+      restoredGroup.setCoords();
       return restoredGroup;
     });
   }

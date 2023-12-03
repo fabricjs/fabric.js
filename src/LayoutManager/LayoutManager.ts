@@ -5,7 +5,6 @@ import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
 import { resetObjectTransform } from '../util/misc/objectTransforms';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
 import {
@@ -161,21 +160,17 @@ export class LayoutManager {
       correction = new Point(),
       relativeCorrection = new Point(),
     } = result;
-    const offset =
-      context.type === LAYOUT_TYPE_INITIALIZATION &&
-      context.objectsRelativeToGroup
-        ? new Point()
-        : prevCenter
-            .subtract(nextCenter)
-            .add(correction)
-            .transform(
-              // in `initialization` we do not account for target's transformation matrix
-              context.type === LAYOUT_TYPE_INITIALIZATION
-                ? iMatrix
-                : invertTransform(target.calcOwnMatrix()),
-              true
-            )
-            .add(relativeCorrection);
+    const offset = prevCenter
+      .subtract(nextCenter)
+      .add(correction)
+      .transform(
+        // in `initialization` we do not account for target's transformation matrix
+        context.type === LAYOUT_TYPE_INITIALIZATION
+          ? iMatrix
+          : invertTransform(target.calcOwnMatrix()),
+        true
+      )
+      .add(relativeCorrection);
 
     return {
       result,
@@ -200,19 +195,10 @@ export class LayoutManager {
     this.layoutObjects(context, layoutResult);
     //  set position
     // in `initialization` we do not account for target's transformation matrix
-    if (context.type === LAYOUT_TYPE_INITIALIZATION) {
-      // TODO: what about strokeWidth?
-      target.set({
-        left:
-          context.x ?? nextCenter.x + size.x * resolveOrigin(target.originX),
-        top: context.y ?? nextCenter.y + size.y * resolveOrigin(target.originY),
-      });
-    } else {
-      target.setPositionByOrigin(nextCenter, CENTER, CENTER);
-      // invalidate
-      target.setCoords();
-      target.set({ dirty: true });
-    }
+    target.setPositionByOrigin(nextCenter, CENTER, CENTER);
+    // invalidate
+    target.setCoords();
+    target.set({ dirty: true });
   }
 
   protected layoutObjects(
@@ -221,12 +207,10 @@ export class LayoutManager {
   ) {
     const { target } = context;
     //  adjust objects to account for new center
-    (context.type !== LAYOUT_TYPE_INITIALIZATION ||
-      !context.objectsRelativeToGroup) &&
-      target.forEachObject((object) => {
-        object.group === target &&
-          this.layoutObject(context, layoutResult, object);
-      });
+    target.forEachObject((object) => {
+      object.group === target &&
+        this.layoutObject(context, layoutResult, object);
+    });
     // adjust clip path to account for new center
     context.strategy.shouldLayoutClipPath(context) &&
       this.layoutObject(context, layoutResult, target.clipPath as FabricObject);
