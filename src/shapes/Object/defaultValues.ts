@@ -36,8 +36,7 @@ export const cacheProperties = [
 ];
 
 export const fabricObjectDefaultValues = {
-  // coming from ObjectOrigin
-  // transforms apply translation, then rotation, scaling, flipping, skewing
+  // see composeMatrix() to see order of transforms. First defaults listed based on this
   top: 0,
   left: 0,
   width: 0,
@@ -47,16 +46,14 @@ export const fabricObjectDefaultValues = {
   flipY: false,
   scaleX: 1,
   scaleY: 1,
+  minScaleLimit: 0,
   skewX: 0,
   skewY: 0,
   originX: LEFT,
   originY: TOP,
   strokeWidth: 1,
   strokeUniform: false,
-  // coming from ObjectGeometry
   padding: 0,
-  // FabricObject itself
-  minScaleLimit: 0,
   opacity: 1,
   paintFirst: 'fill',
   fill: 'rgb(0,0,0)',
@@ -78,12 +75,12 @@ export const fabricObjectDefaultValues = {
   inverted: false,
   absolutePositioned: false,
   centeredRotation: true,
+  centeredScaling: false,
   dirty: true,
 } as const;
 
 export const interactiveObjectDefaultValues = {
   noScaleCache: true,
-  centeredScaling: false,
   lockMovementX: false,
   lockMovementY: false,
   lockRotation: false,
