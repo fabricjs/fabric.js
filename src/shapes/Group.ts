@@ -111,8 +111,13 @@ export class Group
    *
    * @param {FabricObject[]} [objects] instance objects
    * @param {Object} [options] Options object
+   * @param {Boolean} [skipLayout] Do not layout because restoring from Object
    */
-  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
+  constructor(
+    objects: FabricObject[] = [],
+    options: Partial<GroupProps> = {},
+    skipLayout = false
+  ) {
     // @ts-expect-error options error
     super(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
@@ -134,13 +139,15 @@ export class Group
     const layoutManager =
       // not destructured on purpose here.
       options.layoutManager || new LayoutManager();
-    layoutManager.performLayout({
-      type: LAYOUT_TYPE_INITIALIZATION,
-      target: this,
-      targets: [...objects],
-      x: options.left,
-      y: options.top,
-    });
+    if (!skipLayout) {
+      layoutManager.performLayout({
+        type: LAYOUT_TYPE_INITIALIZATION,
+        target: this,
+        targets: [...objects],
+        x: options.left,
+        y: options.top,
+      });
+    }
     this.layoutManager = layoutManager;
   }
 
@@ -638,15 +645,16 @@ export class Group
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      // create a group with the objects around the old center
-      const restoredGroup = new this(objects);
-      // now assign the old properties of the group
-      restoredGroup.set({
-        ...options,
-        ...hydratedOptions,
-      });
-      restoredGroup.setCoords();
-      return restoredGroup;
+      const group = new this(
+        objects,
+        {
+          ...options,
+          ...hydratedOptions,
+        },
+        true
+      );
+      group.setCoords();
+      return group;
     });
   }
 }
