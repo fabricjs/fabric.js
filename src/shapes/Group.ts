@@ -434,7 +434,7 @@ export class Group
    * @return {Boolean}
    */
   willDrawShadow() {
-    if (FabricObject.prototype.willDrawShadow.call(this)) {
+    if (super.willDrawShadow()) {
       return true;
     }
     for (let i = 0; i < this._objects.length; i++) {
