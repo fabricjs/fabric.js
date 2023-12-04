@@ -53,7 +53,9 @@ export abstract class AnimatableObject<
     options: Partial<AnimationOptions<T>> = {}
   ): TAnimation<T> {
     const path = key.split('.');
-    const propIsColor = this.colorProperties.includes(path[path.length - 1]);
+    const propIsColor = AnimatableObject.colorProperties.includes(
+      path[path.length - 1]
+    );
     const { easing, duration, abort, startValue, onChange, onComplete } =
       options;
     const animationOptions = {
