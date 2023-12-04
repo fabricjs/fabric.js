@@ -27,6 +27,7 @@ import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
+import { noop } from '../constants';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -111,13 +112,8 @@ export class Group
    *
    * @param {FabricObject[]} [objects] instance objects
    * @param {Object} [options] Options object
-   * @param {Boolean} [skipLayout] Do not layout because restoring from Object
    */
-  constructor(
-    objects: FabricObject[] = [],
-    options: Partial<GroupProps> = {},
-    skipLayout = false
-  ) {
+  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
     // @ts-expect-error options error
     super(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
@@ -139,15 +135,13 @@ export class Group
     const layoutManager =
       // not destructured on purpose here.
       options.layoutManager || new LayoutManager();
-    if (!skipLayout) {
-      layoutManager.performLayout({
-        type: LAYOUT_TYPE_INITIALIZATION,
-        target: this,
-        targets: [...objects],
-        x: options.left,
-        y: options.top,
-      });
-    }
+    layoutManager.performLayout({
+      type: LAYOUT_TYPE_INITIALIZATION,
+      target: this,
+      targets: [...objects],
+      x: options.left,
+      y: options.top,
+    });
     this.layoutManager = layoutManager;
   }
 
@@ -645,14 +639,14 @@ export class Group
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      const group = new this(
-        objects,
-        {
-          ...options,
-          ...hydratedOptions,
-        },
-        true
-      );
+      const group = new this(objects, {
+        ...options,
+        ...hydratedOptions,
+        layoutManager: {
+          performLayout: noop,
+        } as unknown as LayoutManager,
+      });
+      group.layoutManager = new LayoutManager();
       group.setCoords();
       return group;
     });
