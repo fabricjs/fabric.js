@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): avoid resetting Group transform by default [#9525](https://github.com/fabricjs/fabric.js/pull/9525)
+
 ## [6.0.0-beta16]
 
 - fix(): block `enterEditing` after `endCurrentTransform` [#9513](https://github.com/fabricjs/fabric.js/pull/9513)
