@@ -809,5 +809,27 @@ describe('Layout Manager', () => {
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
       expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
     });
+
+    it('fixed layout should not be reset when all children are removed', () => {
+      const child = new FabricObject({
+        width: 200,
+        height: 200,
+        strokeWidth: 0,
+      });
+      const group = new Group([child], {
+        width: 100,
+        height: 300,
+        strokeWidth: 0,
+        layoutManager: new LayoutManager(new FixedLayout()),
+      });
+
+      expect(group).toMatchObject({ width: 100, height: 300 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
+
+      group.remove(child);
+
+      expect(group).toMatchObject({ width: 100, height: 300 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
+    });
   });
 });
