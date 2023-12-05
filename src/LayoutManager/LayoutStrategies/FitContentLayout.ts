@@ -15,4 +15,11 @@ export class FitContentLayout extends LayoutStrategy {
   shouldPerformLayout(context: StrictLayoutContext) {
     return true;
   }
+
+  /**
+   * @override Reset transform if there are no children
+   */
+  shouldResetTransform(context: StrictLayoutContext) {
+    return context.target.size() === 0;
+  }
 }
