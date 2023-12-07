@@ -8,7 +8,7 @@ setup();
 
 test.describe.configure({ mode: 'serial' });
 
-for (const splitByGrapheme of [false, true]) {
+for (const splitByGrapheme of [true, false]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
     context,
