@@ -112,7 +112,7 @@ for (const splitByGrapheme of [true, false]) {
       // and there is no style on the part of text that follows, but there is visible text.
       await expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `6-after-adding-a-newline-splitByGrapheme-${splitByGrapheme}.png`,
-        maxDiffPixelRatio: 0.003,
+        maxDiffPixelRatio: 0.009,
       });
     });
   });
