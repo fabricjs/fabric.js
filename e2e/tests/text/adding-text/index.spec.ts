@@ -26,6 +26,7 @@ for (const splitByGrapheme of [true, false]) {
         },
         { splitByGrapheme }
       );
+
       await expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `1-initial-splitByGrapheme-${splitByGrapheme}.png`,
       });
