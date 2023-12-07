@@ -8,7 +8,7 @@ setup();
 
 test.describe.configure({ mode: 'serial' });
 
-for (const splitByGrapheme of [false, true]) {
+for (const splitByGrapheme of [true, false]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
     context,
@@ -26,6 +26,7 @@ for (const splitByGrapheme of [false, true]) {
         },
         { splitByGrapheme }
       );
+
       await expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `1-initial-splitByGrapheme-${splitByGrapheme}.png`,
       });
@@ -111,7 +112,7 @@ for (const splitByGrapheme of [false, true]) {
       // and there is no style on the part of text that follows, but there is visible text.
       await expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `6-after-adding-a-newline-splitByGrapheme-${splitByGrapheme}.png`,
-        maxDiffPixelRatio: 0.03,
+        maxDiffPixelRatio: 0.01,
       });
     });
   });
