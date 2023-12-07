@@ -9,7 +9,7 @@ beforeAll(
       splitByGrapheme: true,
       fontSize: 48,
       width: 210,
-      top: 20,
+      top: 0,
       styles: util.stylesFromArray(
         [
           {
@@ -55,5 +55,5 @@ beforeAll(
     canvas.add(text);
     return { text };
   },
-  { width: 300, height: 700 }
+  { width: 250, height: 600 }
 );
