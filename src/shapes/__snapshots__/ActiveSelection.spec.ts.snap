@@ -3,27 +3,6 @@
 exports[`ActiveSelection sets coords after attaching to canvas 1`] = `
 {
   "bl": Point {
-    "x": 600,
-    "y": 250.5,
-  },
-  "br": Point {
-    "x": 802,
-    "y": 250.5,
-  },
-  "tl": Point {
-    "x": 600,
-    "y": 200,
-  },
-  "tr": Point {
-    "x": 802,
-    "y": 200,
-  },
-}
-`;
-
-exports[`ActiveSelection sets coords after attaching to canvas 2`] = `
-{
-  "bl": Point {
     "x": 100,
     "y": 201,
   },
