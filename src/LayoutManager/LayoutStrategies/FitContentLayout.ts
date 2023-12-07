@@ -1,3 +1,4 @@
+import { resetObjectTransform } from '../../util';
 import type { StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 
@@ -16,10 +17,11 @@ export class FitContentLayout extends LayoutStrategy {
     return true;
   }
 
-  /**
-   * @override Reset transform if there are no children
-   */
-  shouldResetTransform(context: StrictLayoutContext) {
-    return context.target.size() === 0;
+  onAfterLayout({ target }: StrictLayoutContext): void {
+    if (target.size() === 0) {
+      resetObjectTransform(target);
+      target.left = 0;
+      target.top = 0;
+    }
   }
 }

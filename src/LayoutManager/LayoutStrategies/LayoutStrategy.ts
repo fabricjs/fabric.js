@@ -65,8 +65,8 @@ export abstract class LayoutStrategy {
    * called from the `onAfterLayout` hook
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  shouldResetTransform(context: StrictLayoutContext) {
-    return false;
+  onAfterLayout(context: StrictLayoutContext) {
+    // Noop
   }
 
   /**

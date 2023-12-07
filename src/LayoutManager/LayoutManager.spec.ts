@@ -479,10 +479,10 @@ describe('Layout Manager', () => {
         const canvasFire = jest.fn();
         target.canvas = { fire: canvasFire };
 
-        const shouldResetTransform = jest
-          .spyOn(manager.strategy, 'shouldResetTransform')
+        const onAfterLayout = jest
+          .spyOn(manager.strategy, 'onAfterLayout')
           .mockImplementation(() => {
-            lifecycle.push(shouldResetTransform);
+            lifecycle.push(onAfterLayout);
           });
 
         const context: StrictLayoutContext = {
@@ -505,11 +505,11 @@ describe('Layout Manager', () => {
         manager['onAfterLayout'](context, layoutResult);
 
         expect(lifecycle).toEqual([
-          shouldResetTransform,
+          onAfterLayout,
           targetFire,
           ...(bubbles ? [parentPerformLayout] : []),
         ]);
-        expect(shouldResetTransform).toBeCalledWith(context);
+        expect(onAfterLayout).toBeCalledWith(context);
         expect(targetFire).toBeCalledWith('layout:after', {
           context,
           result: layoutResult,
@@ -532,23 +532,19 @@ describe('Layout Manager', () => {
     );
 
     test.each([true, false])('reset target transform %s', (reset) => {
-      const targets = [new Group([new FabricObject()]), new FabricObject()];
-      const target = new Group(targets);
+      const target = new Group([]);
       target.left = 50;
 
-      const manager = new LayoutManager();
-      jest
-        .spyOn(manager.strategy, 'shouldResetTransform')
-        .mockImplementation(() => {
-          return reset;
-        });
+      const manager = new LayoutManager(
+        reset ? new FitContentLayout() : new FixedLayout()
+      );
 
       const context: StrictLayoutContext = {
         bubbles: true,
         strategy: manager.strategy,
         type: LAYOUT_TYPE_REMOVED,
         target,
-        targets,
+        targets: [],
         prevStrategy: undefined,
         stopPropagation() {
           this.bubbles = false;
@@ -807,28 +803,6 @@ describe('Layout Manager', () => {
       });
       expect(group).toMatchObject({ width: 100, height: 300 });
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
-    });
-
-    it('fixed layout should not be reset when all children are removed', () => {
-      const child = new FabricObject({
-        width: 200,
-        height: 200,
-        strokeWidth: 0,
-      });
-      const group = new Group([child], {
-        width: 100,
-        height: 300,
-        strokeWidth: 0,
-        layoutManager: new LayoutManager(new FixedLayout()),
-      });
-
-      expect(group).toMatchObject({ width: 100, height: 300 });
-      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
-
-      group.remove(child);
-
-      expect(group).toMatchObject({ width: 100, height: 300 });
       expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
     });
   });
