@@ -13,11 +13,10 @@ for (const splitByGrapheme of [false, true]) {
     page,
     context,
   }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    const canvasUtil = new CanvasUtil(page);
+    const textBoxutil = new TextUtil<Textbox>(page, 'text');
     await test.step('initial render', async () => {
-      await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-      const canvasUtil = new CanvasUtil(page);
-      const textBoxutil = new TextUtil<Textbox>(page, 'text');
-
       await textBoxutil.executeInBrowser(
         (textbox: Textbox, context) => {
           textbox.splitByGrapheme = context.splitByGrapheme;
