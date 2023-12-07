@@ -2,6 +2,8 @@
 
 ## [next]
 
+- test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
+
 ## [6.0.0-beta16]
 
 - fix(): block `enterEditing` after `endCurrentTransform` [#9513](https://github.com/fabricjs/fabric.js/pull/9513)
