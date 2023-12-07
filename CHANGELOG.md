@@ -2,7 +2,7 @@
 
 ## [next]
 
-- test() Backport test add text from the text fix to capture the failing situation first [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
+- test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
 
 ## [6.0.0-beta16]
 
