@@ -768,6 +768,19 @@ describe('Layout Manager', () => {
       expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
     });
 
+    it('should subscribe objects on initialization', () => {
+      const child = new FabricObject({
+        width: 200,
+        height: 200,
+        strokeWidth: 0,
+      });
+      jest.spyOn(child, 'toJSON').mockReturnValue('child');
+      const group = new Group([child]);
+      expect(
+        Array.from(group.layoutManager['_subscriptions'].keys())
+      ).toMatchObject([child]);
+    });
+
     test.each([true, false])(
       'initialization edge case, legacy layout %s',
       (legacy) => {

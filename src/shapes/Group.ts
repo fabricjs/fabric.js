@@ -144,17 +144,14 @@ export class Group
     });
 
     // perform initial layout
-    const layoutManager =
-      // not destructured on purpose here.
-      options.layoutManager || new LayoutManager();
-    layoutManager.performLayout({
+    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
       targets: [...objects],
       x: options.left,
       y: options.top,
     });
-    this.layoutManager = layoutManager;
   }
 
   /**
