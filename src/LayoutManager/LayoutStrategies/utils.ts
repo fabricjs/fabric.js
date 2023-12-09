@@ -34,14 +34,17 @@ export const getObjectBounds = (
   const objectCenter = t
     ? object.getRelativeCenterPoint().transform(t)
     : object.getRelativeCenterPoint();
-  const strokeUniformVector = strokeUniform
-    ? sendVectorToPlane(
-        new Point(strokeWidth, strokeWidth),
-        undefined,
-        destinationGroup.calcTransformMatrix()
-      )
-    : ZERO;
-  const scalingStrokeWidth = strokeUniform ? 0 : strokeWidth;
+  const accountForStroke = !object['isStrokeAccountedForInDimensions']();
+  const strokeUniformVector =
+    strokeUniform && accountForStroke
+      ? sendVectorToPlane(
+          new Point(strokeWidth, strokeWidth),
+          undefined,
+          destinationGroup.calcTransformMatrix()
+        )
+      : ZERO;
+  const scalingStrokeWidth =
+    !strokeUniform && accountForStroke ? strokeWidth : 0;
   const sizeVector = sizeAfterTransform(
     width + scalingStrokeWidth,
     height + scalingStrokeWidth,
