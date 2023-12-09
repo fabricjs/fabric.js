@@ -1,4 +1,19 @@
+import type { TDegree } from '../../../typedefs';
+
 export interface ObjectTransformActionProps {
+  /**
+   * The angle that an object will lock to while rotating.
+   * @type [TDegree]
+   */
+  snapAngle?: TDegree;
+
+  /**
+   * The angle difference from the current snapped angle in which snapping should occur.
+   * When undefined, the snapThreshold will default to the snapAngle.
+   * @type [TDegree]
+   */
+  snapThreshold?: TDegree;
+
   /**
    * When `true` the object will rotate on its center.
    * When `false` will rotate around the origin point defined by originX and originY.

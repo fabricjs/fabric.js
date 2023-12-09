@@ -1,4 +1,3 @@
-import type { TDegree } from '../../../typedefs';
 import type { BorderProps } from './BorderProps';
 import type { ControlProps } from './ControlProps';
 import type { LockInteractionProps } from './LockInteractionProps';
@@ -19,19 +18,6 @@ export interface FabricObjectProps
    * @default true
    */
   noScaleCache?: boolean;
-
-  /**
-   * The angle that an object will lock to while rotating.
-   * @type [TDegree]
-   */
-  snapAngle?: TDegree;
-
-  /**
-   * The angle difference from the current snapped angle in which snapping should occur.
-   * When undefined, the snapThreshold will default to the snapAngle.
-   * @type [TDegree]
-   */
-  snapThreshold?: TDegree;
 
   /**
    * Default cursor value used when hovering over this object on canvas
