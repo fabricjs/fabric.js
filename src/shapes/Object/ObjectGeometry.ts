@@ -170,12 +170,12 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
-  setRelativeXY(point: Point, originX?: TOriginX, originY?: TOriginY) {
-    this.setPositionByOrigin(
-      point,
-      originX || this.originX,
-      originY || this.originY
-    );
+  setRelativeXY(
+    point: Point,
+    originX: TOriginX = this.originX,
+    originY: TOriginY = this.originY
+  ) {
+    this.setPositionByOrigin(point, originX, originY);
   }
 
   /**
