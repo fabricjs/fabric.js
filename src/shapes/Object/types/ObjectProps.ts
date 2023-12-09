@@ -3,7 +3,7 @@ import type { Canvas } from '../../../canvas/Canvas';
 import type { StaticCanvas } from '../../../canvas/StaticCanvas';
 import type { TFiller } from '../../../typedefs';
 import type { FabricObject } from '../Object';
-import type { ObjectTransformProps } from './ObjectTransformProps';
+import type { ObjectTransformActionProps } from './ObjectTransformProps';
 import type {
   ClipPathProps,
   SerializedObjectProps,
@@ -12,7 +12,7 @@ import type {
 export interface ObjectProps
   extends SerializedObjectProps,
     ClipPathProps,
-    ObjectTransformProps {
+    ObjectTransformActionProps {
   clipPath?: FabricObject;
   fill: TFiller | string | null;
   stroke: TFiller | string | null;

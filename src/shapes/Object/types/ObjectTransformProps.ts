@@ -1,4 +1,4 @@
-export interface ObjectTransformProps {
+export interface ObjectTransformActionProps {
   /**
    * When `true` the object will rotate on its center.
    * When `false` will rotate around the origin point defined by originX and originY.
