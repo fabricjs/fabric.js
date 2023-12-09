@@ -5,6 +5,7 @@ import { CENTER, iMatrix } from '../constants';
 import type { Polyline } from '../shapes/Polyline';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import type {
+  TModificationEvents,
   TPointerEvent,
   Transform,
   TransformActionHandler,
@@ -12,7 +13,7 @@ import type {
 import { getLocalPoint } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 
-const ACTION_NAME = 'modifyPoly';
+const ACTION_NAME: TModificationEvents = 'modifyPoly';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 

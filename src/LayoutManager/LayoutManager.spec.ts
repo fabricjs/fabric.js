@@ -1,16 +1,16 @@
-import { StaticCanvas } from '../canvas/StaticCanvas';
+import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
+import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
-
 import {
-  LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_ADDED,
-  LAYOUT_TYPE_REMOVED,
   LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_REMOVED,
 } from './constants';
 import type {
   LayoutContext,
@@ -113,7 +113,7 @@ describe('Layout Manager', () => {
 
   describe('onBeforeLayout', () => {
     describe('triggers', () => {
-      const triggers = [
+      const triggers: ('modified' | TModificationEvents | 'changed')[] = [
         'modified',
         'moving',
         'resizing',
@@ -121,7 +121,8 @@ describe('Layout Manager', () => {
         'scaling',
         'skewing',
         'changed',
-      ] as const;
+        'modifyPoly',
+      ];
 
       it('should subscribe object', () => {
         const lifecycle: jest.SpyInstance[] = [];
