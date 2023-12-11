@@ -838,7 +838,7 @@ export abstract class ITextBehavior<
     if (styleCarriedOver || originalLineLength > charIndex) {
       // skip the last line of since we already prepared it.
       // or contains text without style that we don't want to style
-      // just becuase it changed line
+      // just because it changed lines
       qty--;
     }
     // for the all the lines or all the other lines
