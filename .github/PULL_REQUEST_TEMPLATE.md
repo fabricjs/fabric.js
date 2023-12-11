@@ -9,26 +9,20 @@
         Pull Requests are not always simple. Don't hesitate to ask for help (beware of [gotchas](http://fabricjs.com/fabric-gotchas) 😓).
         We appreciate your effort and would like the process to be productive and enjoyable.
         A strong community means a strong and better product for everyone.
+
+        Each PR can introduce a single feature or change or fix a single bug
+        Large refactors PR have been discussed before and probably splitted in steps
 -->
-
-## Motivation
-
-<!-- Why you are proposing -->
-<!-- You can use the @closes notation to mark issues that will be resolved by this PR -->
 
 ## Description
 
-<!-- What you are proposing -->
-
-## Changes
-
-<!-- before the fix vs. after -->
-
-## Gist
-
-<!-- Technical stuff if necessary -->
+<!-- Summarize the reasons of your changes and the meaning of your code. Why the code you are changing is wrong? why your is better? -->
+<!-- If you are fixing a regression, please link the commit that introduced the bug -->
+<!-- If you are proposing a feature, please link the discussion/issue where that was presented and discussed -->
+<!-- Is this pullrequest a follow up from an open issue? if so please link the issue like the example below in addition to the summary -->
+<!-- Related to #1234 -->
 
 ## In Action
 
-<!-- Show case your accomplishment -->
-<!-- Upload screenshots, screencasts and live examples showing your fix in contrast to the current state -->
+<!-- Add screenshots or recordings if necessary or requested -->
+<!-- Are you proposing a performance change? show a some proof of performance -->
