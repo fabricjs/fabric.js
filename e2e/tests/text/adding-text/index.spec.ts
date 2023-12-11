@@ -119,7 +119,7 @@ for (const splitByGrapheme of [true, false]) {
             width: 120,
             height: 120,
           },
-          maxDiffPixelRatio: 0.03,
+          maxDiffPixels: 0.02,
         }
       );
     });
