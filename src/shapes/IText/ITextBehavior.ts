@@ -808,7 +808,7 @@ export abstract class ITextBehavior<
     const originalLineLength = this._unwrappedTextLines[lineIndex].length;
     const isEndOfLine = originalLineLength === charIndex;
 
-    let someStyleIsCarringOver = false;
+    let someStyleIsCarryingOver = false;
     qty || (qty = 1);
     this.shiftLineStyles(lineIndex, qty);
     const currentCharStyle = this.styles[lineIndex]
@@ -820,7 +820,7 @@ export abstract class ITextBehavior<
     for (const index in this.styles[lineIndex]) {
       const numIndex = parseInt(index, 10);
       if (numIndex >= charIndex) {
-        someStyleIsCarringOver = true;
+        someStyleIsCarryingOver = true;
         newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
         // remove lines from the previous line since they're on a new line now
         if (!(isEndOfLine && charIndex === 0)) {
@@ -829,7 +829,7 @@ export abstract class ITextBehavior<
       }
     }
     let styleCarriedOver = false;
-    if (someStyleIsCarringOver && !isEndOfLine) {
+    if (someStyleIsCarryingOver && !isEndOfLine) {
       // if is end of line, the extra style we copied
       // is probably not something we want
       this.styles[lineIndex + qty] = newLineStyles;
