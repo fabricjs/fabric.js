@@ -62,6 +62,14 @@ export abstract class LayoutStrategy {
   }
 
   /**
+   * called from the `onBeforeLayout` hook
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onBeforeLayout(context: StrictLayoutContext) {
+    // Noop
+  }
+
+  /**
    * called from the `onAfterLayout` hook
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

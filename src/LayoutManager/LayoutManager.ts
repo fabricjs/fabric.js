@@ -100,8 +100,11 @@ export class LayoutManager {
   }
 
   protected onBeforeLayout(context: StrictLayoutContext) {
-    const { target } = context;
+    const { target, strategy } = context;
     const { canvas } = target;
+
+    strategy.onBeforeLayout(context);
+
     // handle layout triggers subscription
     if (
       // subscribe only if instance is the target's `layoutManager`
