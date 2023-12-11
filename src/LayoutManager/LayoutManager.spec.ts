@@ -531,13 +531,14 @@ describe('Layout Manager', () => {
       }
     );
 
-    test.each([true, false])('reset target transform %s', (reset) => {
+    test.each([
+      { strategy: new FitContentLayout(), shouldReset: true },
+      { strategy: new FixedLayout(), shouldReset: false },
+    ])('reset target transform %s', ({ strategy, shouldReset }) => {
       const target = new Group([]);
       target.left = 50;
 
-      const manager = new LayoutManager(
-        reset ? new FitContentLayout() : new FixedLayout()
-      );
+      const manager = new LayoutManager(strategy);
 
       const context: StrictLayoutContext = {
         bubbles: true,
@@ -552,7 +553,7 @@ describe('Layout Manager', () => {
       };
       manager['onAfterLayout'](context);
 
-      expect(target.left).toBe(reset ? 0 : 50);
+      expect(target.left).toBe(shouldReset ? 0 : 50);
     });
 
     test('bubbling', () => {

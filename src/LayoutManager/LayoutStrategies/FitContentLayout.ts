@@ -1,4 +1,4 @@
-import { resetObjectTransform } from '../../util';
+import { resetObjectTransform } from '../../util/misc/objectTransforms';
 import type { StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 
