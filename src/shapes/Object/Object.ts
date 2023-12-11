@@ -706,7 +706,7 @@ export class FabricObject<
       // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
-    } else if (key === 'dirty' && this.group) {
+    } else if (key === 'dirty' && this.group && value) {
       this.group.set('dirty', value);
     }
 
