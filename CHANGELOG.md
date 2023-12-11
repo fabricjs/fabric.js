@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): bubble dirty flag [#9540](https://github.com/fabricjs/fabric.js/pull/9540)
 - test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
 
 ## [6.0.0-beta16]
