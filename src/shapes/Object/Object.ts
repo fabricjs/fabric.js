@@ -707,6 +707,9 @@ export class FabricObject<
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
     } else if (key === 'dirty' && this.group && value) {
+      // a dirty child makes the parent dirty
+      // but a non dirty child will not make the parent non dirty.
+      // the parent could be dirty for some other reason
       this.group.set('dirty', value);
     }
 
