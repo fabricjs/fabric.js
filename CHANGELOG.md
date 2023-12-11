@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(Text) Fix style transfer issue on a line that is not empty [#9461](https://github.com/fabricjs/fabric.js/pull/9461)
+- fix(): bubble dirty flag for group only when true [#9540](https://github.com/fabricjs/fabric.js/pull/9540)
 - test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
 
 ## [6.0.0-beta16]
