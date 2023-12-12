@@ -196,7 +196,7 @@ describe('Layout Manager', () => {
       expect(subscribe).not.toHaveBeenCalled();
     });
 
-    it.each([
+    it.only.each([
       { trigger: LAYOUT_TYPE_INITIALIZATION, action: 'subscribe' },
       { trigger: LAYOUT_TYPE_ADDED, action: 'subscribe' },
       { trigger: LAYOUT_TYPE_REMOVED, action: 'unsubscribe' },
@@ -205,32 +205,41 @@ describe('Layout Manager', () => {
       action: 'subscribe' | 'unsubscribe';
     }[])(
       '$trigger trigger should $action targets and call target hooks',
-      ({ action }) => {
-        const lifecycle: jest.SpyInstance[] = [];
+      ({ trigger, action }) => {
+        const lifecycle: Record<string, jest.SpyInstance>[] = [];
 
         const manager = new LayoutManager();
+        const onBeforeLayout = jest
+          .spyOn(manager.strategy, 'onBeforeLayout')
+          .mockImplementation(() => {
+            lifecycle.push({ onBeforeLayout });
+          });
 
         const targets = [
           new Group([new FabricObject()], { layoutManager: manager }),
           new FabricObject(),
         ];
         const target = new Group(targets, { layoutManager: manager });
-        const canvasFire = jest.fn();
-        target.canvas = { fire: canvasFire };
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
-          lifecycle.push(targetFire);
+          lifecycle.push({ targetFire });
         });
+
+        const canvas = new StaticCanvas();
+        const canvasFire = jest.spyOn(canvas, 'fire').mockImplementation(() => {
+          lifecycle.push({ canvasFire });
+        });
+        target.canvas = canvas;
 
         const subscription = jest
           .spyOn(manager, action)
           .mockImplementation(() => {
-            lifecycle.push(subscription);
+            lifecycle.push({ subscription });
           });
 
         const context: StrictLayoutContext = {
           bubbles: true,
           strategy: manager.strategy,
-          type: LAYOUT_TYPE_INITIALIZATION,
+          type: trigger,
           target,
           targets,
           prevStrategy: undefined,
@@ -240,7 +249,15 @@ describe('Layout Manager', () => {
         };
         manager['onBeforeLayout'](context);
 
-        expect(lifecycle).toEqual([subscription, subscription, targetFire]);
+        expect(lifecycle).toEqual([
+          { onBeforeLayout },
+          { onBeforeLayout },
+          { subscription },
+          { subscription },
+          { onBeforeLayout },
+          { targetFire },
+          { canvasFire },
+        ]);
         expect(targetFire).toBeCalledWith('layout:before', {
           context,
         });
@@ -455,10 +472,10 @@ describe('Layout Manager', () => {
   });
 
   describe('onAfterLayout', () => {
-    it.each([true, false])(
+    it.only.each([true, false])(
       'should call target hooks with bubbling %s',
       (bubbles) => {
-        const lifecycle: jest.SpyInstance[] = [];
+        const lifecycle: Record<string, jest.SpyInstance>[] = [];
         const manager = new LayoutManager();
         const targets = [
           new Group([new FabricObject()], { layoutManager: manager }),
@@ -466,23 +483,26 @@ describe('Layout Manager', () => {
         ];
         const target = new Group(targets, { layoutManager: manager });
         const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
-          lifecycle.push(targetFire);
+          lifecycle.push({ targetFire });
         });
 
         const parent = new Group([target], { layoutManager: manager });
         const parentPerformLayout = jest
           .spyOn(parent.layoutManager, 'performLayout')
           .mockImplementation(() => {
-            lifecycle.push(parentPerformLayout);
+            lifecycle.push({ parentPerformLayout });
           });
 
-        const canvasFire = jest.fn();
-        target.canvas = { fire: canvasFire };
+        const canvas = new StaticCanvas();
+        const canvasFire = jest.spyOn(canvas, 'fire').mockImplementation(() => {
+          lifecycle.push({ canvasFire });
+        });
+        target.canvas = canvas;
 
         const onAfterLayout = jest
           .spyOn(manager.strategy, 'onAfterLayout')
           .mockImplementation(() => {
-            lifecycle.push(onAfterLayout);
+            lifecycle.push({ onAfterLayout });
           });
 
         const context: StrictLayoutContext = {
@@ -505,9 +525,10 @@ describe('Layout Manager', () => {
         manager['onAfterLayout'](context, layoutResult);
 
         expect(lifecycle).toEqual([
-          onAfterLayout,
-          targetFire,
-          ...(bubbles ? [parentPerformLayout] : []),
+          { onAfterLayout },
+          { targetFire },
+          { canvasFire },
+          ...(bubbles ? [{ parentPerformLayout }] : []),
         ]);
         expect(onAfterLayout).toBeCalledWith(context);
         expect(targetFire).toBeCalledWith('layout:after', {

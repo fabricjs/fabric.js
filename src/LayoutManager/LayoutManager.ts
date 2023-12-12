@@ -103,8 +103,6 @@ export class LayoutManager {
     const { target, strategy } = context;
     const { canvas } = target;
 
-    strategy.onBeforeLayout(context);
-
     // handle layout triggers subscription
     if (
       // subscribe only if instance is the target's `layoutManager`
@@ -116,6 +114,9 @@ export class LayoutManager {
     } else if (context.type === LAYOUT_TYPE_REMOVED) {
       context.targets.forEach((object) => this.unsubscribe(object, context));
     }
+
+    strategy.onBeforeLayout(context);
+
     // fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:before', {
       context,
@@ -261,6 +262,7 @@ export class LayoutManager {
       ...bubblingContext
     } = context;
     const { canvas } = target;
+
     strategy.onAfterLayout(context);
 
     //  fire layout event (event will fire only for layouts after initialization layout)
