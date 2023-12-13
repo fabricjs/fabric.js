@@ -5,11 +5,14 @@ import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   calcDimensionsMatrix,
+  calcPlaneRotation,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
   qrDecompose,
 } from '../../util/misc/matrix';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
+import { sendVectorToPlane } from '../../util/misc/planeChange';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
@@ -210,38 +213,34 @@ export class InteractiveFabricObject<
    * @return {Record<string, TOCoord>}
    */
   calcOCoords(): Record<string, TOCoord> {
-    const vpt = this.getViewportTransform(),
-      center = this.getCenterPoint(),
-      tMatrix = createTranslateMatrix(center.x, center.y),
-      rMatrix = createRotateMatrix({
-        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
-      }),
-      positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
-      finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / vpt[0],
-        0,
-        0,
-        1 / vpt[3],
-        0,
-        0,
-      ]),
-      transformOptions = this.group
-        ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
-      coords: Record<string, TOCoord> = {};
+    const vpt = this.getViewportTransform();
+    const rotation = calcPlaneRotation(this.calcTransformMatrix());
+    const center = this.getCenterPoint();
+    const bbox = makeBoundingBoxFromPoints(
+      this.getCoords().map((p) =>
+        // Rotate the point back as if the object is not rotated
+        p.rotate(-rotation, center)
+      )
+    );
+    const size = new Point(bbox.width, bbox.height).scalarAdd(this.padding * 2);
+    const translation = sendVectorToPlane(center, vpt, undefined);
+    const t = multiplyTransformMatrices(
+      createTranslateMatrix(vpt[4] + translation.x, vpt[5] + translation.y),
+      createRotateMatrix({ angle: this.getTotalAngle() })
+    );
 
-    this.forEachControl((control, key) => {
-      const position = control.positionHandler(dim, finalMatrix, this, control);
-      // coords[key] are sometimes used as points. Those are points to which we add
-      // the property corner and touchCorner from `_calcCornerCoords`.
-      // don't remove this assign for an object spread.
-      coords[key] = Object.assign(
-        position,
-        this._calcCornerCoords(control, position)
-      );
-    });
+    return Object.fromEntries(
+      Object.entries(this.controls).map(([key, control]) => {
+        const position = control.positionHandler(size, t, this, control);
+        return [
+          key,
+          // coords[key] are sometimes used as points. Those are points to which we add
+          // the property corner and touchCorner from `_calcCornerCoords`.
+          // don't remove this assign for an object spread.
+          Object.assign(position, this._calcCornerCoords(control, position)),
+        ];
+      })
+    );
 
     // debug code
     /*
@@ -256,7 +255,6 @@ export class InteractiveFabricObject<
         });
       } 50);
     */
-    return coords;
   }
 
   /**
