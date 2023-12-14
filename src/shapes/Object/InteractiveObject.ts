@@ -6,13 +6,13 @@ import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   calcDimensionsMatrix,
   calcPlaneRotation,
-  createRotateMatrix,
+  createRotationMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixArray,
   qrDecompose,
 } from '../../util/misc/matrix';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
-import { sendVectorToPlane } from '../../util/misc/planeChange';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
@@ -214,19 +214,22 @@ export class InteractiveFabricObject<
    */
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform();
-    const rotation = calcPlaneRotation(this.calcTransformMatrix());
     const center = this.getCenterPoint();
+    const rotation = calcPlaneRotation(this.calcTransformMatrix());
+
+    const bboxTransform = multiplyTransformMatrixArray([
+      vpt,
+      createTranslateMatrix(center.x, center.y),
+      createRotationMatrix(-rotation),
+    ]);
     const bbox = makeBoundingBoxFromPoints(
-      this.getCoords().map((p) =>
-        // Rotate the point back as if the object is not rotated
-        p.rotate(-rotation, center)
-      )
+      this.getCoords().map((p) => p.transform(bboxTransform))
     );
     const size = new Point(bbox.width, bbox.height).scalarAdd(this.padding * 2);
-    const translation = sendVectorToPlane(center, vpt, undefined);
+    const translation = center.transform(vpt, true);
     const t = multiplyTransformMatrices(
       createTranslateMatrix(vpt[4] + translation.x, vpt[5] + translation.y),
-      createRotateMatrix({ angle: this.getTotalAngle() })
+      createRotationMatrix(rotation)
     );
 
     return Object.fromEntries(
