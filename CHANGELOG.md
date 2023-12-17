@@ -2,6 +2,7 @@
 
 ## [next]
 
+- perf(): reduce setCoords calls [#9550](https://github.com/fabricjs/fabric.js/pull/9550)
 - fix(): bubble dirty flag for group only when true [#9540](https://github.com/fabricjs/fabric.js/pull/9540)
 - test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
 
