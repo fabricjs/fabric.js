@@ -91,7 +91,6 @@ export class Group
   /**
    * Used to allow targeting of object inside groups.
    * set to true if you want to select an object inside a group.\
-   * **REQUIRES** `subTargetCheck` set to true
    * This will be not removed but slowly replaced with a method setInteractive
    * that will take care of enabling subTargetCheck and necessary object events.
    * There is too much attached to group interactivity to just be evaluated by a
@@ -285,13 +284,6 @@ export class Group
   }
 
   /**
-   * @private
-   */
-  _shouldSetNestedCoords() {
-    return this.subTargetCheck;
-  }
-
-  /**
    * Remove all objects
    * @returns {FabricObject[]} removed objects
    */
@@ -365,7 +357,7 @@ export class Group
         )
       );
     }
-    this._shouldSetNestedCoords() && object.setCoords();
+
     object._set('group', this);
     object._set('canvas', this.canvas);
     this._watchObject(true, object);
@@ -412,7 +404,6 @@ export class Group
           object.calcTransformMatrix()
         )
       );
-      object.setCoords();
     }
     this._watchObject(false, object);
     const index =
@@ -487,16 +478,6 @@ export class Group
       }
     }
     this._drawClipPath(ctx, this.clipPath);
-  }
-
-  /**
-   * @override
-   * @return {Boolean}
-   */
-  setCoords() {
-    super.setCoords();
-    this._shouldSetNestedCoords() &&
-      this.forEachObject((object) => object.setCoords());
   }
 
   triggerLayout(options: ImperativeLayoutOptions = {}) {
@@ -689,7 +670,6 @@ export class Group
         target: group,
         targets: group.getObjects(),
       });
-      group.setCoords();
       return group;
     });
   }

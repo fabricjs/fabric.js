@@ -427,7 +427,6 @@ export class FabricText<
       this.setPathInfo();
     }
     this.initDimensions();
-    this.setCoords();
   }
 
   /**
@@ -1694,6 +1693,7 @@ export class FabricText<
     }
     if (this._forceClearCache) {
       this.initDimensions();
+      this.setCoords();
     }
     super.render(ctx);
   }

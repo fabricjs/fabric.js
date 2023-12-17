@@ -288,13 +288,12 @@ export class PencilBrush extends BaseBrush {
 
     const path = this.createPath(pathData);
     this.canvas.clearContext(this.canvas.contextTop);
-    this.canvas.fire('before:path:created', { path: path });
+    this.canvas.fire('before:path:created', { path });
     this.canvas.add(path);
     this.canvas.requestRenderAll();
-    path.setCoords();
     this._resetShadow();
 
     // fire event 'path' created
-    this.canvas.fire('path:created', { path: path });
+    this.canvas.fire('path:created', { path });
   }
 }

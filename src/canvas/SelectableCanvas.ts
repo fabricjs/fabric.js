@@ -189,6 +189,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Keep track of the subTargets for Mouse Events
+   * Sorted in descending z index order, top most object first
    * @type FabricObject[]
    */
   targets: FabricObject[] = [];
@@ -836,7 +837,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     while (i--) {
       const target = objects[i];
       if (this._checkTarget(target, pointer)) {
-        if (isCollection(target) && target.subTargetCheck) {
+        if (
+          isCollection(target) &&
+          (target.subTargetCheck || target.interactive)
+        ) {
           const subTarget = this._searchPossibleTargets(
             target._objects as FabricObject[],
             pointer
@@ -1132,8 +1136,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
     if (isActiveSelection(object) && prevActiveObject !== object) {
       object.set('canvas', this);
-      object.setCoords();
     }
+
+    object.setCoords();
 
     return true;
   }

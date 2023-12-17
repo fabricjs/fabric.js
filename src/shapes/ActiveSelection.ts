@@ -20,6 +20,8 @@ export interface ActiveSelectionOptions extends GroupProps {
 const activeSelectionDefaultValues: Partial<TClassProperties<ActiveSelection>> =
   {
     multiSelectionStacking: 'canvas-stacking',
+    subTargetCheck: true,
+    interactive: false,
   };
 
 /**
@@ -66,13 +68,6 @@ export class ActiveSelection extends Group {
       layoutManager:
         options.layoutManager ?? new ActiveSelectionLayoutManager(),
     });
-  }
-
-  /**
-   * @private
-   */
-  _shouldSetNestedCoords() {
-    return true;
   }
 
   /**
@@ -149,6 +144,7 @@ export class ActiveSelection extends Group {
     // the object will be in the objects array of both the ActiveSelection and the Group
     // but referenced in the group's _activeObjects so that it won't be rendered twice.
     this._enterGroup(object, removeParentTransform);
+    object.setCoords();
   }
 
   /**
