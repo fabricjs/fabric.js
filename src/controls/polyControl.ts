@@ -103,6 +103,8 @@ export const factoryPolyActionHandler = (
       newPositionNormalized.y + 0.5
     );
 
+    actionPerformed && poly.setCoords();
+
     return actionPerformed;
   };
 };

@@ -1386,7 +1386,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.setCursor(this.defaultCursor);
       return;
     }
-    let hoverCursor = target.hoverCursor || this.hoverCursor;
     const activeSelection =
         this._activeObject === this._activeSelection
           ? this._activeObject
@@ -1400,17 +1399,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target._findTargetCorner(this.getViewportPoint(e));
 
     if (!corner) {
-      if ((target as Group).subTargetCheck) {
-        // hoverCursor should come from top-most subTarget,
-        // so we walk the array backwards
-        this.targets
-          .concat()
-          .reverse()
-          .map((_target) => {
-            hoverCursor = _target.hoverCursor || hoverCursor;
-          });
-      }
-      this.setCursor(hoverCursor);
+      // hoverCursor should come from top-most subTarget
+      const hoverCursor =
+        (target as Group).subTargetCheck &&
+        this.targets.find((target) => target.hoverCursor)?.hoverCursor;
+      this.setCursor(hoverCursor || target.hoverCursor || this.hoverCursor);
     } else {
       const control = target.controls[corner];
       this.setCursor(control.cursorStyleHandler(e, control, target));

@@ -211,6 +211,8 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
       target.setCoords();
+      (target.subTargetCheck || target.interactive) &&
+        target.forEachObject((object) => object.setCoords());
       target.set({ dirty: true });
     }
   }
@@ -245,6 +247,8 @@ export class LayoutManager {
       left: object.left + offset.x,
       top: object.top + offset.y,
     });
+    // TODO: should we delete aCoords/oCoords here so they are not stale if subTargetCheck is false?
+    //  or should we apply offset instead of recalculating aCoords?
   }
 
   protected onAfterLayout(

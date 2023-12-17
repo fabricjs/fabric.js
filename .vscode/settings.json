@@ -12,7 +12,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": false,
-    "source.removeUnusedImports": true
+    "source.organizeImports": "never",
+    "source.removeUnusedImports": "explicit"
   }
 }
