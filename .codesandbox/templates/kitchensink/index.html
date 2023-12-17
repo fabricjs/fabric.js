@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="kitchensink">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Kitchensink</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Plaster" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Engagement" rel="stylesheet" type="text/css">
+    <script src="src/index.ts" type="module"></script>
+</head>
+
+<body>
+    <div id="bd-wrapper" ng-controller="CanvasControls">
+        <h2><span>Fabric.js demos</span> &middot; Kitchensink
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"
+                aria-controls="offcanvas">
+                Toggle Toolbar
+            </button>
+        </h2>
+        <div id="canvas-wrapper">
+            <canvas id="canvas" width="800" height="600"></canvas>
+        </div>
+
+        <div id="offcanvas" class="offcanvas show offcanvas-end" tabindex="-1" data-bs-backdrop="false">
+            <div class="offcanvas-header">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button id="tab-button-simple" class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#simple-shapes" type="button" role="tab" aria-controls="simple-shapes"
+                            aria-selected="false">Simple</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button id="tab-button-object" class="nav-link disabled" data-bs-toggle="tab"
+                            data-bs-target="#object" type="button" role="tab" aria-controls="object"
+                            aria-selected="false" aria-disabled="true">Object</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button id="tab-button-canvas" class="nav-link active" data-bs-toggle="tab"
+                            data-bs-target="#canvastab" type="button" role="tab" aria-controls="canvastab"
+                            aria-selected="true">Canvas</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button id="tab-button-load-svg" class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#load-svg-pane" type="button" role="tab" aria-controls="load-svg-pane"
+                            aria-selected="false">Load SVG</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button id="tab-button-execute" class="nav-link" data-bs-toggle="tab"
+                            data-bs-target="#execute-code" type="button" role="tab" aria-controls="execute-code"
+                            aria-selected="false">Execute</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button id="tab-button-json" class="nav-link" data-bs-toggle="tab" data-bs-target="#json-inout"
+                            type="button" role="tab" aria-controls="json-inout" aria-selected="false">JSON</button>
+                    </li>
+                </ul>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <div class="tab-content">
+                    <div class="tab-pane" id="object" role="tabpanel" aria-labelledby="tab-button-object">
+                        <div class="object-controls">
+                            <label for="color">Fill / Stroke / Background:</label>
+                            <input type="color" style="width:40px" bind-value-to="fill"
+                                class="btn-object-action btn-outline-primary">
+                            <input type="color" style="width:40px" bind-value-to="stroke"
+                                class="btn-object-action btn-outline-primary">
+                            <input type="color" value="" id="text-bg-color" size="10"
+                                class="btn-object-action btn-outline-primary" bind-value-to="bgColor"><br />
+                            <label for="opacity">Opacity:</label>
+                            <input value="100" type="range" bind-value-to="opacity"
+                                class="btn-object-action btn-outline-primary"><br />
+                            <label for="opacity">Stroke width:</label>
+                            <input value="1" min="0" max="30" type="range" bind-value-to="strokeWidth"
+                                class="btn-object-action btn-outline-primary"><br />
+                            <label>
+                                Stroke Uniform:
+                                <input type="checkbox" name="stroke-uniform" class="btn-object-action form-check-input"
+                                    bind-value-to="strokeUniform">
+                            </label>
+                            <div id="text-wrapper" ng-show="getText()">
+                                <div id="text-controls">
+                                    <p>Text specific controls</p>
+                                    <textarea class="form-control" bind-value-to="text" rows="3"
+                                        columns="80"></textarea><br />
+                                    <label for="font-family" style="display:inline-block">Font family:</label>
+                                    <select id="font-family" class="btn-object-action btn-outline-primary"
+                                        bind-value-to="fontFamily">
+                                        <option value="arial">Arial</option>
+                                        <option value="helvetica" selected>Helvetica</option>
+                                        <option value="myriad pro">Myriad Pro</option>
+                                        <option value="delicious">Delicious</option>
+                                        <option value="verdana">Verdana</option>
+                                        <option value="georgia">Georgia</option>
+                                        <option value="courier">Courier</option>
+                                        <option value="comic sans ms">Comic Sans MS</option>
+                                        <option value="impact">Impact</option>
+                                        <option value="monaco">Monaco</option>
+                                        <option value="optima">Optima</option>
+                                        <option value="hoefler text">Hoefler Text</option>
+                                        <option value="plaster">Plaster</option>
+                                        <option value="engagement">Engagement</option>
+                                    </select>
+                                    <br>
+                                    <label for="text-align" style="display:inline-block">Text align:</label>
+                                    <select id="text-align" class="btn-object-action btn-outline-primary"
+                                        bind-value-to="textAlign">
+                                        <option>Left</option>
+                                        <option>Center</option>
+                                        <option>Right</option>
+                                        <option>Justify</option>
+                                        <option>Justify-left</option>
+                                        <option>Justify-right</option>
+                                        <option>Justify-center</option>
+                                    </select>
+                                    <div>
+                                        <label for="text-lines-bg-color">Background text color:</label>
+                                        <input type="color" value="" id="text-lines-bg-color" size="10"
+                                            class="btn-object-action btn-outline-primary" bind-value-to="textBgColor">
+                                    </div>
+                                    <div>
+                                        <label for="text-font-size">Font size:</label>
+                                        <input type="range" value="" min="1" max="120" step="1" id="text-font-size"
+                                            class="btn-object-action btn-outline-primary" bind-value-to="fontSize">
+                                    </div>
+                                    <div>
+                                        <label for="text-line-height">Line height:</label>
+                                        <input type="range" value="" min="0" max="10" step="0.1" id="text-line-height"
+                                            class="btn-object-action btn-outline-primary" bind-value-to="lineHeight">
+                                    </div>
+                                    <div>
+                                        <label for="text-char-spacing">Char spacing:</label>
+                                        <input type="range" value="" min="-200" max="800" step="10"
+                                            id="text-char-spacing" class="btn-object-action btn-outline-primary"
+                                            bind-value-to="charSpacing">
+                                    </div>
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        ng-click="toggleBold()" ng-class="{'active': isBold()}">
+                                        Bold
+                                    </button>
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        id="text-cmd-italic" ng-click="toggleItalic()"
+                                        ng-class="{'active': isItalic()}">
+                                        Italic
+                                    </button>
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        id="text-cmd-underline" ng-click="toggleUnderline()"
+                                        ng-class="{'active': isUnderline()}">
+                                        Underline
+                                    </button>
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        id="text-cmd-linethrough" ng-click="toggleLinethrough()"
+                                        ng-class="{'active': isLinethrough()}">
+                                        Linethrough
+                                    </button>
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        id="text-cmd-overline" ng-click="toggleOverline()"
+                                        ng-class="{'active': isOverline()}">
+                                        Overline
+                                    </button>
+                                    <br />
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        id="text-cmd-superscript" ng-click="setSuperScript()">
+                                        Superscript
+                                    </button>
+                                    <button type="button" class="btn btn-object-action btn-outline-primary"
+                                        id="text-cmd-subscript" ng-click="setSubScript()">
+                                        Subscript
+                                    </button>
+                                    <label>
+                                        GraphemeSplit:
+                                        <input type="checkbox" name="grapheme-split"
+                                            class="btn-object-action form-check-input" bind-value-to="splitByGrapheme">
+                                    </label>
+                                </div>
+                            </div>
+                            <div style="margin-top:10px;">
+                                <button class="btn btn-lock btn-object-action btn-outline-primary"
+                                    ng-click="setHorizontalLock(!getHorizontalLock())"
+                                    ng-class="{'active': getHorizontalLock()}">
+                                    {[ getHorizontalLock() ? 'Unlock horizontal movement' : 'Lock horizontal
+                                    movement' ]}
+                                </button>
+                                <button class="btn btn-lock btn-object-action btn-outline-primary"
+                                    ng-click="setVerticalLock(!getVerticalLock())"
+                                    ng-class="{'active': getVerticalLock()}">
+                                    {[ getVerticalLock() ? 'Unlock vertical movement' : 'Lock vertical movement' ]}
+                                </button>
+                                <br>
+                                <button class="btn btn-lock btn-object-action btn-outline-primary"
+                                    ng-click="setScaleLockX(!getScaleLockX())" ng-class="{'active': getScaleLockX()}">
+                                    {[ getScaleLockX() ? 'Unlock horizontal scaling' : 'Lock horizontal scaling' ]}
+                                </button>
+                                <button class="btn btn-lock btn-object-action btn-outline-primary"
+                                    ng-click="setScaleLockY(!getScaleLockY())" ng-class="{'active': getScaleLockY()}">
+                                    {[ getScaleLockY() ? 'Unlock vertical scaling' : 'Lock vertical scaling' ]}
+                                </button>
+                                <button class="btn btn-lock btn-object-action btn-outline-primary"
+                                    ng-click="setRotationLock(!getRotationLock())"
+                                    ng-class="{'active': getRotationLock()}">
+                                    {[ getRotationLock() ? 'Unlock rotation' : 'Lock rotation' ]}
+                                </button>
+                                <br>
+                                <button class="btn btn-lock btn-object-action btn-outline-primary"
+                                    ng-click="setLockScalingFlip(!getLockScalingFlip())"
+                                    ng-class="{'active': getLockScalingFlip()}">
+                                    {[ getLockScalingFlip() ? 'Unlock scaling flip' : 'Lock scaling flip' ]}
+                                </button>
+                            </div>
+
+                            <div style="margin-top:10px">
+                                <p>
+                                    <span style="margin-right: 10px">Origin X: </span>
+                                    <label>
+                                        Left
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="left"
+                                            bind-value-to="originX">
+                                    </label>
+                                    <label>
+                                        Center
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="center"
+                                            bind-value-to="originX">
+                                    </label>
+                                    <label>
+                                        Right
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="right"
+                                            bind-value-to="originX">
+                                    </label>
+                                    <label>
+                                        0.3
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="0.3"
+                                            bind-value-to="originX">
+                                    </label>
+                                    <label>
+                                        0.5
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="0.5"
+                                            bind-value-to="originX">
+                                    </label>
+                                    <label>
+                                        0.7
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="0.7"
+                                            bind-value-to="originX">
+                                    </label>
+                                    <label>
+                                        1
+                                        <input type="radio" name="origin-x"
+                                            class="origin-x btn-object-action btn-outline-primary" value="1"
+                                            bind-value-to="originX">
+                                    </label>
+                                </p>
+                                <p>
+                                    <span style="margin-right: 10px">Origin Y: </span>
+                                    <label>
+                                        Top
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="top"
+                                            bind-value-to="originY">
+                                    </label>
+                                    <label>
+                                        Center
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="center"
+                                            bind-value-to="originY">
+                                    </label>
+                                    <label>
+                                        Bottom
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="bottom"
+                                            bind-value-to="originY">
+                                    </label>
+                                    <label>
+                                        0.3
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="0.3"
+                                            bind-value-to="originY">
+                                    </label>
+                                    <label>
+                                        0.5
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="0.5"
+                                            bind-value-to="originY">
+                                    </label>
+                                    <label>
+                                        0.7
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="0.7"
+                                            bind-value-to="originY">
+                                    </label>
+                                    <label>
+                                        1
+                                        <input type="radio" name="origin-y"
+                                            class="origin-y btn-object-action btn-outline-primary" value="1"
+                                            bind-value-to="originY">
+                                    </label>
+                                </p>
+                                <p>
+                                    <label>
+                                        Cache:
+                                        <input type="checkbox" name="object-caching"
+                                            class="btn-object-action form-check-input" bind-value-to="objectCaching">
+                                    </label>
+                                    <label>
+                                        No scaling cache:
+                                        <input type="checkbox" name="no-scale-cache"
+                                            class="btn-object-action form-check-input" bind-value-to="noScaleCache">
+                                    </label><br />
+                                    <label>
+                                        Controls:
+                                        <input type="checkbox" name="has-controls"
+                                            class="btn-object-action form-check-input" bind-value-to="hasControls">
+                                    </label>
+                                    <label>
+                                        Transparent corners:
+                                        <input type="checkbox" name="transparent-corners"
+                                            class="btn-object-action form-check-input"
+                                            bind-value-to="transparentCorners">
+                                    </label>
+                                    <label>
+                                        Borders:
+                                        <input type="checkbox" name="has-borders"
+                                            class="btn-object-action form-check-input" bind-value-to="hasBorders">
+                                    </label>
+                                    <label>
+                                        Centered Rotation:
+                                        <input type="checkbox" name="centered-rotation"
+                                            class="btn-object-action form-check-input" bind-value-to="centeredRotation">
+                                    </label>
+
+                                </p>
+                            </div>
+
+                            <div class="m-1">
+                                <button id="send-backwards" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="sendBackwards()">Send
+                                    backwards</button>
+                                <button id="send-to-back" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="sendToBack()">Send
+                                    to
+                                    back</button>
+                            </div>
+
+                            <div class="m-1">
+                                <button id="bring-forward" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="bringForward()">Bring
+                                    forwards</button>
+                                <button id="bring-to-front" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="bringToFront()">Bring to
+                                    front</button>
+                            </div>
+
+                            <div class="m-1">
+                                <button id="gradientify" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="gradientify()">
+                                    Gradientify
+                                </button>
+                                <button id="shadowify" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="shadowify()">
+                                    Shadowify
+                                </button>
+                                <button id="patternify" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="patternify()">
+                                    Patternify
+                                </button>
+                                <button id="clip" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="clip(false)">
+                                    Clip
+                                </button>
+                                <button id="clip-inverted" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="clip(true)">
+                                    Clip Inverted
+                                </button>
+                                <button id="play" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="play()">
+                                    Play
+                                </button>
+                            </div>
+                            <div class="m-1">
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="setPatternStyle('repeat')">
+                                    Pattern repeat
+                                </button>
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="setPatternStyle('repeat-x')">
+                                    Pattern repeat-x
+                                </button>
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="setPatternStyle('repeat-y')">
+                                    Pattern repeat-y
+                                </button>
+                                <button id="patternfy-repeatX" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="setPatternStyle('no-repeat')">
+                                    Pattern repeat-none
+                                </button>
+                            </div>
+                            <div class="m-1">
+                                <button id="resize-filter" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="addResizeFilter()">
+                                    Add Resize filter
+                                </button>
+                                <button id="invert-filter" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="addInvertFilter()">
+                                    set Invert filter
+                                </button>
+                                <button id="invert-filter" class="btn btn-object-action btn-outline-primary m-1"
+                                    ng-click="addContrastFilter()">
+                                    set Contrast filter
+                                </button>
+                            </div>
+                            <div id="cacheInspector">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="simple-shapes" role="tabpanel" aria-labelledby="tab-button-simple">
+                        <p>Add <strong>simple shapes</strong> to canvas:</p>
+                        <div>
+                            <button type="button" class="btn rect btn-outline-primary m-1"
+                                ng-click="addRect()">Rectangle</button>
+                            <button type="button" class="btn circle btn-outline-primary m-1"
+                                ng-click="addCircle()">Circle</button>
+                            <button type="button" class="btn triangle btn-outline-primary m-1"
+                                ng-click="addTriangle()">Triangle</button>
+                            <button type="button" class="btn line btn-outline-primary m-1"
+                                ng-click="addLine()">Line</button>
+                            <button type="button" class="btn polygon btn-outline-primary m-1"
+                                ng-click="addPolygon()">Polygon</button>
+                            <button class="btn btn-outline-primary m-1" ng-click="addText()">Add text</button>
+                            <button class="btn btn-outline-primary m-1" ng-click="addIText()">Add Itext</button>
+                            <button class="btn btn-outline-primary m-1" ng-click="addTextbox()">Add textbox</button>
+                            <button class="btn btn-outline-primary m-1" ng-click="addPatternRect()">Add pattern
+                                rect</button>
+                        </div>
+
+                        <p>Add <strong>images</strong> to canvas:</p>
+                        <div id="img-buttons">
+                            <button type="button" class="btn image4 btn-outline-primary m-1" ng-click="addVideo()">Bunny
+                                video</button>
+                        </div>
+
+                        <p>Add <strong>SVG shapes</strong> to canvas:</p>
+                        <div id="svg-buttons">
+
+
+                            <!--
+                              some elements are positioned incorrectly
+                              <li><button class="shape btn-outline-primary" id="shape137"><strong>xxx</strong> paths</button></li> -->
+
+                            <!--
+                              wrong position of ellipses
+                              <li><button class="shape btn-outline-primary" id="shape127"><strong>xxx</strong> paths</button></li> -->
+
+                            <!--
+                              bezier curve doesn't seem to be rendered correctly
+                              <li><button class="shape btn-outline-primary" id="shape117"><strong>xxx</strong> paths</button></li> -->
+
+                            <!-- <li><button class="shape btn-outline-primary" id="shape111"><strong>18229</strong> paths</button></li> -->
+                        </div>
+                    </div>
+
+                    <div class="tab-pane active" id="canvastab" role="tabpanel" aria-labelledby="tab-button-canvas">
+                        <div id="global-controls">
+                            <p id="complexity">
+                                Canvas complexity (number of paths):
+                                <strong>{[ canvas.complexity() ]}</strong>
+                            </p>
+                            <p>
+                                Rasterize canvas to
+                                <button class="btn btn-success" id="rasterize" ng-click="rasterize()">
+                                    Image
+                                </button>
+                                <button class="btn btn-success" id="rasterize" ng-click="rasterize3x()">
+                                    Image 3X multiplied
+                                </button>
+                                <button class="btn btn-success" id="rasterize-svg" ng-click="rasterizeSVG()">
+                                    SVG
+                                </button>
+                                <button class="btn btn-success" id="rasterize-json" ng-click="rasterizeJSON()">
+                                    JSON
+                                </button>
+                            </p>
+                            <p>
+                                <button class="btn btn-danger clear" ng-click="confirmClear()">Clear canvas</button>
+                                <button class="btn btn-object-action btn-outline-primary" id="remove-selected"
+                                    ng-click="removeSelected()">
+                                    Remove selected object/group
+                                </button>
+                            </p>
+                            <p>
+                                <label for="canvas-background-picker">Canvas background:</label>
+                                <input type="color" bind-value-to="canvasBgColor">
+                            </p>
+                            <p>
+                                <label>
+                                    Enable HIDPI (retina) scaling:
+                                    <input type="checkbox" name="enable-retina" bind-value-to="enableRetinaScaling">
+                                </label>
+                                <label>
+                                    Skip offscreen rendering:
+                                    <input type="checkbox" name="enable-retina" bind-value-to="skipOffscreen">
+                                </label>
+                                <br />
+                                <label>
+                                    Preserve stacking:
+                                    <input type="checkbox" name="preserve-object-stacking"
+                                        bind-value-to="preserveObjectStacking">
+                                </label>
+                                <label>
+                                    Controls above overlay:
+                                    <input type="checkbox" name="controls-above-overlay"
+                                        bind-value-to="controlsAboveOverlay">
+                                </label>
+                            </p>
+                        </div>
+                        <div style="margin-top:10px;" id="drawing-mode-wrapper">
+
+                            <button id="drawing-mode" class="btn btn-outline-primary"
+                                ng-click="setFreeDrawingMode(!getFreeDrawingMode())"
+                                ng-class="{'active': getFreeDrawingMode()}">
+                                {[ getFreeDrawingMode() ? 'Exit free drawing mode' : 'Enter free drawing mode' ]}
+                            </button>
+
+                            <div id="drawing-mode-options" ng-show="getFreeDrawingMode()">
+                                <label for="drawing-mode-selector">Mode:</label>
+                                <select id="drawing-mode-selector" bind-value-to="drawingMode">
+                                    <option>Pencil</option>
+                                    <option>Circle</option>
+                                    <option>Spray</option>
+                                    <option>Pattern</option>
+
+                                    <option>hline</option>
+                                    <option>vline</option>
+                                    <option>square</option>
+                                    <option>diamond</option>
+                                    <option>texture</option>
+                                </select>
+                                <br>
+                                <label for="drawing-line-width">Line width:</label>
+                                <input type="range" value="30" min="0" max="150" bind-value-to="drawingLineWidth">
+                                <br>
+                                <label for="drawing-color">Line color:</label>
+                                <input type="color" value="#005E7A" bind-value-to="drawingLineColor">
+                                <br>
+                                <label for="drawing-shadow-width">Line shadow width:</label>
+                                <input type="range" value="0" min="0" max="50" bind-value-to="drawingLineShadowWidth">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="load-svg-pane" role="tabpanel" aria-labelledby="tab-button-load-svg">
+                        <textarea id="svg-console" class="form-control mb-4" bind-value-to="consoleSVG">
+                          </textarea>
+                        <button type="button" class="btn btn-outline-primary" ng-click="loadSVG()">
+                            Load as Group
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" ng-click="loadSVGWithoutGrouping()">
+                            Load without grouping
+                        </button>
+                    </div>
+
+                    <div class="tab-pane" id="execute-code" role="tabpanel" aria-labelledby="tab-button-execute">
+                        <textarea id="canvas-console" class="form-control mb-4" bind-value-to="console">
+                            </textarea>
+                        <button type="button" class="btn btn-outline-primary" ng-click="execute()">Execute</button>
+                    </div>
+
+                    <div class="tab-pane" id="json-inout" role="tabpanel" aria-labelledby="tab-button-json">
+                        <textarea id="json-console" class="form-control mb-4" bind-value-to="consoleJSON">
+                          </textarea>
+                        <button type="button" class="btn btn-outline-primary" ng-click="loadJSON()">
+                            Load
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" ng-click="saveJSON(true)">
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" ng-click="saveJSON(false)">
+                            Save with no defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

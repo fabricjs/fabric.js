@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="10cm" height="3cm" viewBox="0 0 1000 300"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example tspan01 - using tspan to change visual attributes</desc>
+
+  <g font-family="Verdana" font-size="45" >
+    <text x="200" y="150" fill="blue" >
+      You are
+        <tspan font-weight="bold" fill="red" >not</tspan>
+      a banana.
+    </text>
+  </g>
+</svg>
+

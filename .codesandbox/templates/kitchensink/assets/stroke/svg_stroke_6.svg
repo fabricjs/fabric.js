@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="220" height="320"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example stroke6 - stroke-linejoin/stroke-linecap</desc>
+
+  <g style="fill: none"  stroke="black">
+    <polyline stroke-linejoin="miter" stroke-width="40" stroke-linecap="butt" points="30,115 110,40 190,115" />
+    <polyline style="stroke-linejoin:round; stroke-width:40; stroke-linecap: square;" points="30,200 110,125 190,200" />
+    <polyline stroke-linejoin="bevel" stroke-width="40" fill="none" stroke-linecap="round" points="30,285 110,210 190,285" />
+    <path d="M30,115 L110,40 L190,115 M30,200 L110,125 L190,200 M30,285 L110,210 L190,285" stroke="white" fill="none" />
+  </g>
+</svg>

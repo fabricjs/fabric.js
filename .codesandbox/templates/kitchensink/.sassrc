@@ -1,0 +1,6 @@
+{
+    "includePaths": [
+        "node_modules/",
+        "styles/"
+    ]
+}

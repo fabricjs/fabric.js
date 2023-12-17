@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="236" height="70"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example stroke5 - stroke-linecap</desc>
+
+  <g fill="none" stroke="black" stroke-width="10">
+    <path stroke-linecap="butt" d="M10 20 l215 0" />
+    <path style="stroke-linecap: round;" d="M10 40 l215 0" />
+    <path stroke-linecap="square" d="M10 60 l215 0" />
+  </g>
+</svg>

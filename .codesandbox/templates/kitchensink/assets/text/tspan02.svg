@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="10cm" height="3cm" viewBox="0 0 1000 300"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example tspan02 - using tspan's dx and dy attributes
+        for incremental positioning adjustments</desc>
+
+  <g font-family="Verdana" font-size="45" >
+    <text x="200" y="150" fill="blue" >
+      But you
+        <tspan dx="2em" dy="-50" font-weight="bold" fill="red" >
+          are
+        </tspan>
+        <tspan dy="100">
+           a peach!
+        </tspan>
+    </text>
+  </g>
+</svg>
+
