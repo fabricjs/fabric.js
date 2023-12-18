@@ -36,6 +36,7 @@ import {
  * The point of this LayoutManager is really just to don't touch anything.
  */
 class RespectfulLayoutManager extends LayoutManager {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   performLayout() {}
 }
 
