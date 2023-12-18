@@ -27,7 +27,17 @@ import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
-import { noop } from '../constants';
+
+/**
+ * This class is created to handle the specific case of the group fromObject.
+ * Is not meant to be used anywhere outside the fromObject function.
+ * We could have used a boolean in the constructor but we think the boolean
+ * would stay in the group's constructor interface and create confusion.
+ * The point of this LayoutManager is really just to don't touch anything.
+ */
+class RespectfulLayoutManager extends LayoutManager {
+  performLayout() {}
+}
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -642,9 +652,7 @@ export class Group
       const group = new this(objects, {
         ...options,
         ...hydratedOptions,
-        layoutManager: {
-          performLayout: noop,
-        } as unknown as LayoutManager,
+        layoutManager: new RespectfulLayoutManager(),
       });
       group.layoutManager = new LayoutManager();
       group.setCoords();
