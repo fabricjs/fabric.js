@@ -10,6 +10,9 @@ import type {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { getLocalPoint } from './util';
+import { wrapWithFireEvent } from './wrapWithFireEvent';
+
+const ACTION_NAME = 'modifyPoly';
 
 type TTransformAnchor = Transform & { pointIndex: number };
 
@@ -105,7 +108,10 @@ export const factoryPolyActionHandler = (
 };
 
 export const createPolyActionHandler = (pointIndex: number) =>
-  factoryPolyActionHandler(pointIndex, polyActionHandler);
+  wrapWithFireEvent(
+    ACTION_NAME,
+    factoryPolyActionHandler(pointIndex, polyActionHandler)
+  );
 
 export function createPolyControls(
   poly: Polyline,
@@ -126,7 +132,7 @@ export function createPolyControls(
     idx++
   ) {
     controls[`p${idx}`] = new Control({
-      actionName: 'modifyPoly',
+      actionName: ACTION_NAME,
       positionHandler: createPolyPositionHandler(idx),
       actionHandler: createPolyActionHandler(idx),
       ...options,

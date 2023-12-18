@@ -7,6 +7,10 @@ import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './canvas/Canvas';
 import type { IText } from './shapes/IText/IText';
 import type { StaticCanvas } from './canvas/StaticCanvas';
+import type {
+  LayoutBeforeEvent,
+  LayoutAfterEvent,
+} from './LayoutManager/types';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -53,7 +57,7 @@ export type Transform = {
   target: FabricObject;
   action: string;
   actionHandler?: TransformActionHandler;
-  corner: string | 0;
+  corner: string;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -99,7 +103,8 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modifyPoly';
 
 export interface ModifiedEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
@@ -129,9 +134,21 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   extends TEvent<E> {
   target?: FabricObject;
   subTargets?: FabricObject[];
-  pointer: Point;
   transform?: Transform | null;
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
+  pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
   absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
 }
 
 interface SimpleEventHandler<T extends Event = TPointerEvent>
@@ -158,8 +175,20 @@ export interface DragEventData extends TEvent<DragEvent> {
 }
 
 export interface DropEventData extends DragEventData {
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
   pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
   absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
 }
 
 interface DnDEvents {
@@ -265,6 +294,8 @@ export interface StaticCanvasEvents extends CollectionEvents {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+  'object:layout:before': LayoutBeforeEvent & { target: Group };
+  'object:layout:after': LayoutAfterEvent & { target: Group };
 }
 
 export interface CanvasEvents
