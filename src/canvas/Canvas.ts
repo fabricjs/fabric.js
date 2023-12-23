@@ -1102,6 +1102,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           key,
           control,
         });
+        this.fire('before:transform', {
+          e,
+          transform,
+        });
         const pointer = this.getScenePoint(e);
         control
           ?.getMouseDownHandler(e, target, control)

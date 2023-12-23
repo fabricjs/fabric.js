@@ -624,49 +624,41 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       altKey = e[this.centeredKey as ModifierKey],
       origin = this._shouldCenterTransform(target, action, altKey)
         ? ({ x: CENTER, y: CENTER } as const)
-        : this._getOriginFromCorner(target, key),
-      /**
-       * relative to target's containing coordinate plane
-       * both agree on every point
-       **/
-      transform: Transform = {
-        target: target,
-        action,
-        actionHandler,
-        actionPerformed: false,
-        corner: key ?? '',
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
+        : this._getOriginFromCorner(target, key);
+
+    /**
+     * relative to target's containing coordinate plane
+     * both agree on every point
+     **/
+    return (this._currentTransform = {
+      target: target,
+      action,
+      actionHandler,
+      actionPerformed: false,
+      corner: key ?? '',
+      scaleX: target.scaleX,
+      scaleY: target.scaleY,
+      skewX: target.skewX,
+      skewY: target.skewY,
+      offsetX: pointer.x - target.left,
+      offsetY: pointer.y - target.top,
+      originX: origin.x,
+      originY: origin.y,
+      ex: pointer.x,
+      ey: pointer.y,
+      lastX: pointer.x,
+      lastY: pointer.y,
+      theta: degreesToRadians(target.angle),
+      width: target.width,
+      height: target.height,
+      shiftKey: e.shiftKey,
+      altKey,
+      original: {
+        ...saveObjectTransform(target),
         originX: origin.x,
         originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
-        shiftKey: e.shiftKey,
-        altKey,
-        original: {
-          ...saveObjectTransform(target),
-          originX: origin.x,
-          originY: origin.y,
-        },
-      };
-
-    this._currentTransform = transform;
-
-    this.fire('before:transform', {
-      e,
-      transform,
+      },
     });
-
-    return transform;
   }
 
   /**
