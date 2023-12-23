@@ -521,7 +521,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       action === 'resizing'
     ) {
       centerTransform = this.centeredScaling || target.centeredScaling;
-    } else if (action === 'rotate') {
+    } else if (
+      action === 'rotate' ||
+      action === 'rotateX' ||
+      action === 'rotateY'
+    ) {
       centerTransform = this.centeredRotation || target.centeredRotation;
     }
 
