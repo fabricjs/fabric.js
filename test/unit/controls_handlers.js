@@ -12,8 +12,37 @@
       canvas.off();
       canvas.clear();
     });
+    const getOriginFromCorner = (
+      target,
+      controlName
+    ) => {
+      const origin = {
+        x: target.originX,
+        y: target.originY,
+      };
+
+      if (!controlName) {
+        return origin;
+      }
+
+      // is a left control ?
+      if (['ml', 'tl', 'bl'].includes(controlName)) {
+        origin.x = 'right';
+        // is a right control ?
+      } else if (['mr', 'tr', 'br'].includes(controlName)) {
+        origin.x = 'left';
+      }
+      // is a top control ?
+      if (['tl', 'mt', 'tr'].includes(controlName)) {
+        origin.y = 'bottom';
+        // is a bottom control ?
+      } else if (['bl', 'mb', 'br'].includes(controlName)) {
+        origin.y = 'top';
+      }
+      return origin;
+    }
     function prepareTransform(target, corner) {
-      var origin = canvas._getOriginFromCorner(target, corner);
+      var origin = getOriginFromCorner(target, corner);
       return {
         target,
         corner,
