@@ -19,19 +19,20 @@ import type {
   TCacheCanvasDimensions,
   Abortable,
   TOptions,
+  ObjectImageExportOptions,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
-import { invertTransform, qrDecompose } from '../../util/misc/matrix';
-import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
-  resetObjectTransform,
-  saveObjectTransform,
-} from '../../util/misc/objectTransforms';
-import { sendObjectToPlane } from '../../util/misc/planeChange';
+  createTranslateMatrix,
+  invertTransform,
+  multiplyTransformMatrixArray,
+  qrDecompose,
+} from '../../util/misc/matrix';
+import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
@@ -123,7 +124,7 @@ export class FabricObject<
   declare globalCompositeOperation: GlobalCompositeOperation;
   declare backgroundColor: string;
 
-  declare shadow: Shadow | null;
+  declare shadow?: Shadow | null;
 
   declare visible: boolean;
 
@@ -1359,82 +1360,77 @@ export class FabricObject<
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any = {}) {
-    const origParams = saveObjectTransform(this),
-      originalGroup = this.group,
-      originalShadow = this.shadow,
-      abs = Math.abs,
+  toCanvasElement(options: ObjectImageExportOptions = {}) {
+    const shadow = this.shadow,
       retinaScaling = options.enableRetinaScaling
         ? Math.max(config.devicePixelRatio, 1)
-        : 1,
-      multiplier = (options.multiplier || 1) * retinaScaling;
-    delete this.group;
-    if (options.withoutTransform) {
-      resetObjectTransform(this);
-    }
-    if (options.withoutShadow) {
-      this.shadow = null;
-    }
-    if (options.viewportTransform) {
-      sendObjectToPlane(this, this.getViewportTransform());
-    }
+        : 1;
 
-    this.setCoords();
-    const el = createCanvasElement(),
-      boundingRect = this.getBoundingRect(),
-      shadow = this.shadow,
-      shadowOffset = new Point();
+    let shadowOffsetX = 0;
+    let shadowOffsetY = 0;
 
-    if (shadow) {
+    if (shadow && !options.withoutShadow) {
       const shadowBlur = shadow.blur;
       const scaling = shadow.nonScaling
         ? new Point(1, 1)
         : this.getObjectScaling();
       // consider non scaling shadow.
-      shadowOffset.x =
-        2 * Math.round(abs(shadow.offsetX) + shadowBlur) * abs(scaling.x);
-      shadowOffset.y =
-        2 * Math.round(abs(shadow.offsetY) + shadowBlur) * abs(scaling.y);
+      shadowOffsetX =
+        2 *
+        Math.round(Math.abs(shadow.offsetX) + shadowBlur) *
+        Math.abs(scaling.x);
+      shadowOffsetY =
+        2 *
+        Math.round(Math.abs(shadow.offsetY) + shadowBlur) *
+        Math.abs(scaling.y);
+    } else if (shadow) {
+      delete this.shadow;
     }
-    const width = boundingRect.width + shadowOffset.x,
-      height = boundingRect.height + shadowOffset.y;
-    // if the current width/height is not an integer
-    // we need to make it so.
-    el.width = Math.ceil(width);
-    el.height = Math.ceil(height);
-    const canvas = new StaticCanvas(el, {
+
+    const boundingRect = this.getBoundingRect();
+    const width = Math.ceil(boundingRect.width + shadowOffsetX),
+      height = Math.ceil(boundingRect.height + shadowOffsetY);
+
+    const t = multiplyTransformMatrixArray(
+      [
+        options.viewportTransform && this.getViewportTransform(),
+        options.withoutTransform && invertTransform(this.calcOwnMatrix()),
+        this.group && invertTransform(this.group.calcTransformMatrix()),
+      ],
+      true
+    );
+
+    const el = createCanvasElement();
+    el.width = width;
+    el.height = height;
+    const exportCanvas = new StaticCanvas(el, {
       enableRetinaScaling: false,
       renderOnAddRemove: false,
       skipOffscreen: false,
+      viewportTransform: multiplyTransformMatrixArray([
+        createTranslateMatrix(width / 2, height / 2),
+        t,
+      ]),
+      backgroundColor: options.format === 'jpeg' ? '#fff' : '',
     });
-    if (options.format === 'jpeg') {
-      canvas.backgroundColor = '#fff';
-    }
-    this.setPositionByOrigin(
-      new Point(canvas.width / 2, canvas.height / 2),
-      CENTER,
-      CENTER
-    );
+
     const originalCanvas = this.canvas;
-    // static canvas and canvas have both an array of InteractiveObjects
-    // @ts-expect-error this needs to be fixed somehow, or ignored globally
-    canvas._objects = [this];
-    this.set('canvas', canvas);
-    this.setCoords();
-    const canvasEl = canvas.toCanvasElement(multiplier || 1, options);
+    this.set('canvas', exportCanvas);
+    const canvasEl = exportCanvas.toCanvasElement(
+      (options.multiplier || 1) * retinaScaling,
+      {
+        ...options,
+        objects: [this],
+      }
+    );
     this.set('canvas', originalCanvas);
-    this.shadow = originalShadow;
-    if (originalGroup) {
-      this.group = originalGroup;
-    }
-    this.set(origParams);
-    this.setCoords();
-    // canvas.dispose will call image.dispose that will nullify the elements
-    // since this canvas is a simple element for the process, we remove references
-    // to objects in this way in order to avoid object trashing.
-    canvas._objects = [];
+    this.shadow = shadow;
+
+    // Empty the objects array before destroying the canvas to avoid disposing instance
+    exportCanvas._objects = [];
     // since render has settled it is safe to destroy canvas
-    canvas.destroy();
+    exportCanvas.destroy();
+
     return canvasEl;
   }
 

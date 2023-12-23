@@ -30,7 +30,7 @@ export interface SerializedObjectProps extends BaseProps, FillStrokeProps {
    * @type Shadow
    * @default null
    */
-  shadow: ReturnType<Shadow['toObject']> | null;
+  shadow?: ReturnType<Shadow['toObject']> | null;
 
   /**
    * When set to `false`, an object is not rendered on canvas

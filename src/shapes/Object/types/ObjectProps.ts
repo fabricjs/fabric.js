@@ -12,7 +12,7 @@ export interface ObjectProps extends SerializedObjectProps, ClipPathProps {
   clipPath?: FabricObject;
   fill: TFiller | string | null;
   stroke: TFiller | string | null;
-  shadow: Shadow | null;
+  shadow?: Shadow | null;
   canvas?: StaticCanvas | Canvas;
 
   /**

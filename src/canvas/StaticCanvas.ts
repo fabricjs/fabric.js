@@ -6,7 +6,10 @@ import { createCollectionMixin, isCollection } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
-import type { TCachedFabricObject } from '../shapes/Object/Object';
+import type {
+  TCachedFabricObject,
+  FabricObject as FabricBaseObject,
+} from '../shapes/Object/Object';
 import type {
   Abortable,
   Constructor,
@@ -522,7 +525,7 @@ export class StaticCanvas<
    * @param {CanvasRenderingContext2D} ctx
    * @param {Array} objects to render
    */
-  renderCanvas(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
+  renderCanvas(ctx: CanvasRenderingContext2D, objects: FabricBaseObject[]) {
     if (this.destroyed) {
       return;
     }
@@ -1341,7 +1344,7 @@ export class StaticCanvas<
    *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
    * });
    */
-  toDataURL(options = {} as TDataUrlOptions): string {
+  toDataURL(options: TDataUrlOptions = {}): string {
     const {
       format = 'png',
       quality = 1,
@@ -1374,23 +1377,28 @@ export class StaticCanvas<
    */
   toCanvasElement(
     multiplier = 1,
-    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+    {
+      left = 0,
+      top = 0,
+      width = this.width,
+      height = this.height,
+      filter,
+      objects = this._objects,
+    }: TToCanvasElementOptions = {}
   ): HTMLCanvasElement {
-    const scaledWidth = (width || this.width) * multiplier,
-      scaledHeight = (height || this.height) * multiplier,
+    const scaledWidth = width * multiplier,
+      scaledHeight = height * multiplier,
       zoom = this.getZoom(),
       originalWidth = this.width,
       originalHeight = this.height,
       newZoom = zoom * multiplier,
       vp = this.viewportTransform,
-      translateX = (vp[4] - (left || 0)) * multiplier,
-      translateY = (vp[5] - (top || 0)) * multiplier,
-      newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
+      translateX = (vp[4] - left) * multiplier,
+      translateY = (vp[5] - top) * multiplier,
+      newVp: TMat2D = [newZoom, 0, 0, newZoom, translateX, translateY],
       originalRetina = this.enableRetinaScaling,
       canvasEl = createCanvasElement(),
-      objectsToRender = filter
-        ? this._objects.filter((obj) => filter(obj))
-        : this._objects;
+      objectsToRender = filter ? this._objects.filter(filter) : objects;
     canvasEl.width = scaledWidth;
     canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;

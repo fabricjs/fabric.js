@@ -97,23 +97,34 @@ export type TCacheCanvasDimensions = {
 
 export type TRectBounds = [min: XY, max: XY];
 
+type VisualExportOptions = {
+  multiplier: number;
+  format: ImageFormat;
+  quality: number;
+  enableRetinaScaling: boolean;
+};
+
 export type TToCanvasElementOptions<
   T extends BaseFabricObject = BaseFabricObject
-> = {
-  left?: number;
-  top?: number;
-  width?: number;
-  height?: number;
+> = Partial<TBBox> & {
+  /**
+   * @deprecated pass {@link objects} instead
+   */
   filter?: (object: T) => boolean;
+  objects?: T[];
 };
 
 export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
-  TToCanvasElementOptions<T> & {
-    multiplier: number;
-    format?: ImageFormat;
-    quality?: number;
-    enableRetinaScaling?: boolean;
-  };
+  TToCanvasElementOptions<T> & Partial<VisualExportOptions>;
+
+export type ObjectImageExportOptions = Partial<
+  TBBox &
+    VisualExportOptions & {
+      withoutShadow: boolean;
+      withoutTransform: boolean;
+      viewportTransform: TMat2D;
+    }
+>;
 
 export type Abortable = {
   /**
