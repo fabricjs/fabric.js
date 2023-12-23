@@ -337,7 +337,7 @@ describe('Selectable Canvas', () => {
       canvas.on('before:transform', spy);
       const setupCurrentTransformSpy = jest.spyOn(
         canvas,
-        '_setupCurrentTransform'
+        'setupCurrentTransform'
       );
 
       const {

@@ -19,10 +19,9 @@ describe('polyControl', () => {
     canvas
       .getSelectionElement()
       .dispatchEvent(new MouseEvent('mousedown', { clientX: 50, clientY: 50 }));
-    canvas._setupCurrentTransform(
+    canvas.setupCurrentTransform(
       new MouseEvent('mousedown', { clientX: 50, clientY: 50 }),
-      poly,
-      true
+      { target: poly, key: 'p2', control: poly.controls.p2 }
     );
     document.dispatchEvent(
       new MouseEvent('mousemove', { clientX: 55, clientY: 55 })

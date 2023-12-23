@@ -1,5 +1,5 @@
 import { dragHandler } from '../controls/drag';
-import { getActionFromCorner } from '../controls/util';
+import type { Control } from '../controls/Control';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
@@ -580,16 +580,35 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * @private
-   * @param {Event} e Event object
-   * @param {FabricObject} target
-   * @param {boolean} [alreadySelected] pass true to setup the active control
+   * @deprecated use {@link setupCurrentTransform} instead
    */
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
     alreadySelected: boolean
-  ): void {
+  ) {
+    return this.setupCurrentTransform(e, {
+      target,
+      ...(alreadySelected ? target.getActiveControl() : undefined),
+    });
+  }
+
+  /**
+   * @param {Event} e Event object
+   * @param {FabricObject} target
+   */
+  setupCurrentTransform(
+    e: TPointerEvent,
+    {
+      target,
+      key,
+      control,
+    }:
+      | { target: FabricObject } & (
+          | { key: string; control: Control }
+          | { key?: string; control?: Control }
+        )
+  ): Transform {
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -598,16 +617,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           target.group.calcTransformMatrix()
         )
       : this.getScenePoint(e);
-    const { key: corner = '', control } = target.getActiveControl() || {},
-      actionHandler =
-        alreadySelected && control
-          ? control.getActionHandler(e, target, control)?.bind(control)
-          : dragHandler,
-      action = getActionFromCorner(alreadySelected, corner, e, target),
+    const actionHandler = control
+        ? control.getActionHandler(e, target, control)?.bind(control)
+        : dragHandler,
+      action = control ? control.getActionName(e, control, target) : 'drag',
       altKey = e[this.centeredKey as ModifierKey],
       origin = this._shouldCenterTransform(target, action, altKey)
         ? ({ x: CENTER, y: CENTER } as const)
-        : this._getOriginFromCorner(target, corner),
+        : this._getOriginFromCorner(target, key),
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
@@ -617,7 +634,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         action,
         actionHandler,
         actionPerformed: false,
-        corner,
+        corner: key ?? '',
         scaleX: target.scaleX,
         scaleY: target.scaleY,
         skewX: target.skewX,
@@ -648,6 +665,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       e,
       transform,
     });
+
+    return transform;
   }
 
   /**
