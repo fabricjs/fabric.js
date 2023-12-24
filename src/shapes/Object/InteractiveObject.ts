@@ -221,8 +221,10 @@ export class InteractiveFabricObject<
     const rotation = calcPlaneRotation(
       multiplyTransformMatrices(vpt, this.calcTransformMatrix())
     );
+    const angle = radiansToDegrees(rotation);
 
-    // calculate the viewport bbox size
+    // calculate the viewport bbox size of the object by inverting the rotation
+    // in order to measure the bbox according to the object's axis
     const bboxTransform = multiplyTransformMatrixArray([
       vpt,
       createTranslateMatrix(center.x, center.y),
@@ -240,61 +242,55 @@ export class InteractiveFabricObject<
       createRotationMatrix(rotation)
     );
 
-    const controls: Record<string, TOCoord> = {};
+    // calculate the controls' center point and touch region
+    const coords: Record<string, TOCoord> = {};
     this.forEachControl((control, key) => {
       const position = control.positionHandler(size, t, this, control);
 
-      // coords[key] are sometimes used as points. Those are points to which we add
-      // the property corner and touchCorner from `_calcCornerCoords`.
-      // don't remove this assign for an object spread.
-      controls[key] = Object.assign(
-        position,
-        this._calcCornerCoords(control, position, radiansToDegrees(rotation))
-      );
+      /**
+       * {@link coords} are sometimes used as points.
+       * Those are points to which we assign corner and touchCorner.
+       * Therefore, for now don't remove this assign for an object spread.
+       * `corner`/`touchCorner` are used to determine the interaction area of a control.
+       * note: if we would switch to ROUND corner area, all of this would disappear.
+       * everything would resolve to a single point and a pythagorean theorem for the distance
+       * @todo evaluate simplification of code switching to circle interaction area at runtime
+       */
+      coords[key] = Object.assign(position, {
+        corner: control.calcCornerCoords(
+          angle,
+          this.cornerSize,
+          position.x,
+          position.y,
+          false,
+          this
+        ),
+        touchCorner: control.calcCornerCoords(
+          angle,
+          this.touchCornerSize,
+          position.x,
+          position.y,
+          true,
+          this
+        ),
+      });
     });
 
-    // debug code
-    /*
-      const canvas = this.canvas;
-      setTimeout(function () {
-      if (!canvas) return;
-        canvas.contextTop.clearRect(0, 0, 700, 700);
-        canvas.contextTop.fillStyle = 'green';
-        Object.keys(coords).forEach(function(key) {
-          const control = coords[key];
-          canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-        });
-      } 50);
-    */
+    // // debug code
+    // const canvas = this.canvas;
+    // setTimeout(() => {
+    //   if (!canvas) return;
+    //   const ctx = canvas.getTopContext();
+    //   canvas.clearContext(ctx);
+    //   ctx.fillStyle = 'green';
+    //   Object.entries(coords).forEach(([key, { x, y }]) => {
+    //     ctx.beginPath();
+    //     ctx.arc(x, y, 3, 0, Math.PI * 2);
+    //     ctx.fill();
+    //   });
+    // }, 50);
 
-    return controls;
-  }
-
-  /**
-   * Sets the coordinates that determine the interaction area of each control
-   * note: if we would switch to ROUND corner area, all of this would disappear.
-   * everything would resolve to a single point and a pythagorean theorem for the distance
-   * @todo evaluate simplification of code switching to circle interaction area at runtime
-   * @private
-   */
-  private _calcCornerCoords(control: Control, position: Point, angle: TDegree) {
-    const corner = control.calcCornerCoords(
-      angle,
-      this.cornerSize,
-      position.x,
-      position.y,
-      false,
-      this
-    );
-    const touchCorner = control.calcCornerCoords(
-      angle,
-      this.touchCornerSize,
-      position.x,
-      position.y,
-      true,
-      this
-    );
-    return { corner, touchCorner };
+    return coords;
   }
 
   /**
