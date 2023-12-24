@@ -1,7 +1,10 @@
 import { Point, ZERO } from '../../Point';
 import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import {
+  degreesToRadians,
+  radiansToDegrees,
+} from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   calcDimensionsMatrix,
@@ -215,8 +218,11 @@ export class InteractiveFabricObject<
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform();
     const center = this.getCenterPoint();
-    const rotation = calcPlaneRotation(this.calcTransformMatrix());
+    const rotation = calcPlaneRotation(
+      multiplyTransformMatrices(vpt, this.calcTransformMatrix())
+    );
 
+    // calculate the viewport bbox size
     const bboxTransform = multiplyTransformMatrixArray([
       vpt,
       createTranslateMatrix(center.x, center.y),
@@ -226,24 +232,26 @@ export class InteractiveFabricObject<
       this.getCoords().map((p) => p.transform(bboxTransform))
     );
     const size = new Point(bbox.width, bbox.height).scalarAdd(this.padding * 2);
-    const translation = center.transform(vpt, true);
+
+    // calculate the transform used by controls
+    const translation = center.transform(vpt);
     const t = multiplyTransformMatrices(
-      createTranslateMatrix(vpt[4] + translation.x, vpt[5] + translation.y),
+      createTranslateMatrix(translation.x, translation.y),
       createRotationMatrix(rotation)
     );
 
-    return Object.fromEntries(
-      Object.entries(this.controls).map(([key, control]) => {
-        const position = control.positionHandler(size, t, this, control);
-        return [
-          key,
-          // coords[key] are sometimes used as points. Those are points to which we add
-          // the property corner and touchCorner from `_calcCornerCoords`.
-          // don't remove this assign for an object spread.
-          Object.assign(position, this._calcCornerCoords(control, position)),
-        ];
-      })
-    );
+    const controls: Record<string, TOCoord> = {};
+    this.forEachControl((control, key) => {
+      const position = control.positionHandler(size, t, this, control);
+
+      // coords[key] are sometimes used as points. Those are points to which we add
+      // the property corner and touchCorner from `_calcCornerCoords`.
+      // don't remove this assign for an object spread.
+      controls[key] = Object.assign(
+        position,
+        this._calcCornerCoords(control, position, radiansToDegrees(rotation))
+      );
+    });
 
     // debug code
     /*
@@ -258,6 +266,8 @@ export class InteractiveFabricObject<
         });
       } 50);
     */
+
+    return controls;
   }
 
   /**
@@ -267,8 +277,7 @@ export class InteractiveFabricObject<
    * @todo evaluate simplification of code switching to circle interaction area at runtime
    * @private
    */
-  private _calcCornerCoords(control: Control, position: Point) {
-    const angle = this.getTotalAngle();
+  private _calcCornerCoords(control: Control, position: Point, angle: TDegree) {
     const corner = control.calcCornerCoords(
       angle,
       this.cornerSize,
