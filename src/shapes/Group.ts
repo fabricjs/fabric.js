@@ -29,11 +29,10 @@ import {
 } from '../LayoutManager/constants';
 
 /**
- * This class is created to handle the specific case of the group fromObject.
- * Is not meant to be used anywhere outside the fromObject function.
- * We could have used a boolean in the constructor but we think the boolean
- * would stay in the group's constructor interface and create confusion.
- * The point of this LayoutManager is really just to don't touch anything.
+ * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
+ * We could have used a boolean in the constructor, as we did previously, but we think the boolean
+ * would stay in the group's constructor interface and create confusion, therefore it was removed.
+ * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
  */
 class RespectfulLayoutManager extends LayoutManager {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
