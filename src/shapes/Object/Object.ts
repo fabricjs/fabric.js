@@ -875,7 +875,7 @@ export class FabricObject<
   }
 
   /**
-   * Check if this object or a child object will cast a shadow
+   * Check if this object will cast a shadow with an offset.
    * used by Group.shouldCache to know if child has a shadow recursively
    * @return {Boolean}
    * @deprecated
