@@ -161,21 +161,17 @@ export class LayoutManager {
       correction = new Point(),
       relativeCorrection = new Point(),
     } = result;
-    const offset =
-      context.type === LAYOUT_TYPE_INITIALIZATION &&
-      context.objectsRelativeToGroup
-        ? new Point()
-        : prevCenter
-            .subtract(nextCenter)
-            .add(correction)
-            .transform(
-              // in `initialization` we do not account for target's transformation matrix
-              context.type === LAYOUT_TYPE_INITIALIZATION
-                ? iMatrix
-                : invertTransform(target.calcOwnMatrix()),
-              true
-            )
-            .add(relativeCorrection);
+    const offset = prevCenter
+      .subtract(nextCenter)
+      .add(correction)
+      .transform(
+        // in `initialization` we do not account for target's transformation matrix
+        context.type === LAYOUT_TYPE_INITIALIZATION
+          ? iMatrix
+          : invertTransform(target.calcOwnMatrix()),
+        true
+      )
+      .add(relativeCorrection);
 
     return {
       result,
@@ -221,12 +217,10 @@ export class LayoutManager {
   ) {
     const { target } = context;
     //  adjust objects to account for new center
-    (context.type !== LAYOUT_TYPE_INITIALIZATION ||
-      !context.objectsRelativeToGroup) &&
-      target.forEachObject((object) => {
-        object.group === target &&
-          this.layoutObject(context, layoutResult, object);
-      });
+    target.forEachObject((object) => {
+      object.group === target &&
+        this.layoutObject(context, layoutResult, object);
+    });
     // adjust clip path to account for new center
     context.strategy.shouldLayoutClipPath(context) &&
       this.layoutObject(context, layoutResult, target.clipPath as FabricObject);
