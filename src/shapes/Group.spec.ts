@@ -24,7 +24,13 @@ describe('Group', () => {
       top: 4,
       strokeWidth: 0,
       objects: [
-        new Rect({ width: 100, height: 100, top: 0, left: 0, strokeWidth: 0 }),
+        new Rect({
+          width: 100,
+          height: 100,
+          top: 0,
+          left: 0,
+          strokeWidth: 0,
+        }).toObject(),
       ],
     };
 

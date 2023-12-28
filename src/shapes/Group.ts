@@ -34,7 +34,7 @@ import {
  * would stay in the group's constructor interface and create confusion, therefore it was removed.
  * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
  */
-class RespectfulLayoutManager extends LayoutManager {
+class NoopLayoutManager extends LayoutManager {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   performLayout() {}
 }
@@ -652,7 +652,7 @@ export class Group
       const group = new this(objects, {
         ...options,
         ...hydratedOptions,
-        layoutManager: new RespectfulLayoutManager(),
+        layoutManager: new NoopLayoutManager(),
       });
       group.layoutManager = new LayoutManager();
       group.setCoords();
