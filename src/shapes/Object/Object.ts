@@ -136,6 +136,7 @@ export class FabricObject<
   declare inverted: boolean;
   declare absolutePositioned: boolean;
   declare centeredRotation: boolean;
+  declare centeredScaling: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.
