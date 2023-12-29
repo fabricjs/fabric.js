@@ -5,12 +5,17 @@ QUnit.module('env', (hooks) => {
             delete global.document;
         })
 
+        QUnit.test('import/require of `main` field of package.json throws', assert => {
+            assert.rejects(import('../..'), 'should not resolve main');
+            assert.throws(() => require('../..'), 'should not resolve main');
+        });
+
         QUnit.test('import/require sets env', async assert => {
             const done = assert.async();
             global.window = { devicePixelRatio: 1.25 };
             global.document = { foo: 'bar' };
             const imported = await import('../../dist/index.node.cjs');
-            const required = require('../..');
+            const required = require('../../dist/index.node.cjs');
             assert.equal(imported.getEnv().document.foo, undefined, 'should be node env');
             assert.equal(required.getEnv().document.foo, undefined, 'should be node env');
             done();

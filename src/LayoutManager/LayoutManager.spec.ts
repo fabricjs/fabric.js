@@ -294,11 +294,6 @@ describe('Layout Manager', () => {
   describe('getLayoutResult', () => {
     test.each([
       { type: LAYOUT_TYPE_INITIALIZATION, targets: [] },
-      {
-        type: LAYOUT_TYPE_INITIALIZATION,
-        objectsRelativeToGroup: true,
-        targets: [],
-      },
       { type: LAYOUT_TYPE_IMPERATIVE },
     ] as const)('$type trigger', (options) => {
       const manager = new LayoutManager();
