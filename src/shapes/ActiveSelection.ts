@@ -28,6 +28,16 @@ export interface ActiveSelectionOptions extends GroupProps {
  * })
  */
 export class ActiveSelection extends Group {
+  static type = 'ActiveSelection';
+
+  static ownDefaults: Record<string, any> = {
+    multiSelectionStacking: 'canvas-stacking',
+  };
+
+  static getDefaults() {
+    return { ...super.getDefaults(), ...this.ownDefaults };
+  }
+
   /**
    * controls how selected objects are added during a multiselection event
    * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
@@ -35,10 +45,7 @@ export class ActiveSelection extends Group {
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
    */
-  // TODO FIX THIS WITH THE DEFAULTS LOGIC
-  multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
-
-  static type = 'ActiveSelection';
+  declare multiSelectionStacking: MultiSelectionStacking;
 
   /**
    * @private

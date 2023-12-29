@@ -81,21 +81,6 @@ describe('ActiveSelection', () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it('sets coords after attaching to canvas', () => {
-    const canvas = new Canvas(undefined, {
-      activeSelection: new ActiveSelection([
-        new FabricObject({
-          left: 100,
-          top: 100,
-          width: 100,
-          height: 100,
-        }),
-      ]),
-      viewportTransform: [2, 0, 0, 0.5, 400, 150],
-    });
-    expect(canvas.getActiveSelection().aCoords).toMatchSnapshot();
-  });
-
   it('`setActiveObject` should update the active selection ref on canvas if it changed', () => {
     const canvas = new Canvas();
     const obj1 = new FabricObject();
@@ -117,8 +102,7 @@ describe('ActiveSelection', () => {
   test('adding and removing an object belonging to a group', () => {
     const object = new FabricObject();
     const group = new Group([object]);
-    const canvas = new Canvas();
-    const activeSelection = canvas.getActiveSelection();
+    const activeSelection = new ActiveSelection();
 
     const eventsSpy = jest.spyOn(object, 'fire');
     const removeSpy = jest.spyOn(group, 'remove');
@@ -132,7 +116,6 @@ describe('ActiveSelection', () => {
     activeSelection.add(object);
     expect(object.group).toBe(activeSelection);
     expect(object.parent).toBe(group);
-    expect(object.canvas).toBe(canvas);
     expect(removeSpy).not.toBeCalled();
     expect(exitSpy).toBeCalledWith(object);
     expect(enterSpy).toBeCalledWith(object, true);
@@ -146,7 +129,6 @@ describe('ActiveSelection', () => {
     });
     expect(object.group).toBe(group);
     expect(object.parent).toBe(group);
-    expect(object.canvas).toBeUndefined();
   });
 
   test('transferring an object between active selections', () => {

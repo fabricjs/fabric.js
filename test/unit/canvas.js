@@ -100,6 +100,7 @@
     },
     afterEach: function () {
       fabric.config.restoreDefaults();
+      fabric.classRegistry.setClass(fabric.ActiveSelection);
       return canvas.dispose();
     }
   });
@@ -315,7 +316,7 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     canvas.add(rect1, rect2);
-    var activeSelection = canvas.getActiveSelection();
+    var activeSelection = new fabric.ActiveSelection();
     activeSelection.add(rect1, rect2);
     canvas.setActiveObject(activeSelection);
     canvas.discardActiveObject();
@@ -341,18 +342,21 @@
   });
 
   function initActiveSelection(canvas, activeObject, target, multiSelectionStacking) {
-    const activeSelection = canvas.getActiveSelection();
-    activeSelection.multiSelectionStacking = multiSelectionStacking;
+    fabric.classRegistry.setClass(class TextActiveSelection extends fabric.ActiveSelection {
+      static getDefaults() {
+        return {...super.getDefaults(),multiSelectionStacking}
+      }
+    });
     canvas.setActiveObject(activeObject);
     canvas.handleMultiSelection({ clientX: 0, clientY: 0, [canvas.selectionKey]: true }, target);
   }
 
   function updateActiveSelection(canvas, existing, target, multiSelectionStacking) {
-    const activeSelection = canvas.getActiveSelection();
+    const activeSelection = new fabric.ActiveSelection([], {canvas});
     activeSelection.multiSelectionStacking = multiSelectionStacking;
     activeSelection.add(...existing);
     canvas.setActiveObject(activeSelection);
-    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true, target: canvas.upperCanvasEl }, target);
+    canvas.handleMultiSelection({ clientX: 1, clientY: 1, [canvas.selectionKey]: true, target: canvas.upperCanvasEl }, target || activeSelection);
   }
 
   QUnit.test('create active selection fires selection:created', function(assert) {
@@ -504,7 +508,7 @@
     let isFired = false;
     rect3.on('deselected', () => { isFired = true; });
     canvas.add(rect1, rect2, rect3);
-    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    updateActiveSelection(canvas, [rect1, rect2, rect3], null, 'selection-order');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect3 was deselected');
     assert.ok(isFired, 'fired deselected');
   });
@@ -514,7 +518,7 @@
     const rect2 = new fabric.Rect({ left: -10, width: 5, height: 5 });
     const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
     canvas.add(rect1, rect2, rect3);
-    updateActiveSelection(canvas, [rect1, rect2, rect3], canvas.getActiveSelection(), 'selection-order');
+    updateActiveSelection(canvas, [rect1, rect2, rect3], null, 'selection-order');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
     assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
   });
@@ -711,7 +715,7 @@
     var rect1 = new fabric.Rect();
     var rect2 = new fabric.Rect();
     var rect3 = new fabric.Rect();
-    var activeSelection = canvas.getActiveSelection();
+    var activeSelection = new fabric.ActiveSelection();
     activeSelection.add(rect1, rect2);
     canvas.setActiveObject(activeSelection);
     rect1.on('deselected', function( ) {
@@ -1095,7 +1099,7 @@
     canvas.add(rect1);
     canvas.add(rect2);
     canvas.add(rect3);
-    const group = canvas.getActiveSelection();
+    const group = new fabric.ActiveSelection();
     group.subTargetCheck = true;
     group.add(rect1, rect2);
     group.cornerSize = 2;
@@ -1139,7 +1143,7 @@
     canvas.preserveObjectStacking = true;
     canvas.add(rect1);
     canvas.add(rect2);
-    const group = canvas.getActiveSelection();
+    const group = new fabric.ActiveSelection();
     group.add(rect1, rect2);
     canvas.setActiveObject(group);
     target = canvas.findTarget({
@@ -1218,7 +1222,7 @@
     canvas.add(rect, circle);
     var json = JSON.stringify(canvas);
 
-    const activeSelection = canvas.getActiveSelection();
+    const activeSelection = new fabric.ActiveSelection();
     activeSelection.add(rect, circle);
     canvas.setActiveObject(activeSelection);
     var jsonWithActiveGroup = JSON.stringify(canvas);
@@ -1760,11 +1764,6 @@
     assert.equal(canvas.getActiveObject(), group);
   });
 
-  QUnit.test('getActiveSelection', function(assert) {
-    assert.ok(canvas.getActiveSelection() === canvas._activeSelection, 'should equal');
-    assert.ok(canvas.getActiveSelection() instanceof fabric.ActiveSelection, 'is active selection');
-  });
-
   QUnit.test('item', function(assert) {
     assert.ok(typeof canvas.item === 'function');
 
@@ -1782,7 +1781,7 @@
   });
 
   QUnit.test('discardActiveObject on ActiveSelection', function(assert) {
-    var group = new fabric.ActiveSelection([makeRect(), makeRect()]);
+    var group = new fabric.ActiveSelection([makeRect(), makeRect()], {canvas});
     canvas.setActiveObject(group);
     canvas.discardActiveObject();
     assert.equal(canvas.getActiveObject(), null, 'removing active group sets it to null');
@@ -1878,7 +1877,7 @@
     var circle = new fabric.Circle({ radius: 50, left: 50, top: 50 });
     canvas.add(rect, circle);
     var svg = canvas.toSVG();
-    const activeSelection = canvas.getActiveSelection();
+    const activeSelection = new fabric.ActiveSelection();
     activeSelection.add(rect, circle);
     canvas.setActiveObject(activeSelection);
     var svgWithActiveGroup = canvas.toSVG();
@@ -2272,7 +2271,7 @@
         { start: 28, end: 33, message: 'stroke tolerance not affected by vpt', transparent: false },
         { start: 33, end: 40, message: 'outside', transparent: true },
       ]);
-    });   
+    });
   });
 
   QUnit.test('canvas getTopContext', function(assert) {

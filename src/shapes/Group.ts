@@ -28,6 +28,7 @@ import {
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
 import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
+import type { FitContentLayout } from '../LayoutManager';
 
 /**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
@@ -661,8 +662,12 @@ export class Group
         layoutManager: new NoopLayoutManager(),
       });
       if (layoutManager) {
-        const layoutClass = classRegistry.getClass(layoutManager.type);
-        const strategyClass = classRegistry.getClass(layoutManager.strategy);
+        const layoutClass = classRegistry.getClass<typeof LayoutManager>(
+          layoutManager.type
+        );
+        const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
+          layoutManager.strategy
+        );
         group.layoutManager = new layoutClass(new strategyClass());
       } else {
         group.layoutManager = new LayoutManager();

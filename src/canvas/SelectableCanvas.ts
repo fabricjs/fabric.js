@@ -11,7 +11,6 @@ import type {
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
-  resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import type { TCanvasSizeOptions } from './StaticCanvas';
@@ -35,7 +34,7 @@ import { ActiveSelection } from '../shapes/ActiveSelection';
 import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
-import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
+import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 
@@ -294,17 +293,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  protected _activeSelection: ActiveSelection;
-
-  constructor(
-    el?: string | HTMLCanvasElement,
-    { activeSelection = new ActiveSelection(), ...options }: TCanvasOptions = {}
-  ) {
-    super(el, options);
-    this._activeSelection = activeSelection;
-    this._activeSelection.set('canvas', this);
-    this._activeSelection.setCoords();
-  }
 
   protected initElements(el?: string | HTMLCanvasElement) {
     this.elements = new CanvasDOMManager(el, {
@@ -1033,7 +1021,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Returns instance's active selection
    */
   getActiveSelection() {
-    return this._activeSelection;
+    return this._activeObject instanceof ActiveSelection
+      ? this._activeObject
+      : undefined;
   }
 
   /**
@@ -1042,14 +1032,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
-    if (active) {
-      if (active === this._activeSelection) {
-        return [...(active as ActiveSelection)._objects];
-      } else {
-        return [active];
-      }
-    }
-    return [];
+    return active instanceof ActiveSelection
+      ? active.getObjects()
+      : active
+      ? [active]
+      : [];
   }
 
   /**
@@ -1134,6 +1121,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {Boolean} true if the object has been selected
    */
   _setActiveObject(object: FabricObject, e?: TPointerEvent) {
+    const prevActiveObject = this._activeObject;
     if (this._activeObject === object) {
       return false;
     }
@@ -1144,10 +1132,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     if (object.onSelect({ e })) {
       return false;
     }
+
     this._activeObject = object;
 
-    if (object instanceof ActiveSelection && this._activeSelection !== object) {
-      this._activeSelection = object;
+    if (object instanceof ActiveSelection && prevActiveObject !== object) {
       object.set('canvas', this);
       object.setCoords();
     }
@@ -1172,11 +1160,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       // onDeselect return TRUE to cancel selection;
       if (obj.onDeselect({ e, object })) {
         return false;
-      }
-      // clear active selection
-      if (obj === this._activeSelection) {
-        this._activeSelection.removeAll();
-        resetObjectTransform(this._activeSelection);
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
         // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
@@ -1227,11 +1210,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   destroy() {
     // dispose of active selection
-    const activeSelection = this._activeSelection;
-    activeSelection.removeAll();
-    // @ts-expect-error disposing
-    this._activeSelection = undefined;
-    activeSelection.dispose();
+    const activeSelection = this.getActiveSelection();
+    if (activeSelection) {
+      activeSelection.removeAll();
+      activeSelection.dispose();
+    }
+
+    delete this._activeObject;
 
     super.destroy();
 
@@ -1296,11 +1281,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   _realizeGroupTransformOnObject(
     instance: FabricObject
   ): Partial<typeof instance> {
-    if (
-      instance.group &&
-      instance.group === this._activeSelection &&
-      this._activeObject === instance.group
-    ) {
+    if (instance.group && instance.group === this.getActiveSelection()) {
       const layoutProps = [
         'angle',
         'flipX',
@@ -1313,7 +1294,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
-      addTransformToObject(instance, this._activeObject.calcOwnMatrix());
+      addTransformToObject(instance, instance.group.calcOwnMatrix());
       return originalValues;
     } else {
       return {};
