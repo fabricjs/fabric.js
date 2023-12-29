@@ -84,7 +84,7 @@ export abstract class ITextClickBehavior<
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
-    this.__lastSelected = this.selected;
+    this.__lastSelected = this.selected && !this.getActiveControl();
   }
 
   isTripleClick(newPointer: XY) {

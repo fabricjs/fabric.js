@@ -1,8 +1,12 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
-import type { GroupProps, LayoutContext } from './Group';
+import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
+import {
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_REMOVED,
+} from '../LayoutManager/constants';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -24,8 +28,6 @@ export interface ActiveSelectionOptions extends GroupProps {
  * })
  */
 export class ActiveSelection extends Group {
-  declare _objects: FabricObject[];
-
   /**
    * controls how selected objects are added during a multiselection event
    * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
@@ -125,10 +127,10 @@ export class ActiveSelection extends Group {
       const { parent } = object;
       parent && groups.add(parent);
     });
-    if (type === 'removed') {
+    if (type === LAYOUT_TYPE_REMOVED) {
       //  invalidate groups' layout and mark as dirty
       groups.forEach((group) => {
-        group._onAfterObjectsChange('added', targets);
+        group._onAfterObjectsChange(LAYOUT_TYPE_ADDED, targets);
       });
     } else {
       //  mark groups as dirty
@@ -146,25 +148,6 @@ export class ActiveSelection extends Group {
   onDeselect() {
     this.removeAll();
     return false;
-  }
-
-  _applyLayoutStrategy(context: LayoutContext): void {
-    super._applyLayoutStrategy(context);
-    if (this._objects.length === 0) {
-      // in this case layout was skipped
-      // we reset transform for the next selection
-      Object.assign(this, {
-        left: 0,
-        top: 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        flipX: false,
-        flipY: false,
-      });
-    }
   }
 
   /**

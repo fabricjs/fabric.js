@@ -171,7 +171,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
-      layout:                   'fit-content',
+      // layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -744,7 +744,7 @@
   QUnit.test('group add', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1]);
+        group = new fabric.Group([rect1], { layoutManager: new fabric.LayoutManager() });
 
     var coords = group.aCoords;
     group.add(rect2);
@@ -784,7 +784,7 @@
   QUnit.test('group remove', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2]);
+        group = new fabric.Group([rect1, rect2], { layoutManager: new fabric.LayoutManager() });
 
     var coords = group.aCoords;
     group.remove(rect2);
@@ -903,7 +903,7 @@
   QUnit.test('add and coordinates', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        group = new fabric.Group([]);
+        group = new fabric.Group([], { layoutManager: new fabric.LayoutManager() });
     group.add(rect1);
     group.add(rect2);
     group.left = 5;
