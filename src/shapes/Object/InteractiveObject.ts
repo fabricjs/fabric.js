@@ -18,6 +18,7 @@ import type { ControlRenderingStyleOverride } from '../../controls/controlRender
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import { interactiveObjectDefaultValues } from './defaultValues';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
@@ -38,8 +39,6 @@ export type TStyleOverride = ControlRenderingStyleOverride &
     }
   >;
 
-const interactiveDefaults = {};
-
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
@@ -49,7 +48,6 @@ export class InteractiveFabricObject<
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
-  declare centeredScaling: boolean;
 
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
@@ -136,7 +134,7 @@ export class InteractiveFabricObject<
 
   declare canvas?: Canvas;
 
-  static ownDefaults: Record<string, any> = interactiveDefaults;
+  static ownDefaults: Record<string, any> = interactiveObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {

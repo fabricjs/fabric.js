@@ -1,8 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FabricObject Interactive + BaseObject default values 1`] = `
+exports[`InteractiveObject Interactive + BaseObject default values 1`] = `
 {
-  "FX_DURATION": 500,
   "absolutePositioned": false,
   "activeOn": "down",
   "angle": 0,
@@ -14,11 +13,6 @@ exports[`FabricObject Interactive + BaseObject default values 1`] = `
   "centeredRotation": true,
   "centeredScaling": false,
   "clipPath": undefined,
-  "colorProperties": [
-    "fill",
-    "stroke",
-    "backgroundColor",
-  ],
   "cornerColor": "rgb(178,204,255)",
   "cornerDashArray": null,
   "cornerSize": 13,
