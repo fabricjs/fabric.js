@@ -71,7 +71,7 @@ export function scalingIsForbidden(
     return true;
   }
   // object disappears if scaling 0 sized object so forbid
-  if (fabricObject.width === 0 && by == 'x') {
+  if (fabricObject.width === 0 && by === 'x') {
     return true;
   }
   if (fabricObject.height === 0 && by === 'y') {
