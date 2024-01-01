@@ -1,4 +1,4 @@
-import { FixedLayout, LayoutManager } from '../LayoutManager';
+import { FixedLayout, LayoutManager, ClipPathLayout } from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
 import { Group } from './Group';
 import type { GroupProps } from './Group';
@@ -151,7 +151,6 @@ describe('Group', () => {
         height: 50,
         layoutManager: new LayoutManager(new FixedLayout()),
       });
-      group.layoutManager = new LayoutManager(new FixedLayout());
       const serialized = group.toObject();
       expect(serialized.layoutManager).toMatchObject({
         type: 'layoutManager',
@@ -179,6 +178,45 @@ describe('Group', () => {
       expect(group.left).toBe(10);
       expect(group.width).toBe(40);
       expect(group.height).toBe(50);
+    });
+  });
+
+  describe('With clip-path layout', () => {
+    test('will serialize and deserialize correctly', async () => {
+      const { group } = makeGenericGroup({
+        clipPath: new Rect({ width: 30, height: 30 }),
+        layoutManager: new LayoutManager(new ClipPathLayout()),
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'clip-path',
+      });
+      const restoredGroup = await Group.fromObject(serialized);
+      expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
+      expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(
+        ClipPathLayout
+      );
+    });
+    test('clip-path layout will not change position or size', async () => {
+      const { group } = makeGenericGroup({
+        top: 20,
+        left: 40,
+        clipPath: new Rect({ width: 30, height: 10 }),
+        layoutManager: new LayoutManager(new ClipPathLayout()),
+      });
+      expect(group.top).toBe(20);
+      expect(group.left).toBe(40);
+      // TO DO BUG: this should be 30
+      expect(group.width).toBe(31);
+      expect(group.height).toBe(11);
+      group.add(new Rect({ width: 1000, height: 1000, top: -500, left: -500 }));
+      // group position and size will not change
+      expect(group.top).toBe(20);
+      expect(group.left).toBe(40);
+      // TO DO BUG: this should be 30
+      expect(group.width).toBe(31);
+      expect(group.height).toBe(11);
     });
   });
 
