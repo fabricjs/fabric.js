@@ -5,6 +5,7 @@ import { sendPointToPlane } from '../../util/misc/planeChange';
 import type { LayoutStrategyResult, StrictLayoutContext } from '../types';
 import { LayoutStrategy } from './LayoutStrategy';
 import { getObjectBounds } from './utils';
+import { classRegistry } from '../../ClassRegistry';
 
 /**
  * Layout will adjust the bounding box to match the clip path bounding box.
@@ -68,3 +69,5 @@ export class ClipPathLayout extends LayoutStrategy {
     }
   }
 }
+
+classRegistry.setClass(ClipPathLayout);
