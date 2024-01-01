@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Add save/restore ability to group LayoutManager [#9564](https://github.com/fabricjs/fabric.js/pull/9564)
 - refactor(): Separate defaults for base fabric object vs interactive object. Also some moving around of variables [#9474](https://github.com/fabricjs/fabric.js/pull/9474)
 - refactor(): Change how LayoutManager handles restoring groups [#9522](https://github.com/fabricjs/fabric.js/pull/9522)
 - fix(BaseConfiguration): set `devicePixelRatio` from window [#9470](https://github.com/fabricjs/fabric.js/pull/9470)
