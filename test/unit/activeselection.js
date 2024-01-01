@@ -88,7 +88,11 @@
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false,
-      objects:                  clone.objects
+      objects:                  clone.objects,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -127,6 +131,10 @@
       width:              80,
       height:             60,
       objects:            objects,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
     assert.deepEqual(clone, expectedObject);
   });

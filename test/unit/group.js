@@ -197,6 +197,10 @@
       strokeUniform:            false,
       subTargetCheck:           false,
       interactive:              false,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -235,6 +239,10 @@
       width: 80,
       height: 60,
       objects: objects,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
     assert.deepEqual(clone, expectedObject);
   });
