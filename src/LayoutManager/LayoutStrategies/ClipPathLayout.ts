@@ -30,6 +30,7 @@ export class ClipPathLayout extends LayoutStrategy {
     if (!clipPath || !this.shouldPerformLayout(context)) {
       return;
     }
+    // TODO: remove stroke calculation from this case
     const { width, height } = makeBoundingBoxFromPoints(
       getObjectBounds(target, clipPath as FabricObject)
     );

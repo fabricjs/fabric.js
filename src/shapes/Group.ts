@@ -548,13 +548,17 @@ export class Group
     >,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
+    const layoutManager = this.layoutManager.toObject();
+
     return {
       ...super.toObject([
         'subTargetCheck',
         'interactive',
         ...propertiesToInclude,
       ]),
-      layoutManager: this.layoutManager.toObject(),
+      ...(layoutManager.strategy !== 'fit-content' || this.includeDefaultValues
+        ? { layoutManager }
+        : {}),
       objects: this.__serializeObjects(
         'toObject',
         propertiesToInclude as string[]
