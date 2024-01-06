@@ -1,7 +1,7 @@
 import { Point } from '../Point';
 import { Control } from './Control';
 import type { TMat2D } from '../typedefs';
-import { CENTER, iMatrix } from '../constants';
+import { iMatrix } from '../constants';
 import type { Polyline } from '../shapes/Polyline';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import type {
@@ -9,16 +9,12 @@ import type {
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { getLocalPoint } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
+import { sendPointToPlane } from '../util';
 
 const ACTION_NAME = 'modifyPoly';
 
 type TTransformAnchor = Transform & { pointIndex: number };
-
-const getSize = (poly: Polyline) => {
-  return new Point(poly.width, poly.height);
-};
 
 /**
  * This function locates the controls.
@@ -50,20 +46,15 @@ export const polyActionHandler = (
   x: number,
   y: number
 ) => {
-  const poly = transform.target as Polyline,
-    pointIndex = transform.pointIndex,
-    mouseLocalPosition = getLocalPoint(transform, CENTER, CENTER, x, y),
-    polygonBaseSize = getSize(poly),
-    size = poly._getTransformedDimensions(),
-    sizeFactor = polygonBaseSize.divide(size),
-    adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+  const { target, pointIndex } = transform;
+  const poly = target as Polyline;
+  const mouseLocalPosition = sendPointToPlane(
+    new Point(x, y),
+    undefined,
+    poly.calcTransformMatrix()
+  );
 
-  const finalPointPosition = mouseLocalPosition
-    .multiply(adjustFlip)
-    .multiply(sizeFactor)
-    .add(poly.pathOffset);
-
-  poly.points[pointIndex] = finalPointPosition;
+  poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
   poly.setDimensions();
 
   return true;
