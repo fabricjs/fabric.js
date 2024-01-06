@@ -649,6 +649,7 @@ export class Group
    * @returns {Promise<Group>}
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
+    type,
     objects = [],
     layoutManager,
     ...options
