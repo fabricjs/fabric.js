@@ -10,7 +10,9 @@ type ExportedKeys =
   | 'repeat'
   | 'source';
 
-export type PatternOptions = Partial<Pick<Pattern, ExportedKeys>>;
+export type PatternOptions = Partial<Pick<Pattern, ExportedKeys>> & {
+  source: CanvasImageSource;
+};
 
 export type SerializedPatternOptions = PatternOptions & {
   source: string;
