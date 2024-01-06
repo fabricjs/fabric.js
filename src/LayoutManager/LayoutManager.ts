@@ -80,6 +80,7 @@ export class LayoutManager {
           'scaling',
           'skewing',
           'changed',
+          'modifyPoly',
         ] as TModificationEvents[]
       ).map((key) =>
         object.on(key, (e) =>
