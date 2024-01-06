@@ -1,4 +1,4 @@
-import { Point } from '../../Point';
+import { Point, ZERO } from '../../Point';
 import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
@@ -434,13 +434,14 @@ export class InteractiveFabricObject<
           this.height,
           calcDimensionsMatrix(options)
         ),
-        stroke = (
-          this.strokeUniform
-            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            : // this is extremely confusing. options comes from the upper function
-              // and is the qrDecompose of a matrix that takes in account zoom too
-              new Point(options.scaleX, options.scaleY)
-        ).scalarMultiply(this.strokeWidth);
+        stroke = !this.isStrokeAccountedForInDimensions()
+          ? (this.strokeUniform
+              ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
+              : // this is extremely confusing. options comes from the upper function
+                // and is the qrDecompose of a matrix that takes in account zoom too
+                new Point(options.scaleX, options.scaleY)
+            ).scalarMultiply(this.strokeWidth)
+          : ZERO;
       size = bbox
         .add(stroke)
         .scalarAdd(this.borderScaleFactor)
