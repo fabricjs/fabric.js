@@ -1566,7 +1566,7 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
-    object: Record<string, unknown>,
+    { type, ...object }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
@@ -1575,7 +1575,7 @@ export class FabricObject<
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, type, ...rest } = allOptions;
+          const { [extraParam]: arg0, ...rest } = allOptions;
           // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
