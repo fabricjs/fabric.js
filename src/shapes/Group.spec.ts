@@ -1,18 +1,32 @@
-import { FixedLayout } from '../LayoutManager';
+import {
+  FixedLayout,
+  LayoutManager,
+  ClipPathLayout,
+  FitContentLayout,
+} from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
 import { Group } from './Group';
+import type { GroupProps } from './Group';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
 
+const makeGenericGroup = (options?: Partial<GroupProps>) => {
+  const objs = [new FabricObject(), new FabricObject()];
+  const group = new Group(objs, options);
+  return {
+    group,
+    originalObjs: objs,
+  };
+};
+
 describe('Group', () => {
   it('avoid mutations to passed objects array', () => {
-    const objs = [new FabricObject(), new FabricObject()];
-    const group = new Group(objs);
+    const { group, originalObjs } = makeGenericGroup();
 
     group.add(new FabricObject());
 
-    expect(group._objects).not.toBe(objs);
-    expect(objs).toHaveLength(2);
+    expect(group._objects).not.toBe(originalObjs);
+    expect(originalObjs).toHaveLength(2);
     expect(group._objects).toHaveLength(3);
   });
 
@@ -45,6 +59,15 @@ describe('Group', () => {
   });
 
   describe('With fit-content layout manager', () => {
+    test('will serialize correctly without default values', async () => {
+      const { group } = makeGenericGroup({
+        clipPath: new Rect({ width: 30, height: 30 }),
+        layoutManager: new LayoutManager(new FitContentLayout()),
+        includeDefaultValues: false,
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toBe(undefined);
+    });
     it('Group initialization will calculate correct width/height ignoring passed width and height', async () => {
       const objectOptions = {
         width: 2,
@@ -114,6 +137,125 @@ describe('Group', () => {
       expect(group.top).toBe(50);
       expect(group.width).toBe(100);
       expect(group.height).toBe(100);
+    });
+    test('fit-content layout will change position or size', async () => {
+      const { group } = makeGenericGroup({
+        top: 30,
+        left: 10,
+        width: 40,
+        height: 50,
+      });
+      expect(group.top).toBe(30);
+      expect(group.left).toBe(10);
+      expect(group.width).toBe(1);
+      expect(group.height).toBe(1);
+      group.add(new Rect({ width: 1000, height: 1500, top: -500, left: -400 }));
+      // group position and size will not change
+      expect(group.top).toBe(-500);
+      expect(group.left).toBe(-400);
+      expect(group.width).toBe(1001);
+      expect(group.height).toBe(1501);
+    });
+  });
+
+  describe('With fixed layout', () => {
+    test('will serialize and deserialize correctly', async () => {
+      const { group } = makeGenericGroup({
+        width: 40,
+        height: 50,
+        layoutManager: new LayoutManager(new FixedLayout()),
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'fixed',
+      });
+      const restoredGroup = await Group.fromObject(serialized);
+      expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
+      expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(FixedLayout);
+    });
+    test('will serialize correctly without default values', async () => {
+      const { group } = makeGenericGroup({
+        width: 40,
+        height: 50,
+        layoutManager: new LayoutManager(new FixedLayout()),
+        includeDefaultValues: false,
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'fixed',
+      });
+    });
+    test('Fixed layout will not change position or size', async () => {
+      const { group } = makeGenericGroup({
+        top: 30,
+        left: 10,
+        width: 40,
+        height: 50,
+        layoutManager: new LayoutManager(new FixedLayout()),
+      });
+      expect(group.top).toBe(30);
+      expect(group.left).toBe(10);
+      expect(group.width).toBe(40);
+      expect(group.height).toBe(50);
+      group.add(new Rect({ width: 1000, height: 1000, top: -500, left: -500 }));
+      // group position and size will not change
+      expect(group.top).toBe(30);
+      expect(group.left).toBe(10);
+      expect(group.width).toBe(40);
+      expect(group.height).toBe(50);
+    });
+  });
+
+  describe('With clip-path layout', () => {
+    test('will serialize and deserialize correctly', async () => {
+      const { group } = makeGenericGroup({
+        clipPath: new Rect({ width: 30, height: 30 }),
+        layoutManager: new LayoutManager(new ClipPathLayout()),
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'clip-path',
+      });
+      const restoredGroup = await Group.fromObject(serialized);
+      expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
+      expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(
+        ClipPathLayout
+      );
+    });
+    test('will serialize correctly without default values', async () => {
+      const { group } = makeGenericGroup({
+        clipPath: new Rect({ width: 30, height: 30 }),
+        layoutManager: new LayoutManager(new ClipPathLayout()),
+        includeDefaultValues: false,
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'clip-path',
+      });
+    });
+    test('clip-path layout will not change position or size', async () => {
+      const { group } = makeGenericGroup({
+        top: 20,
+        left: 40,
+        clipPath: new Rect({ width: 30, height: 10 }),
+        layoutManager: new LayoutManager(new ClipPathLayout()),
+      });
+      expect(group.top).toBe(20);
+      expect(group.left).toBe(40);
+      // TO DO BUG: this should be 30
+      expect(group.width).toBe(31);
+      expect(group.height).toBe(11);
+      group.add(new Rect({ width: 1000, height: 1000, top: -500, left: -500 }));
+      // group position and size will not change
+      expect(group.top).toBe(20);
+      expect(group.left).toBe(40);
+      // TO DO BUG: this should be 30
+      expect(group.width).toBe(31);
+      expect(group.height).toBe(11);
     });
   });
 

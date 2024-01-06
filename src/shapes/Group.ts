@@ -27,6 +27,7 @@ import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
+import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 
 /**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
@@ -53,6 +54,7 @@ export interface SerializedGroupProps
   extends SerializedObjectProps,
     GroupOwnProps {
   objects: SerializedObjectProps[];
+  layoutManager: SerializedLayoutManager;
 }
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
@@ -546,12 +548,17 @@ export class Group
     >,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
+    const layoutManager = this.layoutManager.toObject();
+
     return {
       ...super.toObject([
         'subTargetCheck',
         'interactive',
         ...propertiesToInclude,
       ]),
+      ...(layoutManager.strategy !== 'fit-content' || this.includeDefaultValues
+        ? { layoutManager }
+        : {}),
       objects: this.__serializeObjects(
         'toObject',
         propertiesToInclude as string[]
@@ -644,6 +651,7 @@ export class Group
   static fromObject<T extends TOptions<SerializedGroupProps>>({
     type,
     objects = [],
+    layoutManager,
     ...options
   }: T) {
     return Promise.all([
@@ -655,7 +663,13 @@ export class Group
         ...hydratedOptions,
         layoutManager: new NoopLayoutManager(),
       });
-      group.layoutManager = new LayoutManager();
+      if (layoutManager) {
+        const layoutClass = classRegistry.getClass(layoutManager.type);
+        const strategyClass = classRegistry.getClass(layoutManager.strategy);
+        group.layoutManager = new layoutClass(new strategyClass());
+      } else {
+        group.layoutManager = new LayoutManager();
+      }
       group.setCoords();
       return group;
     });
