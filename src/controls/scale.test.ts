@@ -1,4 +1,7 @@
-import { Canvas, Point, Rect, type RectProps } from 'fabric';
+import { Point } from '../Point';
+import { Canvas } from '../canvas/Canvas';
+import { Rect } from '../shapes/Rect';
+import type { RectProps } from '../shapes/Rect';
 import { scalingX, scalingY } from './scale';
 
 //
