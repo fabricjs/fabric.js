@@ -806,7 +806,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   _checkTarget(obj: FabricObject, pointer: Point): boolean {
     if (
       obj &&
-      obj.visible &&
+      obj.isVisible() &&
       obj.evented &&
       this._pointIsInObjectSelectionArea(
         obj,

@@ -599,7 +599,7 @@ export class FabricText<
    */
   _render(ctx: CanvasRenderingContext2D) {
     const path = this.path;
-    path && !path.isNotVisible() && path._render(ctx);
+    path && path.isVisible() && path._render(ctx);
     this._setTextStyles(ctx);
     this._renderTextLinesBackground(ctx);
     this._renderTextDecoration(ctx, 'underline');
@@ -1679,7 +1679,7 @@ export class FabricText<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   render(ctx: CanvasRenderingContext2D) {
-    if (!this.visible) {
+    if (!this.isVisible()) {
       return;
     }
     if (

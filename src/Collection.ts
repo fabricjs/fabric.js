@@ -336,7 +336,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
         const object = this._objects[i] as unknown as InteractiveFabricObject;
         if (
           object.selectable &&
-          object.visible &&
+          object.isVisible() &&
           ((includeIntersecting && object.intersectsWithRect(tl, br)) ||
             object.isContainedWithinRect(tl, br) ||
             (includeIntersecting && object.containsPoint(tl)) ||
