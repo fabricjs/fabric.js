@@ -51,7 +51,7 @@ export const polyActionHandler = (
   const mouseLocalPosition = sendPointToPlane(
     new Point(x, y),
     undefined,
-    poly.calcTransformMatrix()
+    poly.calcOwnMatrix()
   );
 
   poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
@@ -80,19 +80,15 @@ export const factoryPolyActionHandler = (
       anchorPointInParentPlane = anchorPoint
         .subtract(poly.pathOffset)
         .transform(poly.calcOwnMatrix()),
-      actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
-      adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+      actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y);
 
-    const newPositionNormalized = anchorPoint
+    const newAnchorPointInParentPlane = anchorPoint
       .subtract(poly.pathOffset)
-      .divide(poly._getNonTransformedDimensions())
-      .multiply(adjustFlip);
+      .transform(poly.calcOwnMatrix());
 
-    poly.setPositionByOrigin(
-      anchorPointInParentPlane,
-      newPositionNormalized.x + 0.5,
-      newPositionNormalized.y + 0.5
-    );
+    const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
+    poly.left -= diff.x;
+    poly.top -= diff.y;
 
     return actionPerformed;
   };
