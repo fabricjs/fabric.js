@@ -1566,7 +1566,7 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
-    object: Record<string, unknown>,
+    { type, ...object }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
