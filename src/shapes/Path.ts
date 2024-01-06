@@ -26,7 +26,6 @@ import type {
   TSVGReviver,
   TOptions,
 } from '../typedefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
@@ -208,7 +207,7 @@ export class Path<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: cloneDeep(this.path),
+      path: this.path.map((pathCmd) => pathCmd.slice()),
     };
   }
 
