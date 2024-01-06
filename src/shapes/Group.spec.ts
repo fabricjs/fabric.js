@@ -1,4 +1,9 @@
-import { FixedLayout, LayoutManager, ClipPathLayout } from '../LayoutManager';
+import {
+  FixedLayout,
+  LayoutManager,
+  ClipPathLayout,
+  FitContentLayout,
+} from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
 import { Group } from './Group';
 import type { GroupProps } from './Group';
@@ -54,6 +59,15 @@ describe('Group', () => {
   });
 
   describe('With fit-content layout manager', () => {
+    test('will serialize correctly without default values', async () => {
+      const { group } = makeGenericGroup({
+        clipPath: new Rect({ width: 30, height: 30 }),
+        layoutManager: new LayoutManager(new FitContentLayout()),
+        includeDefaultValues: false,
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toBe(undefined);
+    });
     it('Group initialization will calculate correct width/height ignoring passed width and height', async () => {
       const objectOptions = {
         width: 2,
@@ -160,6 +174,19 @@ describe('Group', () => {
       expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
       expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(FixedLayout);
     });
+    test('will serialize correctly without default values', async () => {
+      const { group } = makeGenericGroup({
+        width: 40,
+        height: 50,
+        layoutManager: new LayoutManager(new FixedLayout()),
+        includeDefaultValues: false,
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'fixed',
+      });
+    });
     test('Fixed layout will not change position or size', async () => {
       const { group } = makeGenericGroup({
         top: 30,
@@ -197,6 +224,18 @@ describe('Group', () => {
       expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(
         ClipPathLayout
       );
+    });
+    test('will serialize correctly without default values', async () => {
+      const { group } = makeGenericGroup({
+        clipPath: new Rect({ width: 30, height: 30 }),
+        layoutManager: new LayoutManager(new ClipPathLayout()),
+        includeDefaultValues: false,
+      });
+      const serialized = group.toObject();
+      expect(serialized.layoutManager).toMatchObject({
+        type: 'layoutManager',
+        strategy: 'clip-path',
+      });
     });
     test('clip-path layout will not change position or size', async () => {
       const { group } = makeGenericGroup({
