@@ -30,6 +30,7 @@ describe('typeAssertions', () => {
     test('can detect other subclasses', () => {
       class NewText extends Textbox {
         status = 'new';
+        static type = 'NewText';
       }
       const newText = new NewText('hello world');
       expect(isTextObject(newText)).toBe(true);
@@ -47,6 +48,7 @@ describe('typeAssertions', () => {
     test('can detect other subclasses', () => {
       class NewPath extends Path {
         status = 'new';
+        static type = 'NewPath';
       }
       const newPath = new NewPath('M 0 0 L 1 1');
       expect(isPath(newPath)).toBe(true);
