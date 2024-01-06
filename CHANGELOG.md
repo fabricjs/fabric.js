@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): fix modify polygon points with zero sized polygons ( particular case of axis oriented lines ) [#9575](https://github.com/fabricjs/fabric.js/pull/9575)
 - fix() Addressing path cloning slowness ( partially ) [#9573](https://github.com/fabricjs/fabric.js/pull/9573)
 - feat(): Add save/restore ability to group LayoutManager [#9564](https://github.com/fabricjs/fabric.js/pull/9564)
 - fix() Remove unwanted set type warning [#9569](https://github.com/fabricjs/fabric.js/pull/9569)
