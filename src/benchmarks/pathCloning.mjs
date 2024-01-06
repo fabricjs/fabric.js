@@ -88,3 +88,10 @@ console.log({
   cloningSimpleNormal,
   cloningCustomNormal,
 });
+
+/**
+ * results on a m1pro
+ * { pathCloneDeep: 650, pathOldCode: 563 }
+ * { cloningSimple: 770, cloningCustom: 25 }
+ * { cloningSimpleNormal: 141, cloningCustomNormal: 6 }
+ */
