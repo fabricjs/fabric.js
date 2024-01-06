@@ -124,6 +124,7 @@ export type {
 } from './src/shapes/Group';
 export { Group } from './src/shapes/Group';
 export * from './src/LayoutManager';
+export type { SerializedLayoutManager } from './src/LayoutManager';
 export type {
   ActiveSelectionOptions,
   MultiSelectionStacking,
