@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): `isNotVisible` + rename to `isVisible` [#9574](https://github.com/fabricjs/fabric.js/pull/9574)
 - fix() Addressing path cloning slowness ( partially ) [#9573](https://github.com/fabricjs/fabric.js/pull/9573)
 - feat(): Add save/restore ability to group LayoutManager [#9564](https://github.com/fabricjs/fabric.js/pull/9564)
 - fix() Remove unwanted set type warning [#9569](https://github.com/fabricjs/fabric.js/pull/9569)

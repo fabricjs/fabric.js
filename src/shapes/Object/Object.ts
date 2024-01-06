@@ -739,11 +739,9 @@ export class FabricObject<
    * @memberOf FabricObject.prototype
    * @return {Boolean}
    */
-  isNotVisible() {
+  isVisible() {
     return (
-      this.opacity === 0 ||
-      (!this.width && !this.height && this.strokeWidth === 0) ||
-      !this.visible
+      this.visible && this.opacity > 0 && this.width > 0 && this.height > 0
     );
   }
 
@@ -753,7 +751,7 @@ export class FabricObject<
    */
   render(ctx: CanvasRenderingContext2D) {
     // do not render if width/height are zeros or object is not visible
-    if (this.isNotVisible()) {
+    if (!this.isVisible()) {
       return;
     }
     if (
@@ -978,7 +976,7 @@ export class FabricObject<
    * on parent canvas.
    */
   isCacheDirty(skipCanvas = false) {
-    if (this.isNotVisible()) {
+    if (!this.isVisible()) {
       return false;
     }
     if (

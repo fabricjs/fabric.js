@@ -95,16 +95,16 @@
     });
   });
 
-  QUnit.test('isNotVisible', function(assert) {
+  QUnit.test('isVisible', function(assert) {
     var ellipse = new fabric.Ellipse();
     ellipse.set('rx', 0);
     ellipse.set('ry', 0);
 
-    assert.equal(ellipse.isNotVisible(), false, 'isNotVisible false when rx/ry are 0 because strokeWidth is > 0');
+    assert.equal(ellipse.isVisible(), true, 'isVisible false when rx/ry are 0 because strokeWidth is > 0');
 
     ellipse.set('strokeWidth', 0);
 
-    assert.equal(ellipse.isNotVisible(), true, 'should not render anymore with also strokeWidth 0');
+    assert.equal(ellipse.isVisible(), false, 'should not render anymore with also strokeWidth 0');
 
   });
 
