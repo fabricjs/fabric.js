@@ -1210,17 +1210,17 @@
     object._set('fill', 'blue');
     assert.equal(object.dirty, false, 'dirty is not raised');
   });
-  QUnit.test('isNotVisible', function(assert) {
+  QUnit.test('isVisible', function(assert) {
     var object = new fabric.Object({ fill: 'blue', width: 100, height: 100 });
-    assert.equal(object.isNotVisible(), false, 'object is default visible');
+    assert.equal(object.isVisible(), true, 'object is default visible');
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 1 });
-    assert.equal(object.isNotVisible(), false, 'object is visible with width and height equal 0, but strokeWidth 1');
+    assert.equal(object.isVisible(), false, 'object is visible with width and height equal 0, but strokeWidth 1');
     object = new fabric.Object({ opacity: 0, fill: 'blue' });
-    assert.equal(object.isNotVisible(), true, 'object is not visible with opacity 0');
+    assert.equal(object.isVisible(), false, 'object is not visible with opacity 0');
     object = new fabric.Object({ fill: 'blue', visible: false });
-    assert.equal(object.isNotVisible(), true, 'object is not visible with visible false');
+    assert.equal(object.isVisible(), false, 'object is not visible with visible false');
     object = new fabric.Object({ fill: 'blue', width: 0, height: 0, strokeWidth: 0 });
-    assert.equal(object.isNotVisible(), true, 'object is not visible with also strokeWidth equal 0');
+    assert.equal(object.isVisible(), false, 'object is not visible with also strokeWidth equal 0');
   });
   QUnit.test('shouldCache', function(assert) {
     var object = new fabric.Object();
