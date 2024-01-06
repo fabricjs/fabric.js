@@ -1,16 +1,16 @@
-import { StaticCanvas } from '../canvas/StaticCanvas';
+import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
+import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
-
 import {
-  LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_ADDED,
-  LAYOUT_TYPE_REMOVED,
   LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_REMOVED,
 } from './constants';
 import type {
   LayoutContext,
@@ -113,7 +113,7 @@ describe('Layout Manager', () => {
 
   describe('onBeforeLayout', () => {
     describe('triggers', () => {
-      const triggers = [
+      const triggers: ('modified' | TModificationEvents | 'changed')[] = [
         'modified',
         'moving',
         'resizing',
@@ -121,7 +121,8 @@ describe('Layout Manager', () => {
         'scaling',
         'skewing',
         'changed',
-      ] as const;
+        'modifyPoly',
+      ];
 
       it('should subscribe object', () => {
         const lifecycle: jest.SpyInstance[] = [];
@@ -765,6 +766,19 @@ describe('Layout Manager', () => {
       expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
       expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
       expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
+    });
+
+    it('should subscribe objects on initialization', () => {
+      const child = new FabricObject({
+        width: 200,
+        height: 200,
+        strokeWidth: 0,
+      });
+      jest.spyOn(child, 'toJSON').mockReturnValue('child');
+      const group = new Group([child]);
+      expect(
+        Array.from(group.layoutManager['_subscriptions'].keys())
+      ).toMatchObject([child]);
     });
 
     test.each([true, false])(
