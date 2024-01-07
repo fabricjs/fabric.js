@@ -2,6 +2,8 @@
 
 ## [next]
 
+- patch(Next.js sandbox): simpler canvas hook [#9577](https://github.com/fabricjs/fabric.js/pull/9577)
+
 ## [6.0.0-beta17]
 
 - refactor(): Rewrite how typeAssertion works to avoid isType and add tests for subclasses [#9570](https://github.com/fabricjs/fabric.js/pull/9570)
