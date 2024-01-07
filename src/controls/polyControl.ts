@@ -1,7 +1,6 @@
 import { Point } from '../Point';
 import { Control } from './Control';
 import type { TMat2D } from '../typedefs';
-import { iMatrix } from '../constants';
 import type { Polyline } from '../shapes/Polyline';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import type {
@@ -23,14 +22,15 @@ type TTransformAnchor = Transform & { pointIndex: number };
  */
 export const createPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
-    const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
-      y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
-    return new Point(x, y).transform(
-      multiplyTransformMatrices(
-        polyObject.canvas?.viewportTransform ?? iMatrix,
-        polyObject.calcTransformMatrix()
-      )
-    );
+    const { points, pathOffset } = polyObject;
+    return new Point(points[pointIndex])
+      .subtract(pathOffset)
+      .transform(
+        multiplyTransformMatrices(
+          polyObject.getViewportTransform(),
+          polyObject.calcTransformMatrix()
+        )
+      );
   };
 };
 
