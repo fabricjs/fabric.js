@@ -1,7 +1,7 @@
 import * as fabric from 'fabric';
 
 export function testCase(canvas: fabric.Canvas) {
-  const polygonRed = new fabric.Polygon(
+  const polygonFlatRed = new fabric.Polygon(
     [
       { x: 0, y: 0 },
       { x: 200, y: 0 },
@@ -47,10 +47,12 @@ export function testCase(canvas: fabric.Canvas) {
       strokeWidth: 40,
       scaleX: 2,
       scaleY: 1,
+      angle: 15,
       strokeUniform: true,
       exactBoundingBox: true,
       strokeMiterLimit: 9999,
       skewX: 10,
+      skewY: 10,
       transparentCorners: false,
       cornerStyle: 'circle',
       hasBorders: false,
@@ -59,10 +61,91 @@ export function testCase(canvas: fabric.Canvas) {
     }
   );
 
-  canvas.add(polygonRed);
+  const polygonPurple = new fabric.Polygon(
+    [
+      { x: 0, y: 100 },
+      { x: 50, y: 0 },
+      { x: 100, y: 100 },
+    ],
+    {
+      top: 300,
+      stroke: 'purple',
+      fill: '',
+      strokeWidth: 40,
+      scaleX: 2,
+      scaleY: 1,
+      angle: 10,
+      strokeUniform: true,
+      exactBoundingBox: false,
+      strokeMiterLimit: 9999,
+      skewX: 10,
+      skewY: 10,
+      transparentCorners: false,
+      cornerStyle: 'circle',
+      hasBorders: false,
+      controls: fabric.controlsUtils.createPolyControls(3),
+      objectCaching: false,
+    }
+  );
+
+  const polygonYellow = new fabric.Polygon(
+    [
+      { x: 0, y: 100 },
+      { x: 50, y: 0 },
+      { x: 100, y: 100 },
+    ],
+    {
+      top: 300,
+      stroke: 'yellow',
+      fill: '',
+      strokeWidth: 40,
+      scaleX: 2,
+      scaleY: 1,
+      angle: 10,
+      exactBoundingBox: true,
+      strokeMiterLimit: 9999,
+      skewX: 10,
+      skewY: 10,
+      transparentCorners: false,
+      cornerStyle: 'circle',
+      hasBorders: false,
+      controls: fabric.controlsUtils.createPolyControls(3),
+      objectCaching: false,
+    }
+  );
+
+  const polygonOrange = new fabric.Polygon(
+    [
+      { x: 0, y: 100 },
+      { x: 50, y: 0 },
+      { x: 100, y: 100 },
+    ],
+    {
+      top: 300,
+      fill: '',
+      stroke: 'orange',
+      strokeWidth: 40,
+      scaleX: 2,
+      scaleY: 1,
+      angle: 10,
+      strokeMiterLimit: 9999,
+      skewX: 10,
+      skewY: 10,
+      transparentCorners: false,
+      cornerStyle: 'circle',
+      hasBorders: false,
+      controls: fabric.controlsUtils.createPolyControls(3),
+      objectCaching: false,
+    }
+  );
+
+  canvas.add(polygonFlatRed);
   canvas.add(polygonGreen);
   canvas.add(polygonBlue);
-  canvas.centerObjectH(polygonRed);
+  canvas.add(polygonOrange);
+  canvas.add(polygonPurple);
+  canvas.add(polygonYellow);
+  canvas.centerObjectH(polygonFlatRed);
   canvas.centerObjectH(polygonGreen);
   canvas.centerObjectH(polygonBlue);
 }
