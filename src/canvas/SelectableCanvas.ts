@@ -16,7 +16,7 @@ import {
 } from '../util/misc/objectTransforms';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
-import { isCollection } from '../util/typeAssertions';
+import { isCollection } from '../Collection';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -786,7 +786,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       ];
       // in case of padding we calculate the new coords on the fly.
       // otherwise we have to maintain 2 sets of coordinates for everything.
-      // we can reiterate on storing those on something similar to lineCoords
+      // we can reiterate on storing them.
       // if this is slow, for now the semplification is large and doesn't impact
       // rendering.
       // the idea behind this is that outside target check we don't need ot know

@@ -18,22 +18,6 @@
     }
   });
 
-  QUnit.test('constructor & properties', function(assert) {
-    assert.ok(typeof fabric.Object === 'function');
-
-    var cObj = new fabric.Object();
-
-    assert.ok(cObj);
-    assert.ok(cObj instanceof fabric.FabricObject);
-    assert.ok(cObj.constructor === fabric.Object);
-
-    assert.equal(cObj.constructor.type, 'FabricObject');
-    assert.equal(cObj.includeDefaultValues, true);
-    assert.equal(cObj.selectable, true);
-
-    assert.equal(cObj.objectCaching, !isNode(), 'object caching default value');
-  });
-
   QUnit.test('get', function(assert) {
     var cObj = new fabric.Object({
       left: 11,
@@ -628,63 +612,33 @@
     assert.ok(removedEventFired);
   });
 
-  QUnit.test('getParent', function (assert) {
-    const object = new fabric.Object();
-    const parent = new fabric.Object();
-    parent._exitGroup = () => { };
-    assert.ok(typeof object.getParent === 'function');
-    parent.canvas = canvas;
-    object.group = parent;
-    assert.equal(object.getParent(), parent);
-    assert.equal(parent.getParent(), canvas);
-    const another = new fabric.Object();
-    object.group = another;
-    object.group.group = parent;
-    assert.equal(object.getParent(), another);
-    assert.equal(another.getParent(), parent);
-    object.group = undefined;
-    assert.equal(object.getParent(), undefined);
-    object.canvas = canvas;
-    assert.equal(object.getParent(), canvas);
-    object.group = parent;
-    assert.equal(object.getParent(), parent);
-    const activeSelection = new fabric.ActiveSelection([object], { canvas });
-    assert.equal(object.group, activeSelection);
-    assert.equal(object.__owningGroup, parent);
-    assert.equal(object.canvas, canvas);
-    assert.equal(object.getParent(), parent);
-    object.__owningGroup = undefined;
-    assert.equal(object.getParent(), canvas);
-  });
-
   QUnit.test('isDescendantOf', function (assert) {
     const object = new fabric.Object();
     const parent = new fabric.Object();
     parent._exitGroup = () => { };
     assert.ok(typeof object.isDescendantOf === 'function');
     parent.canvas = canvas;
-    object.group = parent;
+    object.parent = parent;
     assert.ok(object.isDescendantOf(parent));
-    object.group = new fabric.Object();
-    object.group.group = parent;
+    object.parent = new fabric.Object();
+    object.parent.parent = parent;
     assert.ok(object.isDescendantOf(parent));
     assert.ok(object.isDescendantOf(canvas));
-    object.group = undefined;
+    object.parent = undefined;
     assert.ok(object.isDescendantOf(parent) === false);
     assert.ok(object.isDescendantOf(canvas) === false);
     object.canvas = canvas;
     assert.ok(object.isDescendantOf(canvas));
     assert.ok(object.isDescendantOf(object) === false);
-    object.group = parent;
-    assert.equal(object.getParent(), parent);
+    object.parent = parent;
     const activeSelection = new fabric.ActiveSelection([object], { canvas });
     assert.equal(object.group, activeSelection);
-    assert.equal(object.__owningGroup, parent);
+    assert.equal(object.parent, parent);
     assert.equal(object.canvas, canvas);
-    assert.ok(object.isDescendantOf(parent), 'should recognize owning group');
+    assert.ok(object.isDescendantOf(parent), 'should recognize parent');
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
-    object.__owningGroup = undefined;
+    delete object.parent;
     assert.ok(!object.isDescendantOf(parent));
     assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
     assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
@@ -696,15 +650,15 @@
     var other = new fabric.Object();
     assert.ok(typeof object.getAncestors === 'function');
     assert.deepEqual(object.getAncestors(), []);
-    object.group = parent;
+    object.parent = parent;
     assert.deepEqual(object.getAncestors(), [parent]);
     parent.canvas = canvas;
     assert.deepEqual(object.getAncestors(), [parent, canvas]);
-    parent.group = other;
+    parent.parent = other;
     assert.deepEqual(object.getAncestors(), [parent, other]);
     other.canvas = canvas;
     assert.deepEqual(object.getAncestors(), [parent, other, canvas]);
-    delete object.group;
+    delete object.parent;
     assert.deepEqual(object.getAncestors(), []);
   });
 
@@ -730,9 +684,11 @@
       }
       _onObjectAdded(object) {
         object.group = this;
+        object.parent = this;
       }
       _onObjectRemoved(object) {
         delete object.group;
+        delete object.parent;
       }
       removeAll() {
         this.remove(...this._objects);

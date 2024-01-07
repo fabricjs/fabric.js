@@ -2,7 +2,7 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "6.0.0-beta15",
+  "version": "6.0.0-beta17",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -11,14 +11,14 @@
       "url": "https://github.com/asturur"
     },
     {
-      "name": "Steve Eberhardt",
-      "email": "melchiar2@gmail.com",
-      "url": "https://github.com/melchiar"
-    },
-    {
       "name": "Shachar Nencel",
       "email": "shacharnen@gmail.com",
       "url": "https://github.com/ShaMan123"
+    },
+    {
+      "name": "Steve Eberhardt",
+      "email": "melchiar2@gmail.com",
+      "url": "https://github.com/melchiar"
     }
   ],
   "keywords": [
@@ -132,7 +132,6 @@
     "node": ">=16.20.0"
   },
   "module": "./dist/index.mjs",
-  "main": "./dist/index.node.cjs",
   "types": "./dist/index.d.ts",
   "typesVersions": {
     ">=4.2": {
