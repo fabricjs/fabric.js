@@ -1,8 +1,12 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
-import type { GroupProps, LayoutContext } from './Group';
+import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
+import {
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_REMOVED,
+} from '../LayoutManager/constants';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -24,8 +28,6 @@ export interface ActiveSelectionOptions extends GroupProps {
  * })
  */
 export class ActiveSelection extends Group {
-  declare _objects: FabricObject[];
-
   /**
    * controls how selected objects are added during a multiselection event
    * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
@@ -76,22 +78,29 @@ export class ActiveSelection extends Group {
   }
 
   /**
+   * Change an object so that it can be part of an active selection.
+   * this method is called by multiselectAdd from canvas code.
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-   * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    if (object.group) {
-      //  save ref to group for later in order to return to it
-      const parent = object.group;
-      parent._exitGroup(object);
-      // make sure we are setting the correct owning group
-      // in case `object` is transferred between active selections
-      !(parent instanceof ActiveSelection) && (object.__owningGroup = parent);
+    // This condition check that the object has currently a group, and the group
+    // is also its parent, meaning that is not in an active selection, but is
+    // in a normal group.
+    if (object.parent && object.parent === object.group) {
+      // Disconnect the object from the group functionalities, but keep the ref parent intact
+      // for later re-enter
+      object.parent._exitGroup(object);
+      // in this case the object is probably inside an active selection.
+    } else if (object.group && object.parent !== object.group) {
+      // in this case group.remove will also clear the old parent reference.
+      object.group.remove(object);
     }
+    // enter the active selection from a render perspective
+    // the object will be in the objects array of both the ActiveSelection and the Group
+    // but referenced in the group's _activeObjects so that it won't be rendered twice.
     this._enterGroup(object, removeParentTransform);
-    return true;
   }
 
   /**
@@ -102,12 +111,8 @@ export class ActiveSelection extends Group {
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
-    const parent = object.__owningGroup;
-    if (parent) {
-      //  return to owning group
-      parent._enterGroup(object, true);
-      delete object.__owningGroup;
-    }
+    // return to parent
+    object.parent && object.parent._enterGroup(object, true);
   }
 
   /**
@@ -117,16 +122,15 @@ export class ActiveSelection extends Group {
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
     super._onAfterObjectsChange(type, targets);
-    const groups: Group[] = [];
+    const groups = new Set<Group>();
     targets.forEach((object) => {
-      object.group &&
-        !groups.includes(object.group) &&
-        groups.push(object.group);
+      const { parent } = object;
+      parent && groups.add(parent);
     });
-    if (type === 'removed') {
+    if (type === LAYOUT_TYPE_REMOVED) {
       //  invalidate groups' layout and mark as dirty
       groups.forEach((group) => {
-        group._onAfterObjectsChange('added', targets);
+        group._onAfterObjectsChange(LAYOUT_TYPE_ADDED, targets);
       });
     } else {
       //  mark groups as dirty
@@ -144,25 +148,6 @@ export class ActiveSelection extends Group {
   onDeselect() {
     this.removeAll();
     return false;
-  }
-
-  _applyLayoutStrategy(context: LayoutContext): void {
-    super._applyLayoutStrategy(context);
-    if (this._objects.length === 0) {
-      // in this case layout was skipped
-      // we reset transform for the next selection
-      Object.assign(this, {
-        left: 0,
-        top: 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        flipX: false,
-        flipY: false,
-      });
-    }
   }
 
   /**

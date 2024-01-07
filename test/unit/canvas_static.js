@@ -1722,15 +1722,17 @@
     var rectOverlay = new fabric.Rect({ width: 10, heigth: 10 });
     canvas.add(rect);
     canvas.cancelRequestedRender();
+    rectBg.canvas = canvas;
     canvas.backgroundImage = rectBg;
+    rectOverlay.canvas = canvas;
     canvas.overlayImage = rectOverlay;
-    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0,0), 'rect linecoords are set for normal viewport');
-    assert.equal(rectBg.lineCoords, undefined, 'rectBg linecoords are not set');
-    assert.equal(rectOverlay.lineCoords, undefined, 'rectOverlay linecoords are not set');
+    assert.deepEqual(new fabric.Point(rect.oCoords.tl), new fabric.Point(0,0), 'rect oCoords are set for normal viewport');
+    assert.equal(rectBg.oCoords, undefined, 'rectBg oCoords are not set');
+    assert.equal(rectOverlay.oCoords, undefined, 'rectOverlay oCoords are not set');
     canvas.setViewportTransform(vpt);
-    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(50,50), 'rect linecoords are set');
-    assert.deepEqual(rectBg.lineCoords.tl,  new fabric.Point(0,0), 'rectBg linecoords are set');
-    assert.deepEqual(rectOverlay.lineCoords.tl,  new fabric.Point(0,0), 'rectOverlay linecoords are set');
+    assert.deepEqual(new fabric.Point(rect.oCoords.tl), new fabric.Point(50,50), 'rect oCoords are set');
+    assert.deepEqual(new fabric.Point(rectBg.oCoords.tl),  new fabric.Point(50,50), 'rectBg oCoords are set');
+    assert.deepEqual(new fabric.Point(rectOverlay.oCoords.tl),  new fabric.Point(50,50), 'rectOverlay oCoords are set');
   });
 
   QUnit.test('getZoom', function(assert) {

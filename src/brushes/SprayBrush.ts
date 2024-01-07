@@ -141,7 +141,6 @@ export class SprayBrush extends BaseBrush {
       this.optimizeOverlapping ? getUniqueRects(rects) : rects,
       {
         objectCaching: true,
-        layout: 'fixed',
         subTargetCheck: false,
         interactive: false,
       }

@@ -2,9 +2,18 @@ import { radiansToDegrees } from '../../util';
 import { Group } from '../Group';
 import { Canvas } from '../../canvas/Canvas';
 import { FabricObject } from './FabricObject';
-import type { TOCoord } from './InteractiveObject';
+import { InteractiveFabricObject, type TOCoord } from './InteractiveObject';
 
-describe('Object', () => {
+describe('InteractiveObject', () => {
+  it('tests constructor & properties', () => {
+    const obj = new InteractiveFabricObject();
+    expect(obj instanceof InteractiveFabricObject).toBe(true);
+    expect(obj.selectable).toBe(true);
+  });
+  it('Interactive + BaseObject default values', () => {
+    const { controls, ...defaults } = FabricObject.getDefaults();
+    expect(defaults).toMatchSnapshot();
+  });
   describe('setCoords for objects inside group with rotation', () => {
     it('all corners are rotated as much as the object total angle', () => {
       const canvas = new Canvas();
