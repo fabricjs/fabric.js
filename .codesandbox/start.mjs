@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import cp from 'child_process';
 import fs from 'fs-extra';
+import getPort from 'detect-port';
 import moment from 'moment';
 import path from 'node:path';
 import { build } from '../scripts/build.mjs';
@@ -13,7 +14,17 @@ import { wd } from '../scripts/dirname.mjs';
  * I looked for other ways to tell the watcher to watch changes in fabric but I came out with this options only (symlinking and other stuff).
  * @param {string} destination
  */
-export function startSandbox(destination, buildAndWatch, installDeps = false) {
+export async function startSandbox(
+  destination,
+  {
+    template,
+    buildAndWatch = true,
+    installDeps = false,
+    port = 8000,
+    launchBrowser = false,
+    launchVSCode = false,
+  } = {}
+) {
   console.log(chalk.blue('\n> linking fabric'));
   cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
   cp.execSync('npm link fabric --include=dev --save', {
@@ -58,15 +69,22 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
     )
   );
 
-  try {
-    cp.exec('code .', { cwd: destination });
-  } catch (error) {
-    console.log('> failed to open VSCode');
+  if (launchVSCode) {
+    try {
+      cp.exec('code .', { cwd: destination });
+    } catch (error) {
+      console.log('> failed to open VSCode');
+    }
   }
 
-  return cp.spawn('npm run dev', {
+  const usePort = await getPort(port);
+  const task = cp.spawn(`npm run dev -- --port ${usePort}`, {
     cwd: destination,
     stdio: 'inherit',
     shell: true,
   });
+
+  launchBrowser && cp.exec(`open-cli http://localhost:${usePort}/`);
+
+  return task;
 }

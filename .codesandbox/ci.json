@@ -6,5 +6,5 @@
     "/.codesandbox/templates/next",
     "/.codesandbox/templates/vanilla"
   ],
-  "node": "16"
+  "node": "18"
 }

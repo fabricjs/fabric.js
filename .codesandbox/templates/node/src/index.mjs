@@ -1,13 +1,23 @@
-import http from 'http';
+import * as commander from 'commander';
 import * as fabric from 'fabric/node';
+import http from 'http';
 
-const port = Number(process.argv[2]);
+const program = new commander.Command()
+  .allowUnknownOption(false)
+  .allowExcessArguments(false)
+  .option('-p, --port <port>', 'the port to use', 8080)
+  .parse();
+
+const port = Number(program.opts().port);
 
 http
   .createServer((req, res) => {
     const canvas = new fabric.StaticCanvas(null, { width: 100, height: 100 });
     const rect = new fabric.Rect({ width: 20, height: 50, fill: '#ff0000' });
-    const text = new fabric.Text('fabric.js', { fill: 'blue', fontSize: 24 });
+    const text = new fabric.FabricText('fabric.js', {
+      fill: 'blue',
+      fontSize: 24,
+    });
     canvas.add(rect, text);
     canvas.renderAll();
     if (req.url === '/download') {
