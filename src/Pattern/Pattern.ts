@@ -92,7 +92,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternOptions = {}) {
+  constructor(options: PatternOptions) {
     this.id = uid();
     Object.assign(this, options);
   }
