@@ -163,15 +163,19 @@ export class Polyline<
       bboxNoStroke = makeBoundingBoxFromPoints(
         this.points.map((p) => transformPoint(p, matrix, true))
       ),
-      offsetX = bbox.left + bbox.width / 2,
-      offsetY = bbox.top + bbox.height / 2,
-      pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX)),
-      pathOffsetY =
-        offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY)),
       scale = new Point(this.scaleX, this.scaleY);
+    let offsetX = bbox.left + bbox.width / 2,
+      offsetY = bbox.top + bbox.height / 2;
+    if (this.exactBoundingBox) {
+      offsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
+      // Order of those assignments is important.
+      // offsetY relies on offsetX being already changed by the line above
+      offsetY = offsetY - offsetX * Math.tan(degreesToRadians(this.skewY));
+    }
+
     return {
       ...bbox,
-      pathOffset: new Point(pathOffsetX, pathOffsetY),
+      pathOffset: new Point(offsetX, offsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top)
         .subtract(new Point(bbox.left, bbox.top))
         .multiply(scale),
