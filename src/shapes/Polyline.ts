@@ -167,10 +167,9 @@ export class Polyline<
     let offsetX = bbox.left + bbox.width / 2,
       offsetY = bbox.top + bbox.height / 2;
     if (this.exactBoundingBox) {
-      // Order of those assignments is important.
-      // The second assignment relies on offsetX being already changed
-      // by the previous line;
       offsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
+      // Order of those assignments is important.
+      // offsetY relies on offsetX being already changed by the line above
       offsetY = offsetY - offsetX * Math.tan(degreesToRadians(this.skewY));
     }
 
