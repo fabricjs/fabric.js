@@ -26,6 +26,9 @@ export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 
 const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
+/**
+ * @noInheritDoc
+ */
 export class Ellipse<
     Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
     SProps extends SerializedEllipseProps = SerializedEllipseProps,

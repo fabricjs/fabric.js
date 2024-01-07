@@ -4,6 +4,7 @@ import { classRegistry } from '../../ClassRegistry';
 
 /**
  * Layout will adjust the bounding box to fit target's objects.
+ * @noInheritDoc
  */
 export class FitContentLayout extends LayoutStrategy {
   static readonly type = 'fit-content';

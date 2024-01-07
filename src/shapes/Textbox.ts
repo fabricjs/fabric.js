@@ -49,6 +49,7 @@ export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
  * and wraps lines automatically. Textboxes have their Y scaling locked, the
  * user can only change width. Height is adjusted automatically based on the
  * wrapping of lines.
+ * @noInheritDoc
  */
 export class Textbox<
     Props extends TOptions<TextboxProps> = Partial<TextboxProps>,

@@ -1,5 +1,8 @@
 import { Observable } from './Observable';
 
+/**
+ * @noInheritDoc
+ */
 export class CommonMethods<EventSpec> extends Observable<EventSpec> {
   /**
    * Sets object's properties from options, for initialization only

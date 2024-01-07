@@ -44,6 +44,7 @@ type ResizeDuringWEBGLResize = Resize & {
 
 /**
  * Resize image filter class
+ * @noInheritDoc
  * @example
  * const filter = new Resize();
  * object.filters.push(filter);

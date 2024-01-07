@@ -11,6 +11,7 @@ export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
 
 /**
  * Noise filter class
+ * @noInheritDoc
  * @example
  * const filter = new Noise({
  *   noise: 700

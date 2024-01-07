@@ -9,6 +9,7 @@ import { classRegistry } from '../../ClassRegistry';
 
 /**
  * Layout will adjust the bounding box to match the clip path bounding box.
+ * @noInheritDoc
  */
 export class ClipPathLayout extends LayoutStrategy {
   static readonly type = 'clip-path';

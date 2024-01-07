@@ -26,6 +26,9 @@ export interface RectProps extends FabricObjectProps, UniqueRectProps {}
 
 const RECT_PROPS = ['rx', 'ry'] as const;
 
+/**
+ * @noInheritDoc
+ */
 export class Rect<
     Props extends TOptions<RectProps> = Partial<RectProps>,
     SProps extends SerializedRectProps = SerializedRectProps,

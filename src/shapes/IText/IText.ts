@@ -71,6 +71,8 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  * @fires cut
  * @fires paste
  *
+ * @noInheritDoc
+ *
  * #### Supported key combinations
  * ```
  *   Move cursor:                    left, right, up, down

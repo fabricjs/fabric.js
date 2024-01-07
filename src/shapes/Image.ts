@@ -74,6 +74,7 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 
 /**
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
+ * @noInheritDoc
  */
 export class FabricImage<
     Props extends TOptions<ImageProps> = Partial<ImageProps>,

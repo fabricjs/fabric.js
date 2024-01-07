@@ -10,6 +10,7 @@ export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
 /**
  * MyFilter filter class
  * @example
+ * @noInheritDoc
  * const filter = new MyFilter({
  *   add here an example of how to use your filter
  * });

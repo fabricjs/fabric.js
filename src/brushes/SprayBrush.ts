@@ -28,6 +28,9 @@ function getUniqueRects(rects: Rect[]) {
   return uniqueRectsArray;
 }
 
+/**
+ * @noInheritDoc
+ */
 export class SprayBrush extends BaseBrush {
   /**
    * Width of a spray

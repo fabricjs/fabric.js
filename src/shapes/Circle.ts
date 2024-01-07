@@ -49,6 +49,9 @@ export const circleDefaultValues: UniqueCircleProps = {
   endAngle: 360,
 };
 
+/**
+ * @noInheritDoc
+ */
 export class Circle<
     Props extends TOptions<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,

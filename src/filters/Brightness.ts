@@ -10,6 +10,7 @@ export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
 
 /**
  * Brightness filter class
+ * @noInheritDoc
  * @example
  * const filter = new Brightness({
  *   brightness: 0.05

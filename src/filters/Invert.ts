@@ -11,6 +11,8 @@ export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
 };
 
 /**
+ * Invert filter class
+ * @noInheritDoc
  * @example
  * const filter = new Invert();
  * object.filters.push(filter);

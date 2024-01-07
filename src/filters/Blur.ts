@@ -18,6 +18,7 @@ export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
 /**
  * Blur filter class
  * @example
+ * @noInheritDoc
  * const filter = new Blur({
  *   blur: 0.5
  * });

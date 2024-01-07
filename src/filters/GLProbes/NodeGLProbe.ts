@@ -1,6 +1,7 @@
 import { GLProbe } from './GLProbe';
 
 /**
+ * @noInheritDoc
  * @todo GL rendering in node is possible:
  * - https://github.com/stackgl/headless-gl
  * - https://github.com/akira-cn/node-canvas-webgl

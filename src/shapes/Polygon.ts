@@ -1,6 +1,9 @@
 import { classRegistry } from '../ClassRegistry';
 import { Polyline, polylineDefaultValues } from './Polyline';
 
+/**
+ * @noInheritDoc
+ */
 export class Polygon extends Polyline {
   static ownDefaults: Record<string, any> = polylineDefaultValues;
 

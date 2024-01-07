@@ -25,6 +25,7 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
 
 /**
  * Color Blend filter class
+ * @noInheritDoc
  * @example
  * const filter = new BlendColor({
  *  color: '#000',

@@ -11,6 +11,7 @@ export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
 
 /**
  * Vibrance filter class
+ * @noInheritDoc
  * @example
  * const filter = new Vibrance({
  *   vibrance: 1

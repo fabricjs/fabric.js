@@ -68,6 +68,7 @@ export const groupDefaultValues = {
 };
 
 /**
+ * @noInheritDoc
  * @fires object:added
  * @fires object:removed
  * @fires layout:before

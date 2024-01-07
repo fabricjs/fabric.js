@@ -11,6 +11,7 @@ export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
 
 /**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
+ * @noInheritDoc
  * @example <caption>Sharpen filter</caption>
  * const filter = new Convolute({
  *   matrix: [ 0, -1,  0,

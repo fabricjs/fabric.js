@@ -13,6 +13,7 @@ export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
 
 /**
  * HueRotation filter class
+ * @noInheritDoc
  * @example
  * const filter = new HueRotation({
  *   rotation: -0.5

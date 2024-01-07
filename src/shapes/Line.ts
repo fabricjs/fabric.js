@@ -26,6 +26,9 @@ export interface SerializedLineProps
   extends SerializedObjectProps,
     UniqueLineProps {}
 
+/**
+ * @noInheritDoc
+ */
 export class Line<
     Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedLineProps = SerializedLineProps,

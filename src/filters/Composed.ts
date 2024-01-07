@@ -5,6 +5,7 @@ import { classRegistry } from '../ClassRegistry';
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
+ * @noInheritDoc
  */
 export class Composed extends BaseFilter {
   /**

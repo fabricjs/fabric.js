@@ -12,6 +12,7 @@ export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
 
 /**
  * Gamma filter class
+ * @noInheritDoc
  * @example
  * const filter = new Gamma({
  *   gamma: [1, 0.5, 2.1]

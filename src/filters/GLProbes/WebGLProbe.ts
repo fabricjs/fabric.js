@@ -4,6 +4,7 @@ import type { GLPrecision } from './GLProbe';
 
 /**
  * Lazy initialize WebGL constants
+ * @noInheritDoc
  */
 export class WebGLProbe extends GLProbe {
   declare maxTextureSize?: number;

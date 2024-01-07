@@ -32,6 +32,7 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
 /**
  * Image Blend filter class
  * @example
+ * @noInheritDoc
  * const filter = new filters.BlendColor({
  *  color: '#000',
  *  mode: 'multiply'

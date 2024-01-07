@@ -17,7 +17,7 @@ export interface ActiveSelectionOptions extends GroupProps {
 /**
  * Used by Canvas to manage selection.
  * Canvas accepts an `activeSelection` option allowing overriding and customization.
- *
+ * @noInheritDoc
  * @example
  * class MyActiveSelection extends ActiveSelection {
  *   ...

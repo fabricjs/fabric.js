@@ -11,6 +11,9 @@ import type { CanvasItem } from './StaticCanvasDOMManager';
 import { StaticCanvasDOMManager } from './StaticCanvasDOMManager';
 import { setCanvasDimensions } from './util';
 
+/**
+ * @noInheritDoc
+ */
 export class CanvasDOMManager extends StaticCanvasDOMManager {
   upper: CanvasItem;
   container: HTMLDivElement;

@@ -41,6 +41,7 @@ import { Intersection } from '../Intersection';
 
 /**
  * Canvas class
+ * @noInheritDoc
  * @class Canvas
  * @extends StaticCanvas
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}

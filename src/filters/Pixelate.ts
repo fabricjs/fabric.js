@@ -11,6 +11,7 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
 
 /**
  * Pixelate filter class
+ * @noInheritDoc
  * @example
  * const filter = new Pixelate({
  *   blocksize: 8

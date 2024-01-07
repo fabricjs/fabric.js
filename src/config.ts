@@ -114,6 +114,9 @@ class BaseConfiguration {
   NUM_FRACTION_DIGITS = 4;
 }
 
+/**
+ * @noInheritDoc
+ */
 export class Configuration extends BaseConfiguration {
   constructor(config?: TConfiguration) {
     super();

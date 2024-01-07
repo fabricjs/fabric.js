@@ -9,6 +9,7 @@ import { classRegistry } from '../../ClassRegistry';
 
 /**
  * Layout will keep target's initial size.
+ * @noInheritDoc
  */
 export class FixedLayout extends LayoutStrategy {
   static readonly type = 'fixed';

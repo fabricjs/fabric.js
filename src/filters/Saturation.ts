@@ -6,6 +6,7 @@ import { fragmentSource } from './shaders/saturation';
 
 /**
  * Saturate filter class
+ * @noInheritDoc
  * @example
  * const filter = new Saturation({
  *   saturation: 1

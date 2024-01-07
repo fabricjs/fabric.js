@@ -117,6 +117,7 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
 
 /**
  * Text class
+ * @noInheritDoc
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 export class FabricText<

@@ -9,6 +9,9 @@ import { BaseBrush } from './BaseBrush';
 import type { CircleBrushPoint } from './typedefs';
 import { CENTER } from '../constants';
 
+/**
+ * @noInheritDoc
+ */
 export class CircleBrush extends BaseBrush {
   /**
    * Width of a brush

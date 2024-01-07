@@ -65,6 +65,7 @@ export type TSVGExportOptions = {
 
 /**
  * Static canvas class
+ * @noInheritDoc
  * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
  * @fires before:render
  * @fires after:render

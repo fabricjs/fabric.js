@@ -10,6 +10,7 @@ export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
 
 /**
  * Contrast filter class
+ * @noInheritDoc
  * @example
  * const filter = new Contrast({
  *   contrast: 0.25

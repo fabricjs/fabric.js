@@ -13,6 +13,7 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
 
 /**
  * Grayscale image filter class
+ * @noInheritDoc
  * @example
  * const filter = new Grayscale();
  * object.filters.push(filter);

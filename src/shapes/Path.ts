@@ -46,6 +46,9 @@ export interface IPathBBox extends TBBox {
   pathOffset: Point;
 }
 
+/**
+ * @noInheritDoc
+ */
 export class Path<
   Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,

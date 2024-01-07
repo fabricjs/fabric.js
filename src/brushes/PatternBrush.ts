@@ -4,6 +4,9 @@ import type { Canvas } from '../canvas/Canvas';
 import { PencilBrush } from './PencilBrush';
 import type { TSimplePathData } from '../util/path/typedefs';
 
+/**
+ * @noInheritDoc
+ */
 export class PatternBrush extends PencilBrush {
   declare source?: CanvasImageSource;
 

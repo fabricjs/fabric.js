@@ -13,6 +13,7 @@ export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
 
 /**
  * Remove white filter class
+ * @noInheritDoc
  * @example
  * const filter = new RemoveColor({
  *   threshold: 0.2,

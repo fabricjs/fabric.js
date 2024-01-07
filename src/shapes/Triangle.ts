@@ -9,6 +9,9 @@ export const triangleDefaultValues = {
   height: 100,
 };
 
+/**
+ * @noInheritDoc
+ */
 export class Triangle<
     Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
