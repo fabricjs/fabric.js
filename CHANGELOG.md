@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(Next.js sandbox): simpler canvas hook [#9577](https://github.com/fabricjs/fabric.js/pull/9577)
 - fix(): fix modify polygon points with zero sized polygons ( particular case of axis oriented lines ) [#9575](https://github.com/fabricjs/fabric.js/pull/9575)
 - fix(Polyline, Polygon): Fix wrong pathOffset for polyline with the normal bounding box calculation. [#9460](https://github.com/fabricjs/fabric.js/pull/9460)
 
