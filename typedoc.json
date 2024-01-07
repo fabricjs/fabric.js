@@ -7,6 +7,7 @@
   "tsconfig": "typedoc.config.json",
   "hideBreadcrumbs": "true",
   "hideInPageTOC": "true",
+  "hideMembersSymbol": "true",
   "publicPath": "/apidocs/",
-  "plugin": ["typedoc-plugin-markdown"]
+  "plugin": ["typedoc-plugin-no-inherit", "typedoc-plugin-markdown"]
 }
