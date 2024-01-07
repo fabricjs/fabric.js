@@ -17,6 +17,14 @@ import {
   LAYOUT_TYPE_OBJECT_MODIFYING,
 } from './constants';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
+import { classRegistry } from '../ClassRegistry';
+
+const LAYOUT_MANAGER = 'layoutManager';
+
+export type SerializedLayoutManager = {
+  type: string;
+  strategy: string;
+};
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
@@ -72,6 +80,7 @@ export class LayoutManager {
           'scaling',
           'skewing',
           'changed',
+          'modifyPoly',
         ] as TModificationEvents[]
       ).map((key) =>
         object.on(key, (e) =>
@@ -289,9 +298,16 @@ export class LayoutManager {
     this._subscriptions.clear();
   }
 
-  toJSON() {
+  toObject() {
     return {
+      type: LAYOUT_MANAGER,
       strategy: (this.strategy.constructor as typeof LayoutStrategy).type,
     };
   }
+
+  toJSON() {
+    return this.toObject();
+  }
 }
+
+classRegistry.setClass(LayoutManager, LAYOUT_MANAGER);
