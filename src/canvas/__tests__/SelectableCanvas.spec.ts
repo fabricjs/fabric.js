@@ -1,4 +1,3 @@
-import { ActiveSelection } from '../../shapes/ActiveSelection';
 import { FabricObject } from '../../shapes/Object/FabricObject';
 import { Canvas } from '../Canvas';
 
@@ -57,15 +56,5 @@ describe('Canvas', () => {
       canvas.sendObjectToBack(object);
       expect(canvas._objectsToRender).toBeUndefined();
     });
-  });
-
-  test('getActiveSelection', () => {
-    const canvas = new Canvas();
-    const selection = new ActiveSelection();
-    expect(canvas.getActiveSelection()).toBeUndefined();
-    canvas.setActiveObject(selection);
-    expect(canvas.getActiveSelection()).toBe(selection);
-    canvas.discardActiveObject();
-    expect(canvas.getActiveSelection()).toBeUndefined();
   });
 });

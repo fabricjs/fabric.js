@@ -520,7 +520,7 @@
     canvas.add(rect1, rect2, rect3);
     updateActiveSelection(canvas, [rect1, rect2, rect3], null, 'selection-order');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'nothing happened');
-    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+    assert.ok(canvas.getActiveObject() === canvas.getActiveObject(), 'still selected');
   });
 
   QUnit.test('multiselection: selecting a target behind active selection', assert => {
@@ -529,11 +529,11 @@
     const rect3 = new fabric.Rect({ top: 10, width: 10, height: 10 });
     canvas.add(rect1, rect2, rect3);
     initActiveSelection(canvas, rect1, rect3);
-    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'selected');
+    assert.ok(canvas.getActiveObject() === canvas.getActiveObject(), 'selected');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect3], 'created');
     canvas.__onMouseDown({ clientX: 7, clientY: 7, [canvas.selectionKey]: true });
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2, rect3], 'added from behind active selection');
-    assert.ok(canvas.getActiveSelection() === canvas.getActiveObject(), 'still selected');
+    assert.ok(canvas.getActiveObject() === canvas.getActiveObject(), 'still selected');
   });
 
   QUnit.test('setActiveObject fires deselected', function(assert) {

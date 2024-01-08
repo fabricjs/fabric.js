@@ -9,13 +9,14 @@ import type {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { ActiveSelection } from '../shapes/ActiveSelection';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { isActiveSelection } from '../util/typeAssertions';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
@@ -1389,10 +1390,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       return;
     }
     let hoverCursor = target.hoverCursor || this.hoverCursor;
-    const activeSelection =
-        this._activeObject === this.getActiveSelection()
-          ? this._activeObject
-          : null,
+    const activeSelection = isActiveSelection(this._activeObject)
+        ? this._activeObject
+        : null,
       // only show proper corner when group selection is not active
       corner =
         (!activeSelection || target.group !== activeSelection) &&
@@ -1433,7 +1433,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   protected handleMultiSelection(e: TPointerEvent, target?: FabricObject) {
     const activeObject = this._activeObject;
-    const isAS = activeObject instanceof ActiveSelection;
+    const isAS = isActiveSelection(activeObject);
     if (
       // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&

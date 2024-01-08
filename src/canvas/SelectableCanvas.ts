@@ -30,13 +30,13 @@ import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { ActiveSelection } from '../shapes/ActiveSelection';
 import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
+import { isActiveSelection } from '../util/typeAssertions';
 
 /**
  * Canvas class
@@ -1018,21 +1018,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns instance's active selection
-   */
-  getActiveSelection() {
-    return this._activeObject instanceof ActiveSelection
-      ? this._activeObject
-      : undefined;
-  }
-
-  /**
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
-    return active instanceof ActiveSelection
+    return isActiveSelection(active)
       ? active.getObjects()
       : active
       ? [active]
@@ -1135,7 +1126,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
     this._activeObject = object;
 
-    if (object instanceof ActiveSelection && prevActiveObject !== object) {
+    if (isActiveSelection(object) && prevActiveObject !== object) {
       object.set('canvas', this);
       object.setCoords();
     }
@@ -1210,10 +1201,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   destroy() {
     // dispose of active selection
-    const activeSelection = this.getActiveSelection();
-    if (activeSelection) {
-      activeSelection.removeAll();
-      activeSelection.dispose();
+    const activeObject = this._activeObject;
+    if (isActiveSelection(activeObject)) {
+      activeObject.removeAll();
+      activeObject.dispose();
     }
 
     delete this._activeObject;
@@ -1281,7 +1272,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   _realizeGroupTransformOnObject(
     instance: FabricObject
   ): Partial<typeof instance> {
-    if (instance.group && instance.group === this.getActiveSelection()) {
+    if (instance.group && isActiveSelection(instance.group)) {
       const layoutProps = [
         'angle',
         'flipX',

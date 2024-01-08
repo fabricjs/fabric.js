@@ -89,7 +89,7 @@ describe('ActiveSelection', () => {
     const activeSelection = new ActiveSelection([obj1, obj2]);
     const spy = jest.spyOn(activeSelection, 'setCoords');
     canvas.setActiveObject(activeSelection);
-    expect(canvas.getActiveSelection()).toBe(activeSelection);
+    expect(canvas.getActiveObject()).toBe(activeSelection);
     expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
     expect(spy).toHaveBeenCalled();
     expect(activeSelection.canvas).toBe(canvas);

@@ -16,16 +16,14 @@ export interface ActiveSelectionOptions extends GroupProps {
 
 /**
  * Used by Canvas to manage selection.
- * Canvas accepts an `activeSelection` option allowing overriding and customization.
  *
  * @example
  * class MyActiveSelection extends ActiveSelection {
  *   ...
  * }
  *
- * const canvas = new Canvas(el, {
- *  activeSelection: new MyActiveSelection()
- * })
+ * // override the default `ActiveSelection` class
+ * classRegistry.setClass(MyActiveSelection)
  */
 export class ActiveSelection extends Group {
   static type = 'ActiveSelection';

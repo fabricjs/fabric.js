@@ -315,7 +315,7 @@ function testCanvasDisposing() {
         assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
         assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
         assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-        assert.ok(canvas.getActiveSelection() === activeSel, 'active selection');
+        assert.ok(canvas.getActiveObject() === activeSel, 'active selection');
         assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
         if (!isNode()) {
             assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appended to rootNode');
@@ -335,7 +335,7 @@ function testCanvasDisposing() {
         await canvas.dispose();
         assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-        assert.equal(canvas.getActiveSelection(), undefined, 'dispose should dispose active selection');
+        assert.equal(canvas.getActiveObject(), undefined, 'dispose should dispose active selection');
         assert.equal(activeSel.size(), 0, 'dispose should dispose active selection');
         assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
         if (!isNode()) {
