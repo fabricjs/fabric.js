@@ -7,6 +7,7 @@ import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { SprayBrushPoint } from './typedefs';
 import { CENTER } from '../constants';
+import { FixedLayout, LayoutManager } from '../LayoutManager';
 
 /**
  *
@@ -143,6 +144,7 @@ export class SprayBrush extends BaseBrush {
         objectCaching: true,
         subTargetCheck: false,
         interactive: false,
+        layoutManager: new LayoutManager(new FixedLayout()),
       }
     );
     this.shadow && group.set('shadow', new Shadow(this.shadow));

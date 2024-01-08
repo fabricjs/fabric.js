@@ -89,8 +89,7 @@ export class Group
 
   /**
    * Used to allow targeting of object inside groups.
-   * set to true if you want to select an object inside a group.\
-   * **REQUIRES** `subTargetCheck` set to true
+   * set to true if you want to select an object inside a group.
    * @default
    * @type boolean
    */
@@ -276,13 +275,6 @@ export class Group
   }
 
   /**
-   * @private
-   */
-  _shouldSetNestedCoords() {
-    return this.subTargetCheck;
-  }
-
-  /**
    * Remove all objects
    * @returns {FabricObject[]} removed objects
    */
@@ -355,7 +347,7 @@ export class Group
         )
       );
     }
-    this._shouldSetNestedCoords() && object.setCoords();
+
     object._set('group', this);
     object._set('canvas', this.canvas);
     this._watchObject(true, object);
@@ -402,7 +394,6 @@ export class Group
           object.calcTransformMatrix()
         )
       );
-      object.setCoords();
     }
     this._watchObject(false, object);
     const index =
@@ -477,16 +468,6 @@ export class Group
       }
     }
     this._drawClipPath(ctx, this.clipPath);
-  }
-
-  /**
-   * @override
-   * @return {Boolean}
-   */
-  setCoords() {
-    super.setCoords();
-    this._shouldSetNestedCoords() &&
-      this.forEachObject((object) => object.setCoords());
   }
 
   triggerLayout(options: ImperativeLayoutOptions = {}) {
@@ -667,7 +648,6 @@ export class Group
       } else {
         group.layoutManager = new LayoutManager();
       }
-      group.setCoords();
       return group;
     });
   }

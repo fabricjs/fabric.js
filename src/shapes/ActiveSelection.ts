@@ -28,6 +28,20 @@ export interface ActiveSelectionOptions extends GroupProps {
  * })
  */
 export class ActiveSelection extends Group {
+  static type = 'ActiveSelection';
+
+  static ownDefaults: Record<string, any> = {
+    subTargetCheck: true,
+    interactive: false,
+  };
+
+  static getDefaults(): Record<string, any> {
+    return {
+      ...super.getDefaults(),
+      ...ActiveSelection.ownDefaults,
+    };
+  }
+
   /**
    * controls how selected objects are added during a multiselection event
    * - `canvas-stacking` adds the selected object to the active selection while respecting canvas object stacking order
@@ -37,15 +51,6 @@ export class ActiveSelection extends Group {
    */
   // TODO FIX THIS WITH THE DEFAULTS LOGIC
   multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
-
-  static type = 'ActiveSelection';
-
-  /**
-   * @private
-   */
-  _shouldSetNestedCoords() {
-    return true;
-  }
 
   /**
    * @private
@@ -101,6 +106,7 @@ export class ActiveSelection extends Group {
     // the object will be in the objects array of both the ActiveSelection and the Group
     // but referenced in the group's _activeObjects so that it won't be rendered twice.
     this._enterGroup(object, removeParentTransform);
+    object.setCoords();
   }
 
   /**
