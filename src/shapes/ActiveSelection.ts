@@ -7,7 +7,6 @@ import {
   LAYOUT_TYPE_ADDED,
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
-import { resetObjectTransform } from '../util/misc/objectTransforms';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -147,11 +146,10 @@ export class ActiveSelection extends Group {
   }
 
   /**
-   * @override remove all objects and reset transform
+   * @override remove all objects
    */
   onDeselect() {
     this.removeAll();
-    resetObjectTransform(this);
     return false;
   }
 

@@ -13,7 +13,7 @@ describe('ActiveSelection', () => {
     );
   });
 
-  it('deselect removes all objects and resets transform', () => {
+  it('deselect removes all objects', () => {
     const selection = new ActiveSelection([], {
       left: 200,
       top: 100,
@@ -25,7 +25,7 @@ describe('ActiveSelection', () => {
     expect(selection).toMatchObject({
       left: 200,
       top: 100,
-      angle: 0,
+      angle: 45,
       scaleX: 1,
       scaleY: 1,
       skewX: 0,
@@ -35,11 +35,11 @@ describe('ActiveSelection', () => {
       _objects: [],
     });
     selection.add(new FabricObject({ left: 50, top: 50, strokeWidth: 0 }));
-    expect(selection.item(0).getCenterPoint()).toEqual({ x: 50, y: 50 });
+    const { x, y } = selection.item(0).getCenterPoint();
+    expect({ x: Math.round(x), y: Math.round(y) }).toEqual({ x: 50, y: 50 });
   });
 
-  // remove skip once #9152 is merged
-  it.skip('should not set coords in the constructor', () => {
+  it('should not set coords in the constructor', () => {
     const spy = jest.spyOn(ActiveSelection.prototype, 'setCoords');
     new ActiveSelection([
       new FabricObject({
