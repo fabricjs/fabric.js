@@ -28,6 +28,8 @@ export const Canvas = React.forwardRef<
       ref.current = canvas;
     }
 
+    // it is crucial `onLoad` is a dependency of this effect
+    // to ensure the canvas is disposed and re-created if it changes
     onLoad?.(canvas);
 
     return () => {

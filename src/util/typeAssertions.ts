@@ -3,6 +3,7 @@ import type { TFiller } from '../typedefs';
 import type { FabricText } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { Path } from '../shapes/Path';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
 
 export const isFiller = (
   filler: TFiller | string | null
@@ -41,3 +42,8 @@ export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
     typeof (fabricObject as Path)._renderPathCommands === 'function'
   );
 };
+
+export const isActiveSelection = (
+  fabricObject?: FabricObject
+): fabricObject is ActiveSelection =>
+  !!fabricObject && Object.hasOwn(fabricObject, 'multiSelectionStacking');

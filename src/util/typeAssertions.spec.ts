@@ -4,6 +4,7 @@ import {
   isPattern,
   isPath,
   isFiller,
+  isActiveSelection,
 } from './typeAssertions';
 import { FabricText } from '../shapes/Text/Text';
 import { IText } from '../shapes/IText/IText';
@@ -12,6 +13,9 @@ import { Path } from '../shapes/Path';
 import { Pattern } from '../Pattern/Pattern';
 import { Gradient } from '../gradient/Gradient';
 import { Shadow } from '../Shadow';
+import { ActiveSelection } from '../shapes/ActiveSelection';
+import { Canvas } from '../canvas/Canvas';
+import { Group } from '../shapes/Group';
 
 describe('typeAssertions', () => {
   describe('isTextObject', () => {
@@ -104,6 +108,18 @@ describe('typeAssertions', () => {
     test('can detect Gradient', () => {
       const gradient = new Gradient({ type: 'linear' });
       expect(isSerializableFiller(gradient)).toBe(true);
+    });
+  });
+  describe('isActiveSelection', () => {
+    test('can detect activeSelection', () => {
+      const as = new ActiveSelection([], {
+        canvas: new Canvas(),
+      });
+      expect(isActiveSelection(as)).toBe(true);
+    });
+    test('can safeguard against a group', () => {
+      const group = new Group([]);
+      expect(isActiveSelection(group)).toBe(false);
     });
   });
 });
