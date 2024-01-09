@@ -62,13 +62,6 @@ export abstract class LayoutStrategy {
   }
 
   /**
-   * called from the `onAfterLayout` hook
-   */
-  shouldResetTransform(context: StrictLayoutContext) {
-    return context.target.size() === 0;
-  }
-
-  /**
    * Override this method to customize layout.
    */
   calcBoundingBox(

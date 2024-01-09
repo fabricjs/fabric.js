@@ -475,12 +475,6 @@ describe('Layout Manager', () => {
         const canvasFire = jest.fn();
         target.canvas = { fire: canvasFire };
 
-        const shouldResetTransform = jest
-          .spyOn(manager.strategy, 'shouldResetTransform')
-          .mockImplementation(() => {
-            lifecycle.push(shouldResetTransform);
-          });
-
         const context: StrictLayoutContext = {
           bubbles,
           strategy: manager.strategy,
@@ -501,11 +495,9 @@ describe('Layout Manager', () => {
         manager['onAfterLayout'](context, layoutResult);
 
         expect(lifecycle).toEqual([
-          shouldResetTransform,
           targetFire,
           ...(bubbles ? [parentPerformLayout] : []),
         ]);
-        expect(shouldResetTransform).toBeCalledWith(context);
         expect(targetFire).toBeCalledWith('layout:after', {
           context,
           result: layoutResult,
@@ -526,34 +518,6 @@ describe('Layout Manager', () => {
           ]);
       }
     );
-
-    test.each([true, false])('reset target transform %s', (reset) => {
-      const targets = [new Group([new FabricObject()]), new FabricObject()];
-      const target = new Group(targets);
-      target.left = 50;
-
-      const manager = new LayoutManager();
-      jest
-        .spyOn(manager.strategy, 'shouldResetTransform')
-        .mockImplementation(() => {
-          return reset;
-        });
-
-      const context: StrictLayoutContext = {
-        bubbles: true,
-        strategy: manager.strategy,
-        type: LAYOUT_TYPE_REMOVED,
-        target,
-        targets,
-        prevStrategy: undefined,
-        stopPropagation() {
-          this.bubbles = false;
-        },
-      };
-      manager['onAfterLayout'](context);
-
-      expect(target.left).toBe(reset ? 0 : 50);
-    });
 
     test('bubbling', () => {
       const manager = new LayoutManager();
