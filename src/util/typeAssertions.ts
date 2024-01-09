@@ -3,7 +3,6 @@ import type { TFiller } from '../typedefs';
 import type { FabricText } from '../shapes/Text/Text';
 import type { Pattern } from '../Pattern';
 import type { Path } from '../shapes/Path';
-import { classRegistry } from '../ClassRegistry';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
 
 export const isFiller = (
@@ -47,5 +46,4 @@ export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
 export const isActiveSelection = (
   fabricObject?: FabricObject
 ): fabricObject is ActiveSelection =>
-  fabricObject instanceof
-  classRegistry.getClass<typeof ActiveSelection>('ActiveSelection');
+  !!fabricObject && Object.hasOwn(fabricObject, 'multiSelectionStacking');

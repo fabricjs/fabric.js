@@ -1113,9 +1113,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   _setActiveObject(object: FabricObject, e?: TPointerEvent) {
     const prevActiveObject = this._activeObject;
-    if (this._activeObject === object) {
+    if (prevActiveObject === object) {
       return false;
     }
+    // after calling this._discardActiveObject, this,_activeObject could be undefined
     if (!this._discardActiveObject(e, object) && this._activeObject) {
       // refused to deselect
       return false;
@@ -1247,7 +1248,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    */
-  _toObject(
+  protected _toObject(
     instance: FabricObject,
     methodName: 'toObject' | 'toDatalessObject',
     propertiesToInclude: string[]
@@ -1269,10 +1270,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {FabricObject} [instance] the object to transform (gets mutated)
    * @returns the original values of instance which were changed
    */
-  _realizeGroupTransformOnObject(
+  private _realizeGroupTransformOnObject(
     instance: FabricObject
   ): Partial<typeof instance> {
-    if (instance.group && isActiveSelection(instance.group)) {
+    const { group } = instance;
+    if (group && isActiveSelection(group) && this._activeObject === group) {
       const layoutProps = [
         'angle',
         'flipX',
@@ -1285,7 +1287,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
-      addTransformToObject(instance, instance.group.calcOwnMatrix());
+      addTransformToObject(instance, group.calcOwnMatrix());
       return originalValues;
     } else {
       return {};

@@ -1475,13 +1475,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           activeObject.remove(target);
           this._hoveredTarget = target;
           this._hoveredTargets = [...this.targets];
+          // if after removing an object we are left with one only...
           if (activeObject.size() === 1) {
             // activate last remaining object
             // deselecting the active selection will remove the remaining object from it
             this._setActiveObject(activeObject.item(0), e);
           }
         } else {
-          //  `target` isn't part of active selection => add it
+          // `target` isn't part of active selection => add it
           activeObject.multiSelectAdd(target);
           this._hoveredTarget = activeObject;
           this._hoveredTargets = [...this.targets];
