@@ -2,6 +2,7 @@
 
 ## [next]
 
+- BREAKING BETA rm(LayoutManager): `shouldResetTransform` [#9581](https://github.com/fabricjs/fabric.js/pull/9581)
 - refactor(): rm active selection ref [#9561](https://github.com/fabricjs/fabric.js/pull/9561)
 - feat(Next.js sandbox): simpler canvas hook [#9577](https://github.com/fabricjs/fabric.js/pull/9577)
 - fix(): fix modify polygon points with zero sized polygons ( particular case of axis oriented lines ) [#9575](https://github.com/fabricjs/fabric.js/pull/9575)
