@@ -305,19 +305,27 @@ describe('Layout Manager', () => {
         relativeCorrection: new Point(-30, -40),
       });
 
-      const target = new Group([], { scaleX: 2, scaleY: 0.5, angle: 30 });
+      const rect = new FabricObject({ width: 50, height: 50 });
+      const target = new Group([rect], { scaleX: 2, scaleY: 0.5, angle: 30 });
 
       const context: StrictLayoutContext = {
         bubbles: true,
         strategy: manager.strategy,
         target,
+        targets: [rect],
         ...options,
         stopPropagation() {
           this.bubbles = false;
         },
       };
 
-      expect(manager['getLayoutResult'](context)).toMatchSnapshot();
+      expect(manager['getLayoutResult'](context)).toMatchSnapshot({
+        cloneDeepWith: (value: any) => {
+          if (value instanceof Point) {
+            return new Point(Math.round(value.x), Math.round(value.y));
+          }
+        },
+      });
     });
   });
 

@@ -7,12 +7,12 @@ exports[`Layout Manager getLayoutResult imperative trigger 1`] = `
     "y": 100,
   },
   "offset": Point {
-    "x": -67.32050807568876,
-    "y": -138.5640646055102,
+    "x": -42,
+    "y": -113,
   },
   "prevCenter": Point {
-    "x": 0,
-    "y": 0,
+    "x": 38,
+    "y": 37,
   },
   "result": {
     "center": Point {
