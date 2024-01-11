@@ -146,9 +146,7 @@ export class ActiveSelection extends Group {
   }
 
   /**
-   * If returns true, deselection is cancelled.
-   * @since 2.0.0
-   * @return {Boolean} [cancel]
+   * @override remove all objects
    */
   onDeselect() {
     this.removeAll();
