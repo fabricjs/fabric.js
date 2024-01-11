@@ -179,6 +179,13 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
+   * @deprecated intermidiate method to be removed, do not use
+   */
+  protected isStrokeAccountedForInDimensions() {
+    return false;
+  }
+
+  /**
    * @return {Point[]} [tl, tr, br, bl] in the scene plane
    */
   getCoords(): Point[] {

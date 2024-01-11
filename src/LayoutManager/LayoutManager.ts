@@ -4,7 +4,6 @@ import { CENTER, iMatrix } from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
-import { resetObjectTransform } from '../util/misc/objectTransforms';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
@@ -80,6 +79,7 @@ export class LayoutManager {
           'scaling',
           'skewing',
           'changed',
+          'modifyPoly',
         ] as TModificationEvents[]
       ).map((key) =>
         object.on(key, (e) =>
@@ -261,11 +261,6 @@ export class LayoutManager {
       ...bubblingContext
     } = context;
     const { canvas } = target;
-    if (strategy.shouldResetTransform(context)) {
-      resetObjectTransform(target);
-      target.left = 0;
-      target.top = 0;
-    }
 
     //  fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:after', {

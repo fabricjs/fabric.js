@@ -1,16 +1,16 @@
-import { StaticCanvas } from '../canvas/StaticCanvas';
+import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
+import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
-
 import {
-  LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_ADDED,
-  LAYOUT_TYPE_REMOVED,
   LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_REMOVED,
 } from './constants';
 import type {
   LayoutContext,
@@ -113,7 +113,7 @@ describe('Layout Manager', () => {
 
   describe('onBeforeLayout', () => {
     describe('triggers', () => {
-      const triggers = [
+      const triggers: ('modified' | TModificationEvents | 'changed')[] = [
         'modified',
         'moving',
         'resizing',
@@ -121,7 +121,8 @@ describe('Layout Manager', () => {
         'scaling',
         'skewing',
         'changed',
-      ] as const;
+        'modifyPoly',
+      ];
 
       it('should subscribe object', () => {
         const lifecycle: jest.SpyInstance[] = [];
@@ -304,19 +305,27 @@ describe('Layout Manager', () => {
         relativeCorrection: new Point(-30, -40),
       });
 
-      const target = new Group([], { scaleX: 2, scaleY: 0.5, angle: 30 });
+      const rect = new FabricObject({ width: 50, height: 50 });
+      const target = new Group([rect], { scaleX: 2, scaleY: 0.5, angle: 30 });
 
       const context: StrictLayoutContext = {
         bubbles: true,
         strategy: manager.strategy,
         target,
+        targets: [rect],
         ...options,
         stopPropagation() {
           this.bubbles = false;
         },
       };
 
-      expect(manager['getLayoutResult'](context)).toMatchSnapshot();
+      expect(manager['getLayoutResult'](context)).toMatchSnapshot({
+        cloneDeepWith: (value: any) => {
+          if (value instanceof Point) {
+            return new Point(Math.round(value.x), Math.round(value.y));
+          }
+        },
+      });
     });
   });
 
@@ -474,12 +483,6 @@ describe('Layout Manager', () => {
         const canvasFire = jest.fn();
         target.canvas = { fire: canvasFire };
 
-        const shouldResetTransform = jest
-          .spyOn(manager.strategy, 'shouldResetTransform')
-          .mockImplementation(() => {
-            lifecycle.push(shouldResetTransform);
-          });
-
         const context: StrictLayoutContext = {
           bubbles,
           strategy: manager.strategy,
@@ -500,11 +503,9 @@ describe('Layout Manager', () => {
         manager['onAfterLayout'](context, layoutResult);
 
         expect(lifecycle).toEqual([
-          shouldResetTransform,
           targetFire,
           ...(bubbles ? [parentPerformLayout] : []),
         ]);
-        expect(shouldResetTransform).toBeCalledWith(context);
         expect(targetFire).toBeCalledWith('layout:after', {
           context,
           result: layoutResult,
@@ -525,34 +526,6 @@ describe('Layout Manager', () => {
           ]);
       }
     );
-
-    test.each([true, false])('reset target transform %s', (reset) => {
-      const targets = [new Group([new FabricObject()]), new FabricObject()];
-      const target = new Group(targets);
-      target.left = 50;
-
-      const manager = new LayoutManager();
-      jest
-        .spyOn(manager.strategy, 'shouldResetTransform')
-        .mockImplementation(() => {
-          return reset;
-        });
-
-      const context: StrictLayoutContext = {
-        bubbles: true,
-        strategy: manager.strategy,
-        type: LAYOUT_TYPE_REMOVED,
-        target,
-        targets,
-        prevStrategy: undefined,
-        stopPropagation() {
-          this.bubbles = false;
-        },
-      };
-      manager['onAfterLayout'](context);
-
-      expect(target.left).toBe(reset ? 0 : 50);
-    });
 
     test('bubbling', () => {
       const manager = new LayoutManager();
@@ -765,6 +738,19 @@ describe('Layout Manager', () => {
       expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
       expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
       expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
+    });
+
+    it('should subscribe objects on initialization', () => {
+      const child = new FabricObject({
+        width: 200,
+        height: 200,
+        strokeWidth: 0,
+      });
+      jest.spyOn(child, 'toJSON').mockReturnValue('child');
+      const group = new Group([child]);
+      expect(
+        Array.from(group.layoutManager['_subscriptions'].keys())
+      ).toMatchObject([child]);
     });
 
     test.each([true, false])(
