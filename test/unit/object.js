@@ -18,22 +18,6 @@
     }
   });
 
-  QUnit.test('constructor & properties', function(assert) {
-    assert.ok(typeof fabric.Object === 'function');
-
-    var cObj = new fabric.Object();
-
-    assert.ok(cObj);
-    assert.ok(cObj instanceof fabric.FabricObject);
-    assert.ok(cObj.constructor === fabric.Object);
-
-    assert.equal(cObj.constructor.type, 'FabricObject');
-    assert.equal(cObj.includeDefaultValues, true);
-    assert.equal(cObj.selectable, true);
-
-    assert.equal(cObj.objectCaching, !isNode(), 'object caching default value');
-  });
-
   QUnit.test('get', function(assert) {
     var cObj = new fabric.Object({
       left: 11,

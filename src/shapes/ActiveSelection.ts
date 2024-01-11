@@ -1,8 +1,12 @@
 import type { ControlRenderingStyleOverride } from '../controls/controlRendering';
 import { classRegistry } from '../ClassRegistry';
-import type { GroupProps, LayoutContext } from './Group';
+import type { GroupProps } from './Group';
 import { Group } from './Group';
 import type { FabricObject } from './Object/FabricObject';
+import {
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_REMOVED,
+} from '../LayoutManager/constants';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -12,19 +16,25 @@ export interface ActiveSelectionOptions extends GroupProps {
 
 /**
  * Used by Canvas to manage selection.
- * Canvas accepts an `activeSelection` option allowing overriding and customization.
  *
  * @example
  * class MyActiveSelection extends ActiveSelection {
  *   ...
  * }
  *
- * const canvas = new Canvas(el, {
- *  activeSelection: new MyActiveSelection()
- * })
+ * // override the default `ActiveSelection` class
+ * classRegistry.setClass(MyActiveSelection)
  */
 export class ActiveSelection extends Group {
-  declare _objects: FabricObject[];
+  static type = 'ActiveSelection';
+
+  static ownDefaults: Record<string, any> = {
+    multiSelectionStacking: 'canvas-stacking',
+  };
+
+  static getDefaults() {
+    return { ...super.getDefaults(), ...this.ownDefaults };
+  }
 
   /**
    * controls how selected objects are added during a multiselection event
@@ -33,10 +43,7 @@ export class ActiveSelection extends Group {
    * meaning that the stack is ordered by the order in which objects were selected
    * @default `canvas-stacking`
    */
-  // TODO FIX THIS WITH THE DEFAULTS LOGIC
-  multiSelectionStacking: MultiSelectionStacking = 'canvas-stacking';
-
-  static type = 'ActiveSelection';
+  declare multiSelectionStacking: MultiSelectionStacking;
 
   /**
    * @private
@@ -125,10 +132,10 @@ export class ActiveSelection extends Group {
       const { parent } = object;
       parent && groups.add(parent);
     });
-    if (type === 'removed') {
+    if (type === LAYOUT_TYPE_REMOVED) {
       //  invalidate groups' layout and mark as dirty
       groups.forEach((group) => {
-        group._onAfterObjectsChange('added', targets);
+        group._onAfterObjectsChange(LAYOUT_TYPE_ADDED, targets);
       });
     } else {
       //  mark groups as dirty
@@ -139,32 +146,11 @@ export class ActiveSelection extends Group {
   }
 
   /**
-   * If returns true, deselection is cancelled.
-   * @since 2.0.0
-   * @return {Boolean} [cancel]
+   * @override remove all objects
    */
   onDeselect() {
     this.removeAll();
     return false;
-  }
-
-  _applyLayoutStrategy(context: LayoutContext): void {
-    super._applyLayoutStrategy(context);
-    if (this._objects.length === 0) {
-      // in this case layout was skipped
-      // we reset transform for the next selection
-      Object.assign(this, {
-        left: 0,
-        top: 0,
-        angle: 0,
-        scaleX: 1,
-        scaleY: 1,
-        skewX: 0,
-        skewY: 0,
-        flipX: false,
-        flipY: false,
-      });
-    }
   }
 
   /**
