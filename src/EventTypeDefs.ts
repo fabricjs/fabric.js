@@ -12,7 +12,7 @@ import type {
   LayoutAfterEvent,
 } from './LayoutManager/types';
 import type {
-  MODIFYPOLY,
+  MODIFY_POLY,
   MOVING,
   RESIZING,
   ROTATING,
@@ -110,7 +110,7 @@ export type TModificationEvents =
   | typeof ROTATING
   | typeof SKEWING
   | typeof RESIZING
-  | typeof MODIFYPOLY;
+  | typeof MODIFY_POLY;
 
 export interface ModifiedEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {

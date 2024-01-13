@@ -3,7 +3,7 @@ import { Point } from '../Point';
 import {
   CENTER,
   CHANGED,
-  MODIFYPOLY,
+  MODIFY_POLY,
   MOVING,
   RESIZING,
   ROTATING,
@@ -89,7 +89,7 @@ export class LayoutManager {
           SCALING,
           SKEWING,
           CHANGED,
-          MODIFYPOLY,
+          MODIFY_POLY,
         ] as TModificationEvents[]
       ).map((key) =>
         object.on(key, (e) =>

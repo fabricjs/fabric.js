@@ -121,7 +121,7 @@ describe('Layout Manager', () => {
         'scaling',
         'skewing',
         'changed',
-        'modifypoly',
+        'modifyPoly',
       ];
 
       it('should subscribe object', () => {
