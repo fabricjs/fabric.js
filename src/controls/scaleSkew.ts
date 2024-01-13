@@ -4,7 +4,7 @@ import type {
   TPointerEvent,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { SCALE_X, SCALE_Y } from '../constants';
+import { SCALE_X, SCALE_Y, SKEW_X, SKEW_Y } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TAxisKey } from '../typedefs';
 import { scaleCursorStyleHandler, scalingX, scalingY } from './scale';
@@ -27,11 +27,11 @@ export const scaleOrSkewActionName: ControlCallback<
   const isAlternative = isAltAction(eventData, fabricObject);
   if (control.x === 0) {
     // then is scaleY or skewX
-    return isAlternative ? 'skewX' : SCALE_Y;
+    return isAlternative ? SKEW_X : SCALE_Y;
   }
   if (control.y === 0) {
     // then is scaleY or skewX
-    return isAlternative ? 'skewY' : SCALE_X;
+    return isAlternative ? SKEW_Y : SCALE_X;
   }
   return '';
 };

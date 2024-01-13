@@ -19,7 +19,14 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { CENTER, SCALE_X, SCALE_Y, SKEWING } from '../constants';
+import {
+  CENTER,
+  SCALE_X,
+  SCALE_Y,
+  SKEWING,
+  SKEW_X,
+  SKEW_Y,
+} from '../constants';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -37,7 +44,7 @@ const AXIS_KEYS: Record<
   x: {
     counterAxis: 'y',
     scale: SCALE_X,
-    skew: 'skewX',
+    skew: SKEW_X,
     lockSkewing: 'lockSkewingX',
     origin: 'originX',
     flip: 'flipX',
@@ -45,7 +52,7 @@ const AXIS_KEYS: Record<
   y: {
     counterAxis: 'x',
     scale: SCALE_Y,
-    skew: 'skewY',
+    skew: SKEW_Y,
     lockSkewing: 'lockSkewingY',
     origin: 'originY',
     flip: 'flipY',

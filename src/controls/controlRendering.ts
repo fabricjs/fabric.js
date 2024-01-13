@@ -1,4 +1,4 @@
-import { twoMathPi } from '../constants';
+import { FILL, STROKE, twoMathPi } from '../constants';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
@@ -50,7 +50,7 @@ export function renderCircleControl(
       typeof styleOverride.transparentCorners !== 'undefined'
         ? styleOverride.transparentCorners
         : fabricObject.transparentCorners,
-    methodName = transparentCorners ? 'stroke' : 'fill',
+    methodName = transparentCorners ? STROKE : FILL,
     stroke =
       !transparentCorners &&
       (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
@@ -111,7 +111,7 @@ export function renderSquareControl(
       typeof styleOverride.transparentCorners !== 'undefined'
         ? styleOverride.transparentCorners
         : fabricObject.transparentCorners,
-    methodName = transparentCorners ? 'stroke' : 'fill',
+    methodName = transparentCorners ? STROKE : FILL,
     stroke =
       !transparentCorners &&
       (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),

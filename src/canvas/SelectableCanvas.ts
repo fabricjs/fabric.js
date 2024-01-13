@@ -42,6 +42,8 @@ import {
   SCALE,
   SCALE_X,
   SCALE_Y,
+  SKEW_X,
+  SKEW_Y,
   TOP,
 } from '../constants';
 import type { CanvasOptions } from './CanvasOptions';
@@ -1296,8 +1298,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         LEFT,
         SCALE_X,
         SCALE_Y,
-        'skewX',
-        'skewY',
+        SKEW_X,
+        SKEW_Y,
         TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);

@@ -7,6 +7,7 @@ import {
   LEFT,
   SCALE_X,
   SCALE_Y,
+  STROKE,
   TOP,
   VERSION,
 } from '../../constants';
@@ -848,7 +849,7 @@ export class FabricObject<
    */
   needsItsOwnCache() {
     if (
-      this.paintFirst === 'stroke' &&
+      this.paintFirst === STROKE &&
       this.hasFill() &&
       this.hasStroke() &&
       !!this.shadow
@@ -1184,7 +1185,7 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderPaintInOrder(ctx: CanvasRenderingContext2D) {
-    if (this.paintFirst === 'stroke') {
+    if (this.paintFirst === STROKE) {
       this._renderStroke(ctx);
       this._renderFill(ctx);
     } else {

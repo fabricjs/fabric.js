@@ -1,4 +1,13 @@
-import { TOP, LEFT, SCALE_Y, SCALE_X } from '../../constants';
+import {
+  TOP,
+  LEFT,
+  SCALE_Y,
+  SCALE_X,
+  SKEW_X,
+  SKEW_Y,
+  FILL,
+  STROKE,
+} from '../../constants';
 
 export const stateProperties = [
   TOP,
@@ -14,13 +23,13 @@ export const stateProperties = [
   'globalCompositeOperation',
   'shadow',
   'visible',
-  'skewX',
-  'skewY',
+  SKEW_X,
+  SKEW_Y,
 ];
 
 export const cacheProperties = [
-  'fill',
-  'stroke',
+  FILL,
+  STROKE,
   'strokeWidth',
   'strokeDashArray',
   'width',
@@ -55,7 +64,7 @@ export const fabricObjectDefaultValues = {
   strokeUniform: false,
   padding: 0,
   opacity: 1,
-  paintFirst: 'fill',
+  paintFirst: FILL,
   fill: 'rgb(0,0,0)',
   fillRule: 'nonzero',
   stroke: null,
