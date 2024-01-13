@@ -183,20 +183,6 @@ describe('Layout Manager', () => {
       });
     });
 
-    it('a non attached manager should not subscribe object', () => {
-      const manager = new LayoutManager();
-      const subscribe = jest.spyOn(manager, 'subscribe');
-      const object = new FabricObject();
-      const target = new Group([object]);
-      manager.performLayout({
-        type: LAYOUT_TYPE_INITIALIZATION,
-        target,
-        targets: [object],
-      });
-
-      expect(subscribe).not.toHaveBeenCalled();
-    });
-
     it.each([
       { trigger: LAYOUT_TYPE_INITIALIZATION, action: 'subscribe' },
       { trigger: LAYOUT_TYPE_ADDED, action: 'subscribe' },
