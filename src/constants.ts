@@ -25,3 +25,15 @@ export const RIGHT = 'right';
 export const NONE = 'none';
 
 export const reNewline = /\r?\n/;
+
+export const MOVING = 'moving';
+export const SCALING = 'scaling';
+export const ROTATING = 'rotating';
+export const ROTATE = 'rotate';
+export const SKEWING = 'skewing';
+export const RESIZING = 'resizing';
+export const MODIFYPOLY = 'modifypoly';
+export const CHANGED = 'changed';
+export const SCALE = 'scale';
+export const SCALE_X = 'scaleX';
+export const SCALE_Y = 'scaleY';

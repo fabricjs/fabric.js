@@ -1,6 +1,16 @@
 import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
-import { CENTER, iMatrix } from '../constants';
+import {
+  CENTER,
+  CHANGED,
+  MODIFYPOLY,
+  MOVING,
+  RESIZING,
+  ROTATING,
+  SCALING,
+  SKEWING,
+  iMatrix,
+} from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
@@ -73,13 +83,13 @@ export class LayoutManager {
       ),
       ...(
         [
-          'moving',
-          'resizing',
-          'rotating',
-          'scaling',
-          'skewing',
-          'changed',
-          'modifyPoly',
+          MOVING,
+          RESIZING,
+          ROTATING,
+          SCALING,
+          SKEWING,
+          CHANGED,
+          MODIFYPOLY,
         ] as TModificationEvents[]
       ).map((key) =>
         object.on(key, (e) =>

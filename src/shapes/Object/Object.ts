@@ -5,6 +5,8 @@ import {
   CENTER,
   iMatrix,
   LEFT,
+  SCALE_X,
+  SCALE_Y,
   TOP,
   VERSION,
 } from '../../constants';
@@ -695,10 +697,10 @@ export class FabricObject<
   _set(key: string, value: any) {
     const isChanged = this[key as keyof this] !== value;
 
-    if (key === 'scaleX' || key === 'scaleY') {
+    if (key === SCALE_X || key === SCALE_Y) {
       value = this._constrainScale(value);
     }
-    if (key === 'scaleX' && value < 0) {
+    if (key === SCALE_Y && value < 0) {
       this.flipX = !this.flipX;
       value *= -1;
     } else if (key === 'scaleY' && value < 0) {

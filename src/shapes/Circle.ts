@@ -9,6 +9,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { CSSRules } from '../parser/typedefs';
+import { SCALE_X, SCALE_Y } from '../constants';
 
 interface UniqueCircleProps {
   /**
@@ -111,7 +112,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusX(): number {
-    return this.get('radius') * this.get('scaleX');
+    return this.get('radius') * this.get(SCALE_X);
   }
 
   /**
@@ -119,7 +120,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusY(): number {
-    return this.get('radius') * this.get('scaleY');
+    return this.get('radius') * this.get(SCALE_Y);
   }
 
   /**

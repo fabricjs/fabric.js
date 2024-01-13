@@ -1,10 +1,10 @@
-import { TOP, LEFT } from '../../constants';
+import { TOP, LEFT, SCALE_Y, SCALE_X } from '../../constants';
 
 export const stateProperties = [
   TOP,
   LEFT,
-  'scaleX',
-  'scaleY',
+  SCALE_X,
+  SCALE_Y,
   'flipX',
   'flipY',
   'originX',

@@ -16,7 +16,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER, LEFT, TOP } from '../constants';
+import { CENTER, LEFT, SCALE_X, SCALE_Y, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
@@ -278,7 +278,7 @@ export class Polyline<
     if (
       this.exactBoundingBox &&
       changed &&
-      (((key === 'scaleX' || key === 'scaleY') &&
+      (((key === SCALE_X || key === SCALE_Y) &&
         this.strokeUniform &&
         (this.constructor as typeof Polyline).layoutProperties.includes(
           'strokeUniform'

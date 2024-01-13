@@ -11,6 +11,14 @@ import type {
   LayoutBeforeEvent,
   LayoutAfterEvent,
 } from './LayoutManager/types';
+import type {
+  MODIFYPOLY,
+  MOVING,
+  RESIZING,
+  ROTATING,
+  SCALING,
+  SKEWING,
+} from './constants';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -97,12 +105,12 @@ export interface BasicTransformEvent<E extends Event = TPointerEvent>
 }
 
 export type TModificationEvents =
-  | 'moving'
-  | 'scaling'
-  | 'rotating'
-  | 'skewing'
-  | 'resizing'
-  | 'modifyPoly';
+  | typeof MOVING
+  | typeof SCALING
+  | typeof ROTATING
+  | typeof SKEWING
+  | typeof RESIZING
+  | typeof MODIFYPOLY;
 
 export interface ModifiedEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
