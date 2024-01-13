@@ -3,6 +3,26 @@
 ## [next]
 
 - fix(Text) Fix style transfer issue on a line that is not empty [#9461](https://github.com/fabricjs/fabric.js/pull/9461)
+- ci(): add a vue template [#9502](https://github.com/fabricjs/fabric.js/pull/9502)
+- refactor(): `getActiveControl` now returns the key, the corner and the coordinates [#9515](https://github.com/fabricjs/fabric.js/pull/9515)
+- fix(Controls): forbid scaling to avoid NaN issues on scaling zero sized objects. #9475 [#9563](https://github.com/fabricjs/fabric.js/pull/9563)
+- feat(LayoutManager): BREAKING remove `shouldResetTransform` handling from LayoutManager [#9581](https://github.com/fabricjs/fabric.js/pull/9581)
+- refactor(): rm active selection ref [#9561](https://github.com/fabricjs/fabric.js/pull/9561)
+- feat(Next.js sandbox): simpler canvas hook [#9577](https://github.com/fabricjs/fabric.js/pull/9577)
+- fix(): fix modify polygon points with zero sized polygons ( particular case of axis oriented lines ) [#9575](https://github.com/fabricjs/fabric.js/pull/9575)
+- fix(Polyline, Polygon): Fix wrong pathOffset for polyline with the normal bounding box calculation. [#9460](https://github.com/fabricjs/fabric.js/pull/9460)
+
+## [6.0.0-beta17]
+
+- refactor(): Rewrite how typeAssertion works to avoid isType and add tests for subclasses [#9570](https://github.com/fabricjs/fabric.js/pull/9570)
+- fix(): perform layout on poly change + initialization object subscription [#9537](https://github.com/fabricjs/fabric.js/pull/9537)
+- fix(): Addressing path cloning slowness ( partially ) [#9573](https://github.com/fabricjs/fabric.js/pull/9573)
+- fix(): `exactBoundingBox` stroke calculations [#9572](https://github.com/fabricjs/fabric.js/pull/9572)
+- feat(): Add save/restore ability to group LayoutManager [#9564](https://github.com/fabricjs/fabric.js/pull/9564)
+- fix(): Remove unwanted set type warning [#9569](https://github.com/fabricjs/fabric.js/pull/9569)
+- refactor(): Separate defaults for base fabric object vs interactive object. Also some moving around of variables [#9474](https://github.com/fabricjs/fabric.js/pull/9474)
+- refactor(): Change how LayoutManager handles restoring groups [#9522](https://github.com/fabricjs/fabric.js/pull/9522)
+- fix(BaseConfiguration): set `devicePixelRatio` from window [#9470](https://github.com/fabricjs/fabric.js/pull/9470)
 - fix(): bubble dirty flag for group only when true [#9540](https://github.com/fabricjs/fabric.js/pull/9540)
 - test() Backport a test to capture a failing text style situation [#9531](https://github.com/fabricjs/fabric.js/pull/9531)
 
@@ -113,6 +133,7 @@
 - ci(): properly checkout head for stats [#9080](https://github.com/fabricjs/fabric.js/pull/9080)
 - fix(Text): `_getFontDeclaration` wasn't considering fontFamily from the style object [#9082](https://github.com/fabricjs/fabric.js/pull/9082)
 - chore(TS): Fix ITextBehaviour enterEditing type [#9075](https://github.com/fabricjs/fabric.js/pull/9075)
+- cd(node): ban `package.json` main entry [#9068](https://github.com/fabricjs/fabric.js/pull/9068)
 - chore(TS): export FabricObjectProps and GroupProps [#9025](https://github.com/fabricjs/fabric.js/pull/9025)
 - chore(TS): Replace BaseFabricObject with FabricObject [#9016](https://github.com/fabricjs/fabric.js/pull/9016)
 - refactor(svgImport): remove the css/gradient/clipPath global definitions [#9030](https://github.com/fabricjs/fabric.js/pull/9030)

@@ -197,6 +197,10 @@
       strokeUniform:            false,
       subTargetCheck:           false,
       interactive:              false,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
 
     assert.deepEqual(clone, expectedObject);

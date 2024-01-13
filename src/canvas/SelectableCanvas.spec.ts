@@ -302,4 +302,52 @@ describe('Selectable Canvas', () => {
       }
     });
   });
+
+  describe('setupCurrentTransform', () => {
+    test.each(
+      ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr']
+        .map((controlKey) => [
+          { controlKey, zoom: false },
+          { controlKey, zoom: true },
+        ])
+        .flat()
+    )('should fire before:transform event %p', ({ controlKey, zoom }) => {
+      const canvas = new Canvas();
+      const canvasOffset = canvas.calcOffset();
+      const object = new FabricObject({
+        left: 50,
+        top: 50,
+        width: 50,
+        height: 50,
+      });
+      canvas.add(object);
+      canvas.setActiveObject(object);
+      zoom && canvas.zoomToPoint(new Point(25, 25), 2);
+      expect(canvas._currentTransform).toBeFalsy();
+
+      const spy = jest.fn();
+      canvas.on('before:transform', spy);
+      const setupCurrentTransformSpy = jest.spyOn(
+        canvas,
+        '_setupCurrentTransform'
+      );
+
+      const {
+        corner: { tl, tr, bl },
+      } = object.oCoords[controlKey];
+      canvas.getSelectionElement().dispatchEvent(
+        new MouseEvent('mousedown', {
+          clientX: canvasOffset.left + (tl.x + tr.x) / 2,
+          clientY: canvasOffset.top + (tl.y + bl.y) / 2,
+          which: 1,
+        })
+      );
+
+      expect(setupCurrentTransformSpy).toHaveBeenCalledTimes(1);
+      expect(canvas._currentTransform).toBeDefined();
+      expect(canvas._currentTransform).toHaveProperty('target', object);
+      expect(canvas._currentTransform).toHaveProperty('corner', controlKey);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+  });
 });
