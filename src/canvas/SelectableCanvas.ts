@@ -539,7 +539,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   _getOriginFromCorner(
     target: FabricObject,
-    controlName: string | undefined
+    controlName: string
   ): { x: TOriginX; y: TOriginY } {
     const origin = {
       x: target.originX,
