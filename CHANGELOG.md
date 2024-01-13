@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(): use deconstruction to save some bytes of code [#9593](https://github.com/fabricjs/fabric.js/pull/9593)
+- chore(): use deconstruction and constants in place of strings to save some bytes of code [#9593](https://github.com/fabricjs/fabric.js/pull/9593)
 - fix(LayoutManager): remove unnecessary check [#9591](https://github.com/fabricjs/fabric.js/pull/9591)
 - fix(Text) Fix style transfer issue on a line that is not empty [#9461](https://github.com/fabricjs/fabric.js/pull/9461)
 - ci(): add a vue template [#9502](https://github.com/fabricjs/fabric.js/pull/9502)
