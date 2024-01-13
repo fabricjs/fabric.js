@@ -109,17 +109,12 @@ export class LayoutManager {
   }
 
   protected onBeforeLayout(context: StrictLayoutContext) {
-    const { target } = context;
+    const { target, type } = context;
     const { canvas } = target;
     // handle layout triggers subscription
-    if (
-      // subscribe only if instance is the target's `layoutManager`
-      target.layoutManager === this &&
-      (context.type === LAYOUT_TYPE_INITIALIZATION ||
-        context.type === LAYOUT_TYPE_ADDED)
-    ) {
+    if (type === LAYOUT_TYPE_INITIALIZATION || type === LAYOUT_TYPE_ADDED) {
       context.targets.forEach((object) => this.subscribe(object, context));
-    } else if (context.type === LAYOUT_TYPE_REMOVED) {
+    } else if (type === LAYOUT_TYPE_REMOVED) {
       context.targets.forEach((object) => this.unsubscribe(object, context));
     }
     // fire layout event (event will fire only for layouts after initialization layout)
@@ -132,11 +127,11 @@ export class LayoutManager {
         context,
       });
 
-    if (context.type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
-      const { strategy: _, ...tricklingContext } = context;
+    if (type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
+      const { strategy, ...tricklingContext } = context;
       // traverse the tree
       target.forEachObject((object) => {
-        (object as Group).layoutManager?.performLayout({
+        (object as Group).layoutManager.performLayout({
           ...tricklingContext,
           bubbles: false,
           target: object as Group,
@@ -148,19 +143,16 @@ export class LayoutManager {
   protected getLayoutResult(
     context: StrictLayoutContext
   ): Required<LayoutResult> | undefined {
-    const { target } = context;
+    const { target, strategy, type } = context;
 
-    const result = context.strategy.calcLayoutResult(
-      context,
-      target.getObjects()
-    );
+    const result = strategy.calcLayoutResult(context, target.getObjects());
 
     if (!result) {
       return;
     }
 
     const prevCenter =
-      context.type === LAYOUT_TYPE_INITIALIZATION
+      type === LAYOUT_TYPE_INITIALIZATION
         ? new Point()
         : target.getRelativeCenterPoint();
 
@@ -174,7 +166,7 @@ export class LayoutManager {
       .add(correction)
       .transform(
         // in `initialization` we do not account for target's transformation matrix
-        context.type === LAYOUT_TYPE_INITIALIZATION
+        type === LAYOUT_TYPE_INITIALIZATION
           ? iMatrix
           : invertTransform(target.calcOwnMatrix()),
         true
@@ -243,10 +235,8 @@ export class LayoutManager {
     { offset }: Required<LayoutResult>,
     object: FabricObject
   ) {
-    object.set({
-      left: object.left + offset.x,
-      top: object.top + offset.y,
-    });
+    object.left += offset.x;
+    object.top += offset.y;
   }
 
   protected onAfterLayout(
@@ -276,7 +266,7 @@ export class LayoutManager {
 
     //  bubble
     const parent = target.group;
-    if (bubbles && parent?.layoutManager) {
+    if (bubbles && parent) {
       //  add target to context#path
       (bubblingContext.path || (bubblingContext.path = [])).push(target);
       //  all parents should invalidate their layout
@@ -288,8 +278,9 @@ export class LayoutManager {
   }
 
   dispose() {
-    this._subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
-    this._subscriptions.clear();
+    const { _subscriptions } = this;
+    _subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
+    _subscriptions.clear();
   }
 
   toObject() {
