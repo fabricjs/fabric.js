@@ -1,3 +1,4 @@
+import { RESIZING, ROTATE } from '../constants';
 import { changeWidth } from './changeWidth';
 import { Control } from './Control';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
@@ -78,7 +79,7 @@ export const createObjectDefaultControls = () => ({
     cursorStyleHandler: rotationStyleHandler,
     offsetY: -40,
     withConnection: true,
-    actionName: 'rotate',
+    actionName: ROTATE,
   }),
 });
 
@@ -88,14 +89,14 @@ export const createResizeControls = () => ({
     y: 0,
     actionHandler: changeWidth,
     cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionName: 'resizing',
+    actionName: RESIZING,
   }),
   ml: new Control({
     x: -0.5,
     y: 0,
     actionHandler: changeWidth,
     cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionName: 'resizing',
+    actionName: RESIZING,
   }),
 });
 

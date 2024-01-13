@@ -16,7 +16,7 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from '../Text/constants';
-import { CENTER, LEFT, RIGHT } from '../../constants';
+import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 
 type CursorBoundaries = {
   left: number;
@@ -516,7 +516,7 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
+      (this.getValueOfPropertyAt(lineIndex, charIndex, FILL) as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -672,7 +672,7 @@ export class IText<
    */
   getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
+    return this.getValueOfPropertyAt(cp.l, cp.c, FILL);
   }
 
   /**

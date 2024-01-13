@@ -5,6 +5,9 @@ import {
   CENTER,
   iMatrix,
   LEFT,
+  SCALE_X,
+  SCALE_Y,
+  STROKE,
   TOP,
   VERSION,
 } from '../../constants';
@@ -695,10 +698,10 @@ export class FabricObject<
   _set(key: string, value: any) {
     const isChanged = this[key as keyof this] !== value;
 
-    if (key === 'scaleX' || key === 'scaleY') {
+    if (key === SCALE_X || key === SCALE_Y) {
       value = this._constrainScale(value);
     }
-    if (key === 'scaleX' && value < 0) {
+    if (key === SCALE_X && value < 0) {
       this.flipX = !this.flipX;
       value *= -1;
     } else if (key === 'scaleY' && value < 0) {
@@ -846,7 +849,7 @@ export class FabricObject<
    */
   needsItsOwnCache() {
     if (
-      this.paintFirst === 'stroke' &&
+      this.paintFirst === STROKE &&
       this.hasFill() &&
       this.hasStroke() &&
       !!this.shadow
@@ -1182,7 +1185,7 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderPaintInOrder(ctx: CanvasRenderingContext2D) {
-    if (this.paintFirst === 'stroke') {
+    if (this.paintFirst === STROKE) {
       this._renderStroke(ctx);
       this._renderFill(ctx);
     } else {

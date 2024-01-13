@@ -1,3 +1,5 @@
+import { FILL, STROKE } from '../constants';
+
 /**
  * Attributes parsed from all SVG elements
  * @type array
@@ -5,11 +7,11 @@
 export const SHARED_ATTRIBUTES = [
   'display',
   'transform',
-  'fill',
+  FILL,
   'fill-opacity',
   'fill-rule',
   'opacity',
-  'stroke',
+  STROKE,
   'stroke-dasharray',
   'stroke-linecap',
   'stroke-dashoffset',

@@ -7,7 +7,7 @@ import type { TKeyMapIText } from './constants';
 import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT } from '../../constants';
+import { CHANGED, LEFT, RIGHT } from '../../constants';
 import type { IText } from './IText';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 
@@ -173,7 +173,7 @@ export abstract class ITextKeyBehavior<
     }
     const updateAndFire = () => {
       this.updateFromTextArea();
-      this.fire('changed');
+      this.fire(CHANGED);
       if (this.canvas) {
         this.canvas.fire('text:changed', { target: this as unknown as IText });
         this.canvas.requestRenderAll();

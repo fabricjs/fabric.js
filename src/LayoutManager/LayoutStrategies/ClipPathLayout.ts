@@ -26,7 +26,7 @@ export class ClipPathLayout extends LayoutStrategy {
     objects: FabricObject[]
   ): LayoutStrategyResult | undefined {
     const { target } = context;
-    const { clipPath } = target;
+    const { clipPath, group } = target;
     if (!clipPath || !this.shouldPerformLayout(context)) {
       return;
     }
@@ -40,7 +40,7 @@ export class ClipPathLayout extends LayoutStrategy {
       const clipPathCenter = sendPointToPlane(
         clipPath.getRelativeCenterPoint(),
         undefined,
-        target.group?.calcTransformMatrix()
+        group ? group.calcTransformMatrix() : undefined
       );
       return {
         center: clipPathCenter,
