@@ -701,7 +701,7 @@ export class FabricObject<
     if (key === SCALE_X || key === SCALE_Y) {
       value = this._constrainScale(value);
     }
-    if (key === SCALE_Y && value < 0) {
+    if (key === SCALE_X && value < 0) {
       this.flipX = !this.flipX;
       value *= -1;
     } else if (key === 'scaleY' && value < 0) {
