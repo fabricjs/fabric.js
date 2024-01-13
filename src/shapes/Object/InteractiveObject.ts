@@ -1,9 +1,10 @@
-import { Point } from '../../Point';
+import { Point, ZERO } from '../../Point';
 import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
+  calcDimensionsMatrix,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
@@ -17,6 +18,7 @@ import type { ControlRenderingStyleOverride } from '../../controls/controlRender
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import { interactiveObjectDefaultValues } from './defaultValues';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
@@ -37,8 +39,6 @@ export type TStyleOverride = ControlRenderingStyleOverride &
     }
   >;
 
-const interactiveDefaults = {};
-
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
@@ -48,7 +48,6 @@ export class InteractiveFabricObject<
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
-  declare centeredScaling: boolean;
 
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
@@ -135,7 +134,7 @@ export class InteractiveFabricObject<
 
   declare canvas?: Canvas;
 
-  static ownDefaults: Record<string, any> = interactiveDefaults;
+  static ownDefaults: Record<string, any> = interactiveObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
@@ -154,9 +153,14 @@ export class InteractiveFabricObject<
   _updateCacheCanvas() {
     const targetCanvas = this.canvas;
     if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
-      const target = targetCanvas._currentTransform.target,
-        action = targetCanvas._currentTransform.action;
-      if (this === (target as unknown as this) && action.startsWith('scale')) {
+      const transform = targetCanvas._currentTransform,
+        target = transform.target,
+        action = transform.action;
+      if (
+        this === (target as unknown as this) &&
+        action &&
+        action.startsWith('scale')
+      ) {
         return false;
       }
     }
@@ -164,7 +168,14 @@ export class InteractiveFabricObject<
   }
 
   getActiveControl() {
-    return this.__corner;
+    const key = this.__corner;
+    return key
+      ? {
+          key,
+          control: this.controls[key],
+          coord: this.oCoords[key],
+        }
+      : undefined;
   }
 
   /**
@@ -430,14 +441,19 @@ export class InteractiveFabricObject<
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(this.width, this.height, options),
-        stroke = (
-          this.strokeUniform
-            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            : // this is extremely confusing. options comes from the upper function
-              // and is the qrDecompose of a matrix that takes in account zoom too
-              new Point(options.scaleX, options.scaleY)
-        ).scalarMultiply(this.strokeWidth);
+      const bbox = sizeAfterTransform(
+          this.width,
+          this.height,
+          calcDimensionsMatrix(options)
+        ),
+        stroke = !this.isStrokeAccountedForInDimensions()
+          ? (this.strokeUniform
+              ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
+              : // this is extremely confusing. options comes from the upper function
+                // and is the qrDecompose of a matrix that takes in account zoom too
+                new Point(options.scaleX, options.scaleY)
+            ).scalarMultiply(this.strokeWidth)
+          : ZERO;
       size = bbox
         .add(stroke)
         .scalarAdd(this.borderScaleFactor)

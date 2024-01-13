@@ -70,6 +70,15 @@ export function scalingIsForbidden(
   if (lockY && by === 'y') {
     return true;
   }
+  // code crashes because of a division by 0 if a 0 sized object is scaled
+  // forbid to prevent scaling to happen. ISSUE-9475
+  const { width, height, strokeWidth } = fabricObject;
+  if (width === 0 && strokeWidth === 0 && by !== 'y') {
+    return true;
+  }
+  if (height === 0 && strokeWidth === 0 && by !== 'x') {
+    return true;
+  }
   return false;
 }
 

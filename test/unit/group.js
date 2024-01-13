@@ -88,12 +88,14 @@
 
     assert.ok(typeof group.remove === 'function');
     assert.ok(rect1.group === group, 'group should be referenced');
+    assert.ok(rect1.parent === group, 'parent should be referenced');
     group.on('object:removed', (opt) => {
       targets.push(opt.target);
     });
     rect1.on('removed', (opt) => {
       assert.equal(opt.target, group);
       assert.ok(rect1.group === undefined, 'group should not be referenced');
+      assert.ok(rect1.parent === undefined, 'parent should not be referenced');
       fired = true;
     });
     var removed = group.remove(rect2);
@@ -169,7 +171,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
-      layout:                   'fit-content',
+      // layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -195,6 +197,10 @@
       strokeUniform:            false,
       subTargetCheck:           false,
       interactive:              false,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -595,9 +601,12 @@
 
     assert.equal(firstObjInGroup.group, group);
     assert.equal(secondObjInGroup.group, group);
+    assert.equal(firstObjInGroup.parent, group);
+    assert.equal(secondObjInGroup.parent, group);
 
     group.remove(firstObjInGroup);
     assert.ok(typeof firstObjInGroup.group === 'undefined');
+    assert.ok(typeof firstObjInGroup.parent === 'undefined');
   });
 
   QUnit.test('insertAt', function (assert) {
@@ -739,7 +748,7 @@
   QUnit.test('group add', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1]);
+        group = new fabric.Group([rect1], { layoutManager: new fabric.LayoutManager() });
 
     var coords = group.aCoords;
     group.add(rect2);
@@ -779,7 +788,7 @@
   QUnit.test('group remove', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2]);
+        group = new fabric.Group([rect1, rect2], { layoutManager: new fabric.LayoutManager() });
 
     var coords = group.aCoords;
     group.remove(rect2);
@@ -898,7 +907,7 @@
   QUnit.test('add and coordinates', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 3, height: 2, strokeWidth: 0, fill: 'red' }),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 6, angle: 90, strokeWidth: 0, fill: 'red' }),
-        group = new fabric.Group([]);
+        group = new fabric.Group([], { layoutManager: new fabric.LayoutManager() });
     group.add(rect1);
     group.add(rect2);
     group.left = 5;

@@ -37,7 +37,7 @@
     // function fixedLayout(canvas, callback) {
     //     var g = createGroupForLayoutTests('fixed layout', {
     //         backgroundColor: 'azure',
-    //         layout: 'fixed',
+    //         layoutManager: new fabric.LayoutManager(new fabric.FixedLayout()),
     //         width: 50,
     //         height: 50,
     //         angle: 30
@@ -213,7 +213,7 @@
         g.item(0).set({ left: point.x });
         g.item(1).set({ skewX: -45 });
         g.item(2).rotate(45);
-        g.triggerLayout();
+        g.triggerLayout({ strategy: new fabric.FitContentLayout() });
         canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
@@ -230,7 +230,8 @@
 
     function fitContentLayoutAdd(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
-            backgroundColor: 'blue'
+            backgroundColor: 'blue',
+            layoutManager: new fabric.LayoutManager()
         });
         var rect = new fabric.Rect({
             top: 200,
@@ -264,7 +265,7 @@
                 originX: 'center',
                 originY: 'center',
             }),
-            layout: 'clip-path'
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -289,7 +290,7 @@
                 originY: 'center',
                 scaleX: 0.6
             }),
-            layout: 'clip-path'
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -314,7 +315,7 @@
                 top: -100,
                 scaleX: 1.5,
             }),
-            layout: 'clip-path'
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -342,7 +343,7 @@
                 top: 150,
                 skewX: 20
             }),
-            layout: 'clip-path',
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
         });
         canvas.add(g);
         canvas.renderAll();

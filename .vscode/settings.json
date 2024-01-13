@@ -12,9 +12,9 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": false,
-    "source.removeUnusedImports": true
-  },
+    "source.organizeImports": "never",
+    "source.removeUnusedImports": "explicit"
+  }
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
