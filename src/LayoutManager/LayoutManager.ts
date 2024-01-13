@@ -113,10 +113,8 @@ export class LayoutManager {
     const { canvas } = target;
     // handle layout triggers subscription
     if (
-      // subscribe only if instance is the target's `layoutManager`
-      target.layoutManager === this &&
-      (context.type === LAYOUT_TYPE_INITIALIZATION ||
-        context.type === LAYOUT_TYPE_ADDED)
+      context.type === LAYOUT_TYPE_INITIALIZATION ||
+      context.type === LAYOUT_TYPE_ADDED
     ) {
       context.targets.forEach((object) => this.subscribe(object, context));
     } else if (context.type === LAYOUT_TYPE_REMOVED) {
