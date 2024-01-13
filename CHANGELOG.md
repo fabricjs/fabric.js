@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): `getActiveControl` now returns the key, the corner and the coordinates [#9515](https://github.com/fabricjs/fabric.js/pull/9515)
 - fix(Controls): forbid scaling to avoid NaN issues on scaling zero sized objects. #9475 [#9563](https://github.com/fabricjs/fabric.js/pull/9563)
 - feat(LayoutManager): BREAKING remove `shouldResetTransform` handling from LayoutManager [#9581](https://github.com/fabricjs/fabric.js/pull/9581)
 - refactor(): rm active selection ref [#9561](https://github.com/fabricjs/fabric.js/pull/9561)

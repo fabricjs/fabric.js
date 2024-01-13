@@ -1101,7 +1101,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
-        if (mouseDownHandler) {
+        mouseDownHandler &&
           mouseDownHandler.call(
             control,
             e,
@@ -1109,7 +1109,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             pointer.x,
             pointer.y
           );
-        }
       }
     }
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
@@ -1147,17 +1146,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
-  }
-
-  /**
-   * @private
-   */
-  _beforeTransform(e: TPointerEvent) {
-    const t = this._currentTransform!;
-    this.fire('before:transform', {
-      e,
-      transform: t,
-    });
   }
 
   /**
@@ -1343,9 +1331,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             target.group.calcTransformMatrix()
           )
         : scenePoint;
-    // seems used only here.
-    // @TODO: investigate;
-    transform.reset = false;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
 

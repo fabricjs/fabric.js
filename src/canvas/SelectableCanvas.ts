@@ -545,6 +545,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       x: target.originX,
       y: target.originY,
     };
+
+    if (!controlName) {
+      return origin;
+    }
+
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -565,16 +570,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
+   * @param {boolean} [alreadySelected] pass true to setup the active control
    */
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
     alreadySelected: boolean
   ): void {
-    if (!target) {
-      return;
-    }
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -583,22 +586,23 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           target.group.calcTransformMatrix()
         )
       : this.getScenePoint(e);
-    const corner = target.getActiveControl() || '',
-      control = !!corner && target.controls[corner],
+    const { key: corner = '', control } = target.getActiveControl() || {},
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)?.bind(control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
       altKey = e[this.centeredKey as ModifierKey],
+      origin = this._shouldCenterTransform(target, action, altKey)
+        ? ({ x: CENTER, y: CENTER } as const)
+        : this._getOriginFromCorner(target, corner),
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform: Transform = {
         target: target,
-        action: action,
+        action,
         actionHandler,
         actionPerformed: false,
         corner,
@@ -618,7 +622,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         width: target.width,
         height: target.height,
         shiftKey: e.shiftKey,
-        altKey: altKey,
+        altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
@@ -626,13 +630,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         },
       };
 
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = CENTER;
-      transform.originY = CENTER;
-    }
     this._currentTransform = transform;
-    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
-    this._beforeTransform(e);
+
+    this.fire('before:transform', {
+      e,
+      transform,
+    });
   }
 
   /**
