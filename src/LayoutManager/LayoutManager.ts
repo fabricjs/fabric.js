@@ -141,11 +141,12 @@ export class LayoutManager {
       const { strategy, ...tricklingContext } = context;
       // traverse the tree
       target.forEachObject((object) => {
-        (object as Group).layoutManager.performLayout({
-          ...tricklingContext,
-          bubbles: false,
-          target: object as Group,
-        });
+        (object as Group).layoutManager &&
+          (object as Group).layoutManager.performLayout({
+            ...tricklingContext,
+            bubbles: false,
+            target: object as Group,
+          });
       });
     }
   }
