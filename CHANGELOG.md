@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(LayoutManager): remove unnecessary check [#9591](https://github.com/fabricjs/fabric.js/pull/9591)
+- fix(Text) Fix style transfer issue on a line that is not empty [#9461](https://github.com/fabricjs/fabric.js/pull/9461)
 - ci(): add a vue template [#9502](https://github.com/fabricjs/fabric.js/pull/9502)
 - refactor(): `getActiveControl` now returns the key, the corner and the coordinates [#9515](https://github.com/fabricjs/fabric.js/pull/9515)
 - fix(Controls): forbid scaling to avoid NaN issues on scaling zero sized objects. #9475 [#9563](https://github.com/fabricjs/fabric.js/pull/9563)

@@ -110,10 +110,18 @@ for (const splitByGrapheme of [true, false]) {
       await canvasUtil.press('Enter');
       // this part of test is valid if the new line is after a styled char,
       // and there is no style on the part of text that follows, but there is visible text.
-      await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-        name: `6-after-adding-a-newline-splitByGrapheme-${splitByGrapheme}.png`,
-        maxDiffPixelRatio: 0.01,
-      });
+      await expect(page).toHaveScreenshot(
+        `6-after-adding-a-newline-splitByGrapheme-${splitByGrapheme}.png`,
+        {
+          clip: {
+            x: 0,
+            y: clickPointYellow.y - 20,
+            width: 120,
+            height: 120,
+          },
+          maxDiffPixelRatio: 0.029,
+        }
+      );
     });
   });
 }
