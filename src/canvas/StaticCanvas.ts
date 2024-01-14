@@ -43,6 +43,7 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
+import { getDevicePixelRatio } from '../env';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -231,17 +232,11 @@ export class StaticCanvas<
 
   /**
    * @private
-   */
-  _isRetinaScaling() {
-    return config.devicePixelRatio > 1 && this.enableRetinaScaling;
-  }
-
-  /**
-   * @private
+   * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    * @return {Number} retinaScaling if applied, otherwise 1;
    */
   getRetinaScaling() {
-    return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
+    return this.enableRetinaScaling ? getDevicePixelRatio() : 1;
   }
 
   /**
