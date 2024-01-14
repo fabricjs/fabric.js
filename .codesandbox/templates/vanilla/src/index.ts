@@ -11,4 +11,4 @@ canvas.setDimensions({
   height: 500,
 });
 
-testCase(canvas);
+testCase(canvas, false);

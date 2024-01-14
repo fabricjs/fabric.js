@@ -1,9 +1,9 @@
 import * as fabric from 'fabric';
 
-export function testCase(canvas) {
+export function testCase(canvas: fabric.Canvas, objectCaching = true) {
   canvas.preserveObjectStacking = true;
   const circle = new fabric.Circle({ left: 100, top: 50, radius: 50 });
-  const text = new fabric.FabricText('', { evented: false });
+  const text = new fabric.FabricText('empty', { evented: false });
   const itext = new fabric.IText('Edit me\nfit-content layout', {
     left: 100,
     top: 150,
@@ -24,31 +24,34 @@ export function testCase(canvas) {
       backgroundColor: 'blue',
       subTargetCheck: true,
       interactive: true,
-      //objectCaching: false
+      objectCaching,
     }
   );
   canvas.add(text, g);
   g.clone().then((clone) => {
     clone.item(2).set({ text: 'Edit me\nclip path layout' });
     clone.set({
+      objectCaching,
       backgroundColor: 'magenta',
       clipPath: new fabric.Circle({
         radius: 110,
         group: clone,
-        //left: -50, top: -50,
-        // scaleX:0.6
+        left: -50,
+        top: -50,
+        scaleX: 0.6,
       }),
-      layoutManager: 'clip-path',
     });
-    // canvas.add(clone);
+    clone.layoutManager.strategy = new fabric.ClipPathLayout();
+    clone.triggerLayout();
+    canvas.add(clone);
   });
   g.clone().then((clone) => {
     clone.item(2).set({ text: 'Edit me\nclip path layout' });
     clone.set({
+      objectCaching,
       backgroundColor: 'yellow',
       clipPath: new fabric.Circle({
         radius: 110,
-        //left: -50, top: -50,
         originX: 'center',
         originY: 'center',
         group: clone,
@@ -57,15 +60,13 @@ export function testCase(canvas) {
     clone.layoutManager.strategy = new fabric.ClipPathLayout();
     clone.triggerLayout();
     canvas.add(clone);
-    setInterval(() => {
-      clone._set('dirty', true);
-    }, 0);
   });
   g.clone().then((clone) => {
     clone
       .item(2)
       .set({ text: 'Edit me\nabsolute positioned\nclip path layout' });
     clone.set({
+      objectCaching,
       backgroundColor: '#0dcaf0',
       clipPath: new fabric.Circle({
         radius: 110,
@@ -79,7 +80,7 @@ export function testCase(canvas) {
     });
     clone.layoutManager.strategy = new fabric.ClipPathLayout();
     clone.triggerLayout();
-    canvas.insertAt(clone, 0);
+    canvas.insertAt(0, clone);
   });
   canvas.on('after:render', () => {
     text.set('text', `circle is on screen? ${circle.isOnScreen()}`);
