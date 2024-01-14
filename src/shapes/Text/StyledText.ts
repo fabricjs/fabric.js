@@ -188,11 +188,21 @@ export abstract class StyledText<
       this._setLineStyle(lineIndex);
     }
 
-    if (!Object.keys(this._getStyleDeclaration(lineIndex, charIndex)).length) {
-      this._setStyleDeclaration(lineIndex, charIndex, {});
-    }
+    // first create a new object that is a merge of existing and new
+    const newStyle: TextStyleDeclaration = {
+      ...this._getStyleDeclaration(lineIndex, charIndex),
+      ...styles,
+    };
 
-    Object.assign(this._getStyleDeclaration(lineIndex, charIndex), styles);
+    // then delete what is undefined in styles from newStyle
+    Object.keys(styles).forEach((key) => {
+      if (styles[key as keyof TextStyleDeclaration] === undefined) {
+        delete newStyle[key as keyof TextStyleDeclaration];
+      }
+    });
+
+    // finally assign to the old position the new style
+    this._setStyleDeclaration(lineIndex, charIndex, newStyle);
   }
 
   /**
@@ -244,10 +254,13 @@ export abstract class StyledText<
 
   /**
    * get the reference, not a clone, of the style object for a given character,
-   * if not style is set for a pre det
+   * if not style is set for a pre determined line or char, return a new object.
+   * this is tricky and confusing because when you get an empty object you can't
+   * determine if is a reference or a new one.
+   * @TODO this should return always a reference or always a clone, and if necessary undefined.
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @return {Object} style object a REFERENCE to the existing one or a new empty object
+   * @return {TextStyleDeclaration} style object a REFERENCE to the existing one or a new empty object
    */
   _getStyleDeclaration(
     lineIndex: number,

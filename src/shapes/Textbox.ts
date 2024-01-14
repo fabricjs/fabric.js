@@ -227,7 +227,7 @@ export class Textbox<
   /**
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @private
+   * @return {TextStyleDeclaration} style object a REFERENCE to the existing one or a new empty object
    */
   _getStyleDeclaration(
     lineIndex: number,
@@ -256,10 +256,7 @@ export class Textbox<
     style: object
   ) {
     const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-
-    this.styles[lineIndex][charIndex] = style;
+    super._setStyleDeclaration(map.line, map.offset + charIndex, style);
   }
 
   /**
@@ -267,11 +264,9 @@ export class Textbox<
    * @param {Number} charIndex
    * @private
    */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  protected _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
     const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
+    super._deleteStyleDeclaration(map.line, map.offset + charIndex);
   }
 
   /**
@@ -295,7 +290,7 @@ export class Textbox<
    */
   protected _setLineStyle(lineIndex: number) {
     const map = this._styleMap[lineIndex];
-    this.styles[map.line] = {};
+    super._setLineStyle(map.line);
   }
 
   /**
