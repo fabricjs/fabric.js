@@ -24,7 +24,6 @@ class BaseConfiguration {
 
   /**
    * Device Pixel Ratio
-   * If not set fabric will fallback to the environment value
    * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    */
   devicePixelRatio?: number;
