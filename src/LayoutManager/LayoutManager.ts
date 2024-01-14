@@ -82,24 +82,14 @@ export class LayoutManager {
           'modifyPoly',
         ] as TModificationEvents[]
       ).map((key) =>
-        object.on(key, (e) => {
-          const parent = object.parent;
-          console.log(object.parent !== object.group);
-          if (parent && parent.layoutManager !== this) {
-            parent.layoutManager.performLayout({
-              trigger: key,
-              e: { ...e, target: object },
-              type: LAYOUT_TYPE_OBJECT_MODIFYING,
-              target: parent,
-            });
-          }
+        object.on(key, (e) =>
           this.performLayout({
             trigger: key,
             e: { ...e, target: object },
             type: LAYOUT_TYPE_OBJECT_MODIFYING,
             target,
-          });
-        })
+          })
+        )
       ),
     ];
     this._subscriptions.set(object, disposers);
