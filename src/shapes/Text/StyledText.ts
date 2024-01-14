@@ -258,6 +258,7 @@ export abstract class StyledText<
    * this is tricky and confusing because when you get an empty object you can't
    * determine if is a reference or a new one.
    * @TODO this should return always a reference or always a clone, and if necessary undefined.
+   * @protected
    * @param {Number} lineIndex
    * @param {Number} charIndex
    * @return {TextStyleDeclaration} style object a REFERENCE to the existing one or a new empty object
