@@ -181,7 +181,7 @@ export abstract class StyledText<
     }
   }
 
-  private _extendStyles(index: number, styles: TextStyleDeclaration): void {
+  private _extendStyles(index: number, style: TextStyleDeclaration): void {
     const { lineIndex, charIndex } = this.get2DCursorLocation(index);
 
     if (!this._getLineStyle(lineIndex)) {
@@ -191,12 +191,12 @@ export abstract class StyledText<
     // first create a new object that is a merge of existing and new
     const newStyle: TextStyleDeclaration = {
       ...this._getStyleDeclaration(lineIndex, charIndex),
-      ...styles,
+      ...style,
     };
 
     // then delete what is undefined in styles from newStyle
-    Object.keys(styles).forEach((key) => {
-      if (styles[key as keyof TextStyleDeclaration] === undefined) {
+    Object.keys(style).forEach((key) => {
+      if (style[key as keyof TextStyleDeclaration] === undefined) {
         delete newStyle[key as keyof TextStyleDeclaration];
       }
     });
