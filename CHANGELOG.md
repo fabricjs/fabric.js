@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(StyledText): add ability to delete style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
 - refactor(env): Change the way the environment and retina are initialized [#9480](https://github.com/fabricjs/fabric.js/pull/9480)
 - chore(TS): fix type of modifed event that could cause unexpected behaviour in dev code [#9596](https://github.com/fabricjs/fabric.js/pull/9596)
 - fix(LayoutManager): remove unnecessary check [#9591](https://github.com/fabricjs/fabric.js/pull/9591)
