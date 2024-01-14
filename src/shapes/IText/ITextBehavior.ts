@@ -14,7 +14,7 @@ import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
-import type { Canvas } from '../../canvas/Canvas';
+import type { IText } from './IText';
 
 /**
  *  extend this regex to support non english languages
@@ -690,8 +690,9 @@ export abstract class ITextBehavior<
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
     if (this.canvas) {
-      // @ts-expect-error in reality it is an IText instance
-      this.canvas.fire('text:editing:exited', { target: this });
+      this.canvas.fire('text:editing:exited', {
+        target: this as unknown as IText,
+      });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
     return this;

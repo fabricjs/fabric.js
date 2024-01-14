@@ -104,8 +104,8 @@ export type TModificationEvents =
   | 'resizing'
   | 'modifyPoly';
 
-export interface ModifiedEvent<E extends Event = TPointerEvent>
-  extends TEvent<E> {
+export interface ModifiedEvent<E extends Event = TPointerEvent> {
+  e?: E;
   transform: Transform;
   target: FabricObject;
   action?: string;
@@ -123,6 +123,8 @@ type ObjectModificationEvents = ModificationEventsSpec;
 type CanvasModificationEvents = ModificationEventsSpec<
   'object:',
   BasicTransformEvent & { target: FabricObject },
+  // TODO: this typing makes not possible to use properties from modified event
+  // in object:modified
   ModifiedEvent | { target: FabricObject }
 > & {
   'before:transform': TEvent & { transform: Transform };
