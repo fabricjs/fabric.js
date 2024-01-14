@@ -23,8 +23,6 @@ The flow has the following goals/features:
 - calculate group new size and position
 - move the objects to their new position relative to the group center.
 
-**Note**: the option `objectsRelativeToGroup` is related to restoring a group from serialization and should be removed. Object should be eventually normalized in the from Object function or we should ask why do we want to perform a layout if the group has been saved with the layout properties already calculated.
-
 ### Design Topics TBD
 
 - Should layout trigger also on changes to objects like `strokeWidth`, `fontSize` etc.?
@@ -46,12 +44,11 @@ getLayoutResult will return an object that contains:
 - result of strategy.calcLayoutResult
 - nextCenter ( that is part of result, duplicate )
 - prevCenter 0,0 in case of INITIALIZATION
-- offset calculated with prevCenter, nextCenter and various switches ( needs simplification removing `objectsRelativeToGroup`)
+- offset calculated with prevCenter, nextCenter and various switches
 
 commitLayout will get the above results and
 
 - set width/height of the group
-- set the position of all objects ( unless we are coming from `objectsRelativeToGroup`)
 - set the group top/left by either the passed in x/y or the nextCenter value
 
 onAfterLayout will

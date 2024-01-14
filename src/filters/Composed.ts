@@ -67,7 +67,9 @@ export class Composed extends BaseFilter {
   ) {
     return Promise.all(
       ((object.subFilters || []) as BaseFilter[]).map((filter) =>
-        classRegistry.getClass(filter.type).fromObject(filter, options)
+        classRegistry
+          .getClass<typeof BaseFilter>(filter.type)
+          .fromObject(filter, options)
       )
     ).then(
       (enlivedFilters) => new this({ subFilters: enlivedFilters }) as BaseFilter

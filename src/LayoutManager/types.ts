@@ -83,7 +83,6 @@ export type CommonLayoutContext = {
 
 export type InitializationLayoutContext = CommonLayoutContext & {
   type: typeof LAYOUT_TYPE_INITIALIZATION;
-  objectsRelativeToGroup?: boolean;
   targets: FabricObject[];
   x?: number;
   y?: number;

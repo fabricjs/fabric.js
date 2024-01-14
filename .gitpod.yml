@@ -16,3 +16,7 @@ tasks:
   - name: Vanilla
     init: npm install
     command: npm start vanilla -- --no-watch
+
+  - name: Vue.js
+    init: gp sync-await deps
+    command: npm start vue -- --no-watch

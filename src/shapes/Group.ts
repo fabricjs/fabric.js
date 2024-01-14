@@ -27,6 +27,19 @@ import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
+import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
+import type { FitContentLayout } from '../LayoutManager';
+
+/**
+ * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
+ * We could have used a boolean in the constructor, as we did previously, but we think the boolean
+ * would stay in the group's constructor interface and create confusion, therefore it was removed.
+ * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
+ */
+class NoopLayoutManager extends LayoutManager {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  performLayout() {}
+}
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -42,6 +55,7 @@ export interface SerializedGroupProps
   extends SerializedObjectProps,
     GroupOwnProps {
   objects: SerializedObjectProps[];
+  layoutManager: SerializedLayoutManager;
 }
 
 export interface GroupProps extends FabricObjectProps, GroupOwnProps {
@@ -111,13 +125,8 @@ export class Group
    *
    * @param {FabricObject[]} [objects] instance objects
    * @param {Object} [options] Options object
-   * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
    */
-  constructor(
-    objects: FabricObject[] = [],
-    options: Partial<GroupProps> = {},
-    objectsRelativeToGroup?: boolean
-  ) {
+  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
     // @ts-expect-error options error
     super(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
@@ -136,18 +145,14 @@ export class Group
     });
 
     // perform initial layout
-    const layoutManager =
-      // not destructured on purpose here.
-      options.layoutManager || new LayoutManager();
-    layoutManager.performLayout({
+    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
-      objectsRelativeToGroup,
       target: this,
       targets: [...objects],
       x: options.left,
       y: options.top,
     });
-    this.layoutManager = layoutManager;
   }
 
   /**
@@ -433,7 +438,7 @@ export class Group
    * @return {Boolean}
    */
   willDrawShadow() {
-    if (FabricObject.prototype.willDrawShadow.call(this)) {
+    if (super.willDrawShadow()) {
       return true;
     }
     for (let i = 0; i < this._objects.length; i++) {
@@ -541,12 +546,17 @@ export class Group
     >,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
+    const layoutManager = this.layoutManager.toObject();
+
     return {
       ...super.toObject([
         'subTargetCheck',
         'interactive',
         ...propertiesToInclude,
       ]),
+      ...(layoutManager.strategy !== 'fit-content' || this.includeDefaultValues
+        ? { layoutManager }
+        : {}),
       objects: this.__serializeObjects(
         'toObject',
         propertiesToInclude as string[]
@@ -637,28 +647,33 @@ export class Group
    * @returns {Promise<Group>}
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
+    type,
     objects = [],
+    layoutManager,
     ...options
   }: T) {
     return Promise.all([
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      const restoredGroup = new this(
-        objects,
-        {
-          ...options,
-          ...hydratedOptions,
-        },
-        true
-      );
-      if (!options.strategy) {
-        // restore the old save width/height killed by the
-        // default layour manager
-        restoredGroup.width = options.width;
-        restoredGroup.height = options.height;
+      const group = new this(objects, {
+        ...options,
+        ...hydratedOptions,
+        layoutManager: new NoopLayoutManager(),
+      });
+      if (layoutManager) {
+        const layoutClass = classRegistry.getClass<typeof LayoutManager>(
+          layoutManager.type
+        );
+        const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
+          layoutManager.strategy
+        );
+        group.layoutManager = new layoutClass(new strategyClass());
+      } else {
+        group.layoutManager = new LayoutManager();
       }
-      return restoredGroup;
+      group.setCoords();
+      return group;
     });
   }
 }

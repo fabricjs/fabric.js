@@ -4,7 +4,6 @@ import { CENTER, iMatrix } from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
-import { resetObjectTransform } from '../util/misc/objectTransforms';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import type { LayoutStrategy } from './LayoutStrategies/LayoutStrategy';
@@ -17,6 +16,14 @@ import {
   LAYOUT_TYPE_OBJECT_MODIFYING,
 } from './constants';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
+import { classRegistry } from '../ClassRegistry';
+
+const LAYOUT_MANAGER = 'layoutManager';
+
+export type SerializedLayoutManager = {
+  type: string;
+  strategy: string;
+};
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
@@ -72,6 +79,7 @@ export class LayoutManager {
           'scaling',
           'skewing',
           'changed',
+          'modifyPoly',
         ] as TModificationEvents[]
       ).map((key) =>
         object.on(key, (e) =>
@@ -105,10 +113,8 @@ export class LayoutManager {
     const { canvas } = target;
     // handle layout triggers subscription
     if (
-      // subscribe only if instance is the target's `layoutManager`
-      target.layoutManager === this &&
-      (context.type === LAYOUT_TYPE_INITIALIZATION ||
-        context.type === LAYOUT_TYPE_ADDED)
+      context.type === LAYOUT_TYPE_INITIALIZATION ||
+      context.type === LAYOUT_TYPE_ADDED
     ) {
       context.targets.forEach((object) => this.subscribe(object, context));
     } else if (context.type === LAYOUT_TYPE_REMOVED) {
@@ -161,21 +167,17 @@ export class LayoutManager {
       correction = new Point(),
       relativeCorrection = new Point(),
     } = result;
-    const offset =
-      context.type === LAYOUT_TYPE_INITIALIZATION &&
-      context.objectsRelativeToGroup
-        ? new Point()
-        : prevCenter
-            .subtract(nextCenter)
-            .add(correction)
-            .transform(
-              // in `initialization` we do not account for target's transformation matrix
-              context.type === LAYOUT_TYPE_INITIALIZATION
-                ? iMatrix
-                : invertTransform(target.calcOwnMatrix()),
-              true
-            )
-            .add(relativeCorrection);
+    const offset = prevCenter
+      .subtract(nextCenter)
+      .add(correction)
+      .transform(
+        // in `initialization` we do not account for target's transformation matrix
+        context.type === LAYOUT_TYPE_INITIALIZATION
+          ? iMatrix
+          : invertTransform(target.calcOwnMatrix()),
+        true
+      )
+      .add(relativeCorrection);
 
     return {
       result,
@@ -221,12 +223,10 @@ export class LayoutManager {
   ) {
     const { target } = context;
     //  adjust objects to account for new center
-    (context.type !== LAYOUT_TYPE_INITIALIZATION ||
-      !context.objectsRelativeToGroup) &&
-      target.forEachObject((object) => {
-        object.group === target &&
-          this.layoutObject(context, layoutResult, object);
-      });
+    target.forEachObject((object) => {
+      object.group === target &&
+        this.layoutObject(context, layoutResult, object);
+    });
     // adjust clip path to account for new center
     context.strategy.shouldLayoutClipPath(context) &&
       this.layoutObject(context, layoutResult, target.clipPath as FabricObject);
@@ -259,11 +259,6 @@ export class LayoutManager {
       ...bubblingContext
     } = context;
     const { canvas } = target;
-    if (strategy.shouldResetTransform(context)) {
-      resetObjectTransform(target);
-      target.left = 0;
-      target.top = 0;
-    }
 
     //  fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:after', {
@@ -295,9 +290,16 @@ export class LayoutManager {
     this._subscriptions.clear();
   }
 
-  toJSON() {
+  toObject() {
     return {
+      type: LAYOUT_MANAGER,
       strategy: (this.strategy.constructor as typeof LayoutStrategy).type,
     };
   }
+
+  toJSON() {
+    return this.toObject();
+  }
 }
+
+classRegistry.setClass(LayoutManager, LAYOUT_MANAGER);

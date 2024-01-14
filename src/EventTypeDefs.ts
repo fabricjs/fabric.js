@@ -55,7 +55,7 @@ export type ControlCursorCallback = ControlCallback<string>;
  */
 export type Transform = {
   target: FabricObject;
-  action: string;
+  action?: string;
   actionHandler?: TransformActionHandler;
   corner: string;
   scaleX: number;
@@ -79,8 +79,6 @@ export type Transform = {
     originX: TOriginX;
     originY: TOriginY;
   };
-  // @TODO: investigate if this reset is really needed
-  reset?: boolean;
   actionPerformed: boolean;
 };
 
@@ -111,7 +109,7 @@ export interface ModifiedEvent<E extends Event = TPointerEvent> {
   aborted: boolean;
   transform: Transform;
   target: FabricObject;
-  action: string;
+  action?: string;
 }
 
 type ModificationEventsSpec<

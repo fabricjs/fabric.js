@@ -1,3 +1,4 @@
+import { classRegistry } from '../ClassRegistry';
 import { NONE } from '../constants';
 import type {
   CanvasEvents,
@@ -8,12 +9,14 @@ import type {
   Transform,
 } from '../EventTypeDefs';
 import { Point } from '../Point';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
+import { isActiveSelection } from '../util/typeAssertions';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
@@ -1066,7 +1069,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
-        if (mouseDownHandler) {
+        mouseDownHandler &&
           mouseDownHandler.call(
             control,
             e,
@@ -1074,7 +1077,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             pointer.x,
             pointer.y
           );
-        }
       }
     }
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
@@ -1112,17 +1114,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._target = this._currentTransform
       ? this._currentTransform.target
       : this.findTarget(e);
-  }
-
-  /**
-   * @private
-   */
-  _beforeTransform(e: TPointerEvent) {
-    const t = this._currentTransform!;
-    this.fire('before:transform', {
-      e,
-      transform: t,
-    });
   }
 
   /**
@@ -1308,9 +1299,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             target.group.calcTransformMatrix()
           )
         : scenePoint;
-    // seems used only here.
-    // @TODO: investigate;
-    transform.reset = false;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
 
@@ -1354,10 +1342,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       return;
     }
     let hoverCursor = target.hoverCursor || this.hoverCursor;
-    const activeSelection =
-        this._activeObject === this._activeSelection
-          ? this._activeObject
-          : null,
+    const activeSelection = isActiveSelection(this._activeObject)
+        ? this._activeObject
+        : null,
       // only show proper corner when group selection is not active
       corner =
         (!activeSelection || target.group !== activeSelection) &&
@@ -1398,8 +1385,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   protected handleMultiSelection(e: TPointerEvent, target?: FabricObject) {
     const activeObject = this._activeObject;
-    const activeSelection = this._activeSelection;
-    const isAS = activeObject === activeSelection;
+    const isAS = isActiveSelection(activeObject);
     if (
       // check if an active object exists on canvas and if the user is pressing the `selectionKey` while canvas supports multi selection.
       !!activeObject &&
@@ -1422,9 +1408,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       !activeObject.getActiveControl()
     ) {
       if (isAS) {
-        const prevActiveObjects =
-          activeSelection.getObjects() as FabricObject[];
-        if (target === activeSelection) {
+        const prevActiveObjects = activeObject.getObjects();
+        if (target === activeObject) {
           const pointer = this.getViewportPoint(e);
           target =
             // first search active objects for a target to remove
@@ -1437,19 +1422,21 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             return false;
           }
         }
-        if (target.group === activeSelection) {
+        if (target.group === activeObject) {
           // `target` is part of active selection => remove it
-          activeSelection.remove(target);
+          activeObject.remove(target);
           this._hoveredTarget = target;
           this._hoveredTargets = [...this.targets];
-          if (activeSelection.size() === 1) {
+          // if after removing an object we are left with one only...
+          if (activeObject.size() === 1) {
             // activate last remaining object
-            this._setActiveObject(activeSelection.item(0) as FabricObject, e);
+            // deselecting the active selection will remove the remaining object from it
+            this._setActiveObject(activeObject.item(0), e);
           }
         } else {
-          //  `target` isn't part of active selection => add it
-          activeSelection.multiSelectAdd(target);
-          this._hoveredTarget = activeSelection;
+          // `target` isn't part of active selection => add it
+          activeObject.multiSelectAdd(target);
+          this._hoveredTarget = activeObject;
           this._hoveredTargets = [...this.targets];
         }
         this._fireSelectionEvents(prevActiveObjects, e);
@@ -1457,12 +1444,21 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         (activeObject as IText).exitEditing &&
           (activeObject as IText).exitEditing();
         // add the active object and the target to the active selection and set it as the active object
-        activeSelection.multiSelectAdd(activeObject, target);
-        this._hoveredTarget = activeSelection;
+        const klass =
+          classRegistry.getClass<typeof ActiveSelection>('ActiveSelection');
+        const newActiveSelection = new klass([], {
+          /**
+           * it is crucial to pass the canvas ref before calling {@link ActiveSelection#multiSelectAdd}
+           * since it uses {@link FabricObject#isInFrontOf} which relies on the canvas ref
+           */
+          canvas: this,
+        });
+        newActiveSelection.multiSelectAdd(activeObject, target);
+        this._hoveredTarget = newActiveSelection;
         // ISSUE 4115: should we consider subTargets here?
         // this._hoveredTargets = [];
         // this._hoveredTargets = this.targets.concat();
-        this._setActiveObject(activeSelection, e);
+        this._setActiveObject(newActiveSelection, e);
         this._fireSelectionEvents([activeObject], e);
       }
       return true;
@@ -1516,8 +1512,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.setActiveObject(objects[0], e);
     } else if (objects.length > 1) {
       // add to active selection and make it the active object
-      this._activeSelection.add(...objects);
-      this.setActiveObject(this._activeSelection, e);
+      const klass =
+        classRegistry.getClass<typeof ActiveSelection>('ActiveSelection');
+      this.setActiveObject(new klass(objects, { canvas: this }), e);
     }
 
     // cleanup

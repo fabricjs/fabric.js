@@ -859,7 +859,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _toObject(
+  protected _toObject(
     instance: FabricObject,
     methodName: TValidToObjectMethod,
     propertiesToInclude?: string[]

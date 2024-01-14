@@ -92,7 +92,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternOptions = {}) {
+  constructor(options: PatternOptions) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -192,7 +192,7 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: SerializedPatternOptions,
+    { type, source, ...serialized }: SerializedPatternOptions,
     options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
