@@ -293,21 +293,61 @@ describe('Selectable Canvas', () => {
       const group = new Group([object, object2], { scaleX: 2, scaleY: 2 });
       canvas.add(group);
 
-      // point1 is contained in object top left
-      const point1 = new Point(5, 5);
-      expect(canvas._pointIsInObjectSelectionArea(object, point1)).toBe(true);
-      // point2 is contained in object bottom right padding area
-      const point2 = new Point(35, 35);
-      expect(canvas._pointIsInObjectSelectionArea(object, point2)).toBe(true);
-      // point3 is outside of object (bottom) because object is rotate
-      const point3 = new Point(20, 36);
-      expect(canvas._pointIsInObjectSelectionArea(object, point3)).toBe(false);
-      // point4 is outside of object (right)
-      const point4 = new Point(36, 20);
-      expect(canvas._pointIsInObjectSelectionArea(object, point4)).toBe(false);
-      // point5 is outside of object (top left)
-      const point5 = new Point(4, 4);
-      expect(canvas._pointIsInObjectSelectionArea(object, point5)).toBe(false);
+      for (let y = -1; y <= 31; y++) {
+        for (let x = -1; x <= 31; x++) {
+          expect(
+            canvas['_pointIsInObjectSelectionArea'](object, new Point(x, y))
+          ).toBe(x >= 0 && x <= 30 && y >= 0 && y <= 30);
+        }
+      }
+    });
+  });
+
+  describe('setupCurrentTransform', () => {
+    test.each(
+      ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr']
+        .map((controlKey) => [
+          { controlKey, zoom: false },
+          { controlKey, zoom: true },
+        ])
+        .flat()
+    )('should fire before:transform event %p', ({ controlKey, zoom }) => {
+      const canvas = new Canvas();
+      const canvasOffset = canvas.calcOffset();
+      const object = new FabricObject({
+        left: 50,
+        top: 50,
+        width: 50,
+        height: 50,
+      });
+      canvas.add(object);
+      canvas.setActiveObject(object);
+      zoom && canvas.zoomToPoint(new Point(25, 25), 2);
+      expect(canvas._currentTransform).toBeFalsy();
+
+      const spy = jest.fn();
+      canvas.on('before:transform', spy);
+      const setupCurrentTransformSpy = jest.spyOn(
+        canvas,
+        '_setupCurrentTransform'
+      );
+
+      const {
+        corner: { tl, tr, bl },
+      } = object.oCoords[controlKey];
+      canvas.getSelectionElement().dispatchEvent(
+        new MouseEvent('mousedown', {
+          clientX: canvasOffset.left + (tl.x + tr.x) / 2,
+          clientY: canvasOffset.top + (tl.y + bl.y) / 2,
+          which: 1,
+        })
+      );
+
+      expect(setupCurrentTransformSpy).toHaveBeenCalledTimes(1);
+      expect(canvas._currentTransform).toBeDefined();
+      expect(canvas._currentTransform).toHaveProperty('target', object);
+      expect(canvas._currentTransform).toHaveProperty('corner', controlKey);
+      expect(spy).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -1,87 +1,52 @@
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
-import { resolveOrigin } from '../util/misc/resolveOrigin';
-import { Point } from '../Point';
-import { cos } from '../util/misc/cos';
 import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
-import { makeBoundingBoxFromPoints } from '../util/misc/boundingBoxFromPoints';
 import {
   invertTransform,
   multiplyTransformMatrices,
-  transformPoint,
 } from '../util/misc/matrix';
 import {
   enlivenObjectEnlivables,
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { applyTransformToObject } from '../util/misc/objectTransforms';
-import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
-import { sin } from '../util/misc/sin';
 import { FabricObject } from './Object/FabricObject';
 import { Rect } from './Rect';
 import { classRegistry } from '../ClassRegistry';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import { CENTER } from '../constants';
 import { log } from '../util/internals/console';
-
-export type LayoutContextType =
-  | 'initialization'
-  | 'object_modified'
-  | 'added'
-  | 'removed'
-  | 'layout_change'
-  | 'imperative';
-
-export type LayoutContext = {
-  type: LayoutContextType;
-  /**
-   * array of objects starting from the object that triggered the call to the current one
-   */
-  path?: Group[];
-  [key: string]: any;
-};
-
-export interface GroupEvents extends ObjectEvents, CollectionEvents {
-  layout: {
-    context: LayoutContext;
-    result: LayoutResult;
-    diff: Point;
-  };
-}
-
-export type LayoutStrategy =
-  | 'fit-content'
-  | 'fit-content-lazy'
-  | 'fixed'
-  | 'clip-path';
+import type {
+  ImperativeLayoutOptions,
+  LayoutBeforeEvent,
+  LayoutAfterEvent,
+} from '../LayoutManager/types';
+import { LayoutManager } from '../LayoutManager/LayoutManager';
+import {
+  LAYOUT_TYPE_ADDED,
+  LAYOUT_TYPE_IMPERATIVE,
+  LAYOUT_TYPE_INITIALIZATION,
+  LAYOUT_TYPE_REMOVED,
+} from '../LayoutManager/constants';
+import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
+import type { FitContentLayout } from '../LayoutManager';
 
 /**
- * positioning and layout data **relative** to instance's parent
+ * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
+ * We could have used a boolean in the constructor, as we did previously, but we think the boolean
+ * would stay in the group's constructor interface and create confusion, therefore it was removed.
+ * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
  */
-export type LayoutResult = {
-  /**
-   * new centerX as measured by the containing plane (same as `left` with `originX` set to `center`)
-   */
-  centerX: number;
-  /**
-   * new centerY as measured by the containing plane (same as `top` with `originY` set to `center`)
-   */
-  centerY: number;
-  /**
-   * correctionX to translate objects by, measured as `centerX`
-   */
-  correctionX?: number;
-  /**
-   * correctionY to translate objects by, measured as `centerY`
-   */
-  correctionY?: number;
-  width: number;
-  height: number;
-  prevLayout?: LayoutStrategy;
-};
+class NoopLayoutManager extends LayoutManager {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  performLayout() {}
+}
+
+export interface GroupEvents extends ObjectEvents, CollectionEvents {
+  'layout:before': LayoutBeforeEvent;
+  'layout:after': LayoutAfterEvent;
+}
 
 export interface GroupOwnProps {
-  layout: LayoutStrategy;
   subTargetCheck: boolean;
   interactive: boolean;
 }
@@ -90,12 +55,14 @@ export interface SerializedGroupProps
   extends SerializedObjectProps,
     GroupOwnProps {
   objects: SerializedObjectProps[];
+  layoutManager: SerializedLayoutManager;
 }
 
-export interface GroupProps extends FabricObjectProps, GroupOwnProps {}
+export interface GroupProps extends FabricObjectProps, GroupOwnProps {
+  layoutManager: LayoutManager;
+}
 
 export const groupDefaultValues = {
-  layout: 'fit-content',
   strokeWidth: 0,
   subTargetCheck: false,
   interactive: false,
@@ -104,19 +71,15 @@ export const groupDefaultValues = {
 /**
  * @fires object:added
  * @fires object:removed
- * @fires layout once layout completes
+ * @fires layout:before
+ * @fires layout:after
  */
-export class Group extends createCollectionMixin(
-  FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
-) {
-  /**
-   * Specifies the **layout strategy** for instance
-   * Used by `getLayoutStrategyResult` to calculate layout
-   * `fit-content`, `fit-content-lazy`, `fixed`, `clip-path` are supported out of the box
-   * @default
-   */
-  declare layout: LayoutStrategy;
-
+export class Group
+  extends createCollectionMixin(
+    FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
+  )
+  implements GroupProps
+{
   /**
    * Used to optimize performance
    * set to `false` if you don't need contained objects to be targets of events
@@ -134,6 +97,8 @@ export class Group extends createCollectionMixin(
    */
   declare interactive: boolean;
 
+  declare layoutManager: LayoutManager;
+
   /**
    * Used internally to optimize performance
    * Once an object is selected, instance is rendered without the selected object.
@@ -142,17 +107,11 @@ export class Group extends createCollectionMixin(
    */
   protected _activeObjects: FabricObject[] = [];
 
-  static stateProperties: string[] = [
-    ...FabricObject.stateProperties,
-    'layout',
-  ];
-
   static type = 'Group';
 
   static ownDefaults: Record<string, any> = groupDefaultValues;
   private __objectSelectionTracker: (ev: ObjectEvents['selected']) => void;
   private __objectSelectionDisposer: (ev: ObjectEvents['deselected']) => void;
-  private _firstLayoutDone = false;
 
   static getDefaults(): Record<string, any> {
     return {
@@ -166,16 +125,12 @@ export class Group extends createCollectionMixin(
    *
    * @param {FabricObject[]} [objects] instance objects
    * @param {Object} [options] Options object
-   * @param {boolean} [objectsRelativeToGroup] true if objects exist in group coordinate plane
    */
-  constructor(
-    objects: FabricObject[] = [],
-    options: Partial<GroupProps> = {},
-    objectsRelativeToGroup?: boolean
-  ) {
-    super();
-    this._objects = objects.slice(); // Avoid unwanted mutations of Collection to affect the caller
-    this.__objectMonitor = this.__objectMonitor.bind(this);
+  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
+    // @ts-expect-error options error
+    super(options);
+    this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
+
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
       true
@@ -184,15 +139,19 @@ export class Group extends createCollectionMixin(
       this,
       false
     );
-    // setting angle, skewX, skewY must occur after initial layout
-    this.set({ ...options, angle: 0, skewX: 0, skewY: 0 });
+
     this.forEachObject((object) => {
       this.enterGroup(object, false);
     });
-    this._applyLayoutStrategy({
-      type: 'initialization',
-      options,
-      objectsRelativeToGroup,
+
+    // perform initial layout
+    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager.performLayout({
+      type: LAYOUT_TYPE_INITIALIZATION,
+      target: this,
+      targets: [...objects],
+      x: options.left,
+      y: options.top,
     });
   }
 
@@ -240,7 +199,7 @@ export class Group extends createCollectionMixin(
   add(...objects: FabricObject[]) {
     const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
     const size = super.add(...allowedObjects);
-    this._onAfterObjectsChange('added', allowedObjects);
+    this._onAfterObjectsChange(LAYOUT_TYPE_ADDED, allowedObjects);
     return size;
   }
 
@@ -252,7 +211,7 @@ export class Group extends createCollectionMixin(
   insertAt(index: number, ...objects: FabricObject[]) {
     const allowedObjects = this._filterObjectsBeforeEnteringGroup(objects);
     const size = super.insertAt(index, ...allowedObjects);
-    this._onAfterObjectsChange('added', allowedObjects);
+    this._onAfterObjectsChange(LAYOUT_TYPE_ADDED, allowedObjects);
     return size;
   }
 
@@ -263,18 +222,12 @@ export class Group extends createCollectionMixin(
    */
   remove(...objects: FabricObject[]) {
     const removed = super.remove(...objects);
-    this._onAfterObjectsChange('removed', removed);
+    this._onAfterObjectsChange(LAYOUT_TYPE_REMOVED, removed);
     return removed;
   }
 
   _onObjectAdded(object: FabricObject) {
     this.enterGroup(object, true);
-    this.fire('object:added', { target: object });
-    object.fire('added', { target: this });
-  }
-
-  _onRelativeObjectAdded(object: FabricObject) {
-    this.enterGroup(object, false);
     this.fire('object:added', { target: object });
     object.fire('added', { target: this });
   }
@@ -296,11 +249,11 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject[]} targets
    */
   _onAfterObjectsChange(type: 'added' | 'removed', targets: FabricObject[]) {
-    this._applyLayoutStrategy({
-      type: type,
-      targets: targets,
+    this.layoutManager.performLayout({
+      type,
+      targets,
+      target: this,
     });
-    this._set('dirty', true);
   }
 
   _onStackOrderChanged() {
@@ -316,19 +269,9 @@ export class Group extends createCollectionMixin(
     const prev = this[key as keyof this];
     super._set(key, value);
     if (key === 'canvas' && prev !== value) {
-      this.forEachObject((object) => {
+      (this._objects || []).forEach((object) => {
         object._set(key, value);
       });
-    }
-    if (key === 'layout' && prev !== value) {
-      this._applyLayoutStrategy({
-        type: 'layout_change',
-        layout: value,
-        prevLayout: prev,
-      });
-    }
-    if (key === 'interactive') {
-      this.forEachObject((object) => this._watchObject(value, object));
     }
     return this;
   }
@@ -347,15 +290,6 @@ export class Group extends createCollectionMixin(
   removeAll() {
     this._activeObjects = [];
     return this.remove(...this._objects);
-  }
-
-  /**
-   * invalidates layout on object modified
-   * @private
-   */
-  __objectMonitor(ev: ObjectEvents['modified']) {
-    this._applyLayoutStrategy({ ...ev, type: 'object_modified' });
-    this._set('dirty', true);
   }
 
   /**
@@ -384,31 +318,26 @@ export class Group extends createCollectionMixin(
    * @param {FabricObject} object
    */
   _watchObject(watch: boolean, object: FabricObject) {
-    const directive: 'on' | 'off' = watch ? 'on' : 'off';
     //  make sure we listen only once
     watch && this._watchObject(false, object);
-    // @ts-expect-error TS limitations
-    object[directive]('changed', this.__objectMonitor);
-    // @ts-expect-error TS limitations
-    object[directive]('modified', this.__objectMonitor);
-    // @ts-expect-error TS limitations
-    object[directive]('selected', this.__objectSelectionTracker);
-    // @ts-expect-error TS limitations
-    object[directive]('deselected', this.__objectSelectionDisposer);
+    if (watch) {
+      object.on('selected', this.__objectSelectionTracker);
+      object.on('deselected', this.__objectSelectionDisposer);
+    } else {
+      object.off('selected', this.__objectSelectionTracker);
+      object.off('deselected', this.__objectSelectionDisposer);
+    }
   }
 
   /**
    * @private
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
-   * @returns {boolean} true if object entered group
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    if (object.group) {
-      object.group.remove(object);
-    }
+    object.group && object.group.remove(object);
+    object._set('parent', this);
     this._enterGroup(object, removeParentTransform);
-    return true;
   }
 
   /**
@@ -430,7 +359,7 @@ export class Group extends createCollectionMixin(
     this._shouldSetNestedCoords() && object.setCoords();
     object._set('group', this);
     object._set('canvas', this.canvas);
-    this.interactive && this._watchObject(true, object);
+    this._watchObject(true, object);
     const activeObject =
       this.canvas &&
       this.canvas.getActiveObject &&
@@ -451,11 +380,16 @@ export class Group extends createCollectionMixin(
    */
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
+    object._set('parent', undefined);
     object._set('canvas', undefined);
   }
 
   /**
-   * @private
+   * Executes the inner fabric logic of exiting a group.
+   * - Stop watching the object
+   * - Remove the object from the optimization map this._activeObjects
+   * - unset the group property of the object
+   * @protected
    * @param {FabricObject} object
    * @param {boolean} [removeParentTransform] true if object should exit group without applying group's transform to it
    */
@@ -504,7 +438,7 @@ export class Group extends createCollectionMixin(
    * @return {Boolean}
    */
   willDrawShadow() {
-    if (FabricObject.prototype.willDrawShadow.call(this)) {
+    if (super.willDrawShadow()) {
       return true;
     }
     for (let i = 0; i < this._objects.length; i++) {
@@ -556,6 +490,14 @@ export class Group extends createCollectionMixin(
       this.forEachObject((object) => object.setCoords());
   }
 
+  triggerLayout(options: ImperativeLayoutOptions = {}) {
+    this.layoutManager.performLayout({
+      target: this,
+      type: LAYOUT_TYPE_IMPERATIVE,
+      ...options,
+    });
+  }
+
   /**
    * Renders instance on a given context
    * @param {CanvasRenderingContext2D} ctx context to render instance on
@@ -565,394 +507,6 @@ export class Group extends createCollectionMixin(
     super.render(ctx);
     this._transformDone = false;
   }
-
-  /**
-   * @public
-   * @param {Partial<LayoutResult> & { layout?: string }} [context] pass values to use for layout calculations
-   */
-  triggerLayout<T extends this['layout']>(
-    context?: Partial<LayoutResult> & { layout?: T }
-  ) {
-    if (context && context.layout) {
-      context.prevLayout = this.layout;
-      this.layout = context.layout;
-    }
-    this._applyLayoutStrategy({ type: 'imperative', context });
-  }
-
-  /**
-   * @private
-   * @param {FabricObject} object
-   * @param {Point} diff
-   */
-  _adjustObjectPosition(object: FabricObject, diff: Point) {
-    object.set({
-      left: object.left + diff.x,
-      top: object.top + diff.y,
-    });
-  }
-
-  /**
-   * initial layout logic:
-   * calculate bbox of objects (if necessary) and translate it according to options received from the constructor (left, top, width, height)
-   * so it is placed in the center of the bbox received from the constructor
-   *
-   * @private
-   * @param {LayoutContext} context
-   */
-  _applyLayoutStrategy(context: LayoutContext) {
-    const isFirstLayout = context.type === 'initialization';
-    if (!isFirstLayout && !this._firstLayoutDone) {
-      //  reject layout requests before initialization layout
-      return;
-    }
-    const options = isFirstLayout && context.options;
-    const initialTransform = options && {
-      angle: options.angle || 0,
-      skewX: options.skewX || 0,
-      skewY: options.skewY || 0,
-    };
-    const center = this.getRelativeCenterPoint();
-    let result = this.getLayoutStrategyResult(
-      this.layout,
-      [...this._objects],
-      context
-    );
-    let diff: Point;
-    if (result) {
-      //  handle positioning
-      const newCenter = new Point(result.centerX, result.centerY);
-      const vector = center
-        .subtract(newCenter)
-        .add(new Point(result.correctionX || 0, result.correctionY || 0));
-      diff = vector.transform(invertTransform(this.calcOwnMatrix()), true);
-      //  set dimensions
-      this.set({ width: result.width, height: result.height });
-      //  adjust objects to account for new center
-      !context.objectsRelativeToGroup &&
-        this.forEachObject((object) => {
-          object.group === this && this._adjustObjectPosition(object, diff);
-        });
-      //  clip path as well
-      !isFirstLayout &&
-        this.layout !== 'clip-path' &&
-        this.clipPath &&
-        !this.clipPath.absolutePositioned &&
-        this._adjustObjectPosition(this.clipPath as FabricObject, diff);
-      if (!newCenter.eq(center) || initialTransform) {
-        //  set position
-        this.setPositionByOrigin(newCenter, CENTER, CENTER);
-        initialTransform && this.set(initialTransform);
-        this.setCoords();
-      }
-    } else if (isFirstLayout) {
-      //  fill `result` with initial values for the layout hook
-      result = {
-        centerX: center.x,
-        centerY: center.y,
-        width: this.width,
-        height: this.height,
-      };
-      initialTransform && this.set(initialTransform);
-      diff = new Point();
-    } else {
-      //  no `result` so we return
-      return;
-    }
-    //  flag for next layouts
-    this._firstLayoutDone = true;
-    //  fire layout hook and event (event will fire only for layouts after initialization layout)
-    this.onLayout(context, result);
-    this.fire('layout', {
-      context,
-      result,
-      diff,
-    });
-    //  recursive up
-    if (this.group && this.group._applyLayoutStrategy) {
-      //  append the path recursion to context
-      if (!context.path) {
-        context.path = [];
-      }
-      context.path.push(this);
-      //  all parents should invalidate their layout
-      this.group._applyLayoutStrategy(context);
-    }
-  }
-
-  /**
-   * Override this method to customize layout.
-   * If you need to run logic once layout completes use `onLayout`
-   * @public
-   * @param {string} layoutDirective
-   * @param {FabricObject[]} objects
-   * @param {LayoutContext} context
-   * @returns {LayoutResult | undefined}
-   */
-  getLayoutStrategyResult<T extends this['layout']>(
-    layoutDirective: T,
-    objects: FabricObject[],
-    context: LayoutContext
-  ) {
-    if (
-      layoutDirective === 'fit-content-lazy' &&
-      context.type === 'added' &&
-      objects.length > context.targets.length
-    ) {
-      //  calculate added objects' bbox with existing bbox
-      const addedObjects = context.targets.concat(this);
-      return this.prepareBoundingBox(layoutDirective, addedObjects, context);
-    } else if (
-      layoutDirective === 'fit-content' ||
-      layoutDirective === 'fit-content-lazy' ||
-      (layoutDirective === 'fixed' &&
-        (context.type === 'initialization' || context.type === 'imperative'))
-    ) {
-      return this.prepareBoundingBox(layoutDirective, objects, context);
-    } else if (layoutDirective === 'clip-path' && this.clipPath) {
-      const clipPath = this.clipPath;
-      const clipPathSizeAfter = clipPath._getTransformedDimensions();
-      if (
-        clipPath.absolutePositioned &&
-        (context.type === 'initialization' || context.type === 'layout_change')
-      ) {
-        //  we want the center point to exist in group's containing plane
-        let clipPathCenter = clipPath.getCenterPoint();
-        if (this.group) {
-          //  send point from canvas plane to group's containing plane
-          const inv = invertTransform(this.group.calcTransformMatrix());
-          clipPathCenter = transformPoint(clipPathCenter, inv);
-        }
-        return {
-          centerX: clipPathCenter.x,
-          centerY: clipPathCenter.y,
-          width: clipPathSizeAfter.x,
-          height: clipPathSizeAfter.y,
-        };
-      } else if (!clipPath.absolutePositioned) {
-        let center;
-        const clipPathRelativeCenter = clipPath.getRelativeCenterPoint(),
-          //  we want the center point to exist in group's containing plane, so we send it upwards
-          clipPathCenter = transformPoint(
-            clipPathRelativeCenter,
-            this.calcOwnMatrix(),
-            true
-          );
-        if (
-          context.type === 'initialization' ||
-          context.type === 'layout_change'
-        ) {
-          const bbox =
-            this.prepareBoundingBox(layoutDirective, objects, context) || {};
-          center = new Point(bbox.centerX || 0, bbox.centerY || 0);
-          return {
-            centerX: center.x + clipPathCenter.x,
-            centerY: center.y + clipPathCenter.y,
-            correctionX: bbox.correctionX - clipPathCenter.x,
-            correctionY: bbox.correctionY - clipPathCenter.y,
-            width: clipPath.width,
-            height: clipPath.height,
-          };
-        } else {
-          center = this.getRelativeCenterPoint();
-          return {
-            centerX: center.x + clipPathCenter.x,
-            centerY: center.y + clipPathCenter.y,
-            width: clipPathSizeAfter.x,
-            height: clipPathSizeAfter.y,
-          };
-        }
-      }
-    }
-  }
-
-  /**
-   * Override this method to customize layout.
-   * A wrapper around {@link Group#getObjectsBoundingBox}
-   * @public
-   * @param {string} layoutDirective
-   * @param {FabricObject[]} objects
-   * @param {LayoutContext} context
-   * @returns {LayoutResult | undefined}
-   */
-  prepareBoundingBox<T extends this['layout']>(
-    layoutDirective: T,
-    objects: FabricObject[],
-    context: LayoutContext
-  ) {
-    if (context.type === 'initialization') {
-      return this.prepareInitialBoundingBox(layoutDirective, objects, context);
-    } else if (context.type === 'imperative' && context.context) {
-      return {
-        ...(this.getObjectsBoundingBox(objects) || {}),
-        ...context.context,
-      };
-    } else {
-      return this.getObjectsBoundingBox(objects);
-    }
-  }
-
-  /**
-   * Calculates center taking into account originX, originY while not being sure that width/height are initialized
-   * @public
-   * @param {string} layoutDirective
-   * @param {FabricObject[]} objects
-   * @param {LayoutContext} context
-   * @returns {LayoutResult | undefined}
-   */
-  prepareInitialBoundingBox<T extends this['layout']>(
-    layoutDirective: T,
-    objects: FabricObject[],
-    context: LayoutContext
-  ) {
-    const options = context.options || {},
-      hasX = typeof options.left === 'number',
-      hasY = typeof options.top === 'number',
-      hasWidth = typeof options.width === 'number',
-      hasHeight = typeof options.height === 'number';
-
-    //  performance enhancement
-    //  skip layout calculation if bbox is defined
-    if (
-      (hasX &&
-        hasY &&
-        hasWidth &&
-        hasHeight &&
-        context.objectsRelativeToGroup) ||
-      objects.length === 0
-    ) {
-      //  return nothing to skip layout
-      return;
-    }
-
-    const bbox = this.getObjectsBoundingBox(objects) || ({} as LayoutResult);
-    const { centerX = 0, centerY = 0, width: w = 0, height: h = 0 } = bbox;
-    const width = hasWidth ? this.width : w,
-      height = hasHeight ? this.height : h,
-      calculatedCenter = new Point(centerX, centerY),
-      origin = new Point(
-        resolveOrigin(this.originX),
-        resolveOrigin(this.originY)
-      ),
-      size = new Point(width, height),
-      strokeWidthVector = this._getTransformedDimensions({
-        width: 0,
-        height: 0,
-      }),
-      sizeAfter = this._getTransformedDimensions({
-        width: width,
-        height: height,
-        strokeWidth: 0,
-      }),
-      bboxSizeAfter = this._getTransformedDimensions({
-        width: bbox.width,
-        height: bbox.height,
-        strokeWidth: 0,
-      }),
-      rotationCorrection = new Point(0, 0);
-
-    //  calculate center and correction
-    const originT = origin.scalarAdd(0.5);
-    const originCorrection = sizeAfter.multiply(originT);
-    const centerCorrection = new Point(
-      hasWidth ? bboxSizeAfter.x / 2 : originCorrection.x,
-      hasHeight ? bboxSizeAfter.y / 2 : originCorrection.y
-    );
-    const center = new Point(
-      hasX
-        ? this.left - (sizeAfter.x + strokeWidthVector.x) * origin.x
-        : calculatedCenter.x - centerCorrection.x,
-      hasY
-        ? this.top - (sizeAfter.y + strokeWidthVector.y) * origin.y
-        : calculatedCenter.y - centerCorrection.y
-    );
-    const offsetCorrection = new Point(
-      hasX
-        ? center.x - calculatedCenter.x + bboxSizeAfter.x * (hasWidth ? 0.5 : 0)
-        : -(hasWidth
-            ? (sizeAfter.x - strokeWidthVector.x) * 0.5
-            : sizeAfter.x * originT.x),
-      hasY
-        ? center.y -
-          calculatedCenter.y +
-          bboxSizeAfter.y * (hasHeight ? 0.5 : 0)
-        : -(hasHeight
-            ? (sizeAfter.y - strokeWidthVector.y) * 0.5
-            : sizeAfter.y * originT.y)
-    ).add(rotationCorrection);
-    const correction = new Point(
-      hasWidth ? -sizeAfter.x / 2 : 0,
-      hasHeight ? -sizeAfter.y / 2 : 0
-    ).add(offsetCorrection);
-
-    return {
-      centerX: center.x,
-      centerY: center.y,
-      correctionX: correction.x,
-      correctionY: correction.y,
-      width: size.x,
-      height: size.y,
-    };
-  }
-
-  /**
-   * Calculate the bbox of objects relative to instance's containing plane
-   * @public
-   * @param {FabricObject[]} objects
-   * @returns {LayoutResult | null} bounding box
-   */
-  getObjectsBoundingBox(
-    objects: FabricObject[],
-    ignoreOffset?: boolean
-  ): LayoutResult | null {
-    if (objects.length === 0) {
-      return null;
-    }
-    const objectBounds: Point[] = [];
-    objects.forEach((object) => {
-      const objCenter = object.getRelativeCenterPoint();
-      let sizeVector = object._getTransformedDimensions().scalarDivide(2);
-      if (object.angle) {
-        const rad = degreesToRadians(object.angle),
-          sine = Math.abs(sin(rad)),
-          cosine = Math.abs(cos(rad)),
-          rx = sizeVector.x * cosine + sizeVector.y * sine,
-          ry = sizeVector.x * sine + sizeVector.y * cosine;
-        sizeVector = new Point(rx, ry);
-      }
-      objectBounds.push(
-        objCenter.subtract(sizeVector),
-        objCenter.add(sizeVector)
-      );
-    });
-    const { left, top, width, height } =
-      makeBoundingBoxFromPoints(objectBounds);
-
-    const size = new Point(width, height),
-      relativeCenter = (!ignoreOffset ? new Point(left, top) : new Point()).add(
-        size.scalarDivide(2)
-      ),
-      //  we send `relativeCenter` up to group's containing plane
-      center = relativeCenter.transform(this.calcOwnMatrix());
-
-    return {
-      centerX: center.x,
-      centerY: center.y,
-      width: size.x,
-      height: size.y,
-    };
-  }
-
-  /**
-   * Hook that is called once layout has completed.
-   * Provided for layout customization, override if necessary.
-   * Complements `getLayoutStrategyResult`, which is called at the beginning of layout.
-   * @public
-   * @param {LayoutContext} context layout context
-   * @param {LayoutResult} result layout result
-   */
-  // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  onLayout(context: LayoutContext, result: LayoutResult) {}
 
   /**
    *
@@ -992,13 +546,17 @@ export class Group extends createCollectionMixin(
     >,
     K extends keyof T = never
   >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
+    const layoutManager = this.layoutManager.toObject();
+
     return {
       ...super.toObject([
-        'layout',
         'subTargetCheck',
         'interactive',
         ...propertiesToInclude,
       ]),
+      ...(layoutManager.strategy !== 'fit-content' || this.includeDefaultValues
+        ? { layoutManager }
+        : {}),
       objects: this.__serializeObjects(
         'toObject',
         propertiesToInclude as string[]
@@ -1011,6 +569,7 @@ export class Group extends createCollectionMixin(
   }
 
   dispose() {
+    this.layoutManager.unsubscribeTarget(this);
     this._activeObjects = [];
     this.forEachObject((object) => {
       this._watchObject(false, object);
@@ -1088,16 +647,34 @@ export class Group extends createCollectionMixin(
    * @returns {Promise<Group>}
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>({
+    type,
     objects = [],
+    layoutManager,
     ...options
   }: T) {
     return Promise.all([
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
-    ]).then(
-      ([objects, hydratedOptions]) =>
-        new this(objects, { ...options, ...hydratedOptions }, true)
-    );
+    ]).then(([objects, hydratedOptions]) => {
+      const group = new this(objects, {
+        ...options,
+        ...hydratedOptions,
+        layoutManager: new NoopLayoutManager(),
+      });
+      if (layoutManager) {
+        const layoutClass = classRegistry.getClass<typeof LayoutManager>(
+          layoutManager.type
+        );
+        const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
+          layoutManager.strategy
+        );
+        group.layoutManager = new layoutClass(new strategyClass());
+      } else {
+        group.layoutManager = new LayoutManager();
+      }
+      group.setCoords();
+      return group;
+    });
   }
 }
 

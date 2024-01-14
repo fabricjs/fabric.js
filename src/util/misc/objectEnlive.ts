@@ -1,12 +1,18 @@
 import { noop } from '../../constants';
 import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
+import type {
+  Abortable,
+  Constructor,
+  TCrossOrigin,
+  TFiller,
+} from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
 import type { BaseFilter } from '../../filters/BaseFilter';
 import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 import { FabricError, SignalAbortedError } from '../internals/console';
+import type { Gradient } from '../../gradient';
 
 export type LoadImageOptions = Abortable & {
   /**
@@ -88,13 +94,14 @@ export const enlivenObjects = <
     Promise.all(
       objects.map((obj) =>
         classRegistry
-          .getClass(obj.type)
-          .fromObject(obj, {
-            signal,
-            reviver,
-          })
-          .then((fabricInstance: T) => {
-            reviver<T>(obj, fabricInstance);
+          .getClass<
+            Constructor<T> & {
+              fromObject(options: any, context: Abortable): Promise<T>;
+            }
+          >(obj.type)
+          .fromObject(obj, { signal })
+          .then((fabricInstance) => {
+            reviver(obj, fabricInstance);
             instances.push(fabricInstance);
             return fabricInstance;
           })
@@ -137,7 +144,7 @@ export const enlivenObjectEnlivables = <
       }
       // gradient
       if (value.colorStops) {
-        return new (classRegistry.getClass('gradient'))(value);
+        return new (classRegistry.getClass<typeof Gradient>('gradient'))(value);
       }
       // clipPath
       if (value.type) {
@@ -151,7 +158,7 @@ export const enlivenObjectEnlivables = <
       // pattern
       if (value.source) {
         return classRegistry
-          .getClass('pattern')
+          .getClass<typeof Pattern>('pattern')
           .fromObject(value, { signal })
           .then((pattern: Pattern) => {
             instances.push(pattern);

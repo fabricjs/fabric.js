@@ -204,10 +204,10 @@
   });
 
   QUnit.test('toObject without default values', function(assert) {
-    var options = { type: 'Rect', width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
+    var options = { width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
     var rect = new fabric.Rect(options);
     rect.includeDefaultValues = false;
-    assert.deepEqual(rect.toObject(), options);
+    assert.deepEqual(rect.toObject(), { type: 'Rect', ...options });
   });
 
   QUnit.test('paintFirst life cycle', function(assert) {

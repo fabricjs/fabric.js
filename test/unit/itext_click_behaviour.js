@@ -243,6 +243,7 @@
       iText.selected = true;
       iText.__lastSelected = true;
       iText.__corner = 'mt';
+      iText.setCoords();
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
       iText.exitEditing();

@@ -27,7 +27,8 @@ class BaseConfiguration {
    * If not set fabric will fallback to the environment value
    * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    */
-  devicePixelRatio?: number;
+  devicePixelRatio =
+    typeof window !== 'undefined' ? window.devicePixelRatio : 1; // eslint-disable-line no-restricted-globals
 
   /**
    * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.

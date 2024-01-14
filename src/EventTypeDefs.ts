@@ -7,6 +7,10 @@ import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './canvas/Canvas';
 import type { IText } from './shapes/IText/IText';
 import type { StaticCanvas } from './canvas/StaticCanvas';
+import type {
+  LayoutBeforeEvent,
+  LayoutAfterEvent,
+} from './LayoutManager/types';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -51,9 +55,9 @@ export type ControlCursorCallback = ControlCallback<string>;
  */
 export type Transform = {
   target: FabricObject;
-  action: string;
+  action?: string;
   actionHandler?: TransformActionHandler;
-  corner: string | 0;
+  corner: string;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -75,8 +79,6 @@ export type Transform = {
     originX: TOriginX;
     originY: TOriginY;
   };
-  // @TODO: investigate if this reset is really needed
-  reset?: boolean;
   actionPerformed: boolean;
 };
 
@@ -99,13 +101,14 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modifyPoly';
 
-export interface ModifiedEvent<E extends Event = TPointerEvent>
-  extends TEvent<E> {
+export interface ModifiedEvent<E extends Event = TPointerEvent> {
+  e?: E;
   transform: Transform;
   target: FabricObject;
-  action: string;
+  action?: string;
 }
 
 type ModificationEventsSpec<
@@ -120,6 +123,8 @@ type ObjectModificationEvents = ModificationEventsSpec;
 type CanvasModificationEvents = ModificationEventsSpec<
   'object:',
   BasicTransformEvent & { target: FabricObject },
+  // TODO: this typing makes not possible to use properties from modified event
+  // in object:modified
   ModifiedEvent | { target: FabricObject }
 > & {
   'before:transform': TEvent & { transform: Transform };
@@ -289,6 +294,8 @@ export interface StaticCanvasEvents extends CollectionEvents {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+  'object:layout:before': LayoutBeforeEvent & { target: Group };
+  'object:layout:after': LayoutAfterEvent & { target: Group };
 }
 
 export interface CanvasEvents
