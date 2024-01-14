@@ -14,8 +14,7 @@ import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
-import type { Canvas } from '../../canvas/Canvas';
-import { IText } from './IText';
+import type { IText } from './IText';
 
 /**
  *  extend this regex to support non english languages
