@@ -136,6 +136,7 @@ export class FabricObject<
   declare inverted: boolean;
   declare absolutePositioned: boolean;
   declare centeredRotation: boolean;
+  declare centeredScaling: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.
@@ -706,7 +707,10 @@ export class FabricObject<
       // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
-    } else if (key === 'dirty' && this.group) {
+    } else if (key === 'dirty' && this.group && value) {
+      // a dirty child makes the parent dirty
+      // but a non dirty child will not make the parent non dirty.
+      // the parent could be dirty for some other reason
       this.group.set('dirty', value);
     }
 
@@ -872,7 +876,7 @@ export class FabricObject<
   }
 
   /**
-   * Check if this object or a child object will cast a shadow
+   * Check if this object will cast a shadow with an offset.
    * used by Group.shouldCache to know if child has a shadow recursively
    * @return {Boolean}
    * @deprecated
@@ -1338,7 +1342,7 @@ export class FabricObject<
   cloneAsImage(options: any): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    const ImageClass = classRegistry.getClass('image');
+    const ImageClass = classRegistry.getClass<typeof FabricImage>('image');
     return new ImageClass(canvasEl);
   }
 
@@ -1374,9 +1378,9 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
+    this.setCoords();
     const el = createCanvasElement(),
-      // calculate with setCoords now.
-      boundingRect = this.getBoundingRect(true),
+      boundingRect = this.getBoundingRect(),
       shadow = this.shadow,
       shadowOffset = new Point();
 
@@ -1560,7 +1564,7 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
-    object: Record<string, unknown>,
+    { type, ...object }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
@@ -1569,7 +1573,7 @@ export class FabricObject<
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, type, ...rest } = allOptions;
+          const { [extraParam]: arg0, ...rest } = allOptions;
           // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {

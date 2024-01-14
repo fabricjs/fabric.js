@@ -105,8 +105,7 @@
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100 }),
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
-    ], { strokeWidth: 0 });
-    group.clipPath = clipPath;
+    ], { strokeWidth: 0, clipPath });
     canvas.add(group);
     toSVGCanvas(canvas, callback);
   }
@@ -127,8 +126,7 @@
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100, clipPath: small2 }),
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
-    ], { strokeWidth: 0 });
-    group.clipPath = clipPath;
+    ], { strokeWidth: 0, clipPath });
     canvas.add(group);
     toSVGCanvas(canvas, callback);
   }

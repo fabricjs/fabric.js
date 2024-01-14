@@ -310,7 +310,6 @@
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
     assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
-    assert.ok(!cObj.isOnScreen(true), 'object is not onScreen with top 1000 with calculate true and no setCoords call');
     cObj.setCoords();
     assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.1);
@@ -327,7 +326,6 @@
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
     assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
-    assert.ok(!cObj.isOnScreen(true), 'object is not onScreen with top 1000 with calculate true and no setCoords call');
     cObj.setCoords();
     assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.1);
@@ -630,13 +628,13 @@
 
     cObj.left += 5;
     coords = cObj.getCoords();
-    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached oCoords');
-    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached oCoords');
-    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached oCoords');
-    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached oCoords');
+    assert.deepEqual(coords[0], new fabric.Point(40, 30), 'return top left corner cached aCoords');
+    assert.deepEqual(coords[1], new fabric.Point(52, 30), 'return top right corner cached aCoords');
+    assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached aCoords');
+    assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached aCoords');
 
-    // testing calculate here
-    coords = cObj.getCoords(true);
+    cObj.setCoords();
+    coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(45, 30), 'return top left corner recalculated');
     assert.deepEqual(coords[1], new fabric.Point(57, 30), 'return top right corner recalculated');
     assert.deepEqual(coords[2], new fabric.Point(57, 47), 'return bottom right corner recalculated');

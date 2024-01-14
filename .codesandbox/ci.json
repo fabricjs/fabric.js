@@ -4,7 +4,8 @@
     "new",
     "/.codesandbox/templates/node",
     "/.codesandbox/templates/next",
-    "/.codesandbox/templates/vanilla"
+    "/.codesandbox/templates/vanilla",
+    "/.codesandbox/templates/vue"
   ],
   "node": "16"
 }

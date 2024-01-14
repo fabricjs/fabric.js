@@ -1,4 +1,3 @@
-import type { TDegree } from '../../../typedefs';
 import type { BorderProps } from './BorderProps';
 import type { ControlProps } from './ControlProps';
 import type { LockInteractionProps } from './LockInteractionProps';
@@ -19,39 +18,6 @@ export interface FabricObjectProps
    * @default true
    */
   noScaleCache?: boolean;
-
-  /**
-   * When true, this object will use center point as the origin of transformation
-   * when being scaled via the controls.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
-  centeredScaling: boolean;
-
-  /**
-   * When true, this object will use center point as the origin of transformation
-   * when being rotated via the controls.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
-  centeredRotation: boolean;
-
-  /**
-   * The angle that an object will lock to while rotating.
-   * @type [TDegree]
-   */
-  snapAngle?: TDegree;
-
-  /**
-   * The angle difference from the current snapped angle in which snapping should occur.
-   * When undefined, the snapThreshold will default to the snapAngle.
-   * @type [TDegree]
-   */
-  snapThreshold?: TDegree;
 
   /**
    * Default cursor value used when hovering over this object on canvas
