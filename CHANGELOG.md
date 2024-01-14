@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): fix type of modifed event that could cause unexpected behaviour in dev code [#9596](https://github.com/fabricjs/fabric.js/pull/9596)
 - fix(LayoutManager): remove unnecessary check [#9591](https://github.com/fabricjs/fabric.js/pull/9591)
 - fix(Text) Fix style transfer issue on a line that is not empty [#9461](https://github.com/fabricjs/fabric.js/pull/9461)
 - ci(): add a vue template [#9502](https://github.com/fabricjs/fabric.js/pull/9502)
