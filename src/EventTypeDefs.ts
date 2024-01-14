@@ -104,8 +104,8 @@ export type TModificationEvents =
   | 'resizing'
   | 'modifyPoly';
 
-export interface ModifiedEvent<E extends Event = TPointerEvent>
-  extends TEvent<E> {
+export interface ModifiedEvent<E extends Event = TPointerEvent> {
+  e?: E;
   transform: Transform;
   target: FabricObject;
   action?: string;

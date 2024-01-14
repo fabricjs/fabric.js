@@ -1157,7 +1157,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         return false;
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
@@ -1186,6 +1185,48 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const discarded = this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
     return discarded;
+  }
+
+  /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that block the user UX )
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  endCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._finalizeCurrentTransform(e);
+    if (transform && transform.target) {
+      // this could probably go inside _finalizeCurrentTransform
+      transform.target.isMoving = false;
+    }
+    this._currentTransform = null;
+  }
+
+  /**
+   * @private
+   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  _finalizeCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform!,
+      target = transform.target,
+      options = {
+        e,
+        target,
+        transform,
+        action: transform.action,
+      };
+
+    if (target._scaling) {
+      target._scaling = false;
+    }
+
+    target.setCoords();
+
+    if (transform.actionPerformed) {
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+    }
   }
 
   /**
