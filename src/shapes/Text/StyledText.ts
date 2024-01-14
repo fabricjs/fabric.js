@@ -253,15 +253,15 @@ export abstract class StyledText<
   }
 
   /**
-   * get the reference, not a clone, of the style object for a given character,
-   * if not style is set for a pre determined line or char, return a new object.
-   * this is tricky and confusing because when you get an empty object you can't
-   * determine if is a reference or a new one.
-   * @TODO this should return always a reference or always a clone, and if necessary undefined.
+   * Get a reference, not a clone, to the style object for a given character,
+   * if no style is set for a line or char, return a new empty object.
+   * This is tricky and confusing because when you get an empty object you can't
+   * determine if it is a reference or a new one.
+   * @TODO this should always return a reference or always a clone or undefined when necessary.
    * @protected
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @return {TextStyleDeclaration} style object a REFERENCE to the existing one or a new empty object
+   * @return {TextStyleDeclaration} a style object reference to the existing one or a new empty object when undefined
    */
   _getStyleDeclaration(
     lineIndex: number,

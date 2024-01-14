@@ -228,7 +228,7 @@ export class Textbox<
    * @protected
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @return {TextStyleDeclaration} style object a REFERENCE to the existing one or a new empty object
+   * @return {TextStyleDeclaration} a style object reference to the existing one or a new empty object when undefined
    */
   _getStyleDeclaration(
     lineIndex: number,
