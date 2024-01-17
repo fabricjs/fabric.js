@@ -30,17 +30,6 @@ import {
 import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 import type { FitContentLayout } from '../LayoutManager';
 
-/**
- * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
- * We could have used a boolean in the constructor, as we did previously, but we think the boolean
- * would stay in the group's constructor interface and create confusion, therefore it was removed.
- * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
- */
-class NoopLayoutManager extends LayoutManager {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  performLayout() {}
-}
-
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
   'layout:after': LayoutAfterEvent;
@@ -656,11 +645,8 @@ export class Group
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      const group = new this(objects, {
-        ...options,
-        ...hydratedOptions,
-        layoutManager: new NoopLayoutManager(),
-      });
+      // fix: Support user-defined layout managers during initialization
+      let groupLayoutManager;
       if (layoutManager) {
         const layoutClass = classRegistry.getClass<typeof LayoutManager>(
           layoutManager.type
@@ -668,11 +654,17 @@ export class Group
         const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
           layoutManager.strategy
         );
-        group.layoutManager = new layoutClass(new strategyClass());
+        groupLayoutManager = new layoutClass(new strategyClass());
       } else {
-        group.layoutManager = new LayoutManager();
+        groupLayoutManager = new LayoutManager();
       }
-      group.setCoords();
+
+      const group = new this(objects, {
+        ...options,
+        ...hydratedOptions,
+        layoutManager: groupLayoutManager,
+      });
+
       return group;
     });
   }
