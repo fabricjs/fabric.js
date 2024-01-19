@@ -29,26 +29,35 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.down();
     await page.mouse.move(0, 140, { steps: 40 });
     await page.mouse.move(435, 55, { steps: 40 });
-    expect(
-      await canvas.screenshot(),
-      `1. drag "${dragA}" over "lor|em" (A => B)`
-    ).toMatchSnapshot({
-      name: '1.drag-fabric-over-lor|em.png',
-    });
+    expect
+      .soft(
+        await canvas.screenshot(),
+        `1. drag "${dragA}" over "lor|em" (A => B)`
+      )
+      .toMatchSnapshot({
+        name: '1.drag-fabric-over-lor|em.png',
+        maxDiffPixels: 0,
+      });
     await page.mouse.move(240, 140, { steps: 40 });
-    expect(
-      await canvas.screenshot(),
-      `2. before dropping "${dragA}" => "sandbox|" (A => A)`
-    ).toMatchSnapshot({
-      name: '2.before-drop-fabric-after-sandbox.png',
-    });
+    expect
+      .soft(
+        await canvas.screenshot(),
+        `2. before dropping "${dragA}" => "sandbox|" (A => A)`
+      )
+      .toMatchSnapshot({
+        name: '2.before-drop-fabric-after-sandbox.png',
+        maxDiffPixels: 0,
+      });
     await page.mouse.up();
-    expect(
-      await canvas.screenshot(),
-      `3. drop "${dragA}" => "sandbox|${dragA}" (A => A)`
-    ).toMatchSnapshot({
-      name: '3.drop-fabric-after-sandbox.png',
-    });
+    expect
+      .soft(
+        await canvas.screenshot(),
+        `3. drop "${dragA}" => "sandbox|${dragA}" (A => A)`
+      )
+      .toMatchSnapshot({
+        name: '3.drop-fabric-after-sandbox.png',
+        maxDiffPixels: 0,
+      });
   });
 
   await test.step(`drag & drop to B(3) = "lor|${dragA}|em"`, async () => {
@@ -62,12 +71,15 @@ test('Drag & Drop', async ({ page }) => {
         y: 55,
       },
     });
-    expect(
-      await canvas.screenshot(),
-      `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`
-    ).toMatchSnapshot({
-      name: '4.drop--lor|fabric|em.png',
-    });
+    expect
+      .soft(
+        await canvas.screenshot(),
+        `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`
+      )
+      .toMatchSnapshot({
+        name: '4.drop--lor|fabric|em.png',
+        maxDiffPixels: 0,
+      });
   });
 
   await test.step('select B', async () => {
@@ -93,12 +105,15 @@ test('Drag & Drop', async ({ page }) => {
         y: 55,
       },
     });
-    expect(
-      await canvas.screenshot(),
-      `5. drag & drop "${dragB}" => ".js |${dragB}|sandbox" (B => A(4))`
-    ).toMatchSnapshot({
-      name: '5..js |em ips.png',
-    });
+    expect
+      .soft(
+        await canvas.screenshot(),
+        `5. drag & drop "${dragB}" => ".js |${dragB}|sandbox" (B => A(4))`
+      )
+      .toMatchSnapshot({
+        name: '5..js |em ips.png',
+        maxDiffPixels: 0,
+      });
   });
 });
 
@@ -168,17 +183,19 @@ test('Drag Image A', async ({ page }) => {
     });
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
-    expect(image, `drag image A: "${dragA}"`).toMatchSnapshot({
+    expect.soft(image, `drag image A: "${dragA}"`).toMatchSnapshot({
       name: 'drag-image-fabric.png',
-      maxDiffPixelRatio: 0.03,
+      maxDiffPixels: 0,
     });
-    expect(
-      JSON.stringify(position, null, 2),
-      `drag image A position: "${dragA}"`
-    ).toMatchSnapshot({
-      name: 'drag-image-fabric.json',
-      maxDiffPixelRatio: 0.03,
-    });
+    expect
+      .soft(
+        JSON.stringify(position, null, 2),
+        `drag image A position: "${dragA}"`
+      )
+      .toMatchSnapshot({
+        name: 'drag-image-fabric.json',
+        maxDiffPixels: 0,
+      });
   });
 });
 
@@ -205,14 +222,18 @@ test('Drag Image B', async ({ page }) => {
     });
     await canvas.dispatchEvent('dragstart', dragEvent);
     const [image, position] = await trigger;
-    expect(image, `drag image B: "${dragB}"`).toMatchSnapshot({
+    expect.soft(image, `drag image B: "${dragB}"`).toMatchSnapshot({
       name: 'drag-image-em---tge.png',
+      maxDiffPixels: 0,
     });
-    expect(
-      JSON.stringify(position, null, 2),
-      `drag image B position: "${dragB}"`
-    ).toMatchSnapshot({
-      name: 'drag-image-em---tge.json',
-    });
+    expect
+      .soft(
+        JSON.stringify(position, null, 2),
+        `drag image B position: "${dragB}"`
+      )
+      .toMatchSnapshot({
+        name: 'drag-image-em---tge.json',
+        maxDiffPixels: 0,
+      });
   });
 });
