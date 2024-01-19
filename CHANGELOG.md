@@ -2,6 +2,7 @@
 
 ## [next]
 
+- CI(): test strict pixels [#9609](https://github.com/fabricjs/fabric.js/pull/9609)
 - ci(): Add a test case from the multiple selection use case for groups [#9599](https://github.com/fabricjs/fabric.js/pull/9599)
 - refactor(env): Change the way the environment and retina are initialized [#9480](https://github.com/fabricjs/fabric.js/pull/9480)
 - chore(TS): fix type of modifed event that could cause unexpected behaviour in dev code [#9596](https://github.com/fabricjs/fabric.js/pull/9596)
