@@ -59,9 +59,9 @@
 
     assert.ok(polygon instanceof fabric.Polygon);
     assert.ok(polygon instanceof fabric.Polyline);
-    assert.ok(polygon instanceof fabric.Object);
+    assert.ok(polygon instanceof fabric.FabricObject);
 
-    assert.equal(polygon.constructor.name, 'Polygon');
+    assert.equal(polygon.constructor.type, 'Polygon');
     assert.deepEqual(polygon.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
@@ -103,7 +103,7 @@
   });
 
   QUnit.test('polygon with exactBoundingBox true', function(assert) {
-    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 }], {
+    var polygon = new fabric.Polygon([{ x: 10, y: 10 }, { x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 100 },{ x: 10, y: 10 }], {
       exactBoundingBox: true,
       strokeWidth: 60,
       stroke: 'blue'
@@ -306,5 +306,102 @@
       });
       done();
     });
+  });
+  QUnit.test('_calcDimensions with object options', function(assert) {
+    const polygon = new fabric.Polygon(
+      getPoints(), 
+      { 
+        scaleX: 2, 
+        scaleY: 3,
+        skewX: 20,
+        skewY: 30,
+        strokeWidth: 20,
+        strokeMiterLimit: 10,
+        strokeUniform: false,
+        strokeLineJoin: 'miter',
+        exactBoundingBox: true
+      }
+    ),
+    {
+      left,
+      top,
+      width,
+      height,
+      pathOffset,
+      strokeOffset,
+      strokeDiff
+    } = polygon._calcDimensions();
+
+    // Types
+    assert.equal(typeof left, 'number');
+    assert.equal(typeof top, 'number');
+    assert.equal(typeof width, 'number');
+    assert.equal(typeof height, 'number');
+    assert.ok(pathOffset instanceof fabric.Point);
+    assert.ok(strokeOffset instanceof fabric.Point);
+    assert.ok(strokeDiff instanceof fabric.Point);
+
+    // Values
+    assert.equal(left, 10.485714075442775);
+    assert.equal(top, 14.784917784669414);
+    assert.equal(width, 27.707709196083425);
+    assert.equal(height, 21.750672506349947);
+    assert.deepEqual(pathOffset, new fabric.Point(14.999999999999998, 17.000000000000004));
+    assert.deepEqual(strokeOffset, new fabric.Point(11.966623726115365, 8.965754721680533));
+    assert.deepEqual(strokeDiff, new fabric.Point(23.933247452230738, 17.931509443361065));
+  });
+  QUnit.test('_calcDimensions with custom options', function(assert) {
+    const polygon = new fabric.Polygon(
+      getPoints(), 
+      { 
+        scaleX: 2, 
+        scaleY: 3,
+        skewX: 20,
+        skewY: 30,
+        strokeWidth: 20,
+        strokeMiterLimit: 10,
+        strokeUniform: false,
+        strokeLineJoin: 'miter',
+        exactBoundingBox: true
+      }
+    ),
+    customOptions = {
+      scaleX: 4, 
+      scaleY: 2,
+      skewX: 0,
+      skewY: 20,
+      strokeWidth: 10,
+      strokeMiterLimit: 20,
+      strokeUniform: true,
+      strokeLineJoin: 'miter',
+      exactBoundingBox: true
+    },
+    {
+      left,
+      top,
+      width,
+      height,
+      pathOffset,
+      strokeOffset,
+      strokeDiff
+    } = polygon._calcDimensions(customOptions);
+
+    // Types
+    assert.equal(typeof left, 'number');
+    assert.equal(typeof top, 'number');
+    assert.equal(typeof width, 'number');
+    assert.equal(typeof height, 'number');
+    assert.ok(pathOffset instanceof fabric.Point);
+    assert.ok(strokeOffset instanceof fabric.Point);
+    assert.ok(strokeDiff instanceof fabric.Point);
+
+    // Values
+    assert.equal(left, 9.440983005625053);
+    assert.equal(top, 13.60709991156367);
+    assert.equal(width, 11.118033988749893);
+    assert.equal(height, 17.704907204858728);
+    assert.deepEqual(pathOffset, new fabric.Point(6.825391045997646, 18.518912156261834));
+    assert.deepEqual(strokeOffset, new fabric.Point(1.1180339887498931, 6.097807293295057));
+    assert.deepEqual(strokeDiff, new fabric.Point(2.2360679774997863, 12.195614586590114));
   });
 })();

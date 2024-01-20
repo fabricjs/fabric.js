@@ -1,3 +1,5 @@
+import { FabricError } from './util/internals/console';
+
 /*
  * This Map connects the objects type value with their
  * class implementation. It used from any object to understand which are
@@ -22,10 +24,10 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  getClass(classType: string): any {
+  getClass<T>(classType: string): T {
     const constructor = this[JSON].get(classType);
     if (!constructor) {
-      throw new Error(`No class registered for ${classType}`);
+      throw new FabricError(`No class registered for ${classType}`);
     }
     return constructor;
   }
@@ -34,10 +36,10 @@ export class ClassRegistry {
     if (classType) {
       this[JSON].set(classType, classConstructor);
     } else {
-      this[JSON].set(classConstructor.name, classConstructor);
+      this[JSON].set(classConstructor.type, classConstructor);
       // legacy
       // @TODO: needs to be removed in fabric 7 or 8
-      this[JSON].set(classConstructor.name.toLowerCase(), classConstructor);
+      this[JSON].set(classConstructor.type.toLowerCase(), classConstructor);
     }
   }
 
@@ -47,7 +49,7 @@ export class ClassRegistry {
 
   setSVGClass(classConstructor: any, SVGTagName?: string) {
     this[SVG].set(
-      SVGTagName ?? classConstructor.name.toLowerCase(),
+      SVGTagName ?? classConstructor.type.toLowerCase(),
       classConstructor
     );
   }

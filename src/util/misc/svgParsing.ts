@@ -1,6 +1,6 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, NONE } from '../../constants';
 import type {
   TBBox,
   TMat2D,
@@ -50,12 +50,9 @@ export const getSvgAttributes = (type: SVGElementName) => {
  * @param {number} fontSize
  * @return {number}
  */
-export const parseUnit = (value: string, fontSize: number) => {
+export const parseUnit = (value: string, fontSize = DEFAULT_SVG_FONT_SIZE) => {
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
-  if (!fontSize) {
-    fontSize = DEFAULT_SVG_FONT_SIZE;
-  }
   const dpi = config.DPI;
   switch (unit?.[0] as SupportedSVGUnit) {
     case 'mm':
@@ -94,9 +91,9 @@ export type TPreserveArParsed = {
 // align can be either none or undefined or a combination of mid/max
 const parseAlign = (align: string): MinMidMax[] => {
   //divide align in alignX and alignY
-  if (align && align !== 'none') {
+  if (align && align !== NONE) {
     return [align.slice(1, 4) as MinMidMax, align.slice(5, 8) as MinMidMax];
-  } else if (align === 'none') {
+  } else if (align === NONE) {
     return [align, align];
   }
   return ['Mid', 'Mid'];
@@ -140,24 +137,37 @@ export const matrixToSVG = (transform: TMat2D) =>
  * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
  * @param prop
  * @param value
+ * @param {boolean} inlineStyle The default is inline style, the separator used is ":", The other is "="
  * @returns
  */
-export const colorPropToSVG = (prop: string, value?: any) => {
+export const colorPropToSVG = (
+  prop: string,
+  value?: any,
+  inlineStyle = true
+) => {
+  let colorValue;
+  let opacityValue;
   if (!value) {
-    return `${prop}: none; `;
+    colorValue = 'none';
   } else if (value.toLive) {
-    return `${prop}: url(#SVGID_${value.id}); `;
+    colorValue = `url(#SVGID_${value.id})`;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
 
-    let str = `${prop}: ${color.toRgb()}; `;
-
+    colorValue = color.toRgb();
     if (opacity !== 1) {
-      //change the color in rgb + opacity
-      str += `${prop}-opacity: ${opacity.toString()}; `;
+      opacityValue = opacity.toString();
     }
-    return str;
+  }
+  if (inlineStyle) {
+    return `${prop}: ${colorValue}; ${
+      opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ''
+    }`;
+  } else {
+    return `${prop}="${colorValue}" ${
+      opacityValue ? `${prop}-opacity="${opacityValue}" ` : ''
+    }`;
   }
 };
 
@@ -166,7 +176,7 @@ export const createSVGRect = (
   { left, top, width, height }: TBBox,
   precision = config.NUM_FRACTION_DIGITS
 ) => {
-  const svgColor = colorPropToSVG('fill', color);
+  const svgColor = colorPropToSVG('fill', color, false);
   const [x, y, w, h] = [left, top, width, height].map((value) =>
     toFixed(value, precision)
   );

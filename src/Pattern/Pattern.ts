@@ -11,16 +11,19 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
+import { log } from '../util/internals/console';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
+  static type = 'Pattern';
+
   /**
-   * Legacy identifier of the class. Prefer using this.constructor.name 'Pattern'
-   * or utils like isPattern
-   * Will be removed in fabric 7 or 8.
+   * Legacy identifier of the class. Prefer using this.constructor.type 'Pattern'
+   * or utils like isPattern, or instance of to indentify a pattern in your code.
+   * Will be removed in future versiones
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
@@ -30,7 +33,7 @@ export class Pattern {
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**
@@ -89,7 +92,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternOptions = {}) {
+  constructor(options: PatternOptions) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -189,7 +192,7 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: SerializedPatternOptions,
+    { type, source, ...serialized }: SerializedPatternOptions,
     options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {

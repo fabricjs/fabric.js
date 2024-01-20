@@ -1,13 +1,14 @@
 import { Point } from '../../Point';
 import type { Group } from '../Group';
 import type { TDegree, TOriginX, TOriginY } from '../../typedefs';
-import { transformPoint } from '../../util/misc/matrix';
+import { calcDimensionsMatrix, transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
 import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import type { BaseProps } from './types/BaseProps';
 import type { FillStrokeProps } from './types/FillStrokeProps';
+import { CENTER, LEFT, TOP } from '../../constants';
 
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>
@@ -35,12 +36,9 @@ export class ObjectOrigin<EventSpec>
    */
   declare group?: Group;
 
-  declare _originalOriginX?: TOriginX;
-
-  declare _originalOriginY?: TOriginY;
-
   /**
    * Calculate object bounding box dimensions from its properties scale, skew.
+   * This bounding box is aligned with object angle and not with canvas axis or screen.
    * @param {Object} [options]
    * @param {Number} [options.scaleX]
    * @param {Number} [options.scaleY]
@@ -79,7 +77,11 @@ export class ObjectOrigin<EventSpec>
         dimY * dimOptions.scaleY
       );
     } else {
-      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
+      finalDimensions = sizeAfterTransform(
+        dimX,
+        dimY,
+        calcDimensionsMatrix(dimOptions)
+      );
     }
 
     return finalDimensions.scalarAdd(postScalingStrokeValue);
@@ -131,8 +133,8 @@ export class ObjectOrigin<EventSpec>
       point,
       originX,
       originY,
-      'center',
-      'center'
+      CENTER,
+      CENTER
     );
     if (this.angle) {
       return p.rotate(degreesToRadians(this.angle), point);
@@ -154,8 +156,8 @@ export class ObjectOrigin<EventSpec>
   ): Point {
     const p = this.translateToGivenOrigin(
       center,
-      'center',
-      'center',
+      CENTER,
+      CENTER,
       originX,
       originY
     );
@@ -220,57 +222,13 @@ export class ObjectOrigin<EventSpec>
   }
 
   /**
-   * Sets the origin/position of the object to it's center point
-   * @private
-   * @return {void}
-   */
-  _setOriginToCenter() {
-    this._originalOriginX = this.originX;
-    this._originalOriginY = this.originY;
-
-    const center = this.getRelativeCenterPoint();
-
-    this.originX = 'center';
-    this.originY = 'center';
-
-    this.left = center.x;
-    this.top = center.y;
-  }
-
-  /**
-   * Resets the origin/position of the object to it's original origin
-   * @private
-   * @return {void}
-   */
-  _resetOrigin() {
-    if (
-      this._originalOriginX !== undefined &&
-      this._originalOriginY !== undefined
-    ) {
-      const originPoint = this.translateToOriginPoint(
-        this.getRelativeCenterPoint(),
-        this._originalOriginX,
-        this._originalOriginY
-      );
-
-      this.left = originPoint.x;
-      this.top = originPoint.y;
-
-      this.originX = this._originalOriginX;
-      this.originY = this._originalOriginY;
-      this._originalOriginX = undefined;
-      this._originalOriginY = undefined;
-    }
-  }
-
-  /**
    * @private
    */
   _getLeftTopCoords() {
     return this.translateToOriginPoint(
       this.getRelativeCenterPoint(),
-      'left',
-      'top'
+      LEFT,
+      TOP
     );
   }
 }

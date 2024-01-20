@@ -1,4 +1,5 @@
-import type { Image } from '../shapes/Image';
+import { CENTER } from '../constants';
+import type { FabricImage } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
 import { qrDecompose } from './misc/matrix';
@@ -49,12 +50,12 @@ export const removeTransformMatrixForSvgParsing = (
   if (preserveAspectRatioOptions) {
     object.scaleX *= preserveAspectRatioOptions.scaleX;
     object.scaleY *= preserveAspectRatioOptions.scaleY;
-    (object as Image).cropX = preserveAspectRatioOptions.cropX;
-    (object as Image).cropY = preserveAspectRatioOptions.cropY;
+    (object as FabricImage).cropX = preserveAspectRatioOptions.cropX;
+    (object as FabricImage).cropY = preserveAspectRatioOptions.cropY;
     center.x += preserveAspectRatioOptions.offsetLeft;
     center.y += preserveAspectRatioOptions.offsetTop;
     object.width = preserveAspectRatioOptions.width;
     object.height = preserveAspectRatioOptions.height;
   }
-  object.setPositionByOrigin(center, 'center', 'center');
+  object.setPositionByOrigin(center, CENTER, CENTER);
 };

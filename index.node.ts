@@ -1,5 +1,11 @@
-// first we set the env variable by importing the node env file
-import { getNodeCanvas, dispose } from './src/env/node';
+// First we set the env variable
+
+import { setEnv } from './src/env';
+import { getEnv, getNodeCanvas } from './src/env/node';
+
+setEnv(getEnv());
+
+// After the env is set we can export everything and expose specific node functionality
 
 import type { JpegConfig, PngConfig } from 'canvas';
 import {
@@ -14,18 +20,13 @@ export * from './fabric';
 
 export class StaticCanvas extends StaticCanvasBase {
   getNodeCanvas() {
-    return getNodeCanvas(this.lowerCanvasEl);
+    return getNodeCanvas(this.getElement());
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);
   }
   createJPEGStream(opts?: JpegConfig) {
     return this.getNodeCanvas().createJPEGStream(opts);
-  }
-  destroy(): void {
-    const canvasElement = this.lowerCanvasEl!;
-    super.destroy();
-    dispose(canvasElement);
   }
 }
 
@@ -37,19 +38,12 @@ export class StaticCanvas extends StaticCanvasBase {
  */
 export class Canvas extends CanvasBase {
   getNodeCanvas() {
-    return getNodeCanvas(this.lowerCanvasEl);
+    return getNodeCanvas(this.getElement());
   }
   createPNGStream(opts?: PngConfig) {
     return this.getNodeCanvas().createPNGStream(opts);
   }
   createJPEGStream(opts?: JpegConfig) {
     return this.getNodeCanvas().createJPEGStream(opts);
-  }
-  destroy(): void {
-    const upperCanvasEl = this.upperCanvasEl!;
-    const pixelFindCanvasEl = this.pixelFindCanvasEl!;
-    super.destroy();
-    dispose(upperCanvasEl);
-    dispose(pixelFindCanvasEl);
   }
 }

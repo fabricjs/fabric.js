@@ -3,12 +3,16 @@ import type { Canvas } from '../../../canvas/Canvas';
 import type { StaticCanvas } from '../../../canvas/StaticCanvas';
 import type { TFiller } from '../../../typedefs';
 import type { FabricObject } from '../Object';
+import type { ObjectTransformActionProps } from './ObjectTransformProps';
 import type {
   ClipPathProps,
   SerializedObjectProps,
 } from './SerializedObjectProps';
 
-export interface ObjectProps extends SerializedObjectProps, ClipPathProps {
+export interface ObjectProps
+  extends SerializedObjectProps,
+    ClipPathProps,
+    ObjectTransformActionProps {
   clipPath?: FabricObject;
   fill: TFiller | string | null;
   stroke: TFiller | string | null;

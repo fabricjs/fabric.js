@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Textbox fromObject 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "",
+  "charSpacing": 0,
+  "direction": "ltr",
+  "fill": "rgb(0,0,0)",
+  "fillRule": "nonzero",
+  "flipX": false,
+  "flipY": false,
+  "fontFamily": "Times New Roman",
+  "fontSize": 40,
+  "fontStyle": "normal",
+  "fontWeight": "normal",
+  "globalCompositeOperation": "source-over",
+  "height": 254.928,
+  "left": 0,
+  "lineHeight": 1.16,
+  "linethrough": false,
+  "minWidth": 20,
+  "opacity": 1,
+  "originX": "left",
+  "originY": "top",
+  "overline": false,
+  "paintFirst": "fill",
+  "path": undefined,
+  "pathAlign": "baseline",
+  "pathSide": "left",
+  "pathStartOffset": 0,
+  "scaleX": 1,
+  "scaleY": 1,
+  "shadow": null,
+  "skewX": 0,
+  "skewY": 0,
+  "splitByGrapheme": false,
+  "stroke": null,
+  "strokeDashArray": null,
+  "strokeDashOffset": 0,
+  "strokeLineCap": "butt",
+  "strokeLineJoin": "miter",
+  "strokeMiterLimit": 4,
+  "strokeUniform": false,
+  "strokeWidth": 1,
+  "styles": [],
+  "text": "The quick 
+brown 
+fox",
+  "textAlign": "left",
+  "textBackgroundColor": "",
+  "top": 0,
+  "type": "Textbox",
+  "underline": false,
+  "visible": true,
+  "width": 102,
+}
+`;
+
+exports[`Textbox fromObject 2`] = `
+{
+  "height": 254.928,
+  "left": 0,
+  "styles": [],
+  "text": "The quick 
+brown 
+fox",
+  "top": 0,
+  "type": "Textbox",
+  "width": 102,
+}
+`;
+
+exports[`Textbox stylesToArray edge case 1`] = `
+[
+  {
+    "end": 10,
+    "start": 5,
+    "style": {
+      "fill": "red",
+    },
+  },
+  {
+    "end": 17,
+    "start": 16,
+    "style": {
+      "fill": "red",
+    },
+  },
+]
+`;
+
+exports[`Textbox toObject with styles 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "",
+  "charSpacing": 0,
+  "direction": "ltr",
+  "fill": "rgb(0,0,0)",
+  "fillRule": "nonzero",
+  "flipX": false,
+  "flipY": false,
+  "fontFamily": "Times New Roman",
+  "fontSize": 40,
+  "fontStyle": "normal",
+  "fontWeight": "normal",
+  "globalCompositeOperation": "source-over",
+  "height": 202.496,
+  "left": 0,
+  "lineHeight": 1.16,
+  "linethrough": false,
+  "minWidth": 20,
+  "opacity": 1,
+  "originX": "left",
+  "originY": "top",
+  "overline": false,
+  "paintFirst": "fill",
+  "path": undefined,
+  "pathAlign": "baseline",
+  "pathSide": "left",
+  "pathStartOffset": 0,
+  "scaleX": 1,
+  "scaleY": 1,
+  "shadow": null,
+  "skewX": 0,
+  "skewY": 0,
+  "splitByGrapheme": false,
+  "stroke": null,
+  "strokeDashArray": null,
+  "strokeDashOffset": 0,
+  "strokeLineCap": "butt",
+  "strokeLineJoin": "miter",
+  "strokeMiterLimit": 4,
+  "strokeUniform": false,
+  "strokeWidth": 1,
+  "styles": [
+    {
+      "end": 9,
+      "start": 5,
+      "style": {
+        "fill": "red",
+      },
+    },
+    {
+      "end": 18,
+      "start": 13,
+      "style": {
+        "underline": true,
+      },
+    },
+  ],
+  "text": "The quick 
+brown 
+fox",
+  "textAlign": "left",
+  "textBackgroundColor": "",
+  "top": 0,
+  "type": "Textbox",
+  "underline": false,
+  "visible": true,
+  "width": 120,
+}
+`;

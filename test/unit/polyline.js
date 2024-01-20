@@ -58,9 +58,9 @@
     var polyline = new fabric.Polyline(getPoints());
 
     assert.ok(polyline instanceof fabric.Polyline);
-    assert.ok(polyline instanceof fabric.Object);
+    assert.ok(polyline instanceof fabric.FabricObject);
 
-    assert.equal(polyline.constructor.name, 'Polyline');
+    assert.equal(polyline.constructor.type, 'Polyline');
     assert.deepEqual(polyline.get('points'), [{ x: 10, y: 12 }, { x: 20, y: 22 }]);
   });
 
