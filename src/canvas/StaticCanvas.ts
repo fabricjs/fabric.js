@@ -2,7 +2,7 @@ import { config } from '../config';
 import { CENTER, VERSION } from '../constants';
 import type { CanvasEvents, StaticCanvasEvents } from '../EventTypeDefs';
 import type { Gradient } from '../gradient/Gradient';
-import { createCollectionMixin } from '../Collection';
+import { createCollectionMixin, isCollection } from '../Collection';
 import { CommonMethods } from '../CommonMethods';
 import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
@@ -24,6 +24,7 @@ import {
   cancelAnimFrame,
   requestAnimFrame,
 } from '../util/animation/AnimationFrameProvider';
+import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
 import { createCanvasElement, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
@@ -35,17 +36,14 @@ import {
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgParsing';
 import { toFixed } from '../util/misc/toFixed';
-import {
-  isCollection,
-  isFiller,
-  isPattern,
-  isTextObject,
-} from '../util/typeAssertions';
+import { isFiller, isPattern, isTextObject } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
 import type { CSSDimensions } from './DOMManagers/util';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
+import { log, FabricError } from '../util/internals/console';
+import { getDevicePixelRatio } from '../env';
 
 export type TCanvasSizeOptions = {
   backstoreOnly?: boolean;
@@ -115,13 +113,9 @@ export class StaticCanvas<
   declare allowTouchScrolling: boolean;
 
   declare viewportTransform: TMat2D;
+
   /**
-   * Describe canvas element extension over design
-   * properties are tl,tr,bl,br.
-   * if canvas is not zoomed/panned those points are the four corner of canvas
-   * if canvas is viewportTransformed you those points indicate the extension
-   * of canvas element in plain untrasformed coordinates
-   * The coordinates get updated with @method calcViewportBoundaries.
+   * The viewport bounding box in scene plane coordinates, see {@link calcViewportBoundaries}
    */
   declare vptCoords: TCornerPoint;
 
@@ -171,7 +165,7 @@ export class StaticCanvas<
   }
 
   constructor(
-    el: string | HTMLCanvasElement,
+    el?: string | HTMLCanvasElement,
     options: TOptions<StaticCanvasOptions> = {}
   ) {
     super();
@@ -189,7 +183,7 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
   }
 
-  protected initElements(el: string | HTMLCanvasElement) {
+  protected initElements(el?: string | HTMLCanvasElement) {
     this.elements = new StaticCanvasDOMManager(el);
   }
 
@@ -213,12 +207,11 @@ export class StaticCanvas<
 
   _onObjectAdded(obj: FabricObject) {
     if (obj.canvas && (obj.canvas as StaticCanvas) !== this) {
-      /* _DEV_MODE_START_ */
-      console.warn(
-        'fabric.Canvas: trying to add an object that belongs to a different canvas.\n' +
+      log(
+        'warn',
+        'Canvas is trying to add an object that belongs to a different canvas.\n' +
           'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
       );
-      /* _DEV_MODE_END_ */
       obj.canvas.remove(obj);
     }
     obj._set('canvas', this);
@@ -239,17 +232,11 @@ export class StaticCanvas<
 
   /**
    * @private
-   */
-  _isRetinaScaling() {
-    return config.devicePixelRatio > 1 && this.enableRetinaScaling;
-  }
-
-  /**
-   * @private
+   * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    * @return {Number} retinaScaling if applied, otherwise 1;
    */
   getRetinaScaling() {
-    return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
+    return this.enableRetinaScaling ? getDevicePixelRatio() : 1;
   }
 
   /**
@@ -508,10 +495,7 @@ export class StaticCanvas<
 
   /**
    * Calculate the position of the 4 corner of canvas with current viewportTransform.
-   * helps to determinate when an object is in the current rendering viewport using
-   * object absolute coordinates ( aCoords )
-   * @return {Object} points.tl
-   * @chainable
+   * helps to determinate when an object is in the current rendering viewport
    */
   calcViewportBoundaries(): TCornerPoint {
     const width = this.width,
@@ -870,7 +854,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _toObject(
+  protected _toObject(
     instance: FabricObject,
     methodName: TValidToObjectMethod,
     propertiesToInclude?: string[]
@@ -1266,7 +1250,7 @@ export class StaticCanvas<
     { signal }: Abortable = {}
   ): Promise<this> {
     if (!json) {
-      return Promise.reject(new Error('fabric.js: `json` is undefined'));
+      return Promise.reject(new FabricError('`json` is undefined'));
     }
 
     // parse json if it wasn't already
@@ -1440,6 +1424,7 @@ export class StaticCanvas<
   dispose() {
     !this.disposed &&
       this.elements.cleanupDOM({ width: this.width, height: this.height });
+    runningAnimations.cancelByCanvas(this);
     this.disposed = true;
     return new Promise<boolean>((resolve, reject) => {
       const task = () => {

@@ -1,6 +1,7 @@
 import { getFabricWindow } from '../../env';
 import { noop } from '../../constants';
 import type { Abortable } from '../../typedefs';
+import { SignalAbortedError } from './console';
 
 type requestOptions = Abortable & {
   onComplete?: (xhr: XMLHttpRequest) => void;
@@ -29,7 +30,7 @@ export function request(url: string, options: requestOptions = {}) {
     };
 
   if (signal && signal.aborted) {
-    throw new Error('`options.signal` is in `aborted` state');
+    throw new SignalAbortedError('request');
   } else if (signal) {
     signal.addEventListener('abort', abort, { once: true });
   }

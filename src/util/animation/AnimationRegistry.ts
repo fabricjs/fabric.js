@@ -1,4 +1,4 @@
-import type { Canvas } from '../../canvas/Canvas';
+import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { AnimationBase } from './AnimationBase';
 
@@ -25,17 +25,18 @@ class AnimationRegistry extends Array<AnimationBase> {
   }
 
   /**
-   * Cancel all running animations attached to a Canvas on the next frame
-   * @param {Canvas} canvas
+   * Cancel all running animations attached to a canvas on the next frame
+   * @param {StaticCanvas} canvas
    */
-  cancelByCanvas(canvas: Canvas) {
+  cancelByCanvas(canvas: StaticCanvas) {
     if (!canvas) {
       return [];
     }
     const animations = this.filter(
       (animation) =>
-        typeof animation.target === 'object' &&
-        (animation.target as FabricObject)?.canvas === canvas
+        animation.target === canvas ||
+        (typeof animation.target === 'object' &&
+          (animation.target as FabricObject)?.canvas === canvas)
     );
     animations.forEach((animation) => animation.abort());
     return animations;

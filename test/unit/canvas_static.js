@@ -1262,7 +1262,7 @@
     canvas.loadFromJSON(serialized).then(function() {
       assert.ok(!canvas.isEmpty(), 'canvas is not empty');
       assert.equal(canvas.backgroundColor, 'green');
-      assert.ok(canvas.backgroundImage instanceof fabric.Image);
+      assert.ok(canvas.backgroundImage instanceof fabric.FabricImage);
       done();
     });
   });
@@ -1327,7 +1327,7 @@
     var canvas3 = new fabric.StaticCanvas();
     var json = '{"clipPath": {"type":"Text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"normal","fontFamily":"Delicious_500","fontStyle":"normal","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
     canvas3.loadFromJSON(json).then(function() {
-      assert.ok(canvas3.clipPath instanceof fabric.Text);
+      assert.ok(canvas3.clipPath instanceof fabric.FabricText);
       assert.equal(canvas3.clipPath.constructor.type, 'Text');
       done();
     });
@@ -1722,15 +1722,17 @@
     var rectOverlay = new fabric.Rect({ width: 10, heigth: 10 });
     canvas.add(rect);
     canvas.cancelRequestedRender();
+    rectBg.canvas = canvas;
     canvas.backgroundImage = rectBg;
+    rectOverlay.canvas = canvas;
     canvas.overlayImage = rectOverlay;
-    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(0,0), 'rect linecoords are set for normal viewport');
-    assert.equal(rectBg.lineCoords, undefined, 'rectBg linecoords are not set');
-    assert.equal(rectOverlay.lineCoords, undefined, 'rectOverlay linecoords are not set');
+    assert.deepEqual(new fabric.Point(rect.oCoords.tl), new fabric.Point(0,0), 'rect oCoords are set for normal viewport');
+    assert.equal(rectBg.oCoords, undefined, 'rectBg oCoords are not set');
+    assert.equal(rectOverlay.oCoords, undefined, 'rectOverlay oCoords are not set');
     canvas.setViewportTransform(vpt);
-    assert.deepEqual(rect.lineCoords.tl, new fabric.Point(50,50), 'rect linecoords are set');
-    assert.deepEqual(rectBg.lineCoords.tl,  new fabric.Point(0,0), 'rectBg linecoords are set');
-    assert.deepEqual(rectOverlay.lineCoords.tl,  new fabric.Point(0,0), 'rectOverlay linecoords are set');
+    assert.deepEqual(new fabric.Point(rect.oCoords.tl), new fabric.Point(50,50), 'rect oCoords are set');
+    assert.deepEqual(new fabric.Point(rectBg.oCoords.tl),  new fabric.Point(50,50), 'rectBg oCoords are set');
+    assert.deepEqual(new fabric.Point(rectOverlay.oCoords.tl),  new fabric.Point(50,50), 'rectOverlay oCoords are set');
   });
 
   QUnit.test('getZoom', function(assert) {
@@ -1827,28 +1829,6 @@
     assert.deepEqual({ x: canvas.vptCoords.tr.x, y: canvas.vptCoords.tr.y }, { x: 130, y: -145 }, 'tr is 130, -145');
     assert.deepEqual({ x: canvas.vptCoords.bl.x, y: canvas.vptCoords.bl.y }, { x: 30,  y: 30 }, 'bl is 30,-70');
     assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br is 130,-70');
-  });
-
-  QUnit.test('_isRetinaScaling', function(assert) {
-    canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 2 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, true, 'retina > 1 and enabled');
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 2 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina > 1 and disabled');
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 1 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina = 1 and disabled');
-
-    canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 1 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina = 1 and enabled');
   });
 
   QUnit.test('getRetinaScaling', function(assert) {

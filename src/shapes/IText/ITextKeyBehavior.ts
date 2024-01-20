@@ -90,7 +90,7 @@ export abstract class ITextKeyBehavior<
       paste: 'paste',
       compositionstart: 'onCompositionStart',
       compositionupdate: 'onCompositionUpdate',
-      onCompositionUpdate: 'onCompositionEnd',
+      compositionend: 'onCompositionEnd',
     } as Record<string, keyof this>).map(([eventName, handler]) =>
       textarea.addEventListener(
         eventName,

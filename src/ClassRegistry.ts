@@ -1,3 +1,5 @@
+import { FabricError } from './util/internals/console';
+
 /*
  * This Map connects the objects type value with their
  * class implementation. It used from any object to understand which are
@@ -22,10 +24,10 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  getClass(classType: string): any {
+  getClass<T>(classType: string): T {
     const constructor = this[JSON].get(classType);
     if (!constructor) {
-      throw new Error(`No class registered for ${classType}`);
+      throw new FabricError(`No class registered for ${classType}`);
     }
     return constructor;
   }

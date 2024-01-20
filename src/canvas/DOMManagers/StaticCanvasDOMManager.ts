@@ -4,6 +4,7 @@ import type { CSSDimensions } from './util';
 import { setCSSDimensions, getElementOffset } from './util';
 import { createCanvasElement, isHTMLCanvas } from '../../util/misc/dom';
 import { setCanvasDimensions } from './util';
+import { FabricError } from '../../util/internals/console';
 
 export type CanvasItem = {
   el: HTMLCanvasElement;
@@ -20,23 +21,22 @@ export class StaticCanvasDOMManager {
 
   lower: CanvasItem;
 
-  constructor(arg0: string | HTMLCanvasElement) {
+  constructor(arg0?: string | HTMLCanvasElement) {
     const el = this.createLowerCanvas(arg0);
     this.lower = { el, ctx: el.getContext('2d')! };
   }
 
-  protected createLowerCanvas(arg0: HTMLCanvasElement | string) {
+  protected createLowerCanvas(arg0?: HTMLCanvasElement | string) {
     // canvasEl === 'HTMLCanvasElement' does not work on jsdom/node
     const el = isHTMLCanvas(arg0)
       ? arg0
-      : (getFabricDocument().getElementById(arg0) as HTMLCanvasElement) ||
+      : (arg0 &&
+          (getFabricDocument().getElementById(arg0) as HTMLCanvasElement)) ||
         createCanvasElement();
     if (el.hasAttribute('data-fabric')) {
-      /* _DEV_MODE_START_ */
-      throw new Error(
-        'fabric.js: trying to initialize a canvas that has already been initialized'
+      throw new FabricError(
+        'Trying to initialize a canvas that has already been initialized. Did you forget to dispose the canvas?'
       );
-      /* _DEV_MODE_END_ */
     }
     this._originalCanvasStyle = el.style.cssText;
     el.setAttribute('data-fabric', 'main');

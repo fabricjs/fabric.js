@@ -1,7 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import '../../../jest.extend';
+import type { TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
+import { Group } from '../../shapes/Group';
 import { IText } from '../../shapes/IText/IText';
+import { FabricObject } from '../../shapes/Object/FabricObject';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
@@ -20,7 +23,7 @@ describe('Canvas event data', () => {
   };
 
   beforeEach(() => {
-    canvas = new Canvas(null);
+    canvas = new Canvas();
     spy = jest.spyOn(canvas, 'fire');
   });
 
@@ -39,7 +42,7 @@ describe('Canvas event data', () => {
     'wheel',
     'contextmenu',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       canvas
@@ -50,7 +53,7 @@ describe('Canvas event data', () => {
   );
 
   // must call mousedown for mouseup to be listened to
-  test('HTML event "mouseup" should fire a corresponding canvas event with viewportTransform of %s', () => {
+  test('HTML event "mouseup" should fire a corresponding canvas event', () => {
     canvas.setViewportTransform(genericVpt);
     canvas
       .getSelectionElement()
@@ -70,7 +73,7 @@ describe('Canvas event data', () => {
     'dragover',
     'drop',
   ] as (keyof WindowEventMap)[])(
-    'HTML event "%s" should fire a corresponding canvas event with viewportTransform of %s',
+    'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
       // select target and mock some essentials for events to fire
@@ -99,4 +102,67 @@ describe('Canvas event data', () => {
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     }
   );
+
+  test('getScenePoint', () => {
+    const canvas = new Canvas(undefined, {
+      enableRetinaScaling: true,
+      width: 200,
+      height: 200,
+    });
+    jest.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
+    const spy = jest.spyOn(canvas, 'getPointer');
+    jest.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
+      width: 500,
+      height: 500,
+    });
+    jest.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
+    jest.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
+    const ev = new MouseEvent('mousemove', {
+      clientX: 50,
+      clientY: 50,
+    });
+    const point = canvas.getScenePoint(ev);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenNthCalledWith(1, ev);
+    canvas._cacheTransformEventData(ev);
+    expect(point).toEqual(canvas['_absolutePointer']);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(spy).toHaveBeenNthCalledWith(2, ev, true);
+  });
+});
+
+it('A selected subtarget should not fire an event twice', () => {
+  const target = new FabricObject();
+  const group = new Group([target], {
+    subTargetCheck: true,
+    interactive: true,
+  });
+  const canvas = new Canvas();
+  canvas.add(group);
+  const targetSpy = jest.fn();
+  target.on('mousedown', targetSpy);
+  jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+  canvas.__onMouseDown({
+    target: canvas.getSelectionElement(),
+    clientX: 0,
+    clientY: 0,
+  } as unknown as TPointerEvent);
+  expect(targetSpy).toHaveBeenCalledTimes(1);
+});
+
+it('should fire mouse over/out events on target', () => {
+  const target = new FabricObject({ width: 10, height: 10 });
+  const canvas = new Canvas();
+  canvas.add(target);
+
+  jest.spyOn(target, 'toJSON').mockReturnValue('target');
+
+  const targetSpy = jest.spyOn(target, 'fire');
+  const canvasSpy = jest.spyOn(canvas, 'fire');
+  const enter = new MouseEvent('mousemove', { clientX: 5, clientY: 5 });
+  const exit = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
+  canvas._onMouseMove(enter);
+  canvas._onMouseMove(exit);
+  expect(targetSpy.mock.calls).toMatchSnapshot();
+  expect(canvasSpy.mock.calls).toMatchSnapshot();
 });

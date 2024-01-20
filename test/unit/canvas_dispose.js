@@ -47,7 +47,7 @@ function assertCanvasDisposing(klass) {
         assert.equal(el.height, 200, 'restored height');
     });
 
-    
+
     QUnit.test('dispose: clear references async', async function (assert) {
         const canvas = new klass(null, { renderOnAddRemove: false });
         assert.ok(typeof canvas.dispose === 'function');
@@ -173,6 +173,33 @@ function assertCanvasDisposing(klass) {
         });
         animate();
     });
+
+    QUnit.test('disposing during animation should cancel it by target', function (assert) {
+        const done = assert.async();
+        const canvas = new klass(null, { renderOnAddRemove: false });
+        let called = 0;
+        const animate = () => fabric.util.animate({
+            target: canvas,
+            onChange() {
+                if (called === 1) {
+                    assert.equal(fabric.runningAnimations[0].target, canvas, 'should register the animation by target');
+                    canvas.dispose().then(() => {
+                        assert.deepEqual(fabric.runningAnimations, [], 'should cancel the animation');
+                        done();
+                    });
+                    assert.ok(canvas.disposed, 'should flag `disposed`');
+                }
+                called++;
+                canvas.contextTopDirty = true;
+                canvas.hasLostContext = true;
+                canvas.renderAll();
+            },
+            onComplete() {
+                animate();
+            }
+        });
+        animate();
+    });
 }
 
 function testStaticCanvasDisposing() {
@@ -221,7 +248,7 @@ function testCanvasDisposing() {
         wrapperEl = canvas.wrapperEl;
         lowerCanvasEl = canvas.lowerCanvasEl;
         upperCanvasEl = canvas.upperCanvasEl;
-        const activeSel = canvas.getActiveSelection();
+        const activeSel = new fabric.ActiveSelection();
         assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
         assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
         assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
@@ -279,7 +306,8 @@ function testCanvasDisposing() {
         wrapperEl = canvas.wrapperEl;
         lowerCanvasEl = canvas.lowerCanvasEl;
         upperCanvasEl = canvas.upperCanvasEl;
-        const activeSel = canvas.getActiveSelection();
+        const activeSel = new fabric.ActiveSelection();
+        canvas.setActiveObject(activeSel)
         assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
         assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
         assert.equal(wrapperEl.tagName, 'DIV', 'We wrapped canvas with DIV');
@@ -287,7 +315,7 @@ function testCanvasDisposing() {
         assert.equal(wrapperEl.childNodes[0], lowerCanvasEl, 'First child should be lowerCanvas');
         assert.equal(wrapperEl.childNodes[1], upperCanvasEl, 'Second child should be upperCanvas');
         assert.equal(canvas.elements._originalCanvasStyle, elStyle, 'saved original canvas style for disposal');
-        assert.ok(activeSel instanceof fabric.ActiveSelection, 'active selection');
+        assert.ok(canvas.getActiveObject() === activeSel, 'active selection');
         assert.notEqual(el.style.cssText, canvas.elements._originalCanvasStyle, 'canvas el style has been changed');
         if (!isNode()) {
             assert.equal(parentEl.childNodes[0], wrapperEl, 'wrapperEl is appended to rootNode');
@@ -295,7 +323,7 @@ function testCanvasDisposing() {
         //looks like i cannot use parentNode
         //equal(wrapperEl, lowerCanvasEl.parentNode, 'lowerCanvas is appended to wrapperEl');
         //equal(wrapperEl, upperCanvasEl.parentNode, 'upperCanvas is appended to wrapperEl');
-        //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appendend to rootNode');
+        //equal(parentEl, wrapperEl.parentNode, 'wrapperEl is appended to rootNode');
         assert.equal(parentEl.childNodes.length, 1, 'parent div should have 1 child');
         assert.notEqual(parentEl.firstChild, canvas.getElement(), 'canvas should not be parent div firstChild');
         assert.ok(typeof canvas.dispose === 'function');
@@ -307,7 +335,7 @@ function testCanvasDisposing() {
         await canvas.dispose();
         assert.equal(fabric.runningAnimations.length, 0, 'dispose should clear running animations');
         assert.equal(canvas.getObjects().length, 0, 'dispose should clear canvas');
-        assert.equal(canvas.getActiveSelection(), undefined, 'dispose should dispose active selection');
+        assert.equal(canvas.getActiveObject(), undefined, 'dispose should dispose active selection');
         assert.equal(activeSel.size(), 0, 'dispose should dispose active selection');
         assert.equal(parentEl.childNodes.length, 1, 'parent has always 1 child');
         if (!isNode()) {

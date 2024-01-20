@@ -6,7 +6,7 @@ import match from 'micromatch';
 import path from 'path';
 import { getGitInfo } from '../scripts/git.mjs';
 
-const BINARY_EXT = ['png', 'jpg', 'jpeg'];
+const BINARY_EXT = ['png', 'jpg', 'jpeg', 'ico'];
 
 function bufferToBase64DataUrl(buffer, mimeType) {
   return 'data:' + mimeType + ';base64,' + buffer.toString('base64');
@@ -94,7 +94,6 @@ export async function createCodeSandbox(appPath) {
     );
     return `https://codesandbox.io/s/${sandbox_id}`;
   } catch (error) {
-    // console.log(error.response.data);
-    throw new Error(error.response.data);
+    throw error.response?.data || error;
   }
 }

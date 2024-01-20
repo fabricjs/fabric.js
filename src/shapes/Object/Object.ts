@@ -41,7 +41,7 @@ import {
   isSerializableFiller,
   isTextObject,
 } from '../../util/typeAssertions';
-import type { Image } from '../Image';
+import type { FabricImage } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -52,7 +52,8 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
-import { getEnv } from '../../env';
+import { getDevicePixelRatio, getEnv } from '../../env';
+import { log } from '../../util/internals/console';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -135,6 +136,7 @@ export class FabricObject<
   declare inverted: boolean;
   declare absolutePositioned: boolean;
   declare centeredRotation: boolean;
+  declare centeredScaling: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.
@@ -295,7 +297,7 @@ export class FabricObject<
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**
@@ -512,7 +514,7 @@ export class FabricObject<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  protected toObject(propertiesToInclude: any[] = []): any {
+  toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -705,7 +707,10 @@ export class FabricObject<
       // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
-    } else if (key === 'dirty' && this.group) {
+    } else if (key === 'dirty' && this.group && value) {
+      // a dirty child makes the parent dirty
+      // but a non dirty child will not make the parent non dirty.
+      // the parent could be dirty for some other reason
       this.group.set('dirty', value);
     }
 
@@ -844,7 +849,7 @@ export class FabricObject<
       this.paintFirst === 'stroke' &&
       this.hasFill() &&
       this.hasStroke() &&
-      typeof this.shadow === 'object'
+      !!this.shadow
     ) {
       return true;
     }
@@ -871,7 +876,7 @@ export class FabricObject<
   }
 
   /**
-   * Check if this object or a child object will cast a shadow
+   * Check if this object will cast a shadow with an offset.
    * used by Group.shouldCache to know if child has a shadow recursively
    * @return {Boolean}
    * @deprecated
@@ -1332,12 +1337,12 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {Image} Object cloned as image.
+   * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): Image {
+  cloneAsImage(options: any): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    const ImageClass = classRegistry.getClass('image');
+    const ImageClass = classRegistry.getClass<typeof FabricImage>('image');
     return new ImageClass(canvasEl);
   }
 
@@ -1360,9 +1365,7 @@ export class FabricObject<
       originalGroup = this.group,
       originalShadow = this.shadow,
       abs = Math.abs,
-      retinaScaling = options.enableRetinaScaling
-        ? Math.max(config.devicePixelRatio, 1)
-        : 1,
+      retinaScaling = options.enableRetinaScaling ? getDevicePixelRatio() : 1,
       multiplier = (options.multiplier || 1) * retinaScaling;
     delete this.group;
     if (options.withoutTransform) {
@@ -1375,9 +1378,9 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
+    this.setCoords();
     const el = createCanvasElement(),
-      // skip canvas zoom and calculate with setCoords now.
-      boundingRect = this.getBoundingRect(true, true),
+      boundingRect = this.getBoundingRect(),
       shadow = this.shadow,
       shadowOffset = new Point();
 
@@ -1561,7 +1564,7 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
-    object: Record<string, unknown>,
+    { type, ...object }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
@@ -1570,7 +1573,7 @@ export class FabricObject<
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, type, ...rest } = allOptions;
+          const { [extraParam]: arg0, ...rest } = allOptions;
           // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {

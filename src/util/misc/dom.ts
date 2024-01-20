@@ -1,5 +1,6 @@
 import { getFabricDocument } from '../../env';
 import type { ImageFormat } from '../../typedefs';
+import { FabricError } from '../internals/console';
 /**
  * Creates canvas element
  * @return {CanvasElement} initialized canvas element
@@ -7,7 +8,7 @@ import type { ImageFormat } from '../../typedefs';
 export const createCanvasElement = (): HTMLCanvasElement => {
   const element = getFabricDocument().createElement('canvas');
   if (!element || typeof element.getContext === 'undefined') {
-    throw new Error('Failed to create `canvas` element');
+    throw new FabricError('Failed to create `canvas` element');
   }
   return element;
 };
@@ -49,7 +50,7 @@ export const toDataURL = (
 ) => canvasEl.toDataURL(`image/${format}`, quality);
 
 export const isHTMLCanvas = (
-  canvas: HTMLCanvasElement | string
+  canvas?: HTMLCanvasElement | string
 ): canvas is HTMLCanvasElement => {
   return !!canvas && (canvas as HTMLCanvasElement).getContext !== undefined;
 };

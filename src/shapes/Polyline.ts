@@ -20,6 +20,9 @@ import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
+  /**
+   * @deprecated transient option soon to be removed in favor of a different design
+   */
   exactBoundingBox: false,
 };
 
@@ -44,7 +47,7 @@ export class Polyline<
    * Calculate the exact bounding box taking in account strokeWidth on acute angles
    * this will be turned to true by default on fabric 6.0
    * maybe will be left in as an optimization since calculations may be slow
-   * @deprecated
+   * @deprecated transient option soon to be removed in favor of a different design
    * @type Boolean
    * @default false
    */
@@ -160,15 +163,19 @@ export class Polyline<
       bboxNoStroke = makeBoundingBoxFromPoints(
         this.points.map((p) => transformPoint(p, matrix, true))
       ),
-      offsetX = bbox.left + bbox.width / 2,
-      offsetY = bbox.top + bbox.height / 2,
-      pathOffsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX)),
-      pathOffsetY =
-        offsetY - pathOffsetX * Math.tan(degreesToRadians(this.skewY)),
       scale = new Point(this.scaleX, this.scaleY);
+    let offsetX = bbox.left + bbox.width / 2,
+      offsetY = bbox.top + bbox.height / 2;
+    if (this.exactBoundingBox) {
+      offsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
+      // Order of those assignments is important.
+      // offsetY relies on offsetX being already changed by the line above
+      offsetY = offsetY - offsetX * Math.tan(degreesToRadians(this.skewY));
+    }
+
     return {
       ...bbox,
-      pathOffset: new Point(pathOffsetX, pathOffsetY),
+      pathOffset: new Point(offsetX, offsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top)
         .subtract(new Point(bbox.left, bbox.top))
         .multiply(scale),
@@ -206,6 +213,13 @@ export class Polyline<
   }
 
   /**
+   * @deprecated intermidiate method to be removed, do not use
+   */
+  protected isStrokeAccountedForInDimensions() {
+    return this.exactBoundingBox;
+  }
+
+  /**
    * @override stroke is taken in account in size
    */
   _getNonTransformedDimensions() {
@@ -225,9 +239,9 @@ export class Polyline<
   _getTransformedDimensions(options: any = {}) {
     if (this.exactBoundingBox) {
       let size: Point;
-      /* When `strokeUniform = true`, any changes to the properties require recalculating the `width` and `height` because 
-        the stroke projections are affected. 
-        When `strokeUniform = false`, we don't need to recalculate for scale transformations, as the effect of scale on 
+      /* When `strokeUniform = true`, any changes to the properties require recalculating the `width` and `height` because
+        the stroke projections are affected.
+        When `strokeUniform = false`, we don't need to recalculate for scale transformations, as the effect of scale on
         projections follows a linear function (e.g. scaleX of 2 just multiply width by 2)*/
       if (
         Object.keys(options).some(
