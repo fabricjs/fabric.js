@@ -40,7 +40,14 @@
         "isTrusted": true
       },
       "target": "b",
-      "isClick": false,
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "pointer": {
         "x": 435,
         "y": 55
@@ -73,7 +80,14 @@
         "isTrusted": true
       },
       "target": "b",
-      "isClick": false,
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "pointer": {
         "x": 435,
         "y": 55

@@ -41,7 +41,14 @@
       },
       "target": "a",
       "nextTarget": "b",
-      "isClick": false,
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "pointer": {
         "x": 435,
         "y": 55
@@ -63,7 +70,14 @@
       },
       "target": "b",
       "previousTarget": "a",
-      "isClick": false,
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "pointer": {
         "x": 435,
         "y": 55
@@ -84,6 +98,14 @@
       "target": "b",
       "subTargets": [],
       "dragSource": "a",
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "didDrop": false,
       "pointer": {
         "x": 435,
@@ -132,6 +154,14 @@
       "target": "b",
       "subTargets": [],
       "dragSource": "a",
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "didDrop": true,
       "dropTarget": "b",
       "pointer": {
