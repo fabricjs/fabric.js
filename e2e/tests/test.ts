@@ -32,10 +32,8 @@ export function before(
   /**
    * @returns a map of objects for playwright to access during tests
    */
-  cb: (canvas: HTMLCanvasElement) => AsyncReturnValue<{
-    canvas: Canvas;
-    objects?: Record<string, FabricObject>;
-  }>
+  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject> | void>,
+  options?
 ) {
   const task = Promise.resolve().then(async () => {
     const el = document.querySelector<HTMLCanvasElement>(selector);
@@ -60,7 +58,7 @@ export function before(
  * @param options canvas options
  */
 export function beforeAll(
-  cb: (canvas: Canvas) => AsyncReturnValue<Record<string, FabricObject> | void>,
+  cb: Awaited<(canvas: Canvas) => Record<string, FabricObject> | void>,
   options?
 ) {
   before('#canvas', async (el) => {
