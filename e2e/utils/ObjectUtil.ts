@@ -44,7 +44,7 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     );
   }
 
-  async expectObjectToMatch<T extends Record<string, unknown>>(expected: T) {
+  async expectObjectToMatch<S extends T>(expected: Partial<S>) {
     const snapshot = await this.executeInBrowser((object) => object);
     expect(snapshot).toMatchObject(expected);
   }

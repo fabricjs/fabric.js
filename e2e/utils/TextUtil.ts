@@ -19,4 +19,13 @@ export class TextUtil<T extends IText = IText> extends ObjectUtil<T> {
       { index }
     );
   }
+
+  isCursorActive() {
+    return this.executeInBrowser((object) => {
+      return [
+        object['_currentTickState'],
+        object['_currentTickCompleteState'],
+      ].some((cursorAnimation) => cursorAnimation && !cursorAnimation.isDone());
+    });
+  }
 }
