@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout Manager getLayoutResult imperative trigger 1`] = `
+{
+  "nextCenter": Point {
+    "x": 50,
+    "y": 100,
+  },
+  "offset": Point {
+    "x": -42,
+    "y": -113,
+  },
+  "prevCenter": Point {
+    "x": 38,
+    "y": 37,
+  },
+  "result": {
+    "center": Point {
+      "x": 50,
+      "y": 100,
+    },
+    "correction": Point {
+      "x": 10,
+      "y": 20,
+    },
+    "relativeCorrection": Point {
+      "x": -30,
+      "y": -40,
+    },
+    "size": Point {
+      "x": 200,
+      "y": 250,
+    },
+  },
+}
+`;
+
+exports[`Layout Manager getLayoutResult initialization trigger 1`] = `
+{
+  "nextCenter": Point {
+    "x": 50,
+    "y": 100,
+  },
+  "offset": Point {
+    "x": -70,
+    "y": -120,
+  },
+  "prevCenter": Point {
+    "x": 0,
+    "y": 0,
+  },
+  "result": {
+    "center": Point {
+      "x": 50,
+      "y": 100,
+    },
+    "correction": Point {
+      "x": 10,
+      "y": 20,
+    },
+    "relativeCorrection": Point {
+      "x": -30,
+      "y": -40,
+    },
+    "size": Point {
+      "x": 200,
+      "y": 250,
+    },
+  },
+}
+`;

@@ -1,3 +1,4 @@
+import type { JSHandle } from '@playwright/test';
 import { type LocatorScreenshotOptions, type Page } from '@playwright/test';
 import type { Canvas } from 'fabric';
 import os from 'node:os';
@@ -31,15 +32,24 @@ export class CanvasUtil {
       .screenshot({ omitBackground: true, ...options });
   }
 
+  evaluateSelf() {
+    return this.page.evaluateHandle<Canvas>(
+      ([selector]) => canvasMap.get(document.querySelector(selector)),
+      [this.selector]
+    );
+  }
+
   async executeInBrowser<C, R>(
     runInBrowser: (canvas: Canvas, context: C) => R,
-    context: C
+    context?: C
   ): Promise<R> {
-    return (
-      await this.page.evaluateHandle<Canvas>(
-        ([selector]) => canvasMap.get(document.querySelector(selector)),
-        [this.selector]
-      )
-    ).evaluate(runInBrowser, context);
+    return (await this.evaluateSelf()).evaluate(runInBrowser, context);
+  }
+
+  async evaluateHandle<C, R>(
+    runInBrowser: (canvas: Canvas, context: C) => R,
+    context?: C
+  ): Promise<JSHandle<R>> {
+    return (await this.evaluateSelf()).evaluateHandle(runInBrowser, context);
   }
 }

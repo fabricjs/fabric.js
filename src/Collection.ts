@@ -1,8 +1,16 @@
 import type { Constructor, TBBox } from './typedefs';
 import { removeFromArray } from './util/internals';
 import { Point } from './Point';
+import type { ActiveSelection } from './shapes/ActiveSelection';
+import type { Group } from './shapes/Group';
 import type { InteractiveFabricObject } from './shapes/Object/InteractiveObject';
 import type { FabricObject } from './shapes/Object/FabricObject';
+
+export const isCollection = (
+  fabricObject?: FabricObject
+): fabricObject is Group | ActiveSelection => {
+  return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
+};
 
 export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   class Collection extends Base {
@@ -311,6 +319,8 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * Given a bounding box, return all the objects of the collection that are contained in the bounding box.
      * If `includeIntersecting` is true, return also the objects that intersect the bounding box as well.
      * This is meant to work with selection. Is not a generic method.
+     * @param {TBBox} bbox a bounding box in scene coordinates
+     * @param {{ includeIntersecting?: boolean }} options an object with includeIntersecting
      * @returns array of objects contained in the bounding box, ordered from top to bottom stacking wise
      */
     collectObjects(
@@ -327,11 +337,10 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
         if (
           object.selectable &&
           object.visible &&
-          ((includeIntersecting && object.intersectsWithRect(tl, br, true)) ||
-            object.isContainedWithinRect(tl, br, true) ||
-            (includeIntersecting &&
-              object.containsPoint(tl, undefined, true)) ||
-            (includeIntersecting && object.containsPoint(br, undefined, true)))
+          ((includeIntersecting && object.intersectsWithRect(tl, br)) ||
+            object.isContainedWithinRect(tl, br) ||
+            (includeIntersecting && object.containsPoint(tl)) ||
+            (includeIntersecting && object.containsPoint(br)))
         ) {
           objects.push(object);
         }

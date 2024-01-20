@@ -65,7 +65,7 @@
       var iText = new fabric.IText('test');
 
       assert.ok(iText instanceof fabric.IText);
-      assert.ok(iText instanceof fabric.Text);
+      assert.ok(iText instanceof fabric.FabricText);
     });
 
     QUnit.test('initial properties', function(assert) {

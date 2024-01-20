@@ -1,0 +1,221 @@
+[
+  [
+    "dragstart",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a"
+    },
+    "canvas"
+  ],
+  [
+    "dragstart",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a"
+    },
+    "a"
+  ],
+  [
+    "dragenter",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "subTargets": [],
+      "dragSource": "a"
+    },
+    "canvas"
+  ],
+  [
+    "dragleave",
+    {
+      "subTargets": [],
+      "dragSource": "a",
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "nextTarget": "b",
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "a"
+  ],
+  [
+    "dragenter",
+    {
+      "subTargets": [],
+      "dragSource": "a",
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "previousTarget": "a",
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "b"
+  ],
+  [
+    "drop",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "subTargets": [],
+      "dragSource": "a",
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
+      "didDrop": false,
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "canvas"
+  ],
+  [
+    "selection:changed",
+    {},
+    "b"
+  ],
+  [
+    "text:selection:changed",
+    {
+      "target": "b"
+    },
+    "canvas"
+  ],
+  [
+    "changed",
+    {
+      "index": 3,
+      "action": "drop"
+    },
+    "b"
+  ],
+  [
+    "text:changed",
+    {
+      "target": "b"
+    },
+    "canvas"
+  ],
+  [
+    "drop",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "b",
+      "subTargets": [],
+      "dragSource": "a",
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
+      "didDrop": true,
+      "dropTarget": "b",
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "b"
+  ],
+  [
+    "dragend",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "subTargets": [],
+      "dragSource": "a",
+      "didDrop": true,
+      "dropTarget": "b"
+    },
+    "canvas"
+  ],
+  [
+    "changed",
+    {
+      "index": 11,
+      "action": "dragend"
+    },
+    "a"
+  ],
+  [
+    "text:changed",
+    {
+      "target": "a"
+    },
+    "canvas"
+  ],
+  [
+    "dragend",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "target": "a",
+      "subTargets": [],
+      "dragSource": "a",
+      "didDrop": true,
+      "dropTarget": "b"
+    },
+    "a"
+  ]
+]

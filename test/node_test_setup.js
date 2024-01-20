@@ -4,12 +4,6 @@ require('./lib/assert');
 var chalk = require('chalk');
 var commander = require('commander');
 
-// TODO remove block and dependency when node 14 fades out
-// node 14 AbortController polyfill for tests
-if (!global.AbortController) {
-  require("abort-controller/polyfill");
-}
-
 
 commander.program
   .option('-d, --debug', 'debug visual tests by overriding refs (golden images) in case of visual changes', false)

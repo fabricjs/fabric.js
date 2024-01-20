@@ -16,7 +16,7 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
   container: HTMLDivElement;
 
   constructor(
-    arg0: string | HTMLCanvasElement,
+    arg0?: string | HTMLCanvasElement,
     {
       allowTouchScrolling = false,
       containerClass = '',
