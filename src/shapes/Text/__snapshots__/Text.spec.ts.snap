@@ -1,0 +1,214 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FabricText measuring, splitting measuring 1`] = `
+{
+  "kernedWidth": 18,
+  "width": 18,
+}
+`;
+
+exports[`FabricText measuring, splitting splits into lines 1`] = `
+{
+  "_unwrappedLines": [
+    [
+      "t",
+      "e",
+      "s",
+      "t",
+      " ",
+      "f",
+      "o",
+      "o",
+      " ",
+      "b",
+      "a",
+      "r",
+      "-",
+      "b",
+      "a",
+      "z",
+    ],
+    [
+      "q",
+      "u",
+      "x",
+    ],
+  ],
+  "graphemeLines": [
+    [
+      "t",
+      "e",
+      "s",
+      "t",
+      " ",
+      "f",
+      "o",
+      "o",
+      " ",
+      "b",
+      "a",
+      "r",
+      "-",
+      "b",
+      "a",
+      "z",
+    ],
+    [
+      "q",
+      "u",
+      "x",
+    ],
+  ],
+  "graphemeText": [
+    "t",
+    "e",
+    "s",
+    "t",
+    " ",
+    "f",
+    "o",
+    "o",
+    " ",
+    "b",
+    "a",
+    "r",
+    "-",
+    "b",
+    "a",
+    "z",
+    "
+",
+    "q",
+    "u",
+    "x",
+  ],
+  "lines": [
+    "test foo bar-baz",
+    "qux",
+  ],
+}
+`;
+
+exports[`FabricText subscript/superscript 1`] = `
+[
+  {
+    "end": 1,
+    "start": 0,
+    "style": {
+      "fill": "blue",
+      "stroke": "black",
+    },
+  },
+  {
+    "end": 2,
+    "start": 1,
+    "style": {
+      "deltaY": -14,
+      "fill": "blue",
+      "fontSize": 24,
+    },
+  },
+  {
+    "end": 3,
+    "start": 2,
+    "style": {
+      "deltaY": 18.6,
+      "fontSize": 2.4,
+    },
+  },
+  {
+    "end": 4,
+    "start": 3,
+    "style": {
+      "deltaY": 4.4,
+      "fill": "blue",
+      "fontSize": 24,
+      "stroke": "black",
+    },
+  },
+  {
+    "end": 5,
+    "start": 4,
+    "style": {
+      "deltaY": 4.4,
+      "fill": "blue",
+      "fontSize": 24,
+    },
+  },
+  {
+    "end": 6,
+    "start": 5,
+    "style": {
+      "deltaY": 20,
+      "fontSize": 4,
+    },
+  },
+]
+`;
+
+exports[`FabricText toObject 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "",
+  "charSpacing": 0,
+  "direction": "ltr",
+  "fill": "rgb(0,0,0)",
+  "fillRule": "nonzero",
+  "flipX": false,
+  "flipY": false,
+  "fontFamily": "Times New Roman",
+  "fontSize": 40,
+  "fontStyle": "normal",
+  "fontWeight": "normal",
+  "globalCompositeOperation": "source-over",
+  "height": 45.2,
+  "left": 0,
+  "lineHeight": 1.16,
+  "linethrough": false,
+  "opacity": 1,
+  "originX": "left",
+  "originY": "top",
+  "overline": false,
+  "paintFirst": "fill",
+  "path": undefined,
+  "pathAlign": "baseline",
+  "pathSide": "left",
+  "pathStartOffset": 0,
+  "scaleX": 1,
+  "scaleY": 1,
+  "shadow": null,
+  "skewX": 0,
+  "skewY": 0,
+  "stroke": null,
+  "strokeDashArray": null,
+  "strokeDashOffset": 0,
+  "strokeLineCap": "butt",
+  "strokeLineJoin": "miter",
+  "strokeMiterLimit": 4,
+  "strokeUniform": false,
+  "strokeWidth": 1,
+  "styles": [],
+  "text": "text",
+  "textAlign": "left",
+  "textBackgroundColor": "",
+  "top": 0,
+  "type": "Text",
+  "underline": false,
+  "visible": true,
+  "width": 60,
+}
+`;
+
+exports[`FabricText toSVG with NUM_FRACTION_DIGITS 1`] = `
+"<g transform="matrix(1 0 0 1 60.5 23.1)" style=""  >
+		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="12.6" style="fill: rgb(255,0,0); ">x</tspan><tspan x="-40" y="12.6" style="fill: rgb(0,0,255); ">x</tspan><tspan x="-20" y="12.6" style="fill: rgb(0,128,0); ">x</tspan><tspan x="0" y="12.6" style="fill: rgb(255,255,0); ">x</tspan><tspan x="20" y="12.6" style="fill: rgb(255,192,203); ">x</tspan><tspan x="40" y="12.6" >x</tspan></text>
+</g>
+"
+`;
+
+exports[`FabricText toSVG with NUM_FRACTION_DIGITS 2`] = `
+"<g transform="matrix(1 0 0 1 60.5 23.1)" style=""  >
+		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="12.566" style="fill: rgb(255,0,0); ">x</tspan><tspan x="-40" y="12.566" style="fill: rgb(0,0,255); ">x</tspan><tspan x="-20" y="12.566" style="fill: rgb(0,128,0); ">x</tspan><tspan x="0" y="12.566" style="fill: rgb(255,255,0); ">x</tspan><tspan x="20" y="12.566" style="fill: rgb(255,192,203); ">x</tspan><tspan x="40" y="12.566" >x</tspan></text>
+</g>
+"
+`;

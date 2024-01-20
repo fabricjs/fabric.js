@@ -1,3 +1,4 @@
+import { reNewline } from '../../constants';
 import type {
   TextStyle,
   TextStyleDeclaration,
@@ -101,11 +102,8 @@ export const stylesFromArray = (
     // clone to prevent mutation
     return cloneDeep(styles);
   }
-  const textLines = text.split('\n'),
-    stylesObject = {} as Record<
-      string | number,
-      Record<string | number, Record<string, string>>
-    >;
+  const textLines = text.split(reNewline),
+    stylesObject: TextStyle = {};
   let charIndex = -1,
     styleIndex = 0;
   //loop through each textLine

@@ -1,4 +1,3 @@
-import { getFabricDocument } from '../env';
 import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
@@ -12,63 +11,32 @@ import type {
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
-  resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
+import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
-import { isCollection } from '../util/typeAssertions';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
+import { isCollection } from '../Collection';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
-  AssertKeys,
   TMat2D,
   TOriginX,
   TOriginY,
   TSize,
+  TSVGReviver,
 } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
 import type { IText } from '../shapes/IText/IText';
-import { makeElementUnselectable, wrapElement } from '../util/dom_misc';
-import { setStyle } from '../util/dom_style';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
-import type { TSVGReviver } from '../typedefs';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { ActiveSelection } from '../shapes/ActiveSelection';
-import type { TCanvasSizeOptions } from './StaticCanvas';
-import { createCanvasElement } from '../util';
-import { BOTTOM, CENTER, LEFT, NONE, RIGHT, TOP } from '../constants';
-
-export const DefaultCanvasProperties = {
-  uniformScaling: true,
-  uniScaleKey: 'shiftKey',
-  centeredScaling: false,
-  centeredRotation: false,
-  centeredKey: 'altKey',
-  altActionKey: 'shiftKey',
-  selection: true,
-  selectionKey: 'shiftKey',
-  selectionColor: 'rgba(100, 100, 255, 0.3)', // blue
-  selectionDashArray: [],
-  selectionBorderColor: 'rgba(255, 255, 255, 0.3)',
-  selectionLineWidth: 1,
-  selectionFullyContained: false,
-  hoverCursor: 'move',
-  moveCursor: 'move',
-  defaultCursor: 'default',
-  freeDrawingCursor: 'crosshair',
-  notAllowedCursor: 'not-allowed',
-  containerClass: 'canvas-container',
-  perPixelTargetFind: false,
-  targetFindTolerance: 0,
-  skipTargetFind: false,
-  preserveObjectStacking: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
-  enablePointerEvents: false,
-};
+import { cos, createCanvasElement, sin } from '../util';
+import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
+import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
+import type { CanvasOptions } from './CanvasOptions';
+import { canvasDefaults } from './CanvasOptions';
+import { Intersection } from '../Intersection';
+import { isActiveSelection } from '../util/typeAssertions';
 
 /**
  * Canvas class
@@ -164,214 +132,42 @@ export const DefaultCanvasProperties = {
  * });
  *
  */
-export class SelectableCanvas<
-  EventSpec extends CanvasEvents = CanvasEvents
-> extends StaticCanvas<EventSpec> {
+export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
+  extends StaticCanvas<EventSpec>
+  implements Omit<CanvasOptions, 'enablePointerEvents'>
+{
   declare _objects: FabricObject[];
-  /**
-   * When true, objects can be transformed by one side (unproportionally)
-   * when dragged on the corners that normally would not do that.
-   * @type Boolean
-   * @default
-   * @since fabric 4.0 // changed name and default value
-   */
+
+  // transform config
   declare uniformScaling: boolean;
-
-  /**
-   * Indicates which key switches uniform scaling.
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled.
-   * totally wrong named. this sounds like `uniform scaling`
-   * if Canvas.uniformScaling is true, pressing this will set it to false
-   * and viceversa.
-   * @since 1.6.2
-   * @type ModifierKey
-   * @default
-   */
   declare uniScaleKey: TOptionalModifierKey;
-
-  /**
-   * When true, objects use center point as the origin of scale transformation.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
   declare centeredScaling: boolean;
-
-  /**
-   * When true, objects use center point as the origin of rotate transformation.
-   * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
-   * @since 1.3.4
-   * @type Boolean
-   * @default
-   */
   declare centeredRotation: boolean;
-
-  /**
-   * Indicates which key enable centered Transform
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled feature disabled.
-   * @since 1.6.2
-   * @type ModifierKey
-   * @default
-   */
   declare centeredKey: TOptionalModifierKey;
-
-  /**
-   * Indicates which key enable alternate action on corner
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled feature disabled.
-   * @since 1.6.2
-   * @type ModifierKey
-   * @default
-   */
   declare altActionKey: TOptionalModifierKey;
 
-  /**
-   * Indicates that canvas is interactive. This property should not be changed.
-   * @type Boolean
-   * @default
-   */
-  interactive = true;
-
-  /**
-   * Indicates whether group selection should be enabled
-   * @type Boolean
-   * @default
-   */
+  // selection config
   declare selection: boolean;
-
-  /**
-   * Indicates which key or keys enable multiple click selection
-   * Pass value as a string or array of strings
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * If `null` or empty or containing any other string that is not a modifier key
-   * feature is disabled.
-   * @since 1.6.2
-   * @type ModifierKey|ModifierKey[]
-   * @default
-   */
   declare selectionKey: TOptionalModifierKey | ModifierKey[];
-
-  /**
-   * Indicates which key enable alternative selection
-   * in case of target overlapping with active object
-   * values: 'altKey', 'shiftKey', 'ctrlKey'.
-   * For a series of reason that come from the general expectations on how
-   * things should work, this feature works only for preserveObjectStacking true.
-   * If `null` or 'none' or any other string that is not a modifier key
-   * feature is disabled.
-   * @since 1.6.5
-   * @type null|ModifierKey
-   * @default
-   */
   declare altSelectionKey: TOptionalModifierKey;
-
-  /**
-   * Color of selection
-   * @type String
-   * @default
-   */
   declare selectionColor: string;
-
-  /**
-   * Default dash array pattern
-   * If not empty the selection border is dashed
-   * @type Array
-   */
   declare selectionDashArray: number[];
-
-  /**
-   * Color of the border of selection (usually slightly darker than color of selection itself)
-   * @type String
-   * @default
-   */
   declare selectionBorderColor: string;
-
-  /**
-   * Width of a line used in object/group selection
-   * @type Number
-   * @default
-   */
   declare selectionLineWidth: number;
-
-  /**
-   * Select only shapes that are fully contained in the dragged selection rectangle.
-   * @type Boolean
-   * @default
-   */
   declare selectionFullyContained: boolean;
 
-  /**
-   * Default cursor value used when hovering over an object on canvas
-   * @type CSSStyleDeclaration['cursor']
-   * @default move
-   */
+  // cursors
   declare hoverCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Default cursor value used when moving an object on canvas
-   * @type CSSStyleDeclaration['cursor']
-   * @default move
-   */
   declare moveCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Default cursor value used for the entire canvas
-   * @type String
-   * @default default
-   */
   declare defaultCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Cursor value used during free drawing
-   * @type String
-   * @default crosshair
-   */
   declare freeDrawingCursor: CSSStyleDeclaration['cursor'];
-
-  /**
-   * Cursor value used for disabled elements ( corners with disabled action )
-   * @type String
-   * @since 2.0.0
-   * @default not-allowed
-   */
   declare notAllowedCursor: CSSStyleDeclaration['cursor'];
 
-  /**
-   * Default element class that's given to wrapper (div) element of canvas
-   * @type String
-   * @default
-   */
   declare containerClass: string;
 
-  /**
-   * When true, object detection happens on per-pixel basis rather than on per-bounding-box
-   * @type Boolean
-   * @default
-   */
+  // target find config
   declare perPixelTargetFind: boolean;
-
-  /**
-   * Number of pixels around target pixel to tolerate (consider active) during object detection
-   * @type Number
-   * @default
-   */
   declare targetFindTolerance: number;
-
-  /**
-   * When true, target detection is skipped. Target detection will return always undefined.
-   * click selection won't work anymore, events will fire with no targets.
-   * if something is selected before setting it to true, it will be deselected at the first click.
-   * area selection will still work. check the `selection` property too.
-   * if you deactivate both, you should look into staticCanvas.
-   * @type Boolean
-   * @default
-   */
   declare skipTargetFind: boolean;
 
   /**
@@ -384,36 +180,11 @@ export class SelectableCanvas<
    */
   declare isDrawingMode: boolean;
 
-  /**
-   * Indicates whether objects should remain in current stack position when selected.
-   * When false objects are brought to top and rendered as part of the selection group
-   * @type Boolean
-   * @default
-   */
   declare preserveObjectStacking: boolean;
 
-  /**
-   * Indicates if the right click on canvas can output the context menu or not
-   * @type Boolean
-   * @since 1.6.5
-   * @default
-   */
+  // event config
   declare stopContextMenu: boolean;
-
-  /**
-   * Indicates if the canvas can fire right click events
-   * @type Boolean
-   * @since 1.6.5
-   * @default
-   */
   declare fireRightClick: boolean;
-
-  /**
-   * Indicates if the canvas can fire middle click events
-   * @type Boolean
-   * @since 1.7.8
-   * @default
-   */
   declare fireMiddleClick: boolean;
 
   /**
@@ -441,10 +212,10 @@ export class SelectableCanvas<
    * @type FabricObject[]
    * @private
    */
-  _objectsToRender?: FabricObject[] = [];
+  _objectsToRender?: FabricObject[];
 
   /**
-   * hold a referenfce to a data structure that contains information
+   * hold a reference to a data structure that contains information
    * on the current on going transform
    * @type
    * @private
@@ -455,6 +226,7 @@ export class SelectableCanvas<
    * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
+   * x, y, deltaX and deltaY are in scene plane
    * @type
    * @private
    */
@@ -499,39 +271,35 @@ export class SelectableCanvas<
    */
   protected declare _target?: FabricObject;
 
-  static ownDefaults: Record<string, any> = DefaultCanvasProperties;
+  static ownDefaults: Record<string, any> = canvasDefaults;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
   }
 
-  declare upperCanvasEl: HTMLCanvasElement;
-  declare contextTop: CanvasRenderingContext2D;
-  declare wrapperEl: HTMLDivElement;
-  protected declare pixelFindCanvasEl: HTMLCanvasElement;
-  protected declare pixelFindContext: CanvasRenderingContext2D;
+  declare elements: CanvasDOMManager;
+  get upperCanvasEl() {
+    return this.elements.upper?.el;
+  }
+  get contextTop() {
+    return this.elements.upper?.ctx;
+  }
+  get wrapperEl() {
+    return this.elements.container;
+  }
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
 
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  protected readonly _activeSelection: ActiveSelection;
 
-  constructor(el: string | HTMLCanvasElement, options = {}) {
-    super(el, options);
-    this._activeSelection = new ActiveSelection([], { canvas: this });
-  }
-
-  protected initElements(el: string | HTMLCanvasElement) {
-    super.initElements(el);
-    this._applyCanvasStyle(this.lowerCanvasEl);
-    this._initWrapperElement();
-    this._createUpperCanvas();
+  protected initElements(el?: string | HTMLCanvasElement) {
+    this.elements = new CanvasDOMManager(el, {
+      allowTouchScrolling: this.allowTouchScrolling,
+      containerClass: this.containerClass,
+    });
     this._createCacheCanvas();
-  }
-
-  protected _initRetinaScaling() {
-    super._initRetinaScaling();
-    this.__initRetinaScaling(this.upperCanvasEl, this.contextTop);
   }
 
   /**
@@ -563,6 +331,11 @@ export class SelectableCanvas<
       this._hoveredTargets = [];
     }
     super._onObjectRemoved(obj);
+  }
+
+  _onStackOrderChanged() {
+    this._objectsToRender = undefined;
+    super._onStackOrderChanged();
   }
 
   /**
@@ -597,7 +370,7 @@ export class SelectableCanvas<
     }
     !this._objectsToRender &&
       (this._objectsToRender = this._chooseObjectsToRender());
-    this.renderCanvas(this.contextContainer, this._objectsToRender);
+    this.renderCanvas(this.getContext(), this._objectsToRender);
   }
 
   /**
@@ -631,18 +404,6 @@ export class SelectableCanvas<
   }
 
   /**
-   * Given a pointer on the canvas with a viewport applied,
-   * find out the pointer in object coordinates
-   * @private
-   */
-  _normalizePointer(object: FabricObject, pointer: Point): Point {
-    return transformPoint(
-      this.restorePointerVpt(pointer),
-      invertTransform(object.calcTransformMatrix())
-    );
-  }
-
-  /**
    * Set the canvas tolerance value for pixel taret find.
    * Use only integer numbers.
    * @private
@@ -662,8 +423,8 @@ export class SelectableCanvas<
    * @TODO this seems dumb that we treat controls with transparency. we can find controls
    * programmatically without painting them, the cache canvas optimization is always valid
    * @param {FabricObject} target Object to check
-   * @param {Number} x Left coordinate
-   * @param {Number} y Top coordinate
+   * @param {Number} x Left coordinate in viewport space
+   * @param {Number} y Top coordinate in viewport space
    * @return {Boolean}
    */
   isTargetTransparent(target: FabricObject, x: number, y: number): boolean {
@@ -784,6 +545,11 @@ export class SelectableCanvas<
       x: target.originX,
       y: target.originY,
     };
+
+    if (!controlName) {
+      return origin;
+    }
+
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -804,40 +570,39 @@ export class SelectableCanvas<
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
+   * @param {boolean} [alreadySelected] pass true to setup the active control
    */
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
     alreadySelected: boolean
   ): void {
-    if (!target) {
-      return;
-    }
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getPointer(e),
+          this.getScenePoint(e),
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getPointer(e);
-    const corner = target.__corner || '',
-      control = !!corner && target.controls[corner],
+      : this.getScenePoint(e);
+    const { key: corner = '', control } = target.getActiveControl() || {},
       actionHandler =
         alreadySelected && control
-          ? control.getActionHandler(e, target, control)
+          ? control.getActionHandler(e, target, control)?.bind(control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
       altKey = e[this.centeredKey as ModifierKey],
+      origin = this._shouldCenterTransform(target, action, altKey)
+        ? ({ x: CENTER, y: CENTER } as const)
+        : this._getOriginFromCorner(target, corner),
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform: Transform = {
         target: target,
-        action: action,
+        action,
         actionHandler,
         actionPerformed: false,
         corner,
@@ -857,7 +622,7 @@ export class SelectableCanvas<
         width: target.width,
         height: target.height,
         shiftKey: e.shiftKey,
-        altKey: altKey,
+        altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
@@ -865,13 +630,12 @@ export class SelectableCanvas<
         },
       };
 
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = CENTER;
-      transform.originY = CENTER;
-    }
     this._currentTransform = transform;
-    // @ts-ignore
-    this._beforeTransform(e);
+
+    this.fire('before:transform', {
+      e,
+      transform,
+    });
   }
 
   /**
@@ -936,7 +700,7 @@ export class SelectableCanvas<
       return undefined;
     }
 
-    const pointer = this.getPointer(e, true),
+    const pointer = this.getViewportPoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
@@ -982,31 +746,69 @@ export class SelectableCanvas<
   }
 
   /**
-   * Checks point is inside the object.
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
+   * Checks if the point is inside the object selection area including padding
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [globalPointer] x,y object of point coordinates relative to canvas used to search per pixel target.
+   * @param {Object} [pointer] point in scene coordinates
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
-  _checkTarget(
-    pointer: Point,
-    obj: FabricObject,
-    globalPointer: Point
-  ): boolean {
+  private _pointIsInObjectSelectionArea(obj: FabricObject, point: Point) {
+    // getCoords will already take care of group de-nesting
+    let coords = obj.getCoords();
+    const viewportZoom = this.getZoom();
+    const padding = obj.padding / viewportZoom;
+    if (padding) {
+      const [tl, tr, br, bl] = coords;
+      // what is the angle of the object?
+      // we could use getTotalAngle, but is way easier to look at it
+      // from how coords are oriented, since if something went wrong
+      // at least we are consistent.
+      const angleRadians = Math.atan2(tr.y - tl.y, tr.x - tl.x),
+        cosP = cos(angleRadians) * padding,
+        sinP = sin(angleRadians) * padding,
+        cosPSinP = cosP + sinP,
+        cosPMinusSinP = cosP - sinP;
+
+      coords = [
+        new Point(tl.x - cosPMinusSinP, tl.y - cosPSinP),
+        new Point(tr.x + cosPSinP, tr.y - cosPMinusSinP),
+        new Point(br.x + cosPMinusSinP, br.y + cosPSinP),
+        new Point(bl.x - cosPSinP, bl.y + cosPMinusSinP),
+      ];
+      // in case of padding we calculate the new coords on the fly.
+      // otherwise we have to maintain 2 sets of coordinates for everything.
+      // we can reiterate on storing them.
+      // if this is slow, for now the semplification is large and doesn't impact
+      // rendering.
+      // the idea behind this is that outside target check we don't need ot know
+      // where those coords are
+    }
+    return Intersection.isPointInPolygon(point, coords);
+  }
+
+  /**
+   * Checks point is inside the object selection condition. Either area with padding
+   * or over pixels if perPixelTargetFind is enabled
+   * @param {FabricObject} obj Object to test against
+   * @param {Object} [pointer] point from viewport.
+   * @return {Boolean} true if point is contained within an area of given object
+   * @private
+   */
+  _checkTarget(obj: FabricObject, pointer: Point): boolean {
     if (
       obj &&
       obj.visible &&
       obj.evented &&
-      // http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
-      // http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-      obj.containsPoint(pointer)
+      this._pointIsInObjectSelectionArea(
+        obj,
+        sendPointToPlane(pointer, undefined, this.viewportTransform)
+      )
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
       ) {
-        if (!this.isTargetTransparent(obj, globalPointer.x, globalPointer.y)) {
+        if (!this.isTargetTransparent(obj, pointer.x, pointer.y)) {
           return true;
         }
       } else {
@@ -1028,17 +830,12 @@ export class SelectableCanvas<
     pointer: Point
   ): FabricObject | undefined {
     // Cache all targets where their bounding box contains point.
-    let target,
-      i = objects.length;
+    let i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
-      const objToCheck = objects[i];
-      const pointerToUse = objToCheck.group
-        ? this._normalizePointer(objToCheck.group, pointer)
-        : pointer;
-      if (this._checkTarget(pointerToUse, objToCheck, pointer)) {
-        target = objects[i];
+      const target = objects[i];
+      if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
             target._objects as FabricObject[],
@@ -1046,17 +843,16 @@ export class SelectableCanvas<
           );
           subTarget && this.targets.push(subTarget);
         }
-        break;
+        return target;
       }
     }
-    return target;
   }
 
   /**
    * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link fabric.Canvas#_searchPossibleTargets}
+   * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
+   * @param {Point} [pointer] coordinates from viewport to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(
@@ -1076,41 +872,56 @@ export class SelectableCanvas<
   }
 
   /**
-   * Returns pointer coordinates without the effect of the viewport
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
+   * @returns point existing in the same plane as the {@link HTMLCanvasElement},
+   * `(0, 0)` being the top left corner of the {@link HTMLCanvasElement}.
+   * This means that changes to the {@link viewportTransform} do not change the values of the point
+   * and it remains unchanged from the viewer's perspective.
+   *
+   * @example
+   * const scenePoint = sendPointToPlane(
+   *  this.getViewportPoint(e),
+   *  undefined,
+   *  canvas.viewportTransform
+   * );
+   *
    */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
+  getViewportPoint(e: TPointerEvent) {
+    if (this._pointer) {
+      return this._pointer;
+    }
+    return this.getPointer(e, true);
   }
 
   /**
-   * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position
-   * To interact with your shapes top and left you want to use ignoreVpt true
-   * most of the time, while ignoreVpt false will give you coordinates
-   * compatible with the object.oCoords system.
-   * of the time.
-   * @param {Event} e
-   * @param {Boolean} ignoreVpt
-   * @return {Point}
+   * @returns point existing in the scene (the same plane as the plane {@link FabricObject#getCenterPoint} exists in).
+   * This means that changes to the {@link viewportTransform} do not change the values of the point,
+   * however, from the viewer's perspective, the point is changed.
+   *
+   * @example
+   * const viewportPoint = sendPointToPlane(
+   *  this.getScenePoint(e),
+   *  canvas.viewportTransform
+   * );
+   *
    */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
-    // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !ignoreVpt) {
+  getScenePoint(e: TPointerEvent) {
+    if (this._absolutePointer) {
       return this._absolutePointer;
     }
-    if (this._pointer && ignoreVpt) {
-      return this._pointer;
-    }
+    return this.getPointer(e);
+  }
 
+  /**
+   * Returns pointer relative to canvas.
+   *
+   * @deprecated This method is deprecated since v6 to protect you from misuse.
+   * Use {@link getViewportPoint} or {@link getScenePoint} instead.
+   *
+   * @param {Event} e
+   * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
+   * @return {Point}
+   */
+  getPointer(e: TPointerEvent, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
@@ -1129,8 +940,8 @@ export class SelectableCanvas<
     this.calcOffset();
     pointer.x = pointer.x - this._offset.left;
     pointer.y = pointer.y - this._offset.top;
-    if (!ignoreVpt) {
-      pointer = this.restorePointerVpt(pointer);
+    if (!fromViewport) {
+      pointer = sendPointToPlane(pointer, undefined, this.viewportTransform);
     }
 
     const retinaScaling = this.getRetinaScaling();
@@ -1159,62 +970,13 @@ export class SelectableCanvas<
     dimensions: TSize,
     options?: TCanvasSizeOptions
   ) {
-    // @ts-ignore
+    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
     this._resetTransformEventData();
     super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
       this.freeDrawingBrush &&
         this.freeDrawingBrush._setBrushStyles(this.contextTop);
     }
-  }
-
-  /**
-   * Helper for setting width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {Number} value value to set property to
-   */
-  _setBackstoreDimension(prop: keyof TSize, value: number) {
-    super._setBackstoreDimension(prop, value);
-    this.upperCanvasEl[prop] = value;
-  }
-
-  /**
-   * Helper for setting css width/height
-   * @private
-   * @param {String} prop property (width|height)
-   * @param {String} value value to set property to
-   */
-  _setCssDimension(prop: keyof TSize, value: string) {
-    super._setCssDimension(prop, value);
-    this.upperCanvasEl.style[prop] = value;
-    this.wrapperEl.style[prop] = value;
-  }
-
-  /**
-   * @private
-   * @throws {CANVAS_INIT_ERROR} If canvas can not be initialized
-   */
-  protected _createUpperCanvas() {
-    const lowerCanvasEl = this.lowerCanvasEl;
-
-    // if there is no upperCanvas (most common case) we create one.
-    if (!this.upperCanvasEl) {
-      this.upperCanvasEl = createCanvasElement();
-    }
-    const upperCanvasEl = this.upperCanvasEl;
-    // we assign the same classname of the lowerCanvas
-    upperCanvasEl.className = lowerCanvasEl.className;
-    // but then we remove the lower-canvas specific className
-    upperCanvasEl.classList.remove('lower-canvas');
-    // we add the specific upper-canvas class
-    upperCanvasEl.classList.add('upper-canvas');
-    upperCanvasEl.setAttribute('data-fabric', 'top');
-    this.wrapperEl.appendChild(upperCanvasEl);
-    upperCanvasEl.style.cssText = lowerCanvasEl.style.cssText;
-    this._applyCanvasStyle(upperCanvasEl);
-    upperCanvasEl.setAttribute('draggable', 'true');
-    this.contextTop = upperCanvasEl.getContext('2d')!;
   }
 
   protected _createCacheCanvas() {
@@ -1225,47 +987,12 @@ export class SelectableCanvas<
     this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
-  protected _initWrapperElement() {
-    const container = getFabricDocument().createElement('div');
-    container.classList.add(this.containerClass);
-    this.wrapperEl = wrapElement(this.lowerCanvasEl, container);
-    this.wrapperEl.setAttribute('data-fabric', 'wrapper');
-    setStyle(this.wrapperEl, {
-      width: `${this.width}px`,
-      height: `${this.height}px`,
-      position: 'relative',
-    });
-    makeElementUnselectable(this.wrapperEl);
-  }
-
-  /**
-   * @private
-   * @param {HTMLCanvasElement} element canvas element to apply styles on
-   */
-  protected _applyCanvasStyle(element: HTMLCanvasElement) {
-    const width = this.width || element.width,
-      height = this.height || element.height;
-
-    setStyle(element, {
-      position: 'absolute',
-      width: width + 'px',
-      height: height + 'px',
-      left: 0,
-      top: 0,
-      'touch-action': this.allowTouchScrolling ? 'manipulation' : NONE,
-      '-ms-touch-action': this.allowTouchScrolling ? 'manipulation' : NONE,
-    });
-    element.width = width;
-    element.height = height;
-    makeElementUnselectable(element);
-  }
-
   /**
    * Returns context of top canvas where interactions are drawn
    * @returns {CanvasRenderingContext2D}
    */
   getTopContext(): CanvasRenderingContext2D {
-    return this.contextTop;
+    return this.elements.upper.ctx;
   }
 
   /**
@@ -1274,7 +1001,7 @@ export class SelectableCanvas<
    * @return {CanvasRenderingContext2D}
    */
   getSelectionContext(): CanvasRenderingContext2D {
-    return this.contextTop;
+    return this.elements.upper.ctx;
   }
 
   /**
@@ -1282,7 +1009,7 @@ export class SelectableCanvas<
    * @return {HTMLCanvasElement}
    */
   getSelectionElement(): HTMLCanvasElement {
-    return this.upperCanvasEl;
+    return this.elements.upper.el;
   }
 
   /**
@@ -1294,26 +1021,16 @@ export class SelectableCanvas<
   }
 
   /**
-   * Returns instance's active selection
-   */
-  getActiveSelection() {
-    return this._activeSelection;
-  }
-
-  /**
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
-    if (active) {
-      if (active === this._activeSelection) {
-        return [...(active as ActiveSelection)._objects];
-      } else {
-        return [active];
-      }
-    }
-    return [];
+    return isActiveSelection(active)
+      ? active.getObjects()
+      : active
+      ? [active]
+      : [];
   }
 
   /**
@@ -1381,10 +1098,7 @@ export class SelectableCanvas<
    * @param {TPointerEvent} [e] Event (passed along when firing "object:selected")
    * @return {Boolean} true if the object has been selected
    */
-  setActiveObject(
-    object: FabricObject,
-    e?: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
+  setActiveObject(object: FabricObject, e?: TPointerEvent) {
     // we can't inline this, since _setActiveObject will change what getActiveObjects returns
     const currentActives = this.getActiveObjects();
     const selected = this._setActiveObject(object, e);
@@ -1400,13 +1114,12 @@ export class SelectableCanvas<
    * @param {Event} [e] Event (passed along when firing "object:selected")
    * @return {Boolean} true if the object has been selected
    */
-  _setActiveObject(
-    object: FabricObject,
-    e?: TPointerEvent
-  ): this is AssertKeys<this, '_activeObject'> {
-    if (this._activeObject === object) {
+  _setActiveObject(object: FabricObject, e?: TPointerEvent) {
+    const prevActiveObject = this._activeObject;
+    if (prevActiveObject === object) {
       return false;
     }
+    // after calling this._discardActiveObject, this,_activeObject could be undefined
     if (!this._discardActiveObject(e, object) && this._activeObject) {
       // refused to deselect
       return false;
@@ -1414,7 +1127,13 @@ export class SelectableCanvas<
     if (object.onSelect({ e })) {
       return false;
     }
+
     this._activeObject = object;
+
+    if (isActiveSelection(object) && prevActiveObject !== object) {
+      object.set('canvas', this);
+      object.setCoords();
+    }
 
     return true;
   }
@@ -1437,13 +1156,7 @@ export class SelectableCanvas<
       if (obj.onDeselect({ e, object })) {
         return false;
       }
-      // clear active selection
-      if (obj === this._activeSelection) {
-        this._activeSelection.removeAll();
-        resetObjectTransform(this._activeSelection);
-      }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-ignore
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
@@ -1475,6 +1188,48 @@ export class SelectableCanvas<
   }
 
   /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that block the user UX )
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  endCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._finalizeCurrentTransform(e);
+    if (transform && transform.target) {
+      // this could probably go inside _finalizeCurrentTransform
+      transform.target.isMoving = false;
+    }
+    this._currentTransform = null;
+  }
+
+  /**
+   * @private
+   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  _finalizeCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform!,
+      target = transform.target,
+      options = {
+        e,
+        target,
+        transform,
+        action: transform.action,
+      };
+
+    if (target._scaling) {
+      target._scaling = false;
+    }
+
+    target.setCoords();
+
+    if (transform.actionPerformed) {
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+    }
+  }
+
+  /**
    * Sets viewport transformation of this canvas instance
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
@@ -1486,47 +1241,28 @@ export class SelectableCanvas<
     }
   }
 
-  protected cleanupDOM(): void {
-    const wrapperEl = this.wrapperEl!,
-      lowerCanvasEl = this.lowerCanvasEl!,
-      upperCanvasEl = this.upperCanvasEl!;
-    super.cleanupDOM();
-    wrapperEl.removeChild(upperCanvasEl);
-    wrapperEl.removeChild(lowerCanvasEl);
-    if (wrapperEl.parentNode) {
-      wrapperEl.parentNode.replaceChild(lowerCanvasEl, wrapperEl);
-    }
-  }
-
   /**
    * @override clears active selection ref and interactive canvas elements and contexts
    */
   destroy() {
     // dispose of active selection
-    const activeSelection = this._activeSelection!;
-    activeSelection.removeAll();
-    // @ts-expect-error disposing
-    this._activeSelection = undefined;
-    activeSelection.dispose();
+    const activeObject = this._activeObject;
+    if (isActiveSelection(activeObject)) {
+      activeObject.removeAll();
+      activeObject.dispose();
+    }
+
+    delete this._activeObject;
 
     super.destroy();
 
     // free resources
-
-    // top canvas
-    // @ts-expect-error disposing
-    this.contextTop = null;
-    // @ts-expect-error disposing
-    this.upperCanvasEl = undefined;
 
     // pixel find canvas
     // @ts-expect-error disposing
     this.pixelFindContext = null;
     // @ts-expect-error disposing
     this.pixelFindCanvasEl = undefined;
-
-    // @ts-expect-error disposing
-    this.wrapperEl = undefined;
   }
 
   /**
@@ -1556,7 +1292,7 @@ export class SelectableCanvas<
   /**
    * @private
    */
-  _toObject(
+  protected _toObject(
     instance: FabricObject,
     methodName: 'toObject' | 'toDatalessObject',
     propertiesToInclude: string[]
@@ -1578,14 +1314,11 @@ export class SelectableCanvas<
    * @param {FabricObject} [instance] the object to transform (gets mutated)
    * @returns the original values of instance which were changed
    */
-  _realizeGroupTransformOnObject(
+  private _realizeGroupTransformOnObject(
     instance: FabricObject
   ): Partial<typeof instance> {
-    if (
-      instance.group &&
-      instance.group === this._activeSelection &&
-      this._activeObject === instance.group
-    ) {
+    const { group } = instance;
+    if (group && isActiveSelection(group) && this._activeObject === group) {
       const layoutProps = [
         'angle',
         'flipX',
@@ -1598,7 +1331,7 @@ export class SelectableCanvas<
         TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
-      addTransformToObject(instance, this._activeObject.calcOwnMatrix());
+      addTransformToObject(instance, group.calcOwnMatrix());
       return originalValues;
     } else {
       return {};
