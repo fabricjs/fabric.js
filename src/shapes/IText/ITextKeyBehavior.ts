@@ -186,8 +186,8 @@ export abstract class ITextKeyBehavior<
     }
     // decisions about style changes.
     const nextText = this._splitTextIntoLines(
-      this.hiddenTextarea.value
-    ).graphemeText,
+        this.hiddenTextarea.value
+      ).graphemeText,
       charCount = this._text.length,
       nextCharCount = nextText.length,
       selectionStart = this.selectionStart,
@@ -636,8 +636,9 @@ export abstract class ITextKeyBehavior<
    * @param {KeyboardEvent} e Event object
    */
   _moveCursorLeftOrRight(direction: 'Left' | 'Right', e: KeyboardEvent) {
-    const actionName = `moveCursor${direction}${e.shiftKey ? 'WithShift' : 'WithoutShift'
-      }` as const;
+    const actionName = `moveCursor${direction}${
+      e.shiftKey ? 'WithShift' : 'WithoutShift'
+    }` as const;
     this._currentCursorOpacity = 1;
     if (this[actionName](e)) {
       this.abortCursorAnimation();
