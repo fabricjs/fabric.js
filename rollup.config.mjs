@@ -4,10 +4,11 @@ import ts from '@rollup/plugin-typescript';
 import { babel } from '@rollup/plugin-babel';
 import path from 'path';
 import chalk from 'chalk';
-// import dts from "rollup-plugin-dts";
+import noEmit from 'rollup-plugin-no-emit';
 
 const splitter = /\n|\s|,/g;
-
+const input = process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'];
+const outputType = input.length > 1 ? 'dir' : 'file';
 const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 
 const dirname = path.dirname(buildOutput);
@@ -20,6 +21,7 @@ const plugins = [
     tsconfig: './tsconfig.json',
     exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
   }),
+  noEmit({ emit: !Number(process.env.NO_EMIT) }),
   babel({
     extensions: ['.ts', '.js'],
     babelHelpers: 'bundled',
@@ -47,14 +49,16 @@ function onwarn(warning, warn) {
   }
   warn(warning);
 }
-
 // https://rollupjs.org/guide/en/#configuration-files
-export default [
+const config = [
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    input,
     output: [
       {
-        file: path.resolve(dirname, `${basename}.mjs`),
+        [outputType]:
+          outputType === 'file'
+            ? path.resolve(dirname, `${basename}.mjs`)
+            : path.resolve(dirname),
         name: 'fabric',
         format: 'es',
         sourcemap: true,
@@ -65,7 +69,7 @@ export default [
         format: 'umd',
         sourcemap: true,
       },
-      Number(process.env.MINIFY)
+      Number(process.env.MINIFY) && outputType === 'file'
         ? {
             file: path.resolve(dirname, `${basename}.min.js`),
             name: 'fabric',
@@ -98,3 +102,5 @@ export default [
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
 ];
+console.log(config[0].output);
+export default config;

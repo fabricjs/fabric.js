@@ -91,6 +91,27 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
+  ts:
+    runs-on: ubuntu-latest
+    name: TS ${{ matrix.ts }} tests
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18.x]
+        ts: [4.x, latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: |
+          npm ci
+          npm i typescript@${{ matrix.ts }}
+      - name: Build
+        run: npm run build -- -f
+      - name: Run tests
+        run: npm run test -- -s ts
   jest:
     name: Jest tests
     runs-on: ubuntu-latest

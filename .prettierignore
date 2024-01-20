@@ -11,7 +11,8 @@ before_commit
 /scripts/cli_cache.json
 **/dist/
 /lib/
-/test/
+test/*
+!/test/ts
 /website/
 .next/
 .parcel-cache/
