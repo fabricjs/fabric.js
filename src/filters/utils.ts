@@ -18,7 +18,7 @@ export const isWebGLPipelineState = (
 export const isPutImageFaster = (width: number, height: number): boolean => {
   const targetCanvas = createCanvasElement();
   const sourceCanvas = createCanvasElement();
-  const gl = sourceCanvas.getContext('webgl');
+  const gl = sourceCanvas.getContext('webgl')!;
   // eslint-disable-next-line no-undef
   const imageBuffer = new ArrayBuffer(width * height * 4);
 
