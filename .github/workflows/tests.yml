@@ -158,7 +158,8 @@ jobs:
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
-      - uses: ShaMan123/lcov-reporter-action@v1.1.1
+      - uses: ShaMan123/lcov-reporter-action@v1.2.2
+        if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true

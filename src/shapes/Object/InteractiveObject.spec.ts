@@ -1,11 +1,24 @@
+import { Canvas } from '../../canvas/Canvas';
+import { Control } from '../../controls/Control';
 import { radiansToDegrees } from '../../util';
 import { Group } from '../Group';
 import { FabricObject } from './FabricObject';
-import type { TOCoord } from './InteractiveObject';
+import { InteractiveFabricObject, type TOCoord } from './InteractiveObject';
 
-describe('Object', () => {
+describe('InteractiveObject', () => {
+  it('tests constructor & properties', () => {
+    const obj = new InteractiveFabricObject();
+    expect(obj instanceof InteractiveFabricObject).toBe(true);
+    expect(obj.selectable).toBe(true);
+  });
+  it('Interactive + BaseObject default values', () => {
+    const { controls, ...defaults } = FabricObject.getDefaults();
+    expect(defaults).toMatchSnapshot();
+  });
+
   describe('setCoords for objects inside group with rotation', () => {
     it('all corners are rotated as much as the object total angle', () => {
+      const canvas = new Canvas();
       const object = new FabricObject({
         left: 25,
         top: 60,
@@ -21,6 +34,7 @@ describe('Object', () => {
         interactive: true,
         subTargetCheck: true,
       });
+      canvas.add(group);
       group.setCoords();
       const objectAngle = Math.round(object.getTotalAngle());
       expect(objectAngle).toEqual(35);
@@ -35,6 +49,20 @@ describe('Object', () => {
         );
         expect(controlAngle).toEqual(objectAngle);
       });
+    });
+  });
+
+  test('getActiveControl', () => {
+    const object = new FabricObject({ canvas: new Canvas() });
+    const control = new Control();
+    object.controls = { control };
+    object.setCoords();
+    expect(object.getActiveControl()).toBeUndefined();
+    object.__corner = 'control';
+    expect(object.getActiveControl()).toEqual({
+      key: 'control',
+      control,
+      coord: object.oCoords.control,
     });
   });
 });

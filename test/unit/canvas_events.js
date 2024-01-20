@@ -26,55 +26,6 @@
     }
   });
 
-  QUnit.test('_beforeTransform', function (assert) {
-    assert.ok(typeof canvas._beforeTransform === 'function');
-
-    var canvasOffset = canvas.calcOffset();
-    var rect = new fabric.Rect({ left: 50, top: 50, width: 50, height: 50 });
-    canvas.add(rect);
-    canvas.setActiveObject(rect);
-
-    var t, counter = 0;
-    canvas.on('before:transform', function (options) {
-      t = options.transform.target;
-      counter++;
-    });
-
-    var corners = ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr'];
-    for (var i = 0; i < corners.length; i++) {
-      var co = rect.oCoords[corners[i]].corner;
-      var e = {
-        clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
-        clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
-        which: 1,
-        target: canvas.upperCanvasEl
-      };
-      canvas._setupCurrentTransform(e, rect);
-    }
-    assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate for all corners');
-    assert.equal(t, rect, 'before:transform should receive correct target');
-
-    canvas.zoomToPoint({ x: 25, y: 25 }, 2);
-
-    t = null;
-    counter = 0;
-    for (var i = 0; i < corners.length; i++) {
-      var c = corners[i];
-      var co = rect.oCoords[c].corner;
-      var e = {
-        clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
-        clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
-        which: 1,
-        target: canvas.upperCanvasEl
-      };
-      canvas._beforeTransform(e, rect);
-    }
-    assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate when canvas is zoomed');
-    assert.equal(t, rect, 'before:transform should receive correct target when canvas is zoomed');
-
-    canvas.zoomToPoint({ x: 0, y: 0 }, 1);
-  });
-
   QUnit.test('cache and reset event properties', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 60, height: 60 });
@@ -695,7 +646,7 @@
       });
     }
     canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
-      var activeSelection = canvas.getActiveSelection();
+      var activeSelection = new fabric.ActiveSelection();
       activeSelection.add(...canvas.getObjects());
       canvas.setActiveObject(activeSelection);
       setSubTargetCheckRecursive(activeSelection);

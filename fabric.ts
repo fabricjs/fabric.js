@@ -43,7 +43,18 @@ export { PatternBrush } from './src/brushes/PatternBrush';
 
 export {
   FabricObject,
-  _Object as Object,
+
+  /**
+   * @deprecated Due to a naming conflict with the
+   * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object JS API},
+   * `fabric.Object` has been renamed to `FabricObject`
+   *
+   * @example
+   * import { Object } from 'fabric'; // deprecated
+   * import { FabricObject } from 'fabric'; // migration path
+   *
+   */
+  FabricObject as Object,
 } from './src/shapes/Object/FabricObject';
 
 export type {
@@ -75,7 +86,20 @@ export type {
   TPathSide,
   TextProps,
 } from './src/shapes/Text/Text';
-export { Text, FabricText } from './src/shapes/Text/Text';
+export {
+  FabricText,
+  /**
+   * @deprecated Due to a naming conflict with the
+   * {@link https://developer.mozilla.org/en-US/docs/Web/API/Text/Text Web API},
+   * `fabric.Text` has been renamed to `FabricText`
+   *
+   * @example
+   * import { Text } from 'fabric'; // deprecated
+   * import { FabricText } from 'fabric'; // migration path
+   *
+   */
+  FabricText as Text,
+} from './src/shapes/Text/Text';
 export type {
   ITextProps,
   SerializedITextProps,
@@ -95,20 +119,32 @@ export type {
 export type {
   GroupEvents,
   GroupProps,
-  LayoutContext,
   GroupOwnProps,
-  LayoutContextType,
-  LayoutResult,
-  LayoutStrategy,
   SerializedGroupProps,
 } from './src/shapes/Group';
 export { Group } from './src/shapes/Group';
+export * from './src/LayoutManager';
+export type { SerializedLayoutManager } from './src/LayoutManager';
 export type {
   ActiveSelectionOptions,
   MultiSelectionStacking,
 } from './src/shapes/ActiveSelection';
 export { ActiveSelection } from './src/shapes/ActiveSelection';
-export { Image, FabricImage } from './src/shapes/Image';
+export {
+  FabricImage,
+
+  /**
+   * @deprecated Due to a naming conflict with the
+   * {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image Web API},
+   * `fabric.Image` has been renamed to `FabricImage`
+   *
+   * @example
+   * import { Image } from 'fabric'; // deprecated
+   * import { FabricImage } from 'fabric'; // migration path
+   *
+   */
+  FabricImage as Image,
+} from './src/shapes/Image';
 export type {
   ImageSource,
   SerializedImageProps,

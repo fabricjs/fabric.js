@@ -2,7 +2,7 @@ export { changeWidth } from './changeWidth';
 export { renderCircleControl, renderSquareControl } from './controlRendering';
 export * from './commonControls';
 export { dragHandler } from './drag';
-export { createPolyControls } from './polyControl';
+export * from './polyControl';
 export { rotationStyleHandler, rotationWithSnapping } from './rotate';
 export {
   scaleCursorStyleHandler,
