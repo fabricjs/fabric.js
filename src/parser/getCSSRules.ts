@@ -26,13 +26,10 @@ export function getCSSRules(doc: Document) {
     // rules = styleContents.match(/[^{]*\{[\s\S]*?\}/g);
     styleContents
       .split('}')
-      // remove empty rules.
-      .filter(function (rule) {
-        return rule.trim();
-      })
+      // remove empty rules and remove everything if we didn't split in at least 2 pieces
+      .filter((rule, index, array) => array.length > 1 && rule.trim())
       // at this point we have hopefully an array of rules `body { style code... `
-      // eslint-disable-next-line no-loop-func
-      .forEach(function (rule) {
+      .forEach((rule) => {
         const match = rule.split('{'),
           ruleObj: Record<string, string> = {},
           declaration = match[1].trim(),
