@@ -128,7 +128,6 @@
       },
       "target": "b",
       "subTargets": [],
-      "didDrop": false,
       "viewportPoint": {
         "x": 435,
         "y": 55
@@ -137,6 +136,7 @@
         "x": 435,
         "y": 55
       },
+      "didDrop": false,
       "pointer": {
         "x": 435,
         "y": 55
@@ -183,8 +183,6 @@
       },
       "target": "b",
       "subTargets": [],
-      "didDrop": true,
-      "dropTarget": "b",
       "viewportPoint": {
         "x": 435,
         "y": 55
@@ -193,6 +191,8 @@
         "x": 435,
         "y": 55
       },
+      "didDrop": true,
+      "dropTarget": "b",
       "pointer": {
         "x": 435,
         "y": 55
