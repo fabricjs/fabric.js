@@ -3,7 +3,7 @@
   QUnit.module('fabric.util');
 
   function _createImageElement() {
-    return fabric.document.createElement('img');
+    return fabric.getFabricDocument().createElement('img');
   }
 
   function getAbsolutePath(path) {
@@ -24,7 +24,7 @@
     return array.map((val) => val.toFixed(4));
   }
 
-  var IMG_URL = fabric.isLikelyNode
+  var IMG_URL = isNode()
     ? 'file://' + require('path').join(__dirname, '../fixtures/', 'very_large_image.jpg')
     : getAbsolutePath('../fixtures/very_large_image.jpg');
 
@@ -94,9 +94,9 @@
     assert.deepEqual(fabric.util.radiansToDegrees(), NaN);
   });
 
-  QUnit.test('calcRotateMatrix', function (assert) {
-    assert.ok(typeof fabric.util.calcRotateMatrix === 'function', 'calcRotateMatrix should exist');
-    var matrix = fabric.util.calcRotateMatrix({ angle: 90 });
+  QUnit.test('createRotateMatrix', function (assert) {
+    assert.ok(typeof fabric.util.createRotateMatrix === 'function', 'createRotateMatrix should exist');
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 });
     var expected = [
       0,
       1,
@@ -106,6 +106,20 @@
       0
     ];
     assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+  });
+
+  QUnit.test('createRotateMatrix with origin', function (assert) {
+    var matrix = fabric.util.createRotateMatrix({ angle: 90 }, { x: 100, y: 200 });
+    var expected = [
+      0,
+      1,
+      -1,
+      0,
+      300,
+      100
+    ];
+    assert.deepEqual(matrix, expected, 'rotate matrix is equal');
+    assert.deepEqual(new fabric.Point().rotate(Math.PI / 2, new fabric.Point(100, 200)), new fabric.Point(300, 100), 'rotating 0,0 around origin should equal the matrix translation');
   });
 
   QUnit.test('fabric.util.getRandomInt', function(assert) {
@@ -123,27 +137,6 @@
     });
 
     assert.ok(!areAllTheSame);
-  });
-
-  QUnit.test('String.prototype.trim', function(assert) {
-    assert.ok(typeof String.prototype.trim === 'function');
-    assert.equal('\t\n   foo bar \n    \xA0  '.trim(), 'foo bar');
-  });
-
-  QUnit.test('fabric.util.string.camelize', function(assert) {
-    var camelize = fabric.util.string.camelize;
-
-    assert.ok(typeof camelize === 'function');
-
-    assert.equal(camelize('foo'), 'foo');
-    assert.equal(camelize('foo-bar'), 'fooBar');
-    assert.equal(camelize('Foo-bar-Baz'), 'FooBarBaz');
-    assert.equal(camelize('FooBarBaz'), 'FooBarBaz');
-    assert.equal(camelize('-bar'), 'Bar');
-    assert.equal(camelize(''), '');
-    assert.equal(camelize('and_something_with_underscores'), 'and_something_with_underscores');
-    assert.equal(camelize('underscores_and-dashes'), 'underscores_andDashes');
-    assert.equal(camelize('--double'), 'Double');
   });
 
   QUnit.test('fabric.util.string.graphemeSplit', function(assert) {
@@ -187,161 +180,6 @@
     assert.equal(capitalize('2foo'), '2foo');
   });
 
-  QUnit.test('fabric.util.object.extend', function(assert) {
-    var extend = fabric.util.object.extend;
-
-    assert.ok(typeof extend === 'function');
-
-    var destination = { x: 1 },
-        source = { y: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 1);
-    assert.equal(destination.y, 2);
-    assert.equal(source.x, undefined);
-    assert.equal(source.y, 2);
-
-    destination = { x: 1 };
-    source = { x: 2 };
-
-    extend(destination, source);
-
-    assert.equal(destination.x, 2);
-    assert.equal(source.x, 2);
-  });
-
-  QUnit.test('fabric.util.object.extend deep', function(assert) {
-    var extend = fabric.util.object.extend;
-    var d = function() { };
-    var destination = { x: 1 },
-        source = { y: 2, a: { b: 1, c: [1, 2, 3, d] } };
-
-    extend(destination, source, true);
-
-    assert.equal(destination.x, 1, 'x is still in destination');
-    assert.equal(destination.y, 2, 'y has been added');
-    assert.deepEqual(destination.a, source.a, 'a has been copied deeply');
-    assert.notEqual(destination.a, source.a, 'is not the same object');
-    assert.ok(typeof source.a.c[3] === 'function', 'is a function');
-    assert.equal(destination.a.c[3], source.a.c[3], 'functions get referenced');
-  });
-
-  QUnit.test('fabric.util.object.clone', function(assert) {
-    var clone = fabric.util.object.clone;
-
-    assert.ok(typeof clone === 'function');
-
-    var obj = { x: 1, y: [1, 2, 3] },
-        _clone = clone(obj);
-
-    assert.equal(_clone.x, 1);
-    assert.notEqual(obj, _clone);
-    assert.equal(_clone.y, obj.y);
-  });
-
-  QUnit.test('Function.prototype.bind', function(assert) {
-    assert.ok(typeof Function.prototype.bind === 'function');
-
-    var obj = { };
-    function fn() {
-      return [this, arguments[0], arguments[1]];
-    }
-
-    var bound = fn.bind(obj);
-    assert.deepEqual([obj, undefined, undefined], bound());
-    assert.deepEqual([obj, 1, undefined], bound(1));
-    assert.deepEqual([obj, 1, null], bound(1, null));
-
-    bound = fn.bind(obj, 1);
-    assert.deepEqual([obj, 1, undefined], bound());
-    assert.deepEqual([obj, 1, 2], bound(2));
-
-    function Point(x, y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    obj = { };
-    var YAxisPoint = Point.bind(obj, 0);
-    var axisPoint = new YAxisPoint(5);
-
-    assert.deepEqual(0, axisPoint.x);
-    assert.deepEqual(5, axisPoint.y);
-
-    assert.ok(axisPoint instanceof Point);
-    // assert.ok(axisPoint instanceof YAxisPoint); <-- fails
-  });
-
-  QUnit.test('fabric.util.wrapElement', function(assert) {
-    var wrapElement = fabric.util.wrapElement;
-    assert.ok(typeof wrapElement === 'function');
-    var wrapper = fabric.document.createElement('div');
-    var el = fabric.document.createElement('p');
-    var wrapper = wrapElement(el, wrapper);
-
-    assert.equal(wrapper.tagName.toLowerCase(), 'div');
-    assert.equal(wrapper.firstChild, el);
-
-    var childEl = fabric.document.createElement('span');
-    var parentEl = fabric.document.createElement('p');
-
-    parentEl.appendChild(childEl);
-
-    wrapper = wrapElement(childEl, fabric.document.createElement('strong'));
-
-    // wrapper is now in between parent and child
-    assert.equal(wrapper.parentNode, parentEl);
-    assert.equal(wrapper.firstChild, childEl);
-  });
-
-  QUnit.test('fabric.util.makeElementUnselectable', function(assert) {
-    var makeElementUnselectable = fabric.util.makeElementUnselectable;
-
-    assert.ok(typeof makeElementUnselectable === 'function');
-
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
-
-    assert.equal(el, makeElementUnselectable(el), 'should be "chainable"');
-
-    if (typeof el.onselectstart !== 'undefined') {
-      assert.equal(el.onselectstart.toString(), (() => false).toString());
-    }
-
-    // not sure if it's a good idea to test implementation details here
-    // functional test would probably make more sense
-    if (typeof el.unselectable === 'string') {
-      assert.equal('on', el.unselectable);
-    }
-    else if (typeof el.userSelect !== 'undefined') {
-      assert.equal('none', el.userSelect);
-    }
-  });
-
-  QUnit.test('fabric.util.makeElementSelectable', function(assert) {
-    var makeElementSelectable = fabric.util.makeElementSelectable,
-        makeElementUnselectable = fabric.util.makeElementUnselectable;
-
-    assert.ok(typeof makeElementSelectable === 'function');
-
-    var el = fabric.document.createElement('p');
-    el.appendChild(fabric.document.createTextNode('foo'));
-
-    makeElementUnselectable(el);
-    makeElementSelectable(el);
-
-    if (typeof el.onselectstart !== 'undefined') {
-      assert.equal(el.onselectstart, null);
-    }
-    if (typeof el.unselectable === 'string') {
-      assert.equal('', el.unselectable);
-    }
-    else if (typeof el.userSelect !== 'undefined') {
-      assert.equal('', el.userSelect);
-    }
-  });
-
   QUnit.test('fabric.loadSVGFromURL', function(assert) {
     assert.equal('function', typeof fabric.loadSVGFromURL);
   });
@@ -357,25 +195,20 @@
     var done = assert.async();
     assert.equal('function', typeof fabric.loadSVGFromString);
 
-    fabric.loadSVGFromString(SVG_DOC_AS_STRING, function(loadedObjects) {
+    fabric.loadSVGFromString(SVG_DOC_AS_STRING).then(({ objects: loadedObjects }) => {
       assert.ok(loadedObjects[0] instanceof fabric.Polygon);
       assert.equal('red', loadedObjects[0].fill);
-      setTimeout(done, 1000);
+      done();
     });
   });
 
   QUnit.test('fabric.loadSVGFromString with surrounding whitespace', function(assert) {
     var done = assert.async();
-    var loadedObjects = [];
-    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ', function(objects) {
-      loadedObjects = objects;
-    });
-
-    setTimeout(function() {
-      assert.ok(loadedObjects[0] instanceof fabric.Polygon);
-      assert.equal('red', loadedObjects[0] && loadedObjects[0].fill);
+    fabric.loadSVGFromString('   \n\n  ' + SVG_DOC_AS_STRING + '  ').then(({ objects }) => {
+      assert.ok(objects[0] instanceof fabric.Polygon);
+      assert.equal(objects[0].fill, 'red');
       done();
-    }, 1000);
+    });
   });
 
   QUnit.test('fabric.util.loadImage', function(assert) {
@@ -473,7 +306,7 @@
     assert.ok(typeof fabric.util.groupSVGElements === 'function');
 
     var group1;
-    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT, function(objects, options) {
+    fabric.loadSVGFromString(SVG_WITH_1_ELEMENT).then(({ objects, options }) => {
       group1 = fabric.util.groupSVGElements(objects, options);
       assert.ok(group1 instanceof fabric.Polygon, 'it returns just the first element in case is just one');
       done();
@@ -483,69 +316,20 @@
   QUnit.test('fabric.util.groupSVGElements #2', function(assert) {
     var done = assert.async();
     var group2;
-    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS, function(objects, options) {
+    fabric.loadSVGFromString(SVG_WITH_2_ELEMENTS).then(({ objects, options }) => {
       group2 = fabric.util.groupSVGElements(objects, options);
       assert.ok(group2 instanceof fabric.Group);
       done();
     });
   });
 
-  QUnit.test('fabric.util.createClass', function(assert) {
-    var Klass = fabric.util.createClass();
-
-    assert.ok(typeof Klass === 'function');
-    assert.ok(typeof new Klass() === 'object');
-
-    var Person = fabric.util.createClass({
-      initialize: function(firstName, lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-      },
-      toString: function() {
-        return 'My name is ' + this.firstName + ' ' + this.lastName;
-      }
-    });
-
-    assert.ok(typeof Person === 'function');
-    assert.ok(typeof new Person() === 'object');
-
-    var john = new Person('John', 'Meadows');
-    assert.ok(john instanceof Person);
-
-    assert.equal(john.firstName, 'John');
-    assert.equal(john.lastName, 'Meadows');
-    assert.equal(john + '', 'My name is John Meadows');
-
-
-    var WebDeveloper = fabric.util.createClass(Person, {
-      initialize: function(firstName, lastName, skills) {
-        this.callSuper('initialize', firstName, lastName);
-        this.skills = skills;
-      },
-      toString: function() {
-        return this.callSuper('toString') + ' and my skills are ' + this.skills.join(', ');
-      }
-    });
-
-    assert.ok(typeof WebDeveloper === 'function');
-    var dan = new WebDeveloper('Dan', 'Trink', ['HTML', 'CSS', 'Javascript']);
-    assert.ok(dan instanceof Person);
-    assert.ok(dan instanceof WebDeveloper);
-
-    assert.equal(dan.firstName, 'Dan');
-    assert.equal(dan.lastName, 'Trink');
-    assert.deepEqual(dan.skills, ['HTML', 'CSS', 'Javascript']);
-
-    assert.equal(dan + '', 'My name is Dan Trink and my skills are HTML, CSS, Javascript');
-  });
-
   // element doesn't seem to have style on node
-  if (!fabric.isLikelyNode) {
+  if (!isNode()) {
     QUnit.test('fabric.util.setStyle', function(assert) {
 
       assert.ok(typeof fabric.util.setStyle === 'function');
 
-      var el = fabric.document.createElement('div');
+      var el = fabric.getFabricDocument().createElement('div');
 
       fabric.util.setStyle(el, 'color:red');
       assert.equal(el.style.color, 'red');
@@ -557,18 +341,6 @@
       assert.equal(el.style.width, '45px');
     });
   }
-
-  QUnit.test('fabric.util.addListener', function(assert) {
-    assert.ok(typeof fabric.util.addListener === 'function', 'fabric.util.addListener is a function');
-    fabric.util.addListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element addListener');
-  });
-
-  QUnit.test('fabric.util.removeListener', function(assert) {
-    assert.ok(typeof fabric.util.removeListener === 'function', 'fabric.util.removeListener is a function');
-    fabric.util.removeListener(null, 'mouseup');
-    assert.ok(true, 'test did not throw on null element removeListener');
-  });
 
   QUnit.test('fabric.util.pick', function(assert) {
     assert.ok(typeof fabric.util.pick === 'function');
@@ -594,14 +366,6 @@
     assert.equal(destination.baz, 123);
     assert.ok(typeof destination.qux === 'undefined');
     assert.ok(typeof destination.ffffffffff === 'undefined');
-  });
-
-  QUnit.test('getKlass', function(assert) {
-    assert.equal(fabric.util.getKlass('circle'), fabric.Circle);
-    assert.equal(fabric.util.getKlass('i-text'), fabric.IText);
-    assert.equal(fabric.util.getKlass('rect'), fabric.Rect);
-    assert.equal(fabric.util.getKlass('RemoveWhite', 'fabric.Image.filters'), fabric.Image.filters.RemoveWhite);
-    assert.equal(fabric.util.getKlass('Sepia2', 'fabric.Image.filters'), fabric.Image.filters.Sepia2);
   });
 
   QUnit.test('clearFontCache', function(assert) {
@@ -649,6 +413,29 @@
     assert.deepEqual(m3, [2, 2, 2, 2, 3, 3]);
     m3 = fabric.util.multiplyTransformMatrices(m1, m2, true);
     assert.deepEqual(m3, [2, 2, 2, 2, 0, 0]);
+  });
+
+  QUnit.test('multiplyTransformMatrixArray', function (assert) {
+    assert.ok(typeof fabric.util.multiplyTransformMatrixArray === 'function');
+    const m1 = [1, 2, 3, 4, 10, 20], m2 = [5, 6, 7, 8, 30, 40];
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), [
+      23,
+      34,
+      31,
+      46,
+      160,
+      240
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), [
+      23,
+      34,
+      31,
+      46,
+      0,
+      0
+    ]);
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2]), fabric.util.multiplyTransformMatrices(m1, m2));
+    assert.deepEqual(fabric.util.multiplyTransformMatrixArray([m1, m2], true), fabric.util.multiplyTransformMatrices(m1, m2, true));
   });
 
   QUnit.test('resetObjectTransform', function(assert) {
@@ -706,6 +493,11 @@
     assert.equal(transform.angle, 30);
   });
 
+  QUnit.test('isIdentityMatrix', function(assert) {
+    assert.equal(fabric.util.isIdentityMatrix([1, 0, 0, 1, 0, 0]), true, 'is identity');
+    assert.equal(fabric.util.isIdentityMatrix([1, 2, 3, 4, 5, 6]), false, 'is not identity');
+  });
+
   QUnit.test('invertTransform', function(assert) {
     assert.ok(typeof fabric.util.invertTransform === 'function');
     var m1 = [1, 2, 3, 4, 5, 6], m3;
@@ -719,6 +511,202 @@
 
   QUnit.test('fabric.util.getPointer', function(assert) {
     assert.ok(typeof fabric.util.getPointer === 'function', 'fabric.util.getPointer is a function');
+  });
+
+  QUnit.test('isBetweenVectors', function(assert) {
+    assert.ok(typeof fabric.util.isBetweenVectors === 'function', 'fabric.util.isBetweenVectors is a function');
+
+    // Right angle
+    (function() {
+      const initialVector = new fabric.Point(1,0),
+        finalVector = new fabric.Point(0,1);
+      
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #1'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #2'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #3'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #4'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.99),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #5'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0, -0.01),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors right angle #6'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #7'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0, 1),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors right angle #8'
+      );
+    })();
+
+    // Acute angle
+    (function() {
+      const initialVector = new fabric.Point(1, 0),
+        finalVector = new fabric.Point(1, 0.5);
+      
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.25),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors acute angle #1'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #2'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #3'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #4'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.2),
+          initialVector,
+          finalVector 
+        ),
+        true,
+        'isBetweenVectors acute angle #5'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.6),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors acute angle #6'
+      );
+    })();
+
+    // Obtuse angle
+    (function() {
+      const initialVector = new fabric.Point(1, 0.5),
+        finalVector = new fabric.Point(1, 0);
+      
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, 0.25),
+          initialVector,
+          finalVector
+        ),
+        false,
+        'isBetweenVectors obtuse angle #1'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, 0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors obtuse angle #2'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(-0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors obtuse angle #3'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(0.5, -0.5),
+          initialVector,
+          finalVector
+        ),
+        true,
+        'isBetweenVectors obtuse angle #4'
+      );
+      assert.equal(
+        fabric.util.isBetweenVectors(
+          new fabric.Point(1, -0.2),
+          initialVector,
+          finalVector 
+        ),
+        true,
+        'isBetweenVectors obtuse angle #5'
+      );
+    })();
   });
 
   QUnit.test('rotateVector', function(assert) {
@@ -744,156 +732,6 @@
     var tp = fabric.util.transformPoint(point, matrix);
     assert.equal(Math.round(tp.x), 16);
     assert.equal(Math.round(tp.y), 8);
-  });
-
-  /**
-   *
-   * @param {*} actual
-   * @param {*} expected
-   * @param {*} [message]
-   * @param {number} [error] floating point percision, defaults to 10
-   */
-  QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
-    var error = Math.pow(10, error ? -error : -10);
-    this.pushResult({
-      result: actual.every((x, i) => Math.abs(x - expected[i]) < error),
-      actual: actual,
-      expected: expected,
-      message: message
-    })
-  }
-
-  QUnit.test('calcPlaneChangeMatrix', function (assert) {
-    assert.ok(typeof fabric.util.calcPlaneChangeMatrix === 'function');
-    const m1 = [1, 2, 3, 4, 5, 6];
-    const s = [2, 0, 0, 0.5, 0, 0];
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(), fabric.iMatrix);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(undefined, m1), fabric.util.invertTransform(m1));
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(fabric.iMatrix, m1), fabric.util.invertTransform(m1));
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, undefined), m1);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, fabric.iMatrix), m1);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, m1), fabric.iMatrix);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, s), fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(s), m1));
-  })
-
-  QUnit.test('sendPointToPlane', function (assert) {
-    assert.ok(typeof fabric.util.sendPointToPlane === 'function');
-    var m1 = [3, 0, 0, 2, 10, 4],
-      m2 = [1, 2, 3, 4, 5, 6],
-      p, t,
-      obj1 = new fabric.Object(),
-      obj2 = new fabric.Object(),
-      point = new fabric.Point(2, 2),
-      applyTransformToObject = fabric.util.applyTransformToObject,
-      invert = fabric.util.invertTransform,
-      multiply = fabric.util.multiplyTransformMatrices,
-      transformPoint = fabric.util.transformPoint;
-
-    function sendPointToPlane(point, from, to, relationFrom, relationTo) {
-      return fabric.util.sendPointToPlane(
-        point,
-        from ?
-          relationFrom === 'child' ? from.calcTransformMatrix() : from.group?.calcTransformMatrix() :
-          undefined,
-        to ?
-          relationTo === 'child' ? to.calcTransformMatrix() : to.group?.calcTransformMatrix() :
-          undefined
-      );
-    }
-
-    applyTransformToObject(obj1, m1);
-    applyTransformToObject(obj2, m2);
-    obj1.group = new fabric.Object();
-    obj2.group = new fabric.Object();
-    applyTransformToObject(obj1.group, m1);
-    applyTransformToObject(obj2.group, m2);
-    p = sendPointToPlane(point, obj1, obj2, 'child', 'child');
-    t = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, obj1, obj2, 'sibling', 'child');
-    t = multiply(invert(obj2.calcTransformMatrix()), obj1.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, obj1, obj2, 'child', 'sibling');
-    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, obj1, obj2, 'sibling', 'sibling');
-    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, null, obj2, null, 'sibling');
-    t = invert(obj2.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-
-    var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
-    var group = new fabric.Group([obj], { strokeWidth: 0 });
-    var sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, obj, null, 'sibling');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, group, null, 'child');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    group.scaleX = 2;
-    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, obj, null, 'sibling');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, group, null, 'child');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
-  });
-
-  QUnit.test('transformPointRelativeToCanvas', function(assert) {
-    assert.ok(typeof fabric.util.transformPointRelativeToCanvas === 'function');
-    var point = new fabric.Point(2, 2);
-    var matrix = [3, 0, 0, 2, 10, 4];
-    var canvas = {
-      viewportTransform: matrix
-    }
-    var transformPoint = fabric.util.transformPoint;
-    var invertTransform = fabric.util.invertTransform;
-    var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
-    var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
-    assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
-    assert.deepEqual(p, transformPoint(point, matrix));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
-    assert.deepEqual(p, point);
-    p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
-    assert.deepEqual(p, point);
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling');
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', true);
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
-    });
-  });
-
-  QUnit.test('sendObjectToPlane', function (assert) {
-    assert.ok(typeof fabric.util.sendObjectToPlane === 'function');
-    var m = [6, Math.SQRT1_2, 0, 3, 2, 1],
-      m1 = [3, 0, 0, 2, 10, 4],
-      m2 = [1, Math.SQRT1_2, Math.SQRT1_2, 4, 5, 6],
-      actual, expected,
-      obj1 = new fabric.Object(),
-      obj2 = new fabric.Object(),
-      obj = new fabric.Object(),
-      sendObjectToPlane = fabric.util.sendObjectToPlane,
-      applyTransformToObject = fabric.util.applyTransformToObject,
-      invert = fabric.util.invertTransform,
-      multiply = fabric.util.multiplyTransformMatrices;
-    //  silence group check
-    obj1.isOnACache = () => false;
-
-    applyTransformToObject(obj, m);
-    applyTransformToObject(obj1, m1);
-    applyTransformToObject(obj2, m2);
-    obj.group = obj1;
-    actual = sendObjectToPlane(obj, obj1.calcTransformMatrix(), obj2.calcTransformMatrix());
-    expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.matrixIsEqualEnough(actual, expected);
-    assert.matrixIsEqualEnough(obj.calcOwnMatrix(), multiply(actual, m));
-    obj.group = obj2;
-    assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
-    assert.deepEqual(sendObjectToPlane(obj2), fabric.iMatrix, 'sending to nowhere, no transform was applied');
-    assert.matrixIsEqualEnough(obj2.calcOwnMatrix(), m2, 'sending to nowhere, no transform was applied');
   });
 
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
@@ -935,10 +773,6 @@
     assert.equal(element.naturalHeight, 0);
     assert.equal(element.naturalWidth, 0);
   });
-
-  // QUnit.test('createAccessors', function(assert) {
-  //   assert.ok(typeof fabric.util.createAccessors === 'function');
-  // });
 
   QUnit.test('qrDecompose with identity matrix', function(assert) {
     assert.ok(typeof fabric.util.qrDecompose === 'function');
@@ -1098,15 +932,15 @@
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [2, 0, 0, 2, 0, 0]);
-    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
-    assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 z');
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 Z');
+    assert.equal(fabric.util.joinPath(newPath), 'M 200 200 L 400 200 L 340 400 Z');
   });
   QUnit.test('fabric.util.transformPath can apply a generic transform', function(assert) {
     var path = new fabric.Path('M 100 100 L 200 100 L 170 200 z');
     var oldPath = path.path;
     var newPath = fabric.util.transformPath(path.path, [1, 2, 3, 4, 5, 6], path.pathOffset);
-    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 z');
-    assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 z');
+    assert.equal(fabric.util.joinPath(oldPath), 'M 100 100 L 200 100 L 170 200 Z');
+    assert.equal(fabric.util.joinPath(newPath), 'M -195 -294 L -95 -94 L 175 246 Z');
   });
 
   QUnit.test('fabric.util.calcDimensionsMatrix', function(assert) {
@@ -1156,8 +990,8 @@
       0.2696723314583158,
       -0.41255083562929973,
       0.37782470175621224,
-      -153.32445710769997,
-      1.7932869074173539,
+      -149.58276216465225,
+      -0.7631646697634125
     ]);
     assert.equal(result.inverted, false, 'the final clipPathB is not inverted')
     assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
@@ -1171,12 +1005,12 @@
     var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
     var resultingMatrix = result.clipPath.calcTransformMatrix();
     var expectedMatrix = roundArray([
-      1.1335,
-      -0.8090,
-      1.2377,
-      1.7634,
-      171.5698,
-      -127.2043,
+      1.1334741052686363,
+      -0.8090169943749471,
+      1.237652506887899,
+      1.7633557568774187,
+      170.49272017489145,
+      -119.66926584287677
     ]);
     assert.equal(result.inverted, false, 'the final clipPathA is not inverted')
     assert.equal(result.clipPath, clipPathA, 'clipPathA is the final clipPath');

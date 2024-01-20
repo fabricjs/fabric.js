@@ -8,7 +8,8 @@
       eventData = {};
       transform = prepareTransform(target, 'mr');
     });
-    hooks.afterEach(function() {
+    hooks.afterEach(function () {
+      canvas.off();
       canvas.clear();
     });
     function prepareTransform(target, corner) {
@@ -213,37 +214,6 @@
       });
       fabric.controlsUtils.scalingXOrSkewingY(eventData, transform, 200, 300);
     });
-    QUnit.test('wrapWithFixedAnchor', function(assert) {
-      var target = transform.target;
-      transform.originX = 'center';
-      transform.originY = 'center';
-      target.strokeWidth = 0;
-      var actionHandler = function (eventData, transform) {
-        var target = transform.target;
-        target.scaleX = 5;
-        target.scaleY = 5;
-      };
-      var center = target.getCenterPoint();
-      assert.deepEqual(center.x, 50, 'initial center is x 50');
-      assert.deepEqual(center.y, 50, 'initial center is y 50');
-      actionHandler({}, transform);
-      var center2 = target.getCenterPoint();
-      assert.deepEqual(center2.x, 250, 'after action center is x 250');
-      assert.deepEqual(center2.y, 250, 'after action center is y 250');
-      target.top = 0;
-      target.left = 0;
-      target.scaleX = 1;
-      target.scaleY = 1;
-      var center3 = target.getCenterPoint();
-      assert.deepEqual(center3.x, 50, 'after reset center is x 50');
-      assert.deepEqual(center3.y, 50, 'after reset center is y 50');
-      fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)({}, transform);
-      var center4 = target.getCenterPoint();
-      assert.equal(target.scaleX, 5, 'action made scaleX bigger');
-      assert.equal(target.scaleY, 5, 'action made scaleY bigger');
-      assert.deepEqual(center4.x, 50, 'with wrapper center is x 50');
-      assert.deepEqual(center4.y, 50, 'with wrapper center is y 50');
-    });
     QUnit.test('wrapWithFireEvent dont trigger event when actionHandler doesnt change anything', function(assert) {
       transform.target.canvas.on('object:scaling', function() {
         assert.ok(false);
@@ -261,6 +231,61 @@
         fabric.controlsUtils.wrapWithFixedAnchor(actionHandler)
       );
       wrapped(eventData, transform, x, y);
+    });
+    ['ml', 'mt', 'mr', 'mb'].forEach(controlKey => {
+      const axis = {
+        ml: 'x',
+        mt: 'y',
+        mr: 'x',
+        mb: 'y',
+      }[controlKey]
+      const AXIS = axis.toUpperCase();
+      const signKey = `sign${AXIS}`;
+      const scaleKey = `scale${AXIS}`;
+      const flipKey = `flip${AXIS}`;
+      const isX = axis === 'x';
+      QUnit.test(`scaling ${AXIS} from ${controlKey} keeps the same sign when scale = 0`, function (assert) {
+        transform = prepareTransform(transform.target, controlKey);
+        const size = transform.target._getTransformedDimensions()[axis];
+        const factor = 0.5;
+        const fn = fabric.controlsUtils[`scaling${AXIS}`];
+        const exec = point => {
+          const { target } = transform;
+          const origin = target.translateToGivenOrigin(
+            target.getRelativeCenterPoint(),
+            'center',
+            'center',
+            transform.originX,
+            transform.originY
+          );
+          const pointer = point.add(origin);
+          fn(eventData, transform, pointer.x, pointer.y);
+        };
+        const deltaFromControl = new fabric.Point(
+          Number(isX),
+          Number(!isX)
+        ).scalarMultiply(size * factor);
+        exec(new fabric.Point());
+        assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], false, `${flipKey} value after scaling`);
+        assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
+        exec(deltaFromControl);
+        assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], false, `${flipKey} value after scaling`);
+        assert.equal(transform.target[scaleKey], factor, `${scaleKey} value after scaling`);
+        exec(new fabric.Point());
+        assert.equal(transform[signKey], 1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], false, `${flipKey} value after scaling`);
+        assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
+        exec(deltaFromControl.scalarMultiply(-1));
+        assert.equal(transform[signKey], -1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], true, `${flipKey} value after scaling`);
+        assert.equal(transform.target[scaleKey], factor, `${scaleKey} value after scaling`);
+        exec(new fabric.Point());
+        assert.equal(transform[signKey], -1, `${signKey} value after scaling`);
+        assert.equal(transform.target[flipKey], true, `${flipKey} value after scaling`);
+        assert.ok(transform.target[scaleKey] <= 0.001, `${scaleKey} value after scaling back to origin`);
+      });
     });
   });
 })();

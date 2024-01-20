@@ -1,3 +1,5 @@
 # Browsers that we support
 
-chrome >= 58
+chrome >= 64
+safari >= 11
+firefox >= 58

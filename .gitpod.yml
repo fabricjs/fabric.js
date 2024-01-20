@@ -1,2 +1,22 @@
+# https://www.gitpod.io/docs/config-gitpod-file
+
 tasks:
-  - init: npm install
+  - name: Build & Watch
+    init: npm install
+    command: npm run build -- -w -f
+
+  - name: Node
+    init: npm install
+    command: npm start node -- --no-watch
+
+  - name: Next.js
+    init: npm install
+    command: npm start next -- --no-watch
+
+  - name: Vanilla
+    init: npm install
+    command: npm start vanilla -- --no-watch
+
+  - name: Vue.js
+    init: gp sync-await deps
+    command: npm start vue -- --no-watch

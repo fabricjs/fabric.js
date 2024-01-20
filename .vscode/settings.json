@@ -8,5 +8,26 @@
   "markdown.validate.ignoredLinks": [
     // github links
     "../../**"
-  ]
+  ],
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never",
+    "source.removeUnusedImports": "explicit"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/.next": true,
+    "**/.parcel-cache": true,
+    "**/*.code-search": true,
+    "dist": true,
+    "website": true,
+    "coverage": true,
+    ".nyc_output": true,
+    "e2e/test-results": true,
+    "e2e/test-report": true,
+    "test/visual/assets": true
+  },
+  "search.useIgnoreFiles": true
 }

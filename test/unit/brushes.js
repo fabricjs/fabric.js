@@ -39,33 +39,36 @@
         });
         QUnit.test('fabric pencil brush draw point', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.onMouseDown(pointer, { e: {} });
+          const e = { target: canvas.upperCanvasEl };
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10 });
+          brush.onMouseDown(pointer, { e });
           var pathData = brush.convertPointsToSVGPath(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
         });
         QUnit.test('fabric pencil brush multiple points', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
-          brush.onMouseMove(pointer, { e: {} });
+          const e = { target: canvas.upperCanvasEl };
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10 });
+          brush.onMouseDown(pointer, { e });
+          brush.onMouseMove(pointer, { e });
+          brush.onMouseMove(pointer, { e });
+          brush.onMouseMove(pointer, { e });
+          brush.onMouseMove(pointer, { e });
           var pathData = brush.convertPointsToSVGPath(brush._points);
           assert.deepEqual(pathData, parsePath('M 9.999 10 L 10.001 10'), 'path data create a small line that looks like a point');
           assert.equal(brush._points.length, 2, 'concident points are discarded');
         });
         QUnit.test('fabric pencil brush multiple points not discarded', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
-          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
+          const e = { target: canvas.upperCanvasEl };
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 15});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 20});
+          brush.onMouseDown(pointer, { e });
+          brush.onMouseMove(pointer2, { e });
+          brush.onMouseMove(pointer3, { e });
+          brush.onMouseMove(pointer2, { e });
+          brush.onMouseMove(pointer3, { e });
           var pathData = brush.convertPointsToSVGPath(brush._points);
           assert.deepEqual(
             pathData,
@@ -76,16 +79,17 @@
         });
         QUnit.test('fabric pencil brush multiple points outside canvas', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 100});
-          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
-          var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
-          var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer4, { e: {} });
-          brush.onMouseMove(pointer5, { e: {} });
+          const e = { target: canvas.upperCanvasEl };
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 100});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 160});
+          var pointer4 = canvas.getScenePoint({ ...e, clientX: 320, clientY: 100});
+          var pointer5 = canvas.getScenePoint({ ...e, clientX: 100, clientY: 100});
+          brush.onMouseDown(pointer, { e });
+          brush.onMouseMove(pointer2, { e });
+          brush.onMouseMove(pointer3, { e });
+          brush.onMouseMove(pointer4, { e });
+          brush.onMouseMove(pointer5, { e });
           var pathData = brush.convertPointsToSVGPath(brush._points);
           assert.deepEqual(
             pathData,
@@ -97,16 +101,17 @@
         QUnit.test('fabric pencil brush multiple points outside canvas, limitedToCanvasSize true', function(assert) {
           var brush = new fabric.PencilBrush(canvas);
           brush.limitedToCanvasSize = true;
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 100});
-          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 160});
-          var pointer4 = canvas.getPointer({ clientX: 320, clientY: 100});
-          var pointer5 = canvas.getPointer({ clientX: 100, clientY: 100});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer4, { e: {} });
-          brush.onMouseMove(pointer5, { e: {} });
+          const e = { target: canvas.upperCanvasEl };
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 100});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 160});
+          var pointer4 = canvas.getScenePoint({ ...e, clientX: 320, clientY: 100});
+          var pointer5 = canvas.getScenePoint({ ...e, clientX: 100, clientY: 100});
+          brush.onMouseDown(pointer, { e });
+          brush.onMouseMove(pointer2, { e });
+          brush.onMouseMove(pointer3, { e });
+          brush.onMouseMove(pointer4, { e });
+          brush.onMouseMove(pointer5, { e });
           var pathData = brush.convertPointsToSVGPath(brush._points);
           assert.deepEqual(
             pathData,
@@ -127,15 +132,16 @@
             added = opt.path;
           });
           var brush = new fabric.PencilBrush(canvas);
-          var pointer = canvas.getPointer({ clientX: 10, clientY: 10});
-          var pointer2 = canvas.getPointer({ clientX: 15, clientY: 15});
-          var pointer3 = canvas.getPointer({ clientX: 20, clientY: 20});
-          brush.onMouseDown(pointer, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseMove(pointer2, { e: {} });
-          brush.onMouseMove(pointer3, { e: {} });
-          brush.onMouseUp({ e: {} });
+          const e = { target: canvas.upperCanvasEl };
+          var pointer = canvas.getScenePoint({ ...e, clientX: 10, clientY: 10});
+          var pointer2 = canvas.getScenePoint({ ...e, clientX: 15, clientY: 15});
+          var pointer3 = canvas.getScenePoint({ ...e, clientX: 20, clientY: 20});
+          brush.onMouseDown(pointer, { e });
+          brush.onMouseMove(pointer2, { e });
+          brush.onMouseMove(pointer3, { e });
+          brush.onMouseMove(pointer2, { e });
+          brush.onMouseMove(pointer3, { e });
+          brush.onMouseUp({ e });
           assert.equal(fireBeforePathCreatedEvent, true, 'before:path:created event is fired');
           assert.equal(firePathCreatedEvent, true, 'path:created event is fired');
           assert.ok(added instanceof fabric.Path, 'a path is added');

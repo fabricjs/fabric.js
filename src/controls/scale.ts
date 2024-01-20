@@ -1,12 +1,12 @@
-import {
+import type {
   ControlCursorCallback,
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import type { FabricObject } from '../shapes/fabricObject.class';
-import { TAxis } from '../typedefs';
-import { Canvas } from '../__types__';
+import type { FabricObject } from '../shapes/Object/FabricObject';
+import type { TAxis } from '../typedefs';
+import type { Canvas } from '../canvas/Canvas';
 import {
   findCornerQuadrant,
   getLocalPoint,
@@ -37,7 +37,7 @@ export function scaleIsProportional(
   fabricObject: FabricObject
 ): boolean {
   const canvas = fabricObject.canvas as Canvas,
-    uniformIsToggled = eventData[canvas.uniScaleKey];
+    uniformIsToggled = eventData[canvas.uniScaleKey!];
   return (
     (canvas.uniformScaling && !uniformIsToggled) ||
     (!canvas.uniformScaling && uniformIsToggled)
@@ -68,6 +68,15 @@ export function scalingIsForbidden(
     return true;
   }
   if (lockY && by === 'y') {
+    return true;
+  }
+  // code crashes because of a division by 0 if a 0 sized object is scaled
+  // forbid to prevent scaling to happen. ISSUE-9475
+  const { width, height, strokeWidth } = fabricObject;
+  if (width === 0 && strokeWidth === 0 && by !== 'y') {
+    return true;
+  }
+  if (height === 0 && strokeWidth === 0 && by !== 'x') {
     return true;
   }
   return false;
@@ -145,8 +154,8 @@ function scaleObject(
     // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
     // cross many time the origin point and flip the object. so we need a way to filter out the noise.
     // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
-    signX = by !== 'y' ? Math.sign(newPoint.x) : 1;
-    signY = by !== 'x' ? Math.sign(newPoint.y) : 1;
+    signX = by !== 'y' ? Math.sign(newPoint.x || transform.signX || 1) : 1;
+    signY = by !== 'x' ? Math.sign(newPoint.y || transform.signY || 1) : 1;
     if (!transform.signX) {
       transform.signX = signX;
     }
@@ -193,7 +202,7 @@ function scaleObject(
       transform.signY = signY;
     }
   }
-  // minScale is taken are in the setter.
+  // minScale is taken care of in the setter.
   const oldScaleX = target.scaleX,
     oldScaleY = target.scaleY;
   if (!by) {

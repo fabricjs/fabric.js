@@ -1,18 +1,23 @@
-import { fabric } from '../../../HEADER';
-import { SVGElementName, SupportedSVGUnit, TMat2D } from '../../typedefs';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
-import { toFixed } from './toFixed';
+import { Color } from '../../color/Color';
 import { config } from '../../config';
+import { DEFAULT_SVG_FONT_SIZE, NONE } from '../../constants';
+import type {
+  TBBox,
+  TMat2D,
+  SVGElementName,
+  SupportedSVGUnit,
+} from '../../typedefs';
+import { toFixed } from './toFixed';
+
 /**
  * Returns array of attributes for given svg that fabric parses
- * @memberOf fabric.util
  * @param {SVGElementName} type Type of svg element (eg. 'circle')
  * @return {Array} string names of supported attributes
  */
 export const getSvgAttributes = (type: SVGElementName) => {
   const commonAttributes = ['instantiated_by_use', 'style', 'id', 'class'];
   switch (type) {
-    case SVGElementName.linearGradient:
+    case 'linearGradient':
       return commonAttributes.concat([
         'x1',
         'y1',
@@ -45,30 +50,27 @@ export const getSvgAttributes = (type: SVGElementName) => {
  * @param {number} fontSize
  * @return {number}
  */
-export const parseUnit = (value: string, fontSize: number) => {
+export const parseUnit = (value: string, fontSize = DEFAULT_SVG_FONT_SIZE) => {
   const unit = /\D{0,2}$/.exec(value),
     number = parseFloat(value);
-  if (!fontSize) {
-    fontSize = DEFAULT_SVG_FONT_SIZE;
-  }
   const dpi = config.DPI;
-  switch (unit?.[0]) {
-    case SupportedSVGUnit.mm:
+  switch (unit?.[0] as SupportedSVGUnit) {
+    case 'mm':
       return (number * dpi) / 25.4;
 
-    case SupportedSVGUnit.cm:
+    case 'cm':
       return (number * dpi) / 2.54;
 
-    case SupportedSVGUnit.in:
+    case 'in':
       return number * dpi;
 
-    case SupportedSVGUnit.pt:
+    case 'pt':
       return (number * dpi) / 72; // or * 4 / 3
 
-    case SupportedSVGUnit.pc:
+    case 'pc':
       return ((number * dpi) / 72) * 12; // or * 16
 
-    case SupportedSVGUnit.em:
+    case 'em':
       return number * fontSize;
 
     default:
@@ -76,33 +78,11 @@ export const parseUnit = (value: string, fontSize: number) => {
   }
 };
 
-/**
- * Groups SVG elements (usually those retrieved from SVG document)
- * @static
- * @memberOf fabric.util
- * @param {Array} elements fabric.Object(s) parsed from svg, to group
- * @return {fabric.Object|fabric.Group}
- */
-export const groupSVGElements = (elements: any[]) => {
-  if (elements && elements.length === 1) {
-    return elements[0];
-  }
-  return new fabric.Group(elements);
-};
+export type MeetOrSlice = 'meet' | 'slice';
 
-const enum MeetOrSlice {
-  meet = 'meet',
-  slice = 'slice',
-}
+export type MinMidMax = 'Min' | 'Mid' | 'Max' | 'none';
 
-const enum MinMidMax {
-  min = 'Min',
-  mid = 'Mid',
-  max = 'Max',
-  none = 'none',
-}
-
-type TPreserveArParsed = {
+export type TPreserveArParsed = {
   meetOrSlice: MeetOrSlice;
   alignX: MinMidMax;
   alignY: MinMidMax;
@@ -111,12 +91,12 @@ type TPreserveArParsed = {
 // align can be either none or undefined or a combination of mid/max
 const parseAlign = (align: string): MinMidMax[] => {
   //divide align in alignX and alignY
-  if (align && align !== MinMidMax.none) {
+  if (align && align !== NONE) {
     return [align.slice(1, 4) as MinMidMax, align.slice(5, 8) as MinMidMax];
-  } else if (align === MinMidMax.none) {
+  } else if (align === NONE) {
     return [align, align];
   }
-  return [MinMidMax.mid, MinMidMax.mid];
+  return ['Mid', 'Mid'];
 };
 
 /**
@@ -134,7 +114,7 @@ export const parsePreserveAspectRatioAttribute = (
   ];
   const [alignX, alignY] = parseAlign(firstPart);
   return {
-    meetOrSlice: secondPart || MeetOrSlice.meet,
+    meetOrSlice: secondPart || 'meet',
     alignX,
     alignY,
   };
@@ -142,7 +122,6 @@ export const parsePreserveAspectRatioAttribute = (
 
 /**
  * given an array of 6 number returns something like `"matrix(...numbers)"`
- * @memberOf fabric.util
  * @param {TMat2D} transform an array with 6 numbers
  * @return {String} transform matrix for svg
  */
@@ -152,3 +131,54 @@ export const matrixToSVG = (transform: TMat2D) =>
     .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
     .join(' ') +
   ')';
+
+/**
+ * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
+ * we work around it by "moving" alpha channel into opacity attribute and setting fill's alpha to 1
+ * @param prop
+ * @param value
+ * @param {boolean} inlineStyle The default is inline style, the separator used is ":", The other is "="
+ * @returns
+ */
+export const colorPropToSVG = (
+  prop: string,
+  value?: any,
+  inlineStyle = true
+) => {
+  let colorValue;
+  let opacityValue;
+  if (!value) {
+    colorValue = 'none';
+  } else if (value.toLive) {
+    colorValue = `url(#SVGID_${value.id})`;
+  } else {
+    const color = new Color(value),
+      opacity = color.getAlpha();
+
+    colorValue = color.toRgb();
+    if (opacity !== 1) {
+      opacityValue = opacity.toString();
+    }
+  }
+  if (inlineStyle) {
+    return `${prop}: ${colorValue}; ${
+      opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ''
+    }`;
+  } else {
+    return `${prop}="${colorValue}" ${
+      opacityValue ? `${prop}-opacity="${opacityValue}" ` : ''
+    }`;
+  }
+};
+
+export const createSVGRect = (
+  color: string,
+  { left, top, width, height }: TBBox,
+  precision = config.NUM_FRACTION_DIGITS
+) => {
+  const svgColor = colorPropToSVG('fill', color, false);
+  const [x, y, w, h] = [left, top, width, height].map((value) =>
+    toFixed(value, precision)
+  );
+  return `<rect ${svgColor} x="${x}" y="${y}" width="${w}" height="${h}"></rect>`;
+};

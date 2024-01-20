@@ -2,7 +2,7 @@
 
   var REFERENCE_RECT = {
     version:                  fabric.version,
-    type:                     'rect',
+    type:                     'Rect',
     originX:                  'left',
     originY:                  'top',
     left:                     0,
@@ -44,9 +44,9 @@
     var rect = new fabric.Rect();
 
     assert.ok(rect instanceof fabric.Rect);
-    assert.ok(rect instanceof fabric.Object);
+    assert.ok(rect instanceof fabric.FabricObject);
 
-    assert.deepEqual(rect.get('type'), 'rect');
+    assert.deepEqual(rect.constructor.type, 'Rect');
   });
 
   QUnit.test('complexity', function(assert) {
@@ -58,8 +58,8 @@
   QUnit.test('cache properties', function(assert) {
     var rect = new fabric.Rect();
 
-    assert.ok(rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
-    assert.ok(rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
+    assert.ok(fabric.Rect.cacheProperties.indexOf('rx') > -1, 'rx is in cacheProperties array');
+    assert.ok(fabric.Rect.cacheProperties.indexOf('ry') > -1, 'ry is in cacheProperties array');
   });
 
   QUnit.test('toObject', function(assert) {
@@ -78,10 +78,12 @@
       assert.ok(rect instanceof fabric.Rect);
       assert.deepEqual(rect.toObject(), REFERENCE_RECT);
 
-      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-      expectedObject.fill = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
-      expectedObject.stroke = {type: 'linear',coords: {x1: 0,y1: 0,x2: 200,y2: 0},colorStops: [{offset: '0',color: 'rgb(255,0,0)',opacity: 1},{offset: '1',color: 'rgb(0,0,255)',opacity: 1}],offsetX: 0,offsetY: 0};
-      return fabric.Rect.fromObject(expectedObject).then(function(rect2) {
+      var expectedObject = {
+        ...REFERENCE_RECT,
+        fill: { type: 'linear', coords: { x1: 0, y1: 0, x2: 200, y2: 0 }, colorStops: [{ offset: '0', color: 'rgb(255,0,0)', opacity: 1 }, { offset: '1', color: 'rgb(0,0,255)', opacity: 1 }], offsetX: 0, offsetY: 0 },
+        stroke: { type: 'linear', coords: { x1: 0, y1: 0, x2: 200, y2: 0 }, colorStops: [{ offset: '0', color: 'rgb(255,0,0)', opacity: 1 }, { offset: '1', color: 'rgb(0,0,255)', opacity: 1 }], offsetX: 0, offsetY: 0 }
+      };
+      return fabric.Rect.fromObject(expectedObject).then(function (rect2) {
         assert.ok(rect2.fill instanceof fabric.Gradient);
         assert.ok(rect2.stroke instanceof fabric.Gradient);
         done();
@@ -92,7 +94,7 @@
   QUnit.test('fabric.Rect.fromObject with pattern fill', function(assert) {
     var done = assert.async();
     var fillObj = {
-      type: 'pattern',
+      type: 'Pattern',
       source: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg=='
     };
     fabric.Rect.fromObject({ fill: fillObj }).then(function(rect) {
@@ -102,20 +104,21 @@
   });
 
   QUnit.test('fabric.Rect.fromElement', function(assert) {
+    var done = assert.async();
     assert.ok(typeof fabric.Rect.fromElement === 'function');
 
-    var elRect = fabric.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    fabric.Rect.fromElement(elRect, function(rect) {
-      var expectedObject = fabric.util.object.extend({ }, REFERENCE_RECT);
-      expectedObject.visible = false;
+    var elRect = fabric.getFabricDocument().createElementNS('http://www.w3.org/2000/svg', 'rect');
+    fabric.Rect.fromElement(elRect).then((rect) => {
       assert.ok(rect instanceof fabric.Rect);
-      assert.deepEqual(rect.toObject(), expectedObject);
+      assert.deepEqual(rect.toObject(), { ...REFERENCE_RECT, visible: false });
+      done();
     });
   });
 
   QUnit.test('fabric.Rect.fromElement with custom attributes', function(assert) {
+    var done = assert.async();
     var namespace = 'http://www.w3.org/2000/svg';
-    var elRectWithAttrs = fabric.document.createElementNS(namespace, 'rect');
+    var elRectWithAttrs = fabric.getFabricDocument().createElementNS(namespace, 'rect');
 
     elRectWithAttrs.setAttributeNS(namespace, 'x', 10);
     elRectWithAttrs.setAttributeNS(namespace, 'y', 20);
@@ -133,10 +136,11 @@
     elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
     elRectWithAttrs.setAttributeNS(namespace, 'vector-effect', 'non-scaling-stroke');
     //elRectWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
-    fabric.Rect.fromElement(elRectWithAttrs, function(rectWithAttrs) {
+    fabric.Rect.fromElement(elRectWithAttrs).then((rectWithAttrs) => {
       assert.ok(rectWithAttrs instanceof fabric.Rect);
       assert.equal(rectWithAttrs.strokeUniform, true, 'strokeUniform is parsed');
-      var expectedObject = fabric.util.object.extend(REFERENCE_RECT, {
+      var expectedObject = {
+        ...REFERENCE_RECT,
         left:             10,
         top:              20,
         width:            222,
@@ -152,14 +156,9 @@
         rx:               11,
         ry:               12,
         strokeUniform:    true
-      });
+      };
       assert.deepEqual(rectWithAttrs.toObject(), expectedObject);
-    });
-  });
-
-  QUnit.test('empty fromElement', function(assert) {
-    fabric.Rect.fromElement(null, function(rect) {
-      assert.equal(rect, null);
+      done();
     });
   });
 
@@ -205,17 +204,17 @@
   });
 
   QUnit.test('toObject without default values', function(assert) {
-    var options = { type: 'rect', width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
+    var options = { width: 69, height: 50, left: 10, top: 20, version: fabric.version, };
     var rect = new fabric.Rect(options);
     rect.includeDefaultValues = false;
-    assert.deepEqual(rect.toObject(), options);
+    assert.deepEqual(rect.toObject(), { type: 'Rect', ...options });
   });
 
   QUnit.test('paintFirst life cycle', function(assert) {
     var done = assert.async();
     var svg = '<svg><rect x="10" y="10" height="50" width="55" fill="red" stroke="blue" paint-order="stroke" /></svg>';
-    fabric.loadSVGFromString(svg, function(envlivedObjects) {
-      var rect = envlivedObjects[0];
+    fabric.loadSVGFromString(svg).then(({ objects }) => {
+      var rect = objects[0];
       var rectObject = rect.toObject();
       var rectSvg = rect.toSVG();
       assert.equal(rect.paintFirst, 'stroke');

@@ -28,7 +28,7 @@
   QUnit.module('fabric.ActiveSelection', {
     afterEach: function() {
       canvas.clear();
-      canvas.backgroundColor = fabric.Canvas.prototype.backgroundColor;
+      canvas.backgroundColor = fabric.Canvas.getDefaults().backgroundColor;
       canvas.calcOffset();
     }
   });
@@ -38,6 +38,7 @@
 
     assert.ok(group);
     assert.ok(group instanceof fabric.ActiveSelection, 'should be instance of fabric.ActiveSelection');
+    assert.ok(!group.item(0).parent, 'parent ref is undefined');
   });
 
   QUnit.test('toString', function(assert) {
@@ -54,7 +55,7 @@
 
     var expectedObject = {
       version:                  fabric.version,
-      type:                     'activeSelection',
+      type:                     'ActiveSelection',
       originX:                  'left',
       originY:                  'top',
       left:                     50,
@@ -62,7 +63,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
-      layout:                   'fit-content',
+      // layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -87,7 +88,11 @@
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false,
-      objects:                  clone.objects
+      objects:                  clone.objects,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
 
     assert.deepEqual(clone, expectedObject);
@@ -103,7 +108,7 @@
     var clone = group.toObject();
     var objects = [{
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: 10,
       top: -30,
       width: 30,
@@ -111,7 +116,7 @@
       strokeWidth: 0
     }, {
       version: fabric.version,
-      type: 'rect',
+      type: 'Rect',
       left: -40,
       top: -10,
       width: 10,
@@ -120,7 +125,7 @@
     }];
     var expectedObject = {
       version:            fabric.version,
-      type:               'activeSelection',
+      type:               'ActiveSelection',
       left:               50,
       top:                100,
       width:              80,
@@ -184,13 +189,6 @@
     // assert.equal(group.get('lockRotation'), true);
   });
 
-  QUnit.test('inherited methods', function (assert) {
-    var methods = ['add', 'insertAt', 'remove', 'removeAll'];
-    methods.forEach(method => {
-      assert.strictEqual(fabric.ActiveSelection.prototype[method], fabric.Group.prototype[method]);
-    });
-  });
-
   QUnit.test('ActiveSelection shouldCache', function(assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
         rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: true}),
@@ -205,43 +203,6 @@
     canvas.add(g2);
     assert.equal(g2.canvas, canvas);
     assert.equal(g2._objects[3].canvas, canvas);
-  });
-
-  QUnit.test('moveTo on activeSelection', function(assert) {
-    var group = makeAsWith4Objects({ canvas: canvas }),
-        groupEl1 = group.getObjects()[0],
-        groupEl2 = group.getObjects()[1],
-        groupEl3 = group.getObjects()[2],
-        groupEl4 = group.getObjects()[3];
-    canvas.add(groupEl1, groupEl2, groupEl3, groupEl4);
-    canvas.setActiveObject(group);
-    assert.ok(typeof group.item(0).moveTo === 'function');
-
-    // [ 1, 2, 3, 4 ]
-    assert.equal(group.item(0), groupEl1, 'actual group position 1');
-    assert.equal(group.item(1), groupEl2, 'actual group position 2');
-    assert.equal(group.item(2), groupEl3, 'actual group position 3');
-    assert.equal(group.item(3), groupEl4, 'actual group position 4');
-    assert.equal(group.item(9999), undefined);
-    assert.equal(canvas.item(0), groupEl1, 'actual canvas position 1');
-    assert.equal(canvas.item(1), groupEl2, 'actual canvas position 2');
-    assert.equal(canvas.item(2), groupEl3, 'actual canvas position 3');
-    assert.equal(canvas.item(3), groupEl4, 'actual canvas position 4');
-    assert.equal(canvas.item(9999), undefined);
-
-    group.item(0).moveTo(3);
-
-    assert.equal(group.item(0), groupEl1, 'did not change group position 1');
-    assert.equal(group.item(1), groupEl2, 'did not change group position 2');
-    assert.equal(group.item(2), groupEl3, 'did not change group position 3');
-    assert.equal(group.item(3), groupEl4, 'did not change group position 4');
-    assert.equal(group.item(9999), undefined);
-    // moved 1 to level 3 — [2, 3, 4, 1]
-    assert.equal(canvas.item(3), groupEl1, 'item 1 is not at last');
-    assert.equal(canvas.item(0), groupEl2, 'item 2 shifted down to 1');
-    assert.equal(canvas.item(1), groupEl3, 'item 3 shifted down to 2');
-    assert.equal(canvas.item(2), groupEl4, 'item 4 shifted down to 3');
-    assert.equal(canvas.item(9999), undefined);
   });
 
 })();

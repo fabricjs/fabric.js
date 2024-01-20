@@ -1,10 +1,9 @@
-import { Point } from '../../point.class';
-import type { FabricObject } from '../../shapes/object.class';
-import { TMat2D } from '../../typedefs';
+import { Point } from '../../Point';
+import { CENTER } from '../../constants';
+import type { FabricObject } from '../../shapes/Object/Object';
+import type { TMat2D } from '../../typedefs';
 import { makeBoundingBoxFromPoints } from './boundingBoxFromPoints';
-import type { TComposeMatrixArgs, TScaleMatrixArgs } from './matrix';
 import {
-  calcDimensionsMatrix,
   invertTransform,
   multiplyTransformMatrices,
   qrDecompose,
@@ -18,9 +17,8 @@ import {
  * Removing from an object a transform that rotate by 30deg is like rotating by 30deg
  * in the opposite direction.
  * This util is used to add objects inside transformed groups or nested groups.
- * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
- * @param {Array} transform the destination transform
+ * @param {FabricObject} object the object you want to transform
+ * @param {TMat2D} transform the destination transform
  */
 export const removeTransformFromObject = (
   object: FabricObject,
@@ -39,8 +37,7 @@ export const removeTransformFromObject = (
  * this is equivalent to change the space where the object is drawn.
  * Adding to an object a transform that scale by 2 is like scaling it by 2.
  * This is used when removing an object from an active selection for example.
- * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
+ * @param {FabricObject} object the object you want to transform
  * @param {Array} transform the destination transform
  */
 export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
@@ -51,8 +48,7 @@ export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
 
 /**
  * discard an object transform state and apply the one from the matrix.
- * @memberOf fabric.util
- * @param {fabric.Object} object the object you want to transform
+ * @param {FabricObject} object the object you want to transform
  * @param {Array} transform the destination transform
  */
 export const applyTransformToObject = (
@@ -66,13 +62,11 @@ export const applyTransformToObject = (
   object.flipY = false;
   Object.assign(object, otherOptions);
   object.set({ scaleX, scaleY });
-  object.setPositionByOrigin(center, 'center', 'center');
+  object.setPositionByOrigin(center, CENTER, CENTER);
 };
 /**
  * reset an object transform state to neutral. Top and left are not accounted for
- * @static
- * @memberOf fabric.util
- * @param  {fabric.Object} target object to transform
+ * @param  {FabricObject} target object to transform
  */
 export const resetObjectTransform = (target: FabricObject) => {
   target.scaleX = 1;
@@ -86,9 +80,7 @@ export const resetObjectTransform = (target: FabricObject) => {
 
 /**
  * Extract Object transform values
- * @static
- * @memberOf fabric.util
- * @param  {fabric.Object} target object to read from
+ * @param  {FabricObject} target object to read from
  * @return {Object} Components of transform
  */
 export const saveObjectTransform = (target: FabricObject) => ({
@@ -105,33 +97,26 @@ export const saveObjectTransform = (target: FabricObject) => ({
 
 /**
  * given a width and height, return the size of the bounding box
- * that can contains the box with width/height with applied transform
- * described in options.
+ * that can contains the box with width/height with applied transform.
  * Use to calculate the boxes around objects for controls.
- * @memberOf fabric.util
  * @param {Number} width
  * @param {Number} height
- * @param {Object} options
- * @param {Number} options.scaleX
- * @param {Number} options.scaleY
- * @param {Number} options.skewX
- * @param {Number} options.skewY
+ * @param {TMat2D} t
  * @returns {Point} size
  */
 export const sizeAfterTransform = (
   width: number,
   height: number,
-  options: TScaleMatrixArgs
+  t: TMat2D
 ) => {
   const dimX = width / 2,
     dimY = height / 2,
-    transformMatrix = calcDimensionsMatrix(options),
     points = [
       new Point(-dimX, -dimY),
       new Point(dimX, -dimY),
       new Point(-dimX, dimY),
       new Point(dimX, dimY),
-    ].map((p) => p.transform(transformMatrix)),
+    ].map((p) => p.transform(t)),
     bbox = makeBoundingBoxFromPoints(points);
   return new Point(bbox.width, bbox.height);
 };
