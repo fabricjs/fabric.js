@@ -112,14 +112,19 @@ export class Gradient<
     this.id = id ? `${id}_${uid()}` : uid();
     this.type = type;
     this.gradientUnits = gradientUnits;
-    this.gradientTransform = gradientTransform;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
+    this.gradientTransform =
+      gradientTransform && (gradientTransform.slice() as TMat2D);
     this.coords = {
       ...(this.type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
       ...coords,
     } as GradientCoords<T>;
-    this.colorStops = colorStops.slice();
+    this.colorStops = colorStops.map((colorStop) => ({
+      color: colorStop.color,
+      offset: colorStop.offset,
+      opacity: colorStop.opacity,
+    }));
   }
 
   // isType<S extends GradientType>(type: S): this is Gradient<S> {
