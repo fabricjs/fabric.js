@@ -1,4 +1,3 @@
-import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
@@ -133,11 +132,9 @@ export class Gradient<
    */
   addColorStop(colorStops: Record<string, string>) {
     for (const position in colorStops) {
-      const color = new Color(colorStops[position]);
       this.colorStops.push({
         offset: parseFloat(position),
-        color: color.toRgb(),
-        opacity: color.getAlpha(),
+        color: colorStops[position],
       });
     }
     return this;
@@ -269,15 +266,9 @@ export class Gradient<
       }
     }
 
-    colorStops.forEach(({ color, offset, opacity }) => {
+    colorStops.forEach(({ color, offset }) => {
       markup.push(
-        '<stop ',
-        'offset="',
-        offset * 100 + '%',
-        '" style="stop-color:',
-        color,
-        typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';',
-        '"/>\n'
+        `<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`
       );
     });
 
