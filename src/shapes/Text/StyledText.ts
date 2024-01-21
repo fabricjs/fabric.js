@@ -188,18 +188,17 @@ export abstract class StyledText<
       this._setLineStyle(lineIndex);
     }
 
-    // first create a new object that is a merge of existing and new
-    const newStyle: TextStyleDeclaration = {
-      ...this._getStyleDeclaration(lineIndex, charIndex),
-      ...style,
-    };
-
-    // then delete what is undefined in styles from newStyle
-    Object.keys(style).forEach((key) => {
-      if (style[key as keyof TextStyleDeclaration] === undefined) {
-        delete newStyle[key as keyof TextStyleDeclaration];
-      }
-    });
+    const newStyle = Object.fromEntries(
+      Object.entries({
+        // first create a new object that is a merge of existing and new
+        ...this._getStyleDeclaration(lineIndex, charIndex),
+        ...style,
+      }).filter(
+        // then filter out any undefined value
+        ([key, value]) => value !== undefined
+      )
+      // finally 'fromEntries' will create the new object
+    );
 
     // finally assign to the old position the new style
     this._setStyleDeclaration(lineIndex, charIndex, newStyle);
