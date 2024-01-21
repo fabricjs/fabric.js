@@ -45,10 +45,19 @@ import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
 
-export type TCanvasSizeOptions = {
-  backstoreOnly?: boolean;
-  cssOnly?: boolean;
-};
+/**
+ * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
+ * Better try to restrict with types to avoid confusion.
+ */
+export type TCanvasSizeOptions =
+  | {
+      backstoreOnly?: true;
+      cssOnly?: false;
+    }
+  | {
+      backstoreOnly?: false;
+      cssOnly?: true;
+    };
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
@@ -323,14 +332,11 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    */
   setDimensions(
-    dimensions: Partial<TSize>,
-    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+    dimensions: Partial<TSize | CSSDimensions>,
+    options: TCanvasSizeOptions = {}
   ) {
-    this._setDimensionsImpl(dimensions, {
-      cssOnly,
-      backstoreOnly,
-    });
-    if (!cssOnly) {
+    this._setDimensionsImpl(dimensions, options);
+    if (!options.cssOnly) {
       this.requestRenderAll();
     }
   }
