@@ -19,11 +19,30 @@ import { getObjectBounds } from './utils';
  *
  * In charge of calculating the bounding box of the passed objects.
  */
-export abstract class LayoutStrategy {
+export class LayoutStrategy {
   /**
    * override by subclass for persistence (TS does not support `static abstract`)
    */
   static type = 'strategy';
+
+  /**
+   * This method handles the specific case of using {@link Group#fromObject}
+   * by skipping the {@link LAYOUT_TYPE_INITIALIZATION} layout.
+   * Therefore, it keeps the exact layout the group had when {@link Group#toObject} was called.
+   * It is not meant to be used in any other case.
+   * We could have used a boolean in the constructor of {@link LayoutStrategy} or {@link Group}, as we did previously,
+   * but we thought that would create confusion, therefore it was moved here.
+   */
+  static fromObject() {
+    const instance = new this();
+    instance._fromObject = true;
+    return instance;
+  }
+
+  /**
+   * Indicates that {@link LAYOUT_TYPE_INITIALIZATION} layout should be skipped because layout data is ready.
+   */
+  protected _fromObject = false;
 
   /**
    * Used by the `LayoutManager` to perform layout
@@ -40,7 +59,7 @@ export abstract class LayoutStrategy {
 
   shouldPerformLayout(context: StrictLayoutContext) {
     return (
-      context.type === LAYOUT_TYPE_INITIALIZATION ||
+      (context.type === LAYOUT_TYPE_INITIALIZATION && !this._fromObject) ||
       context.type === LAYOUT_TYPE_IMPERATIVE ||
       (!!context.prevStrategy && context.strategy !== context.prevStrategy)
     );

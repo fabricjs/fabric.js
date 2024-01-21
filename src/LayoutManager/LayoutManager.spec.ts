@@ -3,6 +3,7 @@ import { Point } from '../Point';
 import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
+import { Rect } from '../shapes/Rect';
 import { LayoutManager } from './LayoutManager';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
@@ -737,6 +738,31 @@ describe('Layout Manager', () => {
       expect(
         Array.from(group.layoutManager['_subscriptions'].keys())
       ).toMatchObject([child]);
+    });
+
+    it('should subscribe objects when created `fromObject`', async () => {
+      const objectData = {
+        width: 2,
+        height: 3,
+        left: 6,
+        top: 4,
+        strokeWidth: 0,
+        objects: [
+          new Rect({
+            width: 100,
+            height: 100,
+            top: 0,
+            left: 0,
+            strokeWidth: 0,
+          }).toObject(),
+        ],
+      };
+
+      const group = await Group.fromObject(objectData);
+      const rect = group.item(0);
+      expect(
+        Array.from(group.layoutManager['_subscriptions'].keys())
+      ).toMatchObject([rect]);
     });
 
     test.each([true, false])(

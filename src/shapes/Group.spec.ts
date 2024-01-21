@@ -49,6 +49,7 @@ describe('Group', () => {
     };
 
     const group = await Group.fromObject(objectData);
+    expect(group.layoutManager.strategy['_fromObject']).toBeTruthy();
     expect(group.width).toBe(objectData.width);
     expect(group.height).toBe(objectData.height);
     expect(group.left).toBe(objectData.left);

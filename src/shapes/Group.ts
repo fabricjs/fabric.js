@@ -28,18 +28,7 @@ import {
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
 import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
-import type { FitContentLayout } from '../LayoutManager';
-
-/**
- * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
- * We could have used a boolean in the constructor, as we did previously, but we think the boolean
- * would stay in the group's constructor interface and create confusion, therefore it was removed.
- * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
- */
-class NoopLayoutManager extends LayoutManager {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  performLayout() {}
-}
+import { FitContentLayout } from '../LayoutManager';
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
   'layout:before': LayoutBeforeEvent;
@@ -649,31 +638,34 @@ export class Group
   static fromObject<T extends TOptions<SerializedGroupProps>>({
     type,
     objects = [],
-    layoutManager,
+    layoutManager: layoutManagerOptions,
     ...options
   }: T) {
     return Promise.all([
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      const group = new this(objects, {
+      const LayoutStrategyClass = layoutManagerOptions
+        ? classRegistry.getClass<typeof FitContentLayout>(
+            layoutManagerOptions.strategy
+          )
+        : FitContentLayout;
+      const LayoutManagerClass = layoutManagerOptions
+        ? classRegistry.getClass<typeof LayoutManager>(
+            layoutManagerOptions.type
+          )
+        : LayoutManager;
+
+      return new this(objects, {
         ...options,
         ...hydratedOptions,
-        layoutManager: new NoopLayoutManager(),
+        layoutManager: new LayoutManagerClass(
+          /**
+           * create a strategy that will skip {@link LAYOUT_TYPE_INITIALIZATION} layout
+           */
+          LayoutStrategyClass.fromObject()
+        ),
       });
-      if (layoutManager) {
-        const layoutClass = classRegistry.getClass<typeof LayoutManager>(
-          layoutManager.type
-        );
-        const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
-          layoutManager.strategy
-        );
-        group.layoutManager = new layoutClass(new strategyClass());
-      } else {
-        group.layoutManager = new LayoutManager();
-      }
-      group.setCoords();
-      return group;
     });
   }
 }
