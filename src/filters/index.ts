@@ -7,6 +7,6 @@ export {
 } from './FilterBackend';
 export { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 export { WebGLFilterBackend } from './WebGLFilterBackend';
-export { isWebGLPipelineState } from './utils';
+export { isWebGLPipelineState, isPutImageFaster } from './utils';
 
 export * from './typedefs';
