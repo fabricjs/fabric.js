@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(StaticCanvas): StaticCanvas setDimensions typings [#9618](https://github.com/fabricjs/fabric.js/pull/9618)
+- fix(StyledText): add ability to unset style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
 - CD(): expose vue deployed app [#9615](https://github.com/fabricjs/fabric.js/pull/9615)
 - chore(): Upgrade Rollup to 4.9.5 [#9613](https://github.com/fabricjs/fabric.js/pull/9613)
 - chore(): Upgrade rollup and plugins at latest 3 [#9612](https://github.com/fabricjs/fabric.js/pull/9612)

@@ -6,6 +6,7 @@ import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
 import type { FabricText } from './Text';
 import { pick } from '../../util';
+import { pickBy } from '../../util/misc/pick';
 
 export type CompleteTextStyleDeclaration = Pick<
   FabricText,
@@ -181,18 +182,25 @@ export abstract class StyledText<
     }
   }
 
-  private _extendStyles(index: number, styles: TextStyleDeclaration): void {
+  private _extendStyles(index: number, style: TextStyleDeclaration): void {
     const { lineIndex, charIndex } = this.get2DCursorLocation(index);
 
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
     }
 
-    if (!Object.keys(this._getStyleDeclaration(lineIndex, charIndex)).length) {
-      this._setStyleDeclaration(lineIndex, charIndex, {});
-    }
+    const newStyle = pickBy(
+      {
+        // first create a new object that is a merge of existing and new
+        ...this._getStyleDeclaration(lineIndex, charIndex),
+        ...style,
+        // use the predicate to discard undefined values
+      },
+      (value) => value !== undefined
+    );
 
-    Object.assign(this._getStyleDeclaration(lineIndex, charIndex), styles);
+    // finally assign to the old position the new style
+    this._setStyleDeclaration(lineIndex, charIndex, newStyle);
   }
 
   /**
@@ -243,11 +251,15 @@ export abstract class StyledText<
   }
 
   /**
-   * get the reference, not a clone, of the style object for a given character,
-   * if not style is set for a pre det
+   * Get a reference, not a clone, to the style object for a given character,
+   * if no style is set for a line or char, return a new empty object.
+   * This is tricky and confusing because when you get an empty object you can't
+   * determine if it is a reference or a new one.
+   * @TODO this should always return a reference or always a clone or undefined when necessary.
+   * @protected
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @return {Object} style object a REFERENCE to the existing one or a new empty object
+   * @return {TextStyleDeclaration} a style object reference to the existing one or a new empty object when undefined
    */
   _getStyleDeclaration(
     lineIndex: number,

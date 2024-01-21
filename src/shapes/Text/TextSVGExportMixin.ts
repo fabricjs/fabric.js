@@ -5,7 +5,7 @@ import { colorPropToSVG, createSVGRect } from '../../util/misc/svgParsing';
 import { hasStyleChanged } from '../../util/misc/textStyles';
 import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
-import type { TextStyleDeclaration } from './StyledText';
+import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
 import type { FabricText } from './Text';
 
