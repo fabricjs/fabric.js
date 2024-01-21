@@ -6,6 +6,7 @@ import { styleProperties } from './constants';
 import type { StylePropertiesType } from './constants';
 import type { FabricText } from './Text';
 import { pick } from '../../util';
+import { pickBy } from '../../util/misc/pick';
 
 export type CompleteTextStyleDeclaration = Pick<
   FabricText,
@@ -188,16 +189,14 @@ export abstract class StyledText<
       this._setLineStyle(lineIndex);
     }
 
-    const newStyle = Object.fromEntries(
-      Object.entries({
+    const newStyle = pickBy(
+      {
         // first create a new object that is a merge of existing and new
         ...this._getStyleDeclaration(lineIndex, charIndex),
         ...style,
-      }).filter(
-        // then filter out any undefined value
-        ([key, value]) => value !== undefined
-      )
-      // finally 'fromEntries' will create the new object
+        // use the predicate to discard undefined values
+      },
+      (value) => value !== undefined
     );
 
     // finally assign to the old position the new style
