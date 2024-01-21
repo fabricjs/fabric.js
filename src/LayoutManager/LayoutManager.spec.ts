@@ -5,6 +5,7 @@ import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/Rect';
 import { LayoutManager } from './LayoutManager';
+import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
 import {
@@ -740,7 +741,12 @@ describe('Layout Manager', () => {
       ).toMatchObject([child]);
     });
 
-    it('should subscribe objects when created `fromObject`', async () => {
+    describe.each([
+      [FitContentLayout.type, FitContentLayout],
+      [FixedLayout.type, FixedLayout],
+      [ClipPathLayout.type, ClipPathLayout],
+      [undefined, FitContentLayout],
+    ] as const)('fromObject %s', (type, strategy) => {
       const objectData = {
         width: 2,
         height: 3,
@@ -756,13 +762,32 @@ describe('Layout Manager', () => {
             strokeWidth: 0,
           }).toObject(),
         ],
+        clipPath: new Rect({
+          width: 50,
+          height: 50,
+          top: 0,
+          left: 0,
+          strokeWidth: 0,
+        }).toObject(),
+        layoutManager: {
+          strategy: type,
+        },
       };
+      it('should subscribe objects', async () => {
+        const group = await Group.fromObject(objectData);
+        const rect = group.item(0);
+        expect(
+          Array.from(group.layoutManager['_subscriptions'].keys())
+        ).toMatchObject([rect]);
+      });
 
-      const group = await Group.fromObject(objectData);
-      const rect = group.item(0);
-      expect(
-        Array.from(group.layoutManager['_subscriptions'].keys())
-      ).toMatchObject([rect]);
+      it('should skip initialization layout', async () => {
+        const spy = jest.spyOn(strategy.prototype, 'shouldPerformLayout');
+        const group = await Group.fromObject(objectData);
+        expect(group.layoutManager.strategy['_fromObject']).toBeTruthy();
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveReturnedWith(false);
+      });
     });
 
     test.each([true, false])(
