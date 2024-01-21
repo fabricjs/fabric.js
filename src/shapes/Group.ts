@@ -645,12 +645,12 @@ export class Group
       enlivenObjects<FabricObject>(objects),
       enlivenObjectEnlivables(options),
     ]).then(([objects, hydratedOptions]) => {
-      const LayoutStrategyClass = layoutManagerOptions
+      const LayoutStrategyClass = layoutManagerOptions?.strategy
         ? classRegistry.getClass<typeof FitContentLayout>(
             layoutManagerOptions.strategy
           )
         : FitContentLayout;
-      const LayoutManagerClass = layoutManagerOptions
+      const LayoutManagerClass = layoutManagerOptions?.type
         ? classRegistry.getClass<typeof LayoutManager>(
             layoutManagerOptions.type
           )

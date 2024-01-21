@@ -21,8 +21,8 @@ import { classRegistry } from '../ClassRegistry';
 const LAYOUT_MANAGER = 'layoutManager';
 
 export type SerializedLayoutManager = {
-  type: string;
-  strategy: string;
+  type?: string;
+  strategy?: string;
 };
 
 export class LayoutManager {
