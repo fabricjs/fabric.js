@@ -149,8 +149,8 @@ export class Gradient<
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
-      coords: this.coords,
-      colorStops: this.colorStops,
+      coords: { ...this.coords },
+      colorStops: this.colorStops.map((colorStop) => ({ ...colorStop })),
       offsetX: this.offsetX,
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
