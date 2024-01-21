@@ -144,7 +144,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       : this.options.strokeMiterLimit;
 
     if (
-      magnitude(miterVector) / this.strokeProjectionMagnitude <=
+      Math.abs(magnitude(miterVector) / this.strokeProjectionMagnitude) <=
       strokeMiterLimit
     ) {
       projections.push(this.applySkew(this.A.add(miterVector)));
