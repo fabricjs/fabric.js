@@ -2,6 +2,7 @@
 
 ## [next]
 
+- WIP chore(): Remove over-protective cloneDeep from fromObject [#9621](https://github.com/fabricjs/fabric.js/pull/9621)
 - fix(StyledText): add ability to unset style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
 - CD(): expose vue deployed app [#9615](https://github.com/fabricjs/fabric.js/pull/9615)
 - chore(): Upgrade Rollup to 4.9.5 [#9613](https://github.com/fabricjs/fabric.js/pull/9613)
