@@ -309,13 +309,8 @@ export class Gradient<
             coords.r2
           );
 
-    this.colorStops.forEach(({ color, opacity, offset }) => {
-      gradient.addColorStop(
-        offset,
-        typeof opacity !== 'undefined'
-          ? new Color(color).setAlpha(opacity).toRgba()
-          : color
-      );
+    this.colorStops.forEach(({ color, offset }) => {
+      gradient.addColorStop(offset, color);
     });
 
     return gradient;
