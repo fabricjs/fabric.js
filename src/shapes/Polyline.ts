@@ -18,6 +18,7 @@ import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
+import type { _getTransformedDimensionsParams } from './Object/ObjectOrigin';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   /**
@@ -163,10 +164,14 @@ export class Polyline<
       bboxNoStroke = makeBoundingBoxFromPoints(
         this.points.map((p) => transformPoint(p, matrix, true))
       ),
+      // @TODO it is very strange that we allow for scaleX and scaleY in the options
+      // but then here we don't use them
       scale = new Point(this.scaleX, this.scaleY);
     let offsetX = bbox.left + bbox.width / 2,
       offsetY = bbox.top + bbox.height / 2;
     if (this.exactBoundingBox) {
+      // @TODO it is very strange that we allow for skewX and skewY in the options
+      // but then here we don't use them
       offsetX = offsetX - offsetY * Math.tan(degreesToRadians(this.skewX));
       // Order of those assignments is important.
       // offsetY relies on offsetX being already changed by the line above
@@ -232,33 +237,21 @@ export class Polyline<
   /**
    * @override stroke and skewing are taken into account when projecting stroke on points,
    * therefore we don't want the default calculation to account for skewing as well.
-   * Though it is possible to pass `width` and `height` in `options`, doing so is very strange, use with discretion.
    *
    * @private
    */
-  _getTransformedDimensions(options: any = {}) {
+  _getTransformedDimensions(options: _getTransformedDimensionsParams = {}) {
     if (this.exactBoundingBox) {
       let size: Point;
       /* When `strokeUniform = true`, any changes to the properties require recalculating the `width` and `height` because
         the stroke projections are affected.
         When `strokeUniform = false`, we don't need to recalculate for scale transformations, as the effect of scale on
         projections follows a linear function (e.g. scaleX of 2 just multiply width by 2)*/
-      if (
-        Object.keys(options).some(
-          (key) =>
-            this.strokeUniform ||
-            (this.constructor as typeof Polyline).layoutProperties.includes(
-              key as keyof TProjectStrokeOnPointsOptions
-            )
-        )
-      ) {
+      if (this.strokeUniform || 'skewX' in options || 'skewY' in options) {
         const { width, height } = this._calcDimensions(options);
-        size = new Point(options.width ?? width, options.height ?? height);
+        size = new Point(width, height);
       } else {
-        size = new Point(
-          options.width ?? this.width,
-          options.height ?? this.height
-        );
+        size = new Point(this.width, this.height);
       }
       return size.multiply(
         new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY)

@@ -10,6 +10,13 @@ import type { BaseProps } from './types/BaseProps';
 import type { FillStrokeProps } from './types/FillStrokeProps';
 import { CENTER, LEFT, TOP } from '../../constants';
 
+export type _getTransformedDimensionsParams = {
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
+};
+
 export class ObjectOrigin<EventSpec>
   extends CommonMethods<EventSpec>
   implements BaseProps, Pick<FillStrokeProps, 'strokeWidth' | 'strokeUniform'>
@@ -47,7 +54,9 @@ export class ObjectOrigin<EventSpec>
    * @private
    * @returns {Point} dimensions
    */
-  _getTransformedDimensions(options: any = {}): Point {
+  _getTransformedDimensions(
+    options: _getTransformedDimensionsParams = {}
+  ): Point {
     const {
       scaleX = this.scaleX,
       scaleY = this.scaleY,

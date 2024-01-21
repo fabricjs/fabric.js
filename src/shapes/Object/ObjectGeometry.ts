@@ -22,7 +22,10 @@ import {
 import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
-import { ObjectOrigin } from './ObjectOrigin';
+import {
+  ObjectOrigin,
+  type _getTransformedDimensionsParams,
+} from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
 
@@ -550,7 +553,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @param {object} [options] transform options
    * @returns {Point} dimensions
    */
-  _calculateCurrentDimensions(options?: any): Point {
+  _calculateCurrentDimensions(
+    options?: _getTransformedDimensionsParams
+  ): Point {
     return this._getTransformedDimensions(options)
       .transform(this.getViewportTransform(), true)
       .scalarAdd(2 * this.padding);
