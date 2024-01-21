@@ -48,18 +48,15 @@ export class ObjectOrigin<EventSpec>
    * @returns {Point} dimensions
    */
   _getTransformedDimensions(options: any = {}): Point {
-    const dimOptions = {
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      skewX: this.skewX,
-      skewY: this.skewY,
-      width: this.width,
-      height: this.height,
-      strokeWidth: this.strokeWidth,
-      ...options,
-    };
+    const {
+      scaleX = this.scaleX,
+      scaleY = this.scaleY,
+      skewX = this.skewX,
+      skewY = this.skewY,
+    } = options;
+
     // stroke is applied before/after transformations are applied according to `strokeUniform`
-    const strokeWidth = dimOptions.strokeWidth;
+    const strokeWidth = this.strokeWidth;
     let preScalingStrokeValue = strokeWidth,
       postScalingStrokeValue = 0;
 
@@ -67,20 +64,17 @@ export class ObjectOrigin<EventSpec>
       preScalingStrokeValue = 0;
       postScalingStrokeValue = strokeWidth;
     }
-    const dimX = dimOptions.width + preScalingStrokeValue,
-      dimY = dimOptions.height + preScalingStrokeValue,
-      noSkew = dimOptions.skewX === 0 && dimOptions.skewY === 0;
+    const dimX = this.width + preScalingStrokeValue,
+      dimY = this.height + preScalingStrokeValue,
+      noSkew = skewX === 0 && skewY === 0;
     let finalDimensions;
     if (noSkew) {
-      finalDimensions = new Point(
-        dimX * dimOptions.scaleX,
-        dimY * dimOptions.scaleY
-      );
+      finalDimensions = new Point(dimX * scaleX, dimY * scaleY);
     } else {
       finalDimensions = sizeAfterTransform(
         dimX,
         dimY,
-        calcDimensionsMatrix(dimOptions)
+        calcDimensionsMatrix({ scaleX, scaleY, skewX, skewY })
       );
     }
 
