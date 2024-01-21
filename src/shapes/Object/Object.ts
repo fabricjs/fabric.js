@@ -1571,8 +1571,12 @@ export class FabricObject<
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          // @ts-expect-error different signature
-          return new this(extraParam, enlivedObjectOptions);
+          delete enlivedObjectOptions[extraParam];
+          return new this(
+            serializedObjectOptions[extraParam],
+            // @ts-expect-error different signature
+            enlivedObjectOptions
+          );
         } else {
           return new this(enlivedObjectOptions);
         }
