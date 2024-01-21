@@ -3,6 +3,11 @@
 ## [next]
 
 - fix(StyledText): add ability to unset style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
+- CD(): expose vue deployed app [#9615](https://github.com/fabricjs/fabric.js/pull/9615)
+- chore(): Upgrade Rollup to 4.9.5 [#9613](https://github.com/fabricjs/fabric.js/pull/9613)
+- chore(): Upgrade rollup and plugins at latest 3 [#9612](https://github.com/fabricjs/fabric.js/pull/9612)
+- fix(WebGLFilterBackend) Destroy the context of queryWebgl test function, remove automatic perf checkup, make it explicit with a function [#8932](https://github.com/fabricjs/fabric.js/pull/8932)
+- tests(): migrate target hit tests to jest and drag and drop test to playwright [#9333](https://github.com/fabricjs/fabric.js/pull/9333)
 - fix(SVGParser): avoid crashing on SVG that use @import css feature [#9602](https://github.com/fabricjs/fabric.js/pull/9602)
 - fix(): compositionEnd event handler is not registered correctly. (regression from f91362c ) [#9610](https://github.com/fabricjs/fabric.js/pull/9610)
 - ci(): Add a test case from the multiple selection use case for groups [#9599](https://github.com/fabricjs/fabric.js/pull/9599)

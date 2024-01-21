@@ -1,4 +1,3 @@
-import { getFabricWindow } from '../env';
 import { config } from '../config';
 import { createCanvasElement } from '../util/misc/dom';
 import type {
@@ -66,50 +65,6 @@ export class WebGLFilterBackend {
   setupGLContext(width: number, height: number): void {
     this.dispose();
     this.createWebGLCanvas(width, height);
-    // eslint-disable-next-line
-    this.chooseFastestCopyGLTo2DMethod(width, height);
-  }
-
-  /**
-   * Pick a method to copy data from GL context to 2d canvas.  In some browsers using
-   * drawImage should be faster, but is also bugged for a small combination of old hardware
-   * and drivers.
-   * putImageData is faster than drawImage for that specific operation.
-   */
-  chooseFastestCopyGLTo2DMethod(width: number, height: number): void {
-    const targetCanvas = createCanvasElement();
-    // eslint-disable-next-line no-undef
-    const imageBuffer = new ArrayBuffer(width * height * 4);
-    if (config.forceGLPutImageData) {
-      this.imageBuffer = imageBuffer;
-      this.copyGLTo2D = copyGLTo2DPutImageData;
-      return;
-    }
-
-    const testContext = {
-      imageBuffer: imageBuffer,
-    } as unknown as Required<WebGLFilterBackend>;
-    const testPipelineState = {
-      destinationWidth: width,
-      destinationHeight: height,
-      targetCanvas: targetCanvas,
-    } as unknown as TWebGLPipelineState;
-    let startTime;
-    targetCanvas.width = width;
-    targetCanvas.height = height;
-
-    startTime = getFabricWindow().performance.now();
-    this.copyGLTo2D.call(testContext, this.gl, testPipelineState);
-    const drawImageTime = getFabricWindow().performance.now() - startTime;
-
-    startTime = getFabricWindow().performance.now();
-    copyGLTo2DPutImageData.call(testContext, this.gl, testPipelineState);
-    const putImageDataTime = getFabricWindow().performance.now() - startTime;
-
-    if (drawImageTime > putImageDataTime) {
-      this.imageBuffer = imageBuffer;
-      this.copyGLTo2D = copyGLTo2DPutImageData;
-    }
   }
 
   /**
@@ -389,6 +344,35 @@ export class WebGLFilterBackend {
   }
 
   /**
+   * Copy an input WebGL canvas on to an output 2D canvas using 2d canvas' putImageData
+   * API. Measurably faster than using ctx.drawImage in Firefox (version 54 on OSX Sierra).
+   *
+   * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
+   * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
+   * @param {Object} pipelineState The 2D target canvas to copy on to.
+   */
+  copyGLTo2DPutImageData(
+    this: Required<WebGLFilterBackend>,
+    gl: WebGLRenderingContext,
+    pipelineState: TWebGLPipelineState
+  ) {
+    const targetCanvas = pipelineState.targetCanvas,
+      ctx = targetCanvas.getContext('2d'),
+      dWidth = pipelineState.destinationWidth,
+      dHeight = pipelineState.destinationHeight,
+      numBytes = dWidth * dHeight * 4;
+    if (!ctx) {
+      return;
+    }
+    const u8 = new Uint8Array(this.imageBuffer, 0, numBytes);
+    const u8Clamped = new Uint8ClampedArray(this.imageBuffer, 0, numBytes);
+
+    gl.readPixels(0, 0, dWidth, dHeight, gl.RGBA, gl.UNSIGNED_BYTE, u8);
+    const imgData = new ImageData(u8Clamped, dWidth, dHeight);
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  /**
    * Attempt to extract GPU information strings from a WebGL context.
    *
    * Useful information when debugging or blacklisting specific GPUs.
@@ -431,33 +415,4 @@ function resizeCanvasIfNeeded(pipelineState: TWebGLPipelineState): void {
     targetCanvas.width = dWidth;
     targetCanvas.height = dHeight;
   }
-}
-
-/**
- * Copy an input WebGL canvas on to an output 2D canvas using 2d canvas' putImageData
- * API. Measurably faster than using ctx.drawImage in Firefox (version 54 on OSX Sierra).
- *
- * @param {WebGLRenderingContext} sourceContext The WebGL context to copy from.
- * @param {HTMLCanvasElement} targetCanvas The 2D target canvas to copy on to.
- * @param {Object} pipelineState The 2D target canvas to copy on to.
- */
-function copyGLTo2DPutImageData(
-  this: Required<WebGLFilterBackend>,
-  gl: WebGLRenderingContext,
-  pipelineState: TWebGLPipelineState
-) {
-  const targetCanvas = pipelineState.targetCanvas,
-    ctx = targetCanvas.getContext('2d'),
-    dWidth = pipelineState.destinationWidth,
-    dHeight = pipelineState.destinationHeight,
-    numBytes = dWidth * dHeight * 4;
-  if (!ctx) {
-    return;
-  }
-  const u8 = new Uint8Array(this.imageBuffer, 0, numBytes);
-  const u8Clamped = new Uint8ClampedArray(this.imageBuffer, 0, numBytes);
-
-  gl.readPixels(0, 0, dWidth, dHeight, gl.RGBA, gl.UNSIGNED_BYTE, u8);
-  const imgData = new ImageData(u8Clamped, dWidth, dHeight);
-  ctx.putImageData(imgData, 0, 0);
 }
