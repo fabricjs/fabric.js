@@ -3,6 +3,9 @@
 ## [next]
 
 - chore(): removed unused code from Path render function
+
+## [6.0.0-beta18]
+
 - fix(StyledText): add ability to unset style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
 - CD(): expose vue deployed app [#9615](https://github.com/fabricjs/fabric.js/pull/9615)
 - chore(): Upgrade Rollup to 4.9.5 [#9613](https://github.com/fabricjs/fabric.js/pull/9613)
