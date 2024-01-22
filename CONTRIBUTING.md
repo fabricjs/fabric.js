@@ -108,7 +108,8 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
   PRs must be backed with relevant tests, follow [TESTING](#-testing). If you never wrote a test or you find our tests unclear to extend, just ask for help.
   Aim to cover 100% of the changes.
 - **Docs** \
-  Add relevant comments to your code if necessary using [JSDoc 3][jsdoc] and update relevant guides.\
+  Update guides if necessary.\
+  Add relevant comments to your code using [JSDoc3][jsdoc], [JSDoc reference supported by TS][tsjsdoc].\
   The generated documentation can be found at [fabricjs.com][docs], see [DOCS](#-improving-docs).
 - **Changelog**\
   Add a concise listing to the [**CHANGELOG**](CHANGELOG.md) describing what has changed or let github actions add the PR title for you.
@@ -128,15 +129,15 @@ It is more than likely you will be requested to change stuff and refine your wor
 [![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
 [![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
 
-| Suite                                                                        | unit (node)                                                                                              | e2e (browser)                                                                                                                                                                                                                               |
-| ---------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Framework                                                                    | [`jest`][jest]                                                                                           | [`playwright`][playwright]                                                                                                                                                                                                                  |
-| Setup                                                                        |                                                                                                          | <pre>npm run build -- -f -w</pre>                                                                                                                                                                                                           |
-| Running Tests<br><br><br><br><br><pre>\<test cmd\> -- [filter] [watch]</pre> | <pre>npm run test:jest -- [filters] [-w]</pre><br><br><br>It is advised to use filters to save time.<br> | <pre>npm run test:e2e -- [filters] [--ui]</pre><br>In some machines babel is flaky and doesn't build the test files. In that is the case, try running the command using `npx` directly, see [`playwright.setup.ts`](./playwright.setup.ts). |
-| Writing Tests                                                                | Add/update `src/*.(spec\|test).ts` files                                                                 | - Update tests in `e2e/tests`<br>- Create a new test based on `e2e/template`                                                                                                                                                                |
-| Test Gen                                                                     |                                                                                                          | <pre>npm start vanilla<br>npx playwright codegen http://localhost:1234</pre>                                                                                                                                                                |
-| Test Spec                                                                    |                                                                                                          | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br>                                                                                                                                                        |
-| Outputs                                                                      | Snapshots next to the test file                                                                          | - Snapshots next to the test file <br>- `e2e/test-report`<br>- `e2e/test-results`                                                                                                                                                           |
+| Suite                                                                                                         | unit (node)                                    | e2e (browser)                                                                        |
+| ------------------------------------------------------------------------------------------------------------- | :--------------------------------------------- | :----------------------------------------------------------------------------------- |
+| Framework                                                                                                     | [`jest`][jest]                                 | [`playwright`][playwright]                                                           |
+| Setup                                                                                                         |                                                | <pre>npm run build -- -f -w</pre>                                                    |
+| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>npm run test:jest -- [filters] [-w]</pre> | <pre>npm run test:e2e -- [filters] [--ui]</pre>                                      |
+| Writing Tests                                                                                                 | Add/update `src/*.(spec\|test).ts` files       | - Update tests in `e2e/tests`<br>- Create a new test based on `e2e/template`         |
+| Test Gen                                                                                                      |                                                | <pre>npm start vanilla<br>npx playwright codegen http://localhost:1234</pre>         |
+| Test Spec                                                                                                     |                                                | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br> |
+| Outputs                                                                                                       | Snapshots next to the test file                | - Snapshots next to the test file <br>- `e2e/test-report`<br>- `e2e/test-results`    |
 
 ### Legacy Test Suite
 
@@ -263,6 +264,7 @@ Don't forget to unlink the package once you're done.
 [prettier_extension]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
 [eslint]: https://eslint.org/
 [jsdoc]: https://jsdoc.app/
+[tsjsdoc]: https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
 [playwright]: https://playwright.dev/
 [jest]: https://jestjs.io/
 [qunit]: https://qunitjs.com/

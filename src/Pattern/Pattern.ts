@@ -11,6 +11,7 @@ import type {
   PatternOptions,
   SerializedPatternOptions,
 } from './types';
+import { log } from '../util/internals/console';
 
 /**
  * @see {@link http://fabricjs.com/patterns demo}
@@ -32,7 +33,7 @@ export class Pattern {
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**
@@ -91,7 +92,7 @@ export class Pattern {
    * @param {Object} [options] Options object
    * @param {option.source} [source] the pattern source, eventually empty or a drawable
    */
-  constructor(options: PatternOptions = {}) {
+  constructor(options: PatternOptions) {
     this.id = uid();
     Object.assign(this, options);
   }
@@ -191,7 +192,7 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { source, ...serialized }: SerializedPatternOptions,
+    { type, source, ...serialized }: SerializedPatternOptions,
     options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {

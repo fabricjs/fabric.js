@@ -1,7 +1,6 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
@@ -10,21 +9,16 @@ import { ITextKeyBehavior } from './ITextKeyBehavior';
 import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 
-// TODO: this code seems wrong.
-// e.button for a left click is `0` and so different than `1` is more
-// not a right click. PR 3888 introduced this code and was about left clicks.
-function notALeftClick(e: MouseEvent) {
-  return e.button && e.button !== 1;
-}
+/**
+ * `LEFT_CLICK === 0`
+ */
+const notALeftClick = (e: Event) => !!(e as MouseEvent).button;
 
 export abstract class ITextClickBehavior<
-    Props extends TOptions<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
-    EventSpec extends ITextEvents = ITextEvents
-  >
-  extends ITextKeyBehavior<Props, SProps, EventSpec>
-  implements DragMethods
-{
+  Props extends TOptions<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ITextEvents = ITextEvents
+> extends ITextKeyBehavior<Props, SProps, EventSpec> {
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
@@ -90,7 +84,7 @@ export abstract class ITextClickBehavior<
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
-    this.__lastSelected = this.selected;
+    this.__lastSelected = this.selected && !this.getActiveControl();
   }
 
   isTripleClick(newPointer: XY) {
@@ -134,7 +128,7 @@ export abstract class ITextClickBehavior<
     if (
       !this.canvas ||
       !this.editable ||
-      notALeftClick(e as MouseEvent) ||
+      notALeftClick(e) ||
       this.getActiveControl()
     ) {
       return;
@@ -166,7 +160,7 @@ export abstract class ITextClickBehavior<
    * Scope of this implementation is: verify the object is already selected when mousing down
    */
   _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || notALeftClick(e as MouseEvent)) {
+    if (!this.canvas || !this.editable || notALeftClick(e)) {
       return;
     }
     // we want to avoid that an object that was selected and then becomes unselectable,
@@ -178,7 +172,7 @@ export abstract class ITextClickBehavior<
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler({ e, transform, button }: TPointerEventInfo) {
+  mouseUpHandler({ e, transform }: TPointerEventInfo) {
     const didDrag = this.draggableTextDelegate.end(e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
@@ -195,7 +189,7 @@ export abstract class ITextClickBehavior<
       !this.editable ||
       (this.group && !this.group.interactive) ||
       (transform && transform.actionPerformed) ||
-      notALeftClick(e as MouseEvent) ||
+      notALeftClick(e) ||
       didDrag
     ) {
       return;
@@ -241,7 +235,7 @@ export abstract class ITextClickBehavior<
    * @return {Number} Index of a character
    */
   getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.canvas!.getPointer(e)
+    const mouseOffset = this.canvas!.getScenePoint(e)
       .transform(invertTransform(this.calcTransformMatrix()))
       .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,

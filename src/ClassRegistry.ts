@@ -1,3 +1,5 @@
+import { FabricError } from './util/internals/console';
+
 /*
  * This Map connects the objects type value with their
  * class implementation. It used from any object to understand which are

@@ -1,0 +1,27 @@
+{
+  "name": "vue",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+  },
+  "dependencies": {
+    "fabric": "file:../../..",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.2",
+    "@types/node": "^18.18.5",
+    "@vitejs/plugin-vue": "^4.4.0",
+    "@vitejs/plugin-vue-jsx": "^3.0.2",
+    "@vue/tsconfig": "^0.4.0",
+    "npm-run-all2": "^6.1.1",
+    "typescript": "~5.2.0",
+    "vite": "^4.4.11",
+    "vue-tsc": "^1.8.19"
+  }
+}

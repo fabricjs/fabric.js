@@ -5,7 +5,7 @@ import type {
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { FabricObject } from '../Object/FabricObject';
-import { Text } from '../Text/Text';
+import { FabricText } from '../Text/Text';
 import { animate } from '../../util/animation/animate';
 import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
@@ -14,6 +14,7 @@ import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
+import type { IText } from './IText';
 
 /**
  *  extend this regex to support non english languages
@@ -42,7 +43,7 @@ export abstract class ITextBehavior<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents
-> extends Text<Props, SProps, EventSpec> {
+> extends FabricText<Props, SProps, EventSpec> {
   declare abstract isEditing: boolean;
   declare abstract cursorDelay: number;
   declare abstract selectionStart: number;
@@ -404,7 +405,7 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * called by {@link canvas#textEditingManager}
+   * called by {@link Canvas#textEditingManager}
    */
   updateSelectionOnMouseMove(e: TPointerEvent) {
     if (this.getActiveControl()) {
@@ -689,8 +690,9 @@ export abstract class ITextBehavior<
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
     if (this.canvas) {
-      // @ts-expect-error in reality it is an IText instance
-      this.canvas.fire('text:editing:exited', { target: this });
+      this.canvas.fire('text:editing:exited', {
+        target: this as unknown as IText,
+      });
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
     return this;
@@ -804,9 +806,10 @@ export abstract class ITextBehavior<
     copiedStyle?: { [index: number]: TextStyleDeclaration }
   ) {
     const newLineStyles: { [index: number]: TextStyleDeclaration } = {};
-    const isEndOfLine =
-      this._unwrappedTextLines[lineIndex].length === charIndex;
-    let somethingAdded = false;
+    const originalLineLength = this._unwrappedTextLines[lineIndex].length;
+    const isEndOfLine = originalLineLength === charIndex;
+
+    let someStyleIsCarryingOver = false;
     qty || (qty = 1);
     this.shiftLineStyles(lineIndex, qty);
     const currentCharStyle = this.styles[lineIndex]
@@ -818,7 +821,7 @@ export abstract class ITextBehavior<
     for (const index in this.styles[lineIndex]) {
       const numIndex = parseInt(index, 10);
       if (numIndex >= charIndex) {
-        somethingAdded = true;
+        someStyleIsCarryingOver = true;
         newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
         // remove lines from the previous line since they're on a new line now
         if (!(isEndOfLine && charIndex === 0)) {
@@ -827,14 +830,16 @@ export abstract class ITextBehavior<
       }
     }
     let styleCarriedOver = false;
-    if (somethingAdded && !isEndOfLine) {
+    if (someStyleIsCarryingOver && !isEndOfLine) {
       // if is end of line, the extra style we copied
       // is probably not something we want
       this.styles[lineIndex + qty] = newLineStyles;
       styleCarriedOver = true;
     }
-    if (styleCarriedOver) {
+    if (styleCarriedOver || originalLineLength > charIndex) {
       // skip the last line of since we already prepared it.
+      // or contains text without style that we don't want to style
+      // just because it changed lines
       qty--;
     }
     // for the all the lines or all the other lines

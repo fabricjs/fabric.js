@@ -1,10 +1,17 @@
 import { noop } from '../../constants';
 import type { BaseFilter } from '../../filters/BaseFilter';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
-import type { Abortable, TCrossOrigin, TFiller } from '../../typedefs';
+import type {
+  Abortable,
+  Constructor,
+  TCrossOrigin,
+  TFiller,
+} from '../../typedefs';
 import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
 import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
+import { FabricError, SignalAbortedError } from '../internals/console';
+import type { Gradient } from '../../gradient';
 
 export type LoadImageOptions = Abortable & {
   /**
@@ -25,7 +32,7 @@ export const loadImage = (
 ) =>
   new Promise<HTMLImageElement>(function (resolve, reject) {
     if (signal && signal.aborted) {
-      return reject(new Error('`options.signal` is in `aborted` state'));
+      return reject(new SignalAbortedError('loadImage'));
     }
     const img = createImage();
     let abort: EventListenerOrEventListenerObject;
@@ -48,7 +55,7 @@ export const loadImage = (
     img.onload = done;
     img.onerror = function () {
       abort && signal?.removeEventListener('abort', abort);
-      reject(new Error('Error loading ' + img.src));
+      reject(new FabricError(`Error loading ${img.src}`));
     };
     crossOrigin && (img.crossOrigin = crossOrigin);
     img.src = url;
@@ -84,17 +91,16 @@ export const enlivenObjects = <
     const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     Promise.all(
-      objects.map(async (obj) => {
-        const fabricInstance = await classRegistry
+      objects.map((obj) =>
+        classRegistry
           .getClass<T>(obj.type)
-          .fromObject(obj, {
-            signal,
-            reviver,
-          });
-        reviver(obj, fabricInstance);
-        instances.push(fabricInstance);
-        return fabricInstance;
-      })
+          .fromObject(obj, { signal, reviver })
+          .then((fabricInstance) => {
+            reviver(obj, fabricInstance);
+            instances.push(fabricInstance);
+            return fabricInstance;
+          })
+      )
     )
       .then(resolve)
       .catch((error) => {

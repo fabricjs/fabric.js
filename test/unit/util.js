@@ -734,156 +734,6 @@
     assert.equal(Math.round(tp.y), 8);
   });
 
-  /**
-   *
-   * @param {*} actual
-   * @param {*} expected
-   * @param {*} [message]
-   * @param {number} [error] floating point precision, defaults to 10
-   */
-  QUnit.assert.matrixIsEqualEnough = function (actual, expected, message, error) {
-    var error = Math.pow(10, error ? -error : -10);
-    this.pushResult({
-      result: actual.every((x, i) => Math.abs(x - expected[i]) < error),
-      actual: actual,
-      expected: expected,
-      message: message
-    })
-  }
-
-  QUnit.test('calcPlaneChangeMatrix', function (assert) {
-    assert.ok(typeof fabric.util.calcPlaneChangeMatrix === 'function');
-    const m1 = [1, 2, 3, 4, 5, 6];
-    const s = [2, 0, 0, 0.5, 0, 0];
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(), fabric.iMatrix);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(undefined, m1), fabric.util.invertTransform(m1));
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(fabric.iMatrix, m1), fabric.util.invertTransform(m1));
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, undefined), m1);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, fabric.iMatrix), m1);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, m1), fabric.iMatrix);
-    assert.deepEqual(fabric.util.calcPlaneChangeMatrix(m1, s), fabric.util.multiplyTransformMatrices(fabric.util.invertTransform(s), m1));
-  })
-
-  QUnit.test('sendPointToPlane', function (assert) {
-    assert.ok(typeof fabric.util.sendPointToPlane === 'function');
-    var m1 = [3, 0, 0, 2, 10, 4],
-      m2 = [1, 2, 3, 4, 5, 6],
-      p, t,
-      obj1 = new fabric.Object(),
-      obj2 = new fabric.Object(),
-      point = new fabric.Point(2, 2),
-      applyTransformToObject = fabric.util.applyTransformToObject,
-      invert = fabric.util.invertTransform,
-      multiply = fabric.util.multiplyTransformMatrices,
-      transformPoint = fabric.util.transformPoint;
-
-    function sendPointToPlane(point, from, to, relationFrom, relationTo) {
-      return fabric.util.sendPointToPlane(
-        point,
-        from ?
-          relationFrom === 'child' ? from.calcTransformMatrix() : from.group?.calcTransformMatrix() :
-          undefined,
-        to ?
-          relationTo === 'child' ? to.calcTransformMatrix() : to.group?.calcTransformMatrix() :
-          undefined
-      );
-    }
-
-    applyTransformToObject(obj1, m1);
-    applyTransformToObject(obj2, m2);
-    obj1.group = new fabric.Object();
-    obj2.group = new fabric.Object();
-    applyTransformToObject(obj1.group, m1);
-    applyTransformToObject(obj2.group, m2);
-    p = sendPointToPlane(point, obj1, obj2, 'child', 'child');
-    t = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, obj1, obj2, 'sibling', 'child');
-    t = multiply(invert(obj2.calcTransformMatrix()), obj1.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, obj1, obj2, 'child', 'sibling');
-    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, obj1, obj2, 'sibling', 'sibling');
-    t = multiply(invert(obj2.group.calcTransformMatrix()), obj1.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-    p = sendPointToPlane(point, null, obj2, null, 'sibling');
-    t = invert(obj2.group.calcTransformMatrix());
-    assert.deepEqual(p, transformPoint(point, t));
-
-    var obj = new fabric.Rect({ left: 20, top: 20, width: 60, height: 60, strokeWidth: 0 });
-    var group = new fabric.Group([obj], { strokeWidth: 0 });
-    var sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, obj, null, 'sibling');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    sentPoint = sendPointToPlane(new fabric.Point(50, 50), null, group, null, 'child');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    group.scaleX = 2;
-    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, obj, null, 'sibling');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    sentPoint = sendPointToPlane(new fabric.Point(80, 50), null, group, null, 'child');
-    assert.deepEqual(sentPoint, new fabric.Point(0, 0));
-    assert.deepEqual(sendPointToPlane(point), point, 'sending to nowhere, point remains unchanged');
-  });
-
-  QUnit.test('transformPointRelativeToCanvas', function(assert) {
-    assert.ok(typeof fabric.util.transformPointRelativeToCanvas === 'function');
-    var point = new fabric.Point(2, 2);
-    var matrix = [3, 0, 0, 2, 10, 4];
-    var canvas = {
-      viewportTransform: matrix
-    }
-    var transformPoint = fabric.util.transformPoint;
-    var invertTransform = fabric.util.invertTransform;
-    var transformPointRelativeToCanvas = fabric.util.transformPointRelativeToCanvas;
-    var p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'child');
-    assert.deepEqual(p, transformPoint(point, invertTransform(matrix)));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'sibling');
-    assert.deepEqual(p, transformPoint(point, matrix));
-    p = transformPointRelativeToCanvas(point, canvas, 'child', 'child');
-    assert.deepEqual(p, point);
-    p = transformPointRelativeToCanvas(point, canvas, 'sibling', 'sibling');
-    assert.deepEqual(p, point);
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling');
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', true);
-    });
-    assert.throws(function () {
-      transformPointRelativeToCanvas(point, canvas, 'sibling', 'chil');
-    });
-  });
-
-  QUnit.test('sendObjectToPlane', function (assert) {
-    assert.ok(typeof fabric.util.sendObjectToPlane === 'function');
-    var m = [6, Math.SQRT1_2, 0, 3, 2, 1],
-      m1 = [3, 0, 0, 2, 10, 4],
-      m2 = [1, Math.SQRT1_2, Math.SQRT1_2, 4, 5, 6],
-      actual, expected,
-      obj1 = new fabric.Object(),
-      obj2 = new fabric.Object(),
-      obj = new fabric.Object(),
-      sendObjectToPlane = fabric.util.sendObjectToPlane,
-      applyTransformToObject = fabric.util.applyTransformToObject,
-      invert = fabric.util.invertTransform,
-      multiply = fabric.util.multiplyTransformMatrices;
-    //  silence group check
-    obj1.isOnACache = () => false;
-
-    applyTransformToObject(obj, m);
-    applyTransformToObject(obj1, m1);
-    applyTransformToObject(obj2, m2);
-    obj.group = obj1;
-    actual = sendObjectToPlane(obj, obj1.calcTransformMatrix(), obj2.calcTransformMatrix());
-    expected = multiply(invert(obj2.calcTransformMatrix()), obj1.calcTransformMatrix());
-    assert.matrixIsEqualEnough(actual, expected);
-    assert.matrixIsEqualEnough(obj.calcOwnMatrix(), multiply(actual, m));
-    obj.group = obj2;
-    assert.matrixIsEqualEnough(obj.calcTransformMatrix(), multiply(multiply(obj2.calcTransformMatrix(), actual), m));
-    assert.deepEqual(sendObjectToPlane(obj2), fabric.iMatrix, 'sending to nowhere, no transform was applied');
-    assert.matrixIsEqualEnough(obj2.calcOwnMatrix(), m2, 'sending to nowhere, no transform was applied');
-  });
-
   QUnit.test('makeBoundingBoxFromPoints', function(assert) {
     assert.ok(typeof fabric.util.makeBoundingBoxFromPoints === 'function');
     assert.deepEqual(fabric.util.makeBoundingBoxFromPoints([
@@ -1140,8 +990,8 @@
       0.2696723314583158,
       -0.41255083562929973,
       0.37782470175621224,
-      -153.32445710769997,
-      1.7932869074173539,
+      -149.58276216465225,
+      -0.7631646697634125
     ]);
     assert.equal(result.inverted, false, 'the final clipPathB is not inverted')
     assert.equal(result.clipPath, clipPathB, 'clipPathB is the final clipPath');
@@ -1155,12 +1005,12 @@
     var result = fabric.util.mergeClipPaths(clipPathA, clipPathB);
     var resultingMatrix = result.clipPath.calcTransformMatrix();
     var expectedMatrix = roundArray([
-      1.1335,
-      -0.8090,
-      1.2377,
-      1.7634,
-      171.5698,
-      -127.2043,
+      1.1334741052686363,
+      -0.8090169943749471,
+      1.237652506887899,
+      1.7633557568774187,
+      170.49272017489145,
+      -119.66926584287677
     ]);
     assert.equal(result.inverted, false, 'the final clipPathA is not inverted')
     assert.equal(result.clipPath, clipPathA, 'clipPathA is the final clipPath');

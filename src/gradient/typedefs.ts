@@ -66,7 +66,7 @@ export type GradientOptions<T extends GradientType> = {
   type?: T;
   gradientUnits?: GradientUnits;
   colorStops?: ColorStop[];
-  coords: Partial<GradientCoords<T>>;
+  coords?: Partial<GradientCoords<T>>;
   /**
    * @todo rename?
    */

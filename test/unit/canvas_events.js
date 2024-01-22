@@ -26,55 +26,6 @@
     }
   });
 
-  QUnit.test('_beforeTransform', function (assert) {
-    assert.ok(typeof canvas._beforeTransform === 'function');
-
-    var canvasOffset = canvas.calcOffset();
-    var rect = new fabric.Rect({ left: 50, top: 50, width: 50, height: 50 });
-    canvas.add(rect);
-    canvas.setActiveObject(rect);
-
-    var t, counter = 0;
-    canvas.on('before:transform', function (options) {
-      t = options.transform.target;
-      counter++;
-    });
-
-    var corners = ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr'];
-    for (var i = 0; i < corners.length; i++) {
-      var co = rect.oCoords[corners[i]].corner;
-      var e = {
-        clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
-        clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
-        which: 1,
-        target: canvas.upperCanvasEl
-      };
-      canvas._setupCurrentTransform(e, rect);
-    }
-    assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate for all corners');
-    assert.equal(t, rect, 'before:transform should receive correct target');
-
-    canvas.zoomToPoint({ x: 25, y: 25 }, 2);
-
-    t = null;
-    counter = 0;
-    for (var i = 0; i < corners.length; i++) {
-      var c = corners[i];
-      var co = rect.oCoords[c].corner;
-      var e = {
-        clientX: canvasOffset.left + (co.tl.x + co.tr.x) / 2,
-        clientY: canvasOffset.top + (co.tl.y + co.bl.y) / 2,
-        which: 1,
-        target: canvas.upperCanvasEl
-      };
-      canvas._beforeTransform(e, rect);
-    }
-    assert.equal(counter, corners.length, 'before:transform should trigger onBeforeScaleRotate when canvas is zoomed');
-    assert.equal(t, rect, 'before:transform should receive correct target when canvas is zoomed');
-
-    canvas.zoomToPoint({ x: 0, y: 0 }, 1);
-  });
-
   QUnit.test('cache and reset event properties', function(assert) {
     var e = { clientX: 30, clientY: 30, which: 1, target: canvas.upperCanvasEl };
     var rect = new fabric.Rect({ width: 60, height: 60 });
@@ -679,70 +630,6 @@
     assert.deepEqual(targetControl, [], 'no target should be referenced');
   });
 
-  QUnit.test('mouseover and mouseout with subtarget check', function(assert) {
-    var rect1 = new fabric.Rect({ width: 5, height: 5, left: 5, top: 0, strokeWidth: 0, name: 'rect1' });
-    var rect2 = new fabric.Rect({ width: 5, height: 5, left: 5, top: 5, strokeWidth: 0, name: 'rect2' });
-    var rect3 = new fabric.Rect({ width: 5, height: 5, left: 0, top: 5, strokeWidth: 0, name: 'rect3' });
-    var rect4 = new fabric.Rect({ width: 5, height: 5, left: 0, top: 0, strokeWidth: 0, name: 'rect4' });
-    var rect5 = new fabric.Rect({ width: 5, height: 5, left: 2.5, top: 2.5, strokeWidth: 0, name: 'rect5' });
-    var group1 = new fabric.Group([rect1, rect2], { subTargetCheck: true, name: 'group1' });
-    var group2 = new fabric.Group([rect3, rect4], { subTargetCheck: true, name: 'group2' });
-    // a group with 2 groups, with 2 rects each, one group left one group right
-    // each with 2 rects vertically aligned
-    var group = new fabric.Group([group1, group2], { subTargetCheck: true, name: 'group' });
-    var c = new fabric.Canvas();
-    var targetArray = [];
-    var targetOutArray = [];
-    [rect1, rect2, rect3, rect4, rect5, group1, group2, group].forEach(function(t) {
-      t.on('mouseover', function(opt) {
-        targetArray.push(opt.target);
-      });
-      t.on('mouseout', function(opt) {
-        targetOutArray.push(opt.target);
-      });
-    });
-    c.add(group, rect5);
-    simulateEvent(c.upperCanvasEl, 'mousemove', {
-      pointerX: 1, pointerY: 1
-    });
-    assert.equal(targetArray[0], group, 'first hit is group');
-    assert.equal(targetArray[2], group2, 'then hit group2');
-    assert.equal(targetArray[1], rect4, 'then hit rect4');
-    assert.equal(targetOutArray.length, 0, 'no target out');
-
-    targetArray = [];
-    targetOutArray = [];
-    simulateEvent(c.upperCanvasEl, 'mousemove', {
-      pointerX: 5, pointerY: 5
-    });
-    assert.equal(targetArray[0], rect5, 'first hit is target5');
-    assert.equal(targetArray.length, 1, 'only one target');
-    assert.equal(targetOutArray[0], group, 'first targetOutArray is group');
-    assert.equal(targetOutArray[2], group2, 'then targetOutArray group2');
-    assert.equal(targetOutArray[1], rect4, 'then targetOutArray rect4');
-
-    targetArray = [];
-    targetOutArray = [];
-    simulateEvent(c.upperCanvasEl, 'mousemove', {
-      pointerX: 9, pointerY: 9
-    });
-    assert.equal(targetArray[0], group, 'first hit is group');
-    assert.equal(targetArray[2], group1, 'then hit group1');
-    assert.equal(targetArray[1], rect2, 'then hit rect2');
-    assert.equal(targetOutArray.length, 1, 'only one target out when moving away from rect 5');
-    assert.equal(targetOutArray[0], rect5, 'rect5 fires out');
-
-    targetArray = [];
-    targetOutArray = [];
-    simulateEvent(c.upperCanvasEl, 'mousemove', {
-      pointerX: 9, pointerY: 1
-    });
-    assert.equal(targetArray[0], rect1, 'the only target changing is rect1');
-    assert.equal(targetArray.length, 1, 'only one target entering ');
-    assert.equal(targetOutArray.length, 1, 'one target out');
-    assert.equal(targetOutArray[0], rect2, 'the only target out is rect2');
-  });
-
   QUnit.test('Fabric mouseover, mouseout events fire for subTargets when subTargetCheck is enabled', function(assert){
     var done = assert.async();
     var counterOver = 0, counterOut = 0, canvas = new fabric.Canvas();
@@ -759,7 +646,7 @@
       });
     }
     canvas.loadFromJSON(SUB_TARGETS_JSON).then(function() {
-      var activeSelection = canvas.getActiveSelection();
+      var activeSelection = new fabric.ActiveSelection();
       activeSelection.add(...canvas.getObjects());
       canvas.setActiveObject(activeSelection);
       setSubTargetCheckRecursive(activeSelection);

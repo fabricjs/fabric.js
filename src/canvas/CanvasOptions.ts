@@ -4,7 +4,7 @@ import type { StaticCanvasOptions } from './StaticCanvasOptions';
 
 export interface CanvasTransformOptions {
   /**
-   * When true, objects can be transformed by one side (unproportionally)
+   * When true, objects can be transformed by one side (unproportionately)
    * when dragged on the corners that normally would not do that.
    * @type Boolean
    * @default
@@ -258,6 +258,8 @@ export interface CanvasOptions
    */
   preserveObjectStacking: boolean;
 }
+
+export type TCanvasOptions = TOptions<CanvasOptions>;
 
 export const canvasDefaults: TOptions<CanvasOptions> = {
   uniformScaling: true,

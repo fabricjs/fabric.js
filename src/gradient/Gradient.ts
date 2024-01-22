@@ -103,7 +103,7 @@ export class Gradient<
   constructor({
     type = 'linear' as T,
     gradientUnits = 'pixels',
-    coords,
+    coords = {},
     colorStops = [],
     offsetX = 0,
     offsetY = 0,

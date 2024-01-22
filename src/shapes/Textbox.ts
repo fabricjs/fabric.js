@@ -225,9 +225,10 @@ export class Textbox<
   }
 
   /**
+   * @protected
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @private
+   * @return {TextStyleDeclaration} a style object reference to the existing one or a new empty object when undefined
    */
   _getStyleDeclaration(
     lineIndex: number,
@@ -256,10 +257,7 @@ export class Textbox<
     style: object
   ) {
     const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-
-    this.styles[lineIndex][charIndex] = style;
+    super._setStyleDeclaration(map.line, map.offset + charIndex, style);
   }
 
   /**
@@ -267,11 +265,9 @@ export class Textbox<
    * @param {Number} charIndex
    * @private
    */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  protected _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
     const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
+    super._deleteStyleDeclaration(map.line, map.offset + charIndex);
   }
 
   /**
@@ -295,7 +291,7 @@ export class Textbox<
    */
   protected _setLineStyle(lineIndex: number) {
     const map = this._styleMap[lineIndex];
-    this.styles[map.line] = {};
+    super._setLineStyle(map.line);
   }
 
   /**
@@ -339,7 +335,7 @@ export class Textbox<
         : this.wordSplit(line);
 
       if (wordsOrGraphemes.length === 0) {
-        return [];
+        return [{ word: [], width: 0 }];
       }
 
       return wordsOrGraphemes.map((word: string) => {
@@ -349,7 +345,7 @@ export class Textbox<
           : this.graphemeSplit(word);
         const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
-        offset += word.length + infix.length;
+        offset += graphemeArray.length + infix.length;
         return { word: graphemeArray, width };
       });
     });
@@ -498,10 +494,12 @@ export class Textbox<
   /**
    * Detect if a line has a linebreak and so we need to account for it when moving
    * and counting style.
+   * This is important only for splitByGrapheme at the end of wrapping.
+   * If we are not wrapping the offset is always 1
    * @return Number
    */
-  missingNewlineOffset(lineIndex: number) {
-    if (this.splitByGrapheme) {
+  missingNewlineOffset(lineIndex: number, skipWrapping?: boolean): 0 | 1 {
+    if (this.splitByGrapheme && !skipWrapping) {
       return this.isEndOfWrapping(lineIndex) ? 1 : 0;
     }
     return 1;

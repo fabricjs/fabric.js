@@ -38,6 +38,7 @@
 
     assert.ok(group);
     assert.ok(group instanceof fabric.ActiveSelection, 'should be instance of fabric.ActiveSelection');
+    assert.ok(!group.item(0).parent, 'parent ref is undefined');
   });
 
   QUnit.test('toString', function(assert) {
@@ -62,7 +63,7 @@
       width:                    80,
       height:                   60,
       fill:                     'rgb(0,0,0)',
-      layout:                   'fit-content',
+      // layout:                   'fit-content',
       stroke:                   null,
       strokeWidth:              0,
       strokeDashArray:          null,
@@ -87,7 +88,11 @@
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false,
-      objects:                  clone.objects
+      objects:                  clone.objects,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
     };
 
     assert.deepEqual(clone, expectedObject);

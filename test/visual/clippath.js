@@ -91,8 +91,7 @@
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100 }),
       new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
-    ], { strokeWidth: 0 });
-    group.clipPath = clipPath;
+    ], { strokeWidth: 0, clipPath });
     canvas.add(group);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
@@ -105,29 +104,27 @@
     percentage: 0.06,
   });
 
-  // function clipping3(canvas, callback) {
-  //   var clipPath = new fabric.Circle({ radius: 100, top: -100, left: -100 });
-  //   var small = new fabric.Circle({ radius: 50, top: -50, left: -50 });
-  //   var small2 = new fabric.Rect({ width: 30, height: 30, top: -50, left: -50 });
-  //   var group = new fabric.Group([
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'red', clipPath: small }),
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100, clipPath: small2 }),
-  //     new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
-  //   ], { strokeWidth: 0 });
-  //   group.clipPath = clipPath;
-  //   canvas.add(group);
-  //   canvas.renderAll();
-  //   callback(canvas.lowerCanvasEl);
-  // }
+  function clipping3(canvas, callback) {
+    var clipPath = new fabric.Circle({ radius: 100, top: -100, left: -100 });
+    var small = new fabric.Circle({ radius: 50, top: -50, left: -50 });
+    var small2 = new fabric.Rect({ width: 30, height: 30, top: -50, left: -50 });
+    var group = new fabric.Group([
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'red', clipPath: small }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'yellow', left: 100 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'blue', top: 100, clipPath: small2 }),
+      new fabric.Rect({ strokeWidth: 0, width: 100, height: 100, fill: 'green', left: 100, top: 100 })
+    ], { strokeWidth: 0, clipPath });
+    canvas.add(group);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
 
-  // FIX ON NODE
-  // tests.push({
-  //   test: 'Isolation of clipPath of group and inner objects',
-  //   code: clipping3,
-  //   golden: 'clipping3.png',
-  //   percentage: 0.06,
-  // });
+  tests.push({
+    test: 'Isolation of clipPath of group and inner objects',
+    code: clipping3,
+    golden: 'clipping3.png',
+    percentage: 0.06,
+  });
 
   function clipping4(canvas, callback) {
     var clipPath = new fabric.Circle({ radius: 20, strokeWidth: 0, top: -10, left: -10, scaleX: 2, skewY: 45 });

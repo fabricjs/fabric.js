@@ -82,6 +82,36 @@ export class Intersection {
   }
 
   /**
+   * Use the ray casting algorithm to determine if {@link point} is in the polygon defined by {@link points}
+   * @see https://en.wikipedia.org/wiki/Point_in_polygon
+   * @param point
+   * @param points polygon points
+   * @returns
+   */
+  static isPointInPolygon(point: Point, points: Point[]) {
+    const other = new Point(point).setX(
+      Math.min(point.x - 1, ...points.map((p) => p.x))
+    );
+    let hits = 0;
+    for (let index = 0; index < points.length; index++) {
+      const inter = this.intersectSegmentSegment(
+        // polygon side
+        points[index],
+        points[(index + 1) % points.length],
+        // ray
+        point,
+        other
+      );
+      if (inter.includes(point)) {
+        // point is on the polygon side
+        return true;
+      }
+      hits += Number(inter.status === 'Intersection');
+    }
+    return hits % 2 === 1;
+  }
+
+  /**
    * Checks if a line intersects another
    * @see {@link https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection line intersection}
    * @see {@link https://en.wikipedia.org/wiki/Cramer%27s_rule Cramer's rule}
