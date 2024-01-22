@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): removed unused code from Path render function [#9619](https://github.com/fabricjs/fabric.js/pull/9619)
+
 ## [6.0.0-beta18]
 
 - fix(StyledText): add ability to unset style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
