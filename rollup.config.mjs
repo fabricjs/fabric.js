@@ -51,12 +51,11 @@ function onwarn(warning, warn) {
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
     output: [
       // es modules in files
       {
         dir: path.resolve(dirname),
-        name: 'fabric',
         format: 'es',
         preserveModules: true,
         entryFileNames: '[name].mjs',
@@ -65,7 +64,6 @@ export default [
       Number(process.env.MINIFY)
         ? {
             dir: path.resolve(dirname),
-            name: 'fabric',
             format: 'es',
             preserveModules: true,
             entryFileNames: '[name].min.mjs',
@@ -73,6 +71,13 @@ export default [
             plugins: [terser()],
           }
         : null,
+    ],
+    plugins,
+    onwarn,
+  },
+  {
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    output: [
       // es module in bundle
       {
         file: path.resolve(dirname, `${basename}.mjs`),

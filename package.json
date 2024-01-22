@@ -153,6 +153,13 @@
       "node": null,
       "types": "./dist/index.d.ts"
     },
+    "./es": {
+      "import": "./dist/fabric.min.mjs",
+      "require": null,
+      "default": null,
+      "node": null,
+      "types": "./dist/index.d.ts"
+    },
     "./node": {
       "import": "./dist/index.node.mjs",
       "require": "./dist/index.node.cjs",
