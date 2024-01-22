@@ -84,7 +84,6 @@ export default [
         name: 'fabric',
         format: 'es',
         sourcemap: true,
-        plugins: [terser()],
       },
       Number(process.env.MINIFY)
         ? {
