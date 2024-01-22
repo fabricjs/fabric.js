@@ -160,7 +160,7 @@
     assert.ok(typeof shadow.toObject === 'function');
 
     var object = shadow.toObject();
-    assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false}');
+    assert.equal(JSON.stringify(object), '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false,"type":"shadow"}');
   });
 
   QUnit.test('clone with affectStroke', function(assert) {
@@ -177,13 +177,18 @@
     var shadow = new fabric.Shadow();
     shadow.includeDefaultValues = false;
 
-    assert.equal(JSON.stringify(shadow.toObject()), '{}');
+    assert.equal(JSON.stringify(shadow.toObject()), '{"type":"shadow"}');
 
     shadow.color = 'red';
-    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red"}');
+    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","type":"shadow"}');
 
     shadow.offsetX = 15;
-    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15}');
+    assert.equal(JSON.stringify(shadow.toObject()), '{"color":"red","offsetX":15,"type":"shadow"}');
+  });
+
+  QUnit.test('fromObject', assert => {
+    const shadow = fabric.Shadow.fromObject({ color: 'red', offsetX: 15 });
+    assert.ok(shadow instanceof fabric.Shadow);
   });
 
   QUnit.test('toSVG', function(assert) {
