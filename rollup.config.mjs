@@ -129,7 +129,7 @@ export default [
         dir: path.resolve(dirname),
         name: 'fabric',
         format: 'cjs',
-        entryFileNames: '[name].js',
+        entryFileNames: '[name].cjs',
         preserveModules: true,
         sourcemap: true,
       },
