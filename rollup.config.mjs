@@ -59,6 +59,15 @@ export default [
         format: 'es',
         sourcemap: true,
       },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve(dirname, `${basename}.min.mjs`),
+            name: 'fabric',
+            format: 'es',
+            sourcemap: true,
+            plugins: [terser()],
+          }
+        : null,
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
@@ -70,6 +79,7 @@ export default [
             file: path.resolve(dirname, `${basename}.min.js`),
             name: 'fabric',
             format: 'umd',
+            sourcemap: true,
             plugins: [terser()],
           }
         : null,
