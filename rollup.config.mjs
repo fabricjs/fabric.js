@@ -53,11 +53,33 @@ export default [
   {
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
     output: [
+      // es modules in files
+      {
+        dir: path.resolve(dirname),
+        name: 'fabric',
+        format: 'es',
+        preserveModules: true,
+        entryFileNames: '[name].mjs',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            dir: path.resolve(dirname),
+            name: 'fabric',
+            format: 'es',
+            preserveModules: true,
+            entryFileNames: '[name].min.mjs',
+            sourcemap: true,
+            plugins: [terser()],
+          }
+        : null,
+      // es module in bundle
       {
         file: path.resolve(dirname, `${basename}.mjs`),
         name: 'fabric',
         format: 'es',
         sourcemap: true,
+        plugins: [terser()],
       },
       Number(process.env.MINIFY)
         ? {
@@ -68,6 +90,7 @@ export default [
             plugins: [terser()],
           }
         : null,
+      // umd in bundle
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
