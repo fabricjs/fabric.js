@@ -145,6 +145,7 @@
       ]
     }
   },
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": "./dist/index.min.mjs",
