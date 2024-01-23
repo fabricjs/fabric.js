@@ -118,19 +118,15 @@ export default [
     input: ['./index.node.ts'],
     output: [
       {
-        dir: path.resolve(dirname),
+        file: path.resolve(dirname, `${basename}.mjs`),
         name: 'fabric',
         format: 'es',
-        entryFileNames: '[name].mjs',
-        preserveModules: true,
         sourcemap: true,
       },
       {
-        dir: path.resolve(dirname),
+        file: path.resolve(dirname, `${basename}.cjs`),
         name: 'fabric',
         format: 'cjs',
-        entryFileNames: '[name].cjs',
-        preserveModules: true,
         sourcemap: true,
       },
     ],
