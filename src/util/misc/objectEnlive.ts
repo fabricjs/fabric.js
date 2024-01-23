@@ -13,7 +13,7 @@ import type { BaseFilter } from '../../filters/BaseFilter';
 import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 import { FabricError, SignalAbortedError } from '../internals/console';
 import type { Gradient } from '../../gradient';
-import { Shadow } from '../../Shadow';
+import type { Shadow } from '../../Shadow';
 
 export type LoadImageOptions = Abortable & {
   /**
