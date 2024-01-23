@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): Align gradient with class registry usage, part of #9144 [#9627](https://github.com/fabricjs/fabric.js/pull/9627)
 - chore(): removed unused code from Path render function [#9619](https://github.com/fabricjs/fabric.js/pull/9619)
 
 ## [6.0.0-beta18]
