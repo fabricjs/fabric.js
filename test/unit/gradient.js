@@ -142,14 +142,11 @@
 
     var object = gradient.toObject();
 
-    assert.equal(object.coords.x1, gradient.coords.x1);
-    assert.equal(object.coords.x2, gradient.coords.x2);
-    assert.equal(object.coords.y1, gradient.coords.y1);
-    assert.equal(object.coords.y2, gradient.coords.y2);
+    assert.deepEqual(object.coords, gradient.coords);
     assert.equal(object.gradientUnits, gradient.gradientUnits);
     assert.equal(object.type, gradient.type);
     assert.deepEqual(object.gradientTransform, gradient.gradientTransform);
-    assert.equal(object.colorStops, gradient.colorStops);
+    assert.deepEqual(object.colorStops, gradient.colorStops);
   });
 
   QUnit.test('toObject with custom props', function(assert) {
@@ -166,16 +163,9 @@
 
     var object = gradient.toObject();
 
-    assert.equal(object.coords.x1, gradient.coords.x1);
-    assert.equal(object.coords.x2, gradient.coords.x2);
-    assert.equal(object.coords.y1, gradient.coords.y1);
-    assert.equal(object.coords.y2, gradient.coords.y2);
-    assert.equal(object.coords.r1, gradient.coords.r1);
-    assert.equal(object.coords.r2, gradient.coords.r2);
-
+    assert.deepEqual(object.coords, gradient.coords);
     assert.equal(object.type, gradient.type);
-
-    assert.equal(object.colorStops, gradient.colorStops);
+    assert.deepEqual(object.colorStops, gradient.colorStops);
   });
 
   QUnit.test('toLive linearGradient', function(assert) {

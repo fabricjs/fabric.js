@@ -68,7 +68,7 @@ export class Pattern {
    * @type Array
    * @default
    */
-  patternTransform: TMat2D | null = null;
+  declare patternTransform?: TMat2D;
 
   /**
    * The actual pixel source of the pattern
@@ -192,14 +192,24 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { type, source, ...serialized }: SerializedPatternOptions,
+    {
+      type,
+      source,
+      patternTransform,
+      ...otherOptions
+    }: SerializedPatternOptions,
     options: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,
-      crossOrigin: serialized.crossOrigin,
+      crossOrigin: otherOptions.crossOrigin,
     });
-    return new this({ ...serialized, source: img });
+    return new this({
+      ...otherOptions,
+      patternTransform:
+        patternTransform && (patternTransform.slice(0) as TMat2D),
+      source: img,
+    });
   }
 }
 

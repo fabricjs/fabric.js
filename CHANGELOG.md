@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): Remove over-protective cloneDeep from fromObject [#9621](https://github.com/fabricjs/fabric.js/pull/9621)
 - refactor(): Align gradient with class registry usage, part of #9144 [#9627](https://github.com/fabricjs/fabric.js/pull/9627)
 - refactor(): Align shadow with class registry, part of #9144 [#9626](https://github.com/fabricjs/fabric.js/pull/9626)
 - cd() Surface the minified build as standard when importing. [#9624](https://github.com/fabricjs/fabric.js/pull/9624)
