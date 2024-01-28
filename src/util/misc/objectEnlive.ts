@@ -11,7 +11,7 @@ import { createImage } from './dom';
 import { classRegistry } from '../../ClassRegistry';
 import type { FabricObject as BaseFabricObject } from '../../shapes/Object/Object';
 import { FabricError, SignalAbortedError } from '../internals/console';
-import type { Gradient } from '../../gradient';
+import type { Shadow } from '../../Shadow';
 
 export type LoadImageOptions = Abortable & {
   /**
@@ -66,7 +66,9 @@ export type EnlivenObjectOptions = Abortable & {
    * Method for further parsing of object elements,
    * called after each fabric object created.
    */
-  reviver?: <T extends BaseFabricObject | FabricObject | BaseFilter>(
+  reviver?: <
+    T extends BaseFabricObject | FabricObject | BaseFilter | Shadow | TFiller
+  >(
     serializedObj: Record<string, any>,
     instance: T
   ) => void;
@@ -82,7 +84,7 @@ export type EnlivenObjectOptions = Abortable & {
  * @returns {Promise<FabricObject[]>}
  */
 export const enlivenObjects = <
-  T extends BaseFabricObject | FabricObject | BaseFilter
+  T extends BaseFabricObject | FabricObject | BaseFilter | Shadow | TFiller
 >(
   objects: any[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}

@@ -3,6 +3,7 @@ import { getFabricDocument } from '../env';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Gradient } from './Gradient';
 import { parseGradientUnits } from './parser/misc';
+
 import type { SVGOptions } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
@@ -32,6 +33,8 @@ describe('Gradient', () => {
   it('registered in class registry', () => {
     expect(classRegistry.getClass('gradient')).toEqual(Gradient);
     expect(classRegistry.getSVGClass('gradient')).toEqual(Gradient);
+    expect(classRegistry.getClass('linear')).toEqual(Gradient);
+    expect(classRegistry.getClass('radial')).toEqual(Gradient);
   });
 
   test('fromElement linearGradient', () => {
