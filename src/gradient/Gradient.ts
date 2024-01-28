@@ -99,37 +99,31 @@ export class Gradient<
 
   static type = 'Gradient';
 
-  constructor({
-    type = 'linear' as T,
-    gradientUnits = 'pixels',
-    coords = {},
-    colorStops = [],
-    offsetX = 0,
-    offsetY = 0,
-    gradientTransform,
-    id,
-  }: GradientOptions<T>) {
-    this.id = id ? `${id}_${uid()}` : uid();
-    this.type = type;
-    this.gradientUnits = gradientUnits;
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
-    this.gradientTransform =
-      gradientTransform && (gradientTransform.slice() as TMat2D);
-    this.coords = {
-      ...(this.type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
-      ...coords,
-    } as GradientCoords<T>;
-    this.colorStops = colorStops.map((colorStop) => ({
-      color: colorStop.color,
-      offset: colorStop.offset,
-      opacity: colorStop.opacity,
-    }));
+  constructor(options: GradientOptions<T>) {
+    const {
+      type = 'linear' as T,
+      gradientUnits = 'pixels',
+      coords = {},
+      colorStops = [],
+      offsetX = 0,
+      offsetY = 0,
+      gradientTransform,
+      id,
+    } = options || {};
+    Object.assign(this, {
+      type,
+      gradientUnits,
+      coords: {
+        ...(type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
+        ...coords,
+      },
+      colorStops,
+      offsetX,
+      offsetY,
+      gradientTransform,
+      id: id ? `${id}_${uid()}` : uid(),
+    });
   }
-
-  // isType<S extends GradientType>(type: S): this is Gradient<S> {
-  //   return (this.type as GradientType) === type;
-  // }
 
   /**
    * Adds another colorStop
@@ -157,8 +151,8 @@ export class Gradient<
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
-      coords: this.coords,
-      colorStops: this.colorStops,
+      coords: { ...this.coords },
+      colorStops: this.colorStops.map((colorStop) => ({ ...colorStop })),
       offsetX: this.offsetX,
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
@@ -301,18 +295,11 @@ export class Gradient<
    * @return {CanvasGradient}
    */
   toLive(ctx: CanvasRenderingContext2D): CanvasGradient {
-    const coords = this.coords as GradientCoords<'radial'>;
+    const { x1, y1, x2, y2, r1, r2 } = this.coords as GradientCoords<'radial'>;
     const gradient =
       this.type === 'linear'
-        ? ctx.createLinearGradient(coords.x1, coords.y1, coords.x2, coords.y2)
-        : ctx.createRadialGradient(
-            coords.x1,
-            coords.y1,
-            coords.r1,
-            coords.x2,
-            coords.y2,
-            coords.r2
-          );
+        ? ctx.createLinearGradient(x1, y1, x2, y2)
+        : ctx.createRadialGradient(x1, y1, r1, x2, y2, r2);
 
     this.colorStops.forEach(({ color, opacity, offset }) => {
       gradient.addColorStop(
@@ -335,7 +322,14 @@ export class Gradient<
   static async fromObject(
     options: GradientOptions<'linear'> | GradientOptions<'radial'>
   ) {
-    return new this(options);
+    const { colorStops, gradientTransform } = options;
+    return new this({
+      ...options,
+      colorStops: colorStops
+        ? colorStops.map((colorStop) => ({ ...colorStop }))
+        : undefined,
+      gradientTransform: gradientTransform ? [...gradientTransform] : undefined,
+    });
   }
 
   /* _FROM_SVG_START_ */
