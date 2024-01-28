@@ -280,11 +280,19 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setWidth(value: number, options: TCanvasSizeOptions = {}) {
+  setWidth(
+    value: TSize['width'],
+    options?: { backstoreOnly?: true; cssOnly?: false }
+  ): void;
+  setWidth(
+    value: CSSDimensions['width'],
+    options?: { cssOnly?: true; backstoreOnly?: false }
+  ): void;
+  setWidth(value: number, options?: never) {
     return this.setDimensions({ width: value }, options);
   }
 
-  /**
+  /**s
    * Sets height of this canvas instance
    * @param {Number|String} value                         Value to set height to
    * @param {Object}        [options]                     Options object
@@ -292,7 +300,15 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setHeight(value: number, options: TCanvasSizeOptions = {}) {
+  setHeight(
+    value: TSize['height'],
+    options?: { backstoreOnly?: true; cssOnly?: false }
+  ): void;
+  setHeight(
+    value: CSSDimensions['height'],
+    options?: { cssOnly?: true; backstoreOnly?: false }
+  ): void;
+  setHeight(value: CSSDimensions['height'], options?: never) {
     return this.setDimensions({ height: value }, options);
   }
 
@@ -332,11 +348,20 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    */
   setDimensions(
+    dimensions: Partial<CSSDimensions>,
+    options?: { cssOnly?: true; backstoreOnly?: false }
+  ): void;
+  setDimensions(
+    dimensions: Partial<TSize>,
+    options?: { backstoreOnly?: true; cssOnly?: false }
+  ): void;
+  setDimensions(dimensions: Partial<TSize>, options?: never): void;
+  setDimensions(
     dimensions: Partial<TSize | CSSDimensions>,
-    options: TCanvasSizeOptions = {}
+    options?: TCanvasSizeOptions
   ) {
     this._setDimensionsImpl(dimensions, options);
-    if (!options.cssOnly) {
+    if (options && !options.cssOnly) {
       this.requestRenderAll();
     }
   }
