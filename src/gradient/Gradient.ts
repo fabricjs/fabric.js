@@ -321,6 +321,18 @@ export class Gradient<
     return gradient;
   }
 
+  static async fromObject(
+    options: GradientOptions<'linear'>
+  ): Promise<Gradient<'radial'>>;
+  static async fromObject(
+    options: GradientOptions<'radial'>
+  ): Promise<Gradient<'radial'>>;
+  static async fromObject(
+    options: GradientOptions<'linear'> | GradientOptions<'radial'>
+  ) {
+    return new this(options);
+  }
+
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
@@ -400,3 +412,5 @@ export class Gradient<
 }
 
 classRegistry.setClass(Gradient, 'gradient');
+classRegistry.setClass(Gradient, 'linear');
+classRegistry.setClass(Gradient, 'radial');
