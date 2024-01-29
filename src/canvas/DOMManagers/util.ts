@@ -31,8 +31,8 @@ export function allowTouchScrolling(element: HTMLElement, allow: boolean) {
 }
 
 export type CSSDimensions = {
-  width: number | `${number}${string}`;
-  height: number | `${number}${string}`;
+  width: number | string;
+  height: number | string;
 };
 
 export const setCSSDimensions = (

@@ -21,12 +21,6 @@ beforeAll(
       originY: 'center',
     });
     canvas.add(rect1, rect2);
-    canvas.on('mouse:down', ({ pointer, absolutePointer }) =>
-      console.log(pointer, absolutePointer)
-    );
-    canvas.on('mouse:up', ({ pointer, absolutePointer }) =>
-      console.log(pointer, absolutePointer)
-    );
     return { rect1, rect2 };
   },
   { enableRetinaScaling: false }

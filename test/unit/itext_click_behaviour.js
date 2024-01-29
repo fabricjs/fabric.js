@@ -243,6 +243,7 @@
       iText.selected = true;
       iText.__lastSelected = true;
       iText.__corner = 'mt';
+      iText.setCoords();
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
       iText.exitEditing();
@@ -289,7 +290,6 @@
 
         QUnit.test(`click on editing itext make selection:changed fire`, function (assert) {
           var done = assert.async();
-          assert.equal(canvas._isRetinaScaling(), enableRetinaScaling, 'test state is correct');
           assert.equal(canvas.getActiveObject(), null, 'no active object exist');
           assert.equal(count, 0, 'no selection:changed fired yet');
           assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');

@@ -1,9 +1,9 @@
-import type { Page } from '@playwright/test';
+import type { JSHandle, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
-import type { Object as FabricObject } from 'fabric';
+import type { FabricObject } from 'fabric';
 import type { before, beforeAll } from 'test';
 
-export class ObjectUtil<T = FabricObject> {
+export class ObjectUtil<T extends FabricObject = FabricObject> {
   constructor(
     readonly page: Page,
     /**
@@ -12,16 +12,25 @@ export class ObjectUtil<T = FabricObject> {
     readonly objectId: string
   ) {}
 
+  evaluateSelf() {
+    return this.page.evaluateHandle<FabricObject>(
+      ([objectId]) => objectMap.get(objectId),
+      [this.objectId]
+    );
+  }
+
   async executeInBrowser<C, R>(
     runInBrowser: (object: T, context: C) => R,
     context?: C
   ): Promise<R> {
-    return (
-      await this.page.evaluateHandle<FabricObject>(
-        ([objectId]) => objectMap.get(objectId),
-        [this.objectId]
-      )
-    ).evaluate(runInBrowser, context);
+    return (await this.evaluateSelf()).evaluate(runInBrowser, context);
+  }
+
+  async evaluateHandle<C, R>(
+    runInBrowser: (object: T, context: C) => R,
+    context?: C
+  ): Promise<JSHandle<R>> {
+    return (await this.evaluateSelf()).evaluateHandle(runInBrowser, context);
   }
 
   getObjectCenter() {
@@ -35,7 +44,7 @@ export class ObjectUtil<T = FabricObject> {
     );
   }
 
-  async expectObjectToMatch<T extends Record<string, unknown>>(expected: T) {
+  async expectObjectToMatch<S extends T>(expected: Partial<S>) {
     const snapshot = await this.executeInBrowser((object) => object);
     expect(snapshot).toMatchObject(expected);
   }

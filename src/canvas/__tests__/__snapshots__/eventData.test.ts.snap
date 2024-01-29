@@ -34,7 +34,6 @@ exports[`Canvas event data HTML event "dblclick" should fire a corresponding can
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -42,9 +41,17 @@ exports[`Canvas event data HTML event "dblclick" should fire a corresponding can
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -106,7 +113,8 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
+      "currentSubTargets": [],
+      "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -115,9 +123,17 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -127,7 +143,6 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -136,9 +151,17 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -194,14 +217,21 @@ exports[`Canvas event data HTML event "dragenter" should fire a corresponding ca
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
       },
       "previousTarget": undefined,
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -269,14 +299,21 @@ exports[`Canvas event data HTML event "dragover" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
       },
       "previousTarget": undefined,
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -310,8 +347,16 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -331,8 +376,16 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -352,8 +405,16 @@ exports[`Canvas event data HTML event "drop" should fire a corresponding canvas 
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": "Drag Target",
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -368,7 +429,6 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -376,9 +436,17 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -388,7 +456,6 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -396,9 +463,17 @@ exports[`Canvas event data HTML event "mousedown" should fire a corresponding ca
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -420,6 +495,14 @@ exports[`Canvas event data HTML event "mouseenter" should fire a corresponding c
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -436,7 +519,6 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -444,9 +526,17 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -456,7 +546,6 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -464,9 +553,17 @@ exports[`Canvas event data HTML event "mousemove" should fire a corresponding ca
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -484,12 +581,19 @@ exports[`Canvas event data HTML event "mouseout" should fire a corresponding can
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "target": undefined,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -506,7 +610,8 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
+      "currentSubTargets": [],
+      "currentTarget": undefined,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -515,9 +620,17 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
   [
@@ -527,7 +640,6 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -536,9 +648,17 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
@@ -553,7 +673,6 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
         "x": -30,
         "y": -13,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -561,15 +680,23 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
         "x": 50,
         "y": 50,
       },
+      "scenePoint": Point {
+        "x": -30,
+        "y": -13,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 50,
+        "y": 50,
+      },
     },
   ],
 ]
 `;
 
-exports[`should fire mouse over/out events on target 1`] = `
+exports[`Event targets should fire mouse over/out events on target 1`] = `
 [
   [
     "mouseover",
@@ -581,13 +708,20 @@ exports[`should fire mouse over/out events on target 1`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
       },
       "previousTarget": undefined,
+      "scenePoint": Point {
+        "x": 5,
+        "y": 5,
+      },
       "target": "target",
+      "viewportPoint": Point {
+        "x": 5,
+        "y": 5,
+      },
     },
   ],
   [
@@ -597,7 +731,6 @@ exports[`should fire mouse over/out events on target 1`] = `
         "x": 5,
         "y": 5,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -605,9 +738,17 @@ exports[`should fire mouse over/out events on target 1`] = `
         "x": 5,
         "y": 5,
       },
+      "scenePoint": Point {
+        "x": 5,
+        "y": 5,
+      },
       "subTargets": [],
       "target": "target",
       "transform": null,
+      "viewportPoint": Point {
+        "x": 5,
+        "y": 5,
+      },
     },
   ],
   [
@@ -620,19 +761,26 @@ exports[`should fire mouse over/out events on target 1`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "nextTarget": undefined,
       "pointer": Point {
         "x": 20,
         "y": 20,
       },
+      "scenePoint": Point {
+        "x": 20,
+        "y": 20,
+      },
       "target": "target",
+      "viewportPoint": Point {
+        "x": 20,
+        "y": 20,
+      },
     },
   ],
 ]
 `;
 
-exports[`should fire mouse over/out events on target 2`] = `
+exports[`Event targets should fire mouse over/out events on target 2`] = `
 [
   [
     "mouse:move:before",
@@ -641,7 +789,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 5,
         "y": 5,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -649,9 +796,17 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 5,
         "y": 5,
       },
+      "scenePoint": Point {
+        "x": 5,
+        "y": 5,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 5,
+        "y": 5,
+      },
     },
   ],
   [
@@ -664,13 +819,20 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "pointer": Point {
         "x": 5,
         "y": 5,
       },
       "previousTarget": undefined,
+      "scenePoint": Point {
+        "x": 5,
+        "y": 5,
+      },
       "target": "target",
+      "viewportPoint": Point {
+        "x": 5,
+        "y": 5,
+      },
     },
   ],
   [
@@ -680,7 +842,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 5,
         "y": 5,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -688,9 +849,17 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 5,
         "y": 5,
       },
+      "scenePoint": Point {
+        "x": 5,
+        "y": 5,
+      },
       "subTargets": [],
       "target": "target",
       "transform": null,
+      "viewportPoint": Point {
+        "x": 5,
+        "y": 5,
+      },
     },
   ],
   [
@@ -700,7 +869,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 20,
         "y": 20,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -708,9 +876,17 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 20,
         "y": 20,
       },
+      "scenePoint": Point {
+        "x": 20,
+        "y": 20,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 20,
+        "y": 20,
+      },
     },
   ],
   [
@@ -723,13 +899,20 @@ exports[`should fire mouse over/out events on target 2`] = `
       "e": MouseEvent {
         "isTrusted": false,
       },
-      "isClick": false,
       "nextTarget": undefined,
       "pointer": Point {
         "x": 20,
         "y": 20,
       },
+      "scenePoint": Point {
+        "x": 20,
+        "y": 20,
+      },
       "target": "target",
+      "viewportPoint": Point {
+        "x": 20,
+        "y": 20,
+      },
     },
   ],
   [
@@ -739,7 +922,6 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 20,
         "y": 20,
       },
-      "button": 1,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -747,9 +929,17 @@ exports[`should fire mouse over/out events on target 2`] = `
         "x": 20,
         "y": 20,
       },
+      "scenePoint": Point {
+        "x": 20,
+        "y": 20,
+      },
       "subTargets": [],
       "target": undefined,
       "transform": null,
+      "viewportPoint": Point {
+        "x": 20,
+        "y": 20,
+      },
     },
   ],
 ]

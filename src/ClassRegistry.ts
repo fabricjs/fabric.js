@@ -24,7 +24,7 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  getClass(classType: string): any {
+  getClass<T>(classType: string): T {
     const constructor = this[JSON].get(classType);
     if (!constructor) {
       throw new FabricError(`No class registered for ${classType}`);

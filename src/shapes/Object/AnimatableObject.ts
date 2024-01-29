@@ -17,7 +17,7 @@ export abstract class AnimatableObject<
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  declare colorProperties: string[];
+  static colorProperties: string[] = ['fill', 'stroke', 'backgroundColor'];
 
   /**
    * Animates object's properties
@@ -53,7 +53,9 @@ export abstract class AnimatableObject<
     options: Partial<AnimationOptions<T>> = {}
   ): TAnimation<T> {
     const path = key.split('.');
-    const propIsColor = this.colorProperties.includes(path[path.length - 1]);
+    const propIsColor = (
+      this.constructor as typeof AnimatableObject
+    ).colorProperties.includes(path[path.length - 1]);
     const { easing, duration, abort, startValue, onChange, onComplete } =
       options;
     const animationOptions = {

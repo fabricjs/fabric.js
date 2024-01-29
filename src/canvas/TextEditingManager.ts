@@ -1,7 +1,6 @@
 import type { TPointerEvent } from '../EventTypeDefs';
 import type { ITextBehavior } from '../shapes/IText/ITextBehavior';
 import { removeFromArray } from '../util/internals';
-import { isInteractiveTextObject } from '../util/typeAssertions';
 import type { Canvas } from './Canvas';
 
 /**
@@ -14,10 +13,9 @@ export class TextEditingManager {
 
   constructor(canvas: Canvas) {
     const cb = () => {
-      const activeObject = canvas.getActiveObject();
-      if (isInteractiveTextObject(activeObject)) {
-        activeObject.hiddenTextarea && activeObject.hiddenTextarea.focus();
-      }
+      const { hiddenTextarea } =
+        (canvas.getActiveObject() as ITextBehavior) || {};
+      hiddenTextarea && hiddenTextarea.focus();
     };
     const el = canvas.upperCanvasEl;
     el.addEventListener('click', cb);

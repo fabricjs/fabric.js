@@ -12,6 +12,7 @@ before_commit
 **/dist/
 /lib/
 /test/
+/website/
 .next/
 .parcel-cache/
 /docs/

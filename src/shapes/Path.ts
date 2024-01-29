@@ -26,7 +26,6 @@ import type {
   TSVGReviver,
   TOptions,
 } from '../typedefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
 import { CENTER, LEFT, TOP } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
@@ -112,12 +111,6 @@ export class Path<
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
   _renderPathCommands(ctx: CanvasRenderingContext2D) {
-    let subpathStartX = 0,
-      subpathStartY = 0,
-      x = 0, // current x
-      y = 0, // current y
-      controlX = 0, // current control point x
-      controlY = 0; // current control point y
     const l = -this.pathOffset.x,
       t = -this.pathOffset.y;
 
@@ -128,31 +121,21 @@ export class Path<
         command[0] // first letter
       ) {
         case 'L': // lineto, absolute
-          x = command[1];
-          y = command[2];
-          ctx.lineTo(x + l, y + t);
+          ctx.lineTo(command[1] + l, command[2] + t);
           break;
 
         case 'M': // moveTo, absolute
-          x = command[1];
-          y = command[2];
-          subpathStartX = x;
-          subpathStartY = y;
-          ctx.moveTo(x + l, y + t);
+          ctx.moveTo(command[1] + l, command[2] + t);
           break;
 
         case 'C': // bezierCurveTo, absolute
-          x = command[5];
-          y = command[6];
-          controlX = command[3];
-          controlY = command[4];
           ctx.bezierCurveTo(
             command[1] + l,
             command[2] + t,
-            controlX + l,
-            controlY + t,
-            x + l,
-            y + t
+            command[3] + l,
+            command[4] + t,
+            command[5] + l,
+            command[6] + t
           );
           break;
 
@@ -163,15 +146,9 @@ export class Path<
             command[3] + l,
             command[4] + t
           );
-          x = command[3];
-          y = command[4];
-          controlX = command[1];
-          controlY = command[2];
           break;
 
         case 'Z':
-          x = subpathStartX;
-          y = subpathStartY;
           ctx.closePath();
           break;
       }
@@ -208,7 +185,7 @@ export class Path<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: cloneDeep(this.path),
+      path: this.path.map((pathCmd) => pathCmd.slice()),
     };
   }
 
