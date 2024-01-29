@@ -33,7 +33,7 @@ export class ActiveSelection extends Group {
   };
 
   static getDefaults() {
-    return { ...super.getDefaults(), ...this.ownDefaults };
+    return { ...super.getDefaults(), ...ActiveSelection.ownDefaults };
   }
 
   /**
