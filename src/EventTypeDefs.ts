@@ -134,7 +134,6 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   extends TEvent<E> {
   target?: FabricObject;
   subTargets?: FabricObject[];
-  button?: number;
   transform?: Transform | null;
   /**
    * @deprecated
