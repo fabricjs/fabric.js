@@ -1,5 +1,11 @@
-// first we set the env variable by importing the node env file
-import { getNodeCanvas } from './src/env/node';
+// First we set the env variable
+
+import { setEnv } from './src/env';
+import { getEnv, getNodeCanvas } from './src/env/node';
+
+setEnv(getEnv());
+
+// After the env is set we can export everything and expose specific node functionality
 
 import type { JpegConfig, PngConfig } from 'canvas';
 import {

@@ -6,7 +6,7 @@ Configuration files, scripts and templates used by [CodeSandbox CI](https://code
 
 - `ci.json`: configuration for codesandbox ci
 - `.mjs`: script files used by our cli
-- `templates`: ready to start fabric templates (`next`, `node`, `vanilla`)
+- `templates`: ready to start fabric templates (`next`, `node`, `vanilla`, `vue`)
 
 ## Running a Template
 
@@ -42,6 +42,11 @@ First make sure codesandbox supports the framework you would like to create the 
 - Creating a `.codesandboxignore` file tells the deploy script what to ignore. Deploying is restricted in size so be vigilant with deployed assets.
 - Adding the `.codesandbox` suffix to a file tells the deploy script to deploy the suffixed file instead of it's counterpart that will be used only locally. e.g. `index.ts` will be used locally whereas `index.codesandbox.ts` will be used by the deployed codesandbox.
 - See existing [templates](./templates) for reference.
+- Finally, update the following files to expose the deployed app:
+  - [ci.json](./ci.json)
+  - [tasks.json](./tasks.json)
+  - [devcontainer.json](../.devcontainer/devcontainer.json)
+  - [.gitpod.yml](../.gitpod.yml)
 
 Once the template is initialized run `npm start <template>` and you're ready to go.
 

@@ -700,7 +700,7 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
 ]
 `;
 
-exports[`should fire mouse over/out events on target 1`] = `
+exports[`Event targets should fire mouse over/out events on target 1`] = `
 [
   [
     "mouseover",
@@ -784,7 +784,7 @@ exports[`should fire mouse over/out events on target 1`] = `
 ]
 `;
 
-exports[`should fire mouse over/out events on target 2`] = `
+exports[`Event targets should fire mouse over/out events on target 2`] = `
 [
   [
     "mouse:move:before",

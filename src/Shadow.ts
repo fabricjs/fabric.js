@@ -1,5 +1,7 @@
+import { classRegistry } from './ClassRegistry';
 import { Color } from './color/Color';
 import { config } from './config';
+import { reNum } from './parser/constants';
 import { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
 import type { TClassProperties } from './typedefs';
@@ -8,6 +10,36 @@ import { pickBy } from './util/misc/pick';
 import { degreesToRadians } from './util/misc/radiansDegreesConversion';
 import { toFixed } from './util/misc/toFixed';
 import { rotateVector } from './util/misc/vectors';
+
+/**
+   * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
+   * - (?:\s|^): This part captures either a whitespace character (\s) or the beginning of a line (^). It's non-capturing (due to (?:...)), meaning it doesn't create a capturing group.
+   * - (-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?: This captures the first component of the shadow, which is the horizontal offset. Breaking it down:
+   *   - (-?\d+): Captures an optional minus sign followed by one or more digits (integer part of the number).
+   *   - (?:\.\d*)?: Optionally captures a decimal point followed by zero or more digits (decimal part of the number).
+   *   - (?:px)?: Optionally captures the "px" unit.
+   *   - (?:\s?|$): Captures either an optional whitespace or the end of the line. This whole part is wrapped in a non-capturing group and marked as optional with ?.
+   * - (-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?: Similar to the previous step, this captures the vertical offset.
+
+(\d+(?:\.\d*)?(?:px)?)?: This captures the blur radius. It's similar to the horizontal offset but without the optional minus sign.
+
+(?:\s+(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?){0,1}: This captures an optional part for the color. It allows for whitespace followed by a component with an optional minus sign, digits, decimal point, and "px" unit.
+
+(?:$|\s): This captures either the end of the line or a whitespace character. It ensures that the match ends either at the end of the string or with a whitespace character.
+   */
+// eslint-disable-next-line max-len
+
+const shadowOffsetRegex = '(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?';
+
+const reOffsetsAndBlur = () =>
+  new RegExp(
+    '(?:\\s|^)' +
+      shadowOffsetRegex +
+      shadowOffsetRegex +
+      '(' +
+      reNum +
+      '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
+  );
 
 export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   color: 'rgb(0,0,0)',
@@ -26,6 +58,7 @@ export type SerializedShadowOptions = {
   offsetY: number;
   affectStroke: boolean;
   nonScaling: boolean;
+  type: string;
 };
 
 export class Shadow {
@@ -82,6 +115,9 @@ export class Shadow {
   declare id: number;
 
   static ownDefaults = shadowDefaultValues;
+
+  static type = 'shadow';
+
   /**
    * @see {@link http://fabricjs.com/shadows|Shadow demo}
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
@@ -106,12 +142,11 @@ export class Shadow {
    */
   static parseShadow(value: string) {
     const shadowStr = value.trim(),
-      [__, offsetX = 0, offsetY = 0, blur = 0] = (
-        Shadow.reOffsetsAndBlur.exec(shadowStr) || []
+      regex = reOffsetsAndBlur(),
+      [, offsetX = 0, offsetY = 0, blur = 0] = (
+        regex.exec(shadowStr) || []
       ).map((value) => parseFloat(value) || 0),
-      color = (
-        shadowStr.replace(Shadow.reOffsetsAndBlur, '') || 'rgb(0,0,0)'
-      ).trim();
+      color = (shadowStr.replace(regex, '') || 'rgb(0,0,0)').trim();
 
     return {
       color,
@@ -198,17 +233,17 @@ export class Shadow {
       offsetY: this.offsetY,
       affectStroke: this.affectStroke,
       nonScaling: this.nonScaling,
+      type: (this.constructor as typeof Shadow).type,
     };
-    const defaults = Shadow.ownDefaults;
+    const defaults = Shadow.ownDefaults as SerializedShadowOptions;
     return !this.includeDefaultValues
       ? pickBy(data, (value, key) => value !== defaults[key])
       : data;
   }
 
-  /**
-   * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
-   */
-  // eslint-disable-next-line max-len
-  static reOffsetsAndBlur =
-    /(?:\s|^)(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?(\d+(?:\.\d*)?(?:px)?)?(?:\s?|$)(?:$|\s)/;
+  static fromObject(options: Partial<TClassProperties<Shadow>>) {
+    return new this(options);
+  }
 }
+
+classRegistry.setClass(Shadow, 'shadow');

@@ -1831,28 +1831,6 @@
     assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br is 130,-70');
   });
 
-  QUnit.test('_isRetinaScaling', function(assert) {
-    canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 2 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, true, 'retina > 1 and enabled');
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 2 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina > 1 and disabled');
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 1 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina = 1 and disabled');
-
-    canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 1 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina = 1 and enabled');
-  });
-
   QUnit.test('getRetinaScaling', function(assert) {
     canvas.enableRetinaScaling = true;
     fabric.config.configure({ devicePixelRatio: 1 });
