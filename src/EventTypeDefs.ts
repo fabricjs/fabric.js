@@ -106,6 +106,7 @@ export type TModificationEvents =
 
 export interface ModifiedEvent<E extends Event = TPointerEvent> {
   e?: E;
+  aborted: boolean;
   transform: Transform;
   target: FabricObject;
   action?: string;

@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(#9498): exception due to wrong type, refactor endCurrentTransform [#9500](https://github.com/fabricjs/fabric.js/pull/9500)
 - fix(StaticCanvas): StaticCanvas setDimensions typings [#9618](https://github.com/fabricjs/fabric.js/pull/9618)
 - refactor(): Align gradient with class registry usage, part of #9144 [#9627](https://github.com/fabricjs/fabric.js/pull/9627)
 - refactor(): Align shadow with class registry, part of #9144 [#9626](https://github.com/fabricjs/fabric.js/pull/9626)

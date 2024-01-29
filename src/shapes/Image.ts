@@ -586,7 +586,11 @@ export class FabricImage<
    */
   _render(ctx: CanvasRenderingContext2D) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    if (this.isMoving !== true && this.resizeFilter && this._needsResize()) {
+    if (
+      !this.isTransforming('drag') &&
+      this.resizeFilter &&
+      this._needsResize()
+    ) {
       this.applyResizeFilters();
     }
     this._stroke(ctx);
