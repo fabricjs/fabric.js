@@ -1,4 +1,5 @@
 import { FabricText } from './Text';
+import { graphemeSplit } from '../../util/lang_string';
 
 describe('setSelectionStyles', () => {
   test('will set properties at the correct position', () => {
@@ -33,5 +34,26 @@ describe('setSelectionStyles', () => {
     expect(style2After).toEqual({
       deltaY: 0,
     });
+  });
+});
+
+describe('toObject', () => {
+  it('Will serialize text with graphemes in mind', () => {
+    const text = new FabricText('🤩🤩\nHello', {
+      styles: {
+        1: {
+          0: {
+            fontSize: 40,
+          },
+        },
+      },
+    });
+    const serializedStyles = text.toObject().styles;
+    expect(serializedStyles).toEqual([
+      { start: 2, end: 3, style: { fontSize: 40 } },
+    ]);
+    expect(serializedStyles[0].start).toEqual(
+      graphemeSplit(text.textLines[0]).length
+    );
   });
 });
