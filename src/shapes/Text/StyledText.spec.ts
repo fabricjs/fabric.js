@@ -35,3 +35,21 @@ describe('setSelectionStyles', () => {
     });
   });
 });
+
+describe('toObject', () => {
+  it('Will serialize text with grpahemes in mind', () => {
+    const text = new FabricText('🤩🤩\nHello', {
+      styles: {
+        1: {
+          0: {
+            fontSize: 40,
+          },
+        },
+      },
+    });
+    const serializedStyles = text.toObject().styles;
+    expect(serializedStyles).toEqual([
+      { start: 2, end: 3, style: { fontSize: 40 } },
+    ]);
+  });
+});
