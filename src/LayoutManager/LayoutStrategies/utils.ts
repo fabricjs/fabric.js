@@ -52,5 +52,6 @@ export const getObjectBounds = (
   )
     .add(strokeUniformVector)
     .scalarDivide(2);
+
   return [objectCenter.subtract(sizeVector), objectCenter.add(sizeVector)];
 };
