@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(LayoutManager): wrong bounding box position when activeSelection has originX/originY that are not default left/top [#9649](https://github.com/fabricjs/fabric.js/pull/9649)
 - fix(textStyles): Split text into graphemes correctly [#9646](https://github.com/fabricjs/fabric.js/pull/9646)
 - fix(ActiveSelection): static default inheritance [#9635](https://github.com/fabricjs/fabric.js/pull/9635)
 - fix(StaticCanvas): StaticCanvas setDimensions typings [#9618](https://github.com/fabricjs/fabric.js/pull/9618)
