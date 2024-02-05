@@ -1360,7 +1360,15 @@ export class FabricObject<
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any = {}) {
+  toCanvasElement(
+    options: any = {},
+    createToCanvas = (el: HTMLCanvasElement) =>
+      new StaticCanvas(el, {
+        enableRetinaScaling: false,
+        renderOnAddRemove: false,
+        skipOffscreen: false,
+      })
+  ) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
@@ -1401,11 +1409,7 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    const canvas = new StaticCanvas(el, {
-      enableRetinaScaling: false,
-      renderOnAddRemove: false,
-      skipOffscreen: false,
-    });
+    const canvas = createToCanvas(el);
     if (options.format === 'jpeg') {
       canvas.backgroundColor = '#fff';
     }
