@@ -1358,23 +1358,24 @@ export class FabricObject<
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
+   * @param {(el: HTMLCanvasElement) => Canvas} [options.canvasProvider] Create the output canvas
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(
-    options: any = {},
-    createToCanvas = (el: HTMLCanvasElement) =>
-      new StaticCanvas(el, {
-        enableRetinaScaling: false,
-        renderOnAddRemove: false,
-        skipOffscreen: false,
-      })
-  ) {
+  toCanvasElement(options: any = {}) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
       abs = Math.abs,
       retinaScaling = options.enableRetinaScaling ? getDevicePixelRatio() : 1,
-      multiplier = (options.multiplier || 1) * retinaScaling;
+      multiplier = (options.multiplier || 1) * retinaScaling,
+      canvasProvider: (el: HTMLCanvasElement) => StaticCanvas =
+        options.canvasProvider ||
+        ((el: HTMLCanvasElement) =>
+          new StaticCanvas(el, {
+            enableRetinaScaling: false,
+            renderOnAddRemove: false,
+            skipOffscreen: false,
+          }));
     delete this.group;
     if (options.withoutTransform) {
       resetObjectTransform(this);
@@ -1409,7 +1410,7 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    const canvas = createToCanvas(el);
+    const canvas = canvasProvider(el);
     if (options.format === 'jpeg') {
       canvas.backgroundColor = '#fff';
     }
