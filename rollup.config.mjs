@@ -115,6 +115,19 @@ export default [
     onwarn,
   },
   {
+    input: ['./index.offscreen.ts'],
+    output: [
+      {
+        file: path.resolve(dirname, `${basename}.offscreen.mjs`),
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    plugins,
+    onwarn,
+  },
+  {
     input: ['./index.node.ts'],
     output: [
       {
