@@ -30,6 +30,16 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
+const layoutingEvents = [
+  'moving',
+  'resizing',
+  'rotating',
+  'scaling',
+  'skewing',
+  'changed',
+  'modifyPoly',
+] as TModificationEvents[];
+
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
   private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
@@ -55,6 +65,7 @@ export class LayoutManager {
     this.onBeforeLayout(strictContext);
 
     const layoutResult = this.getLayoutResult(strictContext);
+
     layoutResult && this.commitLayout(strictContext, layoutResult);
 
     this.onAfterLayout(strictContext, layoutResult);
@@ -71,36 +82,27 @@ export class LayoutManager {
     const { target } = context;
     this.unsubscribe(object, context);
     const disposers = [
-      object.on('modified', (e) =>
-        this.performLayout({
+      object.on('modified', (e) => {
+        target.layoutManager.performLayout({
           trigger: 'modified',
           e,
           type: LAYOUT_TYPE_OBJECT_MODIFIED,
           target,
-        })
-      ),
-      ...(
-        [
-          'moving',
-          'resizing',
-          'rotating',
-          'scaling',
-          'skewing',
-          'changed',
-          'modifyPoly',
-        ] as TModificationEvents[]
-      ).map((key) =>
-        object.on(key, (e) =>
-          this.performLayout({
+        });
+      }),
+      ...layoutingEvents.map((key) =>
+        object.on(key, (e) => {
+          target.layoutManager.performLayout({
             trigger: key,
             e: { ...e, target: object },
             type: LAYOUT_TYPE_OBJECT_MODIFYING,
             target,
-          })
-        )
+          });
+        })
       ),
     ];
     this._subscriptions.set(object, disposers);
+    return !!object.parent && !!object.group && object.group !== object.parent;
   }
 
   /**
@@ -152,7 +154,7 @@ export class LayoutManager {
       const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
       target.forEachObject((object) => {
-        (object as Group).layoutManager?.performLayout({
+        (object as Group).layoutManager.performLayout({
           ...tricklingContext,
           bubbles: false,
           target: object as Group,
