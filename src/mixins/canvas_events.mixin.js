@@ -148,8 +148,8 @@
 
       var _this = this;
       this._hoveredTargets.forEach(function(_target){
-        _this.fire('mouse:out', { target: target, e: e });
-        _target && target.fire('mouseout', { e: e });
+        _this.fire('mouse:out', { target: _target, e: e });
+        _target && _target.fire('mouseout', { e: e });
       });
       this._hoveredTargets = [];
     },
