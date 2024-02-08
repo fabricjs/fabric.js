@@ -139,9 +139,6 @@
       ],
       "node": [
         "dist/index.node.d.ts"
-      ],
-      "src/*": [
-        "src/*"
       ]
     }
   },
