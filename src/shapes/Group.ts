@@ -39,6 +39,9 @@ import type { FitContentLayout } from '../LayoutManager';
 class NoopLayoutManager extends LayoutManager {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   performLayout() {}
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected subscribe() {}
 }
 
 export interface GroupEvents extends ObjectEvents, CollectionEvents {
@@ -145,11 +148,15 @@ export class Group
     });
 
     // perform initial layout
-    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager = options.layoutManager || new LayoutManager(this);
     this.layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
       targets: [...objects],
+      // TODO: x and y should go away from layoutManager.
+      // if the group gets created with a position, this can be
+      // applied after the layout, the layout doesn't have do know
+      // about the initialization position since it is going to override only and
       x: options.left,
       y: options.top,
     });
@@ -659,7 +666,7 @@ export class Group
       const group = new this(objects, {
         ...options,
         ...hydratedOptions,
-        layoutManager: new NoopLayoutManager(),
+        layoutManager: new NoopLayoutManager({} as Group),
       });
       if (layoutManager) {
         const layoutClass = classRegistry.getClass<typeof LayoutManager>(
@@ -668,9 +675,9 @@ export class Group
         const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
           layoutManager.strategy
         );
-        group.layoutManager = new layoutClass(new strategyClass());
+        group.layoutManager = new layoutClass(group, new strategyClass());
       } else {
-        group.layoutManager = new LayoutManager();
+        group.layoutManager = new LayoutManager(group);
       }
       group.setCoords();
       return group;

@@ -15,6 +15,7 @@ import type {
   LAYOUT_TYPE_REMOVED,
   LAYOUT_TYPE_OBJECT_MODIFIED,
   LAYOUT_TYPE_OBJECT_MODIFYING,
+  LAYOUT_TYPE_SUBSCRIPTION,
 } from './constants';
 
 export type LayoutTrigger =
@@ -23,7 +24,8 @@ export type LayoutTrigger =
   | typeof LAYOUT_TYPE_OBJECT_MODIFIED
   | typeof LAYOUT_TYPE_ADDED
   | typeof LAYOUT_TYPE_REMOVED
-  | typeof LAYOUT_TYPE_IMPERATIVE;
+  | typeof LAYOUT_TYPE_IMPERATIVE
+  | typeof LAYOUT_TYPE_SUBSCRIPTION;
 
 export type LayoutStrategyResult = {
   /**
@@ -89,7 +91,10 @@ export type InitializationLayoutContext = CommonLayoutContext & {
 };
 
 export type CollectionChangeLayoutContext = CommonLayoutContext & {
-  type: typeof LAYOUT_TYPE_ADDED | typeof LAYOUT_TYPE_REMOVED;
+  type:
+    | typeof LAYOUT_TYPE_ADDED
+    | typeof LAYOUT_TYPE_REMOVED
+    | typeof LAYOUT_TYPE_SUBSCRIPTION;
   targets: FabricObject[];
 };
 

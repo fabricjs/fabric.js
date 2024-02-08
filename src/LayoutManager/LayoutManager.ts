@@ -14,6 +14,7 @@ import {
   LAYOUT_TYPE_IMPERATIVE,
   LAYOUT_TYPE_OBJECT_MODIFIED,
   LAYOUT_TYPE_OBJECT_MODIFYING,
+  LAYOUT_TYPE_SUBSCRIPTION,
 } from './constants';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 import { classRegistry } from '../ClassRegistry';
@@ -28,12 +29,28 @@ export type SerializedLayoutManager = {
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
   private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
-
+  private declare target: Group;
   strategy: LayoutStrategy;
 
-  constructor(strategy: LayoutStrategy = new FitContentLayout()) {
+  constructor(
+    target: Group,
+    strategy: LayoutStrategy = new FitContentLayout()
+  ) {
+    this.target = target;
     this.strategy = strategy;
     this._subscriptions = new Map();
+    target.forEachObject((object) =>
+      this.subscribe(object, {
+        type: LAYOUT_TYPE_SUBSCRIPTION,
+        target,
+        targets: target.getObjects(),
+        strategy,
+        stopPropagation() {
+          this.bubbles = false;
+        },
+        bubbles: true,
+      })
+    );
   }
 
   public performLayout(context: LayoutContext) {
@@ -112,10 +129,7 @@ export class LayoutManager {
     const { target } = context;
     const { canvas } = target;
     // handle layout triggers subscription
-    if (
-      context.type === LAYOUT_TYPE_INITIALIZATION ||
-      context.type === LAYOUT_TYPE_ADDED
-    ) {
+    if (context.type === LAYOUT_TYPE_ADDED) {
       context.targets.forEach((object) => this.subscribe(object, context));
     } else if (context.type === LAYOUT_TYPE_REMOVED) {
       context.targets.forEach((object) => this.unsubscribe(object, context));
