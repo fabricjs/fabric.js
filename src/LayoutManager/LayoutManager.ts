@@ -60,8 +60,12 @@ export class LayoutManager {
     this.onBeforeLayout(strictContext);
 
     const layoutResult = this.getLayoutResult(strictContext);
-
-    layoutResult && this.commitLayout(strictContext, layoutResult);
+    if (layoutResult) {
+      this.commitLayout(strictContext, layoutResult);
+    } else {
+      // if there is no layout result, we may still need to flag the group as dirty
+      // if we are moving it through an active selection
+    }
 
     this.onAfterLayout(strictContext, layoutResult);
     this._prevLayoutStrategy = strictContext.strategy;
