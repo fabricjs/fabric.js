@@ -67,7 +67,7 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
       .set({ text: 'Edit me\nabsolute positioned\nclip path layout' });
     clone.set({
       objectCaching,
-      backgroundColor: '#0dcaf0',
+      backgroundColor: 'cyan',
       clipPath: new fabric.Circle({
         radius: 110,
         originX: 'center',
