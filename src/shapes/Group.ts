@@ -569,7 +569,10 @@ export class Group
   }
 
   dispose() {
-    this.layoutManager.unsubscribeTarget(this);
+    this.layoutManager.unsubscribeTargets({
+      targets: this.getObjects(),
+      target: this,
+    });
     this._activeObjects = [];
     this.forEachObject((object) => {
       this._watchObject(false, object);
@@ -672,6 +675,10 @@ export class Group
       } else {
         group.layoutManager = new LayoutManager();
       }
+      group.layoutManager.subscribeTargets({
+        target: group,
+        targets: group.getObjects(),
+      });
       group.setCoords();
       return group;
     });

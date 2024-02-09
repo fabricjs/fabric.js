@@ -12,12 +12,7 @@ import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_REMOVED,
 } from './constants';
-import type {
-  LayoutContext,
-  LayoutResult,
-  LayoutTrigger,
-  StrictLayoutContext,
-} from './types';
+import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
 describe('Layout Manager', () => {
   it('should set fit content strategy by default', () => {
@@ -158,7 +153,7 @@ describe('Layout Manager', () => {
         expect(performLayout.mock.calls).toMatchObject([
           [
             {
-              e: { target: object, ...event },
+              e: { ...event },
               target,
               trigger: 'modified',
               type: 'object_modified',
@@ -182,39 +177,24 @@ describe('Layout Manager', () => {
         expect(performLayout).not.toHaveBeenCalled();
       });
     });
+    describe('triggers and event subscriptions', () => {
+      let manager: LayoutManager;
+      let targets: FabricObject[];
+      let target: Group;
+      let context: StrictLayoutContext;
+      beforeEach(() => {
+        manager = new LayoutManager();
 
-    it.each([
-      { trigger: LAYOUT_TYPE_INITIALIZATION, action: 'subscribe' },
-      { trigger: LAYOUT_TYPE_ADDED, action: 'subscribe' },
-      { trigger: LAYOUT_TYPE_REMOVED, action: 'unsubscribe' },
-    ] as {
-      trigger: LayoutTrigger;
-      action: 'subscribe' | 'unsubscribe';
-    }[])(
-      '$trigger trigger should $action targets and call target hooks',
-      ({ action }) => {
-        const lifecycle: jest.SpyInstance[] = [];
-
-        const manager = new LayoutManager();
-
-        const targets = [
+        targets = [
           new Group([new FabricObject()], { layoutManager: manager }),
           new FabricObject(),
         ];
-        const target = new Group(targets, { layoutManager: manager });
-        const canvasFire = jest.fn();
-        target.canvas = { fire: canvasFire };
-        const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
-          lifecycle.push(targetFire);
-        });
+        target = new Group(targets, { layoutManager: manager });
+        target.canvas = { fire: jest.fn() };
 
-        const subscription = jest
-          .spyOn(manager, action)
-          .mockImplementation(() => {
-            lifecycle.push(subscription);
-          });
+        jest.spyOn(target, 'fire');
 
-        const context: StrictLayoutContext = {
+        context = {
           bubbles: true,
           strategy: manager.strategy,
           type: LAYOUT_TYPE_INITIALIZATION,
@@ -225,18 +205,53 @@ describe('Layout Manager', () => {
             this.bubbles = false;
           },
         };
+      });
+      it(`initialization trigger should subscribe targets and call target hooks`, () => {
+        jest.spyOn(manager, 'subscribe');
+        context.type = LAYOUT_TYPE_INITIALIZATION;
         manager['onBeforeLayout'](context);
-
-        expect(lifecycle).toEqual([subscription, subscription, targetFire]);
-        expect(targetFire).toBeCalledWith('layout:before', {
+        expect(manager['subscribe']).toHaveBeenCalledTimes(targets.length);
+        expect(manager['subscribe']).toHaveBeenCalledWith(targets[0], context);
+        expect(target.fire).toBeCalledWith('layout:before', {
           context,
         });
-        expect(canvasFire).toBeCalledWith('object:layout:before', {
+        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
           context,
           target,
         });
-      }
-    );
+      });
+      it(`object removed trigger should unsubscribe targets and call target hooks`, () => {
+        jest.spyOn(manager, 'unsubscribe');
+        context.type = LAYOUT_TYPE_REMOVED;
+        manager['onBeforeLayout'](context);
+        expect(manager['unsubscribe']).toHaveBeenCalledTimes(targets.length);
+        expect(manager['unsubscribe']).toHaveBeenCalledWith(
+          targets[0],
+          context
+        );
+        expect(target.fire).toBeCalledWith('layout:before', {
+          context,
+        });
+        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+          context,
+          target,
+        });
+      });
+      it(`object added trigger should subscribe targets and call target hooks`, () => {
+        jest.spyOn(manager, 'subscribe');
+        context.type = LAYOUT_TYPE_ADDED;
+        manager['onBeforeLayout'](context);
+        expect(manager['subscribe']).toHaveBeenCalledTimes(targets.length);
+        expect(manager['subscribe']).toHaveBeenCalledWith(targets[0], context);
+        expect(target.fire).toBeCalledWith('layout:before', {
+          context,
+        });
+        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+          context,
+          target,
+        });
+      });
+    });
 
     it('passing deep should layout the entire tree', () => {
       const manager = new LayoutManager();
