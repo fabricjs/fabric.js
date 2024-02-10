@@ -2,6 +2,7 @@
 
 ## [next]
 
+- [draft]: regisrtation on demand [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
 - fix(Object): support specyfing toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
 - ci(): no `src` imports [#9657](https://github.com/fabricjs/fabric.js/pull/9657)
 - fix(textStyles): Split text into graphemes correctly [#9646](https://github.com/fabricjs/fabric.js/pull/9646)
