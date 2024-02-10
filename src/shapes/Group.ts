@@ -676,6 +676,7 @@ export class Group
         group.layoutManager = new LayoutManager();
       }
       group.layoutManager.subscribeTargets({
+        type: LAYOUT_TYPE_INITIALIZATION,
         target: group,
         targets: group.getObjects(),
       });

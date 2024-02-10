@@ -64,7 +64,10 @@ export class LayoutManager {
   /**
    * subscribe to object layout triggers
    */
-  protected subscribe(object: FabricObject, context: { target: Group }) {
+  protected subscribe(
+    object: FabricObject,
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
     const { target } = context;
     this.unsubscribe(object, context);
     const disposers = [
@@ -103,17 +106,23 @@ export class LayoutManager {
   /**
    * unsubscribe object layout triggers
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected unsubscribe(object: FabricObject, context?: { target: Group }) {
+  protected unsubscribe(
+    object: FabricObject,
+    context?: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
     this._subscriptions.delete(object);
   }
 
-  unsubscribeTargets(context: RegistrationContext) {
+  unsubscribeTargets(
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
     context.targets.forEach((object) => this.unsubscribe(object, context));
   }
 
-  subscribeTargets(context: RegistrationContext) {
+  subscribeTargets(
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
     context.targets.forEach((object) => this.subscribe(object, context));
   }
 
