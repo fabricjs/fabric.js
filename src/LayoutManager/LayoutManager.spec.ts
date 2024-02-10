@@ -3,7 +3,9 @@ import { Point } from '../Point';
 import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
+import { Rect } from '../shapes/Rect';
 import { LayoutManager } from './LayoutManager';
+import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
 import {
@@ -754,6 +756,73 @@ describe('Layout Manager', () => {
       ).toMatchObject([child]);
     });
 
+    describe('fromObject restore', () => {
+      const createTestData = (type: string) => ({
+        width: 2,
+        height: 3,
+        left: 6,
+        top: 4,
+        strokeWidth: 0,
+        objects: [
+          new Rect({
+            width: 100,
+            height: 100,
+            top: 0,
+            left: 0,
+            strokeWidth: 0,
+          }).toObject(),
+          new Rect({
+            width: 100,
+            height: 100,
+            top: 0,
+            left: 0,
+            strokeWidth: 0,
+          }).toObject(),
+        ],
+        clipPath: new Rect({
+          width: 50,
+          height: 50,
+          top: 0,
+          left: 0,
+          strokeWidth: 0,
+        }).toObject(),
+        layoutManager: {
+          type: 'layoutManager',
+          strategy: type,
+        },
+      });
+      describe('Fitcontent layout', () => {
+        it('should subscribe objects', async () => {
+          const group = await Group.fromObject(
+            createTestData(FitContentLayout.type)
+          );
+          expect(
+            Array.from(group.layoutManager['_subscriptions'].keys())
+          ).toMatchObject(group.getObjects());
+        });
+      });
+      describe('FixedLayout layout', () => {
+        it('should subscribe objects', async () => {
+          const group = await Group.fromObject(
+            createTestData(FixedLayout.type)
+          );
+          expect(
+            Array.from(group.layoutManager['_subscriptions'].keys())
+          ).toMatchObject(group.getObjects());
+        });
+      });
+      describe('ClipPathLayout layout', () => {
+        it('should subscribe objects', async () => {
+          const group = await Group.fromObject(
+            createTestData(ClipPathLayout.type)
+          );
+          expect(
+            Array.from(group.layoutManager['_subscriptions'].keys())
+          ).toMatchObject(group.getObjects());
+        });
+      });
+    });
+
     test.each([true, false])(
       'initialization edge case, legacy layout %s',
       (legacy) => {
@@ -766,7 +835,7 @@ describe('Layout Manager', () => {
           width: 200,
           height: 200,
           strokeWidth: 0,
-          layoutManager: !legacy ? new LayoutManager() : undefined,
+          layoutManager: legacy ? undefined : new LayoutManager(),
         });
         expect(group).toMatchObject({ width: 200, height: 200 });
         expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
