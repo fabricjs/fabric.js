@@ -1,5 +1,4 @@
 // https://www.typescriptlang.org/docs/handbook/utility-types.html
-import type { StaticCanvas } from './canvas/StaticCanvas';
 import type { Gradient } from './gradient/Gradient';
 import type { Pattern } from './Pattern';
 import type { XY, Point } from './Point';
@@ -136,7 +135,8 @@ type ObjectToCanvasElementExtraOptions = ToCanvasElementExtraOptions & {
   /**
    * Create the fabric canvas instance that will generate the output
    */
-  canvasProvider: () => StaticCanvas;
+  // should be StaticCanvas but that breaks TS because it causes a circular type dep
+  canvasProvider: () => any;
 
   ctx: CanvasRenderingContext2D;
 };

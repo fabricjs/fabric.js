@@ -1419,7 +1419,7 @@ export class FabricObject<
     const width = Math.ceil(boundingRect.width + shadowOffset.x),
       height = Math.ceil(boundingRect.height + shadowOffset.y);
 
-    const canvas = canvasProvider();
+    const canvas = canvasProvider() as StaticCanvas;
     canvas.setDimensions({ width, height });
 
     if (format === 'jpeg') {
