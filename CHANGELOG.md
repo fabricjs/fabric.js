@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): `_findTargetCorner` now returns the key and the control [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
 - feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
 - fix(Object): support specyfing toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
 - ci(): no `src` imports [#9657](https://github.com/fabricjs/fabric.js/pull/9657)
