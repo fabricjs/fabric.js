@@ -70,6 +70,12 @@ export class LayoutManager {
     } else {
       // if there is no layout result, we may still need to flag the group as dirty
       // if we are moving it through an active selection
+      if (
+        context.type === LAYOUT_TYPE_OBJECT_MODIFIED ||
+        context.type === LAYOUT_TYPE_OBJECT_MODIFYING
+      ) {
+        context.target.set('dirty', true);
+      }
     }
 
     this.onAfterLayout(strictContext, layoutResult);
@@ -178,14 +184,6 @@ export class LayoutManager {
     );
 
     if (!result) {
-      // if we are skipping layouting but the type is either modifing or modifined
-      // we need at least to invalidate the cache.
-      if (
-        context.type === LAYOUT_TYPE_OBJECT_MODIFIED ||
-        context.type === LAYOUT_TYPE_OBJECT_MODIFYING
-      ) {
-        context.target.set('dirty', true);
-      }
       return;
     }
 
