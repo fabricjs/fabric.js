@@ -142,6 +142,7 @@ export class LayoutManager {
     const { target } = context;
     const { canvas } = target;
     // handle layout triggers subscription
+    // @TODO: gate the registration when the group is interactive
     if (
       context.type === LAYOUT_TYPE_INITIALIZATION ||
       context.type === LAYOUT_TYPE_ADDED
