@@ -178,6 +178,14 @@ export class LayoutManager {
     );
 
     if (!result) {
+      // if we are skipping layouting but the type is either modifing or modifined
+      // we need at least to invalidate the cache.
+      if (
+        context.type === LAYOUT_TYPE_OBJECT_MODIFIED ||
+        context.type === LAYOUT_TYPE_OBJECT_MODIFYING
+      ) {
+        context.target.set('dirty', true);
+      }
       return;
     }
 
@@ -237,7 +245,7 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
       target.setCoords();
-      target.set({ dirty: true });
+      context.target.set('dirty', true);
     }
   }
 
