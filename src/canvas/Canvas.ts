@@ -812,10 +812,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     let pointer, corner;
     if (target) {
-      corner = target._findTargetCorner(
+      const found = target._findTargetCorner(
         this.getViewportPoint(e),
         isTouchEvent(e)
       );
+      const { key, control } = found || {};
+      corner = key;
       if (
         target.selectable &&
         target !== this._activeObject &&
@@ -823,8 +825,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       ) {
         this.setActiveObject(target, e);
         shouldRender = true;
-      } else {
-        const control = target.controls[corner];
+      } else if (control) {
         const mouseUpHandler =
           control && control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
@@ -1055,7 +1056,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       );
       if (target === this._activeObject && (corner || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
-        const control = target.controls[corner],
+        const control = corner?.control,
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
@@ -1357,7 +1358,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = target.controls[corner];
+      const control = corner.control;
       this.setCursor(control.cursorStyleHandler(e, control, target));
     }
   }

@@ -189,17 +189,22 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
-  _findTargetCorner(pointer: Point, forTouch = false): string {
+  _findTargetCorner(
+    pointer: Point,
+    forTouch = false
+  ): { key: string; control: Control } | undefined {
     if (!this.hasControls || !this.canvas) {
-      return '';
+      return undefined;
     }
 
     this.__corner = undefined;
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
+      const control = this.controls[key];
+
       if (
-        this.controls[key].shouldActivate(
+        control.shouldActivate(
           key,
           this,
           pointer,
@@ -207,11 +212,13 @@ export class InteractiveFabricObject<
         )
       ) {
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
-        return (this.__corner = key);
+        this.__corner = key;
+
+        return { key, control };
       }
     }
 
-    return '';
+    return undefined;
   }
 
   /**

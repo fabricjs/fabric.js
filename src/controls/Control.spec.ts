@@ -24,7 +24,9 @@ describe('Controls', () => {
     jest
       .spyOn(target, '_findTargetCorner')
       .mockImplementation(function (this: FabricObject) {
-        return (this.__corner = 'test');
+        this.__corner = 'test';
+
+        return { key: 'test', control };
       });
 
     const canvas = new Canvas();
