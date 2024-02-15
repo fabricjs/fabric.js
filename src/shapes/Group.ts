@@ -150,6 +150,9 @@ export class Group
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
       targets: [...objects],
+      // @TODO remove this concept from the layout manager.
+      // Layout manager will calculate the correct position,
+      // group options can override it later.
       x: options.left,
       y: options.top,
     });
@@ -300,13 +303,14 @@ export class Group
     selected: T,
     { target: object }: ObjectEvents[T extends true ? 'selected' : 'deselected']
   ) {
+    const activeObjects = this._activeObjects;
     if (selected) {
-      this._activeObjects.push(object);
+      activeObjects.push(object);
       this._set('dirty', true);
-    } else if (this._activeObjects.length > 0) {
-      const index = this._activeObjects.indexOf(object);
+    } else if (activeObjects.length > 0) {
+      const index = activeObjects.indexOf(object);
       if (index > -1) {
-        this._activeObjects.splice(index, 1);
+        activeObjects.splice(index, 1);
         this._set('dirty', true);
       }
     }
