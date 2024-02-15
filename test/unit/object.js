@@ -614,7 +614,7 @@
 
   QUnit.test('isDescendantOf', function (assert) {
     const object = new fabric.Object();
-    const parent = new fabric.Object();
+    const parent = new fabric.Group([]);
     parent._exitGroup = () => { };
     assert.ok(typeof object.isDescendantOf === 'function');
     parent.canvas = canvas;
