@@ -15,7 +15,12 @@ import {
   LAYOUT_TYPE_OBJECT_MODIFIED,
   LAYOUT_TYPE_OBJECT_MODIFYING,
 } from './constants';
-import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
+import type {
+  LayoutContext,
+  LayoutResult,
+  RegistrationContext,
+  StrictLayoutContext,
+} from './types';
 import { classRegistry } from '../ClassRegistry';
 
 const LAYOUT_MANAGER = 'layoutManager';
@@ -72,15 +77,15 @@ export class LayoutManager {
    */
   protected subscribe(
     object: FabricObject,
-    context: StrictLayoutContext
-  ): boolean {
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
     const { target } = context;
     this.unsubscribe(object, context);
     const disposers = [
       object.on('modified', (e) => {
         target.layoutManager.performLayout({
           trigger: 'modified',
-          e: { ...e, target: object },
+          e,
           type: LAYOUT_TYPE_OBJECT_MODIFIED,
           target,
         });
@@ -103,14 +108,24 @@ export class LayoutManager {
   /**
    * unsubscribe object layout triggers
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected unsubscribe(object: FabricObject, context?: StrictLayoutContext) {
+  protected unsubscribe(
+    object: FabricObject,
+    context?: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
     this._subscriptions.delete(object);
   }
 
-  unsubscribeTarget(target: Group) {
-    target.forEachObject((object) => this.unsubscribe(object));
+  unsubscribeTargets(
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
+    context.targets.forEach((object) => this.unsubscribe(object, context));
+  }
+
+  subscribeTargets(
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
+    context.targets.forEach((object) => this.subscribe(object, context));
   }
 
   protected onBeforeLayout(context: StrictLayoutContext) {
@@ -138,7 +153,7 @@ export class LayoutManager {
         }
       });
     } else if (context.type === LAYOUT_TYPE_REMOVED) {
-      context.targets.forEach((object) => this.unsubscribe(object, context));
+      this.unsubscribeTargets(context);
     }
     // fire layout event (event will fire only for layouts after initialization layout)
     target.fire('layout:before', {
