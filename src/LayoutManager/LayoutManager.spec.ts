@@ -149,9 +149,10 @@ describe('Layout Manager', () => {
         const object = new FabricObject();
         const target = new Group([object], { layoutManager: manager });
         manager['subscribe'](object, { target });
-
+        performLayout.mockClear();
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => object.fire(trigger, event));
+        console.log(performLayout.mock.calls[0], performLayout.mock.calls[1]);
         expect(performLayout.mock.calls).toMatchObject([
           [
             {
