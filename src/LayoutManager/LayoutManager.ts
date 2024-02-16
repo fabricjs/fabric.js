@@ -92,14 +92,14 @@ export class LayoutManager {
     const { target } = context;
     this.unsubscribe(object, context);
     const disposers = [
-      object.on('modified', (e) => {
+      object.on('modified', (e) =>
         target.layoutManager.performLayout({
           trigger: 'modified',
           e,
           type: LAYOUT_TYPE_OBJECT_MODIFIED,
           target,
-        });
-      }),
+        })
+      ),
       ...layoutingEvents.map((key) =>
         object.on(key, (e) => {
           target.layoutManager.performLayout({
