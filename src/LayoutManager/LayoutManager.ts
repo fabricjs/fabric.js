@@ -179,13 +179,15 @@ export class LayoutManager {
     if (context.type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
       const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
-      target.forEachObject((object) => {
-        (object as Group).layoutManager.performLayout({
-          ...tricklingContext,
-          bubbles: false,
-          target: object as Group,
-        });
-      });
+      target.forEachObject(
+        (object) =>
+          (object as Group).layoutManager &&
+          (object as Group).layoutManager.performLayout({
+            ...tricklingContext,
+            bubbles: false,
+            target: object as Group,
+          })
+      );
     }
   }
 
