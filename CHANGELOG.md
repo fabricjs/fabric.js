@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(TS): Swap an any for the actual type [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
+
 ## [6.0.0-beta19]
 
 - feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
