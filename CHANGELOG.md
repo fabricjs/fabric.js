@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(TS): Swap an any for the actual type [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
+- chore(TS): Swap an any for the actual type in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
 
 ## [6.0.0-beta19]
 
