@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): first touch gesture [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
+
 ## [6.0.0-beta19]
 
 - feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
