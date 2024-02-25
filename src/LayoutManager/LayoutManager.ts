@@ -30,7 +30,7 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
-const layoutingEvents = [
+export const layoutingEvents = [
   'moving',
   'resizing',
   'rotating',
@@ -42,7 +42,7 @@ const layoutingEvents = [
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
-  private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
+  protected declare _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
 
@@ -93,7 +93,7 @@ export class LayoutManager {
     this.unsubscribe(object, context);
     const disposers = [
       object.on('modified', (e) =>
-        this.performLayout({
+        target.layoutManager.performLayout({
           trigger: 'modified',
           e,
           type: LAYOUT_TYPE_OBJECT_MODIFIED,
@@ -102,7 +102,7 @@ export class LayoutManager {
       ),
       ...layoutingEvents.map((key) =>
         object.on(key, (e) => {
-          this.performLayout({
+          target.layoutManager.performLayout({
             trigger: key,
             e: { ...e, target: object },
             type: LAYOUT_TYPE_OBJECT_MODIFYING,
