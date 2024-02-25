@@ -1161,7 +1161,8 @@ export class FabricText<
 
     ctx.save();
     if (currentDirection !== this.direction) {
-      ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
+      // optional check to safeguard when exporting to canvas element in node
+      ctx.canvas.setAttribute?.('dir', isLtr ? 'ltr' : 'rtl');
       ctx.direction = isLtr ? 'ltr' : 'rtl';
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }

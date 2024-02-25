@@ -99,21 +99,58 @@ export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions<
   T extends BaseFabricObject = BaseFabricObject
-> = {
-  left?: number;
-  top?: number;
-  width?: number;
-  height?: number;
-  filter?: (object: T) => boolean;
+> = Partial<
+  TBBox & {
+    filter: (object: T) => boolean;
+  }
+>;
+
+type ToDataUrlExtraOptions = { quality: number };
+
+type ToCanvasElementExtraOptions = {
+  multiplier: number;
+  enableRetinaScaling: boolean;
+  format: ImageFormat;
 };
 
+type ObjectToCanvasElementExtraOptions = ToCanvasElementExtraOptions & {
+  /**
+   * Remove current object shadow.
+   */
+  withoutShadow: boolean;
+  /**
+   * Remove current object transform ( no scale , no angle, no flip, no skew )
+   */
+  withoutTransform: boolean;
+  /**
+   * Account for canvas viewport transform
+   */
+  viewportTransform: boolean;
+  /**
+   * The context to draw the object onto.
+   * Supports passing a pdf/svg ctx in node.
+   * @see https://github.com/Automattic/node-canvas#createcanvas
+   */
+
+  /**
+   * Create the fabric canvas instance that will generate the output
+   */
+  // should be StaticCanvas but that breaks TS because it causes a circular type dep
+  canvasProvider: () => any;
+
+  ctx: CanvasRenderingContext2D;
+};
+
+export type ObjectToCanvasElementOptions = Partial<
+  TBBox & ObjectToCanvasElementExtraOptions
+>;
+
+export type ObjectToDataUrlOptions = ObjectToCanvasElementOptions &
+  Partial<ToDataUrlExtraOptions>;
+
 export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
-  TToCanvasElementOptions<T> & {
-    multiplier: number;
-    format?: ImageFormat;
-    quality?: number;
-    enableRetinaScaling?: boolean;
-  };
+  TToCanvasElementOptions<T> &
+    Partial<ToCanvasElementExtraOptions & ToDataUrlExtraOptions>;
 
 export type Abortable = {
   /**

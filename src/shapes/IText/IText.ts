@@ -7,7 +7,11 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller, TOptions } from '../../typedefs';
+import type {
+  ObjectToCanvasElementOptions,
+  TFiller,
+  TOptions,
+} from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -354,7 +358,7 @@ export class IText<
    * @override block cursor/selection logic while rendering the exported canvas
    * @todo this workaround should be replaced with a more robust solution
    */
-  toCanvasElement(options?: any): HTMLCanvasElement {
+  toCanvasElement(options?: ObjectToCanvasElementOptions): HTMLCanvasElement {
     const isEditing = this.isEditing;
     this.isEditing = false;
     const canvas = super.toCanvasElement(options);
