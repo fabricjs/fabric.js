@@ -12,7 +12,8 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.19",
-    "open-cli": "^7.0.1"
+    "open-cli": "^7.0.1",
+    "source-map-support": "^0.5.21"
   },
   "keywords": []
 }

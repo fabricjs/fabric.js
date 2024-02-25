@@ -2,7 +2,8 @@
 
 ## [next]
 
-- fix(): first touch gesture [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
+- ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
+- fix(): Correct type mainTouchId initialization [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
 - feat(Circle): Add counterclockwise parameter to Circle class [#9670](https://github.com/fabricjs/fabric.js/pull/9670)
 
 ## [6.0.0-beta19]
