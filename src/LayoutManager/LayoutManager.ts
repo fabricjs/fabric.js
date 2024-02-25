@@ -85,7 +85,7 @@ export class LayoutManager {
   /**
    * subscribe to object layout triggers
    */
-  protected subscribe(
+  subscribe(
     object: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
   ) {
