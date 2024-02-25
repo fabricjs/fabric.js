@@ -30,7 +30,7 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
-export const layoutingEvents = [
+const layoutingEvents = [
   'moving',
   'resizing',
   'rotating',
@@ -42,7 +42,7 @@ export const layoutingEvents = [
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
-  protected declare _subscriptions: Map<FabricObject, VoidFunction[]>;
+  private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
 
