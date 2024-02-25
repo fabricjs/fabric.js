@@ -2,6 +2,8 @@
 
 ## [next]
 
+- ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
+
 ## [6.0.0-beta19]
 
 - feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
