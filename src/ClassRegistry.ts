@@ -12,45 +12,120 @@ import { FabricError } from './util/internals/console';
  * different sources you will need to import all fabric because you may need all classes.
  */
 
+import type { SVGParsingOptions } from './parser/elements_parser';
+import type { CSSRules } from './parser/typedefs';
+import type { Constructor } from './typedefs';
+
 export const JSON = 'json';
 export const SVG = 'svg';
 
+type ConstructorWithType<T extends object> = Constructor<T> & {
+  type: string;
+};
+
+export type TJSONResolver<T extends object = any> = ConstructorWithType<T> & {
+  fromObject(data: unknown, options?: unknown): T | Promise<T>;
+};
+
+export type TSVGResolver<T extends object = any> = ConstructorWithType<T> & {
+  fromElement(
+    element: Element,
+    options: SVGParsingOptions & Record<string, any>,
+    cssRules?: CSSRules
+  ): T | null | Promise<T | null>;
+};
+
+type ResolverReturnValue<T extends object, S = true> = S extends true
+  ? T
+  : T | undefined;
+
 export class ClassRegistry {
-  declare [JSON]: Map<string, any>;
-  declare [SVG]: Map<string, any>;
+  declare [JSON]: Map<string, TJSONResolver>;
+  declare [SVG]: Map<string, TSVGResolver>;
 
   constructor() {
     this[JSON] = new Map();
     this[SVG] = new Map();
   }
 
-  getClass<T>(classType: string): T {
-    const constructor = this[JSON].get(classType);
-    if (!constructor) {
-      throw new FabricError(`No class registered for ${classType}`);
+  getClass<T extends object>(
+    classType: string,
+    strict?: true
+  ): ResolverReturnValue<TJSONResolver<T>>;
+  getClass<T extends object>(
+    classType: string,
+    strict: false
+  ): ResolverReturnValue<TJSONResolver<T>, false>;
+  getClass<T extends object>(
+    data: Record<string, any>,
+    strict?: true
+  ): ResolverReturnValue<TJSONResolver<T>>;
+  getClass<T extends object>(
+    data: Record<string, any>,
+    strict: false
+  ): ResolverReturnValue<TJSONResolver<T>, false>;
+  getClass<T extends object, S extends boolean = true>(
+    arg0: string | Record<string, any>,
+    strict: S = true as S
+  ): ResolverReturnValue<TJSONResolver<T>, S> {
+    if (typeof arg0 === 'object' && arg0.colorStops) {
+      // TODO: remove this backward compat condition once Gradient aligns its type
+      arg0 = 'gradient';
     }
-    return constructor;
+    if (
+      typeof arg0 === 'object' &&
+      ('blur' in arg0 || 'offsetX' in arg0 || 'offsetY' in arg0)
+    ) {
+      // TODO: remove this backward compat condition in v7
+      arg0 = 'shadow';
+    }
+    const constructor = this[JSON].get(
+      typeof arg0 === 'string' ? arg0 : arg0.type
+    );
+    if (!constructor && strict) {
+      throw new Error(`No class registered for ${arg0}`);
+    }
+    return constructor as ResolverReturnValue<TJSONResolver<T>, S>;
   }
 
-  setClass(classConstructor: any, classType?: string) {
+  setClass<T extends object>(
+    classConstructor: ConstructorWithType<T>,
+    classType?: string
+  ) {
     if (classType) {
-      this[JSON].set(classType, classConstructor);
+      this[JSON].set(classType, classConstructor as TJSONResolver<T>);
     } else {
-      this[JSON].set(classConstructor.type, classConstructor);
+      this[JSON].set(
+        classConstructor.type,
+        classConstructor as TJSONResolver<T>
+      );
       // legacy
       // @TODO: needs to be removed in fabric 7 or 8
-      this[JSON].set(classConstructor.type.toLowerCase(), classConstructor);
+      this[JSON].set(
+        classConstructor.type.toLowerCase(),
+        classConstructor as TJSONResolver<T>
+      );
     }
   }
 
-  getSVGClass(SVGTagName: string): any {
-    return this[SVG].get(SVGTagName);
+  getSVGClass<T extends object, S extends boolean = true>(
+    SVGTagName: string,
+    strict: S = true as S
+  ): ResolverReturnValue<TSVGResolver<T>, S> {
+    const constructor = this[SVG].get(SVGTagName);
+    if (!constructor && strict) {
+      throw new Error(`No class registered for SVG tag ${SVGTagName}`);
+    }
+    return constructor as ResolverReturnValue<TSVGResolver<T>, S>;
   }
 
-  setSVGClass(classConstructor: any, SVGTagName?: string) {
+  setSVGClass<T extends object>(
+    classConstructor: ConstructorWithType<T>,
+    SVGTagName?: string
+  ) {
     this[SVG].set(
       SVGTagName ?? classConstructor.type.toLowerCase(),
-      classConstructor
+      classConstructor as TSVGResolver<T>
     );
   }
 }

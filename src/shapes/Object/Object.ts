@@ -11,12 +11,12 @@ import {
 import type { ObjectEvents } from '../../EventTypeDefs';
 import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
-import { Shadow } from '../../Shadow';
+import type { Shadow } from '../../Shadow';
 import type {
+  TCacheCanvasDimensions,
   TDegree,
   TFiller,
   TSize,
-  TCacheCanvasDimensions,
   Abortable,
   TOptions,
 } from '../../typedefs';
@@ -704,9 +704,6 @@ export class FabricObject<
     } else if (key === 'scaleY' && value < 0) {
       this.flipY = !this.flipY;
       value *= -1;
-      // i don't like this automatic initialization here
-    } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
-      value = new Shadow(value);
     } else if (key === 'dirty' && this.group && value) {
       // a dirty child makes the parent dirty
       // but a non dirty child will not make the parent non dirty.
@@ -1327,7 +1324,6 @@ export class FabricObject<
    * and format option. toCanvasElement is faster and produce no loss of quality.
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
-   * @todo fix the export type, it could not be Image but the type that getClass return for 'image'.
    * @param {Object} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
@@ -1339,10 +1335,10 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): FabricImage {
+  cloneAsImage<T extends Image = Image>(options: any): T {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    const ImageClass = classRegistry.getClass<typeof FabricImage>('image');
+    const ImageClass = classRegistry.getClass<T>('image');
     return new ImageClass(canvasEl);
   }
 
@@ -1572,9 +1568,10 @@ export class FabricObject<
     { type, ...object }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
-    return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
+    const data = cloneDeep(object);
+    return enlivenObjectEnlivables<any>(data as any, options).then(
       (enlivedMap) => {
-        const allOptions = { ...options, ...enlivedMap };
+        const allOptions = { ...data, ...enlivedMap };
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {

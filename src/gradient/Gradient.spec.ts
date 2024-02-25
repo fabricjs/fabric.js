@@ -2,6 +2,8 @@ import { expect } from '@jest/globals';
 import { getFabricDocument } from '../env';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Gradient } from './Gradient';
+import { parseGradientUnits } from './parser/misc';
+
 import type { SVGOptions } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
@@ -11,18 +13,26 @@ describe('Gradient', () => {
     obj: FabricObject,
     options: Partial<SVGOptions> = {}
   ) {
-    return Gradient.fromElement(gradientDef, obj, {
-      width: 0,
-      height: 0,
-      viewBoxHeight: 0,
-      viewBoxWidth: 0,
-      opacity: 1,
+    const gradientUnits = parseGradientUnits(gradientDef);
+    const center = obj._findCenterFromElement();
+    return Gradient.fromElement(gradientDef, {
       ...options,
-    } as SVGOptions);
+      gradientUnits,
+      ...(gradientUnits === 'pixels'
+        ? {
+            offsetX: obj.width / 2 - center.x,
+            offsetY: obj.height / 2 - center.y,
+          }
+        : {
+            offsetX: 0,
+            offsetY: 0,
+          }),
+    });
   }
 
   it('registered in class registry', () => {
     expect(classRegistry.getClass('gradient')).toEqual(Gradient);
+    expect(classRegistry.getSVGClass('gradient')).toEqual(Gradient);
     expect(classRegistry.getClass('linear')).toEqual(Gradient);
     expect(classRegistry.getClass('radial')).toEqual(Gradient);
   });
