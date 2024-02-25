@@ -7,6 +7,7 @@ import {
   LAYOUT_TYPE_ADDED,
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
+import { ActiveSelectionLayoutManager } from '../LayoutManager/ActiveSelectionLayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -28,9 +29,22 @@ export interface ActiveSelectionOptions extends GroupProps {
 export class ActiveSelection extends Group {
   static type = 'ActiveSelection';
 
+  /**
+   * The ActiveSelection needs to use the ActiveSelectionLayoutManager
+   * or selections on interactive groups may be broken
+   */
+  declare layoutManager: ActiveSelectionLayoutManager;
+
   static ownDefaults: Record<string, any> = {
     multiSelectionStacking: 'canvas-stacking',
   };
+
+  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
+    super(objects, {
+      layoutManager: new ActiveSelectionLayoutManager(),
+      ...options,
+    });
+  }
 
   static getDefaults() {
     return { ...super.getDefaults(), ...ActiveSelection.ownDefaults };
