@@ -12,13 +12,14 @@ export class ActiveSelectionLayoutManager extends LayoutManager {
   subscribeTargets(
     context: RegistrationContext & Partial<StrictLayoutContext>
   ) {
-    context.targets.forEach(
-      (object) =>
-        object.parent &&
-        this.subscribe(context.target, {
-          target: object.parent, // the original group, the one that will need a relayour
+    context.targets.forEach((object) => {
+      const { parent, group } = object;
+      parent &&
+        group &&
+        parent.layoutManager.subscribe(group, {
+          target: parent, // the original group, the one that will need a relayour
           targets: context.targets,
-        })
-    );
+        });
+    });
   }
 }
