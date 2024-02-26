@@ -1,5 +1,6 @@
-import http from 'http';
 import * as fabric from 'fabric/node';
+import http from 'http';
+import 'source-map-support/register.js';
 
 const port = Number(process.argv[2]);
 
