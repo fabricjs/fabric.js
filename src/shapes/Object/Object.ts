@@ -19,6 +19,7 @@ import type {
   TCacheCanvasDimensions,
   Abortable,
   TOptions,
+  ImageFormat,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -69,6 +70,34 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   > & {
     _cacheContext: CanvasRenderingContext2D;
   };
+
+export type ObjectToCanvasElementOptions = {
+  format?: ImageFormat;
+  /** Multiplier to scale by */
+  multiplier?: number;
+  /** Cropping left offset. Introduced in v1.2.14 */
+  left?: number;
+  /** Cropping top offset. Introduced in v1.2.14 */
+  top?: number;
+  /** Cropping width. Introduced in v1.2.14 */
+  width?: number;
+  /** Cropping height. Introduced in v1.2.14 */
+  height?: number;
+  /** Enable retina scaling for clone image. Introduce in 1.6.4 */
+  enableRetinaScaling?: boolean;
+  /** Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4 */
+  withoutTransform?: boolean;
+  /** Remove current object shadow. Introduced in 2.4.2 */
+  withoutShadow?: boolean;
+  /** Account for canvas viewport transform */
+  viewportTransform?: boolean;
+  /** Function to create the output canvas to export onto */
+  canvasProvider?: <T extends StaticCanvas>(el?: HTMLCanvasElement) => T;
+};
+
+type toDataURLOptions = ObjectToCanvasElementOptions & {
+  quality?: number;
+};
 
 /**
  * Root object class from which all 2d shape classes inherit from
@@ -1328,7 +1357,7 @@ export class FabricObject<
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
    * @todo fix the export type, it could not be Image but the type that getClass return for 'image'.
-   * @param {Object} [options] for clone as image, passed to toDataURL
+   * @param {ObjectToCanvasElementOptions} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1339,7 +1368,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): FabricImage {
+  cloneAsImage(options: ObjectToCanvasElementOptions): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
     const ImageClass = classRegistry.getClass<typeof FabricImage>('image');
@@ -1348,7 +1377,7 @@ export class FabricObject<
 
   /**
    * Converts an object into a HTMLCanvas element
-   * @param {Object} options Options object
+   * @param {ObjectToCanvasElementOptions} options Options object
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1358,10 +1387,10 @@ export class FabricObject<
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
-   * @param {(el: HTMLCanvasElement) => Canvas} [options.canvasProvider] Create the output canvas
+   * @param {(el?: HTMLCanvasElement) => StaticCanvas} [options.canvasProvider] Create the output canvas
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any = {}) {
+  toCanvasElement(options: ObjectToCanvasElementOptions = {}) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
@@ -1457,7 +1486,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL(options: any = {}) {
+  toDataURL(options: toDataURLOptions = {}) {
     return toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
