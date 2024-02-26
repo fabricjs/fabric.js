@@ -73,31 +73,31 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
 
 export type ObjectToCanvasElementOptions = {
   format?: ImageFormat;
-  // Multiplier to scale by
+  /** Multiplier to scale by */
   multiplier?: number;
-  // Cropping left offset. Introduced in v1.2.14
+  /** Cropping left offset. Introduced in v1.2.14 */
   left?: number;
-  // Cropping top offset. Introduced in v1.2.14
+  /** Cropping top offset. Introduced in v1.2.14 */
   top?: number;
-  // Cropping width. Introduced in v1.2.14
+  /** Cropping width. Introduced in v1.2.14 */
   width?: number;
-  // Cropping height. Introduced in v1.2.14
+  /** Cropping height. Introduced in v1.2.14 */
   height?: number;
-  // Enable retina scaling for clone image. Introduce in 1.6.4
+  /** Enable retina scaling for clone image. Introduce in 1.6.4 */
   enableRetinaScaling?: boolean;
-  // Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
+  /** Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4 */
   withoutTransform?: boolean;
-  // Remove current object shadow. Introduced in 2.4.2
+  /** Remove current object shadow. Introduced in 2.4.2 */
   withoutShadow?: boolean;
-  // Account for canvas viewport transform
+  /** Account for canvas viewport transform */
   viewportTransform?: boolean;
-  // Function to create the output canvas to export ont
-  canvasProvider?: (el?: HTMLCanvasElement) => Canvas;
-}
+  /** Function to create the output canvas to export onto */
+  canvasProvider?: <T extends StaticCanvas>(el?: HTMLCanvasElement) => T;
+};
 
 type toDataURLOptions = ObjectToCanvasElementOptions & {
   quality?: number;
-}
+};
 
 /**
  * Root object class from which all 2d shape classes inherit from
@@ -1387,7 +1387,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
-   * @param {(el?: HTMLCanvasElement) => Canvas} [options.canvasProvider] Create the output canvas
+   * @param {(el?: HTMLCanvasElement) => StaticCanvas} [options.canvasProvider] Create the output canvas
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
   toCanvasElement(options: ObjectToCanvasElementOptions = {}) {
