@@ -132,6 +132,11 @@ export type StrictLayoutContext = LayoutContext & {
   stopPropagation(): void;
 };
 
+export type RegistrationContext = {
+  targets: FabricObject[];
+  target: Group;
+};
+
 export type LayoutBeforeEvent = {
   context: StrictLayoutContext;
 };

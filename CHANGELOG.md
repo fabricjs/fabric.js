@@ -3,6 +3,14 @@
 ## [next]
 
 - fix(LayoutManager): wrong bounding box position when activeSelection has originX/originY that are not default left/top [#9649](https://github.com/fabricjs/fabric.js/pull/9649)
+- chore(TS): Add type for options in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
+- ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
+- fix(Canvas): Correct type mainTouchId initialization [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
+- feat(Circle): Add counterclockwise parameter to Circle class [#9670](https://github.com/fabricjs/fabric.js/pull/9670)
+
+## [6.0.0-beta19]
+
+- feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
 - fix(Object): support specyfing toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
 - ci(): no `src` imports [#9657](https://github.com/fabricjs/fabric.js/pull/9657)
 - fix(textStyles): Split text into graphemes correctly [#9646](https://github.com/fabricjs/fabric.js/pull/9646)
