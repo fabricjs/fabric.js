@@ -14,7 +14,7 @@ class CanvasProviderListing {
     this.locked = true;
   };
   unlock = () => {
-    this.locked = true;
+    this.locked = false;
   };
 }
 
