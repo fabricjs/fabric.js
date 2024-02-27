@@ -30,7 +30,8 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
-const layoutingEvents = [
+export const layoutingEvents = [
+  'modified',
   'moving',
   'resizing',
   'rotating',
@@ -82,18 +83,15 @@ export class LayoutManager {
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
-  /**
-   * subscribe to object layout triggers
-   */
-  subscribe(
-    object: FabricObject,
+  protected attachHandlers(
+    childObject: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
-  ) {
+  ): (() => void)[] {
     const { target } = context;
-    this.unsubscribe(object, context);
-    const disposers = [
-      object.on('modified', (e) =>
-        target.layoutManager.performLayout({
+    // TODO fix typescript that block us from condesing this to a single call per key.
+    return [
+      childObject.on('modified', (e) =>
+        this.performLayout({
           trigger: 'modified',
           e,
           type: LAYOUT_TYPE_OBJECT_MODIFIED,
@@ -101,16 +99,27 @@ export class LayoutManager {
         })
       ),
       ...layoutingEvents.map((key) =>
-        object.on(key, (e) => {
-          target.layoutManager.performLayout({
+        childObject.on(key, (e) => {
+          this.performLayout({
             trigger: key,
-            e: { ...e, target: object },
+            e,
             type: LAYOUT_TYPE_OBJECT_MODIFYING,
             target,
           });
         })
       ),
     ];
+  }
+
+  /**
+   * subscribe to object layout triggers
+   */
+  protected subscribe(
+    object: FabricObject,
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
+    this.unsubscribe(object, context);
+    const disposers = this.attachHandlers(object, context);
     this._subscriptions.set(object, disposers);
   }
 
