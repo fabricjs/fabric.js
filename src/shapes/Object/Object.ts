@@ -55,6 +55,7 @@ import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import { getDevicePixelRatio, getEnv } from '../../env';
 import { log } from '../../util/internals/console';
+import { canvasProvider } from '../../canvas/CanvasProvider';
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -199,6 +200,7 @@ export class FabricObject<
    * @type boolean
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   _cacheContext: CanvasRenderingContext2D | null = null;
 
@@ -210,6 +212,7 @@ export class FabricObject<
    * @type HTMLCanvasElement
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare _cacheCanvas?: HTMLCanvasElement;
 
@@ -219,6 +222,7 @@ export class FabricObject<
    * @type number
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare cacheWidth?: number;
 
@@ -228,6 +232,7 @@ export class FabricObject<
    * @type number
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare cacheHeight?: number;
 
@@ -237,6 +242,7 @@ export class FabricObject<
    * @type number
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare zoomX?: number;
 
@@ -246,6 +252,7 @@ export class FabricObject<
    * @type number
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare zoomY?: number;
 
@@ -255,6 +262,7 @@ export class FabricObject<
    * @type number
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare cacheTranslationX?: number;
 
@@ -264,6 +272,7 @@ export class FabricObject<
    * @type number
    * @default undefined
    * @private
+   * @deprecated unused @todo remove
    */
   declare cacheTranslationY?: number;
 
@@ -274,15 +283,6 @@ export class FabricObject<
    * @private
    */
   declare group?: Group;
-
-  /**
-   * Indicate if the object is sitting on a cache dedicated to it
-   * or is part of a larger cache for many object ( a group for example)
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare ownCaching?: boolean;
 
   /**
    * Private. indicates if the object inside a group is on a transformed context or not
@@ -345,6 +345,7 @@ export class FabricObject<
   /**
    * Create a the canvas used to keep the cached copy of the object
    * @private
+   * @deprecated unused @todo remove
    */
   _createCacheCanvas() {
     this._cacheCanvas = createCanvasElement();
@@ -368,6 +369,7 @@ export class FabricObject<
    * @return {Object}.height height of canvas
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @deprecated unused @todo remove
    */
   _limitCacheSize(
     dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
@@ -416,6 +418,7 @@ export class FabricObject<
    * @return {Object}.height height of canvas
    * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @deprecated unused @todo remove
    */
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
@@ -441,6 +444,7 @@ export class FabricObject<
    * returns true or false if canvas needed resize.
    * @private
    * @return {Boolean} true if the canvas has been resized
+   * @deprecated unused @todo remove
    */
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas,
@@ -745,18 +749,16 @@ export class FabricObject<
 
     this[key as keyof this] = value;
 
-    if (isChanged) {
-      const groupNeedsUpdate = this.group && this.group.isOnACache();
+    if (isChanged && this.group) {
       if (
         (this.constructor as typeof FabricObject).cacheProperties.includes(key)
       ) {
         this.dirty = true;
-        groupNeedsUpdate && this.group!.set('dirty', true);
+        this.group.set('dirty', true);
       } else if (
-        groupNeedsUpdate &&
         (this.constructor as typeof FabricObject).stateProperties.includes(key)
       ) {
-        this.group!.set('dirty', true);
+        this.group.set('dirty', true);
       }
     }
     return this;
@@ -776,23 +778,42 @@ export class FabricObject<
     );
   }
 
+  requiresContextIsolation() {
+    if (
+      this.paintFirst === 'stroke' &&
+      !!this.shadow &&
+      this.hasFill() &&
+      this.hasStroke()
+    ) {
+      return true;
+    }
+    if (this.clipPath) {
+      return true;
+    }
+    return false;
+  }
+
   renderInIsolation(
     destination: CanvasRenderingContext2D,
     forClipping = false
   ) {
-    const { ctx: isolatedContext, release } =
-      this.canvas!.canvasProvider.request(destination.canvas);
+    const isolatedContext = canvasProvider.request(destination.canvas);
     isolatedContext.save();
     this._setOpacity(isolatedContext);
     this._setShadow(isolatedContext);
     isolatedContext.setTransform(destination.getTransform());
+    this.transform(isolatedContext);
     forClipping &&
       this.absolutePositioned &&
       destination.transform(...invertTransform(this.calcTransformMatrix()));
-    this.transform(isolatedContext);
     this._renderBackground(isolatedContext);
     this._render(isolatedContext);
-    this._drawClipPath(isolatedContext, this.clipPath);
+    const { clipPath } = this;
+    if (clipPath) {
+      clipPath._set('canvas', this.canvas);
+      clipPath._transformDone = true;
+      clipPath.renderInIsolation(isolatedContext, true);
+    }
     isolatedContext.restore();
 
     destination.save();
@@ -804,7 +825,7 @@ export class FabricObject<
     destination.setTransform(1, 0, 0, 1, 0, 0);
     destination.drawImage(isolatedContext.canvas, 0, 0);
     destination.restore();
-    release();
+    isolatedContext.release();
   }
 
   /**
@@ -825,8 +846,8 @@ export class FabricObject<
       return;
     }
     ctx.save();
+    ctx.globalCompositeOperation = this.globalCompositeOperation;
     if (this.requiresContextIsolation()) {
-      ctx.globalCompositeOperation = this.globalCompositeOperation;
       this.renderInIsolation(ctx);
     } else {
       this.drawSelectionBackground(ctx);
@@ -835,7 +856,6 @@ export class FabricObject<
       this.transform(ctx);
       this._renderBackground(ctx);
       this._render(ctx);
-      this._drawClipPath(ctx, this.clipPath);
     }
     this.dirty = false;
     ctx.restore();
@@ -843,31 +863,6 @@ export class FabricObject<
 
   drawSelectionBackground(ctx: CanvasRenderingContext2D) {
     /* no op */
-  }
-
-  renderCache(options?: any) {
-    options = options || {};
-    if (!this._cacheCanvas || !this._cacheContext) {
-      this._createCacheCanvas();
-    }
-    if (this.isCacheDirty() && this._cacheContext) {
-      const ctx = this._cacheContext;
-      this._renderBackground(ctx);
-      this._render(ctx);
-      this._drawClipPath(ctx, this.clipPath);
-
-      this.dirty = false;
-    }
-  }
-
-  /**
-   * Remove cacheCanvas and its dimensions from the objects
-   */
-  _removeCacheCanvas() {
-    this._cacheCanvas = undefined;
-    this._cacheContext = null;
-    this.cacheWidth = 0;
-    this.cacheHeight = 0;
   }
 
   /**
@@ -901,32 +896,6 @@ export class FabricObject<
   }
 
   /**
-   * When set to `true`, force the object to have its own cache, even if it is inside a group
-   * it may be needed when your object behave in a particular way on the cache and always needs
-   * its own isolated canvas to render correctly.
-   * Created to be overridden
-   * since 1.7.12
-   * @returns Boolean
-   */
-  requiresContextIsolation() {
-    if (
-      this.paintFirst === 'stroke' &&
-      this.hasFill() &&
-      this.hasStroke() &&
-      !!this.shadow
-    ) {
-      return true;
-    }
-    if (this.clipPath) {
-      return true;
-    }
-    if (this.globalCompositeOperation !== 'source-over') {
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Decide if the object should cache or not. Create its own cache level
    * objectCaching is a global flag, wins over everything
    * needsItsOwnCache should be used when the object drawing method requires
@@ -937,110 +906,6 @@ export class FabricObject<
    */
   shouldCache() {
     return this.objectCaching;
-  }
-
-  /**
-   * Check if this object will cast a shadow with an offset.
-   * used by Group.shouldCache to know if child has a shadow recursively
-   * @return {Boolean}
-   * @deprecated
-   */
-  willDrawShadow() {
-    return (
-      !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0)
-    );
-  }
-
-  /**
-   * Execute the drawing operation for an object clipPath
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {FabricObject} clipPath
-   */
-  drawClipPathOnCache(
-    ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject
-  ) {
-    ctx.save();
-    // DEBUG: uncomment this line, comment the following
-    // ctx.globalAlpha = 0.4
-    if (clipPath.inverted) {
-      ctx.globalCompositeOperation = 'destination-out';
-    } else {
-      ctx.globalCompositeOperation = 'destination-in';
-    }
-    //ctx.scale(1 / 2, 1 / 2);
-    if (clipPath.absolutePositioned) {
-      const m = invertTransform(this.calcTransformMatrix());
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    }
-    clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-    ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
-    );
-    ctx.restore();
-  }
-
-  /**
-   * Prepare clipPath state and cache and draw it on instance's cache
-   * @param {CanvasRenderingContext2D} ctx
-   * @param {FabricObject} clipPath
-   */
-  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
-    if (!clipPath) {
-      return;
-    }
-    // needed to setup a couple of variables
-    // path canvas gets overridden with this one.
-    // TODO find a better solution?
-    clipPath._set('canvas', this.canvas);
-    clipPath._transformDone = true;
-    clipPath.renderInIsolation(ctx, true);
-  }
-
-  /**
-   * Paint the cached copy of the object on the target context.
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   */
-  drawCacheOnCanvas(this: TCachedFabricObject, ctx: CanvasRenderingContext2D) {
-    ctx.scale(1 / this.zoomX, 1 / this.zoomY);
-    ctx.drawImage(
-      this._cacheCanvas,
-      -this.cacheTranslationX,
-      -this.cacheTranslationY
-    );
-  }
-
-  /**
-   * Check if cache is dirty
-   * @param {Boolean} skipCanvas skip canvas checks because this object is painted
-   * on parent canvas.
-   */
-  isCacheDirty(skipCanvas = false) {
-    if (this.isNotVisible()) {
-      return false;
-    }
-    if (
-      this._cacheCanvas &&
-      this._cacheContext &&
-      !skipCanvas &&
-      this._updateCacheCanvas()
-    ) {
-      // in this case the context is already cleared.
-      return true;
-    } else {
-      if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
-        if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-          const width = this.cacheWidth! / this.zoomX!;
-          const height = this.cacheHeight! / this.zoomY!;
-          this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
-        }
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

@@ -70,7 +70,7 @@ export const fabricObjectDefaultValues = {
   visible: true,
   includeDefaultValues: true,
   excludeFromExport: false,
-  objectCaching: true,
+  objectCaching: false,
   clipPath: undefined,
   inverted: false,
   absolutePositioned: false,
