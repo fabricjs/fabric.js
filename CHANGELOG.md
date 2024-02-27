@@ -2,6 +2,7 @@
 
 ## [next]
 
+- WIP fix(): context isolation [#9693](https://github.com/fabricjs/fabric.js/pull/9693)
 - chore(TS): Add type for options in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
 - ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
 - fix(Canvas): Correct type mainTouchId initialization [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
