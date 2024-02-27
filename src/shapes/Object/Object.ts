@@ -776,6 +776,37 @@ export class FabricObject<
     );
   }
 
+  renderInIsolation(
+    destination: CanvasRenderingContext2D,
+    forClipping = false
+  ) {
+    const { ctx: isolatedContext, release } =
+      this.canvas!.canvasProvider.request(destination.canvas);
+    isolatedContext.save();
+    this._setOpacity(isolatedContext);
+    this._setShadow(isolatedContext);
+    isolatedContext.setTransform(destination.getTransform());
+    forClipping &&
+      this.absolutePositioned &&
+      destination.transform(...invertTransform(this.calcTransformMatrix()));
+    this.transform(isolatedContext);
+    this._renderBackground(isolatedContext);
+    this._render(isolatedContext);
+    this._drawClipPath(isolatedContext, this.clipPath);
+    isolatedContext.restore();
+
+    destination.save();
+    if (forClipping) {
+      destination.globalCompositeOperation = this.inverted
+        ? 'destination-out'
+        : 'destination-in';
+    }
+    destination.setTransform(1, 0, 0, 1, 0, 0);
+    destination.drawImage(isolatedContext.canvas, 0, 0);
+    destination.restore();
+    release();
+  }
+
   /**
    * Renders an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -794,19 +825,19 @@ export class FabricObject<
       return;
     }
     ctx.save();
-    this._setupCompositeOperation(ctx);
-    this.drawSelectionBackground(ctx);
-    this.transform(ctx);
-    this._setOpacity(ctx);
-    this._setShadow(ctx);
-    if (this.shouldCache()) {
-      this.renderCache();
-      (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
+    if (this.requiresContextIsolation()) {
+      ctx.globalCompositeOperation = this.globalCompositeOperation;
+      this.renderInIsolation(ctx);
     } else {
-      this._removeCacheCanvas();
-      this.drawObject(ctx);
-      this.dirty = false;
+      this.drawSelectionBackground(ctx);
+      this._setOpacity(ctx);
+      this._setShadow(ctx);
+      this.transform(ctx);
+      this._renderBackground(ctx);
+      this._render(ctx);
+      this._drawClipPath(ctx, this.clipPath);
     }
+    this.dirty = false;
     ctx.restore();
   }
 
@@ -820,7 +851,11 @@ export class FabricObject<
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.drawObject(this._cacheContext, options.forClipping);
+      const ctx = this._cacheContext;
+      this._renderBackground(ctx);
+      this._render(ctx);
+      this._drawClipPath(ctx, this.clipPath);
+
       this.dirty = false;
     }
   }
@@ -873,7 +908,7 @@ export class FabricObject<
    * since 1.7.12
    * @returns Boolean
    */
-  needsItsOwnCache() {
+  requiresContextIsolation() {
     if (
       this.paintFirst === 'stroke' &&
       this.hasFill() &&
@@ -883,6 +918,9 @@ export class FabricObject<
       return true;
     }
     if (this.clipPath) {
+      return true;
+    }
+    if (this.globalCompositeOperation !== 'source-over') {
       return true;
     }
     return false;
@@ -898,10 +936,7 @@ export class FabricObject<
    * @return {Boolean}
    */
   shouldCache() {
-    this.ownCaching =
-      this.needsItsOwnCache() ||
-      (this.objectCaching && (!this.group || !this.group.isOnACache()));
-    return this.ownCaching;
+    return this.objectCaching;
   }
 
   /**
@@ -949,27 +984,6 @@ export class FabricObject<
   }
 
   /**
-   * Execute the drawing operation for an object on a specified context
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {boolean} forClipping apply clipping styles
-   */
-  drawObject(ctx: CanvasRenderingContext2D, forClipping?: boolean) {
-    const originalFill = this.fill,
-      originalStroke = this.stroke;
-    if (forClipping) {
-      this.fill = 'black';
-      this.stroke = '';
-      this._setClippingProperties(ctx);
-    } else {
-      this._renderBackground(ctx);
-    }
-    this._render(ctx);
-    this._drawClipPath(ctx, this.clipPath);
-    this.fill = originalFill;
-    this.stroke = originalStroke;
-  }
-
-  /**
    * Prepare clipPath state and cache and draw it on instance's cache
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
@@ -982,10 +996,8 @@ export class FabricObject<
     // path canvas gets overridden with this one.
     // TODO find a better solution?
     clipPath._set('canvas', this.canvas);
-    clipPath.shouldCache();
     clipPath._transformDone = true;
-    clipPath.renderCache({ forClipping: true });
-    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
+    clipPath.renderInIsolation(ctx, true);
   }
 
   /**
@@ -1550,27 +1562,6 @@ export class FabricObject<
       this.top = y;
       this.originX = originX;
       this.originY = originY;
-    }
-  }
-
-  /**
-   * This callback function is called by the parent group of an object every
-   * time a non-delegated property changes on the group. It is passed the key
-   * and value as parameters. Not adding in this function's signature to avoid
-   * Travis build error about unused variables.
-   */
-  setOnGroup() {
-    // implemented by sub-classes, as needed.
-  }
-
-  /**
-   * Sets canvas globalCompositeOperation for specific object
-   * custom composition operation for the particular object can be specified using globalCompositeOperation property
-   * @param {CanvasRenderingContext2D} ctx Rendering canvas context
-   */
-  _setupCompositeOperation(ctx: CanvasRenderingContext2D) {
-    if (this.globalCompositeOperation) {
-      ctx.globalCompositeOperation = this.globalCompositeOperation;
     }
   }
 

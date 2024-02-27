@@ -44,6 +44,7 @@ import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
+import { CanvasProvider } from './CanvasProvider';
 
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
@@ -160,6 +161,7 @@ export class StaticCanvas<
   protected declare nextRenderHandle: number;
 
   declare elements: StaticCanvasDOMManager;
+  declare canvasProvider: CanvasProvider;
 
   static ownDefaults = staticCanvasDefaults;
 
@@ -184,6 +186,7 @@ export class StaticCanvas<
     );
     this.set(options);
     this.initElements(el);
+    this.canvasProvider = new CanvasProvider();
     this._setDimensionsImpl({
       width: this.width || this.elements.lower.el.width || 0,
       height: this.height || this.elements.lower.el.height || 0,
@@ -587,8 +590,6 @@ export class StaticCanvas<
     }
     if (path) {
       path._set('canvas', this);
-      // needed to setup a couple of variables
-      path.shouldCache();
       path._transformDone = true;
       path.renderCache({ forClipping: true });
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
