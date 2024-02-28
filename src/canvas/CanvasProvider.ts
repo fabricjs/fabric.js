@@ -110,7 +110,8 @@ class CanvasProvider {
   };
   private stack: StatefulRenderingContext[] = [];
   private pruned: StatefulRenderingContext[] = [];
-  private isPruning = false;
+  private pruning = false;
+  private locked: boolean;
 
   public registerBuilder(builder: RenderingContextProvider) {
     this.builder = builder;
@@ -167,37 +168,67 @@ class CanvasProvider {
         )
     ) || this.create(type, options)) as StatefulRenderingContext<T>;
     ctx.__locked = true;
-    this.isPruning && this.pruned.push(ctx);
+    this.pruning && this.pruned.push(ctx);
     const { canvas } = ctx;
     canvas.width = width;
     canvas.height = height;
     return ctx;
   }
 
-  public release(ctx: RenderingContext) {
-    const found = this.stack.find((c) => c === ctx);
-    found && (found.__locked = false);
+  /**
+   * Inform that resources are locked and can't be freed
+   * {@link dispose} and {@link prune} will have no affect while {@link locked}
+   */
+  lock() {
+    this.locked = true;
   }
 
+  /**
+   * Inform that the instance is idle so that resources can be freed upon request
+   */
+  unlock() {
+    this.locked = false;
+  }
+
+  /**
+   * Call this at the beginning of the rendering cycle of the deepest object tree
+   * Call {@link prune} at the end of the rendering cycle to cleanup unused resources
+   */
   public beginPruning() {
-    this.isPruning = true;
+    this.pruning = true;
     this.pruned = [];
   }
 
+  /**
+   * Dispose of unused resources
+   * Notice that this method should be called after {@link beginPruning} at the end of the rendering cycle
+   * Calling this method without calling {@link beginPruning} or during a rendering cycle has no effect
+   */
   public prune() {
+    if (this.locked || !this.pruning) {
+      return;
+    }
     this.stack
       .filter((ctx) => !this.pruned.includes(ctx))
       .forEach((ctx) => getEnv().dispose(ctx.canvas));
     this.stack = this.pruned;
     this.pruned = [];
-    this.isPruning = false;
+    this.pruning = false;
   }
 
+  /**
+   * Dispose of all resources
+   * Notice that this method can be called at anytime
+   * However calling during a rendering cycle will have no effect
+   */
   public dispose() {
+    if (this.locked) {
+      return;
+    }
     this.stack.map((ctx) => getEnv().dispose(ctx.canvas));
     this.stack = [];
     this.pruned = [];
-    this.isPruning = false;
+    this.pruning = false;
   }
 }
 

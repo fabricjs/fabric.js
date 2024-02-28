@@ -44,6 +44,7 @@ import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
+import { canvasProvider } from './CanvasProvider';
 
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
@@ -567,6 +568,8 @@ export class StaticCanvas<
       return;
     }
 
+    canvasProvider.lock();
+
     const v = this.viewportTransform,
       path = this.clipPath;
     this.calcViewportBoundaries();
@@ -595,6 +598,8 @@ export class StaticCanvas<
       this.drawControls(ctx);
     }
     this.fire('after:render', { ctx });
+
+    canvasProvider.unlock();
 
     if (this.__cleanupTask) {
       this.__cleanupTask();
