@@ -63,8 +63,6 @@ describe('Plane Change', () => {
     const group2 = new Group();
     const obj = new FabricObject();
 
-    jest.spyOn(group, 'isOnACache').mockReturnValue(false);
-
     applyTransformToObject(obj, m);
     applyTransformToObject(group, m1);
     applyTransformToObject(group2, m2);

@@ -37,9 +37,19 @@ export function testCase(canvas: fabric.Canvas) {
     height: 50,
     left: 0,
     top: 100,
+    paintFirst: 'stroke',
+    shadow: new fabric.Shadow({
+      affectStroke: true,
+      blur: 5,
+      offsetX: 20,
+      offsetY: 20,
+      // nonScaling: true,
+      color: 'red',
+    }),
   });
   canvas.centerObject(text);
   canvas.centerObject(rect);
+  canvas.preserveObjectStacking = true;
   const group = new fabric.Group([rect, text], {
     subTargetCheck: true,
     interactive: true,
@@ -61,6 +71,9 @@ export function testCase(canvas: fabric.Canvas) {
           opacity: value,
         });
         text.set({ dirty: true });
+        rect.shadow!.offsetX = 20 * (value + 1);
+        rect.shadow!.blur = 20 * value;
+        rect.set({ dirty: true });
         canvas.renderAll();
       },
       onComplete: () => animate(!toState),
