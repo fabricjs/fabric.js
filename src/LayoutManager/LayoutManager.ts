@@ -31,7 +31,6 @@ export type SerializedLayoutManager = {
 };
 
 export const layoutingEvents = [
-  'modified',
   'moving',
   'resizing',
   'rotating',

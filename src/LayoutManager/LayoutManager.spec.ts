@@ -163,7 +163,7 @@ describe('Layout Manager', () => {
           ],
           ...triggers.slice(1).map((trigger) => [
             {
-              e: { ...event, target: object },
+              e: event,
               target,
               trigger,
               type: 'object_modifying',
