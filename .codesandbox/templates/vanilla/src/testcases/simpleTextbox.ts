@@ -7,6 +7,7 @@ export function testCase(canvas: fabric.Canvas) {
     splitByGrapheme: true,
     width: 200,
     top: 20,
+    backgroundColor: 'yellow',
     styles: fabric.util.stylesFromArray(
       [
         {
@@ -20,21 +21,81 @@ export function testCase(canvas: fabric.Canvas) {
       ],
       textValue
     ),
+    clipPath: new fabric.Circle({
+      radius: 50,
+      originX: 'center',
+      originY: 'center',
+      scaleX: 2,
+      inverted: true,
+      fill: 'blue',
+      // opacity: 0.4,
+    }),
   });
-  canvas.add(text);
-  canvas.centerObjectH(text);
+  const rect = new fabric.Rect({
+    fill: 'blue',
+    width: 100,
+    height: 50,
+    left: 0,
+    top: 100,
+    paintFirst: 'stroke',
+    shadow: new fabric.Shadow({
+      affectStroke: true,
+      blur: 5,
+      offsetX: 20,
+      offsetY: 20,
+      // nonScaling: true,
+      color: 'red',
+    }),
+  });
+  canvas.centerObject(text);
+  canvas.centerObject(rect);
+  canvas.preserveObjectStacking = true;
+  const group = new fabric.Group([rect, text], {
+    subTargetCheck: true,
+    interactive: true,
+    clipPath: new fabric.Circle({
+      radius: 100,
+      originX: 'center',
+      originY: 'center',
+    }),
+  });
+  canvas.add(group);
+
   function animate(toState) {
-    text.animate(
-      { scaleX: Math.max(toState, 0.1) * 2 },
-      {
-        onChange: () => canvas.renderAll(),
-        onComplete: () => animate(!toState),
-        duration: 1000,
-        easing: toState
-          ? fabric.util.ease.easeInOutQuad
-          : fabric.util.ease.easeInOutSine,
-      }
-    );
+    fabric.util.animate({
+      startValue: 1 - Number(toState),
+      endValue: Number(toState),
+      onChange: (value) => {
+        text.clipPath?.set({
+          scaleX: Math.max(value, 0.1) * 2,
+          opacity: value,
+        });
+        text.set({ dirty: true });
+        rect.shadow!.offsetX = 20 * (value + 1);
+        rect.shadow!.blur = 20 * value;
+        rect.set({ dirty: true });
+        canvas.renderAll();
+      },
+      onComplete: () => animate(!toState),
+      duration: 150,
+      easing: toState
+        ? fabric.util.ease.easeInOutQuad
+        : fabric.util.ease.easeInOutSine,
+    });
+    // text.clipPath!.animate(
+    //   {
+    //     scaleX: Math.max(Number(toState), 0.1) * 2,
+    //     opacity: Number(toState),
+    //   },
+    //   {
+    //     onChange: () => canvas.requestRenderAll(),
+    //     onComplete: () => animate(!toState),
+    //     duration: 150,
+    //     easing: toState
+    //       ? fabric.util.ease.easeInOutQuad
+    //       : fabric.util.ease.easeInOutSine,
+    //   }
+    // );
   }
-  // animate(1);
+  animate(1);
 }

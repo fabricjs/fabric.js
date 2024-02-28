@@ -70,6 +70,7 @@ export const fabricObjectDefaultValues = {
   visible: true,
   includeDefaultValues: true,
   excludeFromExport: false,
+  // TODO: removed as unused or set to false
   objectCaching: true,
   clipPath: undefined,
   inverted: false,

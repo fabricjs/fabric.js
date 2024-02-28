@@ -11,6 +11,6 @@ export type TFabricEnv = {
   readonly window: (Window & typeof globalThis) | DOMWindow;
   readonly isTouchSupported: boolean;
   WebGLProbe: GLProbe;
-  dispose(element: Element): void;
+  dispose(element: Element | OffscreenCanvas): void;
   copyPasteData: TCopyPasteData;
 };

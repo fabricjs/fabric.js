@@ -414,55 +414,17 @@ export class Group
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
-   * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
-   * Generally you do not cache objects in groups because the group is already cached.
-   * @return {Boolean}
+   * Group should always render in isolation to respect {@link CanvasRenderingContext2D#globalCompositeOperation}
    */
-  shouldCache() {
-    const ownCache = FabricObject.prototype.shouldCache.call(this);
-    if (ownCache) {
-      for (let i = 0; i < this._objects.length; i++) {
-        if (this._objects[i].willDrawShadow()) {
-          this.ownCaching = false;
-          return false;
-        }
-      }
-    }
-    return ownCache;
-  }
-
-  /**
-   * Check if this object or a child object will cast a shadow
-   * @return {Boolean}
-   */
-  willDrawShadow() {
-    if (super.willDrawShadow()) {
-      return true;
-    }
-    for (let i = 0; i < this._objects.length; i++) {
-      if (this._objects[i].willDrawShadow()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Check if instance or its group are caching, recursively up
-   * @return {Boolean}
-   */
-  isOnACache(): boolean {
-    return this.ownCaching || (!!this.group && this.group.isOnACache());
+  requiresContextIsolation() {
+    return true;
   }
 
   /**
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawObject(ctx: CanvasRenderingContext2D) {
-    this._renderBackground(ctx);
+  _render(ctx: CanvasRenderingContext2D) {
     for (let i = 0; i < this._objects.length; i++) {
       // TODO: handle rendering edge case somehow
       if (
@@ -477,7 +439,6 @@ export class Group
         this._objects[i].render(ctx);
       }
     }
-    this._drawClipPath(ctx, this.clipPath);
   }
 
   /**
