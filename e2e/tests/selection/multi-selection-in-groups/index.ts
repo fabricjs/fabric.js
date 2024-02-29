@@ -7,7 +7,7 @@ import { Rect, Circle, Group, ClipPathLayout } from 'fabric';
 import { beforeAll } from '../../test';
 
 beforeAll(async (canvas) => {
-  canvas.setDimensions({ width: 700, height: 700 });
+  canvas.setDimensions({ width: 450, height: 450 });
 
   canvas.preserveObjectStacking = true;
   const circle1 = new Circle({ left: 100, top: 50, radius: 50 });
