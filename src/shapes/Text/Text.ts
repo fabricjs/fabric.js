@@ -410,11 +410,11 @@ export class FabricText<
 
   static cacheProperties = [...cacheProperties, ...additionalProps];
 
-  static ownDefaults: Record<string, any> = textDefaultValues;
+  static ownDefaults = textDefaultValues;
 
   static type = 'Text';
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...FabricText.ownDefaults };
   }
 

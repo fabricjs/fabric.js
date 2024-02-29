@@ -55,11 +55,11 @@ export class Polyline<
 
   private declare initialized: true | undefined;
 
-  static ownDefaults: Record<string, any> = polylineDefaultValues;
+  static ownDefaults = polylineDefaultValues;
 
   static type = 'Polyline';
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Polyline.ownDefaults,
