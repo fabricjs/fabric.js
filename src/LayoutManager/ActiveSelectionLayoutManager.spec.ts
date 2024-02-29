@@ -62,6 +62,7 @@ describe('ActiveSelectionLayoutManager', () => {
         asPerformLayout.mockClear();
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => as.fire(trigger, event));
+        expect(asPerformLayout).not.toHaveBeenCalled();
         expect(groupPerformLayout.mock.calls).toMatchObject([
           [
             {
@@ -82,7 +83,6 @@ describe('ActiveSelectionLayoutManager', () => {
         ]);
         groupPerformLayout.mockClear();
         asPerformLayout.mockClear();
-        expect(asPerformLayout).not.toHaveBeenCalled();
         expect(manager['_subscriptions'].get(object)).toBeDefined();
         manager.unsubscribeTargets({ targets: [object], target: as });
         expect(manager['_subscriptions'].get(object)).toBeUndefined();
