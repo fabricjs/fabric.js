@@ -31,6 +31,7 @@ export type SerializedLayoutManager = {
 };
 
 export const buildStandardEvents = (object: FabricObject, target: Group) => {
+  // TODO fix typescript that block us from condesing this to a single call per key.
   return [
     object.on('modified', (e) =>
       target.layoutManager.performLayout({
@@ -110,7 +111,6 @@ export class LayoutManager {
     context: RegistrationContext & Partial<StrictLayoutContext>
   ): (() => void)[] {
     const { target } = context;
-    // TODO fix typescript that block us from condesing this to a single call per key.
     return buildStandardEvents(childObject, target);
   }
 

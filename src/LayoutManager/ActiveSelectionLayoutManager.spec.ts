@@ -31,7 +31,7 @@ describe('ActiveSelectionLayoutManager', () => {
           interactive: true,
           subTargetCheck: true,
         });
-        const as = new ActiveSelection([object]);
+        const as = new ActiveSelection([object], { layoutManager: manager });
         const objectOn = jest.spyOn(object, 'on');
         const objectOff = jest.spyOn(object, 'off');
         const asOn = jest.spyOn(as, 'on');
@@ -45,14 +45,14 @@ describe('ActiveSelectionLayoutManager', () => {
         expect(objectOff).not.toHaveBeenCalled();
       });
 
-      it.skip('a subscribed activeSelection should trigger layout on the object parent', () => {
+      it('a subscribed activeSelection should trigger layout on the object parent', () => {
         const manager = new ActiveSelectionLayoutManager();
         const object = new FabricObject();
         const group = new Group([object], {
           interactive: true,
           subTargetCheck: true,
         });
-        const as = new ActiveSelection([object]);
+        const as = new ActiveSelection([object], { layoutManager: manager });
         const asPerformLayout = jest.spyOn(manager, 'performLayout');
         const groupPerformLayout = jest.spyOn(
           object.parent!.layoutManager,
@@ -66,7 +66,7 @@ describe('ActiveSelectionLayoutManager', () => {
           [
             {
               e: event,
-              target,
+              target: group,
               trigger: 'modified',
               type: 'object_modified',
             },
@@ -74,18 +74,21 @@ describe('ActiveSelectionLayoutManager', () => {
           ...triggers.slice(1).map((trigger) => [
             {
               e: event,
-              target,
+              target: group,
               trigger,
               type: 'object_modifying',
             },
           ]),
         ]);
+        groupPerformLayout.mockClear();
+        asPerformLayout.mockClear();
         expect(asPerformLayout).not.toHaveBeenCalled();
         expect(manager['_subscriptions'].get(object)).toBeDefined();
-        manager['unsubscribe'](object, { target });
+        manager.unsubscribeTargets({ targets: [object], target: as });
         expect(manager['_subscriptions'].get(object)).toBeUndefined();
-        triggers.forEach((trigger) => object.fire(trigger, event));
+        triggers.forEach((trigger) => as.fire(trigger, event));
         expect(groupPerformLayout).not.toHaveBeenCalled();
+        expect(asPerformLayout).not.toHaveBeenCalled();
       });
     });
     describe('triggers and event subscriptions', () => {
