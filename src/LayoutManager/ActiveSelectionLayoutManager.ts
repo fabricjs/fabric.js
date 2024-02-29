@@ -1,9 +1,5 @@
-import { LayoutManager, layoutingEvents } from './LayoutManager';
+import { LayoutManager, buildStandardEvents } from './LayoutManager';
 import type { RegistrationContext, StrictLayoutContext } from './types';
-import {
-  LAYOUT_TYPE_OBJECT_MODIFIED,
-  LAYOUT_TYPE_OBJECT_MODIFYING,
-} from './constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 
 /**
@@ -26,26 +22,6 @@ export class ActiveSelectionLayoutManager extends LayoutManager {
       // nothing to do here
       return [];
     }
-
-    return [
-      activeSelection.on('modified', (e) => {
-        parent.layoutManager.performLayout({
-          trigger: 'modified',
-          e,
-          type: LAYOUT_TYPE_OBJECT_MODIFIED,
-          target: parent,
-        });
-      }),
-      ...layoutingEvents.map((key) =>
-        activeSelection.on(key, (e) => {
-          parent.layoutManager.performLayout({
-            trigger: key,
-            e,
-            type: LAYOUT_TYPE_OBJECT_MODIFYING,
-            target: parent,
-          });
-        })
-      ),
-    ];
+    return buildStandardEvents(activeSelection, parent);
   }
 }

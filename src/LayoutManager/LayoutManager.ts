@@ -1,4 +1,3 @@
-import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { CENTER, iMatrix } from '../constants';
 import type { Group } from '../shapes/Group';
@@ -22,6 +21,7 @@ import type {
   StrictLayoutContext,
 } from './types';
 import { classRegistry } from '../ClassRegistry';
+import type { TModificationEvents } from '../EventTypeDefs';
 
 const LAYOUT_MANAGER = 'layoutManager';
 
@@ -30,15 +30,38 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
-export const layoutingEvents = [
-  'moving',
-  'resizing',
-  'rotating',
-  'scaling',
-  'skewing',
-  'changed',
-  'modifyPoly',
-] as TModificationEvents[];
+export const buildStandardEvents = (object: FabricObject, target: Group) => {
+  return [
+    object.on('modified', (e) =>
+      target.layoutManager.performLayout({
+        trigger: 'modified',
+        e,
+        type: LAYOUT_TYPE_OBJECT_MODIFIED,
+        target,
+      })
+    ),
+    ...(
+      [
+        'moving',
+        'resizing',
+        'rotating',
+        'scaling',
+        'skewing',
+        'changed',
+        'modifyPoly',
+      ] as TModificationEvents[]
+    ).map((key) =>
+      object.on(key, (e) =>
+        target.layoutManager.performLayout({
+          trigger: key,
+          e,
+          type: LAYOUT_TYPE_OBJECT_MODIFYING,
+          target,
+        })
+      )
+    ),
+  ];
+};
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
@@ -88,26 +111,7 @@ export class LayoutManager {
   ): (() => void)[] {
     const { target } = context;
     // TODO fix typescript that block us from condesing this to a single call per key.
-    return [
-      childObject.on('modified', (e) =>
-        this.performLayout({
-          trigger: 'modified',
-          e,
-          type: LAYOUT_TYPE_OBJECT_MODIFIED,
-          target,
-        })
-      ),
-      ...layoutingEvents.map((key) =>
-        childObject.on(key, (e) => {
-          this.performLayout({
-            trigger: key,
-            e,
-            type: LAYOUT_TYPE_OBJECT_MODIFYING,
-            target,
-          });
-        })
-      ),
-    ];
+    return buildStandardEvents(childObject, target);
   }
 
   /**
