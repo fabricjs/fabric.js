@@ -119,8 +119,8 @@
     doc.body.appendChild(wrapper);
     const canvas = new fabric.Canvas(canvasEl);
     assert.equal(wrapper.firstChild, canvas.elements.container, 'replaced canvas el in dom');
-    assert.equal(canvas.elements.container.firstChild, canvas.elements.lower.el, 'appended canvas el to container');
-    assert.equal(canvas.elements.container.lastChild, canvas.elements.upper.el, 'appended upper canvas el to container');
+    assert.equal(canvas.elements.container.firstChild, canvas.elements.main.el, 'appended canvas el to container');
+    assert.equal(canvas.elements.container.lastChild, canvas.elements.top.el, 'appended upper canvas el to container');
   });
 
 

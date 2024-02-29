@@ -18,8 +18,11 @@ export type { StaticCanvasOptions } from './src/canvas/StaticCanvasOptions';
 export { StaticCanvas } from './src/canvas/StaticCanvas';
 export { Canvas } from './src/canvas/Canvas';
 export type { CanvasOptions } from './src/canvas/CanvasOptions';
-export { CanvasDOMManager } from './src/canvas/DOMManagers/CanvasDOMManager';
-export { StaticCanvasDOMManager } from './src/canvas/DOMManagers/StaticCanvasDOMManager';
+export {
+  DOMManager,
+  type DOMManagerType,
+  type StaticDOMManagerType,
+} from './src/canvas/DOMManagers/DOMManager';
 
 export type { XY } from './src/Point';
 export { Point } from './src/Point';

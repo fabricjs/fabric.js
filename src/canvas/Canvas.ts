@@ -18,6 +18,7 @@ import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { isActiveSelection } from '../util/typeAssertions';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
+import { DOMManagerType } from './DOMManagers/DOMManager';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 
@@ -114,8 +115,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   textEditingManager = new TextEditingManager(this);
 
-  constructor(el?: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
-    super(el, options);
+  constructor(
+    arg0?: string | HTMLCanvasElement | DOMManagerType,
+    options: TCanvasOptions = {}
+  ) {
+    super(arg0, options);
+    // enable drag and drop
+    this.elements.items.top.el.setAttribute('draggable', 'true');
     // bind event handlers
     (
       [

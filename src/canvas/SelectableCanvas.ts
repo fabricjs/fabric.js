@@ -37,6 +37,8 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import { DOMManager, DOMManagerType } from './DOMManagers/DOMManager';
+import { FabricError } from '../util/internals/console';
 
 /**
  * Canvas class
@@ -277,12 +279,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
   }
 
-  declare elements: CanvasDOMManager;
+  declare elements: DOMManagerType;
   get upperCanvasEl() {
-    return this.elements.upper?.el;
+    return this.elements.items.top?.el;
   }
   get contextTop() {
-    return this.elements.upper?.ctx;
+    return this.elements.items.top?.ctx;
   }
   get wrapperEl() {
     return this.elements.container;
@@ -294,12 +296,21 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
 
-  protected initElements(el?: string | HTMLCanvasElement) {
-    this.elements = new CanvasDOMManager(el, {
-      allowTouchScrolling: this.allowTouchScrolling,
-      containerClass: this.containerClass,
-    });
+  protected initElements(
+    arg0?: string | HTMLCanvasElement | DOMManagerType
+  ): DOMManagerType {
     this._createCacheCanvas();
+    if (arg0 instanceof DOMManager) {
+      if (!arg0.items.main || !arg0.items.top) {
+        throw new FabricError('Received bad DOMManager');
+      }
+      return arg0;
+    } else {
+      return CanvasDOMManager.build(arg0, {
+        allowTouchScrolling: this.allowTouchScrolling,
+        containerClass: this.containerClass,
+      });
+    }
   }
 
   /**
@@ -992,7 +1003,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @returns {CanvasRenderingContext2D}
    */
   getTopContext(): CanvasRenderingContext2D {
-    return this.elements.upper.ctx;
+    return this.elements.items.top.ctx;
   }
 
   /**
@@ -1001,7 +1012,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {CanvasRenderingContext2D}
    */
   getSelectionContext(): CanvasRenderingContext2D {
-    return this.elements.upper.ctx;
+    return this.elements.items.top.ctx;
   }
 
   /**
@@ -1009,7 +1020,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {HTMLCanvasElement}
    */
   getSelectionElement(): HTMLCanvasElement {
-    return this.elements.upper.el;
+    return this.elements.items.top.el;
   }
 
   /**
