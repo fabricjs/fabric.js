@@ -51,13 +51,19 @@ const IndexPage: NextPage = () => {
   }, []);
 
   return (
-    <div className="position-relative">
+    <div style={{ position: 'relative' }}>
       <CanvasComponent create={create}>
         <CanvasSlot name="main" />
         <CanvasSlot name="pointers" />
+        <iframe
+          src="https://fabricjs.github.io/"
+          width="100%"
+          height="500px"
+          style={{ position: 'absolute', left: 0, top: 0, opacity: 0.8 }}
+        />
         Hello World
         {/* keep on top */}
-        {/* <CanvasSlot name="top" /> */}
+        <CanvasSlot name="top" />
       </CanvasComponent>
     </div>
   );
