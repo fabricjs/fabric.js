@@ -21,28 +21,28 @@ export class ActiveSelectionLayoutManager extends LayoutManager {
     childObject: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
   ): (() => void)[] {
-    const { parent, group } = childObject;
-    if (!parent || group === parent) {
+    const { parent, group: activeSelection } = childObject;
+    if (!parent || !activeSelection || activeSelection === parent) {
       // nothing to do here
       return [];
     }
-    const { target: activeSelection } = context;
+
     return [
-      activeSelection.on('modified', (e) =>
+      activeSelection.on('modified', (e) => {
         parent.layoutManager.performLayout({
           trigger: 'modified',
           e,
           type: LAYOUT_TYPE_OBJECT_MODIFIED,
-          target: activeSelection,
-        })
-      ),
+          target: parent,
+        });
+      }),
       ...layoutingEvents.map((key) =>
         activeSelection.on(key, (e) => {
           parent.layoutManager.performLayout({
             trigger: key,
             e,
             type: LAYOUT_TYPE_OBJECT_MODIFYING,
-            target: activeSelection,
+            target: parent,
           });
         })
       ),
