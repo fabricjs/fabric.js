@@ -55,7 +55,9 @@ let measuringContext: CanvasRenderingContext2D | null;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    measuringContext = createCanvasElement().getContext('2d');
+    const canvas = createCanvasElement();
+    canvas.width = canvas.height = 0;
+    measuringContext = canvas.getContext('2d');
   }
   return measuringContext;
 }
