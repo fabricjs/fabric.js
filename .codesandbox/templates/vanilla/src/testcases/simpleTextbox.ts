@@ -1,6 +1,18 @@
 import * as fabric from 'fabric';
 
 export function testCase(canvas: fabric.Canvas) {
+  const child = new fabric.Rect({
+    width: 200,
+    height: 200,
+    strokeWidth: 0,
+  });
+  const group = new fabric.Group([child], {
+    width: 100,
+    height: 300,
+    strokeWidth: 0,
+    layoutManager: new fabric.LayoutManager(new fabric.FixedLayout()),
+  });
+
   const textValue = 'fabric.js sandbox';
   const text = new fabric.Textbox(textValue, {
     originX: 'center',
@@ -21,7 +33,7 @@ export function testCase(canvas: fabric.Canvas) {
       textValue
     ),
   });
-  canvas.add(text);
+  canvas.add(text, group);
   canvas.centerObjectH(text);
   function animate(toState) {
     text.animate(
