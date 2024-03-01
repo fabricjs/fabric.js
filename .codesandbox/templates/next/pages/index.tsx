@@ -1,16 +1,22 @@
 import * as fabric from 'fabric';
 import { NextPage } from 'next';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CanvasComponent, CanvasSlot } from '../components';
+import { useResize } from '../components/hooks';
 
 const IndexPage: NextPage = () => {
   const ref = useRef<fabric.Canvas>(null);
-  // const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
+  const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
+
+  useResize(ref);
+
   useEffect(() => {
     const canvas = ref.current;
+    // setCanvas(canvas);
     if (!canvas) {
       return;
     }
+
     const textValue = 'fabric.js sandbox';
     const text = new fabric.Textbox(textValue, {
       originX: 'center',
@@ -48,8 +54,6 @@ const IndexPage: NextPage = () => {
     };
     animate(1);
   }, []);
-
-  // useResize(ref, { fillParent: true });
 
   return (
     <div
