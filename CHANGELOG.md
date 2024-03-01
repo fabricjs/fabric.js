@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(LayoutManager): wrong bounding box position when activeSelection has originX/originY that are not default left/top [#9649](https://github.com/fabricjs/fabric.js/pull/9649)
+- perf(): measuring canvas size [#9697](https://github.com/fabricjs/fabric.js/pull/9697)
 - chore(TS): Add type for options in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
 - ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
 - fix(Canvas): Correct type mainTouchId initialization [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
