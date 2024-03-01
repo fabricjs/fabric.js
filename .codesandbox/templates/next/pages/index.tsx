@@ -1,15 +1,16 @@
 import * as fabric from 'fabric';
 import { NextPage } from 'next';
-import { useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { CanvasComponent, CanvasSlot } from '../components';
 
 const IndexPage: NextPage = () => {
-  const create = useCallback((arg0: fabric.DOMManagerType) => {
-    const canvas = (window.canvas = new fabric.Canvas(arg0));
-    canvas.setDimensions({
-      width: window.innerWidth,
-      height: 500,
-    });
+  const ref = useRef<fabric.Canvas>(null);
+  // const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) {
+      return;
+    }
     const textValue = 'fabric.js sandbox';
     const text = new fabric.Textbox(textValue, {
       originX: 'center',
@@ -46,13 +47,15 @@ const IndexPage: NextPage = () => {
       );
     };
     animate(1);
-
-    return canvas;
   }, []);
 
+  // useResize(ref, { fillParent: true });
+
   return (
-    <div style={{ position: 'relative' }}>
-      <CanvasComponent create={create}>
+    <div
+      style={{ position: 'relative', margin: 0, padding: 0, borderWidth: 0 }}
+    >
+      <CanvasComponent ref={ref}>
         <CanvasSlot name="main" />
         <CanvasSlot name="pointers" />
         <iframe
