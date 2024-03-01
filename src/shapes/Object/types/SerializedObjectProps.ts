@@ -46,7 +46,7 @@ export interface SerializedObjectProps extends BaseProps, FillStrokeProps {
    * If you want 0,0 of a clipPath to align with an object center, use clipPath.originX/Y to 'center'
    * @type FabricObject
    */
-  clipPath?: Partial<SerializedObjectProps> & ClipPathProps;
+  clipPath?: Partial<SerializedObjectProps & ClipPathProps>;
 }
 
 export interface ClipPathProps {
