@@ -8,8 +8,6 @@ export class CanvasDOMManager extends StaticCanvasDOMManager<{
   main: HTMLCanvasElement;
   top: HTMLCanvasElement;
 }> {
-  declare readonly container: HTMLDivElement;
-
   /**
    * Keeps a copy of the canvas style before setting retina scaling and other potions
    * in order to return it to original state on dispose
@@ -20,7 +18,7 @@ export class CanvasDOMManager extends StaticCanvasDOMManager<{
   static build(
     arg0?: string | HTMLCanvasElement,
     {
-      allowTouchScrolling = false,
+      allowTouchScrolling: touchScrollingEnabled = false,
       containerClass = '',
     }: {
       allowTouchScrolling?: boolean;
@@ -32,26 +30,26 @@ export class CanvasDOMManager extends StaticCanvasDOMManager<{
   ) {
     const lowerCanvasEl = this.createLowerCanvas(arg0);
     const style = lowerCanvasEl.style.cssText;
+    allowTouchScrolling(lowerCanvasEl, touchScrollingEnabled);
+    makeElementUnselectable(lowerCanvasEl);
+
     const upperCanvasEl = this.createUpperCanvas(lowerCanvasEl);
 
-    this.applyCanvasStyle(lowerCanvasEl, {
-      allowTouchScrolling,
+    setStyle(upperCanvasEl, {
+      position: 'absolute',
+      left: '0',
+      top: '0',
     });
-    this.applyCanvasStyle(upperCanvasEl, {
-      allowTouchScrolling,
-    });
+    allowTouchScrolling(upperCanvasEl, touchScrollingEnabled);
+    makeElementUnselectable(upperCanvasEl);
 
     const container = this.createContainerElement();
     container.classList.add(containerClass);
-    if (lowerCanvasEl.parentNode) {
+    lowerCanvasEl.parentNode &&
       lowerCanvasEl.parentNode.replaceChild(container, lowerCanvasEl);
-    }
     container.append(lowerCanvasEl, upperCanvasEl);
 
-    const manager = new this(
-      { main: lowerCanvasEl, top: upperCanvasEl },
-      container
-    );
+    const manager = new this({ main: lowerCanvasEl, top: upperCanvasEl });
     manager._originalCanvasStyle = style;
     return manager;
   }
@@ -79,35 +77,19 @@ export class CanvasDOMManager extends StaticCanvasDOMManager<{
     return container;
   }
 
-  /**
-   * @private
-   * @param {HTMLCanvasElement} element canvas element to apply styles on
-   */
-  static applyCanvasStyle(
-    element: HTMLCanvasElement,
-    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean }
-  ) {
-    setStyle(element, {
-      position: 'absolute',
-      left: '0',
-      top: '0',
-    });
-    allowTouchScrolling(element, allow);
-    makeElementUnselectable(element);
-  }
-
   cleanupDOM(size: TSize) {
-    const container = this.container,
+    const container = this.items.main.el.parentNode,
       {
         main: { el: lowerCanvasEl },
         top: { el: upperCanvasEl },
       } = this.items;
 
     super.cleanupDOM(size);
-    container.removeChild(upperCanvasEl);
-    container.removeChild(lowerCanvasEl);
-    if (container.parentNode) {
-      container.parentNode.replaceChild(lowerCanvasEl, container);
+    if (container) {
+      container.removeChild(upperCanvasEl);
+      container.removeChild(lowerCanvasEl);
+      container.parentNode &&
+        container.parentNode.replaceChild(lowerCanvasEl, container);
     }
     lowerCanvasEl.style.cssText = this._originalCanvasStyle || '';
     delete this._originalCanvasStyle;

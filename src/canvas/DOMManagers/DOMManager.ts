@@ -35,16 +35,14 @@ export type DOMManagerType = DOMManager<{
 
 export class DOMManager<T extends ItemMap> {
   readonly items: Record<keyof T, CanvasItem>;
-  readonly container?: HTMLDivElement;
 
-  constructor(items: T, container?: HTMLDivElement) {
+  constructor(items: T) {
     this.items = Object.fromEntries(
       Object.entries(items).map(([key, canvas]) => [
         key,
         { el: canvas, ctx: canvas.getContext('2d')! },
       ])
     ) as Record<keyof T, CanvasItem>;
-    this.container = container;
   }
 
   setDimensions(size: TSize, retinaScaling: number) {
@@ -55,7 +53,6 @@ export class DOMManager<T extends ItemMap> {
 
   setCSSDimensions(size: Partial<CSSDimensions>) {
     Object.values(this.items).forEach(({ el }) => setCSSDimensions(el, size));
-    this.container && setCSSDimensions(this.container, size);
   }
 
   /**
@@ -73,7 +70,5 @@ export class DOMManager<T extends ItemMap> {
     });
     // @ts-expect-error disposing
     this.items = {};
-    // @ts-expect-error disposing
-    delete this.container;
   }
 }

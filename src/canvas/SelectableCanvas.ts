@@ -286,9 +286,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   get contextTop() {
     return this.elements.items.top?.ctx;
   }
-  get wrapperEl() {
-    return this.elements.container;
-  }
+
   private declare pixelFindCanvasEl: HTMLCanvasElement;
   private declare pixelFindContext: CanvasRenderingContext2D;
 

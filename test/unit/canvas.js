@@ -118,9 +118,9 @@
     wrapper.appendChild(canvasEl);
     doc.body.appendChild(wrapper);
     const canvas = new fabric.Canvas(canvasEl);
-    assert.equal(wrapper.firstChild, canvas.elements.container, 'replaced canvas el in dom');
-    assert.equal(canvas.elements.container.firstChild, canvas.elements.main.el, 'appended canvas el to container');
-    assert.equal(canvas.elements.container.lastChild, canvas.elements.top.el, 'appended upper canvas el to container');
+    assert.equal(wrapper.firstChild.tagName, 'DIV', 'replaced canvas el in dom');
+    assert.equal(wrapper.firstChild.firstChild, canvas.elements.items.main.el, 'appended canvas el to container');
+    assert.equal(wrapper.firstChild.lastChild, canvas.elements.items.top.el, 'appended upper canvas el to container');
   });
 
 
@@ -191,7 +191,7 @@
   QUnit.test('init', function(assert) {
     assert.equal(canvas.lowerCanvasEl.getAttribute('data-fabric'), 'main', 'el should be marked by canvas init');
     assert.equal(canvas.upperCanvasEl.getAttribute('data-fabric'), 'top', 'el should be marked by canvas init');
-    assert.equal(canvas.wrapperEl.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');
+    assert.equal(canvas.lowerCanvasEl.parentElement.getAttribute('data-fabric'), 'wrapper', 'el should be marked by canvas init');
   });
 
   QUnit.test('renderTop', function(assert) {
@@ -1595,7 +1595,6 @@
 
     assert.equal(canvas.lowerCanvasEl.style.width, '100%', 'Should be as the css only value');
     assert.equal(canvas.upperCanvasEl.style.width, '100%', 'Should be as the css only value');
-    assert.equal(canvas.wrapperEl.style.width, '100%', 'Should be as the css only value');
     assert.equal(canvas.getWidth(), 123, 'Should be as the none css only value');
   });
 
@@ -1605,7 +1604,6 @@
 
     assert.equal(canvas.lowerCanvasEl.style.height, '100%', 'Should be as the css only value');
     assert.equal(canvas.upperCanvasEl.style.height, '100%', 'Should be as the css only value');
-    assert.equal(canvas.wrapperEl.style.height, '100%', 'Should be as the css only value');
     assert.equal(canvas.getHeight(), 123, 'Should be as the none css only value');
   });
 
@@ -1615,7 +1613,6 @@
 
     assert.equal(canvas.lowerCanvasEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.upperCanvasEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.wrapperEl.style.width, 123 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.getWidth(), 500, 'Should be as the backstore only value');
   });
 
@@ -1625,7 +1622,6 @@
 
     assert.equal(canvas.lowerCanvasEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.upperCanvasEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
-    assert.equal(canvas.wrapperEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
   });
 

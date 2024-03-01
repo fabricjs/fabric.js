@@ -245,9 +245,9 @@ function testCanvasDisposing() {
         assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
 
         var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-        wrapperEl = canvas.wrapperEl;
         lowerCanvasEl = canvas.lowerCanvasEl;
         upperCanvasEl = canvas.upperCanvasEl;
+        wrapperEl = lowerCanvasEl.parentElement;
         const activeSel = new fabric.ActiveSelection();
         assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
         assert.equal(wrapperEl.childNodes.length, 2, 'wrapper should have 2 children');
@@ -303,9 +303,9 @@ function testCanvasDisposing() {
         assert.equal(elStyle, 'position: relative;', 'el style should not be empty');
 
         var canvas = new fabric.Canvas(el, { enableRetinaScaling: true, renderOnAddRemove: false });
-        wrapperEl = canvas.wrapperEl;
         lowerCanvasEl = canvas.lowerCanvasEl;
         upperCanvasEl = canvas.upperCanvasEl;
+        wrapperEl = lowerCanvasEl.parentElement;
         const activeSel = new fabric.ActiveSelection();
         canvas.setActiveObject(activeSel)
         assert.equal(parentEl.childNodes.length, 1, 'parentEl has still 1 child only');
