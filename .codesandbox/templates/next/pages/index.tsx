@@ -58,7 +58,7 @@ const IndexPage: NextPage = () => {
         <iframe
           src="https://fabricjs.github.io/"
           width="100%"
-          height="500px"
+          height="100%"
           style={{ position: 'absolute', left: 0, top: 0, opacity: 0.8 }}
         />
         Hello World
