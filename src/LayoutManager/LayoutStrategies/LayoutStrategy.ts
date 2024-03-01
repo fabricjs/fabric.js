@@ -1,6 +1,7 @@
 import { Point } from '../../Point';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_IMPERATIVE,
@@ -88,13 +89,25 @@ export abstract class LayoutStrategy {
         size: bboxSize,
         center: bboxCenter,
       });
-
-      const sizeCorrection = actualSize.subtract(bboxSize);
-
+      const originFactor = new Point(
+        -resolveOrigin(target.originX),
+        -resolveOrigin(target.originY)
+      );
+      const sizeCorrection = actualSize
+        .subtract(bboxSize)
+        .multiply(originFactor);
+      // translate the layout origin from left top to target's origin
+      const center = bboxLeftTop.add(bboxSize.multiply(originFactor));
+      console.log({
+        center: bboxCenter,
+        relativeCorrection: center.subtract(bboxCenter),
+        size: actualSize,
+        originFactor,
+      });
       return {
         // in `initialization` we do not account for target's transformation matrix
-        center: bboxCenter.add(sizeCorrection),
-        relativeCorrection: bboxCenter.subtract(bboxCenter),
+        center: center.add(sizeCorrection),
+        relativeCorrection: center.subtract(bboxCenter),
         size: actualSize,
       };
     } else {

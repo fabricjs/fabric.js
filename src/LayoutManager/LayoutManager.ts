@@ -259,10 +259,8 @@ export class LayoutManager {
     { offset }: Required<LayoutResult>,
     object: FabricObject
   ) {
-    object.set({
-      left: object.left + offset.x,
-      top: object.top + offset.y,
-    });
+    object.left += offset.x;
+    object.top += offset.y;
   }
 
   protected onAfterLayout(
