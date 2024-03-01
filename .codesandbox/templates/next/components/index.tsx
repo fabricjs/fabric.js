@@ -18,9 +18,10 @@ const canvasStyle: React.CSSProperties = {
   userSelect: 'none',
 };
 
-export const CanvasSlot = ({ name }: { name: 'main' | 'top' | string }) => (
-  <div name={name} />
-);
+export const CanvasSlot = forwardRef<
+  HTMLCanvasElement,
+  { name: 'main' | 'top' | string }
+>((props, ref) => <canvas {...props} ref={ref} />);
 
 /**
  * @example Standard
@@ -80,6 +81,7 @@ export const CanvasComponent = forwardRef<
         )
       )
     );
+
     if (typeof ref === 'function') {
       ref(canvas);
     } else if (typeof ref === 'object' && ref) {
@@ -107,12 +109,10 @@ export const CanvasComponent = forwardRef<
       (child as React.ReactElement).type === CanvasSlot
     ) {
       const { name } = (child as React.ReactElement).props;
-      return (
-        <canvas
-          style={name === 'main' ? undefined : canvasStyle}
-          ref={canvasRefs[name]}
-        />
-      );
+      return React.cloneElement(child as React.ReactElement, {
+        style: name === 'main' ? undefined : canvasStyle,
+        ref: canvasRefs[name],
+      });
     } else {
       return child;
     }
