@@ -33,7 +33,7 @@ export function getCSSRules(doc: Document) {
         // if there is more than one opening bracket and the rule starts with '@', it is likely
         // a nested at-rule like @media, @supports, @scope, etc. Ignore these as the code below
         // can not handle it.
-        if ((rule.match(/{/g) || []).length > 1 && rule.trim().startsWith('@')) {
+        if ((rule.match(/{/g) || []).length > 1 && rule.trimStart().startsWith('@')) {
           return;
         }
 
