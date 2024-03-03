@@ -1,7 +1,7 @@
 import * as fabric from 'fabric';
 
-export function testCase(canvas: fabric.Canvas) {
-  const rects = [
+export async function testCase(canvas: fabric.Canvas) {
+  const fixedRects = [
     new fabric.Rect({
       width: 100,
       height: 100,
@@ -32,6 +32,8 @@ export function testCase(canvas: fabric.Canvas) {
     }),
   ];
 
+  const fitRects = await Promise.all(fixedRects.map((rect) => rect.clone()));
+
   const purpleRect = new fabric.Rect({
     width: 100,
     height: 100,
@@ -41,13 +43,26 @@ export function testCase(canvas: fabric.Canvas) {
     fill: 'purple',
   });
 
-  const fixedGroup = new fabric.Group(rects, {
+  const orangeRect = new fabric.Rect({
+    width: 100,
+    height: 100,
+    top: 120,
+    left: 120,
+    opacity: 0.5,
+    fill: 'orange',
+  });
+
+  const fixedGroup = new fabric.Group(fixedRects, {
     width: 100,
     height: 100,
     layoutManager: new fabric.LayoutManager(new fabric.FixedLayout()),
   });
 
-  canvas.add(fixedGroup, purpleRect);
+  const fitGroup = new fabric.Group(fitRects);
+
+  canvas.add(fixedGroup, purpleRect, fitGroup, orangeRect);
 
   fixedGroup.add(purpleRect);
+  fitGroup.add(orangeRect);
+  canvas.requestRenderAll();
 }
