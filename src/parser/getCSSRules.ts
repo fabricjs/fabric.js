@@ -30,9 +30,10 @@ export function getCSSRules(doc: Document) {
       .filter((rule, index, array) => array.length > 1 && rule.trim())
       // at this point we have hopefully an array of rules `body { style code... `
       .forEach((rule) => {
-        // if there is more than one opening bracket, it is likely a nested CSS at-rule
-        // like @media, @supports, @scope, etc. Ignore these.
-        if ((rule.match(/{/g) || []).length > 1) {
+        // if there is more than one opening bracket and the rule starts with '@', it is likely
+        // a nested at-rule like @media, @supports, @scope, etc. Ignore these as the code below
+        // can not handle it.
+        if ((rule.match(/{/g) || []).length > 1 && rule.trim().startsWith('@')) {
           return;
         }
 
