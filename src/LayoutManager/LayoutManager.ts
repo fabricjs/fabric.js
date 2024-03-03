@@ -30,7 +30,10 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
-export const buildStandardEvents = (object: FabricObject, target: Group) => {
+export const buildStandardEvents = (
+  object: FabricObject,
+  target: Group
+): VoidFunction[] => {
   // TODO fix typescript that block us from condesing this to a single call per key.
   return [
     object.on('modified', (e) =>
@@ -106,6 +109,13 @@ export class LayoutManager {
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
+  /**
+   * Attach event handlers to actions we know are layout invalidating when
+   * performed on child objects. returns the disposers for later unsubscribing
+   * @param {FabricObject} childObject
+   * @param {RegistrationContext & Partial<StrictLayoutContext>} context
+   * @returns {VoidFunction[]} disposers remove the handlers
+   */
   protected attachHandlers(
     childObject: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
