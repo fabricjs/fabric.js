@@ -125,7 +125,10 @@ export class LayoutManager {
   }
 
   /**
-   * subscribe to object layout triggers
+   * Subscribe an object to transforms events that will trigger a layout change in the group
+   * This is important only for interactive groups.
+   * @param object
+   * @param context
    */
   protected subscribe(
     object: FabricObject,
