@@ -37,7 +37,8 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
-import { DOMManager, DOMManagerType } from './DOMManagers/DOMManager';
+import type { DOMManagerType } from './DOMManagers/DOMManager';
+import { DOMManager } from './DOMManagers/DOMManager';
 import { FabricError } from '../util/internals/console';
 
 /**

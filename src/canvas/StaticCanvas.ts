@@ -44,7 +44,8 @@ import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
-import { DOMManager, StaticDOMManagerType } from './DOMManagers/DOMManager';
+import type { StaticDOMManagerType } from './DOMManagers/DOMManager';
+import { DOMManager } from './DOMManagers/DOMManager';
 
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset

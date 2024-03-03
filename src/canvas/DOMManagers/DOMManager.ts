@@ -1,7 +1,7 @@
 import { getEnv } from '../../env';
-import { TSize } from '../../typedefs';
+import type { TSize } from '../../typedefs';
+import type { CSSDimensions } from './util';
 import {
-  CSSDimensions,
   getElementOffset,
   setCSSDimensions,
   setCanvasDimensions,
@@ -62,7 +62,9 @@ export class DOMManager<T extends ItemMap> {
     return getElementOffset(this.items.main.el);
   }
 
-  cleanupDOM(size: TSize) {}
+  cleanupDOM(size: TSize) {
+    // exposed for subclasses
+  }
 
   dispose() {
     Object.values(this.items).forEach(({ el }) => {

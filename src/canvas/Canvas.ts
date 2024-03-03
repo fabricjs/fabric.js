@@ -18,7 +18,7 @@ import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { isActiveSelection } from '../util/typeAssertions';
 import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
-import { DOMManagerType } from './DOMManagers/DOMManager';
+import type { DOMManagerType } from './DOMManagers/DOMManager';
 import { SelectableCanvas } from './SelectableCanvas';
 import { TextEditingManager } from './TextEditingManager';
 

@@ -2,7 +2,8 @@ import { getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
 import { FabricError } from '../../util/internals/console';
 import { createCanvasElement, isHTMLCanvas } from '../../util/misc/dom';
-import { ItemMap, DOMManager } from './DOMManager';
+import type { ItemMap } from './DOMManager';
+import { DOMManager } from './DOMManager';
 
 export class StaticCanvasDOMManager<
   T extends ItemMap = {
