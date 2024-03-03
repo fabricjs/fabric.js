@@ -824,7 +824,7 @@ describe('Layout Manager', () => {
     });
 
     test.each([true, false])(
-      'initialization edge case, legacy layout %s',
+      'initialization edge case, with specified layoutManager %s',
       (legacy) => {
         const child = new FabricObject({
           width: 200,
