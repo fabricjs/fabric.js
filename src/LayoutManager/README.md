@@ -28,7 +28,7 @@ When larger or smaller than the actual boundingbox the group is centered on the 
 
 ### Clippath layout strategy
 
-Todo
+The Clippath layout keeps the group around the clipath rather than the objects. The group will be as large as the clipPath, the center of the group will be the center of the clippath.
 
 ## performLayout
 
