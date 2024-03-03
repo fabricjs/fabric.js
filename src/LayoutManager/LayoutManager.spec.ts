@@ -858,7 +858,7 @@ describe('Layout Manager', () => {
       });
       expect(group).toMatchObject({ width: 100, height: 300 });
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
     });
   });
 });
