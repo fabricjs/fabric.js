@@ -366,7 +366,11 @@
             tlControlPoint = new fabric.Circle({ radius: 5, fill: 'red', left: 150, top: 100, strokeWidth: 0 });
 
         var g = new fabric.Group([rect1, rect2, tlControlPoint], Object.assign({}, options, {
-            originX, originY, backgroundColor: 'pink'
+          left:150,
+          top:100,
+          originX,
+          originY,
+          backgroundColor: 'pink'
         }));
         return [g, controlPoint];
     }
