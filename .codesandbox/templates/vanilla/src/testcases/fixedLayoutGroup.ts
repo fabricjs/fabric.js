@@ -70,21 +70,34 @@ export async function testCase(canvas: fabric.Canvas) {
 
   const fitGroup = new fabric.Group(fitRects);
 
-  const clipGroup = new fabric.Group(clipRects, {
-    clipPath: new fabric.Circle({
-      radius: 80,
-      originX: 'center',
-      originY: 'center',
-      top: 10,
-      left: 10,
-    }),
-    layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
-  });
+  const clipGroup = new fabric.Group(
+    [
+      ...clipRects,
+      new fabric.Circle({
+        radius: 1,
+        originX: 'center',
+        originY: 'center',
+        top: 110,
+        left: 110,
+        fill: 'blue',
+      }),
+    ],
+    {
+      clipPath: new fabric.Circle({
+        radius: 80,
+        originX: 'center',
+        originY: 'center',
+        top: 10,
+        left: 10,
+      }),
+      layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
+    }
+  );
 
-  canvas.add(fixedGroup, purpleRect, fitGroup, orangeRect, clipGroup, cyanRect);
+  canvas.add(fixedGroup, fitGroup, clipGroup);
 
   fixedGroup.add(purpleRect);
   fitGroup.add(orangeRect);
-  console.log(clipGroup);
+  clipGroup.add(cyanRect);
   canvas.requestRenderAll();
 }
