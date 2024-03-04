@@ -16,15 +16,19 @@ Since inside the group all objects are organized around the center is anyway eas
 
 When a group is created, FitContent strategy will consider all the objects in the group, find their bounding box, find the center of the bounding box, and assign those to the group.
 
-When a new object is added or removed, a new bounding box is calculated, a new center is found, all the remaining objects are moved by an offset so that are re-centered around the new center
+When a new object is added or removed, a new bounding box is calculated, a new center is found, all the remaining objects are moved by an offset so that are re-positioned around the new center
 
 ### Fixed layout strategy
 
 With the fixed layout a Developer can specify either width or height and have the other calculated.
 If the developer specifies both dimensions of the box, the bounding box is still calculated to obtain the center.
-Once the group is initialized with a fixed layout, adding new objects is not changing the center anymore.
+Once the group is initialized with a fixed layout, adding new objects won't change the group's size and therefore also its position.
 The layout is fixed, is cropped by the bounding box itself.
 When larger or smaller than the actual boundingbox the group is centered on the initial center of the initial set of objects and the fixed bounding box extends from the center.
+
+The Fixed layout strategy is the only strategy in which the developer can change the width and height of the group at will without having it reset when adding or removing objects.
+
+It must be clear that is also possible change width and height of the group in the other cases, but that is an ephemeral change that gets resetted at the next performLayout
 
 ### Clippath layout strategy
 
