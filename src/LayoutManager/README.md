@@ -6,11 +6,11 @@ Layout manager exposes a main public method that performs group layout given a t
 
 The layout manager will calculate the size and position of the group when is created or updated
 The FitContent strategy is the classic fabric 5.x group and will grow or shrink when objects are added or removed.
-In general the expectation is that creating or modifying an object will create a group with a postion and once that group is added to canvas, the position of the objects will be the same visually that those object would have had on the canvas if they weren't on the group.
+In general the expectation is that wrapping objects in a group without specifying a new postion or transformations wont change the object visual position, the position of the objects will be the same that those object would have had on the canvas if they weren't on the group. Theyr coordinates will change to adapt to the group structure.
 This is a legacy behaviour that carries over this new code.
-The behaviour is not important if you are building a group from scratch and you are adding it in a specific position on the canvas, in that case the original position is meaningless and you are overriding it by specifying your postion.
+The behaviour is not important if you are building a group from scratch and you are adding it in a specific position or requesting a specific transform ( scaleX, angle, etc ). In that case the original position is meaningless and is overridden with your transform.
 
-Since inside the group all objects are organized around the center is anyway easier if you can think of your objects position and alignment with scene coordinates and know that they will be maintained in the same position when grouped.
+Since inside the group all objects are organized around the center is anyway easier if you can think of your objects position and alignment with scene coordinates and know that they will be maintained in the same relative position when grouped.
 
 ### FitContent strategy
 
@@ -34,6 +34,10 @@ This layout is clippath dependentent
 WARNING needs fix:
 The behaviour of this layout is currently broken if we want.
 The center of the group is the center of the clipPath visually but the position of the clipPath compared to the object on the canvas is hard to predict as it is now
+
+## Expectations for interactive groups
+
+TBD
 
 ## performLayout
 
