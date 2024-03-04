@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(SVGParser): Don't crash on nested CSS at-rules [#9707](https://github.com/fabricjs/fabric.js/pull/9707)
 - perf(): measuring canvas size [#9697](https://github.com/fabricjs/fabric.js/pull/9697)
 - chore(TS): Add type for options in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
 - ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
