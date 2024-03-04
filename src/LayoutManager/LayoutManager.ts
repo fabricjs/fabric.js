@@ -69,7 +69,7 @@ export const buildStandardEvents = (
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
-  private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
+  protected declare _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
 

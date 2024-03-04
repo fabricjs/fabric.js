@@ -1,4 +1,4 @@
-import { LayoutManager, buildStandardEvents } from './LayoutManager';
+import { LayoutManager } from './LayoutManager';
 import type { RegistrationContext, StrictLayoutContext } from './types';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 
@@ -15,15 +15,43 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
  * This subclass of the LayoutManager has a single duty to fill the gap of this difference.
  */
 export class ActiveSelectionLayoutManager extends LayoutManager {
-  protected attachHandlers(
-    childObject: FabricObject,
+  /**
+   * Subscribe an object to transforms events that will trigger a layout change in the group
+   * This is important only for interactive groups.
+   * @param object
+   * @param context
+   */
+  protected subscribe(
+    object: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
-  ): (() => void)[] {
-    const { parent, group: activeSelection } = childObject;
+  ) {
+    const { parent, group: activeSelection } = object;
     if (!parent || !activeSelection || activeSelection === parent) {
       // nothing to do here
-      return [];
+      return;
     }
-    return buildStandardEvents(activeSelection, parent);
+    this.unsubscribe(object, context);
+    const disposers = this.attachHandlers(activeSelection, {
+      target: parent,
+      targets: [object],
+    });
+    // subscriptions are on the parent, so the active seleciton
+    // will keep has many copies of events has many unique groups
+    // is interfering with
+    this._subscriptions.set(parent, disposers);
+  }
+
+  /**
+   * unsubscribe object layout triggers
+   */
+  protected unsubscribe(
+    object: FabricObject,
+    context?: RegistrationContext & Partial<StrictLayoutContext>
+  ) {
+    const { parent } = object;
+    if (parent) {
+      (this._subscriptions.get(parent) || []).forEach((d) => d());
+      this._subscriptions.delete(parent);
+    }
   }
 }
