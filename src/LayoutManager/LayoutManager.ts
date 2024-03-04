@@ -30,43 +30,6 @@ export type SerializedLayoutManager = {
   strategy: string;
 };
 
-export const buildStandardEvents = (
-  object: FabricObject,
-  target: Group
-): VoidFunction[] => {
-  // TODO fix typescript that block us from condesing this to a single call per key.
-  return [
-    object.on('modified', (e) =>
-      target.layoutManager.performLayout({
-        trigger: 'modified',
-        e,
-        type: LAYOUT_TYPE_OBJECT_MODIFIED,
-        target,
-      })
-    ),
-    ...(
-      [
-        'moving',
-        'resizing',
-        'rotating',
-        'scaling',
-        'skewing',
-        'changed',
-        'modifyPoly',
-      ] as TModificationEvents[]
-    ).map((key) =>
-      object.on(key, (e) =>
-        target.layoutManager.performLayout({
-          trigger: key,
-          e,
-          type: LAYOUT_TYPE_OBJECT_MODIFYING,
-          target,
-        })
-      )
-    ),
-  ];
-};
-
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
   protected declare _subscriptions: Map<FabricObject, VoidFunction[]>;
@@ -121,7 +84,37 @@ export class LayoutManager {
     context: RegistrationContext & Partial<StrictLayoutContext>
   ): (() => void)[] {
     const { target } = context;
-    return buildStandardEvents(childObject, target);
+    // TODO fix typescript that block us from condesing this to a single call per key.
+    return [
+      childObject.on('modified', (e) =>
+        target.layoutManager.performLayout({
+          trigger: 'modified',
+          e,
+          type: LAYOUT_TYPE_OBJECT_MODIFIED,
+          target,
+        })
+      ),
+      ...(
+        [
+          'moving',
+          'resizing',
+          'rotating',
+          'scaling',
+          'skewing',
+          'changed',
+          'modifyPoly',
+        ] as TModificationEvents[]
+      ).map((key) =>
+        childObject.on(key, (e) =>
+          target.layoutManager.performLayout({
+            trigger: key,
+            e,
+            type: LAYOUT_TYPE_OBJECT_MODIFYING,
+            target,
+          })
+        )
+      ),
+    ];
   }
 
   /**
