@@ -107,6 +107,62 @@ describe('ActiveSelectionLayoutManager', () => {
         expect(groupPerformLayout).not.toHaveBeenCalled();
         expect(asPerformLayout).not.toHaveBeenCalled();
       });
+
+      it('a subscribed activeSelection with more objects in the same parent has a bug', () => {
+        const manager = new ActiveSelectionLayoutManager();
+        const object = new FabricObject();
+        const object2 = new FabricObject();
+        const object3 = new FabricObject();
+        const group = new Group([object, object2, object3], {
+          interactive: true,
+          subTargetCheck: true,
+        });
+        const as = new ActiveSelection([object, object2, object3], {
+          layoutManager: manager,
+        });
+        const asPerformLayout = jest.spyOn(manager, 'performLayout');
+        const groupPerformLayout = jest.spyOn(
+          group.layoutManager,
+          'performLayout'
+        );
+        groupPerformLayout.mockClear();
+        asPerformLayout.mockClear();
+        const event = { foo: 'bar' };
+        triggers.forEach((trigger) => as.fire(trigger, event));
+        expect(asPerformLayout).not.toHaveBeenCalled();
+        expect(groupPerformLayout.mock.calls).toMatchObject([
+          [
+            {
+              e: event,
+              target: group,
+              trigger: 'modified',
+              type: 'object_modified',
+            },
+          ],
+          ...triggers.slice(1).map((trigger) => [
+            {
+              e: event,
+              target: group,
+              trigger,
+              type: 'object_modifying',
+            },
+          ]),
+        ]);
+        groupPerformLayout.mockClear();
+        asPerformLayout.mockClear();
+        // we don't keep record of subscriptions on objects
+        expect(manager['_subscriptions'].get(object)).toBeUndefined();
+        expect(manager['_subscriptions'].get(object2)).toBeUndefined();
+        expect(manager['_subscriptions'].get(object3)).toBeUndefined();
+        expect(manager['_subscriptions'].get(group)).toBeDefined();
+        as.remove(object3);
+        groupPerformLayout.mockClear();
+        asPerformLayout.mockClear();
+        // BUG! i removed an object only and group layour is not called anymore
+        expect(manager['_subscriptions'].get(group)).toBeUndefined();
+        triggers.forEach((trigger) => as.fire(trigger, event));
+        expect(groupPerformLayout).not.toHaveBeenCalled();
+      });
     });
   });
 });

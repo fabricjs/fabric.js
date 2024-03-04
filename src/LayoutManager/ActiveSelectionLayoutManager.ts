@@ -16,7 +16,7 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
  */
 export class ActiveSelectionLayoutManager extends LayoutManager {
   /**
-   * Subscribe an object to transforms events that will trigger a layout change in the group
+   * Subscribe an object to transform events that will trigger a layout change on the parent
    * This is important only for interactive groups.
    * @param object
    * @param context
@@ -33,11 +33,10 @@ export class ActiveSelectionLayoutManager extends LayoutManager {
     this.unsubscribe(object, context);
     const disposers = this.attachHandlers(activeSelection, {
       target: parent,
-      targets: [object],
+      targets: context.targets,
     });
-    // subscriptions are on the parent, so the active seleciton
-    // will keep has many copies of events has many unique groups
-    // is interfering with
+    // the _subscriptions Map is using the parent as a key.
+    // This will ensure that a single set of events is kept for each unique parent
     this._subscriptions.set(parent, disposers);
   }
 

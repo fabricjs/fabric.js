@@ -73,8 +73,9 @@ export class LayoutManager {
   }
 
   /**
-   * Attach event handlers to actions we know are layout invalidating when
-   * performed on child objects. returns the disposers for later unsubscribing
+   * Attach handlers for events that we know will invalidate the layout when
+   * performed on child objects ( general transforms ).
+   * Returns the disposers for later unsubscribing and cleanup
    * @param {FabricObject} childObject
    * @param {RegistrationContext & Partial<StrictLayoutContext>} context
    * @returns {VoidFunction[]} disposers remove the handlers
@@ -118,7 +119,7 @@ export class LayoutManager {
   }
 
   /**
-   * Subscribe an object to transforms events that will trigger a layout change in the group
+   * Subscribe an object to transform events that will trigger a layout change on the parent
    * This is important only for interactive groups.
    * @param object
    * @param context
