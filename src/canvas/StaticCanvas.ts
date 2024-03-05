@@ -1230,11 +1230,11 @@ export class StaticCanvas<
           filler.offsetY - finalHeight / 2
         }" width="${
           (repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.width
+            ? (filler.source as HTMLImageElement).width
             : finalWidth
         }" height="${
           (repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.height
+            ? (filler.source as HTMLImageElement).height
             : finalHeight
         }" fill="url(#SVGID_${filler.id})"></rect>\n`
       );

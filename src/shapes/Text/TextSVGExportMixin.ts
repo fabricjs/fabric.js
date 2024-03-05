@@ -296,7 +296,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    // @ts-expect-error TS doesn't respect this type casting
+    // cant use ts-expect-error because of ts 5.3 cross check
+    // @ts-ignore TS doesn't respect this type casting
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
 
