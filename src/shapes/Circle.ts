@@ -54,7 +54,7 @@ const CIRCLE_PROPS = [
   'counterClockwise',
 ] as const;
 
-export const circleDefaultValues: UniqueCircleProps = {
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
@@ -78,7 +78,7 @@ export class Circle<
 
   static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
 
-  static ownDefaults: Record<string, any> = circleDefaultValues;
+  static ownDefaults = circleDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
