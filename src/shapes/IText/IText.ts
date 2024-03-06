@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller, TOptions } from '../../typedefs';
+import type { TClassProperties, TFiller, TOptions } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -26,7 +26,14 @@ type CursorBoundaries = {
   topOffset: number;
 };
 
-export const iTextDefaultValues = {
+// Declare IText protected properties to workaround TS
+const protectedDefaultValues = {
+  _selectionDirection: null,
+  _reSpace: /\s|\r?\n/,
+  inCompositionMode: false,
+};
+
+export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   selectionStart: 0,
   selectionEnd: 0,
   selectionColor: 'rgba(17,119,255,0.3)',
@@ -39,13 +46,11 @@ export const iTextDefaultValues = {
   cursorDuration: 600,
   caching: true,
   hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\r?\n/,
-  inCompositionMode: false,
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
+  ...protectedDefaultValues,
 };
 
 // @TODO this is not complete
@@ -197,9 +202,9 @@ export class IText<
    */
   declare caching: boolean;
 
-  static ownDefaults: Record<string, any> = iTextDefaultValues;
+  static ownDefaults = iTextDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 

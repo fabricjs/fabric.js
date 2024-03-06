@@ -92,9 +92,9 @@ export class Textbox<
 
   static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
 
-  static ownDefaults: Record<string, any> = textboxDefaultValues;
+  static ownDefaults = textboxDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       controls: createTextboxDefaultControls(),
