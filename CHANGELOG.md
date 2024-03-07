@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Run the stat action from forkm [#9716](https://github.com/fabricjs/fabric.js/pull/9716)
 - chore(TS): use consistent and improved types for getDefaults and ownDefaults [#9698](https://github.com/fabricjs/fabric.js/pull/9698)
 - fix(SVGParser): Don't crash on nested CSS at-rules [#9707](https://github.com/fabricjs/fabric.js/pull/9707)
 - perf(): measuring canvas size [#9697](https://github.com/fabricjs/fabric.js/pull/9697)
