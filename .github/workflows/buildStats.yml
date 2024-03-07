@@ -1,4 +1,4 @@
-name: '🩺'
+name: '📈📊'
 
 on:
   pull_request_target:
@@ -6,7 +6,7 @@ on:
     paths-ignore: [CHANGELOG.md]
 
 jobs:
-  stats:
+  stats_target:
     name: Build stats
     runs-on: ubuntu-latest
     env:
@@ -20,11 +20,11 @@ jobs:
         with:
           node-version: 18.x
       - run: npm ci
-      - name: build stats
+      - name: build upstram stats ( this run from the base branch )
         run: npm run build
       - name: persist
         id: a
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           script: |
@@ -36,11 +36,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - name: upstream build stats
+      - name: pr head build stats
         run: npm run build -- -s
       - name: persist
         id: b
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           script: |
@@ -49,7 +49,7 @@ jobs:
               size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: process
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           result-encoding: string
           script: |
