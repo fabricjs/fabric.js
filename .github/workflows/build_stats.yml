@@ -36,7 +36,8 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - run: npm ci
+      - name: reinstall deps after checkout
+        run: npm ci
       - name: pr head build stats
         run: npm run build -- -s
       - name: persist
