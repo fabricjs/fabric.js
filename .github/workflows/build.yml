@@ -19,6 +19,7 @@ jobs:
     name: Build stats
     runs-on: ubuntu-latest
     env:
+      GITHUB_TOKEN: ${{ secrets.WORKFLOW_GRANULAR_TOKEN }}
       minified: dist/index.min.js
       bundled: dist/index.mjs
     steps:
