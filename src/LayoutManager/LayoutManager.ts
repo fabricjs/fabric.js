@@ -57,15 +57,6 @@ export class LayoutManager {
     const layoutResult = this.getLayoutResult(strictContext);
     if (layoutResult) {
       this.commitLayout(strictContext, layoutResult);
-    } else {
-      // if there is no layout result, we may still need to flag the group as dirty
-      // if we are moving it through an active selection
-      if (
-        context.type === LAYOUT_TYPE_OBJECT_MODIFIED ||
-        context.type === LAYOUT_TYPE_OBJECT_MODIFYING
-      ) {
-        context.target.set('dirty', true);
-      }
     }
 
     this.onAfterLayout(strictContext, layoutResult);
@@ -334,6 +325,8 @@ export class LayoutManager {
         target: parent,
       });
     }
+    // if this is nested is also going to invalidate everything else up
+    target.set('dirty', true);
   }
 
   dispose() {
