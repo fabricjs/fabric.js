@@ -241,7 +241,7 @@ export class Shadow {
       : data;
   }
 
-  static fromObject(options: Partial<TClassProperties<Shadow>>) {
+  static async fromObject(options: Partial<TClassProperties<Shadow>>) {
     return new this(options);
   }
 }

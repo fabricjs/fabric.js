@@ -187,8 +187,11 @@
   });
 
   QUnit.test('fromObject', assert => {
-    const shadow = fabric.Shadow.fromObject({ color: 'red', offsetX: 15 });
-    assert.ok(shadow instanceof fabric.Shadow);
+    const done = assert.async();
+    return fabric.Shadow.fromObject({ color: 'red', offsetX: 15 }).then((shadow) => {
+      assert.ok(shadow instanceof fabric.Shadow);
+      done();
+    });
   });
 
   QUnit.test('toSVG', function(assert) {
