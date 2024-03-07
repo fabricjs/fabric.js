@@ -4,11 +4,11 @@ exports[`Shadow fromObject 1`] = `
 {
   "affectStroke": false,
   "blur": 0,
-  "color": "rgb(0,0,0)",
+  "color": "red",
   "id": 0,
   "includeDefaultValues": true,
   "nonScaling": false,
-  "offsetX": 0,
+  "offsetX": 10,
   "offsetY": 0,
 }
 `;
@@ -17,11 +17,11 @@ exports[`Shadow fromObject 2`] = `
 {
   "affectStroke": false,
   "blur": 0,
-  "color": "rgb(0,0,0)",
+  "color": "red",
   "id": 0,
   "includeDefaultValues": true,
   "nonScaling": false,
-  "offsetX": 0,
+  "offsetX": 10,
   "offsetY": 0,
 }
 `;

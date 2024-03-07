@@ -3,7 +3,7 @@ import { Shadow } from './Shadow';
 
 describe('Shadow', () => {
   it('fromObject', async () => {
-    const shadow = await Shadow.fromObject({});
+    const shadow = await Shadow.fromObject({ color: 'red', offsetX: 10 });
     expect(shadow).toMatchObjectSnapshot();
     expect(shadow).toMatchObjectSnapshot({ includeDefaultValues: false });
   });
