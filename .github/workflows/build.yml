@@ -59,6 +59,7 @@ jobs:
       - name: process
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.WORKFLOW_GRANULAR_TOKEN }}
           result-encoding: string
           script: |
             const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
