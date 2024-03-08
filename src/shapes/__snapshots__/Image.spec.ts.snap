@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FabricImage Svg export It exports an svg with styles for an image with stroke 1`] = `
+"<g transform="matrix(1 0 0 1 83.5 83.5)"  >
+<filter id="SVGID_0" y="-45.33%" height="190.66%" x="-36%" width="172%" >
+	<feGaussianBlur in="SourceAlpha" stdDeviation="12"></feGaussianBlur>
+	<feOffset dx="0" dy="14" result="oBlur" ></feOffset>
+	<feFlood flood-color="rgb(0,0,0)" flood-opacity="0.5"/>
+	<feComposite in2="oBlur" operator="in" />
+	<feMerge>
+		<feMergeNode></feMergeNode>
+		<feMergeNode in="SourceGraphic"></feMergeNode>
+	</feMerge>
+</filter>
+<clipPath id="imageCrop_2">
+	<rect x="-75" y="-75" width="150" height="150" />
+</clipPath>
+	<image style="stroke: rgb(255,0,0); stroke-width: 11; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;filter: url(#SVGID_0);"  xlink:href="" x="-85" y="-85" width="200" height="200" clip-path="url(#imageCrop_2)" ></image>
+	<rect x="-75" y="-75" width="150" height="150" style="stroke: rgb(255,0,0); stroke-width: 11; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;filter: url(#SVGID_0);" />
+</g>
+"
+`;
