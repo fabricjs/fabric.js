@@ -76,7 +76,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type Number
    * @private
    */
-  declare mainTouchId: null | number;
+  declare mainTouchId?: number;
 
   declare enablePointerEvents: boolean;
 
@@ -597,7 +597,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   _onTouchStart(e: TouchEvent) {
     e.preventDefault();
-    if (this.mainTouchId === null) {
+    if (this.mainTouchId === undefined) {
       this.mainTouchId = this.getPointerId(e);
     }
     this.__onMouseDown(e);
@@ -661,7 +661,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     this.__onMouseUp(e);
     this._resetTransformEventData();
-    this.mainTouchId = null;
+    delete this.mainTouchId;
     const eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(this.upperCanvasEl);
     removeListener(

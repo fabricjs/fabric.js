@@ -49,8 +49,7 @@ interface UniqueImageProps {
   resizeFilter?: Resize;
 }
 
-export const imageDefaultValues: Partial<UniqueImageProps> &
-  Partial<FabricObjectProps> = {
+export const imageDefaultValues: Partial<TClassProperties<FabricImage>> = {
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
@@ -178,9 +177,9 @@ export class FabricImage<
 
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
-  static ownDefaults: Record<string, any> = imageDefaultValues;
+  static ownDefaults = imageDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...FabricImage.ownDefaults,

@@ -3,6 +3,17 @@
 ## [next]
 
 - refactor(): `_findTargetCorner` now returns the key and the control [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
+- fix(Shadow): Cloning a shape with shadow throws an error[#9711](https://github.com/fabricjs/fabric.js/issues/9711)
+- chore(TS): use consistent and improved types for getDefaults and ownDefaults [#9698](https://github.com/fabricjs/fabric.js/pull/9698)
+- fix(SVGParser): Don't crash on nested CSS at-rules [#9707](https://github.com/fabricjs/fabric.js/pull/9707)
+- perf(): measuring canvas size [#9697](https://github.com/fabricjs/fabric.js/pull/9697)
+- chore(TS): Add type for options in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
+- ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
+- fix(Canvas): Correct type mainTouchId initialization [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
+- feat(Circle): Add counterclockwise parameter to Circle class [#9670](https://github.com/fabricjs/fabric.js/pull/9670)
+
+## [6.0.0-beta19]
+
 - feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
 - fix(Object): support specyfing toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
 - ci(): no `src` imports [#9657](https://github.com/fabricjs/fabric.js/pull/9657)

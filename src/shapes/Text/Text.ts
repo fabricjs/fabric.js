@@ -55,7 +55,9 @@ let measuringContext: CanvasRenderingContext2D | null;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    measuringContext = createCanvasElement().getContext('2d');
+    const canvas = createCanvasElement();
+    canvas.width = canvas.height = 0;
+    measuringContext = canvas.getContext('2d');
   }
   return measuringContext;
 }
@@ -410,11 +412,11 @@ export class FabricText<
 
   static cacheProperties = [...cacheProperties, ...additionalProps];
 
-  static ownDefaults: Record<string, any> = textDefaultValues;
+  static ownDefaults = textDefaultValues;
 
   static type = 'Text';
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...FabricText.ownDefaults };
   }
 

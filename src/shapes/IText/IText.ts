@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller, TOptions } from '../../typedefs';
+import type { TClassProperties, TFiller, TOptions } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -17,6 +17,7 @@ import {
   JUSTIFY_RIGHT,
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
+import type { ObjectToCanvasElementOptions } from '../Object/Object';
 
 type CursorBoundaries = {
   left: number;
@@ -25,7 +26,14 @@ type CursorBoundaries = {
   topOffset: number;
 };
 
-export const iTextDefaultValues = {
+// Declare IText protected properties to workaround TS
+const protectedDefaultValues = {
+  _selectionDirection: null,
+  _reSpace: /\s|\r?\n/,
+  inCompositionMode: false,
+};
+
+export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   selectionStart: 0,
   selectionEnd: 0,
   selectionColor: 'rgba(17,119,255,0.3)',
@@ -38,13 +46,11 @@ export const iTextDefaultValues = {
   cursorDuration: 600,
   caching: true,
   hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\r?\n/,
-  inCompositionMode: false,
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
+  ...protectedDefaultValues,
 };
 
 // @TODO this is not complete
@@ -196,9 +202,9 @@ export class IText<
    */
   declare caching: boolean;
 
-  static ownDefaults: Record<string, any> = iTextDefaultValues;
+  static ownDefaults = iTextDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
@@ -354,7 +360,7 @@ export class IText<
    * @override block cursor/selection logic while rendering the exported canvas
    * @todo this workaround should be replaced with a more robust solution
    */
-  toCanvasElement(options?: any): HTMLCanvasElement {
+  toCanvasElement(options?: ObjectToCanvasElementOptions): HTMLCanvasElement {
     const isEditing = this.isEditing;
     this.isEditing = false;
     const canvas = super.toCanvasElement(options);
