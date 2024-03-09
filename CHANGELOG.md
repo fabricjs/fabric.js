@@ -2,7 +2,7 @@
 
 ## [next]
 
-- refactor(): `_findTargetCorner` now returns the key and the control [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
+- refactor(): `_findTargetCorner` now returns the key and the control - update 8 [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
 - fix(Shadow): Cloning a shape with shadow throws an error[#9711](https://github.com/fabricjs/fabric.js/issues/9711)
 - chore(TS): use consistent and improved types for getDefaults and ownDefaults [#9698](https://github.com/fabricjs/fabric.js/pull/9698)
 - fix(SVGParser): Don't crash on nested CSS at-rules [#9707](https://github.com/fabricjs/fabric.js/pull/9707)
