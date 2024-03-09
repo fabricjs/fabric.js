@@ -22,6 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Check ${{ env.file }}
         run: |
@@ -41,10 +42,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Update ${{ env.file }} from PR title
         id: update
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n'
           prev_log: '- ${{ github.event.changes.title.from }} ${{ env.link }}\n'
@@ -87,7 +88,7 @@ jobs:
         if: fromJson(steps.update.outputs.result)
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 20.x
       - name: Commit & Push
         if: fromJson(steps.update.outputs.result)
         run: |
@@ -96,5 +97,9 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
           git add ${{ env.file }}
+          git remote add pr_remote ${{ github.event.pull_request.head.repo.clone_url }}
+          git remote -v
+          git fetch pr_remote
+          git checkout pr_remote/${{ github.event.pull_request.head.ref }}
           git commit -m "update ${{ env.file }}"
-          git push
+          git push pr_remote HEAD:${{ github.event.pull_request.head.ref }}
