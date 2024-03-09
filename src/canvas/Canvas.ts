@@ -826,8 +826,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         this.setActiveObject(target, e);
         shouldRender = true;
       } else if (control) {
-        const mouseUpHandler =
-          control && control.getMouseUpHandler(e, target, control);
+        const mouseUpHandler = control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getScenePoint(e);
           mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
@@ -1056,7 +1055,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       );
       if (target === this._activeObject && (corner || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
-        const control = corner?.control,
+        const control = corner ? corner.control : undefined,
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
