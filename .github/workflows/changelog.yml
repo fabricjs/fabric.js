@@ -103,4 +103,3 @@ jobs:
           git checkout pr_remote/${{ github.event.pull_request.head.ref }}
           git commit -m "update ${{ env.file }}"
           git push pr_remote HEAD:${{ github.event.pull_request.head.ref }}
-          echo '${{ toJson(github.event.pull_request) }}'
