@@ -99,5 +99,5 @@ jobs:
           git add ${{ env.file }}
           git commit -m "update ${{ env.file }}"
           git remote -v
-          eco "${{ toJson(github.event.pull_request) }}"
+          echo '${{ toJson(github.event.pull_request) }}'
           git push
