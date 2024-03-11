@@ -33,6 +33,7 @@ export async function testCase(canvas: fabric.Canvas) {
   ];
 
   const fitRects = await Promise.all(fixedRects.map((rect) => rect.clone()));
+  const clipRects = await Promise.all(fixedRects.map((rect) => rect.clone()));
 
   const purpleRect = new fabric.Rect({
     width: 100,
@@ -52,6 +53,15 @@ export async function testCase(canvas: fabric.Canvas) {
     fill: 'orange',
   });
 
+  const cyanRect = new fabric.Rect({
+    width: 100,
+    height: 100,
+    top: 120,
+    left: 120,
+    opacity: 0.5,
+    fill: 'cyan',
+  });
+
   const fixedGroup = new fabric.Group(fixedRects, {
     width: 100,
     height: 100,
@@ -60,9 +70,34 @@ export async function testCase(canvas: fabric.Canvas) {
 
   const fitGroup = new fabric.Group(fitRects);
 
-  canvas.add(fixedGroup, purpleRect, fitGroup, orangeRect);
+  const clipGroup = new fabric.Group(
+    [
+      ...clipRects,
+      new fabric.Circle({
+        radius: 1,
+        originX: 'center',
+        originY: 'center',
+        top: 110,
+        left: 110,
+        fill: 'blue',
+      }),
+    ],
+    {
+      clipPath: new fabric.Circle({
+        radius: 80,
+        originX: 'center',
+        originY: 'center',
+        top: 10,
+        left: 10,
+      }),
+      layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
+    }
+  );
+
+  canvas.add(fixedGroup, fitGroup, clipGroup);
 
   fixedGroup.add(purpleRect);
   fitGroup.add(orangeRect);
+  clipGroup.add(cyanRect);
   canvas.requestRenderAll();
 }

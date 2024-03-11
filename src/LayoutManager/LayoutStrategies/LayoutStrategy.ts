@@ -91,6 +91,7 @@ export abstract class LayoutStrategy {
       return {
         // in `initialization` we do not account for target's transformation matrix
         center: bboxCenter,
+        // TODO: investigate if this is still necessary
         relativeCorrection: new Point(0, 0),
         size: actualSize,
       };
