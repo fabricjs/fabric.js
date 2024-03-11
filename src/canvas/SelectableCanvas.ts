@@ -271,7 +271,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   protected declare _target?: FabricObject;
 
-  static ownDefaults: Record<string, any> = canvasDefaults;
+  static ownDefaults = canvasDefaults;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };

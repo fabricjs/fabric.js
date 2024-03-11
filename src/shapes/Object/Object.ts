@@ -293,7 +293,7 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
-  static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
+  static ownDefaults = fabricObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return { ...FabricObject.ownDefaults };

@@ -62,7 +62,7 @@ export interface GroupProps extends FabricObjectProps, GroupOwnProps {
   layoutManager: LayoutManager;
 }
 
-export const groupDefaultValues = {
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
   strokeWidth: 0,
   subTargetCheck: false,
   interactive: false,

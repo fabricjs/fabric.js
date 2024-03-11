@@ -52,7 +52,7 @@ export class Rect<
 
   static cacheProperties = [...cacheProperties, ...RECT_PROPS];
 
-  static ownDefaults: Record<string, any> = rectDefaultValues;
+  static ownDefaults = rectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
