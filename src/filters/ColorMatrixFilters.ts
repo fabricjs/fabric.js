@@ -3,9 +3,7 @@ import { classRegistry } from '../ClassRegistry';
 
 export function createColorMatrixFilter(key: string, matrix: number[]) {
   const newClass = class extends ColorMatrix {
-    get type() {
-      return key;
-    }
+    static type = key;
 
     static defaults = {
       ...colorMatrixDefaultValues,

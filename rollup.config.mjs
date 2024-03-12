@@ -18,6 +18,7 @@ const plugins = [
   ts({
     noForceEmit: true,
     tsconfig: './tsconfig.json',
+    exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
   }),
   babel({
     extensions: ['.ts', '.js'],
@@ -32,9 +33,17 @@ const plugins = [
  * @param {*} warn
  */
 function onwarn(warning, warn) {
-  if (warning.code === 'CIRCULAR_DEPENDENCY') {
-    console.error(chalk.redBright(warning.message));
-    throw Object.assign(new Error(), warning);
+  // we error at any warning.
+  // we allow-list the errors we understand are not harmful
+  if (
+    (warning.code === 'PLUGIN_WARNING' &&
+      !warning.message.includes('sourcemap')) ||
+    warning.code === 'CIRCULAR_DEPENDENCY'
+  ) {
+    console.error(chalk.redBright(warning));
+    if (process.env.CI) {
+      throw Object.assign(new Error(), warning);
+    }
   }
   warn(warning);
 }
@@ -42,14 +51,50 @@ function onwarn(warning, warn) {
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
+    output: [
+      // es modules in files
+      {
+        dir: path.resolve(dirname),
+        format: 'es',
+        preserveModules: true,
+        entryFileNames: '[name].mjs',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            dir: path.resolve(dirname),
+            format: 'es',
+            preserveModules: true,
+            entryFileNames: '[name].min.mjs',
+            sourcemap: true,
+            plugins: [terser()],
+          }
+        : null,
+    ],
+    plugins,
+    onwarn,
+  },
+  {
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
     output: [
+      // es module in bundle
       {
         file: path.resolve(dirname, `${basename}.mjs`),
         name: 'fabric',
         format: 'es',
         sourcemap: true,
       },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve(dirname, `${basename}.min.mjs`),
+            name: 'fabric',
+            format: 'es',
+            sourcemap: true,
+            plugins: [terser()],
+          }
+        : null,
+      // umd in bundle
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
@@ -61,6 +106,7 @@ export default [
             file: path.resolve(dirname, `${basename}.min.js`),
             name: 'fabric',
             format: 'umd',
+            sourcemap: true,
             plugins: [terser()],
           }
         : null,

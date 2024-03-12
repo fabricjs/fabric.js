@@ -6,12 +6,9 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { sin } from '../util/misc/sin';
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
-import type { TClassProperties } from '../typedefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { Abortable, TClassProperties, TOptions } from '../typedefs';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
+import type { CSSRules } from '../parser/typedefs';
 
 interface UniqueCircleProps {
   /**
@@ -22,20 +19,26 @@ interface UniqueCircleProps {
   radius: number;
 
   /**
-   * degrees of start of the circle.
-   * probably will change to degrees in next major version
-   * @type Number 0 - 359
+   * Angle for the start of the circle, in degrees.
+   * @type TDegree 0 - 359
    * @default 0
    */
   startAngle: number;
 
   /**
-   * End angle of the circle
-   * probably will change to degrees in next major version
-   * @type Number 1 - 360
+   * Angle for the end of the circle, in degrees
+   * @type TDegree 1 - 360
    * @default 360
    */
   endAngle: number;
+
+  /**
+   * Orientation for the direction of the circle.
+   * Setting to true will switch the arc of the circle to traverse from startAngle to endAngle in a counter-clockwise direction.
+   * Note: this will only change how the circle is drawn, and does not affect rotational transformation.
+   * @default false
+   */
+  counterClockwise: boolean;
 }
 
 export interface SerializedCircleProps
@@ -44,16 +47,22 @@ export interface SerializedCircleProps
 
 export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
 
-const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
+const CIRCLE_PROPS = [
+  'radius',
+  'startAngle',
+  'endAngle',
+  'counterClockwise',
+] as const;
 
-export const circleDefaultValues: UniqueCircleProps = {
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
+  counterClockwise: false,
 };
 
 export class Circle<
-    Props extends TProps<CircleProps> = Partial<CircleProps>,
+    Props extends TOptions<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -63,10 +72,13 @@ export class Circle<
   declare radius: number;
   declare startAngle: number;
   declare endAngle: number;
+  declare counterClockwise: boolean;
+
+  static type = 'Circle';
 
   static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
 
-  static ownDefaults: Record<string, any> = circleDefaultValues;
+  static ownDefaults = circleDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
@@ -102,7 +114,7 @@ export class Circle<
       this.radius,
       degreesToRadians(this.startAngle),
       degreesToRadians(this.endAngle),
-      false
+      this.counterClockwise
     );
     this._renderPaintInOrder(ctx);
   }
@@ -150,7 +162,7 @@ export class Circle<
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG(): (string | number)[] {
+  _toSVG(): string[] {
     const angle = (this.endAngle - this.startAngle) % 360;
 
     if (angle === 0) {
@@ -159,7 +171,7 @@ export class Circle<
         'COMMON_PARTS',
         'cx="0" cy="0" ',
         'r="',
-        this.radius,
+        `${this.radius}`,
         '" />\n',
       ];
     } else {
@@ -170,14 +182,10 @@ export class Circle<
         startY = sin(start) * radius,
         endX = cos(end) * radius,
         endY = sin(end) * radius,
-        largeFlag = angle > 180 ? '1' : '0';
+        largeFlag = angle > 180 ? 1 : 0,
+        sweepFlag = this.counterClockwise ? 0 : 1;
       return [
-        `<path d="M ${startX} ${startY}`,
-        ` A ${radius} ${radius}`,
-        ' 0 ',
-        `${largeFlag} 1`,
-        ` ${endX} ${endY}`,
-        '" ',
+        `<path d="M ${startX} ${startY} A ${radius} ${radius} 0 ${largeFlag} ${sweepFlag} ${endX} ${endY}" `,
         'COMMON_PARTS',
         ' />\n',
       ];
@@ -198,17 +206,25 @@ export class Circle<
    * Returns {@link Circle} instance from an SVG element
    * @static
    * @memberOf Circle
-   * @param {SVGElement} element Element to parse
+   * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
-  static async fromElement(element: SVGElement): Promise<Circle> {
+  static async fromElement(
+    element: HTMLElement,
+    options: Abortable,
+    cssRules?: CSSRules
+  ): Promise<Circle> {
     const {
       left = 0,
       top = 0,
       radius = 0,
       ...otherParsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES) as Partial<CircleProps>;
+    } = parseAttributes(
+      element,
+      this.ATTRIBUTE_NAMES,
+      cssRules
+    ) as Partial<CircleProps>;
 
     // this probably requires to be fixed for default origins not being top/left.
 
@@ -225,7 +241,7 @@ export class Circle<
   /**
    * @todo how do we declare this??
    */
-  static fromObject<T extends TProps<SerializedCircleProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedCircleProps>>(object: T) {
     return super._fromObject<Circle>(object);
   }
 }

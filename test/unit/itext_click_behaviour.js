@@ -124,34 +124,6 @@
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 0, 'tripleClick selection end is');
     });
-    QUnit.test('_getNewSelectionStartFromOffset end of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 20;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 1000 }, 500, 520, index, jlen);
-      assert.equal(selection, index, 'index value did not change');
-    });
-    QUnit.test('_getNewSelectionStartFromOffset middle of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 20;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 519 }, 500, 520, index, jlen);
-      assert.equal(selection, index + 1, 'index value was moved to next char, since is very near');
-    });
-    QUnit.test('_getNewSelectionStartFromOffset middle of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 20;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 502 }, 500, 520, index, jlen);
-      assert.equal(selection, index, 'index value was NOT moved to next char, since is very near to first one');
-    });
-    QUnit.test('_getNewSelectionStartFromOffset middle of line', function (assert) {
-      var iText = new fabric.IText('test need some word\nsecond line');
-      var index = 10;
-      var jlen = 10;
-      var selection = iText._getNewSelectionStartFromOffset({ y: 1, x: 1000 }, 500, 520, index, jlen);
-      assert.equal(selection, index, 'index value was NOT moved to next char, since is already at end of text');
-    });
     QUnit.test('getSelectionStartFromPointer with scale', function (assert) {
       const eventData = {
         which: 1,
@@ -271,6 +243,7 @@
       iText.selected = true;
       iText.__lastSelected = true;
       iText.__corner = 'mt';
+      iText.setCoords();
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
       iText.exitEditing();
@@ -317,7 +290,6 @@
 
         QUnit.test(`click on editing itext make selection:changed fire`, function (assert) {
           var done = assert.async();
-          assert.equal(canvas._isRetinaScaling(), enableRetinaScaling, 'test state is correct');
           assert.equal(canvas.getActiveObject(), null, 'no active object exist');
           assert.equal(count, 0, 'no selection:changed fired yet');
           assert.equal(countCanvas, 0, 'no text:selection:changed fired yet');

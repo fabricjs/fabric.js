@@ -18,6 +18,8 @@ import type {
   TSize,
   TCacheCanvasDimensions,
   Abortable,
+  TOptions,
+  ImageFormat,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -40,7 +42,7 @@ import {
   isSerializableFiller,
   isTextObject,
 } from '../../util/typeAssertions';
-import type { Image } from '../Image';
+import type { FabricImage } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
@@ -51,13 +53,13 @@ import type { Pattern } from '../../Pattern';
 import type { Canvas } from '../../canvas/Canvas';
 import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
-import type { TProps } from './types';
-import { getEnv } from '../../env';
+import { getDevicePixelRatio, getEnv } from '../../env';
+import { log } from '../../util/internals/console';
 
-export type TCachedFabricObject = FabricObject &
+export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
     Pick<
-      FabricObject,
+      T,
       | 'zoomX'
       | 'zoomY'
       | '_cacheCanvas'
@@ -68,6 +70,34 @@ export type TCachedFabricObject = FabricObject &
   > & {
     _cacheContext: CanvasRenderingContext2D;
   };
+
+export type ObjectToCanvasElementOptions = {
+  format?: ImageFormat;
+  /** Multiplier to scale by */
+  multiplier?: number;
+  /** Cropping left offset. Introduced in v1.2.14 */
+  left?: number;
+  /** Cropping top offset. Introduced in v1.2.14 */
+  top?: number;
+  /** Cropping width. Introduced in v1.2.14 */
+  width?: number;
+  /** Cropping height. Introduced in v1.2.14 */
+  height?: number;
+  /** Enable retina scaling for clone image. Introduce in 1.6.4 */
+  enableRetinaScaling?: boolean;
+  /** Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4 */
+  withoutTransform?: boolean;
+  /** Remove current object shadow. Introduced in 2.4.2 */
+  withoutShadow?: boolean;
+  /** Account for canvas viewport transform */
+  viewportTransform?: boolean;
+  /** Function to create the output canvas to export onto */
+  canvasProvider?: <T extends StaticCanvas>(el?: HTMLCanvasElement) => T;
+};
+
+type toDataURLOptions = ObjectToCanvasElementOptions & {
+  quality?: number;
+};
 
 /**
  * Root object class from which all 2d shape classes inherit from
@@ -98,7 +128,7 @@ export type TCachedFabricObject = FabricObject &
  * @fires drop
  */
 export class FabricObject<
-    Props extends TProps<ObjectProps> = Partial<ObjectProps>,
+    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -135,6 +165,7 @@ export class FabricObject<
   declare inverted: boolean;
   declare absolutePositioned: boolean;
   declare centeredRotation: boolean;
+  declare centeredScaling: boolean;
 
   /**
    * This list of properties is used to check if the state of an object is changed.
@@ -262,11 +293,20 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
-  static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
+  static ownDefaults = fabricObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return { ...FabricObject.ownDefaults };
   }
+
+  /**
+   * The class type. Used to identify which class this is.
+   * This is used for serialization purposes and internally it can be used
+   * to identify classes. As a developer you could use `instance of Class`
+   * but to avoid importing all the code and blocking tree shaking we try
+   * to avoid doing that.
+   */
+  static type = 'FabricObject';
 
   /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
@@ -278,7 +318,7 @@ export class FabricObject<
    * @deprecated
    */
   get type() {
-    const name = this.constructor.name;
+    const name = (this.constructor as typeof FabricObject).type;
     if (name === 'FabricObject') {
       return 'object';
     }
@@ -286,7 +326,7 @@ export class FabricObject<
   }
 
   set type(value) {
-    console.warn('Setting type has no effect', value);
+    log('warn', 'Setting type has no effect', value);
   }
 
   /**
@@ -503,7 +543,7 @@ export class FabricObject<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} Object representation of an instance
    */
-  protected toObject(propertiesToInclude: any[] = []): any {
+  toObject(propertiesToInclude: any[] = []): any {
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       clipPathData =
         this.clipPath && !this.clipPath.excludeFromExport
@@ -515,7 +555,7 @@ export class FabricObject<
           : null,
       object = {
         ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: this.constructor.name,
+        type: (this.constructor as typeof FabricObject).type,
         version: VERSION,
         originX: this.originX,
         originY: this.originY,
@@ -609,7 +649,7 @@ export class FabricObject<
    * @return {String}
    */
   toString() {
-    return `#<${this.constructor.name}>`;
+    return `#<${(this.constructor as typeof FabricObject).type}>`;
   }
 
   /**
@@ -696,7 +736,10 @@ export class FabricObject<
       // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
-    } else if (key === 'dirty' && this.group) {
+    } else if (key === 'dirty' && this.group && value) {
+      // a dirty child makes the parent dirty
+      // but a non dirty child will not make the parent non dirty.
+      // the parent could be dirty for some other reason
       this.group.set('dirty', value);
     }
 
@@ -835,7 +878,7 @@ export class FabricObject<
       this.paintFirst === 'stroke' &&
       this.hasFill() &&
       this.hasStroke() &&
-      typeof this.shadow === 'object'
+      !!this.shadow
     ) {
       return true;
     }
@@ -862,7 +905,7 @@ export class FabricObject<
   }
 
   /**
-   * Check if this object or a child object will cast a shadow
+   * Check if this object will cast a shadow with an offset.
    * used by Group.shouldCache to know if child has a shadow recursively
    * @return {Boolean}
    * @deprecated
@@ -1299,11 +1342,11 @@ export class FabricObject<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @returns {Promise<FabricObject>}
    */
-  clone(propertiesToInclude: string[]) {
+  clone(propertiesToInclude?: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     return (this.constructor as typeof FabricObject).fromObject(
       objectForm
-    ) as unknown as this;
+    ) as unknown as Promise<this>;
   }
 
   /**
@@ -1314,7 +1357,7 @@ export class FabricObject<
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
    * @todo fix the export type, it could not be Image but the type that getClass return for 'image'.
-   * @param {Object} [options] for clone as image, passed to toDataURL
+   * @param {ObjectToCanvasElementOptions} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1323,18 +1366,18 @@ export class FabricObject<
    * @param {Boolean} [options.enableRetinaScaling] Enable retina scaling for clone image. Introduce in 1.6.4
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
-   * @return {Image} Object cloned as image.
+   * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): Image {
+  cloneAsImage(options: ObjectToCanvasElementOptions): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
-    const ImageClass = classRegistry.getClass('image');
+    const ImageClass = classRegistry.getClass<typeof FabricImage>('image');
     return new ImageClass(canvasEl);
   }
 
   /**
    * Converts an object into a HTMLCanvas element
-   * @param {Object} options Options object
+   * @param {ObjectToCanvasElementOptions} options Options object
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1344,17 +1387,24 @@ export class FabricObject<
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
+   * @param {(el?: HTMLCanvasElement) => StaticCanvas} [options.canvasProvider] Create the output canvas
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any = {}) {
+  toCanvasElement(options: ObjectToCanvasElementOptions = {}) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
       abs = Math.abs,
-      retinaScaling = options.enableRetinaScaling
-        ? Math.max(config.devicePixelRatio, 1)
-        : 1,
-      multiplier = (options.multiplier || 1) * retinaScaling;
+      retinaScaling = options.enableRetinaScaling ? getDevicePixelRatio() : 1,
+      multiplier = (options.multiplier || 1) * retinaScaling,
+      canvasProvider: (el: HTMLCanvasElement) => StaticCanvas =
+        options.canvasProvider ||
+        ((el: HTMLCanvasElement) =>
+          new StaticCanvas(el, {
+            enableRetinaScaling: false,
+            renderOnAddRemove: false,
+            skipOffscreen: false,
+          }));
     delete this.group;
     if (options.withoutTransform) {
       resetObjectTransform(this);
@@ -1366,9 +1416,9 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
+    this.setCoords();
     const el = createCanvasElement(),
-      // skip canvas zoom and calculate with setCoords now.
-      boundingRect = this.getBoundingRect(true, true),
+      boundingRect = this.getBoundingRect(),
       shadow = this.shadow,
       shadowOffset = new Point();
 
@@ -1389,11 +1439,7 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    const canvas = new StaticCanvas(el, {
-      enableRetinaScaling: false,
-      renderOnAddRemove: false,
-      skipOffscreen: false,
-    });
+    const canvas = canvasProvider(el);
     if (options.format === 'jpeg') {
       canvas.backgroundColor = '#fff';
     }
@@ -1404,7 +1450,7 @@ export class FabricObject<
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
-    // @ts-ignore this needs to be fixed somehow, or ignored globally
+    // @ts-expect-error this needs to be fixed somehow, or ignored globally
     canvas._objects = [this];
     this.set('canvas', canvas);
     this.setCoords();
@@ -1440,7 +1486,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL(options: any = {}) {
+  toDataURL(options: toDataURLOptions = {}) {
     return toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
@@ -1454,7 +1500,10 @@ export class FabricObject<
    * @return {Boolean}
    */
   isType(...types: string[]) {
-    return types.includes(this.constructor.name) || types.includes(this.type);
+    return (
+      types.includes((this.constructor as typeof FabricObject).type) ||
+      types.includes(this.type)
+    );
   }
 
   /**
@@ -1479,18 +1528,28 @@ export class FabricObject<
    * @param {TDegree} angle Angle value (in degrees)
    */
   rotate(angle: TDegree) {
-    const shouldCenterOrigin =
-      (this.originX !== CENTER || this.originY !== CENTER) &&
-      this.centeredRotation;
+    const { centeredRotation, originX, originY } = this;
 
-    if (shouldCenterOrigin) {
-      this._setOriginToCenter();
+    if (centeredRotation) {
+      const { x, y } = this.getRelativeCenterPoint();
+      this.originX = CENTER;
+      this.originY = CENTER;
+      this.left = x;
+      this.top = y;
     }
 
     this.set('angle', angle);
 
-    if (shouldCenterOrigin) {
-      this._resetOrigin();
+    if (centeredRotation) {
+      const { x, y } = this.translateToOriginPoint(
+        this.getRelativeCenterPoint(),
+        originX,
+        originY
+      );
+      this.left = x;
+      this.top = y;
+      this.originX = originX;
+      this.originY = originY;
     }
   }
 
@@ -1539,7 +1598,7 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
-    object: Record<string, unknown>,
+    { type, ...object }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {}
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
@@ -1548,7 +1607,7 @@ export class FabricObject<
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, type, ...rest } = allOptions;
+          const { [extraParam]: arg0, ...rest } = allOptions;
           // @ts-expect-error different signature
           return new this(arg0, rest);
         } else {
@@ -1565,7 +1624,7 @@ export class FabricObject<
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<FabricObject>}
    */
-  static fromObject<T extends TProps<SerializedObjectProps>>(
+  static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
     options?: Abortable
   ) {

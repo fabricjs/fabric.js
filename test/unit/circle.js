@@ -8,9 +8,9 @@
     var circle = new fabric.Circle();
 
     assert.ok(circle instanceof fabric.Circle, 'should inherit from fabric.Circle');
-    assert.ok(circle instanceof fabric.Object, 'should inherit from fabric.Object');
+    assert.ok(circle instanceof fabric.FabricObject, 'should inherit from fabric.Object');
 
-    assert.deepEqual(circle.constructor.name, 'Circle');
+    assert.deepEqual(circle.constructor.type, 'Circle');
   });
 
   QUnit.test('constructor with radius', function(assert) {
@@ -117,6 +117,7 @@
       radius:                   0,
       startAngle:               0,
       endAngle:                 360,
+      counterClockwise:         false,
       skewX:                    0,
       skewY:                    0,
       strokeUniform:            false
@@ -159,11 +160,19 @@
   });
 
   QUnit.test('toSVG with half circle', function(assert) {
-    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: fabric.util.radiansToDegrees(Math.PI) });
+    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: 180 });
     var svg = circle.toSVG();
     var svgClipPath = circle.toClipPathSVG();
     assert.equal(svg, '<g transform=\"matrix(1 0 0 1 10.5 10.5)\"  >\n<path d=\"M 10 0 A 10 10 0 0 1 -10 0\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"   />\n</g>\n');
     assert.equal(svgClipPath, '\t<path d=\"M 10 0 A 10 10 0 0 1 -10 0\" transform=\"matrix(1 0 0 1 10.5 10.5)\"  />\n', 'half circle as clipPath');
+  });
+
+  QUnit.test('toSVG with counterclockwise half circle', function (assert) {
+    var circle = new fabric.Circle({ width: 100, height: 100, radius: 10, endAngle: 180, counterClockwise: true });
+    var svg = circle.toSVG();
+    var svgClipPath = circle.toClipPathSVG();
+    assert.equal(svg, '<g transform=\"matrix(1 0 0 1 10.5 10.5)\"  >\n<path d=\"M 10 0 A 10 10 0 0 0 -10 0\" style=\"stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;\"   />\n</g>\n');
+    assert.equal(svgClipPath, '\t<path d=\"M 10 0 A 10 10 0 0 0 -10 0\" transform=\"matrix(1 0 0 1 10.5 10.5)\"  />\n', 'half circle as clipPath');
   });
 
   QUnit.test('fromElement', function(assert) {

@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { AssertKeys, TFiller } from '../../typedefs';
+import type { TClassProperties, TFiller, TOptions } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -17,6 +17,7 @@ import {
   JUSTIFY_RIGHT,
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
+import type { ObjectToCanvasElementOptions } from '../Object/Object';
 
 type CursorBoundaries = {
   left: number;
@@ -25,7 +26,14 @@ type CursorBoundaries = {
   topOffset: number;
 };
 
-export const iTextDefaultValues = {
+// Declare IText protected properties to workaround TS
+const protectedDefaultValues = {
+  _selectionDirection: null,
+  _reSpace: /\s|\r?\n/,
+  inCompositionMode: false,
+};
+
+export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   selectionStart: 0,
   selectionEnd: 0,
   selectionColor: 'rgba(17,119,255,0.3)',
@@ -38,13 +46,11 @@ export const iTextDefaultValues = {
   cursorDuration: 600,
   caching: true,
   hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\n/,
-  inCompositionMode: false,
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
+  ...protectedDefaultValues,
 };
 
 // @TODO this is not complete
@@ -103,7 +109,7 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  * ```
  */
 export class IText<
-    Props extends ITextProps = ITextProps,
+    Props extends TOptions<ITextProps> = Partial<ITextProps>,
     SProps extends SerializedITextProps = SerializedITextProps,
     EventSpec extends ITextEvents = ITextEvents
   >
@@ -196,14 +202,18 @@ export class IText<
    */
   declare caching: boolean;
 
-  static ownDefaults: Record<string, any> = iTextDefaultValues;
+  static ownDefaults = iTextDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
+  static type = 'IText';
+
   get type() {
-    return 'i-text';
+    const type = super.type;
+    // backward compatibility
+    return type === 'itext' ? 'i-text' : type;
   }
 
   /**
@@ -212,7 +222,7 @@ export class IText<
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
-  constructor(text: string, options: object) {
+  constructor(text: string, options?: Props) {
     super(text, options);
     this.initBehavior();
   }
@@ -350,7 +360,7 @@ export class IText<
    * @override block cursor/selection logic while rendering the exported canvas
    * @todo this workaround should be replaced with a more robust solution
    */
-  toCanvasElement(options?: any): HTMLCanvasElement {
+  toCanvasElement(options?: ObjectToCanvasElementOptions): HTMLCanvasElement {
     const isEditing = this.isEditing;
     this.isEditing = false;
     const canvas = super.toCanvasElement(options);
@@ -496,7 +506,7 @@ export class IText<
       charIndex =
         cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
       charHeight = this.getValueOfPropertyAt(lineIndex, charIndex, 'fontSize'),
-      multiplier = this.scaleX * this.canvas!.getZoom(),
+      multiplier = this.getObjectScaling().x * this.canvas!.getZoom(),
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset =
@@ -512,7 +522,7 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      this.getValueOfPropertyAt(lineIndex, charIndex, 'fill');
+      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -542,11 +552,11 @@ export class IText<
   /**
    * Renders drag start text selection
    */
-  renderDragSourceEffect(this: AssertKeys<this, 'canvas'>) {
+  renderDragSourceEffect() {
     const dragStartSelection =
       this.draggableTextDelegate.getDragStartSelection()!;
     this._renderSelection(
-      this.canvas.contextTop,
+      this.canvas!.contextTop,
       dragStartSelection,
       this._getCursorBoundaries(dragStartSelection.selectionStart, true)
     );
@@ -666,7 +676,7 @@ export class IText<
    * Unused by the library, is for the end user
    * @return {String | TFiller} Character color (fill)
    */
-  getCurrentCharColor(): string | TFiller {
+  getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
     return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
   }

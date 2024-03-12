@@ -45,6 +45,8 @@ export class ColorMatrix extends BaseFilter {
    */
   declare colorsOnly: boolean;
 
+  static type = 'ColorMatrix';
+
   static defaults = colorMatrixDefaultValues;
 
   setOptions({ matrix, ...options }: Record<string, any>) {

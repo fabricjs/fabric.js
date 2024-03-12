@@ -1,8 +1,7 @@
 import type { FabricObjectProps } from './FabricObjectProps';
+import type { TOptions } from '../../../typedefs';
 
 export type { SerializedObjectProps } from './SerializedObjectProps';
 export type { FabricObjectProps };
 
-export type TProps<T> = Partial<T> & Record<string, any>;
-
-export type TFabricObjectProps = TProps<FabricObjectProps>;
+export type TFabricObjectProps = TOptions<FabricObjectProps>;

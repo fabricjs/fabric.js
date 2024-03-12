@@ -18,15 +18,16 @@ import type {
   TPathSegmentInfo,
   TSimplePathData,
 } from '../util/path/typedefs';
-import type {
-  FabricObjectProps,
-  SerializedObjectProps,
-  TProps,
-} from './Object/types';
+import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import type { TBBox, TClassProperties, TSVGReviver } from '../typedefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
+import type {
+  TBBox,
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+} from '../typedefs';
 import { CENTER, LEFT, TOP } from '../constants';
+import type { CSSRules } from '../parser/typedefs';
 
 interface UniquePathProps {
   sourcePath?: string;
@@ -46,7 +47,7 @@ export interface IPathBBox extends TBBox {
 }
 
 export class Path<
-  Props extends TProps<PathProps> = Partial<PathProps>,
+  Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
   EventSpec extends ObjectEvents = ObjectEvents
 > extends FabricObject<Props, SProps, EventSpec> {
@@ -62,6 +63,8 @@ export class Path<
   declare sourcePath?: string;
 
   declare segmentsInfo?: TPathSegmentInfo[];
+
+  static type = 'Path';
 
   static cacheProperties = [...cacheProperties, 'path', 'fillRule'];
 
@@ -108,12 +111,6 @@ export class Path<
    * @param {CanvasRenderingContext2D} ctx context to render path on
    */
   _renderPathCommands(ctx: CanvasRenderingContext2D) {
-    let subpathStartX = 0,
-      subpathStartY = 0,
-      x = 0, // current x
-      y = 0, // current y
-      controlX = 0, // current control point x
-      controlY = 0; // current control point y
     const l = -this.pathOffset.x,
       t = -this.pathOffset.y;
 
@@ -124,31 +121,21 @@ export class Path<
         command[0] // first letter
       ) {
         case 'L': // lineto, absolute
-          x = command[1];
-          y = command[2];
-          ctx.lineTo(x + l, y + t);
+          ctx.lineTo(command[1] + l, command[2] + t);
           break;
 
         case 'M': // moveTo, absolute
-          x = command[1];
-          y = command[2];
-          subpathStartX = x;
-          subpathStartY = y;
-          ctx.moveTo(x + l, y + t);
+          ctx.moveTo(command[1] + l, command[2] + t);
           break;
 
         case 'C': // bezierCurveTo, absolute
-          x = command[5];
-          y = command[6];
-          controlX = command[3];
-          controlY = command[4];
           ctx.bezierCurveTo(
             command[1] + l,
             command[2] + t,
-            controlX + l,
-            controlY + t,
-            x + l,
-            y + t
+            command[3] + l,
+            command[4] + t,
+            command[5] + l,
+            command[6] + t
           );
           break;
 
@@ -159,15 +146,9 @@ export class Path<
             command[3] + l,
             command[4] + t
           );
-          x = command[3];
-          y = command[4];
-          controlX = command[1];
-          controlY = command[2];
           break;
 
         case 'Z':
-          x = subpathStartX;
-          y = subpathStartY;
           ctx.closePath();
           break;
       }
@@ -204,7 +185,7 @@ export class Path<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      path: cloneDeep(this.path),
+      path: this.path.map((pathCmd) => pathCmd.slice()),
     };
   }
 
@@ -256,7 +237,7 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toClipPathSVG(reviver: TSVGReviver) {
+  toClipPathSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return (
       '\t' +
@@ -272,7 +253,7 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toSVG(reviver: TSVGReviver) {
+  toSVG(reviver: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver: reviver,
@@ -398,7 +379,7 @@ export class Path<
    * @param {Object} object
    * @returns {Promise<Path>}
    */
-  static fromObject<T extends TProps<SerializedPathProps>>(object: T) {
+  static fromObject<T extends TOptions<SerializedPathProps>>(object: T) {
     return this._fromObject<Path>(object, {
       extraParam: 'path',
     });
@@ -408,13 +389,18 @@ export class Path<
    * Creates an instance of Path from an SVG <path> element
    * @static
    * @memberOf Path
-   * @param {SVGElement} element to parse
+   * @param {HTMLElement} element to parse
    * @param {Partial<PathProps>} [options] Options object
    */
-  static async fromElement(element: SVGElement, options: Partial<PathProps>) {
+  static async fromElement(
+    element: HTMLElement,
+    options: Partial<PathProps>,
+    cssRules?: CSSRules
+  ) {
     const { d, ...parsedAttributes } = parseAttributes(
       element,
-      this.ATTRIBUTE_NAMES
+      this.ATTRIBUTE_NAMES,
+      cssRules
     );
     return new this(d, {
       ...parsedAttributes,

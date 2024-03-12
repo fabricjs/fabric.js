@@ -12,7 +12,11 @@ export class TextEditingManager {
   private __disposer: VoidFunction;
 
   constructor(canvas: Canvas) {
-    const cb = () => this.target?.hiddenTextarea?.focus();
+    const cb = () => {
+      const { hiddenTextarea } =
+        (canvas.getActiveObject() as ITextBehavior) || {};
+      hiddenTextarea && hiddenTextarea.focus();
+    };
     const el = canvas.upperCanvasEl;
     el.addEventListener('click', cb);
     this.__disposer = () => el.removeEventListener('click', cb);

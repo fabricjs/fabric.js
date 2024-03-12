@@ -1,0 +1,98 @@
+{
+  "position": {
+    "x": -44.5,
+    "y": -20
+  },
+  "data": {
+    "text/plain": "fabric",
+    "application/fabric": {
+      "value": "fabric",
+      "styles": [
+        {
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontFamily": "Times New Roman",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": ""
+        },
+        {
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontFamily": "Times New Roman",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": ""
+        },
+        {
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontFamily": "Times New Roman",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": ""
+        },
+        {
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontFamily": "Times New Roman",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": ""
+        },
+        {
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontFamily": "Times New Roman",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": ""
+        },
+        {
+          "fontSize": 64,
+          "fontWeight": "bold",
+          "fontFamily": "Times New Roman",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": ""
+        }
+      ]
+    }
+  }
+}

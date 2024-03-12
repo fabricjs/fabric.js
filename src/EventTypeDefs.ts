@@ -1,19 +1,16 @@
 import type { Control } from './controls/Control';
 import type { Point } from './Point';
 import type { FabricObject } from './shapes/Object/FabricObject';
-import type { FabricObject as StaticFabricObject } from './shapes/Object/Object';
-import type { FabricObjectSVGExportMixin } from './shapes/Object/FabricObjectSVGExportMixin';
 import type { Group } from './shapes/Group';
 import type { TOriginX, TOriginY, TRadian } from './typedefs';
 import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './canvas/Canvas';
 import type { IText } from './shapes/IText/IText';
 import type { StaticCanvas } from './canvas/StaticCanvas';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
-export interface BaseFabricObject
-  extends StaticFabricObject,
-    FabricObjectSVGExportMixin {}
+import type {
+  LayoutBeforeEvent,
+  LayoutAfterEvent,
+} from './LayoutManager/types';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -58,9 +55,9 @@ export type ControlCursorCallback = ControlCallback<string>;
  */
 export type Transform = {
   target: FabricObject;
-  action: string;
+  action?: string;
   actionHandler?: TransformActionHandler;
-  corner: string | 0;
+  corner: string;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -82,36 +79,37 @@ export type Transform = {
     originX: TOriginX;
     originY: TOriginY;
   };
-  // @TODO: investigate if this reset is really needed
-  reset?: boolean;
   actionPerformed: boolean;
 };
 
-export type TEvent<E extends Event = TPointerEvent> = {
+export interface TEvent<E extends Event = TPointerEvent> {
   e: E;
-};
+}
 
-type TEventWithTarget<E extends Event = TPointerEvent> = TEvent<E> & {
+interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
   target: FabricObject;
-};
+}
 
-export type BasicTransformEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+export interface BasicTransformEvent<E extends Event = TPointerEvent>
+  extends TEvent<E> {
   transform: Transform;
   pointer: Point;
-};
+}
 
 export type TModificationEvents =
   | 'moving'
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modifyPoly';
 
-export type ModifiedEvent<E extends Event = TPointerEvent> = TEvent<E> & {
+export interface ModifiedEvent<E extends Event = TPointerEvent> {
+  e?: E;
   transform: Transform;
   target: FabricObject;
-  action: string;
-};
+  action?: string;
+}
 
 type ModificationEventsSpec<
   Prefix extends string = '',
@@ -125,47 +123,73 @@ type ObjectModificationEvents = ModificationEventsSpec;
 type CanvasModificationEvents = ModificationEventsSpec<
   'object:',
   BasicTransformEvent & { target: FabricObject },
+  // TODO: this typing makes not possible to use properties from modified event
+  // in object:modified
   ModifiedEvent | { target: FabricObject }
 > & {
   'before:transform': TEvent & { transform: Transform };
 };
 
-export type TPointerEventInfo<E extends TPointerEvent = TPointerEvent> =
-  TEvent<E> & {
-    target?: FabricObject;
-    subTargets?: FabricObject[];
-    button?: number;
-    isClick: boolean;
-    pointer: Point;
-    transform?: Transform | null;
-    absolutePointer: Point;
-    currentSubTargets?: FabricObject[];
-    currentTarget?: FabricObject | null;
-  };
+export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
+  extends TEvent<E> {
+  target?: FabricObject;
+  subTargets?: FabricObject[];
+  transform?: Transform | null;
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
+  pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
+  absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
+}
 
-type SimpleEventHandler<T extends Event = TPointerEvent> = TEvent<T> & {
+interface SimpleEventHandler<T extends Event = TPointerEvent>
+  extends TEvent<T> {
   target?: FabricObject;
   subTargets: FabricObject[];
-};
+}
 
-type InEvent = {
+interface InEvent {
   previousTarget?: FabricObject;
-};
+}
 
-type OutEvent = {
+interface OutEvent {
   nextTarget?: FabricObject;
-};
+}
 
-export type DragEventData = TEvent<DragEvent> & {
+export interface DragEventData extends TEvent<DragEvent> {
   target?: FabricObject;
   subTargets?: FabricObject[];
   dragSource?: FabricObject;
   canDrop?: boolean;
   didDrop?: boolean;
   dropTarget?: FabricObject;
-};
+}
 
-export type DropEventData = DragEventData & { pointer: Point };
+export interface DropEventData extends DragEventData {
+  /**
+   * @deprecated
+   * use viewportPoint instead.
+   * Kept for compatibility
+   */
+  pointer: Point;
+  /**
+   * @deprecated
+   * use scenePoint instead.
+   * Kept for compatibility
+   */
+  absolutePointer: Point;
+  scenePoint: Point;
+  viewportPoint: Point;
+}
 
 interface DnDEvents {
   dragstart: TEventWithTarget<DragEvent>;
@@ -201,8 +225,8 @@ interface CanvasSelectionEvents {
 }
 
 export interface CollectionEvents {
-  'object:added': { target: StaticFabricObject };
-  'object:removed': { target: StaticFabricObject };
+  'object:added': { target: FabricObject };
+  'object:removed': { target: FabricObject };
 }
 
 type BeforeSuffix<T extends string> = `${T}:before`;
@@ -212,10 +236,17 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | WithBeforeSuffix<'up'>
     | 'dblclick'}`,
   TPointerEventInfo
 > &
+  Record<
+    `${Prefix}${WithBeforeSuffix<'up'>}`,
+    TPointerEventInfo & {
+      isClick: boolean;
+      currentTarget?: FabricObject;
+      currentSubTargets: FabricObject[];
+    }
+  > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
   Record<`${Prefix}over`, TPointerEventInfo & InEvent> &
   Record<`${Prefix}out`, TPointerEventInfo & OutEvent>;
@@ -263,6 +294,8 @@ export interface StaticCanvasEvents extends CollectionEvents {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+  'object:layout:before': LayoutBeforeEvent & { target: Group };
+  'object:layout:after': LayoutAfterEvent & { target: Group };
 }
 
 export interface CanvasEvents
