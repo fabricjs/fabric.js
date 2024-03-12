@@ -596,7 +596,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   _onTouchStart(e: TouchEvent) {
-    e.preventDefault();
+    !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
     if (this.mainTouchId === undefined) {
       this.mainTouchId = this.getPointerId(e);
     }
