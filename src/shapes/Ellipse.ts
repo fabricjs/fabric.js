@@ -8,7 +8,7 @@ import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
 
-export const ellipseDefaultValues: UniqueEllipseProps = {
+export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   rx: 0,
   ry: 0,
 };
@@ -52,9 +52,9 @@ export class Ellipse<
 
   static cacheProperties = [...cacheProperties, ...ELLIPSE_PROPS];
 
-  static ownDefaults: Record<string, any> = ellipseDefaultValues;
+  static ownDefaults = ellipseDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Ellipse.ownDefaults,
