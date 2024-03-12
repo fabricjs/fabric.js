@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): minor changes to typescript notation to be compatible with a 5.3.3 [#9725](https://github.com/fabricjs/fabric.js/pull/9725)
 - ci(): Update the changelog and stats action to work from forks
 - fix(Shadow): Cloning a shape with shadow throws an error[#9711](https://github.com/fabricjs/fabric.js/issues/9711)
 - chore(TS): use consistent and improved types for getDefaults and ownDefaults [#9698](https://github.com/fabricjs/fabric.js/pull/9698)
