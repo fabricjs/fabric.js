@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(ActiveSelection): block ancestors/descendants of selected objects from being selected [#9732](https://github.com/fabricjs/fabric.js/pull/9732)
 - fix(Image): typo in style property for svg export [#9717](https://github.com/fabricjs/fabric.js/pull/9717)
 - ci(): Update the changelog and stats action to work from forks
 - fix(Shadow): Cloning a shape with shadow throws an error[#9711](https://github.com/fabricjs/fabric.js/issues/9711)
