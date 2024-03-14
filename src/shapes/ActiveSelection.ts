@@ -87,6 +87,18 @@ export class ActiveSelection extends Group {
   }
 
   /**
+   * @override block ancestors/descendants of selected objects from being selected
+   */
+  canEnterGroup(object: FabricObject) {
+    return (
+      super.canEnterGroup(object) &&
+      !this.getObjects().some(
+        (o) => o.isDescendantOf(object) || object.isDescendantOf(o)
+      )
+    );
+  }
+
+  /**
    * Change an object so that it can be part of an active selection.
    * this method is called by multiselectAdd from canvas code.
    * @private
