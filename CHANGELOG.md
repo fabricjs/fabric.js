@@ -1,7 +1,7 @@
 # Changelog
 
 ## [next]
-
+-fix(borderOpacityWhenMoving): "borderOpacityWhenMoving" does not take effect on the child shapes within the group [#9374](https://github.com/fabricjs/fabric.js/issues/9734)
 - fix(ActiveSelection): block ancestors/descendants of selected objects from being selected [#9732](https://github.com/fabricjs/fabric.js/pull/9732)
 - fix(Image): typo in style property for svg export [#9717](https://github.com/fabricjs/fabric.js/pull/9717)
 - ci(): Update the changelog and stats action to work from forks
