@@ -62,7 +62,7 @@ export interface GroupProps extends FabricObjectProps, GroupOwnProps {
   layoutManager: LayoutManager;
 }
 
-export const groupDefaultValues = {
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
   strokeWidth: 0,
   subTargetCheck: false,
   interactive: false,
@@ -569,7 +569,10 @@ export class Group
   }
 
   dispose() {
-    this.layoutManager.unsubscribeTarget(this);
+    this.layoutManager.unsubscribeTargets({
+      targets: this.getObjects(),
+      target: this,
+    });
     this._activeObjects = [];
     this.forEachObject((object) => {
       this._watchObject(false, object);
@@ -672,6 +675,11 @@ export class Group
       } else {
         group.layoutManager = new LayoutManager();
       }
+      group.layoutManager.subscribeTargets({
+        type: LAYOUT_TYPE_INITIALIZATION,
+        target: group,
+        targets: group.getObjects(),
+      });
       group.setCoords();
       return group;
     });

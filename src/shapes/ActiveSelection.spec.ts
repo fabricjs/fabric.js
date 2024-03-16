@@ -139,4 +139,26 @@ describe('ActiveSelection', () => {
     });
     expect(eventsSpy).toBeCalledTimes(3);
   });
+
+  it('should block descendants from entering selection', () => {
+    const object = new FabricObject();
+    const group = new Group([object]);
+    const activeSelection = new ActiveSelection([group]);
+    const spy = jest.spyOn(activeSelection, 'canEnterGroup');
+    activeSelection.add(object);
+    expect(activeSelection.getObjects()).toEqual([group]);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveNthReturnedWith(1, false);
+  });
+
+  it('should block ancestors from entering selection', () => {
+    const object = new FabricObject();
+    const group = new Group([object]);
+    const activeSelection = new ActiveSelection([object]);
+    const spy = jest.spyOn(activeSelection, 'canEnterGroup');
+    activeSelection.add(group);
+    expect(activeSelection.getObjects()).toEqual([object]);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveNthReturnedWith(1, false);
+  });
 });

@@ -3,6 +3,33 @@
 ## [next]
 
 - DRAFT WIP BREAKING: remove opacity from colorstops in live Gradient class [#9622](https://github.com/fabricjs/fabric.js/pull/9622)
+- fix(ActiveSelection): block ancestors/descendants of selected objects from being selected [#9732](https://github.com/fabricjs/fabric.js/pull/9732)
+- fix(Image): typo in style property for svg export [#9717](https://github.com/fabricjs/fabric.js/pull/9717)
+- ci(): Update the changelog and stats action to work from forks
+- fix(Shadow): Cloning a shape with shadow throws an error[#9711](https://github.com/fabricjs/fabric.js/issues/9711)
+- chore(TS): use consistent and improved types for getDefaults and ownDefaults [#9698](https://github.com/fabricjs/fabric.js/pull/9698)
+- fix(SVGParser): Don't crash on nested CSS at-rules [#9707](https://github.com/fabricjs/fabric.js/pull/9707)
+- perf(): measuring canvas size [#9697](https://github.com/fabricjs/fabric.js/pull/9697)
+- chore(TS): Add type for options in toCanvasElement and toDataUrl [#9673](https://github.com/fabricjs/fabric.js/pull/9673)
+- ci(): add source map support to node sandbox [#9686](https://github.com/fabricjs/fabric.js/pull/9686)
+- fix(Canvas): Correct type mainTouchId initialization [#9684](https://github.com/fabricjs/fabric.js/pull/9684)
+- feat(Circle): Add counterclockwise parameter to Circle class [#9670](https://github.com/fabricjs/fabric.js/pull/9670)
+
+## [6.0.0-beta19]
+
+- feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
+- fix(Object): support specyfing toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
+- ci(): no `src` imports [#9657](https://github.com/fabricjs/fabric.js/pull/9657)
+- fix(textStyles): Split text into graphemes correctly [#9646](https://github.com/fabricjs/fabric.js/pull/9646)
+- fix(ActiveSelection): static default inheritance [#9635](https://github.com/fabricjs/fabric.js/pull/9635)
+- fix(StaticCanvas): StaticCanvas setDimensions typings [#9618](https://github.com/fabricjs/fabric.js/pull/9618)
+- refactor(): Align gradient with class registry usage, part of #9144 [#9627](https://github.com/fabricjs/fabric.js/pull/9627)
+- refactor(): Align shadow with class registry, part of #9144 [#9626](https://github.com/fabricjs/fabric.js/pull/9626)
+- cd() Surface the minified build as standard when importing. [#9624](https://github.com/fabricjs/fabric.js/pull/9624)
+- chore(): removed unused code from Path render function [#9619](https://github.com/fabricjs/fabric.js/pull/9619)
+
+## [6.0.0-beta18]
+
 - fix(StyledText): add ability to unset style (issue #9578) [#9597](https://github.com/fabricjs/fabric.js/pull/9597)
 - CD(): expose vue deployed app [#9615](https://github.com/fabricjs/fabric.js/pull/9615)
 - chore(): Upgrade Rollup to 4.9.5 [#9613](https://github.com/fabricjs/fabric.js/pull/9613)

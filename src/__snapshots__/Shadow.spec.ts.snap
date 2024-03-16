@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Shadow fromObject 1`] = `
+{
+  "affectStroke": false,
+  "blur": 0,
+  "color": "red",
+  "id": 0,
+  "includeDefaultValues": true,
+  "nonScaling": false,
+  "offsetX": 10,
+  "offsetY": 0,
+}
+`;
+
+exports[`Shadow fromObject 2`] = `
+{
+  "affectStroke": false,
+  "blur": 0,
+  "color": "red",
+  "id": 0,
+  "includeDefaultValues": true,
+  "nonScaling": false,
+  "offsetX": 10,
+  "offsetY": 0,
+}
+`;
