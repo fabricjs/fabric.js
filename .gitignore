@@ -7,5 +7,10 @@ change-output.md
 before_commit
 /coverage/
 .idea/
-/dist
+**/dist/
 /cli_output/
+e2e/test-report/
+e2e/test-results/
+**/.cache/
+docs/
+/.codesandbox/
