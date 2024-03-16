@@ -182,7 +182,9 @@ export class EraserBrush extends PencilBrush {
   /**
    * @override
    */
-  _setBrushStyles(ctx: CanvasRenderingContext2D) {
+  protected _setBrushStyles(
+    ctx: CanvasRenderingContext2D = this.canvas.contextTop
+  ) {
     super._setBrushStyles(ctx);
     ctx.strokeStyle = 'black';
   }
