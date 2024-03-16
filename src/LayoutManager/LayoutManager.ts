@@ -259,6 +259,9 @@ export class LayoutManager {
     { offset }: Required<LayoutResult>,
     object: FabricObject
   ) {
+    // TODO: this is here for cache invalidation.
+    // verify if this is necessary since we have explicit
+    // cache invalidation at the end of commitLayout
     object.set({
       left: object.left + offset.x,
       top: object.top + offset.y,

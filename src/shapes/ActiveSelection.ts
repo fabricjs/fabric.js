@@ -8,6 +8,7 @@ import {
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
 import type { TClassProperties } from '../typedefs';
+import { log } from '../util/internals/console';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -84,6 +85,26 @@ export class ActiveSelection extends Group {
         this.insertAt(insertAt, target);
       });
     }
+  }
+
+  /**
+   * @override block ancestors/descendants of selected objects from being selected to prevent a circular object tree
+   */
+  canEnterGroup(object: FabricObject) {
+    if (
+      this.getObjects().some(
+        (o) => o.isDescendantOf(object) || object.isDescendantOf(o)
+      )
+    ) {
+      //  prevent circular object tree
+      log(
+        'error',
+        'ActiveSelection: circular object trees are not supported, this call has no effect'
+      );
+      return false;
+    }
+
+    return super.canEnterGroup(object);
   }
 
   /**

@@ -824,7 +824,7 @@ describe('Layout Manager', () => {
     });
 
     test.each([true, false])(
-      'initialization edge case, legacy layout %s',
+      'initialization edge case, with specified layoutManager %s',
       (legacy) => {
         const child = new FabricObject({
           width: 200,
@@ -858,7 +858,7 @@ describe('Layout Manager', () => {
       });
       expect(group).toMatchObject({ width: 100, height: 300 });
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
     });
   });
 });
