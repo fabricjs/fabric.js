@@ -454,7 +454,7 @@ export class Group
    * @return {Boolean}
    */
   isOnACache(): boolean {
-    return this.ownCaching || (!!this.group && this.group.isOnACache());
+    return this.ownCaching || (!!this.parent && this.parent.isOnACache());
   }
 
   /**
