@@ -361,7 +361,7 @@ export class StaticCanvas<
     options?: TCanvasSizeOptions
   ) {
     this._setDimensionsImpl(dimensions, options);
-    if (options && !options.cssOnly) {
+    if (!options || !options.cssOnly) {
       this.requestRenderAll();
     }
   }
