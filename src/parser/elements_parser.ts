@@ -133,6 +133,8 @@ export class ElementsParser {
     }
   }
 
+  // TODO: resolveClipPath could be run once per clippath with minor work per object.
+  // is a refactor that i m not sure is worth on this code
   async resolveClipPath(obj: NotParsedFabricObject, usingElement: Element) {
     const clipPathElements = this.extractPropertyDefinition(
       obj,
@@ -152,6 +154,10 @@ export class ElementsParser {
       // move the clipPath tag as sibling to the real element that is using it
       clipPathOwner.parentElement!.appendChild(clipPathTag!);
 
+      // this multiplication order could be opposite.
+      // but i don't have an svg to test it
+      // at the first SVG that has a transform on both places and is misplaced
+      // try to invert this multiplication order
       const finalTransform = parseTransformAttribute(
         `${clipPathOwner.getAttribute('transform') || ''} ${
           clipPathTag.getAttribute('originalTransform') || ''
