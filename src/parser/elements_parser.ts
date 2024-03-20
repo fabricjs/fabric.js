@@ -17,9 +17,10 @@ import type { LoadImageOptions } from '../util';
 import type { CSSRules, TSvgReviverCallback } from './typedefs';
 import type { ParsedViewboxTransform } from './applyViewboxTransform';
 import type { SVGOptions } from '../gradient';
+import { getTagName } from './getTagName';
 
 const findTag = (el: Element) =>
-  classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
+  classRegistry.getSVGClass(getTagName(el).toLowerCase());
 
 type StorageType = {
   fill: SVGGradientElement;

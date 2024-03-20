@@ -26,6 +26,8 @@ export const svgValidTagNames = [
     'line',
     'image',
     'text',
+    // we won't parse Groups but we need their reference
+    'g',
   ],
   svgViewBoxElements = ['symbol', 'image', 'marker', 'pattern', 'view', 'svg'],
   svgInvalidAncestors = [
