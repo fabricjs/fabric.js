@@ -70,6 +70,7 @@ export async function parseSVGDocument(
   descendants
     .filter((el) => getTagName(el) === 'clipPath')
     .forEach((el) => {
+      el.setAttribute('originalTransform', el.getAttribute('transform') || '');
       const id = el.getAttribute('id')!;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
         (el) => isValidSvgTag(el)

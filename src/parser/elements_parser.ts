@@ -141,7 +141,6 @@ export class ElementsParser {
     ) as Element[];
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
-      // move the clipPath tag as sibling to the real element that is using it
       const clipPathTag = clipPathElements[0].parentElement!;
       let clipPathOwner = usingElement;
       while (
@@ -150,15 +149,16 @@ export class ElementsParser {
       ) {
         clipPathOwner = clipPathOwner.parentElement;
       }
+      // move the clipPath tag as sibling to the real element that is using it
       clipPathOwner.parentElement!.appendChild(clipPathTag!);
 
       const finalTransform = parseTransformAttribute(
-        `${
-          clipPathOwner.getAttribute('transform') || ''
-        } ${clipPathTag.getAttribute('transform')}`
+        `${clipPathOwner.getAttribute('transform') || ''} ${
+          clipPathTag.getAttribute('originalTransform') || ''
+        }`
       );
 
-      clipPathTag?.setAttribute(
+      clipPathTag.setAttribute(
         'transform',
         `matrix(${finalTransform.join(',')})`
       );
