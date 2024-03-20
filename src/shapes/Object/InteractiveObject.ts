@@ -414,8 +414,9 @@ export class InteractiveFabricObject<
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;
-    ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-
+    if (this.group == this.parent) {
+      ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
+    }
     if (this.flipX) {
       options.angle -= 180;
     }
