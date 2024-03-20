@@ -362,7 +362,8 @@
     });
     var group = new fabric.Group([rect], { interactive: true, subTargetCheck: true, top: 10, left: 10, });
     canvas.add(group, rect2);
-    const as = new fabric.ActiveSelection([rect, rect2], { canvas: canvas, isMoving: true });
+    const as = new fabric.ActiveSelection([rect, rect2], { canvas: canvas, isMoving: true, cornerSize: 12,
+      cornerColor: 'black', cornerStrokeColor: 'black', borderColor: 'black', borderScaleFactor: 4, });
     canvas.setActiveObject(as);
     canvas.renderAll();
     callback(canvas.lowerCanvasEl);
