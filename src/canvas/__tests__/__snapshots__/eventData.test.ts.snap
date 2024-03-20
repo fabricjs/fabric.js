@@ -143,8 +143,6 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "currentSubTargets": [],
-      "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -642,8 +640,6 @@ exports[`Canvas event data HTML event "mouseup" should fire a corresponding canv
         "x": -30,
         "y": -13,
       },
-      "currentSubTargets": [],
-      "currentTarget": undefined,
       "e": MouseEvent {
         "isTrusted": false,
       },
