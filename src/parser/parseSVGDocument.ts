@@ -57,9 +57,7 @@ export async function parseSVGDocument(
 
   const elements = descendants.filter((el) => {
     applyViewboxTransform(el);
-    return (
-      (isValidSvgTag(el) || getTagName(el) === 'g') && !hasInvalidAncestor(el)
-    ); // http://www.w3.org/TR/SVG/struct.html#DefsElement
+    return isValidSvgTag(el) && !hasInvalidAncestor(el); // http://www.w3.org/TR/SVG/struct.html#DefsElement
   });
   if (!elements || (elements && !elements.length)) {
     return {

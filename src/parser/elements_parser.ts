@@ -18,6 +18,7 @@ import type { CSSRules, TSvgReviverCallback } from './typedefs';
 import type { ParsedViewboxTransform } from './applyViewboxTransform';
 import type { SVGOptions } from '../gradient';
 import { getTagName } from './getTagName';
+import { parseTransformAttribute } from './parseTransformAttribute';
 
 const findTag = (el: Element) =>
   classRegistry.getSVGClass(getTagName(el).toLowerCase());
@@ -141,7 +142,7 @@ export class ElementsParser {
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
       // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPathElements[0].parentElement;
+      const clipPathTag = clipPathElements[0].parentElement!;
       let clipPathOwner = usingElement;
       while (
         clipPathOwner.parentElement &&
@@ -150,6 +151,18 @@ export class ElementsParser {
         clipPathOwner = clipPathOwner.parentElement;
       }
       clipPathOwner.parentElement!.appendChild(clipPathTag!);
+
+      const finalTransform = parseTransformAttribute(
+        `${
+          clipPathOwner.getAttribute('transform') || ''
+        } ${clipPathTag.getAttribute('transform')}`
+      );
+
+      clipPathTag?.setAttribute(
+        'transform',
+        `matrix(${finalTransform.join(',')})`
+      );
+
       const container = await Promise.all(
         clipPathElements.map((clipPathElement) => {
           return findTag(clipPathElement)
