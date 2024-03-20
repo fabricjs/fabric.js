@@ -6,9 +6,10 @@ import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
 import { log, SignalAbortedError } from '../util/internals/console';
+import { getTagName } from './getTagName';
 
 const isValidSvgTag = (el: Element) =>
-  svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
+  svgValidTagNamesRegEx.test(getTagName(el));
 
 export const createEmptyResponse = (): SVGParsingOutput => ({
   objects: [],
@@ -67,8 +68,9 @@ export async function parseSVGDocument(
   }
   const localClipPaths: Record<string, Element[]> = {};
   descendants
-    .filter((el) => el.nodeName.replace('svg:', '') === 'clipPath')
+    .filter((el) => getTagName(el) === 'clipPath')
     .forEach((el) => {
+      el.setAttribute('originalTransform', el.getAttribute('transform') || '');
       const id = el.getAttribute('id')!;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
         (el) => isValidSvgTag(el)
