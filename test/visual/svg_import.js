@@ -100,6 +100,7 @@
     'light-bulb',
     'accordion',
     'car',
+    'seaClipPath',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
