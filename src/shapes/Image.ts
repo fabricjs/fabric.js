@@ -412,7 +412,7 @@ export class FabricImage<
       strokeSvg = [
         `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
           this.height
-        }" styles="${this.getSvgStyles()}" />\n`,
+        }" style="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }

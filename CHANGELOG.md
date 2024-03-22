@@ -3,6 +3,12 @@
 ## [next]
 
 - chore(TS): minor changes to typescript notation to be compatible with a 5.3.3 [#9725](https://github.com/fabricjs/fabric.js/pull/9725)
+- fix(InteractiveObject): "borderOpacityWhenMoving" does not take effect on the child shapes within the group [#9374](https://github.com/fabricjs/fabric.js/issues/9734)
+- fix(SVGParser): Consider the transformMatrix of the clipPath owner as part of the clipPath trasnformation [#9750](https://github.com/fabricjs/fabric.js/pull/9750)
+- fix(StaticCanvas): setDimensions not requesting a render if options are not passed [#9710](https://github.com/fabricjs/fabric.js/pull/9710)
+- fix(LayoutManager): wrong bounding box position when activeSelection has originX/originY that are not default left/top [#9649](https://github.com/fabricjs/fabric.js/pull/9649)
+- fix(ActiveSelection): block ancestors/descendants of selected objects from being selected [#9732](https://github.com/fabricjs/fabric.js/pull/9732)
+- fix(Image): typo in style property for svg export [#9717](https://github.com/fabricjs/fabric.js/pull/9717)
 - ci(): Update the changelog and stats action to work from forks
 - fix(Shadow): Cloning a shape with shadow throws an error[#9711](https://github.com/fabricjs/fabric.js/issues/9711)
 - chore(TS): use consistent and improved types for getDefaults and ownDefaults [#9698](https://github.com/fabricjs/fabric.js/pull/9698)
