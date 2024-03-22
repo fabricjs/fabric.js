@@ -70,10 +70,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   }
 
   // normalize angle to positive value
-  if (angle < 0) {
-    angle = 360 + angle;
-  }
-  angle %= 360;
+  angle = Math.abs(angle % 360);
 
   const hasRotated = target.angle !== angle;
   // TODO: why aren't we using set?
