@@ -421,7 +421,12 @@ export class InteractiveFabricObject<
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
+    // since interactive groups have been introduced, an object could be inside a group and needing controls
+    // the following equality check `this.group === this.parent` covers:
+    // object without a group ( undefined === undefined )
+    // object inside a group
+    // excludes object inside a group but multi selected since group and parent will differ in value
+    if (this.group === this.parent) {
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
     }
     if (this.flipX) {

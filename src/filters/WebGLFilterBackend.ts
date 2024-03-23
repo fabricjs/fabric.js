@@ -285,8 +285,8 @@ export class WebGLFilterBackend {
     } else {
       const texture = this.createTexture(
         this.gl,
-        textureImageSource.width,
-        textureImageSource.height,
+        (textureImageSource as HTMLImageElement).width,
+        (textureImageSource as HTMLImageElement).height,
         textureImageSource,
         filter
       );
