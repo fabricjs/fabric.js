@@ -722,8 +722,6 @@ export class FabricObject<
    * @param {*} value
    */
   _set(key: string, value: any) {
-    const isChanged = this[key as keyof this] !== value;
-
     if (key === 'scaleX' || key === 'scaleY') {
       value = this._constrainScale(value);
     }
@@ -736,29 +734,29 @@ export class FabricObject<
       // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
-    } else if (key === 'dirty' && this.group && value) {
-      // a dirty child makes the parent dirty
-      // but a non dirty child will not make the parent non dirty.
-      // the parent could be dirty for some other reason
-      this.group.set('dirty', value);
     }
 
+    const isChanged = this[key as keyof this] !== value;
     this[key as keyof this] = value;
 
-    if (isChanged) {
-      const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (
-        (this.constructor as typeof FabricObject).cacheProperties.includes(key)
-      ) {
-        this.dirty = true;
-        groupNeedsUpdate && this.group!.set('dirty', true);
-      } else if (
-        groupNeedsUpdate &&
-        (this.constructor as typeof FabricObject).stateProperties.includes(key)
-      ) {
-        this.group!.set('dirty', true);
-      }
+    // invalidate caches
+    if (
+      isChanged &&
+      (this.constructor as typeof FabricObject).cacheProperties.includes(key)
+    ) {
+      this.dirty = true;
     }
+    // a dirty child makes the parent dirty.
+    // but a non dirty child does not make the parent not dirty.
+    // the parent could be dirty for some other reason.
+    this.parent &&
+      (this.dirty ||
+        (isChanged &&
+          (this.constructor as typeof FabricObject).stateProperties.includes(
+            key
+          ))) &&
+      this.parent._set('dirty', true);
+
     return this;
   }
 
@@ -900,7 +898,7 @@ export class FabricObject<
   shouldCache() {
     this.ownCaching =
       this.needsItsOwnCache() ||
-      (this.objectCaching && (!this.group || !this.group.isOnACache()));
+      (this.objectCaching && (!this.parent || !this.parent.isOnACache()));
     return this.ownCaching;
   }
 

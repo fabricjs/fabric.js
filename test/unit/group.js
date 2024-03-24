@@ -677,18 +677,6 @@
     assert.equal(g1.dirty, true, 'Group has dirty flag set');
   });
 
-  QUnit.test('dirty flag propagation from children up is stopped if group is not caching', function(assert) {
-    var g1 = makeGroupWith4Objects();
-    var obj = g1.item(0);
-    g1.dirty = false;
-    obj.dirty = false;
-    g1.ownCaching = false;
-    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
-    obj.set('fill', 'red');
-    assert.equal(obj.dirty, true, 'Obj has dirty flag set');
-    assert.equal(g1.dirty, false, 'Group has no dirty flag set');
-  });
-
   QUnit.test('dirty flag propagation from children up does not happen if value does not change really', function(assert) {
     var g1 = makeGroupWith4Objects();
     var obj = g1.item(0);
