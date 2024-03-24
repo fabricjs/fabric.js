@@ -67,46 +67,45 @@ export class LayoutManager {
    * Attach handlers for events that we know will invalidate the layout when
    * performed on child objects ( general transforms ).
    * Returns the disposers for later unsubscribing and cleanup
-   * @param {FabricObject} childObject
+   * @param {FabricObject} object
    * @param {RegistrationContext & Partial<StrictLayoutContext>} context
    * @returns {VoidFunction[]} disposers remove the handlers
    */
   protected attachHandlers(
-    childObject: FabricObject,
+    object: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
-  ): (() => void)[] {
+  ): VoidFunction[] {
     const { target } = context;
-    // TODO fix typescript that block us from condesing this to a single call per key.
-    return [
-      childObject.on('modified', (e) =>
-        target.layoutManager.performLayout({
-          trigger: 'modified',
-          e,
-          type: LAYOUT_TYPE_OBJECT_MODIFIED,
-          target,
-        })
-      ),
-      ...(
-        [
-          'moving',
-          'resizing',
-          'rotating',
-          'scaling',
-          'skewing',
-          'changed',
-          'modifyPoly',
-        ] as TModificationEvents[]
-      ).map((key) =>
-        childObject.on(key, (e) =>
-          target.layoutManager.performLayout({
-            trigger: key,
-            e,
-            type: LAYOUT_TYPE_OBJECT_MODIFYING,
-            target,
-          })
+    return (
+      [
+        'modified',
+        'moving',
+        'resizing',
+        'rotating',
+        'scaling',
+        'skewing',
+        'changed',
+        'modifyPoly',
+      ] as (TModificationEvents & 'modified')[]
+    ).map((key) =>
+      object.on(key, (e) =>
+        this.performLayout(
+          key === 'modified'
+            ? {
+                type: LAYOUT_TYPE_OBJECT_MODIFIED,
+                trigger: key,
+                e,
+                target,
+              }
+            : {
+                type: LAYOUT_TYPE_OBJECT_MODIFYING,
+                trigger: key,
+                e,
+                target,
+              }
         )
-      ),
-    ];
+      )
+    );
   }
 
   /**
@@ -252,7 +251,7 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
       target.setCoords();
-      context.target.set('dirty', true);
+      target.set('dirty', true);
     }
   }
 

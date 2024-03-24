@@ -57,10 +57,14 @@ export class ActiveSelection extends Group {
    */
   declare multiSelectionStacking: MultiSelectionStacking;
 
-  constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
+  constructor(
+    objects: FabricObject[] = [],
+    options: Partial<ActiveSelectionOptions> = {}
+  ) {
     super(objects, {
-      layoutManager: new ActiveSelectionLayoutManager(),
       ...options,
+      layoutManager:
+        options.layoutManager ?? new ActiveSelectionLayoutManager(),
     });
   }
 
