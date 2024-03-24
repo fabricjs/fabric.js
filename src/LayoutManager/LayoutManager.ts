@@ -324,6 +324,7 @@ export class LayoutManager {
         target: parent,
       });
     }
+    target.set('dirty', true);
   }
 
   dispose() {
