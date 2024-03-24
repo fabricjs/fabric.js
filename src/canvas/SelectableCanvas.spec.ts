@@ -304,7 +304,7 @@ describe('Selectable Canvas', () => {
   });
 
   describe('searchPossibleTargets', () => {
-    test('nested non interactive group', () => {
+    test('nested non interactive groups with subTargetCheck', () => {
       const object = new FabricObject({
         left: 0,
         top: 0,
@@ -332,20 +332,31 @@ describe('Selectable Canvas', () => {
         strokeWidth: 0,
       });
 
-      const nestedGroup = new Group([object2, object3], { interactive: false });
+      const nestedGroup = new Group([object2, object3], {
+        interactive: false,
+        subTargetCheck: true,
+      });
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       const group = new Group([object, nestedGroup], {
         interactive: true,
+        subTargetCheck: true,
       });
       canvas.add(group);
 
-      expect(
-        canvas.searchPossibleTargets(
-          canvas.getObjects(),
-          object2.getCenterPoint()
-        )
-      ).toBe(nestedGroup);
+      const object2Position = object2.getCenterPoint();
+      const target = canvas.searchPossibleTargets(
+        canvas.getObjects(),
+        object2Position
+      );
+      expect(target).toBe(nestedGroup);
+
+      nestedGroup.set({ interactive: true });
+      const nestedTarget = canvas.searchPossibleTargets(
+        canvas.getObjects(),
+        object2Position
+      );
+      expect(nestedTarget).toBe(object2);
     });
   });
 
