@@ -314,7 +314,7 @@ export class LayoutManager {
       });
 
     //  bubble
-    const parent = target.group;
+    const parent = target.parent;
     if (bubbles && parent?.layoutManager) {
       //  add target to context#path
       (bubblingContext.path || (bubblingContext.path = [])).push(target);
@@ -324,8 +324,6 @@ export class LayoutManager {
         target: parent,
       });
     }
-    // if this is nested is also going to invalidate everything else up
-    target.set('dirty', true);
   }
 
   dispose() {
