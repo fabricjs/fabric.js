@@ -188,7 +188,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare fireMiddleClick: boolean;
 
   /**
-   * Keep track of the subTargets for Mouse Events
+   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost subTarget
    * @type FabricObject[]
    */
   targets: FabricObject[] = [];
@@ -860,15 +860,27 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer: Point
   ): FabricObject | undefined {
     const target = this._searchPossibleTargets(objects, pointer);
-    // if we found something in this.targets, and the group is interactive, return that subTarget
+
+    // if we found something in this.targets, and the group is interactive, return the innermost subTarget
+    // that is still interactive
     // TODO: reverify why interactive. the target should be returned always, but selected only
     // if interactive.
-    return target &&
+    if (
+      target &&
       isCollection(target) &&
       target.interactive &&
       this.targets[0]
-      ? this.targets[0]
-      : target;
+    ) {
+      /** {@link this.targets} is ordered bottom-up */
+      let subTarget = this.targets[0];
+      while (subTarget.parent && !subTarget.parent.interactive) {
+        subTarget = subTarget.parent;
+      }
+
+      return subTarget;
+    }
+
+    return target;
   }
 
   /**

@@ -303,6 +303,52 @@ describe('Selectable Canvas', () => {
     });
   });
 
+  describe('searchPossibleTargets', () => {
+    test('nested non interactive group', () => {
+      const object = new FabricObject({
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+
+      const object2 = new FabricObject({
+        left: 20,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+
+      const object3 = new FabricObject({
+        left: 40,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+
+      const nestedGroup = new Group([object2, object3], { interactive: false });
+
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      const group = new Group([object, nestedGroup], {
+        interactive: true,
+      });
+      canvas.add(group);
+
+      expect(
+        canvas.searchPossibleTargets(
+          canvas.getObjects(),
+          object2.getCenterPoint()
+        )
+      ).toBe(nestedGroup);
+    });
+  });
+
   describe('setupCurrentTransform', () => {
     test.each(
       ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr']
