@@ -1,24 +1,24 @@
-import { getEnv, getFabricDocument } from '../../env';
+import { getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
 import { createCanvasElement, setStyle } from '../../util';
-import type { CSSDimensions } from './util';
-import {
-  allowTouchScrolling,
-  makeElementUnselectable,
-  setCSSDimensions,
-} from './util';
-import type { CanvasItem } from './StaticCanvasDOMManager';
+import { allowTouchScrolling, makeElementUnselectable } from './util';
 import { StaticCanvasDOMManager } from './StaticCanvasDOMManager';
-import { setCanvasDimensions } from './util';
 
-export class CanvasDOMManager extends StaticCanvasDOMManager {
-  upper: CanvasItem;
-  container: HTMLDivElement;
+export class CanvasDOMManager extends StaticCanvasDOMManager<{
+  main: HTMLCanvasElement;
+  top: HTMLCanvasElement;
+}> {
+  /**
+   * Keeps a copy of the canvas style before setting retina scaling and other potions
+   * in order to return it to original state on dispose
+   * @type string
+   */
+  private _originalCanvasStyle?: string;
 
-  constructor(
+  static build(
     arg0?: string | HTMLCanvasElement,
     {
-      allowTouchScrolling = false,
+      allowTouchScrolling: touchScrollingEnabled = false,
       containerClass = '',
     }: {
       allowTouchScrolling?: boolean;
@@ -28,27 +28,33 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
       containerClass?: string;
     } = {}
   ) {
-    super(arg0);
-    const { el: lowerCanvasEl } = this.lower;
-    const upperCanvasEl = this.createUpperCanvas();
-    this.upper = { el: upperCanvasEl, ctx: upperCanvasEl.getContext('2d')! };
-    this.applyCanvasStyle(lowerCanvasEl, {
-      allowTouchScrolling,
+    const lowerCanvasEl = this.createLowerCanvas(arg0);
+    const style = lowerCanvasEl.style.cssText;
+    allowTouchScrolling(lowerCanvasEl, touchScrollingEnabled);
+    makeElementUnselectable(lowerCanvasEl);
+
+    const upperCanvasEl = this.createUpperCanvas(lowerCanvasEl);
+
+    setStyle(upperCanvasEl, {
+      position: 'absolute',
+      left: '0',
+      top: '0',
     });
-    this.applyCanvasStyle(upperCanvasEl, {
-      allowTouchScrolling,
-    });
+    allowTouchScrolling(upperCanvasEl, touchScrollingEnabled);
+    makeElementUnselectable(upperCanvasEl);
+
     const container = this.createContainerElement();
     container.classList.add(containerClass);
-    if (lowerCanvasEl.parentNode) {
+    lowerCanvasEl.parentNode &&
       lowerCanvasEl.parentNode.replaceChild(container, lowerCanvasEl);
-    }
     container.append(lowerCanvasEl, upperCanvasEl);
-    this.container = container;
+
+    const manager = new this({ main: lowerCanvasEl, top: upperCanvasEl });
+    manager._originalCanvasStyle = style;
+    return manager;
   }
 
-  protected createUpperCanvas() {
-    const { el: lowerCanvasEl } = this.lower;
+  static createUpperCanvas(lowerCanvasEl: HTMLCanvasElement) {
     const el = createCanvasElement();
     // we assign the same classname of the lowerCanvas
     el.className = lowerCanvasEl.className;
@@ -58,11 +64,10 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     el.classList.add('upper-canvas');
     el.setAttribute('data-fabric', 'top');
     el.style.cssText = lowerCanvasEl.style.cssText;
-    el.setAttribute('draggable', 'true');
     return el;
   }
 
-  protected createContainerElement() {
+  static createContainerElement() {
     const container = getFabricDocument().createElement('div');
     container.setAttribute('data-fabric', 'wrapper');
     setStyle(container, {
@@ -72,53 +77,21 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     return container;
   }
 
-  /**
-   * @private
-   * @param {HTMLCanvasElement} element canvas element to apply styles on
-   */
-  protected applyCanvasStyle(
-    element: HTMLCanvasElement,
-    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean }
-  ) {
-    setStyle(element, {
-      position: 'absolute',
-      left: '0',
-      top: '0',
-    });
-    allowTouchScrolling(element, allow);
-    makeElementUnselectable(element);
-  }
-
-  setDimensions(size: TSize, retinaScaling: number) {
-    super.setDimensions(size, retinaScaling);
-    const { el, ctx } = this.upper;
-    setCanvasDimensions(el, ctx, size, retinaScaling);
-  }
-
-  setCSSDimensions(size: Partial<CSSDimensions>): void {
-    super.setCSSDimensions(size);
-    setCSSDimensions(this.upper.el, size);
-    setCSSDimensions(this.container, size);
-  }
-
   cleanupDOM(size: TSize) {
-    const container = this.container,
-      { el: lowerCanvasEl } = this.lower,
-      { el: upperCanvasEl } = this.upper;
-    super.cleanupDOM(size);
-    container.removeChild(upperCanvasEl);
-    container.removeChild(lowerCanvasEl);
-    if (container.parentNode) {
-      container.parentNode.replaceChild(lowerCanvasEl, container);
-    }
-  }
+    const container = this.items.main.el.parentNode,
+      {
+        main: { el: lowerCanvasEl },
+        top: { el: upperCanvasEl },
+      } = this.items;
 
-  dispose() {
-    super.dispose();
-    getEnv().dispose(this.upper.el);
-    // @ts-expect-error disposing
-    delete this.upper;
-    // @ts-expect-error disposing
-    delete this.container;
+    super.cleanupDOM(size);
+    if (container) {
+      container.removeChild(upperCanvasEl);
+      container.removeChild(lowerCanvasEl);
+      container.parentNode &&
+        container.parentNode.replaceChild(lowerCanvasEl, container);
+    }
+    lowerCanvasEl.style.cssText = this._originalCanvasStyle || '';
+    delete this._originalCanvasStyle;
   }
 }

@@ -44,6 +44,8 @@ import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
+import type { StaticDOMManagerType } from './DOMManagers/DOMManager';
+import { DOMManager } from './DOMManagers/DOMManager';
 
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
@@ -134,11 +136,11 @@ export class StaticCanvas<
    * @type HTMLCanvasElement
    */
   get lowerCanvasEl() {
-    return this.elements.lower?.el;
+    return this.elements.items.main?.el;
   }
 
   get contextContainer() {
-    return this.elements.lower?.ctx;
+    return this.elements.items.main?.ctx;
   }
 
   /**
@@ -159,7 +161,7 @@ export class StaticCanvas<
   protected declare hasLostContext: boolean;
   protected declare nextRenderHandle: number;
 
-  declare elements: StaticCanvasDOMManager;
+  declare elements: StaticDOMManagerType;
 
   static ownDefaults = staticCanvasDefaults;
 
@@ -174,7 +176,7 @@ export class StaticCanvas<
   }
 
   constructor(
-    el?: string | HTMLCanvasElement,
+    arg0?: string | HTMLCanvasElement | StaticDOMManagerType,
     options: TOptions<StaticCanvasOptions> = {}
   ) {
     super();
@@ -183,17 +185,26 @@ export class StaticCanvas<
       (this.constructor as typeof StaticCanvas).getDefaults()
     );
     this.set(options);
-    this.initElements(el);
+    this.elements = this.initElements(arg0);
     this._setDimensionsImpl({
-      width: this.width || this.elements.lower.el.width || 0,
-      height: this.height || this.elements.lower.el.height || 0,
+      width: this.width || this.elements.items.main.el.width || 0,
+      height: this.height || this.elements.items.main.el.height || 0,
     });
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
 
-  protected initElements(el?: string | HTMLCanvasElement) {
-    this.elements = new StaticCanvasDOMManager(el);
+  protected initElements(
+    arg0?: string | HTMLCanvasElement | StaticDOMManagerType
+  ): StaticDOMManagerType {
+    if (arg0 instanceof DOMManager) {
+      if (!arg0.items.main) {
+        throw new FabricError('Received bad DOMManager');
+      }
+      return arg0;
+    } else {
+      return StaticCanvasDOMManager.build(arg0);
+    }
   }
 
   add(...objects: FabricObject[]) {
@@ -456,7 +467,7 @@ export class StaticCanvas<
    * @return {HTMLCanvasElement}
    */
   getElement(): HTMLCanvasElement {
-    return this.elements.lower.el;
+    return this.elements.items.main.el;
   }
 
   /**
@@ -472,7 +483,7 @@ export class StaticCanvas<
    * @return {CanvasRenderingContext2D}
    */
   getContext(): CanvasRenderingContext2D {
-    return this.elements.lower.ctx;
+    return this.elements.items.main.ctx;
   }
 
   /**

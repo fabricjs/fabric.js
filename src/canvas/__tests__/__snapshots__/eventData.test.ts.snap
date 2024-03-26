@@ -175,7 +175,7 @@ exports[`Canvas event data HTML event "dragend" should fire a corresponding canv
           data-fabric="top"
           draggable="true"
           height="150"
-          style="position: absolute; left: 0px; top: 0px; user-select: none; width: 300px; height: 150px; cursor: move;"
+          style="user-select: none; position: absolute; left: 0px; top: 0px; width: 300px; height: 150px; cursor: move;"
           width="300"
         />,
         "createPattern": [Function],

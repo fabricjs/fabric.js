@@ -56,5 +56,3 @@ export type TWebGLProgramCacheItem = {
   attributeLocations: TWebGLAttributeLocationMap;
   uniformLocations: TWebGLUniformLocationMap;
 };
-
-export type TApplyFilterArgs = {};
