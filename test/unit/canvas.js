@@ -1641,9 +1641,10 @@
       target: canvas.upperCanvasEl
     };
     canvas.setActiveObject(rect);
-    rect.__corner = rect._findTargetCorner(
+    const targetCorner = rect._findTargetCorner(
       canvas.getViewportPoint(eventStub)
-    ).key;
+    );
+    rect.__corner = targetCorner ? targetCorner.key : undefined;
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
