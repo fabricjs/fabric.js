@@ -207,16 +207,16 @@
     cObj.canvas = {
       getActiveObject() { return cObj }
     };
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.br), 'br');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.tl), 'tl');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.tr), 'tr');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.bl), 'bl');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mr), 'mr');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.ml), 'ml');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mt), 'mt');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mb), 'mb');
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), 'mtr');
-    assert.equal(cObj._findTargetCorner(new fabric.Point()), false);
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.br), { key: 'br', control: cObj.controls.br });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.tl), { key: 'tl', control: cObj.controls.tl });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.tr), { key: 'tr', control: cObj.controls.tr });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.bl), { key: 'bl', control: cObj.controls.bl });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mr), { key: 'mr', control: cObj.controls.mr });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.ml), { key: 'ml', control: cObj.controls.ml });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mt), { key: 'mt', control: cObj.controls.mt });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mb), { key: 'mb', control: cObj.controls.mb });
+    assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mtr), { key: 'mtr', control: cObj.controls.mtr });
+    assert.deepEqual(cObj._findTargetCorner(new fabric.Point()), false);
   });
 
   QUnit.test('_findTargetCorner for touches', function(assert) {
@@ -247,7 +247,7 @@
     cObj.canvas = {
       getActiveObject() { return }
     };
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), '', 'object is not active');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), undefined, 'object is not active');
   });
 
   QUnit.test('_findTargetCorner for non visible control', function (assert) {
@@ -258,7 +258,7 @@
       getActiveObject() { return cObj }
     };
     cObj.isControlVisible = () => false;
-    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), '', 'object is not active');
+    assert.equal(cObj._findTargetCorner(cObj.oCoords.mtr), undefined, 'object is not active');
   });
 
   QUnit.test('_calculateCurrentDimensions', function(assert) {
