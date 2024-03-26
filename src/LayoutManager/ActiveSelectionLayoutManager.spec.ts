@@ -40,7 +40,6 @@ describe('ActiveSelectionLayoutManager', () => {
       });
 
       it('a subscribed activeSelection should trigger layout on the object parent once per parent', () => {
-        const manager = new ActiveSelectionLayoutManager();
         const object = new FabricObject();
         const object2 = new FabricObject();
         const object3 = new FabricObject();
@@ -53,10 +52,8 @@ describe('ActiveSelectionLayoutManager', () => {
           interactive: true,
           subTargetCheck: true,
         });
-        const as = new ActiveSelection([object, object2, object3, object4], {
-          layoutManager: manager,
-        });
-        const asPerformLayout = jest.spyOn(manager, 'performLayout');
+        const as = new ActiveSelection([object, object2, object3, object4]);
+        const asPerformLayout = jest.spyOn(as.layoutManager, 'performLayout');
         const groupPerformLayout = jest.spyOn(
           group.layoutManager,
           'performLayout'
@@ -68,12 +65,15 @@ describe('ActiveSelectionLayoutManager', () => {
         groupPerformLayout.mockClear();
         groupPerformLayout2.mockClear();
         asPerformLayout.mockClear();
+        // group have registered the AS
         expect(group.layoutManager['_subscriptions'].get(as)).toBeDefined();
         expect(group2.layoutManager['_subscriptions'].get(as)).toBeDefined();
-        expect(manager['_subscriptions'].size).toBe(0);
+        // the AS has registered nothing
+        expect(as.layoutManager['_subscriptions'].size).toBe(0);
 
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => as.fire(trigger, event));
+        // the as does not need to perform a layout and indeed is not called
         expect(asPerformLayout).not.toHaveBeenCalled();
         expect(groupPerformLayout.mock.calls).toMatchObject([
           [
@@ -93,9 +93,28 @@ describe('ActiveSelectionLayoutManager', () => {
             },
           ]),
         ]);
+        expect(groupPerformLayout2.mock.calls).toMatchObject([
+          [
+            {
+              e: event,
+              target: group2,
+              trigger: 'modified',
+              type: 'object_modified',
+            },
+          ],
+          ...triggers.slice(1).map((trigger) => [
+            {
+              e: event,
+              target: group2,
+              trigger,
+              type: 'object_modifying',
+            },
+          ]),
+        ]);
         expect(groupPerformLayout).toHaveBeenCalledTimes(triggers.length);
         expect(groupPerformLayout2).toHaveBeenCalledTimes(triggers.length);
-
+        // we remove a single object, but both group and group2 have multiple object in the as
+        // so with this removal nothing changes.
         as.remove(object);
         groupPerformLayout.mockClear();
         groupPerformLayout2.mockClear();
@@ -121,16 +140,35 @@ describe('ActiveSelectionLayoutManager', () => {
             },
           ]),
         ]);
+        expect(groupPerformLayout2.mock.calls).toMatchObject([
+          [
+            {
+              e: event,
+              target: group2,
+              trigger: 'modified',
+              type: 'object_modified',
+            },
+          ],
+          ...triggers.slice(1).map((trigger) => [
+            {
+              e: event,
+              target: group2,
+              trigger,
+              type: 'object_modifying',
+            },
+          ]),
+        ]);
         expect(groupPerformLayout).toHaveBeenCalledTimes(triggers.length);
         expect(groupPerformLayout2).toHaveBeenCalledTimes(triggers.length);
 
         groupPerformLayout.mockClear();
         groupPerformLayout2.mockClear();
         asPerformLayout.mockClear();
-
+        // now that we deselect object 2, the first group is out from the AS
         as.remove(object2);
         expect(group.layoutManager['_subscriptions'].get(as)).toBeUndefined();
         expect(group2.layoutManager['_subscriptions'].get(as)).toBeDefined();
+        // now the active selection is empty and none of the groups is affected by the AS events
         as.removeAll();
         expect(group2.layoutManager['_subscriptions'].get(as)).toBeUndefined();
 
