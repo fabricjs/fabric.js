@@ -216,7 +216,7 @@
     assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mt), { key: 'mt', control: cObj.controls.mt });
     assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mb), { key: 'mb', control: cObj.controls.mb });
     assert.deepEqual(cObj._findTargetCorner(cObj.oCoords.mtr), { key: 'mtr', control: cObj.controls.mtr });
-    assert.deepEqual(cObj._findTargetCorner(new fabric.Point()), false);
+    assert.deepEqual(cObj._findTargetCorner(new fabric.Point()), undefined);
   });
 
   QUnit.test('_findTargetCorner for touches', function(assert) {
@@ -229,14 +229,14 @@
       x: cObj.oCoords.br.x + cObj.cornerSize / 3,
       y: cObj.oCoords.br.y + cObj.cornerSize / 3
     });
-    assert.equal(cObj._findTargetCorner(pointNearBr), 'br', 'cornerSize/3 near br returns br');
-    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event cornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr).key, 'br', 'cornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, true).key, 'br', 'touch event cornerSize/3 near br returns br');
     pointNearBr = new fabric.Point({
       x: cObj.oCoords.br.x + cObj.touchCornerSize / 3,
       y: cObj.oCoords.br.y + cObj.touchCornerSize / 3,
     });
-    assert.equal(cObj._findTargetCorner(pointNearBr, true), 'br', 'touch event touchCornerSize/3 near br returns br');
-    assert.equal(cObj._findTargetCorner(pointNearBr, false), false, 'not touch event touchCornerSize/3 near br returns false');
+    assert.equal(cObj._findTargetCorner(pointNearBr, true).key, 'br', 'touch event touchCornerSize/3 near br returns br');
+    assert.equal(cObj._findTargetCorner(pointNearBr, false), undefined, 'not touch event touchCornerSize/3 near br returns false');
   });
 
 
