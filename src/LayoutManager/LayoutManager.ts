@@ -1,4 +1,3 @@
-import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { CENTER, iMatrix } from '../constants';
 import type { Group } from '../shapes/Group';
@@ -22,6 +21,7 @@ import type {
   StrictLayoutContext,
 } from './types';
 import { classRegistry } from '../ClassRegistry';
+import type { TModificationEvents } from '../EventTypeDefs';
 
 const LAYOUT_MANAGER = 'layoutManager';
 
@@ -32,7 +32,7 @@ export type SerializedLayoutManager = {
 
 export class LayoutManager {
   private declare _prevLayoutStrategy?: LayoutStrategy;
-  private declare _subscriptions: Map<FabricObject, VoidFunction[]>;
+  protected declare _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
 
@@ -55,51 +55,71 @@ export class LayoutManager {
     this.onBeforeLayout(strictContext);
 
     const layoutResult = this.getLayoutResult(strictContext);
-    layoutResult && this.commitLayout(strictContext, layoutResult);
+    if (layoutResult) {
+      this.commitLayout(strictContext, layoutResult);
+    }
 
     this.onAfterLayout(strictContext, layoutResult);
     this._prevLayoutStrategy = strictContext.strategy;
   }
 
   /**
-   * subscribe to object layout triggers
+   * Attach handlers for events that we know will invalidate the layout when
+   * performed on child objects ( general transforms ).
+   * Returns the disposers for later unsubscribing and cleanup
+   * @param {FabricObject} object
+   * @param {RegistrationContext & Partial<StrictLayoutContext>} context
+   * @returns {VoidFunction[]} disposers remove the handlers
+   */
+  protected attachHandlers(
+    object: FabricObject,
+    context: RegistrationContext & Partial<StrictLayoutContext>
+  ): VoidFunction[] {
+    const { target } = context;
+    return (
+      [
+        'modified',
+        'moving',
+        'resizing',
+        'rotating',
+        'scaling',
+        'skewing',
+        'changed',
+        'modifyPoly',
+      ] as (TModificationEvents & 'modified')[]
+    ).map((key) =>
+      object.on(key, (e) =>
+        this.performLayout(
+          key === 'modified'
+            ? {
+                type: LAYOUT_TYPE_OBJECT_MODIFIED,
+                trigger: key,
+                e,
+                target,
+              }
+            : {
+                type: LAYOUT_TYPE_OBJECT_MODIFYING,
+                trigger: key,
+                e,
+                target,
+              }
+        )
+      )
+    );
+  }
+
+  /**
+   * Subscribe an object to transform events that will trigger a layout change on the parent
+   * This is important only for interactive groups.
+   * @param object
+   * @param context
    */
   protected subscribe(
     object: FabricObject,
     context: RegistrationContext & Partial<StrictLayoutContext>
   ) {
-    const { target } = context;
     this.unsubscribe(object, context);
-    const disposers = [
-      object.on('modified', (e) =>
-        this.performLayout({
-          trigger: 'modified',
-          e,
-          type: LAYOUT_TYPE_OBJECT_MODIFIED,
-          target,
-        })
-      ),
-      ...(
-        [
-          'moving',
-          'resizing',
-          'rotating',
-          'scaling',
-          'skewing',
-          'changed',
-          'modifyPoly',
-        ] as TModificationEvents[]
-      ).map((key) =>
-        object.on(key, (e) =>
-          this.performLayout({
-            trigger: key,
-            e: { ...e, target: object },
-            type: LAYOUT_TYPE_OBJECT_MODIFYING,
-            target,
-          })
-        )
-      ),
-    ];
+    const disposers = this.attachHandlers(object, context);
     this._subscriptions.set(object, disposers);
   }
 
@@ -127,15 +147,13 @@ export class LayoutManager {
   }
 
   protected onBeforeLayout(context: StrictLayoutContext) {
-    const { target } = context;
+    const { target, type } = context;
     const { canvas } = target;
     // handle layout triggers subscription
-    if (
-      context.type === LAYOUT_TYPE_INITIALIZATION ||
-      context.type === LAYOUT_TYPE_ADDED
-    ) {
+    // @TODO: gate the registration when the group is interactive
+    if (type === LAYOUT_TYPE_INITIALIZATION || type === LAYOUT_TYPE_ADDED) {
       this.subscribeTargets(context);
-    } else if (context.type === LAYOUT_TYPE_REMOVED) {
+    } else if (type === LAYOUT_TYPE_REMOVED) {
       this.unsubscribeTargets(context);
     }
     // fire layout event (event will fire only for layouts after initialization layout)
@@ -148,16 +166,18 @@ export class LayoutManager {
         context,
       });
 
-    if (context.type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
+    if (type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
       const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
-      target.forEachObject((object) => {
-        (object as Group).layoutManager?.performLayout({
-          ...tricklingContext,
-          bubbles: false,
-          target: object as Group,
-        });
-      });
+      target.forEachObject(
+        (object) =>
+          (object as Group).layoutManager &&
+          (object as Group).layoutManager.performLayout({
+            ...tricklingContext,
+            bubbles: false,
+            target: object as Group,
+          })
+      );
     }
   }
 
@@ -231,7 +251,7 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
       target.setCoords();
-      target.set({ dirty: true });
+      target.set('dirty', true);
     }
   }
 
@@ -294,7 +314,7 @@ export class LayoutManager {
       });
 
     //  bubble
-    const parent = target.group;
+    const parent = target.parent;
     if (bubbles && parent?.layoutManager) {
       //  add target to context#path
       (bubblingContext.path || (bubblingContext.path = [])).push(target);
@@ -304,6 +324,7 @@ export class LayoutManager {
         target: parent,
       });
     }
+    target.set('dirty', true);
   }
 
   dispose() {

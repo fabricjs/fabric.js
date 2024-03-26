@@ -2,6 +2,8 @@
 
 ## [next]
 
+- feat(LayoutManager): Handle the case of activeSelection with objects inside different groups [#9651](https://github.com/fabricjs/fabric.js/pull/9651)
+
 ## [6.0.0-beta20]
 
 - chore(TS): minor changes to typescript notation to be compatible with a 5.3.3 [#9725](https://github.com/fabricjs/fabric.js/pull/9725)
