@@ -192,7 +192,7 @@ export class InteractiveFabricObject<
   _findTargetCorner(
     pointer: Point,
     forTouch = false
-  ): { key: string; control: Control } | undefined {
+  ): { key: string; control: Control; coord: TOCoord } | undefined {
     if (!this.hasControls || !this.canvas) {
       return undefined;
     }
@@ -214,7 +214,7 @@ export class InteractiveFabricObject<
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
         this.__corner = key;
 
-        return { key, control };
+        return { key, control, coord: this.oCoords[key] };
       }
     }
 
