@@ -9,6 +9,7 @@ import {
 } from '../LayoutManager/constants';
 import type { TClassProperties } from '../typedefs';
 import { log } from '../util/internals/console';
+import { ActiveSelectionLayoutManager } from '../LayoutManager/ActiveSelectionLayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -35,11 +36,17 @@ const activeSelectionDefaultValues: Partial<TClassProperties<ActiveSelection>> =
 export class ActiveSelection extends Group {
   static type = 'ActiveSelection';
 
-  static ownDefaults = activeSelectionDefaultValues;
+  static ownDefaults: Record<string, any> = activeSelectionDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...ActiveSelection.ownDefaults };
   }
+
+  /**
+   * The ActiveSelection needs to use the ActiveSelectionLayoutManager
+   * or selections on interactive groups may be broken
+   */
+  declare layoutManager: ActiveSelectionLayoutManager;
 
   /**
    * controls how selected objects are added during a multiselection event
@@ -49,6 +56,17 @@ export class ActiveSelection extends Group {
    * @default `canvas-stacking`
    */
   declare multiSelectionStacking: MultiSelectionStacking;
+
+  constructor(
+    objects: FabricObject[] = [],
+    options: Partial<ActiveSelectionOptions> = {}
+  ) {
+    super(objects, {
+      ...options,
+      layoutManager:
+        options.layoutManager ?? new ActiveSelectionLayoutManager(),
+    });
+  }
 
   /**
    * @private

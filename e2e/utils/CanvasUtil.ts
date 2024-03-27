@@ -1,13 +1,36 @@
 import type { JSHandle } from '@playwright/test';
 import { type LocatorScreenshotOptions, type Page } from '@playwright/test';
-import type { Canvas } from 'fabric';
+import type { Canvas, XY } from 'fabric';
 import os from 'node:os';
+import type { ObjectUtil } from './ObjectUtil';
 
 export class CanvasUtil {
   constructor(readonly page: Page, readonly selector = '#canvas') {}
 
   click(clickProperties: Parameters<Page['click']>[1]) {
     return this.page.click(`canvas_top=${this.selector}`, clickProperties);
+  }
+
+  async makeActiveSelectionWith(objects: ObjectUtil[]) {
+    for (const objectUtil of objects) {
+      this.page.click(`canvas_top=${this.selector}`, {
+        modifiers: ['Shift'],
+        position: await objectUtil.getObjectCenter(),
+      });
+    }
+  }
+
+  async clickAndDrag(point: XY, dragTo: XY, steps = 20) {
+    await this.page.mouse.move(point.x, point.y);
+    await this.page.mouse.down({
+      button: 'left',
+    });
+    await this.page.mouse.move(dragTo.x, dragTo.y, {
+      steps,
+    });
+    await this.page.mouse.up({
+      button: 'left',
+    });
   }
 
   press(keyPressed: Parameters<Page['press']>[1]) {

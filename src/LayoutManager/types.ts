@@ -105,11 +105,11 @@ export type ObjectModifyingLayoutContext =
     } & (
         | {
             trigger: TModificationEvents;
-            e: BasicTransformEvent & { target: FabricObject };
+            e: BasicTransformEvent;
           }
         | {
             trigger: 'changed';
-            e: ITextEvents['changed'] & { target: FabricObject };
+            e: ITextEvents['changed'];
           }
       );
 

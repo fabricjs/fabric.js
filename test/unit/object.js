@@ -614,7 +614,7 @@
 
   QUnit.test('isDescendantOf', function (assert) {
     const object = new fabric.Object();
-    const parent = new fabric.Object();
+    const parent = new fabric.Group([]);
     parent._exitGroup = () => { };
     assert.ok(typeof object.isDescendantOf === 'function');
     parent.canvas = canvas;
@@ -1235,29 +1235,29 @@
     object.needsItsOwnCache = function () { return false; };
 
     object.objectCaching = true;
-    object.group = { isOnACache: function() { return true; }};
+    object.parent = { isOnACache: function() { return true; }};
     assert.equal(object.shouldCache(), false, 'if objectCaching is true, but we are in a group, shouldCache returns false');
 
     object.objectCaching = true;
-    object.group = { isOnACache: function() { return false; }};
+    object.parent = { isOnACache: function() { return false; }};
     assert.equal(object.shouldCache(), true, 'if objectCaching is true, but we are in a not cached group, shouldCache returns true');
 
     object.objectCaching = false;
-    object.group = { isOnACache: function() { return false; }};
+    object.parent = { isOnACache: function() { return false; }};
     assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a not cached group, shouldCache returns false');
 
     object.objectCaching = false;
-    object.group = { isOnACache: function() { return true; }};
+    object.parent = { isOnACache: function() { return true; }};
     assert.equal(object.shouldCache(), false, 'if objectCaching is false, but we are in a cached group, shouldCache returns false');
 
     object.needsItsOwnCache = function () { return true; };
 
     object.objectCaching = false;
-    object.group = { isOnACache: function() { return true; }};
+    object.parent = { isOnACache: function() { return true; }};
     assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group cached, we cache anyway');
 
     object.objectCaching = false;
-    object.group = { isOnACache: function() { return false; }};
+    object.parent = { isOnACache: function() { return false; }};
     assert.equal(object.shouldCache(), true, 'if objectCaching is false, but we have a clipPath, group not cached, we cache anyway');
 
   });

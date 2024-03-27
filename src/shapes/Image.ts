@@ -602,7 +602,8 @@ export class FabricImage<
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    // @ts-expect-error TS doesn't respect this type casting
+    // cant use ts-expect-error because of ts 5.3 cross check
+    // @ts-ignore TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 

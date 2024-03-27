@@ -29,6 +29,12 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
   );
   canvas.add(text, g);
   g.clone().then((clone) => {
+    clone.set({
+      backgroundColor: 'red',
+    });
+    canvas.add(clone);
+  });
+  g.clone().then((clone) => {
     clone.item(2).set({ text: 'Edit me\nclip path layout' });
     clone.set({
       objectCaching,
@@ -67,7 +73,7 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
       .set({ text: 'Edit me\nabsolute positioned\nclip path layout' });
     clone.set({
       objectCaching,
-      backgroundColor: '#0dcaf0',
+      backgroundColor: 'cyan',
       clipPath: new fabric.Circle({
         radius: 110,
         originX: 'center',
