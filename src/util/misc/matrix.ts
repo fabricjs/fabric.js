@@ -166,11 +166,17 @@ export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
  */
 export function createRotateMatrix(
   { angle = 0 }: TRotateMatrixArgs = {},
+  origin: Partial<XY> = {}
+): TMat2D {
+  return createRotationMatrix(degreesToRadians(angle), origin);
+}
+
+export function createRotationMatrix(
+  rotation: TRadian,
   { x = 0, y = 0 }: Partial<XY> = {}
 ): TMat2D {
-  const angleRadiant = degreesToRadians(angle),
-    cosValue = cos(angleRadiant),
-    sinValue = sin(angleRadiant);
+  const cosValue = cos(rotation),
+    sinValue = sin(rotation);
   return [
     cosValue,
     sinValue,

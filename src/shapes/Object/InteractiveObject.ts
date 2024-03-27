@@ -1,15 +1,21 @@
 import { Point, ZERO } from '../../Point';
 import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
-import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
+import {
+  degreesToRadians,
+  radiansToDegrees,
+} from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   calcDimensionsMatrix,
-  createRotateMatrix,
+  calcPlaneRotation,
+  createRotationMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
+  multiplyTransformMatrixArray,
   qrDecompose,
 } from '../../util/misc/matrix';
+import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
@@ -222,81 +228,81 @@ export class InteractiveFabricObject<
    * @return {Record<string, TOCoord>}
    */
   calcOCoords(): Record<string, TOCoord> {
-    const vpt = this.getViewportTransform(),
-      center = this.getCenterPoint(),
-      tMatrix = createTranslateMatrix(center.x, center.y),
-      rMatrix = createRotateMatrix({
-        angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0),
-      }),
-      positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
-      startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
-      finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / vpt[0],
-        0,
-        0,
-        1 / vpt[3],
-        0,
-        0,
-      ]),
-      transformOptions = this.group
-        ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
-      coords: Record<string, TOCoord> = {};
+    const vpt = this.getViewportTransform();
+    const center = this.getCenterPoint();
+    const rotation = calcPlaneRotation(
+      multiplyTransformMatrices(vpt, this.calcTransformMatrix())
+    );
+    const angle = radiansToDegrees(rotation);
 
+    // calculate the viewport bbox size of the object by inverting the rotation
+    // in order to measure the bbox according to the object's axis
+    const bboxTransform = multiplyTransformMatrixArray([
+      vpt,
+      createTranslateMatrix(center.x, center.y),
+      createRotationMatrix(-rotation),
+    ]);
+    const bbox = makeBoundingBoxFromPoints(
+      this.getCoords().map((p) => p.transform(bboxTransform))
+    );
+    const size = new Point(bbox.width, bbox.height).scalarAdd(this.padding * 2);
+
+    // calculate the transform used by controls
+    const translation = center.transform(vpt);
+    const t = multiplyTransformMatrices(
+      createTranslateMatrix(translation.x, translation.y),
+      createRotationMatrix(rotation)
+    );
+
+    // calculate the controls' center point and touch region
+    const coords: Record<string, TOCoord> = {};
     this.forEachControl((control, key) => {
-      const position = control.positionHandler(dim, finalMatrix, this, control);
-      // coords[key] are sometimes used as points. Those are points to which we add
-      // the property corner and touchCorner from `_calcCornerCoords`.
-      // don't remove this assign for an object spread.
-      coords[key] = Object.assign(
-        position,
-        this._calcCornerCoords(control, position)
-      );
+      const position = control.positionHandler(size, t, this, control);
+
+      /**
+       * {@link coords} are sometimes used as points.
+       * Those are points to which we assign corner and touchCorner.
+       * Therefore, for now don't remove this assign for an object spread.
+       * `corner`/`touchCorner` are used to determine the interaction area of a control.
+       * note: if we would switch to ROUND corner area, all of this would disappear.
+       * everything would resolve to a single point and a pythagorean theorem for the distance
+       * @todo evaluate simplification of code switching to circle interaction area at runtime
+       */
+      coords[key] = Object.assign(position, {
+        corner: control.calcCornerCoords(
+          angle,
+          this.cornerSize,
+          position.x,
+          position.y,
+          false,
+          this
+        ),
+        touchCorner: control.calcCornerCoords(
+          angle,
+          this.touchCornerSize,
+          position.x,
+          position.y,
+          true,
+          this
+        ),
+      });
     });
 
-    // debug code
-    /*
-      const canvas = this.canvas;
-      setTimeout(function () {
-      if (!canvas) return;
-        canvas.contextTop.clearRect(0, 0, 700, 700);
-        canvas.contextTop.fillStyle = 'green';
-        Object.keys(coords).forEach(function(key) {
-          const control = coords[key];
-          canvas.contextTop.fillRect(control.x, control.y, 3, 3);
-        });
-      } 50);
-    */
-    return coords;
-  }
+    // // debug code
+    // const canvas = this.canvas;
+    // setTimeout(() => {
+    //   if (!canvas) return;
+    //   const ctx = canvas.getTopContext();
+    //   canvas.clearContext(ctx);
+    //   ctx.fillStyle = 'green';
+    //   Object.entries(coords).forEach(([key, { x, y }]) => {
+    //     ctx.beginPath();
+    //     ctx.arc(x, y, 3, 0, Math.PI * 2);
+    //     ctx.fill();
+    //   });
+    // }, 50);
 
-  /**
-   * Sets the coordinates that determine the interaction area of each control
-   * note: if we would switch to ROUND corner area, all of this would disappear.
-   * everything would resolve to a single point and a pythagorean theorem for the distance
-   * @todo evaluate simplification of code switching to circle interaction area at runtime
-   * @private
-   */
-  private _calcCornerCoords(control: Control, position: Point) {
-    const angle = this.getTotalAngle();
-    const corner = control.calcCornerCoords(
-      angle,
-      this.cornerSize,
-      position.x,
-      position.y,
-      false,
-      this
-    );
-    const touchCorner = control.calcCornerCoords(
-      angle,
-      this.touchCornerSize,
-      position.x,
-      position.y,
-      true,
-      this
-    );
-    return { corner, touchCorner };
+    return coords;
   }
 
   /**
