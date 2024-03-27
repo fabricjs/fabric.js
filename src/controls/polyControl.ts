@@ -101,25 +101,25 @@ export const createPolyActionHandler = (pointIndex: number) =>
     factoryPolyActionHandler(pointIndex, polyActionHandler)
   );
 
-export function createPolyControls(
-  poly: Polyline,
-  options?: Partial<Control>
-): Record<string, Control>;
-export function createPolyControls(
+export function createPolyControls<T extends Polyline>(
+  poly: T,
+  options?: Partial<Control<T>>
+): Record<string, Control<T>>;
+export function createPolyControls<T extends Polyline>(
   numOfControls: number,
-  options?: Partial<Control>
-): Record<string, Control>;
-export function createPolyControls(
+  options?: Partial<Control<T>>
+): Record<string, Control<T>>;
+export function createPolyControls<T extends Polyline>(
   arg0: number | Polyline,
-  options: Partial<Control> = {}
+  options: Partial<Control<T>> = {}
 ) {
-  const controls = {} as Record<string, Control>;
+  const controls = {} as Record<string, Control<T>>;
   for (
     let idx = 0;
     idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length);
     idx++
   ) {
-    controls[`p${idx}`] = new Control({
+    controls[`p${idx}`] = new Control<T>({
       actionName: ACTION_NAME,
       positionHandler: createPolyPositionHandler(idx),
       actionHandler: createPolyActionHandler(idx),

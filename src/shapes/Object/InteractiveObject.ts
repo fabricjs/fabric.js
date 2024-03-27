@@ -25,8 +25,6 @@ export type TOCoord = Point & {
   touchCorner: TCornerPoint;
 };
 
-export type TControlSet = Record<string, Control>;
-
 export type TBorderRenderingStyleOverride = Partial<
   Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
 >;
@@ -114,7 +112,7 @@ export class InteractiveFabricObject<
    * holds the controls for the object.
    * controls are added by default_controls.js
    */
-  declare controls: TControlSet;
+  declare controls: Record<string, Control>;
 
   /**
    * internal boolean to signal the code that the object is
@@ -315,11 +313,7 @@ export class InteractiveFabricObject<
    * @param {Function} fn function to iterate over the controls over
    */
   forEachControl(
-    fn: (
-      control: Control,
-      key: string,
-      fabricObject: InteractiveFabricObject
-    ) => any
+    fn: (control: Control, key: string, fabricObject: this) => any
   ) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
