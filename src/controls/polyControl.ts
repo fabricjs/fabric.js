@@ -14,14 +14,18 @@ import { sendPointToPlane } from '../util';
 
 const ACTION_NAME: TModificationEvents = 'modifyPoly';
 
-type TTransformAnchor = Transform & { pointIndex: number };
+type TTransformAnchor<T extends Polyline> = Transform<T> & {
+  pointIndex: number;
+};
 
 /**
  * This function locates the controls.
  * It'll be used both for drawing and for interaction.
  */
-export const createPolyPositionHandler = (pointIndex: number) => {
-  return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
+export const createPolyPositionHandler = <T extends Polyline>(
+  pointIndex: number
+) => {
+  return function (dim: Point, finalMatrix: TMat2D, polyObject: T) {
     const { points, pathOffset } = polyObject;
     return new Point(points[pointIndex])
       .subtract(pathOffset)
@@ -41,9 +45,9 @@ export const createPolyPositionHandler = (pointIndex: number) => {
  * and the current position in canvas coordinate `transform.target` is a reference to the
  * current object being transformed.
  */
-export const polyActionHandler = (
+export const polyActionHandler = <T extends Polyline>(
   eventData: TPointerEvent,
-  transform: TTransformAnchor,
+  transform: TTransformAnchor<T>,
   x: number,
   y: number
 ) => {
@@ -64,17 +68,17 @@ export const polyActionHandler = (
 /**
  * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
  */
-export const factoryPolyActionHandler = (
+export const factoryPolyActionHandler = <T extends Polyline>(
   pointIndex: number,
-  fn: TransformActionHandler<TTransformAnchor>
+  fn: TransformActionHandler<TTransformAnchor<T>>
 ) => {
   return function (
     eventData: TPointerEvent,
-    transform: Transform,
+    transform: Transform<T>,
     x: number,
     y: number
   ) {
-    const poly = transform.target as Polyline,
+    const poly = transform.target,
       anchorPoint = new Point(
         poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]
       ),
@@ -95,8 +99,10 @@ export const factoryPolyActionHandler = (
   };
 };
 
-export const createPolyActionHandler = (pointIndex: number) =>
-  wrapWithFireEvent(
+export const createPolyActionHandler = <T extends Polyline>(
+  pointIndex: number
+) =>
+  wrapWithFireEvent<Transform<T>>(
     ACTION_NAME,
     factoryPolyActionHandler(pointIndex, polyActionHandler)
   );
@@ -119,7 +125,7 @@ export function createPolyControls<T extends Polyline>(
     idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length);
     idx++
   ) {
-    controls[`p${idx}`] = new Control<T>({
+    controls[`p${idx}`] = new Control({
       actionName: ACTION_NAME,
       positionHandler: createPolyPositionHandler(idx),
       actionHandler: createPolyActionHandler(idx),

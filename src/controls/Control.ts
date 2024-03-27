@@ -2,11 +2,12 @@
 import type {
   ControlActionHandler,
   TPointerEvent,
+  Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
-import type { InteractiveFabricObject as FabricObject } from '../shapes/Object/InteractiveObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import {
   createRotateMatrix,
@@ -150,7 +151,7 @@ export class Control<T extends FabricObject = FabricObject> {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  declare actionHandler: TransformActionHandler;
+  declare actionHandler: TransformActionHandler<Transform<T>>;
 
   /**
    * The control handler for mouse down, provide one to handle mouse down on control
@@ -160,7 +161,7 @@ export class Control<T extends FabricObject = FabricObject> {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  declare mouseDownHandler?: ControlActionHandler;
+  declare mouseDownHandler?: ControlActionHandler<Transform<T>>;
 
   /**
    * The control mouseUpHandler, provide one to handle an effect on mouse up.
@@ -170,7 +171,7 @@ export class Control<T extends FabricObject = FabricObject> {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  declare mouseUpHandler?: ControlActionHandler;
+  declare mouseUpHandler?: ControlActionHandler<Transform<T>>;
 
   shouldActivate(
     controlKey: string,
@@ -198,7 +199,7 @@ export class Control<T extends FabricObject = FabricObject> {
     eventData: TPointerEvent,
     fabricObject: T,
     control: Control<T>
-  ): TransformActionHandler | undefined {
+  ): TransformActionHandler<Transform<T>> | undefined {
     return this.actionHandler;
   }
 
@@ -213,7 +214,7 @@ export class Control<T extends FabricObject = FabricObject> {
     eventData: TPointerEvent,
     fabricObject: T,
     control: Control<T>
-  ): ControlActionHandler | undefined {
+  ): ControlActionHandler<Transform<T>> | undefined {
     return this.mouseDownHandler;
   }
 
@@ -229,7 +230,7 @@ export class Control<T extends FabricObject = FabricObject> {
     eventData: TPointerEvent,
     fabricObject: T,
     control: Control<T>
-  ): ControlActionHandler | undefined {
+  ): ControlActionHandler<Transform<T>> | undefined {
     return this.mouseUpHandler;
   }
 
