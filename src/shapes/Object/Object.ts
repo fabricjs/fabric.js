@@ -921,7 +921,8 @@ export class FabricObject<
    */
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject
+    clipPath: FabricObject,
+    canvasWithClipPath: HTMLCanvasElement
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -931,18 +932,14 @@ export class FabricObject<
     } else {
       ctx.globalCompositeOperation = 'destination-in';
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     //ctx.scale(1 / 2, 1 / 2);
     if (clipPath.absolutePositioned) {
+      // needs fixes?
       const m = invertTransform(this.calcTransformMatrix());
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
-    clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-    ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
-    );
+    ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
 
@@ -967,6 +964,18 @@ export class FabricObject<
     this.stroke = originalStroke;
   }
 
+  renderClipPathCache(this: TCachedFabricObject, clipPath: FabricObject) {
+    const canvas = createCanvasElement();
+    canvas.width = this._cacheCanvas.width;
+    canvas.height = this._cacheCanvas.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.translate(this.cacheTranslationX, this.cacheTranslationY);
+    ctx.scale(this.zoomX, this.zoomY);
+    clipPath.transform(ctx);
+    clipPath.drawObject(ctx, true);
+    return canvas;
+  }
+
   /**
    * Prepare clipPath state and cache and draw it on instance's cache
    * @param {CanvasRenderingContext2D} ctx
@@ -982,8 +991,8 @@ export class FabricObject<
     clipPath._set('canvas', this.canvas);
     clipPath.shouldCache();
     clipPath._transformDone = true;
-    clipPath.renderCache({ forClipping: true });
-    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
+    const canvas = (this as TCachedFabricObject).renderClipPathCache(clipPath);
+    this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
   /**
