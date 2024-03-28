@@ -22,7 +22,7 @@ describe('Controls', () => {
     target.setCoords();
 
     jest
-      .spyOn(target, '_findTargetCorner')
+      .spyOn(target, 'findControl')
       .mockImplementation(function (this: FabricObject) {
         this.__corner = 'test';
 

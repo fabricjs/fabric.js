@@ -1641,7 +1641,7 @@
       target: canvas.upperCanvasEl
     };
     canvas.setActiveObject(rect);
-    const targetCorner = rect._findTargetCorner(
+    const targetCorner = rect.findControl(
       canvas.getViewportPoint(eventStub)
     );
     rect.__corner = targetCorner ? targetCorner.key : undefined;
@@ -1658,7 +1658,7 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: canvas.upperCanvasEl
     };
-    rect.__corner = rect._findTargetCorner(
+    rect.__corner = rect.findControl(
       canvas.getViewportPoint(eventStub)
     ).key;
     canvas._setupCurrentTransform(eventStub, rect, false);
@@ -1669,7 +1669,7 @@
     assert.equal(t.shiftKey, undefined, 'shift was not pressed');
 
     var alreadySelected = true;
-    rect.__corner = rect._findTargetCorner(
+    rect.__corner = rect.findControl(
       canvas.getViewportPoint(eventStub)
     ).key;
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
@@ -1687,7 +1687,7 @@
       target: canvas.upperCanvasEl,
       shiftKey: true
     };
-    rect.__corner = rect._findTargetCorner(
+    rect.__corner = rect.findControl(
       canvas.getViewportPoint(eventStub)
     ).key;
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);

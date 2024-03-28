@@ -2,7 +2,7 @@
 
 ## [next]
 
-- refactor(): `_findTargetCorner` now returns the key and the control [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
+- refactor(): `_findTargetCorner` is now called `findControl` and returns the key and the control and the coordinates [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
 - feat(LayoutManager): Handle the case of activeSelection with objects inside different groups [#9651](https://github.com/fabricjs/fabric.js/pull/9651)
 
 ## [6.0.0-beta20]

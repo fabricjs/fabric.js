@@ -812,7 +812,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     let pointer, corner;
     if (target) {
-      const found = target._findTargetCorner(
+      const found = target.findControl(
         this.getViewportPoint(e),
         isTouchEvent(e)
       );
@@ -1049,7 +1049,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
-      const handle = target._findTargetCorner(
+      const handle = target.findControl(
         this.getViewportPoint(e),
         isTouchEvent(e)
       );
@@ -1342,7 +1342,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // here we call findTargetCorner always with undefined for the touch parameter.
         // we assume that if you are using a cursor you do not need to interact with
         // the bigger touch area.
-        target._findTargetCorner(this.getViewportPoint(e));
+        target.findControl(this.getViewportPoint(e));
 
     if (!corner) {
       if ((target as Group).subTargetCheck) {

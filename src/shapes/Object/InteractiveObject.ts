@@ -189,7 +189,7 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
-  _findTargetCorner(
+  findControl(
     pointer: Point,
     forTouch = false
   ): { key: string; control: Control; coord: TOCoord } | undefined {
