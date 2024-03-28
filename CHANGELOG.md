@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): safeguard stack operations from foreign objects [#9772](https://github.com/fabricjs/fabric.js/pull/9772)
 - feat(LayoutManager): Handle the case of activeSelection with objects inside different groups [#9651](https://github.com/fabricjs/fabric.js/pull/9651)
 
 ## [6.0.0-beta20]

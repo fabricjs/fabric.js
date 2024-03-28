@@ -176,7 +176,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * @returns {boolean} true if change occurred
      */
     sendObjectToBack(object: FabricObject) {
-      if (!object || object === this._objects[0]) {
+      if (object === this._objects[0] || !this._objects.includes(object)) {
         return false;
       }
       removeFromArray(this._objects, object);
@@ -192,7 +192,10 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * @returns {boolean} true if change occurred
      */
     bringObjectToFront(object: FabricObject) {
-      if (!object || object === this._objects[this._objects.length - 1]) {
+      if (
+        object === this._objects[this._objects.length - 1] ||
+        !this._objects.includes(object)
+      ) {
         return false;
       }
       removeFromArray(this._objects, object);
@@ -212,11 +215,8 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * @returns {boolean} true if change occurred
      */
     sendObjectBackwards(object: FabricObject, intersecting?: boolean) {
-      if (!object) {
-        return false;
-      }
       const idx = this._objects.indexOf(object);
-      if (idx !== 0) {
+      if (idx > 0) {
         // if object is not on the bottom of stack
         const newIdx = this.findNewLowerIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
@@ -238,11 +238,8 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * @returns {boolean} true if change occurred
      */
     bringObjectForward(object: FabricObject, intersecting?: boolean) {
-      if (!object) {
-        return false;
-      }
       const idx = this._objects.indexOf(object);
-      if (idx !== this._objects.length - 1) {
+      if (idx > -1 && idx < this._objects.length - 1) {
         // if object is not on top of stack (last item in an array)
         const newIdx = this.findNewUpperIndex(object, idx, intersecting);
         removeFromArray(this._objects, object);
@@ -260,7 +257,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      * @returns {boolean} true if change occurred
      */
     moveObjectTo(object: FabricObject, index: number) {
-      if (object === this._objects[index]) {
+      if (object === this._objects[index] || !this._objects.includes(object)) {
         return false;
       }
       removeFromArray(this._objects, object);
@@ -274,22 +271,17 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       idx: number,
       intersecting?: boolean
     ) {
-      let newIdx;
-
       if (intersecting) {
-        newIdx = idx;
         // traverse down the stack looking for the nearest intersecting object
         for (let i = idx - 1; i >= 0; --i) {
           if (object.isOverlapping(this._objects[i])) {
-            newIdx = i;
-            break;
+            return i;
           }
         }
+        return idx;
       } else {
-        newIdx = idx - 1;
+        return idx - 1;
       }
-
-      return newIdx;
     }
 
     findNewUpperIndex(
@@ -297,22 +289,17 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       idx: number,
       intersecting?: boolean
     ) {
-      let newIdx;
-
       if (intersecting) {
-        newIdx = idx;
         // traverse up the stack looking for the nearest intersecting object
         for (let i = idx + 1; i < this._objects.length; ++i) {
           if (object.isOverlapping(this._objects[i])) {
-            newIdx = i;
-            break;
+            return i;
           }
         }
+        return idx;
       } else {
-        newIdx = idx + 1;
+        return idx + 1;
       }
-
-      return newIdx;
     }
 
     /**
