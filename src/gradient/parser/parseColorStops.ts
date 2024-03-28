@@ -30,7 +30,7 @@ function parseColorStop(el: SVGStopElement, opacityMultiplier: number) {
 
   colorValue = colorValue || el.getAttribute('stop-color') || 'rgb(0,0,0)';
   opacityValue = ifNaN(
-    parseFloat(opacityValue ?? (el.getAttribute('stop-opacity') || '1')),
+    parseFloat(opacityValue || el.getAttribute('stop-opacity') || ''),
     1
   );
 

@@ -62,10 +62,8 @@ describe('Gradient', () => {
     expect(gradient.colorStops[0].offset).toEqual(1);
     expect(gradient.colorStops[1].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(255,255,255)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0);
+    expect(gradient.colorStops[0].color).toEqual('rgba(0,0,0,0)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(255,255,255,1)');
   });
 
   test('fromElement linearGradient with floats percentage - objectBoundingBox', () => {
@@ -191,10 +189,8 @@ describe('Gradient', () => {
     expect(gradient.colorStops[0].offset).toEqual(1);
     expect(gradient.colorStops[1].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(255,255,255)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0);
+    expect(gradient.colorStops[0].color).toEqual('rgba(0,0,0,0)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(255,255,255,1)');
   });
 
   test('fromElement without stop', () => {
@@ -392,7 +388,7 @@ describe('Gradient', () => {
     element.appendChild(stop2);
 
     const object = new FabricObject({ width: 100, height: 100 });
-    const gradient = fromElement(element, object, {});
+    const gradient = fromElement(element, object, {}) as Gradient<'radial'>;
 
     expect(gradient instanceof Gradient).toBeTruthy();
 
@@ -406,8 +402,8 @@ describe('Gradient', () => {
     expect(gradient.colorStops[0].offset).toEqual(1);
     expect(gradient.colorStops[1].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(255,255,255)');
+    expect(gradient.colorStops[0].color).toEqual('rgba(0,0,0,1)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(255,255,255,1)');
   });
 
   test('fromElement radialGradient with transform', () => {
@@ -495,15 +491,10 @@ describe('Gradient', () => {
     expect(gradient.colorStops[2].offset).toEqual(0.5);
     expect(gradient.colorStops[3].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(255,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(0,0,255)');
-    expect(gradient.colorStops[2].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[3].color).toEqual('rgb(0,0,0)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0.5);
-    expect(gradient.colorStops[1].opacity).toEqual(0.9);
-    expect(gradient.colorStops[2].opacity).toEqual(1);
-    expect(gradient.colorStops[3].opacity).toEqual(1);
+    expect(gradient.colorStops[0].color).toEqual('rgba(255,0,0,0.5)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(0,0,255,0.9)');
+    expect(gradient.colorStops[2].color).toEqual('rgba(0,0,0,1)');
+    expect(gradient.colorStops[3].color).toEqual('rgba(0,0,0,1)');
   });
 
   test('fromElement radialGradient colorStop attributes/styles', () => {
@@ -557,14 +548,9 @@ describe('Gradient', () => {
     expect(gradient.colorStops[2].offset).toEqual(0.5);
     expect(gradient.colorStops[3].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(255,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(0,0,255)');
-    expect(gradient.colorStops[2].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[3].color).toEqual('rgb(0,0,0)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0.5);
-    expect(gradient.colorStops[1].opacity).toEqual(0.9);
-    expect(gradient.colorStops[2].opacity).toEqual(1);
-    expect(gradient.colorStops[3].opacity).toEqual(1);
+    expect(gradient.colorStops[0].color).toEqual('rgba(255,0,0,0.5)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(0,0,255,0.9)');
+    expect(gradient.colorStops[2].color).toEqual('rgba(0,0,0,1)');
+    expect(gradient.colorStops[3].color).toEqual('rgba(0,0,0,1)');
   });
 });
