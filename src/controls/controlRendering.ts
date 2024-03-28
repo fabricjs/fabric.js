@@ -1,11 +1,11 @@
 import { twoMathPi } from '../constants';
-import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 
 export type ControlRenderingStyleOverride = Partial<
   Pick<
-    InteractiveFabricObject,
+    FabricObject,
     | 'cornerStyle'
     | 'cornerSize'
     | 'cornerColor'
@@ -14,14 +14,6 @@ export type ControlRenderingStyleOverride = Partial<
     | 'transparentCorners'
   >
 >;
-
-export type ControlRenderer = (
-  ctx: CanvasRenderingContext2D,
-  left: number,
-  top: number,
-  styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
-) => void;
 
 /**
  * Render a round control, as per fabric features.
@@ -35,12 +27,12 @@ export type ControlRenderer = (
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderCircleControl(
-  this: Control,
+  this: Control<any>,
   ctx: CanvasRenderingContext2D,
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: FabricObject
 ) {
   styleOverride = styleOverride || {};
   const xSize =
@@ -96,12 +88,12 @@ export function renderCircleControl(
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 export function renderSquareControl(
-  this: Control,
+  this: Control<any>,
   ctx: CanvasRenderingContext2D,
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: FabricObject
 ) {
   styleOverride = styleOverride || {};
   const xSize =

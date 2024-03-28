@@ -1,6 +1,7 @@
 import { Point, ZERO } from '../../Point';
 import type { TCornerPoint, TDegree } from '../../typedefs';
-import { FabricObject } from './Object';
+import { FabricObject as BaseFabricObject } from './Object';
+import type { FabricObject } from './FabricObject';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
@@ -25,8 +26,6 @@ export type TOCoord = Point & {
   touchCorner: TCornerPoint;
 };
 
-export type TControlSet = Record<string, Control>;
-
 export type TBorderRenderingStyleOverride = Partial<
   Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
 >;
@@ -44,7 +43,7 @@ export class InteractiveFabricObject<
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
-  extends FabricObject<Props, SProps, EventSpec>
+  extends BaseFabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
@@ -114,7 +113,7 @@ export class InteractiveFabricObject<
    * holds the controls for the object.
    * controls are added by default_controls.js
    */
-  declare controls: TControlSet;
+  declare controls: Record<string, Control>;
 
   /**
    * internal boolean to signal the code that the object is
@@ -206,7 +205,7 @@ export class InteractiveFabricObject<
       if (
         control.shouldActivate(
           key,
-          this,
+          this as unknown as FabricObject,
           pointer,
           forTouch ? corner.touchCorner : corner.corner
         )
@@ -252,7 +251,12 @@ export class InteractiveFabricObject<
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
-      const position = control.positionHandler(dim, finalMatrix, this, control);
+      const position = control.positionHandler(
+        dim,
+        finalMatrix,
+        this as unknown as FabricObject,
+        control
+      );
       // coords[key] are sometimes used as points. Those are points to which we add
       // the property corner and touchCorner from `_calcCornerCoords`.
       // don't remove this assign for an object spread.
@@ -293,7 +297,7 @@ export class InteractiveFabricObject<
       position.x,
       position.y,
       false,
-      this
+      this as unknown as FabricObject
     );
     const touchCorner = control.calcCornerCoords(
       angle,
@@ -301,7 +305,7 @@ export class InteractiveFabricObject<
       position.x,
       position.y,
       true,
-      this
+      this as unknown as FabricObject
     );
     return { corner, touchCorner };
   }
@@ -322,11 +326,7 @@ export class InteractiveFabricObject<
    * @param {Function} fn function to iterate over the controls over
    */
   forEachControl(
-    fn: (
-      control: Control,
-      key: string,
-      fabricObject: InteractiveFabricObject
-    ) => any
+    fn: (control: Control, key: string, fabricObject: this) => any
   ) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
@@ -495,7 +495,10 @@ export class InteractiveFabricObject<
     this.forEachControl((control, key) => {
       // in this moment, the ctx is centered on the object.
       // width and height of the above function are the size of the bbox.
-      if (control.withConnection && control.getVisibility(this, key)) {
+      if (
+        control.withConnection &&
+        control.getVisibility(this as unknown as FabricObject, key)
+      ) {
         // reset movement for each control
         shouldStroke = true;
         ctx.moveTo(control.x * size.x, control.y * size.y);
@@ -536,9 +539,9 @@ export class InteractiveFabricObject<
     this._setLineDash(ctx, options.cornerDashArray);
     this.setCoords();
     this.forEachControl((control, key) => {
-      if (control.getVisibility(this, key)) {
+      if (control.getVisibility(this as unknown as FabricObject, key)) {
         const p = this.oCoords[key];
-        control.render(ctx, p.x, p.y, options, this);
+        control.render(ctx, p.x, p.y, options, this as unknown as FabricObject);
       }
     });
     ctx.restore();
@@ -553,7 +556,10 @@ export class InteractiveFabricObject<
   isControlVisible(controlKey: string): boolean {
     return (
       this.controls[controlKey] &&
-      this.controls[controlKey].getVisibility(this, controlKey)
+      this.controls[controlKey].getVisibility(
+        this as unknown as FabricObject,
+        controlKey
+      )
     );
   }
 

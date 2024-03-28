@@ -11,7 +11,7 @@ import { commonEventInfo } from './util';
  * @param {Function} actionHandler the function to wrap
  * @return {Function} a function with an action handler signature
  */
-export const wrapWithFireEvent = <T extends Transform>(
+export const wrapWithFireEvent = <T extends Transform<any>>(
   eventName: TModificationEvents,
   actionHandler: TransformActionHandler<T>
 ) => {

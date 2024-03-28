@@ -2,11 +2,12 @@
 import type {
   ControlActionHandler,
   TPointerEvent,
+  Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
-import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import {
   createRotateMatrix,
@@ -17,7 +18,7 @@ import {
 import type { ControlRenderingStyleOverride } from './controlRendering';
 import { renderCircleControl, renderSquareControl } from './controlRendering';
 
-export class Control {
+export class Control<T extends FabricObject = FabricObject> {
   /**
    * keep track of control visibility.
    * mainly for backward compatibility.
@@ -138,7 +139,7 @@ export class Control {
    */
   withConnection = false;
 
-  constructor(options?: Partial<Control>) {
+  constructor(options?: Partial<Control<T>>) {
     Object.assign(this, options);
   }
 
@@ -150,7 +151,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  declare actionHandler: TransformActionHandler;
+  declare actionHandler: TransformActionHandler<Transform<T>>;
 
   /**
    * The control handler for mouse down, provide one to handle mouse down on control
@@ -160,7 +161,7 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  declare mouseDownHandler?: ControlActionHandler;
+  declare mouseDownHandler?: ControlActionHandler<Transform<T>>;
 
   /**
    * The control mouseUpHandler, provide one to handle an effect on mouse up.
@@ -170,17 +171,18 @@ export class Control {
    * @param {Number} y y position of the cursor
    * @return {Boolean} true if the action/event modified the object
    */
-  declare mouseUpHandler?: ControlActionHandler;
+  declare mouseUpHandler?: ControlActionHandler<Transform<T>>;
 
   shouldActivate(
     controlKey: string,
-    fabricObject: InteractiveFabricObject,
+    fabricObject: T,
     pointer: Point,
     { tl, tr, br, bl }: TCornerPoint
   ) {
     // TODO: locking logic can be handled here instead of in the control handler logic
     return (
-      fabricObject.canvas?.getActiveObject() === fabricObject &&
+      (fabricObject.canvas?.getActiveObject() as unknown as T) ===
+        fabricObject &&
       fabricObject.isControlVisible(controlKey) &&
       Intersection.isPointInPolygon(pointer, [tl, tr, br, bl])
     );
@@ -195,9 +197,9 @@ export class Control {
    */
   getActionHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
-    control: Control
-  ): TransformActionHandler | undefined {
+    fabricObject: T,
+    control: Control<T>
+  ): TransformActionHandler<Transform<T>> | undefined {
     return this.actionHandler;
   }
 
@@ -210,9 +212,9 @@ export class Control {
    */
   getMouseDownHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
-    control: Control
-  ): ControlActionHandler | undefined {
+    fabricObject: T,
+    control: Control<T>
+  ): ControlActionHandler<Transform<T>> | undefined {
     return this.mouseDownHandler;
   }
 
@@ -226,9 +228,9 @@ export class Control {
    */
   getMouseUpHandler(
     eventData: TPointerEvent,
-    fabricObject: InteractiveFabricObject,
-    control: Control
-  ): ControlActionHandler | undefined {
+    fabricObject: T,
+    control: Control<T>
+  ): ControlActionHandler<Transform<T>> | undefined {
     return this.mouseUpHandler;
   }
 
@@ -243,8 +245,8 @@ export class Control {
    */
   cursorStyleHandler(
     eventData: TPointerEvent,
-    control: Control,
-    fabricObject: InteractiveFabricObject
+    control: Control<T>,
+    fabricObject: T
   ) {
     return control.cursorStyle;
   }
@@ -258,8 +260,8 @@ export class Control {
    */
   getActionName(
     eventData: TPointerEvent,
-    control: Control,
-    fabricObject: InteractiveFabricObject
+    control: Control<T>,
+    fabricObject: T
   ) {
     return control.actionName;
   }
@@ -270,7 +272,7 @@ export class Control {
    * @param {String} controlKey key where the control is memorized on the
    * @return {Boolean}
    */
-  getVisibility(fabricObject: InteractiveFabricObject, controlKey: string) {
+  getVisibility(fabricObject: T, controlKey: string) {
     return fabricObject._controlsVisibility?.[controlKey] ?? this.visible;
   }
 
@@ -279,19 +281,15 @@ export class Control {
    * @param {Boolean} visibility for the object
    * @return {Void}
    */
-  setVisibility(
-    visibility: boolean,
-    name: string,
-    fabricObject: InteractiveFabricObject
-  ) {
+  setVisibility(visibility: boolean, name: string, fabricObject: T) {
     this.visible = visibility;
   }
 
   positionHandler(
     dim: Point,
     finalMatrix: TMat2D,
-    fabricObject: InteractiveFabricObject,
-    currentControl: Control
+    fabricObject: T,
+    currentControl: Control<T>
   ) {
     return new Point(
       this.x * dim.x + this.offsetX,
@@ -314,7 +312,7 @@ export class Control {
     centerX: number,
     centerY: number,
     isTouch: boolean,
-    fabricObject: InteractiveFabricObject
+    fabricObject: T
   ) {
     const t = multiplyTransformMatrixArray([
       createTranslateMatrix(centerX, centerY),
@@ -349,7 +347,7 @@ export class Control {
     left: number,
     top: number,
     styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: InteractiveFabricObject
+    fabricObject: T
   ) {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
