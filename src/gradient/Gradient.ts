@@ -1,4 +1,3 @@
-import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
@@ -133,11 +132,9 @@ export class Gradient<
    */
   addColorStop(colorStops: Record<string, string>) {
     for (const position in colorStops) {
-      const color = new Color(colorStops[position]);
       this.colorStops.push({
         offset: parseFloat(position),
-        color: color.toRgb(),
-        opacity: color.getAlpha(),
+        color: colorStops[position],
       });
     }
     return this;
@@ -152,8 +149,8 @@ export class Gradient<
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
-      coords: this.coords,
-      colorStops: this.colorStops,
+      coords: { ...this.coords },
+      colorStops: this.colorStops.map((colorStop) => ({ ...colorStop })),
       offsetX: this.offsetX,
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
@@ -269,15 +266,9 @@ export class Gradient<
       }
     }
 
-    colorStops.forEach(({ color, offset, opacity }) => {
+    colorStops.forEach(({ color, offset }) => {
       markup.push(
-        '<stop ',
-        'offset="',
-        offset * 100 + '%',
-        '" style="stop-color:',
-        color,
-        typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';',
-        '"/>\n'
+        `<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`
       );
     });
 
@@ -309,13 +300,8 @@ export class Gradient<
             coords.r2
           );
 
-    this.colorStops.forEach(({ color, opacity, offset }) => {
-      gradient.addColorStop(
-        offset,
-        typeof opacity !== 'undefined'
-          ? new Color(color).setAlpha(opacity).toRgba()
-          : color
-      );
+    this.colorStops.forEach(({ color, offset }) => {
+      gradient.addColorStop(offset, color);
     });
 
     return gradient;
