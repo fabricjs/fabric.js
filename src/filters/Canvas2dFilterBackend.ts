@@ -31,7 +31,7 @@ export class Canvas2dFilterBackend {
     sourceHeight: number,
     targetCanvas: HTMLCanvasElement
   ): T2DPipelineState | void {
-    const ctx = targetCanvas.getContext('2d');
+    const ctx = targetCanvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) {
       return;
     }
