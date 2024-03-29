@@ -80,7 +80,7 @@
     'vector-effect',
     'svg-with-no-dim-rect',
     'notoemoji-person',
-    // 'clippath-8',
+    'clippath-8',
     'emoji-b',
     'gold-logo',
     'svg_missing_clippath',
