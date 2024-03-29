@@ -53,7 +53,7 @@
   tests.push({
     test: 'Clip a rect with a circle, no zoom',
     code: clipping0,
-    golden: 'clipping0.png',
+    golden: 'clipping0_SVG.png',
     newModule: 'Export clippaths to SVG',
     percentage: 0.06,
     beforeEachHandler: function() {
@@ -73,7 +73,7 @@
   tests.push({
     test: 'A clippath ignores fill and stroke for drawing, not positioning',
     code: clipping01,
-    golden: 'clipping01.png',
+    golden: 'clipping01_SVG.png',
     percentage: 0.06,
   });
 
@@ -90,7 +90,7 @@
   tests.push({
     test: 'Clip a rect with a circle, with zoom',
     code: clipping1,
-    golden: 'clipping1.png',
+    golden: 'clipping1_SVG.png',
     percentage: 0.06,
   });
 
@@ -113,7 +113,7 @@
   tests.push({
     test: 'Clip a group with a circle',
     code: clipping2,
-    golden: 'clipping2.png',
+    golden: 'clipping2_SVG.png',
     percentage: 0.06,
   });
 
@@ -134,7 +134,7 @@
   tests.push({
     test: 'Isolation of clipPath of group and inner objects',
     code: clipping3,
-    golden: 'clipping3.png',
+    golden: 'clipping3_SVG.png',
     percentage: 0.06,
     disabled: false,
   });
@@ -169,7 +169,7 @@
   tests.push({
     test: 'ClipPath can be transformed',
     code: clipping4,
-    golden: 'clipping4.png',
+    golden: 'clipping4_SVG.png',
     percentage: 0.06,
   });
 
@@ -206,7 +206,7 @@
   tests.push({
     test: 'ClipPath can be a group with many objects',
     code: clipping5,
-    golden: 'clipping5.png',
+    golden: 'clipping5_SVG.png',
     percentage: 0.06,
     disabled: false,
   });
@@ -245,7 +245,7 @@
   tests.push({
     test: 'ClipPath can be inverted, it will clip what is outside the clipPath',
     code: clipping6,
-    golden: 'clipping6.png',
+    golden: 'clipping6_SVG.png',
     percentage: 0.06,
     disabled: true,
   });
@@ -270,7 +270,7 @@
   tests.push({
     test: 'Many Objects can share the same clipPath',
     code: clipping7,
-    golden: 'clipping7.png',
+    golden: 'clipping7_SVG.png',
     percentage: 0.06,
     disabled: false,
   });
@@ -293,8 +293,8 @@
 
   tests.push({
     test: 'an absolute positioned clipPath, shared',
-    code: clipping8,
-    golden: 'clipping8.png',
+    code: clipping8Svg,
+    golden: 'clipping8_SVG.png',
     percentage: 0.06,
     disabled: false,
   });
@@ -316,7 +316,7 @@
   tests.push({
     test: 'a clipPath on the canvas',
     code: clipping9,
-    golden: 'clipping9.png',
+    golden: 'clipping9_SVG.png',
     percentage: 0.06,
     disabled: false,
   });
@@ -331,7 +331,7 @@
   tests.push({
     test: 'clipPath with a path on a simple elements',
     code: clipping10,
-    golden: 'clipping10.png',
+    golden: 'clipping10_SVG.png',
     percentage: 0.06,
   });
 
@@ -345,7 +345,7 @@
   tests.push({
     test: 'clipPath made of polygons and paths',
     code: clipping11,
-    golden: 'clippath-9.png',
+    golden: 'clippath-9_SVG.png',
     percentage: 0.06,
     width: 400,
     height: 400,
@@ -361,7 +361,7 @@
   tests.push({
     test: 'Export a radial svg with scaling',
     code: clipping12,
-    golden: 'clipping12.png',
+    golden: 'clipping12_SVG.png',
     percentage: 0.06,
     width: 220,
     height: 300,
@@ -377,7 +377,7 @@
   tests.push({
     test: 'Export complex gradients',
     code: clipping13,
-    golden: 'clipping13.png',
+    golden: 'clipping13_SVG.png',
     percentage: 0.06,
     width: 290,
     height: 400,
