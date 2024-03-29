@@ -84,7 +84,7 @@ export function testCase(canvas: fabric.Canvas) {
       cornerStyle: 'circle',
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(3),
-      objectCaching: false,
+      objectCaching: true,
     }
   );
 
