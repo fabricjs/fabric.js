@@ -964,7 +964,7 @@ export class FabricObject<
     this.stroke = originalStroke;
   }
 
-  renderClipPathCache(this: TCachedFabricObject, clipPath: FabricObject) {
+  createClipPathLayer(this: TCachedFabricObject, clipPath: FabricObject) {
     const canvas = createCanvasElement();
     canvas.width = this._cacheCanvas.width;
     canvas.height = this._cacheCanvas.height;
@@ -991,7 +991,7 @@ export class FabricObject<
     clipPath._set('canvas', this.canvas);
     clipPath.shouldCache();
     clipPath._transformDone = true;
-    const canvas = (this as TCachedFabricObject).renderClipPathCache(clipPath);
+    const canvas = (this as TCachedFabricObject).createClipPathLayer(clipPath);
     this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
