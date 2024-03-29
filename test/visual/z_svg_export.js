@@ -293,7 +293,7 @@
 
   tests.push({
     test: 'an absolute positioned clipPath, shared',
-    code: clipping8Svg,
+    code: clipping8,
     golden: 'clipping8_SVG.png',
     percentage: 0.06,
     disabled: false,
