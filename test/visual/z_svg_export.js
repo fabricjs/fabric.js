@@ -360,13 +360,8 @@
 
   tests.push({
     test: 'Export a radial svg with scaling',
-<<<<<<< HEAD
-    code: clipping12,
-    golden: 'clipping12_SVG.png',
-=======
     code: export12,
     golden: 'export12_SVG.png',
->>>>>>> master
     percentage: 0.06,
     width: 220,
     height: 300,
@@ -381,13 +376,8 @@
 
   tests.push({
     test: 'Export complex gradients',
-<<<<<<< HEAD
-    code: clipping13,
-    golden: 'clipping13_SVG.png',
-=======
     code: export13,
     golden: 'export13_SVG.png',
->>>>>>> master
     percentage: 0.06,
     width: 290,
     height: 400,
