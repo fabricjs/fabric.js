@@ -578,10 +578,7 @@ export class Group
   }
 
   dispose() {
-    this.layoutManager.unsubscribeTargets({
-      targets: this.getObjects(),
-      target: this,
-    });
+    this.layoutManager.dispose();
     this._activeObjects = [];
     this.forEachObject((object) => {
       this._watchObject(false, object);
