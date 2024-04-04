@@ -964,7 +964,10 @@ export class FabricObject<
     this.stroke = originalStroke;
   }
 
-  createClipPathLayer(this: TCachedFabricObject, clipPath: FabricObject) {
+  private createClipPathLayer(
+    this: TCachedFabricObject,
+    clipPath: FabricObject
+  ) {
     const canvas = createCanvasElement();
     canvas.width = this._cacheCanvas.width;
     canvas.height = this._cacheCanvas.height;
@@ -982,6 +985,7 @@ export class FabricObject<
     clipPath.transform(ctx);
     clipPath.drawObject(ctx, true);
     delete clipPath._cacheCanvas;
+    console.log(canvas);
     return canvas;
   }
 
