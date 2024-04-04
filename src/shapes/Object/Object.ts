@@ -977,14 +977,28 @@ export class FabricObject<
     clipPath._cacheCanvas = canvas;
     // if the clipPath is clipped, we need its own cache for reference.
     if (clipPath.clipPath) {
+      clipPath.clipPath.parentClipPath = clipPath;
       // we do not use it but we need it for the next step.
       // it is a waste, we could have just the information handy, we do not need
       // to create a real canvas. we need cacheChanvas width/height/translationX/translationY
       clipPath._createCacheCanvas();
+      clipPath._cacheCanvas.width = canvas.width;
+      clipPath._cacheCanvas.height = canvas.height;
+      clipPath.cacheTranslationX = this.cacheTranslationX;
+      clipPath.cacheTranslationY = this.cacheTranslationY;
+      clipPath.zoomX = this.zoomX;
+      clipPath.zoomY = this.zoomY;
+    }
+    if (clipPath.parentClipPath) {
+      console.log(clipPath.parentClipPath);
+      clipPath.parentClipPath.transform(ctx);
     }
     clipPath.transform(ctx);
     clipPath.drawObject(ctx, true);
     delete clipPath._cacheCanvas;
+    if (clipPath.clipPath) {
+      delete clipPath.clipPath.parentClipPath;
+    }
     console.log(canvas);
     return canvas;
   }
