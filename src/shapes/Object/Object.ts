@@ -921,7 +921,8 @@ export class FabricObject<
    */
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject
+    clipPath: FabricObject,
+    canvasWithClipPath: HTMLCanvasElement
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -931,18 +932,14 @@ export class FabricObject<
     } else {
       ctx.globalCompositeOperation = 'destination-in';
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     //ctx.scale(1 / 2, 1 / 2);
     if (clipPath.absolutePositioned) {
+      // needs fixes?
       const m = invertTransform(this.calcTransformMatrix());
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
-    clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-    ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
-    );
+    ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
 
@@ -967,6 +964,45 @@ export class FabricObject<
     this.stroke = originalStroke;
   }
 
+  private createClipPathLayer(
+    this: TCachedFabricObject,
+    clipPath: FabricObject
+  ) {
+    const canvas = createCanvasElement();
+    canvas.width = this._cacheCanvas.width;
+    canvas.height = this._cacheCanvas.height;
+    const ctx = canvas.getContext('2d')!;
+    ctx.translate(this.cacheTranslationX, this.cacheTranslationY);
+    ctx.scale(this.zoomX, this.zoomY);
+    clipPath._cacheCanvas = canvas;
+    // if the clipPath is clipped, we need its own cache for reference.
+    if (clipPath.clipPath) {
+      clipPath.clipPath.parentClipPath = clipPath;
+      // we do not use it but we need it for the next step.
+      // it is a waste, we could have just the information handy, we do not need
+      // to create a real canvas. we need cacheChanvas width/height/translationX/translationY
+      clipPath._createCacheCanvas();
+      clipPath._cacheCanvas.width = canvas.width;
+      clipPath._cacheCanvas.height = canvas.height;
+      clipPath.cacheTranslationX = this.cacheTranslationX;
+      clipPath.cacheTranslationY = this.cacheTranslationY;
+      clipPath.zoomX = this.zoomX;
+      clipPath.zoomY = this.zoomY;
+    }
+    if (clipPath.parentClipPath) {
+      console.log(clipPath.parentClipPath);
+      clipPath.parentClipPath.transform(ctx);
+    }
+    clipPath.transform(ctx);
+    clipPath.drawObject(ctx, true);
+    delete clipPath._cacheCanvas;
+    if (clipPath.clipPath) {
+      delete clipPath.clipPath.parentClipPath;
+    }
+    console.log(canvas);
+    return canvas;
+  }
+
   /**
    * Prepare clipPath state and cache and draw it on instance's cache
    * @param {CanvasRenderingContext2D} ctx
@@ -982,8 +1018,8 @@ export class FabricObject<
     clipPath._set('canvas', this.canvas);
     clipPath.shouldCache();
     clipPath._transformDone = true;
-    clipPath.renderCache({ forClipping: true });
-    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
+    const canvas = (this as TCachedFabricObject).createClipPathLayer(clipPath);
+    this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
   /**
