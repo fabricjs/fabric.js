@@ -871,13 +871,17 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       target.interactive &&
       this.targets[0]
     ) {
-      /** {@link this.targets} is ordered bottom-up */
-      let subTarget = this.targets[0];
-      while (subTarget.parent && !subTarget.parent.interactive) {
-        subTarget = subTarget.parent;
+      /** targets[0] is the innermost nested target, but it could be inside non interactive groups and so not a selection target */
+      const targets = this.targets;
+      for (let i = targets.length - 1; i > 0; i--) {
+        const t = targets[i];
+        if (!(isCollection(t) && t.interactive)) {
+          // one of the subtargets was not interactive. that is the last subtarget we can return.
+          // we can't dig more deep;
+          return t;
+        }
       }
-
-      return subTarget;
+      return targets[0];
     }
 
     return target;
