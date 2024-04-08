@@ -91,8 +91,6 @@ export const factoryPolyActionHandler = (
     poly.left -= diff.x;
     poly.top -= diff.y;
 
-    actionPerformed && poly.setCoords();
-
     return actionPerformed;
   };
 };

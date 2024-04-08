@@ -21,7 +21,6 @@ export function wrapWithFixedAnchor<T extends Transform>(
       transform.originX,
       transform.originY
     );
-    actionPerformed && target.setCoords();
     return actionPerformed;
   }) as TransformActionHandler<T>;
 }
