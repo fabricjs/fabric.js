@@ -188,7 +188,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare fireMiddleClick: boolean;
 
   /**
-   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost subTarget
+   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost nested subTarget
    * @type FabricObject[]
    */
   targets: FabricObject[] = [];
