@@ -26,6 +26,8 @@ export abstract class LayoutStrategy {
 
   /**
    * Used by the `LayoutManager` to perform layout
+   * @TODO/fix: if this method is calcResult, should calc unconditionally.
+   * the condition to not calc should be evaluated by the layoutManager.
    * @returns layout result **OR** `undefined` to skip layout
    */
   public calcLayoutResult(
