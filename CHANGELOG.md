@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
+
 ## [6.0.0-beta20]
 
 - chore(TS): minor changes to typescript notation to be compatible with a 5.3.3 [#9725](https://github.com/fabricjs/fabric.js/pull/9725)
