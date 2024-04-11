@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Reduce some calls to setCoords() [#9795](https://github.com/fabricjs/fabric.js/pull/9795)
 - fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
 - test(): Rename svg tests [#9775](https://github.com/fabricjs/fabric.js/pull/9775)
 - refactor(): `_findTargetCorner` is now called `findControl` and returns the key and the control and the coordinates [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
