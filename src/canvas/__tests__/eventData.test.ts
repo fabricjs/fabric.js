@@ -476,7 +476,7 @@ describe('Event targets', () => {
       });
 
       group.subTargetCheck = true;
-      group.setCoords();
+      group.invalidateCoords();
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: group,

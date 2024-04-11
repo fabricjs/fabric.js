@@ -46,6 +46,7 @@ import type { FabricImage } from '../Image';
 import {
   cacheProperties,
   fabricObjectDefaultValues,
+  geometryProperties,
   stateProperties,
 } from './defaultValues';
 import type { Gradient } from '../../gradient/Gradient';
@@ -183,6 +184,8 @@ export class FabricObject<
    * @type Array
    */
   static cacheProperties: string[] = cacheProperties;
+
+  static geometryProperties: string[] = geometryProperties;
 
   /**
    * When set to `true`, object's cache will be rerendered next render call.
@@ -756,6 +759,13 @@ export class FabricObject<
             key
           ))) &&
       this.parent._set('dirty', true);
+
+    if (
+      isChanged &&
+      (this.constructor as typeof FabricObject).geometryProperties.includes(key)
+    ) {
+      this.invalidateCoords();
+    }
 
     return this;
   }
@@ -1414,7 +1424,7 @@ export class FabricObject<
       sendObjectToPlane(this, this.getViewportTransform());
     }
 
-    this.setCoords();
+    this.invalidateCoords();
     const el = createCanvasElement(),
       boundingRect = this.getBoundingRect(),
       shadow = this.shadow,
@@ -1451,7 +1461,7 @@ export class FabricObject<
     // @ts-expect-error this needs to be fixed somehow, or ignored globally
     canvas._objects = [this];
     this.set('canvas', canvas);
-    this.setCoords();
+    this.invalidateCoords();
     const canvasEl = canvas.toCanvasElement(multiplier || 1, options);
     this.set('canvas', originalCanvas);
     this.shadow = originalShadow;
@@ -1459,7 +1469,7 @@ export class FabricObject<
       this.group = originalGroup;
     }
     this.set(origParams);
-    this.setCoords();
+    this.invalidateCoords();
     // canvas.dispose will call image.dispose that will nullify the elements
     // since this canvas is a simple element for the process, we remove references
     // to objects in this way in order to avoid object trashing.

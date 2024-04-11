@@ -38,6 +38,30 @@ export const cacheProperties = [
   'clipPath',
 ];
 
+export const geometryProperties = [
+  TOP,
+  LEFT,
+  'angle',
+  'scaleX',
+  'scaleY',
+  'flipX',
+  'flipY',
+  'skewX',
+  'skewY',
+  'width',
+  'height',
+  'originX',
+  'originY',
+  'strokeWidth',
+  'strokeUniform',
+  // this don't affect coords currently but should
+  'strokeLineCap',
+  'strokeLineJoin',
+  'strokeMiterLimit',
+  // this doesn't affect aCoords but due to laziness it will invalidate all coords
+  'padding',
+];
+
 export const fabricObjectDefaultValues: Partial<
   TClassProperties<FabricObject>
 > = {

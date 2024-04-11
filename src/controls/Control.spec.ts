@@ -1,3 +1,4 @@
+import { Point } from '../Point';
 import { Canvas } from '../canvas/Canvas';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Control } from './Control';
@@ -19,14 +20,31 @@ describe('Controls', () => {
       canvas: new Canvas(),
     });
 
-    target.setCoords();
+    target.invalidateCoords();
 
     jest
       .spyOn(target, 'findControl')
       .mockImplementation(function (this: FabricObject) {
         this.__corner = 'test';
 
-        return { key: 'test', control };
+        return {
+          key: 'test',
+          control,
+          coord: Object.assign(new Point(), {
+            corner: {
+              tl: new Point(),
+              tr: new Point(),
+              br: new Point(),
+              bl: new Point(),
+            },
+            touchCorner: {
+              tl: new Point(),
+              tr: new Point(),
+              br: new Point(),
+              bl: new Point(),
+            },
+          }),
+        };
       });
 
     const canvas = new Canvas();

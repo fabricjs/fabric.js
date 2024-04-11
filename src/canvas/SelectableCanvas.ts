@@ -1150,7 +1150,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       object.set('canvas', this);
     }
 
-    object.setCoords();
+    object.invalidateCoords();
 
     return true;
   }
@@ -1238,7 +1238,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       target._scaling = false;
     }
 
-    target.setCoords();
+    target.invalidateCoords();
 
     if (transform.actionPerformed) {
       this.fire('object:modified', options);
@@ -1254,7 +1254,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     super.setViewportTransform(vpt);
     const activeObject = this._activeObject;
     if (activeObject) {
-      activeObject.setCoords();
+      activeObject.invalidateCoords();
     }
   }
 

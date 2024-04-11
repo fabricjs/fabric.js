@@ -24,7 +24,6 @@ describe('IText', () => {
         });
         const group = new Group([text]);
         group.set({ scaleX: scale, scaleY: scale, angle });
-        group.setCoords();
         const fillRect = jest.fn();
         const getZoom = jest.fn().mockReturnValue(zoom);
         const mockContext = { fillRect };

@@ -87,7 +87,7 @@ export abstract class AnimatableObject<
         valueProgress: number,
         durationProgress: number
       ) => {
-        this.setCoords();
+        this.invalidateCoords();
         onComplete &&
           // @ts-expect-error generic callback arg0 is wrong
           onComplete(value, valueProgress, durationProgress);

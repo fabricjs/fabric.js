@@ -33,7 +33,6 @@ beforeAll((canvas) => {
   });
   canvas.add(group);
   canvas.centerObject(group);
-  group.setCoords();
   canvas.setActiveObject(rect);
   canvas.renderAll();
   return { rect, group };

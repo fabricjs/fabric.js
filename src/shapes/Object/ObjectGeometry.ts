@@ -357,7 +357,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   scale(value: number): void {
     this._set('scaleX', value);
     this._set('scaleY', value);
-    this.setCoords();
+    this.invalidateCoords();
   }
 
   /**

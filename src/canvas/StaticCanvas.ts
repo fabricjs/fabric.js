@@ -224,7 +224,7 @@ export class StaticCanvas<
       obj.canvas.remove(obj);
     }
     obj._set('canvas', this);
-    obj.setCoords();
+    obj.invalidateCoords();
     this.fire('object:added', { target: obj });
     obj.fire('added', { target: this });
   }
@@ -793,7 +793,7 @@ export class StaticCanvas<
    */
   _centerObject(object: FabricObject, center: Point) {
     object.setXY(center, CENTER, CENTER);
-    object.setCoords();
+    object.invalidateCoords();
     this.renderOnAddRemove && this.requestRenderAll();
   }
 

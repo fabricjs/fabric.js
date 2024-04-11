@@ -313,10 +313,9 @@
     var text = new fabric.Textbox('xa xb xc xd xe ya yb id', { strokeWidth: 0 });
     canvas.add(text);
     canvas.setActiveObject(text);
-    var canvasEl = canvas.getElement();
     var eventStub = {
       clientX: text.width,
-      clientY: text.oCoords.mr.corner.tl.y + 1,
+      clientY: text.getControlCoords().mr.corner.tl.y + 1,
       type: 'mousedown',
       target: canvas.upperCanvasEl
     };
@@ -343,7 +342,7 @@
     var canvasEl = canvas.getElement();
     var eventStub = {
       clientX: text.left,
-      clientY: text.oCoords.ml.corner.tl.y + 2,
+      clientY: text.getControlCoords().ml.corner.tl.y + 2,
       type: 'mousedown',
       target: canvas.upperCanvasEl
     };
@@ -489,7 +488,7 @@
     var text = 'aaa aaq ggg gg oee eee';
     var styles = {};
     for (var index = 0; index < text.length; index++) {
-      styles[index] = { fontSize: 4 };      
+      styles[index] = { fontSize: 4 };
     }
     var textbox = new fabric.Textbox(text, {
       styles: { 0: styles },

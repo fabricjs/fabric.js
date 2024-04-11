@@ -231,17 +231,8 @@
 
     cObj.set('left', 250).set('top', 250);
 
-    // coords should still correspond to initial one, even after invoking `set`
-    assert.equal(cObj.oCoords.tl.x, 150);
-    assert.equal(cObj.oCoords.tl.y, 150);
-    assert.equal(cObj.oCoords.tr.x, 250);
-    assert.equal(cObj.oCoords.tr.y, 150);
-    assert.equal(cObj.oCoords.bl.x, 150);
-    assert.equal(cObj.oCoords.bl.y, 250);
-    assert.equal(cObj.oCoords.br.x, 250);
-    assert.equal(cObj.oCoords.br.y, 250);
-    assert.equal(cObj.oCoords.mtr.x, 200);
-    assert.equal(cObj.oCoords.mtr.y, 110);
+    assert.equal(cObj.aCoords, undefined);
+    assert.equal(cObj.oCoords, undefined);
 
     // recalculate coords
     cObj.setCoords();
@@ -259,6 +250,7 @@
     assert.equal(cObj.oCoords.mtr.y, 210);
 
     cObj.set('padding', 25);
+    assert.equal(cObj.oCoords, undefined);
     cObj.setCoords();
     // coords should still correspond to initial one, even after invoking `set`
     assert.equal(cObj.oCoords.tl.x, 225, 'setCoords tl.x padding');
