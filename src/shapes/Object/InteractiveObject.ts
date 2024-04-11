@@ -91,7 +91,7 @@ export class InteractiveFabricObject<
    * `corner/touchCorner` describe the 4 points forming the interactive area of the corner.
    * Used to draw and locate controls.
    */
-  declare oCoords: Record<string, TOCoord>;
+  protected declare oCoords?: Record<string, TOCoord>;
 
   /**
    * keeps the value of the last hovered corner during mouse move.
@@ -167,13 +167,17 @@ export class InteractiveFabricObject<
     return super._updateCacheCanvas();
   }
 
+  getControlCoords() {
+    return this.oCoords || (this.oCoords = this.calcOCoords());
+  }
+
   getActiveControl() {
     const key = this.__corner;
     return key
       ? {
           key,
           control: this.controls[key],
-          coord: this.oCoords[key],
+          coord: this.getControlCoords()[key],
         }
       : undefined;
   }
@@ -198,7 +202,8 @@ export class InteractiveFabricObject<
     }
 
     this.__corner = undefined;
-    const cornerEntries = Object.entries(this.oCoords);
+    const coords = this.getControlCoords();
+    const cornerEntries = Object.entries(coords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
       const control = this.controls[key];
@@ -214,7 +219,7 @@ export class InteractiveFabricObject<
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
         this.__corner = key;
 
-        return { key, control, coord: this.oCoords[key] };
+        return { key, control, coord: coords[key] };
       }
     }
 
@@ -314,6 +319,11 @@ export class InteractiveFabricObject<
   setCoords(): void {
     super.setCoords();
     this.canvas && (this.oCoords = this.calcOCoords());
+  }
+
+  invalidateCoords() {
+    super.invalidateCoords();
+    delete this.oCoords;
   }
 
   /**
@@ -534,9 +544,10 @@ export class InteractiveFabricObject<
       ctx.strokeStyle = options.cornerStrokeColor;
     }
     this._setLineDash(ctx, options.cornerDashArray);
+    const coords = this.getControlCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
-        const p = this.oCoords[key];
+        const p = coords[key];
         control.render(ctx, p.x, p.y, options, this);
       }
     });

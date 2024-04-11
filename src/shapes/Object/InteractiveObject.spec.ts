@@ -37,7 +37,7 @@ describe('InteractiveObject', () => {
       canvas.add(group);
       const objectAngle = Math.round(object.getTotalAngle());
       expect(objectAngle).toEqual(35);
-      Object.values(object.oCoords).forEach((cornerPoint: TOCoord) => {
+      Object.values(object['oCoords']!).forEach((cornerPoint: TOCoord) => {
         const controlAngle = Math.round(
           radiansToDegrees(
             Math.atan2(
@@ -61,7 +61,7 @@ describe('InteractiveObject', () => {
     expect(object.getActiveControl()).toEqual({
       key: 'control',
       control,
-      coord: object.oCoords.control,
+      coord: object['oCoords']!.control,
     });
   });
 });

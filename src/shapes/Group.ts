@@ -31,16 +31,6 @@ import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 import type { FitContentLayout } from '../LayoutManager';
 
 /**
- * @deprecated setting descendant coords is might become redundant in the near future once coords are refactored for it
- * This is being discussed and is here as an intermediate step until coords support what is needed.
- */
-export const setDescendantCoords = (group: Group) => {
-  group.forEachObject((object) => {
-    object instanceof Group ? setDescendantCoords(object) : object.setCoords();
-  });
-};
-
-/**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
  * We could have used a boolean in the constructor, as we did previously, but we think the boolean
  * would stay in the group's constructor interface and create confusion, therefore it was removed.
@@ -304,6 +294,14 @@ export class Group
   }
 
   /**
+   * @override recursively invalidate descendant coords as well
+   */
+  invalidateCoords() {
+    super.invalidateCoords();
+    this.forEachObject((object) => object.invalidateCoords());
+  }
+
+  /**
    * keeps track of the selected objects
    * @private
    */
@@ -416,6 +414,8 @@ export class Group
         )
       );
     }
+    // invalidate coords in case group was transformed
+    object.invalidateCoords();
     this._watchObject(false, object);
     const index =
       this._activeObjects.length > 0 ? this._activeObjects.indexOf(object) : -1;
@@ -489,13 +489,6 @@ export class Group
       }
     }
     this._drawClipPath(ctx, this.clipPath);
-  }
-
-  /**
-   * @deprecated intermediate internal method here for the dev to noop, see {@link setDescendantCoords}
-   */
-  protected setDescendantCoords() {
-    setDescendantCoords(this);
   }
 
   triggerLayout(options: ImperativeLayoutOptions = {}) {

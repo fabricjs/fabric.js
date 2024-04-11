@@ -9,7 +9,7 @@ import { scalingX, scalingY } from './scale';
 //
 const createZeroThickRectangleScalingItems = (
   rectOptions: { width: number; height: number } & Partial<RectProps>,
-  usedCorner: keyof Rect['oCoords'],
+  usedCorner: string,
   pointDiff: Point
 ) => {
   const extraMargin = 100;

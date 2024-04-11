@@ -10,7 +10,7 @@ import type {
 } from '../EventTypeDefs';
 import { Point } from '../Point';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
-import { Group } from '../shapes/Group';
+import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
@@ -1309,10 +1309,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const actionPerformed =
       !!actionHandler && actionHandler(e, transform, pointer.x, pointer.y);
 
-    if (actionPerformed) {
-      target.setCoords();
-      target instanceof Group && target['setDescendantCoords']();
-    }
+    actionPerformed && target.invalidateCoords();
 
     if (action === 'drag' && actionPerformed) {
       target.isMoving = true;

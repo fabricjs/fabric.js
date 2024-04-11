@@ -474,6 +474,8 @@ export class FabricText<
       // once text is measured we need to make space fatter to make justified text.
       this.enlargeSpaces();
     }
+
+    this.invalidateCoords();
   }
 
   /**
@@ -1693,7 +1695,6 @@ export class FabricText<
     }
     if (this._forceClearCache) {
       this.initDimensions();
-      this.setCoords();
     }
     super.render(ctx);
   }
@@ -1771,7 +1772,6 @@ export class FabricText<
     }
     if (needsDims && this.initialized) {
       this.initDimensions();
-      this.setCoords();
     }
     return this;
   }

@@ -47,7 +47,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * The coordinates get updated with {@link setCoords}.
    * You can calculate them without updating with {@link calcACoords()}
    */
-  declare aCoords: TACoords;
+  protected declare aCoords?: TACoords;
 
   /**
    * storage cache for object transform matrix
@@ -435,6 +435,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    */
   setCoords(): void {
     this.aCoords = this.calcACoords();
+  }
+
+  invalidateCoords() {
+    delete this.aCoords;
   }
 
   transformMatrixKey(skipGroup = false): string {

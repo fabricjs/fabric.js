@@ -154,9 +154,6 @@ export class ActiveSelection extends Group {
     this._exitGroup(object, removeParentTransform);
     // return to parent
     object.parent && object.parent._enterGroup(object, true);
-    // invalidate coords in case active selection was transformed
-    delete object['aCoords'];
-    delete object['oCoords'];
   }
 
   /**
