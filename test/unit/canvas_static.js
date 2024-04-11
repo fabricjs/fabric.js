@@ -1425,7 +1425,6 @@
     assert.equal(canvas.item(2), rect3);
 
     rect1.set({ top: 100 });
-    rect1.setCoords();
     canvas.sendObjectBackwards(rect1, true);
 
     assert.equal(canvas.item(1), rect1);
@@ -1482,7 +1481,6 @@
     assert.equal(canvas.item(2), rect3);
 
     rect2.set({ left: 200 });
-    rect2.setCoords();
     canvas.bringObjectForward(rect2, true);
 
     // rect2, rect3 do not overlap

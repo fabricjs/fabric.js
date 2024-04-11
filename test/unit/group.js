@@ -329,7 +329,7 @@
   QUnit.test('containsPoint', function(assert) {
 
     var group = makeGroupWith2Objects();
-    group.set({ originX: 'center', originY: 'center' }).setCoords();
+    group.set({ originX: 'center', originY: 'center' });
 
     //  Rect #1     top: 100, left: 100, width: 30, height: 10
     //  Rect #2     top: 120, left: 50, width: 10, height: 40
@@ -345,7 +345,7 @@
 
     group.scale(1);
     group.padding = 30;
-    group.setCoords();
+    group.invalidateCoords();
     assert.ok(group.containsPoint(new fabric.Point( 50, 120 )));
     assert.ok(!group.containsPoint(new fabric.Point( 100, 170 )));
     assert.ok(!group.containsPoint(new fabric.Point( 0, 0 )));

@@ -840,7 +840,6 @@
     var target = new fabric.Rect({ width: 100, height: 100 });
     canvas.add(target);
     canvas.setActiveObject(target);
-    target.setCoords();
     const expected = {
       mt: 'n-resize',
       mb: 's-resize',
@@ -852,7 +851,7 @@
       br: 'se-resize',
       mtr: 'crosshair',
     };
-    Object.entries(target.oCoords).forEach(([corner, coords]) => {
+    Object.entries(target.getControlCoords()).forEach(([corner, coords]) => {
       const e = { clientX: coords.x, clientY: coords.y, [key]: false, target: canvas.upperCanvasEl };
       canvas._setCursorFromEvent(e, target);
       assert.equal(canvas.upperCanvasEl.style.cursor, expected[corner], `${expected[corner]} action is not disabled`);

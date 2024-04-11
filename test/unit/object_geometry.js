@@ -4,7 +4,6 @@
 
   QUnit.test('intersectsWithRectangle without zoom', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
-    cObj.setCoords();
     assert.ok(typeof cObj.intersectsWithRect === 'function');
 
     var point1 = new fabric.Point(110, 100),
@@ -20,7 +19,6 @@
     var cObj = new fabric.Rect({ left: 10, top: 10, width: 20, height: 20 });
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
-    cObj.setCoords();
     canvas.calcViewportBoundaries();
 
     var point1 = new fabric.Point(5, 5),
@@ -34,28 +32,23 @@
 
   QUnit.test('intersectsWithObject', function(assert) {
     var cObj = new fabric.Object({ left: 50, top: 50, width: 100, height: 100 });
-    cObj.setCoords();
     assert.ok(typeof cObj.intersectsWithObject === 'function', 'has intersectsWithObject method');
 
     var cObj2 = new fabric.Object({ left: -150, top: -150, width: 200, height: 200 });
-    cObj2.setCoords();
     assert.ok(cObj.intersectsWithObject(cObj2), 'cobj2 does intersect with cobj');
     assert.ok(cObj2.intersectsWithObject(cObj), 'cobj2 does intersect with cobj');
 
     var cObj3 = new fabric.Object({ left: 392.5, top: 339.5, width: 13, height: 33 });
-    cObj3.setCoords();
     assert.ok(!cObj.intersectsWithObject(cObj3), 'cobj3 does not intersect with cobj (external)');
     assert.ok(!cObj3.intersectsWithObject(cObj), 'cobj3 does not intersect with cobj (external)');
 
     var cObj4 = new fabric.Object({ left: 0, top: 0, width: 200, height: 200 });
-    cObj4.setCoords();
     assert.ok(cObj4.intersectsWithObject(cObj), 'overlapping objects are considered intersecting');
     assert.ok(cObj.intersectsWithObject(cObj4), 'overlapping objects are considered intersecting');
   });
 
   QUnit.test('isContainedWithinRect', function(assert) {
     var cObj = new fabric.Object({ left: 20, top: 20, width: 10, height: 10 });
-    cObj.setCoords();
     assert.ok(typeof cObj.isContainedWithinRect === 'function');
 
     // fully contained
@@ -70,7 +63,6 @@
     var cObj = new fabric.Rect({ left: 20, top: 20, width: 10, height: 10 });
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
-    cObj.setCoords();
     canvas.calcViewportBoundaries();
     assert.ok(typeof cObj.isContainedWithinRect === 'function');
 
@@ -91,8 +83,6 @@
         point5 = new fabric.Point(50, 60),
         point6 = new fabric.Point(70, 80);
 
-    object.setCoords();
-
     // object and area intersects
     assert.equal(object.intersectsWithRect(point1, point2), true);
     // area is contained in object (no intersection)
@@ -107,10 +97,10 @@
         object2 = new fabric.Object({ left: 25, top: 35, width: 20, height: 20, angle: 50, strokeWidth: 0 }),
         object3 = new fabric.Object({ left: 50, top: 50, width: 20, height: 20, angle: 0, strokeWidth: 0 });
 
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
-    object1.set({ originX: 'center', originY: 'center' }).setCoords();
-    object2.set({ originX: 'center', originY: 'center' }).setCoords();
-    object3.set({ originX: 'center', originY: 'center' }).setCoords();
+    object.set({ originX: 'center', originY: 'center' });
+    object1.set({ originX: 'center', originY: 'center' });
+    object2.set({ originX: 'center', originY: 'center' });
+    object3.set({ originX: 'center', originY: 'center' });
 
     assert.equal(object.intersectsWithObject(object1), true, 'object and object1 intersects');
     assert.equal(object.intersectsWithObject(object2), true, 'object2 is contained in object');
@@ -123,16 +113,11 @@
         object2 = new fabric.Object({ left: 20, top: 20, width: 40, height: 40, angle: 0 }),
         object3 = new fabric.Object({ left: 50, top: 50, width: 40, height: 40, angle: 0 });
 
-    object.setCoords();
-    object1.setCoords();
-    object2.setCoords();
-    object3.setCoords();
-
     assert.equal(object1.isContainedWithinObject(object), true, 'object1 is fully contained within object');
     assert.equal(object2.isContainedWithinObject(object), false, 'object2 intersects object (not fully contained)');
     assert.equal(object3.isContainedWithinObject(object), false, 'object3 is outside of object (not fully contained)');
     object1.angle = 45;
-    object1.setCoords();
+    object1.invalidateCoords();
     assert.equal(object1.isContainedWithinObject(object), false, 'object1 rotated is not contained within object');
 
     var rect1 = new fabric.Rect({
@@ -149,8 +134,6 @@
       top: 0,
       angle: 45,
     });
-    rect1.setCoords();
-    rect2.setCoords();
     assert.equal(rect1.isContainedWithinObject(rect2), false, 'rect1 rotated is not contained within rect2');
   });
 
@@ -163,7 +146,7 @@
         point5 = new fabric.Point(80, 80),
         point6 = new fabric.Point(90, 90);
 
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
+    object.set({ originX: 'center', originY: 'center' })
 
     // area is contained in object (no intersection)
     assert.equal(object.isContainedWithinRect(point1, point2), true);
@@ -182,7 +165,7 @@
         point5 = new fabric.Point(80, 80),
         point6 = new fabric.Point(90, 90);
 
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
+    object.set({ originX: 'center', originY: 'center' })
 
     // area is contained in object (no intersection)
     assert.equal(object.isContainedWithinRect(point1, point2), true);
@@ -200,7 +183,7 @@
         point4 = new fabric.Point(15, 40),
         point5 = new fabric.Point(30, 15);
 
-    object.set({ originX: 'center', originY: 'center' }).setCoords();
+    object.set({ originX: 'center', originY: 'center' })
 
     // point1 is contained in object
     assert.equal(object.containsPoint(point1), true);
@@ -298,14 +281,13 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
-    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
-    cObj.setCoords();
+    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since invalidateCoords is not called and calculate is not set, even when top is already at 1000');
+    cObj.invalidateCoords();
     assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.1);
-    cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
   });
 
@@ -314,14 +296,13 @@
     canvas.viewportTransform = [-1, 0, 0, -1, 0, 0];
     canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen');
     cObj.top = 1000;
-    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since setCoords is not called and calculate is not set, even when top is already at 1000');
-    cObj.setCoords();
+    assert.ok(cObj.isOnScreen(), 'object is still wrongly on screen since invalidateCoords is not called and calculate is not set, even when top is already at 1000');
+    cObj.invalidateCoords();
     assert.ok(!cObj.isOnScreen(), 'object is not onScreen with top 1000');
     canvas.setZoom(0.1);
-    cObj.setCoords();
     assert.ok(cObj.isOnScreen(), 'zooming out the object is again on screen');
   });
 
@@ -361,11 +342,11 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.equal(cObj.isOnScreen(), true, 'object is onScreen because it include the canvas');
     cObj.top = -1000;
     cObj.left = -1000;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.equal(cObj.isOnScreen(), false, 'object is completely out of viewport');
   });
 
@@ -374,11 +355,11 @@
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
     canvas.calcViewportBoundaries();
     cObj.canvas = canvas;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.ok(cObj.isOnScreen(), 'object is onScreen because it intersect a canvas line');
     cObj.top -= 20;
     cObj.left -= 20;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.ok(!cObj.isOnScreen(), 'object is completely out of viewport');
   });
 
@@ -486,7 +467,6 @@
     var cObj = new fabric.Object({ strokeWidth: 0, width: 10, height: 10, top: 6, left: 5 }),
         boundingRect;
 
-    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 5, 'gives the bounding rect left with absolute coords');
     assert.equal(boundingRect.width, 10, 'gives the bounding rect width with absolute coords');
@@ -494,7 +474,7 @@
     cObj.canvas = {
        viewportTransform: [2, 0, 0, 2, 0, 0]
     };
-    cObj.setCoords();
+    cObj.invalidateCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 5, 'gives the bounding rect left with absolute coords, regardless of vpt');
     assert.equal(boundingRect.width, 10, 'gives the bounding rect width with absolute coords, regardless of vpt');
@@ -506,13 +486,12 @@
         boundingRect;
     assert.ok(typeof cObj.getBoundingRect === 'function');
 
-    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(boundingRect.top, 0);
     assert.equal(boundingRect.width, 0);
     assert.equal(boundingRect.height, 0);
-    cObj.set('width', 123).setCoords();
+    cObj.set('width', 123);
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(boundingRect.top, 0);
@@ -520,7 +499,6 @@
     assert.equal(boundingRect.height, 0);
 
     cObj.set('height', 167);
-    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(Math.abs(boundingRect.top).toFixed(13), 0);
@@ -528,7 +506,6 @@
     assert.equal(boundingRect.height, 167);
 
     cObj.scale(2)
-    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left, 0);
     assert.equal(Math.abs(boundingRect.top).toFixed(13), 0);
@@ -541,31 +518,27 @@
         boundingRect;
     assert.ok(typeof cObj.getBoundingRect === 'function');
 
-    cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 1);
     assert.equal(boundingRect.height.toFixed(2), 1);
 
-    cObj.set('width', 123)
-    cObj.setCoords();
+    cObj.set('width', 123);
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 1);
 
-    cObj.set('height', 167)
-    cObj.setCoords();
+    cObj.set('height', 167);
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
     assert.equal(boundingRect.width.toFixed(2), 124);
     assert.equal(boundingRect.height.toFixed(2), 168);
 
-    cObj.scale(2)
-    cObj.setCoords();
+    cObj.scale(2);
     boundingRect = cObj.getBoundingRect();
     assert.equal(boundingRect.left.toFixed(2), 0);
     assert.equal(boundingRect.top.toFixed(2), 0);
@@ -625,7 +598,7 @@
     assert.deepEqual(coords[2], new fabric.Point(52, 47), 'return bottom right corner cached aCoords');
     assert.deepEqual(coords[3], new fabric.Point(40, 47), 'return bottom left corner cached aCoords');
 
-    cObj.setCoords();
+    cObj.invalidateCoords();
     coords = cObj.getCoords();
     assert.deepEqual(coords[0], new fabric.Point(45, 30), 'return top left corner recalculated');
     assert.deepEqual(coords[1], new fabric.Point(57, 30), 'return top right corner recalculated');
@@ -720,15 +693,15 @@
     cObj.canvas = canvas;
     cObj.left = -60;
     cObj.top = -60;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), true,'object is partially onScreen');
     cObj.left = -110;
     cObj.top = -110;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false,'object is completely offScreen and not partial');
     cObj.left = 45;
     cObj.top = 45;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), false, 'object is completely on screen and not partial');
     canvas.setZoom(2);
     assert.equal(cObj.isPartiallyOnScreen(true), true, 'after zooming object is partially onScreen and offScreen');
@@ -743,7 +716,7 @@
     cObj.top = -20;
     cObj.scaleX = 2;
     cObj.scaleY = 2;
-    cObj.setCoords();
+    cObj.invalidateCoords();
     assert.equal(cObj.isPartiallyOnScreen(true), true, 'object has all corners outside screen but contains canvas');
   });
 })();

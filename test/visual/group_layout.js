@@ -172,7 +172,6 @@
             [rect3, rect4],
             { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
         group3.subTargetCheck = true;
-        group3.setCoords();
         var rect1 = new fabric.Rect({
             width: 100,
             height: 100,
