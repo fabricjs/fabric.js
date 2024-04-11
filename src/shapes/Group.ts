@@ -31,6 +31,16 @@ import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 import type { FitContentLayout } from '../LayoutManager';
 
 /**
+ * @deprecated setting descendant coords is might become redundant in the near future once coords are refactored for it
+ * This is being discussed and is here as an intermediate step until coords support what is needed.
+ */
+export const setDescendantCoords = (group: Group) => {
+  group.forEachObject((object) => {
+    object instanceof Group ? setDescendantCoords(object) : object.setCoords();
+  });
+};
+
+/**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
  * We could have used a boolean in the constructor, as we did previously, but we think the boolean
  * would stay in the group's constructor interface and create confusion, therefore it was removed.
@@ -285,13 +295,6 @@ export class Group
   }
 
   /**
-   * @private
-   */
-  _shouldSetNestedCoords() {
-    return this.subTargetCheck;
-  }
-
-  /**
    * Remove all objects
    * @returns {FabricObject[]} removed objects
    */
@@ -365,7 +368,7 @@ export class Group
         )
       );
     }
-    this._shouldSetNestedCoords() && object.setCoords();
+
     object._set('group', this);
     object._set('canvas', this.canvas);
     this._watchObject(true, object);
@@ -412,7 +415,6 @@ export class Group
           object.calcTransformMatrix()
         )
       );
-      object.setCoords();
     }
     this._watchObject(false, object);
     const index =
@@ -490,13 +492,10 @@ export class Group
   }
 
   /**
-   * @override
-   * @return {Boolean}
+   * @deprecated intermediate internal method here for the dev to noop, see {@link setDescendantCoords}
    */
-  setCoords() {
-    super.setCoords();
-    this._shouldSetNestedCoords() &&
-      this.forEachObject((object) => object.setCoords());
+  protected setDescendantCoords() {
+    setDescendantCoords(this);
   }
 
   triggerLayout(options: ImperativeLayoutOptions = {}) {
@@ -689,7 +688,6 @@ export class Group
         target: group,
         targets: group.getObjects(),
       });
-      group.setCoords();
       return group;
     });
   }

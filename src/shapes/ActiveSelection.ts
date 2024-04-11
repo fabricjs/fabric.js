@@ -70,13 +70,6 @@ export class ActiveSelection extends Group {
 
   /**
    * @private
-   */
-  _shouldSetNestedCoords() {
-    return true;
-  }
-
-  /**
-   * @private
    * @override we don't want the selection monitor to be active
    */
   __objectSelectionMonitor() {
@@ -161,6 +154,9 @@ export class ActiveSelection extends Group {
     this._exitGroup(object, removeParentTransform);
     // return to parent
     object.parent && object.parent._enterGroup(object, true);
+    // invalidate coords in case active selection was transformed
+    delete object['aCoords'];
+    delete object['oCoords'];
   }
 
   /**

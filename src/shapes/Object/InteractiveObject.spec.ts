@@ -35,7 +35,6 @@ describe('InteractiveObject', () => {
         subTargetCheck: true,
       });
       canvas.add(group);
-      group.setCoords();
       const objectAngle = Math.round(object.getTotalAngle());
       expect(objectAngle).toEqual(35);
       Object.values(object.oCoords).forEach((cornerPoint: TOCoord) => {

@@ -251,6 +251,7 @@ export class LayoutManager {
       target.setPositionByOrigin(nextCenter, CENTER, CENTER);
       // invalidate
       target.setCoords();
+      target['setDescendantCoords']();
       target.set('dirty', true);
     }
   }

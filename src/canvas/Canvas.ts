@@ -10,7 +10,7 @@ import type {
 } from '../EventTypeDefs';
 import { Point } from '../Point';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
-import type { Group } from '../shapes/Group';
+import { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
@@ -1304,19 +1304,19 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     transform: Transform,
     pointer: Point
   ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
-    let actionPerformed = false;
-    // this object could be created from the function in the control handlers
+    const { action, actionHandler, target } = transform;
 
-    if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
+    const actionPerformed =
+      !!actionHandler && actionHandler(e, transform, pointer.x, pointer.y);
+
+    if (actionPerformed) {
+      target.setCoords();
+      target instanceof Group && target['setDescendantCoords']();
     }
+
     if (action === 'drag' && actionPerformed) {
-      transform.target.isMoving = true;
-      this.setCursor(transform.target.moveCursor || this.moveCursor);
+      target.isMoving = true;
+      this.setCursor(target.moveCursor || this.moveCursor);
     }
     transform.actionPerformed = transform.actionPerformed || actionPerformed;
   }
@@ -1332,7 +1332,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.setCursor(this.defaultCursor);
       return;
     }
-    let hoverCursor = target.hoverCursor || this.hoverCursor;
     const activeSelection = isActiveSelection(this._activeObject)
         ? this._activeObject
         : null,
@@ -1345,17 +1344,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         target.findControl(this.getViewportPoint(e));
 
     if (!corner) {
-      if ((target as Group).subTargetCheck) {
-        // hoverCursor should come from top-most subTarget,
-        // so we walk the array backwards
-        this.targets
-          .concat()
-          .reverse()
-          .map((_target) => {
-            hoverCursor = _target.hoverCursor || hoverCursor;
-          });
-      }
-      this.setCursor(hoverCursor);
+      // hoverCursor should come from top-most subTarget
+      const subTargetHoverCursor =
+        (target as Group).subTargetCheck &&
+        this.targets.find((target) => target.hoverCursor)?.hoverCursor;
+      this.setCursor(
+        subTargetHoverCursor || target.hoverCursor || this.hoverCursor
+      );
     } else {
       const control = corner.control;
       this.setCursor(control.cursorStyleHandler(e, control, target));
