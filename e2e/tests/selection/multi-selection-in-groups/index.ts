@@ -24,7 +24,6 @@ beforeAll(async (canvas) => {
     ],
     {
       backgroundColor: 'blue',
-      subTargetCheck: true,
       interactive: true,
     }
   );

@@ -29,7 +29,6 @@ beforeAll((canvas) => {
     angle: 30,
     scaleX: 2,
     interactive: true,
-    subTargetCheck: true,
   });
   canvas.add(group);
   canvas.centerObject(group);

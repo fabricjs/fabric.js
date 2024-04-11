@@ -32,7 +32,6 @@ describe('InteractiveObject', () => {
         angle: 30,
         scaleX: 2,
         interactive: true,
-        subTargetCheck: true,
       });
       canvas.add(group);
       const objectAngle = Math.round(object.getTotalAngle());

@@ -144,7 +144,6 @@ describe('Event targets', () => {
   it('A selected subtarget should not fire an event twice', () => {
     const target = new FabricObject();
     const group = new Group([target], {
-      subTargetCheck: true,
       interactive: true,
     });
     const canvas = new Canvas();
@@ -296,7 +295,6 @@ describe('Event targets', () => {
       (searchAll) => {
         const subTarget1 = new FabricObject();
         const target1 = new Group([subTarget1], {
-          subTargetCheck: true,
           interactive: true,
         });
         const subTarget2 = new FabricObject();
@@ -304,7 +302,6 @@ describe('Event targets', () => {
           subTargetCheck: true,
         });
         const parent = new Group([target1, target2], {
-          subTargetCheck: true,
           interactive: true,
         });
         registerTestObjects({
@@ -336,7 +333,6 @@ describe('Event targets', () => {
         subTargetCheck: true,
       });
       const parent = new Group([target], {
-        subTargetCheck: true,
         interactive: true,
       });
       registerTestObjects({ subTarget, target, parent });

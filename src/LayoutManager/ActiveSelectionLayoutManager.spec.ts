@@ -23,7 +23,6 @@ describe('ActiveSelectionLayoutManager', () => {
         const object = new FabricObject();
         const group = new Group([object], {
           interactive: true,
-          subTargetCheck: true,
         });
         const as = new ActiveSelection([object], { layoutManager: manager });
         const objectOn = jest.spyOn(object, 'on');
@@ -46,11 +45,9 @@ describe('ActiveSelectionLayoutManager', () => {
         const object4 = new FabricObject();
         const group = new Group([object, object2], {
           interactive: true,
-          subTargetCheck: true,
         });
         const group2 = new Group([object3, object4], {
           interactive: true,
-          subTargetCheck: true,
         });
         const as = new ActiveSelection([object, object2, object3, object4]);
         const asPerformLayout = jest.spyOn(as.layoutManager, 'performLayout');

@@ -91,7 +91,6 @@ export class Group
   /**
    * Used to allow targeting of object inside groups.
    * set to true if you want to select an object inside a group.\
-   * **REQUIRES** `subTargetCheck` set to true
    * This will be not removed but slowly replaced with a method setInteractive
    * that will take care of enabling subTargetCheck and necessary object events.
    * There is too much attached to group interactivity to just be evaluated by a

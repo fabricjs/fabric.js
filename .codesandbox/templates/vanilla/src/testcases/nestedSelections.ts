@@ -22,7 +22,6 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
     ],
     {
       backgroundColor: 'blue',
-      subTargetCheck: true,
       interactive: true,
       objectCaching,
     }

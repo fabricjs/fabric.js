@@ -1343,7 +1343,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (!corner) {
       // hoverCursor should come from top-most subTarget
       const subTargetHoverCursor =
-        (target as Group).subTargetCheck &&
+        ((target as Group).subTargetCheck || (target as Group).interactive) &&
         this.targets.find((target) => target.hoverCursor)?.hoverCursor;
       this.setCursor(
         subTargetHoverCursor || target.hoverCursor || this.hoverCursor
