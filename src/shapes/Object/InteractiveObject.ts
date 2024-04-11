@@ -312,7 +312,6 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Calling this method is probably redundant, consider calling {@link invalidateCoords} instead.
    * @override set controls' coordinates as well
    * @return {void}
    */

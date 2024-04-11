@@ -465,7 +465,7 @@ describe('Selectable Canvas', () => {
 
       const {
         corner: { tl, tr, bl },
-      } = object.oCoords[controlKey];
+      } = object.getControlCoords()[controlKey];
       canvas.getSelectionElement().dispatchEvent(
         new MouseEvent('mousedown', {
           clientX: canvasOffset.left + (tl.x + tr.x) / 2,

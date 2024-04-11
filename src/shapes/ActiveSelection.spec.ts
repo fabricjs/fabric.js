@@ -58,7 +58,7 @@ describe('ActiveSelection', () => {
     const obj2 = new FabricObject();
     canvas.add(obj1, obj2);
     const activeSelection = new ActiveSelection([obj1, obj2]);
-    const spy = jest.spyOn(activeSelection, 'setCoords');
+    const spy = jest.spyOn(activeSelection, 'invalidateCoords');
     canvas.setActiveObject(activeSelection);
     expect(canvas.getActiveObject()).toBe(activeSelection);
     expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);

@@ -220,7 +220,7 @@ export class FabricImage<
   /**
    * Sets image element for this instance to a specified one.
    * If filters defined they are applied to new image.
-   * You might need to call `canvas.renderAll` and `object.setCoords` after replacing, to render new image and update controls area.
+   * You might need to call `canvas.renderAll` after replacing, to render new image and update controls area.
    * @param {HTMLImageElement} element
    * @param {Partial<TSize>} [size] Options object
    */
@@ -677,8 +677,11 @@ export class FabricImage<
    */
   _setWidthHeight({ width, height }: Partial<TSize> = {}) {
     const size = this.getOriginalSize();
+    const { width: prevWidth, height: prevHeight } = this;
     this.width = width || size.width;
     this.height = height || size.height;
+    (prevWidth !== this.width || prevHeight !== this.height) &&
+      this.invalidateCoords();
   }
 
   /**

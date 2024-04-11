@@ -57,7 +57,7 @@ Object.assign(FabricObject.prototype, {
         onChange(value);
       },
       onComplete: () => {
-        this.setCoords();
+        this.invalidateCoords();
         onComplete();
       },
     });

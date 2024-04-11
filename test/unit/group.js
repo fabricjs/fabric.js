@@ -719,17 +719,6 @@
     assert.equal(isTransparent(ctx, 7, 7, 0), true, '7,7 is transparent');
   });
 
-  QUnit.test('group add', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1], { layoutManager: new fabric.LayoutManager() });
-
-    var coords = group.aCoords;
-    group.add(rect2);
-    var newCoords = group.aCoords;
-    assert.notEqual(coords, newCoords, 'object coords have been recalculated - add');
-  });
-
   QUnit.test('group add edge cases', function (assert) {
     var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
       rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false }),
@@ -757,17 +746,6 @@
     assert.notOk(group.canEnterGroup(circularGroup), 'circular group should be denied entry');
     group.add(circularGroup);
     assert.deepEqual(group.getObjects(), [rect2, nestedGroup], 'objects should not have changed');
-  });
-
-  QUnit.test('group remove', function(assert) {
-    var rect1 = new fabric.Rect({ top: 1, left: 1, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        rect2 = new fabric.Rect({ top: 5, left: 5, width: 2, height: 2, strokeWidth: 0, fill: 'red', opacity: 1, objectCaching: false}),
-        group = new fabric.Group([rect1, rect2], { layoutManager: new fabric.LayoutManager() });
-
-    var coords = group.aCoords;
-    group.remove(rect2);
-    var newCoords = group.aCoords;
-    assert.notEqual(coords, newCoords, 'object coords have been recalculated - remove');
   });
 
   QUnit.test('group willDrawShadow', function(assert) {

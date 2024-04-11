@@ -38,7 +38,7 @@ Object.assign(StaticCanvas.prototype, {
         onChange();
       },
       onComplete: function () {
-        object.setCoords();
+        object.invalidateCoords();
         onComplete();
       },
     });
@@ -71,7 +71,7 @@ Object.assign(StaticCanvas.prototype, {
         onChange();
       },
       onComplete: function () {
-        object.setCoords();
+        object.invalidateCoords();
         onComplete();
       },
     });

@@ -39,7 +39,7 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
 
   getObjectControlPoint(controlName: string) {
     return this.executeInBrowser(
-      (object, { controlName }) => object.oCoords[controlName],
+      (object, { controlName }) => object.getControlCoords()[controlName],
       { controlName }
     );
   }

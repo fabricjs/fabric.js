@@ -345,10 +345,10 @@ describe('Layout Manager', () => {
       const targetSet = jest.spyOn(target, 'set').mockImplementation(() => {
         lifecycle.push(targetSet);
       });
-      const targetSetCoords = jest
-        .spyOn(target, 'setCoords')
+      const targetInvalidateCoords = jest
+        .spyOn(target, 'invalidateCoords')
         .mockImplementation(() => {
-          lifecycle.push(targetSetCoords);
+          lifecycle.push(targetInvalidateCoords);
         });
       const targetSetPositionByOrigin = jest
         .spyOn(target, 'setPositionByOrigin')
@@ -386,7 +386,7 @@ describe('Layout Manager', () => {
         },
         targetMocks: {
           set: targetSet,
-          setCoords: targetSetCoords,
+          invalidateCoords: targetInvalidateCoords,
           setPositionByOrigin: targetSetPositionByOrigin,
         },
         mocks: {
@@ -450,7 +450,7 @@ describe('Layout Manager', () => {
         targetMocks.set,
         layoutObjects,
         targetMocks.setPositionByOrigin,
-        targetMocks.setCoords,
+        targetMocks.invalidateCoords,
         targetMocks.set,
       ]);
       expect(targetMocks.set).nthCalledWith(1, { width, height });
