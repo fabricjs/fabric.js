@@ -18,10 +18,16 @@ import {
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
+type controlOffset = {
+  x: number;
+  y: number;	
+}
+
 type ScaleTransform = Transform & {
   gestureScale?: number;
   signX?: number;
   signY?: number;
+  controlOffset?: controlOffset;  
 };
 
 type ScaleBy = TAxis | 'equally' | '' | undefined;
