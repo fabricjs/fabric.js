@@ -582,6 +582,8 @@ export class Group
       targets: this.getObjects(),
       target: this,
     });
+    // dispose additional listeners that may have been
+    // added by the developer on the layoutManager #9787
     this.layoutManager.dispose();
     this._activeObjects = [];
     this.forEachObject((object) => {
