@@ -829,6 +829,9 @@ export const getPointOnPath = (
   }
 };
 
+const rePathCmdAll = new RegExp(rePathCommand, 'gi');
+const rePathCmd = new RegExp(rePathCommand, 'i');
+
 /**
  *
  * @param {string} pathString
@@ -847,41 +850,31 @@ export const parsePath = (pathString: string): TComplexPathData => {
   pathString = cleanupSvgAttribute(pathString);
 
   const res: TComplexPathData = [];
-  for (const match of pathString.matchAll(new RegExp(rePathCommand, 'gi'))) {
-    let matchStr = match[0];
+  for (let [match] of pathString.matchAll(rePathCmdAll)) {
     const chain: TComplexPathData = [];
     let paramArr: RegExpExecArray | null;
     do {
-      paramArr = new RegExp(rePathCommand, 'i').exec(matchStr);
+      paramArr = rePathCmd.exec(match);
       if (!paramArr) {
         break;
       }
       // ignore undefined match groups
-      const filteredGroups = paramArr.filter((g) => g);
+      const filteredGroups = paramArr.filter(Boolean);
       // remove the first element from the match array since it's just the whole command
-      filteredGroups.shift();
+      const value = filteredGroups.shift();
       // if we can't parse the number, just interpret it as a string
       // (since it's probably the path command)
-      const command = filteredGroups.map((g) => {
+      const command: (string | number)[] = [];
+      for (const g of filteredGroups) {
         const numParse = Number.parseFloat(g);
-        if (Number.isNaN(numParse)) {
-          return g;
-        } else {
-          return numParse;
-        }
-      });
-      chain.push(command as any);
+        command.push(Number.isNaN(numParse) ? g : numParse);
+      }
+      chain.push(command as TComplexParsedCommand);
       // stop now if it's a z command
       if (filteredGroups.length <= 1) {
         break;
       }
-      // remove the last part of the chained command
-      filteredGroups.shift();
-      // ` ?` is to support commands with optional spaces between flags
-      matchStr = matchStr.replace(
-        new RegExp(`${filteredGroups.join(' ?')} ?$`),
-        ''
-      );
+      match = match.slice(value ? value.length : 0);
     } while (paramArr);
     // add the chain, convert multiple m's to l's in the process
     chain.reverse().forEach((c, idx) => {

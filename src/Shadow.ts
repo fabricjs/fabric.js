@@ -31,15 +31,14 @@ import { rotateVector } from './util/misc/vectors';
 
 const shadowOffsetRegex = '(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?';
 
-const reOffsetsAndBlur = () =>
-  new RegExp(
-    '(?:\\s|^)' +
-      shadowOffsetRegex +
-      shadowOffsetRegex +
-      '(' +
-      reNum +
-      '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
-  );
+const reOffsetsAndBlur = new RegExp(
+  '(?:\\s|^)' +
+    shadowOffsetRegex +
+    shadowOffsetRegex +
+    '(' +
+    reNum +
+    '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
+);
 
 export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   color: 'rgb(0,0,0)',
@@ -142,11 +141,10 @@ export class Shadow {
    */
   static parseShadow(value: string) {
     const shadowStr = value.trim(),
-      regex = reOffsetsAndBlur(),
       [, offsetX = 0, offsetY = 0, blur = 0] = (
-        regex.exec(shadowStr) || []
+        reOffsetsAndBlur.exec(shadowStr) || []
       ).map((value) => parseFloat(value) || 0),
-      color = (shadowStr.replace(regex, '') || 'rgb(0,0,0)').trim();
+      color = (shadowStr.replace(reOffsetsAndBlur, '') || 'rgb(0,0,0)').trim();
 
     return {
       color,

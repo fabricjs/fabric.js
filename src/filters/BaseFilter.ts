@@ -16,6 +16,8 @@ import {
 import type { Abortable } from '../typedefs';
 import { FabricError } from '../util/internals/console';
 
+const regex = new RegExp(highPsourceCode, 'g');
+
 export class BaseFilter {
   /**
    * Filter type
@@ -84,7 +86,7 @@ export class BaseFilter {
     } = getEnv();
     if (GLPrecision !== 'highp') {
       fragmentSource = fragmentSource.replace(
-        new RegExp(highPsourceCode, 'g'),
+        regex,
         highPsourceCode.replace('highp', GLPrecision)
       );
     }
