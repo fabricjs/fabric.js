@@ -2,6 +2,7 @@
 
 ## [next]
 
+- perf(): rm runtime RegExp usages [#9802](https://github.com/fabricjs/fabric.js/pull/9802)
 - fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
 - test(): Rename svg tests [#9775](https://github.com/fabricjs/fabric.js/pull/9775)
 - refactor(): `_findTargetCorner` is now called `findControl` and returns the key and the control and the coordinates [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
