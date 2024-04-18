@@ -58,6 +58,34 @@ describe('Group', () => {
     expect(group.height).toBe(100);
   });
 
+  test('disposes the LayoutManager subscriptions', () => {
+    class CustomLayoutManager extends LayoutManager {
+      private disposers: VoidFunction[] = [];
+
+      attachListener(subscription: VoidFunction) {
+        this.disposers.push(subscription);
+      }
+
+      dispose(): void {
+        this.disposers.forEach((d) => d());
+        this.disposers = [];
+
+        super.dispose();
+      }
+    }
+
+    const objs = [new FabricObject(), new FabricObject()];
+    const layoutManager = new CustomLayoutManager(new FitContentLayout());
+    const group = new Group(objs, { layoutManager });
+
+    const subscription = jest.fn();
+    layoutManager.attachListener(subscription);
+
+    group.dispose();
+
+    expect(subscription).toHaveBeenCalled();
+  });
+
   describe('With fit-content layout manager', () => {
     test('will serialize correctly without default values', async () => {
       const { group } = makeGenericGroup({
