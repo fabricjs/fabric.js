@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- fix(Group, Controls): Fix interactive group actions when negative scaling is involved [#9811](https://github.com/fabricjs/fabric.js/pull/9811)
+
 ## [6.0.0-rc1]
 
 - fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
