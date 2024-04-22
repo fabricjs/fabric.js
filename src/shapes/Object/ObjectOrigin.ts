@@ -49,6 +49,9 @@ export class ObjectOrigin<EventSpec>
    */
   _getTransformedDimensions(options: any = {}): Point {
     const dimOptions = {
+      // if scaleX or scaleY are negative numbers,
+      // this will return dimensions that are negative.
+      // and this will break assumptions around the codebase
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       skewX: this.skewX,
