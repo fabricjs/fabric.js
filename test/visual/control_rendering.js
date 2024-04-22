@@ -327,6 +327,36 @@
     fabricClass: 'Canvas',
   });
 
+  function controlboxFlippedYInRotatedGroup(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 9, angle: 0, flipX: false,
+      cornerSize: 12, cornerColor: 'green', cornerStrokeColor: 'blue',
+      transparentCorners: false, borderScaleFactor: 3,
+      fill: 'red', top: 50, left: 35,
+    });
+    var group = new fabric.Group([rect], {
+      angle: 90,
+      left: 110,
+      flipY: true,
+      interactive: true,
+      subTargetCheck: true,
+    });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox with flipped Y in rotated group',
+    code: controlboxFlippedYInRotatedGroup,
+    golden: 'controls11group90r.png',
+    percentage: 0.004,
+    width: 180,
+    height: 180,
+    fabricClass: 'Canvas',
+  });
+
   function controlboxOpacitySingle(canvas, callback) {
     var rect = new fabric.Rect({
       width: 90, height: 90, padding: 3, opacity: 0.4,
