@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [6.0.0-rc1]
 
 - fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
 - test(): Rename svg tests [#9775](https://github.com/fabricjs/fabric.js/pull/9775)
