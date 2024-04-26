@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+
 - feat(IText): Adjust cursor blinking for better feedback [#9823](https://github.com/fabricjs/fabric.js/pull/9823)
 
 ## [6.0.0-rc1]
