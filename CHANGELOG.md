@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- fix(): Replace 'hasOwn' with 'in' operator in typeAssertions check [#9812](https://github.com/fabricjs/fabric.js/pull/9812)
+
 ## [6.0.0-rc1]
 
 - fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
