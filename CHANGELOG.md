@@ -3,6 +3,7 @@
 ## [next]
 
 - feat(IText): Adjust cursor blinking for better feedback [#9823](https://github.com/fabricjs/fabric.js/pull/9823)
+- fix(): Replace 'hasOwn' with 'in' operator in typeAssertions check [#9812](https://github.com/fabricjs/fabric.js/pull/9812)
 
 ## [6.0.0-rc1]
 
