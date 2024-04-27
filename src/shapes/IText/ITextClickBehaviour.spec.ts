@@ -8,7 +8,7 @@ const currentAnimation = [];
 const origCalculate = ValueAnimation.prototype.calculate;
 ValueAnimation.prototype.calculate = function (timeElapsed: number) {
   const value = origCalculate.call(this, timeElapsed);
-  currentAnimation.push(value.value);
+  currentAnimation.push(value.value.toFixed(3));
   return value;
 };
 
