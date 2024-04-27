@@ -1,6 +1,12 @@
 import { roundSnapshotOptions } from '../../../jest.extend';
 import { IText } from './IText';
 
+import { ValueAnimation } from '../../util/animation/ValueAnimation';
+
+let currentAnimation: string[] = [];
+
+const origCalculate = ValueAnimation.prototype.calculate;
+
 export function matchTextStateSnapshot(text: IText) {
   const {
     styles,
@@ -88,5 +94,35 @@ describe('text imperative changes', () => {
     );
 
     expect(iText.missingNewlineOffset(0)).toBe(1);
+  });
+});
+
+describe('IText click behaviour', () => {
+  beforeAll(() => {
+    ValueAnimation.prototype.calculate = function (timeElapsed: number) {
+      const value = origCalculate.call(this, timeElapsed);
+      currentAnimation.push(value.value.toFixed(3));
+      return value;
+    };
+    jest.useFakeTimers();
+    currentAnimation = [];
+  });
+  afterAll(() => {
+    ValueAnimation.prototype.calculate = origCalculate;
+    jest.useRealTimers();
+  });
+  test('initDelayedCursor false - with delay', () => {
+    const iText = new IText('', { canvas: {} });
+    iText.initDelayedCursor();
+    jest.advanceTimersByTime(2000);
+    expect(currentAnimation).toMatchSnapshot();
+    iText.abortCursorAnimation();
+  });
+  test('initDelayedCursor true - with NO delay', () => {
+    const iText = new IText('', { canvas: {} });
+    iText.initDelayedCursor(true);
+    jest.advanceTimersByTime(2000);
+    expect(currentAnimation).toMatchSnapshot();
+    iText.abortCursorAnimation();
   });
 });
