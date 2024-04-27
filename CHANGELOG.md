@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test() add cursor animation testing [#9829](https://github.com/fabricjs/fabric.js/pull/9829)
 - fix(): Replace 'hasOwn' with 'in' operator in typeAssertions check [#9812](https://github.com/fabricjs/fabric.js/pull/9812)
 
 ## [6.0.0-rc1]
