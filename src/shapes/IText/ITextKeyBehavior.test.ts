@@ -200,7 +200,8 @@ describe('IText move cursor', () => {
       iText.selectionEnd = 1;
       iText.moveCursorLeft(keybEventShiftTrue);
       expect(selection).toEqual(1);
-      expect(_tickMock).not.toBeCalled();
+      expect(_tickMock).toBeCalledWith(1000); // will start the animation and then abort it
+      _tickMock.mockClear();
       iText.moveCursorLeft(keybEventShiftTrue); // do it again
       expect(selection).toEqual(1); // should not fire with no change');
       expect(iText.selectionStart).toEqual(0); // should not move');
@@ -225,7 +226,8 @@ describe('IText move cursor', () => {
       expect(selection).toEqual(1);
       expect(iText.selectionStart).toEqual(30); // multi selection now;
       expect(iText.selectionEnd).toEqual(31); // multi selection now;
-      expect(_tickMock).not.toBeCalled();
+      expect(_tickMock).toBeCalledWith(1000); // will start the animation and then abort it
+      _tickMock.mockClear();
       iText.moveCursorRight(keybEventShiftTrue);
       expect(selection).toEqual(1); // should fire with no change
       expect(iText.selectionStart).toEqual(30); // should not move');
