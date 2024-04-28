@@ -337,10 +337,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a word based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectWord(selectionStart: number) {
+  selectWord(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     // search backwards
     const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
@@ -358,10 +359,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a line based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectLine(selectionStart: number) {
+  selectLine(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
       newSelectionEnd = this.findLineBoundaryRight(selectionStart);
