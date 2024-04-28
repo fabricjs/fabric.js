@@ -8,24 +8,28 @@ const keybEventShiftFalse = { shiftKey: false } as KeyboardEvent;
 const keybEventShiftTrue = { shiftKey: true } as KeyboardEvent;
 
 describe('IText move cursor', () => {
+  let iText: IText,
+    selection = 0;
+  test('enterEditing does not use delayedCursor', () => {
+    iText = new IText('test need some word\nsecond line');
+    jest.spyOn(iText, '_tick');
+    iText.on('selection:changed', () => selection++);
+    iText.enterEditing();
+    // enter editing will set the cursor and set selection to 1
+    expect(selection).toBe(1);
+    expect(iText._tick).toBeCalledWith();
+  });
   describe('selection changes', () => {
-    let iText: IText, selection: number;
-    const _tickMock = jest.fn();
+    const _initDelayedMock = jest.fn();
     beforeEach(() => {
-      _tickMock.mockClear();
+      _initDelayedMock.mockClear();
       iText = new IText('test need some word\nsecond line');
-      iText._tick = _tickMock;
+      iText.initDelayedCursor = _initDelayedMock;
       iText.on('selection:changed', () => selection++);
       selection = 0;
     });
     afterEach(() => {
       iText.dispose();
-    });
-    test('enterEditing', () => {
-      iText.enterEditing();
-      // enter editing will set the cursor and set selection to 1
-      expect(selection).toBe(1);
-      expect(_tickMock).toBeCalledWith();
     });
     test('enterEditing and onInput', () => {
       iText.enterEditing();
@@ -50,14 +54,14 @@ describe('IText move cursor', () => {
       }`;
       iText.updateFromTextArea();
       expect(iText.width).toBeGreaterThan(700); // 'iText is now more than 700px'
-      expect(_tickMock).toBeCalledWith(); // restart curso animation
+      expect(_initDelayedMock).toBeCalledWith(); // restart curso animation
     });
     test('selectAll', () => {
       iText.selectAll();
       expect(selection).toBe(1); // 'should fire once on selectAll';
       expect(iText.selectionStart).toBe(0); // 'should start from 0';
       expect(iText.selectionEnd).toBe(31); // 'should end at end of text';
-      expect(_tickMock).not.toBeCalled(); // no cursor animation changes
+      expect(_initDelayedMock).not.toBeCalled(); // no cursor animation changes
     });
     test('selectWord', () => {
       iText.selectionStart = 2;
@@ -66,7 +70,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // 'should fire once on selectWord
       expect(iText.selectionStart).toBe(0); // ' 'should start at word start');
       expect(iText.selectionEnd).toBe(4); // ' 'should end at word end');
-      expect(_tickMock).not.toBeCalled(); // no cursor animation changes
+      expect(_initDelayedMock).not.toBeCalled(); // no cursor animation changes
     });
     test('selectLine', () => {
       iText.selectionStart = 2;
@@ -75,7 +79,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // 'should fire once on selectLine');
       expect(iText.selectionStart).toBe(0); // 'should start at line start');
       expect(iText.selectionEnd).toBe(19); // 'should end at line end');
-      expect(_tickMock).not.toBeCalled(); // no cursor animation changes
+      expect(_initDelayedMock).not.toBeCalled(); // no cursor animation changes
     });
     test('moveCursorLeft', () => {
       iText.selectionStart = 2;
@@ -84,7 +88,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); //  'should fire once on moveCursorLeft');
       expect(iText.selectionStart).toBe(1); //  'should be 1 less than 2');
       expect(iText.selectionEnd).toBe(1); //  'should be 1 less than 2');
-      expect(_tickMock).toBeCalledWith(1000); // moving cursor with keyboard restart cursor animation
+      expect(_initDelayedMock).toBeCalledWith(); // moving cursor with keyboard restart cursor animation
     });
     test('moveCursorRight', () => {
       iText.selectionStart = 2;
@@ -93,7 +97,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); //  'should fire once on moveCursorLeft');
       expect(iText.selectionStart).toBe(3); //  'should be 1 more than 2');
       expect(iText.selectionEnd).toBe(3); //  'should be 1 more than 2');
-      expect(_tickMock).toBeCalledWith(1000); // moving cursor with keyboard restart cursor animation
+      expect(_initDelayedMock).toBeCalledWith(); // moving cursor with keyboard restart cursor animation
     });
     test('moveCursorDown', () => {
       iText.selectionStart = 2;
@@ -102,13 +106,13 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // 'should fire once on moveCursorDown');
       expect(iText.selectionStart).toBe(22); // 'should be on second line');
       expect(iText.selectionEnd).toBe(22); // 'should be on second line');
-      expect(_tickMock).toBeCalledWith(1000);
-      _tickMock.mockClear();
+      expect(_initDelayedMock).toBeCalledWith();
+      _initDelayedMock.mockClear();
       iText.moveCursorDown(keybEventShiftFalse);
       expect(selection).toBe(2); // 'should fire once on moveCursorDown');
       expect(iText.selectionStart).toBe(31); // 'should be at end of text');
       expect(iText.selectionEnd).toBe(31); // 'should be at end of text');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursorUp', () => {
@@ -118,13 +122,13 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // should fire once on moveCursorUp');
       expect(iText.selectionStart).toBe(2); // should be back to first line');
       expect(iText.selectionEnd).toBe(2); // should be back on first line');
-      expect(_tickMock).toBeCalledWith(1000);
-      _tickMock.mockClear();
+      expect(_initDelayedMock).toBeCalledWith();
+      _initDelayedMock.mockClear();
       iText.moveCursorUp(keybEventShiftFalse);
       expect(selection).toBe(2); // should fire once on moveCursorUp');
       expect(iText.selectionStart).toBe(0); // should be back to first line');
       expect(iText.selectionEnd).toBe(0); // should be back on first line');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursorLeft or up with no change', () => {
@@ -134,12 +138,12 @@ describe('IText move cursor', () => {
       expect(selection).toBe(0); // should not fire with no change');
       expect(iText.selectionStart).toBe(0); // should not move');
       expect(iText.selectionEnd).toBe(0); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
       iText.moveCursorUp(keybEventShiftFalse);
       expect(selection).toBe(0); // should not fire with no change');
       expect(iText.selectionStart).toBe(0); // should not move');
       expect(iText.selectionEnd).toBe(0); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
     });
 
     test('moveCursorRight or down with not change', () => {
@@ -149,12 +153,12 @@ describe('IText move cursor', () => {
       expect(selection).toBe(0); // should not fire with no change');
       expect(iText.selectionStart).toBe(31); // should not move');
       expect(iText.selectionEnd).toBe(31); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
       iText.moveCursorDown(keybEventShiftFalse);
       expect(selection).toBe(0); // should not fire with no change');
       expect(iText.selectionStart).toBe(31); // should not move');
       expect(iText.selectionEnd).toBe(31); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
     });
 
     test('moveCursorUp from multi selection to cursor selection', () => {
@@ -164,7 +168,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // should fire');
       expect(iText.selectionStart).toBe(9); // should move to upper line start');
       expect(iText.selectionEnd).toBe(9); // should move to upper line end');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursorDown from multi selection to cursor selection', () => {
@@ -174,7 +178,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // should fire');
       expect(iText.selectionStart).toBe(24); // should move to down line');
       expect(iText.selectionEnd).toBe(24); // should move to down line');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursorRight from multi selection to cursor selection', () => {
@@ -184,7 +188,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // should fire');
       expect(iText.selectionStart).toBe(4); // should move to right by 1');
       expect(iText.selectionEnd).toBe(4); // should move to right by 1');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursorLeft from multi selection to cursor selection', () => {
@@ -194,7 +198,7 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1); // should fire');
       expect(iText.selectionStart).toBe(28); // should move to selection Start');
       expect(iText.selectionEnd).toBe(28); // should move to selection Start');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursor at start with shift', () => {
@@ -202,23 +206,23 @@ describe('IText move cursor', () => {
       iText.selectionEnd = 1;
       iText.moveCursorLeft(keybEventShiftTrue);
       expect(selection).toBe(1);
-      expect(_tickMock).toBeCalledWith(1000); // will start the animation and then abort it
-      _tickMock.mockClear();
+      expect(_initDelayedMock).toBeCalledWith(); // will start the animation and then abort it
+      _initDelayedMock.mockClear();
       iText.moveCursorLeft(keybEventShiftTrue); // do it again
       expect(selection).toBe(1); // should not fire with no change');
       expect(iText.selectionStart).toBe(0); // should not move');
       expect(iText.selectionEnd).toBe(1); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
       iText.moveCursorUp(keybEventShiftTrue);
       expect(selection).toBe(1); // should not fire with no change');
       expect(iText.selectionStart).toBe(0); // should not move');
       expect(iText.selectionEnd).toBe(1); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
       iText.moveCursorRight(keybEventShiftTrue);
       expect(selection).toBe(2); // this time it changes back to single selection;
       expect(iText.selectionStart).toBe(1); // should not move');
       expect(iText.selectionEnd).toBe(1); // should not move');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
 
     test('moveCursor at end with shift', () => {
@@ -228,23 +232,23 @@ describe('IText move cursor', () => {
       expect(selection).toBe(1);
       expect(iText.selectionStart).toBe(30); // multi selection now;
       expect(iText.selectionEnd).toBe(31); // multi selection now;
-      expect(_tickMock).toBeCalledWith(1000); // will start the animation and then abort it
-      _tickMock.mockClear();
+      expect(_initDelayedMock).toBeCalledWith(); // will start the animation and then abort it
+      _initDelayedMock.mockClear();
       iText.moveCursorRight(keybEventShiftTrue);
       expect(selection).toBe(1); // should fire with no change
       expect(iText.selectionStart).toBe(30); // should not move');
       expect(iText.selectionEnd).toBe(31); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
       iText.moveCursorDown(keybEventShiftTrue);
       expect(selection).toBe(1); // should fire with no change
       expect(iText.selectionStart).toBe(30); // should not move');
       expect(iText.selectionEnd).toBe(31); // should not move');
-      expect(_tickMock).not.toBeCalled();
+      expect(_initDelayedMock).not.toBeCalled();
       iText.moveCursorLeft(keybEventShiftTrue);
       expect(selection).toBe(2); // now it changed back to 2
       expect(iText.selectionStart).toBe(30); // should not move');
       expect(iText.selectionEnd).toBe(30); // should not move');
-      expect(_tickMock).toBeCalledWith(1000);
+      expect(_initDelayedMock).toBeCalledWith();
     });
   });
   test('mousedown calls key maps', () => {
