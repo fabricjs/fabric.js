@@ -12,10 +12,6 @@
       canvas.cancelRequestedRender();
     });
 
-    function wait(ms = 32) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     QUnit.test('doubleClickHandler', async function (assert) {
       var done = assert.async();
       var iText = new fabric.IText('test need some word\nsecond line');

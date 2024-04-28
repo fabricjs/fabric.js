@@ -136,6 +136,15 @@ describe('IText cursor animation snapshot', () => {
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
+  test('exiting from a canvas will abort animation', () => {
+    const iText = new IText('asd', { canvas: {} });
+    iText.initDelayedCursor(true);
+    jest.advanceTimersByTime(160);
+    iText.canvas = undefined;
+    jest.advanceTimersByTime(2000);
+    expect(currentAnimation).toMatchSnapshot();
+    iText.abortCursorAnimation();
+  });
 });
 
 describe('IText _tick', () => {

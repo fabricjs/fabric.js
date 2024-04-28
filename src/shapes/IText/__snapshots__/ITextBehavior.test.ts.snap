@@ -1,5 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`IText cursor animation snapshot exiting from a canvas will abort animation 1`] = `
+[
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+]
+`;
+
 exports[`IText cursor animation snapshot initDelayedCursor false - with delay 1`] = `
 [
   "1.000",

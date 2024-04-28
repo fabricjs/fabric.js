@@ -134,16 +134,10 @@ export abstract class ITextBehavior<
       duration,
       delay,
       onComplete,
-      abort: () => {
-        const abrt =
-          !this.canvas ||
-          // we do not want to animate a selection, only cursor
-          this.selectionStart !== this.selectionEnd;
-        if (abrt) {
-          console.log(abrt);
-        }
-        return abrt;
-      },
+      abort: () =>
+        !this.canvas ||
+        // we do not want to animate a selection, only cursor
+        this.selectionStart !== this.selectionEnd,
       onChange: (value) => {
         this._currentCursorOpacity = value;
         this.renderCursorOrSelection();

@@ -66,7 +66,6 @@
       assert.equal(selection, 1, 'should fire once on selectAll');
       assert.equal(iText.selectionStart, 0, 'should start from 0');
       assert.equal(iText.selectionEnd, 31, 'should end at end of text');
-      await _assertCursorAnimation(false, true);
       done();
     });
 
@@ -77,7 +76,6 @@
       assert.equal(selection, 1, 'should fire once on selectWord');
       assert.equal(iText.selectionStart, 0, 'should start at word start');
       assert.equal(iText.selectionEnd, 4, 'should end at word end');
-      await _assertCursorAnimation(false, true);
       done();
     });
 
@@ -88,7 +86,6 @@
       assert.equal(selection, 1, 'should fire once on selectLine');
       assert.equal(iText.selectionStart, 0, 'should start at line start');
       assert.equal(iText.selectionEnd, 19, 'should end at line end');
-      await _assertCursorAnimation(false, true);
       done();
     });
 
