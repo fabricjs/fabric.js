@@ -12,13 +12,6 @@
       canvas.cancelRequestedRender();
     });
 
-    function assertCursorAnimation(assert, text, active = false) {
-      const cursorState = [text._currentTickState, text._currentTickCompleteState].some(
-        (cursorAnimation) => cursorAnimation && !cursorAnimation.isDone()
-      );
-      assert.equal(cursorState, active, `cursor animation state should be ${active}`);
-    }
-
     function wait(ms = 32) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -34,15 +27,11 @@
         clientY: 10
       };
       iText.enterEditing();
-      assertCursorAnimation(assert, iText, true);
       iText.doubleClickHandler({
         e: eventData
       });
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 4, 'dblClick selection end is');
-      // wait for cursor animation tick to run
-      await wait();
-      assertCursorAnimation(assert, iText);
       eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
@@ -54,8 +43,6 @@
       });
       assert.equal(iText.selectionStart, 20, 'second dblClick selection start is');
       assert.equal(iText.selectionEnd, 26, 'second dblClick selection end is');
-      assertCursorAnimation(assert, iText);
-      iText.exitEditing();
       done();
     });
     QUnit.test('doubleClickHandler no editing', function (assert) {
@@ -72,7 +59,6 @@
       });
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 0, 'dblClick selection end is');
-      assertCursorAnimation(assert, iText);
     });
     QUnit.test('tripleClickHandler', async function (assert) {
       var done = assert.async();
@@ -85,15 +71,11 @@
         clientY: 10
       };
       iText.enterEditing();
-      assertCursorAnimation(assert, iText, true);
       iText.tripleClickHandler({
         e: eventData
       });
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 19, 'tripleClick selection end is');
-      // wait for cursor animation tick to run
-      await wait();
-      assertCursorAnimation(assert, iText);
       eventData = {
         which: 1,
         target: canvas.upperCanvasEl,
@@ -105,7 +87,6 @@
       });
       assert.equal(iText.selectionStart, 20, 'second tripleClick selection start is');
       assert.equal(iText.selectionEnd, 31, 'second tripleClick selection end is');
-      assertCursorAnimation(assert, iText);
       iText.exitEditing();
       done();
     });
@@ -184,7 +165,6 @@
       iText.__lastSelected = true;
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, true, 'iText entered editing');
-      assertCursorAnimation(assert, iText, true);
       iText.exitEditing();
     });
     QUnit.test('_mouseUpHandler on a selected object does enter edit if there is an activeObject', function (assert) {
@@ -198,7 +178,6 @@
       iText.__lastSelected = true;
       iText.mouseUpHandler({ e: {} });
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
-      assertCursorAnimation(assert, iText);
       iText.exitEditing();
     });
     QUnit.test('_mouseUpHandler on a selected text in a group does NOT enter editing', function (assert) {
@@ -226,7 +205,6 @@
       iText.__lastSelected = true;
       canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
       assert.equal(iText.isEditing, true, 'iText should enter editing');
-      assertCursorAnimation(assert, iText, true);
       iText.exitEditing();
       group.interactive = false;
       iText.selected = true;
@@ -308,7 +286,6 @@
             assert.equal(iText.isEditing, true, 'Itext entered editing');
             assert.equal(iText.selectionStart, 2, 'Itext set the selectionStart');
             assert.equal(iText.selectionEnd, 2, 'Itext set the selectionend');
-            assertCursorAnimation(assert, iText, true);
             assert.equal(count, 1, 'no selection:changed fired yet');
             assert.equal(countCanvas, 1, 'no text:selection:changed fired yet');
             done();

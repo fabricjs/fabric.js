@@ -135,11 +135,14 @@ export abstract class ITextBehavior<
       delay,
       onComplete,
       abort: () => {
-        return (
+        const abrt =
           !this.canvas ||
           // we do not want to animate a selection, only cursor
-          this.selectionStart !== this.selectionEnd
-        );
+          this.selectionStart !== this.selectionEnd;
+        if (abrt) {
+          console.log(abrt);
+        }
+        return abrt;
       },
       onChange: (value) => {
         this._currentCursorOpacity = value;
@@ -197,6 +200,10 @@ export abstract class ITextBehavior<
     }
   }
 
+  /**
+   * Restart tue cursor animation if either is in complete state ( between animations )
+   * or if it never started before
+   */
   restartCursorIfNeeded() {
     if (
       [this._currentTickState, this._currentTickCompleteState].some(

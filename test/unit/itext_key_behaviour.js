@@ -39,7 +39,6 @@
     });
     QUnit.test('enterEditing', async function (assert) {
       iText.enterEditing();
-      await _assertCursorAnimation(true);
       assert.equal(selection, 1, 'will fire on enter edit since the cursor is changing for the first time');
     });
 

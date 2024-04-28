@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`IText click behaviour initDelayedCursor false - with delay 1`] = `
+exports[`IText cursor animation snapshot initDelayedCursor false - with delay 1`] = `
 [
   "1.000",
   "1.000",
@@ -64,69 +64,9 @@ exports[`IText click behaviour initDelayedCursor false - with delay 1`] = `
 ]
 `;
 
-exports[`IText click behaviour initDelayedCursor true - with NO delay 1`] = `
+exports[`IText cursor animation snapshot initDelayedCursor true - with NO delay 1`] = `
 [
   "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "1.000",
-  "0.000",
-  "1.000",
-  "0.996",
-  "0.986",
-  "0.969",
-  "0.944",
-  "0.914",
-  "0.876",
-  "0.833",
-  "0.784",
-  "0.729",
-  "0.669",
-  "0.605",
-  "0.536",
-  "0.463",
-  "0.388",
-  "0.309",
-  "0.228",
-  "0.146",
-  "1.000",
-  "0.063",
   "1.000",
   "1.000",
   "1.000",
@@ -243,6 +183,23 @@ exports[`IText click behaviour initDelayedCursor true - with NO delay 1`] = `
   "0.536",
   "0.463",
   "0.388",
+]
+`;
+
+exports[`IText cursor animation snapshot selectionStart/selection end will abort animation 1`] = `
+[
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
+  "1.000",
 ]
 `;
 

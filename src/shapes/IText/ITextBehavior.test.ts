@@ -3,10 +3,6 @@ import { IText } from './IText';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
 
-let currentAnimation: string[] = [];
-
-const origCalculate = ValueAnimation.prototype.calculate;
-
 export function matchTextStateSnapshot(text: IText) {
   const {
     styles,
@@ -97,7 +93,9 @@ describe('text imperative changes', () => {
   });
 });
 
-describe('IText click behaviour', () => {
+describe('IText cursor animation snapshot', () => {
+  let currentAnimation: string[] = [];
+  const origCalculate = ValueAnimation.prototype.calculate;
   beforeAll(() => {
     ValueAnimation.prototype.calculate = function (timeElapsed: number) {
       const value = origCalculate.call(this, timeElapsed);
@@ -105,6 +103,9 @@ describe('IText click behaviour', () => {
       return value;
     };
     jest.useFakeTimers();
+  });
+  beforeEach(() => {
+    jest.runAllTimers();
     currentAnimation = [];
   });
   afterAll(() => {
@@ -124,5 +125,42 @@ describe('IText click behaviour', () => {
     jest.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
+  });
+  test('selectionStart/selection end will abort animation', () => {
+    const iText = new IText('asd', { canvas: {} });
+    iText.initDelayedCursor(true);
+    jest.advanceTimersByTime(160);
+    iText.selectionStart = 0;
+    iText.selectionEnd = 3;
+    jest.advanceTimersByTime(2000);
+    expect(currentAnimation).toMatchSnapshot();
+    iText.abortCursorAnimation();
+  });
+});
+
+describe('IText _tick', () => {
+  const _tickMock = jest.fn();
+  beforeEach(() => {
+    _tickMock.mockClear();
+  });
+  test('enter Editing will call _tick', () => {
+    const iText = new IText('hello\nhello');
+    iText._tick = _tickMock;
+    iText.enterEditing();
+    expect(iText._tick).toHaveBeenCalledWith();
+  });
+  test('mouse up will fire an animation restart with 0 delay if is a click', () => {
+    const iText = new IText('hello\nhello');
+    iText._tick = _tickMock;
+    iText.enterEditing();
+    expect(iText._tick).toHaveBeenCalledWith();
+    _tickMock.mockClear();
+    iText.__lastSelected = true;
+    iText.mouseUpHandler({
+      e: {
+        button: 0,
+      },
+    });
+    expect(iText._tick).toHaveBeenCalledWith(0);
   });
 });
