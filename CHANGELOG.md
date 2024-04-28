@@ -2,7 +2,7 @@
 
 ## [next]
 
-- test(): Add cursor animation testing [#9829](https://github.com/fabricjs/fabric.js/pull/9829)
+- test(): Add cursor animation testing and migrate some easy one to jest [#9829](https://github.com/fabricjs/fabric.js/pull/9829)
 - fix(): Replace 'hasOwn' with 'in' operator in typeAssertions check [#9812](https://github.com/fabricjs/fabric.js/pull/9812)
 
 ## [6.0.0-rc1]
