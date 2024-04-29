@@ -155,7 +155,7 @@ export abstract class ITextBehavior<
     this._currentTickState = this._animateCursor({
       toValue: 0,
       duration: this.cursorDuration / 2,
-      delay: delay || 100,
+      delay: Math.max(delay || 0, 100),
       onComplete: this._onTickComplete,
     });
   }
