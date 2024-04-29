@@ -97,11 +97,13 @@ describe('IText cursor animation snapshot', () => {
   let currentAnimation: string[] = [];
   const origCalculate = ValueAnimation.prototype.calculate;
   beforeAll(() => {
-    ValueAnimation.prototype.calculate = function (timeElapsed: number) {
-      const value = origCalculate.call(this, timeElapsed);
-      currentAnimation.push(value.value.toFixed(3));
-      return value;
-    };
+    jest
+      .spyOn(ValueAnimation.prototype, 'calculate')
+      .mockImplementation(function (timeElapsed: number) {
+        const value = origCalculate.call(this, timeElapsed);
+        currentAnimation.push(value.value.toFixed(3));
+        return value;
+      });
     jest.useFakeTimers();
   });
   beforeEach(() => {
@@ -109,7 +111,7 @@ describe('IText cursor animation snapshot', () => {
     currentAnimation = [];
   });
   afterAll(() => {
-    ValueAnimation.prototype.calculate = origCalculate;
+    jest.resetAllMocks();
     jest.useRealTimers();
   });
   test('initDelayedCursor false - with delay', () => {
@@ -154,15 +156,15 @@ describe('IText _tick', () => {
   });
   test('enter Editing will call _tick', () => {
     const iText = new IText('hello\nhello');
-    iText._tick = _tickMock;
+    jest.spyOn(iText, '_tick').mockImplementation(_tickMock);
     iText.enterEditing();
-    expect(iText._tick).toHaveBeenCalledWith();
+    expect(_tickMock).toHaveBeenCalledWith();
   });
   test('mouse up will fire an animation restart with 0 delay if is a click', () => {
     const iText = new IText('hello\nhello');
-    iText._tick = _tickMock;
+    jest.spyOn(iText, '_tick').mockImplementation(_tickMock);
     iText.enterEditing();
-    expect(iText._tick).toHaveBeenCalledWith();
+    expect(_tickMock).toHaveBeenCalledWith();
     _tickMock.mockClear();
     iText.__lastSelected = true;
     iText.mouseUpHandler({
@@ -170,6 +172,6 @@ describe('IText _tick', () => {
         button: 0,
       },
     });
-    expect(iText._tick).toHaveBeenCalledWith(0);
+    expect(_tickMock).toHaveBeenCalledWith(0);
   });
 });
