@@ -107,6 +107,7 @@ jobs:
         with:
           name: coverage-jest
           path: .nyc_output/*.json
+
   e2e:
     needs: [prime-build]
     name: Playwright tests
@@ -155,6 +156,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: coverage-e2e
+          path: .nyc_output
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-jest
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report

@@ -29,7 +29,7 @@ module.exports = {
   coverageDirectory: '.nyc_output',
 
   // An array of regexp pattern strings used to skip coverage collection
-  coveragePathIgnorePatterns: ['/node_modules/'],
+  coveragePathIgnorePatterns: ['/node_modules/', 'jest.extend.ts'],
 
   // Indicates which provider should be used to instrument code for coverage (babel)
   coverageProvider: 'v8',
