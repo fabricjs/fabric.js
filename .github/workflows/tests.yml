@@ -164,6 +164,10 @@ jobs:
         with:
           name: coverage-e2e
           path: .nyc_output
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-jest
+          path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
       - uses: ShaMan123/lcov-reporter-action@v1.2.2
