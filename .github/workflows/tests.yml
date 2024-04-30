@@ -102,16 +102,19 @@ jobs:
           install-system-deps: false
       - name: Run Jest unit test
         run: npm run test:jest:coverage
+      - name: Report jest coverage
+        uses: raulanatol/jest-coverage-comment-action@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jest-command: ''
+          use-existing-reports: true
+          working-directory: '.'
       - name: Upload test coverage
         uses: actions/upload-artifact@v3
         with:
           name: coverage-jest
           path: coverage/*.json
-      - uses: raulanatol/jest-coverage-comment-action@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-previous: false
-          use-existing-reports: true
+
   e2e:
     needs: [prime-build]
     name: Playwright tests
