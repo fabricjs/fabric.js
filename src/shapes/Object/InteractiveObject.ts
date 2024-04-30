@@ -204,6 +204,7 @@ export class InteractiveFabricObject<
       const control = this.controls[key];
 
       if (
+        this.controls[key] &&
         control.shouldActivate(
           key,
           this,
@@ -247,13 +248,8 @@ export class InteractiveFabricObject<
       ]),
       transformOptions = this.group
         ? qrDecompose(this.calcTransformMatrix())
-        : undefined;
-    // decomposing could bring negative scaling and `_calculateCurrentDimensions` can't take it
-    if (transformOptions) {
-      transformOptions.scaleX = Math.abs(transformOptions.scaleX);
-      transformOptions.scaleY = Math.abs(transformOptions.scaleY);
-    }
-    const dim = this._calculateCurrentDimensions(transformOptions),
+        : undefined,
+      dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
