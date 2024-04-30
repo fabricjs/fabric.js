@@ -147,7 +147,7 @@ export abstract class ITextBehavior<
 
   private _tick(delay?: number) {
     this._currentTickState = this._animateCursor({
-      toValue: 1,
+      toValue: 0,
       duration: this.cursorDuration,
       delay,
       onComplete: this._onTickComplete,
@@ -157,7 +157,7 @@ export abstract class ITextBehavior<
   private _onTickComplete() {
     this._currentTickCompleteState?.abort();
     this._currentTickCompleteState = this._animateCursor({
-      toValue: 0,
+      toValue: 1,
       duration: this.cursorDuration / 2,
       delay: 100,
       onComplete: this._tick,

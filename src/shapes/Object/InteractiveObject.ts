@@ -204,6 +204,7 @@ export class InteractiveFabricObject<
       const control = this.controls[key];
 
       if (
+      	this.controls[key] &&
         control.shouldActivate(
           key,
           this,
