@@ -106,11 +106,11 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage-jest
-          path: .nyc_output/*.json
+          path: coverage/*.json
       - uses: raulanatol/jest-coverage-comment-action@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          use-existing-reports: .nyc_output/coverage-final.json
+          use-existing-reports: true
   e2e:
     needs: [prime-build]
     name: Playwright tests
