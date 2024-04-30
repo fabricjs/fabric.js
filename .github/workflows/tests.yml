@@ -107,6 +107,10 @@ jobs:
         with:
           name: coverage-jest
           path: .nyc_output/*.json
+      - uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          coverage-file: .nyc_output/coverage-final.json
+          annotation: none
   e2e:
     needs: [prime-build]
     name: Playwright tests
