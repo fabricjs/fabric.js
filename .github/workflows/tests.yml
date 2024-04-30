@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: coverage-jest
-          path: coverage/*.json
+          path: .nyc_output/*.json
 
   e2e:
     needs: [prime-build]
