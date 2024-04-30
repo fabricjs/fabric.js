@@ -102,13 +102,6 @@ jobs:
           install-system-deps: false
       - name: Run Jest unit test
         run: npm run test:jest:coverage
-      - name: Report jest coverage
-        uses: raulanatol/jest-coverage-comment-action@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          jest-command: ''
-          use-existing-reports: true
-          working-directory: '.'
       - name: Upload test coverage
         uses: actions/upload-artifact@v3
         with:
