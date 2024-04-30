@@ -107,10 +107,10 @@ jobs:
         with:
           name: coverage-jest
           path: .nyc_output/*.json
-      - uses: ArtiomTr/jest-coverage-report-action@v2
+      - uses: raulanatol/jest-coverage-comment-action@main
         with:
-          coverage-file: .nyc_output/coverage-final.json
-          annotation: none
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          use-existing-reports: .nyc_output/coverage-final.json
   e2e:
     needs: [prime-build]
     name: Playwright tests
