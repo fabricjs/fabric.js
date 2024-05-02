@@ -682,20 +682,22 @@ export class InteractiveFabricObject<
    * example: render the selection status for the part of text that is being dragged from a text object
    * @public
    * @param {DragEvent} e
+   * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
-  renderDragSourceEffect(e: DragEvent) {
+  renderDragSourceEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
     // for subclasses
   }
 
   /**
    * Override to customize drag and drop behavior
    * render a specific effect when an object is the target of a drag event
-   * used to show that the underly object can receive a drop, or to show how the
+   * used to show that the underlay object can receive a drop, or to show how the
    * object will change when dropping. example: show the cursor where the text is about to be dropped
    * @public
    * @param {DragEvent} e
+   * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
-  renderDropTargetEffect(e: DragEvent) {
+  renderDropTargetEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
     // for subclasses
   }
 }

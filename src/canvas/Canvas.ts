@@ -328,14 +328,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (source) {
       ctx.save();
       source.transform(ctx);
-      source.renderDragSourceEffect(e);
+      source.renderDragSourceEffect(e, ctx);
       ctx.restore();
       dirty = true;
     }
     if (target) {
       ctx.save();
       target.transform(ctx);
-      target.renderDropTargetEffect(e);
+      target.renderDropTargetEffect(e, ctx);
       ctx.restore();
       dirty = true;
     }

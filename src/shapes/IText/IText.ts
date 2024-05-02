@@ -478,13 +478,12 @@ export class IText<
   }
 
   /**
-   * Renders cursor on context Top, outside the animation cycle, on request
+   * Renders cursor on {@link ctx}, outside the animation cycle, on request.
    * Used for the drag/drop effect.
-   * If contextTop is not available, do nothing.
    */
-  renderCursorAt(selectionStart: number) {
+  renderCursorAt(ctx: CanvasRenderingContext2D, selectionStart: number) {
     const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas!.contextTop, boundaries, selectionStart);
+    this._renderCursor(ctx, boundaries, selectionStart);
   }
 
   /**
@@ -550,21 +549,21 @@ export class IText<
   }
 
   /**
-   * Renders drag start text selection
+   * @override Render drag start text selection
    */
-  renderDragSourceEffect() {
+  renderDragSourceEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
     const dragStartSelection =
       this.draggableTextDelegate.getDragStartSelection()!;
     this._renderSelection(
-      this.canvas!.contextTop,
+      ctx,
       dragStartSelection,
       this._getCursorBoundaries(dragStartSelection.selectionStart, true)
     );
   }
 
-  renderDropTargetEffect(e: DragEvent) {
+  renderDropTargetEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
     const dragSelection = this.getSelectionStartFromPointer(e);
-    this.renderCursorAt(dragSelection);
+    this.renderCursorAt(ctx, dragSelection);
   }
 
   /**
