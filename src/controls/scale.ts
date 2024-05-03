@@ -18,10 +18,16 @@ import {
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
+type controlOffset = {
+  x: number;
+  y: number;	
+}
+
 type ScaleTransform = Transform & {
   gestureScale?: number;
   signX?: number;
   signY?: number;
+  controlOffset?: controlOffset;  
 };
 
 type ScaleBy = TAxis | 'equally' | '' | undefined;
@@ -171,6 +177,16 @@ function scaleObject(
     }
 
     dim = target._getTransformedDimensions();
+
+    // Adjust control offsets. Fixes jumping problem in scaling when hitting a control while not being centered on it.
+    if (!transform.controlOffset) {
+      // need to determine if this is a ALT Action, multiply newPoints by 2 if it is.
+      let multi = isTransformCentered(transform) ? 2 : 1
+      transform.controlOffset = { x: dim.x - Math.abs(newPoint.x * multi), y: dim.y - Math.abs(newPoint.y * multi) }
+    }
+    dim.x -= transform.controlOffset.x
+    dim.y -= transform.controlOffset.y
+
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
