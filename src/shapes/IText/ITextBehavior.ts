@@ -145,21 +145,26 @@ export abstract class ITextBehavior<
     });
   }
 
+  /**
+   * changes the cursor from visible to invisible
+   */
   private _tick(delay?: number) {
     this._currentTickState = this._animateCursor({
-      toValue: 1,
-      duration: this.cursorDuration,
-      delay,
+      toValue: 0,
+      duration: this.cursorDuration / 2,
+      delay: Math.max(delay || 0, 100),
       onComplete: this._onTickComplete,
     });
   }
 
+  /**
+   * Changes the cursor from invisible to visible
+   */
   private _onTickComplete() {
     this._currentTickCompleteState?.abort();
     this._currentTickCompleteState = this._animateCursor({
-      toValue: 0,
-      duration: this.cursorDuration / 2,
-      delay: 100,
+      toValue: 1,
+      duration: this.cursorDuration,
       onComplete: this._tick,
     });
   }
