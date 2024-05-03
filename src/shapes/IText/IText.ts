@@ -161,6 +161,20 @@ export class IText<
    * @default
    */
   declare editingBorderColor: string;
+  
+  /**
+   * Type of mouse action, char (single click), word (double click), line (triple click)
+   * @type String
+   * @default
+   */  
+  declare selector: string;
+  
+  /**
+   * Store start and end points of selection
+   * @type Array
+   * @default
+   */
+  declare selectBounds: number[];
 
   /**
    * Width of cursor (in px)

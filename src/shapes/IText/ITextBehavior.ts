@@ -51,6 +51,10 @@ export abstract class ITextBehavior<
   declare abstract cursorDuration: number;
   declare abstract editable: boolean;
   declare abstract editingBorderColor: string;
+  
+  declare abstract selector: string;
+  declare abstract selectBounds: number[];
+  //declare _textLines: string[][];
 
   declare abstract compositionStart: number;
   declare abstract compositionEnd: number;
@@ -372,7 +376,7 @@ export abstract class ITextBehavior<
     this.selectionEnd = newSelectionEnd;
     this._fireSelectionChanged();
     this._updateTextarea();
-    return this;
+    this.renderCursorOrSelection();
   }
 
   /**
@@ -418,37 +422,44 @@ export abstract class ITextBehavior<
     const el = this.hiddenTextarea!;
     // regain focus
     getDocumentFromElement(el).activeElement !== el && el.focus();
+      
+      let newSelectionStart = this.getSelectionStartFromPointer(e),
+        currentStart = this.selectionStart,
+        currentEnd = this.selectionEnd;
+      if ((newSelectionStart !== this.__selectionStartOnMouseDown || currentStart === currentEnd) && (currentStart === newSelectionStart || currentEnd === newSelectionStart)) {
+        return;
+      }
+      
+      if (this.selector=="word") {
+        newSelectionStart=this.searchWordBoundary(newSelectionStart, (newSelectionStart>this.selectBounds[0]) ? 1: -1);
+      }
 
-    const newSelectionStart = this.getSelectionStartFromPointer(e),
-      currentStart = this.selectionStart,
-      currentEnd = this.selectionEnd;
-    if (
-      (newSelectionStart !== this.__selectionStartOnMouseDown ||
-        currentStart === currentEnd) &&
-      (currentStart === newSelectionStart || currentEnd === newSelectionStart)
-    ) {
-      return;
-    }
-    if (newSelectionStart > this.__selectionStartOnMouseDown) {
-      this.selectionStart = this.__selectionStartOnMouseDown;
-      this.selectionEnd = newSelectionStart;
-    } else {
-      this.selectionStart = newSelectionStart;
-      this.selectionEnd = this.__selectionStartOnMouseDown;
-    }
-    if (
-      this.selectionStart !== currentStart ||
-      this.selectionEnd !== currentEnd
-    ) {
-      this._fireSelectionChanged();
-      this._updateTextarea();
-      this.renderCursorOrSelection();
-    }
-  }
+      if (this.selector=="line") {
+        if (newSelectionStart > this.selectBounds[0]) {
+        newSelectionStart = this.findLineBoundaryRight(newSelectionStart);
+      }else{
+        newSelectionStart = this.findLineBoundaryLeft(newSelectionStart);
+        }
+      }
 
-  /**
-   * @private
-   */
+      if (newSelectionStart > this.selectBounds[0]) {
+        this.selectionStart = this.selectBounds[0];
+        this.selectionEnd = newSelectionStart;
+      } else {
+        this.selectionStart = newSelectionStart;
+        this.selectionEnd = this.selectBounds[1];
+      }
+      
+      if (this.selectionStart !== currentStart || this.selectionEnd !== currentEnd) {
+        this._fireSelectionChanged();
+        this._updateTextarea();
+        this.renderCursorOrSelection();
+      }
+    }
+
+    /**
+     * @private
+     */
   _setEditingProps() {
     this.hoverCursor = 'text';
 

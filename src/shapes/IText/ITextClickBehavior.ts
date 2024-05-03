@@ -20,33 +20,20 @@ export abstract class ITextClickBehavior<
   EventSpec extends ITextEvents = ITextEvents
 > extends ITextKeyBehavior<Props, SProps, EventSpec> {
   private declare __lastSelected: boolean;
-  private declare __lastClickTime: number;
-  private declare __lastLastClickTime: number;
-  private declare __lastPointer: XY | Record<string, never>;
-  private declare __newClickTime: number;
 
   protected draggableTextDelegate: DraggableTextDelegate;
 
   initBehavior() {
-    // Initializes event handlers related to cursor or selection
-    this.on('mousedown', this._mouseDownHandler);
+      // Initializes event handlers related to cursor or selection
     this.on('mousedown:before', this._mouseDownHandlerBefore);
+    this.on('mousedown', this._mouseDownHandler);
     this.on('mouseup', this.mouseUpHandler);
-    this.on('mousedblclick', this.doubleClickHandler);
-    this.on('tripleclick', this.tripleClickHandler);
-
-    // Initializes "dbclick" event handler
-    this.__lastClickTime = +new Date();
-    // for triple click
-    this.__lastLastClickTime = +new Date();
-    this.__lastPointer = {};
-    this.on('mousedown', this.onMouseDown);
 
     // @ts-expect-error in reality it is an IText instance
     this.draggableTextDelegate = new DraggableTextDelegate(this);
-
     super.initBehavior();
   }
+
 
   shouldStartDragging() {
     return this.draggableTextDelegate.isActive();
@@ -68,55 +55,6 @@ export abstract class ITextClickBehavior<
   }
 
   /**
-   * Default event handler to simulate triple click
-   * @private
-   */
-  onMouseDown(options: TPointerEventInfo) {
-    if (!this.canvas) {
-      return;
-    }
-    this.__newClickTime = +new Date();
-    const newPointer = options.pointer;
-    if (this.isTripleClick(newPointer)) {
-      this.fire('tripleclick', options);
-      stopEvent(options.e);
-    }
-    this.__lastLastClickTime = this.__lastClickTime;
-    this.__lastClickTime = this.__newClickTime;
-    this.__lastPointer = newPointer;
-    this.__lastSelected = this.selected && !this.getActiveControl();
-  }
-
-  isTripleClick(newPointer: XY) {
-    return (
-      this.__newClickTime - this.__lastClickTime < 500 &&
-      this.__lastClickTime - this.__lastLastClickTime < 500 &&
-      this.__lastPointer.x === newPointer.x &&
-      this.__lastPointer.y === newPointer.y
-    );
-  }
-
-  /**
-   * Default handler for double click, select a word
-   */
-  doubleClickHandler(options: TPointerEventInfo) {
-    if (!this.isEditing) {
-      return;
-    }
-    this.selectWord(this.getSelectionStartFromPointer(options.e));
-  }
-
-  /**
-   * Default handler for triple click, select a line
-   */
-  tripleClickHandler(options: TPointerEventInfo) {
-    if (!this.isEditing) {
-      return;
-    }
-    this.selectLine(this.getSelectionStartFromPointer(options.e));
-  }
-
-  /**
    * Default event handler for the basic functionalities needed on _mouseDown
    * can be overridden to do something different.
    * Scope of this implementation is: find the click position, set selectionStart
@@ -129,30 +67,45 @@ export abstract class ITextClickBehavior<
       !this.canvas ||
       !this.editable ||
       notALeftClick(e) ||
-      this.getActiveControl()
+      this.getActiveControl() || 
+      ( e.detail == 1 && this.draggableTextDelegate.start(e))
     ) {
       return;
     }
-
-    if (this.draggableTextDelegate.start(e)) {
-      return;
+      
+    if (!this.isEditing && e.detail>1) {
+      this.enterEditing(e);
     }
-
+      
     this.canvas.textEditingManager.register(this);
-
-    if (this.selected) {
-      this.inCompositionMode = false;
-      this.setCursorByClick(e);
-    }
-
-    if (this.isEditing) {
-      this.__selectionStartOnMouseDown = this.selectionStart;
-      if (this.selectionStart === this.selectionEnd) {
-        this.abortCursorAnimation();
+      
+      if (this.selected) {
+        this.inCompositionMode = false;
+        if (e.detail == 1) {
+          this.setCursorByClick(e);
+        }
       }
-      this.renderCursorOrSelection();
+
+      if (this.isEditing) {
+        this.__selectionStartOnMouseDown = this.selectionStart;
+        if (this.selectionStart === this.selectionEnd) {
+          this.abortCursorAnimation();
+        }
+        this.selector="char"
+        if (e.detail == 2) {
+          this.selectWord(this.getSelectionStartFromPointer(e));
+          this.selector="word"
+        }
+        if (e.detail == 3) {
+          this.selectLine(this.getSelectionStartFromPointer(e));
+          this.selector="line"
+        }
+        this.selectBounds=[this.selectionStart, this.selectionEnd]
+        this.renderCursorOrSelection();
+      }
+
+      this.__lastSelected = this.selected && !this.getActiveControl();
     }
-  }
 
   /**
    * Default event handler for the basic functionalities needed on mousedown:before
@@ -162,57 +115,47 @@ export abstract class ITextClickBehavior<
   _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
     if (!this.canvas || !this.editable || notALeftClick(e)) {
       return;
+    }     
+      // we want to avoid that an object that was selected and then becomes unselectable,
+      // may trigger editing mode in some way.
+      this.selected = this === this.canvas._activeObject;
     }
-    // we want to avoid that an object that was selected and then becomes unselectable,
-    // may trigger editing mode in some way.
-    this.selected = this === this.canvas._activeObject;
-  }
 
-  /**
-   * standard handler for mouse up, overridable
-   * @private
-   */
-  mouseUpHandler({ e, transform }: TPointerEventInfo) {
-    const didDrag = this.draggableTextDelegate.end(e);
-    if (this.canvas) {
-      this.canvas.textEditingManager.unregister(this);
-
-      const activeObject = this.canvas._activeObject;
-      if (activeObject && activeObject !== this) {
-        // avoid running this logic when there is an active object
-        // this because is possible with shift click and fast clicks,
-        // to rapidly deselect and reselect this object and trigger an enterEdit
+    /**
+     * standard handler for mouse up, overridable
+     * @private
+     */
+    mouseUpHandler({ e, transform }: TPointerEventInfo) {
+      const didDrag = this.draggableTextDelegate.end(e);
+      if (this.canvas) {
+        this.canvas.textEditingManager.unregister(this);
+        const activeObject = this.canvas._activeObject;
+        if (activeObject && activeObject !== this) {
+          // avoid running this logic when there is an active object
+          // this because is possible with shift click and fast clicks,
+          // to rapidly deselect and reselect this object and trigger an enterEdit
+          return;
+        }
+      }
+      if (!this.editable || this.group && !this.group.interactive || transform && transform.actionPerformed || notALeftClick(e) || didDrag) {
         return;
       }
-    }
-    if (
-      !this.editable ||
-      (this.group && !this.group.interactive) ||
-      (transform && transform.actionPerformed) ||
-      notALeftClick(e) ||
-      didDrag
-    ) {
-      return;
-    }
-
-    if (this.__lastSelected && !this.getActiveControl()) {
-      this.selected = false;
-      this.__lastSelected = false;
-      this.enterEditing(e);
-      if (this.selectionStart === this.selectionEnd) {
-        this.initDelayedCursor(true);
+      
+      if (this.__lastSelected && !this.getActiveControl()) {
+        this.__lastSelected = false;
+        this.enterEditing(e);
+        if (this.selectionStart === this.selectionEnd) {
+          this.initDelayedCursor(true);
+        } 
       } else {
-        this.renderCursorOrSelection();
+        this.selected = true;
       }
-    } else {
-      this.selected = true;
     }
-  }
 
   /**
    * Changes cursor location in a text depending on passed pointer (x/y) object
    * @param {TPointerEvent} e Event object
-   */
+   */     
   setCursorByClick(e: TPointerEvent) {
     const newSelection = this.getSelectionStartFromPointer(e),
       start = this.selectionStart,
