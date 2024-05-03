@@ -732,7 +732,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
         // we must not prevent the event's default behavior in order for the window to start dragging
-        !activeObject.shouldStartDragging()) &&
+        !activeObject.shouldStartDragging(e)) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);

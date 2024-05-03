@@ -653,7 +653,7 @@ export class InteractiveFabricObject<
    * Fired from {@link Canvas#_onMouseMove}
    * @returns true in order for the window to start a drag session
    */
-  shouldStartDragging() {
+  shouldStartDragging(e: TPointerEvent) {
     return false;
   }
 
