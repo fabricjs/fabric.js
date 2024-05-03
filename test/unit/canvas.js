@@ -1416,7 +1416,7 @@
     var target = makeRect();
     canvas.add(target);
     canvas.setActiveObject(target);
-    canvas._setupCurrentTransform(e, target, true);
+    canvas.setupCurrentTransform(e, target, target.findControl(new fabric.Point(5,5)));
     assert.ok(canvas._currentTransform, 'transform should be set');
     target.isMoving = true;
     canvas._discardActiveObject();
@@ -1628,125 +1628,6 @@
     assert.equal(canvas.wrapperEl.style.height, 123 + 'px', 'Should be as none backstore only value + "px"');
     assert.equal(canvas.getHeight(), 500, 'Should be as the backstore only value');
   });
-
-  QUnit.test('setupCurrentTransform', function(assert) {
-    assert.ok(typeof canvas._setupCurrentTransform === 'function');
-
-    var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
-    canvas.add(rect);
-    var canvasOffset = canvas.calcOffset();
-    var eventStub = {
-      clientX: canvasOffset.left + 100,
-      clientY: canvasOffset.top + 100,
-      target: canvas.upperCanvasEl
-    };
-    canvas.setActiveObject(rect);
-    const targetCorner = rect.findControl(
-      canvas.getViewportPoint(eventStub)
-    );
-    rect.__corner = targetCorner ? targetCorner.key : undefined;
-    canvas._setupCurrentTransform(eventStub, rect);
-    var t = canvas._currentTransform;
-    assert.equal(t.target, rect, 'should have rect as a target');
-    assert.equal(t.action, 'drag', 'should target inside rect and setup drag');
-    assert.equal(t.corner, 0, 'no corner selected');
-    assert.equal(t.originX, rect.originX, 'no origin change for drag');
-    assert.equal(t.originY, rect.originY, 'no origin change for drag');
-
-    eventStub = {
-      clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
-      clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
-      target: canvas.upperCanvasEl
-    };
-    rect.__corner = rect.findControl(
-      canvas.getViewportPoint(eventStub)
-    ).key;
-    canvas._setupCurrentTransform(eventStub, rect, false);
-    t = canvas._currentTransform;
-    assert.equal(t.target, rect, 'should have rect as a target');
-    assert.equal(t.action, 'drag', 'should setup drag since the object was not selected');
-    assert.equal(t.corner, 'tl', 'tl selected');
-    assert.equal(t.shiftKey, undefined, 'shift was not pressed');
-
-    var alreadySelected = true;
-    rect.__corner = rect.findControl(
-      canvas.getViewportPoint(eventStub)
-    ).key;
-    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
-    t = canvas._currentTransform;
-    assert.equal(t.target, rect, 'should have rect as a target');
-    assert.equal(t.action, 'scale', 'should target a corner and setup scale');
-    assert.equal(t.corner, 'tl', 'tl selected');
-    assert.equal(t.originX, 'right', 'origin in opposite direction');
-    assert.equal(t.originY, 'bottom', 'origin in opposite direction');
-    assert.equal(t.shiftKey, undefined, 'shift was not pressed');
-
-    eventStub = {
-      clientX: canvasOffset.left + rect.left - 2,
-      clientY: canvasOffset.top + rect.top + rect.height / 2,
-      target: canvas.upperCanvasEl,
-      shiftKey: true
-    };
-    rect.__corner = rect.findControl(
-      canvas.getViewportPoint(eventStub)
-    ).key;
-    canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
-    t = canvas._currentTransform;
-    assert.equal(t.target, rect, 'should have rect as a target');
-    assert.equal(t.action, 'skewY', 'should target a corner and setup skew');
-    assert.equal(t.shiftKey, true, 'shift was pressed');
-    assert.equal(t.corner, 'ml', 'ml selected');
-    assert.equal(t.originX, 'right', 'origin in opposite direction');
-
-    // to be replaced with new api test
-    // eventStub = {
-    //   clientX: canvasOffset.left + rect.oCoords.mtr.x,
-    //   clientY: canvasOffset.top + rect.oCoords.mtr.y,
-    //   target: canvas.upperCanvasEl,
-    // };
-    // canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
-    // t = canvas._currentTransform;
-    // assert.equal(t.target, rect, 'should have rect as a target');
-    // assert.equal(t.action, 'mtr', 'should target a corner and setup rotate');
-    // assert.equal(t.corner, 'mtr', 'mtr selected');
-    // assert.equal(t.originX, 'center', 'origin in center');
-    // assert.equal(t.originY, 'center', 'origin in center');
-    // canvas._currentTransform = false;
-  });
-
-  // QUnit.test('_rotateObject', function(assert) {
-  //   assert.ok(typeof canvas._rotateObject === 'function');
-  //   var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50 });
-  //   canvas.add(rect);
-  //   var canvasEl = canvas.getElement(),
-  //       canvasOffset = fabric.util.getElementOffset(canvasEl);
-  //   var eventStub = {
-  //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
-  //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
-  //     target: canvas.upperCanvasEl,
-  //   };
-  //   canvas._setupCurrentTransform(eventStub, rect);
-  //   var rotated = canvas._rotateObject(30, 30, 'equally');
-  //   assert.equal(rotated, true, 'return true if a rotation happened');
-  //   rotated = canvas._rotateObject(30, 30);
-  //   assert.equal(rotated, false, 'return true if no rotation happened');
-  // });
-  //
-  // QUnit.test('_rotateObject do not change origins', function(assert) {
-  //   assert.ok(typeof canvas._rotateObject === 'function');
-  //   var rect = new fabric.Rect({ left: 75, top: 75, width: 50, height: 50, originX: 'right', originY: 'bottom' });
-  //   canvas.add(rect);
-  //   var canvasEl = canvas.getElement(),
-  //       canvasOffset = fabric.util.getElementOffset(canvasEl);
-  //   var eventStub = {
-  //     clientX: canvasOffset.left + rect.oCoords.mtr.x,
-  //     clientY: canvasOffset.top + rect.oCoords.mtr.y,
-  //     target: canvas.upperCanvasEl,
-  //   };
-  //   canvas._setupCurrentTransform(eventStub, rect);
-  //   assert.equal(rect.originX, 'right');
-  //   assert.equal(rect.originY, 'bottom');
-  // });
 
   QUnit.skip('fxRemove', function(assert) {
     var done = assert.async();

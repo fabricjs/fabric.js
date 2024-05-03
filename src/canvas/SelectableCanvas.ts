@@ -1,5 +1,4 @@
 import { dragHandler } from '../controls/drag';
-import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
@@ -37,6 +36,7 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import type { Control } from '../controls/Control';
 
 /**
  * Canvas class
@@ -568,16 +568,31 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * @private
+   * Setup state used by the canvas to execute object transforms via the control API
    * @param {Event} e Event object
    * @param {FabricObject} target
-   * @param {boolean} [alreadySelected] pass true to setup the active control
+   * @param [transformContext] pass {@link FabricObject.findControl}, `{ key: 'drag' }` to setup dragging
+   * or undefined to block transforming
    */
-  _setupCurrentTransform(
+  setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
-    alreadySelected: boolean
-  ): void {
+    transformContext?:
+      | { key: string; control: Control }
+      | { key: 'drag'; control?: never }
+  ): Transform {
+    const key = transformContext?.key || '';
+    const control = transformContext?.control;
+    const action = control?.getActionName(e, control, target) ?? key,
+      altKey = e[this.centeredKey as ModifierKey],
+      origin = this._shouldCenterTransform(target, action, altKey)
+        ? ({ x: CENTER, y: CENTER } as const)
+        : this._getOriginFromCorner(target, key);
+
+    /**
+     * relative to target's containing coordinate plane
+     * both agree on every point
+     **/
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -586,56 +601,63 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           target.group.calcTransformMatrix()
         )
       : this.getScenePoint(e);
-    const { key: corner = '', control } = target.getActiveControl() || {},
-      actionHandler =
-        alreadySelected && control
-          ? control.getActionHandler(e, target, control)?.bind(control)
-          : dragHandler,
-      action = getActionFromCorner(alreadySelected, corner, e, target),
-      altKey = e[this.centeredKey as ModifierKey],
-      origin = this._shouldCenterTransform(target, action, altKey)
-        ? ({ x: CENTER, y: CENTER } as const)
-        : this._getOriginFromCorner(target, corner),
-      /**
-       * relative to target's containing coordinate plane
-       * both agree on every point
-       **/
-      transform: Transform = {
-        target: target,
-        action,
-        actionHandler,
-        actionPerformed: false,
-        corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
+    const transform: Transform = {
+      target: target,
+      action,
+      actionHandler: control
+        ? control.getActionHandler(e, target, control)?.bind(control)
+        : key === 'drag'
+        ? dragHandler
+        : undefined,
+      actionPerformed: false,
+      corner: control ? key : '',
+      scaleX: target.scaleX,
+      scaleY: target.scaleY,
+      skewX: target.skewX,
+      skewY: target.skewY,
+      offsetX: pointer.x - target.left,
+      offsetY: pointer.y - target.top,
+      originX: origin.x,
+      originY: origin.y,
+      ex: pointer.x,
+      ey: pointer.y,
+      lastX: pointer.x,
+      lastY: pointer.y,
+      theta: degreesToRadians(target.angle),
+      width: target.width,
+      height: target.height,
+      shiftKey: e.shiftKey,
+      altKey,
+      original: {
+        ...saveObjectTransform(target),
         originX: origin.x,
         originY: origin.y,
-        ex: pointer.x,
-        ey: pointer.y,
-        lastX: pointer.x,
-        lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
-        shiftKey: e.shiftKey,
-        altKey,
-        original: {
-          ...saveObjectTransform(target),
-          originX: origin.x,
-          originY: origin.y,
-        },
-      };
+      },
+    };
 
-    this._currentTransform = transform;
+    return (this._currentTransform = transform);
+  }
 
-    this.fire('before:transform', {
+  /**
+   * @deprecated use {@link setupCurrentTransform} and fire your own `before:transform` event if you need to
+   * @param {Event} e Event object
+   * @param {FabricObject} target
+   * @param {boolean} [activateControl] pass true to setup the active control
+   */
+  _setupCurrentTransform(
+    e: TPointerEvent,
+    target: FabricObject,
+    activateControl: boolean
+  ) {
+    const transform = this.setupCurrentTransform(
       e,
-      transform,
-    });
+      target,
+      (activateControl &&
+        target.findControl(this.getViewportPoint(e), isTouchEvent(e))) || {
+        key: 'drag',
+      }
+    );
+    this.fire('before:transform', { e, transform });
   }
 
   /**
