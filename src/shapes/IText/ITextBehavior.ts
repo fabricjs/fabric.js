@@ -134,13 +134,10 @@ export abstract class ITextBehavior<
       duration,
       delay,
       onComplete,
-      abort: () => {
-        return (
-          !this.canvas ||
-          // we do not want to animate a selection, only cursor
-          this.selectionStart !== this.selectionEnd
-        );
-      },
+      abort: () =>
+        !this.canvas ||
+        // we do not want to animate a selection, only cursor
+        this.selectionStart !== this.selectionEnd,
       onChange: (value) => {
         this._currentCursorOpacity = value;
         this.renderCursorOrSelection();
@@ -202,6 +199,10 @@ export abstract class ITextBehavior<
     }
   }
 
+  /**
+   * Restart tue cursor animation if either is in complete state ( between animations )
+   * or if it never started before
+   */
   restartCursorIfNeeded() {
     if (
       [this._currentTickState, this._currentTickCompleteState].some(
@@ -341,10 +342,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a word based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectWord(selectionStart: number) {
+  selectWord(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     // search backwards
     const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
@@ -362,10 +364,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a line based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectLine(selectionStart: number) {
+  selectLine(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
       newSelectionEnd = this.findLineBoundaryRight(selectionStart);

@@ -247,8 +247,13 @@ export class InteractiveFabricObject<
       ]),
       transformOptions = this.group
         ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
+        : undefined;
+    // decomposing could bring negative scaling and `_calculateCurrentDimensions` can't take it
+    if (transformOptions) {
+      transformOptions.scaleX = Math.abs(transformOptions.scaleX);
+      transformOptions.scaleY = Math.abs(transformOptions.scaleY);
+    }
+    const dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
@@ -648,7 +653,7 @@ export class InteractiveFabricObject<
    * Fired from {@link Canvas#_onMouseMove}
    * @returns true in order for the window to start a drag session
    */
-  shouldStartDragging() {
+  shouldStartDragging(e: TPointerEvent) {
     return false;
   }
 
