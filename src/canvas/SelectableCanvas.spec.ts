@@ -2,6 +2,8 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 import { Canvas } from './Canvas';
 import { Group } from '../shapes/Group';
+import { createTranslateMatrix } from '../util';
+import type { TPointerEventInfo } from '../EventTypeDefs';
 
 describe('Selectable Canvas', () => {
   describe('_pointIsInObjectSelectionArea', () => {
@@ -479,6 +481,30 @@ describe('Selectable Canvas', () => {
       expect(canvas._currentTransform).toHaveProperty('target', object);
       expect(canvas._currentTransform).toHaveProperty('corner', controlKey);
       expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    test('caching event pointers is a mistake', () => {
+      const canvas = new Canvas();
+      const spy = jest
+        .fn()
+        .mockImplementation(({ e, scenePoint }: TPointerEventInfo) => {
+          const before = canvas.getScenePoint(e);
+          canvas.setViewportTransform(createTranslateMatrix(50, 50));
+          // canvas._resetTransformEventData();
+          return { event: scenePoint, before, after: canvas.getScenePoint(e) };
+        });
+      canvas.once('mouse:down', spy);
+      canvas.getSelectionElement().dispatchEvent(
+        new MouseEvent('mousedown', {
+          clientX: 50,
+          clientY: 50,
+        })
+      );
+      expect(spy).toHaveReturnedWith({
+        event: new Point(50, 50),
+        before: new Point(50, 50),
+        after: new Point(),
+      });
     });
   });
 });
