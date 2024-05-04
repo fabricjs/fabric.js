@@ -1117,8 +1117,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   __onMouseMove(e: TPointerEvent) {
     this._isClick = false;
-    this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
+    this._handleEvent(e, 'move:before');
 
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
