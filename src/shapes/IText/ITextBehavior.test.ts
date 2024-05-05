@@ -147,6 +147,24 @@ describe('IText cursor animation snapshot', () => {
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
+  test('Animation is configurable - fast cursor with delay', () => {
+    const iText = new IText('', { canvas: {} });
+    iText.cursorDelay = 200;
+    iText.cursorDuration = 80;
+    iText.initDelayedCursor();
+    jest.advanceTimersByTime(1000);
+    expect(currentAnimation).toMatchSnapshot();
+    iText.abortCursorAnimation();
+  });
+  test('Animation is configurable - fast cursor with no delay', () => {
+    const iText = new IText('', { canvas: {} });
+    iText.cursorDelay = 200;
+    iText.cursorDuration = 80;
+    iText.initDelayedCursor(true);
+    jest.advanceTimersByTime(1000);
+    expect(currentAnimation).toMatchSnapshot();
+    iText.abortCursorAnimation();
+  });
 });
 
 describe('IText _tick', () => {
