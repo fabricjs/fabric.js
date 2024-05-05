@@ -565,9 +565,9 @@ export class IText<
 
   renderDropTargetEffect(
     ctx: CanvasRenderingContext2D,
-    { e }: DragEventRenderingEffectData
+    { scenePoint }: DragEventRenderingEffectData
   ) {
-    const dragSelection = this.getSelectionStartFromPointer(e);
+    const dragSelection = this.getSelectionStartFromPoint(scenePoint);
     this.renderCursorAt(ctx, dragSelection);
   }
 

@@ -24,7 +24,8 @@
       };
       iText.enterEditing();
       iText.doubleClickHandler({
-        e: eventData
+        e: eventData,
+        scenePoint: new fabric.Point(40, 10)
       });
       assert.equal(iText.selectionStart, 0, 'dblClick selection start is');
       assert.equal(iText.selectionEnd, 4, 'dblClick selection end is');
@@ -32,10 +33,11 @@
         which: 1,
         target: canvas.upperCanvasEl,
         clientX: 40,
-        clientY: 60
+        clientY: 60,
       };
       iText.doubleClickHandler({
-        e: eventData
+        e: eventData,
+        scenePoint: new fabric.Point(40, 60)
       });
       assert.equal(iText.selectionStart, 20, 'second dblClick selection start is');
       assert.equal(iText.selectionEnd, 26, 'second dblClick selection end is');
@@ -68,7 +70,8 @@
       };
       iText.enterEditing();
       iText.tripleClickHandler({
-        e: eventData
+        e: eventData,
+        scenePoint: new fabric.Point(40, 10)
       });
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 19, 'tripleClick selection end is');
@@ -79,7 +82,8 @@
         clientY: 60
       };
       iText.tripleClickHandler({
-        e: eventData
+        e: eventData,
+        scenePoint: new fabric.Point(40, 60)
       });
       assert.equal(iText.selectionStart, 20, 'second tripleClick selection start is');
       assert.equal(iText.selectionEnd, 31, 'second tripleClick selection end is');
@@ -96,7 +100,8 @@
         clientY: 10
       };
       iText.tripleClickHandler({
-        e: eventData
+        e: eventData,
+        scenePoint: new fabric.Point(40, 10)
       });
       assert.equal(iText.selectionStart, 0, 'tripleClick selection start is');
       assert.equal(iText.selectionEnd, 0, 'tripleClick selection end is');
@@ -185,10 +190,11 @@
       canvas.add(group);
       iText.selected = true;
       iText.__lastSelected = true;
+      let spy;
+      canvas.on('mouse:up', (ev)=> (spy = ev));
       canvas.__onMouseUp({ clientX: 1, clientY: 1, target: canvas.upperCanvasEl });
-      assert.equal(canvas._target, group, 'group should be found as target');
+      assert.equal(spy.target, group, 'group should be found as target');
       assert.equal(iText.isEditing, false, 'iText should not enter editing');
-      iText.exitEditing();
     });
     QUnit.test('_mouseUpHandler on a text in a group', function (assert) {
       var iText = new fabric.IText('test');

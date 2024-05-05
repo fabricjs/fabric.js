@@ -644,7 +644,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         this.viewportTransform
       ),
       action: (activateControl &&
-        target.findControl(this.getViewportPoint(e), isTouchEvent(e))) || {
+        target.findControl(viewportPoint, isTouchEvent(e))) || {
         key: 'drag',
       },
     });

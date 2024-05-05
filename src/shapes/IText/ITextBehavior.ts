@@ -87,6 +87,10 @@ export abstract class ITextBehavior<
   abstract initHiddenTextarea(): void;
   abstract _fireSelectionChanged(): void;
   abstract renderCursorOrSelection(): void;
+  abstract getSelectionStartFromPoint(scenePoint: Point): number;
+  /**
+   * @deprecated use {@link getSelectionStartFromPoint}
+   */
   abstract getSelectionStartFromPointer(e: TPointerEvent): number;
   abstract _getCursorBoundaries(
     index: number,

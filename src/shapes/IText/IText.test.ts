@@ -2,6 +2,7 @@ import { Canvas } from '../../canvas/Canvas';
 import '../../../jest.extend';
 import { Group } from '../Group';
 import { IText } from './IText';
+import { getFabricDocument } from '../../env';
 
 describe('IText', () => {
   describe('cursor drawing width', () => {
@@ -38,5 +39,53 @@ describe('IText', () => {
         });
       }
     );
+  });
+
+  it.only('firing up on a selected text in a group should NOT enter editing', () => {
+    const text = new IText('test');
+    const canvas = new Canvas();
+    canvas.add(text);
+
+    jest.spyOn(text, 'initDelayedCursor').mockImplementation(() => {});
+    jest.spyOn(text, 'renderCursorOrSelection').mockImplementation(() => {});
+    jest.spyOn(text, 'toJSON').mockReturnValue('text');
+    const spy = jest.fn();
+    canvas.on('mouse:up', spy);
+
+    const fireClick = () => {
+      canvas
+        .getSelectionElement()
+        .dispatchEvent(new MouseEvent('mousedown', { clientX: 1, clientY: 1 }));
+      getFabricDocument().dispatchEvent(
+        new MouseEvent('mouseup', { clientX: 1, clientY: 1 })
+      );
+    };
+
+    const group = new Group([], { subTargetCheck: false });
+    jest.spyOn(group, 'toJSON').mockReturnValue('group');
+
+    expect(text.isEditing).toBe(false);
+
+    fireClick();
+    text.selected = true;
+    text.__lastSelected = true;
+    fireClick();
+    expect(text.isEditing).toBe(true);
+
+    canvas.remove(text);
+    group.add(text);
+    canvas.add(group);
+    fireClick();
+    expect(text.isEditing).toBe(false);
+    expect(spy).toHaveBeenCalledWith(
+      expect.objectContaining({ target: group })
+    );
+
+    canvas.remove(group);
+    group.remove(text);
+    canvas.add(text);
+    fireClick();
+    expect(text.isEditing).toBe(true);
+    expect(spy).toHaveBeenCalledWith(expect.objectContaining({ target: text }));
   });
 });

@@ -209,7 +209,7 @@ export class DraggableTextDelegate {
       if (this.isActive() && this.__dragStartSelection) {
         //  drag source trying to drop over itself
         //  allow dropping only outside of drag start selection
-        const index = this.target.getSelectionStartFromPointer(e);
+        const index = this.target.getSelectionStartFromPoint(e.scenePoint);
         const dragStartSelection = this.__dragStartSelection;
         return (
           index < dragStartSelection.selectionStart ||
@@ -265,7 +265,7 @@ export class DraggableTextDelegate {
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
    */
   dropHandler(ev: DragEventData) {
-    const { e } = ev;
+    const { e, scenePoint } = ev;
     const didDrop = e.defaultPrevented;
     this.__isDraggingOver = false;
     // inform browser that the drop has been accepted
@@ -274,7 +274,7 @@ export class DraggableTextDelegate {
     if (insert && !didDrop) {
       const target = this.target;
       const canvas = target.canvas!;
-      let insertAt = target.getSelectionStartFromPointer(e);
+      let insertAt = target.getSelectionStartFromPoint(scenePoint);
       const { styles } = (
         e.dataTransfer!.types.includes('application/fabric')
           ? JSON.parse(e.dataTransfer!.getData('application/fabric'))

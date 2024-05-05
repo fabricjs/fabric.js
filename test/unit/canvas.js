@@ -650,18 +650,18 @@
     canvas.add(rect1, rect2);
     // Intersects none
     setGroupSelector(canvas, { x: 25, y: 25, deltaX: 1, deltaY: 1 });
-    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.equal(canvas.handleSelection({}), false, 'selection did not occur, intersects none');
     var onSelectCalls = onSelectRect1CallCount + onSelectRect2CallCount;
     assert.equal(onSelectCalls, 0, 'none of the onSelect methods was called');
     // Intersects one
     setGroupSelector(canvas, { x: 0, y: 0, deltaX: 5, deltaY: 5 });
-    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.ok(canvas.handleSelection({}), 'selection occurred intersects 1');
     assert.equal(canvas.getActiveObject(), rect1, 'rect1 was selected');
     assert.equal(onSelectRect1CallCount, 1, 'rect1 onSelect was called while setting active object');
     assert.equal(onSelectRect2CallCount, 0, 'rect2 onSelect was not called');
     // Intersects both
     setGroupSelector(canvas, { x: 0, y: 0, deltaX: 15, deltaY: 5 });
-    assert.ok(canvas.handleSelection({}), 'selection occurred');
+    assert.ok(canvas.handleSelection({}), 'selection occurred intersects both');
     assert.deepEqual(canvas.getActiveObjects(), [rect1, rect2], 'rect1 selected');
     assert.equal(onSelectRect1CallCount, 2, 'rect1 onSelect was called once when collectiong it and once when selecting it');
     assert.equal(onSelectRect2CallCount, 1, 'rect2 onSelect was called');
@@ -1416,7 +1416,13 @@
     var target = makeRect();
     canvas.add(target);
     canvas.setActiveObject(target);
-    canvas.setupCurrentTransform(e, target, target.findControl(new fabric.Point(5,5)));
+    canvas.setupCurrentTransform({
+      e,
+      target,
+      viewportPoint: new fabric.Point(5, 5),
+      scenePoint: new fabric.Point(5, 5),
+      action: target.findControl(new fabric.Point(5, 5))
+    });
     assert.ok(canvas._currentTransform, 'transform should be set');
     target.isMoving = true;
     canvas._discardActiveObject();

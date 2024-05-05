@@ -5,7 +5,24 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a"
+      "viewportPoint": {
+        "x": 130,
+        "y": 40
+      },
+      "scenePoint": {
+        "x": 130,
+        "y": 40
+      },
+      "target": "a",
+      "subTargets": [],
+      "pointer": {
+        "x": 130,
+        "y": 40
+      },
+      "absolutePointer": {
+        "x": 130,
+        "y": 40
+      }
     },
     "canvas"
   ],
@@ -15,7 +32,24 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a"
+      "viewportPoint": {
+        "x": 130,
+        "y": 40
+      },
+      "scenePoint": {
+        "x": 130,
+        "y": 40
+      },
+      "target": "a",
+      "subTargets": [],
+      "pointer": {
+        "x": 130,
+        "y": 40
+      },
+      "absolutePointer": {
+        "x": 130,
+        "y": 40
+      }
     },
     "a"
   ],
@@ -25,21 +59,34 @@
       "e": {
         "isTrusted": true
       },
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "target": "b",
       "subTargets": [],
-      "dragSource": "a"
+      "dragSource": "a",
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
     },
     "canvas"
   ],
   [
     "dragenter",
     {
-      "subTargets": [],
-      "dragSource": "a",
       "e": {
         "isTrusted": true
       },
-      "target": "b",
       "viewportPoint": {
         "x": 435,
         "y": 55
@@ -48,6 +95,9 @@
         "x": 435,
         "y": 55
       },
+      "subTargets": [],
+      "dragSource": "a",
+      "target": "b",
       "pointer": {
         "x": 435,
         "y": 55
@@ -65,21 +115,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "b",
-      "subTargets": [],
-      "dragSource": "a"
-    },
-    "canvas"
-  ],
-  [
-    "dragleave",
-    {
-      "subTargets": [],
-      "dragSource": "a",
-      "e": {
-        "isTrusted": true
-      },
-      "target": "b",
       "viewportPoint": {
         "x": 435,
         "y": 55
@@ -88,6 +123,37 @@
         "x": 435,
         "y": 55
       },
+      "target": "b",
+      "subTargets": [],
+      "dragSource": "a",
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
+    },
+    "canvas"
+  ],
+  [
+    "dragleave",
+    {
+      "e": {
+        "isTrusted": true
+      },
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
+      "subTargets": [],
+      "dragSource": "a",
+      "target": "b",
       "pointer": {
         "x": 435,
         "y": 55
@@ -105,10 +171,26 @@
       "e": {
         "isTrusted": true
       },
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "target": "a",
       "subTargets": [],
       "dragSource": "a",
-      "didDrop": false
+      "didDrop": false,
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
     },
     "canvas"
   ],
@@ -118,10 +200,26 @@
       "e": {
         "isTrusted": true
       },
+      "viewportPoint": {
+        "x": 435,
+        "y": 55
+      },
+      "scenePoint": {
+        "x": 435,
+        "y": 55
+      },
       "target": "a",
       "subTargets": [],
       "dragSource": "a",
-      "didDrop": false
+      "didDrop": false,
+      "pointer": {
+        "x": 435,
+        "y": 55
+      },
+      "absolutePointer": {
+        "x": 435,
+        "y": 55
+      }
     },
     "a"
   ]

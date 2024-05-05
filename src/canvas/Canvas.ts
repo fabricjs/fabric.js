@@ -31,18 +31,19 @@ const prepareEvent = <T extends Event>(canvas: Canvas, e: T) => {
   const scenePoint = Object.freeze(
     sendPointToPlane(viewportPoint, undefined, canvas.viewportTransform)
   );
+  // should be non writable but too many tests are failing
   Object.defineProperties(e, {
     viewportPoint: {
       value: viewportPoint,
-      configurable: false,
+      configurable: true,
       enumerable: false,
-      writable: false,
+      writable: true,
     },
     scenePoint: {
       value: scenePoint,
-      configurable: false,
+      configurable: true,
       enumerable: false,
-      writable: false,
+      writable: true,
     },
   });
   return {
@@ -842,10 +843,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
 
     const actionPerformed = this._finalizeCurrentTransform(e);
-    const areaSelectionExecuted =
+    const executedAreaSelection =
       !actionPerformed && !isClick && this.handleSelection(e);
-    const targetSelected =
-      !areaSelectionExecuted &&
+    const selectedTarget =
+      !executedAreaSelection &&
       target &&
       target.selectable &&
       target !== this._activeObject &&
@@ -903,7 +904,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // reset the target information about which corner is selected
     target && (target.__corner = undefined);
 
-    if (actionPerformed || areaSelectionExecuted || targetSelected) {
+    if (actionPerformed || executedAreaSelection || selectedTarget) {
       this.requestRenderAll();
     } else if (!isClick && !(this._activeObject as IText)?.isEditing) {
       this.renderTop();
@@ -1011,7 +1012,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.discardActiveObject(e);
     const selectedTarget =
       !executedMultiSelection &&
-      target &&
+      !!target &&
       target.selectable &&
       target.activeOn === 'down' &&
       this.setActiveObject(target, e);
@@ -1026,11 +1027,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // target is not editing
     // target is not already selected ( otherwise we drag )
     const shouldStartAreaSelection =
+      !executedMultiSelection &&
       !selectedTarget &&
       this.selection &&
       (!activeObject ||
-        (!activeObject.selectable &&
-          !(activeObject as IText).isEditing &&
+        (!(activeObject as IText).isEditing &&
           activeObject !== prevActiveObject));
 
     if (shouldStartAreaSelection) {
@@ -1048,9 +1049,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         activeObject.findControl(viewportPoint, isTouchEvent(e));
       const transformContext =
         controlContext ||
-        (activeObject === prevActiveObject && !executedMultiSelection
-          ? ({ key: 'drag' } as const)
-          : undefined);
+        (!executedMultiSelection ? ({ key: 'drag' } as const) : undefined);
 
       if (transformContext) {
         const transform = this.setupCurrentTransform({
@@ -1149,7 +1148,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this._setCursorFromEvent(e, target);
       this._fireOverOutEvents(data, target);
     } else {
-      this._transformObject(e, this._currentTransform);
+      this.transformObject(data, this._currentTransform);
     }
 
     this.textEditingManager.onMouseMove(e);
@@ -1277,19 +1276,18 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   /**
    * @private
-   * @param {Event} e Event fired on mousemove
    */
-  _transformObject(e: StatefulEvent<TPointerEvent>, transform: Transform) {
+  transformObject({ e, scenePoint }: TPointerEventInfo, transform: Transform) {
     const target = transform.target,
       //  transform pointer to target's containing coordinate plane
       //  both pointer and object should agree on every point
       localPointer = target.group
         ? sendPointToPlane(
-            e.scenePoint,
+            scenePoint,
             undefined,
             target.group.calcTransformMatrix()
           )
-        : e.scenePoint;
+        : scenePoint;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
 
@@ -1328,37 +1326,27 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object
    * @param {Object} target Object that the mouse is hovering, if so.
    */
-  _setCursorFromEvent(e: StatefulEvent<TPointerEvent>, target?: FabricObject) {
+  _setCursorFromEvent(e: TPointerEvent, target?: FabricObject) {
     if (!target) {
       this.setCursor(this.defaultCursor);
       return;
     }
-    let hoverCursor = target.hoverCursor || this.hoverCursor;
-    const activeSelection = isActiveSelection(this._activeObject)
-        ? this._activeObject
-        : null,
-      // only show proper corner when group selection is not active
-      corner =
-        (!activeSelection || target.group !== activeSelection) &&
-        // here we call findTargetCorner always with undefined for the touch parameter.
-        // we assume that if you are using a cursor you do not need to interact with
-        // the bigger touch area.
-        target.findControl(e.viewportPoint);
 
-    if (!corner) {
-      if ((target as Group).subTargetCheck) {
-        // hoverCursor should come from top-most subTarget,
-        // so we walk the array backwards
-        this.targets
-          .concat()
-          .reverse()
-          .map((_target) => {
-            hoverCursor = _target.hoverCursor || hoverCursor;
-          });
-      }
-      this.setCursor(hoverCursor);
+    // use control cursor only when active selection is not active
+    const activeControl =
+      (!isActiveSelection(this._activeObject) ||
+        !target.isDescendantOf(this._activeObject)) &&
+      target.getActiveControl();
+
+    if (!activeControl) {
+      const subTargetHoverCursor =
+        (target as Group).subTargetCheck &&
+        this.targets.find((subTarget) => subTarget.hoverCursor)?.hoverCursor;
+      this.setCursor(
+        subTargetHoverCursor || target.hoverCursor || this.hoverCursor
+      );
     } else {
-      const control = corner.control;
+      const control = activeControl.control;
       this.setCursor(control.cursorStyleHandler(e, control, target));
     }
   }
@@ -1405,12 +1393,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       if (isAS) {
         const prevActiveObjects = activeObject.getObjects();
         if (target === activeObject) {
+          const viewportPoint =
+            'viewportPoint' in e ? e.viewportPoint : this.getViewportPoint(e);
           target =
             // first search active objects for a target to remove
-            this.searchPossibleTargets(prevActiveObjects, e.viewportPoint) ||
+            this.searchPossibleTargets(prevActiveObjects, viewportPoint) ||
             //  if not found, search under active selection for a target to add
             // `prevActiveObjects` will be searched but we already know they will not be found
-            this.searchPossibleTargets(this._objects, e.viewportPoint);
+            this.searchPossibleTargets(this._objects, viewportPoint);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;
@@ -1434,6 +1424,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           this._hoveredTargets = [...this.targets];
         }
         this._fireSelectionEvents(prevActiveObjects, e);
+        return true;
       } else {
         (activeObject as IText).exitEditing &&
           (activeObject as IText).exitEditing();
@@ -1454,8 +1445,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // this._hoveredTargets = this.targets.concat();
         this._setActiveObject(newActiveSelection, e);
         this._fireSelectionEvents([activeObject], e);
+        return true;
       }
-      return true;
     }
     return false;
   }

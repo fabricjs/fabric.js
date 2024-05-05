@@ -19,10 +19,13 @@ describe('polyControl', () => {
     const e = new MouseEvent('mousedown', { clientX: 50, clientY: 50 });
     canvas.getSelectionElement().dispatchEvent(e);
     canvas.setupCurrentTransform({
-      e: Object.assign(e, {
-        viewportPoint: canvas.getViewportPoint(e),
-        scenePoint: canvas.getViewportPoint(e),
-      }),
+      e: Object.assign(
+        new MouseEvent('mousedown', { clientX: 50, clientY: 50 }),
+        {
+          viewportPoint: canvas.getViewportPoint(e),
+          scenePoint: canvas.getViewportPoint(e),
+        }
+      ),
       viewportPoint: canvas.getViewportPoint(e),
       scenePoint: canvas.getViewportPoint(e),
       target: poly,

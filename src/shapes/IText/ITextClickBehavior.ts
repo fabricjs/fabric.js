@@ -107,7 +107,7 @@ export abstract class ITextClickBehavior<
     if (!this.isEditing) {
       return;
     }
-    this.selectWord(this.getSelectionStartFromPointer(options.e));
+    this.selectWord(this.getSelectionStartFromPoint(options.scenePoint));
   }
 
   /**
@@ -117,7 +117,7 @@ export abstract class ITextClickBehavior<
     if (!this.isEditing) {
       return;
     }
-    this.selectLine(this.getSelectionStartFromPointer(options.e));
+    this.selectLine(this.getSelectionStartFromPoint(options.scenePoint));
   }
 
   /**
@@ -238,8 +238,8 @@ export abstract class ITextClickBehavior<
    * @param {TPointerEvent} e Event object
    * @return {Number} Index of a character
    */
-  getSelectionStartFromPointer(e: StatefulEvent<Event>): number {
-    const mouseOffset = e.scenePoint
+  getSelectionStartFromPoint(scenePoint: Point): number {
+    const mouseOffset = scenePoint
       .transform(invertTransform(this.calcTransformMatrix()))
       .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,
@@ -285,6 +285,15 @@ export abstract class ITextClickBehavior<
       // if object is horizontally flipped, mirror cursor location from the end
       this.flipX ? charLength - charIndex : charIndex,
       this._text.length
+    );
+  }
+
+  /**
+   * @deprecated use {@link getSelectionStartFromPoint}
+   */
+  getSelectionStartFromPointer(e: StatefulEvent<Event> | Event): number {
+    return this.getSelectionStartFromPoint(
+      'scenePoint' in e ? e.scenePoint : this.canvas!.getScenePoint(e)
     );
   }
 }

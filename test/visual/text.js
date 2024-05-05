@@ -498,6 +498,8 @@
     const dragEventStub = {
       clientX: 0,
       clientY: 0,
+      viewportPoint: new fabric.Point(),
+      scenePoint: new fabric.Point(),
       dataTransfer: {
         setDragImage(imageSource, x, y) {
           canvas.getContext().drawImage(imageSource, 0, 0);

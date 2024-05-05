@@ -24,11 +24,7 @@ export type StatefulEvent<E extends Event> = E & {
   scenePoint: Point;
 };
 
-export type TPointerEvent = StatefulEvent<
-  MouseEvent | TouchEvent | PointerEvent
->;
-
-export type TDragEvent = StatefulEvent<DragEvent>;
+export type TPointerEvent = MouseEvent | TouchEvent | PointerEvent;
 
 export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,

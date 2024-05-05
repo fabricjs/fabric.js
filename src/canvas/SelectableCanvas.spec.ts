@@ -4,6 +4,7 @@ import { Canvas } from './Canvas';
 import { Group } from '../shapes/Group';
 import { Rect } from '../shapes/Rect';
 import { TPointerEventInfo } from '../EventTypeDefs';
+import { createTranslateMatrix } from '../util/misc/matrix';
 
 describe('Selectable Canvas', () => {
   describe('_pointIsInObjectSelectionArea', () => {
@@ -493,7 +494,6 @@ describe('Selectable Canvas', () => {
         .mockImplementation(({ e, scenePoint }: TPointerEventInfo) => {
           const before = canvas.getScenePoint(e);
           canvas.setViewportTransform(createTranslateMatrix(50, 50));
-          // canvas._resetTransformEventData();
           return { event: scenePoint, before, after: canvas.getScenePoint(e) };
         });
       canvas.once('mouse:down', spy);
@@ -574,7 +574,13 @@ describe('Selectable Canvas', () => {
 
         canvas.getSelectionElement().dispatchEvent(eOverTLControl);
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith(eOverTLControl, rect, hit);
+        expect(spy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            e: eOverTLControl,
+            target: rect,
+            action: hit,
+          })
+        );
         expect(controlDownSpy).toHaveBeenCalledTimes(1);
 
         spy.mockClear();
