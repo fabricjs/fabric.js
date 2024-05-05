@@ -165,6 +165,15 @@ interface OutEvent {
   nextTarget?: FabricObject;
 }
 
+export type DragEventRenderingEffectData = {
+  e: DragEvent;
+  dragSource: FabricObject | undefined;
+  dropTarget: FabricObject | undefined;
+  prevDropTarget: FabricObject | undefined;
+  viewportPoint: Point;
+  scenePoint: Point;
+};
+
 export interface DragEventData extends TEvent<DragEvent> {
   target?: FabricObject;
   subTargets?: FabricObject[];

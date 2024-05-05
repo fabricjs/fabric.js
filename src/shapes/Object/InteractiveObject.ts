@@ -12,7 +12,11 @@ import {
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type {
+  DragEventRenderingEffectData,
+  ObjectEvents,
+  TPointerEvent,
+} from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import type { FabricObjectProps } from './types/FabricObjectProps';
@@ -684,7 +688,10 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
-  renderDragSourceEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
+  renderDragSourceEffect(
+    ctx: CanvasRenderingContext2D,
+    context: DragEventRenderingEffectData
+  ) {
     // for subclasses
   }
 
@@ -697,7 +704,10 @@ export class InteractiveFabricObject<
    * @param {DragEvent} e
    * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
-  renderDropTargetEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
+  renderDropTargetEffect(
+    ctx: CanvasRenderingContext2D,
+    context: DragEventRenderingEffectData
+  ) {
     // for subclasses
   }
 }

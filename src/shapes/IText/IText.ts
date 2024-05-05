@@ -18,6 +18,7 @@ import {
 } from '../Text/constants';
 import { CENTER, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
+import type { DragEventRenderingEffectData } from '../../EventTypeDefs';
 
 type CursorBoundaries = {
   left: number;
@@ -551,7 +552,7 @@ export class IText<
   /**
    * @override Render drag start text selection
    */
-  renderDragSourceEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
+  renderDragSourceEffect(ctx: CanvasRenderingContext2D) {
     const dragStartSelection =
       this.draggableTextDelegate.getDragStartSelection()!;
     this._renderSelection(
@@ -561,7 +562,10 @@ export class IText<
     );
   }
 
-  renderDropTargetEffect(e: DragEvent, ctx: CanvasRenderingContext2D) {
+  renderDropTargetEffect(
+    ctx: CanvasRenderingContext2D,
+    { e }: DragEventRenderingEffectData
+  ) {
     const dragSelection = this.getSelectionStartFromPointer(e);
     this.renderCursorAt(ctx, dragSelection);
   }

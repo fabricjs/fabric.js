@@ -3,6 +3,7 @@ import { NONE } from '../constants';
 import type {
   CanvasEvents,
   DragEventData,
+  DragEventRenderingEffectData,
   ObjectEvents,
   TPointerEvent,
   TPointerEventNames,
@@ -311,35 +312,35 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * Doing so will render the correct effect for all cases including an overlap between `source` and `target`.
    * @private
    */
-  private _renderDragEffects(
-    e: DragEvent,
-    source?: FabricObject,
-    target?: FabricObject
-  ) {
+  private _renderDragEffects(context: DragEventRenderingEffectData) {
+    const { dragSource, dropTarget, prevDropTarget } = context;
     let dirty = false;
     // clear top context
-    const dropTarget = this._dropTarget;
-    if (dropTarget && dropTarget !== source && dropTarget !== target) {
-      dropTarget.clearContextTop();
+    if (
+      prevDropTarget &&
+      prevDropTarget !== dragSource &&
+      prevDropTarget !== dropTarget
+    ) {
+      prevDropTarget.clearContextTop();
       dirty = true;
     }
-    source?.clearContextTop();
-    target !== source && target?.clearContextTop();
+    dragSource?.clearContextTop();
+    dropTarget !== dragSource && dropTarget?.clearContextTop();
     // render effects
     const ctx = this.contextTop;
     ctx.save();
     ctx.transform(...this.viewportTransform);
-    if (source) {
+    if (dragSource) {
       ctx.save();
-      source.transform(ctx);
-      source.renderDragSourceEffect(e, ctx);
+      dragSource.transform(ctx);
+      dragSource.renderDragSourceEffect(ctx, context);
       ctx.restore();
       dirty = true;
     }
-    if (target) {
+    if (dropTarget) {
       ctx.save();
-      target.transform(ctx);
-      target.renderDropTargetEffect(e, ctx);
+      dropTarget.transform(ctx);
+      dropTarget.renderDropTargetEffect(ctx, context);
       ctx.restore();
       dirty = true;
     }
@@ -455,7 +456,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       subTarget.fire(eventType, options);
     }
     //  render drag effects now that relations between source and target is clear
-    this._renderDragEffects(e, dragSource, dropTarget);
+    this._renderDragEffects({
+      ...points,
+      e,
+      dragSource,
+      dropTarget,
+      prevDropTarget: this._dropTarget,
+    });
     this._dropTarget = dropTarget;
   }
 
@@ -484,8 +491,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragLeave(e: DragEvent) {
+    const points = getEventPoints(this, e);
     const options: DragEventData = {
-      ...getEventPoints(this, e),
+      ...points,
       e,
       target: this._draggedoverTarget,
       subTargets: this.targets,
@@ -495,7 +503,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     //  fire dragleave on targets
     this._fireEnterLeaveEvents(undefined, options);
-    this._renderDragEffects(e, this._dragSource);
+    this._renderDragEffects({
+      ...points,
+      e,
+      dragSource: this._dragSource,
+      dropTarget: undefined,
+      prevDropTarget: this._dropTarget,
+    });
     this._dropTarget = undefined;
     //  clear targets
     this.targets = [];
