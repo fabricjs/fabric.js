@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(FabricObject): pass `e` to `shouldStartDragging` [#9843](https://github.com/fabricjs/fabric.js/pull/9843)
+- feat(FabricObject): pass `e` to `shouldStartDragging` [#9843](https://github.com/fabricjs/fabric.js/pull/9843)
 - feat(Object): pass `ctx` to dnd methods [#9844](https://github.com/fabricjs/fabric.js/pull/9844)
 - ci(): Add Jest coverage to the report [#9836](https://github.com/fabricjs/fabric.js/pull/9836)
 - test(): Add cursor animation testing and migrate some easy one to jest [#9829](https://github.com/fabricjs/fabric.js/pull/9829)
