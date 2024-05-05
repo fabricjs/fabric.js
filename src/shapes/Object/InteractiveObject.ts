@@ -12,7 +12,11 @@ import {
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
+import type {
+  DragEventRenderingEffectData,
+  ObjectEvents,
+  TPointerEvent,
+} from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import type { FabricObjectProps } from './types/FabricObjectProps';
@@ -682,20 +686,28 @@ export class InteractiveFabricObject<
    * example: render the selection status for the part of text that is being dragged from a text object
    * @public
    * @param {DragEvent} e
+   * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
-  renderDragSourceEffect(e: DragEvent) {
+  renderDragSourceEffect(
+    ctx: CanvasRenderingContext2D,
+    context: DragEventRenderingEffectData
+  ) {
     // for subclasses
   }
 
   /**
    * Override to customize drag and drop behavior
    * render a specific effect when an object is the target of a drag event
-   * used to show that the underly object can receive a drop, or to show how the
+   * used to show that the underlay object can receive a drop, or to show how the
    * object will change when dropping. example: show the cursor where the text is about to be dropped
    * @public
    * @param {DragEvent} e
+   * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
-  renderDropTargetEffect(e: DragEvent) {
+  renderDropTargetEffect(
+    ctx: CanvasRenderingContext2D,
+    context: DragEventRenderingEffectData
+  ) {
     // for subclasses
   }
 }
