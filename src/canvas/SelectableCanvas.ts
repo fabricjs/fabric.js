@@ -5,6 +5,7 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
   CanvasEvents,
   ModifierKey,
+  StatefulEvent,
   TOptionalModifierKey,
   TPointerEvent,
   Transform,
@@ -220,7 +221,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @type
    * @private
    */
-  _currentTransform: Transform | null = null;
+  _currentTransform?: Transform;
 
   /**
    * hold a reference to a data structure used to track the selection
@@ -244,32 +245,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @private
    */
   contextTopDirty = false;
-
-  /**
-   * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
-   * @type {Point}
-   */
-  protected declare _absolutePointer?: Point;
-
-  /**
-   * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _pointer holds a reference to the pointer in html coordinates that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
-   * @type {Point}
-   */
-  protected declare _pointer?: Point;
-
-  /**
-   * During a mouse event we may need the target multiple times in multiple functions.
-   * _target holds a reference to the target that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * @type {FabricObject}
-   */
-  protected declare _target?: FabricObject;
 
   static ownDefaults = canvasDefaults;
 
@@ -574,18 +549,18 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {boolean} [alreadySelected] pass true to setup the active control
    */
   _setupCurrentTransform(
-    e: TPointerEvent,
+    e: StatefulEvent<TPointerEvent>,
     target: FabricObject,
     alreadySelected: boolean
   ): void {
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          this.getScenePoint(e),
+          e.scenePoint,
           undefined,
           target.group.calcTransformMatrix()
         )
-      : this.getScenePoint(e);
+      : e.scenePoint;
     const { key: corner = '', control } = target.getActiveControl() || {},
       actionHandler =
         alreadySelected && control
@@ -695,54 +670,79 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Event} e mouse event
    * @return {FabricObject | null} the target found
    */
-  findTarget(e: TPointerEvent): FabricObject | undefined {
+  findEventTargets({
+    e,
+    viewportPoint,
+  }: {
+    e: Event;
+    viewportPoint: Point;
+    scenePoint: Point;
+  }): { target: FabricObject | undefined; subTargets: FabricObject[] } {
     if (this.skipTargetFind) {
-      return undefined;
+      return { target: undefined, subTargets: [] };
     }
 
-    const pointer = this.getViewportPoint(e),
-      activeObject = this._activeObject,
+    const activeObject = this._activeObject,
       aObjects = this.getActiveObjects();
 
     this.targets = [];
 
     if (activeObject && aObjects.length >= 1) {
-      if (activeObject.findControl(pointer, isTouchEvent(e))) {
+      if (activeObject.findControl(viewportPoint, isTouchEvent(e))) {
         // if we hit the corner of the active object, let's return that.
-        return activeObject;
+        return { target: activeObject, subTargets: this.targets };
       } else if (
         aObjects.length > 1 &&
         // check pointer is over active selection and possibly perform `subTargetCheck`
-        this.searchPossibleTargets([activeObject], pointer)
+        this.searchPossibleTargets([activeObject], viewportPoint)
       ) {
         // active selection does not select sub targets like normal groups
-        return activeObject;
+        return { target: activeObject, subTargets: this.targets };
       } else if (
-        activeObject === this.searchPossibleTargets([activeObject], pointer)
+        activeObject ===
+        this.searchPossibleTargets([activeObject], viewportPoint)
       ) {
         // active object is not an active selection
         if (!this.preserveObjectStacking) {
-          return activeObject;
+          return { target: activeObject, subTargets: this.targets };
         } else {
           const subTargets = this.targets;
           this.targets = [];
-          const target = this.searchPossibleTargets(this._objects, pointer);
+          const target = this.searchPossibleTargets(
+            this._objects,
+            viewportPoint
+          );
           if (
-            e[this.altSelectionKey as ModifierKey] &&
+            this.altSelectionKey &&
+            (e as MouseEvent)[this.altSelectionKey] &&
             target &&
             target !== activeObject
           ) {
             // alt selection: select active object even though it is not the top most target
             // restore targets
             this.targets = subTargets;
-            return activeObject;
+            return { target: activeObject, subTargets: this.targets };
           }
-          return target;
+          return { target, subTargets: this.targets };
         }
       }
     }
 
-    return this.searchPossibleTargets(this._objects, pointer);
+    const target = this.searchPossibleTargets(this._objects, viewportPoint);
+    return { target, subTargets: this.targets };
+  }
+
+  /**
+   * @deprecated use {@link findEventTargets}
+   */
+  findTarget(e: TPointerEvent) {
+    const viewportPoint = this.getViewportPoint(e);
+    const scenePoint = sendPointToPlane(
+      viewportPoint,
+      undefined,
+      this.viewportTransform
+    );
+    return this.findEventTargets({ e, viewportPoint, scenePoint }).target;
   }
 
   /**
@@ -901,10 +901,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * );
    *
    */
-  getViewportPoint(e: TPointerEvent) {
-    if (this._pointer) {
-      return this._pointer;
-    }
+  getViewportPoint(e: Event) {
     return this.getPointer(e, true);
   }
 
@@ -920,11 +917,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * );
    *
    */
-  getScenePoint(e: TPointerEvent) {
-    if (this._absolutePointer) {
-      return this._absolutePointer;
-    }
-    return this.getPointer(e);
+  getScenePoint(e: Event) {
+    return sendPointToPlane(
+      this.getViewportPoint(e),
+      undefined,
+      this.viewportTransform
+    );
   }
 
   /**
@@ -937,7 +935,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, fromViewport = false): Point {
+  getPointer(e: Event, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),
@@ -986,8 +984,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     dimensions: TSize,
     options?: TCanvasSizeOptions
   ) {
-    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
-    this._resetTransformEventData();
     super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
       this.freeDrawingBrush &&
@@ -1210,13 +1206,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
    */
   endCurrentTransform(e?: TPointerEvent) {
-    const transform = this._currentTransform;
-    this._finalizeCurrentTransform(e);
-    if (transform && transform.target) {
-      // this could probably go inside _finalizeCurrentTransform
-      transform.target.isMoving = false;
-    }
-    this._currentTransform = null;
+    const actionPerformed = this._finalizeCurrentTransform(e);
+    delete this._currentTransform;
+    return actionPerformed;
   }
 
   /**
@@ -1224,8 +1216,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
    */
   _finalizeCurrentTransform(e?: TPointerEvent) {
-    const transform = this._currentTransform!,
-      target = transform.target,
+    const transform = this._currentTransform;
+    if (!transform) {
+      return false;
+    }
+
+    const target = transform.target,
       options = {
         e,
         target,
@@ -1233,16 +1229,18 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         action: transform.action,
       };
 
-    if (target._scaling) {
-      target._scaling = false;
-    }
+    delete target._scaling;
+    target.isMoving = false;
 
     target.setCoords();
 
     if (transform.actionPerformed) {
       this.fire('object:modified', options);
       target.fire('modified', options);
+      return true;
     }
+
+    return false;
   }
 
   /**

@@ -1,4 +1,8 @@
-import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
+import type {
+  StatefulEvent,
+  TPointerEvent,
+  TPointerEventInfo,
+} from '../../EventTypeDefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import { stopEvent } from '../../util/dom_event';
@@ -56,14 +60,14 @@ export abstract class ITextClickBehavior<
    * @public override this method to control whether instance should/shouldn't become a drag source, @see also {@link DraggableTextDelegate#isActive}
    * @returns {boolean} should handle event
    */
-  onDragStart(e: DragEvent) {
+  onDragStart(e: StatefulEvent<DragEvent>) {
     return this.draggableTextDelegate.onDragStart(e);
   }
 
   /**
    * @public override this method to control whether instance should/shouldn't become a drop target
    */
-  canDrop(e: DragEvent) {
+  canDrop(e: StatefulEvent<DragEvent>) {
     return this.draggableTextDelegate.canDrop(e);
   }
 
@@ -234,8 +238,8 @@ export abstract class ITextClickBehavior<
    * @param {TPointerEvent} e Event object
    * @return {Number} Index of a character
    */
-  getSelectionStartFromPointer(e: TPointerEvent): number {
-    const mouseOffset = this.canvas!.getScenePoint(e)
+  getSelectionStartFromPointer(e: StatefulEvent<Event>): number {
+    const mouseOffset = e.scenePoint
       .transform(invertTransform(this.calcTransformMatrix()))
       .add(new Point(-this._getLeftOffset(), -this._getTopOffset()));
     let height = 0,

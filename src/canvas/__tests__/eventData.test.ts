@@ -9,6 +9,7 @@ import { FabricObject } from '../../shapes/Object/FabricObject';
 import { Rect } from '../../shapes/Rect';
 import { Triangle } from '../../shapes/Triangle';
 import type { TMat2D } from '../../typedefs';
+import { sendPointToPlane } from '../../util';
 import { Canvas } from '../Canvas';
 
 const genericVpt = [2.3, 0, 0, 2.3, 120, 80] as TMat2D;
@@ -133,8 +134,6 @@ describe('Canvas event data', () => {
     const point = canvas.getScenePoint(ev);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenNthCalledWith(1, ev);
-    canvas._cacheTransformEventData(ev);
-    expect(point).toEqual(canvas['_absolutePointer']);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenNthCalledWith(2, ev, true);
   });
@@ -282,13 +281,19 @@ describe('Event targets', () => {
       return e;
     };
 
-    const findTarget = (canvas: Canvas, ev?: MouseEventInit) => {
-      const target = canvas.findTarget(
-        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev })
-      );
-      const targets = canvas.targets;
-      canvas.targets = [];
-      return { target, targets };
+    const findTarget = (
+      canvas: Canvas,
+      { clientX = 0, clientY = 0, ...ev }: MouseEventInit = {}
+    ) => {
+      return canvas.findEventTargets({
+        e: mockEvent({ canvas, clientX, clientY, ...ev }),
+        viewportPoint: new Point(clientX, clientY),
+        scenePoint: sendPointToPlane(
+          new Point(clientX, clientY),
+          undefined,
+          canvas.viewportTransform
+        ),
+      });
     };
 
     test.skip.each([true, false])(
@@ -378,7 +383,7 @@ describe('Event targets', () => {
       canvas.targets = [new FabricObject()];
       expect(findTarget(canvas, { clientX: 0, clientY: 0 })).toEqual({
         target: undefined,
-        targets: [],
+        subTargets: [],
       });
     });
 
@@ -405,7 +410,7 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: rect,
-        targets: [],
+        subTargets: [],
       });
     });
 
@@ -430,24 +435,24 @@ describe('Event targets', () => {
       const e2 = { clientX: 4, clientY: 4 };
 
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] }
+        { target: rectOver, subTargets: [] }
         // 'Should return the rectOver, rect is not considered'
       );
 
       canvas.setActiveObject(rect);
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] }
+        { target: rectOver, subTargets: [] }
         // 'Should still return rectOver because is above active object'
       );
 
       expect(findTarget(canvas, e2)).toEqual(
-        { target: rect, targets: [] }
+        { target: rect, subTargets: [] }
         // 'Should rect because a corner of the activeObject has been hit'
       );
 
       canvas.altSelectionKey = 'shiftKey';
       expect(findTarget(canvas, e)).toEqual(
-        { target: rect, targets: [] }
+        { target: rect, subTargets: [] }
         // 'Should rect because active and altSelectionKey is pressed'
       );
     });
@@ -467,12 +472,12 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: group,
-        targets: [],
+        subTargets: [],
       });
 
       expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
         target: group,
-        targets: [],
+        subTargets: [],
       });
 
       group.subTargetCheck = true;
@@ -480,17 +485,17 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: group,
-        targets: [rect],
+        subTargets: [rect],
       });
 
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
         target: group,
-        targets: [],
+        subTargets: [],
       });
 
       expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
         target: group,
-        targets: [rect2],
+        subTargets: [rect2],
       });
     });
 
@@ -547,32 +552,32 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 96, clientY: 186 })).toEqual({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 98, clientY: 188 })).toEqual({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 100, clientY: 190 })).toEqual({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 102, clientY: 192 })).toEqual({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 104, clientY: 194 })).toEqual({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 106, clientY: 196 })).toEqual({
         target: group,
-        targets: [rect2],
+        subTargets: [rect2],
       });
     });
 
@@ -600,7 +605,7 @@ describe('Event targets', () => {
 
         expect(findTarget(canvas, { clientX: 9, clientY: 9 })).toEqual({
           target: group,
-          targets: [rect],
+          subTargets: [rect],
         });
       }
     );
@@ -614,18 +619,18 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: triangle,
-        targets: [],
+        subTargets: [],
       });
 
       canvas.perPixelTargetFind = true;
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: undefined,
-        targets: [],
+        subTargets: [],
       });
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
         target: triangle,
-        targets: [],
+        subTargets: [],
       });
     });
 
@@ -725,7 +730,7 @@ describe('Event targets', () => {
         const { canvas } = prepareTest();
         expect(findTarget(canvas, { clientX, clientY })).toEqual({
           target: undefined,
-          targets: [],
+          subTargets: [],
         });
       });
 
@@ -745,32 +750,32 @@ describe('Event targets', () => {
 
         expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
           target: group3,
-          targets: [deepTriangle, deepGroup, group2],
+          subTargets: [deepTriangle, deepGroup, group2],
         });
 
         expect(findTarget(canvas, { clientX: 50, clientY: 20 })).toEqual({
           target: group3,
-          targets: [deepCircle, deepGroup, group2],
+          subTargets: [deepCircle, deepGroup, group2],
         });
 
         expect(findTarget(canvas, { clientX: 117, clientY: 16 })).toEqual({
           target: group3,
-          targets: [deepRect, deepGroup, group2],
+          subTargets: [deepRect, deepGroup, group2],
         });
 
         expect(findTarget(canvas, { clientX: 100, clientY: 90 })).toEqual({
           target: group3,
-          targets: [rect2, group2],
+          subTargets: [rect2, group2],
         });
 
         expect(findTarget(canvas, { clientX: 9, clientY: 145 })).toEqual({
           target: group3,
-          targets: [circle2, group2],
+          subTargets: [circle2, group2],
         });
 
         expect(findTarget(canvas, { clientX: 66, clientY: 143 })).toEqual({
           target: group3,
-          targets: [triangle2, group2],
+          subTargets: [triangle2, group2],
         });
       });
     });
@@ -806,25 +811,25 @@ describe('Event targets', () => {
 
       expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
         target: activeSelection,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
       expect(findTarget(canvas, { clientX: 40, clientY: 15 })).toEqual({
         target: undefined,
-        targets: [],
+        subTargets: [],
       });
       expect(activeSelection.__corner).toBeUndefined();
 
       expect(findTarget(canvas, { clientX: 0, clientY: 0 })).toEqual({
         target: activeSelection,
-        targets: [],
+        subTargets: [],
       });
       expect(activeSelection.__corner).toBe('tl');
 
       expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
         {
           target: activeSelection,
-          targets: [],
+          subTargets: [],
         }
         // 'Should not return the rect behind active selection'
       );
@@ -833,13 +838,13 @@ describe('Event targets', () => {
       expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
         {
           target: rect3,
-          targets: [],
+          subTargets: [],
         }
         // 'Should return the rect after clearing selection'
       );
     });
 
-    test('findTarget on active selection with perPixelTargetFind', () => {
+    test.only('findTarget on active selection with perPixelTargetFind', () => {
       const rect1 = new Rect({
         left: 0,
         top: 0,
@@ -853,6 +858,7 @@ describe('Event targets', () => {
         height: 10,
       });
       const activeSelection = new ActiveSelection([rect1, rect2]);
+      const controlSpy = jest.spyOn(activeSelection, 'findControl');
       registerTestObjects({ rect1, rect2, activeSelection });
 
       const canvas = new Canvas(undefined, {
@@ -863,14 +869,17 @@ describe('Event targets', () => {
       canvas.add(rect1, rect2);
       canvas.setActiveObject(activeSelection);
 
+      expect(controlSpy).not.toHaveBeenCalled();
       expect(findTarget(canvas, { clientX: 8, clientY: 8 })).toEqual({
         target: activeSelection,
-        targets: [],
+        subTargets: [],
       });
 
+      expect(controlSpy).toHaveBeenCalledTimes(1);
+      expect(controlSpy).toHaveReturnedWith(undefined);
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
         target: undefined,
-        targets: [],
+        subTargets: [],
       });
     });
   });

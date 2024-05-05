@@ -554,12 +554,13 @@ export class IText<
    */
   renderDragSourceEffect(ctx: CanvasRenderingContext2D) {
     const dragStartSelection =
-      this.draggableTextDelegate.getDragStartSelection()!;
-    this._renderSelection(
-      ctx,
-      dragStartSelection,
-      this._getCursorBoundaries(dragStartSelection.selectionStart, true)
-    );
+      this.draggableTextDelegate.getDragStartSelection();
+    dragStartSelection &&
+      this._renderSelection(
+        ctx,
+        dragStartSelection,
+        this._getCursorBoundaries(dragStartSelection.selectionStart, true)
+      );
   }
 
   renderDropTargetEffect(

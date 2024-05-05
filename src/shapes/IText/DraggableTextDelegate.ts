@@ -1,5 +1,6 @@
 import type { Canvas } from '../../canvas/Canvas';
 import type { DragEventData, TPointerEvent } from '../../EventTypeDefs';
+import type { StatefulEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
@@ -98,7 +99,7 @@ export class DraggableTextDelegate {
    * https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage
    */
   setDragImage(
-    e: DragEvent,
+    e: StatefulEvent<DragEvent>,
     {
       selectionStart,
       selectionEnd,
@@ -116,8 +117,7 @@ export class DraggableTextDelegate {
       boundaries.top + boundaries.topOffset
     ).multiply(flipFactor);
     const pos = selectionPosition.transform(target.calcTransformMatrix());
-    const pointer = canvas.getScenePoint(e);
-    const diff = pointer.subtract(pos);
+    const diff = e.scenePoint.subtract(pos);
     const retinaScaling = target.getCanvasRetinaScaling();
     const bbox = target.getBoundingRect();
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
@@ -164,7 +164,7 @@ export class DraggableTextDelegate {
   /**
    * @returns {boolean} determines whether {@link target} should/shouldn't become a drag source
    */
-  onDragStart(e: DragEvent): boolean {
+  onDragStart(e: StatefulEvent<DragEvent>): boolean {
     this.__dragStartFired = true;
     const target = this.target;
     const active = this.isActive();
@@ -200,7 +200,7 @@ export class DraggableTextDelegate {
    * use {@link targetCanDrop} to respect overriding
    * @returns {boolean} determines whether {@link target} should/shouldn't become a drop target
    */
-  canDrop(e: DragEvent): boolean {
+  canDrop(e: StatefulEvent<DragEvent>): boolean {
     if (
       this.target.editable &&
       !this.target.getActiveControl() &&
@@ -224,7 +224,7 @@ export class DraggableTextDelegate {
   /**
    * in order to respect overriding {@link IText#canDrop} we call that instead of calling {@link canDrop} directly
    */
-  protected targetCanDrop(e: DragEvent) {
+  protected targetCanDrop(e: StatefulEvent<DragEvent>) {
     return this.target.canDrop(e);
   }
 

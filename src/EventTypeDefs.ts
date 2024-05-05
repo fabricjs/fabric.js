@@ -19,7 +19,16 @@ export type ModifierKey = keyof Pick<
 
 export type TOptionalModifierKey = ModifierKey | null | undefined;
 
-export type TPointerEvent = MouseEvent | TouchEvent | PointerEvent;
+export type StatefulEvent<E extends Event> = E & {
+  viewportPoint: Point;
+  scenePoint: Point;
+};
+
+export type TPointerEvent = StatefulEvent<
+  MouseEvent | TouchEvent | PointerEvent
+>;
+
+export type TDragEvent = StatefulEvent<DragEvent>;
 
 export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,
@@ -83,7 +92,7 @@ export type Transform = {
 };
 
 export interface TEvent<E extends Event = TPointerEvent> {
-  e: E;
+  e: StatefulEvent<E>;
 }
 
 interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
@@ -130,11 +139,7 @@ type CanvasModificationEvents = ModificationEventsSpec<
   'before:transform': TEvent & { transform: Transform };
 };
 
-export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
-  extends TEvent<E> {
-  target?: FabricObject;
-  subTargets?: FabricObject[];
-  transform?: Transform | null;
+export interface EventPoints {
   /**
    * @deprecated
    * use viewportPoint instead.
@@ -149,6 +154,14 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   absolutePointer: Point;
   scenePoint: Point;
   viewportPoint: Point;
+}
+
+export interface TPointerEventInfo<E extends Event = TPointerEvent>
+  extends TEvent<E>,
+    EventPoints {
+  target?: FabricObject;
+  subTargets: FabricObject[];
+  transform?: Transform | null;
 }
 
 interface SimpleEventHandler<T extends Event = TPointerEvent>
@@ -165,8 +178,7 @@ interface OutEvent {
   nextTarget?: FabricObject;
 }
 
-export type DragEventRenderingEffectData = {
-  e: DragEvent;
+export type DragEventRenderingEffectData = TEvent<DragEvent> & {
   dragSource: FabricObject | undefined;
   dropTarget: FabricObject | undefined;
   prevDropTarget: FabricObject | undefined;
@@ -174,27 +186,13 @@ export type DragEventRenderingEffectData = {
   scenePoint: Point;
 };
 
-export interface DragEventData extends TEvent<DragEvent> {
+export interface DragEventData extends TEvent<DragEvent>, EventPoints {
   target?: FabricObject;
-  subTargets?: FabricObject[];
+  subTargets: FabricObject[];
   dragSource?: FabricObject;
   canDrop?: boolean;
   didDrop?: boolean;
   dropTarget?: FabricObject;
-  /**
-   * @deprecated
-   * use viewportPoint instead.
-   * Kept for compatibility
-   */
-  pointer: Point;
-  /**
-   * @deprecated
-   * use scenePoint instead.
-   * Kept for compatibility
-   */
-  absolutePointer: Point;
-  scenePoint: Point;
-  viewportPoint: Point;
 }
 
 interface DnDEvents {

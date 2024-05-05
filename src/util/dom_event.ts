@@ -1,10 +1,9 @@
-import type { TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { getScrollLeftTop } from './dom_misc';
 
 const touchEvents = ['touchstart', 'touchmove', 'touchend'];
 
-function getTouchInfo(event: TouchEvent | MouseEvent): MouseEvent | Touch {
+function getTouchInfo(event: Event): MouseEvent | Touch {
   const touchProp = (event as TouchEvent).changedTouches;
   if (touchProp && touchProp[0]) {
     return touchProp[0];
@@ -12,14 +11,14 @@ function getTouchInfo(event: TouchEvent | MouseEvent): MouseEvent | Touch {
   return event as MouseEvent;
 }
 
-export const getPointer = (event: TPointerEvent): Point => {
+export const getPointer = (event: Event): Point => {
   const element = event.target as HTMLElement,
     scroll = getScrollLeftTop(element),
     _evt = getTouchInfo(event);
   return new Point(_evt.clientX + scroll.left, _evt.clientY + scroll.top);
 };
 
-export const isTouchEvent = (event: TPointerEvent) =>
+export const isTouchEvent = (event: Event) =>
   touchEvents.includes(event.type) ||
   (event as PointerEvent).pointerType === 'touch';
 

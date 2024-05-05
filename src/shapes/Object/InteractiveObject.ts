@@ -15,6 +15,7 @@ import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import type {
   DragEventRenderingEffectData,
   ObjectEvents,
+  StatefulEvent,
   TPointerEvent,
 } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
@@ -657,7 +658,7 @@ export class InteractiveFabricObject<
    * Fired from {@link Canvas#_onMouseMove}
    * @returns true in order for the window to start a drag session
    */
-  shouldStartDragging(e: TPointerEvent) {
+  shouldStartDragging(e: Event) {
     return false;
   }
 
@@ -666,17 +667,17 @@ export class InteractiveFabricObject<
    * Fired once a drag session has started
    * @returns true to handle the drag event
    */
-  onDragStart(e: DragEvent) {
+  onDragStart(e: StatefulEvent<DragEvent>) {
     return false;
   }
 
   /**
    * Override to customize drag and drop behavior
    * @public
-   * @param {DragEvent} e
+   * @param {StatefulEvent<DragEvent>} e
    * @returns {boolean} true if the object currently dragged can be dropped on the target
    */
-  canDrop(e: DragEvent): boolean {
+  canDrop(e: StatefulEvent<DragEvent>): boolean {
     return false;
   }
 
@@ -685,7 +686,6 @@ export class InteractiveFabricObject<
    * render a specific effect when an object is the source of a drag event
    * example: render the selection status for the part of text that is being dragged from a text object
    * @public
-   * @param {DragEvent} e
    * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
   renderDragSourceEffect(
@@ -701,7 +701,6 @@ export class InteractiveFabricObject<
    * used to show that the underlay object can receive a drop, or to show how the
    * object will change when dropping. example: show the cursor where the text is about to be dropped
    * @public
-   * @param {DragEvent} e
    * @param {CanvasRenderingContext2D} ctx transformed into object plane
    */
   renderDropTargetEffect(
