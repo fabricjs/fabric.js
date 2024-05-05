@@ -277,25 +277,17 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  let scaleMat = createScaleMatrix(
+  let matrix = createScaleMatrix(
     flipX ? -scaleX : scaleX,
     flipY ? -scaleY : scaleY
   );
   if (skewX) {
-    scaleMat = multiplyTransformMatrices(
-      scaleMat,
-      createSkewXMatrix(skewX),
-      true
-    );
+    matrix = multiplyTransformMatrices(matrix, createSkewXMatrix(skewX), true);
   }
   if (skewY) {
-    scaleMat = multiplyTransformMatrices(
-      scaleMat,
-      createSkewXMatrix(skewY),
-      true
-    );
+    matrix = multiplyTransformMatrices(matrix, createSkewXMatrix(skewY), true);
   }
-  return scaleMat;
+  return matrix;
 };
 
 /**
