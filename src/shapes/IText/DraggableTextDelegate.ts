@@ -1,9 +1,5 @@
 import type { Canvas } from '../../canvas/Canvas';
-import type {
-  DragEventData,
-  DropEventData,
-  TPointerEvent,
-} from '../../EventTypeDefs';
+import type { DragEventData, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
@@ -268,7 +264,7 @@ export class DraggableTextDelegate {
    * in order to change the drop value or to customize styling respectively, by listening to the `drop:before` event
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#performing_a_drop
    */
-  dropHandler(ev: DropEventData) {
+  dropHandler(ev: DragEventData) {
     const { e } = ev;
     const didDrop = e.defaultPrevented;
     this.__isDraggingOver = false;

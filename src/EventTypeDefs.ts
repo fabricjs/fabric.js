@@ -172,9 +172,6 @@ export interface DragEventData extends TEvent<DragEvent> {
   canDrop?: boolean;
   didDrop?: boolean;
   dropTarget?: FabricObject;
-}
-
-export interface DropEventData extends DragEventData {
   /**
    * @deprecated
    * use viewportPoint instead.
@@ -192,15 +189,15 @@ export interface DropEventData extends DragEventData {
 }
 
 interface DnDEvents {
-  dragstart: TEventWithTarget<DragEvent>;
+  dragstart: DragEventData;
   drag: DragEventData;
   dragover: DragEventData;
   dragenter: DragEventData & InEvent;
   dragleave: DragEventData & OutEvent;
   dragend: DragEventData;
-  'drop:before': DropEventData;
-  drop: DropEventData;
-  'drop:after': DropEventData;
+  'drop:before': DragEventData;
+  drop: DragEventData;
+  'drop:after': DragEventData;
 }
 
 interface CanvasDnDEvents extends DnDEvents {
