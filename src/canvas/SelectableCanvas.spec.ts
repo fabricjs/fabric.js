@@ -542,13 +542,19 @@ describe('Selectable Canvas', () => {
         canvas.add(rect);
         canvas.setActiveObject(rect);
         expect(
-          canvas.setupCurrentTransform(
-            e,
-            rect,
-            rect.findControl(canvas.getViewportPoint(e)) || {
+          canvas.setupCurrentTransform({
+            e: Object.assign(e, {
+              viewportPoint: canvas.getViewportPoint(e),
+              scenePoint: canvas.getViewportPoint(e),
+            }),
+            viewportPoint: canvas.getViewportPoint(e),
+            scenePoint: canvas.getViewportPoint(e),
+            target: rect,
+            subTargets: [],
+            action: rect.findControl(canvas.getViewportPoint(e)) || {
               key: 'drag',
-            }
-          )
+            },
+          })
         ).toMatchSnapshot();
       });
 

@@ -1053,11 +1053,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           : undefined);
 
       if (transformContext) {
-        const transform = this.setupCurrentTransform(
-          e,
-          activeObject,
-          transformContext
-        );
+        const transform = this.setupCurrentTransform({
+          ...data,
+          target: activeObject,
+          action: transformContext,
+        });
         this.fire('before:transform', {
           e,
           transform,

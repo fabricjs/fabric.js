@@ -4,9 +4,9 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import type {
   CanvasEvents,
   ModifierKey,
-  StatefulEvent,
   TOptionalModifierKey,
   TPointerEvent,
+  TPointerEventInfo,
   Transform,
 } from '../EventTypeDefs';
 import {
@@ -544,23 +544,30 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * Setup state used by the canvas to execute object transforms via the control API
-   * @param {Event} e Event object
+   * @param {TPointerEventInfo} data Event object
    * @param {FabricObject} target
    * @param [transformContext] pass {@link FabricObject.findControl}, `{ key: 'drag' }` to setup dragging
    * or undefined to block transforming
    */
-  setupCurrentTransform(
-    e: StatefulEvent<TPointerEvent>,
-    target: FabricObject,
-    transformContext?:
+  setupCurrentTransform({
+    e,
+    scenePoint,
+    target,
+    action: { key = '', control } = {},
+  }: {
+    e: TPointerEvent;
+    viewportPoint: Point;
+    scenePoint: Point;
+    target: FabricObject;
+    subTargets: FabricObject[];
+    action?:
       | { key: string; control: Control }
       | { key: 'drag'; control?: never }
-  ): Transform {
-    const key = transformContext?.key || '';
-    const control = transformContext?.control;
-    const action = control?.getActionName(e, control, target) ?? key,
-      altKey = e[this.centeredKey as ModifierKey],
-      origin = this._shouldCenterTransform(target, action, altKey)
+      | { key?: never; control?: never };
+  }): Transform {
+    const actionName = control?.getActionName(e, control, target) ?? key,
+      altKey = !!this.centeredKey && e[this.centeredKey],
+      origin = this._shouldCenterTransform(target, actionName, altKey)
         ? ({ x: CENTER, y: CENTER } as const)
         : this._getOriginFromCorner(target, key);
 
@@ -571,14 +578,15 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
-          e.scenePoint,
+          scenePoint,
           undefined,
           target.group.calcTransformMatrix()
         )
-      : e.scenePoint;
+      : scenePoint;
+
     const transform: Transform = {
       target: target,
-      action,
+      action: actionName,
       actionHandler: control
         ? control.getActionHandler(e, target, control)?.bind(control)
         : key === 'drag'
@@ -624,14 +632,22 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     target: FabricObject,
     activateControl: boolean
   ) {
-    const transform = this.setupCurrentTransform(
+    const viewportPoint = this.getViewportPoint(e);
+    const transform = this.setupCurrentTransform({
       e,
       target,
-      (activateControl &&
+      subTargets: this.targets,
+      viewportPoint,
+      scenePoint: sendPointToPlane(
+        viewportPoint,
+        undefined,
+        this.viewportTransform
+      ),
+      action: (activateControl &&
         target.findControl(this.getViewportPoint(e), isTouchEvent(e))) || {
         key: 'drag',
-      }
-    );
+      },
+    });
     this.fire('before:transform', { e, transform });
   }
 
