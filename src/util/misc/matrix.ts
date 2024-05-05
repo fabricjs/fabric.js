@@ -277,14 +277,25 @@ export const calcDimensionsMatrix = ({
   skewX = 0 as TDegree,
   skewY = 0 as TDegree,
 }: TScaleMatrixArgs) => {
-  return multiplyTransformMatrixArray(
-    [
-      createScaleMatrix(flipX ? -scaleX : scaleX, flipY ? -scaleY : scaleY),
-      skewX && createSkewXMatrix(skewX),
-      skewY && createSkewYMatrix(skewY),
-    ],
-    true
+  let scaleMat = createScaleMatrix(
+    flipX ? -scaleX : scaleX,
+    flipY ? -scaleY : scaleY
   );
+  if (skewX) {
+    scaleMat = multiplyTransformMatrices(
+      scaleMat,
+      createSkewXMatrix(skewX),
+      true
+    );
+  }
+  if (skewY) {
+    scaleMat = multiplyTransformMatrices(
+      scaleMat,
+      createSkewXMatrix(skewY),
+      true
+    );
+  }
+  return scaleMat;
 };
 
 /**
@@ -309,9 +320,13 @@ export const composeMatrix = ({
   angle = 0 as TDegree,
   ...otherOptions
 }: TComposeMatrixArgs): TMat2D => {
-  return multiplyTransformMatrixArray([
-    createTranslateMatrix(translateX, translateY),
-    angle && createRotateMatrix({ angle }),
-    calcDimensionsMatrix(otherOptions),
-  ]);
+  let matrix = createTranslateMatrix(translateX, translateY);
+  if (angle) {
+    matrix = multiplyTransformMatrices(matrix, createRotateMatrix({ angle }));
+  }
+  const scaleMatrix = calcDimensionsMatrix(otherOptions);
+  if (!isIdentityMatrix(scaleMatrix)) {
+    matrix = multiplyTransformMatrices(matrix, scaleMatrix);
+  }
+  return matrix;
 };
