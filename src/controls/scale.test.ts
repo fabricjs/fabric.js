@@ -50,8 +50,11 @@ const createZeroThickRectangleScalingItems = (
 
   canvas.setActiveObject(target);
   target.__corner = usedCorner;
-  canvas._setupCurrentTransform(mouseDown, target, false);
-  const transform = canvas._currentTransform!;
+  const transform = canvas.setupCurrentTransform(
+    mouseDown,
+    target,
+    target.getActiveControl()
+  );
   const pointer = canvas.getScenePoint(moveEvent);
 
   // return items used by our action handler

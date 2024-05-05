@@ -6,6 +6,7 @@
 - fix(Canvas): mouse move before event data [#9849](https://github.com/fabricjs/fabric.js/pull/9849)
 - chore(FabricObject): pass `e` to `shouldStartDragging` [#9843](https://github.com/fabricjs/fabric.js/pull/9843)
 - feat(Object): pass `ctx` to dnd methods [#9844](https://github.com/fabricjs/fabric.js/pull/9844)
+- refactor(Canvas): `_setupCurrentTransform` => `setupCurrentTransform` fixing control mousedown unexpected behavior [#9842](https://github.com/fabricjs/fabric.js/pull/9842)
 - ci(): Add Jest coverage to the report [#9836](https://github.com/fabricjs/fabric.js/pull/9836)
 - test(): Add cursor animation testing and migrate some easy one to jest [#9829](https://github.com/fabricjs/fabric.js/pull/9829)
 - fix(Group, Controls): Fix interactive group actions when negative scaling is involved [#9811](https://github.com/fabricjs/fabric.js/pull/9811)

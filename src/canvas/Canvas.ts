@@ -1043,23 +1043,39 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
 
     if (activeObject) {
-      const foundControl =
+      const controlContext =
         activeObject === prevActiveObject &&
         activeObject.findControl(viewportPoint, isTouchEvent(e));
-      if (foundControl || !executedMultiSelection) {
-        this._setupCurrentTransform(
+      const transformContext =
+        controlContext ||
+        (activeObject === prevActiveObject && !executedMultiSelection
+          ? ({ key: 'drag' } as const)
+          : undefined);
+
+      if (transformContext) {
+        const transform = this.setupCurrentTransform(
           e,
           activeObject,
-          prevActiveObject === activeObject
+          transformContext
         );
-        const control = foundControl ? foundControl.control : undefined,
-          mouseDownHandler =
-            control && control.getMouseDownHandler(e, activeObject, control);
+        this.fire('before:transform', {
+          e,
+          transform,
+        });
+
+        const mouseDownHandler =
+          controlContext &&
+          controlContext.control.getMouseDownHandler(
+            e,
+            activeObject,
+            controlContext.control
+          );
+
         mouseDownHandler &&
           mouseDownHandler.call(
-            control,
+            controlContext.control,
             e,
-            this._currentTransform!,
+            transform,
             scenePoint.x,
             scenePoint.y
           );
