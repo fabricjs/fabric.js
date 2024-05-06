@@ -85,6 +85,26 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
+ * @perf declare at top level to avoid recreating on the fly
+ */
+const reduceMatrices = (
+  product: TMat2D | undefined | null | false,
+  curr: TMat2D | undefined | null | false
+) =>
+  curr && product ? multiplyTransformMatrices(curr, product) : curr || product;
+
+/**
+ * @perf declare at top level to avoid recreating on the fly
+ */
+const reduce2x2Matrices = (
+  product: TMat2D | undefined | null | false,
+  curr: TMat2D | undefined | null | false
+) =>
+  curr && product
+    ? multiplyTransformMatrices(curr, product, true)
+    : curr || product;
+
+/**
  * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
  *
  * `multiplyTransformMatrixArray([A, B, C, D])` is equivalent to `A(B(C(D)))`
@@ -97,13 +117,8 @@ export const multiplyTransformMatrixArray = (
   matrices: (TMat2D | undefined | null | false)[],
   is2x2?: boolean
 ): TMat2D =>
-  matrices.reduceRight(
-    (product: TMat2D | undefined, curr) =>
-      curr && product
-        ? multiplyTransformMatrices(curr, product, is2x2)
-        : curr || product,
-    undefined
-  ) || (iMatrix.concat() as TMat2D);
+  matrices.reduceRight(is2x2 ? reduce2x2Matrices : reduceMatrices, undefined) ||
+  (iMatrix.concat() as TMat2D);
 
 export const calcPlaneRotation = ([a, b]: TMat2D) =>
   Math.atan2(b, a) as TRadian;
