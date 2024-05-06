@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): multiplyTransformMatrixArray redundant multiplication [#9860](https://github.com/fabricjs/fabric.js/pull/9860)
 - fix(Polyline): safeguard points arg from options [#9855](https://github.com/fabricjs/fabric.js/pull/9855)
 - feat(IText): Adjust cursor blinking for better feedback [#9823](https://github.com/fabricjs/fabric.js/pull/9823)
 - feat(FabricObject): pass `e` to `shouldStartDragging` [#9843](https://github.com/fabricjs/fabric.js/pull/9843)
