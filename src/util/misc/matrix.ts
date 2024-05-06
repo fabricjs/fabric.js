@@ -271,6 +271,18 @@ export const createSkewYMatrix = (skewValue: TDegree): TMat2D => [
   0,
 ];
 
+export const hasMatrixDimensionProps = ({
+  scaleX,
+  scaleY,
+  skewX,
+  skewY,
+  flipX,
+  flipY,
+}: TComposeMatrixArgs) =>
+  (typeof scaleX === 'number' && scaleX !== 1) ||
+  (typeof scaleY === 'number' && scaleY !== 1) ||
+  !!(skewX || skewY || flipX || flipY);
+
 /**
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
@@ -286,22 +298,20 @@ export const createSkewYMatrix = (skewValue: TDegree): TMat2D => [
  * @param  {Number} [options.skewY]
  * @return {Number[]} transform matrix
  */
-export const calcDimensionsMatrix = ({
-  scaleX = 1,
-  scaleY = 1,
-  flipX = false,
-  flipY = false,
-  skewX = 0 as TDegree,
-  skewY = 0 as TDegree,
-}: TScaleMatrixArgs) => {
-  return multiplyTransformMatrixArray(
-    [
-      createScaleMatrix(flipX ? -scaleX : scaleX, flipY ? -scaleY : scaleY),
-      skewX && createSkewXMatrix(skewX),
-      skewY && createSkewYMatrix(skewY),
-    ],
-    true
-  );
+export const calcDimensionsMatrix = (decomposedValues: TScaleMatrixArgs) => {
+  return hasMatrixDimensionProps(decomposedValues)
+    ? multiplyTransformMatrixArray(
+        [
+          createScaleMatrix(
+            (decomposedValues.flipX ? -1 : 1) * (decomposedValues.scaleX ?? 1),
+            (decomposedValues.flipY ? -1 : 1) * (decomposedValues.scaleY ?? 1)
+          ),
+          decomposedValues.skewX && createSkewXMatrix(decomposedValues.skewX),
+          decomposedValues.skewY && createSkewYMatrix(decomposedValues.skewY),
+        ],
+        true
+      )
+    : (iMatrix.concat() as TMat2D);
 };
 
 /**
@@ -324,23 +334,12 @@ export const composeMatrix = ({
   translateX,
   translateY,
   angle,
-  scaleX,
-  scaleY,
-  skewX,
-  skewY,
-  flipX,
-  flipY,
+  ...dimensionProps
 }: TComposeMatrixArgs): TMat2D => {
   return multiplyTransformMatrixArray([
     !!(translateX || translateY) &&
       createTranslateMatrix(translateX, translateY),
     angle && createRotateMatrix({ angle }),
-    ((scaleX && scaleX !== 1) ||
-      (scaleY && scaleY !== 1) ||
-      skewX ||
-      skewY ||
-      flipX ||
-      flipY) &&
-      calcDimensionsMatrix({ scaleX, scaleY, skewX, skewY, flipX, flipY }),
+    calcDimensionsMatrix(dimensionProps),
   ]);
 };
