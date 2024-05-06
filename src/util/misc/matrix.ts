@@ -285,7 +285,7 @@ export const calcDimensionsMatrix = ({
     matrix = multiplyTransformMatrices(matrix, createSkewXMatrix(skewX), true);
   }
   if (skewY) {
-    matrix = multiplyTransformMatrices(matrix, createSkewXMatrix(skewY), true);
+    matrix = multiplyTransformMatrices(matrix, createSkewYMatrix(skewY), true);
   }
   return matrix;
 };
