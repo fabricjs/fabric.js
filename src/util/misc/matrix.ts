@@ -96,12 +96,14 @@ export const multiplyTransformMatrices = (
 export const multiplyTransformMatrixArray = (
   matrices: (TMat2D | undefined | null | false)[],
   is2x2?: boolean
-) =>
+): TMat2D =>
   matrices.reduceRight(
-    (product: TMat2D, curr) =>
-      curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
-    iMatrix
-  );
+    (product: TMat2D | undefined, curr) =>
+      curr && product
+        ? multiplyTransformMatrices(curr, product, is2x2)
+        : curr || product,
+    undefined
+  ) || (iMatrix.concat() as TMat2D);
 
 export const calcPlaneRotation = ([a, b]: TMat2D) =>
   Math.atan2(b, a) as TRadian;
@@ -142,7 +144,7 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
  * @param {number} [y] translation on Y axis
  * @returns {TMat2D} matrix
  */
-export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
+export const createTranslateMatrix = (x = 0, y = 0): TMat2D => [
   1,
   0,
   0,
@@ -304,14 +306,26 @@ export const calcDimensionsMatrix = ({
  * @return {Number[]} transform matrix
  */
 export const composeMatrix = ({
-  translateX = 0,
-  translateY = 0,
-  angle = 0 as TDegree,
-  ...otherOptions
+  translateX,
+  translateY,
+  angle,
+  scaleX,
+  scaleY,
+  skewX,
+  skewY,
+  flipX,
+  flipY,
 }: TComposeMatrixArgs): TMat2D => {
   return multiplyTransformMatrixArray([
-    createTranslateMatrix(translateX, translateY),
+    !!(translateX || translateY) &&
+      createTranslateMatrix(translateX, translateY),
     angle && createRotateMatrix({ angle }),
-    calcDimensionsMatrix(otherOptions),
+    ((scaleX && scaleX !== 1) ||
+      (scaleY && scaleY !== 1) ||
+      skewX ||
+      skewY ||
+      flipX ||
+      flipY) &&
+      calcDimensionsMatrix({ scaleX, scaleY, skewX, skewY, flipX, flipY }),
   ]);
 };
