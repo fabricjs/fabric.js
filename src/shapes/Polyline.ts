@@ -108,7 +108,7 @@ export class Polyline<
    * });
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
-    super({ points, ...options });
+    super({ ...options, points });
     const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
