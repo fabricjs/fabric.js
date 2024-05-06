@@ -30,7 +30,7 @@ import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { cos, createCanvasElement, invertTransform, sin } from '../util';
+import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
 import type { CanvasOptions } from './CanvasOptions';
@@ -908,42 +908,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   searchPossibleTargets(objects: FabricObject[], pointer: Point) {
     return this.findTargets(objects, pointer).target;
-  }
-
-  /**
-   * Returns pointer coordinates without the effect of the viewport
-   * @param {Object} pointer with "x" and "y" number values in canvas HTML coordinates
-   * @return {Object} object with "x" and "y" number values in fabricCanvas coordinates
-   */
-  restorePointerVpt(pointer: Point): Point {
-    return pointer.transform(invertTransform(this.viewportTransform));
-  }
-
-  /**
-   * Returns pointer coordinates relative to canvas.
-   * Can return coordinates with or without viewportTransform.
-   * ignoreVpt false gives back coordinates that represent
-   * the point clicked on canvas element.
-   * ignoreVpt true gives back coordinates after being processed
-   * by the viewportTransform ( sort of coordinates of what is displayed
-   * on the canvas where you are clicking.
-   * ignoreVpt true = HTMLElement coordinates relative to top,left
-   * ignoreVpt false, default = fabric space coordinates, the same used for shape position.
-   * To interact with your shapes top and left you want to use ignoreVpt false
-   * most of the time, while ignoreVpt true will give you coordinates
-   * compatible with the object.oCoords system.
-   * of the time.
-   * @param {Event} e
-   * @param {Boolean} ignoreVpt
-   * @return {Point}
-   */
-  getPointer(e: TPointerEvent, ignoreVpt = false): Point {
-    // return cached values if we are in the event processing chain
-    if (this._absolutePointer && !ignoreVpt) {
-      return this._absolutePointer;
-    }
-
-    return target;
   }
 
   /**
