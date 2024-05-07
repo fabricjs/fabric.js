@@ -205,7 +205,7 @@ export class IText<
   static ownDefaults = iTextDefaultValues;
 
   static getDefaults(): Record<string, any> {
-    return { ...super.getDefaults(), ...IText.ownDefaults };
+    return {};
   }
 
   static type = 'IText';
@@ -698,6 +698,8 @@ export class IText<
     super.dispose();
   }
 }
+
+Object.assign(IText.prototype, IText.ownDefaults);
 
 classRegistry.setClass(IText);
 // legacy

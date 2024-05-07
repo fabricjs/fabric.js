@@ -417,7 +417,7 @@ export class FabricText<
   static type = 'Text';
 
   static getDefaults(): Record<string, any> {
-    return { ...super.getDefaults(), ...FabricText.ownDefaults };
+    return {};
   }
 
   constructor(text: string, options: Props = {} as Props) {
@@ -1914,6 +1914,7 @@ export class FabricText<
   }
 }
 
+Object.assign(FabricText.prototype, FabricText.ownDefaults);
 applyMixins(FabricText, [TextSVGExportMixin]);
 classRegistry.setClass(FabricText);
 classRegistry.setSVGClass(FabricText);

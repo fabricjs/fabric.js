@@ -296,7 +296,7 @@ export class FabricObject<
   static ownDefaults = fabricObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
-    return { ...FabricObject.ownDefaults };
+    return {};
   }
 
   /**
@@ -1629,6 +1629,8 @@ export class FabricObject<
     return this._fromObject(object, options);
   }
 }
+
+Object.assign(FabricObject.prototype, FabricObject.ownDefaults);
 
 classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, 'object');

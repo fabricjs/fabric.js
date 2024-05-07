@@ -137,11 +137,7 @@ export class InteractiveFabricObject<
   static ownDefaults = interactiveObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
-    return {
-      ...super.getDefaults(),
-      controls: createObjectDefaultControls(),
-      ...InteractiveFabricObject.ownDefaults,
-    };
+    return {};
   }
 
   /**
@@ -699,3 +695,5 @@ export class InteractiveFabricObject<
     // for subclasses
   }
 }
+Object.assign(InteractiveFabricObject.prototype, InteractiveFabricObject.ownDefaults);
+Object.assign(InteractiveFabricObject.prototype, {controls: createObjectDefaultControls()});
