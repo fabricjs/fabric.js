@@ -39,8 +39,7 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
  *
  * const filter = new BlendImage({
  *  image: fabricImageObject,
- *  mode: 'multiply',
- *  alpha: 0.5
+ *  mode: 'multiply'
  * });
  * object.filters.push(filter);
  * object.applyFilters();
@@ -48,11 +47,19 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
  */
 export class BlendImage extends BaseFilter {
   /**
-   * Color to make the blend operation with. default to a reddish color since black or white
-   * gives always strong result.
+   * Image to make the blend operation with.
    **/
   declare image: FabricImage;
 
+  /**
+   * Blend mode for the filter: either 'multiply' or 'mask'. 'multiply' will
+   * multiply the values of each channel (R, G, B, and A) of the filter image by
+   * their corresponding values in the base image. 'mask' will only look at the
+   * alpha channel of the filter image, and apply those values to the base
+   * image's alpha channel.
+   * @type String
+   * @default
+   **/
   declare mode: TBlendImageMode;
 
   /**

@@ -33,8 +33,7 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
  *
  * const filter = new BlendImage({
  *  image: fabricImageObject,
- *  mode: 'multiply',
- *  alpha: 0.5
+ *  mode: 'multiply'
  * });
  * object.filters.push(filter);
  * object.applyFilters();
