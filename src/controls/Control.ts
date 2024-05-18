@@ -327,8 +327,8 @@ export class Control {
     return {
       tl: new Point(-0.5, -0.5).transform(t),
       tr: new Point(0.5, -0.5).transform(t),
-      bl: new Point(-0.5, 0.5).transform(t),
       br: new Point(0.5, 0.5).transform(t),
+      bl: new Point(-0.5, 0.5).transform(t),
     };
   }
 
