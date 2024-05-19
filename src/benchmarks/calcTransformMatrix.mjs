@@ -96,3 +96,9 @@ console.log({ simpleOld, simpleNew });
  * { complexOld: 749, complexNew: 627 }
  * { simpleOld: 537, simpleNew: 374 }
  */
+
+/**
+ * After removing the spread operator
+ * { complexOld: 761, complexNew: 446 }
+ * { simpleOld: 526, simpleNew: 271 }
+ */

@@ -294,6 +294,7 @@ export const calcDimensionsMatrix = ({
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
+ * Before changing this function look at: src/benchmarks/calcTransformMatrix.mjs
  * @param  {Object} options
  * @param  {Number} [options.angle]
  * @param  {Number} [options.scaleX]
@@ -306,17 +307,13 @@ export const calcDimensionsMatrix = ({
  * @param  {Number} [options.translateY]
  * @return {Number[]} transform matrix
  */
-export const composeMatrix = ({
-  translateX = 0,
-  translateY = 0,
-  angle = 0 as TDegree,
-  ...otherOptions
-}: TComposeMatrixArgs): TMat2D => {
+export const composeMatrix = (options: TComposeMatrixArgs): TMat2D => {
+  const { translateX = 0, translateY = 0, angle = 0 as TDegree } = options;
   let matrix = createTranslateMatrix(translateX, translateY);
   if (angle) {
     matrix = multiplyTransformMatrices(matrix, createRotateMatrix({ angle }));
   }
-  const scaleMatrix = calcDimensionsMatrix(otherOptions);
+  const scaleMatrix = calcDimensionsMatrix(options);
   if (!isIdentityMatrix(scaleMatrix)) {
     matrix = multiplyTransformMatrices(matrix, scaleMatrix);
   }
