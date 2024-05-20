@@ -446,18 +446,18 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     prefix.push(
       this.top,
       this.left,
-      this.scaleX,
-      this.scaleY,
-      this.skewX,
-      this.skewY,
-      this.angle,
-      resolveOrigin(this.originX),
-      resolveOrigin(this.originY),
       this.width,
       this.height,
+      this.scaleX,
+      this.scaleY,
+      this.angle,
+      this.strokeWidth,
+      this.skewX,
+      this.skewY,
       +this.flipX,
       +this.flipY,
-      this.strokeWidth
+      resolveOrigin(this.originX),
+      resolveOrigin(this.originY)
     );
 
     return prefix;
