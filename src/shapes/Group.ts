@@ -665,7 +665,7 @@ export class Group
    */
   static fromObject<T extends TOptions<SerializedGroupProps>>(
     { type, objects = [], layoutManager, ...options }: T,
-    abortable: Abortable = {}
+    abortable?: Abortable
   ) {
     return Promise.all([
       enlivenObjects<FabricObject>(objects, abortable),
