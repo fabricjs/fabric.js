@@ -1,6 +1,11 @@
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
-import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
+import type {
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+  Abortable,
+} from '../typedefs';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -658,15 +663,13 @@ export class Group
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject<T extends TOptions<SerializedGroupProps>>({
-    type,
-    objects = [],
-    layoutManager,
-    ...options
-  }: T) {
+  static fromObject<T extends TOptions<SerializedGroupProps>>(
+    { type, objects = [], layoutManager, ...options }: T,
+    abortable: Abortable = {}
+  ) {
     return Promise.all([
-      enlivenObjects<FabricObject>(objects),
-      enlivenObjectEnlivables(options),
+      enlivenObjects<FabricObject>(objects, abortable),
+      enlivenObjectEnlivables(options, abortable),
     ]).then(([objects, hydratedOptions]) => {
       const group = new this(objects, {
         ...options,
