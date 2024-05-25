@@ -26,6 +26,16 @@ export class Triangle<
   }
 
   /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, (this.constructor as typeof Triangle).ownDefaults);
+    this.setOptions(options);
+  }
+
+  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */

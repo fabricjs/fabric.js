@@ -145,6 +145,19 @@ export class InteractiveFabricObject<
   }
 
   /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(
+      this,
+      (this.constructor as typeof InteractiveFabricObject).ownDefaults
+    );
+    this.setOptions(options);
+  }
+
+  /**
    * Update width and height of the canvas for cache
    * returns true or false if canvas needed resize.
    * @private

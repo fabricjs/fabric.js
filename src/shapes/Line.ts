@@ -71,8 +71,14 @@ export class Line<
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Props = {} as Props) {
-    super({ ...options, x1, y1, x2, y2 });
+  constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Partial<Props> = {}) {
+    super();
+    Object.assign(this, (this.constructor as typeof Line).ownDefaults);
+    this.setOptions(options);
+    this.x1 = x1;
+    this.x2 = x2;
+    this.y1 = y1;
+    this.y2 = y2;
     this._setWidthHeight();
     const { left, top } = options;
     typeof left === 'number' && this.set(LEFT, left);

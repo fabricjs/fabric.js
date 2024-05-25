@@ -6,13 +6,6 @@ export class Polygon extends Polyline {
 
   static type = 'Polygon';
 
-  static getDefaults(): Record<string, any> {
-    return {
-      ...super.getDefaults(),
-      ...Polyline.ownDefaults,
-    };
-  }
-
   protected isOpen() {
     return false;
   }

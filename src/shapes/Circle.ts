@@ -88,6 +88,16 @@ export class Circle<
   }
 
   /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, (this.constructor as typeof Circle).ownDefaults);
+    this.setOptions(options);
+  }
+
+  /**
    * @private
    * @param {String} key
    * @param {*} value

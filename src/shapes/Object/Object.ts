@@ -296,7 +296,7 @@ export class FabricObject<
   static ownDefaults = fabricObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
-    return { ...FabricObject.ownDefaults };
+    return FabricObject.ownDefaults;
   }
 
   /**
@@ -333,12 +333,9 @@ export class FabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Props = {} as Props) {
+  constructor(options?: Props) {
     super();
-    Object.assign(
-      this,
-      (this.constructor as typeof FabricObject).getDefaults()
-    );
+    Object.assign(this, (this.constructor as typeof FabricObject).ownDefaults);
     this.setOptions(options);
   }
 

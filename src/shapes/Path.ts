@@ -76,9 +76,12 @@ export class Path<
    */
   constructor(
     path: TComplexPathData | string,
+    // todo: evaluate this spread here
     { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
-    super(options as Props);
+    super();
+    Object.assign(this, (this.constructor as typeof Path).ownDefaults);
+    this.setOptions(options);
     this._setPath(path || [], true);
     typeof left === 'number' && this.set(LEFT, left);
     typeof top === 'number' && this.set(TOP, top);

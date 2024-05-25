@@ -62,10 +62,14 @@ export class ActiveSelection extends Group {
     options: Partial<ActiveSelectionOptions> = {}
   ) {
     super(objects, {
-      ...options,
       layoutManager:
         options.layoutManager ?? new ActiveSelectionLayoutManager(),
     });
+    Object.assign(
+      this,
+      (this.constructor as typeof ActiveSelection).ownDefaults
+    );
+    this.setOptions(options);
   }
 
   /**
