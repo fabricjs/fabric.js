@@ -98,7 +98,6 @@ export class Textbox<
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createTextboxDefaultControls(),
       ...Textbox.ownDefaults,
     };
   }
@@ -109,9 +108,7 @@ export class Textbox<
    * @param {Object} [options] Options object
    */
   constructor(text: string, options?: Props) {
-    super(text);
-    Object.assign(this, Textbox.ownDefaults);
-    this.setOptions(options);
+    super(text, { ...Textbox.ownDefaults, ...options } as Props);
   }
 
   /**

@@ -59,16 +59,12 @@ export class ActiveSelection extends Group {
 
   constructor(
     objects: FabricObject[] = [],
-    options: Partial<ActiveSelectionOptions> = {}
+    { layoutManager, ...options }: Partial<ActiveSelectionOptions> = {}
   ) {
     super(objects, {
-      layoutManager:
-        options.layoutManager ?? new ActiveSelectionLayoutManager(),
+      layoutManager: layoutManager ?? new ActiveSelectionLayoutManager(),
     });
-    Object.assign(
-      this,
-      (this.constructor as typeof ActiveSelection).ownDefaults
-    );
+    Object.assign(this, ActiveSelection.ownDefaults);
     this.setOptions(options);
   }
 

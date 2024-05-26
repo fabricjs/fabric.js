@@ -222,9 +222,7 @@ export class IText<
    * @param {Object} [options] Options object
    */
   constructor(text: string, options?: Props) {
-    super(text);
-    Object.assign(this, IText.ownDefaults);
-    this.setOptions(options);
+    super(text, { ...IText.ownDefaults, ...options } as Props);
     this.initBehavior();
   }
 

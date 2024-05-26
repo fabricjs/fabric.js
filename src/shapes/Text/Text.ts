@@ -423,8 +423,8 @@ export class FabricText<
   constructor(text: string, options?: Props) {
     super();
     Object.assign(this, FabricText.ownDefaults);
-    this.text = text;
     this.setOptions(options);
+    this.text = text;
     this.initialized = true;
     if (this.path) {
       this.setPathInfo();
