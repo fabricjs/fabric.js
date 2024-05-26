@@ -1,11 +1,11 @@
 import { runningAnimations } from './AnimationRegistry';
-import { animateColor } from './animate';
+import { animateColor, animate } from './animate';
 import * as ease from './easing';
 import { Color } from '../../color/Color';
 import { FabricObject } from '../../shapes/Object/FabricObject';
 
 jest.useFakeTimers();
-const findAnimationsByTarget = (target) =>
+const findAnimationsByTarget = (target: any) =>
   runningAnimations.filter(({ target: t }) => target === t);
 
 describe('animate', () => {
@@ -99,251 +99,146 @@ describe('animate', () => {
     });
     jest.advanceTimersByTime(duration + 16);
   });
+  it('animateColor opacity only', async () => {
+    let called = false;
+    const duration = 96;
+    animateColor({
+      startValue: 'rgba(255, 0, 0, 0.9)',
+      endValue: 'rgba(255, 0, 0, 0.7)',
+      duration: 96,
+      onChange: function (val, changePerc) {
+        const alpha = new Color(val).getAlpha();
+        // 'valueProgress should match'
+        expect(changePerc).toBe((0.9 - alpha) / (0.9 - 0.7));
+        called = true;
+      },
+      onComplete: function (val, changePerc, timePerc) {
+        // 'color is animated on all 4 values';
+        expect(val).toBe('rgba(255,0,0,0.7)');
+      },
+    });
+    jest.advanceTimersByTime(duration + 16);
+    expect(called).toBe(true);
+  });
+  it('endValue', async () => {
+    const duration = 16;
+    animate({
+      startValue: 2,
+      endValue: 5,
+      duration,
+      onComplete: function (val, changePerc, timePerc) {
+        //  'endValue is respected')
+        expect(val).toBe(5);
+        // , 'change percentage is 100%')
+        expect(changePerc).toBe(1);
+        // , 'time percentage is 100%'
+        expect(timePerc).toBe(1);
+      },
+    });
+    jest.advanceTimersByTime(duration + 16);
+  });
+  it('animation context', async () => {
+    const options = { foo: 'bar' };
+    const context = animate(options);
+    expect(context.state).toBe('pending');
+    expect(typeof context.abort === 'function').toBe(true);
+    expect(context.duration).toEqual(500);
+    expect(runningAnimations.length).toBe(1);
+    jest.advanceTimersByTime(32);
+    expect(context.state).toBe('running');
+    jest.advanceTimersByTime(1000);
+    expect(context.state).toBe('completed');
+    // 'animation should not exist in registry'
+    expect(runningAnimations.length).toBe(0);
+  });
+  it('runningAnimations', async () => {
+    expect(runningAnimations instanceof Array).toBe(true);
+    expect(typeof runningAnimations.cancelAll === 'function').toBe(true);
+    expect(typeof runningAnimations.cancelByTarget === 'function').toBe(true);
+    expect(typeof runningAnimations.cancelByCanvas === 'function').toBe(true);
+    expect(runningAnimations.length).toBe(0);
+    const target = { foo: 'bar' };
+    const context = animate({
+      target,
+    });
+    jest.advanceTimersByTime(32);
+    // 'should have registered animation'
+    expect(runningAnimations.length).toBe(1);
+    expect(context.state).toBe('running');
+    // 'animation should exist in registry'
+    expect(runningAnimations.indexOf(context)).toBe(0);
+    const byTarget = findAnimationsByTarget(target);
+    //  'should have found registered animation by target'
+    expect(byTarget.length).toBe(1);
+    //  'should have found registered animation by target'
+    expect(byTarget[0]).toEqual(context);
+    jest.advanceTimersByTime(1000);
+    expect(context.state).toBe('completed');
+    expect(runningAnimations.length).toBe(0);
+  });
+  it('runningAnimations with abort', async () => {
+    let abort = false;
+    var options = {
+      abort() {
+        return abort;
+      },
+    };
+    var context = animate(options);
+    jest.advanceTimersByTime(100);
+    expect(runningAnimations.length).toBe(1);
+    expect(runningAnimations.indexOf(context)).toBe(0);
+    expect(context.state).toBe('running');
+    abort = true;
+    jest.advanceTimersByTime(100);
+    expect(runningAnimations.length).toBe(0);
+    expect(runningAnimations.indexOf(context)).toBe(-1);
+    expect(context.state).toBe('aborted');
+  });
+  it('runningAnimations with imperative abort', async () => {
+    var options = { foo: 'bar' };
+    var context = animate(options);
+    expect(context.state).toBe('pending');
+    jest.advanceTimersByTime(32);
+    expect(context.state).toBe('running');
+    context.abort();
+    jest.advanceTimersByTime(32);
+    expect(context.state).toBe('aborted');
+  });
+  it('runningAnimations cancelAll', async () => {
+    const options = { foo: 'bar' };
+    animate(options);
+    animate(options);
+    animate(options);
+    animate(options);
+    expect(runningAnimations.length).toBe(4);
+    expect(typeof runningAnimations.cancelAll === 'function').toBe(true);
+    const cancelledAnimations = runningAnimations.cancelAll();
+    expect(cancelledAnimations.length).toBe(4);
+    expect(runningAnimations.length).toBe(0);
+    //  make sure splice didn't destroy instance
+    expect(runningAnimations instanceof Array).toBe(true);
+  });
 });
 
-//   QUnit.test('animateColor opacity only', function (assert) {
-//     var done = assert.async();
-//     let called = false;
-//     animateColor({
-//       startValue: 'rgba(255, 0, 0, 0.9)',
-//       endValue: 'rgba(255, 0, 0, 0.7)',
-//       duration: 96,
-//       onChange: function (val, changePerc) {
-//         const alpha = new fabric.Color(val).getAlpha();
-//         expect(
-//           changePerc,
-//           (0.9 - alpha) / (0.9 - 0.7),
-//           'valueProgress should match'
-//         );
-//         called = true;
-//       },
-//       onComplete: function (val, changePerc, timePerc) {
-//         expect(
-//           val,
-//           'rgba(255,0,0,0.7)',
-//           'color is animated on all 4 values'
-//         );
-//         expect(changePerc, 1, 'change percentage is 100%');
-//         expect(timePerc, 1, 'time percentage is 100%');
-//         expect((called);
-//         done();
-//       },
-//     });
-//   });
-
-//   QUnit.test('endValue', function (assert) {
-//     var done = assert.async();
-//     animate({
-//       startValue: 2,
-//       endValue: 5,
-//       duration: 16,
-//       onComplete: function (val, changePerc, timePerc) {
-//         expect(val, 5, 'endValue is respected');
-//         expect(changePerc, 1, 'change percentage is 100%');
-//         expect(timePerc, 1, 'time percentage is 100%');
-//         done();
-//       },
-//     });
-//   });
-
-//   QUnit.test('animation context', function (assert) {
-//     var done = assert.async();
-//     var options = { foo: 'bar' };
-//     const context = animate(options);
-//     expect(context.state, 'pending', 'state');
-//     expect((typeof context.abort === 'function', 'context');
-//     expect(context.duration, 500, 'defaults');
-//     assert.propEqual(options, { foo: 'bar' }, 'options were mutated');
-//     setTimeout(function () {
-//       expect(context.state, 'completed', 'state');
-//       expect(
-//         fabric.runningAnimations.length,
-//         0,
-//         'animation should not exist in registry'
-//       );
-//       done();
-//     }, 1000);
-//   });
-
-//   QUnit.test('fabric.runningAnimations', function (assert) {
-//     var done = assert.async();
-//     expect((fabric.runningAnimations instanceof Array);
-//     expect((typeof fabric.runningAnimations.cancelAll === 'function');
-//     expect((typeof fabric.runningAnimations.cancelByTarget === 'function');
-//     expect((typeof fabric.runningAnimations.cancelByCanvas === 'function');
-//     expect(
-//       fabric.runningAnimations.length,
-//       0,
-//       'should have registered animation'
-//     );
-//     var context,
-//       target = { foo: 'bar' };
-//     var options = {
-//       target,
-//       onChange() {
-//         expect(context.state, 'running', 'state');
-//         expect(
-//           fabric.runningAnimations.indexOf(context),
-//           0,
-//           'animation should exist in registry'
-//         );
-//       },
-//       onComplete() {
-//         setTimeout(() => {
-//           expect(context.state, 'completed', 'state');
-//           expect(
-//             fabric.runningAnimations.length,
-//             0,
-//             'should have unregistered animation'
-//           );
-//           done();
-//         }, 0);
-//       },
-//     };
-//     context = animate(options);
-//     expect(
-//       fabric.runningAnimations.length,
-//       1,
-//       'should have registered animation'
-//     );
-//     expect(
-//       fabric.runningAnimations.indexOf(context),
-//       0,
-//       'animation should exist in registry'
-//     );
-//     var byTarget = findAnimationsByTarget(target);
-//     expect(
-//       byTarget.length,
-//       1,
-//       'should have found registered animation by target'
-//     );
-//     assert.deepEqual(
-//       byTarget[0],
-//       context,
-//       'should have found registered animation by target'
-//     );
-//     delete byTarget[0].target;
-//     expect(
-//       findAnimationsByTarget(target),
-//       0,
-//       'should not have found registered animation by target'
-//     );
-//   });
-
-//   QUnit.test('fabric.runningAnimations with abort', function (assert) {
-//     var done = assert.async();
-//     var _abort = false;
-//     var options = {
-//       onStart() {
-//         setTimeout(() => {
-//           _abort = true;
-//         }, 100);
-//       },
-//       abort() {
-//         if (_abort) {
-//           setTimeout(() => {
-//             expect(
-//               fabric.runningAnimations.length,
-//               0,
-//               'should have unregistered animation'
-//             );
-//             done();
-//           }, 0);
-//         }
-//         expect(
-//           fabric.runningAnimations.indexOf(context),
-//           0,
-//           'animation should exist in registry'
-//         );
-//         return _abort;
-//       },
-//     };
-//     var context = animate(options);
-//     expect(
-//       fabric.runningAnimations.length,
-//       1,
-//       'should have registered animation'
-//     );
-//     expect(
-//       fabric.runningAnimations.indexOf(context),
-//       0,
-//       'animation should exist in registry'
-//     );
-//   });
-
-//   QUnit.test(
-//     'fabric.runningAnimations with imperative abort',
-//     function (assert) {
-//       var options = { foo: 'bar' };
-//       var context = animate(options);
-//       expect(context.state, 'pending', 'state');
-//       expect(
-//         fabric.runningAnimations.length,
-//         1,
-//         'should have registered animation'
-//       );
-//       expect(
-//         fabric.runningAnimations.indexOf(context),
-//         0,
-//         'animation should exist in registry'
-//       );
-//       context.abort();
-//       expect(context.state, 'aborted', 'state');
-//       expect(
-//         fabric.runningAnimations.length,
-//         0,
-//         'should have unregistered animation'
-//       );
-//     }
-//   );
-
-//   QUnit.test('fabric.runningAnimations cancelAll', function (assert) {
-//     var options = { foo: 'bar' };
-//     animate(options);
-//     animate(options);
-//     animate(options);
-//     animate(options);
-//     expect(
-//       fabric.runningAnimations.length,
-//       4,
-//       'should have registered animations'
-//     );
-//     var cancelledAnimations = fabric.runningAnimations.cancelAll();
-//     expect(
-//       cancelledAnimations.length,
-//       4,
-//       'should return cancelled animations'
-//     );
-//     expect(
-//       fabric.runningAnimations.length,
-//       0,
-//       'should have registered animations'
-//     );
-//     //  make sure splice didn't destroy instance
-//     expect((fabric.runningAnimations instanceof Array);
-//     expect((typeof fabric.runningAnimations.cancelAll === 'function');
-//   });
-
-//   QUnit.test('fabric.runningAnimations cancelByCanvas', function (assert) {
-//     var done = assert.async();
+//   it('runningAnimations cancelByCanvas', async () => {
 //     var canvas = { pip: 'py' };
 //     animate({ foo: 'bar', target: 'pip' });
 //     animate({ foo: 'bar', target: { canvas: 'pip' } });
 //     animate({ foo: 'bar' });
 //     animate({ target: { canvas } });
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       4,
 //       'should have registered animations'
 //     );
-//     var cancelledAnimations = fabric.runningAnimations.cancelByCanvas();
+//     var cancelledAnimations = runningAnimations.cancelByCanvas();
 //     expect(cancelledAnimations.length, 0, 'should return empty array');
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       4,
 //       'should have registered animations'
 //     );
-//     cancelledAnimations = fabric.runningAnimations.cancelByCanvas(canvas);
+//     cancelledAnimations = runningAnimations.cancelByCanvas(canvas);
 //     expect(
 //       cancelledAnimations.length,
 //       1,
@@ -355,7 +250,7 @@ describe('animate', () => {
 //       'should return cancelled animations by canvas'
 //     );
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       3,
 //       'should have left registered animation'
 //     );
@@ -364,8 +259,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('fabric.runningAnimations cancelByTarget', function (assert) {
-//     var done = assert.async();
+//   it('runningAnimations cancelByTarget', async () => {
 //     var options = { foo: 'bar', target: 'pip' },
 //       opt2 = { bar: 'baz' };
 //     animate(options);
@@ -373,30 +267,30 @@ describe('animate', () => {
 //     animate(options);
 //     const baz = animate(opt2);
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       4,
 //       'should have registered animations'
 //     );
-//     var cancelledAnimations = fabric.runningAnimations.cancelByTarget();
+//     var cancelledAnimations = runningAnimations.cancelByTarget();
 //     expect(cancelledAnimations.length, 0, 'should return empty array');
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       4,
 //       'should have registered animations'
 //     );
-//     cancelledAnimations = fabric.runningAnimations.cancelByTarget('pip');
+//     cancelledAnimations = runningAnimations.cancelByTarget('pip');
 //     expect(
 //       cancelledAnimations.length,
 //       3,
 //       'should return cancelled animations'
 //     );
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       1,
 //       'should have left 1 registered animation'
 //     );
 //     assert.strictEqual(
-//       fabric.runningAnimations[0],
+//       runningAnimations[0],
 //       baz,
 //       'should have left 1 registered animation'
 //     );
@@ -405,8 +299,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate', function (assert) {
-//     var done = assert.async();
+//   it('animate', async () => {
 //     var object = new fabric.Object({
 //       left: 20,
 //       top: 30,
@@ -429,12 +322,12 @@ describe('animate', () => {
 //       'should be instance of ValueAnimation'
 //     );
 //     expect(
-//       fabric.runningAnimations.length,
+//       runningAnimations.length,
 //       1,
 //       'should have 1 registered animation'
 //     );
 //     expect(
-//       fabric.runningAnimations[0].target,
+//       runningAnimations[0].target,
 //       object,
 //       'animation.target should be set'
 //     );
@@ -445,8 +338,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate with increment', function (assert) {
-//     var done = assert.async();
+//   it('animate with increment', async () => {
 //     var object = new fabric.Object({
 //       left: 20,
 //       top: 30,
@@ -468,8 +360,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate with keypath', function (assert) {
-//     var done = assert.async();
+//   it('animate with keypath', async () => {
 //     var object = new fabric.Object({
 //       left: 20,
 //       top: 30,
@@ -492,7 +383,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate with color', function (assert) {
+//   it('animate with color', async () => {
 //     var done = assert.async(),
 //       object = new fabric.Object(),
 //       properties = fabric.Object.colorProperties;
@@ -502,7 +393,7 @@ describe('animate', () => {
 //       object.animate({ [prop]: 'blue' });
 //       expect((true, 'animate without options does not crash');
 //       expect(
-//         fabric.runningAnimations.length,
+//         runningAnimations.length,
 //         index + 1,
 //         'should have 1 registered animation'
 //       );
@@ -526,8 +417,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate with decrement', function (assert) {
-//     var done = assert.async();
+//   it('animate with decrement', async () => {
 //     var object = new fabric.Object({
 //       left: 20,
 //       top: 30,
@@ -549,8 +439,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate multiple properties', function (assert) {
-//     var done = assert.async();
+//   it('animate multiple properties', async () => {
 //     var object = new fabric.Object({ left: 123, top: 124 });
 //     const context = object.animate({ left: 223, top: 224 });
 //     assert.deepEqual(
@@ -575,8 +464,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate multiple properties with callback', function (assert) {
-//     var done = assert.async();
+//   it('animate multiple properties with callback', async () => {
 //     var object = new fabric.Object({ left: 0, top: 0 });
 
 //     var changedInvocations = 0;
@@ -610,8 +498,7 @@ describe('animate', () => {
 //     }, 1000);
 //   });
 
-//   QUnit.test('animate with list of values', function (assert) {
-//     var done = assert.async();
+//   it('animate with list of values', async () => {
 //     var run = false;
 
 //     animate({
@@ -620,16 +507,16 @@ describe('animate', () => {
 //       duration: 96,
 //       onChange: function (currentValue, valueProgress) {
 //         expect(
-//           fabric.runningAnimations.length,
+//           runningAnimations.length,
 //           1,
 //           'runningAnimations should not be empty'
 //         );
 //         expect((Array.isArray(currentValue), 'should be array');
 //         expect((
-//           Object.isFrozen(fabric.runningAnimations[0].value),
+//           Object.isFrozen(runningAnimations[0].value),
 //           'should be frozen'
 //         );
-//         assert.deepEqual(fabric.runningAnimations[0].value, currentValue);
+//         assert.deepEqual(runningAnimations[0].value, currentValue);
 //         expect(currentValue.length, 3);
 //         currentValue.forEach(function (v) {
 //           expect((v > 0, 'confirm values are not invalid numbers');
@@ -653,8 +540,7 @@ describe('animate', () => {
 //     });
 //   });
 
-//   QUnit.test('animate with abort', function (assert) {
-//     var done = assert.async();
+//   it('animate with abort', async () => {
 //     var object = new fabric.Object({ left: 123, top: 124 });
 
 //     var context;
@@ -680,8 +566,7 @@ describe('animate', () => {
 //     }, 100);
 //   });
 
-//   QUnit.test('animate with imperative abort', function (assert) {
-//     var done = assert.async();
+//   it('animate with imperative abort', async () => {
 //     var object = new fabric.Object({ left: 123, top: 124 });
 
 //     let called = 0;
@@ -708,8 +593,7 @@ describe('animate', () => {
 //     }, 100);
 //   });
 
-//   QUnit.test('animate with delay', function (assert) {
-//     var done = assert.async();
+//   it('animate with delay', async () => {
 //     var object = new fabric.Object({ left: 123, top: 124 });
 //     var t = new Date();
 //     const context = object._animate('left', 223, {
