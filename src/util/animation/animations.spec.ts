@@ -3,6 +3,7 @@ import { animateColor, animate } from './animate';
 import * as ease from './easing';
 import { Color } from '../../color/Color';
 import { FabricObject } from '../../shapes/Object/FabricObject';
+import { ValueAnimation } from './ValueAnimation';
 
 jest.useFakeTimers();
 const findAnimationsByTarget = (target: any) =>
@@ -178,12 +179,12 @@ describe('animate', () => {
   });
   it('runningAnimations with abort', async () => {
     let abort = false;
-    var options = {
+    const options = {
       abort() {
         return abort;
       },
     };
-    var context = animate(options);
+    const context = animate(options);
     jest.advanceTimersByTime(100);
     expect(runningAnimations.length).toBe(1);
     expect(runningAnimations.indexOf(context)).toBe(0);
@@ -195,8 +196,8 @@ describe('animate', () => {
     expect(context.state).toBe('aborted');
   });
   it('runningAnimations with imperative abort', async () => {
-    var options = { foo: 'bar' };
-    var context = animate(options);
+    const options = { foo: 'bar' };
+    const context = animate(options);
     expect(context.state).toBe('pending');
     jest.advanceTimersByTime(32);
     expect(context.state).toBe('running');
@@ -218,147 +219,74 @@ describe('animate', () => {
     //  make sure splice didn't destroy instance
     expect(runningAnimations instanceof Array).toBe(true);
   });
+  it('runningAnimations cancelByCanvas', async () => {
+    const canvas = { pip: 'py' };
+    animate({ foo: 'bar', target: 'pip' });
+    animate({ foo: 'bar', target: { canvas: 'pip' } });
+    animate({ foo: 'bar' });
+    animate({ target: { canvas } });
+    // 'should have registered animations'
+    expect(runningAnimations.length).toBe(4);
+    let cancelledAnimations = runningAnimations.cancelByCanvas();
+    // 'should return empty array'
+    expect(cancelledAnimations.length).toBe(0);
+    // animations are still all there
+    expect(runningAnimations.length).toBe(4);
+    cancelledAnimations = runningAnimations.cancelByCanvas(canvas);
+    // 'should return cancelled animations'
+    expect(cancelledAnimations.length).toBe(1);
+    expect(cancelledAnimations[0].target.canvas).toBe(canvas);
+    // 'should have left registered animation'
+    expect(runningAnimations.length).toBe(3);
+    jest.advanceTimersByTime(1000);
+  });
+  it('runningAnimations cancelByTarget', async () => {
+    var options = { foo: 'bar', target: 'pip' },
+      opt2 = { bar: 'baz' };
+    animate(options);
+    animate(options);
+    animate(options);
+    const baz = animate(opt2);
+    expect(runningAnimations.length).toBe(4);
+    var cancelledAnimations = runningAnimations.cancelByTarget();
+    expect(cancelledAnimations.length).toBe(0);
+    expect(runningAnimations.length).toBe(4);
+    cancelledAnimations = runningAnimations.cancelByTarget('pip');
+    expect(cancelledAnimations.length).toBe(3);
+    expect(runningAnimations.length).toBe(1);
+    expect(runningAnimations[0]).toBe(baz);
+    jest.advanceTimersByTime(1000);
+  });
+  it('animate', async () => {
+    const object = new FabricObject({
+      left: 20,
+      top: 30,
+      width: 40,
+      height: 50,
+      angle: 43,
+    });
+    expect(typeof object.animate === 'function').toBe(true);
+    const context = object.animate({ left: 40 });
+    expect(Object.keys(context)).toEqual(['left']);
+    expect(context.left instanceof ValueAnimation).toBe(true);
+    expect(runningAnimations.length).toBe(1);
+    expect(runningAnimations[0].target).toBe(object);
+    jest.advanceTimersByTime(1000);
+    expect(Math.round(object.left)).toBe(40);
+  });
+  it('animate with increment and without options', async () => {
+    const object = new FabricObject({
+      left: 20,
+      top: 30,
+      width: 40,
+      height: 50,
+      angle: 43,
+    });
+    object.animate({ left: object.left + 40 });
+    jest.advanceTimersByTime(1000);
+    expect(Math.round(object.left)).toBe(60);
+  });
 });
-
-//   it('runningAnimations cancelByCanvas', async () => {
-//     var canvas = { pip: 'py' };
-//     animate({ foo: 'bar', target: 'pip' });
-//     animate({ foo: 'bar', target: { canvas: 'pip' } });
-//     animate({ foo: 'bar' });
-//     animate({ target: { canvas } });
-//     expect(
-//       runningAnimations.length,
-//       4,
-//       'should have registered animations'
-//     );
-//     var cancelledAnimations = runningAnimations.cancelByCanvas();
-//     expect(cancelledAnimations.length, 0, 'should return empty array');
-//     expect(
-//       runningAnimations.length,
-//       4,
-//       'should have registered animations'
-//     );
-//     cancelledAnimations = runningAnimations.cancelByCanvas(canvas);
-//     expect(
-//       cancelledAnimations.length,
-//       1,
-//       'should return cancelled animations'
-//     );
-//     expect(
-//       cancelledAnimations[0].target.canvas,
-//       canvas,
-//       'should return cancelled animations by canvas'
-//     );
-//     expect(
-//       runningAnimations.length,
-//       3,
-//       'should have left registered animation'
-//     );
-//     setTimeout(() => {
-//       done();
-//     }, 1000);
-//   });
-
-//   it('runningAnimations cancelByTarget', async () => {
-//     var options = { foo: 'bar', target: 'pip' },
-//       opt2 = { bar: 'baz' };
-//     animate(options);
-//     animate(options);
-//     animate(options);
-//     const baz = animate(opt2);
-//     expect(
-//       runningAnimations.length,
-//       4,
-//       'should have registered animations'
-//     );
-//     var cancelledAnimations = runningAnimations.cancelByTarget();
-//     expect(cancelledAnimations.length, 0, 'should return empty array');
-//     expect(
-//       runningAnimations.length,
-//       4,
-//       'should have registered animations'
-//     );
-//     cancelledAnimations = runningAnimations.cancelByTarget('pip');
-//     expect(
-//       cancelledAnimations.length,
-//       3,
-//       'should return cancelled animations'
-//     );
-//     expect(
-//       runningAnimations.length,
-//       1,
-//       'should have left 1 registered animation'
-//     );
-//     assert.strictEqual(
-//       runningAnimations[0],
-//       baz,
-//       'should have left 1 registered animation'
-//     );
-//     setTimeout(() => {
-//       done();
-//     }, 1000);
-//   });
-
-//   it('animate', async () => {
-//     var object = new fabric.Object({
-//       left: 20,
-//       top: 30,
-//       width: 40,
-//       height: 50,
-//       angle: 43,
-//     });
-
-//     expect((typeof object.animate === 'function');
-
-//     const context = object.animate({ left: 40 });
-//     assert.deepEqual(
-//       Object.keys(context),
-//       ['left'],
-//       'should return a map of animation classes'
-//     );
-//     expect(
-//       context.left.constructor.name,
-//       'ValueAnimation',
-//       'should be instance of ValueAnimation'
-//     );
-//     expect(
-//       runningAnimations.length,
-//       1,
-//       'should have 1 registered animation'
-//     );
-//     expect(
-//       runningAnimations[0].target,
-//       object,
-//       'animation.target should be set'
-//     );
-
-//     setTimeout(function () {
-//       expect(40, Math.round(object.left), 'left has been animated to 40');
-//       done();
-//     }, 1000);
-//   });
-
-//   it('animate with increment', async () => {
-//     var object = new fabric.Object({
-//       left: 20,
-//       top: 30,
-//       width: 40,
-//       height: 50,
-//       angle: 43,
-//     });
-
-//     object.animate({ left: object.left + 40 });
-//     expect((true, 'animate without options does not crash');
-
-//     setTimeout(function () {
-//       expect(
-//         Math.round(object.left),
-//         60,
-//         'left has been increased by 40'
-//       );
-//       done();
-//     }, 1000);
-//   });
 
 //   it('animate with keypath', async () => {
 //     var object = new fabric.Object({
