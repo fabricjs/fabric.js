@@ -152,7 +152,7 @@ export class InteractiveFabricObject<
     Object.assign(
       this,
       this.createControls(),
-      (this.constructor as typeof InteractiveFabricObject).ownDefaults
+      InteractiveFabricObject.ownDefaults
     );
     this.setOptions(options);
   }
