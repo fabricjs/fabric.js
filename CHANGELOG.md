@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): Convert Animation tests to jest [#9892](https://github.com/fabricjs/fabric.js/pull/9892)
 - fix(Group): Pass down the abort signal from group to objects [#9890](https://github.com/fabricjs/fabric.js/pull/9890)
 - fix(util): restore old composeMatrix code for performances improvement [#9851](https://github.com/fabricjs/fabric.js/pull/9851)
 - fix(Control): corner coords definition order [#9884](https://github.com/fabricjs/fabric.js/pull/9884)
