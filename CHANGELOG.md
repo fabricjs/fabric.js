@@ -3,6 +3,8 @@
 ## [next]
 
 - perf(ObjectGeometry): replace cache key string with array [#9887](https://github.com/fabricjs/fabric.js/pull/9887)
+- docs(): Improve JSDOCs for BlendImage [#9876](https://github.com/fabricjs/fabric.js/pull/9876)
+- fix(Group): Pass down the abort signal from group to objects [#9890](https://github.com/fabricjs/fabric.js/pull/9890)
 - fix(util): restore old composeMatrix code for performances improvement [#9851](https://github.com/fabricjs/fabric.js/pull/9851)
 - fix(Control): corner coords definition order [#9884](https://github.com/fabricjs/fabric.js/pull/9884)
 - fix(Polyline): safeguard points arg from options [#9855](https://github.com/fabricjs/fabric.js/pull/9855)
