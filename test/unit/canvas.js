@@ -343,8 +343,11 @@
 
   function initActiveSelection(canvas, activeObject, target, multiSelectionStacking) {
     fabric.classRegistry.setClass(class TextActiveSelection extends fabric.ActiveSelection {
-      static getDefaults() {
-        return {...super.getDefaults(),multiSelectionStacking}
+      static ownDefaults = {
+        multiSelectionStacking,
+      }
+      constructor(objects, options) {
+        super(objects, { ...TextActiveSelection.ownDefaults, ...options })
       }
     });
     canvas.setActiveObject(activeObject);
