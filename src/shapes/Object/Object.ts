@@ -335,7 +335,7 @@ export class FabricObject<
    */
   constructor(options?: Props) {
     super();
-    Object.assign(this, (this.constructor as typeof FabricObject).ownDefaults);
+    Object.assign(this, FabricObject.ownDefaults);
     this.setOptions(options);
   }
 

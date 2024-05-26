@@ -110,7 +110,7 @@ export class Polyline<
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
     super();
-    Object.assign(this, (this.constructor as typeof Polyline).ownDefaults);
+    Object.assign(this, Polyline.ownDefaults);
     this.setOptions(options);
     this.points = points;
     const { left, top } = options;

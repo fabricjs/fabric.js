@@ -138,7 +138,7 @@ export class Group
    */
   constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
     super();
-    Object.assign(this, (this.constructor as typeof Group).ownDefaults);
+    Object.assign(this, Group.ownDefaults);
     this.setOptions(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 

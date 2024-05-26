@@ -80,7 +80,7 @@ export class Path<
     { path: _, left, top, ...options }: Partial<Props> = {}
   ) {
     super();
-    Object.assign(this, (this.constructor as typeof Path).ownDefaults);
+    Object.assign(this, Path.ownDefaults);
     this.setOptions(options);
     this._setPath(path || [], true);
     typeof left === 'number' && this.set(LEFT, left);

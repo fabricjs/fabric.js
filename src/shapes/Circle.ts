@@ -93,7 +93,7 @@ export class Circle<
    */
   constructor(options?: Props) {
     super();
-    Object.assign(this, (this.constructor as typeof Circle).ownDefaults);
+    Object.assign(this, Circle.ownDefaults);
     this.setOptions(options);
   }
 

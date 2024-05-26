@@ -73,7 +73,7 @@ export class Line<
    */
   constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Partial<Props> = {}) {
     super();
-    Object.assign(this, (this.constructor as typeof Line).ownDefaults);
+    Object.assign(this, Line.ownDefaults);
     this.setOptions(options);
     this.x1 = x1;
     this.x2 = x2;

@@ -31,7 +31,7 @@ export class Triangle<
    */
   constructor(options?: Props) {
     super();
-    Object.assign(this, (this.constructor as typeof Triangle).ownDefaults);
+    Object.assign(this, Triangle.ownDefaults);
     this.setOptions(options);
   }
 

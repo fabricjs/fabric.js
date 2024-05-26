@@ -67,7 +67,7 @@ export class Ellipse<
    */
   constructor(options?: Props) {
     super();
-    Object.assign(this, (this.constructor as typeof Ellipse).ownDefaults);
+    Object.assign(this, Ellipse.ownDefaults);
     this.setOptions(options);
   }
 

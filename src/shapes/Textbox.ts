@@ -103,6 +103,17 @@ export class Textbox<
   }
 
   /**
+   * Constructor
+   * @param {String} text Text string
+   * @param {Object} [options] Options object
+   */
+  constructor(text: string, options?: Props) {
+    super(text);
+    Object.assign(this, Textbox.ownDefaults);
+    this.setOptions(options);
+  }
+
+  /**
    * Unlike superclass's version of this function, Textbox does not update
    * its width.
    * @private

@@ -67,7 +67,7 @@ export class Rect<
    */
   constructor(options?: Props) {
     super();
-    Object.assign(this, (this.constructor as typeof Rect).ownDefaults);
+    Object.assign(this, Rect.ownDefaults);
     this.setOptions(options);
     this._initRxRy();
   }
