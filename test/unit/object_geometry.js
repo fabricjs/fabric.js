@@ -343,11 +343,11 @@
     var key3 = cObj.transformMatrixKey();
     cObj.width = 5;
     var key4 = cObj.transformMatrixKey();
-    assert.notEqual(key1, key2, 'keys are different');
-    assert.equal(key1, key3, 'keys are equal');
-    assert.notEqual(key4, key2, 'keys are different');
-    assert.notEqual(key4, key1, 'keys are different');
-    assert.notEqual(key4, key3, 'keys are different');
+    assert.notDeepEqual(key1, key2, 'keys are different');
+    assert.deepEqual(key1, key3, 'keys are equal');
+    assert.notDeepEqual(key4, key2, 'keys are different');
+    assert.notDeepEqual(key4, key1, 'keys are different');
+    assert.notDeepEqual(key4, key3, 'keys are different');
   });
 
   QUnit.test('transformMatrixKey depends from originX/originY', function(assert) {
@@ -358,9 +358,9 @@
     var key2 = cObj.transformMatrixKey();
     cObj.originY = 'center';
     var key3 = cObj.transformMatrixKey();
-    assert.notEqual(key1, key2, 'keys are different origins 1');
-    assert.notEqual(key1, key3, 'keys are different origins 2');
-    assert.notEqual(key2, key3, 'keys are different origins 3');
+    assert.notDeepEqual(key1, key2, 'keys are different origins 1');
+    assert.notDeepEqual(key1, key3, 'keys are different origins 2');
+    assert.notDeepEqual(key2, key3, 'keys are different origins 3');
   });
 
   QUnit.test('isOnScreen with object that include canvas', function(assert) {
