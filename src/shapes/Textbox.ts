@@ -116,7 +116,7 @@ export class Textbox<
    * If you prefer to have on instance of controls shared among all objects
    * make this function return an empty object and add controls to the ownDefaults object
    */
-  protected createControls(): { controls: Record<string, Control> } {
+  static createControls(): { controls: Record<string, Control> } {
     return { controls: createTextboxDefaultControls() };
   }
 

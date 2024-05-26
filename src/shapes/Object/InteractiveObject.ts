@@ -151,7 +151,7 @@ export class InteractiveFabricObject<
     super();
     Object.assign(
       this,
-      this.createControls(),
+      (this.constructor as typeof InteractiveFabricObject).createControls(),
       InteractiveFabricObject.ownDefaults
     );
     this.setOptions(options);
@@ -163,7 +163,7 @@ export class InteractiveFabricObject<
    * make this function return an empty object and add controls to the ownDefaults
    * @param {Object} [options] Options object
    */
-  protected createControls(): { controls: Record<string, Control> } {
+  static createControls(): { controls: Record<string, Control> } {
     return { controls: createObjectDefaultControls() };
   }
 
