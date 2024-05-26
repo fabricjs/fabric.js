@@ -424,6 +424,9 @@ export class FabricText<
     super();
     Object.assign(this, FabricText.ownDefaults);
     this.setOptions(options);
+    if (!this.styles) {
+      this.styles = {};
+    }
     this.text = text;
     this.initialized = true;
     if (this.path) {
