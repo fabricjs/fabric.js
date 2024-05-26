@@ -4,6 +4,7 @@ import * as ease from './easing';
 import { Color } from '../../color/Color';
 import { FabricObject } from '../../shapes/Object/FabricObject';
 import { ValueAnimation } from './ValueAnimation';
+import { Shadow } from '../../Shadow';
 
 jest.useFakeTimers();
 const findAnimationsByTarget = (target: any) =>
@@ -286,64 +287,34 @@ describe('animate', () => {
     jest.advanceTimersByTime(1000);
     expect(Math.round(object.left)).toBe(60);
   });
+  it('animate with keypath', async () => {
+    var object = new FabricObject({
+      left: 20,
+      top: 30,
+      width: 40,
+      height: 50,
+      angle: 43,
+      shadow: new Shadow({ offsetX: 20 }),
+    });
+    object.animate({ 'shadow.offsetX': 100 });
+    jest.advanceTimersByTime(1000);
+    expect(Math.round(object.shadow!.offsetX)).toBe(100);
+  });
+  it('animate with color', async () => {
+    const object = new FabricObject(),
+      properties = FabricObject.colorProperties;
+    properties.forEach((prop, index) => {
+      object.set(prop, 'red');
+      object.animate({ [prop]: 'blue' });
+      expect(runningAnimations.length).toBe(index + 1);
+      expect(findAnimationsByTarget(object).length).toBe(index + 1);
+    });
+    jest.advanceTimersByTime(1000);
+    properties.forEach((prop) => {
+      expect(object[prop]).toBe('rgba(0,0,255,1)');
+    });
+  });
 });
-
-//   it('animate with keypath', async () => {
-//     var object = new fabric.Object({
-//       left: 20,
-//       top: 30,
-//       width: 40,
-//       height: 50,
-//       angle: 43,
-//       shadow: { offsetX: 20 },
-//     });
-
-//     object.animate({ 'shadow.offsetX': 100 });
-//     expect((true, 'animate without options does not crash');
-
-//     setTimeout(function () {
-//       expect(
-//         Math.round(object.shadow.offsetX),
-//         100,
-//         'property has been animated'
-//       );
-//       done();
-//     }, 1000);
-//   });
-
-//   it('animate with color', async () => {
-//     var done = assert.async(),
-//       object = new fabric.Object(),
-//       properties = fabric.Object.colorProperties;
-
-//     properties.forEach(function (prop, index) {
-//       object.set(prop, 'red');
-//       object.animate({ [prop]: 'blue' });
-//       expect((true, 'animate without options does not crash');
-//       expect(
-//         runningAnimations.length,
-//         index + 1,
-//         'should have 1 registered animation'
-//       );
-//       expect(
-//         findAnimationsByTarget(object).length,
-//         index + 1,
-//         'animation.target should be set'
-//       );
-
-//       setTimeout(function () {
-//         expect(
-//           object[prop],
-//           new fabric.Color('blue').toRgba(),
-//           'property [' + prop + '] has been animated'
-//         );
-//       }, 1000);
-//     });
-
-//     setTimeout(function () {
-//       done();
-//     }, 1000);
-//   });
 
 //   it('animate with decrement', async () => {
 //     var object = new fabric.Object({
