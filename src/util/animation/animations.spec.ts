@@ -242,14 +242,14 @@ describe('animate', () => {
     jest.advanceTimersByTime(1000);
   });
   it('runningAnimations cancelByTarget', async () => {
-    var options = { foo: 'bar', target: 'pip' },
+    const options = { foo: 'bar', target: 'pip' },
       opt2 = { bar: 'baz' };
     animate(options);
     animate(options);
     animate(options);
     const baz = animate(opt2);
     expect(runningAnimations.length).toBe(4);
-    var cancelledAnimations = runningAnimations.cancelByTarget();
+    let cancelledAnimations = runningAnimations.cancelByTarget();
     expect(cancelledAnimations.length).toBe(0);
     expect(runningAnimations.length).toBe(4);
     cancelledAnimations = runningAnimations.cancelByTarget('pip');
@@ -288,7 +288,7 @@ describe('animate', () => {
     expect(Math.round(object.left)).toBe(60);
   });
   it('animate with keypath', async () => {
-    var object = new FabricObject({
+    const object = new FabricObject({
       left: 20,
       top: 30,
       width: 40,
@@ -314,130 +314,87 @@ describe('animate', () => {
       expect(object[prop]).toBe('rgba(0,0,255,1)');
     });
   });
+  it('animate with decrement', async () => {
+    const object = new FabricObject({
+      left: 20,
+      top: 30,
+      width: 40,
+      height: 50,
+      angle: 43,
+    });
+
+    object.animate({ left: object.left - 40 });
+    jest.advanceTimersByTime(1000);
+    expect(Math.round(object.left)).toBe(-20);
+  });
+  it('animate multiple properties', async () => {
+    const object = new FabricObject({ left: 123, top: 124 });
+    const context = object.animate({ left: 223, top: 224 });
+    expect(Object.keys(context)).toEqual(['left', 'top']);
+    expect(context.left instanceof ValueAnimation).toBe(true);
+    expect(context.top instanceof ValueAnimation).toBe(true);
+    jest.advanceTimersByTime(1000);
+    expect(Math.round(object.get('left'))).toBe(223);
+    expect(Math.round(object.get('top'))).toBe(224);
+  });
+  it('animate multiple properties with callback', async () => {
+    const object = new FabricObject({ left: 0, top: 0 });
+
+    let changedInvocations = 0;
+    let completeInvocations = 0;
+
+    object.animate(
+      { left: 1, top: 1 },
+      {
+        duration: 10,
+        onChange: function () {
+          changedInvocations++;
+        },
+        onComplete: function () {
+          completeInvocations++;
+        },
+      }
+    );
+    jest.advanceTimersByTime(32);
+    expect(Math.round(object.get('left'))).toBe(1);
+    expect(Math.round(object.get('top'))).toBe(1);
+    expect(changedInvocations).toBe(4);
+    expect(completeInvocations).toBe(2);
+  });
+  it('animate with list of values', async () => {
+    let run = 0;
+    const duration = 96;
+    animate({
+      startValue: [1, 2, 3],
+      endValue: [2, 4, 6],
+      duration,
+      onChange: (currentValue, valueProgress) => {
+        expect(runningAnimations.length).toBe(1);
+        expect(Array.isArray(currentValue)).toBe(true);
+        expect(Object.isFrozen(runningAnimations[0].value)).toBe(true);
+        expect(runningAnimations[0].value).toEqual(currentValue);
+        expect(currentValue.length).toBe(3);
+        expect(currentValue[0]).toBeLessThanOrEqual(2);
+        try {
+          currentValue[0] = 200;
+          // catch the frozen status
+          expect(true).toBe(false);
+        } catch (e) {
+          expect(e).toBeInstanceOf(Error);
+        }
+        run++;
+      },
+      onComplete: (endValue) => {
+        expect(Object.isFrozen(endValue)).toBe(true);
+        expect(endValue.length).toBe(3);
+        expect(endValue).toEqual([2, 4, 6]);
+      },
+    });
+    jest.advanceTimersByTime(duration + 20);
+    expect(run).toBeGreaterThanOrEqual(3);
+    jest.advanceTimersByTime(duration + 20);
+  });
 });
-
-//   it('animate with decrement', async () => {
-//     var object = new fabric.Object({
-//       left: 20,
-//       top: 30,
-//       width: 40,
-//       height: 50,
-//       angle: 43,
-//     });
-
-//     object.animate({ left: object.left - 40 });
-//     expect((true, 'animate without options does not crash');
-
-//     setTimeout(function () {
-//       expect(
-//         Math.round(object.left),
-//         -20,
-//         'left has been decreased by 40'
-//       );
-//       done();
-//     }, 1000);
-//   });
-
-//   it('animate multiple properties', async () => {
-//     var object = new fabric.Object({ left: 123, top: 124 });
-//     const context = object.animate({ left: 223, top: 224 });
-//     assert.deepEqual(
-//       Object.keys(context),
-//       ['left', 'top'],
-//       'should return a map of animation classes'
-//     );
-//     expect(
-//       context.left.constructor.name,
-//       'ValueAnimation',
-//       'should be instance of ValueAnimation'
-//     );
-//     expect(
-//       context.top.constructor.name,
-//       'ValueAnimation',
-//       'should be instance of ValueAnimation'
-//     );
-//     setTimeout(function () {
-//       expect(223, Math.round(object.get('left')));
-//       expect(224, Math.round(object.get('top')));
-//       done();
-//     }, 1000);
-//   });
-
-//   it('animate multiple properties with callback', async () => {
-//     var object = new fabric.Object({ left: 0, top: 0 });
-
-//     var changedInvocations = 0;
-//     var completeInvocations = 0;
-
-//     object.animate(
-//       { left: 1, top: 1 },
-//       {
-//         duration: 1,
-//         onChange: function () {
-//           changedInvocations++;
-//         },
-//         onComplete: function () {
-//           completeInvocations++;
-//         },
-//       }
-//     );
-
-//     setTimeout(function () {
-//       expect(Math.round(object.get('left')), 1);
-//       expect(Math.round(object.get('top')), 1);
-
-//       expect((changedInvocations > 0);
-//       expect(
-//         completeInvocations,
-//         2,
-//         'the callbacks get call for each animation'
-//       );
-
-//       done();
-//     }, 1000);
-//   });
-
-//   it('animate with list of values', async () => {
-//     var run = false;
-
-//     animate({
-//       startValue: [1, 2, 3],
-//       endValue: [2, 4, 6],
-//       duration: 96,
-//       onChange: function (currentValue, valueProgress) {
-//         expect(
-//           runningAnimations.length,
-//           1,
-//           'runningAnimations should not be empty'
-//         );
-//         expect((Array.isArray(currentValue), 'should be array');
-//         expect((
-//           Object.isFrozen(runningAnimations[0].value),
-//           'should be frozen'
-//         );
-//         assert.deepEqual(runningAnimations[0].value, currentValue);
-//         expect(currentValue.length, 3);
-//         currentValue.forEach(function (v) {
-//           expect((v > 0, 'confirm values are not invalid numbers');
-//         });
-//         expect(valueProgress, currentValue[0] - 1, 'should match');
-//         // Make sure mutations are not kept
-//         expect((
-//           currentValue[0] <= 2,
-//           'mutating callback values must not persist'
-//         );
-//         currentValue[0] = 200;
-//         run = true;
-//       },
-//       onComplete: function (endValue) {
-//         expect((Object.isFrozen(endValue), 'should be frozen');
-//         expect(endValue.length, 3);
-//         assert.deepEqual(endValue, [2, 4, 6]);
-//         expect(run, true, 'something run');
-//         done();
-//       },
-//     });
-//   });
 
 //   it('animate with abort', async () => {
 //     var object = new fabric.Object({ left: 123, top: 124 });
