@@ -791,7 +791,7 @@ export class FabricImage<
    */
   static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, type, ...object }: T,
-    options: Abortable = {}
+    options?: Abortable
   ) {
     return Promise.all([
       loadImage(src!, { ...options, crossOrigin }),

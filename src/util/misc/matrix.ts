@@ -298,26 +298,32 @@ export const hasMatrixDimensionProps = ({
  * @param  {Number} [options.skewY]
  * @return {Number[]} transform matrix
  */
-export const calcDimensionsMatrix = (decomposedValues: TScaleMatrixArgs) => {
-  return hasMatrixDimensionProps(decomposedValues)
-    ? multiplyTransformMatrixArray(
-        [
-          createScaleMatrix(
-            (decomposedValues.flipX ? -1 : 1) * (decomposedValues.scaleX ?? 1),
-            (decomposedValues.flipY ? -1 : 1) * (decomposedValues.scaleY ?? 1)
-          ),
-          decomposedValues.skewX && createSkewXMatrix(decomposedValues.skewX),
-          decomposedValues.skewY && createSkewYMatrix(decomposedValues.skewY),
-        ],
-        true
-      )
-    : (iMatrix.concat() as TMat2D);
+export const calcDimensionsMatrix = ({
+  scaleX = 1,
+  scaleY = 1,
+  flipX = false,
+  flipY = false,
+  skewX = 0 as TDegree,
+  skewY = 0 as TDegree,
+}: TScaleMatrixArgs) => {
+  let matrix = createScaleMatrix(
+    flipX ? -scaleX : scaleX,
+    flipY ? -scaleY : scaleY
+  );
+  if (skewX) {
+    matrix = multiplyTransformMatrices(matrix, createSkewXMatrix(skewX), true);
+  }
+  if (skewY) {
+    matrix = multiplyTransformMatrices(matrix, createSkewYMatrix(skewY), true);
+  }
+  return matrix;
 };
 
 /**
  * Returns a transform matrix starting from an object of the same kind of
  * the one returned from qrDecompose, useful also if you want to calculate some
  * transformations from an object that is not enlived yet
+ * Before changing this function look at: src/benchmarks/calcTransformMatrix.mjs
  * @param  {Object} options
  * @param  {Number} [options.angle]
  * @param  {Number} [options.scaleX]
@@ -330,16 +336,16 @@ export const calcDimensionsMatrix = (decomposedValues: TScaleMatrixArgs) => {
  * @param  {Number} [options.translateY]
  * @return {Number[]} transform matrix
  */
-export const composeMatrix = ({
-  translateX,
-  translateY,
-  angle,
-  ...dimensionProps
-}: TComposeMatrixArgs): TMat2D => {
-  return multiplyTransformMatrixArray([
-    !!(translateX || translateY) &&
-      createTranslateMatrix(translateX, translateY),
-    angle && createRotateMatrix({ angle }),
-    calcDimensionsMatrix(dimensionProps),
-  ]);
+
+export const composeMatrix = (options: TComposeMatrixArgs): TMat2D => {
+  const { translateX = 0, translateY = 0, angle = 0 as TDegree } = options;
+  let matrix = createTranslateMatrix(translateX, translateY);
+  if (angle) {
+    matrix = multiplyTransformMatrices(matrix, createRotateMatrix({ angle }));
+  }
+  const scaleMatrix = calcDimensionsMatrix(options);
+  if (!isIdentityMatrix(scaleMatrix)) {
+    matrix = multiplyTransformMatrices(matrix, scaleMatrix);
+  }
+  return matrix;
 };

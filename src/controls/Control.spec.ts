@@ -1,4 +1,6 @@
 import { Canvas } from '../canvas/Canvas';
+import { Intersection } from '../Intersection';
+import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Control } from './Control';
 
@@ -46,5 +48,21 @@ describe('Controls', () => {
     expect(mouseDownHandler.mock.contexts).toEqual([control]);
     expect(actionHandler.mock.contexts).toEqual([control]);
     expect(mouseUpHandler.mock.contexts).toEqual([control, control]);
+  });
+
+  test('corners coords definition order', () => {
+    const control = new Control({ sizeX: 20, sizeY: 20 });
+    const coords = control.calcCornerCoords(
+      0,
+      0,
+      10,
+      10,
+      false,
+      new FabricObject()
+    );
+
+    expect(
+      Intersection.isPointInPolygon(new Point(15, 10), Object.values(coords))
+    ).toBe(true);
   });
 });

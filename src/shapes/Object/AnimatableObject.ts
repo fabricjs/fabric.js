@@ -56,16 +56,14 @@ export abstract class AnimatableObject<
     const propIsColor = (
       this.constructor as typeof AnimatableObject
     ).colorProperties.includes(path[path.length - 1]);
-    const { easing, duration, abort, startValue, onChange, onComplete } =
-      options;
+    const { abort, startValue, onChange, onComplete } = options;
     const animationOptions = {
+      ...options,
       target: this,
       // path.reduce... is the current value in case start value isn't provided
       startValue:
         startValue ?? path.reduce((deep: any, key) => deep[key], this),
       endValue,
-      easing,
-      duration,
       abort: abort?.bind(this),
       onChange: (
         value: number | number[] | string,
