@@ -394,75 +394,62 @@ describe('animate', () => {
     expect(run).toBeGreaterThanOrEqual(3);
     jest.advanceTimersByTime(duration + 20);
   });
+  it('abort function is calle with object as context', async () => {
+    const object = new FabricObject({ left: 123, top: 124 });
+    let context: any;
+    object.animate(
+      { left: 223, top: 224 },
+      {
+        abort: function () {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          context = this;
+          return true;
+        },
+      }
+    );
+    jest.advanceTimersByTime(100);
+    expect(Math.round(object.get('left'))).toBe(123);
+    expect(Math.round(object.get('top'))).toBe(124);
+    expect(context).toBe(object);
+    jest.advanceTimersByTime(500);
+  });
+  it('animate with imperative abort', async () => {
+    const object = new FabricObject({ left: 123, top: 124 });
+
+    let called = 0;
+    const context = object._animate('left', 223, {
+      abort: function () {
+        called++;
+        return false;
+      },
+    });
+
+    expect(typeof context.abort === 'function').toBe(true);
+    expect(context.state).toBe('pending');
+    context.abort();
+    expect(context.state).toBe('aborted');
+    jest.advanceTimersByTime(100);
+    expect(Math.round(object.get('left'))).toBe(123);
+    expect(called).toBe(0);
+  });
+  it('animate with delay', async () => {
+    const object = new FabricObject({ left: 123, top: 124 });
+    const delay = 500;
+    const offset = 20;
+    const duration = 200;
+    const context = object._animate('left', 223, {
+      delay,
+      duration,
+    });
+    expect(context.state).toBe('pending');
+    jest.advanceTimersByTime(delay - offset);
+    expect(context.state).toBe('pending');
+    jest.advanceTimersByTime(offset * 2);
+    expect(context.state).toBe('running');
+    jest.advanceTimersByTime(duration + offset);
+    expect(context.state).toBe('completed');
+  });
 });
-
-//   it('animate with abort', async () => {
-//     var object = new fabric.Object({ left: 123, top: 124 });
-
-//     var context;
-//     object.animate(
-//       { left: 223, top: 224 },
-//       {
-//         abort: function () {
-//           context = this;
-//           return true;
-//         },
-//       }
-//     );
-
-//     setTimeout(function () {
-//       expect(123, Math.round(object.get('left')));
-//       expect(124, Math.round(object.get('top')));
-//       expect(
-//         context,
-//         object,
-//         'abort should be called in context of an object'
-//       );
-//       done();
-//     }, 100);
-//   });
-
-//   it('animate with imperative abort', async () => {
-//     var object = new fabric.Object({ left: 123, top: 124 });
-
-//     let called = 0;
-//     const context = object._animate('left', 223, {
-//       abort: function () {
-//         called++;
-//         return false;
-//       },
-//     });
-
-//     expect((typeof context.abort === 'function');
-//     expect(context.state, 'pending', 'state');
-//     context.abort();
-//     expect(context.state, 'aborted', 'state');
-
-//     setTimeout(function () {
-//       expect(Math.round(object.get('left')), 123);
-//       expect(
-//         called,
-//         0,
-//         'declarative abort should be called once before imperative abort cancels the run'
-//       );
-//       done();
-//     }, 100);
-//   });
-
-//   it('animate with delay', async () => {
-//     var object = new fabric.Object({ left: 123, top: 124 });
-//     var t = new Date();
-//     const context = object._animate('left', 223, {
-//       onStart: function () {
-//         expect(context.state, 'running', 'state');
-//         assert.gte(new Date() - t, 500, 'animation delay');
-//         return false;
-//       },
-//       onComplete: done,
-//       delay: 500,
-//     });
-//     expect(context.state, 'pending', 'state');
-//   });
 
 describe('easing', () => {
   afterEach(() => {
