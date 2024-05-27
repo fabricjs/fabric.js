@@ -99,9 +99,11 @@ export const multiplyTransformMatrixArray = (
 ) =>
   matrices.reduceRight(
     (product: TMat2D, curr) =>
-      curr ? multiplyTransformMatrices(curr, product, is2x2) : product,
-    iMatrix
-  );
+      curr && product
+        ? multiplyTransformMatrices(curr, product, is2x2)
+        : curr || product,
+    undefined as unknown as TMat2D
+  ) || iMatrix.concat();
 
 export const calcPlaneRotation = ([a, b]: TMat2D) =>
   Math.atan2(b, a) as TRadian;
