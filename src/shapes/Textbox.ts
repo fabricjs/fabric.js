@@ -7,6 +7,7 @@ import type { TextStyleDeclaration } from './Text/StyledText';
 import type { SerializedITextProps, ITextProps } from './IText/IText';
 import type { ITextEvents } from './IText/ITextBehavior';
 import type { TextLinesInfo } from './Text/Text';
+import type { Control } from '../controls/Control';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -97,9 +98,26 @@ export class Textbox<
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createTextboxDefaultControls(),
       ...Textbox.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {String} text Text string
+   * @param {Object} [options] Options object
+   */
+  constructor(text: string, options?: Props) {
+    super(text, { ...Textbox.ownDefaults, ...options } as Props);
+  }
+
+  /**
+   * Creates the default control object.
+   * If you prefer to have on instance of controls shared among all objects
+   * make this function return an empty object and add controls to the ownDefaults object
+   */
+  static createControls(): { controls: Record<string, Control> } {
+    return { controls: createTextboxDefaultControls() };
   }
 
   /**

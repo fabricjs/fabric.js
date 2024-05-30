@@ -196,8 +196,11 @@ export class FabricImage<
    */
   constructor(elementId: string, options?: Props);
   constructor(element: ImageSource, options?: Props);
-  constructor(arg0: ImageSource | string, options: Props = {} as Props) {
-    super({ filters: [], ...options });
+  constructor(arg0: ImageSource | string, options?: Props) {
+    super();
+    this.filters = [];
+    Object.assign(this, FabricImage.ownDefaults);
+    this.setOptions(options);
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       typeof arg0 === 'string'

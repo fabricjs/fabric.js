@@ -2,6 +2,7 @@
 
 ## [next]
 
+- perf(): Rework constructors to avoid the extra perf cost of current setup [#9891](https://github.com/fabricjs/fabric.js/pull/9891)
 - perf(): Remove redundant matrix multiplication in multiplayTransformMatrixArray [#9893](https://github.com/fabricjs/fabric.js/pull/9893)
 - test(): Convert Animation tests to jest [#9892](https://github.com/fabricjs/fabric.js/pull/9892)
 - perf(ObjectGeometry): replace cache key string with array [#9887](https://github.com/fabricjs/fabric.js/pull/9887)

@@ -139,9 +139,32 @@ export class InteractiveFabricObject<
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createObjectDefaultControls(),
       ...InteractiveFabricObject.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(
+      this,
+      (this.constructor as typeof InteractiveFabricObject).createControls(),
+      InteractiveFabricObject.ownDefaults
+    );
+    this.setOptions(options);
+  }
+
+  /**
+   * Creates the default control object.
+   * If you prefer to have on instance of controls shared among all objects
+   * make this function return an empty object and add controls to the ownDefaults
+   * @param {Object} [options] Options object
+   */
+  static createControls(): { controls: Record<string, Control> } {
+    return { controls: createObjectDefaultControls() };
   }
 
   /**

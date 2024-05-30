@@ -137,8 +137,9 @@ export class Group
    * @param {Object} [options] Options object
    */
   constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
-    // @ts-expect-error options error
-    super(options);
+    super();
+    Object.assign(this, Group.ownDefaults);
+    this.setOptions(options);
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
