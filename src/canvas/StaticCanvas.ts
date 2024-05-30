@@ -1414,9 +1414,10 @@ export class StaticCanvas<
    */
   toCanvasElement(
     multiplier = 1,
-    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+    options = {} as TToCanvasElementOptions
   ): HTMLCanvasElement {
-    const scaledWidth = (width || this.width) * multiplier,
+    const { width, height, left, top, filter } = options,
+      scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
       zoom = this.getZoom(),
       originalWidth = this.width,
