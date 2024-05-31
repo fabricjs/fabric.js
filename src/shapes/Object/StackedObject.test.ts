@@ -1,4 +1,5 @@
 import { Canvas } from '../../canvas/Canvas';
+import { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ActiveSelection } from '../ActiveSelection';
 import { Group } from '../Group';
 import { FabricObject } from './FabricObject';
@@ -34,6 +35,24 @@ describe('StackedObject', () => {
     expect(!object.isDescendantOf(parent));
     expect(object.isDescendantOf(activeSelection)).toBe(true);
     expect(object.isDescendantOf(canvas)).toBe(true);
+  });
+
+  test('getAncestors return type', () => {
+    const object = new FabricObject();
+
+    const parents: Group[] = object.getAncestors(true);
+
+    const isCanvas = (a: unknown): a is Canvas | StaticCanvas =>
+      a instanceof Canvas || a instanceof StaticCanvas;
+    const isGroup = (a: unknown): a is Group => a instanceof Group;
+
+    const ancestors = object.getAncestors(false);
+    const parentAncestors: Group[] = ancestors.filter(isGroup);
+    const canvasAncestor: Canvas | StaticCanvas = ancestors.filter(isCanvas)[0];
+
+    expect(parents).toBeDefined();
+    expect(parentAncestors).toBeDefined();
+    expect(canvasAncestor).toBeDefined();
   });
 
   test('getAncestors', () => {
