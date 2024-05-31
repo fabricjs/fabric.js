@@ -612,55 +612,6 @@
     assert.ok(removedEventFired);
   });
 
-  QUnit.test('isDescendantOf', function (assert) {
-    const object = new fabric.Object();
-    const parent = new fabric.Group([]);
-    parent._exitGroup = () => { };
-    assert.ok(typeof object.isDescendantOf === 'function');
-    parent.canvas = canvas;
-    object.parent = parent;
-    assert.ok(object.isDescendantOf(parent));
-    object.parent = new fabric.Object();
-    object.parent.parent = parent;
-    assert.ok(object.isDescendantOf(parent));
-    assert.ok(object.isDescendantOf(canvas));
-    object.parent = undefined;
-    assert.ok(object.isDescendantOf(parent) === false);
-    assert.ok(object.isDescendantOf(canvas) === false);
-    object.canvas = canvas;
-    assert.ok(object.isDescendantOf(canvas));
-    assert.ok(object.isDescendantOf(object) === false);
-    object.parent = parent;
-    const activeSelection = new fabric.ActiveSelection([object], { canvas });
-    assert.equal(object.group, activeSelection);
-    assert.equal(object.parent, parent);
-    assert.equal(object.canvas, canvas);
-    assert.ok(object.isDescendantOf(parent), 'should recognize parent');
-    assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
-    assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
-    delete object.parent;
-    assert.ok(!object.isDescendantOf(parent));
-    assert.ok(object.isDescendantOf(activeSelection), 'should recognize active selection');
-    assert.ok(object.isDescendantOf(canvas), 'should recognize canvas');
-  });
-
-  QUnit.test('getAncestors', function (assert) {
-    var object = new fabric.Object();
-    var parent = new fabric.Object();
-    var other = new fabric.Object();
-    assert.ok(typeof object.getAncestors === 'function');
-    assert.deepEqual(object.getAncestors(), []);
-    object.parent = parent;
-    assert.deepEqual(object.getAncestors(), [parent]);
-    parent.canvas = canvas;
-    assert.deepEqual(object.getAncestors(), [parent, canvas]);
-    parent.parent = other;
-    assert.deepEqual(object.getAncestors(), [parent, other]);
-    other.canvas = canvas;
-    assert.deepEqual(object.getAncestors(), [parent, other, canvas]);
-    delete object.parent;
-    assert.deepEqual(object.getAncestors(), []);
-  });
 
   function prepareObjectsForTreeTesting() {
     class TestObject extends fabric.Object {

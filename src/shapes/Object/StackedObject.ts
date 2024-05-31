@@ -4,6 +4,11 @@ import type { Canvas } from '../../canvas/Canvas';
 import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectGeometry } from './ObjectGeometry';
 
+// Check if an object is a Group without using the class to avoid circular dependency
+const isGroup = (obj: StackedObject): obj is Group => {
+  return typeof (obj as Group).enterGroup === 'function';
+};
+
 type TAncestor = StackedObject | Canvas | StaticCanvas;
 type TCollection = Group | Canvas | StaticCanvas;
 
@@ -11,27 +16,25 @@ type TCollection = Group | Canvas | StaticCanvas;
  * Strict: only ancestors that are objects (without canvas)
  */
 export type Ancestors<Strict> = Strict extends true
-  ? [StackedObject | Group] | [StackedObject | Group, ...Group[]] | Group[]
-  :
-      | [StackedObject | Group | Canvas | StaticCanvas]
-      | [StackedObject | Group, Canvas | StaticCanvas]
-      | [StackedObject, ...Group[]]
-      | Group[]
-      | [StackedObject | Group, ...Group[], Canvas | StaticCanvas];
+  ? Group[]
+  : [...Group[], Canvas | StaticCanvas] | [(Canvas | StaticCanvas)?];
 
 export type AncestryComparison<Strict> = {
   /**
    * common ancestors of `this` and`other`(may include`this` | `other`)
    */
-  common: Ancestors<Strict>;
+  common:
+    | [StackedObject, ...Ancestors<Strict>]
+    | Ancestors<Strict>
+    | [StackedObject?];
   /**
    * ancestors that are of `this` only
    */
-  fork: Ancestors<Strict>;
+  fork: [StackedObject, ...Ancestors<Strict>] | [StackedObject?];
   /**
    * ancestors that are of `other` only
    */
-  otherFork: Ancestors<Strict>;
+  otherFork: [StackedObject, ...Ancestors<Strict>] | [StackedObject?];
 };
 
 export class StackedObject<
@@ -95,15 +98,22 @@ export class StackedObject<
       return {
         fork: [],
         otherFork: [],
-        common: [this, ...this.getAncestors(strict)],
-      } as AncestryComparison<S>;
+        common: [this, ...(this.getAncestors(strict) as Ancestors<S>)],
+      };
     }
-    const ancestors = this.getAncestors(strict);
-    const otherAncestors = other.getAncestors(strict);
+
+    type AncestorsTuple = Omit<Ancestors<S>, 'slice'> & {
+      // Don't widen the tuple to a generic array
+      slice: (from?: number, to?: number) => Ancestors<S>;
+    };
+    const ancestors = this.getAncestors(strict) as AncestorsTuple;
+    const otherAncestors = other.getAncestors(strict) as AncestorsTuple;
+
     //  if `this` has no ancestors and `this` is top ancestor of `other` we must handle the following case
     if (
       ancestors.length === 0 &&
       otherAncestors.length > 0 &&
+      isGroup(this) &&
       this === otherAncestors[otherAncestors.length - 1]
     ) {
       return {
@@ -113,41 +123,41 @@ export class StackedObject<
           ...otherAncestors.slice(0, otherAncestors.length - 1),
         ],
         common: [this],
-      } as AncestryComparison<S>;
+      };
     }
     //  compare ancestors
     for (let i = 0, ancestor; i < ancestors.length; i++) {
       ancestor = ancestors[i];
-      if (ancestor === other) {
+      if (isGroup(other) && ancestor === other) {
         return {
           fork: [this, ...ancestors.slice(0, i)],
           otherFork: [],
           common: ancestors.slice(i),
-        } as AncestryComparison<S>;
+        };
       }
       for (let j = 0; j < otherAncestors.length; j++) {
-        if (this === otherAncestors[j]) {
+        if (isGroup(this) && this === otherAncestors[j]) {
           return {
             fork: [],
             otherFork: [other, ...otherAncestors.slice(0, j)],
-            common: [this, ...ancestors],
-          } as AncestryComparison<S>;
+            common: [this, ...ancestors.slice()],
+          };
         }
         if (ancestor === otherAncestors[j]) {
           return {
             fork: [this, ...ancestors.slice(0, i)],
             otherFork: [other, ...otherAncestors.slice(0, j)],
             common: ancestors.slice(i),
-          } as AncestryComparison<S>;
+          };
         }
       }
     }
     // nothing shared
     return {
-      fork: [this, ...ancestors],
-      otherFork: [other, ...otherAncestors],
+      fork: [this, ...ancestors.slice()],
+      otherFork: [other, ...otherAncestors.slice()],
       common: [],
-    } as AncestryComparison<S>;
+    };
   }
 
   /**
@@ -174,10 +184,10 @@ export class StackedObject<
     if (!ancestorData) {
       return undefined;
     }
-    if (ancestorData.fork.includes(other as any)) {
+    if (ancestorData.fork.includes(other)) {
       return true;
     }
-    if (ancestorData.otherFork.includes(this as any)) {
+    if (ancestorData.otherFork.includes(this)) {
       return false;
     }
     const firstCommonAncestor = ancestorData.common[0];
