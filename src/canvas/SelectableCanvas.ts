@@ -23,7 +23,6 @@ import type {
   TOriginY,
   TSize,
   TSVGReviver,
-  TToCanvasElementOptions,
 } from '../typedefs';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import { getPointer, isTouchEvent } from '../util/dom_event';
@@ -466,20 +465,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     } else {
       return e[sKey];
     }
-  }
-
-  toCanvasElement(
-    multiplier = 1,
-    options = {} as TToCanvasElementOptions
-  ): HTMLCanvasElement {
-    const { keepControls } = options;
-    const originalActive = this._activeObject;
-    if (!keepControls) {
-      this._activeObject = undefined;
-    }
-    const el = super.toCanvasElement(multiplier, options);
-    this._activeObject = originalActive;
-    return el;
   }
 
   /**

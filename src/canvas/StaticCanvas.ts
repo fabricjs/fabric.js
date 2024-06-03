@@ -161,6 +161,15 @@ export class StaticCanvas<
 
   declare elements: StaticCanvasDOMManager;
 
+  /**
+   * When true control drawing is skipped.
+   * This boolean is used to avoid toDataURL to export controls.
+   * Usage of this boolean to build up other flows and features is not supported
+   * @type Boolean
+   * @default false
+   */
+  protected declare skipControlsDrawing: boolean;
+
   static ownDefaults = staticCanvasDefaults;
 
   // reference to
@@ -188,6 +197,7 @@ export class StaticCanvas<
       width: this.width || this.elements.lower.el.width || 0,
       height: this.height || this.elements.lower.el.height || 0,
     });
+    this.skipControlsDrawing = false;
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
@@ -582,7 +592,7 @@ export class StaticCanvas<
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     this._renderObjects(ctx, objects);
     ctx.restore();
-    if (!this.controlsAboveOverlay) {
+    if (!this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
     if (path) {
@@ -594,7 +604,7 @@ export class StaticCanvas<
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
-    if (this.controlsAboveOverlay) {
+    if (this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
     this.fire('after:render', { ctx });
@@ -1414,14 +1424,14 @@ export class StaticCanvas<
    */
   toCanvasElement(
     multiplier = 1,
-    options = {} as TToCanvasElementOptions
+    { width, height, left, top, filter } = {} as TToCanvasElementOptions
   ): HTMLCanvasElement {
-    const { width, height, left, top, filter } = options,
-      scaledWidth = (width || this.width) * multiplier,
+    const scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
       zoom = this.getZoom(),
       originalWidth = this.width,
       originalHeight = this.height,
+      originalSkipControlsDrawing = this.skipControlsDrawing,
       newZoom = zoom * multiplier,
       vp = this.viewportTransform,
       translateX = (vp[4] - (left || 0)) * multiplier,
@@ -1438,6 +1448,7 @@ export class StaticCanvas<
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
+    this.skipControlsDrawing = true;
     this.calcViewportBoundaries();
     this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
@@ -1445,6 +1456,7 @@ export class StaticCanvas<
     this.height = originalHeight;
     this.calcViewportBoundaries();
     this.enableRetinaScaling = originalRetina;
+    this.skipControlsDrawing = originalSkipControlsDrawing;
     return canvasEl;
   }
 

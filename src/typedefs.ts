@@ -105,7 +105,6 @@ export type TToCanvasElementOptions<
   width?: number;
   height?: number;
   filter?: (object: T) => boolean;
-  keepControls?: boolean;
 };
 
 export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
