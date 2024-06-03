@@ -850,31 +850,40 @@ export const parsePath = (pathString: string): TComplexPathData => {
   pathString = cleanupSvgAttribute(pathString);
 
   const res: TComplexPathData = [];
-  for (let [match] of pathString.matchAll(rePathCmdAll)) {
+  for (let [matchStr] of pathString.matchAll(rePathCmdAll)) {
     const chain: TComplexPathData = [];
     let paramArr: RegExpExecArray | null;
     do {
-      paramArr = rePathCmd.exec(match);
+      paramArr = rePathCmd.exec(matchStr);
       if (!paramArr) {
         break;
       }
       // ignore undefined match groups
-      const filteredGroups = paramArr.filter(Boolean);
+      const filteredGroups = paramArr.filter((g) => g);
       // remove the first element from the match array since it's just the whole command
-      const value = filteredGroups.shift();
+      filteredGroups.shift();
       // if we can't parse the number, just interpret it as a string
       // (since it's probably the path command)
-      const command: (string | number)[] = [];
-      for (const g of filteredGroups) {
+      const command = filteredGroups.map((g) => {
         const numParse = Number.parseFloat(g);
-        command.push(Number.isNaN(numParse) ? g : numParse);
-      }
-      chain.push(command as TComplexParsedCommand);
+        if (Number.isNaN(numParse)) {
+          return g;
+        } else {
+          return numParse;
+        }
+      });
+      chain.push(command as any);
       // stop now if it's a z command
       if (filteredGroups.length <= 1) {
         break;
       }
-      match = match.slice(value ? value.length : 0);
+      // remove the last part of the chained command
+      filteredGroups.shift();
+      // ` ?` is to support commands with optional spaces between flags
+      matchStr = matchStr.replace(
+        new RegExp(`${filteredGroups.join(' ?')} ?$`),
+        ''
+      );
     } while (paramArr);
     // add the chain, convert multiple m's to l's in the process
     chain.reverse().forEach((c, idx) => {
