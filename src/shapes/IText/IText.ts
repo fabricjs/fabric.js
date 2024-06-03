@@ -217,13 +217,12 @@ export class IText<
   }
 
   /**
-
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
   constructor(text: string, options?: Props) {
-    super(text, options);
+    super(text, { ...IText.ownDefaults, ...options } as Props);
     this.initBehavior();
   }
 

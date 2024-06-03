@@ -420,8 +420,14 @@ export class FabricText<
     return { ...super.getDefaults(), ...FabricText.ownDefaults };
   }
 
-  constructor(text: string, options: Props = {} as Props) {
-    super({ ...options, text, styles: options?.styles || {} });
+  constructor(text: string, options?: Props) {
+    super();
+    Object.assign(this, FabricText.ownDefaults);
+    this.setOptions(options);
+    if (!this.styles) {
+      this.styles = {};
+    }
+    this.text = text;
     this.initialized = true;
     if (this.path) {
       this.setPathInfo();
