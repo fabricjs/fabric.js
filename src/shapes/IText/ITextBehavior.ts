@@ -701,6 +701,7 @@ export abstract class ITextBehavior<
       this.canvas.fire('text:editing:exited', {
         target: this as unknown as IText,
       });
+      // todo: evaluate add an action to this event
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
     return this;
