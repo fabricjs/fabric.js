@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(_renderControls): fixed render order so group controls are rendered over child objects
 - types(): Make event type explicit - non generic, and fix pattern fromObject type [#9907](https://github.com/fabricjs/fabric.js/pull/9907)
 
 ## [6.0.0-rc2]
