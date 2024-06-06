@@ -47,6 +47,7 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 6.0.0-rc2
         - 6.0.0-rc1
         - 6.0.0-beta9
         - 6.0.0-beta8
@@ -105,6 +106,9 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 22.2.0
+        - 22.1.0
+        - 22.0.0
         - 21.7.3
         - 21.7.2
         - 21.7.1
@@ -118,6 +122,9 @@ body:
         - 21.2.0
         - 21.1.0
         - 21.0.0
+        - 20.14.0
+        - 20.13.1
+        - 20.13.0
         - 20.12.2
         - 20.12.1
         - 20.12.0
@@ -150,6 +157,7 @@ body:
         - 19.1.0
         - 19.0.1
         - 19.0.0
+        - 18.20.3
         - 18.20.2
         - 18.20.1
         - 18.20.0

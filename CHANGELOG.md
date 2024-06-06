@@ -2,6 +2,8 @@
 
 ## [next]
 
+- types(): Make event type explicit - non generic, and fix pattern fromObject type [#9907](https://github.com/fabricjs/fabric.js/pull/9907)
+
 ## [6.0.0-rc2]
 
 - perf(): remove some runtime RegExp usages [#9802](https://github.com/fabricjs/fabric.js/pull/9802)
