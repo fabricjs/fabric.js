@@ -1,11 +1,11 @@
 # Changelog
 
 ## [next]
-
+- fix(filters) RemoveColor has missing getFragmentSource method ( typo ) [#9911](https://github.com/fabricjs/fabric.js/pull/9911)
 - types(): Make event type explicit - non generic, and fix pattern fromObject type [#9907](https://github.com/fabricjs/fabric.js/pull/9907)
 
 ## [6.0.0-rc2]
-- fix(filters) RemoveColor has missing getFragmentSource method ( typo ) [#9911](https://github.com/fabricjs/fabric.js/pull/9911)
+
 - perf(): remove some runtime RegExp usages [#9802](https://github.com/fabricjs/fabric.js/pull/9802)
 - fix(Canvas): Avoid exporting controls with toDataURL [#9896](https://github.com/fabricjs/fabric.js/pull/9896)
 - perf(): Rework constructors to avoid the extra perf cost of current setup [#9891](https://github.com/fabricjs/fabric.js/pull/9891)
