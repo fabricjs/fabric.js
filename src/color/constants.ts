@@ -75,15 +75,15 @@ export const reRGBa = () =>
  *
  * /^hsla?\(         // Matches the beginning of the string and the opening parenthesis of "hsl" or "hsla"
  * \s*               // Matches any whitespace characters (space, tab, etc.) zero or more times
- * (\d{1,3})         // Hue: Matches one to three digits and captures it in a group
+ * ([\d\.]+)         // Hue: Matches one or more digits with decimal and captures it in a group
  * \s*               // Matches any whitespace characters zero or more times
  * [\s|,]            // Matches a space, tab or comma
  * \s*               // Matches any whitespace characters zero or more times
- * (\d{1,3}%)        // Saturation: Matches one to three digits followed by a percentage sign and captures it in a group
+ * ([\d\.]+%)        // Saturation: Matches digits/decimal followed by a percentage sign and captures it in a group
  * \s*               // Matches any whitespace characters zero or more times
  * [\s|,]            // Matches a space, tab or comma
  * \s*               // Matches any whitespace characters zero or more times
- * (\d{1,3}%)        // Lightness: Matches one to three digits followed by a percentage sign and captures it in a group
+ * ([\d\.]+%)        // Lightness: Matches digits or decimal followed by a percentage sign and captures it in a group
  * \s*               // Matches any whitespace characters zero or more times
  * (?:               // Alpha: Begins a non-capturing group for the alpha value
  *   \s*             // Matches any whitespace characters zero or more times
@@ -99,7 +99,7 @@ export const reRGBa = () =>
  * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
 export const reHSLa = () =>
-  /^hsla?\(\s*([+-]?\d{1,3})\s*[\s|,]\s*(\d{1,3}%)\s*[\s|,]\s*(\d{1,3}%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
+  /^hsla?\(\s*([+-]?[\d\.]+)\s*[\s|,]\s*([\d\.]+%)\s*[\s|,]\s*([\d\.]+%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
