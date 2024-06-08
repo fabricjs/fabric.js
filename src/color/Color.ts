@@ -256,7 +256,6 @@ export class Color {
    */
   static sourceFromHsl(color: string): TRGBAColorSource | undefined {
     const noNone = color.replaceAll('none', '0');
-    console.log(noNone);
     const match = noNone.match(reHSLa());
     if (!match) {
       return;
