@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): remove strict parameter for ancestry. [#9918](https://github.com/fabricjs/fabric.js/pull/9918)
 - fix(Controls): add support for numeric origins to changeWidth [#9909](https://github.com/fabricjs/fabric.js/pull/9909)
 - fix(\_renderControls): fixed render order so group controls are rendered over child objects [#9914](https://github.com/fabricjs/fabric.js/pull/9914)
 - fix(filters): RemoveColor has missing getFragmentSource method ( typo ) [#9911](https://github.com/fabricjs/fabric.js/pull/9911)
