@@ -237,7 +237,6 @@ export class ActiveSelection extends Group {
   ) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    super._renderControls(ctx, styleOverride);
     const options = {
       hasControls: false,
       ...childrenOverride,
@@ -246,6 +245,7 @@ export class ActiveSelection extends Group {
     for (let i = 0; i < this._objects.length; i++) {
       this._objects[i]._renderControls(ctx, options);
     }
+    super._renderControls(ctx, styleOverride);
     ctx.restore();
   }
 }
