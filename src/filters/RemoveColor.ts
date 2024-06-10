@@ -1,9 +1,9 @@
+import { classRegistry } from '../ClassRegistry';
 import { Color } from '../color/Color';
 import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
-import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-import { classRegistry } from '../ClassRegistry';
 import { fragmentShader } from './shaders/removeColor';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
     color: '#FFFFFF',
@@ -45,7 +45,7 @@ export class RemoveColor extends BaseFilter {
 
   static defaults = removeColorDefaultValues;
 
-  getFragmentShader() {
+  getFragmentSource() {
     return fragmentShader;
   }
 
