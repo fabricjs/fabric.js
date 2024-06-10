@@ -326,7 +326,7 @@ export class Color {
    * @static
    * @memberOf Color
    * @param {String} value ex: 0deg, 0.5turn, 2rad
-   * @return {String} numeric string in degrees, or '0' for improper input
+   * @return {Number} number in degrees or NaN if inputs are invalid
    */
   static parseAngletoDegrees(value: string): number {
     const lowercase = value.toLowerCase();
