@@ -21,11 +21,6 @@ describe('Color regex and conversion tests', () => {
     expect(color1.getSource().toString()).toBe([192, 63, 106, 0.25].toString());
   });
 
-  it('Converts a hsla color with empty entries to rgba', () => {
-    const color1 = new Color('hsla(none,none,50%,0.5)');
-    expect(color1.getSource().toString()).toBe([128, 128, 128, 0.5].toString());
-  });
-
   it('Converts a hsla color with angle deg to rgba', () => {
     const color1 = new Color('hsl(120deg,100%,50%)');
     expect(color1.getSource().toString()).toBe([0, 255, 0, 1].toString());

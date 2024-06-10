@@ -255,14 +255,13 @@ export class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color: string): TRGBAColorSource | undefined {
-    const noNone = color.replaceAll('none', '0');
-    const match = noNone.match(reHSLa());
+    const match = color.match(reHSLa());
     if (!match) {
       return;
     }
     const match1degrees = Color.parseAngletoDegrees(match[1]);
 
-    const h = (((parseFloat(match1degrees) % 360) + 360) % 360) / 360,
+    const h = (((match1degrees % 360) + 360) % 360) / 360,
       s = parseFloat(match[2]) / 100,
       l = parseFloat(match[3]) / 100;
     let r: number, g: number, b: number;
@@ -329,23 +328,20 @@ export class Color {
    * @param {String} value ex: 0deg, 0.5turn, 2rad
    * @return {String} numeric string in degrees, or '0' for improper input
    */
-  static parseAngletoDegrees(value: string): string {
+  static parseAngletoDegrees(value: string): number {
     const lowercase = value.toLowerCase();
-    if (lowercase.indexOf('deg') > -1) {
-      return lowercase.replace('deg', '');
-    }
+    const numeric = parseFloat(lowercase);
 
-    if (lowercase.indexOf('rad') > -1) {
+    if (lowercase.includes('rad')) {
       const numeric = parseFloat(lowercase.replace('rad', ''));
-      return numeric === undefined ? '0' : radiansToDegrees(numeric).toString();
+      return radiansToDegrees(numeric);
     }
 
-    if (lowercase.indexOf('turn') > -1) {
-      const numeric = parseFloat(lowercase.replace('turn', ''));
-      return numeric === undefined ? '0' : (numeric * 360).toString();
+    if (lowercase.includes('turn')) {
+      return numeric * 360;
     }
 
     // Value is probably just a number already in degrees eg '50'
-    return lowercase;
+    return numeric;
   }
 }
