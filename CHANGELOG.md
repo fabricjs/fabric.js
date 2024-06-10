@@ -3,6 +3,8 @@
 ## [next]
 
 - fix(Controls): add support for numeric origins to changeWidth [#9909](https://github.com/fabricjs/fabric.js/pull/9909)
+- fix(\_renderControls): fixed render order so group controls are rendered over child objects [#9914](https://github.com/fabricjs/fabric.js/pull/9914)
+- fix(filters): RemoveColor has missing getFragmentSource method ( typo ) [#9911](https://github.com/fabricjs/fabric.js/pull/9911)
 - types(): Make event type explicit - non generic, and fix pattern fromObject type [#9907](https://github.com/fabricjs/fabric.js/pull/9907)
 
 ## [6.0.0-rc2]
