@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Controls): add support for numeric origins to changeWidth [#9909](https://github.com/fabricjs/fabric.js/pull/9909)
 - types(): Make event type explicit - non generic, and fix pattern fromObject type [#9907](https://github.com/fabricjs/fabric.js/pull/9907)
 
 ## [6.0.0-rc2]
