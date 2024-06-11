@@ -333,7 +333,6 @@ export class Color {
     const numeric = parseFloat(lowercase);
 
     if (lowercase.includes('rad')) {
-      const numeric = parseFloat(lowercase.replace('rad', ''));
       return radiansToDegrees(numeric);
     }
 
