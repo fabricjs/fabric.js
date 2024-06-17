@@ -1,14 +1,11 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/gamma';
+
 export type GammaInput = [number, number, number];
 
-export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
-  mainParameter: 'gamma',
-  gamma: [1, 1, 1],
-};
+const defaultGammaValue: GammaInput = [1, 1, 1];
 
 /**
  * Gamma filter class
@@ -25,7 +22,7 @@ export class Gamma extends BaseFilter {
    * @param {Array} gamma
    * @default
    */
-  declare gamma: GammaInput;
+  public gamma: GammaInput = defaultGammaValue;
   declare rgbValues?: {
     r: Uint8Array;
     g: Uint8Array;
@@ -33,8 +30,6 @@ export class Gamma extends BaseFilter {
   };
 
   static type = 'Gamma';
-
-  static defaults = gammaDefaultValues;
 
   getFragmentSource() {
     return fragmentSource;
@@ -61,7 +56,7 @@ export class Gamma extends BaseFilter {
       this.rgbValues = {
         r: new Uint8Array(256),
         g: new Uint8Array(256),
-        b: new Uint8Array(256),
+        b: new Uint8Array(256)
       };
     }
 
@@ -80,6 +75,20 @@ export class Gamma extends BaseFilter {
     }
   }
 
+  isNeutralState() {
+    return defaultGammaValue.every(
+      (value: number, i: number) => value === this.gamma[i]
+    );
+  }
+
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      gamma: [...this.gamma]
+    };
+  }
+
   /**
    * Return WebGL uniform locations for this filter's shader.
    *
@@ -91,7 +100,7 @@ export class Gamma extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uGamma: gl.getUniformLocation(program, 'uGamma'),
+      uGamma: gl.getUniformLocation(program, 'uGamma')
     };
   }
 

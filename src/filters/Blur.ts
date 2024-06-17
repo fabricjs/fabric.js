@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -10,10 +9,7 @@ import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blur';
 
-export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
-  blur: 0,
-  mainParameter: 'blur',
-};
+const defaultBlurValue = 0;
 
 /**
  * Blur filter class
@@ -33,14 +29,12 @@ export class Blur extends BaseFilter {
    * @type Number
    * @default
    */
-  declare blur: number;
+  public blur: number = defaultBlurValue;
 
   declare horizontal: boolean;
   declare aspectRatio: number;
 
   static type = 'Blur';
-
-  static defaults = blurDefaultValues;
 
   getFragmentSource(): string {
     return fragmentSource;
@@ -133,6 +127,17 @@ export class Blur extends BaseFilter {
   ): TWebGLUniformLocationMap {
     return {
       delta: gl.getUniformLocation(program, 'uDelta'),
+    };
+  }
+
+  isNeutralState(): boolean {
+    return this.blur === defaultBlurValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      blur: this.blur
     };
   }
 

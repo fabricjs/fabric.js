@@ -1,8 +1,10 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/saturation';
+
+const defaultSaturationValue = 0;
+
 
 /**
  * Saturate filter class
@@ -13,12 +15,6 @@ import { fragmentSource } from './shaders/saturation';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-
-export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  saturation: 0,
-  mainParameter: 'saturation',
-};
-
 export class Saturation extends BaseFilter {
   /**
    * Saturation value, from -1 to 1.
@@ -28,11 +24,10 @@ export class Saturation extends BaseFilter {
    * @param {Number} saturation
    * @default
    */
-  declare saturation: number;
+  public saturation = defaultSaturationValue;
 
   static type = 'Saturation';
 
-  static defaults = saturationDefaultValues;
 
   getFragmentSource() {
     return fragmentSource;
@@ -55,6 +50,17 @@ export class Saturation extends BaseFilter {
       data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
       data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
     }
+  }
+
+  isNeutralState(): boolean {
+    return this.saturation === defaultSaturationValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      saturation: this.saturation
+    };
   }
 
   /**

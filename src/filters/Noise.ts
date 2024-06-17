@@ -1,13 +1,9 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/noise';
 
-export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
-  mainParameter: 'noise',
-  noise: 0,
-};
+const defaultNoiseValue = 0;
 
 /**
  * Noise filter class
@@ -25,11 +21,9 @@ export class Noise extends BaseFilter {
    * @param {Number} noise
    * @default
    */
-  declare noise: number;
+  public noise = defaultNoiseValue;
 
   static type = 'Noise';
-
-  static defaults = noiseDefaultValues;
 
   getFragmentSource() {
     return fragmentSource;
@@ -52,6 +46,10 @@ export class Noise extends BaseFilter {
       data[i + 1] += rand;
       data[i + 2] += rand;
     }
+  }
+
+  isNeutralState(): boolean {
+    return this.noise === defaultNoiseValue;
   }
 
   /**

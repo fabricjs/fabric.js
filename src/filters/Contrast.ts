@@ -1,12 +1,9 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/constrast';
-export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
-  contrast: 0,
-  mainParameter: 'contrast',
-};
+
+const defaultContrastValue = 0;
 
 /**
  * Contrast filter class
@@ -23,11 +20,9 @@ export class Contrast extends BaseFilter {
    * @param {Number} contrast
    * @default 0
    */
-  declare contrast: number;
+  public contrast = defaultContrastValue;
 
   static type = 'Contrast';
-
-  static defaults = contrastDefaultValues;
 
   getFragmentSource() {
     return fragmentSource;
@@ -50,6 +45,17 @@ export class Contrast extends BaseFilter {
       data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
       data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
     }
+  }
+
+  isNeutralState() {
+    return this.contrast === defaultContrastValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      contrast: this.contrast
+    };
   }
 
   /**

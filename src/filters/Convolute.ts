@@ -1,13 +1,7 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/convolute';
-
-export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
-  opaque: false,
-  matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
-};
 
 /**
  * Adapted from <a href="http://www.html5rocks.com/en/tutorials/canvas/imagefilters/">html5rocks article</a>
@@ -53,16 +47,14 @@ export class Convolute extends BaseFilter {
   /*
    * Opaque value (true/false)
    */
-  declare opaque: boolean;
+  public opaque = false;
 
   /*
    * matrix for the filter, max 9x9
    */
-  declare matrix: number[];
+  public matrix: number[] = [0, 0, 0, 0, 1, 0, 0, 0, 0];
 
   static type = 'Convolute';
-
-  static defaults = convoluteDefaultValues;
 
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${

@@ -1,19 +1,12 @@
-import { ColorMatrix, colorMatrixDefaultValues } from './ColorMatrix';
+import { ColorMatrix } from './ColorMatrix';
 import { classRegistry } from '../ClassRegistry';
 
 export function createColorMatrixFilter(key: string, matrix: number[]) {
   const newClass = class extends ColorMatrix {
     static type = key;
-
-    static defaults = {
-      ...colorMatrixDefaultValues,
-      /**
-       * Lock the matrix export for this kind of static, parameter less filters.
-       */
-      mainParameter: undefined,
-      matrix,
-    };
+    public defaultMatrixValue = matrix;
   };
+
   classRegistry.setClass(newClass, key);
   return newClass;
 }

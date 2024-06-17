@@ -1,32 +1,26 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/colorMatrix';
-export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
-  {
-    matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-    mainParameter: 'matrix',
-    colorsOnly: true,
-  };
 
 /**
-   * Color Matrix filter class
-   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
-   * @example <caption>Kodachrome filter</caption>
-   * const filter = new ColorMatrix({
-   *  matrix: [
-       1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
-       -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
-       -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 35.62982807460946,
-       0, 0, 0, 1, 0
-      ]
-   * });
-   * object.filters.push(filter);
-   * object.applyFilters();
-   */
+ * Color Matrix filter class
+ * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
+ * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
+ * @example <caption>Kodachrome filter</caption>
+ * const filter = new ColorMatrix({
+ *  matrix: [
+ 1.1285582396593525, -0.3967382283601348, -0.03992559172921793, 0, 63.72958762196502,
+ -0.16404339962244616, 1.0835251566291304, -0.05498805115633132, 0, 24.732407896706203,
+ -0.16786010706155763, -0.5603416277695248, 1.6014850761964943, 0, 35.62982807460946,
+ 0, 0, 0, 1, 0
+ ]
+ * });
+ * object.filters.push(filter);
+ * object.applyFilters();
+ */
 export class ColorMatrix extends BaseFilter {
+  public defaultMatrixValue = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
   /**
    * Colormatrix for pixels.
    * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
@@ -43,11 +37,14 @@ export class ColorMatrix extends BaseFilter {
    * @type Boolean
    * @default true
    */
-  declare colorsOnly: boolean;
+  public colorsOnly = true;
 
   static type = 'ColorMatrix';
 
-  static defaults = colorMatrixDefaultValues;
+  constructor(options: Record<string, any> = {}) {
+    super(options);
+    this.matrix = this.defaultMatrixValue;
+  }
 
   setOptions({ matrix, ...options }: Record<string, any>) {
     if (matrix) {
@@ -93,6 +90,19 @@ export class ColorMatrix extends BaseFilter {
     }
   }
 
+  isNeutralState(): boolean {
+    return this.defaultMatrixValue.every(
+      (value: number, i: number) => value === this.matrix[i]
+    );
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      matrix: [...this.matrix]
+    };
+  }
+
   /**
    * Return WebGL uniform locations for this filter's shader.
    *
@@ -105,7 +115,7 @@ export class ColorMatrix extends BaseFilter {
   ): TWebGLUniformLocationMap {
     return {
       uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
-      uConstants: gl.getUniformLocation(program, 'uConstants'),
+      uConstants: gl.getUniformLocation(program, 'uConstants')
     };
   }
 
@@ -136,7 +146,7 @@ export class ColorMatrix extends BaseFilter {
         m[15],
         m[16],
         m[17],
-        m[18],
+        m[18]
       ],
       constants = [m[4], m[9], m[14], m[19]];
     gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);

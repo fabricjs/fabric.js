@@ -1,13 +1,9 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/vibrance';
 
-export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
-  vibrance: 0,
-  mainParameter: 'vibrance',
-};
+const defaultVibranceValue = 0;
 
 /**
  * Vibrance filter class
@@ -27,11 +23,9 @@ export class Vibrance extends BaseFilter {
    * @param {Number} vibrance
    * @default
    */
-  declare vibrance: number;
+  public vibrance = defaultVibranceValue;
 
   static type = 'Vibrance';
-
-  static defaults = vibranceDefaultValues;
 
   getFragmentSource() {
     return fragmentSource;
@@ -58,6 +52,17 @@ export class Vibrance extends BaseFilter {
     }
   }
 
+  isNeutralState(): boolean {
+    return this.vibrance === defaultVibranceValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      vibrance: this.vibrance
+    };
+  }
+
   /**
    * Return WebGL uniform locations for this filter's shader.
    *
@@ -69,7 +74,7 @@ export class Vibrance extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uVibrance: gl.getUniformLocation(program, 'uVibrance'),
+      uVibrance: gl.getUniformLocation(program, 'uVibrance')
     };
   }
 

@@ -1,11 +1,7 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
-export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
-  myParameter: 0,
-  mainParameter: 'myParameter',
-};
+const defaultMyParameterValue = 0;
 
 /**
  * MyFilter filter class
@@ -24,9 +20,7 @@ export class MyFilter extends BaseFilter {
    * @param {Number} myParameter
    * @default
    */
-  declare myParameter: number;
-
-  static defaults = myFilterDefaultValues;
+  public myParameter = defaultMyParameterValue;
 
   getFragmentSource() {
     return `
@@ -41,6 +35,7 @@ export class MyFilter extends BaseFilter {
         }
       `;
   }
+
   /**
    * Apply the MyFilter operation to a Uint8ClampedArray representing the pixels of an image.
    *
@@ -69,7 +64,18 @@ export class MyFilter extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uMyParameter: gl.getUniformLocation(program, 'uMyParameter'),
+      uMyParameter: gl.getUniformLocation(program, 'uMyParameter')
+    };
+  }
+
+  isNeutralState(): boolean {
+    return this.myParameter === defaultMyParameterValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      myParameter: this.myParameter
     };
   }
 

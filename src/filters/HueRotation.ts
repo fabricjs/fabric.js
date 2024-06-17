@@ -1,15 +1,10 @@
-import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
 import { ColorMatrix } from './ColorMatrix';
 import type { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
-export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
-  {
-    rotation: 0,
-    mainParameter: 'rotation',
-  };
+const defaultRotationValue = 0;
 
 /**
  * HueRotation filter class
@@ -20,16 +15,13 @@ export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
  * object.filters.push(filter);
  * object.applyFilters();
  */
-// @ts-expect-error some babbling about mainParameter
 export class HueRotation extends ColorMatrix {
   /**
    * HueRotation value, from -1 to 1.
    */
-  declare rotation: number;
+  public rotation = defaultRotationValue;
 
   static type = 'HueRotation';
-
-  static defaults = hueRotationDefaultValues;
 
   calculateMatrix() {
     const rad = this.rotation * Math.PI,
@@ -52,7 +44,14 @@ export class HueRotation extends ColorMatrix {
 
   isNeutralState() {
     this.calculateMatrix();
-    return super.isNeutralState();
+    return this.rotation === defaultRotationValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      rotation: this.rotation
+    };
   }
 
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {

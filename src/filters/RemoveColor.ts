@@ -1,15 +1,8 @@
 import { classRegistry } from '../ClassRegistry';
 import { Color } from '../color/Color';
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import { fragmentShader } from './shaders/removeColor';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
-export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
-  {
-    color: '#FFFFFF',
-    distance: 0.02,
-    useAlpha: false,
-  };
 
 /**
  * Remove white filter class
@@ -27,23 +20,21 @@ export class RemoveColor extends BaseFilter {
    * @param {String} type
    * @default
    */
-  declare color: string;
+  public color = '#FFFFFF';
 
   /**
    * distance to actual color, as value up or down from each r,g,b
    * between 0 and 1
    **/
-  declare distance: number;
+  public distance = 0.2;
 
   /**
    * For color to remove inside distance, use alpha channel for a smoother deletion
    * NOT IMPLEMENTED YET
    **/
-  declare useAlpha: boolean;
+  public useAlpha = false;
 
   static type = 'RemoveColor';
-
-  static defaults = removeColorDefaultValues;
 
   getFragmentSource() {
     return fragmentShader;

@@ -1,14 +1,7 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/invert';
-
-export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
-  alpha: false,
-  invert: true,
-  mainParameter: 'invert',
-};
 
 /**
  * @example
@@ -22,18 +15,16 @@ export class Invert extends BaseFilter {
    * @param {Boolean} alpha
    * @default
    **/
-  declare alpha: boolean;
+  public alpha = false;
 
   /**
    * Filter invert. if false, does nothing
    * @param {Boolean} invert
    * @default
    */
-  declare invert: boolean;
+  public invert = true;
 
   static type = 'Invert';
-
-  static defaults = invertDefaultValues;
 
   /**
    * Apply the Invert operation to a Uint8Array representing the pixels of an image.
@@ -57,11 +48,17 @@ export class Invert extends BaseFilter {
     return fragmentSource;
   }
 
+  toObject() {
+    return {
+      ...super.toObject(),
+      invert: this.invert
+    };
+  }
+
   /**
    * Invert filter isNeutralState implementation
    * Used only in image applyFilters to discard filters that will not have an effect
    * on the image
-   * @param {Object} options
    **/
   isNeutralState() {
     return !this.invert;

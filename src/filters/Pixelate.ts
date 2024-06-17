@@ -1,13 +1,9 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/pixelate';
 
-export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
-  blocksize: 4,
-  mainParameter: 'blocksize',
-};
+const defaultBlockSizeValue = 4;
 
 /**
  * Pixelate filter class
@@ -19,11 +15,10 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
  * object.applyFilters();
  */
 export class Pixelate extends BaseFilter {
-  declare blocksize: number;
+  public blocksize = defaultBlockSizeValue;
 
   static type = 'Pixelate';
 
-  static defaults = pixelateDefaultValues;
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
@@ -60,6 +55,14 @@ export class Pixelate extends BaseFilter {
     return this.blocksize === 1;
   }
 
+  toObject() {
+    return {
+      ...super.toObject(),
+      blocksize: this.blocksize
+    };
+  }
+
+
   protected getFragmentSource(): string {
     return fragmentSource;
   }
@@ -77,7 +80,7 @@ export class Pixelate extends BaseFilter {
     return {
       uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
       uStepW: gl.getUniformLocation(program, 'uStepW'),
-      uStepH: gl.getUniformLocation(program, 'uStepH'),
+      uStepH: gl.getUniformLocation(program, 'uStepH')
     };
   }
 

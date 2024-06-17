@@ -1,12 +1,9 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/brightness';
-export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
-  brightness: 0,
-  mainParameter: 'brightness',
-};
+
+const defaultBrightnessValue = 0;
 
 /**
  * Brightness filter class
@@ -28,8 +25,6 @@ export class Brightness extends BaseFilter {
   declare brightness: number;
 
   static type = 'Brightness';
-
-  static defaults = brightnessDefaultValues;
 
   getFragmentSource() {
     return fragmentSource;
@@ -64,7 +59,18 @@ export class Brightness extends BaseFilter {
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
     return {
-      uBrightness: gl.getUniformLocation(program, 'uBrightness'),
+      uBrightness: gl.getUniformLocation(program, 'uBrightness')
+    };
+  }
+
+  isNeutralState(): boolean {
+    return this.brightness === defaultBrightnessValue;
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      brightness: this.brightness
     };
   }
 
