@@ -143,7 +143,7 @@ export class ColorMatrix extends BaseFilter {
     gl.uniform4fv(uniformLocations.uConstants, constants);
   }
 
-  toObject() {
+  toObject(): { type: string } & Record<string, unknown> {
     return {
       ...super.toObject(),
       matrix: [...this.matrix],

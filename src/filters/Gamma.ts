@@ -1,11 +1,10 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/gamma';
 export type GammaInput = [number, number, number];
 
-export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
+export const gammaDefaultValues: { gamma: GammaInput } = {
   gamma: [1, 1, 1],
 };
 
@@ -39,9 +38,13 @@ export class Gamma extends BaseFilter {
     return fragmentSource;
   }
 
-  constructor({ gamma = [1, 1, 1], ...options }: { gamma?: GammaInput } = {}) {
+  constructor(options: { gamma?: GammaInput } = {}) {
     super(options);
-    this.gamma = gamma;
+    this.gamma =
+      options.gamma ||
+      ((
+        this.constructor as typeof Gamma
+      ).defaults.gamma.concat() as GammaInput);
   }
 
   /**
@@ -105,6 +108,11 @@ export class Gamma extends BaseFilter {
     uniformLocations: TWebGLUniformLocationMap
   ) {
     gl.uniform3fv(uniformLocations.uGamma, this.gamma);
+  }
+
+  isNeutralState() {
+    const { gamma } = this;
+    return gamma[0] === 1 && gamma[1] === 1 && gamma[2] === 1;
   }
 }
 

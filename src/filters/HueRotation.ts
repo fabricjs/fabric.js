@@ -49,13 +49,19 @@ export class HueRotation extends ColorMatrix {
   }
 
   isNeutralState() {
-    this.calculateMatrix();
-    return super.isNeutralState();
+    return this.rotation === 0;
   }
 
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {
     this.calculateMatrix();
     super.applyTo(options);
+  }
+
+  toObject() {
+    return {
+      type: this.type,
+      rotation: this.rotation,
+    };
   }
 }
 

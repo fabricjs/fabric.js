@@ -83,12 +83,8 @@ export class Noise extends BaseFilter {
     gl.uniform1f(uniformLocations.uSeed, Math.random());
   }
 
-  /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
-   */
-  toObject() {
-    return { ...super.toObject(), noise: this.noise };
+  isNeutralState() {
+    return this.noise === 0;
   }
 }
 

@@ -83,6 +83,10 @@ export class Saturation extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
   }
+
+  isNeutralState() {
+    return this.saturation === 0;
+  }
 }
 
 classRegistry.setClass(Saturation);

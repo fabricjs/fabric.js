@@ -84,6 +84,10 @@ export class Vibrance extends BaseFilter {
   ) {
     gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
   }
+
+  isNeutralState() {
+    return this.vibrance === 0;
+  }
 }
 
 classRegistry.setClass(Vibrance);

@@ -359,7 +359,7 @@ export class BaseFilter {
    * Returns object representation of an instance
    * @return {Object} Object representation of an instance
    */
-  toObject() {
+  toObject(): { type: string } & Record<string, unknown> {
     const defaultKeys = Object.keys(
       (this.constructor as typeof BaseFilter).defaults
     );

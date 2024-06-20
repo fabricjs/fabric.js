@@ -4,6 +4,7 @@ import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import { fragmentShader } from './shaders/removeColor';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+
 export const removeColorDefaultValues: Partial<TClassProperties<RemoveColor>> =
   {
     color: '#FFFFFF',
@@ -123,14 +124,6 @@ export class RemoveColor extends BaseFilter {
       ];
     gl.uniform4fv(uniformLocations.uLow, lowC);
     gl.uniform4fv(uniformLocations.uHigh, highC);
-  }
-
-  /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
-   */
-  toObject() {
-    return { ...super.toObject(), color: this.color, distance: this.distance };
   }
 }
 
