@@ -15,12 +15,6 @@ export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
   scaleX: 1,
   scaleY: 1,
   lanczosLobes: 3,
-  fragmentSourceTOP: `
-    precision highp float;
-    uniform sampler2D uTexture;
-    uniform vec2 uDelta;
-    varying vec2 vTexCoord;
-  `,
 };
 
 export type TResizeType = 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
@@ -78,8 +72,6 @@ export class Resize extends BaseFilter {
    * @default
    */
   declare lanczosLobes: number;
-
-  declare fragmentSourceTOP: string;
 
   static type = 'Resize';
 
@@ -152,7 +144,10 @@ export class Resize extends BaseFilter {
       offsets[i - 1] = `${i}.0 * uDelta`;
     }
     return `
-      ${this.fragmentSourceTOP}
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform vec2 uDelta;
+      varying vec2 vTexCoord;
       uniform float uTaps[${filterWindow}];
       void main() {
         vec4 color = texture2D(uTexture, vTexCoord);

@@ -9,24 +9,13 @@ import type {
 } from './typedefs';
 import type { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './shaders/blendImage';
+import { fragmentSource, vertexSource } from './shaders/blendImage';
 
 export type TBlendImageMode = 'multiply' | 'mask';
 
 export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
   mode: 'multiply',
   alpha: 1,
-  vertexSource: `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    varying vec2 vTexCoord2;
-    uniform mat3 uTransformMatrix;
-    void main() {
-      vTexCoord = aPosition;
-      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }
-    `,
 };
 
 /**
@@ -78,6 +67,10 @@ export class BlendImage extends BaseFilter {
 
   getFragmentSource(): string {
     return fragmentSource[this.mode];
+  }
+
+  getVertexSource(): string {
+    return vertexSource;
   }
 
   applyToWebGL(options: TWebGLPipelineState) {

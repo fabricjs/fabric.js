@@ -40,12 +40,6 @@ export class BaseFilter {
   declare static defaults: Record<string, any>;
 
   /**
-   * Array of attributes to send with buffers. do not modify
-   * @private
-   */
-  vertexSource = vertexSource;
-
-  /**
    * Constructor
    * @param {Object} [options] Options object
    */
@@ -61,6 +55,10 @@ export class BaseFilter {
     return identityFragmentShader;
   }
 
+  getVertexSource(): string {
+    return vertexSource;
+  }
+
   /**
    * Compile this filter's shader program.
    *
@@ -71,7 +69,7 @@ export class BaseFilter {
   createProgram(
     gl: WebGLRenderingContext,
     fragmentSource: string = this.getFragmentSource(),
-    vertexSource: string = this.vertexSource
+    vertexSource: string = this.getVertexSource()
   ) {
     const {
       WebGLProbe: { GLPrecision = 'highp' },

@@ -4,7 +4,6 @@ import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
 export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
   myParameter: 0,
-  mainParameter: 'myParameter',
 };
 
 /**
