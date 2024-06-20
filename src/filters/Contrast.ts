@@ -3,9 +3,9 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/constrast';
+
 export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
   contrast: 0,
-  mainParameter: 'contrast',
 };
 
 /**
@@ -32,6 +32,11 @@ export class Contrast extends BaseFilter {
   getFragmentSource() {
     return fragmentSource;
   }
+
+  isNeutralState() {
+    return this.contrast === 0;
+  }
+
   /**
    * Apply the Contrast operation to a Uint8Array representing the pixels of an image.
    *

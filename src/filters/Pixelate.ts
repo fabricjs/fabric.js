@@ -6,7 +6,6 @@ import { fragmentSource } from './shaders/pixelate';
 
 export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
   blocksize: 4,
-  mainParameter: 'blocksize',
 };
 
 /**

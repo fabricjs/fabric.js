@@ -6,7 +6,6 @@ import { fragmentSource } from './shaders/vibrance';
 
 export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
   vibrance: 0,
-  mainParameter: 'vibrance',
 };
 
 /**

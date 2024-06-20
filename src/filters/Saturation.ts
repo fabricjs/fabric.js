@@ -16,7 +16,6 @@ import { fragmentSource } from './shaders/saturation';
 
 export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
   saturation: 0,
-  mainParameter: 'saturation',
 };
 
 export class Saturation extends BaseFilter {

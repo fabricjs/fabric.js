@@ -7,12 +7,12 @@ export function createColorMatrixFilter(key: string, matrix: number[]) {
 
     static defaults = {
       ...colorMatrixDefaultValues,
-      /**
-       * Lock the matrix export for this kind of static, parameter less filters.
-       */
-      mainParameter: undefined,
       matrix,
     };
+
+    toObject() {
+      return { type: this.type };
+    }
   };
   classRegistry.setClass(newClass, key);
   return newClass;

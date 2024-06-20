@@ -5,7 +5,6 @@ import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/noise';
 
 export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
-  mainParameter: 'noise',
   noise: 0,
 };
 

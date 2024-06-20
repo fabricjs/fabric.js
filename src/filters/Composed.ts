@@ -44,7 +44,7 @@ export class Composed extends BaseFilter {
    */
   toObject() {
     return {
-      ...super.toObject(),
+      type: this.type,
       subFilters: this.subFilters.map((filter) => filter.toObject()),
     };
   }

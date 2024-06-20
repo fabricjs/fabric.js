@@ -8,7 +8,6 @@ export type TGrayscaleMode = 'average' | 'lightness' | 'luminosity';
 
 export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
   mode: 'average',
-  mainParameter: 'mode',
 };
 
 /**

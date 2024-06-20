@@ -3,10 +3,10 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/colorMatrix';
+
 export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
   {
     matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-    mainParameter: 'matrix',
     colorsOnly: true,
   };
 
@@ -141,6 +141,13 @@ export class ColorMatrix extends BaseFilter {
       constants = [m[4], m[9], m[14], m[19]];
     gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
     gl.uniform4fv(uniformLocations.uConstants, constants);
+  }
+
+  toObject() {
+    return {
+      ...super.toObject(),
+      matrix: [...this.matrix],
+    };
   }
 }
 

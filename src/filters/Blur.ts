@@ -12,7 +12,6 @@ import { fragmentSource } from './shaders/blur';
 
 export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
   blur: 0,
-  mainParameter: 'blur',
 };
 
 /**
@@ -148,6 +147,10 @@ export class Blur extends BaseFilter {
   ) {
     const delta = this.chooseRightDelta();
     gl.uniform2fv(uniformLocations.delta, delta);
+  }
+
+  isNeutralState() {
+    return this.blur === 0;
   }
 
   /**

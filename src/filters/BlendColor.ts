@@ -200,19 +200,6 @@ export class BlendColor extends BaseFilter {
     source[3] = this.alpha;
     gl.uniform4fv(uniformLocations.uColor, source);
   }
-
-  /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
-   */
-  toObject() {
-    return {
-      type: this.type,
-      color: this.color,
-      mode: this.mode,
-      alpha: this.alpha,
-    };
-  }
 }
 
 classRegistry.setClass(BlendColor);

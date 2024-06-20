@@ -8,7 +8,6 @@ import { classRegistry } from '../ClassRegistry';
 export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
   {
     rotation: 0,
-    mainParameter: 'rotation',
   };
 
 /**
@@ -20,7 +19,6 @@ export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
  * object.filters.push(filter);
  * object.applyFilters();
  */
-// @ts-expect-error some babbling about mainParameter
 export class HueRotation extends ColorMatrix {
   /**
    * HueRotation value, from -1 to 1.

@@ -6,7 +6,6 @@ import { fragmentSource } from './shaders/gamma';
 export type GammaInput = [number, number, number];
 
 export const gammaDefaultValues: Partial<TClassProperties<Gamma>> = {
-  mainParameter: 'gamma',
   gamma: [1, 1, 1],
 };
 

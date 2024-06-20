@@ -3,9 +3,9 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/brightness';
+
 export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
   brightness: 0,
-  mainParameter: 'brightness',
 };
 
 /**
@@ -51,6 +51,10 @@ export class Brightness extends BaseFilter {
       data[i + 1] = data[i + 1] + brightness;
       data[i + 2] = data[i + 2] + brightness;
     }
+  }
+
+  isNeutralState() {
+    return this.brightness === 0;
   }
 
   /**

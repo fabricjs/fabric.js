@@ -7,7 +7,6 @@ import { fragmentSource } from './shaders/invert';
 export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
   alpha: false,
   invert: true,
-  mainParameter: 'invert',
 };
 
 /**

@@ -46,14 +46,6 @@ export class BaseFilter {
   vertexSource = vertexSource;
 
   /**
-   * Name of the parameter that can be changed in the filter.
-   * Some filters have more than one parameter and there is no
-   * mainParameter
-   * @private
-   */
-  declare mainParameter?: keyof this | undefined;
-
-  /**
    * Constructor
    * @param {Object} [options] Options object
    */
@@ -233,22 +225,7 @@ export class BaseFilter {
    **/
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNeutralState(options?: any): boolean {
-    const main = this.mainParameter,
-      defaultValue = (this.constructor as typeof BaseFilter).defaults[
-        main as string
-      ];
-    if (main) {
-      const thisValue = this[main];
-      if (Array.isArray(defaultValue) && Array.isArray(thisValue)) {
-        return defaultValue.every(
-          (value: any, i: number) => value === thisValue[i]
-        );
-      } else {
-        return defaultValue === thisValue;
-      }
-    } else {
-      return false;
-    }
+    return false;
   }
 
   /**
@@ -350,16 +327,6 @@ export class BaseFilter {
     gl.activeTexture(gl.TEXTURE0);
   }
 
-  getMainParameter() {
-    return this.mainParameter ? this[this.mainParameter] : undefined;
-  }
-
-  setMainParameter(value: any) {
-    if (this.mainParameter) {
-      this[this.mainParameter] = value;
-    }
-  }
-
   /**
    * Send uniform data from this filter to its shader program on the GPU.
    *
@@ -393,10 +360,16 @@ export class BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    const mainP = this.mainParameter;
+    const defaultKeys = Object.keys(
+      (this.constructor as typeof BaseFilter).defaults
+    );
+
     return {
       type: this.type,
-      ...(mainP ? { [mainP]: this[mainP] } : {}),
+      ...defaultKeys.reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = this[key as keyof this];
+        return acc;
+      }, {}),
     };
   }
 
