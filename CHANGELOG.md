@@ -2,6 +2,7 @@
 
 ## [next]
 
+- TEST 2 [#9933](https://github.com/fabricjs/fabric.js/pull/9933)
 - refactor(): remove strict parameter for ancestry. [#9918](https://github.com/fabricjs/fabric.js/pull/9918)
 - feat(Color): add support for decimals and different angle types in HSL color parsing [#9915](https://github.com/fabricjs/fabric.js/pull/9915)
 - fix(Controls): add support for numeric origins to changeWidth [#9909](https://github.com/fabricjs/fabric.js/pull/9909)
