@@ -44,6 +44,8 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
 
   static defaults = blurDefaultValues;
 
+  static uniformLocations = ['uDelta'];
+
   getFragmentSource(): string {
     return fragmentSource;
   }
@@ -121,21 +123,6 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
     ctx1.globalAlpha = 1;
     ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
     return newImageData;
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      delta: gl.getUniformLocation(program, 'uDelta'),
-    };
   }
 
   /**

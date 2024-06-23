@@ -71,6 +71,8 @@ export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
 
   static type = 'BlendColor';
 
+  static uniformLocations = ['uColor'];
+
   getCacheKey() {
     return `${this.type}_${this.mode}`;
   }
@@ -170,21 +172,6 @@ export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
           data[i + 2] = tb + b * alpha1;
       }
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uColor: gl.getUniformLocation(program, 'uColor'),
-    };
   }
 
   /**

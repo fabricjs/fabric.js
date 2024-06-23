@@ -32,6 +32,8 @@ export class Contrast extends BaseFilter<'Contrast', ContrastOwnProps> {
 
   static defaults = contrastDefaultValues;
 
+  static uniformLocations = ['uContrast'];
+
   getFragmentSource() {
     return fragmentSource;
   }
@@ -58,21 +60,6 @@ export class Contrast extends BaseFilter<'Contrast', ContrastOwnProps> {
       data[i + 1] = contrastF * (data[i + 1] - 128) + 128;
       data[i + 2] = contrastF * (data[i + 2] - 128) + 128;
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uContrast: gl.getUniformLocation(program, 'uContrast'),
-    };
   }
 
   /**

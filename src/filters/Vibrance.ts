@@ -35,6 +35,8 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
 
   static defaults = vibranceDefaultValues;
 
+  static uniformLocations = ['uVibrance'];
+
   getFragmentSource() {
     return fragmentSource;
   }
@@ -58,21 +60,6 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
       data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
       data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uVibrance: gl.getUniformLocation(program, 'uVibrance'),
-    };
   }
 
   /**

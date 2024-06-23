@@ -34,6 +34,8 @@ export class Brightness extends BaseFilter<'Brightness', BrightnessOwnProps> {
 
   static defaults = brightnessDefaultValues;
 
+  static uniformLocations = ['uBrightness'];
+
   getFragmentSource() {
     return fragmentSource;
   }
@@ -58,21 +60,6 @@ export class Brightness extends BaseFilter<'Brightness', BrightnessOwnProps> {
 
   isNeutralState() {
     return this.brightness === 0;
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uBrightness: gl.getUniformLocation(program, 'uBrightness'),
-    };
   }
 
   /**

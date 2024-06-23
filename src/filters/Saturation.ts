@@ -35,6 +35,8 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
 
   static defaults = saturationDefaultValues;
 
+  static uniformLocations = ['uSaturation'];
+
   getFragmentSource() {
     return fragmentSource;
   }
@@ -56,21 +58,6 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
       data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
       data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uSaturation: gl.getUniformLocation(program, 'uSaturation'),
-    };
   }
 
   /**

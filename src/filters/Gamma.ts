@@ -41,6 +41,8 @@ export class Gamma extends BaseFilter<typeof GAMMA, GammaOwnProps> {
 
   static defaults = gammaDefaultValues;
 
+  static uniformLocations = ['uGamma'];
+
   getFragmentSource() {
     return fragmentSource;
   }
@@ -87,21 +89,6 @@ export class Gamma extends BaseFilter<typeof GAMMA, GammaOwnProps> {
       data[i + 1] = rgb.g[data[i + 1]];
       data[i + 2] = rgb.b[data[i + 2]];
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uGamma: gl.getUniformLocation(program, 'uGamma'),
-    };
   }
 
   /**

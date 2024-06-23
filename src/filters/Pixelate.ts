@@ -27,6 +27,8 @@ export class Pixelate extends BaseFilter<'Pixelate', PixelateOwnProps> {
 
   static defaults = pixelateDefaultValues;
 
+  static uniformLocations = ['uBlockSize'];
+
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
    *
@@ -64,23 +66,6 @@ export class Pixelate extends BaseFilter<'Pixelate', PixelateOwnProps> {
 
   protected getFragmentSource(): string {
     return fragmentSource;
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
-      uStepW: gl.getUniformLocation(program, 'uStepW'),
-      uStepH: gl.getUniformLocation(program, 'uStepH'),
-    };
   }
 
   /**

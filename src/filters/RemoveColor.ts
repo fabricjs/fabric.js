@@ -53,6 +53,8 @@ export class RemoveColor extends BaseFilter<
 
   static defaults = removeColorDefaultValues;
 
+  static uniformLocations = ['uLow', 'uHigh'];
+
   getFragmentSource() {
     return fragmentShader;
   }
@@ -87,22 +89,6 @@ export class RemoveColor extends BaseFilter<
         data[i + 3] = 0;
       }
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uLow: gl.getUniformLocation(program, 'uLow'),
-      uHigh: gl.getUniformLocation(program, 'uHigh'),
-    };
   }
 
   /**

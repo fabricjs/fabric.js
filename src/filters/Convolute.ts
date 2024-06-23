@@ -68,6 +68,8 @@ export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
 
   static defaults = convoluteDefaultValues;
 
+  static uniformLocations = ['uMatrix', 'uOpaque', 'uHalfSize', 'uSize'];
+
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${
       this.opaque ? 1 : 0
@@ -141,24 +143,6 @@ export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
       }
     }
     options.imageData = output;
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMatrix: gl.getUniformLocation(program, 'uMatrix'),
-      uOpaque: gl.getUniformLocation(program, 'uOpaque'),
-      uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
-      uSize: gl.getUniformLocation(program, 'uSize'),
-    };
   }
 
   /**

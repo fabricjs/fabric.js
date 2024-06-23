@@ -33,6 +33,8 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
 
   static defaults = noiseDefaultValues;
 
+  static uniformLocations = ['uNoise', 'uSeed'];
+
   getFragmentSource() {
     return fragmentSource;
   }
@@ -54,22 +56,6 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
       data[i + 1] += rand;
       data[i + 2] += rand;
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uNoise: gl.getUniformLocation(program, 'uNoise'),
-      uSeed: gl.getUniformLocation(program, 'uSeed'),
-    };
   }
 
   /**

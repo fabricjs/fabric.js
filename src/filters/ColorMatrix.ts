@@ -59,6 +59,8 @@ export class ColorMatrix<
 
   static defaults = colorMatrixDefaultValues;
 
+  static uniformLocations = ['uColorMatrix', 'uConstants'];
+
   getFragmentSource(): string {
     return fragmentSource;
   }
@@ -93,22 +95,6 @@ export class ColorMatrix<
           r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
       }
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
-      uConstants: gl.getUniformLocation(program, 'uConstants'),
-    };
   }
 
   /**

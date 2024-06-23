@@ -40,6 +40,13 @@ export class BaseFilter<
    */
   static type = 'BaseFilter';
 
+  /**
+   * Contains the uniform locations for the fragment shader.
+   * uStepW and uStepH are handled by the BaseFilter, each filter class
+   * needs to specify all the one that are needed
+   */
+  static uniformLocations: string[] = [];
+
   declare static defaults: Record<string, unknown>;
 
   /**
@@ -124,6 +131,7 @@ export class BaseFilter<
     const uniformLocations = this.getUniformLocations(gl, program) || {};
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
     uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
+
     return {
       program,
       attributeLocations: this.getAttributeLocations(gl, program),
@@ -150,8 +158,6 @@ export class BaseFilter<
   /**
    * Return a map of uniform names to WebGLUniformLocation objects.
    *
-   * Intended to be overridden by subclasses.
-   *
    * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
    * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
    * @returns {Object} A map of uniform names to uniform locations.
@@ -160,7 +166,17 @@ export class BaseFilter<
     gl: WebGLRenderingContext,
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
-    return {};
+    const locations = (this.constructor as unknown as typeof BaseFilter<string>)
+      .uniformLocations;
+
+    const uniformLocations: Record<string, WebGLUniformLocation | null> = {};
+    for (let i = 0; i < locations.length; i++) {
+      uniformLocations[locations[i]] = gl.getUniformLocation(
+        program,
+        locations[i]
+      );
+    }
+    return uniformLocations;
   }
 
   /**

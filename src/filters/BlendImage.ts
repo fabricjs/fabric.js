@@ -65,6 +65,8 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
 
   static defaults = blendImageDefaultValues;
 
+  static uniformLocations = ['uTransformMatrix', 'uImage'];
+
   getCacheKey() {
     return `${this.type}_${this.mode}`;
   }
@@ -166,22 +168,6 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
           break;
       }
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uTransformMatrix: gl.getUniformLocation(program, 'uTransformMatrix'),
-      uImage: gl.getUniformLocation(program, 'uImage'),
-    };
   }
 
   /**

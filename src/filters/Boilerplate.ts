@@ -32,6 +32,8 @@ export class MyFilter extends BaseFilter<'MyFilter', MyFilterOwnProps> {
 
   static defaults = myFilterDefaultValues;
 
+  static uniformLocations = ['uMyParameter'];
+
   getFragmentSource() {
     return `
       precision highp float;
@@ -60,21 +62,6 @@ export class MyFilter extends BaseFilter<'MyFilter', MyFilterOwnProps> {
     for (let i = 0; i < options.imageData.data.length; i += 4) {
       // insert here your code to modify data[i]
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMyParameter: gl.getUniformLocation(program, 'uMyParameter'),
-    };
   }
 
   /**

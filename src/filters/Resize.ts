@@ -83,18 +83,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
 
   static defaults = resizeDefaultValues;
 
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(gl: WebGLRenderingContext, program: WebGLProgram) {
-    return {
-      uDelta: gl.getUniformLocation(program, 'uDelta'),
-      uTaps: gl.getUniformLocation(program, 'uTaps'),
-    };
-  }
+  static uniformLocations = ['uDelta', 'uTaps'];
 
   /**
    * Send data from this filter to its shader program's uniforms.

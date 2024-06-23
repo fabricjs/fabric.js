@@ -27,6 +27,8 @@ export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
 
   static defaults = grayscaleDefaultValues;
 
+  static uniformLocations = ['uMode'];
+
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
    *
@@ -62,21 +64,6 @@ export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
 
   getFragmentSource() {
     return fragmentSource[this.mode];
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMode: gl.getUniformLocation(program, 'uMode'),
-    };
   }
 
   /**
