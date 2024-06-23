@@ -1,10 +1,14 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/convolute';
 
-export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
+export type ConvoluteOwnProps = {
+  opaque: boolean;
+  matrix: number[];
+};
+
+export const convoluteDefaultValues: ConvoluteOwnProps = {
   opaque: false,
   matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
 };
@@ -49,16 +53,16 @@ export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Convolute extends BaseFilter {
+export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
   /*
    * Opaque value (true/false)
    */
-  declare opaque: boolean;
+  declare opaque: ConvoluteOwnProps['opaque'];
 
   /*
    * matrix for the filter, max 9x9
    */
-  declare matrix: number[];
+  declare matrix: ConvoluteOwnProps['matrix'];
 
   static type = 'Convolute';
 

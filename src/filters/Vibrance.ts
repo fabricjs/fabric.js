@@ -1,10 +1,13 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/vibrance';
 
-export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
+export type VibranceOwnProps = {
+  vibrance: number;
+};
+
+export const vibranceDefaultValues: VibranceOwnProps = {
   vibrance: 0,
 };
 
@@ -17,7 +20,7 @@ export const vibranceDefaultValues: Partial<TClassProperties<Vibrance>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Vibrance extends BaseFilter {
+export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
   /**
    * Vibrance value, from -1 to 1.
    * Increases/decreases the saturation of more muted colors with less effect on saturated colors.
@@ -26,7 +29,7 @@ export class Vibrance extends BaseFilter {
    * @param {Number} vibrance
    * @default
    */
-  declare vibrance: number;
+  declare vibrance: VibranceOwnProps['vibrance'];
 
   static type = 'Vibrance';
 

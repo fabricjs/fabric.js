@@ -1052,7 +1052,7 @@
     assert.ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"Sepia"}');
+    assert.equal(JSON.stringify(object), '{"type":"Sepia","colorsOnly":false}');
   });
 
   QUnit.test('toJSON', function(assert) {
@@ -1060,7 +1060,7 @@
     assert.ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    assert.equal(JSON.stringify(json), '{"type":"Sepia"}');
+    assert.equal(JSON.stringify(json), '{"type":"Sepia","colorsOnly":false}');
   });
 
   QUnit.test('fromObject', function(assert) {
@@ -1115,11 +1115,11 @@
     assert.ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"Resize","scaleX":1,"scaleY":1,"resizeType":"hermite","lanczosLobes":3}');
+    assert.equal(JSON.stringify(object), '{"type":"Resize","resizeType":"hermite","scaleX":1,"scaleY":1,"lanczosLobes":3}');
 
     filter.resizeType = 'bilinear';
     object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"Resize","scaleX":1,"scaleY":1,"resizeType":"bilinear","lanczosLobes":3}');
+    assert.equal(JSON.stringify(object), '{"type":"Resize","resizeType":"bilinear","scaleX":1,"scaleY":1,"lanczosLobes":3}');
   });
 
   QUnit.test('fromObject', function(assert) {

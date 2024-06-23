@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -10,7 +9,11 @@ import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blur';
 
-export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
+type BlurOwnProps = {
+  blur: number;
+};
+
+export const blurDefaultValues: BlurOwnProps = {
   blur: 0,
 };
 
@@ -24,7 +27,7 @@ export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Blur extends BaseFilter {
+export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
   /**
    * blur value, in percentage of image dimensions.
    * specific to keep the image blur constant at different resolutions
@@ -32,7 +35,7 @@ export class Blur extends BaseFilter {
    * @type Number
    * @default
    */
-  declare blur: number;
+  declare blur: BlurOwnProps['blur'];
 
   declare horizontal: boolean;
   declare aspectRatio: number;

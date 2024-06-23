@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type {
   T2DPipelineState,
@@ -10,14 +9,21 @@ import { classRegistry } from '../ClassRegistry';
 import { createCanvasElement } from '../util/misc/dom';
 import type { XY } from '../Point';
 
-export const resizeDefaultValues: Partial<TClassProperties<Resize>> = {
+export type TResizeType = 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
+
+export type ResizeOwnProps = {
+  resizeType: TResizeType;
+  scaleX: number;
+  scaleY: number;
+  lanczosLobes: number;
+};
+
+export const resizeDefaultValues: ResizeOwnProps = {
   resizeType: 'hermite',
   scaleX: 1,
   scaleY: 1,
   lanczosLobes: 3,
 };
-
-export type TResizeType = 'bilinear' | 'hermite' | 'sliceHack' | 'lanczos';
 
 type ResizeDuring2DResize = Resize & {
   rcpScaleX: number;
@@ -43,35 +49,35 @@ type ResizeDuringWEBGLResize = Resize & {
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
-export class Resize extends BaseFilter {
+export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
   /**
    * Resize type
    * for webgl resizeType is just lanczos, for canvas2d can be:
    * bilinear, hermite, sliceHack, lanczos.
    * @default
    */
-  declare resizeType: TResizeType;
+  declare resizeType: ResizeOwnProps['resizeType'];
 
   /**
    * Scale factor for resizing, x axis
    * @param {Number} scaleX
    * @default
    */
-  declare scaleX: number;
+  declare scaleX: ResizeOwnProps['scaleX'];
 
   /**
    * Scale factor for resizing, y axis
    * @param {Number} scaleY
    * @default
    */
-  declare scaleY: number;
+  declare scaleY: ResizeOwnProps['scaleY'];
 
   /**
    * LanczosLobes parameter for lanczos filter, valid for resizeType lanczos
    * @param {Number} lanczosLobes
    * @default
    */
-  declare lanczosLobes: number;
+  declare lanczosLobes: ResizeOwnProps['lanczosLobes'];
 
   static type = 'Resize';
 
@@ -546,20 +552,6 @@ export class Resize extends BaseFilter {
       }
     }
     return img2;
-  }
-
-  /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
-   */
-  toObject() {
-    return {
-      type: this.type,
-      scaleX: this.scaleX,
-      scaleY: this.scaleY,
-      resizeType: this.resizeType,
-      lanczosLobes: this.lanczosLobes,
-    };
   }
 }
 

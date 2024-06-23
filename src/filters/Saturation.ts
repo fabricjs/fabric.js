@@ -1,8 +1,15 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/saturation';
+
+export type SaturationOwnProps = {
+  saturation: number;
+};
+
+export const saturationDefaultValues: SaturationOwnProps = {
+  saturation: 0,
+};
 
 /**
  * Saturate filter class
@@ -13,12 +20,7 @@ import { fragmentSource } from './shaders/saturation';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-
-export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  saturation: 0,
-};
-
-export class Saturation extends BaseFilter {
+export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
   /**
    * Saturation value, from -1 to 1.
    * Increases/decreases the color saturation.
@@ -27,7 +29,7 @@ export class Saturation extends BaseFilter {
    * @param {Number} saturation
    * @default
    */
-  declare saturation: number;
+  declare saturation: SaturationOwnProps['saturation'];
 
   static type = 'Saturation';
 

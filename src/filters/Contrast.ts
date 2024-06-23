@@ -1,10 +1,13 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/constrast';
 
-export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
+type ContrastOwnProps = {
+  contrast: number;
+};
+
+export const contrastDefaultValues: ContrastOwnProps = {
   contrast: 0,
 };
 
@@ -17,13 +20,13 @@ export const contrastDefaultValues: Partial<TClassProperties<Contrast>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Contrast extends BaseFilter {
+export class Contrast extends BaseFilter<'Contrast', ContrastOwnProps> {
   /**
    * contrast value, range from -1 to 1.
    * @param {Number} contrast
    * @default 0
    */
-  declare contrast: number;
+  declare contrast: ContrastOwnProps['contrast'];
 
   static type = 'Contrast';
 

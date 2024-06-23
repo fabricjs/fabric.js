@@ -1,5 +1,4 @@
 import { FabricImage } from '../shapes/Image';
-import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -13,7 +12,12 @@ import { fragmentSource, vertexSource } from './shaders/blendImage';
 
 export type TBlendImageMode = 'multiply' | 'mask';
 
-export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
+type BlendImageOwnProps = {
+  mode: TBlendImageMode;
+  alpha: number;
+};
+
+export const blendImageDefaultValues: BlendImageOwnProps = {
   mode: 'multiply',
   alpha: 1,
 };
@@ -34,7 +38,7 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendImage extends BaseFilter {
+export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
   /**
    * Image to make the blend operation with.
    **/
@@ -49,13 +53,13 @@ export class BlendImage extends BaseFilter {
    * @type String
    * @default
    **/
-  declare mode: TBlendImageMode;
+  declare mode: BlendImageOwnProps['mode'];
 
   /**
    * alpha value. represent the strength of the blend image operation.
    * not implemented.
    **/
-  declare alpha: number;
+  declare alpha: BlendImageOwnProps['alpha'];
 
   static type = 'BlendImage';
 
@@ -197,14 +201,17 @@ export class BlendImage extends BaseFilter {
 
   /**
    * Returns object representation of an instance
+   * TODO: Handle the possibility of missing image better.
+   * As of now a BlendImage filter without image can't be used with fromObject
    * @return {Object} Object representation of an instance
    */
-  toObject() {
+  toObject(): {
+    type: 'BlendImage';
+    image: ReturnType<FabricImage['toObject']>;
+  } & BlendImageOwnProps {
     return {
-      type: this.type,
+      ...super.toObject(),
       image: this.image && this.image.toObject(),
-      mode: this.mode,
-      alpha: this.alpha,
     };
   }
 
@@ -216,13 +223,13 @@ export class BlendImage extends BaseFilter {
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<BlendImage>}
    */
-  static fromObject(
+  static async fromObject(
     { type, image, ...filterOptions }: Record<string, any>,
     options: { signal: AbortSignal }
-  ) {
+  ): Promise<BaseFilter<'BlendImage', BlendImageOwnProps>> {
     return FabricImage.fromObject(image, options).then(
       (enlivedImage) =>
-        new this({ ...filterOptions, image: enlivedImage }) as BaseFilter
+        new this({ ...filterOptions, image: enlivedImage }) as BlendImage
     );
   }
 }

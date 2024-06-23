@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
@@ -6,7 +5,11 @@ import { fragmentSource } from './shaders/grayscale';
 
 export type TGrayscaleMode = 'average' | 'lightness' | 'luminosity';
 
-export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
+type GrayscaleOwnProps = {
+  mode: TGrayscaleMode;
+};
+
+export const grayscaleDefaultValues: GrayscaleOwnProps = {
   mode: 'average',
 };
 
@@ -17,7 +20,7 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends BaseFilter {
+export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
   declare mode: TGrayscaleMode;
 
   static type = 'Grayscale';

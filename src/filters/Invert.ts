@@ -1,10 +1,14 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/invert';
 
-export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
+export type InvertOwnProps = {
+  alpha: boolean;
+  invert: boolean;
+};
+
+export const invertDefaultValues: InvertOwnProps = {
   alpha: false,
   invert: true,
 };
@@ -15,20 +19,20 @@ export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
-export class Invert extends BaseFilter {
+export class Invert extends BaseFilter<'Invert', InvertOwnProps> {
   /**
    * Invert also alpha.
    * @param {Boolean} alpha
    * @default
    **/
-  declare alpha: boolean;
+  declare alpha: InvertOwnProps['alpha'];
 
   /**
    * Filter invert. if false, does nothing
    * @param {Boolean} invert
    * @default
    */
-  declare invert: boolean;
+  declare invert: InvertOwnProps['invert'];
 
   static type = 'Invert';
 

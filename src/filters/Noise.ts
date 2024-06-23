@@ -1,10 +1,13 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/noise';
 
-export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
+export type NoiseOwnProps = {
+  noise: number;
+};
+
+export const noiseDefaultValues: NoiseOwnProps = {
   noise: 0,
 };
 
@@ -18,13 +21,13 @@ export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Noise extends BaseFilter {
+export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
   /**
    * Noise value, from
    * @param {Number} noise
    * @default
    */
-  declare noise: number;
+  declare noise: NoiseOwnProps['noise'];
 
   static type = 'Noise';
 

@@ -1,5 +1,4 @@
 import { Color } from '../color/Color';
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
@@ -17,7 +16,13 @@ export type TBlendMode =
   | 'exclusion'
   | 'tint';
 
-export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
+type BlendColorOwnProps = {
+  color: string;
+  mode: TBlendMode;
+  alpha: number;
+};
+
+export const blendColorDefaultValues: BlendColorOwnProps = {
   color: '#F95C63',
   mode: 'multiply',
   alpha: 1,
@@ -39,14 +44,14 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendColor extends BaseFilter {
+export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    * @type String
    * @default
    **/
-  declare color: string;
+  declare color: BlendColorOwnProps['color'];
 
   /**
    * Blend mode for the filter: one of multiply, add, difference, screen, subtract,
@@ -54,14 +59,13 @@ export class BlendColor extends BaseFilter {
    * @type String
    * @default
    **/
-  declare mode: TBlendMode;
-
+  declare mode: BlendColorOwnProps['mode'];
   /**
    * alpha value. represent the strength of the blend color operation.
    * @type Number
    * @default
    **/
-  declare alpha: number;
+  declare alpha: BlendColorOwnProps['alpha'];
 
   static defaults = blendColorDefaultValues;
 

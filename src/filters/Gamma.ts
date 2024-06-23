@@ -1,10 +1,17 @@
 import { BaseFilter } from './BaseFilter';
-import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/gamma';
+import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+
+const GAMMA = 'Gamma' as const;
+
 export type GammaInput = [number, number, number];
 
-export const gammaDefaultValues: { gamma: GammaInput } = {
+export type GammaOwnProps = {
+  gamma: GammaInput;
+};
+
+export const gammaDefaultValues: GammaOwnProps = {
   gamma: [1, 1, 1],
 };
 
@@ -17,20 +24,20 @@ export const gammaDefaultValues: { gamma: GammaInput } = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Gamma extends BaseFilter {
+export class Gamma extends BaseFilter<typeof GAMMA, GammaOwnProps> {
   /**
    * Gamma array value, from 0.01 to 2.2.
    * @param {Array} gamma
    * @default
    */
-  declare gamma: GammaInput;
+  declare gamma: GammaOwnProps['gamma'];
   declare rgbValues?: {
     r: Uint8Array;
     g: Uint8Array;
     b: Uint8Array;
   };
 
-  static type = 'Gamma';
+  static type = GAMMA;
 
   static defaults = gammaDefaultValues;
 
@@ -113,6 +120,13 @@ export class Gamma extends BaseFilter {
   isNeutralState() {
     const { gamma } = this;
     return gamma[0] === 1 && gamma[1] === 1 && gamma[2] === 1;
+  }
+
+  toObject(): { type: typeof GAMMA; gamma: GammaInput } {
+    return {
+      type: GAMMA,
+      gamma: this.gamma.concat() as GammaInput,
+    };
   }
 }
 

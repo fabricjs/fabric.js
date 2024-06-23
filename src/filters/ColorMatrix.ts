@@ -1,14 +1,21 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
-import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type {
+  T2DPipelineState,
+  TMatColorMatrix,
+  TWebGLUniformLocationMap,
+} from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/colorMatrix';
 
-export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
-  {
-    matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-    colorsOnly: true,
-  };
+type ColorMatrixOwnProps = {
+  matrix: TMatColorMatrix;
+  colorsOnly: boolean;
+};
+
+export const colorMatrixDefaultValues: ColorMatrixOwnProps = {
+  matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  colorsOnly: true,
+};
 
 /**
    * Color Matrix filter class
@@ -26,7 +33,10 @@ export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
    * object.filters.push(filter);
    * object.applyFilters();
    */
-export class ColorMatrix extends BaseFilter {
+export class ColorMatrix<
+  Name extends string = 'ColorMatrix',
+  OwnProps extends object = ColorMatrixOwnProps
+> extends BaseFilter<Name, OwnProps> {
   /**
    * Colormatrix for pixels.
    * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
@@ -35,7 +45,7 @@ export class ColorMatrix extends BaseFilter {
    * @param {Array} matrix array of 20 numbers.
    * @default
    */
-  declare matrix: number[];
+  declare matrix: ColorMatrixOwnProps['matrix'];
 
   /**
    * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
@@ -43,19 +53,11 @@ export class ColorMatrix extends BaseFilter {
    * @type Boolean
    * @default true
    */
-  declare colorsOnly: boolean;
+  declare colorsOnly: ColorMatrixOwnProps['colorsOnly'];
 
   static type = 'ColorMatrix';
 
   static defaults = colorMatrixDefaultValues;
-
-  setOptions({ matrix, ...options }: Record<string, any>) {
-    if (matrix) {
-      // safeguard against mutation
-      this.matrix = [...matrix];
-    }
-    Object.assign(this, options);
-  }
 
   getFragmentSource(): string {
     return fragmentSource;
@@ -143,10 +145,10 @@ export class ColorMatrix extends BaseFilter {
     gl.uniform4fv(uniformLocations.uConstants, constants);
   }
 
-  toObject(): { type: string } & Record<string, unknown> {
+  toObject() {
     return {
       ...super.toObject(),
-      matrix: [...this.matrix],
+      matrix: [...this.matrix] as TMatColorMatrix,
     };
   }
 }

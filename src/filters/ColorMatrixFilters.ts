@@ -1,17 +1,23 @@
-import { ColorMatrix, colorMatrixDefaultValues } from './ColorMatrix';
+import { ColorMatrix } from './ColorMatrix';
 import { classRegistry } from '../ClassRegistry';
+import type { TMatColorMatrix } from './typedefs';
 
-export function createColorMatrixFilter(key: string, matrix: number[]) {
-  const newClass = class extends ColorMatrix {
+type FixedFiltersOwnProps = {
+  colorsOnly: boolean;
+};
+
+export function createColorMatrixFilter(key: string, matrix: TMatColorMatrix) {
+  const newClass = class extends ColorMatrix<typeof key, FixedFiltersOwnProps> {
     static type = key;
 
     static defaults = {
-      ...colorMatrixDefaultValues,
+      colorsOnly: false,
       matrix,
     };
 
-    toObject() {
-      return { type: this.type };
+    //@ts-expect-error TS wants matrix to be exported.
+    toObject(): { type: string } & FixedFiltersOwnProps {
+      return { type: this.type, colorsOnly: this.colorsOnly };
     }
   };
   classRegistry.setClass(newClass, key);

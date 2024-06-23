@@ -18,14 +18,17 @@ import { FabricError } from '../util/internals/console';
 
 const regex = new RegExp(highPsourceCode, 'g');
 
-export class BaseFilter {
+export class BaseFilter<
+  Name extends string,
+  OwnProps extends Record<string, any> = object
+> {
   /**
    * Filter type
    * @param {String} type
    * @default
    */
-  get type(): string {
-    return (this.constructor as typeof BaseFilter).type;
+  get type(): Name {
+    return (this.constructor as typeof BaseFilter).type as Name;
   }
 
   /**
@@ -37,7 +40,7 @@ export class BaseFilter {
    */
   static type = 'BaseFilter';
 
-  declare static defaults: Record<string, any>;
+  declare static defaults: Record<string, unknown>;
 
   /**
    * Constructor
@@ -258,7 +261,7 @@ export class BaseFilter {
    * Used to force recompilation when parameters change or to retrieve the shader from cache
    * @type string
    **/
-  getCacheKey() {
+  getCacheKey(): string {
     return this.type;
   }
 
@@ -357,17 +360,18 @@ export class BaseFilter {
    * Returns object representation of an instance
    * @return {Object} Object representation of an instance
    */
-  toObject(): { type: string } & Record<string, unknown> {
+  toObject(): { type: Name } & OwnProps {
     const defaultKeys = Object.keys(
       (this.constructor as typeof BaseFilter).defaults
-    );
+    ) as (keyof OwnProps)[];
 
     return {
       type: this.type,
-      ...defaultKeys.reduce<Record<string, unknown>>((acc, key) => {
+      ...defaultKeys.reduce<OwnProps>((acc, key) => {
+        //@ts-expect-error TS doesn't get i want an object that looks like this
         acc[key] = this[key as keyof this];
         return acc;
-      }, {}),
+      }, {} as OwnProps),
     };
   }
 
@@ -383,7 +387,7 @@ export class BaseFilter {
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
     options: Abortable
-  ) {
+  ): Promise<BaseFilter<string, object>> {
     return new this(filterOptions);
   }
 }

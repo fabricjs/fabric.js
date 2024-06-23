@@ -1,10 +1,13 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/pixelate';
 
-export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
+export type PixelateOwnProps = {
+  blocksize: number;
+};
+
+export const pixelateDefaultValues: PixelateOwnProps = {
   blocksize: 4,
 };
 
@@ -17,8 +20,8 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Pixelate extends BaseFilter {
-  declare blocksize: number;
+export class Pixelate extends BaseFilter<'Pixelate', PixelateOwnProps> {
+  declare blocksize: PixelateOwnProps['blocksize'];
 
   static type = 'Pixelate';
 
