@@ -31,15 +31,14 @@ import { rotateVector } from './util/misc/vectors';
 
 const shadowOffsetRegex = '(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?';
 
-const reOffsetsAndBlur = () =>
-  new RegExp(
-    '(?:\\s|^)' +
-      shadowOffsetRegex +
-      shadowOffsetRegex +
-      '(' +
-      reNum +
-      '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
-  );
+const reOffsetsAndBlur = new RegExp(
+  '(?:\\s|^)' +
+    shadowOffsetRegex +
+    shadowOffsetRegex +
+    '(' +
+    reNum +
+    '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
+);
 
 export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   color: 'rgb(0,0,0)',
@@ -127,7 +126,7 @@ export class Shadow {
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
     const options: Partial<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
-    Object.assign(this, (this.constructor as typeof Shadow).ownDefaults);
+    Object.assign(this, Shadow.ownDefaults);
     for (const prop in options) {
       // @ts-expect-error for loops are so messy in TS
       this[prop] = options[prop];
@@ -142,11 +141,10 @@ export class Shadow {
    */
   static parseShadow(value: string) {
     const shadowStr = value.trim(),
-      regex = reOffsetsAndBlur(),
       [, offsetX = 0, offsetY = 0, blur = 0] = (
-        regex.exec(shadowStr) || []
+        reOffsetsAndBlur.exec(shadowStr) || []
       ).map((value) => parseFloat(value) || 0),
-      color = (shadowStr.replace(regex, '') || 'rgb(0,0,0)').trim();
+      color = (shadowStr.replace(reOffsetsAndBlur, '') || 'rgb(0,0,0)').trim();
 
     return {
       color,

@@ -1360,7 +1360,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     // If the object is in a selection group, simulate what would happen to that
     // object when the group is deselected

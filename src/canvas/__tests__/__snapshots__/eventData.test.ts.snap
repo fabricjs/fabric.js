@@ -703,6 +703,33 @@ exports[`Canvas event data HTML event "wheel" should fire a corresponding canvas
 exports[`Event targets should fire mouse over/out events on target 1`] = `
 [
   [
+    "mousemove:before",
+    {
+      "absolutePointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "e": MouseEvent {
+        "isTrusted": false,
+      },
+      "pointer": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "scenePoint": Point {
+        "x": 5,
+        "y": 5,
+      },
+      "subTargets": [],
+      "target": "target",
+      "transform": null,
+      "viewportPoint": Point {
+        "x": 5,
+        "y": 5,
+      },
+    },
+  ],
+  [
     "mouseover",
     {
       "absolutePointer": Point {
@@ -805,7 +832,7 @@ exports[`Event targets should fire mouse over/out events on target 2`] = `
         "y": 5,
       },
       "subTargets": [],
-      "target": undefined,
+      "target": "target",
       "transform": null,
       "viewportPoint": Point {
         "x": 5,
