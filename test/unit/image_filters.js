@@ -247,7 +247,7 @@
     assert.ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"ColorMatrix","matrix":[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0]}');
+    assert.equal(JSON.stringify(object), '{"type":"ColorMatrix","matrix":[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0],"colorsOnly":true}');
 
     filter.matrix = [
       0, 1, 0, 0, 0.2,
@@ -257,7 +257,7 @@
     ];
 
     object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"ColorMatrix","matrix":[0,1,0,0,0.2,0,0,1,0,0.1,1,0,0,0,0.3,0,0,0,1,0]}');
+    assert.equal(JSON.stringify(object), '{"type":"ColorMatrix","matrix":[0,1,0,0,0.2,0,0,1,0,0.1,1,0,0,0,0.3,0,0,0,1,0],"colorsOnly":true}');
   });
 
   QUnit.test('toJSON', function(assert) {
@@ -265,7 +265,7 @@
     assert.ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    assert.equal(JSON.stringify(json), '{"type":"ColorMatrix","matrix":[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0]}');
+    assert.equal(JSON.stringify(json), '{"type":"ColorMatrix","matrix":[1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0],"colorsOnly":true}');
 
     filter.matrix = [
       0, 1, 0, 0, 0.2,
@@ -273,9 +273,10 @@
       1, 0, 0, 0, 0.3,
       0, 0, 0, 1, 0
     ];
+    filter.colorsOnly = false;
 
     json = filter.toJSON();
-    assert.equal(JSON.stringify(json), '{"type":"ColorMatrix","matrix":[0,1,0,0,0.2,0,0,1,0,0.1,1,0,0,0,0.3,0,0,0,1,0]}');
+    assert.equal(JSON.stringify(json), '{"type":"ColorMatrix","matrix":[0,1,0,0,0.2,0,0,1,0,0.1,1,0,0,0,0.3,0,0,0,1,0],"colorsOnly":false}');
   });
 
   QUnit.test('fromObject', function(assert) {
@@ -287,19 +288,6 @@
       assert.deepEqual(restoredFilter, filter);
       done();
     });
-  });
-
-  QUnit.test('isNeutralState', function(assert) {
-    var filter = new fabric.filters.ColorMatrix();
-
-    assert.ok(filter.isNeutralState(), 'Is neutral when matrix is identity');
-    filter.matrix = [
-      0, 1, 0, 0, 0.2,
-      0, 0, 1, 0, 0.1,
-      1, 0, 0, 0, 0.3,
-      0, 0, 0, 1, 0
-    ];
-    assert.notOk(filter.isNeutralState(), 'Is not neutral when matrix changes');
   });
 
   QUnit.module('fabric.filters.HueRotation');
@@ -802,15 +790,15 @@
     assert.ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"Invert","invert":true}');
+    assert.equal(JSON.stringify(object), '{"type":"Invert","alpha":false,"invert":true}');
   });
 
   QUnit.test('toJSON', function(assert) {
-    var filter = new fabric.filters.Invert();
+    var filter = new fabric.filters.Invert({ alpha: true });
     assert.ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    assert.equal(JSON.stringify(json), '{"type":"Invert","invert":true}');
+    assert.equal(JSON.stringify(json), '{"type":"Invert","alpha":true,"invert":true}');
   });
 
   QUnit.test('fromObject', function(assert) {
