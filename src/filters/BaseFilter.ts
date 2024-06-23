@@ -53,7 +53,10 @@ export class BaseFilter<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({ type, ...options }: Record<string, any> = {}) {
+  constructor({
+    type,
+    ...options
+  }: { type?: never } & Partial<OwnProps> & Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,

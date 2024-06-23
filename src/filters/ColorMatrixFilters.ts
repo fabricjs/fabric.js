@@ -21,7 +21,7 @@ export function createColorMatrixFilter(key: string, matrix: TMatColorMatrix) {
     }
   };
   classRegistry.setClass(newClass, key);
-  return newClass;
+  return newClass as typeof ColorMatrix<typeof key, FixedFiltersOwnProps>;
 }
 
 export const Brownie = createColorMatrixFilter(
