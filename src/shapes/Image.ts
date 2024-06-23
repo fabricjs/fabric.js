@@ -45,7 +45,7 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  filters: BaseFilter[];
+  filters: BaseFilter<string, Record<string, any>>[];
   resizeFilter?: Resize;
 }
 
@@ -166,7 +166,7 @@ export class FabricImage<
 
   protected declare src: string;
 
-  declare filters: BaseFilter[];
+  declare filters: BaseFilter<string, Record<string, any>>[];
   declare resizeFilter: Resize;
 
   declare _element: ImageSource;
@@ -506,7 +506,7 @@ export class FabricImage<
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
-      [filter as BaseFilter],
+      [filter],
       elementToFilter,
       sourceWidth,
       sourceHeight,
@@ -522,7 +522,9 @@ export class FabricImage<
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
-  applyFilters(filters: BaseFilter[] = this.filters || []) {
+  applyFilters(
+    filters: BaseFilter<string, Record<string, any>>[] = this.filters || []
+  ) {
     filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 
@@ -798,9 +800,9 @@ export class FabricImage<
   ) {
     return Promise.all([
       loadImage(src!, { ...options, crossOrigin }),
-      f && enlivenObjects<BaseFilter>(f, options),
+      f && enlivenObjects<BaseFilter<string>>(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects<BaseFilter>([rf], options),
+      rf && enlivenObjects<BaseFilter<'Resize'>>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {

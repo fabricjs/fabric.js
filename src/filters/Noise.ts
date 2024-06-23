@@ -1,11 +1,13 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/noise';
 
-export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
-  mainParameter: 'noise',
+export type NoiseOwnProps = {
+  noise: number;
+};
+
+export const noiseDefaultValues: NoiseOwnProps = {
   noise: 0,
 };
 
@@ -19,17 +21,19 @@ export const noiseDefaultValues: Partial<TClassProperties<Noise>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Noise extends BaseFilter {
+export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
   /**
    * Noise value, from
    * @param {Number} noise
    * @default
    */
-  declare noise: number;
+  declare noise: NoiseOwnProps['noise'];
 
   static type = 'Noise';
 
   static defaults = noiseDefaultValues;
+
+  static uniformLocations = ['uNoise', 'uSeed'];
 
   getFragmentSource() {
     return fragmentSource;
@@ -42,9 +46,6 @@ export class Noise extends BaseFilter {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.noise === 0) {
-      return;
-    }
     const noise = this.noise;
     for (let i = 0; i < data.length; i += 4) {
       const rand = (0.5 - Math.random()) * noise;
@@ -52,22 +53,6 @@ export class Noise extends BaseFilter {
       data[i + 1] += rand;
       data[i + 2] += rand;
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uNoise: gl.getUniformLocation(program, 'uNoise'),
-      uSeed: gl.getUniformLocation(program, 'uSeed'),
-    };
   }
 
   /**
@@ -84,12 +69,8 @@ export class Noise extends BaseFilter {
     gl.uniform1f(uniformLocations.uSeed, Math.random());
   }
 
-  /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
-   */
-  toObject() {
-    return { ...super.toObject(), noise: this.noise };
+  isNeutralState() {
+    return this.noise === 0;
   }
 }
 

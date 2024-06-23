@@ -18,14 +18,17 @@ import { FabricError } from '../util/internals/console';
 
 const regex = new RegExp(highPsourceCode, 'g');
 
-export class BaseFilter {
+export class BaseFilter<
+  Name extends string,
+  OwnProps extends Record<string, any> = object
+> {
   /**
    * Filter type
    * @param {String} type
    * @default
    */
-  get type(): string {
-    return (this.constructor as typeof BaseFilter).type;
+  get type(): Name {
+    return (this.constructor as typeof BaseFilter).type as Name;
   }
 
   /**
@@ -37,27 +40,23 @@ export class BaseFilter {
    */
   static type = 'BaseFilter';
 
-  declare static defaults: Record<string, any>;
-
   /**
-   * Array of attributes to send with buffers. do not modify
-   * @private
+   * Contains the uniform locations for the fragment shader.
+   * uStepW and uStepH are handled by the BaseFilter, each filter class
+   * needs to specify all the one that are needed
    */
-  vertexSource = vertexSource;
+  static uniformLocations: string[] = [];
 
-  /**
-   * Name of the parameter that can be changed in the filter.
-   * Some filters have more than one parameter and there is no
-   * mainParameter
-   * @private
-   */
-  declare mainParameter?: keyof this | undefined;
+  declare static defaults: Record<string, unknown>;
 
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({ type, ...options }: Record<string, any> = {}) {
+  constructor({
+    type,
+    ...options
+  }: { type?: never } & Partial<OwnProps> & Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,
@@ -67,6 +66,10 @@ export class BaseFilter {
 
   protected getFragmentSource(): string {
     return identityFragmentShader;
+  }
+
+  getVertexSource(): string {
+    return vertexSource;
   }
 
   /**
@@ -79,7 +82,7 @@ export class BaseFilter {
   createProgram(
     gl: WebGLRenderingContext,
     fragmentSource: string = this.getFragmentSource(),
-    vertexSource: string = this.vertexSource
+    vertexSource: string = this.getVertexSource()
   ) {
     const {
       WebGLProbe: { GLPrecision = 'highp' },
@@ -131,6 +134,7 @@ export class BaseFilter {
     const uniformLocations = this.getUniformLocations(gl, program) || {};
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
     uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
+
     return {
       program,
       attributeLocations: this.getAttributeLocations(gl, program),
@@ -157,8 +161,6 @@ export class BaseFilter {
   /**
    * Return a map of uniform names to WebGLUniformLocation objects.
    *
-   * Intended to be overridden by subclasses.
-   *
    * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
    * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
    * @returns {Object} A map of uniform names to uniform locations.
@@ -167,7 +169,17 @@ export class BaseFilter {
     gl: WebGLRenderingContext,
     program: WebGLProgram
   ): TWebGLUniformLocationMap {
-    return {};
+    const locations = (this.constructor as unknown as typeof BaseFilter<string>)
+      .uniformLocations;
+
+    const uniformLocations: Record<string, WebGLUniformLocation | null> = {};
+    for (let i = 0; i < locations.length; i++) {
+      uniformLocations[locations[i]] = gl.getUniformLocation(
+        program,
+        locations[i]
+      );
+    }
+    return uniformLocations;
   }
 
   /**
@@ -233,22 +245,7 @@ export class BaseFilter {
    **/
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNeutralState(options?: any): boolean {
-    const main = this.mainParameter,
-      defaultValue = (this.constructor as typeof BaseFilter).defaults[
-        main as string
-      ];
-    if (main) {
-      const thisValue = this[main];
-      if (Array.isArray(defaultValue) && Array.isArray(thisValue)) {
-        return defaultValue.every(
-          (value: any, i: number) => value === thisValue[i]
-        );
-      } else {
-        return defaultValue === thisValue;
-      }
-    } else {
-      return false;
-    }
+    return false;
   }
 
   /**
@@ -283,7 +280,7 @@ export class BaseFilter {
    * Used to force recompilation when parameters change or to retrieve the shader from cache
    * @type string
    **/
-  getCacheKey() {
+  getCacheKey(): string {
     return this.type;
   }
 
@@ -350,16 +347,6 @@ export class BaseFilter {
     gl.activeTexture(gl.TEXTURE0);
   }
 
-  getMainParameter() {
-    return this.mainParameter ? this[this.mainParameter] : undefined;
-  }
-
-  setMainParameter(value: any) {
-    if (this.mainParameter) {
-      this[this.mainParameter] = value;
-    }
-  }
-
   /**
    * Send uniform data from this filter to its shader program on the GPU.
    *
@@ -392,11 +379,18 @@ export class BaseFilter {
    * Returns object representation of an instance
    * @return {Object} Object representation of an instance
    */
-  toObject() {
-    const mainP = this.mainParameter;
+  toObject(): { type: Name } & OwnProps {
+    const defaultKeys = Object.keys(
+      (this.constructor as typeof BaseFilter).defaults
+    ) as (keyof OwnProps)[];
+
     return {
       type: this.type,
-      ...(mainP ? { [mainP]: this[mainP] } : {}),
+      ...defaultKeys.reduce<OwnProps>((acc, key) => {
+        //@ts-expect-error TS doesn't get i want an object that looks like this
+        acc[key] = this[key as keyof this];
+        return acc;
+      }, {} as OwnProps),
     };
   }
 
@@ -412,7 +406,7 @@ export class BaseFilter {
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
     options: Abortable
-  ) {
+  ): Promise<BaseFilter<string, object>> {
     return new this(filterOptions);
   }
 }

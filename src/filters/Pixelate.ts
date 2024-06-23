@@ -1,12 +1,14 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/pixelate';
 
-export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
+export type PixelateOwnProps = {
+  blocksize: number;
+};
+
+export const pixelateDefaultValues: PixelateOwnProps = {
   blocksize: 4,
-  mainParameter: 'blocksize',
 };
 
 /**
@@ -18,12 +20,14 @@ export const pixelateDefaultValues: Partial<TClassProperties<Pixelate>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Pixelate extends BaseFilter {
-  declare blocksize: number;
+export class Pixelate extends BaseFilter<'Pixelate', PixelateOwnProps> {
+  declare blocksize: PixelateOwnProps['blocksize'];
 
   static type = 'Pixelate';
 
   static defaults = pixelateDefaultValues;
+
+  static uniformLocations = ['uBlockSize'];
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
@@ -62,23 +66,6 @@ export class Pixelate extends BaseFilter {
 
   protected getFragmentSource(): string {
     return fragmentSource;
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uBlocksize: gl.getUniformLocation(program, 'uBlocksize'),
-      uStepW: gl.getUniformLocation(program, 'uStepW'),
-      uStepH: gl.getUniformLocation(program, 'uStepH'),
-    };
   }
 
   /**
