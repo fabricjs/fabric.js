@@ -240,12 +240,12 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toClipPathSVG(reviver: TSVGReviver): string {
+  toClipPathSVG(reviver?: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return (
       '\t' +
       this._createBaseClipPathSVGMarkup(this._toSVG(), {
-        reviver: reviver,
+        reviver,
         additionalTransform: additionalTransform,
       })
     );
@@ -256,10 +256,10 @@ export class Path<
    * @param {Function} [reviver] Method for further parsing of svg representation.
    * @return {string} svg representation of an instance
    */
-  toSVG(reviver: TSVGReviver): string {
+  toSVG(reviver?: TSVGReviver): string {
     const additionalTransform = this._getOffsetTransform();
     return this._createBaseSVGMarkup(this._toSVG(), {
-      reviver: reviver,
+      reviver,
       additionalTransform: additionalTransform,
     });
   }

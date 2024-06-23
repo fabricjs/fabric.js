@@ -29,7 +29,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(this: TextSVGExportMixin & FabricText, reviver: TSVGReviver): string {
+  toSVG(this: TextSVGExportMixin & FabricText, reviver?: TSVGReviver): string {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
