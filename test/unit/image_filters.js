@@ -1000,15 +1000,15 @@
     assert.ok(typeof filter.toObject === 'function');
 
     var object = filter.toObject();
-    assert.equal(JSON.stringify(object), '{"type":"RemoveColor","color":"#FFFFFF","distance":0.02}');
+    assert.equal(JSON.stringify(object), '{"type":"RemoveColor","color":"#FFFFFF","distance":0.02,"useAlpha":false}');
   });
 
   QUnit.test('toJSON', function(assert) {
-    var filter = new fabric.filters.RemoveColor({ color: 'blue'});
+    var filter = new fabric.filters.RemoveColor({ color: 'blue', useAlpha: true});
     assert.ok(typeof filter.toJSON === 'function');
 
     var json = filter.toJSON();
-    assert.equal(JSON.stringify(json), '{"type":"RemoveColor","color":"blue","distance":0.02}');
+    assert.equal(JSON.stringify(json), '{"type":"RemoveColor","color":"blue","distance":0.02,"useAlpha":true}');
   });
 
   QUnit.test('fromObject', function(assert) {
