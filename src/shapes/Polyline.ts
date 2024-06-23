@@ -65,6 +65,7 @@ export class Polyline<
       ...Polyline.ownDefaults,
     };
   }
+
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
@@ -108,7 +109,10 @@ export class Polyline<
    * });
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
-    super({ points, ...options });
+    super();
+    Object.assign(this, Polyline.ownDefaults);
+    this.setOptions(options);
+    this.points = points;
     const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);

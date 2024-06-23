@@ -39,7 +39,7 @@ type NotParsedFabricObject = FabricObject & {
 export class ElementsParser {
   declare elements: Element[];
   declare options: LoadImageOptions & ParsedViewboxTransform;
-  declare reviver: TSvgReviverCallback | undefined;
+  declare reviver?: TSvgReviverCallback;
   declare regexUrl: RegExp;
   declare doc: Document;
   declare clipPaths: Record<string, Element[]>;

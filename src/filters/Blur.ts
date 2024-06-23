@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -10,9 +9,12 @@ import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/blur';
 
-export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
+type BlurOwnProps = {
+  blur: number;
+};
+
+export const blurDefaultValues: BlurOwnProps = {
   blur: 0,
-  mainParameter: 'blur',
 };
 
 /**
@@ -25,7 +27,7 @@ export const blurDefaultValues: Partial<TClassProperties<Blur>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Blur extends BaseFilter {
+export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
   /**
    * blur value, in percentage of image dimensions.
    * specific to keep the image blur constant at different resolutions
@@ -33,7 +35,7 @@ export class Blur extends BaseFilter {
    * @type Number
    * @default
    */
-  declare blur: number;
+  declare blur: BlurOwnProps['blur'];
 
   declare horizontal: boolean;
   declare aspectRatio: number;
@@ -41,6 +43,8 @@ export class Blur extends BaseFilter {
   static type = 'Blur';
 
   static defaults = blurDefaultValues;
+
+  static uniformLocations = ['uDelta'];
 
   getFragmentSource(): string {
     return fragmentSource;
@@ -122,21 +126,6 @@ export class Blur extends BaseFilter {
   }
 
   /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      delta: gl.getUniformLocation(program, 'uDelta'),
-    };
-  }
-
-  /**
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
@@ -148,6 +137,10 @@ export class Blur extends BaseFilter {
   ) {
     const delta = this.chooseRightDelta();
     gl.uniform2fv(uniformLocations.delta, delta);
+  }
+
+  isNeutralState() {
+    return this.blur === 0;
   }
 
   /**

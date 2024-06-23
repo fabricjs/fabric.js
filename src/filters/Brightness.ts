@@ -1,11 +1,14 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/brightness';
-export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
+
+type BrightnessOwnProps = {
+  brightness: number;
+};
+
+export const brightnessDefaultValues: BrightnessOwnProps = {
   brightness: 0,
-  mainParameter: 'brightness',
 };
 
 /**
@@ -17,7 +20,7 @@ export const brightnessDefaultValues: Partial<TClassProperties<Brightness>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Brightness extends BaseFilter {
+export class Brightness extends BaseFilter<'Brightness', BrightnessOwnProps> {
   /**
    * Brightness value, from -1 to 1.
    * translated to -255 to 255 for 2d
@@ -25,11 +28,13 @@ export class Brightness extends BaseFilter {
    * @param {Number} brightness
    * @default
    */
-  declare brightness: number;
+  declare brightness: BrightnessOwnProps['brightness'];
 
   static type = 'Brightness';
 
   static defaults = brightnessDefaultValues;
+
+  static uniformLocations = ['uBrightness'];
 
   getFragmentSource() {
     return fragmentSource;
@@ -42,9 +47,6 @@ export class Brightness extends BaseFilter {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.brightness === 0) {
-      return;
-    }
     const brightness = Math.round(this.brightness * 255);
     for (let i = 0; i < data.length; i += 4) {
       data[i] = data[i] + brightness;
@@ -53,19 +55,8 @@ export class Brightness extends BaseFilter {
     }
   }
 
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uBrightness: gl.getUniformLocation(program, 'uBrightness'),
-    };
+  isNeutralState() {
+    return this.brightness === 0;
   }
 
   /**

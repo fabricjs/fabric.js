@@ -139,9 +139,32 @@ export class InteractiveFabricObject<
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createObjectDefaultControls(),
       ...InteractiveFabricObject.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(
+      this,
+      (this.constructor as typeof InteractiveFabricObject).createControls(),
+      InteractiveFabricObject.ownDefaults
+    );
+    this.setOptions(options);
+  }
+
+  /**
+   * Creates the default control object.
+   * If you prefer to have on instance of controls shared among all objects
+   * make this function return an empty object and add controls to the ownDefaults
+   * @param {Object} [options] Options object
+   */
+  static createControls(): { controls: Record<string, Control> } {
+    return { controls: createObjectDefaultControls() };
   }
 
   /**
@@ -247,8 +270,13 @@ export class InteractiveFabricObject<
       ]),
       transformOptions = this.group
         ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
+        : undefined;
+    // decomposing could bring negative scaling and `_calculateCurrentDimensions` can't take it
+    if (transformOptions) {
+      transformOptions.scaleX = Math.abs(transformOptions.scaleX);
+      transformOptions.scaleY = Math.abs(transformOptions.scaleY);
+    }
+    const dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
@@ -512,6 +540,9 @@ export class InteractiveFabricObject<
    * Draws corners of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
+   * Be aware that since fabric 6.0 this function does not call setCoords anymore.
+   * setCoords needs to be called manually if the object of which we are rendering controls
+   * is outside the standard selection and transform process.
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {ControlRenderingStyleOverride} styleOverride object to override the object style
    */
@@ -534,7 +565,6 @@ export class InteractiveFabricObject<
       ctx.strokeStyle = options.cornerStrokeColor;
     }
     this._setLineDash(ctx, options.cornerDashArray);
-    this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
         const p = this.oCoords[key];
@@ -648,7 +678,7 @@ export class InteractiveFabricObject<
    * Fired from {@link Canvas#_onMouseMove}
    * @returns true in order for the window to start a drag session
    */
-  shouldStartDragging() {
+  shouldStartDragging(e: TPointerEvent) {
     return false;
   }
 

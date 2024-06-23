@@ -24,8 +24,9 @@ const transforms = `(?:${transform}*)`;
 const transformList = String.raw`^\s*(?:${transforms}?)\s*$`;
 // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
 const reTransformList = new RegExp(transformList);
+const reTransform = new RegExp(transform);
+const reTransformAll = new RegExp(transform, 'g');
 // == end transform regexp
-const reTransform = new RegExp(transform, 'g');
 
 /**
  * Parses "transform" attribute, returning an array of values
@@ -53,8 +54,8 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     return [...iMatrix];
   }
 
-  for (const match of attributeValue.matchAll(reTransform)) {
-    const transformMatch = new RegExp(transform).exec(match[0]);
+  for (const match of attributeValue.matchAll(reTransformAll)) {
+    const transformMatch = reTransform.exec(match[0]);
     if (!transformMatch) {
       continue;
     }
