@@ -1002,7 +1002,7 @@ export class StaticCanvas<
    *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
    * });
    */
-  toSVG(options: TSVGExportOptions = {}, reviver: TSVGReviver) {
+  toSVG(options: TSVGExportOptions = {}, reviver?: TSVGReviver) {
     options.reviver = reviver;
     const markup: string[] = [];
 
@@ -1181,7 +1181,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _setSVGObjects(markup: string[], reviver: TSVGReviver) {
+  _setSVGObjects(markup: string[], reviver?: TSVGReviver) {
     this.forEachObject((fabricObject) => {
       if (fabricObject.excludeFromExport) {
         return;
@@ -1197,7 +1197,7 @@ export class StaticCanvas<
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     markup.push(instance.toSVG(reviver));
   }
@@ -1208,7 +1208,7 @@ export class StaticCanvas<
   _setSVGBgOverlayImage(
     markup: string[],
     property: 'overlayImage' | 'backgroundImage',
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     const bgOrOverlay = this[property];
     if (bgOrOverlay && !bgOrOverlay.excludeFromExport && bgOrOverlay.toSVG) {
