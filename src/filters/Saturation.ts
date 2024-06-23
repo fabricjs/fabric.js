@@ -48,9 +48,6 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.saturation === 0) {
-      return;
-    }
     const adjust = -this.saturation;
     for (let i = 0; i < data.length; i += 4) {
       const max = Math.max(data[i], data[i + 1], data[i + 2]);

@@ -48,9 +48,6 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.vibrance === 0) {
-      return;
-    }
     const adjust = -this.vibrance;
     for (let i = 0; i < data.length; i += 4) {
       const max = Math.max(data[i], data[i + 1], data[i + 2]);
@@ -66,7 +63,7 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {Object} uniformLocations A map of string uniform names to WebGLUniformLocation objects
+   * @param {TWebGLUniformLocationMap} uniformLocations A map of string uniform names to WebGLUniformLocation objects
    */
   sendUniformData(
     gl: WebGLRenderingContext,

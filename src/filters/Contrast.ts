@@ -49,9 +49,6 @@ export class Contrast extends BaseFilter<'Contrast', ContrastOwnProps> {
    * @param {ImageData} options.imageData The Uint8Array to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.contrast === 0) {
-      return;
-    }
     const contrast = Math.floor(this.contrast * 255),
       contrastF = (259 * (contrast + 255)) / (255 * (259 - contrast));
 

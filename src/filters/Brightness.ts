@@ -47,9 +47,6 @@ export class Brightness extends BaseFilter<'Brightness', BrightnessOwnProps> {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.brightness === 0) {
-      return;
-    }
     const brightness = Math.round(this.brightness * 255);
     for (let i = 0; i < data.length; i += 4) {
       data[i] = data[i] + brightness;

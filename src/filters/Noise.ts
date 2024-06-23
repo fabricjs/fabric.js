@@ -46,9 +46,6 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.noise === 0) {
-      return;
-    }
     const noise = this.noise;
     for (let i = 0; i < data.length; i += 4) {
       const rand = (0.5 - Math.random()) * noise;
