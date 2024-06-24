@@ -1304,16 +1304,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     transform: Transform,
     pointer: Point
   ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
-    let actionPerformed = false;
-    // this object could be created from the function in the control handlers
+    const { action, actionHandler, target } = transform;
 
-    if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
-    }
+    const actionPerformed =
+      !!actionHandler && actionHandler(e, transform, pointer.x, pointer.y);
+    actionPerformed && target.setCoords();
+
+    // this object could be created from the function in the control handlers
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);
