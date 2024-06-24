@@ -1,6 +1,7 @@
 import type { JSHandle } from '@playwright/test';
 import { type LocatorScreenshotOptions, type Page } from '@playwright/test';
 import type { Canvas, XY } from 'fabric';
+import { util } from 'fabric';
 import os from 'node:os';
 import type { ObjectUtil } from './ObjectUtil';
 
@@ -18,6 +19,18 @@ export class CanvasUtil {
         position: await objectUtil.getObjectCenter(),
       });
     }
+  }
+
+  async makeActiveSelectionByDragging(objects: ObjectUtil[]) {
+    const points = [];
+    for (const objectUtil of objects) {
+      points.push(...(await objectUtil.getObjectCoords()));
+    }
+    const bbox = util.makeBoundingBoxFromPoints(points);
+    await this.clickAndDrag(
+      { x: bbox.left - 20, y: bbox.top - 20 },
+      { x: bbox.left + bbox.width + 20, y: bbox.top + bbox.height + 20 }
+    );
   }
 
   async clickAndDrag(point: XY, dragTo: XY, steps = 20) {

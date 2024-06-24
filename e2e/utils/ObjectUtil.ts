@@ -37,6 +37,10 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     return this.executeInBrowser((object) => object.getCenterPoint());
   }
 
+  getObjectCoords() {
+    return this.executeInBrowser((object) => object.getCoords());
+  }
+
   getObjectControlPoint(controlName: string) {
     return this.executeInBrowser(
       (object, { controlName }) => object.oCoords[controlName],
