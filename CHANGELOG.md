@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(Activeselection): Activeselection default initialization [#9940](https://github.com/fabricjs/fabric.js/pull/9940)
+
 ## [6.0.0-rc3]
 
 - fix(StaticCanvas): fully clean the cache canvas to avoid leaving trailing pixels [#9779](https://github.com/fabricjs/fabric.js/pull/9779)
