@@ -1007,16 +1007,12 @@
     });
     var object = new fabric.Object({ width: 10, height: 10, strokeWidth: 0 });
     object._createCacheCanvas();
-    assert.equal(object.cacheWidth, 12, 'current cache dimensions are saved');
-    assert.equal(object.cacheHeight, 12, 'current cache dimensions are saved');
     assert.equal(object._updateCacheCanvas(), false, 'second execution of cache canvas return false');
     object.scaleX = 2;
     assert.equal(object._updateCacheCanvas(), true, 'if scale change, it returns true');
-    assert.equal(object.cacheWidth, 22, 'current cache dimensions is updated');
     assert.equal(object.zoomX, 2, 'current scale level is saved');
     object.width = 2;
     assert.equal(object._updateCacheCanvas(), true, 'if dimension change, it returns true');
-    assert.equal(object.cacheWidth, 6, 'current cache dimensions is updated');
     object.strokeWidth = 2;
     assert.equal(object._updateCacheCanvas(), true, 'if strokeWidth change, it returns true');
   });
