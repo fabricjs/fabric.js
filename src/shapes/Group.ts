@@ -140,6 +140,21 @@ export class Group
     super();
     Object.assign(this, Group.ownDefaults);
     this.setOptions(options);
+    this.groupInit(objects, options);
+  }
+
+  /**
+   * Shared code between group and active selection
+   * Meant to be used by the constructor.
+   */
+  protected groupInit(
+    objects: FabricObject[],
+    options: {
+      layoutManager?: LayoutManager;
+      top?: number;
+      left?: number;
+    }
+  ) {
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
@@ -156,7 +171,7 @@ export class Group
     });
 
     // perform initial layout
-    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager = options.layoutManager ?? new LayoutManager();
     this.layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
