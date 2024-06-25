@@ -6,6 +6,7 @@
 
 ## [6.0.0-rc3]
 
+- feat(Color): add isUnrecognised property [#9936](https://github.com/fabricjs/fabric.js/pull/9936)
 - fix(StaticCanvas): fully clean the cache canvas to avoid leaving trailing pixels [#9779](https://github.com/fabricjs/fabric.js/pull/9779)
 - perf(): Reduce some calls to setCoords() [#9795](https://github.com/fabricjs/fabric.js/pull/9795)
 - chore(TS): svg reviver is optional [#9935](https://github.com/fabricjs/fabric.js/pull/9935)

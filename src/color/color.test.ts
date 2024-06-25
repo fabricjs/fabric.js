@@ -49,4 +49,10 @@ describe('Color regex and conversion tests', () => {
       [120.1, 60.2, 30.3, 1].toString()
     );
   });
+
+  it('Create an unrecognised color', () => {
+    const color1 = new Color('not a color');
+    expect(color1.isUnrecognised).toBe(true);
+    expect(color1.getSource().toString()).toBe([0, 0, 0, 1].toString());
+  });
 });
