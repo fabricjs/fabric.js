@@ -25,7 +25,12 @@ export class CanvasUtil {
     for (const objectUtil of objects) {
       points.push(...(await objectUtil.getObjectCoords()));
     }
-    const bbox = fabric.util.makeBoundingBoxFromPoints(points);
+    const bbox = await this.executeInBrowser(
+      (_, { points }) => {
+        return fabric.util.makeBoundingBoxFromPoints(points);
+      },
+      { points }
+    );
     await this.clickAndDrag(
       { x: bbox.left - 20, y: bbox.top - 20 },
       { x: bbox.left + bbox.width + 20, y: bbox.top + bbox.height + 20 }
