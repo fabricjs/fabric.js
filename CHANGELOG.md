@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [6.0.0-rc4]
+
 - chore(): update dev deps [#9944](https://github.com/fabricjs/fabric.js/pull/9944)
 - chore() Remove Node 16, add Node 22 in the test suite [#9942](https://github.com/fabricjs/fabric.js/pull/9942)
 - test(e2e): Activeselection default initialization E2E test [#9941](https://github.com/fabricjs/fabric.js/pull/9941)
