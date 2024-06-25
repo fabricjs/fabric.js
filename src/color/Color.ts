@@ -16,6 +16,7 @@ import {
  */
 export class Color {
   private declare _source: TRGBAColorSource;
+  isUnrecognised = false;
 
   /**
    *
@@ -51,7 +52,7 @@ export class Color {
           Color.sourceFromHsl(color) ||
           // color is not recognized
           // we default to black as canvas does
-          ([0, 0, 0, 1] as TRGBAColorSource);
+          ((this.isUnrecognised = true) && ([0, 0, 0, 1] as TRGBAColorSource));
   }
 
   /**
