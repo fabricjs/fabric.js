@@ -6,7 +6,7 @@ import type { Circle } from 'fabric';
 
 setup();
 
-test.only('Activeselection with mouse drag with origin non defaults', async ({
+test('Activeselection with mouse drag with origin non defaults', async ({
   page,
 }) => {
   const canvasUtil = new CanvasUtil(page);
