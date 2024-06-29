@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [6.0.0]
+
 ## [6.0.0-rc4]
 
 - chore(): update dev deps [#9944](https://github.com/fabricjs/fabric.js/pull/9944)
