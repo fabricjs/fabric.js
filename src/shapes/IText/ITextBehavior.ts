@@ -15,6 +15,7 @@ import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
 import type { IText } from './IText';
+import { getFabricDocument } from '../../env';
 
 /**
  *  extend this regex to support non english languages
@@ -615,6 +616,13 @@ export abstract class ITextBehavior<
     // add canvas offset on document
     p.x += this.canvas._offset.left;
     p.y += this.canvas._offset.top;
+
+    const doc =
+      (this.canvas && getDocumentFromElement(this.canvas.getElement())) ||
+      getFabricDocument();
+    if (p.y > doc.body.clientHeight - charHeight) {
+      p.y = doc.body.clientHeight - charHeight;
+    }
 
     return {
       left: `${p.x}px`,
