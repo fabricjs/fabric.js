@@ -2,6 +2,8 @@
 
 ## [next]
 
+- docs(): update README.md [#9957](https://github.com/fabricjs/fabric.js/pull/9957)
+
 ## [6.0.0]
 
 ## [6.0.0-rc4]
