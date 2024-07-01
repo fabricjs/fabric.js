@@ -30,10 +30,10 @@ export interface ControlProps {
   /**
    * Color of controlling corners of an object (when it's active and transparentCorners false)
    * @since 1.6.2
-   * @type String | null
-   * @default null
+   * @type String
+   * @default ''
    */
-  cornerStrokeColor: string | null;
+  cornerStrokeColor: string;
 
   /**
    * Specify style of control, 'rect' or 'circle'
@@ -41,7 +41,7 @@ export interface ControlProps {
    * And you can swap it with one of the alternative proposed with the control api
    * @since 1.6.2
    * @type 'rect' | 'circle'
-   * @default rect
+   * @default 'rect'
    * @deprecated
    */
   cornerStyle: 'rect' | 'circle';
