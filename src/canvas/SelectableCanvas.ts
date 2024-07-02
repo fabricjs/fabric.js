@@ -36,6 +36,7 @@ import {
   BOTTOM,
   CENTER,
   LEFT,
+  MODIFIED,
   RESIZING,
   RIGHT,
   ROTATE,
@@ -1254,7 +1255,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
     if (transform.actionPerformed) {
       this.fire('object:modified', options);
-      target.fire('modified', options);
+      target.fire(MODIFIED, options);
     }
   }
 

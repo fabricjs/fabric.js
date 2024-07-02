@@ -41,3 +41,4 @@ export const SKEW_X = 'skewX';
 export const SKEW_Y = 'skewY';
 export const FILL = 'fill';
 export const STROKE = 'stroke';
+export const MODIFIED = 'modified';

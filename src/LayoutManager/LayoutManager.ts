@@ -2,6 +2,7 @@ import { Point } from '../Point';
 import {
   CENTER,
   CHANGED,
+  MODIFIED,
   MODIFY_POLY,
   MOVING,
   RESIZING,
@@ -88,7 +89,7 @@ export class LayoutManager {
     const { target } = context;
     return (
       [
-        'modified',
+        MODIFIED,
         MOVING,
         RESIZING,
         ROTATING,
@@ -100,7 +101,7 @@ export class LayoutManager {
     ).map((key) =>
       object.on(key, (e) =>
         this.performLayout(
-          key === 'modified'
+          key === MODIFIED
             ? {
                 type: LAYOUT_TYPE_OBJECT_MODIFIED,
                 trigger: key,
