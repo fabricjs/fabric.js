@@ -134,7 +134,7 @@ export class BaseFilter<
     const uniformLocations = this.getUniformLocations(gl, program) || {};
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
     uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
-
+    console.log({ uniformLocations });
     return {
       program,
       attributeLocations: this.getAttributeLocations(gl, program),
@@ -171,14 +171,16 @@ export class BaseFilter<
   ): TWebGLUniformLocationMap {
     const locations = (this.constructor as unknown as typeof BaseFilter<string>)
       .uniformLocations;
-
     const uniformLocations: Record<string, WebGLUniformLocation | null> = {};
     for (let i = 0; i < locations.length; i++) {
       uniformLocations[locations[i]] = gl.getUniformLocation(
         program,
         locations[i]
       );
+      console.log(locations[i], uniformLocations[locations[i]]);
     }
+    console.log({ locations, uniformLocations });
+
     return uniformLocations;
   }
 

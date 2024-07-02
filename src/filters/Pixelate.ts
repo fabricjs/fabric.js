@@ -27,7 +27,7 @@ export class Pixelate extends BaseFilter<'Pixelate', PixelateOwnProps> {
 
   static defaults = pixelateDefaultValues;
 
-  static uniformLocations = ['uBlockSize'];
+  static uniformLocations = ['uBlocksize'];
 
   /**
    * Apply the Pixelate operation to a Uint8ClampedArray representing the pixels of an image.
