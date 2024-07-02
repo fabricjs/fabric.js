@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(): use deconstruction and constants in place of strings to save some bytes of code [#9593](https://github.com/fabricjs/fabric.js/pull/9593)
+- tests(): Start moving visual tests to playwrigth [#9481](https://github.com/fabricjs/fabric.js/pull/9481)
 - fix(filters): Fix bugs in Pixelate and Blur filter [#9962](https://github.com/fabricjs/fabric.js/pull/9962)
 - docs(): update README.md [#9957](https://github.com/fabricjs/fabric.js/pull/9957)
 
