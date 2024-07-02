@@ -4,7 +4,7 @@
 
 import * as fabric from 'fabric';
 import { renderTests } from './renderingCases';
-import { beforeRenderTest } from '../test';
+import { beforeRenderTest } from '../../test';
 
 beforeRenderTest(
   (canvas) => {

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import setup from '../../setup';
-import { CanvasUtil } from '../../utils/CanvasUtil';
-import { TestingCanvas } from '../../utils/createNodeSnapshot';
+import setup from '../../../setup';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { TestingCanvas } from '../../../utils/createNodeSnapshot';
 import { renderTests } from './renderingCases';
 import * as fabric from 'fabric/node';
 
