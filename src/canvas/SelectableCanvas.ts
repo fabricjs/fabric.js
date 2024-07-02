@@ -1175,8 +1175,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (this._currentTransform && this._currentTransform.target === obj) {
         this.endCurrentTransform(e);
       }
+      if (isActiveSelection(this._hoveredTarget)) {
+        this._hoveredTarget = undefined;
+      }
       this._activeObject = undefined;
-      this._hoveredTarget = undefined;
       return true;
     }
     return false;
