@@ -1176,6 +1176,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
+      this._hoveredTarget = undefined;
       return true;
     }
     return false;
