@@ -2,6 +2,7 @@ import type {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { ROTATING } from '../constants';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -82,6 +83,6 @@ const rotateObjectWithSnapping: TransformActionHandler = (
 };
 
 export const rotationWithSnapping = wrapWithFireEvent(
-  'rotating',
+  ROTATING,
   wrapWithFixedAnchor(rotateObjectWithSnapping)
 );

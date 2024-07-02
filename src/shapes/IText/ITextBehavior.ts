@@ -13,7 +13,7 @@ import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT, reNewline } from '../../constants';
+import { LEFT, MODIFIED, RIGHT, reNewline } from '../../constants';
 import type { IText } from './IText';
 
 /**
@@ -696,7 +696,7 @@ export abstract class ITextBehavior<
       this.setCoords();
     }
     this.fire('editing:exited');
-    isTextChanged && this.fire('modified');
+    isTextChanged && this.fire(MODIFIED);
     if (this.canvas) {
       this.canvas.fire('text:editing:exited', {
         target: this as unknown as IText,

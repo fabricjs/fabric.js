@@ -1,5 +1,16 @@
 import { Point } from '../Point';
-import { CENTER, iMatrix } from '../constants';
+import {
+  CENTER,
+  CHANGED,
+  MODIFIED,
+  MODIFY_POLY,
+  MOVING,
+  RESIZING,
+  ROTATING,
+  SCALING,
+  SKEWING,
+  iMatrix,
+} from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
@@ -78,19 +89,19 @@ export class LayoutManager {
     const { target } = context;
     return (
       [
-        'modified',
-        'moving',
-        'resizing',
-        'rotating',
-        'scaling',
-        'skewing',
-        'changed',
-        'modifyPoly',
+        MODIFIED,
+        MOVING,
+        RESIZING,
+        ROTATING,
+        SCALING,
+        SKEWING,
+        CHANGED,
+        MODIFY_POLY,
       ] as (TModificationEvents & 'modified')[]
     ).map((key) =>
       object.on(key, (e) =>
         this.performLayout(
-          key === 'modified'
+          key === MODIFIED
             ? {
                 type: LAYOUT_TYPE_OBJECT_MODIFIED,
                 trigger: key,
@@ -184,19 +195,16 @@ export class LayoutManager {
   protected getLayoutResult(
     context: StrictLayoutContext
   ): Required<LayoutResult> | undefined {
-    const { target } = context;
+    const { target, strategy, type } = context;
 
-    const result = context.strategy.calcLayoutResult(
-      context,
-      target.getObjects()
-    );
+    const result = strategy.calcLayoutResult(context, target.getObjects());
 
     if (!result) {
       return;
     }
 
     const prevCenter =
-      context.type === LAYOUT_TYPE_INITIALIZATION
+      type === LAYOUT_TYPE_INITIALIZATION
         ? new Point()
         : target.getRelativeCenterPoint();
 
@@ -210,7 +218,7 @@ export class LayoutManager {
       .add(correction)
       .transform(
         // in `initialization` we do not account for target's transformation matrix
-        context.type === LAYOUT_TYPE_INITIALIZATION
+        type === LAYOUT_TYPE_INITIALIZATION
           ? iMatrix
           : invertTransform(target.calcOwnMatrix()),
         true
@@ -328,8 +336,9 @@ export class LayoutManager {
   }
 
   dispose() {
-    this._subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
-    this._subscriptions.clear();
+    const { _subscriptions } = this;
+    _subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
+    _subscriptions.clear();
   }
 
   toObject() {

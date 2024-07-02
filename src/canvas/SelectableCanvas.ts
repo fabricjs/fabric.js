@@ -32,7 +32,21 @@ import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
 import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
-import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
+import {
+  BOTTOM,
+  CENTER,
+  LEFT,
+  MODIFIED,
+  RESIZING,
+  RIGHT,
+  ROTATE,
+  SCALE,
+  SCALE_X,
+  SCALE_Y,
+  SKEW_X,
+  SKEW_Y,
+  TOP,
+} from '../constants';
 import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
@@ -517,13 +531,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     let centerTransform;
 
     if (
-      action === 'scale' ||
-      action === 'scaleX' ||
-      action === 'scaleY' ||
-      action === 'resizing'
+      action === SCALE ||
+      action === SCALE_X ||
+      action === SCALE_Y ||
+      action === RESIZING
     ) {
       centerTransform = this.centeredScaling || target.centeredScaling;
-    } else if (action === 'rotate') {
+    } else if (action === ROTATE) {
       centerTransform = this.centeredRotation || target.centeredRotation;
     }
 
@@ -1241,7 +1255,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
     if (transform.actionPerformed) {
       this.fire('object:modified', options);
-      target.fire('modified', options);
+      target.fire(MODIFIED, options);
     }
   }
 
@@ -1340,10 +1354,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         'flipX',
         'flipY',
         LEFT,
-        'scaleX',
-        'scaleY',
-        'skewX',
-        'skewY',
+        SCALE_X,
+        SCALE_Y,
+        SKEW_X,
+        SKEW_Y,
         TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);

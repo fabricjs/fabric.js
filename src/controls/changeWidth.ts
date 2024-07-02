@@ -1,5 +1,5 @@
 import type { TransformActionHandler } from '../EventTypeDefs';
-import { CENTER, LEFT, RIGHT } from '../constants';
+import { CENTER, LEFT, RESIZING, RIGHT } from '../constants';
 import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -51,6 +51,6 @@ export const changeObjectWidth: TransformActionHandler = (
 };
 
 export const changeWidth = wrapWithFireEvent(
-  'resizing',
+  RESIZING,
   wrapWithFixedAnchor(changeObjectWidth)
 );

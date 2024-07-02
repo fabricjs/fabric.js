@@ -1,5 +1,5 @@
 import { cache } from '../../cache';
-import { DEFAULT_SVG_FONT_SIZE } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, FILL, STROKE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
   CompleteTextStyleDeclaration,
@@ -621,7 +621,7 @@ export class FabricText<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderText(ctx: CanvasRenderingContext2D) {
-    if (this.paintFirst === 'stroke') {
+    if (this.paintFirst === STROKE) {
       this._renderTextStroke(ctx);
       this._renderTextFill(ctx);
     } else {
@@ -1100,7 +1100,7 @@ export class FabricText<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderTextFill(ctx: CanvasRenderingContext2D) {
-    if (!this.fill && !this.styleHas('fill')) {
+    if (!this.fill && !this.styleHas(FILL)) {
       return;
     }
 
@@ -1572,7 +1572,7 @@ export class FabricText<
       let boxStart = 0;
       let boxWidth = 0;
       let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
-      let lastFill = this.getValueOfPropertyAt(i, 0, 'fill');
+      let lastFill = this.getValueOfPropertyAt(i, 0, FILL);
       let currentDecoration;
       let currentFill;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
@@ -1581,7 +1581,7 @@ export class FabricText<
       for (let j = 0, jlen = line.length; j < jlen; j++) {
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         currentDecoration = this.getValueOfPropertyAt(i, j, type);
-        currentFill = this.getValueOfPropertyAt(i, j, 'fill');
+        currentFill = this.getValueOfPropertyAt(i, j, FILL);
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {

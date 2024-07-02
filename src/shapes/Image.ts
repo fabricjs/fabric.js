@@ -25,7 +25,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
-import { NONE } from '../constants';
+import { FILL, NONE } from '../constants';
 import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
@@ -419,7 +419,7 @@ export class FabricImage<
       ];
       this.fill = origFill;
     }
-    if (this.paintFirst !== 'fill') {
+    if (this.paintFirst !== FILL) {
       svgString = svgString.concat(strokeSvg, imageMarkup);
     } else {
       svgString = svgString.concat(imageMarkup, strokeSvg);

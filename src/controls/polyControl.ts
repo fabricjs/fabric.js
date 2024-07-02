@@ -11,8 +11,9 @@ import type {
 } from '../EventTypeDefs';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { sendPointToPlane } from '../util';
+import { MODIFY_POLY } from '../constants';
 
-const ACTION_NAME: TModificationEvents = 'modifyPoly';
+const ACTION_NAME: TModificationEvents = MODIFY_POLY;
 
 type TTransformAnchor = Transform & { pointIndex: number };
 

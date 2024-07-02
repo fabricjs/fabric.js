@@ -1,4 +1,4 @@
-//@ts-nocheck
+// @ts-nocheck
 
 import { scalingEqually } from '../controls/scale';
 import { fireEvent } from '../controls/fireEvent';
@@ -7,7 +7,8 @@ import {
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
 import { Canvas } from './Canvas';
-import { CENTER } from '../constants';
+import { CENTER, ROTATING, ROTATE, SCALE } from '../constants';
+
 /**
  * Adds support for multi-touch gestures using the Event.js library.
  * Fires the following custom events:
@@ -61,13 +62,13 @@ Object.assign(Canvas.prototype, {
     const t = this._currentTransform;
     const e = this.__gesturesParams.e;
 
-    t.action = 'scale';
+    t.action = SCALE;
     t.originX = t.originY = CENTER;
 
     this._scaleObjectBy(self.scale, e);
 
     if (self.rotation !== 0) {
-      t.action = 'rotate';
+      t.action = ROTATE;
       this._rotateObjectByAngle(self.rotation, e);
     }
 
@@ -171,7 +172,7 @@ Object.assign(Canvas.prototype, {
       return;
     }
     t.target.rotate(radiansToDegrees(degreesToRadians(curAngle) + t.theta));
-    fireEvent('rotating', {
+    fireEvent(ROTATING, {
       target: t.target,
       e: e,
       transform: t,

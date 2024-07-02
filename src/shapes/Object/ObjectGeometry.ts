@@ -6,7 +6,7 @@ import type {
   TOriginX,
   TOriginY,
 } from '../../typedefs';
-import { iMatrix } from '../../constants';
+import { SCALE_X, SCALE_Y, iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
@@ -356,8 +356,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {void}
    */
   scale(value: number): void {
-    this._set('scaleX', value);
-    this._set('scaleY', value);
+    this._set(SCALE_X, value);
+    this._set(SCALE_Y, value);
     this.setCoords();
   }
 
