@@ -56,6 +56,10 @@ export {
    */
   FabricObject as Object,
 } from './src/shapes/Object/FabricObject';
+/**
+ * Exported so we can tweak default values
+ */
+export { FabricObject as BaseFabricObject } from './src/shapes/Object/Object';
 
 export type {
   TFabricObjectProps,
@@ -119,14 +123,12 @@ export type {
 export type {
   GroupEvents,
   GroupProps,
-  LayoutContext,
   GroupOwnProps,
-  LayoutContextType,
-  LayoutResult,
-  LayoutStrategy,
   SerializedGroupProps,
 } from './src/shapes/Group';
 export { Group } from './src/shapes/Group';
+export * from './src/LayoutManager';
+export type { SerializedLayoutManager } from './src/LayoutManager';
 export type {
   ActiveSelectionOptions,
   MultiSelectionStacking,

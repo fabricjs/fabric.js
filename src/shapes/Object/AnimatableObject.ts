@@ -17,7 +17,7 @@ export abstract class AnimatableObject<
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  declare colorProperties: string[];
+  static colorProperties: string[] = ['fill', 'stroke', 'backgroundColor'];
 
   /**
    * Animates object's properties
@@ -53,17 +53,17 @@ export abstract class AnimatableObject<
     options: Partial<AnimationOptions<T>> = {}
   ): TAnimation<T> {
     const path = key.split('.');
-    const propIsColor = this.colorProperties.includes(path[path.length - 1]);
-    const { easing, duration, abort, startValue, onChange, onComplete } =
-      options;
+    const propIsColor = (
+      this.constructor as typeof AnimatableObject
+    ).colorProperties.includes(path[path.length - 1]);
+    const { abort, startValue, onChange, onComplete } = options;
     const animationOptions = {
+      ...options,
       target: this,
       // path.reduce... is the current value in case start value isn't provided
       startValue:
         startValue ?? path.reduce((deep: any, key) => deep[key], this),
       endValue,
-      easing,
-      duration,
       abort: abort?.bind(this),
       onChange: (
         value: number | number[] | string,

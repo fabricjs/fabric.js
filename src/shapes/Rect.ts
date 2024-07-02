@@ -52,7 +52,7 @@ export class Rect<
 
   static cacheProperties = [...cacheProperties, ...RECT_PROPS];
 
-  static ownDefaults: Record<string, any> = rectDefaultValues;
+  static ownDefaults = rectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
@@ -64,13 +64,13 @@ export class Rect<
   /**
    * Constructor
    * @param {Object} [options] Options object
-   * @return {Object} thisArg
    */
-  constructor(options: Props) {
-    super(options);
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, Rect.ownDefaults);
+    this.setOptions(options);
     this._initRxRy();
   }
-
   /**
    * Initializes rx/ry attributes
    * @private

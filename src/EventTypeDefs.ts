@@ -7,6 +7,10 @@ import type { saveObjectTransform } from './util/misc/objectTransforms';
 import type { Canvas } from './canvas/Canvas';
 import type { IText } from './shapes/IText/IText';
 import type { StaticCanvas } from './canvas/StaticCanvas';
+import type {
+  LayoutBeforeEvent,
+  LayoutAfterEvent,
+} from './LayoutManager/types';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -51,9 +55,9 @@ export type ControlCursorCallback = ControlCallback<string>;
  */
 export type Transform = {
   target: FabricObject;
-  action: string;
+  action?: string;
   actionHandler?: TransformActionHandler;
-  corner: string | 0;
+  corner: string;
   scaleX: number;
   scaleY: number;
   skewX: number;
@@ -75,8 +79,6 @@ export type Transform = {
     originX: TOriginX;
     originY: TOriginY;
   };
-  // @TODO: investigate if this reset is really needed
-  reset?: boolean;
   actionPerformed: boolean;
 };
 
@@ -99,30 +101,35 @@ export type TModificationEvents =
   | 'scaling'
   | 'rotating'
   | 'skewing'
-  | 'resizing';
+  | 'resizing'
+  | 'modifyPoly';
 
-export interface ModifiedEvent<E extends Event = TPointerEvent>
-  extends TEvent<E> {
-  transform: Transform;
+export interface ModifiedEvent<E extends Event = TPointerEvent> {
+  e?: E;
+  transform?: Transform;
   target: FabricObject;
-  action: string;
+  action?: string;
 }
 
-type ModificationEventsSpec<
-  Prefix extends string = '',
-  Modification = BasicTransformEvent,
-  Modified = ModifiedEvent | never
-> = Record<`${Prefix}${TModificationEvents}`, Modification> &
-  Record<`${Prefix}modified`, Modified>;
+type ObjectModificationEvents = {
+  moving: BasicTransformEvent;
+  scaling: BasicTransformEvent;
+  rotating: BasicTransformEvent;
+  skewing: BasicTransformEvent;
+  resizing: BasicTransformEvent;
+  modifyPoly: BasicTransformEvent;
+  modified: ModifiedEvent;
+};
 
-type ObjectModificationEvents = ModificationEventsSpec;
-
-type CanvasModificationEvents = ModificationEventsSpec<
-  'object:',
-  BasicTransformEvent & { target: FabricObject },
-  ModifiedEvent | { target: FabricObject }
-> & {
+type CanvasModificationEvents = {
   'before:transform': TEvent & { transform: Transform };
+  'object:moving': BasicTransformEvent & { target: FabricObject };
+  'object:scaling': BasicTransformEvent & { target: FabricObject };
+  'object:rotating': BasicTransformEvent & { target: FabricObject };
+  'object:skewing': BasicTransformEvent & { target: FabricObject };
+  'object:resizing': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPoly': BasicTransformEvent & { target: FabricObject };
+  'object:modified': ModifiedEvent;
 };
 
 export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
@@ -289,6 +296,8 @@ export interface StaticCanvasEvents extends CollectionEvents {
   // rendering
   'before:render': { ctx: CanvasRenderingContext2D };
   'after:render': { ctx: CanvasRenderingContext2D };
+  'object:layout:before': LayoutBeforeEvent & { target: Group };
+  'object:layout:after': LayoutAfterEvent & { target: Group };
 }
 
 export interface CanvasEvents

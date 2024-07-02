@@ -37,7 +37,7 @@
     // function fixedLayout(canvas, callback) {
     //     var g = createGroupForLayoutTests('fixed layout', {
     //         backgroundColor: 'azure',
-    //         layout: 'fixed',
+    //         layoutManager: new fabric.LayoutManager(new fabric.FixedLayout()),
     //         width: 50,
     //         height: 50,
     //         angle: 30
@@ -213,7 +213,7 @@
         g.item(0).set({ left: point.x });
         g.item(1).set({ skewX: -45 });
         g.item(2).rotate(45);
-        g.triggerLayout();
+        g.triggerLayout({ strategy: new fabric.FitContentLayout() });
         canvas.add(g);
         canvas.renderAll();
         callback(canvas.lowerCanvasEl);
@@ -230,7 +230,8 @@
 
     function fitContentLayoutAdd(canvas, callback) {
         var g = createGroupForLayoutTests('fit-content layout', {
-            backgroundColor: 'blue'
+            backgroundColor: 'blue',
+            layoutManager: new fabric.LayoutManager()
         });
         var rect = new fabric.Rect({
             top: 200,
@@ -264,7 +265,7 @@
                 originX: 'center',
                 originY: 'center',
             }),
-            layout: 'clip-path'
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -289,7 +290,7 @@
                 originY: 'center',
                 scaleX: 0.6
             }),
-            layout: 'clip-path'
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -314,7 +315,7 @@
                 top: -100,
                 scaleX: 1.5,
             }),
-            layout: 'clip-path'
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout())
         });
         canvas.add(g);
         canvas.renderAll();
@@ -342,7 +343,7 @@
                 top: 150,
                 skewX: 20
             }),
-            layout: 'clip-path',
+            layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
         });
         canvas.add(g);
         canvas.renderAll();
@@ -365,7 +366,11 @@
             tlControlPoint = new fabric.Circle({ radius: 5, fill: 'red', left: 150, top: 100, strokeWidth: 0 });
 
         var g = new fabric.Group([rect1, rect2, tlControlPoint], Object.assign({}, options, {
-            originX, originY, backgroundColor: 'pink'
+          left:150,
+          top:100,
+          originX,
+          originY,
+          backgroundColor: 'pink'
         }));
         return [g, controlPoint];
     }
@@ -385,6 +390,27 @@
                         callback(canvas.lowerCanvasEl);
                     },
                     golden: `group-layout/origin-${ox}-${oy}-${angle}deg.png`,
+                    percentage: 0.001,
+                    width: 200,
+                    height: 200
+                });
+            });
+        });
+    }
+
+    // with position
+    for (let angle = 0; angle < 360; angle += 30) {
+        originX.forEach(ox => {
+            originY.forEach(oy => {
+                tests.push({
+                    test: `layout with position and originX=${ox}, originY=${oy} and angle=${angle} values`,
+                    code: function (canvas, callback) {
+                        canvas.add.apply(canvas, createObjectsForOriginTests(ox, oy, { angle, left: 150, top: 100 }));
+                        canvas.setViewportTransform([1, 0, 0, 1, -50, 0]);
+                        canvas.renderAll();
+                        callback(canvas.lowerCanvasEl);
+                    },
+                    golden: `group-layout/with-position-origin-${ox}-${oy}-${angle}deg.png`,
                     percentage: 0.001,
                     width: 200,
                     height: 200

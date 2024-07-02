@@ -1,0 +1,2772 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`animate animateColor change percentage is calculated from a changed value 1`] = `
+[
+  0,
+  0.03529411764705882,
+  0.13333333333333333,
+  0.29411764705882354,
+  0.4980392156862745,
+  0.7411764705882353,
+  1,
+]
+`;
+
+exports[`easing defaultEasing 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0031",
+    "val": "0.3083",
+  },
+  {
+    "percentage": "0.0123",
+    "val": "1.2312",
+  },
+  {
+    "percentage": "0.0276",
+    "val": "2.7630",
+  },
+  {
+    "percentage": "0.0489",
+    "val": "4.8943",
+  },
+  {
+    "percentage": "0.0761",
+    "val": "7.6120",
+  },
+  {
+    "percentage": "0.1090",
+    "val": "10.8993",
+  },
+  {
+    "percentage": "0.1474",
+    "val": "14.7360",
+  },
+  {
+    "percentage": "0.1910",
+    "val": "19.0983",
+  },
+  {
+    "percentage": "0.2396",
+    "val": "23.9594",
+  },
+  {
+    "percentage": "0.2929",
+    "val": "29.2893",
+  },
+  {
+    "percentage": "0.3506",
+    "val": "35.0552",
+  },
+  {
+    "percentage": "0.4122",
+    "val": "41.2215",
+  },
+  {
+    "percentage": "0.4775",
+    "val": "47.7501",
+  },
+  {
+    "percentage": "0.5460",
+    "val": "54.6010",
+  },
+  {
+    "percentage": "0.6173",
+    "val": "61.7317",
+  },
+  {
+    "percentage": "0.6910",
+    "val": "69.0983",
+  },
+  {
+    "percentage": "0.7666",
+    "val": "76.6555",
+  },
+  {
+    "percentage": "0.8436",
+    "val": "84.3566",
+  },
+  {
+    "percentage": "0.9215",
+    "val": "92.1541",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInBack 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0039",
+    "val": "-0.3916",
+  },
+  {
+    "percentage": "0.0143",
+    "val": "-1.4314",
+  },
+  {
+    "percentage": "0.0292",
+    "val": "-2.9168",
+  },
+  {
+    "percentage": "0.0465",
+    "val": "-4.6451",
+  },
+  {
+    "percentage": "0.0641",
+    "val": "-6.4137",
+  },
+  {
+    "percentage": "0.0802",
+    "val": "-8.0200",
+  },
+  {
+    "percentage": "0.0926",
+    "val": "-9.2613",
+  },
+  {
+    "percentage": "0.0994",
+    "val": "-9.9352",
+  },
+  {
+    "percentage": "0.0984",
+    "val": "-9.8388",
+  },
+  {
+    "percentage": "0.0877",
+    "val": "-8.7698",
+  },
+  {
+    "percentage": "0.0653",
+    "val": "-6.5253",
+  },
+  {
+    "percentage": "0.0290",
+    "val": "-2.9028",
+  },
+  {
+    "percentage": "0.0230",
+    "val": "2.3004",
+  },
+  {
+    "percentage": "0.0929",
+    "val": "9.2868",
+  },
+  {
+    "percentage": "0.1826",
+    "val": "18.2590",
+  },
+  {
+    "percentage": "0.2942",
+    "val": "29.4198",
+  },
+  {
+    "percentage": "0.4297",
+    "val": "42.9716",
+  },
+  {
+    "percentage": "0.5912",
+    "val": "59.1172",
+  },
+  {
+    "percentage": "0.7806",
+    "val": "78.0591",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInBounce 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0155",
+    "val": "1.5469",
+  },
+  {
+    "percentage": "0.0119",
+    "val": "1.1875",
+  },
+  {
+    "percentage": "0.0548",
+    "val": "5.4844",
+  },
+  {
+    "percentage": "0.0600",
+    "val": "6.0000",
+  },
+  {
+    "percentage": "0.0273",
+    "val": "2.7344",
+  },
+  {
+    "percentage": "0.0694",
+    "val": "6.9375",
+  },
+  {
+    "percentage": "0.1673",
+    "val": "16.7344",
+  },
+  {
+    "percentage": "0.2275",
+    "val": "22.7500",
+  },
+  {
+    "percentage": "0.2498",
+    "val": "24.9844",
+  },
+  {
+    "percentage": "0.2344",
+    "val": "23.4375",
+  },
+  {
+    "percentage": "0.1811",
+    "val": "18.1094",
+  },
+  {
+    "percentage": "0.0900",
+    "val": "9.0000",
+  },
+  {
+    "percentage": "0.0736",
+    "val": "7.3594",
+  },
+  {
+    "percentage": "0.3194",
+    "val": "31.9375",
+  },
+  {
+    "percentage": "0.5273",
+    "val": "52.7344",
+  },
+  {
+    "percentage": "0.6975",
+    "val": "69.7500",
+  },
+  {
+    "percentage": "0.8298",
+    "val": "82.9844",
+  },
+  {
+    "percentage": "0.9244",
+    "val": "92.4375",
+  },
+  {
+    "percentage": "0.9811",
+    "val": "98.1094",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInCirc 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0013",
+    "val": "0.1251",
+  },
+  {
+    "percentage": "0.0050",
+    "val": "0.5013",
+  },
+  {
+    "percentage": "0.0113",
+    "val": "1.1314",
+  },
+  {
+    "percentage": "0.0202",
+    "val": "2.0204",
+  },
+  {
+    "percentage": "0.0318",
+    "val": "3.1754",
+  },
+  {
+    "percentage": "0.0461",
+    "val": "4.6061",
+  },
+  {
+    "percentage": "0.0633",
+    "val": "6.3250",
+  },
+  {
+    "percentage": "0.0835",
+    "val": "8.3485",
+  },
+  {
+    "percentage": "0.1070",
+    "val": "10.6971",
+  },
+  {
+    "percentage": "0.1340",
+    "val": "13.3975",
+  },
+  {
+    "percentage": "0.1648",
+    "val": "16.4835",
+  },
+  {
+    "percentage": "0.2000",
+    "val": "20.0000",
+  },
+  {
+    "percentage": "0.2401",
+    "val": "24.0066",
+  },
+  {
+    "percentage": "0.2859",
+    "val": "28.5857",
+  },
+  {
+    "percentage": "0.3386",
+    "val": "33.8562",
+  },
+  {
+    "percentage": "0.4000",
+    "val": "40.0000",
+  },
+  {
+    "percentage": "0.4732",
+    "val": "47.3217",
+  },
+  {
+    "percentage": "0.5641",
+    "val": "56.4110",
+  },
+  {
+    "percentage": "0.6878",
+    "val": "68.7750",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInCubic 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0001",
+    "val": "0.0125",
+  },
+  {
+    "percentage": "0.0010",
+    "val": "0.1000",
+  },
+  {
+    "percentage": "0.0034",
+    "val": "0.3375",
+  },
+  {
+    "percentage": "0.0080",
+    "val": "0.8000",
+  },
+  {
+    "percentage": "0.0156",
+    "val": "1.5625",
+  },
+  {
+    "percentage": "0.0270",
+    "val": "2.7000",
+  },
+  {
+    "percentage": "0.0429",
+    "val": "4.2875",
+  },
+  {
+    "percentage": "0.0640",
+    "val": "6.4000",
+  },
+  {
+    "percentage": "0.0911",
+    "val": "9.1125",
+  },
+  {
+    "percentage": "0.1250",
+    "val": "12.5000",
+  },
+  {
+    "percentage": "0.1664",
+    "val": "16.6375",
+  },
+  {
+    "percentage": "0.2160",
+    "val": "21.6000",
+  },
+  {
+    "percentage": "0.2746",
+    "val": "27.4625",
+  },
+  {
+    "percentage": "0.3430",
+    "val": "34.3000",
+  },
+  {
+    "percentage": "0.4219",
+    "val": "42.1875",
+  },
+  {
+    "percentage": "0.5120",
+    "val": "51.2000",
+  },
+  {
+    "percentage": "0.6141",
+    "val": "61.4125",
+  },
+  {
+    "percentage": "0.7290",
+    "val": "72.9000",
+  },
+  {
+    "percentage": "0.8574",
+    "val": "85.7375",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInElastic 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0007",
+    "val": "0.0691",
+  },
+  {
+    "percentage": "0.0020",
+    "val": "0.1953",
+  },
+  {
+    "percentage": "0.0014",
+    "val": "0.1381",
+  },
+  {
+    "percentage": "0.0020",
+    "val": "-0.1953",
+  },
+  {
+    "percentage": "0.0055",
+    "val": "-0.5524",
+  },
+  {
+    "percentage": "0.0039",
+    "val": "-0.3906",
+  },
+  {
+    "percentage": "0.0055",
+    "val": "0.5524",
+  },
+  {
+    "percentage": "0.0156",
+    "val": "1.5625",
+  },
+  {
+    "percentage": "0.0110",
+    "val": "1.1049",
+  },
+  {
+    "percentage": "0.0156",
+    "val": "-1.5625",
+  },
+  {
+    "percentage": "0.0442",
+    "val": "-4.4194",
+  },
+  {
+    "percentage": "0.0312",
+    "val": "-3.1250",
+  },
+  {
+    "percentage": "0.0442",
+    "val": "4.4194",
+  },
+  {
+    "percentage": "0.1250",
+    "val": "12.5000",
+  },
+  {
+    "percentage": "0.0884",
+    "val": "8.8388",
+  },
+  {
+    "percentage": "0.1250",
+    "val": "-12.5000",
+  },
+  {
+    "percentage": "0.3536",
+    "val": "-35.3553",
+  },
+  {
+    "percentage": "0.2500",
+    "val": "-25.0000",
+  },
+  {
+    "percentage": "0.3536",
+    "val": "35.3553",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInExpo 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0014",
+    "val": "0.1381",
+  },
+  {
+    "percentage": "0.0020",
+    "val": "0.1953",
+  },
+  {
+    "percentage": "0.0028",
+    "val": "0.2762",
+  },
+  {
+    "percentage": "0.0039",
+    "val": "0.3906",
+  },
+  {
+    "percentage": "0.0055",
+    "val": "0.5524",
+  },
+  {
+    "percentage": "0.0078",
+    "val": "0.7813",
+  },
+  {
+    "percentage": "0.0110",
+    "val": "1.1049",
+  },
+  {
+    "percentage": "0.0156",
+    "val": "1.5625",
+  },
+  {
+    "percentage": "0.0221",
+    "val": "2.2097",
+  },
+  {
+    "percentage": "0.0313",
+    "val": "3.1250",
+  },
+  {
+    "percentage": "0.0442",
+    "val": "4.4194",
+  },
+  {
+    "percentage": "0.0625",
+    "val": "6.2500",
+  },
+  {
+    "percentage": "0.0884",
+    "val": "8.8388",
+  },
+  {
+    "percentage": "0.1250",
+    "val": "12.5000",
+  },
+  {
+    "percentage": "0.1768",
+    "val": "17.6777",
+  },
+  {
+    "percentage": "0.2500",
+    "val": "25.0000",
+  },
+  {
+    "percentage": "0.3536",
+    "val": "35.3553",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.7071",
+    "val": "70.7107",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutBack 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0112",
+    "val": "-1.1177",
+  },
+  {
+    "percentage": "0.0375",
+    "val": "-3.7519",
+  },
+  {
+    "percentage": "0.0682",
+    "val": "-6.8240",
+  },
+  {
+    "percentage": "0.0926",
+    "val": "-9.2556",
+  },
+  {
+    "percentage": "0.0997",
+    "val": "-9.9682",
+  },
+  {
+    "percentage": "0.0788",
+    "val": "-7.8833",
+  },
+  {
+    "percentage": "0.0192",
+    "val": "-1.9226",
+  },
+  {
+    "percentage": "0.0899",
+    "val": "8.9926",
+  },
+  {
+    "percentage": "0.2594",
+    "val": "25.9406",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.7406",
+    "val": "74.0594",
+  },
+  {
+    "percentage": "0.9101",
+    "val": "91.0074",
+  },
+  {
+    "percentage": "1.0192",
+    "val": "101.9226",
+  },
+  {
+    "percentage": "1.0788",
+    "val": "107.8833",
+  },
+  {
+    "percentage": "1.0997",
+    "val": "109.9682",
+  },
+  {
+    "percentage": "1.0926",
+    "val": "109.2556",
+  },
+  {
+    "percentage": "1.0682",
+    "val": "106.8240",
+  },
+  {
+    "percentage": "1.0375",
+    "val": "103.7519",
+  },
+  {
+    "percentage": "1.0112",
+    "val": "101.1177",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutBounce 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0059",
+    "val": "0.5938",
+  },
+  {
+    "percentage": "0.0300",
+    "val": "3.0000",
+  },
+  {
+    "percentage": "0.0347",
+    "val": "3.4688",
+  },
+  {
+    "percentage": "0.1138",
+    "val": "11.3750",
+  },
+  {
+    "percentage": "0.1172",
+    "val": "11.7188",
+  },
+  {
+    "percentage": "0.0450",
+    "val": "4.5000",
+  },
+  {
+    "percentage": "0.1597",
+    "val": "15.9688",
+  },
+  {
+    "percentage": "0.3488",
+    "val": "34.8750",
+  },
+  {
+    "percentage": "0.4622",
+    "val": "46.2188",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.5378",
+    "val": "53.7813",
+  },
+  {
+    "percentage": "0.6512",
+    "val": "65.1250",
+  },
+  {
+    "percentage": "0.8403",
+    "val": "84.0313",
+  },
+  {
+    "percentage": "0.9550",
+    "val": "95.5000",
+  },
+  {
+    "percentage": "0.8828",
+    "val": "88.2813",
+  },
+  {
+    "percentage": "0.8862",
+    "val": "88.6250",
+  },
+  {
+    "percentage": "0.9653",
+    "val": "96.5313",
+  },
+  {
+    "percentage": "0.9700",
+    "val": "97.0000",
+  },
+  {
+    "percentage": "0.9941",
+    "val": "99.4063",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutCirc 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0025",
+    "val": "0.2506",
+  },
+  {
+    "percentage": "0.0101",
+    "val": "1.0102",
+  },
+  {
+    "percentage": "0.0230",
+    "val": "2.3030",
+  },
+  {
+    "percentage": "0.0417",
+    "val": "4.1742",
+  },
+  {
+    "percentage": "0.0670",
+    "val": "6.6987",
+  },
+  {
+    "percentage": "0.1000",
+    "val": "10.0000",
+  },
+  {
+    "percentage": "0.1429",
+    "val": "14.2929",
+  },
+  {
+    "percentage": "0.2000",
+    "val": "20.0000",
+  },
+  {
+    "percentage": "0.2821",
+    "val": "28.2055",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.7179",
+    "val": "71.7945",
+  },
+  {
+    "percentage": "0.8000",
+    "val": "80.0000",
+  },
+  {
+    "percentage": "0.8571",
+    "val": "85.7071",
+  },
+  {
+    "percentage": "0.9000",
+    "val": "90.0000",
+  },
+  {
+    "percentage": "0.9330",
+    "val": "93.3013",
+  },
+  {
+    "percentage": "0.9583",
+    "val": "95.8258",
+  },
+  {
+    "percentage": "0.9770",
+    "val": "97.6970",
+  },
+  {
+    "percentage": "0.9899",
+    "val": "98.9898",
+  },
+  {
+    "percentage": "0.9975",
+    "val": "99.7494",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutCubic 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0005",
+    "val": "0.0500",
+  },
+  {
+    "percentage": "0.0040",
+    "val": "0.4000",
+  },
+  {
+    "percentage": "0.0135",
+    "val": "1.3500",
+  },
+  {
+    "percentage": "0.0320",
+    "val": "3.2000",
+  },
+  {
+    "percentage": "0.0625",
+    "val": "6.2500",
+  },
+  {
+    "percentage": "0.1080",
+    "val": "10.8000",
+  },
+  {
+    "percentage": "0.1715",
+    "val": "17.1500",
+  },
+  {
+    "percentage": "0.2560",
+    "val": "25.6000",
+  },
+  {
+    "percentage": "0.3645",
+    "val": "36.4500",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.6355",
+    "val": "63.5500",
+  },
+  {
+    "percentage": "0.7440",
+    "val": "74.4000",
+  },
+  {
+    "percentage": "0.8285",
+    "val": "82.8500",
+  },
+  {
+    "percentage": "0.8920",
+    "val": "89.2000",
+  },
+  {
+    "percentage": "0.9375",
+    "val": "93.7500",
+  },
+  {
+    "percentage": "0.9680",
+    "val": "96.8000",
+  },
+  {
+    "percentage": "0.9865",
+    "val": "98.6500",
+  },
+  {
+    "percentage": "0.9960",
+    "val": "99.6000",
+  },
+  {
+    "percentage": "0.9995",
+    "val": "99.9500",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutElastic 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0010",
+    "val": "0.0977",
+  },
+  {
+    "percentage": "0.0003",
+    "val": "0.0339",
+  },
+  {
+    "percentage": "0.0037",
+    "val": "-0.3671",
+  },
+  {
+    "percentage": "0.0039",
+    "val": "-0.3906",
+  },
+  {
+    "percentage": "0.0120",
+    "val": "1.1969",
+  },
+  {
+    "percentage": "0.0239",
+    "val": "2.3939",
+  },
+  {
+    "percentage": "0.0312",
+    "val": "-3.1250",
+  },
+  {
+    "percentage": "0.1175",
+    "val": "-11.7462",
+  },
+  {
+    "percentage": "0.0434",
+    "val": "4.3412",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.9566",
+    "val": "95.6588",
+  },
+  {
+    "percentage": "1.1175",
+    "val": "111.7462",
+  },
+  {
+    "percentage": "1.0313",
+    "val": "103.1250",
+  },
+  {
+    "percentage": "0.9761",
+    "val": "97.6061",
+  },
+  {
+    "percentage": "0.9880",
+    "val": "98.8031",
+  },
+  {
+    "percentage": "1.0039",
+    "val": "100.3906",
+  },
+  {
+    "percentage": "1.0037",
+    "val": "100.3671",
+  },
+  {
+    "percentage": "0.9997",
+    "val": "99.9661",
+  },
+  {
+    "percentage": "0.9990",
+    "val": "99.9023",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutExpo 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0010",
+    "val": "0.0977",
+  },
+  {
+    "percentage": "0.0020",
+    "val": "0.1953",
+  },
+  {
+    "percentage": "0.0039",
+    "val": "0.3906",
+  },
+  {
+    "percentage": "0.0078",
+    "val": "0.7813",
+  },
+  {
+    "percentage": "0.0156",
+    "val": "1.5625",
+  },
+  {
+    "percentage": "0.0313",
+    "val": "3.1250",
+  },
+  {
+    "percentage": "0.0625",
+    "val": "6.2500",
+  },
+  {
+    "percentage": "0.1250",
+    "val": "12.5000",
+  },
+  {
+    "percentage": "0.2500",
+    "val": "25.0000",
+  },
+  {
+    "percentage": "1.5000",
+    "val": "-150.0000",
+  },
+  {
+    "percentage": "1.2500",
+    "val": "-125.0000",
+  },
+  {
+    "percentage": "1.1250",
+    "val": "-112.5000",
+  },
+  {
+    "percentage": "1.0625",
+    "val": "-106.2500",
+  },
+  {
+    "percentage": "1.0313",
+    "val": "-103.1250",
+  },
+  {
+    "percentage": "1.0156",
+    "val": "-101.5625",
+  },
+  {
+    "percentage": "1.0078",
+    "val": "-100.7813",
+  },
+  {
+    "percentage": "1.0039",
+    "val": "-100.3906",
+  },
+  {
+    "percentage": "1.0020",
+    "val": "-100.1953",
+  },
+  {
+    "percentage": "1.0010",
+    "val": "-100.0977",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutQuad 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0050",
+    "val": "0.5000",
+  },
+  {
+    "percentage": "0.0200",
+    "val": "2.0000",
+  },
+  {
+    "percentage": "0.0450",
+    "val": "4.5000",
+  },
+  {
+    "percentage": "0.0800",
+    "val": "8.0000",
+  },
+  {
+    "percentage": "0.1250",
+    "val": "12.5000",
+  },
+  {
+    "percentage": "0.1800",
+    "val": "18.0000",
+  },
+  {
+    "percentage": "0.2450",
+    "val": "24.5000",
+  },
+  {
+    "percentage": "0.3200",
+    "val": "32.0000",
+  },
+  {
+    "percentage": "0.4050",
+    "val": "40.5000",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.5950",
+    "val": "59.5000",
+  },
+  {
+    "percentage": "0.6800",
+    "val": "68.0000",
+  },
+  {
+    "percentage": "0.7550",
+    "val": "75.5000",
+  },
+  {
+    "percentage": "0.8200",
+    "val": "82.0000",
+  },
+  {
+    "percentage": "0.8750",
+    "val": "87.5000",
+  },
+  {
+    "percentage": "0.9200",
+    "val": "92.0000",
+  },
+  {
+    "percentage": "0.9550",
+    "val": "95.5000",
+  },
+  {
+    "percentage": "0.9800",
+    "val": "98.0000",
+  },
+  {
+    "percentage": "0.9950",
+    "val": "99.5000",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutQuart 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0001",
+    "val": "0.0050",
+  },
+  {
+    "percentage": "0.0008",
+    "val": "0.0800",
+  },
+  {
+    "percentage": "0.0040",
+    "val": "0.4050",
+  },
+  {
+    "percentage": "0.0128",
+    "val": "1.2800",
+  },
+  {
+    "percentage": "0.0313",
+    "val": "3.1250",
+  },
+  {
+    "percentage": "0.0648",
+    "val": "6.4800",
+  },
+  {
+    "percentage": "0.1200",
+    "val": "12.0050",
+  },
+  {
+    "percentage": "0.2048",
+    "val": "20.4800",
+  },
+  {
+    "percentage": "0.3281",
+    "val": "32.8050",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.6720",
+    "val": "67.1950",
+  },
+  {
+    "percentage": "0.7952",
+    "val": "79.5200",
+  },
+  {
+    "percentage": "0.8800",
+    "val": "87.9950",
+  },
+  {
+    "percentage": "0.9352",
+    "val": "93.5200",
+  },
+  {
+    "percentage": "0.9688",
+    "val": "96.8750",
+  },
+  {
+    "percentage": "0.9872",
+    "val": "98.7200",
+  },
+  {
+    "percentage": "0.9960",
+    "val": "99.5950",
+  },
+  {
+    "percentage": "0.9992",
+    "val": "99.9200",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "99.9950",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutQuint 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0000",
+    "val": "0.0005",
+  },
+  {
+    "percentage": "0.0002",
+    "val": "0.0160",
+  },
+  {
+    "percentage": "0.0012",
+    "val": "0.1215",
+  },
+  {
+    "percentage": "0.0051",
+    "val": "0.5120",
+  },
+  {
+    "percentage": "0.0156",
+    "val": "1.5625",
+  },
+  {
+    "percentage": "0.0389",
+    "val": "3.8880",
+  },
+  {
+    "percentage": "0.0840",
+    "val": "8.4035",
+  },
+  {
+    "percentage": "0.1638",
+    "val": "16.3840",
+  },
+  {
+    "percentage": "0.2952",
+    "val": "29.5245",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.7048",
+    "val": "70.4755",
+  },
+  {
+    "percentage": "0.8362",
+    "val": "83.6160",
+  },
+  {
+    "percentage": "0.9160",
+    "val": "91.5965",
+  },
+  {
+    "percentage": "0.9611",
+    "val": "96.1120",
+  },
+  {
+    "percentage": "0.9844",
+    "val": "98.4375",
+  },
+  {
+    "percentage": "0.9949",
+    "val": "99.4880",
+  },
+  {
+    "percentage": "0.9988",
+    "val": "99.8785",
+  },
+  {
+    "percentage": "0.9998",
+    "val": "99.9840",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "99.9995",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInOutSine 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0062",
+    "val": "0.6156",
+  },
+  {
+    "percentage": "0.0245",
+    "val": "2.4472",
+  },
+  {
+    "percentage": "0.0545",
+    "val": "5.4497",
+  },
+  {
+    "percentage": "0.0955",
+    "val": "9.5492",
+  },
+  {
+    "percentage": "0.1464",
+    "val": "14.6447",
+  },
+  {
+    "percentage": "0.2061",
+    "val": "20.6107",
+  },
+  {
+    "percentage": "0.2730",
+    "val": "27.3005",
+  },
+  {
+    "percentage": "0.3455",
+    "val": "34.5492",
+  },
+  {
+    "percentage": "0.4218",
+    "val": "42.1783",
+  },
+  {
+    "percentage": "0.5000",
+    "val": "50.0000",
+  },
+  {
+    "percentage": "0.5782",
+    "val": "57.8217",
+  },
+  {
+    "percentage": "0.6545",
+    "val": "65.4508",
+  },
+  {
+    "percentage": "0.7270",
+    "val": "72.6995",
+  },
+  {
+    "percentage": "0.7939",
+    "val": "79.3893",
+  },
+  {
+    "percentage": "0.8536",
+    "val": "85.3553",
+  },
+  {
+    "percentage": "0.9045",
+    "val": "90.4508",
+  },
+  {
+    "percentage": "0.9455",
+    "val": "94.5503",
+  },
+  {
+    "percentage": "0.9755",
+    "val": "97.5528",
+  },
+  {
+    "percentage": "0.9938",
+    "val": "99.3844",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInQuad 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0025",
+    "val": "0.2500",
+  },
+  {
+    "percentage": "0.0100",
+    "val": "1.0000",
+  },
+  {
+    "percentage": "0.0225",
+    "val": "2.2500",
+  },
+  {
+    "percentage": "0.0400",
+    "val": "4.0000",
+  },
+  {
+    "percentage": "0.0625",
+    "val": "6.2500",
+  },
+  {
+    "percentage": "0.0900",
+    "val": "9.0000",
+  },
+  {
+    "percentage": "0.1225",
+    "val": "12.2500",
+  },
+  {
+    "percentage": "0.1600",
+    "val": "16.0000",
+  },
+  {
+    "percentage": "0.2025",
+    "val": "20.2500",
+  },
+  {
+    "percentage": "0.2500",
+    "val": "25.0000",
+  },
+  {
+    "percentage": "0.3025",
+    "val": "30.2500",
+  },
+  {
+    "percentage": "0.3600",
+    "val": "36.0000",
+  },
+  {
+    "percentage": "0.4225",
+    "val": "42.2500",
+  },
+  {
+    "percentage": "0.4900",
+    "val": "49.0000",
+  },
+  {
+    "percentage": "0.5625",
+    "val": "56.2500",
+  },
+  {
+    "percentage": "0.6400",
+    "val": "64.0000",
+  },
+  {
+    "percentage": "0.7225",
+    "val": "72.2500",
+  },
+  {
+    "percentage": "0.8100",
+    "val": "81.0000",
+  },
+  {
+    "percentage": "0.9025",
+    "val": "90.2500",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInQuart 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0000",
+    "val": "0.0006",
+  },
+  {
+    "percentage": "0.0001",
+    "val": "0.0100",
+  },
+  {
+    "percentage": "0.0005",
+    "val": "0.0506",
+  },
+  {
+    "percentage": "0.0016",
+    "val": "0.1600",
+  },
+  {
+    "percentage": "0.0039",
+    "val": "0.3906",
+  },
+  {
+    "percentage": "0.0081",
+    "val": "0.8100",
+  },
+  {
+    "percentage": "0.0150",
+    "val": "1.5006",
+  },
+  {
+    "percentage": "0.0256",
+    "val": "2.5600",
+  },
+  {
+    "percentage": "0.0410",
+    "val": "4.1006",
+  },
+  {
+    "percentage": "0.0625",
+    "val": "6.2500",
+  },
+  {
+    "percentage": "0.0915",
+    "val": "9.1506",
+  },
+  {
+    "percentage": "0.1296",
+    "val": "12.9600",
+  },
+  {
+    "percentage": "0.1785",
+    "val": "17.8506",
+  },
+  {
+    "percentage": "0.2401",
+    "val": "24.0100",
+  },
+  {
+    "percentage": "0.3164",
+    "val": "31.6406",
+  },
+  {
+    "percentage": "0.4096",
+    "val": "40.9600",
+  },
+  {
+    "percentage": "0.5220",
+    "val": "52.2006",
+  },
+  {
+    "percentage": "0.6561",
+    "val": "65.6100",
+  },
+  {
+    "percentage": "0.8145",
+    "val": "81.4506",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInQuint 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0000",
+    "val": "0.0010",
+  },
+  {
+    "percentage": "0.0001",
+    "val": "0.0076",
+  },
+  {
+    "percentage": "0.0003",
+    "val": "0.0320",
+  },
+  {
+    "percentage": "0.0010",
+    "val": "0.0977",
+  },
+  {
+    "percentage": "0.0024",
+    "val": "0.2430",
+  },
+  {
+    "percentage": "0.0053",
+    "val": "0.5252",
+  },
+  {
+    "percentage": "0.0102",
+    "val": "1.0240",
+  },
+  {
+    "percentage": "0.0185",
+    "val": "1.8453",
+  },
+  {
+    "percentage": "0.0313",
+    "val": "3.1250",
+  },
+  {
+    "percentage": "0.0503",
+    "val": "5.0328",
+  },
+  {
+    "percentage": "0.0778",
+    "val": "7.7760",
+  },
+  {
+    "percentage": "0.1160",
+    "val": "11.6029",
+  },
+  {
+    "percentage": "0.1681",
+    "val": "16.8070",
+  },
+  {
+    "percentage": "0.2373",
+    "val": "23.7305",
+  },
+  {
+    "percentage": "0.3277",
+    "val": "32.7680",
+  },
+  {
+    "percentage": "0.4437",
+    "val": "44.3705",
+  },
+  {
+    "percentage": "0.5905",
+    "val": "59.0490",
+  },
+  {
+    "percentage": "0.7738",
+    "val": "77.3781",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeInSine 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0031",
+    "val": "0.3083",
+  },
+  {
+    "percentage": "0.0123",
+    "val": "1.2312",
+  },
+  {
+    "percentage": "0.0276",
+    "val": "2.7630",
+  },
+  {
+    "percentage": "0.0489",
+    "val": "4.8943",
+  },
+  {
+    "percentage": "0.0761",
+    "val": "7.6120",
+  },
+  {
+    "percentage": "0.1090",
+    "val": "10.8993",
+  },
+  {
+    "percentage": "0.1474",
+    "val": "14.7360",
+  },
+  {
+    "percentage": "0.1910",
+    "val": "19.0983",
+  },
+  {
+    "percentage": "0.2396",
+    "val": "23.9594",
+  },
+  {
+    "percentage": "0.2929",
+    "val": "29.2893",
+  },
+  {
+    "percentage": "0.3506",
+    "val": "35.0552",
+  },
+  {
+    "percentage": "0.4122",
+    "val": "41.2215",
+  },
+  {
+    "percentage": "0.4775",
+    "val": "47.7501",
+  },
+  {
+    "percentage": "0.5460",
+    "val": "54.6010",
+  },
+  {
+    "percentage": "0.6173",
+    "val": "61.7317",
+  },
+  {
+    "percentage": "0.6910",
+    "val": "69.0983",
+  },
+  {
+    "percentage": "0.7666",
+    "val": "76.6555",
+  },
+  {
+    "percentage": "0.8436",
+    "val": "84.3566",
+  },
+  {
+    "percentage": "0.9215",
+    "val": "92.1541",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutBack 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.2194",
+    "val": "21.9409",
+  },
+  {
+    "percentage": "0.4088",
+    "val": "40.8828",
+  },
+  {
+    "percentage": "0.5703",
+    "val": "57.0284",
+  },
+  {
+    "percentage": "0.7058",
+    "val": "70.5802",
+  },
+  {
+    "percentage": "0.8174",
+    "val": "81.7410",
+  },
+  {
+    "percentage": "0.9071",
+    "val": "90.7132",
+  },
+  {
+    "percentage": "0.9770",
+    "val": "97.6996",
+  },
+  {
+    "percentage": "1.0290",
+    "val": "102.9028",
+  },
+  {
+    "percentage": "1.0653",
+    "val": "106.5253",
+  },
+  {
+    "percentage": "1.0877",
+    "val": "108.7698",
+  },
+  {
+    "percentage": "1.0984",
+    "val": "109.8388",
+  },
+  {
+    "percentage": "1.0994",
+    "val": "109.9352",
+  },
+  {
+    "percentage": "1.0926",
+    "val": "109.2613",
+  },
+  {
+    "percentage": "1.0802",
+    "val": "108.0200",
+  },
+  {
+    "percentage": "1.0641",
+    "val": "106.4137",
+  },
+  {
+    "percentage": "1.0465",
+    "val": "104.6451",
+  },
+  {
+    "percentage": "1.0292",
+    "val": "102.9168",
+  },
+  {
+    "percentage": "1.0143",
+    "val": "101.4314",
+  },
+  {
+    "percentage": "1.0039",
+    "val": "100.3916",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutBounce 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0189",
+    "val": "1.8906",
+  },
+  {
+    "percentage": "0.0756",
+    "val": "7.5625",
+  },
+  {
+    "percentage": "0.1702",
+    "val": "17.0156",
+  },
+  {
+    "percentage": "0.3025",
+    "val": "30.2500",
+  },
+  {
+    "percentage": "0.4727",
+    "val": "47.2656",
+  },
+  {
+    "percentage": "0.6806",
+    "val": "68.0625",
+  },
+  {
+    "percentage": "0.9264",
+    "val": "92.6406",
+  },
+  {
+    "percentage": "0.9100",
+    "val": "91.0000",
+  },
+  {
+    "percentage": "0.8189",
+    "val": "81.8906",
+  },
+  {
+    "percentage": "0.7656",
+    "val": "76.5625",
+  },
+  {
+    "percentage": "0.7502",
+    "val": "75.0156",
+  },
+  {
+    "percentage": "0.7725",
+    "val": "77.2500",
+  },
+  {
+    "percentage": "0.8327",
+    "val": "83.2656",
+  },
+  {
+    "percentage": "0.9306",
+    "val": "93.0625",
+  },
+  {
+    "percentage": "0.9727",
+    "val": "97.2656",
+  },
+  {
+    "percentage": "0.9400",
+    "val": "94.0000",
+  },
+  {
+    "percentage": "0.9452",
+    "val": "94.5156",
+  },
+  {
+    "percentage": "0.9881",
+    "val": "98.8125",
+  },
+  {
+    "percentage": "0.9845",
+    "val": "98.4531",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutCirc 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.3122",
+    "val": "31.2250",
+  },
+  {
+    "percentage": "0.4359",
+    "val": "43.5890",
+  },
+  {
+    "percentage": "0.5268",
+    "val": "52.6783",
+  },
+  {
+    "percentage": "0.6000",
+    "val": "60.0000",
+  },
+  {
+    "percentage": "0.6614",
+    "val": "66.1438",
+  },
+  {
+    "percentage": "0.7141",
+    "val": "71.4143",
+  },
+  {
+    "percentage": "0.7599",
+    "val": "75.9934",
+  },
+  {
+    "percentage": "0.8000",
+    "val": "80.0000",
+  },
+  {
+    "percentage": "0.8352",
+    "val": "83.5165",
+  },
+  {
+    "percentage": "0.8660",
+    "val": "86.6025",
+  },
+  {
+    "percentage": "0.8930",
+    "val": "89.3029",
+  },
+  {
+    "percentage": "0.9165",
+    "val": "91.6515",
+  },
+  {
+    "percentage": "0.9367",
+    "val": "93.6750",
+  },
+  {
+    "percentage": "0.9539",
+    "val": "95.3939",
+  },
+  {
+    "percentage": "0.9682",
+    "val": "96.8246",
+  },
+  {
+    "percentage": "0.9798",
+    "val": "97.9796",
+  },
+  {
+    "percentage": "0.9887",
+    "val": "98.8686",
+  },
+  {
+    "percentage": "0.9950",
+    "val": "99.4987",
+  },
+  {
+    "percentage": "0.9987",
+    "val": "99.8749",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutCubic 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.1426",
+    "val": "14.2625",
+  },
+  {
+    "percentage": "0.2710",
+    "val": "27.1000",
+  },
+  {
+    "percentage": "0.3859",
+    "val": "38.5875",
+  },
+  {
+    "percentage": "0.4880",
+    "val": "48.8000",
+  },
+  {
+    "percentage": "0.5781",
+    "val": "57.8125",
+  },
+  {
+    "percentage": "0.6570",
+    "val": "65.7000",
+  },
+  {
+    "percentage": "0.7254",
+    "val": "72.5375",
+  },
+  {
+    "percentage": "0.7840",
+    "val": "78.4000",
+  },
+  {
+    "percentage": "0.8336",
+    "val": "83.3625",
+  },
+  {
+    "percentage": "0.8750",
+    "val": "87.5000",
+  },
+  {
+    "percentage": "0.9089",
+    "val": "90.8875",
+  },
+  {
+    "percentage": "0.9360",
+    "val": "93.6000",
+  },
+  {
+    "percentage": "0.9571",
+    "val": "95.7125",
+  },
+  {
+    "percentage": "0.9730",
+    "val": "97.3000",
+  },
+  {
+    "percentage": "0.9844",
+    "val": "98.4375",
+  },
+  {
+    "percentage": "0.9920",
+    "val": "99.2000",
+  },
+  {
+    "percentage": "0.9966",
+    "val": "99.6625",
+  },
+  {
+    "percentage": "0.9990",
+    "val": "99.9000",
+  },
+  {
+    "percentage": "0.9999",
+    "val": "99.9875",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutElastic 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.6464",
+    "val": "64.6447",
+  },
+  {
+    "percentage": "1.2500",
+    "val": "125.0000",
+  },
+  {
+    "percentage": "1.3536",
+    "val": "135.3553",
+  },
+  {
+    "percentage": "1.1250",
+    "val": "112.5000",
+  },
+  {
+    "percentage": "0.9116",
+    "val": "91.1612",
+  },
+  {
+    "percentage": "0.8750",
+    "val": "87.5000",
+  },
+  {
+    "percentage": "0.9558",
+    "val": "95.5806",
+  },
+  {
+    "percentage": "1.0313",
+    "val": "103.1250",
+  },
+  {
+    "percentage": "1.0442",
+    "val": "104.4194",
+  },
+  {
+    "percentage": "1.0156",
+    "val": "101.5625",
+  },
+  {
+    "percentage": "0.9890",
+    "val": "98.8951",
+  },
+  {
+    "percentage": "0.9844",
+    "val": "98.4375",
+  },
+  {
+    "percentage": "0.9945",
+    "val": "99.4476",
+  },
+  {
+    "percentage": "1.0039",
+    "val": "100.3906",
+  },
+  {
+    "percentage": "1.0055",
+    "val": "100.5524",
+  },
+  {
+    "percentage": "1.0020",
+    "val": "100.1953",
+  },
+  {
+    "percentage": "0.9986",
+    "val": "99.8619",
+  },
+  {
+    "percentage": "0.9980",
+    "val": "99.8047",
+  },
+  {
+    "percentage": "0.9993",
+    "val": "99.9309",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutExpo 1`] = `
+[
+  {
+    "percentage": "2.0000",
+    "val": "-200.0000",
+  },
+  {
+    "percentage": "1.7071",
+    "val": "-170.7107",
+  },
+  {
+    "percentage": "1.5000",
+    "val": "-150.0000",
+  },
+  {
+    "percentage": "1.3536",
+    "val": "-135.3553",
+  },
+  {
+    "percentage": "1.2500",
+    "val": "-125.0000",
+  },
+  {
+    "percentage": "1.1768",
+    "val": "-117.6777",
+  },
+  {
+    "percentage": "1.1250",
+    "val": "-112.5000",
+  },
+  {
+    "percentage": "1.0884",
+    "val": "-108.8388",
+  },
+  {
+    "percentage": "1.0625",
+    "val": "-106.2500",
+  },
+  {
+    "percentage": "1.0442",
+    "val": "-104.4194",
+  },
+  {
+    "percentage": "1.0313",
+    "val": "-103.1250",
+  },
+  {
+    "percentage": "1.0221",
+    "val": "-102.2097",
+  },
+  {
+    "percentage": "1.0156",
+    "val": "-101.5625",
+  },
+  {
+    "percentage": "1.0110",
+    "val": "-101.1049",
+  },
+  {
+    "percentage": "1.0078",
+    "val": "-100.7813",
+  },
+  {
+    "percentage": "1.0055",
+    "val": "-100.5524",
+  },
+  {
+    "percentage": "1.0039",
+    "val": "-100.3906",
+  },
+  {
+    "percentage": "1.0028",
+    "val": "-100.2762",
+  },
+  {
+    "percentage": "1.0020",
+    "val": "-100.1953",
+  },
+  {
+    "percentage": "1.0014",
+    "val": "-100.1381",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutQuad 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0975",
+    "val": "9.7500",
+  },
+  {
+    "percentage": "0.1900",
+    "val": "19.0000",
+  },
+  {
+    "percentage": "0.2775",
+    "val": "27.7500",
+  },
+  {
+    "percentage": "0.3600",
+    "val": "36.0000",
+  },
+  {
+    "percentage": "0.4375",
+    "val": "43.7500",
+  },
+  {
+    "percentage": "0.5100",
+    "val": "51.0000",
+  },
+  {
+    "percentage": "0.5775",
+    "val": "57.7500",
+  },
+  {
+    "percentage": "0.6400",
+    "val": "64.0000",
+  },
+  {
+    "percentage": "0.6975",
+    "val": "69.7500",
+  },
+  {
+    "percentage": "0.7500",
+    "val": "75.0000",
+  },
+  {
+    "percentage": "0.7975",
+    "val": "79.7500",
+  },
+  {
+    "percentage": "0.8400",
+    "val": "84.0000",
+  },
+  {
+    "percentage": "0.8775",
+    "val": "87.7500",
+  },
+  {
+    "percentage": "0.9100",
+    "val": "91.0000",
+  },
+  {
+    "percentage": "0.9375",
+    "val": "93.7500",
+  },
+  {
+    "percentage": "0.9600",
+    "val": "96.0000",
+  },
+  {
+    "percentage": "0.9775",
+    "val": "97.7500",
+  },
+  {
+    "percentage": "0.9900",
+    "val": "99.0000",
+  },
+  {
+    "percentage": "0.9975",
+    "val": "99.7500",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutQuart 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.1855",
+    "val": "18.5494",
+  },
+  {
+    "percentage": "0.3439",
+    "val": "34.3900",
+  },
+  {
+    "percentage": "0.4780",
+    "val": "47.7994",
+  },
+  {
+    "percentage": "0.5904",
+    "val": "59.0400",
+  },
+  {
+    "percentage": "0.6836",
+    "val": "68.3594",
+  },
+  {
+    "percentage": "0.7599",
+    "val": "75.9900",
+  },
+  {
+    "percentage": "0.8215",
+    "val": "82.1494",
+  },
+  {
+    "percentage": "0.8704",
+    "val": "87.0400",
+  },
+  {
+    "percentage": "0.9085",
+    "val": "90.8494",
+  },
+  {
+    "percentage": "0.9375",
+    "val": "93.7500",
+  },
+  {
+    "percentage": "0.9590",
+    "val": "95.8994",
+  },
+  {
+    "percentage": "0.9744",
+    "val": "97.4400",
+  },
+  {
+    "percentage": "0.9850",
+    "val": "98.4994",
+  },
+  {
+    "percentage": "0.9919",
+    "val": "99.1900",
+  },
+  {
+    "percentage": "0.9961",
+    "val": "99.6094",
+  },
+  {
+    "percentage": "0.9984",
+    "val": "99.8400",
+  },
+  {
+    "percentage": "0.9995",
+    "val": "99.9494",
+  },
+  {
+    "percentage": "0.9999",
+    "val": "99.9900",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "99.9994",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutQuint 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.2262",
+    "val": "22.6219",
+  },
+  {
+    "percentage": "0.4095",
+    "val": "40.9510",
+  },
+  {
+    "percentage": "0.5563",
+    "val": "55.6295",
+  },
+  {
+    "percentage": "0.6723",
+    "val": "67.2320",
+  },
+  {
+    "percentage": "0.7627",
+    "val": "76.2695",
+  },
+  {
+    "percentage": "0.8319",
+    "val": "83.1930",
+  },
+  {
+    "percentage": "0.8840",
+    "val": "88.3971",
+  },
+  {
+    "percentage": "0.9222",
+    "val": "92.2240",
+  },
+  {
+    "percentage": "0.9497",
+    "val": "94.9672",
+  },
+  {
+    "percentage": "0.9688",
+    "val": "96.8750",
+  },
+  {
+    "percentage": "0.9815",
+    "val": "98.1547",
+  },
+  {
+    "percentage": "0.9898",
+    "val": "98.9760",
+  },
+  {
+    "percentage": "0.9947",
+    "val": "99.4748",
+  },
+  {
+    "percentage": "0.9976",
+    "val": "99.7570",
+  },
+  {
+    "percentage": "0.9990",
+    "val": "99.9023",
+  },
+  {
+    "percentage": "0.9997",
+    "val": "99.9680",
+  },
+  {
+    "percentage": "0.9999",
+    "val": "99.9924",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "99.9990",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;
+
+exports[`easing easeOutSine 1`] = `
+[
+  {
+    "percentage": "0.0000",
+    "val": "0.0000",
+  },
+  {
+    "percentage": "0.0785",
+    "val": "7.8459",
+  },
+  {
+    "percentage": "0.1564",
+    "val": "15.6434",
+  },
+  {
+    "percentage": "0.2334",
+    "val": "23.3445",
+  },
+  {
+    "percentage": "0.3090",
+    "val": "30.9017",
+  },
+  {
+    "percentage": "0.3827",
+    "val": "38.2683",
+  },
+  {
+    "percentage": "0.4540",
+    "val": "45.3990",
+  },
+  {
+    "percentage": "0.5225",
+    "val": "52.2499",
+  },
+  {
+    "percentage": "0.5878",
+    "val": "58.7785",
+  },
+  {
+    "percentage": "0.6494",
+    "val": "64.9448",
+  },
+  {
+    "percentage": "0.7071",
+    "val": "70.7107",
+  },
+  {
+    "percentage": "0.7604",
+    "val": "76.0406",
+  },
+  {
+    "percentage": "0.8090",
+    "val": "80.9017",
+  },
+  {
+    "percentage": "0.8526",
+    "val": "85.2640",
+  },
+  {
+    "percentage": "0.8910",
+    "val": "89.1007",
+  },
+  {
+    "percentage": "0.9239",
+    "val": "92.3880",
+  },
+  {
+    "percentage": "0.9511",
+    "val": "95.1057",
+  },
+  {
+    "percentage": "0.9724",
+    "val": "97.2370",
+  },
+  {
+    "percentage": "0.9877",
+    "val": "98.7688",
+  },
+  {
+    "percentage": "0.9969",
+    "val": "99.6917",
+  },
+  {
+    "percentage": "1.0000",
+    "val": "100.0000",
+  },
+]
+`;

@@ -1,7 +1,6 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import type { DragMethods } from '../Object/InteractiveObject';
 import { stopEvent } from '../../util/dom_event';
 import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
@@ -16,13 +15,10 @@ import type { TextProps, SerializedTextProps } from '../Text/Text';
 const notALeftClick = (e: Event) => !!(e as MouseEvent).button;
 
 export abstract class ITextClickBehavior<
-    Props extends TOptions<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
-    EventSpec extends ITextEvents = ITextEvents
-  >
-  extends ITextKeyBehavior<Props, SProps, EventSpec>
-  implements DragMethods
-{
+  Props extends TOptions<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ITextEvents = ITextEvents
+> extends ITextKeyBehavior<Props, SProps, EventSpec> {
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
   private declare __lastLastClickTime: number;
@@ -52,12 +48,21 @@ export abstract class ITextClickBehavior<
     super.initBehavior();
   }
 
+  /**
+   * If this method returns true a mouse move operation over a text selection
+   * will not prevent the native mouse event allowing the browser to start a drag operation.
+   * shouldStartDragging can be read 'do not prevent default for mouse move event'
+   * To prevent drag and drop between objects both shouldStartDragging and onDragStart should return false
+   * @returns
+   */
   shouldStartDragging() {
     return this.draggableTextDelegate.isActive();
   }
 
   /**
-   * @public override this method to control whether instance should/shouldn't become a drag source, @see also {@link DraggableTextDelegate#isActive}
+   * @public override this method to control whether instance should/shouldn't become a drag source,
+   * @see also {@link DraggableTextDelegate#isActive}
+   * To prevent drag and drop between objects both shouldStartDragging and onDragStart should return false
    * @returns {boolean} should handle event
    */
   onDragStart(e: DragEvent) {
@@ -88,7 +93,7 @@ export abstract class ITextClickBehavior<
     this.__lastLastClickTime = this.__lastClickTime;
     this.__lastClickTime = this.__newClickTime;
     this.__lastPointer = newPointer;
-    this.__lastSelected = this.selected;
+    this.__lastSelected = this.selected && !this.getActiveControl();
   }
 
   isTripleClick(newPointer: XY) {

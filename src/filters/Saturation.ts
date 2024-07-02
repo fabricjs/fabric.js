@@ -1,8 +1,15 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/saturation';
+
+export type SaturationOwnProps = {
+  saturation: number;
+};
+
+export const saturationDefaultValues: SaturationOwnProps = {
+  saturation: 0,
+};
 
 /**
  * Saturate filter class
@@ -13,13 +20,7 @@ import { fragmentSource } from './shaders/saturation';
  * object.filters.push(filter);
  * object.applyFilters();
  */
-
-export const saturationDefaultValues: Partial<TClassProperties<Saturation>> = {
-  saturation: 0,
-  mainParameter: 'saturation',
-};
-
-export class Saturation extends BaseFilter {
+export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
   /**
    * Saturation value, from -1 to 1.
    * Increases/decreases the color saturation.
@@ -28,11 +29,13 @@ export class Saturation extends BaseFilter {
    * @param {Number} saturation
    * @default
    */
-  declare saturation: number;
+  declare saturation: SaturationOwnProps['saturation'];
 
   static type = 'Saturation';
 
   static defaults = saturationDefaultValues;
+
+  static uniformLocations = ['uSaturation'];
 
   getFragmentSource() {
     return fragmentSource;
@@ -45,9 +48,6 @@ export class Saturation extends BaseFilter {
    * @param {ImageData} options.imageData The Uint8ClampedArray to be filtered.
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
-    if (this.saturation === 0) {
-      return;
-    }
     const adjust = -this.saturation;
     for (let i = 0; i < data.length; i += 4) {
       const max = Math.max(data[i], data[i + 1], data[i + 2]);
@@ -55,21 +55,6 @@ export class Saturation extends BaseFilter {
       data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
       data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uSaturation: gl.getUniformLocation(program, 'uSaturation'),
-    };
   }
 
   /**
@@ -83,6 +68,10 @@ export class Saturation extends BaseFilter {
     uniformLocations: TWebGLUniformLocationMap
   ) {
     gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
+  }
+
+  isNeutralState() {
+    return this.saturation === 0;
   }
 }
 

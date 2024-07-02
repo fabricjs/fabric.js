@@ -14,7 +14,7 @@ import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, RIGHT, reNewline } from '../../constants';
-import type { Canvas } from '../../canvas/Canvas';
+import type { IText } from './IText';
 
 /**
  *  extend this regex to support non english languages
@@ -134,13 +134,10 @@ export abstract class ITextBehavior<
       duration,
       delay,
       onComplete,
-      abort: () => {
-        return (
-          !this.canvas ||
-          // we do not want to animate a selection, only cursor
-          this.selectionStart !== this.selectionEnd
-        );
-      },
+      abort: () =>
+        !this.canvas ||
+        // we do not want to animate a selection, only cursor
+        this.selectionStart !== this.selectionEnd,
       onChange: (value) => {
         this._currentCursorOpacity = value;
         this.renderCursorOrSelection();
@@ -148,21 +145,26 @@ export abstract class ITextBehavior<
     });
   }
 
+  /**
+   * changes the cursor from visible to invisible
+   */
   private _tick(delay?: number) {
     this._currentTickState = this._animateCursor({
-      toValue: 1,
-      duration: this.cursorDuration,
-      delay,
+      toValue: 0,
+      duration: this.cursorDuration / 2,
+      delay: Math.max(delay || 0, 100),
       onComplete: this._onTickComplete,
     });
   }
 
+  /**
+   * Changes the cursor from invisible to visible
+   */
   private _onTickComplete() {
     this._currentTickCompleteState?.abort();
     this._currentTickCompleteState = this._animateCursor({
-      toValue: 0,
-      duration: this.cursorDuration / 2,
-      delay: 100,
+      toValue: 1,
+      duration: this.cursorDuration,
       onComplete: this._tick,
     });
   }
@@ -197,6 +199,10 @@ export abstract class ITextBehavior<
     }
   }
 
+  /**
+   * Restart tue cursor animation if either is in complete state ( between animations )
+   * or if it never started before
+   */
   restartCursorIfNeeded() {
     if (
       [this._currentTickState, this._currentTickCompleteState].some(
@@ -336,10 +342,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a word based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectWord(selectionStart: number) {
+  selectWord(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     // search backwards
     const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
@@ -357,10 +364,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a line based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectLine(selectionStart: number) {
+  selectLine(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
       newSelectionEnd = this.findLineBoundaryRight(selectionStart);
@@ -690,8 +698,10 @@ export abstract class ITextBehavior<
     this.fire('editing:exited');
     isTextChanged && this.fire('modified');
     if (this.canvas) {
-      // @ts-expect-error in reality it is an IText instance
-      this.canvas.fire('text:editing:exited', { target: this });
+      this.canvas.fire('text:editing:exited', {
+        target: this as unknown as IText,
+      });
+      // todo: evaluate add an action to this event
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
     return this;
@@ -805,9 +815,10 @@ export abstract class ITextBehavior<
     copiedStyle?: { [index: number]: TextStyleDeclaration }
   ) {
     const newLineStyles: { [index: number]: TextStyleDeclaration } = {};
-    const isEndOfLine =
-      this._unwrappedTextLines[lineIndex].length === charIndex;
-    let somethingAdded = false;
+    const originalLineLength = this._unwrappedTextLines[lineIndex].length;
+    const isEndOfLine = originalLineLength === charIndex;
+
+    let someStyleIsCarryingOver = false;
     qty || (qty = 1);
     this.shiftLineStyles(lineIndex, qty);
     const currentCharStyle = this.styles[lineIndex]
@@ -819,7 +830,7 @@ export abstract class ITextBehavior<
     for (const index in this.styles[lineIndex]) {
       const numIndex = parseInt(index, 10);
       if (numIndex >= charIndex) {
-        somethingAdded = true;
+        someStyleIsCarryingOver = true;
         newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
         // remove lines from the previous line since they're on a new line now
         if (!(isEndOfLine && charIndex === 0)) {
@@ -828,14 +839,16 @@ export abstract class ITextBehavior<
       }
     }
     let styleCarriedOver = false;
-    if (somethingAdded && !isEndOfLine) {
+    if (someStyleIsCarryingOver && !isEndOfLine) {
       // if is end of line, the extra style we copied
       // is probably not something we want
       this.styles[lineIndex + qty] = newLineStyles;
       styleCarriedOver = true;
     }
-    if (styleCarriedOver) {
+    if (styleCarriedOver || originalLineLength > charIndex) {
       // skip the last line of since we already prepared it.
+      // or contains text without style that we don't want to style
+      // just because it changed lines
       qty--;
     }
     // for the all the lines or all the other lines

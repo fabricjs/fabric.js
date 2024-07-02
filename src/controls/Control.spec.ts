@@ -1,4 +1,6 @@
 import { Canvas } from '../canvas/Canvas';
+import { Intersection } from '../Intersection';
+import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Control } from './Control';
 
@@ -16,9 +18,18 @@ describe('Controls', () => {
 
     const target = new FabricObject({
       controls: { test: control, test2: control },
+      canvas: new Canvas(),
     });
-    jest.spyOn(target, '_findTargetCorner').mockReturnValue('test');
-    jest.spyOn(target, 'getActiveControl').mockReturnValue('test');
+
+    target.setCoords();
+
+    jest
+      .spyOn(target, 'findControl')
+      .mockImplementation(function (this: FabricObject) {
+        this.__corner = 'test';
+
+        return { key: 'test', control };
+      });
 
     const canvas = new Canvas();
     canvas.setActiveObject(target);
@@ -37,5 +48,21 @@ describe('Controls', () => {
     expect(mouseDownHandler.mock.contexts).toEqual([control]);
     expect(actionHandler.mock.contexts).toEqual([control]);
     expect(mouseUpHandler.mock.contexts).toEqual([control, control]);
+  });
+
+  test('corners coords definition order', () => {
+    const control = new Control({ sizeX: 20, sizeY: 20 });
+    const coords = control.calcCornerCoords(
+      0,
+      0,
+      10,
+      10,
+      false,
+      new FabricObject()
+    );
+
+    expect(
+      Intersection.isPointInPolygon(new Point(15, 10), Object.values(coords))
+    ).toBe(true);
   });
 });

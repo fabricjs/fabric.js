@@ -1,9 +1,10 @@
-import { Point } from '../../Point';
+import { Point, ZERO } from '../../Point';
 import type { TCornerPoint, TDegree } from '../../typedefs';
 import { FabricObject } from './Object';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
+  calcDimensionsMatrix,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
@@ -17,6 +18,7 @@ import type { ControlRenderingStyleOverride } from '../../controls/controlRender
 import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
+import { interactiveObjectDefaultValues } from './defaultValues';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
@@ -37,15 +39,6 @@ export type TStyleOverride = ControlRenderingStyleOverride &
     }
   >;
 
-export interface DragMethods {
-  shouldStartDragging(): boolean;
-  onDragStart(e: DragEvent): boolean;
-}
-
-export type FabricObjectWithDragSupport = InteractiveFabricObject & DragMethods;
-
-const interactiveDefaults = {};
-
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
@@ -55,7 +48,6 @@ export class InteractiveFabricObject<
   implements FabricObjectProps
 {
   declare noScaleCache: boolean;
-  declare centeredScaling: boolean;
 
   declare snapAngle?: TDegree;
   declare snapThreshold?: TDegree;
@@ -94,13 +86,10 @@ export class InteractiveFabricObject<
   declare moveCursor: CSSStyleDeclaration['cursor'] | null;
 
   /**
-   * Describe object's corner position in canvas element coordinates.
-   * properties are depending on control keys and padding the main controls.
-   * each property is an object with x, y and corner.
-   * The `corner` property contains in a similar manner the 4 points of the
-   * interactive area of the corner.
-   * The coordinates depends from the controls positionHandler and are used
-   * to draw and locate controls
+   * The object's controls' position in viewport coordinates
+   * Calculated by {@link Control#positionHandler} and {@link Control#calcCornerCoords}, depending on {@link padding}.
+   * `corner/touchCorner` describe the 4 points forming the interactive area of the corner.
+   * Used to draw and locate controls.
    */
   declare oCoords: Record<string, TOCoord>;
 
@@ -145,14 +134,37 @@ export class InteractiveFabricObject<
 
   declare canvas?: Canvas;
 
-  static ownDefaults: Record<string, any> = interactiveDefaults;
+  static ownDefaults = interactiveObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createObjectDefaultControls(),
       ...InteractiveFabricObject.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(
+      this,
+      (this.constructor as typeof InteractiveFabricObject).createControls(),
+      InteractiveFabricObject.ownDefaults
+    );
+    this.setOptions(options);
+  }
+
+  /**
+   * Creates the default control object.
+   * If you prefer to have on instance of controls shared among all objects
+   * make this function return an empty object and add controls to the ownDefaults
+   * @param {Object} [options] Options object
+   */
+  static createControls(): { controls: Record<string, Control> } {
+    return { controls: createObjectDefaultControls() };
   }
 
   /**
@@ -164,9 +176,14 @@ export class InteractiveFabricObject<
   _updateCacheCanvas() {
     const targetCanvas = this.canvas;
     if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
-      const target = targetCanvas._currentTransform.target,
-        action = targetCanvas._currentTransform.action;
-      if (this === (target as unknown as this) && action.startsWith('scale')) {
+      const transform = targetCanvas._currentTransform,
+        target = transform.target,
+        action = transform.action;
+      if (
+        this === (target as unknown as this) &&
+        action &&
+        action.startsWith('scale')
+      ) {
         return false;
       }
     }
@@ -174,7 +191,14 @@ export class InteractiveFabricObject<
   }
 
   getActiveControl() {
-    return this.__corner;
+    const key = this.__corner;
+    return key
+      ? {
+          key,
+          control: this.controls[key],
+          coord: this.oCoords[key],
+        }
+      : undefined;
   }
 
   /**
@@ -188,17 +212,22 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
-  _findTargetCorner(pointer: Point, forTouch = false): string {
+  findControl(
+    pointer: Point,
+    forTouch = false
+  ): { key: string; control: Control; coord: TOCoord } | undefined {
     if (!this.hasControls || !this.canvas) {
-      return '';
+      return undefined;
     }
 
     this.__corner = undefined;
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
+      const control = this.controls[key];
+
       if (
-        this.controls[key].shouldActivate(
+        control.shouldActivate(
           key,
           this,
           pointer,
@@ -206,11 +235,13 @@ export class InteractiveFabricObject<
         )
       ) {
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
-        return (this.__corner = key);
+        this.__corner = key;
+
+        return { key, control, coord: this.oCoords[key] };
       }
     }
 
-    return '';
+    return undefined;
   }
 
   /**
@@ -239,8 +270,13 @@ export class InteractiveFabricObject<
       ]),
       transformOptions = this.group
         ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
+        : undefined;
+    // decomposing could bring negative scaling and `_calculateCurrentDimensions` can't take it
+    if (transformOptions) {
+      transformOptions.scaleX = Math.abs(transformOptions.scaleX);
+      transformOptions.scaleY = Math.abs(transformOptions.scaleY);
+    }
+    const dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
@@ -299,16 +335,12 @@ export class InteractiveFabricObject<
   }
 
   /**
-   * Sets corner and controls position coordinates based on current angle, width and height, left and top.
-   * oCoords are used to find the corners
-   * aCoords are used to quickly find an object on the canvas
-   * lineCoords are used to quickly find object during pointer events.
+   * @override set controls' coordinates as well
    * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords(): void {
     super.setCoords();
-    // set coordinates of the draggable boxes in the corners used to scale/rotate the image
     this.canvas && (this.oCoords = this.calcOCoords());
   }
 
@@ -417,7 +449,12 @@ export class InteractiveFabricObject<
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
+    // since interactive groups have been introduced, an object could be inside a group and needing controls
+    // the following equality check `this.group === this.parent` covers:
+    // object without a group ( undefined === undefined )
+    // object inside a group
+    // excludes object inside a group but multi selected since group and parent will differ in value
+    if (this.group === this.parent) {
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
     }
     if (this.flipX) {
@@ -444,14 +481,19 @@ export class InteractiveFabricObject<
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
-      const bbox = sizeAfterTransform(this.width, this.height, options),
-        stroke = (
-          this.strokeUniform
-            ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
-            : // this is extremely confusing. options comes from the upper function
-              // and is the qrDecompose of a matrix that takes in account zoom too
-              new Point(options.scaleX, options.scaleY)
-        ).scalarMultiply(this.strokeWidth);
+      const bbox = sizeAfterTransform(
+          this.width,
+          this.height,
+          calcDimensionsMatrix(options)
+        ),
+        stroke = !this.isStrokeAccountedForInDimensions()
+          ? (this.strokeUniform
+              ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
+              : // this is extremely confusing. options comes from the upper function
+                // and is the qrDecompose of a matrix that takes in account zoom too
+                new Point(options.scaleX, options.scaleY)
+            ).scalarMultiply(this.strokeWidth)
+          : ZERO;
       size = bbox
         .add(stroke)
         .scalarAdd(this.borderScaleFactor)
@@ -498,6 +540,9 @@ export class InteractiveFabricObject<
    * Draws corners of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
+   * Be aware that since fabric 6.0 this function does not call setCoords anymore.
+   * setCoords needs to be called manually if the object of which we are rendering controls
+   * is outside the standard selection and transform process.
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {ControlRenderingStyleOverride} styleOverride object to override the object style
    */
@@ -520,7 +565,6 @@ export class InteractiveFabricObject<
       ctx.strokeStyle = options.cornerStrokeColor;
     }
     this._setLineDash(ctx, options.cornerDashArray);
-    this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
         const p = this.oCoords[key];
@@ -630,11 +674,28 @@ export class InteractiveFabricObject<
   }
 
   /**
+   * Override to customize Drag behavior
+   * Fired from {@link Canvas#_onMouseMove}
+   * @returns true in order for the window to start a drag session
+   */
+  shouldStartDragging(e: TPointerEvent) {
+    return false;
+  }
+
+  /**
+   * Override to customize Drag behavior\
+   * Fired once a drag session has started
+   * @returns true to handle the drag event
+   */
+  onDragStart(e: DragEvent) {
+    return false;
+  }
+
+  /**
    * Override to customize drag and drop behavior
-   * return true if the object currently dragged can be dropped on the target
    * @public
    * @param {DragEvent} e
-   * @returns {boolean}
+   * @returns {boolean} true if the object currently dragged can be dropped on the target
    */
   canDrop(e: DragEvent): boolean {
     return false;
@@ -646,7 +707,6 @@ export class InteractiveFabricObject<
    * example: render the selection status for the part of text that is being dragged from a text object
    * @public
    * @param {DragEvent} e
-   * @returns {boolean}
    */
   renderDragSourceEffect(e: DragEvent) {
     // for subclasses
@@ -659,7 +719,6 @@ export class InteractiveFabricObject<
    * object will change when dropping. example: show the cursor where the text is about to be dropped
    * @public
    * @param {DragEvent} e
-   * @returns {boolean}
    */
   renderDropTargetEffect(e: DragEvent) {
     // for subclasses

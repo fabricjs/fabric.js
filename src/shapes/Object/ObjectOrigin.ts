@@ -1,7 +1,7 @@
 import { Point } from '../../Point';
 import type { Group } from '../Group';
 import type { TDegree, TOriginX, TOriginY } from '../../typedefs';
-import { transformPoint } from '../../util/misc/matrix';
+import { calcDimensionsMatrix, transformPoint } from '../../util/misc/matrix';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
 import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import { CommonMethods } from '../../CommonMethods';
@@ -38,6 +38,7 @@ export class ObjectOrigin<EventSpec>
 
   /**
    * Calculate object bounding box dimensions from its properties scale, skew.
+   * This bounding box is aligned with object angle and not with canvas axis or screen.
    * @param {Object} [options]
    * @param {Number} [options.scaleX]
    * @param {Number} [options.scaleY]
@@ -48,6 +49,9 @@ export class ObjectOrigin<EventSpec>
    */
   _getTransformedDimensions(options: any = {}): Point {
     const dimOptions = {
+      // if scaleX or scaleY are negative numbers,
+      // this will return dimensions that are negative.
+      // and this will break assumptions around the codebase
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       skewX: this.skewX,
@@ -76,7 +80,11 @@ export class ObjectOrigin<EventSpec>
         dimY * dimOptions.scaleY
       );
     } else {
-      finalDimensions = sizeAfterTransform(dimX, dimY, dimOptions);
+      finalDimensions = sizeAfterTransform(
+        dimX,
+        dimY,
+        calcDimensionsMatrix(dimOptions)
+      );
     }
 
     return finalDimensions.scalarAdd(postScalingStrokeValue);

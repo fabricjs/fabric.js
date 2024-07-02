@@ -11,12 +11,11 @@ import type {
 } from '../EventTypeDefs';
 import {
   addTransformToObject,
-  resetObjectTransform,
   saveObjectTransform,
 } from '../util/misc/objectTransforms';
 import type { TCanvasSizeOptions } from './StaticCanvas';
 import { StaticCanvas } from './StaticCanvas';
-import { isCollection } from '../util/typeAssertions';
+import { isCollection } from '../Collection';
 import { isTransparent } from '../util/misc/isTransparent';
 import type {
   TMat2D,
@@ -31,12 +30,13 @@ import type { IText } from '../shapes/IText/IText';
 import type { BaseBrush } from '../brushes/BaseBrush';
 import { pick } from '../util/misc/pick';
 import { sendPointToPlane } from '../util/misc/planeChange';
-import { ActiveSelection } from '../shapes/ActiveSelection';
-import { createCanvasElement } from '../util';
+import { cos, createCanvasElement, sin } from '../util';
 import { CanvasDOMManager } from './DOMManagers/CanvasDOMManager';
 import { BOTTOM, CENTER, LEFT, RIGHT, TOP } from '../constants';
-import type { CanvasOptions, TCanvasOptions } from './CanvasOptions';
+import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
+import { Intersection } from '../Intersection';
+import { isActiveSelection } from '../util/typeAssertions';
 
 /**
  * Canvas class
@@ -188,7 +188,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare fireMiddleClick: boolean;
 
   /**
-   * Keep track of the subTargets for Mouse Events
+   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost nested subTarget
    * @type FabricObject[]
    */
   targets: FabricObject[] = [];
@@ -226,6 +226,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * hold a reference to a data structure used to track the selection
    * box on canvas drag
    * on the current on going transform
+   * x, y, deltaX and deltaY are in scene plane
    * @type
    * @private
    */
@@ -270,7 +271,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   protected declare _target?: FabricObject;
 
-  static ownDefaults: Record<string, any> = canvasDefaults;
+  static ownDefaults = canvasDefaults;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
@@ -292,17 +293,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
-  protected _activeSelection: ActiveSelection;
-
-  constructor(
-    el?: string | HTMLCanvasElement,
-    { activeSelection = new ActiveSelection(), ...options }: TCanvasOptions = {}
-  ) {
-    super(el, options);
-    this._activeSelection = activeSelection;
-    this._activeSelection.set('canvas', this);
-    this._activeSelection.setCoords();
-  }
 
   protected initElements(el?: string | HTMLCanvasElement) {
     this.elements = new CanvasDOMManager(el, {
@@ -555,6 +545,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       x: target.originX,
       y: target.originY,
     };
+
+    if (!controlName) {
+      return origin;
+    }
+
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -575,16 +570,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    * @param {Event} e Event object
-   * @param {FaricObject} target
+   * @param {FabricObject} target
+   * @param {boolean} [alreadySelected] pass true to setup the active control
    */
   _setupCurrentTransform(
     e: TPointerEvent,
     target: FabricObject,
     alreadySelected: boolean
   ): void {
-    if (!target) {
-      return;
-    }
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
         sendPointToPlane(
@@ -593,22 +586,23 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           target.group.calcTransformMatrix()
         )
       : this.getScenePoint(e);
-    const corner = target.getActiveControl() || '',
-      control = !!corner && target.controls[corner],
+    const { key: corner = '', control } = target.getActiveControl() || {},
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)?.bind(control)
           : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
-      origin = this._getOriginFromCorner(target, corner),
       altKey = e[this.centeredKey as ModifierKey],
+      origin = this._shouldCenterTransform(target, action, altKey)
+        ? ({ x: CENTER, y: CENTER } as const)
+        : this._getOriginFromCorner(target, corner),
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform: Transform = {
         target: target,
-        action: action,
+        action,
         actionHandler,
         actionPerformed: false,
         corner,
@@ -628,7 +622,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         width: target.width,
         height: target.height,
         shiftKey: e.shiftKey,
-        altKey: altKey,
+        altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
@@ -636,13 +630,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         },
       };
 
-    if (this._shouldCenterTransform(target, action, altKey)) {
-      transform.originX = CENTER;
-      transform.originY = CENTER;
-    }
     this._currentTransform = transform;
-    // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
-    this._beforeTransform(e);
+
+    this.fire('before:transform', {
+      e,
+      transform,
+    });
   }
 
   /**
@@ -714,7 +707,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.targets = [];
 
     if (activeObject && aObjects.length >= 1) {
-      if (activeObject._findTargetCorner(pointer, isTouchEvent(e))) {
+      if (activeObject.findControl(pointer, isTouchEvent(e))) {
         // if we hit the corner of the active object, let's return that.
         return activeObject;
       } else if (
@@ -753,7 +746,49 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Checks point is inside the object.
+   * Checks if the point is inside the object selection area including padding
+   * @param {FabricObject} obj Object to test against
+   * @param {Object} [pointer] point in scene coordinates
+   * @return {Boolean} true if point is contained within an area of given object
+   * @private
+   */
+  private _pointIsInObjectSelectionArea(obj: FabricObject, point: Point) {
+    // getCoords will already take care of group de-nesting
+    let coords = obj.getCoords();
+    const viewportZoom = this.getZoom();
+    const padding = obj.padding / viewportZoom;
+    if (padding) {
+      const [tl, tr, br, bl] = coords;
+      // what is the angle of the object?
+      // we could use getTotalAngle, but is way easier to look at it
+      // from how coords are oriented, since if something went wrong
+      // at least we are consistent.
+      const angleRadians = Math.atan2(tr.y - tl.y, tr.x - tl.x),
+        cosP = cos(angleRadians) * padding,
+        sinP = sin(angleRadians) * padding,
+        cosPSinP = cosP + sinP,
+        cosPMinusSinP = cosP - sinP;
+
+      coords = [
+        new Point(tl.x - cosPMinusSinP, tl.y - cosPSinP),
+        new Point(tr.x + cosPSinP, tr.y - cosPMinusSinP),
+        new Point(br.x + cosPMinusSinP, br.y + cosPSinP),
+        new Point(bl.x - cosPSinP, bl.y + cosPMinusSinP),
+      ];
+      // in case of padding we calculate the new coords on the fly.
+      // otherwise we have to maintain 2 sets of coordinates for everything.
+      // we can reiterate on storing them.
+      // if this is slow, for now the semplification is large and doesn't impact
+      // rendering.
+      // the idea behind this is that outside target check we don't need ot know
+      // where those coords are
+    }
+    return Intersection.isPointInPolygon(point, coords);
+  }
+
+  /**
+   * Checks point is inside the object selection condition. Either area with padding
+   * or over pixels if perPixelTargetFind is enabled
    * @param {FabricObject} obj Object to test against
    * @param {Object} [pointer] point from viewport.
    * @return {Boolean} true if point is contained within an area of given object
@@ -764,9 +799,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      obj.containsPoint(
-        sendPointToPlane(pointer, undefined, this.viewportTransform),
-        true
+      this._pointIsInObjectSelectionArea(
+        obj,
+        sendPointToPlane(pointer, undefined, this.viewportTransform)
       )
     ) {
       if (
@@ -825,15 +860,31 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer: Point
   ): FabricObject | undefined {
     const target = this._searchPossibleTargets(objects, pointer);
-    // if we found something in this.targets, and the group is interactive, return that subTarget
+
+    // if we found something in this.targets, and the group is interactive, return the innermost subTarget
+    // that is still interactive
     // TODO: reverify why interactive. the target should be returned always, but selected only
     // if interactive.
-    return target &&
+    if (
+      target &&
       isCollection(target) &&
       target.interactive &&
       this.targets[0]
-      ? this.targets[0]
-      : target;
+    ) {
+      /** targets[0] is the innermost nested target, but it could be inside non interactive groups and so not a selection target */
+      const targets = this.targets;
+      for (let i = targets.length - 1; i > 0; i--) {
+        const t = targets[i];
+        if (!(isCollection(t) && t.interactive)) {
+          // one of the subtargets was not interactive. that is the last subtarget we can return.
+          // we can't dig more deep;
+          return t;
+        }
+      }
+      return targets[0];
+    }
+
+    return target;
   }
 
   /**
@@ -986,26 +1037,16 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Returns instance's active selection
-   */
-  getActiveSelection() {
-    return this._activeSelection;
-  }
-
-  /**
    * Returns an array with the current selected objects
    * @return {FabricObject[]} active objects array
    */
   getActiveObjects(): FabricObject[] {
     const active = this._activeObject;
-    if (active) {
-      if (active === this._activeSelection) {
-        return [...(active as ActiveSelection)._objects];
-      } else {
-        return [active];
-      }
-    }
-    return [];
+    return isActiveSelection(active)
+      ? active.getObjects()
+      : active
+      ? [active]
+      : [];
   }
 
   /**
@@ -1090,9 +1131,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {Boolean} true if the object has been selected
    */
   _setActiveObject(object: FabricObject, e?: TPointerEvent) {
-    if (this._activeObject === object) {
+    const prevActiveObject = this._activeObject;
+    if (prevActiveObject === object) {
       return false;
     }
+    // after calling this._discardActiveObject, this,_activeObject could be undefined
     if (!this._discardActiveObject(e, object) && this._activeObject) {
       // refused to deselect
       return false;
@@ -1100,13 +1143,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     if (object.onSelect({ e })) {
       return false;
     }
+
     this._activeObject = object;
 
-    if (object instanceof ActiveSelection && this._activeSelection !== object) {
-      this._activeSelection = object;
+    if (isActiveSelection(object) && prevActiveObject !== object) {
       object.set('canvas', this);
-      object.setCoords();
     }
+    object.setCoords();
 
     return true;
   }
@@ -1129,13 +1172,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (obj.onDeselect({ e, object })) {
         return false;
       }
-      // clear active selection
-      if (obj === this._activeSelection) {
-        this._activeSelection.removeAll();
-        resetObjectTransform(this._activeSelection);
-      }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
@@ -1167,6 +1204,48 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that block the user UX )
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  endCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._finalizeCurrentTransform(e);
+    if (transform && transform.target) {
+      // this could probably go inside _finalizeCurrentTransform
+      transform.target.isMoving = false;
+    }
+    this._currentTransform = null;
+  }
+
+  /**
+   * @private
+   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  _finalizeCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform!,
+      target = transform.target,
+      options = {
+        e,
+        target,
+        transform,
+        action: transform.action,
+      };
+
+    if (target._scaling) {
+      target._scaling = false;
+    }
+
+    target.setCoords();
+
+    if (transform.actionPerformed) {
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+    }
+  }
+
+  /**
    * Sets viewport transformation of this canvas instance
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
@@ -1183,11 +1262,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   destroy() {
     // dispose of active selection
-    const activeSelection = this._activeSelection;
-    activeSelection.removeAll();
-    // @ts-expect-error disposing
-    this._activeSelection = undefined;
-    activeSelection.dispose();
+    const activeObject = this._activeObject;
+    if (isActiveSelection(activeObject)) {
+      activeObject.removeAll();
+      activeObject.dispose();
+    }
+
+    delete this._activeObject;
 
     super.destroy();
 
@@ -1227,7 +1308,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   /**
    * @private
    */
-  _toObject(
+  protected _toObject(
     instance: FabricObject,
     methodName: 'toObject' | 'toDatalessObject',
     propertiesToInclude: string[]
@@ -1249,14 +1330,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {FabricObject} [instance] the object to transform (gets mutated)
    * @returns the original values of instance which were changed
    */
-  _realizeGroupTransformOnObject(
+  private _realizeGroupTransformOnObject(
     instance: FabricObject
   ): Partial<typeof instance> {
-    if (
-      instance.group &&
-      instance.group === this._activeSelection &&
-      this._activeObject === instance.group
-    ) {
+    const { group } = instance;
+    if (group && isActiveSelection(group) && this._activeObject === group) {
       const layoutProps = [
         'angle',
         'flipX',
@@ -1269,7 +1347,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         TOP,
       ] as (keyof typeof instance)[];
       const originalValues = pick<typeof instance>(instance, layoutProps);
-      addTransformToObject(instance, this._activeObject.calcOwnMatrix());
+      addTransformToObject(instance, group.calcOwnMatrix());
       return originalValues;
     } else {
       return {};
@@ -1282,7 +1360,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     // If the object is in a selection group, simulate what would happen to that
     // object when the group is deselected

@@ -829,6 +829,9 @@ export const getPointOnPath = (
   }
 };
 
+const rePathCmdAll = new RegExp(rePathCommand, 'gi');
+const rePathCmd = new RegExp(rePathCommand, 'i');
+
 /**
  *
  * @param {string} pathString
@@ -847,12 +850,11 @@ export const parsePath = (pathString: string): TComplexPathData => {
   pathString = cleanupSvgAttribute(pathString);
 
   const res: TComplexPathData = [];
-  for (const match of pathString.matchAll(new RegExp(rePathCommand, 'gi'))) {
-    let matchStr = match[0];
+  for (let [matchStr] of pathString.matchAll(rePathCmdAll)) {
     const chain: TComplexPathData = [];
     let paramArr: RegExpExecArray | null;
     do {
-      paramArr = new RegExp(rePathCommand, 'i').exec(matchStr);
+      paramArr = rePathCmd.exec(matchStr);
       if (!paramArr) {
         break;
       }

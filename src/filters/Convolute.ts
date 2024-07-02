@@ -1,10 +1,14 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/convolute';
 
-export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
+export type ConvoluteOwnProps = {
+  opaque: boolean;
+  matrix: number[];
+};
+
+export const convoluteDefaultValues: ConvoluteOwnProps = {
   opaque: false,
   matrix: [0, 0, 0, 0, 1, 0, 0, 0, 0],
 };
@@ -49,20 +53,22 @@ export const convoluteDefaultValues: Partial<TClassProperties<Convolute>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class Convolute extends BaseFilter {
+export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
   /*
    * Opaque value (true/false)
    */
-  declare opaque: boolean;
+  declare opaque: ConvoluteOwnProps['opaque'];
 
   /*
    * matrix for the filter, max 9x9
    */
-  declare matrix: number[];
+  declare matrix: ConvoluteOwnProps['matrix'];
 
   static type = 'Convolute';
 
   static defaults = convoluteDefaultValues;
+
+  static uniformLocations = ['uMatrix', 'uOpaque', 'uHalfSize', 'uSize'];
 
   getCacheKey() {
     return `${this.type}_${Math.sqrt(this.matrix.length)}_${
@@ -137,24 +143,6 @@ export class Convolute extends BaseFilter {
       }
     }
     options.imageData = output;
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMatrix: gl.getUniformLocation(program, 'uMatrix'),
-      uOpaque: gl.getUniformLocation(program, 'uOpaque'),
-      uHalfSize: gl.getUniformLocation(program, 'uHalfSize'),
-      uSize: gl.getUniformLocation(program, 'uSize'),
-    };
   }
 
   /**

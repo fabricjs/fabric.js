@@ -1,21 +1,20 @@
 import { Point } from '../Point';
 import { Control } from './Control';
 import type { TMat2D } from '../typedefs';
-import { CENTER, iMatrix } from '../constants';
 import type { Polyline } from '../shapes/Polyline';
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import type {
+  TModificationEvents,
   TPointerEvent,
   Transform,
   TransformActionHandler,
 } from '../EventTypeDefs';
-import { getLocalPoint } from './util';
+import { wrapWithFireEvent } from './wrapWithFireEvent';
+import { sendPointToPlane } from '../util';
+
+const ACTION_NAME: TModificationEvents = 'modifyPoly';
 
 type TTransformAnchor = Transform & { pointIndex: number };
-
-const getSize = (poly: Polyline) => {
-  return new Point(poly.width, poly.height);
-};
 
 /**
  * This function locates the controls.
@@ -23,14 +22,15 @@ const getSize = (poly: Polyline) => {
  */
 export const createPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
-    const x = polyObject.points[pointIndex].x - polyObject.pathOffset.x,
-      y = polyObject.points[pointIndex].y - polyObject.pathOffset.y;
-    return new Point(x, y).transform(
-      multiplyTransformMatrices(
-        polyObject.canvas?.viewportTransform ?? iMatrix,
-        polyObject.calcTransformMatrix()
-      )
-    );
+    const { points, pathOffset } = polyObject;
+    return new Point(points[pointIndex])
+      .subtract(pathOffset)
+      .transform(
+        multiplyTransformMatrices(
+          polyObject.getViewportTransform(),
+          polyObject.calcTransformMatrix()
+        )
+      );
   };
 };
 
@@ -47,20 +47,15 @@ export const polyActionHandler = (
   x: number,
   y: number
 ) => {
-  const poly = transform.target as Polyline,
-    pointIndex = transform.pointIndex,
-    mouseLocalPosition = getLocalPoint(transform, CENTER, CENTER, x, y),
-    polygonBaseSize = getSize(poly),
-    size = poly._getTransformedDimensions(),
-    sizeFactor = polygonBaseSize.divide(size),
-    adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+  const { target, pointIndex } = transform;
+  const poly = target as Polyline;
+  const mouseLocalPosition = sendPointToPlane(
+    new Point(x, y),
+    undefined,
+    poly.calcOwnMatrix()
+  );
 
-  const finalPointPosition = mouseLocalPosition
-    .multiply(adjustFlip)
-    .multiply(sizeFactor)
-    .add(poly.pathOffset);
-
-  poly.points[pointIndex] = finalPointPosition;
+  poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
   poly.setDimensions();
 
   return true;
@@ -86,26 +81,25 @@ export const factoryPolyActionHandler = (
       anchorPointInParentPlane = anchorPoint
         .subtract(poly.pathOffset)
         .transform(poly.calcOwnMatrix()),
-      actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y),
-      adjustFlip = new Point(poly.flipX ? -1 : 1, poly.flipY ? -1 : 1);
+      actionPerformed = fn(eventData, { ...transform, pointIndex }, x, y);
 
-    const newPositionNormalized = anchorPoint
+    const newAnchorPointInParentPlane = anchorPoint
       .subtract(poly.pathOffset)
-      .divide(poly._getNonTransformedDimensions())
-      .multiply(adjustFlip);
+      .transform(poly.calcOwnMatrix());
 
-    poly.setPositionByOrigin(
-      anchorPointInParentPlane,
-      newPositionNormalized.x + 0.5,
-      newPositionNormalized.y + 0.5
-    );
+    const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
+    poly.left -= diff.x;
+    poly.top -= diff.y;
 
     return actionPerformed;
   };
 };
 
 export const createPolyActionHandler = (pointIndex: number) =>
-  factoryPolyActionHandler(pointIndex, polyActionHandler);
+  wrapWithFireEvent(
+    ACTION_NAME,
+    factoryPolyActionHandler(pointIndex, polyActionHandler)
+  );
 
 export function createPolyControls(
   poly: Polyline,
@@ -126,7 +120,7 @@ export function createPolyControls(
     idx++
   ) {
     controls[`p${idx}`] = new Control({
-      actionName: 'modifyPoly',
+      actionName: ACTION_NAME,
       positionHandler: createPolyPositionHandler(idx),
       actionHandler: createPolyActionHandler(idx),
       ...options,

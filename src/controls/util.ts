@@ -25,7 +25,7 @@ export const NOT_ALLOWED_CURSOR = 'not-allowed';
  */
 export const getActionFromCorner = (
   alreadySelected: boolean,
-  corner: string,
+  corner: string | undefined,
   e: TPointerEvent,
   target: FabricObject
 ) => {
@@ -42,7 +42,10 @@ export const getActionFromCorner = (
  * @return {Boolean} true if transform is centered
  */
 export function isTransformCentered(transform: Transform) {
-  return transform.originX === CENTER && transform.originY === CENTER;
+  return (
+    resolveOrigin(transform.originX) === resolveOrigin(CENTER) &&
+    resolveOrigin(transform.originY) === resolveOrigin(CENTER)
+  );
 }
 
 export function invertOrigin(origin: TOriginX | TOriginY) {
