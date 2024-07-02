@@ -1,7 +1,6 @@
 import type { JSHandle, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import type { FabricObject } from 'fabric';
-import type { before, beforeAll } from 'test';
 
 export class ObjectUtil<T extends FabricObject = FabricObject> {
   constructor(
@@ -37,6 +36,10 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     return this.executeInBrowser((object) => object.getCenterPoint());
   }
 
+  getObjectCoords() {
+    return this.executeInBrowser((object) => object.getCoords());
+  }
+
   getObjectControlPoint(controlName: string) {
     return this.executeInBrowser(
       (object, { controlName }) => object.oCoords[controlName],
@@ -44,7 +47,7 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     );
   }
 
-  async expectObjectToMatch<T extends Record<string, unknown>>(expected: T) {
+  async expectObjectToMatch<S extends T>(expected: Partial<S>) {
     const snapshot = await this.executeInBrowser((object) => object);
     expect(snapshot).toMatchObject(expected);
   }

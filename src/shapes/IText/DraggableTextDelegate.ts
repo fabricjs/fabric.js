@@ -122,7 +122,6 @@ export class DraggableTextDelegate {
     const pos = selectionPosition.transform(target.calcTransformMatrix());
     const pointer = canvas.getScenePoint(e);
     const diff = pointer.subtract(pos);
-    const enableRetinaScaling = canvas._isRetinaScaling();
     const retinaScaling = target.getCanvasRetinaScaling();
     const bbox = target.getBoundingRect();
     const correction = pos.subtract(new Point(bbox.left, bbox.top));
@@ -141,7 +140,7 @@ export class DraggableTextDelegate {
     target.setSelectionStyles(styleOverride, selectionEnd, target.text.length);
     target.dirty = true;
     const dragImage = target.toCanvasElement({
-      enableRetinaScaling,
+      enableRetinaScaling: canvas.enableRetinaScaling,
       viewportTransform: true,
     });
     // restore values

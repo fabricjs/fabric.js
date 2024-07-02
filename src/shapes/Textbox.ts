@@ -7,6 +7,7 @@ import type { TextStyleDeclaration } from './Text/StyledText';
 import type { SerializedITextProps, ITextProps } from './IText/IText';
 import type { ITextEvents } from './IText/ITextBehavior';
 import type { TextLinesInfo } from './Text/Text';
+import type { Control } from '../controls/Control';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -92,14 +93,31 @@ export class Textbox<
 
   static textLayoutProperties = [...IText.textLayoutProperties, 'width'];
 
-  static ownDefaults: Record<string, any> = textboxDefaultValues;
+  static ownDefaults = textboxDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createTextboxDefaultControls(),
       ...Textbox.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {String} text Text string
+   * @param {Object} [options] Options object
+   */
+  constructor(text: string, options?: Props) {
+    super(text, { ...Textbox.ownDefaults, ...options } as Props);
+  }
+
+  /**
+   * Creates the default control object.
+   * If you prefer to have on instance of controls shared among all objects
+   * make this function return an empty object and add controls to the ownDefaults object
+   */
+  static createControls(): { controls: Record<string, Control> } {
+    return { controls: createTextboxDefaultControls() };
   }
 
   /**
@@ -225,9 +243,10 @@ export class Textbox<
   }
 
   /**
+   * @protected
    * @param {Number} lineIndex
    * @param {Number} charIndex
-   * @private
+   * @return {TextStyleDeclaration} a style object reference to the existing one or a new empty object when undefined
    */
   _getStyleDeclaration(
     lineIndex: number,
@@ -256,10 +275,7 @@ export class Textbox<
     style: object
   ) {
     const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-
-    this.styles[lineIndex][charIndex] = style;
+    super._setStyleDeclaration(map.line, map.offset + charIndex, style);
   }
 
   /**
@@ -267,11 +283,9 @@ export class Textbox<
    * @param {Number} charIndex
    * @private
    */
-  _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
+  protected _deleteStyleDeclaration(lineIndex: number, charIndex: number) {
     const map = this._styleMap[lineIndex];
-    lineIndex = map.line;
-    charIndex = map.offset + charIndex;
-    delete this.styles[lineIndex][charIndex];
+    super._deleteStyleDeclaration(map.line, map.offset + charIndex);
   }
 
   /**
@@ -295,7 +309,7 @@ export class Textbox<
    */
   protected _setLineStyle(lineIndex: number) {
     const map = this._styleMap[lineIndex];
-    this.styles[map.line] = {};
+    super._setLineStyle(map.line);
   }
 
   /**
@@ -554,7 +568,8 @@ export class Textbox<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  // @ts-expect-error TS this typing limitations
+  // cant use ts-expect-error because of ts 5.3 cross check
+  // @ts-ignore TS this typing limitations
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never

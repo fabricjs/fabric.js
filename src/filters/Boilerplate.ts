@@ -1,10 +1,12 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 
-export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
+type MyFilterOwnProps = {
+  myParameter: number;
+};
+
+export const myFilterDefaultValues: MyFilterOwnProps = {
   myParameter: 0,
-  mainParameter: 'myParameter',
 };
 
 /**
@@ -16,7 +18,7 @@ export const myFilterDefaultValues: Partial<TClassProperties<MyFilter>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class MyFilter extends BaseFilter {
+export class MyFilter extends BaseFilter<'MyFilter', MyFilterOwnProps> {
   /**
    * MyFilter value, from -1 to 1.
    * translated to -255 to 255 for 2d
@@ -24,9 +26,13 @@ export class MyFilter extends BaseFilter {
    * @param {Number} myParameter
    * @default
    */
-  declare myParameter: number;
+  declare myParameter: MyFilterOwnProps['myParameter'];
+
+  static type = 'MyFilter';
 
   static defaults = myFilterDefaultValues;
+
+  static uniformLocations = ['uMyParameter'];
 
   getFragmentSource() {
     return `
@@ -59,21 +65,6 @@ export class MyFilter extends BaseFilter {
   }
 
   /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMyParameter: gl.getUniformLocation(program, 'uMyParameter'),
-    };
-  }
-
-  /**
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
@@ -86,9 +77,9 @@ export class MyFilter extends BaseFilter {
     gl.uniform1f(uniformLocations.uMyParameter, this.myParameter);
   }
 
-  static async fromObject(object: any) {
+  static async fromObject(object: any): Promise<MyFilter> {
     // or overide with custom logic if your filter needs to
     // deserialize something that is not a plain value
-    return new this(object) as BaseFilter;
+    return new this(object);
   }
 }

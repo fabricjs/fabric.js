@@ -303,6 +303,137 @@ describe('Selectable Canvas', () => {
     });
   });
 
+  describe('searchPossibleTargets', () => {
+    test('the target returned will stop at the first non interactive container', () => {
+      const object = new FabricObject({
+        id: 'a',
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+      const groupB = new Group([object], {
+        id: 'b',
+        interactive: true,
+        subTargetCheck: true,
+      });
+      const groupC = new Group([groupB], {
+        id: 'c',
+        interactive: false,
+        subTargetCheck: true,
+      });
+      const groupD = new Group([groupC], {
+        id: 'd',
+        interactive: true,
+        subTargetCheck: true,
+      });
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      canvas.add(groupD);
+      const target = canvas.searchPossibleTargets(
+        canvas.getObjects(),
+        groupD.getCenterPoint()
+      );
+      expect(target).toBe(groupC);
+      expect(canvas.targets.map((obj) => obj.id)).toEqual(['a', 'b', 'c']);
+    });
+    test('a interactive group covered by a non interactive group wont be selected', () => {
+      const object = new FabricObject({
+        id: 'a',
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+      const groupB = new Group([object], {
+        id: 'b',
+        interactive: true,
+        subTargetCheck: true,
+      });
+      const groupC = new Group([groupB], {
+        id: 'c',
+        interactive: false,
+        subTargetCheck: true,
+      });
+      const groupD = new Group([groupC], {
+        id: 'd',
+        interactive: true,
+        subTargetCheck: true,
+      });
+      const groupE = new Group([groupD], {
+        id: 'e',
+        interactive: true,
+        subTargetCheck: true,
+      });
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      canvas.add(groupE);
+      const target = canvas.searchPossibleTargets(
+        canvas.getObjects(),
+        groupD.getCenterPoint()
+      );
+      expect(target).toBe(groupC);
+      expect(canvas.targets.map((obj) => obj.id)).toEqual(['a', 'b', 'c', 'd']);
+    });
+
+    test('nested non interactive groups with subTargetCheck', () => {
+      const object = new FabricObject({
+        left: 0,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+
+      const object2 = new FabricObject({
+        left: 20,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+
+      const object3 = new FabricObject({
+        left: 40,
+        top: 0,
+        width: 10,
+        height: 10,
+        padding: 0,
+        strokeWidth: 0,
+      });
+
+      const nestedGroup = new Group([object2, object3], {
+        interactive: false,
+        subTargetCheck: true,
+      });
+
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      const group = new Group([object, nestedGroup], {
+        interactive: true,
+        subTargetCheck: true,
+      });
+      canvas.add(group);
+
+      const object2Position = object2.getCenterPoint();
+      const target = canvas.searchPossibleTargets(
+        canvas.getObjects(),
+        object2Position
+      );
+      expect(target).toBe(nestedGroup);
+
+      nestedGroup.set({ interactive: true });
+      const nestedTarget = canvas.searchPossibleTargets(
+        canvas.getObjects(),
+        object2Position
+      );
+      expect(nestedTarget).toBe(object2);
+    });
+  });
+
   describe('setupCurrentTransform', () => {
     test.each(
       ['tl', 'mt', 'tr', 'mr', 'br', 'mb', 'bl', 'ml', 'mtr']

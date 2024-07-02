@@ -201,7 +201,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare fireMiddleClick: boolean;
 
   /**
-   * Keep track of the subTargets for Mouse Events
+   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost nested subTarget
    * @type FabricObject[]
    */
   targets: FabricObject[] = [];
@@ -284,7 +284,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   protected declare _target?: FabricObject;
 
-  static ownDefaults: Record<string, any> = canvasDefaults;
+  static ownDefaults = canvasDefaults;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...SelectableCanvas.ownDefaults };
@@ -720,7 +720,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.targets = [];
 
     if (activeObject && aObjects.length >= 1) {
-      if (activeObject._findTargetCorner(pointer, isTouchEvent(e))) {
+      if (activeObject.findControl(pointer, isTouchEvent(e))) {
         // if we hit the corner of the active object, let's return that.
         return activeObject;
       } else if (
@@ -873,15 +873,31 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer: Point
   ): FabricObject | undefined {
     const target = this._searchPossibleTargets(objects, pointer);
-    // if we found something in this.targets, and the group is interactive, return that subTarget
+
+    // if we found something in this.targets, and the group is interactive, return the innermost subTarget
+    // that is still interactive
     // TODO: reverify why interactive. the target should be returned always, but selected only
     // if interactive.
-    return target &&
+    if (
+      target &&
       isCollection(target) &&
       target.interactive &&
       this.targets[0]
-      ? this.targets[0]
-      : target;
+    ) {
+      /** targets[0] is the innermost nested target, but it could be inside non interactive groups and so not a selection target */
+      const targets = this.targets;
+      for (let i = targets.length - 1; i > 0; i--) {
+        const t = targets[i];
+        if (!(isCollection(t) && t.interactive)) {
+          // one of the subtargets was not interactive. that is the last subtarget we can return.
+          // we can't dig more deep;
+          return t;
+        }
+      }
+      return targets[0];
+    }
+
+    return target;
   }
 
   /**
@@ -1145,8 +1161,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
     if (isActiveSelection(object) && prevActiveObject !== object) {
       object.set('canvas', this);
-      object.setCoords();
     }
+    object.setCoords();
 
     return true;
   }
@@ -1170,7 +1186,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         return false;
       }
       if (this._currentTransform && this._currentTransform.target === obj) {
-        // @ts-expect-error this method exists in the subclass - should be moved or declared as abstract
         this.endCurrentTransform(e);
       }
       this._activeObject = undefined;
@@ -1199,6 +1214,48 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const discarded = this._discardActiveObject(e);
     this._fireSelectionEvents(currentActives, e);
     return discarded;
+  }
+
+  /**
+   * End the current transform.
+   * You don't usually need to call this method unless you are interrupting a user initiated transform
+   * because of some other event ( a press of key combination, or something that block the user UX )
+   * @param {Event} [e] send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  endCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform;
+    this._finalizeCurrentTransform(e);
+    if (transform && transform.target) {
+      // this could probably go inside _finalizeCurrentTransform
+      transform.target.isMoving = false;
+    }
+    this._currentTransform = null;
+  }
+
+  /**
+   * @private
+   * @param {Event} e send the mouse event that generate the finalize down, so it can be used in the event
+   */
+  _finalizeCurrentTransform(e?: TPointerEvent) {
+    const transform = this._currentTransform!,
+      target = transform.target,
+      options = {
+        e,
+        target,
+        transform,
+        action: transform.action,
+      };
+
+    if (target._scaling) {
+      target._scaling = false;
+    }
+
+    target.setCoords();
+
+    if (transform.actionPerformed) {
+      this.fire('object:modified', options);
+      target.fire('modified', options);
+    }
   }
 
   /**
@@ -1316,7 +1373,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     // If the object is in a selection group, simulate what would happen to that
     // object when the group is deselected

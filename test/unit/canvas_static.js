@@ -1714,27 +1714,6 @@
     canvas.viewportTransform = fabric.StaticCanvas.getDefaults().viewportTransform;
   });
 
-  QUnit.test('setViewportTransform calls objects setCoords', function(assert) {
-    var vpt = [2, 0, 0, 2, 50, 50];
-    assert.deepEqual(canvas.viewportTransform, [1, 0, 0, 1, 0, 0], 'initial viewport is identity matrix');
-    var rect = new fabric.Rect({ width: 10, heigth: 10 });
-    var rectBg = new fabric.Rect({ width: 10, heigth: 10 });
-    var rectOverlay = new fabric.Rect({ width: 10, heigth: 10 });
-    canvas.add(rect);
-    canvas.cancelRequestedRender();
-    rectBg.canvas = canvas;
-    canvas.backgroundImage = rectBg;
-    rectOverlay.canvas = canvas;
-    canvas.overlayImage = rectOverlay;
-    assert.deepEqual(new fabric.Point(rect.oCoords.tl), new fabric.Point(0,0), 'rect oCoords are set for normal viewport');
-    assert.equal(rectBg.oCoords, undefined, 'rectBg oCoords are not set');
-    assert.equal(rectOverlay.oCoords, undefined, 'rectOverlay oCoords are not set');
-    canvas.setViewportTransform(vpt);
-    assert.deepEqual(new fabric.Point(rect.oCoords.tl), new fabric.Point(50,50), 'rect oCoords are set');
-    assert.deepEqual(new fabric.Point(rectBg.oCoords.tl),  new fabric.Point(50,50), 'rectBg oCoords are set');
-    assert.deepEqual(new fabric.Point(rectOverlay.oCoords.tl),  new fabric.Point(50,50), 'rectOverlay oCoords are set');
-  });
-
   QUnit.test('getZoom', function(assert) {
     assert.ok(typeof canvas.getZoom === 'function');
     var vpt = [2, 0, 0, 2, 50, 50];
@@ -1829,28 +1808,6 @@
     assert.deepEqual({ x: canvas.vptCoords.tr.x, y: canvas.vptCoords.tr.y }, { x: 130, y: -145 }, 'tr is 130, -145');
     assert.deepEqual({ x: canvas.vptCoords.bl.x, y: canvas.vptCoords.bl.y }, { x: 30,  y: 30 }, 'bl is 30,-70');
     assert.deepEqual({ x: canvas.vptCoords.br.x, y: canvas.vptCoords.br.y }, { x: 130,  y: 30 }, 'br is 130,-70');
-  });
-
-  QUnit.test('_isRetinaScaling', function(assert) {
-    canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 2 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, true, 'retina > 1 and enabled');
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 2 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina > 1 and disabled');
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 1 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina = 1 and disabled');
-
-    canvas.enableRetinaScaling = true;
-    fabric.config.configure({ devicePixelRatio: 1 });
-    var isScaling = canvas._isRetinaScaling();
-    assert.equal(isScaling, false, 'retina = 1 and enabled');
   });
 
   QUnit.test('getRetinaScaling', function(assert) {

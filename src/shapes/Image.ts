@@ -45,12 +45,11 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  filters: BaseFilter[];
+  filters: BaseFilter<string, Record<string, any>>[];
   resizeFilter?: Resize;
 }
 
-export const imageDefaultValues: Partial<UniqueImageProps> &
-  Partial<FabricObjectProps> = {
+export const imageDefaultValues: Partial<TClassProperties<FabricImage>> = {
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
@@ -167,7 +166,7 @@ export class FabricImage<
 
   protected declare src: string;
 
-  declare filters: BaseFilter[];
+  declare filters: BaseFilter<string, Record<string, any>>[];
   declare resizeFilter: Resize;
 
   declare _element: ImageSource;
@@ -178,9 +177,9 @@ export class FabricImage<
 
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
-  static ownDefaults: Record<string, any> = imageDefaultValues;
+  static ownDefaults = imageDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...FabricImage.ownDefaults,
@@ -197,8 +196,11 @@ export class FabricImage<
    */
   constructor(elementId: string, options?: Props);
   constructor(element: ImageSource, options?: Props);
-  constructor(arg0: ImageSource | string, options: Props = {} as Props) {
-    super({ filters: [], ...options });
+  constructor(arg0: ImageSource | string, options?: Props) {
+    super();
+    this.filters = [];
+    Object.assign(this, FabricImage.ownDefaults);
+    this.setOptions(options);
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       typeof arg0 === 'string'
@@ -413,7 +415,7 @@ export class FabricImage<
       strokeSvg = [
         `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
           this.height
-        }" styles="${this.getSvgStyles()}" />\n`,
+        }" style="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }
@@ -504,7 +506,7 @@ export class FabricImage<
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
-      [filter as BaseFilter],
+      [filter],
       elementToFilter,
       sourceWidth,
       sourceHeight,
@@ -520,7 +522,9 @@ export class FabricImage<
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
-  applyFilters(filters: BaseFilter[] = this.filters || []) {
+  applyFilters(
+    filters: BaseFilter<string, Record<string, any>>[] = this.filters || []
+  ) {
     filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 
@@ -603,7 +607,8 @@ export class FabricImage<
     ctx: CanvasRenderingContext2D
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    // @ts-expect-error TS doesn't respect this type casting
+    // cant use ts-expect-error because of ts 5.3 cross check
+    // @ts-ignore TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 
@@ -791,13 +796,13 @@ export class FabricImage<
    */
   static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, type, ...object }: T,
-    options: Abortable = {}
+    options?: Abortable
   ) {
     return Promise.all([
       loadImage(src!, { ...options, crossOrigin }),
-      f && enlivenObjects<BaseFilter>(f, options),
+      f && enlivenObjects<BaseFilter<string>>(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects<BaseFilter>([rf], options),
+      rf && enlivenObjects<BaseFilter<'Resize'>>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {

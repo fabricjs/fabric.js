@@ -90,7 +90,7 @@ export abstract class ITextKeyBehavior<
       paste: 'paste',
       compositionstart: 'onCompositionStart',
       compositionupdate: 'onCompositionUpdate',
-      onCompositionUpdate: 'onCompositionEnd',
+      compositionend: 'onCompositionEnd',
     } as Record<string, keyof this>).map(([eventName, handler]) =>
       textarea.addEventListener(
         eventName,
@@ -488,8 +488,9 @@ export abstract class ITextKeyBehavior<
       const max = this.text.length;
       this.selectionStart = capValue(0, this.selectionStart, max);
       this.selectionEnd = capValue(0, this.selectionEnd, max);
+      // TODO fix: abort and init should be an alternative depending
+      // on selectionStart/End being equal or different
       this.abortCursorAnimation();
-      this._currentCursorOpacity = 1;
       this.initDelayedCursor();
       this._fireSelectionChanged();
       this._updateTextarea();
@@ -641,6 +642,8 @@ export abstract class ITextKeyBehavior<
     }` as const;
     this._currentCursorOpacity = 1;
     if (this[actionName](e)) {
+      // TODO fix: abort and init should be an alternative depending
+      // on selectionStart/End being equal or different
       this.abortCursorAnimation();
       this.initDelayedCursor();
       this._fireSelectionChanged();

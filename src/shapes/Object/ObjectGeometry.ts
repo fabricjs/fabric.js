@@ -25,9 +25,10 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 type TMatrixCache = {
-  key: string;
+  key: number[];
   value: TMat2D;
 };
 
@@ -437,40 +438,29 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     this.aCoords = this.calcACoords();
   }
 
-  transformMatrixKey(skipGroup = false): string {
-    const sep = '_';
-    let prefix = '';
+  transformMatrixKey(skipGroup = false): number[] {
+    let prefix: number[] = [];
     if (!skipGroup && this.group) {
-      prefix = this.group.transformMatrixKey(skipGroup) + sep;
+      prefix = this.group.transformMatrixKey(skipGroup);
     }
-    return (
-      prefix +
-      this.top +
-      sep +
-      this.left +
-      sep +
-      this.scaleX +
-      sep +
-      this.scaleY +
-      sep +
-      this.skewX +
-      sep +
-      this.skewY +
-      sep +
-      this.angle +
-      sep +
-      this.originX +
-      sep +
-      this.originY +
-      sep +
-      this.width +
-      sep +
-      this.height +
-      sep +
-      this.strokeWidth +
-      this.flipX +
-      this.flipY
+    prefix.push(
+      this.top,
+      this.left,
+      this.width,
+      this.height,
+      this.scaleX,
+      this.scaleY,
+      this.angle,
+      this.strokeWidth,
+      this.skewX,
+      this.skewY,
+      +this.flipX,
+      +this.flipY,
+      resolveOrigin(this.originX),
+      resolveOrigin(this.originY)
     );
+
+    return prefix;
   }
 
   /**
@@ -487,7 +477,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     }
     const key = this.transformMatrixKey(skipGroup),
       cache = this.matrixCache;
-    if (cache && cache.key === key) {
+    if (cache && cache.key.every((x, i) => x === key[i])) {
       return cache.value;
     }
     if (this.group) {

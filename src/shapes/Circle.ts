@@ -20,20 +20,26 @@ interface UniqueCircleProps {
   radius: number;
 
   /**
-   * degrees of start of the circle.
-   * probably will change to degrees in next major version
-   * @type Number 0 - 359
+   * Angle for the start of the circle, in degrees.
+   * @type TDegree 0 - 359
    * @default 0
    */
   startAngle: number;
 
   /**
-   * End angle of the circle
-   * probably will change to degrees in next major version
-   * @type Number 1 - 360
+   * Angle for the end of the circle, in degrees
+   * @type TDegree 1 - 360
    * @default 360
    */
   endAngle: number;
+
+  /**
+   * Orientation for the direction of the circle.
+   * Setting to true will switch the arc of the circle to traverse from startAngle to endAngle in a counter-clockwise direction.
+   * Note: this will only change how the circle is drawn, and does not affect rotational transformation.
+   * @default false
+   */
+  counterClockwise: boolean;
 }
 
 export interface SerializedCircleProps
@@ -42,12 +48,18 @@ export interface SerializedCircleProps
 
 export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
 
-const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle'] as const;
+const CIRCLE_PROPS = [
+  'radius',
+  'startAngle',
+  'endAngle',
+  'counterClockwise',
+] as const;
 
-export const circleDefaultValues: UniqueCircleProps = {
+export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
   radius: 0,
   startAngle: 0,
   endAngle: 360,
+  counterClockwise: false,
 };
 
 export class Circle<
@@ -61,18 +73,29 @@ export class Circle<
   declare radius: number;
   declare startAngle: number;
   declare endAngle: number;
+  declare counterClockwise: boolean;
 
   static type = 'Circle';
 
   static cacheProperties = [...cacheProperties, ...CIRCLE_PROPS];
 
-  static ownDefaults: Record<string, any> = circleDefaultValues;
+  static ownDefaults = circleDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Circle.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, Circle.ownDefaults);
+    this.setOptions(options);
   }
 
   /**
@@ -102,7 +125,7 @@ export class Circle<
       this.radius,
       degreesToRadians(this.startAngle),
       degreesToRadians(this.endAngle),
-      false
+      this.counterClockwise
     );
     this._renderPaintInOrder(ctx);
   }
@@ -170,14 +193,10 @@ export class Circle<
         startY = sin(start) * radius,
         endX = cos(end) * radius,
         endY = sin(end) * radius,
-        largeFlag = angle > 180 ? '1' : '0';
+        largeFlag = angle > 180 ? 1 : 0,
+        sweepFlag = this.counterClockwise ? 0 : 1;
       return [
-        `<path d="M ${startX} ${startY}`,
-        ` A ${radius} ${radius}`,
-        ' 0 ',
-        `${largeFlag} 1`,
-        ` ${endX} ${endY}`,
-        '" ',
+        `<path d="M ${startX} ${startY} A ${radius} ${radius} 0 ${largeFlag} ${sweepFlag} ${endX} ${endY}" `,
         'COMMON_PARTS',
         ' />\n',
       ];

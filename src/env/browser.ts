@@ -4,21 +4,14 @@ import type { TCopyPasteData, TFabricEnv } from './types';
 
 const copyPasteData: TCopyPasteData = {};
 
-let initialized = false;
-let isTouchSupported: boolean;
-
 export const getEnv = (): TFabricEnv => {
-  if (!initialized) {
-    isTouchSupported =
-      'ontouchstart' in window ||
-      'ontouchstart' in document ||
-      (window && window.navigator && window.navigator.maxTouchPoints > 0);
-    initialized = true;
-  }
   return {
     document,
     window,
-    isTouchSupported,
+    isTouchSupported:
+      'ontouchstart' in window ||
+      'ontouchstart' in document ||
+      (window && window.navigator && window.navigator.maxTouchPoints > 0),
     WebGLProbe: new WebGLProbe(),
     dispose() {
       // noop

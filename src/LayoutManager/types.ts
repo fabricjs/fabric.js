@@ -105,11 +105,11 @@ export type ObjectModifyingLayoutContext =
     } & (
         | {
             trigger: TModificationEvents;
-            e: BasicTransformEvent & { target: FabricObject };
+            e: BasicTransformEvent;
           }
         | {
             trigger: 'changed';
-            e: ITextEvents['changed'] & { target: FabricObject };
+            e: ITextEvents['changed'];
           }
       );
 
@@ -130,6 +130,11 @@ export type StrictLayoutContext = LayoutContext & {
   prevStrategy?: LayoutStrategy;
   bubbles: boolean;
   stopPropagation(): void;
+};
+
+export type RegistrationContext = {
+  targets: FabricObject[];
+  target: Group;
 };
 
 export type LayoutBeforeEvent = {

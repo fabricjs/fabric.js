@@ -43,11 +43,21 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
+import { getDevicePixelRatio } from '../env';
 
-export type TCanvasSizeOptions = {
-  backstoreOnly?: boolean;
-  cssOnly?: boolean;
-};
+/**
+ * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
+ * Better try to restrict with types to avoid confusion.
+ */
+export type TCanvasSizeOptions =
+  | {
+      backstoreOnly?: true;
+      cssOnly?: false;
+    }
+  | {
+      backstoreOnly?: false;
+      cssOnly?: true;
+    };
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
@@ -151,6 +161,15 @@ export class StaticCanvas<
 
   declare elements: StaticCanvasDOMManager;
 
+  /**
+   * When true control drawing is skipped.
+   * This boolean is used to avoid toDataURL to export controls.
+   * Usage of this boolean to build up other flows and features is not supported
+   * @type Boolean
+   * @default false
+   */
+  protected declare skipControlsDrawing: boolean;
+
   static ownDefaults = staticCanvasDefaults;
 
   // reference to
@@ -178,6 +197,7 @@ export class StaticCanvas<
       width: this.width || this.elements.lower.el.width || 0,
       height: this.height || this.elements.lower.el.height || 0,
     });
+    this.skipControlsDrawing = false;
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
@@ -231,17 +251,11 @@ export class StaticCanvas<
 
   /**
    * @private
-   */
-  _isRetinaScaling() {
-    return config.devicePixelRatio > 1 && this.enableRetinaScaling;
-  }
-
-  /**
-   * @private
+   * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    * @return {Number} retinaScaling if applied, otherwise 1;
    */
   getRetinaScaling() {
-    return this._isRetinaScaling() ? Math.max(1, config.devicePixelRatio) : 1;
+    return this.enableRetinaScaling ? getDevicePixelRatio() : 1;
   }
 
   /**
@@ -276,11 +290,19 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setWidth(value: number, options: TCanvasSizeOptions = {}) {
+  setWidth(
+    value: TSize['width'],
+    options?: { backstoreOnly?: true; cssOnly?: false }
+  ): void;
+  setWidth(
+    value: CSSDimensions['width'],
+    options?: { cssOnly?: true; backstoreOnly?: false }
+  ): void;
+  setWidth(value: number, options?: never) {
     return this.setDimensions({ width: value }, options);
   }
 
-  /**
+  /**s
    * Sets height of this canvas instance
    * @param {Number|String} value                         Value to set height to
    * @param {Object}        [options]                     Options object
@@ -288,7 +310,15 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setHeight(value: number, options: TCanvasSizeOptions = {}) {
+  setHeight(
+    value: TSize['height'],
+    options?: { backstoreOnly?: true; cssOnly?: false }
+  ): void;
+  setHeight(
+    value: CSSDimensions['height'],
+    options?: { cssOnly?: true; backstoreOnly?: false }
+  ): void;
+  setHeight(value: CSSDimensions['height'], options?: never) {
     return this.setDimensions({ height: value }, options);
   }
 
@@ -328,14 +358,20 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    */
   setDimensions(
+    dimensions: Partial<CSSDimensions>,
+    options?: { cssOnly?: true; backstoreOnly?: false }
+  ): void;
+  setDimensions(
     dimensions: Partial<TSize>,
-    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+    options?: { backstoreOnly?: true; cssOnly?: false }
+  ): void;
+  setDimensions(dimensions: Partial<TSize>, options?: never): void;
+  setDimensions(
+    dimensions: Partial<TSize | CSSDimensions>,
+    options?: TCanvasSizeOptions
   ) {
-    this._setDimensionsImpl(dimensions, {
-      cssOnly,
-      backstoreOnly,
-    });
-    if (!cssOnly) {
+    this._setDimensionsImpl(dimensions, options);
+    if (!options || !options.cssOnly) {
       this.requestRenderAll();
     }
   }
@@ -353,21 +389,7 @@ export class StaticCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    const backgroundObject = this.backgroundImage,
-      overlayObject = this.overlayImage,
-      len = this._objects.length;
-
     this.viewportTransform = vpt;
-    for (let i = 0; i < len; i++) {
-      const object = this._objects[i];
-      object.group || object.setCoords();
-    }
-    if (backgroundObject) {
-      backgroundObject.setCoords();
-    }
-    if (overlayObject) {
-      overlayObject.setCoords();
-    }
     this.calcViewportBoundaries();
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -556,7 +578,7 @@ export class StaticCanvas<
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     this._renderObjects(ctx, objects);
     ctx.restore();
-    if (!this.controlsAboveOverlay) {
+    if (!this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
     if (path) {
@@ -568,7 +590,7 @@ export class StaticCanvas<
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
-    if (this.controlsAboveOverlay) {
+    if (this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
     this.fire('after:render', { ctx });
@@ -966,7 +988,7 @@ export class StaticCanvas<
    *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
    * });
    */
-  toSVG(options: TSVGExportOptions = {}, reviver: TSVGReviver) {
+  toSVG(options: TSVGExportOptions = {}, reviver?: TSVGReviver) {
     options.reviver = reviver;
     const markup: string[] = [];
 
@@ -1145,7 +1167,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _setSVGObjects(markup: string[], reviver: TSVGReviver) {
+  _setSVGObjects(markup: string[], reviver?: TSVGReviver) {
     this.forEachObject((fabricObject) => {
       if (fabricObject.excludeFromExport) {
         return;
@@ -1161,7 +1183,7 @@ export class StaticCanvas<
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     markup.push(instance.toSVG(reviver));
   }
@@ -1172,7 +1194,7 @@ export class StaticCanvas<
   _setSVGBgOverlayImage(
     markup: string[],
     property: 'overlayImage' | 'backgroundImage',
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     const bgOrOverlay = this[property];
     if (bgOrOverlay && !bgOrOverlay.excludeFromExport && bgOrOverlay.toSVG) {
@@ -1204,11 +1226,11 @@ export class StaticCanvas<
           filler.offsetY - finalHeight / 2
         }" width="${
           (repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.width
+            ? (filler.source as HTMLImageElement).width
             : finalWidth
         }" height="${
           (repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.height
+            ? (filler.source as HTMLImageElement).height
             : finalHeight
         }" fill="url(#SVGID_${filler.id})"></rect>\n`
       );
@@ -1395,6 +1417,7 @@ export class StaticCanvas<
       zoom = this.getZoom(),
       originalWidth = this.width,
       originalHeight = this.height,
+      originalSkipControlsDrawing = this.skipControlsDrawing,
       newZoom = zoom * multiplier,
       vp = this.viewportTransform,
       translateX = (vp[4] - (left || 0)) * multiplier,
@@ -1411,6 +1434,7 @@ export class StaticCanvas<
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
+    this.skipControlsDrawing = true;
     this.calcViewportBoundaries();
     this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
@@ -1418,6 +1442,7 @@ export class StaticCanvas<
     this.height = originalHeight;
     this.calcViewportBoundaries();
     this.enableRetinaScaling = originalRetina;
+    this.skipControlsDrawing = originalSkipControlsDrawing;
     return canvasEl;
   }
 

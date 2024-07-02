@@ -56,6 +56,10 @@ export {
    */
   FabricObject as Object,
 } from './src/shapes/Object/FabricObject';
+/**
+ * Exported so we can tweak default values
+ */
+export { FabricObject as BaseFabricObject } from './src/shapes/Object/Object';
 
 export type {
   TFabricObjectProps,

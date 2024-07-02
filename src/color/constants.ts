@@ -75,15 +75,22 @@ export const reRGBa = () =>
  *
  * /^hsla?\(         // Matches the beginning of the string and the opening parenthesis of "hsl" or "hsla"
  * \s*               // Matches any whitespace characters (space, tab, etc.) zero or more times
- * (\d{1,3})         // Hue: Matches one to three digits and captures it in a group
+ * (\d{0,3}          // Hue: 0 to three digits - start capture in a group
+ * (?:\.\d+)?        // Hue: Optional (non capture group) decimal with one or more digits.
+ * (?:deg|turn|rad)? // Hue: Optionally include suffix deg or turn or rad
+ * )                 // Hue: End capture group
  * \s*               // Matches any whitespace characters zero or more times
  * [\s|,]            // Matches a space, tab or comma
  * \s*               // Matches any whitespace characters zero or more times
- * (\d{1,3}%)        // Saturation: Matches one to three digits followed by a percentage sign and captures it in a group
+ * (\d{0,3}          // Saturation: 0 to three digits - start capture in a group
+ * (?:\.\d+)?        // Saturation: Optional decimal with one or more digits in a non-capturing group
+ * %?)               // Saturation: match optional % character and end capture group
  * \s*               // Matches any whitespace characters zero or more times
  * [\s|,]            // Matches a space, tab or comma
  * \s*               // Matches any whitespace characters zero or more times
- * (\d{1,3}%)        // Lightness: Matches one to three digits followed by a percentage sign and captures it in a group
+ * (\d{0,3}          // Lightness: 0 to three digits - start capture in a group
+ * (?:\.\d+)?        // Lightness: Optional decimal with one or more digits in a non-capturing group
+ * %?)                // Lightness: match % character and end capture group
  * \s*               // Matches any whitespace characters zero or more times
  * (?:               // Alpha: Begins a non-capturing group for the alpha value
  *   \s*             // Matches any whitespace characters zero or more times
@@ -99,7 +106,7 @@ export const reRGBa = () =>
  * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
 export const reHSLa = () =>
-  /^hsla?\(\s*([+-]?\d{1,3})\s*[\s|,]\s*(\d{1,3}%)\s*[\s|,]\s*(\d{1,3}%)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
+  /^hsla?\(\s*([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)

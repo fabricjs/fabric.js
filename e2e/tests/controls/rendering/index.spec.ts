@@ -55,6 +55,7 @@ test('control box rendering', async ({ page }) => {
                     subTarget.borderScaleFactor = 3;
                     subTarget.transparentCorners = false;
                     const color = subTarget.fill;
+                    subTarget.setCoords();
                     subTarget._renderControls(canvas.contextContainer, {
                       borderColor: color,
                       cornerColor: color,

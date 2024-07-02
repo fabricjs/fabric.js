@@ -63,16 +63,17 @@ export class Polyline<
 
   private declare initialized: true | undefined;
 
-  static ownDefaults: Record<string, any> = polylineDefaultValues;
+  static ownDefaults = polylineDefaultValues;
 
   static type = 'Polyline';
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Polyline.ownDefaults,
     };
   }
+
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
@@ -116,7 +117,10 @@ export class Polyline<
    * });
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
-    super({ points, ...options });
+    super();
+    Object.assign(this, Polyline.ownDefaults);
+    this.setOptions(options);
+    this.points = points;
     const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);

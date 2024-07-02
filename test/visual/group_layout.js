@@ -366,7 +366,11 @@
             tlControlPoint = new fabric.Circle({ radius: 5, fill: 'red', left: 150, top: 100, strokeWidth: 0 });
 
         var g = new fabric.Group([rect1, rect2, tlControlPoint], Object.assign({}, options, {
-            originX, originY, backgroundColor: 'pink'
+          left:150,
+          top:100,
+          originX,
+          originY,
+          backgroundColor: 'pink'
         }));
         return [g, controlPoint];
     }
@@ -386,6 +390,27 @@
                         callback(canvas.lowerCanvasEl);
                     },
                     golden: `group-layout/origin-${ox}-${oy}-${angle}deg.png`,
+                    percentage: 0.001,
+                    width: 200,
+                    height: 200
+                });
+            });
+        });
+    }
+
+    // with position
+    for (let angle = 0; angle < 360; angle += 30) {
+        originX.forEach(ox => {
+            originY.forEach(oy => {
+                tests.push({
+                    test: `layout with position and originX=${ox}, originY=${oy} and angle=${angle} values`,
+                    code: function (canvas, callback) {
+                        canvas.add.apply(canvas, createObjectsForOriginTests(ox, oy, { angle, left: 150, top: 100 }));
+                        canvas.setViewportTransform([1, 0, 0, 1, -50, 0]);
+                        canvas.renderAll();
+                        callback(canvas.lowerCanvasEl);
+                    },
+                    golden: `group-layout/with-position-origin-${ox}-${oy}-${angle}deg.png`,
                     percentage: 0.001,
                     width: 200,
                     height: 200

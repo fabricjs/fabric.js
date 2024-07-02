@@ -112,28 +112,32 @@ export type TModificationEvents =
   | typeof RESIZING
   | typeof MODIFY_POLY;
 
-export interface ModifiedEvent<E extends Event = TPointerEvent>
-  extends TEvent<E> {
-  transform: Transform;
+export interface ModifiedEvent<E extends Event = TPointerEvent> {
+  e?: E;
+  transform?: Transform;
   target: FabricObject;
   action?: string;
 }
 
-type ModificationEventsSpec<
-  Prefix extends string = '',
-  Modification = BasicTransformEvent,
-  Modified = ModifiedEvent | never
-> = Record<`${Prefix}${TModificationEvents}`, Modification> &
-  Record<`${Prefix}modified`, Modified>;
+type ObjectModificationEvents = {
+  moving: BasicTransformEvent;
+  scaling: BasicTransformEvent;
+  rotating: BasicTransformEvent;
+  skewing: BasicTransformEvent;
+  resizing: BasicTransformEvent;
+  modifyPoly: BasicTransformEvent;
+  modified: ModifiedEvent;
+};
 
-type ObjectModificationEvents = ModificationEventsSpec;
-
-type CanvasModificationEvents = ModificationEventsSpec<
-  'object:',
-  BasicTransformEvent & { target: FabricObject },
-  ModifiedEvent | { target: FabricObject }
-> & {
+type CanvasModificationEvents = {
   'before:transform': TEvent & { transform: Transform };
+  'object:moving': BasicTransformEvent & { target: FabricObject };
+  'object:scaling': BasicTransformEvent & { target: FabricObject };
+  'object:rotating': BasicTransformEvent & { target: FabricObject };
+  'object:skewing': BasicTransformEvent & { target: FabricObject };
+  'object:resizing': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPoly': BasicTransformEvent & { target: FabricObject };
+  'object:modified': ModifiedEvent;
 };
 
 export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>

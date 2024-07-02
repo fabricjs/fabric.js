@@ -343,8 +343,11 @@
 
   function initActiveSelection(canvas, activeObject, target, multiSelectionStacking) {
     fabric.classRegistry.setClass(class TextActiveSelection extends fabric.ActiveSelection {
-      static getDefaults() {
-        return {...super.getDefaults(),multiSelectionStacking}
+      static ownDefaults = {
+        multiSelectionStacking,
+      }
+      constructor(objects, options) {
+        super(objects, { ...TextActiveSelection.ownDefaults, ...options })
       }
     });
     canvas.setActiveObject(activeObject);
@@ -769,392 +772,6 @@
     });
     assert.equal(target, null, 'Should not find target');
     canvas.remove(rect);
-  });
-
-  QUnit.test('findTarget preserveObjectStacking false', function(assert) {
-    canvas.preserveObjectStacking = false;
-    var rect = makeRect({ left: 0, top: 0 }),
-        rectOver = makeRect({ left: 0, top: 0 }),
-        target,
-        e = { clientX: 5, clientY: 5, target: canvas.upperCanvasEl };
-    canvas.add(rect);
-    canvas.add(rectOver);
-    canvas.setActiveObject(rect);
-    canvas.renderAll();
-    target = canvas.findTarget(e);
-    assert.equal(target, rect, 'Should return the rect');
-  });
-
-  QUnit.test('findTarget preserveObjectStacking true', function(assert) {
-    assert.ok(typeof canvas.findTarget === 'function');
-    canvas.preserveObjectStacking = true;
-    var rect = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
-        rectOver = makeRect({ left: 0, top: 0, width: 30, height: 30 }),
-        target,
-        e1 = { clientX: 15, clientY: 15, shiftKey: true, target: canvas.upperCanvasEl },
-        e2 = { clientX: 4, clientY: 4, target: canvas.upperCanvasEl };
-    canvas.add(rect);
-    canvas.add(rectOver);
-    target = canvas.findTarget(e1);
-    assert.equal(target, rectOver, 'Should return the rectOver, rect is not considered');
-    canvas.setActiveObject(rect);
-    target = canvas.findTarget(e1);
-    assert.equal(target, rectOver, 'Should still return rectOver because is above active object');
-    target = canvas.findTarget(e2);
-    assert.equal(target, rect, 'Should rect because a corner of the activeObject has been hit');
-    canvas.altSelectionKey = 'shiftKey';
-    target = canvas.findTarget(e1);
-    assert.equal(target, rect, 'Should rect because active and altSelectionKey is pressed');
-    canvas.preserveObjectStacking = false;
-  });
-
-  QUnit.test('findTarget with subTargetCheck', function(assert) {
-    var rect = makeRect({ left: 0, top: 0 }),
-        rect2 = makeRect({ left: 30, top:  30}), target,
-        group = new fabric.Group([rect, rect2]);
-
-    canvas.add(group);
-
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
-
-    target = canvas.findTarget({
-      clientX: 30, clientY: 30, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    group.subTargetCheck = true;
-    group.setCoords();
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    assert.equal(canvas.targets[0], rect, 'should return the rect');
-
-    target = canvas.findTarget({
-      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    assert.equal(canvas.targets[0], undefined, 'no subtarget should return');
-
-    target = canvas.findTarget({
-      clientX: 32, clientY: 32, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    assert.equal(canvas.targets[0], rect2, 'should return the rect2');
-    canvas.remove(group);
-  });
-
-  QUnit.test('findTarget with subTargetCheck and canvas zoom', function(assert) {
-    var rect3 = new fabric.Rect({
-      width: 100,
-      height: 100,
-      fill: 'yellow'
-    });
-    var rect4 = new fabric.Rect({
-      width: 100,
-      height: 100,
-      left: 100,
-      top: 100,
-      fill: 'purple'
-    });
-    var group3 = new fabric.Group(
-      [rect3, rect4],
-      { scaleX: 0.5, scaleY: 0.5, top: 100, left: 0 });
-    group3.subTargetCheck = true;
-    group3.setCoords();
-    var rect1 = new fabric.Rect({
-      width: 100,
-      height: 100,
-      fill: 'red'
-    });
-    var rect2 = new fabric.Rect({
-      width: 100,
-      height: 100,
-      left: 100,
-      top: 100,
-      fill: 'blue'
-    });
-    var g = new fabric.Group([rect1, rect2, group3], { top: -150, left: -50 });
-    g.subTargetCheck = true;
-    canvas.viewportTransform = [0.1, 0, 0, 0.1, 100, 200];
-    canvas.add(g);
-
-    var target = canvas.findTarget({
-      clientX: 96, clientY: 186, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, g, 'Should return the group 96');
-    assert.equal(canvas.targets[0], rect1, 'should find the target rect 96');
-    canvas.targets = [];
-
-    target = canvas.findTarget({
-      clientX: 98, clientY: 188, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, g, 'Should return the group 98');
-    assert.equal(canvas.targets[0], rect1, 'should find the target rect1 98');
-    canvas.targets = [];
-
-    target = canvas.findTarget({
-      clientX: 100, clientY: 190, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, g, 'Should return the group 100');
-    assert.equal(canvas.targets[0], rect1, 'should find the target rect1 100');
-    canvas.targets = [];
-
-    target = canvas.findTarget({
-      clientX: 102, clientY: 192, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, g, 'Should return the group 102');
-    assert.equal(canvas.targets[0], rect1, 'should find the target rect 102');
-    canvas.targets = [];
-
-    target = canvas.findTarget({
-      clientX: 104, clientY: 194, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, g, 'Should return the group 104');
-    assert.equal(canvas.targets[0], rect1, 'should find the target rect 104');
-    canvas.targets = [];
-
-    target = canvas.findTarget({
-      clientX: 106, clientY: 196, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, g, 'Should return the group 106');
-    assert.equal(canvas.targets[0], rect2, 'should find the target rect2 106');
-    canvas.targets = [];
-  });
-
-  QUnit.test('findTarget with subTargetCheck on activeObject', function(assert) {
-    var rect = makeRect({ left: 0, top: 0 }),
-        rect2 = makeRect({ left: 30, top:  30}), target,
-        group = new fabric.Group([rect, rect2]);
-
-
-    group.subTargetCheck = true;
-    canvas.add(group);
-    canvas.setActiveObject(group);
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    assert.equal(canvas.targets[0], rect, 'should return the rect');
-
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-
-    assert.equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
-
-    canvas.remove(group);
-  });
-
-  QUnit.test('findTarget with subTargetCheck on activeObject and preserveObjectStacking true', function(assert) {
-    var rect = makeRect({ left: 0, top: 0 }),
-        rect2 = makeRect({ left: 30, top:  30}), target,
-        group = new fabric.Group([rect, rect2]);
-    canvas.preserveObjectStacking = true;
-    group.subTargetCheck = true;
-    canvas.add(group);
-    canvas.setActiveObject(group);
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the group');
-    assert.equal(canvas.targets[0], rect, 'should return the rect');
-
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-
-    target = canvas.findTarget({
-      clientX: 9, clientY: 9, target: canvas.upperCanvasEl
-    });
-
-    assert.equal(canvas.targets.length, 1, 'multiple calls to subtarget should not add more to targets');
-
-    canvas.remove(group);
-  });
-
-  QUnit.test('findTarget with perPixelTargetFind', function(assert) {
-    assert.ok(typeof canvas.findTarget === 'function');
-    var triangle = makeTriangle({ left: 0, top: 0 }), target;
-    canvas.add(triangle);
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, triangle, 'Should return the triangle by bounding box');
-    //TODO find out why this stops the tests
-    canvas.perPixelTargetFind = true;
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks');
-    target = canvas.findTarget({
-      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, triangle, 'Should return the triangle now');
-    canvas.perPixelTargetFind = false;
-    canvas.remove(triangle);
-  });
-
-  QUnit.test('findTarget with perPixelTargetFind in nested group', function(assert) {
-    assert.ok(typeof canvas.findTarget === 'function');
-    var triangle = makeTriangle({ left: 0, top: 0, width: 30, height: 30, fill: 'yellow' }),
-        triangle2 = makeTriangle({ left: 100, top: 120, width: 30, height: 30, angle: 100, fill: 'pink' }),
-        circle = new fabric.Circle({ radius: 30, top: 0, left: 30, fill: 'blue' }),
-        circle2 = new fabric.Circle({ scaleX: 2, scaleY: 2, radius: 10, top: 120, left: -20, fill: 'purple' }),
-        rect = new fabric.Rect({ width: 100, height: 80, top: 50, left: 60, fill: 'green' }),
-        rect2 = new fabric.Rect({ width: 50, height: 30, top: 10, left: 110, fill: 'red', skewX: 40, skewY: 20 }),
-        group1 = new fabric.Group([triangle, circle, rect2], { subTargetCheck: true }),
-        group2 = new fabric.Group([group1, circle2, rect, triangle2], { subTargetCheck: true }),
-        group3 = new fabric.Group([group2], { subTargetCheck: true }),
-        target;
-
-    canvas.add(group3);
-    canvas.perPixelTargetFind = true;
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 1');
-    target = canvas.findTarget({
-      clientX: 21, clientY: 9, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 2');
-    target = canvas.findTarget({
-      clientX: 37, clientY: 7, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 3');
-    target = canvas.findTarget({
-      clientX: 89, clientY: 47, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 4');
-    target = canvas.findTarget({
-      clientX: 16, clientY: 122, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 5');
-    target = canvas.findTarget({
-      clientX: 127, clientY: 37, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 6');
-    target = canvas.findTarget({
-      clientX: 87, clientY: 139, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should return null because of transparency checks case 7');
-    target = canvas.findTarget({
-      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group3, 'Should return the group3 now');
-    assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
-    assert.equal(canvas.targets[0], triangle, 'The deepest target should be triangle');
-    target = canvas.findTarget({
-      clientX: 50, clientY: 20, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group3, 'Should return the group3 now');
-    assert.equal(canvas.targets.length, 3, 'Subtargets length should be 3');
-    assert.equal(canvas.targets[0], circle, 'The deepest target should be circle');
-    target = canvas.findTarget({
-      clientX: 117, clientY: 16, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group3, 'Should return the group3 now');
-    assert.equal(canvas.targets.length, 3, 'Subtargets length should be 2');
-    assert.equal(canvas.targets[0], rect2, 'The deepest target should be rect2');
-    target = canvas.findTarget({
-      clientX: 100, clientY: 90, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group3, 'Should return the group3 now');
-    assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
-    assert.equal(canvas.targets[0], rect, 'The deepest target should be rect');
-    target = canvas.findTarget({
-      clientX: 9, clientY: 145, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group3, 'Should return the group3 now');
-    assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
-    assert.equal(canvas.targets[0], circle2, 'The deepest target should be circle2');
-    target = canvas.findTarget({
-      clientX: 66, clientY: 143, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group3, 'Should return the group3 now');
-    assert.equal(canvas.targets.length, 2, 'Subtargets length should be 2');
-    assert.equal(canvas.targets[0], triangle2, 'The deepest target should be triangle2');
-    canvas.remove(group3);
-  });
-
-  QUnit.test('findTarget on active selection', function(assert) {
-    var rect1 = makeRect({ left: 0, top: 0 }), target;
-    var rect2 = makeRect({ left: 20, top: 20 });
-    var rect3 = makeRect({ left: 20, top: 0 });
-    canvas.add(rect1);
-    canvas.add(rect2);
-    canvas.add(rect3);
-    const group = new fabric.ActiveSelection();
-    group.subTargetCheck = true;
-    group.add(rect1, rect2);
-    group.cornerSize = 2;
-    group.setCoords();
-    canvas.setActiveObject(group);
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the activegroup');
-    target = canvas.findTarget({
-      clientX: 40, clientY: 15, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should miss the activegroup');
-    assert.ok(!group.__corner, 'not over control');
-    target = canvas.findTarget({
-      clientX: 0, clientY: 0, target: canvas.upperCanvasEl
-    });
-    assert.equal(group.__corner, 'tl', 'over control');
-    assert.ok(target, group, 'should return active selection if over control');
-    target = canvas.findTarget({
-      clientX: 5, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.ok(target, group, 'should return active selection');
-    assert.equal(canvas.targets[0], rect1, 'Should return the rect inside active selection');
-    target = canvas.findTarget({
-      clientX: 25, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the active selection');
-    assert.deepEqual(canvas.targets, [], 'Should not return the rect behind active selection');
-    canvas.discardActiveObject();
-    target = canvas.findTarget({
-      clientX: 25, clientY: 5, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, rect3, 'Should return the rect3 now that active selection has been cleared');
-  });
-
-  QUnit.test('findTarget on active selection with perPixelTargetFind', function(assert) {
-    var rect1 = makeRect({ left: 0, top: 0 }), target;
-    var rect2 = makeRect({ left: 20, top: 20 });
-    canvas.perPixelTargetFind = true;
-    canvas.preserveObjectStacking = true;
-    canvas.add(rect1);
-    canvas.add(rect2);
-    const group = new fabric.ActiveSelection();
-    group.add(rect1, rect2);
-    canvas.setActiveObject(group);
-    target = canvas.findTarget({
-      clientX: 8, clientY: 8, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, group, 'Should return the activegroup');
-
-    target = canvas.findTarget({
-      clientX: 15, clientY: 15, target: canvas.upperCanvasEl
-    });
-    assert.equal(target, null, 'Should miss the activegroup');
   });
 
   QUnit.test('toDataURL', function(assert) {
@@ -2027,9 +1644,10 @@
       target: canvas.upperCanvasEl
     };
     canvas.setActiveObject(rect);
-    rect.__corner = rect._findTargetCorner(
+    const targetCorner = rect.findControl(
       canvas.getViewportPoint(eventStub)
     );
+    rect.__corner = targetCorner ? targetCorner.key : undefined;
     canvas._setupCurrentTransform(eventStub, rect);
     var t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
@@ -2043,9 +1661,9 @@
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: canvas.upperCanvasEl
     };
-    rect.__corner = rect._findTargetCorner(
+    rect.__corner = rect.findControl(
       canvas.getViewportPoint(eventStub)
-    );
+    ).key;
     canvas._setupCurrentTransform(eventStub, rect, false);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
@@ -2054,9 +1672,9 @@
     assert.equal(t.shiftKey, undefined, 'shift was not pressed');
 
     var alreadySelected = true;
-    rect.__corner = rect._findTargetCorner(
+    rect.__corner = rect.findControl(
       canvas.getViewportPoint(eventStub)
-    );
+    ).key;
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
@@ -2072,9 +1690,9 @@
       target: canvas.upperCanvasEl,
       shiftKey: true
     };
-    rect.__corner = rect._findTargetCorner(
+    rect.__corner = rect.findControl(
       canvas.getViewportPoint(eventStub)
-    );
+    ).key;
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform;
     assert.equal(t.target, rect, 'should have rect as a target');
