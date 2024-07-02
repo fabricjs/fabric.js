@@ -1,6 +1,6 @@
 import * as fabric from 'fabric/node';
 
-class TestingCanvas extends fabric.StaticCanvas {
+export class TestingCanvas extends fabric.Canvas {
   requestRenderAll(): void {
     this.renderAll();
   }
