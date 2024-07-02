@@ -8,6 +8,7 @@ export type renderTestType = {
   size: [number, number];
   percentage: number;
   title: string;
+  golden: string;
   disabled?: 'node' | 'browser';
   renderFunction: (
     canvas: Canvas,
@@ -20,6 +21,7 @@ const emptyTest: renderTestType = {
   size: [450, 220],
   percentage: 0.05,
   title: '',
+  golden: '*.png',
   renderFunction: async function render(
     canvas: Canvas,
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -34,6 +36,7 @@ export const renderTests: renderTestType[] = [
     size: [450, 220],
     percentage: 0.05,
     title: 'polygon boundingbox with skew',
+    golden: 'polygonbboxWithSkew.png',
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -72,6 +75,7 @@ export const renderTests: renderTestType[] = [
     percentage: 0.09,
     size: [150, 60],
     title: 'Rect with strokeUniform true',
+    golden: 'generic1.png',
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -106,6 +110,7 @@ export const renderTests: renderTestType[] = [
   {
     size: [100, 100],
     percentage: 0.011,
+    golden: 'strokeNegativeScale.png',
     title: 'Rect with strokeUniform: true and negative scaling',
     disabled: 'node',
     renderFunction: async function render(
@@ -148,6 +153,7 @@ export const renderTests: renderTestType[] = [
     size: [150, 60],
     percentage: 0.09,
     title: 'Rect DropShadow with nonScaling: true',
+    golden: 'shadownonscaling.png',
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -176,43 +182,56 @@ export const renderTests: renderTestType[] = [
       canvas.add(obj);
     },
   },
+  {
+    size: [210, 210],
+    percentage: 0.09,
+    golden: 'polygonWithStroke.png',
+    title: 'polygon position independently from strokeWidth and origin',
+    renderFunction: async function render(
+      canvas: Canvas,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      fabric: typeof import('fabric')
+    ) {
+      canvas.set({ backgroundColor: '#AAAA77' });
+      const p1 = new fabric.Polygon(
+        [
+          { x: 0, y: 216 },
+          { x: 125, y: 433 },
+          { x: 375, y: 433 },
+          { x: 500, y: 216 },
+          { x: 375, y: 0 },
+          { x: 125, y: 0 },
+        ],
+        {
+          fill: 'white',
+        }
+      );
+      canvas.add(p1);
+      const p2 = new fabric.Polygon(
+        [
+          { x: 0, y: 216 },
+          { x: 125, y: 433 },
+          { x: 375, y: 433 },
+          { x: 500, y: 216 },
+          { x: 375, y: 0 },
+          { x: 125, y: 0 },
+        ],
+        {
+          fill: 'transparent',
+          stroke: '#00AAFFAA',
+          strokeWidth: 15,
+          originX: 'center',
+          originY: 'center',
+        }
+      );
+      canvas.add(p2);
+      canvas.setZoom(0.4);
+    },
+  },
 ];
 
 // function polygonWithStroke(canvas, callback) {
-//   canvas.set({ backgroundColor: '#AAAA77' });
-//   var p1 = new fabric.Polygon(
-//     [
-//       { x: 0, y: 216 },
-//       { x: 125, y: 433 },
-//       { x: 375, y: 433 },
-//       { x: 500, y: 216 },
-//       { x: 375, y: 0 },
-//       { x: 125, y: 0 },
-//     ],
-//     {
-//       fill: 'white',
-//     }
-//   );
-//   canvas.add(p1);
-//   var p2 = new fabric.Polygon(
-//     [
-//       { x: 0, y: 216 },
-//       { x: 125, y: 433 },
-//       { x: 375, y: 433 },
-//       { x: 500, y: 216 },
-//       { x: 375, y: 0 },
-//       { x: 125, y: 0 },
-//     ],
-//     {
-//       fill: 'transparent',
-//       stroke: '#00AAFFAA',
-//       strokeWidth: 15,
-//       originX: 'center',
-//       originY: 'center',
-//     }
-//   );
-//   canvas.add(p2);
-//   canvas.setZoom(0.4);
+//
 //   canvas.renderAll();
 //   callback(canvas.lowerCanvasEl);
 // }

@@ -21,7 +21,7 @@ test('VISUAL RENDERING TESTS', async ({ page }, config) => {
           await new CanvasUtil(page).screenshot(),
           `browser snapshot`
         ).toMatchSnapshot({
-          name: `${testCase.title}.png`,
+          name: testCase.golden || `${testCase.title}.png`,
           maxDiffPixelRatio: testCase.percentage,
         });
       });
@@ -43,7 +43,7 @@ test('VISUAL RENDERING TESTS', async ({ page }, config) => {
           buffer,
           `node snapshot should match browser snapshot`
         ).toMatchSnapshot({
-          name: `${testCase.title}.png`,
+          name: testCase.golden || `${testCase.title}.png`,
           maxDiffPixelRatio: testCase.percentage,
         });
       });
