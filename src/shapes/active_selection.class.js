@@ -125,7 +125,6 @@
     _renderControls: function(ctx, styleOverride, childrenOverride) {
       ctx.save();
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      this.callSuper('_renderControls', ctx, styleOverride);
       childrenOverride = childrenOverride || { };
       if (typeof childrenOverride.hasControls === 'undefined') {
         childrenOverride.hasControls = false;
@@ -134,6 +133,7 @@
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i]._renderControls(ctx, childrenOverride);
       }
+      this.callSuper('_renderControls', ctx, styleOverride);
       ctx.restore();
     },
   });
