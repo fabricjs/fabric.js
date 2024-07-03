@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.3.0' };
+var fabric = fabric || { version: '5.4.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -27782,7 +27782,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             charIndex: selectionStart
           };
         }
-        selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+        selectionStart -= lines[i].length + this.missingNewlineOffset(i, skipWrapping);
       }
       return {
         lineIndex: i - 1,
@@ -28454,7 +28454,6 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       }
     }
     fabric.Object._fromObject('IText', objCopy, function(textInstance) {
-      textInstance.styles = fabric.util.stylesFromArray(object.styles, object.text);
       if (object.path) {
         fabric.Object._fromObject('Path', object.path, function(pathInstance) {
           textInstance.set('path', pathInstance);
@@ -29211,8 +29210,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     insertNewlineStyleObject: function(lineIndex, charIndex, qty, copiedStyle) {
       var currentCharStyle,
           newLineStyles = {},
-          somethingAdded = false,
-          isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
+          someStyleIsCarryingOver = false,
+          originalLineLength = this._unwrappedTextLines[lineIndex].length,
+          isEndOfLine = originalLineLength === charIndex;
 
       qty || (qty = 1);
       this.shiftLineStyles(lineIndex, qty);
@@ -29224,7 +29224,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       for (var index in this.styles[lineIndex]) {
         var numIndex = parseInt(index, 10);
         if (numIndex >= charIndex) {
-          somethingAdded = true;
+          someStyleIsCarryingOver = true;
           newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
           // remove lines from the previous line since they're on a new line now
           if (!(isEndOfLine && charIndex === 0)) {
@@ -29233,14 +29233,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
       }
       var styleCarriedOver = false;
-      if (somethingAdded && !isEndOfLine) {
+      if (someStyleIsCarryingOver && !isEndOfLine) {
         // if is end of line, the extra style we copied
         // is probably not something we want
         this.styles[lineIndex + qty] = newLineStyles;
         styleCarriedOver = true;
       }
-      if (styleCarriedOver) {
-        // skip the last line of since we already prepared it.
+      if (styleCarriedOver || originalLineLength > charIndex) {
+        // skip the last line of since we already prepared it
+        // or contains text without style that we don't want to style
+        // just because it changed lines
         qty--;
       }
       // for the all the lines or all the other lines
@@ -31020,10 +31022,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     /**
      * Detect if a line has a linebreak and so we need to account for it when moving
      * and counting style.
+     * This is important only for splitByGrapheme at the end of wrapping.
+     * If we are not wrapping the offset is always 1
      * @return Number
      */
-    missingNewlineOffset: function(lineIndex) {
-      if (this.splitByGrapheme) {
+    missingNewlineOffset: function(lineIndex, skipWrapping) {
+      if (this.splitByGrapheme && !skipWrapping) {
         return this.isEndOfWrapping(lineIndex) ? 1 : 0;
       }
       return 1;
@@ -31090,7 +31094,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var objCopy = Object.assign({}, object, { styles: styles });
     delete objCopy.path;
     return fabric.Object._fromObject('Textbox', objCopy,  function(textInstance) {
-      textInstance.styles = fabric.util.stylesFromArray(object.styles, object.text);
       if (object.path) {
         fabric.Object._fromObject('Path', object.path, function(pathInstance) {
           textInstance.set('path', pathInstance);
