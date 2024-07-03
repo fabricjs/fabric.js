@@ -7,6 +7,7 @@
 - fix() active selection control drawing order
 - fix() patterns for gradient sometimes hitting 0 size
 - fix() Enliving of text on a path for classes different than plain Text
+- fix() Some old style shifting bugs for text
 
 ## [5.2.1]
 
