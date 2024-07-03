@@ -523,7 +523,6 @@
       }
     }
     fabric.Object._fromObject('IText', objCopy, function(textInstance) {
-      textInstance.styles = fabric.util.stylesFromArray(object.styles, object.text);
       if (object.path) {
         fabric.Object._fromObject('Path', object.path, function(pathInstance) {
           textInstance.set('path', pathInstance);
