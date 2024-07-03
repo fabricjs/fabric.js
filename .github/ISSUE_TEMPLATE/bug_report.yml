@@ -110,6 +110,7 @@ body:
       label: Node Version (if applicable)
       description: Provide the version if the bug occurs in Node.js
       options:
+        - 22.4.0
         - 22.3.0
         - 22.2.0
         - 22.1.0
