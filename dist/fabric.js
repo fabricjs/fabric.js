@@ -27257,6 +27257,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this[type] && !this.styleHas(type)) {
         return;
       }
+      ctx.save();
+      // if type is overline or linethrough we shouldn't cast shadow
+      if (type === 'overline' || type === 'linethrough') {
+        this._removeShadow(ctx);
+      }
       var heightOfLine, size, _size,
           lineLeftOffset, dy, _dy,
           line, lastDecoration,
@@ -27343,9 +27348,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         );
         topOffset += heightOfLine;
       }
-      // if there is text background color no
-      // other shadows should be casted
-      this._removeShadow(ctx);
+      ctx.restore();
     },
 
     /**
