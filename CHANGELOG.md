@@ -3,6 +3,10 @@
 ## [5.4.0]
 
 - fix() fix an issue with offScreen detection and background/overlay Vpt setting [`#8896`](https://github.com/fabricjs/fabric.js/pull/8896)
+- fix() removal of shadow for uncached text with decoration
+- fix() active selection control drawing order
+- fix() patterns for gradient sometimes hitting 0 size
+- fix() Enliving of text on a path for classes different than plain Text
 
 ## [5.2.1]
 
