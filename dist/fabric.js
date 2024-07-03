@@ -9875,10 +9875,15 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       }
       if (object) {
         ctx.save();
+        var skipOffscreen = this.skipOffscreen;
+        // if the object doesn't move with the viewport,
+        // the offscreen concept does not apply;
+        this.skipOffscreen = needsVpt;
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
         object.render(ctx);
+        this.skipOffscreen = skipOffscreen;
         ctx.restore();
       }
     },
@@ -13105,8 +13110,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var _this = this;
       this._hoveredTargets.forEach(function(_target){
-        _this.fire('mouse:out', { target: target, e: e });
-        _target && target.fire('mouseout', { e: e });
+        _this.fire('mouse:out', { target: _target, e: e });
+        _target && _target.fire('mouseout', { e: e });
       });
       this._hoveredTargets = [];
     },
@@ -18055,7 +18060,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
+      var retinaScaling = 1, matrix, p;
+      if (this.canvas) {
+        retinaScaling = this.canvas.getRetinaScaling();
+      }
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
@@ -20857,7 +20865,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _renderControls: function(ctx, styleOverride, childrenOverride) {
       ctx.save();
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      this.callSuper('_renderControls', ctx, styleOverride);
       childrenOverride = childrenOverride || { };
       if (typeof childrenOverride.hasControls === 'undefined') {
         childrenOverride.hasControls = false;
@@ -20866,6 +20873,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i]._renderControls(ctx, childrenOverride);
       }
+      this.callSuper('_renderControls', ctx, styleOverride);
       ctx.restore();
     },
   });
@@ -28433,6 +28441,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
+    delete objCopy.path;
     parseDecoration(objCopy);
     if (objCopy.styles) {
       for (var i in objCopy.styles) {
@@ -28441,7 +28450,18 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
       }
     }
-    fabric.Object._fromObject('IText', objCopy, callback, 'text');
+    fabric.Object._fromObject('IText', objCopy, function(textInstance) {
+      textInstance.styles = fabric.util.stylesFromArray(object.styles, object.text);
+      if (object.path) {
+        fabric.Object._fromObject('Path', object.path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 })();
 
@@ -31065,7 +31085,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject('Textbox', objCopy, callback, 'text');
+    delete objCopy.path;
+    return fabric.Object._fromObject('Textbox', objCopy,  function(textInstance) {
+      textInstance.styles = fabric.util.stylesFromArray(object.styles, object.text);
+      if (object.path) {
+        fabric.Object._fromObject('Path', object.path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 })(typeof exports !== 'undefined' ? exports : this);
 
