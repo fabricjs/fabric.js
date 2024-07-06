@@ -11,6 +11,4 @@ canvas.setDimensions({
   height: 500,
 });
 
-canvas.off('object:added');
-
 testCase(canvas);

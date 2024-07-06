@@ -82,7 +82,7 @@ export type EnlivenObjectOptions = Abortable & {
 
 /**
  * Creates corresponding fabric instances from their object representations
- * @param {Object[]} objects Objects to enliven
+ * @param {(BaseFabricObject | FabricObject | BaseFilter<string> | Shadow | TFiller)[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
  * @param {(serializedObj: object, instance: FabricObject) => any} [options.reviver] Method for further parsing of object elements,
  * called after each fabric object created.
