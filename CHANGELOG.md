@@ -2,6 +2,12 @@
 
 ## [next]
 
+## [6.0.2]
+
+- fix(TS): Type fixes and improved JSDOCS. [#9978](https://github.com/fabricjs/fabric.js/pull/9978)
+
+## [6.0.1]
+
 - chore(): export InteractiveFabricObject to tweak default values [#9963](https://github.com/fabricjs/fabric.js/pull/9963)
 - chore(): use deconstruction and constants in place of strings to save some bytes of code [#9593](https://github.com/fabricjs/fabric.js/pull/9593)
 - tests(): Start moving visual tests to playwrigth [#9481](https://github.com/fabricjs/fabric.js/pull/9481)

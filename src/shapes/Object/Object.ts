@@ -285,19 +285,21 @@ export class FabricObject<
   }
 
   /**
-   * The class type. Used to identify which class this is.
-   * This is used for serialization purposes and internally it can be used
-   * to identify classes. As a developer you could use `instance of Class`
-   * but to avoid importing all the code and blocking tree shaking we try
-   * to avoid doing that.
+   * The class type.
+   * This is used for serialization and deserialization purposes and internally it can be used
+   * to identify classes.
+   * When we transform a class in a plain JS object we need a way to recognize which class it was,
+   * and the type is the way we do that. It has no other purposes and you should not give one.
+   * Hard to reach on instances and please do not use to drive instance's logic (this.constructor.type).
+   * To idenfity a class use instanceof class ( instanceof Rect ).
+   * We do not do that in fabricJS code because we want to try to have code splitting possible.
    */
   static type = 'FabricObject';
 
   /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
-   * The setter exists because is very hard to catch all the ways in which a type value
-   * could be set in the instance
+   * The setter exists to avoid type errors in old code and possibly current deserialization code.
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
