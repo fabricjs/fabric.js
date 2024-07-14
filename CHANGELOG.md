@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): Removed website submodule
+
 ## [6.0.2]
 
 - fix(TS): Type fixes and improved JSDOCS. [#9978](https://github.com/fabricjs/fabric.js/pull/9978)
