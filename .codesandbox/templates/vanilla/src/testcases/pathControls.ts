@@ -7,7 +7,6 @@ export function testCase(canvas: fabric.Canvas) {
       stroke: 'red',
       strokeWidth: 0.1,
       cornerStyle: 'circle',
-      cornerSize: 8,
       objectCaching: false,
       scaleX: 20,
       scaleY: 20,

@@ -411,13 +411,13 @@ export class InteractiveFabricObject<
     size: Point,
     styleOverride: TStyleOverride = {}
   ): void {
-    ctx.save();
     const options = {
       hasControls: this.hasControls,
       borderColor: this.borderColor,
       borderDashArray: this.borderDashArray,
       ...styleOverride,
     };
+    ctx.save();
     ctx.strokeStyle = options.borderColor;
     this._setLineDash(ctx, options.borderDashArray);
     this.strokeBorders(ctx, size);
