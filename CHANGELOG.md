@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Path controls utility [#9998](https://github.com/fabricjs/fabric.js/pull/9998)
 - chore(): Removed website submodule
 
 ## [6.0.2]
