@@ -12,6 +12,7 @@ import type {
   LayoutAfterEvent,
 } from './LayoutManager/types';
 import type {
+  MODIFIED,
   MODIFY_PATH,
   MODIFY_POLY,
   MOVING,
@@ -122,13 +123,14 @@ export interface ModifiedEvent<E extends Event = TPointerEvent> {
 }
 
 type ObjectModificationEvents = {
-  moving: BasicTransformEvent;
-  scaling: BasicTransformEvent;
-  rotating: BasicTransformEvent;
-  skewing: BasicTransformEvent;
-  resizing: BasicTransformEvent;
-  modifyPoly: BasicTransformEvent;
-  modified: ModifiedEvent;
+  [MOVING]: BasicTransformEvent;
+  [SCALING]: BasicTransformEvent;
+  [ROTATING]: BasicTransformEvent;
+  [SKEWING]: BasicTransformEvent;
+  [RESIZING]: BasicTransformEvent;
+  [MODIFY_POLY]: BasicTransformEvent;
+  [MODIFY_PATH]: BasicTransformEvent;
+  [MODIFIED]: ModifiedEvent;
 };
 
 type CanvasModificationEvents = {
@@ -139,6 +141,7 @@ type CanvasModificationEvents = {
   'object:skewing': BasicTransformEvent & { target: FabricObject };
   'object:resizing': BasicTransformEvent & { target: FabricObject };
   'object:modifyPoly': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPath': BasicTransformEvent & { target: FabricObject };
   'object:modified': ModifiedEvent;
 };
 

@@ -3,6 +3,7 @@ import {
   CENTER,
   CHANGED,
   MODIFIED,
+  MODIFY_PATH,
   MODIFY_POLY,
   MOVING,
   RESIZING,
@@ -97,6 +98,7 @@ export class LayoutManager {
         SKEWING,
         CHANGED,
         MODIFY_POLY,
+        MODIFY_PATH,
       ] as (TModificationEvents & 'modified')[]
     ).map((key) =>
       object.on(key, (e) =>
