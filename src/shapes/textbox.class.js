@@ -388,10 +388,12 @@
     /**
      * Detect if a line has a linebreak and so we need to account for it when moving
      * and counting style.
+     * This is important only for splitByGrapheme at the end of wrapping.
+     * If we are not wrapping the offset is always 1
      * @return Number
      */
-    missingNewlineOffset: function(lineIndex) {
-      if (this.splitByGrapheme) {
+    missingNewlineOffset: function(lineIndex, skipWrapping) {
+      if (this.splitByGrapheme && !skipWrapping) {
         return this.isEndOfWrapping(lineIndex) ? 1 : 0;
       }
       return 1;
@@ -456,6 +458,17 @@
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject('Textbox', objCopy, callback, 'text');
+    delete objCopy.path;
+    return fabric.Object._fromObject('Textbox', objCopy,  function(textInstance) {
+      if (object.path) {
+        fabric.Object._fromObject('Path', object.path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 })(typeof exports !== 'undefined' ? exports : this);

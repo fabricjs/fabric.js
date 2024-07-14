@@ -740,8 +740,9 @@
     insertNewlineStyleObject: function(lineIndex, charIndex, qty, copiedStyle) {
       var currentCharStyle,
           newLineStyles = {},
-          somethingAdded = false,
-          isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
+          someStyleIsCarryingOver = false,
+          originalLineLength = this._unwrappedTextLines[lineIndex].length,
+          isEndOfLine = originalLineLength === charIndex;
 
       qty || (qty = 1);
       this.shiftLineStyles(lineIndex, qty);
@@ -753,7 +754,7 @@
       for (var index in this.styles[lineIndex]) {
         var numIndex = parseInt(index, 10);
         if (numIndex >= charIndex) {
-          somethingAdded = true;
+          someStyleIsCarryingOver = true;
           newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
           // remove lines from the previous line since they're on a new line now
           if (!(isEndOfLine && charIndex === 0)) {
@@ -762,14 +763,16 @@
         }
       }
       var styleCarriedOver = false;
-      if (somethingAdded && !isEndOfLine) {
+      if (someStyleIsCarryingOver && !isEndOfLine) {
         // if is end of line, the extra style we copied
         // is probably not something we want
         this.styles[lineIndex + qty] = newLineStyles;
         styleCarriedOver = true;
       }
-      if (styleCarriedOver) {
-        // skip the last line of since we already prepared it.
+      if (styleCarriedOver || originalLineLength > charIndex) {
+        // skip the last line of since we already prepared it
+        // or contains text without style that we don't want to style
+        // just because it changed lines
         qty--;
       }
       // for the all the lines or all the other lines

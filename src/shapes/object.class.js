@@ -1577,8 +1577,8 @@
       var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           pCanvas = fabric.util.createCanvasElement(), pCtx, retinaScaling = this.canvas.getRetinaScaling(),
           width = dims.x / this.scaleX / retinaScaling, height = dims.y / this.scaleY / retinaScaling;
-      pCanvas.width = width;
-      pCanvas.height = height;
+      pCanvas.width = Math.ceil(width);
+      pCanvas.height = Math.ceil(height);
       pCtx = pCanvas.getContext('2d');
       pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(width, 0); pCtx.lineTo(width, height);
       pCtx.lineTo(0, height); pCtx.closePath();

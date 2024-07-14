@@ -513,6 +513,7 @@
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
+    delete objCopy.path;
     parseDecoration(objCopy);
     if (objCopy.styles) {
       for (var i in objCopy.styles) {
@@ -521,6 +522,16 @@
         }
       }
     }
-    fabric.Object._fromObject('IText', objCopy, callback, 'text');
+    fabric.Object._fromObject('IText', objCopy, function(textInstance) {
+      if (object.path) {
+        fabric.Object._fromObject('Path', object.path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 })();

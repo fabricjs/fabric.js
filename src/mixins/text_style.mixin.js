@@ -177,7 +177,7 @@
             charIndex: selectionStart
           };
         }
-        selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+        selectionStart -= lines[i].length + this.missingNewlineOffset(i, skipWrapping);
       }
       return {
         lineIndex: i - 1,

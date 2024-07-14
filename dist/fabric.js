@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.3.0' };
+var fabric = fabric || { version: '5.4.0' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -9875,10 +9875,15 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
       }
       if (object) {
         ctx.save();
+        var skipOffscreen = this.skipOffscreen;
+        // if the object doesn't move with the viewport,
+        // the offscreen concept does not apply;
+        this.skipOffscreen = needsVpt;
         if (needsVpt) {
           ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
         }
         object.render(ctx);
+        this.skipOffscreen = skipOffscreen;
         ctx.restore();
       }
     },
@@ -13105,8 +13110,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       var _this = this;
       this._hoveredTargets.forEach(function(_target){
-        _this.fire('mouse:out', { target: target, e: e });
-        _target && target.fire('mouseout', { e: e });
+        _this.fire('mouse:out', { target: _target, e: e });
+        _target && _target.fire('mouseout', { e: e });
       });
       this._hoveredTargets = [];
     },
@@ -16018,8 +16023,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       var dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
           pCanvas = fabric.util.createCanvasElement(), pCtx, retinaScaling = this.canvas.getRetinaScaling(),
           width = dims.x / this.scaleX / retinaScaling, height = dims.y / this.scaleY / retinaScaling;
-      pCanvas.width = width;
-      pCanvas.height = height;
+      pCanvas.width = Math.ceil(width);
+      pCanvas.height = Math.ceil(height);
       pCtx = pCanvas.getContext('2d');
       pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(width, 0); pCtx.lineTo(width, height);
       pCtx.lineTo(0, height); pCtx.closePath();
@@ -18055,7 +18060,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     drawControls: function(ctx, styleOverride) {
       styleOverride = styleOverride || {};
       ctx.save();
-      var retinaScaling = this.canvas.getRetinaScaling(), matrix, p;
+      var retinaScaling = 1, matrix, p;
+      if (this.canvas) {
+        retinaScaling = this.canvas.getRetinaScaling();
+      }
       ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
       ctx.strokeStyle = ctx.fillStyle = styleOverride.cornerColor || this.cornerColor;
       if (!this.transparentCorners) {
@@ -20857,7 +20865,6 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
     _renderControls: function(ctx, styleOverride, childrenOverride) {
       ctx.save();
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-      this.callSuper('_renderControls', ctx, styleOverride);
       childrenOverride = childrenOverride || { };
       if (typeof childrenOverride.hasControls === 'undefined') {
         childrenOverride.hasControls = false;
@@ -20866,6 +20873,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       for (var i = 0, len = this._objects.length; i < len; i++) {
         this._objects[i]._renderControls(ctx, childrenOverride);
       }
+      this.callSuper('_renderControls', ctx, styleOverride);
       ctx.restore();
     },
   });
@@ -27249,6 +27257,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       if (!this[type] && !this.styleHas(type)) {
         return;
       }
+      ctx.save();
+      // if type is overline or linethrough we shouldn't cast shadow
+      if (type === 'overline' || type === 'linethrough') {
+        this._removeShadow(ctx);
+      }
       var heightOfLine, size, _size,
           lineLeftOffset, dy, _dy,
           line, lastDecoration,
@@ -27335,9 +27348,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         );
         topOffset += heightOfLine;
       }
-      // if there is text background color no
-      // other shadows should be casted
-      this._removeShadow(ctx);
+      ctx.restore();
     },
 
     /**
@@ -27771,7 +27782,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             charIndex: selectionStart
           };
         }
-        selectionStart -= lines[i].length + this.missingNewlineOffset(i);
+        selectionStart -= lines[i].length + this.missingNewlineOffset(i, skipWrapping);
       }
       return {
         lineIndex: i - 1,
@@ -28433,6 +28444,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
+    delete objCopy.path;
     parseDecoration(objCopy);
     if (objCopy.styles) {
       for (var i in objCopy.styles) {
@@ -28441,7 +28453,17 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
       }
     }
-    fabric.Object._fromObject('IText', objCopy, callback, 'text');
+    fabric.Object._fromObject('IText', objCopy, function(textInstance) {
+      if (object.path) {
+        fabric.Object._fromObject('Path', object.path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 })();
 
@@ -29188,8 +29210,9 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
     insertNewlineStyleObject: function(lineIndex, charIndex, qty, copiedStyle) {
       var currentCharStyle,
           newLineStyles = {},
-          somethingAdded = false,
-          isEndOfLine = this._unwrappedTextLines[lineIndex].length === charIndex;
+          someStyleIsCarryingOver = false,
+          originalLineLength = this._unwrappedTextLines[lineIndex].length,
+          isEndOfLine = originalLineLength === charIndex;
 
       qty || (qty = 1);
       this.shiftLineStyles(lineIndex, qty);
@@ -29201,7 +29224,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       for (var index in this.styles[lineIndex]) {
         var numIndex = parseInt(index, 10);
         if (numIndex >= charIndex) {
-          somethingAdded = true;
+          someStyleIsCarryingOver = true;
           newLineStyles[numIndex - charIndex] = this.styles[lineIndex][index];
           // remove lines from the previous line since they're on a new line now
           if (!(isEndOfLine && charIndex === 0)) {
@@ -29210,14 +29233,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         }
       }
       var styleCarriedOver = false;
-      if (somethingAdded && !isEndOfLine) {
+      if (someStyleIsCarryingOver && !isEndOfLine) {
         // if is end of line, the extra style we copied
         // is probably not something we want
         this.styles[lineIndex + qty] = newLineStyles;
         styleCarriedOver = true;
       }
-      if (styleCarriedOver) {
-        // skip the last line of since we already prepared it.
+      if (styleCarriedOver || originalLineLength > charIndex) {
+        // skip the last line of since we already prepared it
+        // or contains text without style that we don't want to style
+        // just because it changed lines
         qty--;
       }
       // for the all the lines or all the other lines
@@ -30997,10 +31022,12 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     /**
      * Detect if a line has a linebreak and so we need to account for it when moving
      * and counting style.
+     * This is important only for splitByGrapheme at the end of wrapping.
+     * If we are not wrapping the offset is always 1
      * @return Number
      */
-    missingNewlineOffset: function(lineIndex) {
-      if (this.splitByGrapheme) {
+    missingNewlineOffset: function(lineIndex, skipWrapping) {
+      if (this.splitByGrapheme && !skipWrapping) {
         return this.isEndOfWrapping(lineIndex) ? 1 : 0;
       }
       return 1;
@@ -31065,7 +31092,18 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     var styles = fabric.util.stylesFromArray(object.styles, object.text);
     //copy object to prevent mutation
     var objCopy = Object.assign({}, object, { styles: styles });
-    return fabric.Object._fromObject('Textbox', objCopy, callback, 'text');
+    delete objCopy.path;
+    return fabric.Object._fromObject('Textbox', objCopy,  function(textInstance) {
+      if (object.path) {
+        fabric.Object._fromObject('Path', object.path, function(pathInstance) {
+          textInstance.set('path', pathInstance);
+          callback(textInstance);
+        }, 'path');
+      }
+      else {
+        callback(textInstance);
+      }
+    }, 'text');
   };
 })(typeof exports !== 'undefined' ? exports : this);
 
