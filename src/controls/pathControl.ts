@@ -214,15 +214,14 @@ export function createPathControls(
     const command = path.path[commandIndex];
     const commandType = command[0];
 
+    if (commandType !== 'Z') {
+      controls[`c_${commandIndex}_${commandType}`] = createControl(
+        commandIndex,
+        command.length - 2,
+        options
+      );
+    }
     switch (commandType) {
-      case 'M':
-      case 'L':
-        controls[`c_${commandIndex}_${commandType}`] = createControl(
-          commandIndex,
-          1,
-          options
-        );
-        break;
       case 'C':
         controls[`c_${commandIndex}_${commandType}_c1`] = createControl(
           commandIndex,
@@ -238,11 +237,6 @@ export function createPathControls(
           commandIndex,
           5
         );
-        controls[`c_${commandIndex}_${commandType}_p`] = createControl(
-          commandIndex,
-          5,
-          options
-        );
         break;
       case 'Q':
         controls[`c_${commandIndex}_${commandType}_c1`] = createControl(
@@ -253,11 +247,6 @@ export function createPathControls(
           3,
           commandIndex - 1,
           indexFromPrevCommand(previousCommandType)
-        );
-        controls[`c_${commandIndex}_${commandType}`] = createControl(
-          commandIndex,
-          3,
-          options
         );
         break;
     }
