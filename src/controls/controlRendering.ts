@@ -15,12 +15,14 @@ export type ControlRenderingStyleOverride = Partial<
   >
 >;
 
-export type ControlRenderer = (
+export type ControlRenderer<
+  O extends InteractiveFabricObject = InteractiveFabricObject
+> = (
   ctx: CanvasRenderingContext2D,
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: O
 ) => void;
 
 /**

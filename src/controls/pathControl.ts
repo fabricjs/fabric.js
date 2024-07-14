@@ -11,8 +11,12 @@ import type {
 } from '../EventTypeDefs';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { sendPointToPlane } from '../util';
+import type { TSimpleParseCommandType } from '../util/path/typedefs';
 import { iMatrix, MODIFY_PATH } from '../constants';
-import type { ControlRenderingStyleOverride } from './controlRendering';
+import type {
+  ControlRenderer,
+  ControlRenderingStyleOverride,
+} from './controlRendering';
 
 const ACTION_NAME: TModificationEvents = MODIFY_PATH;
 
@@ -21,10 +25,22 @@ type TTransformAnchor = Transform & {
   commandIndex: number;
 };
 
-export function wrapRenderWithConnectionC(
+export function wrapRenderWithConnection(
   commandIndex: number,
   pointIndex: number
-) {
+): ControlRenderer<Path>;
+export function wrapRenderWithConnection(
+  commandIndex: number,
+  pointIndex: number,
+  commandIndexPrevious: number,
+  pointIndexPrevious: number
+): ControlRenderer<Path>;
+export function wrapRenderWithConnection(
+  commandIndex: number,
+  pointIndex: number,
+  commandIndexPrevious?: number | never,
+  pointIndexPrevious?: number | never
+): ControlRenderer<Path> {
   return function (
     this: Control,
     ctx: CanvasRenderingContext2D,
@@ -38,47 +54,17 @@ export function wrapRenderWithConnectionC(
       iMatrix,
       fabricObject
     );
-    ctx.moveTo(left, top);
+    if (pointIndexPrevious) {
+      const point2 = createPathPositionHandler(
+        commandIndexPrevious!,
+        pointIndexPrevious
+      )(ZERO, iMatrix, fabricObject);
+      ctx.moveTo(point2.x, point2.y);
+      ctx.lineTo(left, top);
+    } else {
+      ctx.moveTo(left, top);
+    }
     ctx.lineTo(point.x, point.y);
-    ctx.stroke();
-    return Control.prototype.render.call(
-      this,
-      ctx,
-      left,
-      top,
-      styleOverride,
-      fabricObject
-    );
-  };
-}
-
-export function wrapRenderWithConnectionQ(
-  commandIndex: number,
-  commandIndexPrevious: number,
-  pointIndexPrevious: number
-) {
-  return function (
-    this: Control,
-    ctx: CanvasRenderingContext2D,
-    left: number,
-    top: number,
-    styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: Path
-  ) {
-    const point = createPathPositionHandler(commandIndex, 3)(
-      ZERO,
-      iMatrix,
-      fabricObject
-    );
-    const point2 = createPathPositionHandler(
-      commandIndexPrevious,
-      pointIndexPrevious
-    )(ZERO, iMatrix, fabricObject);
-
-    ctx.moveTo(point2.x, point2.y);
-    ctx.lineTo(left, top);
-    ctx.lineTo(point.x, point.y);
-
     ctx.stroke();
     return Control.prototype.render.call(
       this,
@@ -197,12 +183,15 @@ export const createPathActionHandler = (
     factoryPathActionHandler(commandIndex, pointIndex, PathActionHandler)
   );
 
+const indexFromPrevCommand = (previousCommandType: TSimpleParseCommandType) =>
+  previousCommandType === 'C' ? 5 : previousCommandType === 'Q' ? 3 : 1;
+
 export function createPathControls(
   path: Path,
   options?: Partial<Control>
 ): Record<string, Control> {
   const controls = {} as Record<string, Control>;
-  let previousCommandType = 'M';
+  let previousCommandType: TSimpleParseCommandType = 'M';
   for (
     let commandIndex = 0;
     commandIndex < (typeof path === 'number' ? path : path.path.length);
@@ -226,13 +215,9 @@ export function createPathControls(
           actionName: ACTION_NAME,
           positionHandler: createPathPositionHandler(commandIndex, 1),
           actionHandler: createPathActionHandler(commandIndex, 1),
-          render: wrapRenderWithConnectionC(
+          render: wrapRenderWithConnection(
             commandIndex - 1,
-            previousCommandType === 'C'
-              ? 5
-              : previousCommandType === 'Q'
-              ? 3
-              : 1
+            indexFromPrevCommand(previousCommandType)
           ),
           ...options,
         });
@@ -240,7 +225,7 @@ export function createPathControls(
           actionName: ACTION_NAME,
           positionHandler: createPathPositionHandler(commandIndex, 3),
           actionHandler: createPathActionHandler(commandIndex, 3),
-          render: wrapRenderWithConnectionC(commandIndex, 5),
+          render: wrapRenderWithConnection(commandIndex, 5),
           ...options,
         });
         controls[`cmd_${commandIndex}_${commandType}_p`] = new Control({
@@ -255,14 +240,11 @@ export function createPathControls(
           actionName: ACTION_NAME,
           positionHandler: createPathPositionHandler(commandIndex, 1),
           actionHandler: createPathActionHandler(commandIndex, 1),
-          render: wrapRenderWithConnectionQ(
+          render: wrapRenderWithConnection(
             commandIndex,
+            3,
             commandIndex - 1,
-            previousCommandType === 'C'
-              ? 5
-              : previousCommandType === 'Q'
-              ? 3
-              : 1
+            indexFromPrevCommand(previousCommandType)
           ),
           ...options,
         });
