@@ -206,12 +206,7 @@ export function createPathControls(
 ): Record<string, Control> {
   const controls = {} as Record<string, Control>;
   let previousCommandType: TSimpleParseCommandType = 'M';
-  for (
-    let commandIndex = 0;
-    commandIndex < (typeof path === 'number' ? path : path.path.length);
-    commandIndex++
-  ) {
-    const command = path.path[commandIndex];
+  path.path.forEach((command, commandIndex) => {
     const commandType = command[0];
 
     if (commandType !== 'Z') {
@@ -251,6 +246,6 @@ export function createPathControls(
         break;
     }
     previousCommandType = commandType;
-  }
+  });
   return controls;
 }
