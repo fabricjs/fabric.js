@@ -10,7 +10,7 @@ import type {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
-import { sendPointToPlane } from '../util';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import type { TSimpleParseCommandType } from '../util/path/typedefs';
 import { iMatrix, MODIFY_PATH } from '../constants';
 import type {
@@ -27,19 +27,9 @@ type TTransformAnchor = Transform & {
 
 export function wrapRenderWithConnection(
   commandIndex: number,
-  pointIndex: number
-): ControlRenderer<Path>;
-export function wrapRenderWithConnection(
-  commandIndex: number,
   pointIndex: number,
-  commandIndexPrevious: number,
-  pointIndexPrevious: number
-): ControlRenderer<Path>;
-export function wrapRenderWithConnection(
-  commandIndex: number,
-  pointIndex: number,
-  commandIndexPrevious?: number | never,
-  pointIndexPrevious?: number | never
+  commandIndexPrevious?: number,
+  pointIndexPrevious?: number
 ): ControlRenderer<Path> {
   return function (
     this: Control,
@@ -54,9 +44,9 @@ export function wrapRenderWithConnection(
       iMatrix,
       fabricObject
     );
-    if (pointIndexPrevious) {
+    if (commandIndexPrevious && pointIndexPrevious) {
       const point2 = createPathPositionHandler(
-        commandIndexPrevious!,
+        commandIndexPrevious,
         pointIndexPrevious
       )(ZERO, iMatrix, fabricObject);
       ctx.moveTo(point2.x, point2.y);
@@ -85,20 +75,18 @@ export const createPathPositionHandler = (
   commandIndex: number,
   pointIndex: number
 ) => {
-  return function (dim: Point, finalMatrix: TMat2D, polyObject: Path) {
-    const { path, pathOffset } = polyObject;
+  return function (dim: Point, finalMatrix: TMat2D, pathObject: Path) {
+    const { path, pathOffset } = pathObject;
     const command = path[commandIndex];
     return new Point(
-      command[pointIndex] as number,
-      command[pointIndex + 1] as number
-    )
-      .subtract(pathOffset)
-      .transform(
-        multiplyTransformMatrices(
-          polyObject.getViewportTransform(),
-          polyObject.calcTransformMatrix()
-        )
-      );
+      (command[pointIndex] as number) - pathOffset.x,
+      (command[pointIndex + 1] as number) - pathOffset.y
+    ).transform(
+      multiplyTransformMatrices(
+        pathObject.getViewportTransform(),
+        pathObject.calcTransformMatrix()
+      )
+    );
   };
 };
 
@@ -116,16 +104,16 @@ export const PathActionHandler = (
   y: number
 ) => {
   const { target, pointIndex, commandIndex } = transform;
-  const path = target as Path;
+  const { path, pathOffset } = target as Path;
   const mouseLocalPosition = sendPointToPlane(
     new Point(x, y),
     undefined,
-    path.calcOwnMatrix()
-  ).add(path.pathOffset);
+    target.calcOwnMatrix()
+  );
 
-  path.path[commandIndex][pointIndex] = mouseLocalPosition.x;
-  path.path[commandIndex][pointIndex + 1] = mouseLocalPosition.y;
-  path.setDimensions();
+  path[commandIndex][pointIndex] = mouseLocalPosition.x + pathOffset.x;
+  path[commandIndex][pointIndex + 1] = mouseLocalPosition.y + pathOffset.y;
+  (target as Path).setDimensions();
 
   return true;
 };
@@ -144,17 +132,17 @@ export const factoryPathActionHandler = (
     x: number,
     y: number
   ) {
-    const path = transform.target as Path,
-      commands = path.path,
-      anchorCommand =
-        commands[(commandIndex > 0 ? commandIndex : commands.length) - 1],
+    const { target } = transform;
+    const { path, pathOffset } = target as Path,
+      anchorCommand = path[(commandIndex > 0 ? commandIndex : path.length) - 1],
       anchorPoint = new Point(
         anchorCommand[pointIndex] as number,
         anchorCommand[pointIndex + 1] as number
       ),
       anchorPointInParentPlane = anchorPoint
-        .subtract(path.pathOffset)
-        .transform(path.calcOwnMatrix()),
+        .subtract(pathOffset)
+        .transform(target.calcOwnMatrix()),
+      // fn mutates target, target.path and target.pathOffset
       actionPerformed = fn(
         eventData,
         { ...transform, pointIndex, commandIndex },
@@ -163,12 +151,12 @@ export const factoryPathActionHandler = (
       );
 
     const newAnchorPointInParentPlane = anchorPoint
-      .subtract(path.pathOffset)
-      .transform(path.calcOwnMatrix());
+      .subtract((target as Path).pathOffset)
+      .transform(target.calcOwnMatrix());
 
     const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
-    path.left -= diff.x;
-    path.top -= diff.y;
+    target.left -= diff.x;
+    target.top -= diff.y;
 
     return actionPerformed;
   };
@@ -185,6 +173,32 @@ export const createPathActionHandler = (
 
 const indexFromPrevCommand = (previousCommandType: TSimpleParseCommandType) =>
   previousCommandType === 'C' ? 5 : previousCommandType === 'Q' ? 3 : 1;
+
+const createControl = (
+  commandIndexPos: number,
+  pointIndexPos: number,
+  options?: Partial<Control>,
+  commandIndexConnect?: number,
+  pointIndexConnect?: number,
+  commandIndexConnect2?: number,
+  pointIndexConnect2?: number
+) =>
+  new Control({
+    actionName: ACTION_NAME,
+    positionHandler: createPathPositionHandler(commandIndexPos, pointIndexPos),
+    actionHandler: createPathActionHandler(commandIndexPos, pointIndexPos),
+    ...(commandIndexConnect && pointIndexConnect
+      ? {
+          render: wrapRenderWithConnection(
+            commandIndexConnect,
+            pointIndexConnect,
+            commandIndexConnect2,
+            pointIndexConnect2
+          ),
+        }
+      : {}),
+    ...options,
+  });
 
 export function createPathControls(
   path: Path,
@@ -203,57 +217,48 @@ export function createPathControls(
     switch (commandType) {
       case 'M':
       case 'L':
-        controls[`cmd_${commandIndex}_${commandType}`] = new Control({
-          actionName: ACTION_NAME,
-          positionHandler: createPathPositionHandler(commandIndex, 1),
-          actionHandler: createPathActionHandler(commandIndex, 1),
-          ...options,
-        });
+        controls[`c_${commandIndex}_${commandType}`] = createControl(
+          commandIndex,
+          1,
+          options
+        );
         break;
       case 'C':
-        controls[`cmd_${commandIndex}_${commandType}_c1`] = new Control({
-          actionName: ACTION_NAME,
-          positionHandler: createPathPositionHandler(commandIndex, 1),
-          actionHandler: createPathActionHandler(commandIndex, 1),
-          render: wrapRenderWithConnection(
-            commandIndex - 1,
-            indexFromPrevCommand(previousCommandType)
-          ),
-          ...options,
-        });
-        controls[`cmd_${commandIndex}_${commandType}_c2`] = new Control({
-          actionName: ACTION_NAME,
-          positionHandler: createPathPositionHandler(commandIndex, 3),
-          actionHandler: createPathActionHandler(commandIndex, 3),
-          render: wrapRenderWithConnection(commandIndex, 5),
-          ...options,
-        });
-        controls[`cmd_${commandIndex}_${commandType}_p`] = new Control({
-          actionName: ACTION_NAME,
-          positionHandler: createPathPositionHandler(commandIndex, 5),
-          actionHandler: createPathActionHandler(commandIndex, 5),
-          ...options,
-        });
+        controls[`c_${commandIndex}_${commandType}_c1`] = createControl(
+          commandIndex,
+          1,
+          options,
+          commandIndex - 1,
+          indexFromPrevCommand(previousCommandType)
+        );
+        controls[`c_${commandIndex}_${commandType}_c2`] = createControl(
+          commandIndex,
+          3,
+          options,
+          commandIndex,
+          5
+        );
+        controls[`c_${commandIndex}_${commandType}_p`] = createControl(
+          commandIndex,
+          5,
+          options
+        );
         break;
       case 'Q':
-        controls[`cmd_${commandIndex}_${commandType}_c1`] = new Control({
-          actionName: ACTION_NAME,
-          positionHandler: createPathPositionHandler(commandIndex, 1),
-          actionHandler: createPathActionHandler(commandIndex, 1),
-          render: wrapRenderWithConnection(
-            commandIndex,
-            3,
-            commandIndex - 1,
-            indexFromPrevCommand(previousCommandType)
-          ),
-          ...options,
-        });
-        controls[`cmd_${commandIndex}_${commandType}`] = new Control({
-          actionName: ACTION_NAME,
-          positionHandler: createPathPositionHandler(commandIndex, 3),
-          actionHandler: createPathActionHandler(commandIndex, 3),
-          ...options,
-        });
+        controls[`c_${commandIndex}_${commandType}_c1`] = createControl(
+          commandIndex,
+          1,
+          options,
+          commandIndex,
+          3,
+          commandIndex - 1,
+          indexFromPrevCommand(previousCommandType)
+        );
+        controls[`c_${commandIndex}_${commandType}`] = createControl(
+          commandIndex,
+          3,
+          options
+        );
         break;
     }
     previousCommandType = commandType;
