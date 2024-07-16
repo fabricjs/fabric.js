@@ -119,7 +119,7 @@ export const PathActionHandler = (
 };
 
 /**
- * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
+ * Keep the path in the same position when we change its `width`/`height`/`top`/`left`.
  */
 export const factoryPathActionHandler = (
   commandIndex: number,
