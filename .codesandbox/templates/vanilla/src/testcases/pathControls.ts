@@ -15,6 +15,9 @@ export function testCase(canvas: fabric.Canvas) {
       top: 100,
     }
   );
-  (path.controls = fabric.controlsUtils.createPathControls(path)),
-    canvas.add(path);
+  path.controls = fabric.controlsUtils.createPathControls(path);
+  canvas.add(path);
+  path.on('modifyPath', (opt) => {
+    console.log(opt.commandIndex, opt.pointIndex);
+  });
 }

@@ -168,7 +168,8 @@ export const createPathActionHandler = (
 ) =>
   wrapWithFireEvent(
     ACTION_NAME,
-    factoryPathActionHandler(commandIndex, pointIndex, PathActionHandler)
+    factoryPathActionHandler(commandIndex, pointIndex, PathActionHandler),
+    { pointIndex, commandIndex }
   );
 
 const indexFromPrevCommand = (previousCommandType: TSimpleParseCommandType) =>
@@ -218,14 +219,14 @@ export function createPathControls(
     }
     switch (commandType) {
       case 'C':
-        controls[`c_${commandIndex}_${commandType}_c1`] = createControl(
+        controls[`c_${commandIndex}_${commandType}_CP_1`] = createControl(
           commandIndex,
           1,
           options,
           commandIndex - 1,
           indexFromPrevCommand(previousCommandType)
         );
-        controls[`c_${commandIndex}_${commandType}_c2`] = createControl(
+        controls[`c_${commandIndex}_${commandType}_CP_2`] = createControl(
           commandIndex,
           3,
           options,
@@ -234,7 +235,7 @@ export function createPathControls(
         );
         break;
       case 'Q':
-        controls[`c_${commandIndex}_${commandType}_c1`] = createControl(
+        controls[`c_${commandIndex}_${commandType}_CP_1`] = createControl(
           commandIndex,
           1,
           options,

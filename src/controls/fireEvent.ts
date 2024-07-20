@@ -1,11 +1,11 @@
 import type {
-  BasicTransformEvent,
+  ObjectModificationEvents,
   TModificationEvents,
 } from '../EventTypeDefs';
 
 export const fireEvent = (
   eventName: TModificationEvents,
-  options: BasicTransformEvent
+  options: ObjectModificationEvents[typeof eventName]
 ) => {
   const {
     transform: { target },

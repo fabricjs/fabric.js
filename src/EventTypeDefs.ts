@@ -122,14 +122,19 @@ export interface ModifiedEvent<E extends Event = TPointerEvent> {
   action?: string;
 }
 
-type ObjectModificationEvents = {
+export interface ModifyPathEvent {
+  commandIndex: number;
+  pointIndex: number;
+}
+
+export type ObjectModificationEvents = {
   [MOVING]: BasicTransformEvent;
   [SCALING]: BasicTransformEvent;
   [ROTATING]: BasicTransformEvent;
   [SKEWING]: BasicTransformEvent;
   [RESIZING]: BasicTransformEvent;
   [MODIFY_POLY]: BasicTransformEvent;
-  [MODIFY_PATH]: BasicTransformEvent;
+  [MODIFY_PATH]: BasicTransformEvent & ModifyPathEvent;
   [MODIFIED]: ModifiedEvent;
 };
 
@@ -141,7 +146,9 @@ type CanvasModificationEvents = {
   'object:skewing': BasicTransformEvent & { target: FabricObject };
   'object:resizing': BasicTransformEvent & { target: FabricObject };
   'object:modifyPoly': BasicTransformEvent & { target: FabricObject };
-  'object:modifyPath': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPath': BasicTransformEvent & {
+    target: FabricObject;
+  } & ModifyPathEvent;
   'object:modified': ModifiedEvent;
 };
 
