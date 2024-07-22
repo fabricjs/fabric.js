@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(): Removed website submodule
+- fix(custom-attr-type): Custom attribute contains type or source. [#10001](https://github.com/fabricjs/fabric.js/issues/10001)
 
 ## [6.0.2]
 

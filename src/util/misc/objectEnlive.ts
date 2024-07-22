@@ -162,6 +162,9 @@ export const enlivenObjectEnlivables = <
         }).then(([enlived]) => {
           instances.push(enlived);
           return enlived;
+        }).catch(_ => {
+          // Possibly a user-defined property, should output as is if parsing fails
+          return value;
         });
       }
       // pattern
@@ -172,6 +175,9 @@ export const enlivenObjectEnlivables = <
           .then((pattern: Pattern) => {
             instances.push(pattern);
             return pattern;
+          }).catch(_ => {
+            // Possibly a user-defined property, should output as is if parsing fails
+            return value;
           });
       }
       return value;
