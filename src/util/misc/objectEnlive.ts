@@ -151,33 +151,27 @@ export const enlivenObjectEnlivables = <
     const instances: (FabricObject | TFiller | Shadow)[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
-    const promises = Object.values(serializedObject).map((value: any) => {
+    const promises = Object.entries(serializedObject).map(([key, value]: [string, any]) => {
       if (!value) {
         return value;
       }
       // clipPath or shadow or gradient
-      if (value.type) {
+      if (['clipPath', 'shadow', 'gradient'].includes(key) && value.type) {
         return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
           signal,
         }).then(([enlived]) => {
           instances.push(enlived);
           return enlived;
-        }).catch(_ => {
-          // Possibly a user-defined property, should output as is if parsing fails
-          return value;
         });
       }
       // pattern
-      if (value.source) {
+      if (["stroke", "fill"].includes(key) && value.source) {
         return classRegistry
           .getClass<typeof Pattern>('pattern')
           .fromObject(value, { signal })
           .then((pattern: Pattern) => {
             instances.push(pattern);
             return pattern;
-          }).catch(_ => {
-            // Possibly a user-defined property, should output as is if parsing fails
-            return value;
           });
       }
       return value;
