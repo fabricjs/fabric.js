@@ -16,6 +16,7 @@ describe('ActiveSelectionLayoutManager', () => {
         'skewing',
         'changed',
         'modifyPoly',
+        'modifyPath',
       ];
 
       it('should subscribe activeSelection that contains object', () => {
