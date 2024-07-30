@@ -2,8 +2,8 @@
 
 ## [next]
 
+- fix(): Avoid errors on restoring custom properties that pass the lazy detection of shadow,gradient,pattern and clipPath. [#10001](https://github.com/fabricjs/fabric.js/issues/10001)
 - chore(): Removed website submodule
-- fix(custom-attr-type): Custom attribute contains type or source. [#10001](https://github.com/fabricjs/fabric.js/issues/10001)
 
 ## [6.0.2]
 
