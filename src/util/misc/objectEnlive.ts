@@ -1,5 +1,4 @@
 import { noop } from '../../constants';
-import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type {
   Abortable,
@@ -151,44 +150,26 @@ export const enlivenObjectEnlivables = <
     const instances: (FabricObject | TFiller | Shadow)[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
-    const promises = Object.entries(serializedObject).map(
-      ([key, value]: [string, any]) => {
-        if (!value) {
-          return value;
-        }
-        // clipPath or shadow or gradient or text on a path or the backgroundImage or overlayImage of canvas
-        if (
-          value.type &&
-          [
-            'clipPath',
-            'shadow',
-            'fill',
-            'stroke',
-            'path',
-            'backgroundImage',
-            'overlayImage',
-          ].includes(key)
-        ) {
-          return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
-            signal,
-          }).then(([enlived]) => {
-            instances.push(enlived);
-            return enlived;
-          });
-        }
-        // pattern
-        if (value.source && ['stroke', 'fill'].includes(key)) {
-          return classRegistry
-            .getClass<typeof Pattern>('pattern')
-            .fromObject(value, { signal })
-            .then((pattern: Pattern) => {
-              instances.push(pattern);
-              return pattern;
-            });
-        }
+    const promises = Object.values(serializedObject).map((value: any) => {
+      if (!value) {
         return value;
       }
-    );
+      /**
+       * clipPath or shadow or gradient or text on a path or a pattern,
+       * or the backgroundImage or overlayImage of canvas
+       * If we have a type and there is a classe registered for it, we enlive it.
+       * If there is no class registered for it we return the value as is
+       * */
+      if (value.type && classRegistry.getClass(value.type)) {
+        return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
+          signal,
+        }).then(([enlived]) => {
+          instances.push(enlived);
+          return enlived;
+        });
+      }
+      return value;
+    });
     const keys = Object.keys(serializedObject);
     Promise.all(promises)
       .then((enlived) => {
