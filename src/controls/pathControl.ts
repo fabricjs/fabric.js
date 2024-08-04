@@ -24,7 +24,7 @@ export type PathPointControlStyle = {
   connectionDashArray?: number[];
 };
 
-export const calcPathPointPosition = (
+const calcPathPointPosition = (
   pathObject: Path,
   commandIndex: number,
   pointIndex: number
@@ -42,7 +42,7 @@ export const calcPathPointPosition = (
   );
 };
 
-export const movePathPoint = (
+const movePathPoint = (
   pathObject: Path,
   x: number,
   y: number,
@@ -104,7 +104,7 @@ function pathPositionHandler(
  * and the current position in canvas coordinate `transform.target` is a reference to the
  * current object being transformed.
  */
-export function pathActionHandler(
+function pathActionHandler(
   this: PathPointControl,
   eventData: TPointerEvent,
   transform: TTransformAnchor,
