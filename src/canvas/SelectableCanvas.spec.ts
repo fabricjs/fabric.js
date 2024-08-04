@@ -2,6 +2,7 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
 import { Canvas } from './Canvas';
 import { Group } from '../shapes/Group';
+import { ActiveSelection } from '../shapes/ActiveSelection';
 
 describe('Selectable Canvas', () => {
   describe('_pointIsInObjectSelectionArea', () => {
@@ -479,6 +480,23 @@ describe('Selectable Canvas', () => {
       expect(canvas._currentTransform).toHaveProperty('target', object);
       expect(canvas._currentTransform).toHaveProperty('corner', controlKey);
       expect(spy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('_discardActiveObject', () => {
+    test('will clear hovered target if the target is the active selection', () => {
+      const objects = [new FabricObject(), new FabricObject()];
+      const canvas = new Canvas();
+      canvas.add(...objects);
+      const as = new ActiveSelection(objects);
+      as.canvas = canvas;
+      canvas._hoveredTarget = as;
+      canvas.setActiveObject(as);
+      expect(canvas._activeObject).toBe(as);
+      expect(canvas._hoveredTarget).toBe(as);
+      canvas.discardActiveObject();
+      expect(canvas._activeObject).toBe(undefined);
+      expect(canvas._hoveredTarget).toBe(undefined);
     });
   });
 });
