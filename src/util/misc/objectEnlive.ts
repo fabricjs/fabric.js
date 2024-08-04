@@ -158,6 +158,7 @@ export const enlivenObjectEnlivables = <
         }
         // clipPath or shadow or gradient or text on a path or the backgroundImage or overlayImage of canvas
         if (
+          value.type &&
           [
             'clipPath',
             'shadow',
@@ -166,8 +167,7 @@ export const enlivenObjectEnlivables = <
             'path',
             'backgroundImage',
             'overlayImage',
-          ].includes(key) &&
-          value.type
+          ].includes(key)
         ) {
           return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
             signal,
@@ -177,7 +177,7 @@ export const enlivenObjectEnlivables = <
           });
         }
         // pattern
-        if (['stroke', 'fill'].includes(key) && value.source) {
+        if (value.source && ['stroke', 'fill'].includes(key)) {
           return classRegistry
             .getClass<typeof Pattern>('pattern')
             .fromObject(value, { signal })
