@@ -156,9 +156,17 @@ export const enlivenObjectEnlivables = <
         if (!value) {
           return value;
         }
-        // clipPath or shadow or gradient or text on a path
+        // clipPath or shadow or gradient or text on a path or the backgroundImage or overlayImage of canvas
         if (
-          ['clipPath', 'shadow', 'gradient', 'path'].includes(key) &&
+          [
+            'clipPath',
+            'shadow',
+            'fill',
+            'stroke',
+            'path',
+            'backgroundImage',
+            'overlayImage',
+          ].includes(key) &&
           value.type
         ) {
           return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
