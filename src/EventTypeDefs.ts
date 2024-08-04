@@ -11,6 +11,16 @@ import type {
   LayoutBeforeEvent,
   LayoutAfterEvent,
 } from './LayoutManager/types';
+import type {
+  MODIFIED,
+  MODIFY_PATH,
+  MODIFY_POLY,
+  MOVING,
+  RESIZING,
+  ROTATING,
+  SCALING,
+  SKEWING,
+} from './constants';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -97,12 +107,13 @@ export interface BasicTransformEvent<E extends Event = TPointerEvent>
 }
 
 export type TModificationEvents =
-  | 'moving'
-  | 'scaling'
-  | 'rotating'
-  | 'skewing'
-  | 'resizing'
-  | 'modifyPoly';
+  | typeof MOVING
+  | typeof SCALING
+  | typeof ROTATING
+  | typeof SKEWING
+  | typeof RESIZING
+  | typeof MODIFY_POLY
+  | typeof MODIFY_PATH;
 
 export interface ModifiedEvent<E extends Event = TPointerEvent> {
   e?: E;
@@ -111,14 +122,20 @@ export interface ModifiedEvent<E extends Event = TPointerEvent> {
   action?: string;
 }
 
-type ObjectModificationEvents = {
-  moving: BasicTransformEvent;
-  scaling: BasicTransformEvent;
-  rotating: BasicTransformEvent;
-  skewing: BasicTransformEvent;
-  resizing: BasicTransformEvent;
-  modifyPoly: BasicTransformEvent;
-  modified: ModifiedEvent;
+export interface ModifyPathEvent {
+  commandIndex: number;
+  pointIndex: number;
+}
+
+export type ObjectModificationEvents = {
+  [MOVING]: BasicTransformEvent;
+  [SCALING]: BasicTransformEvent;
+  [ROTATING]: BasicTransformEvent;
+  [SKEWING]: BasicTransformEvent;
+  [RESIZING]: BasicTransformEvent;
+  [MODIFY_POLY]: BasicTransformEvent;
+  [MODIFY_PATH]: BasicTransformEvent & ModifyPathEvent;
+  [MODIFIED]: ModifiedEvent;
 };
 
 type CanvasModificationEvents = {
@@ -129,6 +146,9 @@ type CanvasModificationEvents = {
   'object:skewing': BasicTransformEvent & { target: FabricObject };
   'object:resizing': BasicTransformEvent & { target: FabricObject };
   'object:modifyPoly': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPath': BasicTransformEvent & {
+    target: FabricObject;
+  } & ModifyPathEvent;
   'object:modified': ModifiedEvent;
 };
 

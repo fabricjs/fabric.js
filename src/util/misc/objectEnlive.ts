@@ -68,7 +68,12 @@ export type EnlivenObjectOptions = Abortable & {
    * called after each fabric object created.
    */
   reviver?: <
-    T extends BaseFabricObject | FabricObject | BaseFilter | Shadow | TFiller
+    T extends
+      | BaseFabricObject
+      | FabricObject
+      | BaseFilter<string>
+      | Shadow
+      | TFiller
   >(
     serializedObj: Record<string, any>,
     instance: T
@@ -76,6 +81,7 @@ export type EnlivenObjectOptions = Abortable & {
 };
 
 /**
+ * @TODO type this correctly.
  * Creates corresponding fabric instances from their object representations
  * @param {Object[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
@@ -85,7 +91,12 @@ export type EnlivenObjectOptions = Abortable & {
  * @returns {Promise<FabricObject[]>}
  */
 export const enlivenObjects = <
-  T extends BaseFabricObject | FabricObject | BaseFilter | Shadow | TFiller
+  T extends
+    | BaseFabricObject
+    | FabricObject
+    | BaseFilter<string>
+    | Shadow
+    | TFiller
 >(
   objects: any[],
   { signal, reviver = noop }: EnlivenObjectOptions = {}

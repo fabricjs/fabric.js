@@ -1,5 +1,4 @@
 import { FabricImage } from '../shapes/Image';
-import type { TClassProperties } from '../typedefs';
 import { createCanvasElement } from '../util/misc/dom';
 import { BaseFilter } from './BaseFilter';
 import type {
@@ -9,24 +8,18 @@ import type {
 } from './typedefs';
 import type { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
-import { fragmentSource } from './shaders/blendImage';
+import { fragmentSource, vertexSource } from './shaders/blendImage';
 
 export type TBlendImageMode = 'multiply' | 'mask';
 
-export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
+type BlendImageOwnProps = {
+  mode: TBlendImageMode;
+  alpha: number;
+};
+
+export const blendImageDefaultValues: BlendImageOwnProps = {
   mode: 'multiply',
   alpha: 1,
-  vertexSource: `
-    attribute vec2 aPosition;
-    varying vec2 vTexCoord;
-    varying vec2 vTexCoord2;
-    uniform mat3 uTransformMatrix;
-    void main() {
-      vTexCoord = aPosition;
-      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
-      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
-    }
-    `,
 };
 
 /**
@@ -45,7 +38,7 @@ export const blendImageDefaultValues: Partial<TClassProperties<BlendImage>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendImage extends BaseFilter {
+export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
   /**
    * Image to make the blend operation with.
    **/
@@ -60,17 +53,19 @@ export class BlendImage extends BaseFilter {
    * @type String
    * @default
    **/
-  declare mode: TBlendImageMode;
+  declare mode: BlendImageOwnProps['mode'];
 
   /**
    * alpha value. represent the strength of the blend image operation.
    * not implemented.
    **/
-  declare alpha: number;
+  declare alpha: BlendImageOwnProps['alpha'];
 
   static type = 'BlendImage';
 
   static defaults = blendImageDefaultValues;
+
+  static uniformLocations = ['uTransformMatrix', 'uImage'];
 
   getCacheKey() {
     return `${this.type}_${this.mode}`;
@@ -78,6 +73,10 @@ export class BlendImage extends BaseFilter {
 
   getFragmentSource(): string {
     return fragmentSource[this.mode];
+  }
+
+  getVertexSource(): string {
+    return vertexSource;
   }
 
   applyToWebGL(options: TWebGLPipelineState) {
@@ -172,22 +171,6 @@ export class BlendImage extends BaseFilter {
   }
 
   /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uTransformMatrix: gl.getUniformLocation(program, 'uTransformMatrix'),
-      uImage: gl.getUniformLocation(program, 'uImage'),
-    };
-  }
-
-  /**
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
@@ -204,14 +187,17 @@ export class BlendImage extends BaseFilter {
 
   /**
    * Returns object representation of an instance
+   * TODO: Handle the possibility of missing image better.
+   * As of now a BlendImage filter without image can't be used with fromObject
    * @return {Object} Object representation of an instance
    */
-  toObject() {
+  toObject(): {
+    type: 'BlendImage';
+    image: ReturnType<FabricImage['toObject']>;
+  } & BlendImageOwnProps {
     return {
-      type: this.type,
+      ...super.toObject(),
       image: this.image && this.image.toObject(),
-      mode: this.mode,
-      alpha: this.alpha,
     };
   }
 
@@ -223,13 +209,13 @@ export class BlendImage extends BaseFilter {
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @returns {Promise<BlendImage>}
    */
-  static fromObject(
+  static async fromObject(
     { type, image, ...filterOptions }: Record<string, any>,
     options: { signal: AbortSignal }
-  ) {
+  ): Promise<BaseFilter<'BlendImage', BlendImageOwnProps>> {
     return FabricImage.fromObject(image, options).then(
       (enlivedImage) =>
-        new this({ ...filterOptions, image: enlivedImage }) as BaseFilter
+        new this({ ...filterOptions, image: enlivedImage }) as BlendImage
     );
   }
 }

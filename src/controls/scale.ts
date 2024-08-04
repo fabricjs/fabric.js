@@ -17,6 +17,7 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import { SCALE_X, SCALE_Y, SCALING } from '../constants';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;
@@ -206,12 +207,12 @@ function scaleObject(
   const oldScaleX = target.scaleX,
     oldScaleY = target.scaleY;
   if (!by) {
-    !isLocked(target, 'lockScalingX') && target.set('scaleX', scaleX);
-    !isLocked(target, 'lockScalingY') && target.set('scaleY', scaleY);
+    !isLocked(target, 'lockScalingX') && target.set(SCALE_X, scaleX);
+    !isLocked(target, 'lockScalingY') && target.set(SCALE_Y, scaleY);
   } else {
     // forbidden cases already handled on top here.
-    by === 'x' && target.set('scaleX', scaleX);
-    by === 'y' && target.set('scaleY', scaleY);
+    by === 'x' && target.set(SCALE_X, scaleX);
+    by === 'y' && target.set(SCALE_Y, scaleY);
   }
   return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
 }
@@ -271,16 +272,16 @@ const scaleObjectY: TransformActionHandler<ScaleTransform> = (
 };
 
 export const scalingEqually = wrapWithFireEvent(
-  'scaling',
+  SCALING,
   wrapWithFixedAnchor(scaleObjectFromCorner)
 );
 
 export const scalingX = wrapWithFireEvent(
-  'scaling',
+  SCALING,
   wrapWithFixedAnchor(scaleObjectX)
 );
 
 export const scalingY = wrapWithFireEvent(
-  'scaling',
+  SCALING,
   wrapWithFixedAnchor(scaleObjectY)
 );

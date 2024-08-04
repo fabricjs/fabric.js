@@ -59,13 +59,17 @@ export class ActiveSelection extends Group {
 
   constructor(
     objects: FabricObject[] = [],
-    { layoutManager, ...options }: Partial<ActiveSelectionOptions> = {}
+    options: Partial<ActiveSelectionOptions> = {}
   ) {
-    super(objects, {
-      layoutManager: layoutManager ?? new ActiveSelectionLayoutManager(),
-    });
+    super();
     Object.assign(this, ActiveSelection.ownDefaults);
     this.setOptions(options);
+    const { left, top, layoutManager } = options;
+    this.groupInit(objects, {
+      left,
+      top,
+      layoutManager: layoutManager ?? new ActiveSelectionLayoutManager(),
+    });
   }
 
   /**
@@ -237,7 +241,6 @@ export class ActiveSelection extends Group {
   ) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    super._renderControls(ctx, styleOverride);
     const options = {
       hasControls: false,
       ...childrenOverride,
@@ -246,6 +249,7 @@ export class ActiveSelection extends Group {
     for (let i = 0; i < this._objects.length; i++) {
       this._objects[i]._renderControls(ctx, options);
     }
+    super._renderControls(ctx, styleOverride);
     ctx.restore();
   }
 }

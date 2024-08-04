@@ -106,7 +106,6 @@ describe('Polyline', () => {
       });
     });
   });
-
   it('should safeguard passing points in options', () => {
     expect(new Polyline(points, { points: [{ x: 1, y: 1 }] })).toEqual(
       expect.objectContaining({

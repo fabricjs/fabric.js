@@ -19,6 +19,7 @@ import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 import { interactiveObjectDefaultValues } from './defaultValues';
+import { SCALE } from '../../constants';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
@@ -182,7 +183,7 @@ export class InteractiveFabricObject<
       if (
         this === (target as unknown as this) &&
         action &&
-        action.startsWith('scale')
+        action.startsWith(SCALE)
       ) {
         return false;
       }
@@ -540,6 +541,9 @@ export class InteractiveFabricObject<
    * Draws corners of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
+   * Be aware that since fabric 6.0 this function does not call setCoords anymore.
+   * setCoords needs to be called manually if the object of which we are rendering controls
+   * is outside the standard selection and transform process.
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {ControlRenderingStyleOverride} styleOverride object to override the object style
    */
@@ -562,7 +566,6 @@ export class InteractiveFabricObject<
       ctx.strokeStyle = options.cornerStrokeColor;
     }
     this._setLineDash(ctx, options.cornerDashArray);
-    this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
         const p = this.oCoords[key];

@@ -389,21 +389,7 @@ export class StaticCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    const backgroundObject = this.backgroundImage,
-      overlayObject = this.overlayImage,
-      len = this._objects.length;
-
     this.viewportTransform = vpt;
-    for (let i = 0; i < len; i++) {
-      const object = this._objects[i];
-      object.group || object.setCoords();
-    }
-    if (backgroundObject) {
-      backgroundObject.setCoords();
-    }
-    if (overlayObject) {
-      overlayObject.setCoords();
-    }
     this.calcViewportBoundaries();
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -1002,7 +988,7 @@ export class StaticCanvas<
    *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
    * });
    */
-  toSVG(options: TSVGExportOptions = {}, reviver: TSVGReviver) {
+  toSVG(options: TSVGExportOptions = {}, reviver?: TSVGReviver) {
     options.reviver = reviver;
     const markup: string[] = [];
 
@@ -1181,7 +1167,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _setSVGObjects(markup: string[], reviver: TSVGReviver) {
+  _setSVGObjects(markup: string[], reviver?: TSVGReviver) {
     this.forEachObject((fabricObject) => {
       if (fabricObject.excludeFromExport) {
         return;
@@ -1197,7 +1183,7 @@ export class StaticCanvas<
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     markup.push(instance.toSVG(reviver));
   }
@@ -1208,7 +1194,7 @@ export class StaticCanvas<
   _setSVGBgOverlayImage(
     markup: string[],
     property: 'overlayImage' | 'backgroundImage',
-    reviver: TSVGReviver
+    reviver?: TSVGReviver
   ) {
     const bgOrOverlay = this[property];
     if (bgOrOverlay && !bgOrOverlay.excludeFromExport && bgOrOverlay.toSVG) {

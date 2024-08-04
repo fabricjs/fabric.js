@@ -1,4 +1,4 @@
-import { iMatrix } from '../constants';
+import { ROTATE, SCALE, SKEW_X, SKEW_Y, iMatrix } from '../constants';
 import { reNum } from './constants';
 import type { TMat2D } from '../typedefs';
 import { cleanupSvgAttribute } from '../util/internals/cleanupSvgAttribute';
@@ -70,16 +70,16 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
       case 'translate':
         matrix = createTranslateMatrix(arg0, arg1);
         break;
-      case 'rotate':
+      case ROTATE:
         matrix = createRotateMatrix({ angle: arg0 }, { x: arg1, y: arg2 });
         break;
-      case 'scale':
+      case SCALE:
         matrix = createScaleMatrix(arg0, arg1);
         break;
-      case 'skewX':
+      case SKEW_X:
         matrix = createSkewXMatrix(arg0);
         break;
-      case 'skewY':
+      case SKEW_Y:
         matrix = createSkewYMatrix(arg0);
         break;
       case 'matrix':

@@ -294,6 +294,8 @@ export type TSimpleParsedCommand =
   | TParsedAbsoluteCubicCurveCommand
   | TParsedAbsoluteQuadraticCurveCommand;
 
+export type TSimpleParseCommandType = 'L' | 'M' | 'C' | 'Q' | 'Z';
+
 /**
  * A series of simple paths
  */

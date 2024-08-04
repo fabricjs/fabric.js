@@ -39,11 +39,11 @@ export abstract class LayoutStrategy {
     }
   }
 
-  shouldPerformLayout(context: StrictLayoutContext) {
+  shouldPerformLayout({ type, prevStrategy, strategy }: StrictLayoutContext) {
     return (
-      context.type === LAYOUT_TYPE_INITIALIZATION ||
-      context.type === LAYOUT_TYPE_IMPERATIVE ||
-      (!!context.prevStrategy && context.strategy !== context.prevStrategy)
+      type === LAYOUT_TYPE_INITIALIZATION ||
+      type === LAYOUT_TYPE_IMPERATIVE ||
+      (!!prevStrategy && strategy !== prevStrategy)
     );
   }
 
@@ -69,13 +69,13 @@ export abstract class LayoutStrategy {
     objects: FabricObject[],
     context: StrictLayoutContext
   ): LayoutStrategyResult | undefined {
-    if (context.type === LAYOUT_TYPE_IMPERATIVE && context.overrides) {
+    const { type, target } = context;
+    if (type === LAYOUT_TYPE_IMPERATIVE && context.overrides) {
       return context.overrides;
     }
     if (objects.length === 0) {
       return;
     }
-    const { target } = context;
     const { left, top, width, height } = makeBoundingBoxFromPoints(
       objects
         .map((object) => getObjectBounds(target, object))
@@ -85,7 +85,7 @@ export abstract class LayoutStrategy {
     const bboxLeftTop = new Point(left, top);
     const bboxCenter = bboxLeftTop.add(bboxSize.scalarDivide(2));
 
-    if (context.type === LAYOUT_TYPE_INITIALIZATION) {
+    if (type === LAYOUT_TYPE_INITIALIZATION) {
       const actualSize = this.getInitialSize(context, {
         size: bboxSize,
         center: bboxCenter,

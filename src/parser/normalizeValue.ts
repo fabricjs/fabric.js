@@ -1,7 +1,7 @@
 import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { parseUnit } from '../util/misc/svgParsing';
 import { parseTransformAttribute } from './parseTransformAttribute';
-import { CENTER, LEFT, RIGHT, NONE } from '../constants';
+import { CENTER, LEFT, RIGHT, NONE, FILL, STROKE } from '../constants';
 
 export function normalizeValue(
   attr: string,
@@ -12,7 +12,7 @@ export function normalizeValue(
   const isArray = Array.isArray(value);
   let parsed: number | number[];
   let ouputValue: string | null | boolean | number[] | number = value;
-  if ((attr === 'fill' || attr === 'stroke') && value === NONE) {
+  if ((attr === FILL || attr === STROKE) && value === NONE) {
     ouputValue = '';
   } else if (attr === 'strokeUniform') {
     return value === 'non-scaling-stroke';
@@ -48,13 +48,13 @@ export function normalizeValue(
     // parseUnit returns px and we convert it to em
     parsed = (parseUnit(value, fontSize) / fontSize) * 1000;
   } else if (attr === 'paintFirst') {
-    const fillIndex = value.indexOf('fill');
-    const strokeIndex = value.indexOf('stroke');
-    ouputValue = 'fill';
+    const fillIndex = value.indexOf(FILL);
+    const strokeIndex = value.indexOf(STROKE);
+    ouputValue = FILL;
     if (fillIndex > -1 && strokeIndex > -1 && strokeIndex < fillIndex) {
-      ouputValue = 'stroke';
+      ouputValue = STROKE;
     } else if (fillIndex === -1 && strokeIndex > -1) {
-      ouputValue = 'stroke';
+      ouputValue = STROKE;
     }
   } else if (attr === 'href' || attr === 'xlink:href' || attr === 'font') {
     return value;

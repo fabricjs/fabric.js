@@ -1,4 +1,5 @@
 import type { TColorArg } from '../../color/typedefs';
+import { FILL, STROKE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { TAnimation } from '../../util/animation/animate';
 import { animate, animateColor } from '../../util/animation/animate';
@@ -17,7 +18,7 @@ export abstract class AnimatableObject<
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  static colorProperties: string[] = ['fill', 'stroke', 'backgroundColor'];
+  static colorProperties: string[] = [FILL, STROKE, 'backgroundColor'];
 
   /**
    * Animates object's properties

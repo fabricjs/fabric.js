@@ -1,5 +1,4 @@
 import { Color } from '../color/Color';
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
@@ -17,7 +16,13 @@ export type TBlendMode =
   | 'exclusion'
   | 'tint';
 
-export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
+type BlendColorOwnProps = {
+  color: string;
+  mode: TBlendMode;
+  alpha: number;
+};
+
+export const blendColorDefaultValues: BlendColorOwnProps = {
   color: '#F95C63',
   mode: 'multiply',
   alpha: 1,
@@ -39,14 +44,14 @@ export const blendColorDefaultValues: Partial<TClassProperties<BlendColor>> = {
  * object.applyFilters();
  * canvas.renderAll();
  */
-export class BlendColor extends BaseFilter {
+export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
   /**
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    * @type String
    * @default
    **/
-  declare color: string;
+  declare color: BlendColorOwnProps['color'];
 
   /**
    * Blend mode for the filter: one of multiply, add, difference, screen, subtract,
@@ -54,18 +59,19 @@ export class BlendColor extends BaseFilter {
    * @type String
    * @default
    **/
-  declare mode: TBlendMode;
-
+  declare mode: BlendColorOwnProps['mode'];
   /**
    * alpha value. represent the strength of the blend color operation.
    * @type Number
    * @default
    **/
-  declare alpha: number;
+  declare alpha: BlendColorOwnProps['alpha'];
 
   static defaults = blendColorDefaultValues;
 
   static type = 'BlendColor';
+
+  static uniformLocations = ['uColor'];
 
   getCacheKey() {
     return `${this.type}_${this.mode}`;
@@ -169,21 +175,6 @@ export class BlendColor extends BaseFilter {
   }
 
   /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uColor: gl.getUniformLocation(program, 'uColor'),
-    };
-  }
-
-  /**
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
@@ -199,19 +190,6 @@ export class BlendColor extends BaseFilter {
     source[2] = (this.alpha * source[2]) / 255;
     source[3] = this.alpha;
     gl.uniform4fv(uniformLocations.uColor, source);
-  }
-
-  /**
-   * Returns object representation of an instance
-   * @return {Object} Object representation of an instance
-   */
-  toObject() {
-    return {
-      type: this.type,
-      color: this.color,
-      mode: this.mode,
-      alpha: this.alpha,
-    };
   }
 }
 

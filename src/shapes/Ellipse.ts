@@ -1,4 +1,4 @@
-import { twoMathPi } from '../constants';
+import { SCALE_X, SCALE_Y, twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Abortable, TClassProperties, TOptions } from '../typedefs';
@@ -98,7 +98,7 @@ export class Ellipse<
    * @return {Number}
    */
   getRx() {
-    return this.get('rx') * this.get('scaleX');
+    return this.get('rx') * this.get(SCALE_X);
   }
 
   /**
@@ -106,7 +106,7 @@ export class Ellipse<
    * @return {Number}
    */
   getRy() {
-    return this.get('ry') * this.get('scaleY');
+    return this.get('ry') * this.get(SCALE_Y);
   }
 
   /**

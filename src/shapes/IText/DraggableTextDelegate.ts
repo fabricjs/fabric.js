@@ -10,7 +10,7 @@ import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { NONE } from '../../constants';
+import { CHANGED, NONE } from '../../constants';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -326,7 +326,7 @@ export class DraggableTextDelegate {
       target.hiddenTextarea!.value = target.text;
       target._updateTextarea();
       target.hiddenTextarea!.focus();
-      target.fire('changed', {
+      target.fire(CHANGED, {
         index: insertAt + selectionStartOffset,
         action: 'drop',
       });
@@ -364,7 +364,7 @@ export class DraggableTextDelegate {
             target.hiddenTextarea &&
               (target.hiddenTextarea.value = target.text);
             target._updateTextarea();
-            target.fire('changed', {
+            target.fire(CHANGED, {
               index: selectionStart,
               action: 'dragend',
             });
