@@ -79,7 +79,7 @@ export const movePathPoint = (
   const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
   pathObject.left -= diff.x;
   pathObject.top -= diff.y;
-
+  pathObject.set('dirty', true);
   return true;
 };
 
