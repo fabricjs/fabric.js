@@ -151,31 +151,33 @@ export const enlivenObjectEnlivables = <
     const instances: (FabricObject | TFiller | Shadow)[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
     // enlive every possible property
-    const promises = Object.entries(serializedObject).map(([key, value]: [string, any]) => {
-      if (!value) {
+    const promises = Object.entries(serializedObject).map(
+      ([key, value]: [string, any]) => {
+        if (!value) {
+          return value;
+        }
+        // clipPath or shadow or gradient
+        if (['clipPath', 'shadow', 'gradient'].includes(key) && value.type) {
+          return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
+            signal,
+          }).then(([enlived]) => {
+            instances.push(enlived);
+            return enlived;
+          });
+        }
+        // pattern
+        if (['stroke', 'fill'].includes(key) && value.source) {
+          return classRegistry
+            .getClass<typeof Pattern>('pattern')
+            .fromObject(value, { signal })
+            .then((pattern: Pattern) => {
+              instances.push(pattern);
+              return pattern;
+            });
+        }
         return value;
       }
-      // clipPath or shadow or gradient
-      if (['clipPath', 'shadow', 'gradient'].includes(key) && value.type) {
-        return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
-          signal,
-        }).then(([enlived]) => {
-          instances.push(enlived);
-          return enlived;
-        });
-      }
-      // pattern
-      if (["stroke", "fill"].includes(key) && value.source) {
-        return classRegistry
-          .getClass<typeof Pattern>('pattern')
-          .fromObject(value, { signal })
-          .then((pattern: Pattern) => {
-            instances.push(pattern);
-            return pattern;
-          });
-      }
-      return value;
-    });
+    );
     const keys = Object.keys(serializedObject);
     Promise.all(promises)
       .then((enlived) => {
