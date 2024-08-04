@@ -10,7 +10,7 @@ import type {
   TransformActionHandler,
 } from '../EventTypeDefs';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
-import { sendPointToPlane } from '../util';
+import { sendPointToPlane } from '../util/misc/planeChange';
 import { MODIFY_POLY } from '../constants';
 
 const ACTION_NAME: TModificationEvents = MODIFY_POLY;

@@ -1,6 +1,6 @@
 import * as fabric from 'fabric';
 import './styles.css';
-import { testCase } from './testcases/filters';
+import { testCase } from './testcases/pathControls';
 
 const el = document.getElementById('canvas');
 const canvas = (window.canvas = new fabric.Canvas(el));

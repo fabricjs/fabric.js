@@ -33,6 +33,7 @@ export const ROTATE = 'rotate';
 export const SKEWING = 'skewing';
 export const RESIZING = 'resizing';
 export const MODIFY_POLY = 'modifyPoly';
+export const MODIFY_PATH = 'modifyPath';
 export const CHANGED = 'changed';
 export const SCALE = 'scale';
 export const SCALE_X = 'scaleX';
