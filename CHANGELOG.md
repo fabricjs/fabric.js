@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): When deselecting an active selection remove its reference from hoveredTarget [#9961](https://github.com/fabricjs/fabric.js/pull/9961)
 - feat(): Path controls utility [#9998](https://github.com/fabricjs/fabric.js/pull/9998)
 - chore(): Removed website submodule
 
