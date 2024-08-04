@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(): Avoid errors on restoring custom properties that pass the lazy detection of shadow,gradient,pattern and clipPath. [#10001](https://github.com/fabricjs/fabric.js/issues/10001)
+- fix(): When deselecting an active selection remove its reference from hoveredTarget [#9961](https://github.com/fabricjs/fabric.js/pull/9961)
 - feat(): Path controls utility [#9998](https://github.com/fabricjs/fabric.js/pull/9998)
 - chore(): Removed website submodule
 
