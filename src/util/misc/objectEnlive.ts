@@ -1,5 +1,4 @@
 import { noop } from '../../constants';
-import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type {
   Abortable,
@@ -155,24 +154,19 @@ export const enlivenObjectEnlivables = <
       if (!value) {
         return value;
       }
-      // clipPath or shadow or gradient
-      if (value.type) {
+      /**
+       * clipPath or shadow or gradient or text on a path or a pattern,
+       * or the backgroundImage or overlayImage of canvas
+       * If we have a type and there is a classe registered for it, we enlive it.
+       * If there is no class registered for it we return the value as is
+       * */
+      if (value.type && classRegistry.getClass(value.type)) {
         return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
           signal,
         }).then(([enlived]) => {
           instances.push(enlived);
           return enlived;
         });
-      }
-      // pattern
-      if (value.source) {
-        return classRegistry
-          .getClass<typeof Pattern>('pattern')
-          .fromObject(value, { signal })
-          .then((pattern: Pattern) => {
-            instances.push(pattern);
-            return pattern;
-          });
       }
       return value;
     });
