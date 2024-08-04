@@ -155,8 +155,8 @@ export const enlivenObjectEnlivables = <
       if (!value) {
         return value;
       }
-      // clipPath or shadow or gradient
-      if (['clipPath', 'shadow', 'gradient'].includes(key) && value.type) {
+      // clipPath or shadow or gradient or text on a path
+      if (['clipPath', 'shadow', 'gradient', 'path'].includes(key) && value.type) {
         return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
           signal,
         }).then(([enlived]) => {
