@@ -24,7 +24,7 @@ export class ClassRegistry {
     this[SVG] = new Map();
   }
 
-  hasClass(classType: string): boolean {
+  has(classType: string): boolean {
     return this[JSON].has(classType);
   }
 
