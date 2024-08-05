@@ -24,7 +24,6 @@ type TTransformAnchor = Transform & { pointIndex: number };
 export const createPolyPositionHandler = (pointIndex: number) => {
   return function (dim: Point, finalMatrix: TMat2D, polyObject: Polyline) {
     const { points, pathOffset } = polyObject;
-
     return new Point(points[pointIndex])
       .subtract(pathOffset)
       .transform(
