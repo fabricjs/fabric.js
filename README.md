@@ -109,6 +109,16 @@ import { fabric } from 'fabric';
     fill: 'red',
   });
   canvas.add(rect);
+
+  // load aligning_guidelines
+  fabric.initAligningGuidelines(canvas, {
+    /** Aligning line color */
+    color: 'rgb(255,0,0,0.9)',
+    /** Aligning line dimensions */
+    width: 1,
+    /** At what distance from the shape does alignment begin? */
+    margin: 4,
+  });
 </script>
 ```
 

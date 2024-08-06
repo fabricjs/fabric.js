@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Add v6 aligning guidelines. [#10033](https://github.com/fabricjs/fabric.js/discussions/10033)
 - feat(): Add has method to classRegistry to allow to check if a class exists. (fixes #10001)
 
 ## [6.1.0]
