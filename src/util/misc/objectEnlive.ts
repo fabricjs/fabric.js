@@ -160,7 +160,7 @@ export const enlivenObjectEnlivables = <
        * If we have a type and there is a classe registered for it, we enlive it.
        * If there is no class registered for it we return the value as is
        * */
-      if (value.type && classRegistry.getClass(value.type)) {
+      if (value.type && classRegistry.has(value.type)) {
         return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
           signal,
         }).then(([enlived]) => {
