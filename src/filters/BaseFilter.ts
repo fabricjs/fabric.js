@@ -387,8 +387,7 @@ export class BaseFilter<
     return {
       type: this.type,
       ...defaultKeys.reduce<OwnProps>((acc, key) => {
-        //@ts-expect-error TS doesn't get i want an object that looks like this
-        acc[key] = this[key as keyof this];
+        acc[key] = this[key as keyof this] as unknown as typeof acc[typeof key];
         return acc;
       }, {} as OwnProps),
     };
