@@ -568,8 +568,6 @@ export class Textbox<
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
-  // cant use ts-expect-error because of ts 5.3 cross check
-  // @ts-ignore TS this typing limitations
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never

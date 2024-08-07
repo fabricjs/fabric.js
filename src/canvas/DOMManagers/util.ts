@@ -1,4 +1,4 @@
-import { LEFT, NONE, TOP } from '../../constants';
+import { NONE } from '../../constants';
 import type { TSize } from '../../typedefs';
 import {
   getDocumentFromElement,
@@ -50,25 +50,21 @@ export const setCSSDimensions = (
  * @return {Object} Object with "left" and "top" properties
  */
 export function getElementOffset(element: HTMLElement) {
-  let box = { left: 0, top: 0 };
   const doc = element && getDocumentFromElement(element),
-    offset = { left: 0, top: 0 },
-    offsetAttributes = {
-      borderLeftWidth: LEFT,
-      borderTopWidth: TOP,
-      paddingLeft: LEFT,
-      paddingTop: TOP,
-    } as const;
+    offset = { left: 0, top: 0 };
 
   if (!doc) {
     return offset;
   }
-  const elemStyle =
-    getWindowFromElement(element)?.getComputedStyle(element, null) || {};
-  for (const attr in offsetAttributes) {
-    // @ts-expect-error TS learn to iterate!
-    offset[offsetAttributes[attr]] += parseInt(elemStyle[attr], 10) || 0;
-  }
+  const elemStyle: CSSStyleDeclaration =
+    getWindowFromElement(element)?.getComputedStyle(element, null) ||
+    ({} as CSSStyleDeclaration);
+  offset.left += parseInt(elemStyle.borderLeftWidth, 10) || 0;
+  offset.top += parseInt(elemStyle.borderTopWidth, 10) || 0;
+  offset.left += parseInt(elemStyle.paddingLeft, 10) || 0;
+  offset.top += parseInt(elemStyle.paddingTop, 10) || 0;
+
+  let box = { left: 0, top: 0 };
 
   const docElem = doc.documentElement;
   if (typeof element.getBoundingClientRect !== 'undefined') {
