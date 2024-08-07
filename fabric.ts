@@ -178,3 +178,5 @@ export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
 
 export * from './src/filters';
+
+export { initAligningGuidelines } from './lib/aligning_guidelines/index';
