@@ -10,7 +10,6 @@ import type {
   TCurveInfo,
   TComplexPathData,
   TParsedAbsoluteCubicCurveCommand,
-  TParsedCubicCurveCommand,
   TPathSegmentInfo,
   TPointAngle,
   TSimpleParsedCommand,
@@ -60,7 +59,7 @@ const segmentToBezier = (
   mT: number,
   fromX: number,
   fromY: number
-): TParsedCubicCurveCommand => {
+): TParsedAbsoluteCubicCurveCommand => {
   const costh1 = cos(theta1),
     sinth1 = sin(theta1),
     costh2 = cos(theta2),
@@ -145,7 +144,7 @@ const arcToSegments = (
 
   // Convert into cubic bezier segments <= 90deg
   const segments = Math.ceil(Math.abs((dtheta / PI) * 2)),
-    result = new Array(segments),
+    result = [],
     mDelta = dtheta / segments,
     mT =
       ((8 / 3) * Math.sin(mDelta / 4) * Math.sin(mDelta / 4)) /
@@ -842,7 +841,6 @@ const rePathCmd = new RegExp(rePathCommand, 'i');
  *   ['Q', 3, 5, 2, 1, 4, 0],
  *   ['Q', 9, 12, 2, 1, 4, 0],
  * ];
- *
  */
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
