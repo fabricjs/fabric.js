@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Fix path Arc parsing regression issue [#10048](https://github.com/fabricjs/fabric.js/pull/10048)
 - chore(TS): Update TS to latest [#10044](https://github.com/fabricjs/fabric.js/pull/10044)
 - feat(): Add has method to classRegistry to allow to check if a class exists. (fixes #10001)
 
