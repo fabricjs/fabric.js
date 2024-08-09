@@ -841,7 +841,6 @@ const rePathCmd = new RegExp(rePathCommand, 'i');
  *   ['Q', 3, 5, 2, 1, 4, 0],
  *   ['Q', 9, 12, 2, 1, 4, 0],
  * ];
- *
  */
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
