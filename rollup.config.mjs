@@ -17,7 +17,7 @@ const plugins = [
   ts({
     noForceEmit: true,
     tsconfig: './tsconfig.json',
-    exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
+    exclude: ['dist', 'dist-extensions', '**/**.spec.ts', '**/**.test.ts'],
   }),
   babel({
     extensions: ['.ts', '.js'],
@@ -30,7 +30,7 @@ const pluginsExtensions = [
   ts({
     noForceEmit: true,
     tsconfig: './tsconfig-extensions.json',
-    exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
+    exclude: ['dist', 'dist-extensions', '**/**.spec.ts', '**/**.test.ts'],
   }),
   babel({
     extensions: ['.ts', '.js'],
