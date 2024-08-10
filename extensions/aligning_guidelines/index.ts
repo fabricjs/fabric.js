@@ -4,8 +4,8 @@ import type {
   FabricObject,
   TBBox,
   TPointerEvent,
-} from '../../fabric';
-import { Point } from '../../src/Point';
+} from 'fabric';
+import { Point, util } from 'fabric';
 import {
   collectHorizontalPoint,
   collectLine,
@@ -15,7 +15,6 @@ import {
   drawVerticalLine,
   getObjectsByTarget,
 } from './util';
-import { makeBoundingBoxFromPoints } from '../../src/util/misc/boundingBoxFromPoints';
 import type { HorizontalLine, VerticalLine } from './typedefs';
 import { AligningLineConfig } from './constant';
 
@@ -43,7 +42,7 @@ export function initAligningGuidelines(
     const cacheValue = cacheMap.get(cacheKey);
     if (cacheValue) return cacheValue;
     const coords = object.getCoords();
-    const rect = makeBoundingBoxFromPoints(coords);
+    const rect = util.makeBoundingBoxFromPoints(coords);
     const value: [TBBox, Point[]] = [rect, coords];
     cacheMap.set(cacheKey, value);
     return value;

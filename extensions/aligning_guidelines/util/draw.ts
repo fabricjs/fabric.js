@@ -1,6 +1,6 @@
-import type { Canvas } from '../../../fabric';
-import { Point } from '../../../src/Point';
-import { HorizontalLine, VerticalLine } from '../typedefs';
+import type { Canvas } from 'fabric';
+import { Point } from 'fabric';
+import type { HorizontalLine, VerticalLine } from '../typedefs';
 import { AligningLineConfig } from '../constant';
 
 function drawLine(canvas: Canvas, origin: Point, target: Point) {

@@ -8,6 +8,7 @@ before_commit
 /coverage/
 .idea/
 **/dist/
+**/dist-extensions/
 /cli_output/
 e2e/test-report/
 e2e/test-results/

@@ -1,6 +1,6 @@
-import type { FabricObject, TBBox } from '../../../fabric';
-import { Point } from '../../../src/Point';
-import { HorizontalLine, VerticalLine } from '../typedefs';
+import type { FabricObject, TBBox } from 'fabric';
+import { Point } from 'fabric';
+import type { HorizontalLine, VerticalLine } from '../typedefs';
 import { AligningLineConfig } from '../constant';
 import { getDistance, setPositionDir } from './basic';
 

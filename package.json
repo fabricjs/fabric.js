@@ -162,6 +162,13 @@
       "default": "./dist/index.node.cjs",
       "node": "./dist/index.node.cjs",
       "types": "./dist/index.node.d.ts"
+    },
+    "./extensions": {
+      "import": "./dist-extensions/index.min.mjs",
+      "require": null,
+      "default": null,
+      "node": null,
+      "types": "./dist-extensions/index.d.ts"
     }
   }
 }

@@ -1,4 +1,4 @@
-import { HorizontalLineProps, VerticalLineProps } from '../typedefs';
+import type { HorizontalLineProps, VerticalLineProps } from '../typedefs';
 import { AligningLineConfig } from '../constant';
 
 export function makeVerticalLine(props: VerticalLineProps) {

@@ -12,12 +12,24 @@ const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 
 const dirname = path.dirname(buildOutput);
 const basename = path.basename(buildOutput, '.js');
-
 const plugins = [
   json(),
   ts({
     noForceEmit: true,
     tsconfig: './tsconfig.json',
+    exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
+  }),
+  babel({
+    extensions: ['.ts', '.js'],
+    babelHelpers: 'bundled',
+  }),
+];
+
+const pluginsExtensions = [
+  json(),
+  ts({
+    noForceEmit: true,
+    tsconfig: './tsconfig-extensions.json',
     exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
   }),
   babel({
@@ -50,12 +62,98 @@ function onwarn(warning, warn) {
 
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
+  // {
+  //   input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
+  //   output: [
+  //     // es modules in files
+  //     {
+  //       dir: path.resolve(dirname),
+  //       format: 'es',
+  //       preserveModules: true,
+  //       entryFileNames: '[name].mjs',
+  //       sourcemap: true,
+  //     },
+  //     Number(process.env.MINIFY)
+  //       ? {
+  //           dir: path.resolve(dirname),
+  //           format: 'es',
+  //           preserveModules: true,
+  //           entryFileNames: '[name].min.mjs',
+  //           sourcemap: true,
+  //           plugins: [terser()],
+  //         }
+  //       : null,
+  //   ],
+  //   plugins,
+  //   onwarn,
+  // },
+  // {
+  //   input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+  //   output: [
+  //     // es module in bundle
+  //     {
+  //       file: path.resolve(dirname, `${basename}.mjs`),
+  //       name: 'fabric',
+  //       format: 'es',
+  //       sourcemap: true,
+  //     },
+  //     Number(process.env.MINIFY)
+  //       ? {
+  //           file: path.resolve(dirname, `${basename}.min.mjs`),
+  //           name: 'fabric',
+  //           format: 'es',
+  //           sourcemap: true,
+  //           plugins: [terser()],
+  //         }
+  //       : null,
+  //     // umd in bundle
+  //     {
+  //       file: path.resolve(dirname, `${basename}.js`),
+  //       name: 'fabric',
+  //       format: 'umd',
+  //       sourcemap: true,
+  //     },
+  //     Number(process.env.MINIFY)
+  //       ? {
+  //           file: path.resolve(dirname, `${basename}.min.js`),
+  //           name: 'fabric',
+  //           format: 'umd',
+  //           sourcemap: true,
+  //           plugins: [terser()],
+  //         }
+  //       : null,
+  //   ],
+  //   plugins,
+  //   onwarn,
+  // },
+  // {
+  //   input: ['./index.node.ts'],
+  //   output: [
+  //     {
+  //       file: path.resolve(dirname, `${basename}.node.mjs`),
+  //       name: 'fabric',
+  //       format: 'es',
+  //       sourcemap: true,
+  //     },
+  //     {
+  //       file: path.resolve(dirname, `${basename}.node.cjs`),
+  //       name: 'fabric',
+  //       format: 'cjs',
+  //       sourcemap: true,
+  //     },
+  //   ],
+  //   plugins,
+  //   onwarn,
+  //   external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+  // },
+  // EXTENSIONS
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
+    input: ['./extensions/index.ts'],
+    external: ['fabric'],
     output: [
       // es modules in files
       {
-        dir: path.resolve(dirname),
+        dir: path.resolve('./dist-extensions'),
         format: 'es',
         preserveModules: true,
         entryFileNames: '[name].mjs',
@@ -63,7 +161,7 @@ export default [
       },
       Number(process.env.MINIFY)
         ? {
-            dir: path.resolve(dirname),
+            dir: path.resolve('./dist-extensions'),
             format: 'es',
             preserveModules: true,
             entryFileNames: '[name].min.mjs',
@@ -72,66 +170,7 @@ export default [
           }
         : null,
     ],
-    plugins,
+    plugins: pluginsExtensions,
     onwarn,
-  },
-  {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
-    output: [
-      // es module in bundle
-      {
-        file: path.resolve(dirname, `${basename}.mjs`),
-        name: 'fabric',
-        format: 'es',
-        sourcemap: true,
-      },
-      Number(process.env.MINIFY)
-        ? {
-            file: path.resolve(dirname, `${basename}.min.mjs`),
-            name: 'fabric',
-            format: 'es',
-            sourcemap: true,
-            plugins: [terser()],
-          }
-        : null,
-      // umd in bundle
-      {
-        file: path.resolve(dirname, `${basename}.js`),
-        name: 'fabric',
-        format: 'umd',
-        sourcemap: true,
-      },
-      Number(process.env.MINIFY)
-        ? {
-            file: path.resolve(dirname, `${basename}.min.js`),
-            name: 'fabric',
-            format: 'umd',
-            sourcemap: true,
-            plugins: [terser()],
-          }
-        : null,
-    ],
-    plugins,
-    onwarn,
-  },
-  {
-    input: ['./index.node.ts'],
-    output: [
-      {
-        file: path.resolve(dirname, `${basename}.node.mjs`),
-        name: 'fabric',
-        format: 'es',
-        sourcemap: true,
-      },
-      {
-        file: path.resolve(dirname, `${basename}.node.cjs`),
-        name: 'fabric',
-        format: 'cjs',
-        sourcemap: true,
-      },
-    ],
-    plugins,
-    onwarn,
-    external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
 ];
