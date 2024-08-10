@@ -44,7 +44,7 @@ function collectVerticalLine(props: CollectItemLineProps) {
     if (min == item.dis) {
       const line = list[item.index];
       const aLine = aList[item.index];
-      let x = line.x;
+      const x = line.x;
       const y = aLine.y;
 
       const y1 = Math.min(line.y, line.y2, y, aLine.y2);
@@ -86,7 +86,7 @@ function collectHorizontalLine(props: CollectItemLineProps) {
     if (min == item.dis) {
       const line = list[item.index];
       const aLine = aList[item.index];
-      let y = line.y;
+      const y = line.y;
       const x = aLine.x;
 
       const x1 = Math.min(line.x, line.x2, x, aLine.x2);
