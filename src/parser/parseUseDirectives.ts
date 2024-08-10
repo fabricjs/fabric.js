@@ -74,7 +74,7 @@ export function parseUseDirectives(doc: Document) {
         parseStyleString(nodeValue!, styleRecord);
         parseStyleString(el2.getAttribute('style')!, styleRecord);
         const mergedStyles = Object.keys(styleRecord).reduce(
-          (a, v) => a + ' ' + v + ': ' + styleRecord[v] + ';',
+          (a, v) => a + v + ':' + styleRecord[v] + ';',
           ''
         );
         el2.setAttribute(nodeName, mergedStyles);
