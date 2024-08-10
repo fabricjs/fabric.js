@@ -10,7 +10,6 @@ import type {
   TCurveInfo,
   TComplexPathData,
   TParsedAbsoluteCubicCurveCommand,
-  TParsedCubicCurveCommand,
   TPathSegmentInfo,
   TPointAngle,
   TSimpleParsedCommand,
@@ -60,7 +59,7 @@ const segmentToBezier = (
   mT: number,
   fromX: number,
   fromY: number
-): TParsedCubicCurveCommand => {
+): TParsedAbsoluteCubicCurveCommand => {
   const costh1 = cos(theta1),
     sinth1 = sin(theta1),
     costh2 = cos(theta2),
@@ -145,7 +144,7 @@ const arcToSegments = (
 
   // Convert into cubic bezier segments <= 90deg
   const segments = Math.ceil(Math.abs((dtheta / PI) * 2)),
-    result = new Array(segments),
+    result = [],
     mDelta = dtheta / segments,
     mT =
       ((8 / 3) * Math.sin(mDelta / 4) * Math.sin(mDelta / 4)) /
@@ -829,6 +828,9 @@ export const getPointOnPath = (
   }
 };
 
+const rePathCmdAll = new RegExp(rePathCommand, 'gi');
+const rePathCmd = new RegExp(rePathCommand, 'i');
+
 /**
  *
  * @param {string} pathString
@@ -839,7 +841,6 @@ export const getPointOnPath = (
  *   ['Q', 3, 5, 2, 1, 4, 0],
  *   ['Q', 9, 12, 2, 1, 4, 0],
  * ];
- *
  */
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
@@ -847,12 +848,11 @@ export const parsePath = (pathString: string): TComplexPathData => {
   pathString = cleanupSvgAttribute(pathString);
 
   const res: TComplexPathData = [];
-  for (const match of pathString.matchAll(new RegExp(rePathCommand, 'gi'))) {
-    let matchStr = match[0];
+  for (let [matchStr] of pathString.matchAll(rePathCmdAll)) {
     const chain: TComplexPathData = [];
     let paramArr: RegExpExecArray | null;
     do {
-      paramArr = new RegExp(rePathCommand, 'i').exec(matchStr);
+      paramArr = rePathCmd.exec(matchStr);
       if (!paramArr) {
         break;
       }

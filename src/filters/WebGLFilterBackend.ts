@@ -106,7 +106,7 @@ export class WebGLFilterBackend {
    * omitted, caching will be skipped.
    */
   applyFilters(
-    filters: BaseFilter[],
+    filters: BaseFilter<string, Record<string, any>>[],
     source: TexImageSource,
     width: number,
     height: number,
@@ -285,8 +285,8 @@ export class WebGLFilterBackend {
     } else {
       const texture = this.createTexture(
         this.gl,
-        textureImageSource.width,
-        textureImageSource.height,
+        (textureImageSource as HTMLImageElement).width,
+        (textureImageSource as HTMLImageElement).height,
         textureImageSource,
         filter
       );

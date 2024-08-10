@@ -732,7 +732,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
         // we must not prevent the event's default behavior in order for the window to start dragging
-        !activeObject.shouldStartDragging()) &&
+        !activeObject.shouldStartDragging(e)) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
@@ -812,10 +812,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     let pointer, corner;
     if (target) {
-      corner = target._findTargetCorner(
+      const found = target.findControl(
         this.getViewportPoint(e),
         isTouchEvent(e)
       );
+      const { key, control } = found || {};
+      corner = key;
       if (
         target.selectable &&
         target !== this._activeObject &&
@@ -823,10 +825,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       ) {
         this.setActiveObject(target, e);
         shouldRender = true;
-      } else {
-        const control = target.controls[corner];
-        const mouseUpHandler =
-          control && control.getMouseUpHandler(e, target, control);
+      } else if (control) {
+        const mouseUpHandler = control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getScenePoint(e);
           mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
@@ -1049,13 +1049,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
-      const corner = target._findTargetCorner(
+      const handle = target.findControl(
         this.getViewportPoint(e),
         isTouchEvent(e)
       );
-      if (target === this._activeObject && (corner || !grouped)) {
+      if (target === this._activeObject && (handle || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
-        const control = target.controls[corner],
+        const control = handle ? handle.control : undefined,
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
@@ -1117,8 +1117,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   __onMouseMove(e: TPointerEvent) {
     this._isClick = false;
-    this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
+    this._handleEvent(e, 'move:before');
 
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
@@ -1304,16 +1304,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     transform: Transform,
     pointer: Point
   ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
-    let actionPerformed = false;
-    // this object could be created from the function in the control handlers
+    const { action, actionHandler, target } = transform;
 
-    if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
-    }
+    const actionPerformed =
+      !!actionHandler && actionHandler(e, transform, pointer.x, pointer.y);
+    actionPerformed && target.setCoords();
+
+    // this object could be created from the function in the control handlers
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);
@@ -1342,7 +1339,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // here we call findTargetCorner always with undefined for the touch parameter.
         // we assume that if you are using a cursor you do not need to interact with
         // the bigger touch area.
-        target._findTargetCorner(this.getViewportPoint(e));
+        target.findControl(this.getViewportPoint(e));
 
     if (!corner) {
       if ((target as Group).subTargetCheck) {
@@ -1357,7 +1354,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = target.controls[corner];
+      const control = corner.control;
       this.setCursor(control.cursorStyleHandler(e, control, target));
     }
   }

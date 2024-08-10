@@ -8,6 +8,8 @@ import {
   LAYOUT_TYPE_REMOVED,
 } from '../LayoutManager/constants';
 import type { TClassProperties } from '../typedefs';
+import { log } from '../util/internals/console';
+import { ActiveSelectionLayoutManager } from '../LayoutManager/ActiveSelectionLayoutManager';
 
 export type MultiSelectionStacking = 'canvas-stacking' | 'selection-order';
 
@@ -34,11 +36,17 @@ const activeSelectionDefaultValues: Partial<TClassProperties<ActiveSelection>> =
 export class ActiveSelection extends Group {
   static type = 'ActiveSelection';
 
-  static ownDefaults = activeSelectionDefaultValues;
+  static ownDefaults: Record<string, any> = activeSelectionDefaultValues;
 
   static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...ActiveSelection.ownDefaults };
   }
+
+  /**
+   * The ActiveSelection needs to use the ActiveSelectionLayoutManager
+   * or selections on interactive groups may be broken
+   */
+  declare layoutManager: ActiveSelectionLayoutManager;
 
   /**
    * controls how selected objects are added during a multiselection event
@@ -48,6 +56,21 @@ export class ActiveSelection extends Group {
    * @default `canvas-stacking`
    */
   declare multiSelectionStacking: MultiSelectionStacking;
+
+  constructor(
+    objects: FabricObject[] = [],
+    options: Partial<ActiveSelectionOptions> = {}
+  ) {
+    super();
+    Object.assign(this, ActiveSelection.ownDefaults);
+    this.setOptions(options);
+    const { left, top, layoutManager } = options;
+    this.groupInit(objects, {
+      left,
+      top,
+      layoutManager: layoutManager ?? new ActiveSelectionLayoutManager(),
+    });
+  }
 
   /**
    * @private
@@ -84,6 +107,26 @@ export class ActiveSelection extends Group {
         this.insertAt(insertAt, target);
       });
     }
+  }
+
+  /**
+   * @override block ancestors/descendants of selected objects from being selected to prevent a circular object tree
+   */
+  canEnterGroup(object: FabricObject) {
+    if (
+      this.getObjects().some(
+        (o) => o.isDescendantOf(object) || object.isDescendantOf(o)
+      )
+    ) {
+      //  prevent circular object tree
+      log(
+        'error',
+        'ActiveSelection: circular object trees are not supported, this call has no effect'
+      );
+      return false;
+    }
+
+    return super.canEnterGroup(object);
   }
 
   /**
@@ -198,7 +241,6 @@ export class ActiveSelection extends Group {
   ) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    super._renderControls(ctx, styleOverride);
     const options = {
       hasControls: false,
       ...childrenOverride,
@@ -207,6 +249,7 @@ export class ActiveSelection extends Group {
     for (let i = 0; i < this._objects.length; i++) {
       this._objects[i]._renderControls(ctx, options);
     }
+    super._renderControls(ctx, styleOverride);
     ctx.restore();
   }
 }

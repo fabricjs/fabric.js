@@ -13,7 +13,7 @@ import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT, reNewline } from '../../constants';
+import { LEFT, MODIFIED, RIGHT, reNewline } from '../../constants';
 import type { IText } from './IText';
 
 /**
@@ -134,13 +134,10 @@ export abstract class ITextBehavior<
       duration,
       delay,
       onComplete,
-      abort: () => {
-        return (
-          !this.canvas ||
-          // we do not want to animate a selection, only cursor
-          this.selectionStart !== this.selectionEnd
-        );
-      },
+      abort: () =>
+        !this.canvas ||
+        // we do not want to animate a selection, only cursor
+        this.selectionStart !== this.selectionEnd,
       onChange: (value) => {
         this._currentCursorOpacity = value;
         this.renderCursorOrSelection();
@@ -148,21 +145,26 @@ export abstract class ITextBehavior<
     });
   }
 
+  /**
+   * changes the cursor from visible to invisible
+   */
   private _tick(delay?: number) {
     this._currentTickState = this._animateCursor({
-      toValue: 1,
-      duration: this.cursorDuration,
-      delay,
+      toValue: 0,
+      duration: this.cursorDuration / 2,
+      delay: Math.max(delay || 0, 100),
       onComplete: this._onTickComplete,
     });
   }
 
+  /**
+   * Changes the cursor from invisible to visible
+   */
   private _onTickComplete() {
     this._currentTickCompleteState?.abort();
     this._currentTickCompleteState = this._animateCursor({
-      toValue: 0,
-      duration: this.cursorDuration / 2,
-      delay: 100,
+      toValue: 1,
+      duration: this.cursorDuration,
       onComplete: this._tick,
     });
   }
@@ -197,6 +199,10 @@ export abstract class ITextBehavior<
     }
   }
 
+  /**
+   * Restart tue cursor animation if either is in complete state ( between animations )
+   * or if it never started before
+   */
   restartCursorIfNeeded() {
     if (
       [this._currentTickState, this._currentTickCompleteState].some(
@@ -336,10 +342,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a word based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectWord(selectionStart: number) {
+  selectWord(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     // search backwards
     const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
@@ -357,10 +364,11 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * TODO fix: selectionStart set as 0 will be ignored?
    * Selects a line based on the index
    * @param {Number} selectionStart Index of a character
    */
-  selectLine(selectionStart: number) {
+  selectLine(selectionStart?: number) {
     selectionStart = selectionStart || this.selectionStart;
     const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
       newSelectionEnd = this.findLineBoundaryRight(selectionStart);
@@ -398,8 +406,10 @@ export abstract class ITextBehavior<
     this.fire('editing:entered', e ? { e } : undefined);
     this._fireSelectionChanged();
     if (this.canvas) {
-      // @ts-expect-error in reality it is an IText instance
-      this.canvas.fire('text:editing:entered', { target: this, e });
+      this.canvas.fire('text:editing:entered', {
+        target: this as unknown as IText,
+        e,
+      });
       this.canvas.requestRenderAll();
     }
   }
@@ -688,11 +698,12 @@ export abstract class ITextBehavior<
       this.setCoords();
     }
     this.fire('editing:exited');
-    isTextChanged && this.fire('modified');
+    isTextChanged && this.fire(MODIFIED);
     if (this.canvas) {
       this.canvas.fire('text:editing:exited', {
         target: this as unknown as IText,
       });
+      // todo: evaluate add an action to this event
       isTextChanged && this.canvas.fire('object:modified', { target: this });
     }
     return this;

@@ -19,9 +19,7 @@ export const isSerializableFiller = (
 
 export const isPattern = (filler: TFiller): filler is Pattern => {
   return (
-    !!filler &&
-    (filler as Pattern).offsetX !== undefined &&
-    Object.hasOwn(filler, 'source')
+    !!filler && (filler as Pattern).offsetX !== undefined && 'source' in filler
   );
 };
 
@@ -46,4 +44,4 @@ export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
 export const isActiveSelection = (
   fabricObject?: FabricObject
 ): fabricObject is ActiveSelection =>
-  !!fabricObject && Object.hasOwn(fabricObject, 'multiSelectionStacking');
+  !!fabricObject && 'multiSelectionStacking' in fabricObject;

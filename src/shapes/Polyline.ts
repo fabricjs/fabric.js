@@ -16,7 +16,15 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER, LEFT, TOP } from '../constants';
+import {
+  CENTER,
+  LEFT,
+  SCALE_X,
+  SCALE_Y,
+  SKEW_X,
+  SKEW_Y,
+  TOP,
+} from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
@@ -65,13 +73,14 @@ export class Polyline<
       ...Polyline.ownDefaults,
     };
   }
+
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
   static layoutProperties: (keyof Polyline)[] = [
-    'skewX',
-    'skewY',
+    SKEW_X,
+    SKEW_Y,
     'strokeLineCap',
     'strokeLineJoin',
     'strokeMiterLimit',
@@ -108,7 +117,10 @@ export class Polyline<
    * });
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
-    super({ points, ...options });
+    super();
+    Object.assign(this, Polyline.ownDefaults);
+    this.setOptions(options);
+    this.points = points;
     const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
@@ -278,7 +290,7 @@ export class Polyline<
     if (
       this.exactBoundingBox &&
       changed &&
-      (((key === 'scaleX' || key === 'scaleY') &&
+      (((key === SCALE_X || key === SCALE_Y) &&
         this.strokeUniform &&
         (this.constructor as typeof Polyline).layoutProperties.includes(
           'strokeUniform'

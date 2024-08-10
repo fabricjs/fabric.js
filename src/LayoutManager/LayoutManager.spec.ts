@@ -119,6 +119,7 @@ describe('Layout Manager', () => {
         'skewing',
         'changed',
         'modifyPoly',
+        'modifyPath',
       ];
 
       it('should subscribe object', () => {
@@ -147,15 +148,15 @@ describe('Layout Manager', () => {
         const manager = new LayoutManager();
         const performLayout = jest.spyOn(manager, 'performLayout');
         const object = new FabricObject();
-        const target = new Group();
+        const target = new Group([object], { layoutManager: manager });
         manager['subscribe'](object, { target });
-
+        performLayout.mockClear();
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => object.fire(trigger, event));
         expect(performLayout.mock.calls).toMatchObject([
           [
             {
-              e: { ...event },
+              e: event,
               target,
               trigger: 'modified',
               type: 'object_modified',
@@ -163,7 +164,7 @@ describe('Layout Manager', () => {
           ],
           ...triggers.slice(1).map((trigger) => [
             {
-              e: { target: object, ...event },
+              e: event,
               target,
               trigger,
               type: 'object_modifying',
@@ -455,9 +456,7 @@ describe('Layout Manager', () => {
       ]);
       expect(targetMocks.set).nthCalledWith(1, { width, height });
       expect(layoutObjects).toBeCalledWith(context, layoutResult);
-      expect(targetMocks.set).nthCalledWith(2, {
-        dirty: true,
-      });
+      expect(targetMocks.set).nthCalledWith(2, 'dirty', true);
     });
   });
 
@@ -824,7 +823,7 @@ describe('Layout Manager', () => {
     });
 
     test.each([true, false])(
-      'initialization edge case, legacy layout %s',
+      'initialization edge case, with specified layoutManager %s',
       (legacy) => {
         const child = new FabricObject({
           width: 200,
@@ -858,7 +857,7 @@ describe('Layout Manager', () => {
       });
       expect(group).toMatchObject({ width: 100, height: 300 });
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
     });
   });
 });

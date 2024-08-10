@@ -1,3 +1,4 @@
+import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
 import type { TRGBAColorSource, TColorArg } from './typedefs';
@@ -15,6 +16,7 @@ import {
  */
 export class Color {
   private declare _source: TRGBAColorSource;
+  isUnrecognised = false;
 
   /**
    *
@@ -50,7 +52,7 @@ export class Color {
           Color.sourceFromHsl(color) ||
           // color is not recognized
           // we default to black as canvas does
-          ([0, 0, 0, 1] as TRGBAColorSource);
+          ((this.isUnrecognised = true) && ([0, 0, 0, 1] as TRGBAColorSource));
   }
 
   /**
@@ -258,8 +260,9 @@ export class Color {
     if (!match) {
       return;
     }
+    const match1degrees = Color.parseAngletoDegrees(match[1]);
 
-    const h = (((parseFloat(match[1]) % 360) + 360) % 360) / 360,
+    const h = (((match1degrees % 360) + 360) % 360) / 360,
       s = parseFloat(match[2]) / 100,
       l = parseFloat(match[3]) / 100;
     let r: number, g: number, b: number;
@@ -316,5 +319,29 @@ export class Color {
       );
       return [r, g, b, a / 255];
     }
+  }
+
+  /**
+   * Converts a string that could be any angle notation (50deg, 0.5turn, 2rad)
+   * into degrees without the 'deg' suffix
+   * @static
+   * @memberOf Color
+   * @param {String} value ex: 0deg, 0.5turn, 2rad
+   * @return {Number} number in degrees or NaN if inputs are invalid
+   */
+  static parseAngletoDegrees(value: string): number {
+    const lowercase = value.toLowerCase();
+    const numeric = parseFloat(lowercase);
+
+    if (lowercase.includes('rad')) {
+      return radiansToDegrees(numeric);
+    }
+
+    if (lowercase.includes('turn')) {
+      return numeric * 360;
+    }
+
+    // Value is probably just a number already in degrees eg '50'
+    return numeric;
   }
 }

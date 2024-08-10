@@ -1,4 +1,4 @@
-import { CENTER } from '../constants';
+import { CENTER, SCALE_X, SCALE_Y } from '../constants';
 import type { FabricImage } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
@@ -23,8 +23,8 @@ const _assignTransformMatrixProps = (
     );
     object.flipX = false;
     object.flipY = false;
-    object.set('scaleX', scaleX);
-    object.set('scaleY', scaleY);
+    object.set(SCALE_X, scaleX);
+    object.set(SCALE_Y, scaleY);
     object.angle = angle;
     object.skewX = skewX;
     object.skewY = 0;

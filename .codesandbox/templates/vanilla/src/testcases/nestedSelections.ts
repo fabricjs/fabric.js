@@ -4,6 +4,15 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
   canvas.preserveObjectStacking = true;
   const circle = new fabric.Circle({ left: 100, top: 50, radius: 50 });
   const text = new fabric.FabricText('empty', { evented: false });
+  const nastyTriangle = new fabric.Triangle({
+    width: 10,
+    height: 150,
+    strokeWidth: 25,
+    strokeUniform: true,
+    stroke: 'green',
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 99999,
+  });
   const itext = new fabric.IText('Edit me\nfit-content layout', {
     left: 100,
     top: 150,
@@ -19,6 +28,7 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
       }),
       circle,
       itext,
+      nastyTriangle,
     ],
     {
       backgroundColor: 'blue',
@@ -28,6 +38,12 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
     }
   );
   canvas.add(text, g);
+  g.clone().then((clone) => {
+    clone.set({
+      backgroundColor: 'red',
+    });
+    canvas.add(clone);
+  });
   g.clone().then((clone) => {
     clone.item(2).set({ text: 'Edit me\nclip path layout' });
     clone.set({
@@ -67,7 +83,7 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
       .set({ text: 'Edit me\nabsolute positioned\nclip path layout' });
     clone.set({
       objectCaching,
-      backgroundColor: '#0dcaf0',
+      backgroundColor: 'cyan',
       clipPath: new fabric.Circle({
         radius: 110,
         originX: 'center',
@@ -81,9 +97,5 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
     clone.layoutManager.strategy = new fabric.ClipPathLayout();
     clone.triggerLayout();
     canvas.insertAt(0, clone);
-  });
-  canvas.on('after:render', () => {
-    text.set('text', `circle is on screen? ${circle.isOnScreen()}`);
-    text.dirty && canvas.requestRenderAll();
   });
 }

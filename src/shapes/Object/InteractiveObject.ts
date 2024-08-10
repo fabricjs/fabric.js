@@ -19,6 +19,7 @@ import type { FabricObjectProps } from './types/FabricObjectProps';
 import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 import { interactiveObjectDefaultValues } from './defaultValues';
+import { SCALE } from '../../constants';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
@@ -139,9 +140,32 @@ export class InteractiveFabricObject<
   static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
-      controls: createObjectDefaultControls(),
       ...InteractiveFabricObject.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(
+      this,
+      (this.constructor as typeof InteractiveFabricObject).createControls(),
+      InteractiveFabricObject.ownDefaults
+    );
+    this.setOptions(options);
+  }
+
+  /**
+   * Creates the default control object.
+   * If you prefer to have on instance of controls shared among all objects
+   * make this function return an empty object and add controls to the ownDefaults
+   * @param {Object} [options] Options object
+   */
+  static createControls(): { controls: Record<string, Control> } {
+    return { controls: createObjectDefaultControls() };
   }
 
   /**
@@ -159,7 +183,7 @@ export class InteractiveFabricObject<
       if (
         this === (target as unknown as this) &&
         action &&
-        action.startsWith('scale')
+        action.startsWith(SCALE)
       ) {
         return false;
       }
@@ -189,17 +213,22 @@ export class InteractiveFabricObject<
    * @param {boolean} forTouch indicates if we are looking for interaction area with a touch action
    * @return {String|Boolean} corner code (tl, tr, bl, br, etc.), or 0 if nothing is found.
    */
-  _findTargetCorner(pointer: Point, forTouch = false): string {
+  findControl(
+    pointer: Point,
+    forTouch = false
+  ): { key: string; control: Control; coord: TOCoord } | undefined {
     if (!this.hasControls || !this.canvas) {
-      return '';
+      return undefined;
     }
 
     this.__corner = undefined;
     const cornerEntries = Object.entries(this.oCoords);
     for (let i = cornerEntries.length - 1; i >= 0; i--) {
       const [key, corner] = cornerEntries[i];
+      const control = this.controls[key];
+
       if (
-        this.controls[key].shouldActivate(
+        control.shouldActivate(
           key,
           this,
           pointer,
@@ -207,11 +236,13 @@ export class InteractiveFabricObject<
         )
       ) {
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
-        return (this.__corner = key);
+        this.__corner = key;
+
+        return { key, control, coord: this.oCoords[key] };
       }
     }
 
-    return '';
+    return undefined;
   }
 
   /**
@@ -240,8 +271,13 @@ export class InteractiveFabricObject<
       ]),
       transformOptions = this.group
         ? qrDecompose(this.calcTransformMatrix())
-        : undefined,
-      dim = this._calculateCurrentDimensions(transformOptions),
+        : undefined;
+    // decomposing could bring negative scaling and `_calculateCurrentDimensions` can't take it
+    if (transformOptions) {
+      transformOptions.scaleX = Math.abs(transformOptions.scaleX);
+      transformOptions.scaleY = Math.abs(transformOptions.scaleY);
+    }
+    const dim = this._calculateCurrentDimensions(transformOptions),
       coords: Record<string, TOCoord> = {};
 
     this.forEachControl((control, key) => {
@@ -414,7 +450,12 @@ export class InteractiveFabricObject<
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
     ctx.lineWidth = 1 * this.borderScaleFactor;
-    if (!this.group) {
+    // since interactive groups have been introduced, an object could be inside a group and needing controls
+    // the following equality check `this.group === this.parent` covers:
+    // object without a group ( undefined === undefined )
+    // object inside a group
+    // excludes object inside a group but multi selected since group and parent will differ in value
+    if (this.group === this.parent) {
       ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
     }
     if (this.flipX) {
@@ -500,6 +541,9 @@ export class InteractiveFabricObject<
    * Draws corners of an object's bounding box.
    * Requires public properties: width, height
    * Requires public options: cornerSize, padding
+   * Be aware that since fabric 6.0 this function does not call setCoords anymore.
+   * setCoords needs to be called manually if the object of which we are rendering controls
+   * is outside the standard selection and transform process.
    * @param {CanvasRenderingContext2D} ctx Context to draw on
    * @param {ControlRenderingStyleOverride} styleOverride object to override the object style
    */
@@ -522,7 +566,6 @@ export class InteractiveFabricObject<
       ctx.strokeStyle = options.cornerStrokeColor;
     }
     this._setLineDash(ctx, options.cornerDashArray);
-    this.setCoords();
     this.forEachControl((control, key) => {
       if (control.getVisibility(this, key)) {
         const p = this.oCoords[key];
@@ -636,7 +679,7 @@ export class InteractiveFabricObject<
    * Fired from {@link Canvas#_onMouseMove}
    * @returns true in order for the window to start a drag session
    */
-  shouldStartDragging() {
+  shouldStartDragging(e: TPointerEvent) {
     return false;
   }
 

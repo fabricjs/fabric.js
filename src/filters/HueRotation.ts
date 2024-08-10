@@ -1,15 +1,16 @@
-import type { TClassProperties } from '../typedefs';
 import { cos } from '../util/misc/cos';
 import { sin } from '../util/misc/sin';
 import { ColorMatrix } from './ColorMatrix';
 import type { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
-export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
-  {
-    rotation: 0,
-    mainParameter: 'rotation',
-  };
+export type HueRotationOwnProps = {
+  rotation: number;
+};
+
+export const hueRotationDefaultValues: HueRotationOwnProps = {
+  rotation: 0,
+};
 
 /**
  * HueRotation filter class
@@ -20,12 +21,14 @@ export const hueRotationDefaultValues: Partial<TClassProperties<HueRotation>> =
  * object.filters.push(filter);
  * object.applyFilters();
  */
-// @ts-expect-error some babbling about mainParameter
-export class HueRotation extends ColorMatrix {
+export class HueRotation extends ColorMatrix<
+  'HueRotation',
+  HueRotationOwnProps
+> {
   /**
    * HueRotation value, from -1 to 1.
    */
-  declare rotation: number;
+  declare rotation: HueRotationOwnProps['rotation'];
 
   static type = 'HueRotation';
 
@@ -51,13 +54,20 @@ export class HueRotation extends ColorMatrix {
   }
 
   isNeutralState() {
-    this.calculateMatrix();
-    return super.isNeutralState();
+    return this.rotation === 0;
   }
 
   applyTo(options: TWebGLPipelineState | T2DPipelineState) {
     this.calculateMatrix();
     super.applyTo(options);
+  }
+
+  //@ts-expect-error TS and classes with different methods
+  toObject(): { type: 'HueRotation'; rotation: number } {
+    return {
+      type: this.type,
+      rotation: this.rotation,
+    };
   }
 }
 

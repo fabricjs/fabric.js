@@ -16,7 +16,7 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from '../Text/constants';
-import { CENTER, LEFT, RIGHT } from '../../constants';
+import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
 
 type CursorBoundaries = {
@@ -217,13 +217,12 @@ export class IText<
   }
 
   /**
-
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
   constructor(text: string, options?: Props) {
-    super(text, options);
+    super(text, { ...IText.ownDefaults, ...options } as Props);
     this.initBehavior();
   }
 
@@ -522,7 +521,7 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
+      (this.getValueOfPropertyAt(lineIndex, charIndex, FILL) as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
@@ -678,7 +677,7 @@ export class IText<
    */
   getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
+    return this.getValueOfPropertyAt(cp.l, cp.c, FILL);
   }
 
   /**

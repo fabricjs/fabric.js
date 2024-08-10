@@ -10,16 +10,18 @@ import {
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
-import { CENTER } from '../constants';
+import { CENTER, FILL, STROKE } from '../constants';
 import { getGradientDefs } from './getGradientDefs';
 import { getCSSRules } from './getCSSRules';
 import type { LoadImageOptions } from '../util';
 import type { CSSRules, TSvgReviverCallback } from './typedefs';
 import type { ParsedViewboxTransform } from './applyViewboxTransform';
 import type { SVGOptions } from '../gradient';
+import { getTagName } from './getTagName';
+import { parseTransformAttribute } from './parseTransformAttribute';
 
 const findTag = (el: Element) =>
-  classRegistry.getSVGClass(el.tagName.toLowerCase().replace('svg:', ''));
+  classRegistry.getSVGClass(getTagName(el).toLowerCase());
 
 type StorageType = {
   fill: SVGGradientElement;
@@ -37,7 +39,7 @@ type NotParsedFabricObject = FabricObject & {
 export class ElementsParser {
   declare elements: Element[];
   declare options: LoadImageOptions & ParsedViewboxTransform;
-  declare reviver: TSvgReviverCallback | undefined;
+  declare reviver?: TSvgReviverCallback;
   declare regexUrl: RegExp;
   declare doc: Document;
   declare clipPaths: Record<string, Element[]>;
@@ -75,8 +77,8 @@ export class ElementsParser {
         this.options,
         this.cssRules
       );
-      this.resolveGradient(obj, el, 'fill');
-      this.resolveGradient(obj, el, 'stroke');
+      this.resolveGradient(obj, el, FILL);
+      this.resolveGradient(obj, el, STROKE);
       if (obj instanceof FabricImage && obj._originalElement) {
         removeTransformMatrixForSvgParsing(
           obj,
@@ -131,6 +133,8 @@ export class ElementsParser {
     }
   }
 
+  // TODO: resolveClipPath could be run once per clippath with minor work per object.
+  // is a refactor that i m not sure is worth on this code
   async resolveClipPath(obj: NotParsedFabricObject, usingElement: Element) {
     const clipPathElements = this.extractPropertyDefinition(
       obj,
@@ -139,8 +143,7 @@ export class ElementsParser {
     ) as Element[];
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
-      // move the clipPath tag as sibling to the real element that is using it
-      const clipPathTag = clipPathElements[0].parentElement;
+      const clipPathTag = clipPathElements[0].parentElement!;
       let clipPathOwner = usingElement;
       while (
         clipPathOwner.parentElement &&
@@ -148,7 +151,24 @@ export class ElementsParser {
       ) {
         clipPathOwner = clipPathOwner.parentElement;
       }
+      // move the clipPath tag as sibling to the real element that is using it
       clipPathOwner.parentElement!.appendChild(clipPathTag!);
+
+      // this multiplication order could be opposite.
+      // but i don't have an svg to test it
+      // at the first SVG that has a transform on both places and is misplaced
+      // try to invert this multiplication order
+      const finalTransform = parseTransformAttribute(
+        `${clipPathOwner.getAttribute('transform') || ''} ${
+          clipPathTag.getAttribute('originalTransform') || ''
+        }`
+      );
+
+      clipPathTag.setAttribute(
+        'transform',
+        `matrix(${finalTransform.join(',')})`
+      );
+
       const container = await Promise.all(
         clipPathElements.map((clipPathElement) => {
           return findTag(clipPathElement)

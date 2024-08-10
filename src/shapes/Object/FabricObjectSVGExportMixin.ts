@@ -1,7 +1,7 @@
 import type { TSVGReviver } from '../../typedefs';
 import { uid } from '../../util/internals/uid';
 import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
-import { NONE } from '../../constants';
+import { FILL, NONE, STROKE } from '../../constants';
 import type { FabricObject } from './FabricObject';
 import { isFiller } from '../../util/typeAssertions';
 
@@ -34,8 +34,8 @@ export class FabricObjectSVGExportMixin {
       opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
       visibility = this.visible ? '' : ' visibility: hidden;',
       filter = skipShadow ? '' : this.getSvgFilter(),
-      fill = colorPropToSVG('fill', this.fill),
-      stroke = colorPropToSVG('stroke', this.stroke);
+      fill = colorPropToSVG(FILL, this.fill),
+      stroke = colorPropToSVG(STROKE, this.stroke);
 
     return [
       stroke,
@@ -247,8 +247,6 @@ export class FabricObjectSVGExportMixin {
   }
 
   addPaintOrder(this: FabricObjectSVGExportMixin & FabricObject) {
-    return this.paintFirst !== 'fill'
-      ? ` paint-order="${this.paintFirst}" `
-      : '';
+    return this.paintFirst !== FILL ? ` paint-order="${this.paintFirst}" ` : '';
   }
 }

@@ -447,6 +447,25 @@
     height: 400,
   });
 
+  function toCanvasElementAndControls(fabricCanvas, callback) {
+    var rect = new fabric.Rect({ width: 200, height: 200, left: 50, top: 50, fill: 'yellow' });
+    var canvas = new fabric.Canvas();
+    canvas.add(rect);
+    canvas.setDimensions({ width: 300, height: 300 });
+    canvas.setActiveObject(rect);
+    callback(canvas.toCanvasElement());
+  }
+
+  tests.push({
+    test: 'fabric.Canvas will not export controls',
+    code: toCanvasElementAndControls,
+    // use the same golden on purpose
+    golden: 'toCanvasElementAndControls.png',
+    percentage: 0.02,
+    width: 300,
+    height: 300,
+  });
+
   function pathWithGradient(canvas, callback) {
     var pathWithGradient = new fabric.Path('M 0 0 L 0 100 L 100 100 L 100 0 Z', {
       fill: new fabric.Gradient({

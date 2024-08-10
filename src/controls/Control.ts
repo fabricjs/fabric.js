@@ -6,6 +6,7 @@ import type {
 } from '../EventTypeDefs';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
+import { SCALE } from '../constants';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
 import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import {
@@ -39,7 +40,7 @@ export class Control {
    * @type {String}
    * @default 'scale'
    */
-  actionName = 'scale';
+  actionName = SCALE;
 
   /**
    * Drawing angle of the control.
@@ -327,8 +328,8 @@ export class Control {
     return {
       tl: new Point(-0.5, -0.5).transform(t),
       tr: new Point(0.5, -0.5).transform(t),
-      bl: new Point(-0.5, 0.5).transform(t),
       br: new Point(0.5, 0.5).transform(t),
+      bl: new Point(-0.5, 0.5).transform(t),
     };
   }
 

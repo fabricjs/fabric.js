@@ -1,7 +1,6 @@
 import type { JSHandle, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 import type { FabricObject } from 'fabric';
-import type { before, beforeAll } from 'test';
 
 export class ObjectUtil<T extends FabricObject = FabricObject> {
   constructor(
@@ -35,6 +34,10 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
 
   getObjectCenter() {
     return this.executeInBrowser((object) => object.getCenterPoint());
+  }
+
+  getObjectCoords() {
+    return this.executeInBrowser((object) => object.getCoords());
   }
 
   getObjectControlPoint(controlName: string) {
