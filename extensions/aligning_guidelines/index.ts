@@ -8,13 +8,15 @@ import type {
 import { Point, util } from 'fabric';
 import {
   collectHorizontalPoint,
-  collectLine,
   collectVerticalPoint,
+} from './util/collect-point';
+import {
   drawHorizontalLine,
   drawPointList,
   drawVerticalLine,
-  getObjectsByTarget,
-} from './util';
+} from './util/draw';
+import { getObjectsByTarget } from './util/get-objects-by-target';
+import { collectLine } from './util/collect-line';
 import type { HorizontalLine, VerticalLine } from './typedefs';
 import { AligningLineConfig } from './constant';
 

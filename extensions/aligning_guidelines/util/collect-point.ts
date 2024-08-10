@@ -11,6 +11,7 @@ type CollectPointProps = {
 };
 const originXArr: TOriginX[] = ['left', 'center', 'right'];
 const originYArr: TOriginY[] = ['top', 'center', 'bottom'];
+
 export function collectVerticalPoint(props: CollectPointProps) {
   const aligningLineMargin = AligningLineConfig.margin;
   const { activeObject, isScale, index, point, list } = props;
