@@ -1,6 +1,7 @@
 import { svgNS } from './constants';
 import { getMultipleNodes } from './getMultipleNodes';
 import { applyViewboxTransform } from './applyViewboxTransform';
+import { parseStyleString } from './parseStyleString';
 
 export function parseUseDirectives(doc: Document) {
   const nodelist = getMultipleNodes(doc, ['use', 'svg:use']);
@@ -67,6 +68,16 @@ export function parseUseDirectives(doc: Document) {
 
       if (nodeName === 'transform') {
         currentTrans = nodeValue + ' ' + currentTrans;
+      } else if (nodeName === 'style' && el2.getAttribute('style') !== null) {
+        // when both sides have styles, merge the two styles, with the ref being priority (not use)
+        const styleRecord: Record<string, any> = {};
+        parseStyleString(nodeValue!, styleRecord);
+        parseStyleString(el2.getAttribute('style')!, styleRecord);
+        const mergedStyles = Object.keys(styleRecord).reduce(
+          (a, v) => a + ' ' + v + ': ' + styleRecord[v] + ';',
+          ''
+        );
+        el2.setAttribute(nodeName, mergedStyles);
       } else {
         el2.setAttribute(nodeName, nodeValue!);
       }
