@@ -63,7 +63,7 @@ function onwarn(warning, warn) {
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
+    input: ['./fabric.ts'],
     output: [
       // es modules in files
       {
@@ -147,6 +147,7 @@ export default [
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
   // EXTENSIONS
+
   {
     input: ['./extensions/index.ts'],
     external: ['fabric'],
@@ -166,6 +167,28 @@ export default [
             preserveModules: true,
             entryFileNames: '[name].min.mjs',
             sourcemap: true,
+            plugins: [terser()],
+          }
+        : null,
+      // umd module
+      {
+        file: path.resolve('./dist-extensions', `fabric-extensions.js`),
+        name: 'fabricExtensions',
+        format: 'umd',
+        sourcemap: true,
+        globals: {
+          fabric: 'fabric',
+        },
+      },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve('./dist-extensions', `fabric-extensions.js`),
+            name: 'fabricExtensions',
+            format: 'umd',
+            sourcemap: true,
+            globals: {
+              fabric: 'fabric',
+            },
             plugins: [terser()],
           }
         : null,
