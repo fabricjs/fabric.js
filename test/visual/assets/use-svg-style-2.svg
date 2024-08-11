@@ -1,0 +1,15 @@
+<svg id="svg" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+      <style>.a {fill: cyan;} .b {fill: yellow;} .c{ stroke-width: 6; stroke: purple} .a.c { fill: hotpink }</style>
+    </defs>
+    <path class="c" id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z"  />
+    <use x="100" y="0" xlink:href="#heart" class="a" />
+    <g transform="translate(0, 100)">
+      <path style="fill:red;" id="heart2" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+      <use x="100" y="0" xlink:href="#heart2" class="b" />
+    </g>
+    <g transform="translate(0, 180)">
+      <path class="b" id="heart3" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+      <use x="100" y="0" xlink:href="#heart3" style="fill:purple" fill="black" />
+    </g>
+</svg>

@@ -102,6 +102,7 @@
     'car',
     'seaClipPath',
     'use-and-style',
+    'use-svg-style-2',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
