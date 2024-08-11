@@ -20,6 +20,23 @@ export class CanvasUtil {
     }
   }
 
+  async makeActiveSelectionByDragging(objects: ObjectUtil[]) {
+    const points = [];
+    for (const objectUtil of objects) {
+      points.push(...(await objectUtil.getObjectCoords()));
+    }
+    const bbox = await this.executeInBrowser(
+      (_, { points }) => {
+        return fabric.util.makeBoundingBoxFromPoints(points);
+      },
+      { points }
+    );
+    await this.clickAndDrag(
+      { x: bbox.left - 20, y: bbox.top - 20 },
+      { x: bbox.left + bbox.width + 20, y: bbox.top + bbox.height + 20 }
+    );
+  }
+
   async clickAndDrag(point: XY, dragTo: XY, steps = 20) {
     await this.page.mouse.move(point.x, point.y);
     await this.page.mouse.down({

@@ -1,6 +1,11 @@
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
-import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
+import type {
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+  Abortable,
+} from '../typedefs';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -132,8 +137,24 @@ export class Group
    * @param {Object} [options] Options object
    */
   constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
-    // @ts-expect-error options error
-    super(options);
+    super();
+    Object.assign(this, Group.ownDefaults);
+    this.setOptions(options);
+    this.groupInit(objects, options);
+  }
+
+  /**
+   * Shared code between group and active selection
+   * Meant to be used by the constructor.
+   */
+  protected groupInit(
+    objects: FabricObject[],
+    options: {
+      layoutManager?: LayoutManager;
+      top?: number;
+      left?: number;
+    }
+  ) {
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
@@ -150,7 +171,7 @@ export class Group
     });
 
     // perform initial layout
-    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager = options.layoutManager ?? new LayoutManager();
     this.layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
@@ -658,15 +679,13 @@ export class Group
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject<T extends TOptions<SerializedGroupProps>>({
-    type,
-    objects = [],
-    layoutManager,
-    ...options
-  }: T) {
+  static fromObject<T extends TOptions<SerializedGroupProps>>(
+    { type, objects = [], layoutManager, ...options }: T,
+    abortable?: Abortable
+  ) {
     return Promise.all([
-      enlivenObjects<FabricObject>(objects),
-      enlivenObjectEnlivables(options),
+      enlivenObjects<FabricObject>(objects, abortable),
+      enlivenObjectEnlivables(options, abortable),
     ]).then(([objects, hydratedOptions]) => {
       const group = new this(objects, {
         ...options,

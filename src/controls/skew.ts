@@ -19,7 +19,14 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { CENTER } from '../constants';
+import {
+  CENTER,
+  SCALE_X,
+  SCALE_Y,
+  SKEWING,
+  SKEW_X,
+  SKEW_Y,
+} from '../constants';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -36,16 +43,16 @@ const AXIS_KEYS: Record<
 > = {
   x: {
     counterAxis: 'y',
-    scale: 'scaleX',
-    skew: 'skewX',
+    scale: SCALE_X,
+    skew: SKEW_X,
     lockSkewing: 'lockSkewingX',
     origin: 'originX',
     flip: 'flipX',
   },
   y: {
     counterAxis: 'x',
-    scale: 'scaleY',
-    skew: 'skewY',
+    scale: SCALE_Y,
+    skew: SKEW_Y,
     lockSkewing: 'lockSkewingY',
     origin: 'originY',
     flip: 'flipY',
@@ -130,7 +137,7 @@ function skewObject(
       dimAfter = target._getTransformedDimensions(),
       compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
     compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * scaleX);
+      target.set(SCALE_X, compensationFactor * scaleX);
   }
 
   return changed;
@@ -188,7 +195,7 @@ function skewHandler(
     origin = -skewingDirection * 0.5 + 0.5;
 
   const finalHandler = wrapWithFireEvent<SkewTransform>(
-    'skewing',
+    SKEWING,
     wrapWithFixedAnchor((eventData, transform, x, y) =>
       skewObject(axis, transform, new Point(x, y))
     )

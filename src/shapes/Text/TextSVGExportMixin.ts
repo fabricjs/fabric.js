@@ -8,6 +8,7 @@ import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin
 import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
 import type { FabricText } from './Text';
+import { STROKE, FILL } from '../../constants';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -29,7 +30,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return this._wrapSVGTextAndBg(textAndBg);
   }
 
-  toSVG(this: TextSVGExportMixin & FabricText, reviver: TSVGReviver): string {
+  toSVG(this: TextSVGExportMixin & FabricText, reviver?: TSVGReviver): string {
     return this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
@@ -296,8 +297,6 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    // cant use ts-expect-error because of ts 5.3 cross check
-    // @ts-ignore TS doesn't respect this type casting
     return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
   }
 
@@ -326,7 +325,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     const textDecoration = this.getSvgTextDecoration(style);
 
     return [
-      stroke ? colorPropToSVG('stroke', stroke) : '',
+      stroke ? colorPropToSVG(STROKE, stroke) : '',
       strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
       fontFamily
         ? `font-family: ${
@@ -339,7 +338,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontStyle ? `font-style: ${fontStyle}; ` : '',
       fontWeight ? `font-weight: ${fontWeight}; ` : '',
       textDecoration ? `text-decoration: ${textDecoration}; ` : textDecoration,
-      fill ? colorPropToSVG('fill', fill) : '',
+      fill ? colorPropToSVG(FILL, fill) : '',
       deltaY ? `baseline-shift: ${-deltaY}; ` : '',
       useWhiteSpace ? 'white-space: pre; ' : '',
     ].join('');

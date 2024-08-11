@@ -1,0 +1,34 @@
+<svg id="svg" viewBox="0 0 200 570" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <path id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z"
+      style="stroke:#00FF00;fill:#ff0000" />
+    <use x="100" y="0" xlink:href="#heart"
+      style="stroke-width:8.0;fill:#0000ff" />
+    <g transform="translate(0, 100)">
+      <path id="heart2" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+      <use x="100" y="0" xlink:href="#heart2"
+        style="stroke-width:5.0;fill:#0000ff" />
+    </g>
+    <g transform="translate(0, 180)">
+      <path id="heart3" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" 
+        style="stroke:#000000;fill:#ff0000" />
+      <use x="100" y="0" xlink:href="#heart3" fill="yellow" />
+    </g>
+    <g transform="translate(0, 260)">
+      <path id="heart4" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" 
+         fill="green" />
+      <use x="100" y="0" xlink:href="#heart4" fill="purple" stroke-width="8" stroke="yellow" />
+    </g>
+    <g transform="translate(0, 350)">
+      <path id="heart5" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" 
+         style="" />
+      <use x="100" y="0" xlink:href="#heart5" style="fill: pink" stroke-width="8" fill="purple" stroke="cyan" />
+    </g>
+    <g transform="translate(0, 440)">
+      <path id="heart6" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" 
+        fill="violet" style="" />
+      <use x="100" y="0" xlink:href="#heart6" style="fill: pink" stroke-width="8" fill="purple" stroke="cyan" />
+    </g>
+    <circle id="myCircle" cx="5" cy="5" r="4" stroke="blue" />
+    <use href="#myCircle" x="10" fill="blue" />
+    <use href="#myCircle" x="20" fill="white" stroke="red" />
+</svg>

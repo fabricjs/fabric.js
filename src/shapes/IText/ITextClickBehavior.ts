@@ -48,12 +48,21 @@ export abstract class ITextClickBehavior<
     super.initBehavior();
   }
 
+  /**
+   * If this method returns true a mouse move operation over a text selection
+   * will not prevent the native mouse event allowing the browser to start a drag operation.
+   * shouldStartDragging can be read 'do not prevent default for mouse move event'
+   * To prevent drag and drop between objects both shouldStartDragging and onDragStart should return false
+   * @returns
+   */
   shouldStartDragging() {
     return this.draggableTextDelegate.isActive();
   }
 
   /**
-   * @public override this method to control whether instance should/shouldn't become a drag source, @see also {@link DraggableTextDelegate#isActive}
+   * @public override this method to control whether instance should/shouldn't become a drag source,
+   * @see also {@link DraggableTextDelegate#isActive}
+   * To prevent drag and drop between objects both shouldStartDragging and onDragStart should return false
    * @returns {boolean} should handle event
    */
   onDragStart(e: DragEvent) {

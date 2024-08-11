@@ -2,13 +2,17 @@
  * Runs from the BROWSER
  */
 
-import type { Object as FabricObject } from 'fabric';
+import type { FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
 import * as fabric from 'fabric';
+import * as fabricExtensions from 'fabric/extensions';
 
 const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
-
+const renderingTestMap = (window.renderingTestMap = new Map<
+  string,
+  () => void
+>());
 type AsyncReturnValue<T> = T | Promise<T>;
 
 const setupTasks: Promise<void>[] = [];
@@ -16,7 +20,7 @@ const teardownTasks: Awaited<VoidFunction>[] = [];
 
 // makes possible call things in browser context.
 window.fabric = fabric;
-
+window.fabricExtensions = fabricExtensions;
 window.__setupFabricHook = () => Promise.all(setupTasks);
 window.__teardownFabricHook = () =>
   Promise.all(teardownTasks.map((cb) => cb()));
@@ -51,6 +55,26 @@ export function before(
     });
   });
   setupTasks.push(task);
+}
+
+export async function beforeRenderTest(
+  cb: (
+    canvas: Canvas
+  ) => AsyncReturnValue<{ title: string; boundFunction: () => void }[]>,
+  options
+) {
+  const el = document.querySelector<HTMLCanvasElement>('#canvas');
+  const canvas = new Canvas(el, options);
+  // cb has to bind the rendering test to the specific canvas and add a clear before the test
+  const renderingTests = await cb(canvas);
+  renderingTests.forEach((renderTest) => {
+    if (renderingTestMap.has(renderTest.title)) {
+      throw new Error(
+        `test identifiers must be unique: ${renderTest.title} is already defined`
+      );
+    }
+    renderingTestMap.set(renderTest.title, renderTest.boundFunction);
+  });
 }
 
 /**

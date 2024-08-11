@@ -25,7 +25,7 @@ export class Canvas2dFilterBackend {
    * @param {HTMLCanvasElement} targetCanvas The destination for filtered output to be drawn.
    */
   applyFilters(
-    filters: BaseFilter[],
+    filters: BaseFilter<string, Record<string, any>>[],
     sourceElement: CanvasImageSource,
     sourceWidth: number,
     sourceHeight: number,

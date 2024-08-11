@@ -5,6 +5,9 @@ import {
   CENTER,
   iMatrix,
   LEFT,
+  SCALE_X,
+  SCALE_Y,
+  STROKE,
   TOP,
   VERSION,
 } from '../../constants';
@@ -214,24 +217,6 @@ export class FabricObject<
   declare _cacheCanvas?: HTMLCanvasElement;
 
   /**
-   * Size of the cache canvas, width
-   * since 1.7.0
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare cacheWidth?: number;
-
-  /**
-   * Size of the cache canvas, height
-   * since 1.7.0
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare cacheHeight?: number;
-
-  /**
    * zoom level used on the cacheCanvas to draw the cache, X axe
    * since 1.7.0
    * @type number
@@ -296,23 +281,25 @@ export class FabricObject<
   static ownDefaults = fabricObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
-    return { ...FabricObject.ownDefaults };
+    return FabricObject.ownDefaults;
   }
 
   /**
-   * The class type. Used to identify which class this is.
-   * This is used for serialization purposes and internally it can be used
-   * to identify classes. As a developer you could use `instance of Class`
-   * but to avoid importing all the code and blocking tree shaking we try
-   * to avoid doing that.
+   * The class type.
+   * This is used for serialization and deserialization purposes and internally it can be used
+   * to identify classes.
+   * When we transform a class in a plain JS object we need a way to recognize which class it was,
+   * and the type is the way we do that. It has no other purposes and you should not give one.
+   * Hard to reach on instances and please do not use to drive instance's logic (this.constructor.type).
+   * To idenfity a class use instanceof class ( instanceof Rect ).
+   * We do not do that in fabricJS code because we want to try to have code splitting possible.
    */
   static type = 'FabricObject';
 
   /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
-   * The setter exists because is very hard to catch all the ways in which a type value
-   * could be set in the instance
+   * The setter exists to avoid type errors in old code and possibly current deserialization code.
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
@@ -333,12 +320,9 @@ export class FabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Props = {} as Props) {
+  constructor(options?: Props) {
     super();
-    Object.assign(
-      this,
-      (this.constructor as typeof FabricObject).getDefaults()
-    );
+    Object.assign(this, FabricObject.ownDefaults);
     this.setOptions(options);
   }
 
@@ -443,7 +427,7 @@ export class FabricObject<
    * @return {Boolean} true if the canvas has been resized
    */
   _updateCacheCanvas() {
-    const canvas = this._cacheCanvas,
+    const canvas = this._cacheCanvas!,
       context = this._cacheContext,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       minCacheSize = config.minCacheSideLimit,
@@ -451,8 +435,7 @@ export class FabricObject<
       height = dims.height,
       zoomX = dims.zoomX,
       zoomY = dims.zoomY,
-      dimensionsChanged =
-        width !== this.cacheWidth || height !== this.cacheHeight,
+      dimensionsChanged = width !== canvas.width || height !== canvas.height,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
 
     if (!canvas || !context) {
@@ -505,8 +488,6 @@ export class FabricObject<
         Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY =
         Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
-      this.cacheWidth = width;
-      this.cacheHeight = height;
       context.translate(this.cacheTranslationX, this.cacheTranslationY);
       context.scale(zoomX, zoomY);
       this.zoomX = zoomX;
@@ -722,10 +703,10 @@ export class FabricObject<
    * @param {*} value
    */
   _set(key: string, value: any) {
-    if (key === 'scaleX' || key === 'scaleY') {
+    if (key === SCALE_X || key === SCALE_Y) {
       value = this._constrainScale(value);
     }
-    if (key === 'scaleX' && value < 0) {
+    if (key === SCALE_X && value < 0) {
       this.flipX = !this.flipX;
       value *= -1;
     } else if (key === 'scaleY' && value < 0) {
@@ -829,8 +810,6 @@ export class FabricObject<
   _removeCacheCanvas() {
     this._cacheCanvas = undefined;
     this._cacheContext = null;
-    this.cacheWidth = 0;
-    this.cacheHeight = 0;
   }
 
   /**
@@ -873,7 +852,7 @@ export class FabricObject<
    */
   needsItsOwnCache() {
     if (
-      this.paintFirst === 'stroke' &&
+      this.paintFirst === STROKE &&
       this.hasFill() &&
       this.hasStroke() &&
       !!this.shadow
@@ -1044,20 +1023,18 @@ export class FabricObject<
     if (this.isNotVisible()) {
       return false;
     }
-    if (
-      this._cacheCanvas &&
-      this._cacheContext &&
-      !skipCanvas &&
-      this._updateCacheCanvas()
-    ) {
+    const canvas = this._cacheCanvas;
+    const ctx = this._cacheContext;
+    if (canvas && ctx && !skipCanvas && this._updateCacheCanvas()) {
       // in this case the context is already cleared.
       return true;
     } else {
       if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
-        if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-          const width = this.cacheWidth! / this.zoomX!;
-          const height = this.cacheHeight! / this.zoomY!;
-          this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
+        if (canvas && ctx && !skipCanvas) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.restore();
         }
         return true;
       }
@@ -1245,7 +1222,7 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderPaintInOrder(ctx: CanvasRenderingContext2D) {
-    if (this.paintFirst === 'stroke') {
+    if (this.paintFirst === STROKE) {
       this._renderStroke(ctx);
       this._renderFill(ctx);
     } else {

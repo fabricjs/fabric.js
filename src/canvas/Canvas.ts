@@ -732,7 +732,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
         // we must not prevent the event's default behavior in order for the window to start dragging
-        !activeObject.shouldStartDragging()) &&
+        !activeObject.shouldStartDragging(e)) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
@@ -1117,8 +1117,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   __onMouseMove(e: TPointerEvent) {
     this._isClick = false;
-    this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
+    this._handleEvent(e, 'move:before');
 
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
@@ -1304,16 +1304,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     transform: Transform,
     pointer: Point
   ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
-    let actionPerformed = false;
-    // this object could be created from the function in the control handlers
+    const { action, actionHandler, target } = transform;
 
-    if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
-    }
+    const actionPerformed =
+      !!actionHandler && actionHandler(e, transform, pointer.x, pointer.y);
+    actionPerformed && target.setCoords();
+
+    // this object could be created from the function in the control handlers
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);

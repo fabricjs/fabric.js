@@ -106,7 +106,7 @@ export class WebGLFilterBackend {
    * omitted, caching will be skipped.
    */
   applyFilters(
-    filters: BaseFilter[],
+    filters: BaseFilter<string, Record<string, any>>[],
     source: TexImageSource,
     width: number,
     height: number,

@@ -6,7 +6,7 @@ import type {
   TOriginX,
   TOriginY,
 } from '../../typedefs';
-import { iMatrix } from '../../constants';
+import { SCALE_X, SCALE_Y, iMatrix } from '../../constants';
 import { Intersection } from '../../Intersection';
 import { Point } from '../../Point';
 import { makeBoundingBoxFromPoints } from '../../util/misc/boundingBoxFromPoints';
@@ -25,9 +25,10 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import { ObjectOrigin } from './ObjectOrigin';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { ControlProps } from './types/ControlProps';
+import { resolveOrigin } from '../../util/misc/resolveOrigin';
 
 type TMatrixCache = {
-  key: string;
+  key: number[];
   value: TMat2D;
 };
 
@@ -143,7 +144,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
    * object.setXY(new Point(5, 5), 'left', 'bottom').
-   * @param {Point} point position in canvas coordinate plane
+   * @param {Point} point position in scene coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
@@ -355,8 +356,8 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @return {void}
    */
   scale(value: number): void {
-    this._set('scaleX', value);
-    this._set('scaleY', value);
+    this._set(SCALE_X, value);
+    this._set(SCALE_Y, value);
     this.setCoords();
   }
 
@@ -437,40 +438,29 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     this.aCoords = this.calcACoords();
   }
 
-  transformMatrixKey(skipGroup = false): string {
-    const sep = '_';
-    let prefix = '';
+  transformMatrixKey(skipGroup = false): number[] {
+    let prefix: number[] = [];
     if (!skipGroup && this.group) {
-      prefix = this.group.transformMatrixKey(skipGroup) + sep;
+      prefix = this.group.transformMatrixKey(skipGroup);
     }
-    return (
-      prefix +
-      this.top +
-      sep +
-      this.left +
-      sep +
-      this.scaleX +
-      sep +
-      this.scaleY +
-      sep +
-      this.skewX +
-      sep +
-      this.skewY +
-      sep +
-      this.angle +
-      sep +
-      this.originX +
-      sep +
-      this.originY +
-      sep +
-      this.width +
-      sep +
-      this.height +
-      sep +
-      this.strokeWidth +
-      this.flipX +
-      this.flipY
+    prefix.push(
+      this.top,
+      this.left,
+      this.width,
+      this.height,
+      this.scaleX,
+      this.scaleY,
+      this.angle,
+      this.strokeWidth,
+      this.skewX,
+      this.skewY,
+      +this.flipX,
+      +this.flipY,
+      resolveOrigin(this.originX),
+      resolveOrigin(this.originY)
     );
+
+    return prefix;
   }
 
   /**
@@ -487,7 +477,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     }
     const key = this.transformMatrixKey(skipGroup),
       cache = this.matrixCache;
-    if (cache && cache.key === key) {
+    if (cache && cache.key.every((x, i) => x === key[i])) {
       return cache.value;
     }
     if (this.group) {

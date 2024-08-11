@@ -1,6 +1,6 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
-import { DEFAULT_SVG_FONT_SIZE, NONE } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, FILL, NONE } from '../../constants';
 import type {
   TBBox,
   TMat2D,
@@ -176,7 +176,7 @@ export const createSVGRect = (
   { left, top, width, height }: TBBox,
   precision = config.NUM_FRACTION_DIGITS
 ) => {
-  const svgColor = colorPropToSVG('fill', color, false);
+  const svgColor = colorPropToSVG(FILL, color, false);
   const [x, y, w, h] = [left, top, width, height].map((value) =>
     toFixed(value, precision)
   );

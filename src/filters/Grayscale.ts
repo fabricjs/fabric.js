@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
@@ -6,9 +5,12 @@ import { fragmentSource } from './shaders/grayscale';
 
 export type TGrayscaleMode = 'average' | 'lightness' | 'luminosity';
 
-export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
+type GrayscaleOwnProps = {
+  mode: TGrayscaleMode;
+};
+
+export const grayscaleDefaultValues: GrayscaleOwnProps = {
   mode: 'average',
-  mainParameter: 'mode',
 };
 
 /**
@@ -18,12 +20,14 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends BaseFilter {
+export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
   declare mode: TGrayscaleMode;
 
   static type = 'Grayscale';
 
   static defaults = grayscaleDefaultValues;
+
+  static uniformLocations = ['uMode'];
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
@@ -60,21 +64,6 @@ export class Grayscale extends BaseFilter {
 
   getFragmentSource() {
     return fragmentSource[this.mode];
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMode: gl.getUniformLocation(program, 'uMode'),
-    };
   }
 
   /**

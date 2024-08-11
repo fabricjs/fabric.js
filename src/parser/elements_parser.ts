@@ -10,7 +10,7 @@ import {
 import { removeTransformMatrixForSvgParsing } from '../util/transform_matrix_removal';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { Point } from '../Point';
-import { CENTER } from '../constants';
+import { CENTER, FILL, STROKE } from '../constants';
 import { getGradientDefs } from './getGradientDefs';
 import { getCSSRules } from './getCSSRules';
 import type { LoadImageOptions } from '../util';
@@ -39,7 +39,7 @@ type NotParsedFabricObject = FabricObject & {
 export class ElementsParser {
   declare elements: Element[];
   declare options: LoadImageOptions & ParsedViewboxTransform;
-  declare reviver: TSvgReviverCallback | undefined;
+  declare reviver?: TSvgReviverCallback;
   declare regexUrl: RegExp;
   declare doc: Document;
   declare clipPaths: Record<string, Element[]>;
@@ -77,8 +77,8 @@ export class ElementsParser {
         this.options,
         this.cssRules
       );
-      this.resolveGradient(obj, el, 'fill');
-      this.resolveGradient(obj, el, 'stroke');
+      this.resolveGradient(obj, el, FILL);
+      this.resolveGradient(obj, el, STROKE);
       if (obj instanceof FabricImage && obj._originalElement) {
         removeTransformMatrixForSvgParsing(
           obj,

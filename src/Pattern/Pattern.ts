@@ -201,7 +201,7 @@ export class Pattern {
 
   static async fromObject(
     { type, source, ...serialized }: SerializedPatternOptions,
-    options: Abortable
+    options?: Abortable
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

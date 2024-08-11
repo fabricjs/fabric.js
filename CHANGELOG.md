@@ -3,6 +3,83 @@
 ## [next]
 
 - fix(FabricObject): Render clipPath as sharp as the object [#9774](https://github.com/fabricjs/fabric.js/pull/9774)
+- feat(): Add v6 aligning guidelines. [#10033](https://github.com/fabricjs/fabric.js/discussions/10033)
+
+## [6.2.0]
+
+- fix(SVG import): Parse use directive attribute issues [#10053](https://github.com/fabricjs/fabric.js/pull/10053)
+- fix(SVG import): Fix style tag processing in use tag when reference also has a style [#10050](https://github.com/fabricjs/fabric.js/pull/10050)
+- fix(SVG import): Fix path Arc parsing regression issue [#10048](https://github.com/fabricjs/fabric.js/pull/10048)
+- chore(TS): Update TS to latest [#10044](https://github.com/fabricjs/fabric.js/pull/10044)
+- feat(ClassRegistry): Add has method to classRegistry to allow to check if a class exists. (fixes #10001)
+
+## [6.1.0]
+
+- fix(): Avoid errors on restoring custom properties that pass the lazy detection of shadow,gradient,pattern and clipPath. [#10001](https://github.com/fabricjs/fabric.js/issues/10001)
+- fix(): When deselecting an active selection remove its reference from hoveredTarget [#9961](https://github.com/fabricjs/fabric.js/pull/9961)
+- feat(): Path controls utility [#9998](https://github.com/fabricjs/fabric.js/pull/9998)
+- chore(): Removed website submodule
+
+## [6.0.2]
+
+- fix(TS): Type fixes and improved JSDOCS. [#9978](https://github.com/fabricjs/fabric.js/pull/9978)
+
+## [6.0.1]
+
+- chore(): export InteractiveFabricObject to tweak default values [#9963](https://github.com/fabricjs/fabric.js/pull/9963)
+- chore(): use deconstruction and constants in place of strings to save some bytes of code [#9593](https://github.com/fabricjs/fabric.js/pull/9593)
+- tests(): Start moving visual tests to playwrigth [#9481](https://github.com/fabricjs/fabric.js/pull/9481)
+- fix(filters): Fix bugs in Pixelate and Blur filter [#9962](https://github.com/fabricjs/fabric.js/pull/9962)
+- docs(): update README.md [#9957](https://github.com/fabricjs/fabric.js/pull/9957)
+
+## [6.0.0]
+
+## [6.0.0-rc4]
+
+- chore(): update dev deps [#9944](https://github.com/fabricjs/fabric.js/pull/9944)
+- chore() Remove Node 16, add Node 22 in the test suite [#9942](https://github.com/fabricjs/fabric.js/pull/9942)
+- test(e2e): Activeselection default initialization E2E test [#9941](https://github.com/fabricjs/fabric.js/pull/9941)
+- fix(Activeselection): Activeselection default initialization [#9940](https://github.com/fabricjs/fabric.js/pull/9940)
+- feat(Color): add isUnrecognised property [#9936](https://github.com/fabricjs/fabric.js/pull/9936)
+
+## [6.0.0-rc3]
+
+- fix(StaticCanvas): fully clean the cache canvas to avoid leaving trailing pixels [#9779](https://github.com/fabricjs/fabric.js/pull/9779)
+- perf(): Reduce some calls to setCoords() [#9795](https://github.com/fabricjs/fabric.js/pull/9795)
+- chore(TS): svg reviver is optional [#9935](https://github.com/fabricjs/fabric.js/pull/9935)
+- refactor(filters): Remove mainParameter, add stronger types to filters, refactor getUniformLocations [#9933](https://github.com/fabricjs/fabric.js/pull/9933)
+- refactor(): remove strict parameter for ancestry. [#9918](https://github.com/fabricjs/fabric.js/pull/9918)
+- feat(Color): add support for decimals and different angle types in HSL color parsing [#9915](https://github.com/fabricjs/fabric.js/pull/9915)
+- fix(Controls): add support for numeric origins to changeWidth [#9909](https://github.com/fabricjs/fabric.js/pull/9909)
+- fix(ActiveSelection): fixed render order so group controls are rendered over child objects [#9914](https://github.com/fabricjs/fabric.js/pull/9914)
+- fix(filters): RemoveColor has missing getFragmentSource method ( typo ) [#9911](https://github.com/fabricjs/fabric.js/pull/9911)
+- types(): Make event type explicit - non generic, and fix pattern fromObject type [#9907](https://github.com/fabricjs/fabric.js/pull/9907)
+
+## [6.0.0-rc2]
+
+- perf(): remove some runtime RegExp usages [#9802](https://github.com/fabricjs/fabric.js/pull/9802)
+- fix(Canvas): Avoid exporting controls with toDataURL [#9896](https://github.com/fabricjs/fabric.js/pull/9896)
+- perf(): Rework constructors to avoid the extra perf cost of current setup [#9891](https://github.com/fabricjs/fabric.js/pull/9891)
+- perf(): Remove redundant matrix multiplication in multiplayTransformMatrixArray [#9893](https://github.com/fabricjs/fabric.js/pull/9893)
+- test(): Convert Animation tests to jest [#9892](https://github.com/fabricjs/fabric.js/pull/9892)
+- perf(ObjectGeometry): replace cache key string with array [#9887](https://github.com/fabricjs/fabric.js/pull/9887)
+- docs(): Improve JSDOCs for BlendImage [#9876](https://github.com/fabricjs/fabric.js/pull/9876)
+- fix(Group): Pass down the abort signal from group to objects [#9890](https://github.com/fabricjs/fabric.js/pull/9890)
+- fix(util): restore old composeMatrix code for performances improvement [#9851](https://github.com/fabricjs/fabric.js/pull/9851)
+- fix(Control): corner coords definition order [#9884](https://github.com/fabricjs/fabric.js/pull/9884)
+- fix(Polyline): safeguard points arg from options [#9855](https://github.com/fabricjs/fabric.js/pull/9855)
+- feat(IText): Adjust cursor blinking for better feedback [#9823](https://github.com/fabricjs/fabric.js/pull/9823)
+- feat(FabricObject): pass `e` to `shouldStartDragging` [#9843](https://github.com/fabricjs/fabric.js/pull/9843)
+- fix(Canvas): mouse move before event data [#9849](https://github.com/fabricjs/fabric.js/pull/9849)
+- chore(FabricObject): pass `e` to `shouldStartDragging` [#9843](https://github.com/fabricjs/fabric.js/pull/9843)
+- ci(): Add Jest coverage to the report [#9836](https://github.com/fabricjs/fabric.js/pull/9836)
+- test(): Add cursor animation testing and migrate some easy one to jest [#9829](https://github.com/fabricjs/fabric.js/pull/9829)
+- fix(Group, Controls): Fix interactive group actions when negative scaling is involved [#9811](https://github.com/fabricjs/fabric.js/pull/9811)
+- fix(): Replace 'hasOwn' with 'in' operator in typeAssertions check [#9812](https://github.com/fabricjs/fabric.js/pull/9812)
+
+## [6.0.0-rc1]
+
+- fix(Canvas): Fix searchPossibleTargets for non-interactive nested targets [#9762](https://github.com/fabricjs/fabric.js/pull/9762)
 - test(): Rename svg tests [#9775](https://github.com/fabricjs/fabric.js/pull/9775)
 - refactor(): `_findTargetCorner` is now called `findControl` and returns the key and the control and the coordinates [#9668](https://github.com/fabricjs/fabric.js/pull/9668)
 - feat(LayoutManager): Handle the case of activeSelection with objects inside different groups [#9651](https://github.com/fabricjs/fabric.js/pull/9651)

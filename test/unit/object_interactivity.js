@@ -147,7 +147,7 @@
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
   QUnit.test('corner coords: custom control size', function(assert) {
     //set custom corner size
-    const sharedControls = fabric.Object.getDefaults().controls;
+    const sharedControls = fabric.FabricObject.createControls().controls;
     sharedControls.bl.sizeX = 30;
     sharedControls.bl.sizeY = 10;
 
