@@ -36,7 +36,7 @@
       test: 'Svg import test ' + svgName,
       code: test,
       golden: svgName + '.png',
-      percentage: 0.06,
+      percentage: 0.04,
     };
   }
 
@@ -101,6 +101,7 @@
     'accordion',
     'car',
     'seaClipPath',
+    'use-and-style',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));

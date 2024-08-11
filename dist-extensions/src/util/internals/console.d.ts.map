@@ -1,0 +1,1 @@
+{"version":3,"file":"console.d.ts","sourceRoot":"","sources":["../../../../src/util/internals/console.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,GAAG,aACJ,KAAK,GAAG,MAAM,GAAG,OAAO,qBACf,GAAG,EAAE,SAGsB,CAAC;AAEjD,qBAAa,WAAY,SAAQ,KAAK;gBACxB,OAAO,CAAC,EAAE,MAAM,EAAE,OAAO,CAAC,EAAE,YAAY;CAGrD;AAED,qBAAa,kBAAmB,SAAQ,WAAW;gBACrC,OAAO,EAAE,MAAM;CAG5B"}

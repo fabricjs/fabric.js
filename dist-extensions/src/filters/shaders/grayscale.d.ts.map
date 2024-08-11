@@ -1,0 +1,1 @@
+{"version":3,"file":"grayscale.d.ts","sourceRoot":"","sources":["../../../../src/filters/shaders/grayscale.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,cAAc,CAAC;AAEnD,eAAO,MAAM,cAAc,EAAE,MAAM,CAAC,cAAc,EAAE,MAAM,CAiCzD,CAAC"}

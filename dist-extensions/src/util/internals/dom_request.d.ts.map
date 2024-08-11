@@ -1,0 +1,1 @@
+{"version":3,"file":"dom_request.d.ts","sourceRoot":"","sources":["../../../../src/util/internals/dom_request.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,gBAAgB,CAAC;AAGhD,KAAK,cAAc,GAAG,SAAS,GAAG;IAChC,UAAU,CAAC,EAAE,CAAC,GAAG,EAAE,cAAc,KAAK,IAAI,CAAC;CAC5C,CAAC;AAEF;;;;;;;;GAQG;AAEH,wBAAgB,OAAO,CAAC,GAAG,EAAE,MAAM,EAAE,OAAO,GAAE,cAAmB,kBAiChE"}
