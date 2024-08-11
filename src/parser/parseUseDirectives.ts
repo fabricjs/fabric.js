@@ -24,51 +24,64 @@ export function parseUseDirectives(doc: Document) {
     }
     let clonedOriginal = referencedElement.cloneNode(true) as Element;
 
-    // Transform attribute needs to be merged in a particular way
-    const x = useElement.getAttribute('x') || 0;
-    const y = useElement.getAttribute('y') || 0;
-    const transform = useElement.getAttribute('transform') || '';
+    const originalAttributes: NamedNodeMap = clonedOriginal.attributes;
+    const useAttributes: NamedNodeMap = useElement.attributes;
 
+    const useAttrMap: Record<string, string> = {};
+    for (const attr of useAttributes) {
+      attr.value && (useAttrMap[attr.name] = attr.value);
+    }
+    const originalAttrMap: Record<string, string> = {};
+    for (const attr of originalAttributes) {
+      attr.value && (originalAttrMap[attr.name] = attr.value);
+    }
+
+    // Transform attribute needs to be merged in a particular way
+    const { x = 0, y = 0, transform = '' } = useAttrMap;
     const currentTrans = `${transform} ${
-      clonedOriginal.getAttribute('transform') || ''
+      originalAttrMap.transform || ''
     } translate(${x}, ${y})`;
 
     applyViewboxTransform(clonedOriginal);
 
     if (/^svg$/i.test(clonedOriginal.nodeName)) {
+      // if is an SVG, create a group and apply all the attributes on top of it
       const el3 = clonedOriginal.ownerDocument.createElementNS(svgNS, 'g');
-      for (const attr of clonedOriginal.attributes) {
-        attr && el3.setAttributeNS(svgNS, attr.nodeName, attr.nodeValue!);
-      }
+      Object.entries(originalAttrMap).forEach(([name, value]) =>
+        el3.setAttributeNS(svgNS, name, value)
+      );
       el3.append(...clonedOriginal.childNodes);
       clonedOriginal = el3;
     }
 
-    for (const attr of useElement.attributes) {
+    for (const attr of useAttributes) {
       if (!attr) {
         continue;
       }
-      const { nodeName, nodeValue } = attr;
-      if (skipAttributes.includes(nodeName)) {
+      const { name, value } = attr;
+      if (skipAttributes.includes(name)) {
         continue;
       }
 
-      if (
-        nodeName === 'style' &&
-        clonedOriginal.getAttribute('style') !== null
-      ) {
-        // when both sides have styles, merge the two styles, with the ref being priority (not use)
+      if (name === 'style') {
+        // when use has a style, merge the two styles, with the ref being priority (not use)
         // priority is by feature. an attribute for fill on the original element
         // will overwrite the fill in style or attribute for tha use
         const styleRecord: Record<string, any> = {};
-        parseStyleString(nodeValue!, styleRecord);
-        parseStyleString(clonedOriginal.getAttribute('style')!, styleRecord);
+        parseStyleString(value!, styleRecord);
+        // cleanup styleRecord from attributes of original
+        Object.entries(originalAttrMap).forEach(([name, value]) => {
+          styleRecord[name] = value;
+        });
+        // now we can put in the style of the original that will overwrite the original attributes
+        parseStyleString(originalAttrMap.style || '', styleRecord);
         const mergedStyles = Object.entries(styleRecord)
           .map((entry) => entry.join(':'))
           .join(';');
-        clonedOriginal.setAttribute(nodeName, mergedStyles);
+        clonedOriginal.setAttribute(name, mergedStyles);
       } else {
-        clonedOriginal.setAttribute(nodeName, nodeValue!);
+        // set the attribute from use element only if the original does not have it already
+        !originalAttrMap[name] && clonedOriginal.setAttribute(name, value!);
       }
     }
 
