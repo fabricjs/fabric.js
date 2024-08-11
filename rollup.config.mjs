@@ -106,7 +106,7 @@ export default [
             plugins: [terser()],
           }
         : null,
-      // umd in bundle
+      // umd module in bundle, the cdn one for fiddles
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
@@ -135,6 +135,7 @@ export default [
         format: 'es',
         sourcemap: true,
       },
+      // todo remove
       {
         file: path.resolve(dirname, `${basename}.node.cjs`),
         name: 'fabric',
@@ -160,38 +161,17 @@ export default [
         entryFileNames: '[name].mjs',
         sourcemap: true,
       },
-      Number(process.env.MINIFY)
-        ? {
-            dir: path.resolve('./dist-extensions'),
-            format: 'es',
-            preserveModules: true,
-            entryFileNames: '[name].min.mjs',
-            sourcemap: true,
-            plugins: [terser()],
-          }
-        : null,
-      // umd module
+      // umd module, the cdn one for fiddles, minified
       {
-        file: path.resolve('./dist-extensions', `fabric-extensions.js`),
+        file: path.resolve('./dist-extensions', `fabric-extensions.min.js`),
         name: 'fabricExtensions',
         format: 'umd',
         sourcemap: true,
         globals: {
           fabric: 'fabric',
         },
+        plugins: [terser()],
       },
-      Number(process.env.MINIFY)
-        ? {
-            file: path.resolve('./dist-extensions', `fabric-extensions.js`),
-            name: 'fabricExtensions',
-            format: 'umd',
-            sourcemap: true,
-            globals: {
-              fabric: 'fabric',
-            },
-            plugins: [terser()],
-          }
-        : null,
     ],
     plugins: pluginsExtensions,
     onwarn,

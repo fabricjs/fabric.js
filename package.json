@@ -164,10 +164,10 @@
       "types": "./dist/index.node.d.ts"
     },
     "./extensions": {
-      "import": "./dist-extensions/index.min.mjs",
+      "import": "./dist-extensions/index.mjs",
       "require": null,
-      "default": null,
-      "node": null,
+      "default": "./dist-extensions/fabric-extensions.min.js",
+      "node": "./dist-extensions/index.mjs",
       "types": "./dist-extensions/index.d.ts"
     }
   }

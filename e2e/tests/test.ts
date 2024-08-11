@@ -2,9 +2,10 @@
  * Runs from the BROWSER
  */
 
-import type { Object as FabricObject } from 'fabric';
+import type { FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
 import * as fabric from 'fabric';
+import * as fabricExtensions from 'fabric/extensions';
 
 const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
@@ -19,7 +20,7 @@ const teardownTasks: Awaited<VoidFunction>[] = [];
 
 // makes possible call things in browser context.
 window.fabric = fabric;
-
+window.fabricExtensions = fabricExtensions;
 window.__setupFabricHook = () => Promise.all(setupTasks);
 window.__teardownFabricHook = () =>
   Promise.all(teardownTasks.map((cb) => cb()));
