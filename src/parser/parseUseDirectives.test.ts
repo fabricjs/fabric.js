@@ -74,4 +74,40 @@ describe('parseUseDirectives', () => {
       expect(style1).toContain('fill:#ff0000');
     }
   });
+  it('correctly merge styles tags considering attributes', async () => {
+    const str = `<svg id="svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <path fill="red" id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+      <use x="100" y="0" xlink:href="#heart" style="stroke:#000000;fill:green" />
+      </svg>`;
+
+    const parser = new (getFabricWindow().DOMParser)();
+    const doc = parser.parseFromString(str.trim(), 'text/xml');
+    parseUseDirectives(doc);
+
+    const elements = Array.from(doc.documentElement.getElementsByTagName('*'));
+    expect(elements[0]).not.toBeNull();
+    expect(elements[1]).not.toBeNull();
+    if (elements[1] !== null) {
+      const style1 = elements[1].getAttribute('style');
+      expect(style1).toContain('fill:red');
+    }
+  });
+  it('Will not override existing attributes', async () => {
+    const str = `<svg id="svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <path fill="yellow" id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+      <use x="100" y="0" xlink:href="#heart" fill="blue" />
+      </svg>`;
+
+    const parser = new (getFabricWindow().DOMParser)();
+    const doc = parser.parseFromString(str.trim(), 'text/xml');
+    parseUseDirectives(doc);
+
+    const elements = Array.from(doc.documentElement.getElementsByTagName('*'));
+    expect(elements[0]).not.toBeNull();
+    expect(elements[1]).not.toBeNull();
+    if (elements[1] !== null) {
+      const style1 = elements[1].getAttribute('fill');
+      expect(style1).toBe('yellow');
+    }
+  });
 });
