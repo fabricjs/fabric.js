@@ -62,7 +62,7 @@
     "local-server": "http-server ./ -d=false",
     "test:e2e": "npx playwright test --headed",
     "coverage:report": "nyc report --reporter=lcov --reporter=text",
-    "lint": "eslint --config .eslintrc.js src",
+    "lint": "eslint --config .eslintrc.js src extensions",
     "lint_tests": "eslint test/unit --config .eslintrc_tests && eslint test/visual --config .eslintrc_tests",
     "all": "npm run build && npm run test -- --all && npm run lint && npm run lint_tests && npm run export",
     "prettier:check": "prettier --check .",
@@ -99,7 +99,7 @@
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
     "commander": "^9.1.0",
-    "eslint": "8.40",
+    "eslint": "8.57",
     "eslint-config-prettier": "^8.6.0",
     "fireworm": "^0.7.2",
     "fs-extra": "^10.0.1",
@@ -162,6 +162,13 @@
       "default": "./dist/index.node.cjs",
       "node": "./dist/index.node.cjs",
       "types": "./dist/index.node.d.ts"
+    },
+    "./extensions": {
+      "import": "./dist-extensions/index.mjs",
+      "require": null,
+      "default": "./dist-extensions/fabric-extensions.min.js",
+      "node": "./dist-extensions/index.mjs",
+      "types": "./dist-extensions/index.d.ts"
     }
   }
 }
