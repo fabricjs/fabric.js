@@ -1,4 +1,6 @@
-export const AligningLineConfig = {
+import type { AligningLineConfig } from './typedefs';
+
+export const aligningLineConfig: AligningLineConfig = {
   offset: 0,
   /** At what distance from the shape does alignment begin? */
   margin: 4,

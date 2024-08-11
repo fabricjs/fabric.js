@@ -1,10 +1,10 @@
 import type { Canvas } from 'fabric';
 import { Point } from 'fabric';
 import type { HorizontalLine, VerticalLine } from '../typedefs';
-import { AligningLineConfig } from '../constant';
+import { aligningLineConfig } from '../constant';
 
 function drawLine(canvas: Canvas, origin: Point, target: Point) {
-  const { width, color } = AligningLineConfig;
+  const { width, color } = aligningLineConfig;
   const ctx = canvas.getSelectionContext();
   const viewportTransform = canvas.viewportTransform;
   const zoom = canvas.getZoom();
@@ -35,7 +35,7 @@ function drawX(ctx: CanvasRenderingContext2D, zoom: number, point: Point) {
   ctx.restore();
 }
 function drawPoint(canvas: Canvas, arr: Point[]) {
-  const { width, color } = AligningLineConfig;
+  const { width, color } = aligningLineConfig;
   const ctx = canvas.getSelectionContext();
   const viewportTransform = canvas.viewportTransform;
   const zoom = canvas.getZoom();

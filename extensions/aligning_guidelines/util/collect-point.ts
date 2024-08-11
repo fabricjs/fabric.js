@@ -1,5 +1,5 @@
 import type { FabricObject, Point, TOriginX, TOriginY } from 'fabric';
-import { AligningLineConfig } from '../constant';
+import { aligningLineConfig } from '../constant';
 import { getDistance } from './basic';
 
 type CollectPointProps = {
@@ -13,7 +13,7 @@ const originXArr: TOriginX[] = ['left', 'center', 'right'];
 const originYArr: TOriginY[] = ['top', 'center', 'bottom'];
 
 export function collectVerticalPoint(props: CollectPointProps) {
-  const aligningLineMargin = AligningLineConfig.margin;
+  const aligningLineMargin = aligningLineConfig.margin;
   const { activeObject, isScale, index, point, list } = props;
   const { dis, arr } = getDistanceList(point, list, 'x');
   const margin = aligningLineMargin / (activeObject.canvas?.getZoom() ?? 1);
@@ -40,7 +40,7 @@ export function collectVerticalPoint(props: CollectPointProps) {
 }
 
 export function collectHorizontalPoint(props: CollectPointProps) {
-  const aligningLineMargin = AligningLineConfig.margin;
+  const aligningLineMargin = aligningLineConfig.margin;
   const { activeObject, isScale, index, point, list } = props;
   const { dis, arr } = getDistanceList(point, list, 'y');
   const margin = aligningLineMargin / (activeObject.canvas?.getZoom() ?? 1);

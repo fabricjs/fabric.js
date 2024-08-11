@@ -17,18 +17,24 @@ import {
 } from './util/draw';
 import { getObjectsByTarget } from './util/get-objects-by-target';
 import { collectLine } from './util/collect-line';
-import type { HorizontalLine, VerticalLine } from './typedefs';
-import { AligningLineConfig } from './constant';
+import type {
+  AligningLineConfig,
+  HorizontalLine,
+  VerticalLine,
+} from './typedefs';
+import { aligningLineConfig } from './constant';
 
 type TransformEvent = BasicTransformEvent<TPointerEvent> & {
   target: FabricObject;
 };
-type AlignOptions = Partial<typeof AligningLineConfig>;
+
+export type { AligningLineConfig } from './typedefs';
+
 export function initAligningGuidelines(
   canvas: Canvas,
-  options: AlignOptions = {}
+  options: Partial<AligningLineConfig> = {}
 ) {
-  Object.assign(AligningLineConfig, options);
+  Object.assign(aligningLineConfig, options);
 
   const horizontalLines = new Set<string>();
   const verticalLines = new Set<string>();

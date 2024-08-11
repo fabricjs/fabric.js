@@ -1,7 +1,7 @@
 import type { FabricObject, TBBox } from 'fabric';
 import { Point } from 'fabric';
 import type { HorizontalLine, VerticalLine } from '../typedefs';
-import { AligningLineConfig } from '../constant';
+import { aligningLineConfig } from '../constant';
 import { getDistance, setPositionDir } from './basic';
 
 type CollectLineProps = {
@@ -11,7 +11,7 @@ type CollectLineProps = {
 };
 
 export function collectLine(props: CollectLineProps) {
-  const aligningLineMargin = AligningLineConfig.margin;
+  const aligningLineMargin = aligningLineConfig.margin;
   const { activeObject, activeObjectRect, objectRect } = props;
   const list = makeLineByRect(objectRect);
   const aList = makeLineByRect(activeObjectRect);

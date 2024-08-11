@@ -1,8 +1,8 @@
 import type { HorizontalLineProps, VerticalLineProps } from '../typedefs';
-import { AligningLineConfig } from '../constant';
+import { aligningLineConfig } from '../constant';
 
 export function makeVerticalLine(props: VerticalLineProps) {
-  const aligningLineOffset = AligningLineConfig.offset;
+  const aligningLineOffset = aligningLineConfig.offset;
   const { x, objectHeight, objectY, activeObjectHeight, activeObjectY } = props;
   const b = objectY < activeObjectY;
   return {
@@ -17,7 +17,7 @@ export function makeVerticalLine(props: VerticalLineProps) {
 }
 
 export function makeHorizontalLine(props: HorizontalLineProps) {
-  const aligningLineOffset = AligningLineConfig.offset;
+  const aligningLineOffset = aligningLineConfig.offset;
   const { y, objectX, objectWidth, activeObjectX, activeObjectWidth } = props;
   const b = objectX < activeObjectX;
   return {

@@ -1,1 +1,4 @@
-export { initAligningGuidelines } from './aligning_guidelines';
+export {
+  initAligningGuidelines,
+  type AligningLineConfig,
+} from './aligning_guidelines';
