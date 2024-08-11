@@ -8,11 +8,14 @@ export function parseUseDirectives(doc: Document) {
   const skipAttributes = ['x', 'y', 'xlink:href', 'href', 'transform'];
 
   for (const useElement of nodelist) {
-    const xlink = (
-      useElement.getAttribute('xlink:href') ||
-      useElement.getAttribute('href') ||
-      ''
-    ).slice(1);
+    const useAttributes: NamedNodeMap = useElement.attributes;
+
+    const useAttrMap: Record<string, string> = {};
+    for (const attr of useAttributes) {
+      attr.value && (useAttrMap[attr.name] = attr.value);
+    }
+
+    const xlink = (useAttrMap['xlink:href'] || useAttrMap.href || '').slice(1);
 
     if (xlink === '') {
       return;
@@ -25,12 +28,7 @@ export function parseUseDirectives(doc: Document) {
     let clonedOriginal = referencedElement.cloneNode(true) as Element;
 
     const originalAttributes: NamedNodeMap = clonedOriginal.attributes;
-    const useAttributes: NamedNodeMap = useElement.attributes;
 
-    const useAttrMap: Record<string, string> = {};
-    for (const attr of useAttributes) {
-      attr.value && (useAttrMap[attr.name] = attr.value);
-    }
     const originalAttrMap: Record<string, string> = {};
     for (const attr of originalAttributes) {
       attr.value && (originalAttrMap[attr.name] = attr.value);
