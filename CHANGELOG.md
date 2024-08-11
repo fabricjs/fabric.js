@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [6.2.0]
+
 - fix(): Parse use directive attribute issues [#10053](https://github.com/fabricjs/fabric.js/pull/10053)
 - fix(parseUseDirectives): Fix style tag processing in use tag when reference also has a style [#10050](https://github.com/fabricjs/fabric.js/pull/10050)
 - fix(): Fix path Arc parsing regression issue [#10048](https://github.com/fabricjs/fabric.js/pull/10048)
