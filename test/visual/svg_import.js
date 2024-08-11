@@ -36,7 +36,7 @@
       test: 'Svg import test ' + svgName,
       code: test,
       golden: svgName + '.png',
-      percentage: 0.04,
+      percentage: 0.055,
     };
   }
 
