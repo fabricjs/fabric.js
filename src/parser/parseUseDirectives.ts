@@ -7,52 +7,44 @@ export function parseUseDirectives(doc: Document) {
   const nodelist = getMultipleNodes(doc, ['use', 'svg:use']);
   const skipAttributes = ['x', 'y', 'xlink:href', 'href', 'transform'];
 
-  for (const el of nodelist) {
-    const xlinkAttribute =
-      el.getAttribute('xlink:href') || el.getAttribute('href');
+  for (const useElement of nodelist) {
+    const xlink = (
+      useElement.getAttribute('xlink:href') ||
+      useElement.getAttribute('href') ||
+      ''
+    ).slice(1);
 
-    if (xlinkAttribute === null) {
+    if (xlink === '') {
       return;
     }
-
-    const xlink = xlinkAttribute.slice(1);
-    const el2Orig = doc.getElementById(xlink);
-    if (el2Orig === null) {
+    const referencedElement = doc.getElementById(xlink);
+    if (referencedElement === null) {
       // if we can't find the target of the xlink, consider this use tag bad, similar to no xlink
       return;
     }
-    let el2 = el2Orig.cloneNode(true) as Element;
+    let clonedOriginal = referencedElement.cloneNode(true) as Element;
 
     // Transform attribute needs to be merged in a particular way
-
-    const x = el.getAttribute('x') || 0;
-    const y = el.getAttribute('y') || 0;
-    const transform = el.getAttribute('transform') || '';
+    const x = useElement.getAttribute('x') || 0;
+    const y = useElement.getAttribute('y') || 0;
+    const transform = useElement.getAttribute('transform') || '';
 
     const currentTrans = `${transform} ${
-      el2.getAttribute('transform') || ''
+      clonedOriginal.getAttribute('transform') || ''
     } translate(${x}, ${y})`;
-    const namespace = svgNS;
 
-    applyViewboxTransform(el2);
-    if (/^svg$/i.test(el2.nodeName)) {
-      const el3 = el2.ownerDocument.createElementNS(namespace, 'g');
-      for (
-        let j = 0, attrs = el2.attributes, len = attrs.length;
-        j < len;
-        j++
-      ) {
-        const attr: Attr | null = attrs.item(j);
-        attr && el3.setAttributeNS(namespace, attr.nodeName, attr.nodeValue!);
+    applyViewboxTransform(clonedOriginal);
+
+    if (/^svg$/i.test(clonedOriginal.nodeName)) {
+      const el3 = clonedOriginal.ownerDocument.createElementNS(svgNS, 'g');
+      for (const attr of clonedOriginal.attributes) {
+        attr && el3.setAttributeNS(svgNS, attr.nodeName, attr.nodeValue!);
       }
-      // el2.firstChild != null
-      while (el2.firstChild) {
-        el3.appendChild(el2.firstChild);
-      }
-      el2 = el3;
+      el3.append(...clonedOriginal.childNodes);
+      clonedOriginal = el3;
     }
 
-    for (const attr of el.attributes) {
+    for (const attr of useElement.attributes) {
       if (!attr) {
         continue;
       }
@@ -61,24 +53,28 @@ export function parseUseDirectives(doc: Document) {
         continue;
       }
 
-      if (nodeName === 'style' && el2.getAttribute('style') !== null) {
+      if (
+        nodeName === 'style' &&
+        clonedOriginal.getAttribute('style') !== null
+      ) {
         // when both sides have styles, merge the two styles, with the ref being priority (not use)
+        // priority is by feature. an attribute for fill on the original element
+        // will overwrite the fill in style or attribute for tha use
         const styleRecord: Record<string, any> = {};
         parseStyleString(nodeValue!, styleRecord);
-        parseStyleString(el2.getAttribute('style')!, styleRecord);
+        parseStyleString(clonedOriginal.getAttribute('style')!, styleRecord);
         const mergedStyles = Object.entries(styleRecord)
           .map((entry) => entry.join(':'))
           .join(';');
-        el2.setAttribute(nodeName, mergedStyles);
+        clonedOriginal.setAttribute(nodeName, mergedStyles);
       } else {
-        el2.setAttribute(nodeName, nodeValue!);
+        clonedOriginal.setAttribute(nodeName, nodeValue!);
       }
     }
 
-    el2.setAttribute('transform', currentTrans);
-    el2.setAttribute('instantiated_by_use', '1');
-    el2.removeAttribute('id');
-    const parentNode = el.parentNode;
-    parentNode!.replaceChild(el2, el);
+    clonedOriginal.setAttribute('transform', currentTrans);
+    clonedOriginal.setAttribute('instantiated_by_use', '1');
+    clonedOriginal.removeAttribute('id');
+    useElement.parentNode!.replaceChild(clonedOriginal, useElement);
   }
 }
