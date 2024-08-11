@@ -5,32 +5,33 @@ import { parseStyleString } from './parseStyleString';
 
 export function parseUseDirectives(doc: Document) {
   const nodelist = getMultipleNodes(doc, ['use', 'svg:use']);
-  let i = 0;
-  while (nodelist.length && i < nodelist.length) {
-    const el = nodelist[i],
-      xlinkAttribute = el.getAttribute('xlink:href') || el.getAttribute('href');
+  const skipAttributes = ['x', 'y', 'xlink:href', 'href', 'transform'];
+
+  for (const el of nodelist) {
+    const xlinkAttribute =
+      el.getAttribute('xlink:href') || el.getAttribute('href');
 
     if (xlinkAttribute === null) {
       return;
     }
 
     const xlink = xlinkAttribute.slice(1);
-    const x = el.getAttribute('x') || 0;
-    const y = el.getAttribute('y') || 0;
     const el2Orig = doc.getElementById(xlink);
     if (el2Orig === null) {
       // if we can't find the target of the xlink, consider this use tag bad, similar to no xlink
       return;
     }
     let el2 = el2Orig.cloneNode(true) as Element;
-    let currentTrans =
-      (el2.getAttribute('transform') || '') +
-      ' translate(' +
-      x +
-      ', ' +
-      y +
-      ')';
-    const oldLength = nodelist.length;
+
+    // Transform attribute needs to be merged in a particular way
+
+    const x = el.getAttribute('x') || 0;
+    const y = el.getAttribute('y') || 0;
+    const transform = el.getAttribute('transform') || '';
+
+    const currentTrans = `${transform} ${
+      el2.getAttribute('transform') || ''
+    } translate(${x}, ${y})`;
     const namespace = svgNS;
 
     applyViewboxTransform(el2);
@@ -51,24 +52,16 @@ export function parseUseDirectives(doc: Document) {
       el2 = el3;
     }
 
-    for (let j = 0, attrs = el.attributes, len = attrs.length; j < len; j++) {
-      const attr = attrs.item(j);
+    for (const attr of el.attributes) {
       if (!attr) {
         continue;
       }
       const { nodeName, nodeValue } = attr;
-      if (
-        nodeName === 'x' ||
-        nodeName === 'y' ||
-        nodeName === 'xlink:href' ||
-        nodeName === 'href'
-      ) {
+      if (skipAttributes.includes(nodeName)) {
         continue;
       }
 
-      if (nodeName === 'transform') {
-        currentTrans = nodeValue + ' ' + currentTrans;
-      } else if (nodeName === 'style' && el2.getAttribute('style') !== null) {
+      if (nodeName === 'style' && el2.getAttribute('style') !== null) {
         // when both sides have styles, merge the two styles, with the ref being priority (not use)
         const styleRecord: Record<string, any> = {};
         parseStyleString(nodeValue!, styleRecord);
@@ -87,9 +80,5 @@ export function parseUseDirectives(doc: Document) {
     el2.removeAttribute('id');
     const parentNode = el.parentNode;
     parentNode!.replaceChild(el2, el);
-    // some browsers do not shorten nodelist after replaceChild (IE8)
-    if (nodelist.length === oldLength) {
-      i++;
-    }
   }
 }
