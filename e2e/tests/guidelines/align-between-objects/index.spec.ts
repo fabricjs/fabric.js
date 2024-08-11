@@ -27,7 +27,7 @@ test('Snapping and guideline render', async ({ page }) => {
     expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: 'moved down but still snapping.png',
     });
-    await page.mouse.move(rect1Pos.x + 200, rect1Pos.y + 70, {
+    await page.mouse.move(rect1Pos.x + 290, rect1Pos.y + 70, {
       steps: 40,
     });
     expect(await canvasUtil.screenshot()).toMatchSnapshot({
