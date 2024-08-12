@@ -6,7 +6,6 @@
 import { initAligningGuidelines } from 'fabric/extensions';
 
 const config = {
-  offset: 0,
   /** At what distance from the shape does alignment begin? */
   margin: 4,
   /** Aligning line dimensions */
