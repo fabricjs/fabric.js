@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Remove unused code from aligning guidelines [#10056](https://github.com/fabricjs/fabric.js/discussions/10056)
 - feat(): Add v6 aligning guidelines. [#10033](https://github.com/fabricjs/fabric.js/discussions/10033)
 
 ## [6.2.0]
