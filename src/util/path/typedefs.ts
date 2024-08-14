@@ -88,11 +88,8 @@ export type TParsedCommand =
 type TCommand1<T extends TParsedCommand> = `${T[0]}`;
 type TCommand2<T extends TParsedCommand> = `${T[0]} ${T[1]}`;
 type TCommand3<T extends TParsedCommand> = `${T[0]} ${T[1]} ${T[2]}`;
-type TCommand4<T extends TParsedCommand> = `${T[0]} ${T[1]} ${T[2]} ${T[3]}`;
 type TCommand5<T extends TParsedCommand> =
   `${T[0]} ${T[1]} ${T[2]} ${T[3]} ${T[4]}`;
-type TCommand6<T extends TParsedCommand> =
-  `${T[0]} ${T[1]} ${T[2]} ${T[3]} ${T[4]} ${T[5]}`;
 type TCommand7<T extends TParsedCommand> =
   `${T[0]} ${T[1]} ${T[2]} ${T[3]} ${T[4]} ${T[5]} ${T[6]}`;
 type TCommand8<T extends TParsedCommand> =

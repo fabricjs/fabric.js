@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { Path, FabricObject, util } from '../../dist/index.mjs';
 import lodash from 'lodash';
 import { normalPath, insanelyLongButRealPath } from './pathData.mjs';
@@ -51,19 +52,19 @@ const size2 = 100;
 
 const cloningSimple = await benchmark(async () => {
   for (let i = 0; i < size2; i++) {
-    const cloned = JSON.parse(JSON.stringify(parsedPath));
+    JSON.parse(JSON.stringify(parsedPath));
   }
 });
 
 const cloningLodash = await benchmark(async () => {
   for (let i = 0; i < size2; i++) {
-    const cloned = lodash.cloneDeep(parsedPath);
+    lodash.cloneDeep(parsedPath);
   }
 });
 
 const cloningCustom = await benchmark(async () => {
   for (let i = 0; i < size2; i++) {
-    const cloned = parsedPath.map((pathCmd) => pathCmd.slice());
+    parsedPath.map((pathCmd) => pathCmd.slice());
   }
 });
 
@@ -77,19 +78,19 @@ const size3 = 10_000;
 
 const cloningSimpleNormal = await benchmark(async () => {
   for (let i = 0; i < size3; i++) {
-    const cloned = JSON.parse(JSON.stringify(parsedNormalPath));
+    JSON.parse(JSON.stringify(parsedNormalPath));
   }
 });
 
 const cloningLodashNormal = await benchmark(async () => {
   for (let i = 0; i < size3; i++) {
-    const cloned = lodash.cloneDeep(parsedNormalPath);
+    lodash.cloneDeep(parsedNormalPath);
   }
 });
 
 const cloningCustomNormal = await benchmark(async () => {
   for (let i = 0; i < size3; i++) {
-    const cloned = parsedNormalPath.map((pathCmd) => pathCmd.slice());
+    parsedNormalPath.map((pathCmd) => pathCmd.slice());
   }
 });
 
