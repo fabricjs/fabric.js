@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Update eslint to 9 [#10066](https://github.com/fabricjs/fabric.js/pull/10066)
 - fix(): Remove unused code from aligning guidelines [#10056](https://github.com/fabricjs/fabric.js/discussions/10056)
 - feat(): Add v6 aligning guidelines. [#10033](https://github.com/fabricjs/fabric.js/discussions/10033)
 
