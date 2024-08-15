@@ -10,7 +10,7 @@ import { scalingX, scalingY } from './scale';
 const createZeroThickRectangleScalingItems = (
   rectOptions: { width: number; height: number } & Partial<RectProps>,
   usedCorner: keyof Rect['oCoords'],
-  pointDiff: Point
+  pointDiff: Point,
 ) => {
   const extraMargin = 100;
   const { width, height } = rectOptions;
@@ -68,14 +68,14 @@ describe('Scale', () => {
       createZeroThickRectangleScalingItems(
         { width: 0, height: 60 },
         'mr',
-        new Point(20, 0) // moving right
+        new Point(20, 0), // moving right
       );
     const currentScale = target.scaleX;
     const didScale = scalingX(moveEvent, transform, pointer.x, pointer.y);
     expect(currentScale).toEqual(transform.target.scaleX);
     expect((transform.target as Rect).scaleX).not.toBeNaN();
     expect((transform.target as Rect).scaleX).not.toBe(
-      Number.POSITIVE_INFINITY
+      Number.POSITIVE_INFINITY,
     );
     expect(didScale).toBe(false);
   });
@@ -85,7 +85,7 @@ describe('Scale', () => {
       createZeroThickRectangleScalingItems(
         { width: 0, height: 60 },
         'br',
-        new Point(20, 20) // moving right
+        new Point(20, 20), // moving right
       );
     const currentScaleX = target.scaleX;
     const currentScaleY = target.scaleY;
@@ -94,7 +94,7 @@ describe('Scale', () => {
     expect(currentScaleY).toEqual(transform.target.scaleY);
     expect((transform.target as Rect).scaleX).not.toBeNaN();
     expect((transform.target as Rect).scaleX).not.toBe(
-      Number.POSITIVE_INFINITY
+      Number.POSITIVE_INFINITY,
     );
     expect(didScale).toBe(false);
   });
@@ -104,14 +104,14 @@ describe('Scale', () => {
       createZeroThickRectangleScalingItems(
         { width: 60, height: 0 },
         'mb',
-        new Point(0, 20)
+        new Point(0, 20),
       );
 
     const didScale = scalingY(moveEvent, transform, pointer.x, pointer.y);
 
     expect((transform.target as Rect).scaleY).not.toBeNaN();
     expect((transform.target as Rect).scaleY).not.toBe(
-      Number.POSITIVE_INFINITY
+      Number.POSITIVE_INFINITY,
     );
     expect(didScale).toBe(false);
   });
@@ -121,14 +121,14 @@ describe('Scale', () => {
       createZeroThickRectangleScalingItems(
         { width: 60, height: 0 },
         'br',
-        new Point(20, 20)
+        new Point(20, 20),
       );
 
     const didScale = scalingY(moveEvent, transform, pointer.x, pointer.y);
 
     expect((transform.target as Rect).scaleY).not.toBeNaN();
     expect((transform.target as Rect).scaleY).not.toBe(
-      Number.POSITIVE_INFINITY
+      Number.POSITIVE_INFINITY,
     );
     expect(didScale).toBe(false);
   });

@@ -13,7 +13,7 @@ export default () =>
 
           queryAll(root: Document, selector: string) {
             return Array.from(root.querySelectorAll(selector)).map(
-              (el) => el.parentElement
+              (el) => el.parentElement,
             );
           },
         };
@@ -29,7 +29,7 @@ export default () =>
 
           queryAll(root: Document, selector: string) {
             return Array.from(root.querySelectorAll(selector)).map((el) =>
-              el.parentElement.querySelector('canvas.upper-canvas')
+              el.parentElement.querySelector('canvas.upper-canvas'),
             );
           },
         };

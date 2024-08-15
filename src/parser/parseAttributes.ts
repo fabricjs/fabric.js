@@ -19,7 +19,7 @@ import type { CSSRules } from './typedefs';
 export function parseAttributes(
   element: HTMLElement | null,
   attributes: string[],
-  cssRules?: CSSRules
+  cssRules?: CSSRules,
 ): Record<string, any> {
   if (!element) {
     return {};
@@ -37,7 +37,7 @@ export function parseAttributes(
     parentAttributes = parseAttributes(
       element.parentElement,
       attributes,
-      cssRules
+      cssRules,
     );
     if (parentAttributes.fontSize) {
       fontSize = parentFontSize = parseUnit(parentAttributes.fontSize);
@@ -78,7 +78,7 @@ export function parseAttributes(
       normalizedAttr,
       ownAttributes[attr],
       parentAttributes,
-      fontSize!
+      fontSize!,
     );
     normalizedStyle[normalizedAttr] = normalizedValue;
   }

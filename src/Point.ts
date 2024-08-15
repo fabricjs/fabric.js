@@ -234,7 +234,7 @@ export class Point implements XY {
     t = Math.max(Math.min(1, t), 0);
     return new Point(
       this.x + (that.x - this.x) * t,
-      this.y + (that.y - this.y) * t
+      this.y + (that.y - this.y) * t,
     );
   }
 
@@ -364,7 +364,7 @@ export class Point implements XY {
     const p = this.subtract(origin);
     const rotated = new Point(
       p.x * cosinus - p.y * sinus,
-      p.x * sinus + p.y * cosinus
+      p.x * sinus + p.y * cosinus,
     );
     return rotated.add(origin);
   }
@@ -380,7 +380,7 @@ export class Point implements XY {
   transform(t: TMat2D, ignoreOffset = false): Point {
     return new Point(
       t[0] * this.x + t[2] * this.y + (ignoreOffset ? 0 : t[4]),
-      t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5])
+      t[1] * this.x + t[3] * this.y + (ignoreOffset ? 0 : t[5]),
     );
   }
 }

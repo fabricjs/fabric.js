@@ -13,7 +13,7 @@ const colorAttributesMap = {
  */
 
 export function setStrokeFillOpacity(
-  attributes: Record<string, any>
+  attributes: Record<string, any>,
 ): Record<string, any> {
   const defaults = FabricObject.getDefaults();
   Object.entries(colorAttributesMap).forEach(([attr, colorAttr]) => {

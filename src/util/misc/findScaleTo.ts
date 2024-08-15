@@ -11,7 +11,7 @@ import type { TSize } from '../../typedefs';
 export const findScaleToFit = (source: TSize, destination: TSize) =>
   Math.min(
     destination.width / source.width,
-    destination.height / source.height
+    destination.height / source.height,
   );
 
 /**
@@ -25,5 +25,5 @@ export const findScaleToFit = (source: TSize, destination: TSize) =>
 export const findScaleToCover = (source: TSize, destination: TSize) =>
   Math.max(
     destination.width / source.width,
-    destination.height / source.height
+    destination.height / source.height,
   );

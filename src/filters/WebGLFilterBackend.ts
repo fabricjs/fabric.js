@@ -106,12 +106,12 @@ export class WebGLFilterBackend {
    * omitted, caching will be skipped.
    */
   applyFilters(
-    filters: BaseFilter[],
+    filters: BaseFilter<string, Record<string, any>>[],
     source: TexImageSource,
     width: number,
     height: number,
     targetCanvas: HTMLCanvasElement,
-    cacheKey?: string
+    cacheKey?: string,
   ): TWebGLPipelineState | undefined {
     const gl = this.gl;
     const ctx = targetCanvas.getContext('2d');
@@ -142,7 +142,7 @@ export class WebGLFilterBackend {
         gl,
         width,
         height,
-        !cachedTexture ? source : undefined
+        !cachedTexture ? source : undefined,
       ),
       targetTexture: this.createTexture(gl, width, height),
       originalTexture:
@@ -151,7 +151,7 @@ export class WebGLFilterBackend {
           gl,
           width,
           height,
-          !cachedTexture ? source : undefined
+          !cachedTexture ? source : undefined,
         )!,
       passes: filters.length,
       webgl: true,
@@ -219,7 +219,7 @@ export class WebGLFilterBackend {
     textureImageSource?: TexImageSource,
     filter?:
       | WebGLRenderingContextBase['NEAREST']
-      | WebGLRenderingContextBase['LINEAR']
+      | WebGLRenderingContextBase['LINEAR'],
   ) {
     const {
       NEAREST,
@@ -245,7 +245,7 @@ export class WebGLFilterBackend {
         RGBA,
         RGBA,
         UNSIGNED_BYTE,
-        textureImageSource
+        textureImageSource,
       );
     } else {
       gl.texImage2D(
@@ -257,7 +257,7 @@ export class WebGLFilterBackend {
         0,
         RGBA,
         UNSIGNED_BYTE,
-        null
+        null,
       );
     }
     return texture;
@@ -277,7 +277,7 @@ export class WebGLFilterBackend {
     textureImageSource: TexImageSource,
     filter?:
       | WebGLRenderingContextBase['NEAREST']
-      | WebGLRenderingContextBase['LINEAR']
+      | WebGLRenderingContextBase['LINEAR'],
   ): WebGLTexture | null {
     const { textureCache } = this;
     if (textureCache[uniqueId]) {
@@ -285,10 +285,10 @@ export class WebGLFilterBackend {
     } else {
       const texture = this.createTexture(
         this.gl,
-        textureImageSource.width,
-        textureImageSource.height,
+        (textureImageSource as HTMLImageElement).width,
+        (textureImageSource as HTMLImageElement).height,
         textureImageSource,
-        filter
+        filter,
       );
       if (texture) {
         textureCache[uniqueId] = texture;
@@ -339,7 +339,7 @@ export class WebGLFilterBackend {
       0,
       0,
       targetCanvas.width,
-      targetCanvas.height
+      targetCanvas.height,
     );
   }
 
@@ -354,7 +354,7 @@ export class WebGLFilterBackend {
   copyGLTo2DPutImageData(
     this: Required<WebGLFilterBackend>,
     gl: WebGLRenderingContext,
-    pipelineState: TWebGLPipelineState
+    pipelineState: TWebGLPipelineState,
   ) {
     const targetCanvas = pipelineState.targetCanvas,
       ctx = targetCanvas.getContext('2d'),

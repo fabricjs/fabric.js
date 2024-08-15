@@ -5,6 +5,9 @@ import {
   CENTER,
   iMatrix,
   LEFT,
+  SCALE_X,
+  SCALE_Y,
+  STROKE,
   TOP,
   VERSION,
 } from '../../constants';
@@ -19,6 +22,7 @@ import type {
   TCacheCanvasDimensions,
   Abortable,
   TOptions,
+  ImageFormat,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
@@ -70,6 +74,34 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
     _cacheContext: CanvasRenderingContext2D;
   };
 
+export type ObjectToCanvasElementOptions = {
+  format?: ImageFormat;
+  /** Multiplier to scale by */
+  multiplier?: number;
+  /** Cropping left offset. Introduced in v1.2.14 */
+  left?: number;
+  /** Cropping top offset. Introduced in v1.2.14 */
+  top?: number;
+  /** Cropping width. Introduced in v1.2.14 */
+  width?: number;
+  /** Cropping height. Introduced in v1.2.14 */
+  height?: number;
+  /** Enable retina scaling for clone image. Introduce in 1.6.4 */
+  enableRetinaScaling?: boolean;
+  /** Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4 */
+  withoutTransform?: boolean;
+  /** Remove current object shadow. Introduced in 2.4.2 */
+  withoutShadow?: boolean;
+  /** Account for canvas viewport transform */
+  viewportTransform?: boolean;
+  /** Function to create the output canvas to export onto */
+  canvasProvider?: <T extends StaticCanvas>(el?: HTMLCanvasElement) => T;
+};
+
+type toDataURLOptions = ObjectToCanvasElementOptions & {
+  quality?: number;
+};
+
 /**
  * Root object class from which all 2d shape classes inherit from
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
@@ -100,8 +132,9 @@ export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
  */
 export class FabricObject<
     Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends AnimatableObject<EventSpec>
   implements ObjectProps
@@ -185,24 +218,6 @@ export class FabricObject<
   declare _cacheCanvas?: HTMLCanvasElement;
 
   /**
-   * Size of the cache canvas, width
-   * since 1.7.0
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare cacheWidth?: number;
-
-  /**
-   * Size of the cache canvas, height
-   * since 1.7.0
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare cacheHeight?: number;
-
-  /**
    * zoom level used on the cacheCanvas to draw the cache, X axe
    * since 1.7.0
    * @type number
@@ -264,26 +279,28 @@ export class FabricObject<
    */
   declare _transformDone?: boolean;
 
-  static ownDefaults: Record<string, any> = fabricObjectDefaultValues;
+  static ownDefaults = fabricObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {
-    return { ...FabricObject.ownDefaults };
+    return FabricObject.ownDefaults;
   }
 
   /**
-   * The class type. Used to identify which class this is.
-   * This is used for serialization purposes and internally it can be used
-   * to identify classes. As a developer you could use `instance of Class`
-   * but to avoid importing all the code and blocking tree shaking we try
-   * to avoid doing that.
+   * The class type.
+   * This is used for serialization and deserialization purposes and internally it can be used
+   * to identify classes.
+   * When we transform a class in a plain JS object we need a way to recognize which class it was,
+   * and the type is the way we do that. It has no other purposes and you should not give one.
+   * Hard to reach on instances and please do not use to drive instance's logic (this.constructor.type).
+   * To idenfity a class use instanceof class ( instanceof Rect ).
+   * We do not do that in fabricJS code because we want to try to have code splitting possible.
    */
   static type = 'FabricObject';
 
   /**
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
-   * The setter exists because is very hard to catch all the ways in which a type value
-   * could be set in the instance
+   * The setter exists to avoid type errors in old code and possibly current deserialization code.
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
@@ -304,12 +321,9 @@ export class FabricObject<
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor(options: Props = {} as Props) {
+  constructor(options?: Props) {
     super();
-    Object.assign(
-      this,
-      (this.constructor as typeof FabricObject).getDefaults()
-    );
+    Object.assign(this, FabricObject.ownDefaults);
     this.setOptions(options);
   }
 
@@ -341,7 +355,7 @@ export class FabricObject<
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
+    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any,
   ) {
     const width = dims.width,
       height = dims.height,
@@ -414,7 +428,7 @@ export class FabricObject<
    * @return {Boolean} true if the canvas has been resized
    */
   _updateCacheCanvas() {
-    const canvas = this._cacheCanvas,
+    const canvas = this._cacheCanvas!,
       context = this._cacheContext,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       minCacheSize = config.minCacheSideLimit,
@@ -422,8 +436,7 @@ export class FabricObject<
       height = dims.height,
       zoomX = dims.zoomX,
       zoomY = dims.zoomY,
-      dimensionsChanged =
-        width !== this.cacheWidth || height !== this.cacheHeight,
+      dimensionsChanged = width !== canvas.width || height !== canvas.height,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
 
     if (!canvas || !context) {
@@ -476,8 +489,6 @@ export class FabricObject<
         Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY =
         Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
-      this.cacheWidth = width;
-      this.cacheHeight = height;
       context.translate(this.cacheTranslationX, this.cacheTranslationY);
       context.scale(zoomX, zoomY);
       this.zoomX = zoomX;
@@ -693,12 +704,10 @@ export class FabricObject<
    * @param {*} value
    */
   _set(key: string, value: any) {
-    const isChanged = this[key as keyof this] !== value;
-
-    if (key === 'scaleX' || key === 'scaleY') {
+    if (key === SCALE_X || key === SCALE_Y) {
       value = this._constrainScale(value);
     }
-    if (key === 'scaleX' && value < 0) {
+    if (key === SCALE_X && value < 0) {
       this.flipX = !this.flipX;
       value *= -1;
     } else if (key === 'scaleY' && value < 0) {
@@ -707,29 +716,29 @@ export class FabricObject<
       // i don't like this automatic initialization here
     } else if (key === 'shadow' && value && !(value instanceof Shadow)) {
       value = new Shadow(value);
-    } else if (key === 'dirty' && this.group && value) {
-      // a dirty child makes the parent dirty
-      // but a non dirty child will not make the parent non dirty.
-      // the parent could be dirty for some other reason
-      this.group.set('dirty', value);
     }
 
+    const isChanged = this[key as keyof this] !== value;
     this[key as keyof this] = value;
 
-    if (isChanged) {
-      const groupNeedsUpdate = this.group && this.group.isOnACache();
-      if (
-        (this.constructor as typeof FabricObject).cacheProperties.includes(key)
-      ) {
-        this.dirty = true;
-        groupNeedsUpdate && this.group!.set('dirty', true);
-      } else if (
-        groupNeedsUpdate &&
-        (this.constructor as typeof FabricObject).stateProperties.includes(key)
-      ) {
-        this.group!.set('dirty', true);
-      }
+    // invalidate caches
+    if (
+      isChanged &&
+      (this.constructor as typeof FabricObject).cacheProperties.includes(key)
+    ) {
+      this.dirty = true;
     }
+    // a dirty child makes the parent dirty.
+    // but a non dirty child does not make the parent not dirty.
+    // the parent could be dirty for some other reason.
+    this.parent &&
+      (this.dirty ||
+        (isChanged &&
+          (this.constructor as typeof FabricObject).stateProperties.includes(
+            key,
+          ))) &&
+      this.parent._set('dirty', true);
+
     return this;
   }
 
@@ -781,7 +790,7 @@ export class FabricObject<
     ctx.restore();
   }
 
-  drawSelectionBackground(ctx: CanvasRenderingContext2D) {
+  drawSelectionBackground(_ctx: CanvasRenderingContext2D) {
     /* no op */
   }
 
@@ -802,8 +811,6 @@ export class FabricObject<
   _removeCacheCanvas() {
     this._cacheCanvas = undefined;
     this._cacheContext = null;
-    this.cacheWidth = 0;
-    this.cacheHeight = 0;
   }
 
   /**
@@ -846,7 +853,7 @@ export class FabricObject<
    */
   needsItsOwnCache() {
     if (
-      this.paintFirst === 'stroke' &&
+      this.paintFirst === STROKE &&
       this.hasFill() &&
       this.hasStroke() &&
       !!this.shadow
@@ -871,7 +878,7 @@ export class FabricObject<
   shouldCache() {
     this.ownCaching =
       this.needsItsOwnCache() ||
-      (this.objectCaching && (!this.group || !this.group.isOnACache()));
+      (this.objectCaching && (!this.parent || !this.parent.isOnACache()));
     return this.ownCaching;
   }
 
@@ -894,7 +901,7 @@ export class FabricObject<
    */
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject
+    clipPath: TCachedFabricObject,
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -914,7 +921,7 @@ export class FabricObject<
     ctx.drawImage(
       clipPath._cacheCanvas,
       -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
+      -clipPath.cacheTranslationY,
     );
     ctx.restore();
   }
@@ -968,7 +975,7 @@ export class FabricObject<
     ctx.drawImage(
       this._cacheCanvas,
       -this.cacheTranslationX,
-      -this.cacheTranslationY
+      -this.cacheTranslationY,
     );
   }
 
@@ -981,20 +988,18 @@ export class FabricObject<
     if (this.isNotVisible()) {
       return false;
     }
-    if (
-      this._cacheCanvas &&
-      this._cacheContext &&
-      !skipCanvas &&
-      this._updateCacheCanvas()
-    ) {
+    const canvas = this._cacheCanvas;
+    const ctx = this._cacheContext;
+    if (canvas && ctx && !skipCanvas && this._updateCacheCanvas()) {
       // in this case the context is already cleared.
       return true;
     } else {
       if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
-        if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-          const width = this.cacheWidth! / this.zoomX!;
-          const height = this.cacheHeight! / this.zoomY!;
-          this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
+        if (canvas && ctx && !skipCanvas) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.restore();
         }
         return true;
       }
@@ -1042,7 +1047,7 @@ export class FabricObject<
       | 'strokeDashOffset'
       | 'strokeLineJoin'
       | 'strokeMiterLimit'
-    >
+    >,
   ) {
     const stroke = decl.stroke;
     if (stroke) {
@@ -1155,7 +1160,7 @@ export class FabricObject<
    */
   _applyPatternGradientTransform(
     ctx: CanvasRenderingContext2D,
-    filler: TFiller
+    filler: TFiller,
   ) {
     if (!isFiller(filler)) {
       return { offsetX: 0, offsetY: 0 };
@@ -1182,7 +1187,7 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
   _renderPaintInOrder(ctx: CanvasRenderingContext2D) {
-    if (this.paintFirst === 'stroke') {
+    if (this.paintFirst === STROKE) {
       this._renderStroke(ctx);
       this._renderFill(ctx);
     } else {
@@ -1196,9 +1201,9 @@ export class FabricObject<
    * function that actually render something on the context.
    * empty here to allow Obects to work on tests to benchmark fabric functionalites
    * not related to rendering
-   * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {CanvasRenderingContext2D} _ctx Context to render on
    */
-  _render(ctx: CanvasRenderingContext2D) {
+  _render(_ctx: CanvasRenderingContext2D) {
     // placeholder to be overridden
   }
 
@@ -1258,7 +1263,7 @@ export class FabricObject<
    */
   _applyPatternForTransformedGradient(
     ctx: CanvasRenderingContext2D,
-    filler: TFiller
+    filler: TFiller,
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       pCanvas = createCanvasElement(),
@@ -1282,18 +1287,18 @@ export class FabricObject<
     pCtx.translate(width / 2, height / 2);
     pCtx.scale(
       dims.zoomX / this.scaleX / retinaScaling,
-      dims.zoomY / this.scaleY / retinaScaling
+      dims.zoomY / this.scaleY / retinaScaling,
     );
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fillStyle = filler.toLive(ctx)!;
     pCtx.fill();
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,
-      -this.height / 2 - this.strokeWidth / 2
+      -this.height / 2 - this.strokeWidth / 2,
     );
     ctx.scale(
       (retinaScaling * this.scaleX) / dims.zoomX,
-      (retinaScaling * this.scaleY) / dims.zoomY
+      (retinaScaling * this.scaleY) / dims.zoomY,
     );
     ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
@@ -1316,7 +1321,7 @@ export class FabricObject<
   clone(propertiesToInclude?: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     return (this.constructor as typeof FabricObject).fromObject(
-      objectForm
+      objectForm,
     ) as unknown as Promise<this>;
   }
 
@@ -1328,7 +1333,7 @@ export class FabricObject<
    * If you need to get a real Jpeg or Png from an object, using toDataURL is the right way to do it.
    * toCanvasElement and then toBlob from the obtained canvas is also a good option.
    * @todo fix the export type, it could not be Image but the type that getClass return for 'image'.
-   * @param {Object} [options] for clone as image, passed to toDataURL
+   * @param {ObjectToCanvasElementOptions} [options] for clone as image, passed to toDataURL
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1339,7 +1344,7 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {FabricImage} Object cloned as image.
    */
-  cloneAsImage(options: any): FabricImage {
+  cloneAsImage(options: ObjectToCanvasElementOptions): FabricImage {
     const canvasEl = this.toCanvasElement(options);
     // TODO: how to import Image w/o an import cycle?
     const ImageClass = classRegistry.getClass<typeof FabricImage>('image');
@@ -1348,7 +1353,7 @@ export class FabricObject<
 
   /**
    * Converts an object into a HTMLCanvas element
-   * @param {Object} options Options object
+   * @param {ObjectToCanvasElementOptions} options Options object
    * @param {Number} [options.multiplier=1] Multiplier to scale by
    * @param {Number} [options.left] Cropping left offset. Introduced in v1.2.14
    * @param {Number} [options.top] Cropping top offset. Introduced in v1.2.14
@@ -1358,15 +1363,24 @@ export class FabricObject<
    * @param {Boolean} [options.withoutTransform] Remove current object transform ( no scale , no angle, no flip, no skew ). Introduced in 2.3.4
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @param {Boolean} [options.viewportTransform] Account for canvas viewport transform
+   * @param {(el?: HTMLCanvasElement) => StaticCanvas} [options.canvasProvider] Create the output canvas
    * @return {HTMLCanvasElement} Returns DOM element <canvas> with the FabricObject
    */
-  toCanvasElement(options: any = {}) {
+  toCanvasElement(options: ObjectToCanvasElementOptions = {}) {
     const origParams = saveObjectTransform(this),
       originalGroup = this.group,
       originalShadow = this.shadow,
       abs = Math.abs,
       retinaScaling = options.enableRetinaScaling ? getDevicePixelRatio() : 1,
-      multiplier = (options.multiplier || 1) * retinaScaling;
+      multiplier = (options.multiplier || 1) * retinaScaling,
+      canvasProvider: (el: HTMLCanvasElement) => StaticCanvas =
+        options.canvasProvider ||
+        ((el: HTMLCanvasElement) =>
+          new StaticCanvas(el, {
+            enableRetinaScaling: false,
+            renderOnAddRemove: false,
+            skipOffscreen: false,
+          }));
     delete this.group;
     if (options.withoutTransform) {
       resetObjectTransform(this);
@@ -1401,18 +1415,14 @@ export class FabricObject<
     // we need to make it so.
     el.width = Math.ceil(width);
     el.height = Math.ceil(height);
-    const canvas = new StaticCanvas(el, {
-      enableRetinaScaling: false,
-      renderOnAddRemove: false,
-      skipOffscreen: false,
-    });
+    const canvas = canvasProvider(el);
     if (options.format === 'jpeg') {
       canvas.backgroundColor = '#fff';
     }
     this.setPositionByOrigin(
       new Point(canvas.width / 2, canvas.height / 2),
       CENTER,
-      CENTER
+      CENTER,
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
@@ -1452,11 +1462,11 @@ export class FabricObject<
    * @param {Boolean} [options.withoutShadow] Remove current object shadow. Introduced in 2.4.2
    * @return {String} Returns a data: URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL(options: any = {}) {
+  toDataURL(options: toDataURLOptions = {}) {
     return toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
-      options.quality || 1
+      options.quality || 1,
     );
   }
 
@@ -1510,7 +1520,7 @@ export class FabricObject<
       const { x, y } = this.translateToOriginPoint(
         this.getRelativeCenterPoint(),
         originX,
-        originY
+        originY,
       );
       this.left = x;
       this.top = y;
@@ -1565,7 +1575,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     { type, ...object }: Record<string, unknown>,
-    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {},
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1579,7 +1589,7 @@ export class FabricObject<
         } else {
           return new this(allOptions);
         }
-      }
+      },
     ) as Promise<S>;
   }
 
@@ -1592,7 +1602,7 @@ export class FabricObject<
    */
   static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
-    options?: Abortable
+    options?: Abortable,
   ) {
     return this._fromObject(object, options);
   }

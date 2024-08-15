@@ -1,4 +1,3 @@
-import type { Canvas } from '../../canvas/Canvas';
 import type {
   DragEventData,
   DropEventData,
@@ -10,7 +9,7 @@ import { setStyle } from '../../util/dom_style';
 import { cloneDeep } from '../../util/internals/cloneDeep';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { NONE } from '../../constants';
+import { CHANGED, NONE } from '../../constants';
 
 /**
  * #### Dragging IText/Textbox Lifecycle
@@ -109,7 +108,7 @@ export class DraggableTextDelegate {
     }: {
       selectionStart: number;
       selectionEnd: number;
-    }
+    },
   ) {
     const target = this.target;
     const canvas = target.canvas!;
@@ -117,7 +116,7 @@ export class DraggableTextDelegate {
     const boundaries = target._getCursorBoundaries(selectionStart);
     const selectionPosition = new Point(
       boundaries.left + boundaries.leftOffset,
-      boundaries.top + boundaries.topOffset
+      boundaries.top + boundaries.topOffset,
     ).multiply(flipFactor);
     const pos = selectionPosition.transform(target.calcTransformMatrix());
     const pointer = canvas.getScenePoint(e);
@@ -160,7 +159,7 @@ export class DraggableTextDelegate {
       dragImage.remove();
     };
     getDocumentFromElement(
-      (e.target || this.target.hiddenTextarea)! as HTMLElement
+      (e.target || this.target.hiddenTextarea)! as HTMLElement,
     ).body.appendChild(dragImage);
     e.dataTransfer?.setDragImage(dragImage, offset.x, offset.y);
   }
@@ -189,9 +188,9 @@ export class DraggableTextDelegate {
           styles: target.getSelectionStyles(
             selection.selectionStart,
             selection.selectionEnd,
-            true
+            true,
           ),
-        })
+        }),
       );
       e.dataTransfer.effectAllowed = 'copyMove';
       this.setDragImage(e, data);
@@ -317,16 +316,16 @@ export class DraggableTextDelegate {
       target.enterEditing(e);
       target.selectionStart = Math.min(
         insertAt + selectionStartOffset,
-        target._text.length
+        target._text.length,
       );
       target.selectionEnd = Math.min(
         target.selectionStart + insert.length,
-        target._text.length
+        target._text.length,
       );
       target.hiddenTextarea!.value = target.text;
       target._updateTextarea();
       target.hiddenTextarea!.focus();
-      target.fire('changed', {
+      target.fire(CHANGED, {
         index: insertAt + selectionStartOffset,
         action: 'drop',
       });
@@ -364,7 +363,7 @@ export class DraggableTextDelegate {
             target.hiddenTextarea &&
               (target.hiddenTextarea.value = target.text);
             target._updateTextarea();
-            target.fire('changed', {
+            target.fire(CHANGED, {
               index: selectionStart,
               action: 'dragend',
             });

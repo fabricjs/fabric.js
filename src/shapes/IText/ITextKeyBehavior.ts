@@ -7,14 +7,14 @@ import type { TKeyMapIText } from './constants';
 import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT } from '../../constants';
+import { CHANGED, LEFT, RIGHT } from '../../constants';
 import type { IText } from './IText';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 
 export abstract class ITextKeyBehavior<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
-  EventSpec extends ITextEvents = ITextEvents
+  EventSpec extends ITextEvents = ITextEvents,
 > extends ITextBehavior<Props, SProps, EventSpec> {
   /**
    * For functionalities on keyDown
@@ -94,8 +94,8 @@ export abstract class ITextKeyBehavior<
     } as Record<string, keyof this>).map(([eventName, handler]) =>
       textarea.addEventListener(
         eventName,
-        (this[handler] as Function).bind(this)
-      )
+        (this[handler] as EventListener).bind(this),
+      ),
     );
     this.hiddenTextarea = textarea;
   }
@@ -173,7 +173,7 @@ export abstract class ITextKeyBehavior<
     }
     const updateAndFire = () => {
       this.updateFromTextArea();
-      this.fire('changed');
+      this.fire(CHANGED);
       if (this.canvas) {
         this.canvas.fire('text:changed', { target: this as unknown as IText });
         this.canvas.requestRenderAll();
@@ -186,7 +186,7 @@ export abstract class ITextKeyBehavior<
     }
     // decisions about style changes.
     const nextText = this._splitTextIntoLines(
-        this.hiddenTextarea.value
+        this.hiddenTextarea.value,
       ).graphemeText,
       charCount = this._text.length,
       nextCharCount = nextText.length,
@@ -202,7 +202,7 @@ export abstract class ITextKeyBehavior<
     const textareaSelection = this.fromStringToGraphemeSelection(
       this.hiddenTextarea.selectionStart,
       this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      this.hiddenTextarea.value,
     );
     const backDelete = selectionStart > textareaSelection.selectionStart;
 
@@ -215,13 +215,13 @@ export abstract class ITextKeyBehavior<
       } else {
         removedText = this._text.slice(
           selectionStart,
-          selectionStart - charDiff
+          selectionStart - charDiff,
         );
       }
     }
     const insertedText = nextText.slice(
       textareaSelection.selectionEnd - charDiff,
-      textareaSelection.selectionEnd
+      textareaSelection.selectionEnd,
     );
     if (removedText && removedText.length) {
       if (insertedText.length) {
@@ -231,14 +231,14 @@ export abstract class ITextKeyBehavior<
         copiedStyle = this.getSelectionStyles(
           selectionStart,
           selectionStart + 1,
-          false
+          false,
         );
         // now duplicate the style one for each inserted text.
         copiedStyle = insertedText.map(
           () =>
             // this return an array of references, but that is fine since we are
             // copying the style later.
-            copiedStyle![0]
+            copiedStyle![0],
         );
       }
       if (selection) {
@@ -303,7 +303,7 @@ export abstract class ITextKeyBehavior<
       copyPasteData.copiedTextStyle = this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd,
-        true
+        true,
       );
     } else {
       copyPasteData.copiedTextStyle = undefined;
@@ -477,7 +477,7 @@ export abstract class ITextKeyBehavior<
   _moveCursorUpOrDown(direction: 'Up' | 'Down', e: KeyboardEvent) {
     const offset = this[`get${direction}CursorOffset`](
       e,
-      this._selectionDirection === RIGHT
+      this._selectionDirection === RIGHT,
     );
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
@@ -488,8 +488,9 @@ export abstract class ITextKeyBehavior<
       const max = this.text.length;
       this.selectionStart = capValue(0, this.selectionStart, max);
       this.selectionEnd = capValue(0, this.selectionEnd, max);
+      // TODO fix: abort and init should be an alternative depending
+      // on selectionStart/End being equal or different
       this.abortCursorAnimation();
-      this._currentCursorOpacity = 1;
       this.initDelayedCursor();
       this._fireSelectionChanged();
       this._updateTextarea();
@@ -508,7 +509,7 @@ export abstract class ITextKeyBehavior<
     this.setSelectionStartEndWithShift(
       this.selectionStart,
       this.selectionEnd,
-      newSelection
+      newSelection,
     );
     return offset !== 0;
   }
@@ -548,7 +549,7 @@ export abstract class ITextKeyBehavior<
   _move(
     e: KeyboardEvent,
     prop: 'selectionStart' | 'selectionEnd',
-    direction: 'Left' | 'Right'
+    direction: 'Left' | 'Right',
   ): boolean {
     let newValue: number | undefined;
     if (e.altKey) {
@@ -641,6 +642,8 @@ export abstract class ITextKeyBehavior<
     }` as const;
     this._currentCursorOpacity = 1;
     if (this[actionName](e)) {
+      // TODO fix: abort and init should be an alternative depending
+      // on selectionStart/End being equal or different
       this.abortCursorAnimation();
       this.initDelayedCursor();
       this._fireSelectionChanged();

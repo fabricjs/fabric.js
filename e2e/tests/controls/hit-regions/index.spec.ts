@@ -18,8 +18,8 @@ test('Control hit regions', async ({ page }) => {
     for (let y = 0; y <= canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
         const point = new fabric.Point(x, y);
-        rect._findTargetCorner(point, true) && render(point, 'indigo');
-        rect._findTargetCorner(point) && render(point, 'magenta');
+        rect.findControl(point, true) && render(point, 'indigo');
+        rect.findControl(point) && render(point, 'magenta');
       }
     }
   });

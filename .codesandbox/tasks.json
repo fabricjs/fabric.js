@@ -48,6 +48,15 @@
         "port": 1234,
         "prLink": "direct"
       }
+    },
+    "vue": {
+      "name": "Run Vue Template",
+      "command": "npm start vue -- --no-watch",
+      "runAtStart": true,
+      "preview": {
+        "port": 5173,
+        "prLink": "direct"
+      }
     }
   }
 }

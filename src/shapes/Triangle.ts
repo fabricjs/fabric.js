@@ -1,10 +1,10 @@
 import { classRegistry } from '../ClassRegistry';
 import { FabricObject } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
-import type { TOptions } from '../typedefs';
+import type { TClassProperties, TOptions } from '../typedefs';
 import type { ObjectEvents } from '../EventTypeDefs';
 
-export const triangleDefaultValues = {
+export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
   width: 100,
   height: 100,
 };
@@ -12,17 +12,27 @@ export const triangleDefaultValues = {
 export class Triangle<
     Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
   static type = 'Triangle';
 
-  static ownDefaults: Record<string, any> = triangleDefaultValues;
+  static ownDefaults = triangleDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...Triangle.ownDefaults };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, Triangle.ownDefaults);
+    this.setOptions(options);
   }
 
   /**

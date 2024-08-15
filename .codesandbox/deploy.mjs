@@ -18,7 +18,7 @@ function globToRegex(glob, opts) {
 
 function parseIgnoreFile(file) {
   return _.compact(fs.readFileSync(file).toString().split('\n')).map((p) =>
-    globToRegex(p.trim())
+    globToRegex(p.trim()),
   );
 }
 
@@ -26,7 +26,7 @@ export function ignore(appPath, fileName) {
   const gitignore = path.resolve(appPath, '.gitignore');
   const codesandboxignore = path.resolve(appPath, '.codesandboxignore');
   const ignore = _.flatten(
-    [gitignore, codesandboxignore].filter(fs.existsSync).map(parseIgnoreFile)
+    [gitignore, codesandboxignore].filter(fs.existsSync).map(parseIgnoreFile),
   );
   return ignore.some((r) => r.test(fileName));
 }
@@ -36,7 +36,7 @@ export function ignore(appPath, fileName) {
  */
 export async function createCodeSandbox(appPath) {
   const { trigger: __, ...packageJSON } = JSON.parse(
-    fs.readFileSync(path.resolve(appPath, 'package.json'))
+    fs.readFileSync(path.resolve(appPath, 'package.json')),
   );
   // omit linked package
   if (packageJSON.dependencies.fabric.startsWith('file:')) {
@@ -63,7 +63,7 @@ export async function createCodeSandbox(appPath) {
       files[fileName] = {
         content: bufferToBase64DataUrl(
           fs.readFileSync(filePath),
-          `image/${ext}`
+          `image/${ext}`,
         ),
         isBinary: true,
       };
@@ -87,10 +87,10 @@ export async function createCodeSandbox(appPath) {
       'https://codesandbox.io/api/v1/sandboxes/define?json=1',
       {
         template: JSON.parse(
-          fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) || null
+          fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) || null,
         ).template,
         files,
-      }
+      },
     );
     return `https://codesandbox.io/s/${sandbox_id}`;
   } catch (error) {

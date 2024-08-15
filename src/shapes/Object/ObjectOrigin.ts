@@ -49,6 +49,9 @@ export class ObjectOrigin<EventSpec>
    */
   _getTransformedDimensions(options: any = {}): Point {
     const dimOptions = {
+      // if scaleX or scaleY are negative numbers,
+      // this will return dimensions that are negative.
+      // and this will break assumptions around the codebase
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       skewX: this.skewX,
@@ -74,13 +77,13 @@ export class ObjectOrigin<EventSpec>
     if (noSkew) {
       finalDimensions = new Point(
         dimX * dimOptions.scaleX,
-        dimY * dimOptions.scaleY
+        dimY * dimOptions.scaleY,
       );
     } else {
       finalDimensions = sizeAfterTransform(
         dimX,
         dimY,
-        calcDimensionsMatrix(dimOptions)
+        calcDimensionsMatrix(dimOptions),
       );
     }
 
@@ -101,7 +104,7 @@ export class ObjectOrigin<EventSpec>
     fromOriginX: TOriginX,
     fromOriginY: TOriginY,
     toOriginX: TOriginX,
-    toOriginY: TOriginY
+    toOriginY: TOriginY,
   ): Point {
     let x = point.x,
       y = point.y;
@@ -127,14 +130,14 @@ export class ObjectOrigin<EventSpec>
   translateToCenterPoint(
     point: Point,
     originX: TOriginX,
-    originY: TOriginY
+    originY: TOriginY,
   ): Point {
     const p = this.translateToGivenOrigin(
       point,
       originX,
       originY,
       CENTER,
-      CENTER
+      CENTER,
     );
     if (this.angle) {
       return p.rotate(degreesToRadians(this.angle), point);
@@ -152,14 +155,14 @@ export class ObjectOrigin<EventSpec>
   translateToOriginPoint(
     center: Point,
     originX: TOriginX,
-    originY: TOriginY
+    originY: TOriginY,
   ): Point {
     const p = this.translateToGivenOrigin(
       center,
       CENTER,
       CENTER,
       originX,
-      originY
+      originY,
     );
     if (this.angle) {
       return p.rotate(degreesToRadians(this.angle), center);
@@ -186,7 +189,7 @@ export class ObjectOrigin<EventSpec>
     return this.translateToCenterPoint(
       new Point(this.left, this.top),
       this.originX,
-      this.originY
+      this.originY,
     );
   }
 
@@ -200,7 +203,7 @@ export class ObjectOrigin<EventSpec>
     return this.translateToOriginPoint(
       this.getRelativeCenterPoint(),
       originX,
-      originY
+      originY,
     );
   }
 
@@ -216,7 +219,7 @@ export class ObjectOrigin<EventSpec>
       position = this.translateToOriginPoint(
         center,
         this.originX,
-        this.originY
+        this.originY,
       );
     this.set({ left: position.x, top: position.y });
   }
@@ -228,7 +231,7 @@ export class ObjectOrigin<EventSpec>
     return this.translateToOriginPoint(
       this.getRelativeCenterPoint(),
       LEFT,
-      TOP
+      TOP,
     );
   }
 }

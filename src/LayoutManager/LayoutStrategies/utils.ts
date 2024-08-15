@@ -15,7 +15,7 @@ import {
  */
 export const getObjectBounds = (
   destinationGroup: Group,
-  object: FabricObject
+  object: FabricObject,
 ): Point[] => {
   const {
     strokeUniform,
@@ -28,7 +28,7 @@ export const getObjectBounds = (
     currentGroup && currentGroup !== destinationGroup
       ? calcPlaneChangeMatrix(
           currentGroup.calcTransformMatrix(),
-          destinationGroup.calcTransformMatrix()
+          destinationGroup.calcTransformMatrix(),
         )
       : null;
   const objectCenter = t
@@ -40,7 +40,7 @@ export const getObjectBounds = (
       ? sendVectorToPlane(
           new Point(strokeWidth, strokeWidth),
           undefined,
-          destinationGroup.calcTransformMatrix()
+          destinationGroup.calcTransformMatrix(),
         )
       : ZERO;
   const scalingStrokeWidth =
@@ -48,7 +48,7 @@ export const getObjectBounds = (
   const sizeVector = sizeAfterTransform(
     width + scalingStrokeWidth,
     height + scalingStrokeWidth,
-    multiplyTransformMatrixArray([t, object.calcOwnMatrix()], true)
+    multiplyTransformMatrixArray([t, object.calcOwnMatrix()], true),
   )
     .add(strokeUniformVector)
     .scalarDivide(2);

@@ -76,7 +76,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type Number
    * @private
    */
-  declare mainTouchId: null | number;
+  declare mainTouchId?: number;
 
   declare enablePointerEvents: boolean;
 
@@ -144,6 +144,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         '_onDrop',
       ] as (keyof this)[]
     ).forEach((eventHandler) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
       this[eventHandler] = (this[eventHandler] as Function).bind(this);
     });
     // register event handlers
@@ -158,7 +159,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     return this.enablePointerEvents ? 'pointer' : 'mouse';
   }
 
-  addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
+  addOrRemove(functor: any, _eventjsFunctor: 'add' | 'remove') {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
@@ -167,7 +168,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       canvasElement,
       `${eventTypePrefix}move`,
       this._onMouseMove,
-      addEventOptions
+      addEventOptions,
     );
     functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
@@ -207,25 +208,25 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     removeListener(
       doc,
       `${eventTypePrefix}up`,
-      this._onMouseUp as EventListener
+      this._onMouseUp as EventListener,
     );
     removeListener(
       doc,
       'touchend',
       this._onTouchEnd as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     removeListener(
       doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     removeListener(
       doc,
       'touchmove',
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
   }
 
@@ -294,7 +295,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       addListener(
         this.upperCanvasEl,
         'drag',
-        this._onDragProgress as EventListener
+        this._onDragProgress as EventListener,
       );
       return;
     }
@@ -310,7 +311,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _renderDragEffects(
     e: DragEvent,
     source?: FabricObject,
-    target?: FabricObject
+    target?: FabricObject,
   ) {
     let dirty = false;
     // clear top context
@@ -363,7 +364,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     removeListener(
       this.upperCanvasEl,
       'drag',
-      this._onDragProgress as EventListener
+      this._onDragProgress as EventListener,
     );
     this.fire('dragend', options);
     this._dragSource && this._dragSource.fire('dragend', options);
@@ -396,7 +397,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this.targets = [];
     const target = this._searchPossibleTargets(
       this._objects,
-      this.getViewportPoint(e)
+      this.getViewportPoint(e),
     );
     return {
       target,
@@ -597,7 +598,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   _onTouchStart(e: TouchEvent) {
     e.preventDefault();
-    if (this.mainTouchId === null) {
+    if (this.mainTouchId === undefined) {
       this.mainTouchId = this.getPointerId(e);
     }
     this.__onMouseDown(e);
@@ -609,19 +610,19 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       doc,
       'touchend',
       this._onTouchEnd as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     addListener(
       doc,
       'touchmove',
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     // Unbind mousedown to prevent double triggers from touch devices
     removeListener(
       canvasElement,
       `${eventTypePrefix}down`,
-      this._onMouseDown as EventListener
+      this._onMouseDown as EventListener,
     );
   }
 
@@ -638,7 +639,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       canvasElement,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     const doc = getDocumentFromElement(canvasElement);
     addListener(doc, `${eventTypePrefix}up`, this._onMouseUp as EventListener);
@@ -646,7 +647,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
   }
 
@@ -661,20 +662,20 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     this.__onMouseUp(e);
     this._resetTransformEventData();
-    this.mainTouchId = null;
+    delete this.mainTouchId;
     const eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(this.upperCanvasEl);
     removeListener(
       doc,
       'touchend',
       this._onTouchEnd as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     removeListener(
       doc,
       'touchmove',
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     if (this._willAddMouseDown) {
       clearTimeout(this._willAddMouseDown);
@@ -685,7 +686,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       addListener(
         this.upperCanvasEl,
         `${eventTypePrefix}down`,
-        this._onMouseDown as EventListener
+        this._onMouseDown as EventListener,
       );
       this._willAddMouseDown = 0;
     }, 400) as unknown as number;
@@ -705,19 +706,19 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       removeListener(
         doc,
         `${eventTypePrefix}up`,
-        this._onMouseUp as EventListener
+        this._onMouseUp as EventListener,
       );
       removeListener(
         doc,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
-        addEventOptions
+        addEventOptions,
       );
       addListener(
         canvasElement,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
-        addEventOptions
+        addEventOptions,
       );
     }
   }
@@ -732,7 +733,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       (!activeObject ||
         // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
         // we must not prevent the event's default behavior in order for the window to start dragging
-        !activeObject.shouldStartDragging()) &&
+        !activeObject.shouldStartDragging(e)) &&
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
@@ -812,10 +813,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     let pointer, corner;
     if (target) {
-      corner = target._findTargetCorner(
+      const found = target.findControl(
         this.getViewportPoint(e),
-        isTouchEvent(e)
+        isTouchEvent(e),
       );
+      const { key, control } = found || {};
+      corner = key;
       if (
         target.selectable &&
         target !== this._activeObject &&
@@ -823,10 +826,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       ) {
         this.setActiveObject(target, e);
         shouldRender = true;
-      } else {
-        const control = target.controls[corner];
-        const mouseUpHandler =
-          control && control.getMouseUpHandler(e, target, control);
+      } else if (control) {
+        const mouseUpHandler = control.getMouseUpHandler(e, target, control);
         if (mouseUpHandler) {
           pointer = this.getScenePoint(e);
           mouseUpHandler.call(control, e, transform!, pointer.x, pointer.y);
@@ -847,7 +848,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           originalControl.getMouseUpHandler(
             e,
             transform.target,
-            originalControl
+            originalControl,
           );
       pointer = pointer || this.getScenePoint(e);
       originalMouseUpHandler &&
@@ -856,7 +857,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           e,
           transform,
           pointer.x,
-          pointer.y
+          pointer.y,
         );
     }
     this._setCursorFromEvent(e, target);
@@ -874,7 +875,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
     eventType: T,
-    options: (CanvasEvents & ObjectEvents)[T]
+    options: (CanvasEvents & ObjectEvents)[T],
   ) {
     const { target, subTargets = [] } = options as {
       target?: FabricObject;
@@ -1049,13 +1050,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
-      const corner = target._findTargetCorner(
+      const handle = target.findControl(
         this.getViewportPoint(e),
-        isTouchEvent(e)
+        isTouchEvent(e),
       );
-      if (target === this._activeObject && (corner || !grouped)) {
+      if (target === this._activeObject && (handle || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
-        const control = target.controls[corner],
+        const control = handle ? handle.control : undefined,
           pointer = this.getScenePoint(e),
           mouseDownHandler =
             control && control.getMouseDownHandler(e, target, control);
@@ -1065,7 +1066,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             e,
             this._currentTransform!,
             pointer.x,
-            pointer.y
+            pointer.y,
           );
       }
     }
@@ -1099,7 +1100,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._absolutePointer = sendPointToPlane(
       this._pointer,
       undefined,
-      this.viewportTransform
+      this.viewportTransform,
     );
     this._target = this._currentTransform
       ? this._currentTransform.target
@@ -1117,8 +1118,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   __onMouseMove(e: TPointerEvent) {
     this._isClick = false;
-    this._handleEvent(e, 'move:before');
     this._cacheTransformEventData(e);
+    this._handleEvent(e, 'move:before');
 
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
@@ -1232,7 +1233,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target?: FabricObject;
       oldTarget?: FabricObject;
       fireCanvas?: boolean;
-    }
+    },
   ) {
     const { targetIn, targetOut, canvasIn, canvasOut } =
       syntheticEventConfig[type];
@@ -1286,7 +1287,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         ? sendPointToPlane(
             scenePoint,
             undefined,
-            target.group.calcTransformMatrix()
+            target.group.calcTransformMatrix(),
           )
         : scenePoint;
     transform.shiftKey = e.shiftKey;
@@ -1302,18 +1303,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _performTransformAction(
     e: TPointerEvent,
     transform: Transform,
-    pointer: Point
+    pointer: Point,
   ) {
-    const x = pointer.x,
-      y = pointer.y,
-      action = transform.action,
-      actionHandler = transform.actionHandler;
-    let actionPerformed = false;
-    // this object could be created from the function in the control handlers
+    const { action, actionHandler, target } = transform;
 
-    if (actionHandler) {
-      actionPerformed = actionHandler(e, transform, x, y);
-    }
+    const actionPerformed =
+      !!actionHandler && actionHandler(e, transform, pointer.x, pointer.y);
+    actionPerformed && target.setCoords();
+
+    // this object could be created from the function in the control handlers
     if (action === 'drag' && actionPerformed) {
       transform.target.isMoving = true;
       this.setCursor(transform.target.moveCursor || this.moveCursor);
@@ -1342,7 +1340,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // here we call findTargetCorner always with undefined for the touch parameter.
         // we assume that if you are using a cursor you do not need to interact with
         // the bigger touch area.
-        target._findTargetCorner(this.getViewportPoint(e));
+        target.findControl(this.getViewportPoint(e));
 
     if (!corner) {
       if ((target as Group).subTargetCheck) {
@@ -1357,7 +1355,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = target.controls[corner];
+      const control = corner.control;
       this.setCursor(control.cursorStyleHandler(e, control, target));
     }
   }
@@ -1482,7 +1480,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         width: size.x,
         height: size.y,
       },
-      { includeIntersecting: !this.selectionFullyContained }
+      { includeIntersecting: !this.selectionFullyContained },
     ) as FabricObject[];
 
     const objects =
@@ -1493,9 +1491,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           ? [collectedObjects[0]]
           : []
         : collectedObjects.length > 1
-        ? collectedObjects.filter((object) => !object.onSelect({ e })).reverse()
-        : // `setActiveObject` will call `onSelect(collectedObjects[0])` in this case
-          collectedObjects;
+          ? collectedObjects
+              .filter((object) => !object.onSelect({ e }))
+              .reverse()
+          : // `setActiveObject` will call `onSelect(collectedObjects[0])` in this case
+            collectedObjects;
 
     // set active object
     if (objects.length === 1) {

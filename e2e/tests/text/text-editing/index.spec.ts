@@ -28,7 +28,7 @@ test('textbox typing and resizing', async ({ page }) => {
       'insert text in a textbox from the keyboard will wrap text on current textbox width',
       {
         // delay: 160,
-      }
+      },
     );
 
   expect(await canvasUtil.screenshot()).toMatchSnapshot({ name: 'typed.png' });

@@ -8,7 +8,7 @@ describe('polyControl', () => {
   it('should fire events', () => {
     const poly = new Polygon(
       [new Point(), new Point(50, 0), new Point(50, 50), new Point(0, 50)],
-      { controls: createPolyControls(4) }
+      { controls: createPolyControls(4) },
     );
     const canvas = new Canvas();
     canvas.add(poly);
@@ -22,13 +22,13 @@ describe('polyControl', () => {
     canvas._setupCurrentTransform(
       new MouseEvent('mousedown', { clientX: 50, clientY: 50 }),
       poly,
-      true
+      true,
     );
     document.dispatchEvent(
-      new MouseEvent('mousemove', { clientX: 55, clientY: 55 })
+      new MouseEvent('mousemove', { clientX: 55, clientY: 55 }),
     );
     document.dispatchEvent(
-      new MouseEvent('mouseup', { clientX: 55, clientY: 55 })
+      new MouseEvent('mouseup', { clientX: 55, clientY: 55 }),
     );
 
     expect(
@@ -37,8 +37,8 @@ describe('polyControl', () => {
           {
             transform: { action },
           },
-        ]) => action
-      )
+        ]) => action,
+      ),
     ).toMatchObject(['modifyPoly', 'modifyPoly']);
   });
 });

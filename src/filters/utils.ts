@@ -4,7 +4,7 @@ import { WebGLFilterBackend } from './WebGLFilterBackend';
 import type { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 
 export const isWebGLPipelineState = (
-  options: TWebGLPipelineState | T2DPipelineState
+  options: TWebGLPipelineState | T2DPipelineState,
 ): options is TWebGLPipelineState => {
   return (options as TWebGLPipelineState).webgl !== undefined;
 };
@@ -38,7 +38,7 @@ export const isPutImageFaster = (width: number, height: number): boolean => {
   WebGLFilterBackend.prototype.copyGLTo2D.call(
     testContext,
     gl,
-    testPipelineState
+    testPipelineState,
   );
   const drawImageTime = getFabricWindow().performance.now() - startTime;
 
@@ -46,7 +46,7 @@ export const isPutImageFaster = (width: number, height: number): boolean => {
   WebGLFilterBackend.prototype.copyGLTo2DPutImageData.call(
     testContext,
     gl,
-    testPipelineState
+    testPipelineState,
   );
   const putImageDataTime = getFabricWindow().performance.now() - startTime;
 

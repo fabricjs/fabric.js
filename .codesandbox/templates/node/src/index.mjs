@@ -1,5 +1,6 @@
-import http from 'http';
 import * as fabric from 'fabric/node';
+import http from 'http';
+import 'source-map-support/register.js';
 
 const port = Number(process.argv[2]);
 
@@ -26,6 +27,6 @@ http
   .listen(port, (err) => {
     if (err) throw err;
     console.log(
-      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`
+      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`,
     );
   });

@@ -2,6 +2,7 @@ import type {
   ControlCursorCallback,
   TransformActionHandler,
 } from '../EventTypeDefs';
+import { ROTATING } from '../constants';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { isLocked, NOT_ALLOWED_CURSOR } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -18,7 +19,7 @@ import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 export const rotationStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject
+  fabricObject,
 ) => {
   if (fabricObject.lockRotation) {
     return NOT_ALLOWED_CURSOR;
@@ -40,12 +41,12 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   eventData,
   { target, ex, ey, theta, originX, originY },
   x,
-  y
+  y,
 ) => {
   const pivotPoint = target.translateToOriginPoint(
     target.getRelativeCenterPoint(),
     originX,
-    originY
+    originY,
   );
 
   if (isLocked(target, 'lockRotation')) {
@@ -82,6 +83,6 @@ const rotateObjectWithSnapping: TransformActionHandler = (
 };
 
 export const rotationWithSnapping = wrapWithFireEvent(
-  'rotating',
-  wrapWithFixedAnchor(rotateObjectWithSnapping)
+  ROTATING,
+  wrapWithFixedAnchor(rotateObjectWithSnapping),
 );

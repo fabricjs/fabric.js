@@ -35,7 +35,7 @@ export class StaticCanvasDOMManager {
         createCanvasElement();
     if (el.hasAttribute('data-fabric')) {
       throw new FabricError(
-        'Trying to initialize a canvas that has already been initialized. Did you forget to dispose the canvas?'
+        'Trying to initialize a canvas that has already been initialized. Did you forget to dispose the canvas?',
       );
     }
     this._originalCanvasStyle = el.style.cssText;

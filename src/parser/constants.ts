@@ -13,7 +13,7 @@ export const reFontDeclaration = new RegExp(
     reNum +
     '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' +
     reNum +
-    '))?\\s+(.*)'
+    '))?\\s+(.*)',
 );
 
 export const svgValidTagNames = [
@@ -95,5 +95,5 @@ export const reViewBoxAttrValue = new RegExp(
     '\\s*(' +
     reNum +
     '+)\\s*' +
-    '$'
+    '$',
 );

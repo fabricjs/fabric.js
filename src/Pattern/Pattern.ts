@@ -117,8 +117,8 @@ export class Pattern {
     return this.isImageSource()
       ? this.source.src
       : this.isCanvasSource()
-      ? this.source.toDataURL()
-      : '';
+        ? this.source.toDataURL()
+        : '';
   }
 
   /**
@@ -174,16 +174,24 @@ export class Pattern {
       patternWidth =
         repeat === 'repeat-y' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetX || 0)
-          : ifNaN((patternSource.width as number) / width, 0),
+          : ifNaN(
+              ((patternSource as HTMLImageElement).width as number) / width,
+              0,
+            ),
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
-          : ifNaN((patternSource.height as number) / height, 0);
+          : ifNaN(
+              ((patternSource as HTMLImageElement).height as number) / height,
+              0,
+            );
 
     return [
       `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
-      `<image x="0" y="0" width="${patternSource.width}" height="${
-        patternSource.height
+      `<image x="0" y="0" width="${
+        (patternSource as HTMLImageElement).width
+      }" height="${
+        (patternSource as HTMLImageElement).height
       }" xlink:href="${this.sourceToString()}"></image>`,
       `</pattern>`,
       '',
@@ -193,7 +201,7 @@ export class Pattern {
 
   static async fromObject(
     { type, source, ...serialized }: SerializedPatternOptions,
-    options: Abortable
+    options?: Abortable,
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

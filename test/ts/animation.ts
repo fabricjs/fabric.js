@@ -13,7 +13,6 @@ animate({
   // @ts-expect-error `byValue` is not part of options
   byValue: 2,
 });
-// @ts-expect-error `byValue` is not part of options
 animate({
   byValue: 2,
   endValue: 3,

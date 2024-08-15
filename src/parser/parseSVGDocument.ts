@@ -6,9 +6,10 @@ import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
 import { log, SignalAbortedError } from '../util/internals/console';
+import { getTagName } from './getTagName';
 
 const isValidSvgTag = (el: Element) =>
-  svgValidTagNamesRegEx.test(el.nodeName.replace('svg:', ''));
+  svgValidTagNamesRegEx.test(getTagName(el));
 
 export const createEmptyResponse = (): SVGParsingOutput => ({
   objects: [],
@@ -37,7 +38,7 @@ export const createEmptyResponse = (): SVGParsingOutput => ({
 export async function parseSVGDocument(
   doc: Document,
   reviver?: TSvgReviverCallback,
-  { crossOrigin, signal }: LoadImageOptions = {}
+  { crossOrigin, signal }: LoadImageOptions = {},
 ): Promise<SVGParsingOutput> {
   if (signal && signal.aborted) {
     log('log', new SignalAbortedError('parseSVGDocument'));
@@ -67,11 +68,12 @@ export async function parseSVGDocument(
   }
   const localClipPaths: Record<string, Element[]> = {};
   descendants
-    .filter((el) => el.nodeName.replace('svg:', '') === 'clipPath')
+    .filter((el) => getTagName(el) === 'clipPath')
     .forEach((el) => {
+      el.setAttribute('originalTransform', el.getAttribute('transform') || '');
       const id = el.getAttribute('id')!;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
-        (el) => isValidSvgTag(el)
+        (el) => isValidSvgTag(el),
       );
     });
 
@@ -81,7 +83,7 @@ export async function parseSVGDocument(
     options,
     reviver,
     doc,
-    localClipPaths
+    localClipPaths,
   );
 
   const instances = await elementParser.parse();

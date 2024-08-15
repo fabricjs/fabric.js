@@ -7,7 +7,7 @@ import type { Transform, TransformActionHandler } from '../EventTypeDefs';
  * @return {Function} a function with an action handler signature
  */
 export function wrapWithFixedAnchor<T extends Transform>(
-  actionHandler: TransformActionHandler<T>
+  actionHandler: TransformActionHandler<T>,
 ) {
   return ((eventData, transform, x, y) => {
     const { target, originX, originY } = transform,
@@ -19,7 +19,7 @@ export function wrapWithFixedAnchor<T extends Transform>(
     target.setPositionByOrigin(
       constraint,
       transform.originX,
-      transform.originY
+      transform.originY,
     );
     return actionPerformed;
   }) as TransformActionHandler<T>;

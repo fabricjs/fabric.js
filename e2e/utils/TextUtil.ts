@@ -10,13 +10,13 @@ export class TextUtil<T extends IText = IText> extends ObjectUtil<T> {
         // add extra 10 pixels to avoid controls
         const point = new fabric.Point(
           left + leftOffset + 10,
-          top + topOffset + 10
+          top + topOffset + 10,
         );
 
         const t = point.transform(object.calcTransformMatrix());
         return t;
       },
-      { index }
+      { index },
     );
   }
 

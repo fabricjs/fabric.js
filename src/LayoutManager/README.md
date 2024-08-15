@@ -2,6 +2,47 @@
 
 Layout manager exposes a main public method that performs group layout given a target group and target objects.
 
+## Expectations for non interactive groups
+
+The layout manager will calculate the size and position of the group when is created or updated
+The FitContent strategy is the classic fabric 5.x group and will grow or shrink when objects are added or removed.
+In general the expectation is that wrapping objects in a group without specifying a new postion or transformations wont change the object visual position, the position of the objects will be the same that those object would have had on the canvas if they weren't on the group. Theyr coordinates will change to adapt to the group structure.
+This is a legacy behaviour that carries over this new code.
+The behaviour is not important if you are building a group from scratch and you are adding it in a specific position or requesting a specific transform ( scaleX, angle, etc ). In that case the original position is meaningless and is overridden with your transform.
+
+Since inside the group all objects are organized around the center is anyway easier if you can think of your objects position and alignment with scene coordinates and know that they will be maintained in the same relative position when grouped.
+
+### FitContent strategy
+
+When a group is created, FitContent strategy will consider all the objects in the group, find their bounding box, find the center of the bounding box, and assign those to the group.
+
+When a new object is added or removed, a new bounding box is calculated, a new center is found, all the remaining objects are moved by an offset so that are re-positioned around the new center
+
+### Fixed layout strategy
+
+With the fixed layout a Developer can specify either width or height and have the other calculated.
+If the developer specifies both dimensions of the box, the bounding box is still calculated to obtain the center.
+Once the group is initialized with a fixed layout, adding new objects won't change the group's size and therefore also its position.
+The layout is fixed, is cropped by the bounding box itself.
+When larger or smaller than the actual boundingbox the group is centered on the initial center of the initial set of objects and the fixed bounding box extends from the center.
+
+The Fixed layout strategy is the only strategy in which the developer can change the width and height of the group at will without having it reset when adding or removing objects.
+
+It must be clear that is also possible change width and height of the group in the other cases, but that is an ephemeral change that gets resetted at the next performLayout
+
+### Clippath layout strategy
+
+The Clippath layout keeps the group around the clipath rather than the objects. The group will be as large as the clipPath, the center of the group will be the center of the clippath.
+This layout is clippath dependentent
+
+WARNING needs fix:
+The behaviour of this layout is currently broken if we want.
+The center of the group is the center of the clipPath visually but the position of the clipPath compared to the object on the canvas is hard to predict as it is now
+
+## Expectations for interactive groups
+
+TBD
+
 ## performLayout
 
 Each performLayout call gets a context, the context has always

@@ -18,7 +18,7 @@ export function testCase(canvas: fabric.Canvas) {
           end: 9,
         },
       ],
-      textValue
+      textValue,
     ),
   });
   canvas.add(text);
@@ -33,7 +33,7 @@ export function testCase(canvas: fabric.Canvas) {
         easing: toState
           ? fabric.util.ease.easeInOutQuad
           : fabric.util.ease.easeInOutSine,
-      }
+      },
     );
   }
   // animate(1);

@@ -37,7 +37,7 @@ describe('IText', () => {
           cloneDeepWith: (value) =>
             typeof value === 'number' ? value.toFixed(3) : undefined,
         });
-      }
+      },
     );
   });
 });

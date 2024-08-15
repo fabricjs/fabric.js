@@ -26,7 +26,7 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
        * @deprecated here only for backward compatibility
        */
       containerClass?: string;
-    } = {}
+    } = {},
   ) {
     super(arg0);
     const { el: lowerCanvasEl } = this.lower;
@@ -78,7 +78,7 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
    */
   protected applyCanvasStyle(
     element: HTMLCanvasElement,
-    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean }
+    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean },
   ) {
     setStyle(element, {
       position: 'absolute',

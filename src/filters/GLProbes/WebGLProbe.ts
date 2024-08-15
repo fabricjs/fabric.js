@@ -16,7 +16,7 @@ export class WebGLProbe extends GLProbe {
    */
   private testPrecision(
     gl: WebGLRenderingContext,
-    precision: GLPrecision
+    precision: GLPrecision,
   ): boolean {
     const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -36,7 +36,7 @@ export class WebGLProbe extends GLProbe {
     if (gl) {
       this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
       this.GLPrecision = (['highp', 'mediump', 'lowp'] as const).find(
-        (precision) => this.testPrecision(gl, precision)
+        (precision) => this.testPrecision(gl, precision),
       );
       gl.getExtension('WEBGL_lose_context')!.loseContext();
       log('log', `WebGL: max texture size ${this.maxTextureSize}`);
