@@ -6,7 +6,7 @@ import type {
 import { Point } from '../../Point';
 import type { IText } from './IText';
 import { setStyle } from '../../util/dom_style';
-import { cloneDeep } from '../../util/internals/cloneDeep';
+import { cloneStyles } from '../../util/internals/cloneStyles';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { CHANGED, NONE } from '../../constants';
@@ -128,7 +128,7 @@ export class DraggableTextDelegate {
     const offset = correction.add(diff).transform(vpt, true);
     //  prepare instance for drag image snapshot by making all non selected text invisible
     const bgc = target.backgroundColor;
-    const styles = cloneDeep(target.styles);
+    const styles = cloneStyles(target.styles);
     target.backgroundColor = '';
     const styleOverride = {
       stroke: 'transparent',

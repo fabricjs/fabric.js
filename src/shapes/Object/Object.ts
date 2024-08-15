@@ -26,7 +26,6 @@ import type {
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
-import { cloneDeep } from '../../util/internals/cloneDeep';
 import { capValue } from '../../util/misc/capValue';
 import { createCanvasElement, toDataURL } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
@@ -1574,20 +1573,22 @@ export class FabricObject<
    * @returns {Promise<FabricObject>}
    */
   static _fromObject<S extends FabricObject>(
-    { type, ...object }: Record<string, unknown>,
+    { type, ...serializedObjectOptions }: Record<string, unknown>,
     { extraParam, ...options }: Abortable & { extraParam?: string } = {},
   ): Promise<S> {
-    return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
-      (enlivedMap) => {
-        const allOptions = { ...options, ...enlivedMap };
+    return enlivenObjectEnlivables<any>(serializedObjectOptions, options).then(
+      (enlivedObjectOptions) => {
         // from the resulting enlived options, extract options.extraParam to arg0
         // to avoid accidental overrides later
         if (extraParam) {
-          const { [extraParam]: arg0, ...rest } = allOptions;
-          // @ts-expect-error different signature
-          return new this(arg0, rest);
+          delete enlivedObjectOptions[extraParam];
+          return new this(
+            serializedObjectOptions[extraParam],
+            // @ts-expect-error different signature
+            enlivedObjectOptions,
+          );
         } else {
-          return new this(allOptions);
+          return new this(enlivedObjectOptions);
         }
       },
     ) as Promise<S>;

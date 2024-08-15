@@ -3,7 +3,7 @@ import type {
   TextStyle,
   TextStyleDeclaration,
 } from '../../shapes/Text/StyledText';
-import { cloneDeep } from '../internals/cloneDeep';
+import { cloneStyles } from '../internals/cloneStyles';
 import { graphemeSplit } from '../lang_string';
 
 export type TextStyleArray = {
@@ -54,7 +54,7 @@ export const stylesToArray = (
   let charIndex = -1,
     prevStyle = {};
   // clone style structure to prevent mutation
-  styles = cloneDeep(styles);
+  styles = cloneStyles(styles);
 
   //loop through each textLine
   for (let i = 0; i < textLines.length; i++) {
@@ -102,7 +102,7 @@ export const stylesFromArray = (
 ): TextStyle => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation
-    return cloneDeep(styles);
+    return cloneStyles(styles);
   }
   const textLines = text.split(reNewline),
     stylesObject: TextStyle = {};
