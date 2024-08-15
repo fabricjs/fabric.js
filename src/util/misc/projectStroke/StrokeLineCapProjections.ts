@@ -36,7 +36,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
   calcOrthogonalProjection(
     from: Point,
     to: Point,
-    magnitude: number = this.strokeProjectionMagnitude
+    magnitude: number = this.strokeProjectionMagnitude,
   ) {
     const vector = this.createSideVector(from, to);
     return this.scaleUnitVector(getOrthonormalVector(vector), magnitude);
@@ -74,7 +74,7 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
         .multiply(this.strokeUniformScalar);
       projections.push(
         this.applySkew(this.A.add(projection)),
-        this.applySkew(this.A.subtract(projection))
+        this.applySkew(this.A.subtract(projection)),
       );
     } else {
       projections.push(
@@ -82,8 +82,8 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
           this.A,
           this.T,
           this.T,
-          this.options
-        ).projectRound()
+          this.options,
+        ).projectRound(),
       );
     }
 
@@ -112,16 +112,16 @@ export class StrokeLineCapProjections extends StrokeProjectionsBase {
       const orthogonalProjection = this.calcOrthogonalProjection(
         this.A,
         this.T,
-        this.strokeProjectionMagnitude
+        this.strokeProjectionMagnitude,
       );
       const strokePointingOut = this.scaleUnitVector(
         getUnitVector(this.createSideVector(this.A, this.T)),
-        -this.strokeProjectionMagnitude
+        -this.strokeProjectionMagnitude,
       );
       const projectedA = this.A.add(strokePointingOut);
       projections.push(
         projectedA.add(orthogonalProjection),
-        projectedA.subtract(orthogonalProjection)
+        projectedA.subtract(orthogonalProjection),
       );
     }
 

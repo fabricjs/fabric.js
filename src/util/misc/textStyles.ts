@@ -21,7 +21,7 @@ export type TextStyleArray = {
 export const hasStyleChanged = (
   prevStyle: TextStyleDeclaration,
   thisStyle: TextStyleDeclaration,
-  forTextSpans = false
+  forTextSpans = false,
 ) =>
   prevStyle.fill !== thisStyle.fill ||
   prevStyle.stroke !== thisStyle.stroke ||
@@ -47,7 +47,7 @@ export const hasStyleChanged = (
  */
 export const stylesToArray = (
   styles: TextStyle,
-  text: string
+  text: string,
 ): TextStyleArray => {
   const textLines = text.split('\n'),
     stylesArray = [];
@@ -98,7 +98,7 @@ export const stylesToArray = (
  */
 export const stylesFromArray = (
   styles: TextStyleArray | TextStyle,
-  text: string
+  text: string,
 ): TextStyle => {
   if (!Array.isArray(styles)) {
     // clone to prevent mutation

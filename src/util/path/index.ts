@@ -58,7 +58,7 @@ const segmentToBezier = (
   cy1: number,
   mT: number,
   fromX: number,
-  fromY: number
+  fromY: number,
 ): TParsedAbsoluteCubicCurveCommand => {
   const costh1 = cos(theta1),
     sinth1 = sin(theta1),
@@ -93,7 +93,7 @@ const arcToSegments = (
   ry: number,
   large: number,
   sweep: number,
-  rotateX: TRadian
+  rotateX: TRadian,
 ): TParsedAbsoluteCubicCurveCommand[] => {
   if (rx === 0 || ry === 0) {
     return [];
@@ -133,7 +133,7 @@ const arcToSegments = (
     (px - cx) / _rx,
     (py - cy) / _ry,
     (-px - cx) / _rx,
-    (-py - cy) / _ry
+    (-py - cy) / _ry,
   );
 
   if (sweep === 0 && dtheta > 0) {
@@ -163,7 +163,7 @@ const arcToSegments = (
       cy1,
       mT,
       fromX,
-      fromY
+      fromY,
     );
     fromX = result[i][5];
     fromY = result[i][6];
@@ -185,7 +185,7 @@ const calcVectorAngle = (
   ux: number,
   uy: number,
   vx: number,
-  vy: number
+  vy: number,
 ): TRadian => {
   const ta = Math.atan2(uy, ux),
     tb = Math.atan2(vy, vx);
@@ -225,7 +225,7 @@ export function getBoundsOfCurve(
   cp2x: number,
   cp2y: number,
   endx: number,
-  endy: number
+  endy: number,
 ): TRectBounds {
   let argsString: string;
   if (config.cachesBoundsOfCurve) {
@@ -290,7 +290,7 @@ export function getBoundsOfCurve(
     cp2x,
     cp2y,
     endx,
-    endy
+    endy,
   );
   while (j--) {
     const { x, y } = iterator(tvalues[j]);
@@ -321,7 +321,7 @@ export function getBoundsOfCurve(
 export const fromArcToBeziers = (
   fx: number,
   fy: number,
-  [_, rx, ry, rot, large, sweep, tx, ty]: TParsedArcCommand
+  [_, rx, ry, rot, large, sweep, tx, ty]: TParsedArcCommand,
 ): TParsedAbsoluteCubicCurveCommand[] => {
   const segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
@@ -518,7 +518,7 @@ const calcLineLength = (
   x1: number,
   y1: number,
   x2: number,
-  y2: number
+  y2: number,
 ): number => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 
 /**
@@ -541,7 +541,7 @@ const getPointOnCubicBezierIterator =
     cp2x: number,
     cp2y: number,
     endx: number,
-    endy: number
+    endy: number,
   ) =>
   (pct: number) => {
     const c1 = CB1(pct),
@@ -550,7 +550,7 @@ const getPointOnCubicBezierIterator =
       c4 = CB4(pct);
     return new Point(
       endx * c1 + cp2x * c2 + cp1x * c3 + begx * c4,
-      endy * c1 + cp2y * c2 + cp1y * c3 + begy * c4
+      endy * c1 + cp2y * c2 + cp1y * c3 + begy * c4,
     );
   };
 
@@ -567,7 +567,7 @@ const getTangentCubicIterator =
     p3x: number,
     p3y: number,
     p4x: number,
-    p4y: number
+    p4y: number,
   ) =>
   (pct: number) => {
     const qb1 = QB1(pct),
@@ -587,7 +587,7 @@ const getPointOnQuadraticBezierIterator =
     p2x: number,
     p2y: number,
     p3x: number,
-    p3y: number
+    p3y: number,
   ) =>
   (pct: number) => {
     const c1 = QB1(pct),
@@ -595,7 +595,7 @@ const getPointOnQuadraticBezierIterator =
       c3 = QB3(pct);
     return new Point(
       p3x * c1 + p2x * c2 + p1x * c3,
-      p3y * c1 + p2y * c2 + p1y * c3
+      p3y * c1 + p2y * c2 + p1y * c3,
     );
   };
 
@@ -606,7 +606,7 @@ const getTangentQuadraticIterator =
     p2x: number,
     p2y: number,
     p3x: number,
-    p3y: number
+    p3y: number,
   ) =>
   (pct: number) => {
     const invT = 1 - pct,
@@ -620,7 +620,7 @@ const getTangentQuadraticIterator =
 const pathIterator = (
   iterator: (pct: number) => Point,
   x1: number,
-  y1: number
+  y1: number,
 ) => {
   let tempP = new Point(x1, y1),
     tmpLen = 0;
@@ -642,7 +642,7 @@ const pathIterator = (
  */
 const findPercentageForDistance = (
   segInfo: TCurveInfo<'Q' | 'C'>,
-  distance: number
+  distance: number,
 ): TPointAngle => {
   let perc = 0,
     tmpLen = 0,
@@ -679,7 +679,7 @@ const findPercentageForDistance = (
  * @return {TPathSegmentInfo[]} path commands information
  */
 export const getPathSegmentsInfo = (
-  path: TSimplePathData
+  path: TSimplePathData,
 ): TPathSegmentInfo[] => {
   let totalLength = 0,
     //x2 and y2 are the coords of segment start
@@ -721,7 +721,7 @@ export const getPathSegmentsInfo = (
           current[3],
           current[4],
           current[5],
-          current[6]
+          current[6],
         );
         tempInfo = <TCurveInfo<'C'>>basicInfo;
         tempInfo.iterator = iterator;
@@ -733,7 +733,7 @@ export const getPathSegmentsInfo = (
           current[3],
           current[4],
           current[5],
-          current[6]
+          current[6],
         );
         tempInfo.length = pathIterator(iterator, x1, y1);
 
@@ -747,7 +747,7 @@ export const getPathSegmentsInfo = (
           current[1],
           current[2],
           current[3],
-          current[4]
+          current[4],
         );
         tempInfo = <TCurveInfo<'Q'>>basicInfo;
         tempInfo.iterator = iterator;
@@ -757,7 +757,7 @@ export const getPathSegmentsInfo = (
           current[1],
           current[2],
           current[3],
-          current[4]
+          current[4],
         );
         tempInfo.length = pathIterator(iterator, x1, y1);
         x1 = current[3];
@@ -789,7 +789,7 @@ export const getPathSegmentsInfo = (
 export const getPointOnPath = (
   path: TSimplePathData,
   distance: number,
-  infos: TPathSegmentInfo[] = getPathSegmentsInfo(path)
+  infos: TPathSegmentInfo[] = getPathSegmentsInfo(path),
 ): TPointAngle | undefined => {
   let i = 0;
   while (distance - infos[i].length > 0 && i < infos.length - 2) {
@@ -807,7 +807,7 @@ export const getPointOnPath = (
       return {
         ...new Point(segInfo.x, segInfo.y).lerp(
           new Point(segInfo.destX, segInfo.destY),
-          segPercent
+          segPercent,
         ),
         angle: Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x),
       };
@@ -815,7 +815,7 @@ export const getPointOnPath = (
       return {
         ...new Point(segInfo.x, segInfo.y).lerp(
           new Point(segment[1]!, segment[2]!),
-          segPercent
+          segPercent,
         ),
         angle: Math.atan2(segment[2]! - segInfo.y, segment[1]! - segInfo.x),
       };
@@ -880,7 +880,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
       // ` ?` is to support commands with optional spaces between flags
       matchStr = matchStr.replace(
         new RegExp(`${filteredGroups.join(' ?')} ?$`),
-        ''
+        '',
       );
     } while (paramArr);
     // add the chain, convert multiple m's to l's in the process
@@ -904,7 +904,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
  */
 export const getSmoothPathFromPoints = (
   points: Point[],
-  correction = 0
+  correction = 0,
 ): TSimplePathData => {
   let p1 = new Point(points[0]),
     p2 = new Point(points[1]),
@@ -961,7 +961,7 @@ export const getSmoothPathFromPoints = (
 export const transformPath = (
   path: TSimplePathData,
   transform: TMat2D,
-  pathOffset: Point
+  pathOffset: Point,
 ): TSimplePathData => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
@@ -982,7 +982,7 @@ export const transformPath = (
           x: pathSegment[i] as number,
           y: pathSegment[i + 1] as number,
         },
-        transform
+        transform,
       );
       newSegment[i] = x;
       newSegment[i + 1] = y;
@@ -999,7 +999,7 @@ export const transformPath = (
  */
 export const getRegularPolygonPath = (
   numVertexes: number,
-  radius: number
+  radius: number,
 ): TSimplePathData => {
   const interiorAngle = (Math.PI * 2) / numVertexes;
   // rotationAdjustment rotates the path by 1/2 the interior angle so that the polygon always has a flat side on the bottom

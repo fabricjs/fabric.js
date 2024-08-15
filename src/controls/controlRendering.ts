@@ -16,13 +16,13 @@ export type ControlRenderingStyleOverride = Partial<
 >;
 
 export type ControlRenderer<
-  O extends InteractiveFabricObject = InteractiveFabricObject
+  O extends InteractiveFabricObject = InteractiveFabricObject,
 > = (
   ctx: CanvasRenderingContext2D,
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: O
+  fabricObject: O,
 ) => void;
 
 /**
@@ -42,7 +42,7 @@ export function renderCircleControl(
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: InteractiveFabricObject,
 ) {
   styleOverride = styleOverride || {};
   const xSize =
@@ -103,7 +103,7 @@ export function renderSquareControl(
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: InteractiveFabricObject,
 ) {
   styleOverride = styleOverride || {};
   const xSize =

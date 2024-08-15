@@ -7,7 +7,7 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
     left: number,
     top: number,
     styleOverride: any,
-    fabricObject: fabric.FabricObject
+    fabricObject: fabric.FabricObject,
   ) {
     ctx.save();
     ctx.font = '12px Arial';

@@ -11,7 +11,7 @@ export const setCanvasDimensions = (
   el: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   { width, height }: TSize,
-  retinaScaling = 1
+  retinaScaling = 1,
 ) => {
   el.width = width;
   el.height = height;
@@ -37,7 +37,7 @@ export type CSSDimensions = {
 
 export const setCSSDimensions = (
   el: HTMLElement,
-  { width, height }: Partial<CSSDimensions>
+  { width, height }: Partial<CSSDimensions>,
 ) => {
   width && (el.style.width = typeof width === 'number' ? `${width}px` : width);
   height &&

@@ -91,7 +91,7 @@ export async function testCase(canvas: fabric.Canvas) {
         left: 10,
       }),
       layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
-    }
+    },
   );
 
   canvas.add(fixedGroup, fitGroup, clipGroup);

@@ -67,7 +67,7 @@ export class Brightness extends BaseFilter<'Brightness', BrightnessOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uBrightness, this.brightness);
   }

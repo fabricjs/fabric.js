@@ -17,14 +17,14 @@ export default () => {
     // add test script
     const testDir = path.relative(
       path.resolve(process.cwd(), 'e2e', 'tests'),
-      path.resolve(file, '..')
+      path.resolve(file, '..'),
     );
     const pathToHTML = path.resolve(
       process.cwd(),
       'e2e',
       'tests',
       testDir,
-      'index.html'
+      'index.html',
     );
     if (existsSync(pathToHTML)) {
       const doc = new JSDOM(readFileSync(pathToHTML).toString()).window
@@ -38,19 +38,19 @@ export default () => {
       'e2e',
       'tests',
       testDir,
-      'index.ts'
+      'index.ts',
     );
     const pathToBuiltApp = path.resolve(
       process.cwd(),
       'e2e',
       'dist',
       testDir,
-      'index.js'
+      'index.js',
     );
     const exists = existsSync(pathToBuiltApp);
     if (!exists && existsSync(pathToApp)) {
       throw new Error(
-        `test script '${pathToBuiltApp}' not found: global setup script probably did not run`
+        `test script '${pathToBuiltApp}' not found: global setup script probably did not run`,
       );
     } else if (exists) {
       // used to avoid a race condition that occurs because of script loading
@@ -58,12 +58,12 @@ export default () => {
         () =>
           new Promise((resolve) => {
             window.addEventListener('fabric:setup', resolve, { once: true });
-          })
+          }),
       );
       await page.addScriptTag({
         type: 'module',
         content: `${readFileSync(
-          path.relative(process.cwd(), pathToBuiltApp)
+          path.relative(process.cwd(), pathToBuiltApp),
         ).toString()}
        window.dispatchEvent(new CustomEvent('fabric:setup'));
        `,

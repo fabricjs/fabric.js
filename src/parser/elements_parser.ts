@@ -51,7 +51,7 @@ export class ElementsParser {
     options: LoadImageOptions & ParsedViewboxTransform,
     reviver: TSvgReviverCallback | undefined,
     doc: Document,
-    clipPaths: Record<string, Element[]>
+    clipPaths: Record<string, Element[]>,
   ) {
     this.elements = elements;
     this.options = options;
@@ -65,7 +65,7 @@ export class ElementsParser {
 
   parse(): Promise<Array<FabricObject | null>> {
     return Promise.all(
-      this.elements.map((element) => this.createObject(element))
+      this.elements.map((element) => this.createObject(element)),
     );
   }
 
@@ -75,14 +75,14 @@ export class ElementsParser {
       const obj: NotParsedFabricObject = await klass.fromElement(
         el,
         this.options,
-        this.cssRules
+        this.cssRules,
       );
       this.resolveGradient(obj, el, FILL);
       this.resolveGradient(obj, el, STROKE);
       if (obj instanceof FabricImage && obj._originalElement) {
         removeTransformMatrixForSvgParsing(
           obj,
-          obj.parsePreserveAspectRatioAttribute()
+          obj.parsePreserveAspectRatioAttribute(),
         );
       } else {
         removeTransformMatrixForSvgParsing(obj);
@@ -97,7 +97,7 @@ export class ElementsParser {
   extractPropertyDefinition(
     obj: NotParsedFabricObject,
     property: 'fill' | 'stroke' | 'clipPath',
-    storage: Record<string, StorageType[typeof property]>
+    storage: Record<string, StorageType[typeof property]>,
   ): StorageType[typeof property] | undefined {
     const value = obj[property]!,
       regex = this.regexUrl;
@@ -116,12 +116,12 @@ export class ElementsParser {
   resolveGradient(
     obj: NotParsedFabricObject,
     el: Element,
-    property: 'fill' | 'stroke'
+    property: 'fill' | 'stroke',
   ) {
     const gradientDef = this.extractPropertyDefinition(
       obj,
       property,
-      this.gradientDefs
+      this.gradientDefs,
     ) as SVGGradientElement;
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
@@ -139,7 +139,7 @@ export class ElementsParser {
     const clipPathElements = this.extractPropertyDefinition(
       obj,
       'clipPath',
-      this.clipPaths
+      this.clipPaths,
     ) as Element[];
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
@@ -161,12 +161,12 @@ export class ElementsParser {
       const finalTransform = parseTransformAttribute(
         `${clipPathOwner.getAttribute('transform') || ''} ${
           clipPathTag.getAttribute('originalTransform') || ''
-        }`
+        }`,
       );
 
       clipPathTag.setAttribute(
         'transform',
-        `matrix(${finalTransform.join(',')})`
+        `matrix(${finalTransform.join(',')})`,
       );
 
       const container = await Promise.all(
@@ -179,13 +179,13 @@ export class ElementsParser {
               delete enlivedClippath.clipRule;
               return enlivedClippath;
             });
-        })
+        }),
       );
       const clipPath =
         container.length === 1 ? container[0] : new Group(container);
       const gTransform = multiplyTransformMatrices(
         objTransformInv,
-        clipPath.calcTransformMatrix()
+        clipPath.calcTransformMatrix(),
       );
       if (clipPath.clipPath) {
         await this.resolveClipPath(clipPath, clipPathOwner);
@@ -206,7 +206,7 @@ export class ElementsParser {
       clipPath.setPositionByOrigin(
         new Point(translateX, translateY),
         CENTER,
-        CENTER
+        CENTER,
       );
       obj.clipPath = clipPath;
     } else {

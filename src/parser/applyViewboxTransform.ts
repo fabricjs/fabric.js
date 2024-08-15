@@ -19,7 +19,7 @@ export type ParsedViewboxTransform = Partial<{
  * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
  */
 export function applyViewboxTransform(
-  element: Element
+  element: Element,
 ): ParsedViewboxTransform {
   if (!svgViewBoxElementsRegEx.test(element.nodeName)) {
     return {};
@@ -99,7 +99,7 @@ export function applyViewboxTransform(
 
   // default is to preserve aspect ratio
   const preserveAspectRatio = parsePreserveAspectRatioAttribute(
-    element.getAttribute('preserveAspectRatio') || ''
+    element.getAttribute('preserveAspectRatio') || '',
   );
   if (preserveAspectRatio.alignX !== NONE) {
     //translate all container for the effect of Mid, Min, Max

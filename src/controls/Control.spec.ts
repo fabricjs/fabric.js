@@ -23,13 +23,13 @@ describe('Controls', () => {
 
     target.setCoords();
 
-    jest
-      .spyOn(target, 'findControl')
-      .mockImplementation(function (this: FabricObject) {
-        this.__corner = 'test';
+    jest.spyOn(target, 'findControl').mockImplementation(function (
+      this: FabricObject,
+    ) {
+      this.__corner = 'test';
 
-        return { key: 'test', control };
-      });
+      return { key: 'test', control };
+    });
 
     const canvas = new Canvas();
     canvas.setActiveObject(target);
@@ -58,11 +58,11 @@ describe('Controls', () => {
       10,
       10,
       false,
-      new FabricObject()
+      new FabricObject(),
     );
 
     expect(
-      Intersection.isPointInPolygon(new Point(15, 10), Object.values(coords))
+      Intersection.isPointInPolygon(new Point(15, 10), Object.values(coords)),
     ).toBe(true);
   });
 });

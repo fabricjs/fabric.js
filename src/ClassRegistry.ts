@@ -54,7 +54,7 @@ export class ClassRegistry {
   setSVGClass(classConstructor: any, SVGTagName?: string) {
     this[SVG].set(
       SVGTagName ?? classConstructor.type.toLowerCase(),
-      classConstructor
+      classConstructor,
     );
   }
 }

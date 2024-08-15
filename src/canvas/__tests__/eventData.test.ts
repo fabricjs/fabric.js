@@ -58,7 +58,7 @@ describe('Canvas event data', () => {
         .getSelectionElement()
         .dispatchEvent(new MouseEvent(type, { clientX: 50, clientY: 50 }));
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
-    }
+    },
   );
 
   // must call mousedown for mouseup to be listened to
@@ -69,7 +69,7 @@ describe('Canvas event data', () => {
       .dispatchEvent(new MouseEvent('mousedown', { clientX: 50, clientY: 50 }));
     spy.mockReset();
     document.dispatchEvent(
-      new MouseEvent('mouseup', { clientX: 50, clientY: 50 })
+      new MouseEvent('mouseup', { clientX: 50, clientY: 50 }),
     );
     expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
   });
@@ -100,16 +100,16 @@ describe('Canvas event data', () => {
         new MouseEvent('dragstart', {
           clientX: 50,
           clientY: 50,
-        })
+        }),
       );
       canvas.getSelectionElement().dispatchEvent(
         new MouseEvent(type, {
           clientX: 50,
           clientY: 50,
-        })
+        }),
       );
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
-    }
+    },
   );
 
   test('getScenePoint', () => {
@@ -156,7 +156,7 @@ describe('Event targets', () => {
       new MouseEvent('mousedown', {
         clientX: 50,
         clientY: 50,
-      })
+      }),
     );
     expect(targetSpy).toHaveBeenCalledTimes(1);
   });
@@ -284,7 +284,7 @@ describe('Event targets', () => {
 
     const findTarget = (canvas: Canvas, ev?: MouseEventInit) => {
       const target = canvas.findTarget(
-        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev })
+        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev }),
       );
       const targets = canvas.targets;
       canvas.targets = [];
@@ -325,9 +325,9 @@ describe('Event targets', () => {
         expect(found).toEqual(
           searchAll
             ? [subTarget2, target2, subTarget1, target1, parent]
-            : [subTarget2, target2, parent]
+            : [subTarget2, target2, parent],
         );
-      }
+      },
     );
 
     test.failing('searchPossibleTargets', () => {
@@ -367,7 +367,7 @@ describe('Event targets', () => {
       jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets(
         [activeSelection],
-        new Point()
+        new Point(),
       );
       expect(found).toBe(activeSelection);
       expect(canvas.targets).toEqual([]);
@@ -430,24 +430,24 @@ describe('Event targets', () => {
       const e2 = { clientX: 4, clientY: 4 };
 
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] }
+        { target: rectOver, targets: [] },
         // 'Should return the rectOver, rect is not considered'
       );
 
       canvas.setActiveObject(rect);
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] }
+        { target: rectOver, targets: [] },
         // 'Should still return rectOver because is above active object'
       );
 
       expect(findTarget(canvas, e2)).toEqual(
-        { target: rect, targets: [] }
+        { target: rect, targets: [] },
         // 'Should rect because a corner of the activeObject has been hit'
       );
 
       canvas.altSelectionKey = 'shiftKey';
       expect(findTarget(canvas, e)).toEqual(
-        { target: rect, targets: [] }
+        { target: rect, targets: [] },
         // 'Should rect because active and altSelectionKey is pressed'
       );
     });
@@ -602,7 +602,7 @@ describe('Event targets', () => {
           target: group,
           targets: [rect],
         });
-      }
+      },
     );
 
     test('findTarget with perPixelTargetFind', () => {
@@ -825,7 +825,7 @@ describe('Event targets', () => {
         {
           target: activeSelection,
           targets: [],
-        }
+        },
         // 'Should not return the rect behind active selection'
       );
 
@@ -834,7 +834,7 @@ describe('Event targets', () => {
         {
           target: rect3,
           targets: [],
-        }
+        },
         // 'Should return the rect after clearing selection'
       );
     });

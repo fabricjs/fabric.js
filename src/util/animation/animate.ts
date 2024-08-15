@@ -12,11 +12,11 @@ export type TAnimation<T extends number | number[] | TColorArg> =
   T extends TColorArg
     ? ColorAnimation
     : T extends number[]
-    ? ArrayAnimation
-    : ValueAnimation;
+      ? ArrayAnimation
+      : ValueAnimation;
 
 const isArrayAnimation = (
-  options: ArrayAnimationOptions | ValueAnimationOptions
+  options: ArrayAnimationOptions | ValueAnimationOptions,
 ): options is ArrayAnimationOptions => {
   return Array.isArray(options.startValue) || Array.isArray(options.endValue);
 };
@@ -50,13 +50,13 @@ const isArrayAnimation = (
 export function animate(options: ArrayAnimationOptions): ArrayAnimation;
 export function animate(options: ValueAnimationOptions): ValueAnimation;
 export function animate<
-  T extends ValueAnimationOptions | ArrayAnimationOptions
+  T extends ValueAnimationOptions | ArrayAnimationOptions,
 >(
-  options: T
+  options: T,
 ): T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation;
 export function animate<
   T extends ValueAnimationOptions | ArrayAnimationOptions,
-  R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
+  R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation,
 >(options: T): R {
   const animation = (
     isArrayAnimation(options)

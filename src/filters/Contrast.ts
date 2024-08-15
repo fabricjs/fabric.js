@@ -67,7 +67,7 @@ export class Contrast extends BaseFilter<'Contrast', ContrastOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uContrast, this.contrast);
   }

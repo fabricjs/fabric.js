@@ -11,7 +11,7 @@ import type { FabricObject } from '../../shapes/Object/FabricObject';
  */
 export const groupSVGElements = (
   elements: FabricObject[],
-  options?: Partial<GroupProps>
+  options?: Partial<GroupProps>,
 ) => {
   if (elements && elements.length === 1) {
     return elements[0];

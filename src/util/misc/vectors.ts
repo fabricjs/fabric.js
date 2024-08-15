@@ -61,7 +61,7 @@ export const getUnitVector = (v: Point): Point =>
  */
 export const getOrthonormalVector = (
   v: Point,
-  counterClockwise = true
+  counterClockwise = true,
 ): Point =>
   getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));
 

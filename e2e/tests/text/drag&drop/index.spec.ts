@@ -32,7 +32,7 @@ const selectFabricInA = (page: Page) => {
 
 const readEventStream = async (page: Page) => {
   const data = await new CanvasUtil(page).executeInBrowser((canvas) =>
-    canvas.readEventStream()
+    canvas.readEventStream(),
   );
   return JSON.stringify(data, null, 2);
 };
@@ -52,7 +52,7 @@ test('Drag & Drop', async ({ page }) => {
       await a.executeInBrowser((text) => [
         text['draggableTextDelegate'].isActive(),
         text.shouldStartDragging(),
-      ])
+      ]),
     ).toEqual([true, true]);
     expect(await a.isCursorActive()).toBeFalsy();
     await page.mouse.up();
@@ -60,7 +60,7 @@ test('Drag & Drop', async ({ page }) => {
       await a.executeInBrowser((text) => [
         text['draggableTextDelegate'].isActive(),
         text.shouldStartDragging(),
-      ])
+      ]),
     ).toEqual([false, false]);
     await a.expectObjectToMatch({
       selectionStart: 3,
@@ -80,7 +80,7 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.move(435, 55, { steps: 10 });
     expect(
       await canvas.screenshot(),
-      `1. drag "${dragA}" over "lor|em" (A => B)`
+      `1. drag "${dragA}" over "lor|em" (A => B)`,
     ).toMatchSnapshot({
       name: '1.drag-fabric-over-lor|em.png',
     });
@@ -89,14 +89,14 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.move(240, 140, { steps: 10 });
     expect(
       await canvas.screenshot(),
-      `2. before dropping "${dragA}" => "sandbox|" (A => A)`
+      `2. before dropping "${dragA}" => "sandbox|" (A => A)`,
     ).toMatchSnapshot({
       name: '2.before-drop-fabric-after-sandbox.png',
     });
     await page.mouse.up();
     expect(
       await canvas.screenshot(),
-      `3. drop "${dragA}" => "sandbox|${dragA}" (A => A)`
+      `3. drop "${dragA}" => "sandbox|${dragA}" (A => A)`,
     ).toMatchSnapshot({
       name: '3.drop-fabric-after-sandbox.png',
     });
@@ -117,11 +117,11 @@ test('Drag & Drop', async ({ page }) => {
       },
     });
     expect(await page.evaluate(() => document.activeElement)).toBe(
-      await b.executeInBrowser((text) => text.hiddenTextarea)
+      await b.executeInBrowser((text) => text.hiddenTextarea),
     );
     expect(
       await canvas.screenshot(),
-      `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`
+      `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`,
     ).toMatchSnapshot({
       name: '4.drop--lor|fabric|em.png',
     });
@@ -155,11 +155,11 @@ test('Drag & Drop', async ({ page }) => {
       },
     });
     expect(await page.evaluate(() => document.activeElement)).toBe(
-      await a.executeInBrowser((text) => text.hiddenTextarea)
+      await a.executeInBrowser((text) => text.hiddenTextarea),
     );
     expect(
       await canvas.screenshot(),
-      `5. drag & drop "${dragB}" => ".js |${dragB}|sandbox" (B => A(4))`
+      `5. drag & drop "${dragB}" => ".js |${dragB}|sandbox" (B => A(4))`,
     ).toMatchSnapshot({
       name: '5..js |em ips.png',
     });
@@ -180,7 +180,7 @@ test('Drag & Drop', async ({ page }) => {
     // );
     expect(
       await page.screenshot(),
-      `6. drag & drop ".js |${dragB}|sandbox" to textarea (A => textarea)`
+      `6. drag & drop ".js |${dragB}|sandbox" to textarea (A => textarea)`,
     ).toMatchSnapshot({
       name: '6.drop-textarea.png',
     });
@@ -199,11 +199,11 @@ test('Drag & Drop', async ({ page }) => {
     await canvas.hover({ position: { x: 435, y: 55 } });
     await page.mouse.up();
     expect(await page.evaluate(() => document.activeElement)).toBe(
-      await b.executeInBrowser((text) => text.hiddenTextarea)
+      await b.executeInBrowser((text) => text.hiddenTextarea),
     );
     expect(
       await page.screenshot(),
-      `7. drag & drop "dolor" to B = "lor|dolor|fabrictur" (textarea => B)`
+      `7. drag & drop "dolor" to B = "lor|dolor|fabrictur" (textarea => B)`,
     ).toMatchSnapshot({
       name: '7.drop-textarea-to-B-lor|dolor|fabrictur.png',
     });
@@ -316,7 +316,7 @@ test('Disabling Drop', async ({ page }) => {
 async function waitForDataTransfer(
   page: Page,
   canvas: Locator,
-  { x, y }: { x: number; y: number }
+  { x, y }: { x: number; y: number },
 ) {
   return test.step('initialize drag start', async () => {
     await canvas.hover({
@@ -336,7 +336,7 @@ async function waitForDataTransfer(
             window.dispatchEvent(
               new CustomEvent('drag:data', {
                 detail: { image, x, y, data: this.__data },
-              })
+              }),
             );
           },
         },
@@ -349,7 +349,7 @@ async function waitForDataTransfer(
             this.__data[type] = out;
           },
         },
-      })
+      }),
     );
     return [
       { dataTransfer },
@@ -369,9 +369,9 @@ async function waitForDataTransfer(
                     image: image.toDataURL(`image/png`, 1),
                     ...rest,
                   }),
-                { once: true }
-              )
-            )
+                { once: true },
+              ),
+            ),
         )
         .then(({ x, y, image, ...data }) => {
           return [binaryToBuffer(image), { x, y }, data] as const;
@@ -406,7 +406,7 @@ test('Drag Image A', async ({ page }) => {
     });
     expect(
       JSON.stringify({ position, ...data }, null, 2),
-      `drag image A position: "${dragA}"`
+      `drag image A position: "${dragA}"`,
     ).toMatchSnapshot({
       name: 'drag-image-fabric.json',
       maxDiffPixelRatio: 0.03,
@@ -442,7 +442,7 @@ test('Drag Image B', async ({ page }) => {
     });
     expect(
       JSON.stringify({ position, ...data }, null, 2),
-      `drag image B position: "${dragB}"`
+      `drag image B position: "${dragB}"`,
     ).toMatchSnapshot({
       name: 'drag-image-em---tge.json',
     });

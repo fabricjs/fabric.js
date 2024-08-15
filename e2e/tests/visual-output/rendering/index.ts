@@ -25,5 +25,5 @@ beforeRenderTest(
   },
   {
     enableRetinaScaling: false,
-  }
+  },
 );

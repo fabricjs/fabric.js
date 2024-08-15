@@ -297,7 +297,7 @@ describe('Selectable Canvas', () => {
       for (let y = -1; y <= 31; y++) {
         for (let x = -1; x <= 31; x++) {
           expect(
-            canvas['_pointIsInObjectSelectionArea'](object, new Point(x, y))
+            canvas['_pointIsInObjectSelectionArea'](object, new Point(x, y)),
           ).toBe(x >= 0 && x <= 30 && y >= 0 && y <= 30);
         }
       }
@@ -334,7 +334,7 @@ describe('Selectable Canvas', () => {
       canvas.add(groupD);
       const target = canvas.searchPossibleTargets(
         canvas.getObjects(),
-        groupD.getCenterPoint()
+        groupD.getCenterPoint(),
       );
       expect(target).toBe(groupC);
       expect(canvas.targets.map((obj) => obj.id)).toEqual(['a', 'b', 'c']);
@@ -373,7 +373,7 @@ describe('Selectable Canvas', () => {
       canvas.add(groupE);
       const target = canvas.searchPossibleTargets(
         canvas.getObjects(),
-        groupD.getCenterPoint()
+        groupD.getCenterPoint(),
       );
       expect(target).toBe(groupC);
       expect(canvas.targets.map((obj) => obj.id)).toEqual(['a', 'b', 'c', 'd']);
@@ -422,14 +422,14 @@ describe('Selectable Canvas', () => {
       const object2Position = object2.getCenterPoint();
       const target = canvas.searchPossibleTargets(
         canvas.getObjects(),
-        object2Position
+        object2Position,
       );
       expect(target).toBe(nestedGroup);
 
       nestedGroup.set({ interactive: true });
       const nestedTarget = canvas.searchPossibleTargets(
         canvas.getObjects(),
-        object2Position
+        object2Position,
       );
       expect(nestedTarget).toBe(object2);
     });
@@ -442,7 +442,7 @@ describe('Selectable Canvas', () => {
           { controlKey, zoom: false },
           { controlKey, zoom: true },
         ])
-        .flat()
+        .flat(),
     )('should fire before:transform event %p', ({ controlKey, zoom }) => {
       const canvas = new Canvas();
       const canvasOffset = canvas.calcOffset();
@@ -461,7 +461,7 @@ describe('Selectable Canvas', () => {
       canvas.on('before:transform', spy);
       const setupCurrentTransformSpy = jest.spyOn(
         canvas,
-        '_setupCurrentTransform'
+        '_setupCurrentTransform',
       );
 
       const {
@@ -472,7 +472,7 @@ describe('Selectable Canvas', () => {
           clientX: canvasOffset.left + (tl.x + tr.x) / 2,
           clientY: canvasOffset.top + (tl.y + bl.y) / 2,
           which: 1,
-        })
+        }),
       );
 
       expect(setupCurrentTransformSpy).toHaveBeenCalledTimes(1);

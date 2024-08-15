@@ -141,7 +141,7 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
       0,
       image.scaleY,
       image.left,
-      image.top
+      image.top,
     );
     context.drawImage(image.getElement(), 0, 0, width, height);
     const blendData = context.getImageData(0, 0, width, height).data;
@@ -178,7 +178,7 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const matrix = this.calculateMatrix();
     gl.uniform1i(uniformLocations.uImage, 1); // texture unit 1.
@@ -211,11 +211,11 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
    */
   static async fromObject(
     { type, image, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal }
+    options: { signal: AbortSignal },
   ): Promise<BaseFilter<'BlendImage', BlendImageOwnProps>> {
     return FabricImage.fromObject(image, options).then(
       (enlivedImage) =>
-        new this({ ...filterOptions, image: enlivedImage }) as BlendImage
+        new this({ ...filterOptions, image: enlivedImage }) as BlendImage,
     );
   }
 }

@@ -107,7 +107,7 @@ export class PencilBrush extends BaseBrush {
         this.oldEnd = PencilBrush.drawSegment(
           ctx,
           points[length - 2],
-          points[length - 1]
+          points[length - 1],
         );
         ctx.stroke();
         ctx.restore();

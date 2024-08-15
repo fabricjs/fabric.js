@@ -11,5 +11,5 @@ import type { TRadian } from '../../typedefs';
 export const rotatePoint = (
   point: Point,
   origin: Point,
-  radians: TRadian
+  radians: TRadian,
 ): Point => point.rotate(radians, origin);

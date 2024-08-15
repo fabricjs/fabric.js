@@ -66,7 +66,7 @@ export function subscribe(cb, debounce) {
     _.debounce((type, file) => {
       if (file !== path.basename(lockFile)) return;
       cb(isLocked(), !!(readLockFile() ?? {}).error);
-    }, debounce)
+    }, debounce),
   );
 }
 
@@ -88,8 +88,8 @@ export function report(type, data) {
             },
           },
           null,
-          '\t'
-        )
+          '\t',
+        ),
       );
       break;
     case 'error':
@@ -105,8 +105,8 @@ export function report(type, data) {
             },
           },
           null,
-          '\t'
-        )
+          '\t',
+        ),
       );
       break;
     case 'end':

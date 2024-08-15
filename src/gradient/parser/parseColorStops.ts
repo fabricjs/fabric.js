@@ -29,7 +29,7 @@ function parseColorStop(el: SVGStopElement, multiplier: number) {
   }
 
   const color = new Color(
-    colorValue || el.getAttribute('stop-color') || 'rgb(0,0,0)'
+    colorValue || el.getAttribute('stop-color') || 'rgb(0,0,0)',
   );
 
   return {
@@ -44,7 +44,7 @@ function parseColorStop(el: SVGStopElement, multiplier: number) {
 
 export function parseColorStops(
   el: SVGGradientElement,
-  opacityAttr: string | null
+  opacityAttr: string | null,
 ) {
   const colorStops: ColorStop[] = [],
     colorStopEls = el.getElementsByTagName('stop'),

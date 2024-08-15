@@ -27,7 +27,7 @@ describe('Plane Change', () => {
     expect(calcPlaneChangeMatrix(m1, iMatrix)).toEqual(m1);
     expect(calcPlaneChangeMatrix(m1, m1)).toEqual(iMatrix);
     expect(calcPlaneChangeMatrix(m1, s)).toEqual(
-      multiplyTransformMatrices(invertTransform(s), m1)
+      multiplyTransformMatrices(invertTransform(s), m1),
     );
   });
 
@@ -37,7 +37,7 @@ describe('Plane Change', () => {
     expect(sendPointToPlane(point, s)).toEqual({ x: 52, y: 50.5 });
     expect(sendPointToPlane(point, undefined, s)).toEqual({ x: -24.5, y: -98 });
     expect(
-      sendPointToPlane(point, createRotateMatrix({ angle: 90 }), s)
+      sendPointToPlane(point, createRotateMatrix({ angle: 90 }), s),
     ).toEqual({ x: -25.5, y: -98 });
     expect(sendPointToPlane(point, s, s)).toEqual(point);
     expect(sendPointToPlane(point)).toEqual(point);
@@ -49,7 +49,7 @@ describe('Plane Change', () => {
     expect(sendVectorToPlane(point, s)).toEqual({ x: 2, y: 0.5 });
     expect(sendVectorToPlane(point, undefined, s)).toEqual({ x: 0.5, y: 2 });
     expect(
-      sendVectorToPlane(point, createRotateMatrix({ angle: 90 }), s)
+      sendVectorToPlane(point, createRotateMatrix({ angle: 90 }), s),
     ).toEqual({ x: -0.5, y: 2 });
     expect(sendVectorToPlane(point, s, s)).toEqual(point);
     expect(sendVectorToPlane(point)).toEqual(point);
@@ -73,24 +73,24 @@ describe('Plane Change', () => {
     const actual = sendObjectToPlane(
       obj,
       group.calcTransformMatrix(),
-      group2.calcTransformMatrix()
+      group2.calcTransformMatrix(),
     );
     expect(actual).toEqualRoundedMatrix(
       multiplyTransformMatrices(
         invertTransform(group2.calcTransformMatrix()),
-        group.calcTransformMatrix()
-      )
+        group.calcTransformMatrix(),
+      ),
     );
     expect(obj.calcOwnMatrix()).toEqualRoundedMatrix(
-      multiplyTransformMatrices(actual, m)
+      multiplyTransformMatrices(actual, m),
     );
 
     obj.group = group2;
     expect(obj.calcTransformMatrix()).toEqualRoundedMatrix(
       multiplyTransformMatrices(
         multiplyTransformMatrices(group2.calcTransformMatrix(), actual),
-        m
-      )
+        m,
+      ),
     );
 
     //   sending to nowhere, no transform was applied

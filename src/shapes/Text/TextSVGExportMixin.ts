@@ -18,7 +18,7 @@ function createSVGInlineRect(
   left: number,
   top: number,
   width: number,
-  height: number
+  height: number,
 ) {
   return `\t\t${createSVGRect(color, { left, top, width, height })}\n`;
 }
@@ -54,7 +54,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     }: {
       textSpans: string[];
       textBgRects: string[];
-    }
+    },
   ) {
     const noShadow = true,
       textDecoration = this.getSvgTextDecoration(this);
@@ -88,7 +88,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   private _getSVGTextAndBg(
     this: TextSVGExportMixin & FabricText,
     textTopOffset: number,
-    textLeftOffset: number
+    textLeftOffset: number,
   ) {
     const textSpans: string[] = [],
       textBgRects: string[] = [];
@@ -103,8 +103,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
           -this.width / 2,
           -this.height / 2,
           this.width,
-          this.height
-        )
+          this.height,
+        ),
       );
 
     // text and text-background
@@ -118,14 +118,14 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
           textBgRects,
           i,
           textLeftOffset + lineOffset,
-          height
+          height,
         );
       }
       this._setSVGTextLineText(
         textSpans,
         i,
         textLeftOffset + lineOffset,
-        height
+        height,
       );
       height += this.getHeightOfLine(i);
     }
@@ -141,11 +141,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     char: string,
     styleDecl: TextStyleDeclaration,
     left: number,
-    top: number
+    top: number,
   ) {
     const styleProps = this.getSvgSpanStyles(
         styleDecl,
-        char !== char.trim() || !!char.match(multipleSpacesRegex)
+        char !== char.trim() || !!char.match(multipleSpacesRegex),
       ),
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
@@ -153,10 +153,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
 
     return `<tspan x="${toFixed(
       left,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}" y="${toFixed(
       top,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}" ${dySpan}${fillStyles}>${escapeXml(char)}</tspan>`;
   }
 
@@ -165,7 +165,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textSpans: string[],
     lineIndex: number,
     textLeftOffset: number,
-    textTopOffset: number
+    textTopOffset: number,
   ) {
     const lineHeight = this.getHeightOfLine(lineIndex),
       isJustify = this.textAlign.includes(JUSTIFY),
@@ -209,8 +209,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
             charsToRender,
             style,
             textLeftOffset,
-            textTopOffset
-          )
+            textTopOffset,
+          ),
         );
         charsToRender = '';
         actualStyle = nextStyle;
@@ -229,7 +229,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textBgRects: (string | number)[],
     i: number,
     leftOffset: number,
-    textTopOffset: number
+    textTopOffset: number,
   ) {
     const line = this._textLines[i],
       heightOfLine = this.getHeightOfLine(i) / this.lineHeight;
@@ -248,8 +248,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
               leftOffset + boxStart,
               textTopOffset,
               boxWidth,
-              heightOfLine
-            )
+              heightOfLine,
+            ),
           );
         boxStart = left;
         boxWidth = width;
@@ -265,8 +265,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
           leftOffset + boxStart,
           textTopOffset,
           boxWidth,
-          heightOfLine
-        )
+          heightOfLine,
+        ),
       );
   }
 
@@ -275,7 +275,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    */
   _getSVGLineTopOffset(
     this: TextSVGExportMixin & FabricText,
-    lineIndex: number
+    lineIndex: number,
   ) {
     let lineTopOffset = 0,
       j;
@@ -309,7 +309,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   getSvgSpanStyles(
     this: TextSVGExportMixin & FabricText,
     style: TextStyleDeclaration,
-    useWhiteSpace?: boolean
+    useWhiteSpace?: boolean,
   ) {
     const {
       fontFamily,
@@ -351,7 +351,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    */
   getSvgTextDecoration(
     this: TextSVGExportMixin & FabricText,
-    style: TextStyleDeclaration
+    style: TextStyleDeclaration,
   ) {
     return (['overline', 'underline', 'line-through'] as const)
       .filter(
@@ -361,7 +361,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
               | 'overline'
               | 'underline'
               | 'linethrough'
-          ]
+          ],
       )
       .join(' ');
   }

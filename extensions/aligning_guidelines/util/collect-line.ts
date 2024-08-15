@@ -122,7 +122,7 @@ type LineProps = {
 function getDistanceLine(
   target: LineProps,
   list: LineProps[],
-  type: 'x' | 'y'
+  type: 'x' | 'y',
 ) {
   let dis = Infinity;
   let index = -1;

@@ -29,7 +29,7 @@ const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 export class Ellipse<
     Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
     SProps extends SerializedEllipseProps = SerializedEllipseProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements EllipseProps
@@ -116,7 +116,7 @@ export class Ellipse<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
@@ -167,12 +167,12 @@ export class Ellipse<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const parsedAttributes = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
-      cssRules
+      cssRules,
     );
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;

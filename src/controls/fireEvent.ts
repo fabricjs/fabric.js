@@ -5,7 +5,7 @@ import type {
 
 export const fireEvent = (
   eventName: TModificationEvents,
-  options: ObjectModificationEvents[typeof eventName]
+  options: ObjectModificationEvents[typeof eventName],
 ) => {
   const {
     transform: { target },

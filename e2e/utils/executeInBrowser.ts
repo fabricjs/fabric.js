@@ -8,9 +8,9 @@ export async function executeInBrowser<C, R>(
       getCanvas: (selector?: string) => Canvas;
       getObject: (key: string) => FabricObject;
     },
-    context: C
+    context: C,
   ) => R,
-  context?: C
+  context?: C,
 ): Promise<R> {
   return (
     await page.evaluateHandle(() => ({

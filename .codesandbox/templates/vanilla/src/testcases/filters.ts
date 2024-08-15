@@ -6,7 +6,7 @@ export async function testCase(canvas: fabric.Canvas) {
     height: 200,
   });
   canvasImage.add(
-    new fabric.Rect({ fill: 'red', width: 100, height: 100, top: 0, left: 0 })
+    new fabric.Rect({ fill: 'red', width: 100, height: 100, top: 0, left: 0 }),
   );
   canvasImage.add(
     new fabric.Rect({
@@ -15,7 +15,7 @@ export async function testCase(canvas: fabric.Canvas) {
       height: 100,
       top: 0,
       left: 100,
-    })
+    }),
   );
   canvasImage.add(
     new fabric.Rect({
@@ -24,7 +24,7 @@ export async function testCase(canvas: fabric.Canvas) {
       height: 100,
       top: 100,
       left: 0,
-    })
+    }),
   );
   canvasImage.add(
     new fabric.Rect({
@@ -33,7 +33,7 @@ export async function testCase(canvas: fabric.Canvas) {
       height: 100,
       top: 100,
       left: 100,
-    })
+    }),
   );
   canvasImage.renderAll();
   const image = new fabric.Image(canvasImage.lowerCanvasEl);

@@ -42,7 +42,7 @@ Object.assign(FabricObject.prototype, {
     callbacks: {
       onChange?(value: TDegree): any;
       onComplete?(): any;
-    } = {}
+    } = {},
   ) {
     const onComplete = callbacks.onComplete || noop,
       onChange = callbacks.onChange || noop;

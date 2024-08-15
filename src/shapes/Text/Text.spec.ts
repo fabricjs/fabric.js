@@ -14,7 +14,7 @@ describe('FabricText', () => {
 
   it('fromObject', async () => {
     expect((await FabricText.fromObject({ text: 'text' })).toObject()).toEqual(
-      new FabricText('text').toObject()
+      new FabricText('text').toObject(),
     );
   });
 

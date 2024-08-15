@@ -15,11 +15,11 @@ import { commonEventInfo } from './util';
  */
 export const wrapWithFireEvent = <
   T extends Transform,
-  P extends object = Record<string, never>
+  P extends object = Record<string, never>,
 >(
   eventName: TModificationEvents,
   actionHandler: TransformActionHandler<T>,
-  extraEventInfo?: P
+  extraEventInfo?: P,
 ) => {
   return ((eventData, transform, x, y) => {
     const actionPerformed = actionHandler(eventData, transform, x, y);

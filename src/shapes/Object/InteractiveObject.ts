@@ -43,7 +43,7 @@ export type TStyleOverride = ControlRenderingStyleOverride &
 export class InteractiveFabricObject<
     Props extends TFabricObjectProps = Partial<FabricObjectProps>,
     SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
@@ -153,7 +153,7 @@ export class InteractiveFabricObject<
     Object.assign(
       this,
       (this.constructor as typeof InteractiveFabricObject).createControls(),
-      InteractiveFabricObject.ownDefaults
+      InteractiveFabricObject.ownDefaults,
     );
     this.setOptions(options);
   }
@@ -215,7 +215,7 @@ export class InteractiveFabricObject<
    */
   findControl(
     pointer: Point,
-    forTouch = false
+    forTouch = false,
   ): { key: string; control: Control; coord: TOCoord } | undefined {
     if (!this.hasControls || !this.canvas) {
       return undefined;
@@ -232,7 +232,7 @@ export class InteractiveFabricObject<
           key,
           this,
           pointer,
-          forTouch ? corner.touchCorner : corner.corner
+          forTouch ? corner.touchCorner : corner.corner,
         )
       ) {
         // this.canvas.contextTop.fillRect(pointer.x - 1, pointer.y - 1, 2, 2);
@@ -287,7 +287,7 @@ export class InteractiveFabricObject<
       // don't remove this assign for an object spread.
       coords[key] = Object.assign(
         position,
-        this._calcCornerCoords(control, position)
+        this._calcCornerCoords(control, position),
       );
     });
 
@@ -322,7 +322,7 @@ export class InteractiveFabricObject<
       position.x,
       position.y,
       false,
-      this
+      this,
     );
     const touchCorner = control.calcCornerCoords(
       angle,
@@ -330,7 +330,7 @@ export class InteractiveFabricObject<
       position.x,
       position.y,
       true,
-      this
+      this,
     );
     return { corner, touchCorner };
   }
@@ -354,8 +354,8 @@ export class InteractiveFabricObject<
     fn: (
       control: Control,
       key: string,
-      fabricObject: InteractiveFabricObject
-    ) => any
+      fabricObject: InteractiveFabricObject,
+    ) => any,
   ) {
     for (const i in this.controls) {
       fn(this.controls[i], i, this);
@@ -409,7 +409,7 @@ export class InteractiveFabricObject<
   _drawBorders(
     ctx: CanvasRenderingContext2D,
     size: Point,
-    styleOverride: TStyleOverride = {}
+    styleOverride: TStyleOverride = {},
   ): void {
     const options = {
       hasControls: this.hasControls,
@@ -434,7 +434,7 @@ export class InteractiveFabricObject<
    */
   _renderControls(
     ctx: CanvasRenderingContext2D,
-    styleOverride: TStyleOverride = {}
+    styleOverride: TStyleOverride = {},
   ) {
     const { hasBorders, hasControls } = this;
     const styleOptions = {
@@ -478,14 +478,14 @@ export class InteractiveFabricObject<
   drawBorders(
     ctx: CanvasRenderingContext2D,
     options: TQrDecomposeOut,
-    styleOverride: TStyleOverride
+    styleOverride: TStyleOverride,
   ): void {
     let size;
     if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
       const bbox = sizeAfterTransform(
           this.width,
           this.height,
-          calcDimensionsMatrix(options)
+          calcDimensionsMatrix(options),
         ),
         stroke = !this.isStrokeAccountedForInDimensions()
           ? (this.strokeUniform
@@ -501,7 +501,7 @@ export class InteractiveFabricObject<
         .scalarAdd(this.padding * 2);
     } else {
       size = this._calculateCurrentDimensions().scalarAdd(
-        this.borderScaleFactor
+        this.borderScaleFactor,
       );
     }
     this._drawBorders(ctx, size, styleOverride);
@@ -516,7 +516,7 @@ export class InteractiveFabricObject<
    */
   drawControlsConnectingLines(
     ctx: CanvasRenderingContext2D,
-    size: Point
+    size: Point,
   ): void {
     let shouldStroke = false;
 
@@ -530,7 +530,7 @@ export class InteractiveFabricObject<
         ctx.moveTo(control.x * size.x, control.y * size.y);
         ctx.lineTo(
           control.x * size.x + control.offsetX,
-          control.y * size.y + control.offsetY
+          control.y * size.y + control.offsetY,
         );
       }
     });
@@ -549,7 +549,7 @@ export class InteractiveFabricObject<
    */
   drawControls(
     ctx: CanvasRenderingContext2D,
-    styleOverride: ControlRenderingStyleOverride = {}
+    styleOverride: ControlRenderingStyleOverride = {},
   ) {
     ctx.save();
     const retinaScaling = this.getCanvasRetinaScaling();
@@ -610,7 +610,7 @@ export class InteractiveFabricObject<
    */
   setControlsVisibility(options: Record<string, boolean> = {}) {
     Object.entries(options).forEach(([controlKey, visibility]) =>
-      this.setControlVisible(controlKey, visibility)
+      this.setControlVisible(controlKey, visibility),
     );
   }
 
@@ -625,7 +625,7 @@ export class InteractiveFabricObject<
    * with the object transformMatrix, or restored to neutral transform
    */
   clearContextTop(
-    restoreManually?: boolean
+    restoreManually?: boolean,
   ): CanvasRenderingContext2D | undefined {
     if (!this.canvas) {
       return;

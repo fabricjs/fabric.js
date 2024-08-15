@@ -7,7 +7,7 @@ export function normalizeValue(
   attr: string,
   value: any,
   parentAttributes: Record<string, any>,
-  fontSize: number
+  fontSize: number,
 ): string | null | boolean | number[] | number {
   const isArray = Array.isArray(value);
   let parsed: number | number[];
@@ -26,7 +26,7 @@ export function normalizeValue(
     if (parentAttributes && parentAttributes.transformMatrix) {
       ouputValue = multiplyTransformMatrices(
         parentAttributes.transformMatrix,
-        parseTransformAttribute(value)
+        parseTransformAttribute(value),
       );
     } else {
       ouputValue = parseTransformAttribute(value);

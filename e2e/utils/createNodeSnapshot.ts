@@ -10,9 +10,9 @@ export async function createNodeSnapshot(
   cb: (
     canvas: TestingCanvas,
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    fabric: typeof import('fabric/node')
+    fabric: typeof import('fabric/node'),
   ) => any | Promise<any>,
-  options: Partial<fabric.StaticCanvasOptions> = {}
+  options: Partial<fabric.StaticCanvasOptions> = {},
 ) {
   const canvas = new TestingCanvas(null, {
     enableRetinaScaling: false,

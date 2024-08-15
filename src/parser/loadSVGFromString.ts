@@ -20,7 +20,7 @@ import type { SVGParsingOutput, TSvgReviverCallback } from './typedefs';
 export function loadSVGFromString(
   string: string,
   reviver?: TSvgReviverCallback,
-  options?: LoadImageOptions
+  options?: LoadImageOptions,
 ): Promise<SVGParsingOutput> {
   const parser = new (getFabricWindow().DOMParser)(),
     // should we use `image/svg+xml` here?

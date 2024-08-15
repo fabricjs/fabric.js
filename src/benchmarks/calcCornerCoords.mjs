@@ -19,7 +19,7 @@ class OldControl extends Control {
     objectCornerSize,
     centerX,
     centerY,
-    isTouch
+    isTouch,
   ) {
     let cosHalfOffset, sinHalfOffset, cosHalfOffsetComp, sinHalfOffsetComp;
     const xSize = isTouch ? this.touchSizeX : this.sizeX,
@@ -64,14 +64,14 @@ class OldObject extends FabricObject {
       this.cornerSize,
       position.x,
       position.y,
-      false
+      false,
     );
     const touchCorner = control.calcCornerCoords(
       this.angle,
       this.touchCornerSize,
       position.x,
       position.y,
-      true
+      true,
     );
     return { corner, touchCorner };
   }

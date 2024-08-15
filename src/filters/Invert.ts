@@ -80,7 +80,7 @@ export class Invert extends BaseFilter<'Invert', InvertOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1i(uniformLocations.uInvert, Number(this.invert));
     gl.uniform1i(uniformLocations.uAlpha, Number(this.alpha));

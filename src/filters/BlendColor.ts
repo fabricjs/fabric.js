@@ -182,7 +182,7 @@ export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const source = new Color(this.color).getSource();
     source[0] = (this.alpha * source[0]) / 255;
