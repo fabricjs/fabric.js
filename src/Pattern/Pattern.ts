@@ -1,6 +1,6 @@
 import { config } from '../config';
 import type { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
-import { ifNaN } from '../util/internals';
+import { ifNaN } from '../util/internals/ifNaN';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';

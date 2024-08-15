@@ -1,5 +1,5 @@
 import type { Constructor, TBBox } from './typedefs';
-import { removeFromArray } from './util/internals';
+import { removeFromArray } from './util/internals/removeFromArray';
 import { Point } from './Point';
 import type { ActiveSelection } from './shapes/ActiveSelection';
 import type { Group } from './shapes/Group';

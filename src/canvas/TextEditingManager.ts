@@ -1,6 +1,6 @@
 import type { TPointerEvent } from '../EventTypeDefs';
 import type { ITextBehavior } from '../shapes/IText/ITextBehavior';
-import { removeFromArray } from '../util/internals';
+import { removeFromArray } from '../util/internals/removeFromArray';
 import type { Canvas } from './Canvas';
 
 /**

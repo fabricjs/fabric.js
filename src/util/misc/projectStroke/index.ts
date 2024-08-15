@@ -1,5 +1,5 @@
 import { Point, type XY } from '../../../Point';
-import { findIndexRight } from '../../internals';
+import { findIndexRight } from '../../internals/findRight';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
