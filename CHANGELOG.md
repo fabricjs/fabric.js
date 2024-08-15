@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [6.3.0]
+
 - chore(): Remove over-protective cloneDeep from fromObject [#9621](https://github.com/fabricjs/fabric.js/pull/9621)
 - chore(): Prettier apply the new standard configuration [#10067](https://github.com/fabricjs/fabric.js/pull/10067)
 - chore(): Update dev dependencies Lint, Prettier, Jest [#10066](https://github.com/fabricjs/fabric.js/pull/10066)
