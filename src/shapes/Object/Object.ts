@@ -132,6 +132,7 @@ type toDataURLOptions = ObjectToCanvasElementOptions & {
  */
 export class FabricObject<
     Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents
   >
@@ -789,7 +790,7 @@ export class FabricObject<
     ctx.restore();
   }
 
-  drawSelectionBackground(ctx: CanvasRenderingContext2D) {
+  drawSelectionBackground(_ctx: CanvasRenderingContext2D) {
     /* no op */
   }
 
@@ -1200,9 +1201,9 @@ export class FabricObject<
    * function that actually render something on the context.
    * empty here to allow Obects to work on tests to benchmark fabric functionalites
    * not related to rendering
-   * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {CanvasRenderingContext2D} _ctx Context to render on
    */
-  _render(ctx: CanvasRenderingContext2D) {
+  _render(_ctx: CanvasRenderingContext2D) {
     // placeholder to be overridden
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { util } from '../../dist/index.mjs';
 
 // perf(composeMatrix): 25% improv by restoring v5 implementation #9851

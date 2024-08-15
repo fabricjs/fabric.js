@@ -52,6 +52,7 @@ export class Color {
           Color.sourceFromHsl(color) ||
           // color is not recognized
           // we default to black as canvas does
+          // eslint-disable-next-line no-constant-binary-expression
           ((this.isUnrecognised = true) && ([0, 0, 0, 1] as TRGBAColorSource));
   }
 

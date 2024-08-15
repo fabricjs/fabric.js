@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import {
   Object as FabricObject,
   Point,

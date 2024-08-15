@@ -271,7 +271,7 @@ export class BaseFilter<
     }
   }
 
-  applyTo2d(options: T2DPipelineState): void {
+  applyTo2d(_options: T2DPipelineState): void {
     // override by subclass
   }
 
@@ -352,12 +352,12 @@ export class BaseFilter<
    *
    * Intended to be overridden by subclasses.
    *
-   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
-   * @param {Object} uniformLocations A map of shader uniform names to their locations.
+   * @param {WebGLRenderingContext} _gl The canvas context used to compile the shader program.
+   * @param {Object} _uniformLocations A map of shader uniform names to their locations.
    */
   sendUniformData(
-    gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    _gl: WebGLRenderingContext,
+    _uniformLocations: TWebGLUniformLocationMap
   ): void {
     // override by subclass
   }
@@ -404,7 +404,7 @@ export class BaseFilter<
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    options: Abortable
+    _options: Abortable
   ): Promise<BaseFilter<string, object>> {
     return new this(filterOptions);
   }

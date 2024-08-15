@@ -94,7 +94,7 @@ export abstract class ITextKeyBehavior<
     } as Record<string, keyof this>).map(([eventName, handler]) =>
       textarea.addEventListener(
         eventName,
-        (this[handler] as Function).bind(this)
+        (this[handler] as EventListener).bind(this)
       )
     );
     this.hiddenTextarea = textarea;

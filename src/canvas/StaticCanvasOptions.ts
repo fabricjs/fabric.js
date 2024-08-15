@@ -1,7 +1,6 @@
 import { iMatrix } from '../constants';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TFiller, TMat2D, TOptions } from '../typedefs';
-import type { StaticCanvas } from './StaticCanvas';
 
 interface CanvasDrawableOptions {
   /**

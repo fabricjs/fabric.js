@@ -117,7 +117,7 @@ export class FabricObjectSVGExportMixin {
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG(reviver?: TSVGReviver): string[] {
+  _toSVG(_reviver?: TSVGReviver): string[] {
     return [''];
   }
 

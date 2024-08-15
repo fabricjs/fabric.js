@@ -141,7 +141,7 @@ export class LayoutManager {
    */
   protected unsubscribe(
     object: FabricObject,
-    context?: RegistrationContext & Partial<StrictLayoutContext>
+    _context?: RegistrationContext & Partial<StrictLayoutContext>
   ) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
     this._subscriptions.delete(object);

@@ -541,7 +541,7 @@ export class FabricText<
    * @return Number
    */
   missingNewlineOffset(lineIndex: number, skipWrapping?: boolean): 0 | 1;
-  missingNewlineOffset(lineIndex: number): 1 {
+  missingNewlineOffset(_lineIndex: number): 1 {
     return 1;
   }
 

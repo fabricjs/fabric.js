@@ -1,4 +1,3 @@
-import type { Canvas } from '../../canvas/Canvas';
 import type {
   DragEventData,
   DropEventData,

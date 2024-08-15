@@ -22,7 +22,7 @@ describe('ActiveSelectionLayoutManager', () => {
       it('should subscribe activeSelection that contains object', () => {
         const manager = new ActiveSelectionLayoutManager();
         const object = new FabricObject();
-        const group = new Group([object], {
+        new Group([object], {
           interactive: true,
           subTargetCheck: true,
         });

@@ -1,5 +1,4 @@
 import type { TColorArg } from '../../color/typedefs';
-import type { AnimationBase } from './AnimationBase';
 
 export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 

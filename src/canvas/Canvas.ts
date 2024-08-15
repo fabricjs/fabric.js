@@ -144,6 +144,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         '_onDrop',
       ] as (keyof this)[]
     ).forEach((eventHandler) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
       this[eventHandler] = (this[eventHandler] as Function).bind(this);
     });
     // register event handlers
@@ -158,7 +159,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     return this.enablePointerEvents ? 'pointer' : 'mouse';
   }
 
-  addOrRemove(functor: any, eventjsFunctor: 'add' | 'remove') {
+  addOrRemove(functor: any, _eventjsFunctor: 'add' | 'remove') {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
