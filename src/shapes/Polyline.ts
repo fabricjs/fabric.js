@@ -15,7 +15,6 @@ import { toFixed } from '../util/misc/toFixed';
 import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
-import { cloneDeep } from '../util/internals/cloneDeep';
 import {
   CENTER,
   LEFT,
@@ -315,7 +314,7 @@ export class Polyline<
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
-      points: cloneDeep(this.points),
+      points: this.points.map(({ x, y }) => ({ x, y })),
     };
   }
 
