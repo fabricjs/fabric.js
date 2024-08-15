@@ -22,10 +22,6 @@ describe('ActiveSelectionLayoutManager', () => {
       it('should subscribe activeSelection that contains object', () => {
         const manager = new ActiveSelectionLayoutManager();
         const object = new FabricObject();
-        const group = new Group([object], {
-          interactive: true,
-          subTargetCheck: true,
-        });
         const as = new ActiveSelection([object], { layoutManager: manager });
         const objectOn = jest.spyOn(object, 'on');
         const objectOff = jest.spyOn(object, 'off');

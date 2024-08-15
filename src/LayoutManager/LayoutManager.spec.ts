@@ -92,7 +92,7 @@ describe('Layout Manager', () => {
         [commitLayout, onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
           }) => expect(arg1).toEqual(layoutResult)
         );
@@ -100,7 +100,7 @@ describe('Layout Manager', () => {
         [onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
           }) => expect(arg1).toBeUndefined()
         );

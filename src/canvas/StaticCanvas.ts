@@ -84,6 +84,7 @@ export type TSVGExportOptions = {
  */
 // TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     EventSpec extends StaticCanvasEvents = StaticCanvasEvents
   >
   extends createCollectionMixin(CommonMethods<CanvasEvents>)
@@ -549,7 +550,7 @@ export class StaticCanvas<
     }
   }
 
-  drawControls(ctx: CanvasRenderingContext2D) {
+  drawControls(_ctx: CanvasRenderingContext2D) {
     // Static canvas has no controls
   }
 
