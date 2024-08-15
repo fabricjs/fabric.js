@@ -7,7 +7,7 @@
  */
 export function setStyle(
   element: HTMLElement,
-  styles: string | Record<string, string>
+  styles: string | Record<string, string>,
 ) {
   const elementStyle = element.style;
   if (!elementStyle) {
@@ -16,7 +16,7 @@ export function setStyle(
     element.style.cssText += ';' + styles;
   } else {
     Object.entries(styles).forEach(([property, value]) =>
-      elementStyle.setProperty(property, value)
+      elementStyle.setProperty(property, value),
     );
   }
 }

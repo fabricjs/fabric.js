@@ -22,12 +22,12 @@ import {
  */
 export const removeTransformFromObject = (
   object: FabricObject,
-  transform: TMat2D
+  transform: TMat2D,
 ) => {
   const inverted = invertTransform(transform),
     finalTransform = multiplyTransformMatrices(
       inverted,
-      object.calcOwnMatrix()
+      object.calcOwnMatrix(),
     );
   applyTransformToObject(object, finalTransform);
 };
@@ -43,7 +43,7 @@ export const removeTransformFromObject = (
 export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
   applyTransformToObject(
     object,
-    multiplyTransformMatrices(transform, object.calcOwnMatrix())
+    multiplyTransformMatrices(transform, object.calcOwnMatrix()),
   );
 
 /**
@@ -53,7 +53,7 @@ export const addTransformToObject = (object: FabricObject, transform: TMat2D) =>
  */
 export const applyTransformToObject = (
   object: FabricObject,
-  transform: TMat2D
+  transform: TMat2D,
 ) => {
   const { translateX, translateY, scaleX, scaleY, ...otherOptions } =
       qrDecompose(transform),
@@ -107,7 +107,7 @@ export const saveObjectTransform = (target: FabricObject) => ({
 export const sizeAfterTransform = (
   width: number,
   height: number,
-  t: TMat2D
+  t: TMat2D,
 ) => {
   const dimX = width / 2,
     dimY = height / 2,

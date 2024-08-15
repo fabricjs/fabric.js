@@ -12,7 +12,7 @@ export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 export type TOnAnimationChangeCallback<T, R = void> = (
   value: T,
   valueProgress: number,
-  durationProgress: number
+  durationProgress: number,
 ) => R;
 
 /**
@@ -37,13 +37,13 @@ export type TEasingFunction<T = unknown> = T extends number[]
       startValue: number,
       byValue: number,
       duration: number,
-      index: number
+      index: number,
     ) => number
   : (
       timeElapsed: number,
       startValue: number,
       byValue: number,
-      duration: number
+      duration: number,
     ) => number;
 
 export type TAnimationBaseOptions<T> = {
@@ -132,5 +132,5 @@ export type AnimationOptions<T extends number | number[] | TColorArg> =
   T extends TColorArg
     ? ColorAnimationOptions
     : T extends number[]
-    ? ArrayAnimationOptions
-    : ValueAnimationOptions;
+      ? ArrayAnimationOptions
+      : ValueAnimationOptions;

@@ -117,8 +117,8 @@ export class Pattern {
     return this.isImageSource()
       ? this.source.src
       : this.isCanvasSource()
-      ? this.source.toDataURL()
-      : '';
+        ? this.source.toDataURL()
+        : '';
   }
 
   /**
@@ -176,14 +176,14 @@ export class Pattern {
           ? 1 + Math.abs(patternOffsetX || 0)
           : ifNaN(
               ((patternSource as HTMLImageElement).width as number) / width,
-              0
+              0,
             ),
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
           : ifNaN(
               ((patternSource as HTMLImageElement).height as number) / height,
-              0
+              0,
             );
 
     return [
@@ -201,7 +201,7 @@ export class Pattern {
 
   static async fromObject(
     { type, source, ...serialized }: SerializedPatternOptions,
-    options?: Abortable
+    options?: Abortable,
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

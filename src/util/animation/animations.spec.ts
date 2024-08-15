@@ -353,7 +353,7 @@ describe('animate', () => {
         onComplete: function () {
           completeInvocations++;
         },
-      }
+      },
     );
     jest.advanceTimersByTime(32);
     expect(Math.round(object.get('left'))).toBe(1);
@@ -405,7 +405,7 @@ describe('animate', () => {
           context = this;
           return true;
         },
-      }
+      },
     );
     jest.advanceTimersByTime(100);
     expect(Math.round(object.get('left'))).toBe(123);
@@ -477,7 +477,7 @@ describe('easing', () => {
             });
           },
           easing: easingFunction,
-        }
+        },
       );
       jest.advanceTimersByTime(duration + 16);
       expect(snapshot).toMatchSnapshot();

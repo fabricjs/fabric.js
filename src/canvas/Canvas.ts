@@ -168,7 +168,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       canvasElement,
       `${eventTypePrefix}move`,
       this._onMouseMove,
-      addEventOptions
+      addEventOptions,
     );
     functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
@@ -208,25 +208,25 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     removeListener(
       doc,
       `${eventTypePrefix}up`,
-      this._onMouseUp as EventListener
+      this._onMouseUp as EventListener,
     );
     removeListener(
       doc,
       'touchend',
       this._onTouchEnd as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     removeListener(
       doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     removeListener(
       doc,
       'touchmove',
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
   }
 
@@ -295,7 +295,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       addListener(
         this.upperCanvasEl,
         'drag',
-        this._onDragProgress as EventListener
+        this._onDragProgress as EventListener,
       );
       return;
     }
@@ -311,7 +311,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _renderDragEffects(
     e: DragEvent,
     source?: FabricObject,
-    target?: FabricObject
+    target?: FabricObject,
   ) {
     let dirty = false;
     // clear top context
@@ -364,7 +364,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     removeListener(
       this.upperCanvasEl,
       'drag',
-      this._onDragProgress as EventListener
+      this._onDragProgress as EventListener,
     );
     this.fire('dragend', options);
     this._dragSource && this._dragSource.fire('dragend', options);
@@ -397,7 +397,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this.targets = [];
     const target = this._searchPossibleTargets(
       this._objects,
-      this.getViewportPoint(e)
+      this.getViewportPoint(e),
     );
     return {
       target,
@@ -610,19 +610,19 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       doc,
       'touchend',
       this._onTouchEnd as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     addListener(
       doc,
       'touchmove',
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     // Unbind mousedown to prevent double triggers from touch devices
     removeListener(
       canvasElement,
       `${eventTypePrefix}down`,
-      this._onMouseDown as EventListener
+      this._onMouseDown as EventListener,
     );
   }
 
@@ -639,7 +639,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       canvasElement,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     const doc = getDocumentFromElement(canvasElement);
     addListener(doc, `${eventTypePrefix}up`, this._onMouseUp as EventListener);
@@ -647,7 +647,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       doc,
       `${eventTypePrefix}move`,
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
   }
 
@@ -669,13 +669,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       doc,
       'touchend',
       this._onTouchEnd as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     removeListener(
       doc,
       'touchmove',
       this._onMouseMove as EventListener,
-      addEventOptions
+      addEventOptions,
     );
     if (this._willAddMouseDown) {
       clearTimeout(this._willAddMouseDown);
@@ -686,7 +686,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       addListener(
         this.upperCanvasEl,
         `${eventTypePrefix}down`,
-        this._onMouseDown as EventListener
+        this._onMouseDown as EventListener,
       );
       this._willAddMouseDown = 0;
     }, 400) as unknown as number;
@@ -706,19 +706,19 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       removeListener(
         doc,
         `${eventTypePrefix}up`,
-        this._onMouseUp as EventListener
+        this._onMouseUp as EventListener,
       );
       removeListener(
         doc,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
-        addEventOptions
+        addEventOptions,
       );
       addListener(
         canvasElement,
         `${eventTypePrefix}move`,
         this._onMouseMove as EventListener,
-        addEventOptions
+        addEventOptions,
       );
     }
   }
@@ -815,7 +815,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (target) {
       const found = target.findControl(
         this.getViewportPoint(e),
-        isTouchEvent(e)
+        isTouchEvent(e),
       );
       const { key, control } = found || {};
       corner = key;
@@ -848,7 +848,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           originalControl.getMouseUpHandler(
             e,
             transform.target,
-            originalControl
+            originalControl,
           );
       pointer = pointer || this.getScenePoint(e);
       originalMouseUpHandler &&
@@ -857,7 +857,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           e,
           transform,
           pointer.x,
-          pointer.y
+          pointer.y,
         );
     }
     this._setCursorFromEvent(e, target);
@@ -875,7 +875,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   _basicEventHandler<T extends keyof (CanvasEvents | ObjectEvents)>(
     eventType: T,
-    options: (CanvasEvents & ObjectEvents)[T]
+    options: (CanvasEvents & ObjectEvents)[T],
   ) {
     const { target, subTargets = [] } = options as {
       target?: FabricObject;
@@ -1052,7 +1052,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       }
       const handle = target.findControl(
         this.getViewportPoint(e),
-        isTouchEvent(e)
+        isTouchEvent(e),
       );
       if (target === this._activeObject && (handle || !grouped)) {
         this._setupCurrentTransform(e, target, alreadySelected);
@@ -1066,7 +1066,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             e,
             this._currentTransform!,
             pointer.x,
-            pointer.y
+            pointer.y,
           );
       }
     }
@@ -1100,7 +1100,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._absolutePointer = sendPointToPlane(
       this._pointer,
       undefined,
-      this.viewportTransform
+      this.viewportTransform,
     );
     this._target = this._currentTransform
       ? this._currentTransform.target
@@ -1233,7 +1233,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target?: FabricObject;
       oldTarget?: FabricObject;
       fireCanvas?: boolean;
-    }
+    },
   ) {
     const { targetIn, targetOut, canvasIn, canvasOut } =
       syntheticEventConfig[type];
@@ -1287,7 +1287,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         ? sendPointToPlane(
             scenePoint,
             undefined,
-            target.group.calcTransformMatrix()
+            target.group.calcTransformMatrix(),
           )
         : scenePoint;
     transform.shiftKey = e.shiftKey;
@@ -1303,7 +1303,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _performTransformAction(
     e: TPointerEvent,
     transform: Transform,
-    pointer: Point
+    pointer: Point,
   ) {
     const { action, actionHandler, target } = transform;
 
@@ -1480,7 +1480,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         width: size.x,
         height: size.y,
       },
-      { includeIntersecting: !this.selectionFullyContained }
+      { includeIntersecting: !this.selectionFullyContained },
     ) as FabricObject[];
 
     const objects =
@@ -1491,9 +1491,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           ? [collectedObjects[0]]
           : []
         : collectedObjects.length > 1
-        ? collectedObjects.filter((object) => !object.onSelect({ e })).reverse()
-        : // `setActiveObject` will call `onSelect(collectedObjects[0])` in this case
-          collectedObjects;
+          ? collectedObjects
+              .filter((object) => !object.onSelect({ e }))
+              .reverse()
+          : // `setActiveObject` will call `onSelect(collectedObjects[0])` in this case
+            collectedObjects;
 
     // set active object
     if (objects.length === 1) {

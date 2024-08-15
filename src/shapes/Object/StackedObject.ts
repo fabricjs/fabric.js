@@ -28,7 +28,7 @@ export type AncestryComparison = {
 };
 
 export class StackedObject<
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends ObjectGeometry<EventSpec> {
   /**
    * A reference to the parent of the object
@@ -170,10 +170,10 @@ export class StackedObject<
     const headOfFork = ancestorData.fork.pop(),
       headOfOtherFork = ancestorData.otherFork.pop(),
       thisIndex = (firstCommonAncestor as TCollection)._objects.indexOf(
-        headOfFork as any
+        headOfFork as any,
       ),
       otherIndex = (firstCommonAncestor as TCollection)._objects.indexOf(
-        headOfOtherFork as any
+        headOfOtherFork as any,
       );
     return thisIndex > -1 && thisIndex > otherIndex;
   }

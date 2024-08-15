@@ -67,7 +67,7 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uVibrance, -this.vibrance);
   }

@@ -77,5 +77,5 @@ export type TMatColorMatrix = [
   number,
   number,
   number,
-  number
+  number,
 ];

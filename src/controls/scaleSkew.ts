@@ -46,7 +46,7 @@ export const scaleOrSkewActionName: ControlCallback<
 export const scaleSkewCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject
+  fabricObject,
 ) => {
   return isAltAction(eventData, fabricObject)
     ? skewCursorStyleHandler(eventData, control, fabricObject)
@@ -65,7 +65,7 @@ export const scalingXOrSkewingY: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return isAltAction(eventData, transform.target)
     ? skewHandlerY(eventData, transform, x, y)
@@ -85,7 +85,7 @@ export const scalingYOrSkewingX: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return isAltAction(eventData, transform.target)
     ? skewHandlerX(eventData, transform, x, y)

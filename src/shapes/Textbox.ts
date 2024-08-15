@@ -54,7 +54,7 @@ export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
 export class Textbox<
     Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
     SProps extends SerializedTextboxProps = SerializedTextboxProps,
-    EventSpec extends ITextEvents = ITextEvents
+    EventSpec extends ITextEvents = ITextEvents,
   >
   extends IText<Props, SProps, EventSpec>
   implements UniqueTextboxProps
@@ -250,7 +250,7 @@ export class Textbox<
    */
   _getStyleDeclaration(
     lineIndex: number,
-    charIndex: number
+    charIndex: number,
   ): TextStyleDeclaration {
     if (this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
@@ -272,7 +272,7 @@ export class Textbox<
   protected _setStyleDeclaration(
     lineIndex: number,
     charIndex: number,
-    style: object
+    style: object,
   ) {
     const map = this._styleMap[lineIndex];
     super._setStyleDeclaration(map.line, map.offset + charIndex, style);
@@ -396,7 +396,7 @@ export class Textbox<
         lineIndex,
         i + charOffset,
         prevGrapheme,
-        skipLeft
+        skipLeft,
       );
       width += box.kernedWidth;
       prevGrapheme = word[i];
@@ -429,7 +429,7 @@ export class Textbox<
     lineIndex: number,
     desiredWidth: number,
     { largestWordWidth, wordsData }: GraphemeData,
-    reservedSpace = 0
+    reservedSpace = 0,
   ): string[][] {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
@@ -448,7 +448,7 @@ export class Textbox<
     const maxWidth = Math.max(
       desiredWidth,
       largestWordWidth,
-      this.dynamicMinWidth
+      this.dynamicMinWidth,
     );
     // layout words
     const data = wordsData[lineIndex];
@@ -570,7 +570,7 @@ export class Textbox<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject<T, K>([
       'minWidth',

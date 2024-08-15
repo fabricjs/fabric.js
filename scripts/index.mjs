@@ -86,8 +86,8 @@ function startWebsite() {
   if (os.platform() === 'win32') {
     console.log(
       chalk.green(
-        'Consider using ubuntu on WSL to run jekyll with the following options:'
-      )
+        'Consider using ubuntu on WSL to run jekyll with the following options:',
+      ),
     );
     console.log(chalk.yellow('-- force_polling --livereload'));
     console.log(chalk.gray('https://github.com/microsoft/WSL/issues/216'));
@@ -113,8 +113,8 @@ function watch(path, callback, debounce = 500) {
         }
       },
       debounce,
-      { trailing: true }
-    )
+      { trailing: true },
+    ),
   );
 }
 
@@ -125,8 +125,8 @@ function copy(from, to) {
     console.log(
       `copied ${path.relative(containingFolder, from)} to ${path.relative(
         containingFolder,
-        to
-      )}`
+        to,
+      )}`,
     );
   } catch (error) {
     console.error(error);
@@ -155,13 +155,13 @@ function exportBuildToWebsite(options = {}) {
 function exportAssetsToWebsite(options) {
   copy(
     path.resolve(wd, './package.json'),
-    path.resolve(websiteDir, './lib/package.json')
+    path.resolve(websiteDir, './lib/package.json'),
   );
   BUILD_SOURCE.forEach((p) =>
-    copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p))
+    copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)),
   );
   console.log(
-    chalk.bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`)
+    chalk.bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`),
   );
   options.watch &&
     BUILD_SOURCE.forEach((p) => {
@@ -169,8 +169,8 @@ function exportAssetsToWebsite(options) {
         copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p));
         console.log(
           chalk.bold(
-            `[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`
-          )
+            `[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`,
+          ),
         );
       });
     });
@@ -185,10 +185,12 @@ function exportTestsToWebsite(options) {
       './test/lib',
     ];
     paths.forEach((location) =>
-      copy(path.resolve(wd, location), path.resolve(websiteDir, location))
+      copy(path.resolve(wd, location), path.resolve(websiteDir, location)),
     );
     console.log(
-      chalk.bold(`[${moment().format('HH:mm')}] exported tests to fabricjs.com`)
+      chalk.bold(
+        `[${moment().format('HH:mm')}] exported tests to fabricjs.com`,
+      ),
     );
   };
   exportTests();
@@ -234,8 +236,8 @@ async function runTestem({
       os.platform() === 'darwin'
         ? 'open'
         : os.platform() === 'win32'
-        ? 'start'
-        : 'xdg-open';
+          ? 'start'
+          : 'xdg-open';
     cp.exec([start, url].join(' '));
   }
 
@@ -257,7 +259,7 @@ async function runTestem({
     try {
       cp.execSync(
         ['testem', 'ci', ...processCmdOptions].join(' '),
-        processOptions
+        processOptions,
       );
     } catch (error) {
       return true;
@@ -365,10 +367,10 @@ function createChoiceData(type, file) {
 async function selectTestFile() {
   const selected = readCLIFile();
   const unitTests = listTestFiles('unit').map((file) =>
-    createChoiceData('unit', file)
+    createChoiceData('unit', file),
   );
   const visualTests = listTestFiles('visual').map((file) =>
-    createChoiceData('visual', file)
+    createChoiceData('visual', file),
   );
   const { tests: filteredTests } = await inquirer.prompt([
     {
@@ -383,19 +385,19 @@ async function selectTestFile() {
         return new Promise((resolve) => {
           const tests = _.concat(unitTests, visualTests);
           const value = _.map(this.getCurrentValue(), (value) =>
-            createChoiceData(value.type, value.file)
+            createChoiceData(value.type, value.file),
           );
           if (value.length > 0) {
             if (
               value.find(
-                (v) => v.value && v.value.type === 'unit' && !v.value.file
+                (v) => v.value && v.value.type === 'unit' && !v.value.file,
               )
             ) {
               _.pullAll(tests, unitTests);
             }
             if (
               value.find(
-                (v) => v.value && v.value.type === 'visual' && !v.value.file
+                (v) => v.value && v.value.type === 'visual' && !v.value.file,
               )
             ) {
               _.pullAll(tests, visualTests);
@@ -438,7 +440,7 @@ async function runInteractiveTestSuite(options) {
       }
       return acc;
     },
-    { unit: [], visual: [] }
+    { unit: [], visual: [] },
   );
   return Promise.all(
     _.map(tests, (files, suite) => {
@@ -447,7 +449,7 @@ async function runInteractiveTestSuite(options) {
       } else if (Array.isArray(files) && files.length > 0) {
         return test(suite, files, options);
       }
-    })
+    }),
   );
 }
 
@@ -484,8 +486,8 @@ program
   .description('run test suite')
   .addOption(
     new commander.Option('-s, --suite <suite...>', 'test suite to run').choices(
-      ['unit', 'visual']
-    )
+      ['unit', 'visual'],
+    ),
   )
   .option('-f, --file <file>', 'run a specific test file')
   .option('--filter <filter>', 'filter tests by name')
@@ -493,7 +495,7 @@ program
   .option(
     '-d, --debug',
     'debug visual tests by overriding refs (golden images) in case of visual changes',
-    false
+    false,
   )
   .option('-r, --recreate', 'recreate visual refs (golden images)', false)
   .option('-v, --verbose', 'log passing tests', true)
@@ -503,7 +505,7 @@ program
   .addOption(
     new commander.Option('-c, --context <context...>', 'context to test in')
       .choices(['node', 'chrome', 'firefox'])
-      .default(['node'])
+      .default(['node']),
   )
   .option('-p, --port')
   .option('-o, --out <out>', 'path to report test results to')
@@ -521,16 +523,16 @@ program
         ...(await Promise.all(
           _.map(options.suite, (suite) => {
             return test(suite, null, options);
-          })
-        ))
+          }),
+        )),
       );
     } else if (options.file) {
       results.push(
         await test(
           options.file.startsWith('visual') ? 'visual' : 'unit',
           [`test/${options.file}`],
-          options
-        )
+          options,
+        ),
       );
     } else {
       results.push(...(await runInteractiveTestSuite(options)));
@@ -556,7 +558,7 @@ website
   .addOption(
     new commander.Option('-i, --include <what...>')
       .choices(['build', 'tests'])
-      .default(['build', 'tests'], 'export all')
+      .default(['build', 'tests'], 'export all'),
   )
   .option('-w, --watch')
   .action(exportToWebsite);

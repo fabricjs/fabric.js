@@ -29,8 +29,8 @@ export const createPolyPositionHandler = (pointIndex: number) => {
       .transform(
         multiplyTransformMatrices(
           polyObject.getViewportTransform(),
-          polyObject.calcTransformMatrix()
-        )
+          polyObject.calcTransformMatrix(),
+        ),
       );
   };
 };
@@ -46,14 +46,14 @@ export const polyActionHandler = (
   eventData: TPointerEvent,
   transform: TTransformAnchor,
   x: number,
-  y: number
+  y: number,
 ) => {
   const { target, pointIndex } = transform;
   const poly = target as Polyline;
   const mouseLocalPosition = sendPointToPlane(
     new Point(x, y),
     undefined,
-    poly.calcOwnMatrix()
+    poly.calcOwnMatrix(),
   );
 
   poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
@@ -67,17 +67,17 @@ export const polyActionHandler = (
  */
 export const factoryPolyActionHandler = (
   pointIndex: number,
-  fn: TransformActionHandler<TTransformAnchor>
+  fn: TransformActionHandler<TTransformAnchor>,
 ) => {
   return function (
     eventData: TPointerEvent,
     transform: Transform,
     x: number,
-    y: number
+    y: number,
   ) {
     const poly = transform.target as Polyline,
       anchorPoint = new Point(
-        poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]
+        poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1],
       ),
       anchorPointInParentPlane = anchorPoint
         .subtract(poly.pathOffset)
@@ -99,20 +99,20 @@ export const factoryPolyActionHandler = (
 export const createPolyActionHandler = (pointIndex: number) =>
   wrapWithFireEvent(
     ACTION_NAME,
-    factoryPolyActionHandler(pointIndex, polyActionHandler)
+    factoryPolyActionHandler(pointIndex, polyActionHandler),
   );
 
 export function createPolyControls(
   poly: Polyline,
-  options?: Partial<Control>
+  options?: Partial<Control>,
 ): Record<string, Control>;
 export function createPolyControls(
   numOfControls: number,
-  options?: Partial<Control>
+  options?: Partial<Control>,
 ): Record<string, Control>;
 export function createPolyControls(
   arg0: number | Polyline,
-  options: Partial<Control> = {}
+  options: Partial<Control> = {},
 ) {
   const controls = {} as Record<string, Control>;
   for (

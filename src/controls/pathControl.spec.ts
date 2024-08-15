@@ -26,13 +26,13 @@ describe('pathControls', () => {
     canvas._setupCurrentTransform(
       new MouseEvent('mousedown', { clientX: 50, clientY: 50 }),
       path,
-      true
+      true,
     );
     document.dispatchEvent(
-      new MouseEvent('mousemove', { clientX: 55, clientY: 55 })
+      new MouseEvent('mousemove', { clientX: 55, clientY: 55 }),
     );
     document.dispatchEvent(
-      new MouseEvent('mouseup', { clientX: 55, clientY: 55 })
+      new MouseEvent('mouseup', { clientX: 55, clientY: 55 }),
     );
 
     expect(spyModifyPath).toHaveBeenCalledWith(
@@ -42,24 +42,24 @@ describe('pathControls', () => {
         transform: expect.objectContaining({
           action: 'modifyPath',
         }),
-      })
+      }),
     );
 
     canvas
       .getSelectionElement()
       .dispatchEvent(
-        new MouseEvent('mousedown', { clientX: 50, clientY: 150 })
+        new MouseEvent('mousedown', { clientX: 50, clientY: 150 }),
       );
     canvas._setupCurrentTransform(
       new MouseEvent('mousedown', { clientX: 50, clientY: 150 }),
       path,
-      true
+      true,
     );
     document.dispatchEvent(
-      new MouseEvent('mousemove', { clientX: 55, clientY: 155 })
+      new MouseEvent('mousemove', { clientX: 55, clientY: 155 }),
     );
     document.dispatchEvent(
-      new MouseEvent('mouseup', { clientX: 55, clientY: 155 })
+      new MouseEvent('mouseup', { clientX: 55, clientY: 155 }),
     );
 
     expect(spyModifyPath).toHaveBeenCalledWith(
@@ -69,7 +69,7 @@ describe('pathControls', () => {
         transform: expect.objectContaining({
           action: 'modifyPath',
         }),
-      })
+      }),
     );
   });
 });

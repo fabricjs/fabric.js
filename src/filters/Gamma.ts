@@ -99,7 +99,7 @@ export class Gamma extends BaseFilter<typeof GAMMA, GammaOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform3fv(uniformLocations.uGamma, this.gamma);
   }

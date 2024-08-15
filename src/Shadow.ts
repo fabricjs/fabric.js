@@ -37,7 +37,7 @@ const reOffsetsAndBlur = new RegExp(
     shadowOffsetRegex +
     '(' +
     reNum +
-    '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
+    '?(?:px)?)?(?:\\s?|$)(?:$|\\s)',
 );
 
 export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
@@ -166,7 +166,7 @@ export class Shadow {
   toSVG(object: FabricObject) {
     const offset = rotateVector(
         new Point(this.offsetX, this.offsetY),
-        degreesToRadians(-object.angle)
+        degreesToRadians(-object.angle),
       ),
       BLUR_BOX = 20,
       color = new Color(this.color);
@@ -179,14 +179,14 @@ export class Shadow {
       fBoxX =
         toFixed(
           (Math.abs(offset.x) + this.blur) / object.width,
-          config.NUM_FRACTION_DIGITS
+          config.NUM_FRACTION_DIGITS,
         ) *
           100 +
         BLUR_BOX;
       fBoxY =
         toFixed(
           (Math.abs(offset.y) + this.blur) / object.height,
-          config.NUM_FRACTION_DIGITS
+          config.NUM_FRACTION_DIGITS,
         ) *
           100 +
         BLUR_BOX;
@@ -204,13 +204,13 @@ export class Shadow {
       100 + 2 * fBoxX
     }%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(
       this.blur ? this.blur / 2 : 0,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(
       offset.x,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}" dy="${toFixed(
       offset.y,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
   }
 

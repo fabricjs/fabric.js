@@ -8,26 +8,26 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     /**
      * the key matching the a key returned from the {@link beforeAll} or {@link before} callback
      */
-    readonly objectId: string
+    readonly objectId: string,
   ) {}
 
   evaluateSelf() {
     return this.page.evaluateHandle<FabricObject>(
       ([objectId]) => objectMap.get(objectId),
-      [this.objectId]
+      [this.objectId],
     );
   }
 
   async executeInBrowser<C, R>(
     runInBrowser: (object: T, context: C) => R,
-    context?: C
+    context?: C,
   ): Promise<R> {
     return (await this.evaluateSelf()).evaluate(runInBrowser, context);
   }
 
   async evaluateHandle<C, R>(
     runInBrowser: (object: T, context: C) => R,
-    context?: C
+    context?: C,
   ): Promise<JSHandle<R>> {
     return (await this.evaluateSelf()).evaluateHandle(runInBrowser, context);
   }
@@ -43,7 +43,7 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
   getObjectControlPoint(controlName: string) {
     return this.executeInBrowser(
       (object, { controlName }) => object.oCoords[controlName],
-      { controlName }
+      { controlName },
     );
   }
 

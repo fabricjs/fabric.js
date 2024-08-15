@@ -46,7 +46,7 @@ export function parseUseDirectives(doc: Document) {
       // if is an SVG, create a group and apply all the attributes on top of it
       const el3 = clonedOriginal.ownerDocument.createElementNS(svgNS, 'g');
       Object.entries(originalAttrMap).forEach(([name, value]) =>
-        el3.setAttributeNS(svgNS, name, value)
+        el3.setAttributeNS(svgNS, name, value),
       );
       el3.append(...clonedOriginal.childNodes);
       clonedOriginal = el3;

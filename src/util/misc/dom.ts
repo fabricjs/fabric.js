@@ -26,7 +26,7 @@ export const createImage = (): HTMLImageElement =>
  * @return {CanvasElement} initialized canvas element
  */
 export const copyCanvasElement = (
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement,
 ): HTMLCanvasElement => {
   const newCanvas = createCanvasElement();
   newCanvas.width = canvas.width;
@@ -46,11 +46,11 @@ export const copyCanvasElement = (
 export const toDataURL = (
   canvasEl: HTMLCanvasElement,
   format: ImageFormat,
-  quality: number
+  quality: number,
 ) => canvasEl.toDataURL(`image/${format}`, quality);
 
 export const isHTMLCanvas = (
-  canvas?: HTMLCanvasElement | string
+  canvas?: HTMLCanvasElement | string,
 ): canvas is HTMLCanvasElement => {
   return !!canvas && (canvas as HTMLCanvasElement).getContext !== undefined;
 };

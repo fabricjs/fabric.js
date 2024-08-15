@@ -6,13 +6,13 @@ import type { Path } from '../shapes/Path';
 import type { ActiveSelection } from '../shapes/ActiveSelection';
 
 export const isFiller = (
-  filler: TFiller | string | null
+  filler: TFiller | string | null,
 ): filler is TFiller => {
   return !!filler && (filler as TFiller).toLive !== undefined;
 };
 
 export const isSerializableFiller = (
-  filler: TFiller | string | null
+  filler: TFiller | string | null,
 ): filler is TFiller => {
   return !!filler && typeof (filler as TFiller).toObject === 'function';
 };
@@ -24,7 +24,7 @@ export const isPattern = (filler: TFiller): filler is Pattern => {
 };
 
 export const isTextObject = (
-  fabricObject?: FabricObject
+  fabricObject?: FabricObject,
 ): fabricObject is FabricText => {
   return (
     !!fabricObject &&
@@ -42,6 +42,6 @@ export const isPath = (fabricObject?: FabricObject): fabricObject is Path => {
 };
 
 export const isActiveSelection = (
-  fabricObject?: FabricObject
+  fabricObject?: FabricObject,
 ): fabricObject is ActiveSelection =>
   !!fabricObject && 'multiSelectionStacking' in fabricObject;

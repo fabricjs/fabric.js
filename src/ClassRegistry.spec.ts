@@ -7,7 +7,7 @@ describe('ClassRegistry', () => {
   });
   it('will error if a class is request that is not registered', () => {
     expect(() => classRegistry.getClass('any')).toThrow(
-      'No class registered for any'
+      'No class registered for any',
     );
   });
   it('will return a class previously registered', () => {

@@ -24,7 +24,7 @@ export const makeBoundingBoxFromPoints = (points: XY[]): TBBox => {
         max: max.max(curr),
       };
     },
-    { min: new Point(points[0]), max: new Point(points[0]) }
+    { min: new Point(points[0]), max: new Point(points[0]) },
   );
 
   const size = max.subtract(min);

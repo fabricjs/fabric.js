@@ -99,7 +99,7 @@ export class RemoveColor extends BaseFilter<
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const source = new Color(this.color).getSource(),
       distance = this.distance,

@@ -65,7 +65,7 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 export class Circle<
     Props extends TOptions<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueCircleProps
@@ -125,7 +125,7 @@ export class Circle<
       this.radius,
       degreesToRadians(this.startAngle),
       degreesToRadians(this.endAngle),
-      this.counterClockwise
+      this.counterClockwise,
     );
     this._renderPaintInOrder(ctx);
   }
@@ -161,7 +161,7 @@ export class Circle<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
@@ -224,7 +224,7 @@ export class Circle<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ): Promise<Circle> {
     const {
       left = 0,
@@ -234,7 +234,7 @@ export class Circle<
     } = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
-      cssRules
+      cssRules,
     ) as Partial<CircleProps>;
 
     // this probably requires to be fixed for default origins not being top/left.

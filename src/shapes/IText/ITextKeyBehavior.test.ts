@@ -290,10 +290,10 @@ describe('IText move cursor', () => {
     iText.copy();
     expect(copyPasteData.copiedText).toBe('te'); // it copied first 2 characters');
     expect(copyPasteData.copiedTextStyle![0].fill).toEqual(
-      iText.styles[0][0].fill
+      iText.styles[0][0].fill,
     ); // 'style is cloned'
     expect(copyPasteData.copiedTextStyle![1].fill).toBe(
-      iText.styles[0][1].fill
+      iText.styles[0][1].fill,
     ); // 'style is referenced'
     expect(iText.styles[0][1].fontSize).toBe(undefined); // style had not fontSize');
     expect(copyPasteData.copiedTextStyle![1].fontSize).toBe(25); // style took fontSize from text element'

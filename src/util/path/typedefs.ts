@@ -60,16 +60,7 @@ export type TParsedCommand =
       arg2: number,
       arg3: number,
       arg4: number,
-      arg5: number
-    ]
-  | [
-      command: string,
-      arg1: number,
-      arg2: number,
-      arg3: number,
-      arg4: number,
       arg5: number,
-      arg6: number
     ]
   | [
       command: string,
@@ -79,7 +70,16 @@ export type TParsedCommand =
       arg4: number,
       arg5: number,
       arg6: number,
-      arg7: number
+    ]
+  | [
+      command: string,
+      arg1: number,
+      arg2: number,
+      arg3: number,
+      arg4: number,
+      arg5: number,
+      arg6: number,
+      arg7: number,
     ];
 
 /**
@@ -103,7 +103,7 @@ export type TParsedAbsoluteMoveToCommand = [command: 'M', x: number, y: number];
 export type TParsedRelativeMoveToCommand = [
   command: 'm',
   dx: number,
-  dy: number
+  dy: number,
 ];
 export type TParsedMoveToCommand =
   | TParsedAbsoluteMoveToCommand
@@ -150,7 +150,7 @@ export type TParsedAbsoluteCubicCurveCommand = [
   controlPoint2X: number,
   controlPoint2Y: number,
   endX: number,
-  endY: number
+  endY: number,
 ];
 export type TParsedRelativeCubicCurveCommand = [
   command: 'c',
@@ -159,7 +159,7 @@ export type TParsedRelativeCubicCurveCommand = [
   controlPoint2DX: number,
   controlPoint2DY: number,
   endDX: number,
-  endDY: number
+  endDY: number,
 ];
 export type TParsedCubicCurveCommand =
   | TParsedAbsoluteCubicCurveCommand
@@ -172,14 +172,14 @@ export type TParsedAbsoluteCubicCurveShortcutCommand = [
   controlPoint2X: number,
   controlPoint2Y: number,
   endX: number,
-  endY: number
+  endY: number,
 ];
 export type TParsedRelativeCubicCurveShortcutCommand = [
   command: 's',
   controlPoint2DX: number,
   controlPoint2DY: number,
   endDX: number,
-  endDY: number
+  endDY: number,
 ];
 export type TParsedCubicCurveShortcutCommand =
   | TParsedAbsoluteCubicCurveShortcutCommand
@@ -193,14 +193,14 @@ export type TParsedAbsoluteQuadraticCurveCommand = [
   controlPointX: number,
   controlPointY: number,
   endX: number,
-  endY: number
+  endY: number,
 ];
 export type TParsedRelativeQuadraticCurveCommand = [
   command: 'q',
   controlPointDX: number,
   controlPointDY: number,
   endDX: number,
-  endDY: number
+  endDY: number,
 ];
 export type TParsedQuadraticCurveCommand =
   | TParsedAbsoluteQuadraticCurveCommand
@@ -211,12 +211,12 @@ export type TQuadraticCurveCommand = TCommand5<TParsedQuadraticCurveCommand>;
 export type TParsedAbsoluteQuadraticCurveShortcutCommand = [
   command: 'T',
   endX: number,
-  endY: number
+  endY: number,
 ];
 export type TParsedRelativeQuadraticCurveShortcutCommand = [
   command: 't',
   endDX: number,
-  endDY: number
+  endDY: number,
 ];
 export type TParsedQuadraticCurveShortcutCommand =
   | TParsedAbsoluteQuadraticCurveShortcutCommand
@@ -233,7 +233,7 @@ export type TParsedAbsoluteArcCommand = [
   largeArc: 0 | 1,
   sweep: 0 | 1,
   endX: number,
-  endY: number
+  endY: number,
 ];
 export type TParsedRelativeArcCommand = [
   command: 'a',
@@ -243,7 +243,7 @@ export type TParsedRelativeArcCommand = [
   largeArc: 0 | 1,
   sweep: 0 | 1,
   endDX: number,
-  endDY: number
+  endDY: number,
 ];
 
 export type TParsedArcCommand =

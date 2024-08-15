@@ -12,7 +12,7 @@ import type {
 import { StackedObject } from './StackedObject';
 
 export abstract class AnimatableObject<
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends StackedObject<EventSpec> {
   /**
    * List of properties to consider for animating colors.
@@ -34,12 +34,15 @@ export abstract class AnimatableObject<
    */
   animate<T extends number | number[] | TColorArg>(
     animatable: Record<string, T>,
-    options?: Partial<AnimationOptions<T>>
+    options?: Partial<AnimationOptions<T>>,
   ): Record<string, TAnimation<T>> {
-    return Object.entries(animatable).reduce((acc, [key, endValue]) => {
-      acc[key] = this._animate(key, endValue, options);
-      return acc;
-    }, {} as Record<string, TAnimation<T>>);
+    return Object.entries(animatable).reduce(
+      (acc, [key, endValue]) => {
+        acc[key] = this._animate(key, endValue, options);
+        return acc;
+      },
+      {} as Record<string, TAnimation<T>>,
+    );
   }
 
   /**
@@ -51,7 +54,7 @@ export abstract class AnimatableObject<
   _animate<T extends number | number[] | TColorArg>(
     key: string,
     endValue: T,
-    options: Partial<AnimationOptions<T>> = {}
+    options: Partial<AnimationOptions<T>> = {},
   ): TAnimation<T> {
     const path = key.split('.');
     const propIsColor = (
@@ -69,7 +72,7 @@ export abstract class AnimatableObject<
       onChange: (
         value: number | number[] | string,
         valueProgress: number,
-        durationProgress: number
+        durationProgress: number,
       ) => {
         path.reduce((deep: Record<string, any>, key, index) => {
           if (index === path.length - 1) {
@@ -84,7 +87,7 @@ export abstract class AnimatableObject<
       onComplete: (
         value: number | number[] | string,
         valueProgress: number,
-        durationProgress: number
+        durationProgress: number,
       ) => {
         this.setCoords();
         onComplete &&
@@ -97,7 +100,7 @@ export abstract class AnimatableObject<
       propIsColor
         ? animateColor(animationOptions as ColorAnimationOptions)
         : animate(
-            animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+            animationOptions as ValueAnimationOptions | ArrayAnimationOptions,
           )
     ) as TAnimation<T>;
   }

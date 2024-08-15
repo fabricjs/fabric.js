@@ -85,7 +85,7 @@ const roundPoint = (point: fabric.Point) => ({
 const parseEvent = (
   type: string,
   { pointer, absolutePointer, ...ev } = {},
-  caller: fabric.Textbox | fabric.Canvas
+  caller: fabric.Textbox | fabric.Canvas,
 ) =>
   JSON.parse(
     JSON.stringify([
@@ -98,7 +98,7 @@ const parseEvent = (
           : {}),
       },
       caller,
-    ])
+    ]),
   );
 
 class TestCanvas extends fabric.Canvas {
@@ -143,7 +143,7 @@ before('#canvas', (el) => {
           end: 9,
         },
       ],
-      textValue
+      textValue,
     ),
   });
   const b = new fabric.Textbox('lorem ipsum\ndolor\nsit Amet2\nconsectgetur', {
@@ -165,10 +165,10 @@ before('#canvas', (el) => {
     (type) => {
       a.on(type, (ev) => canvas.eventStream.push(parseEvent(type, ev, a)));
       b.on(type, (ev) => canvas.eventStream.push(parseEvent(type, ev, b)));
-    }
+    },
   );
   Object.entries({ a, b }).forEach(
-    ([key, object]) => (object.toJSON = () => key)
+    ([key, object]) => (object.toJSON = () => key),
   );
 
   canvas.add(a, b);

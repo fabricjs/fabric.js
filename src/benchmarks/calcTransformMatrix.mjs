@@ -19,12 +19,12 @@ util2.calcDimensionsMatrix = ({
     [
       util2.createScaleMatrix(
         flipX ? -scaleX : scaleX,
-        flipY ? -scaleY : scaleY
+        flipY ? -scaleY : scaleY,
       ),
       skewX && util2.createSkewXMatrix(skewX),
       skewY && util2.createSkewYMatrix(skewY),
     ],
-    true
+    true,
   );
 };
 

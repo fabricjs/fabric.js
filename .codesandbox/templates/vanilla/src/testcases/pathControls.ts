@@ -11,7 +11,7 @@ export function testCase(canvas: fabric.Canvas) {
       fill: 'transparent',
       left: 100,
       top: 100,
-    }
+    },
   );
   path.controls = fabric.controlsUtils.createPathControls(path, {
     controlPointStyle: {

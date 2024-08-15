@@ -18,7 +18,7 @@ export class FixedLayout extends LayoutStrategy {
    */
   getInitialSize(
     { target }: StrictLayoutContext & InitializationLayoutContext,
-    { size }: Pick<LayoutStrategyResult, 'center' | 'size'>
+    { size }: Pick<LayoutStrategyResult, 'center' | 'size'>,
   ): Point {
     return new Point(target.width || size.x, target.height || size.y);
   }

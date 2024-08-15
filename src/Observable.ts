@@ -22,12 +22,12 @@ export class Observable<EventSpec> {
    */
   on<K extends keyof EventSpec, E extends EventSpec[K]>(
     eventName: K,
-    handler: TEventCallback<E>
+    handler: TEventCallback<E>,
   ): VoidFunction;
   on(handlers: EventRegistryObject<EventSpec>): VoidFunction;
   on<K extends keyof EventSpec, E extends EventSpec[K]>(
     arg0: K | EventRegistryObject<EventSpec>,
-    handler?: TEventCallback<E>
+    handler?: TEventCallback<E>,
   ): VoidFunction {
     if (!this.__eventListeners) {
       this.__eventListeners = {} as Record<keyof EventSpec, TEventCallback[]>;
@@ -61,12 +61,12 @@ export class Observable<EventSpec> {
    */
   once<K extends keyof EventSpec, E extends EventSpec[K]>(
     eventName: K,
-    handler: TEventCallback<E>
+    handler: TEventCallback<E>,
   ): VoidFunction;
   once(handlers: EventRegistryObject<EventSpec>): VoidFunction;
   once<K extends keyof EventSpec, E extends EventSpec[K]>(
     arg0: K | EventRegistryObject<EventSpec>,
-    handler?: TEventCallback<E>
+    handler?: TEventCallback<E>,
   ): VoidFunction {
     if (typeof arg0 === 'object') {
       // one object with key/value pairs was passed
@@ -81,7 +81,7 @@ export class Observable<EventSpec> {
         function onceHandler(this: Observable<EventSpec>, ...args) {
           handler.call(this, ...args);
           disposer();
-        }
+        },
       );
       return disposer;
     } else {
@@ -97,7 +97,7 @@ export class Observable<EventSpec> {
    */
   private _removeEventListener<K extends keyof EventSpec>(
     eventName: K,
-    handler?: TEventCallback
+    handler?: TEventCallback,
   ) {
     if (!this.__eventListeners[eventName]) {
       return;
@@ -137,7 +137,7 @@ export class Observable<EventSpec> {
   off(): void;
   off<K extends keyof EventSpec>(
     arg0?: K | EventRegistryObject<EventSpec>,
-    handler?: TEventCallback
+    handler?: TEventCallback,
   ) {
     if (!this.__eventListeners) {
       return;

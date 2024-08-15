@@ -9,7 +9,7 @@ describe('ActiveSelection', () => {
     const activeSelection = new ActiveSelection();
     expect(activeSelection.layoutManager).toBeDefined();
     expect(activeSelection.layoutManager?.strategy).toBeInstanceOf(
-      FitContentLayout
+      FitContentLayout,
     );
   });
 

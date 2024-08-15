@@ -152,7 +152,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     if (this.group) {
       point = transformPoint(
         point,
-        invertTransform(this.group.calcTransformMatrix())
+        invertTransform(this.group.calcTransformMatrix()),
       );
     }
     this.setRelativeXY(point, originX, originY);
@@ -174,7 +174,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   setRelativeXY(
     point: Point,
     originX: TOriginX = this.originX,
-    originY: TOriginY = this.originY
+    originY: TOriginY = this.originY,
   ) {
     this.setPositionByOrigin(point, originX, originY);
   }
@@ -207,7 +207,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     const intersection = Intersection.intersectPolygonRectangle(
       this.getCoords(),
       tl,
-      br
+      br,
     );
     return intersection.status === 'Intersection';
   }
@@ -220,7 +220,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   intersectsWithObject(other: ObjectGeometry): boolean {
     const intersection = Intersection.intersectPolygonPolygon(
       this.getCoords(),
-      other.getCoords()
+      other.getCoords(),
     );
 
     return (
@@ -289,7 +289,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
           point.x <= br.x &&
           point.x >= tl.x &&
           point.y <= br.y &&
-          point.y >= tl.y
+          point.y >= tl.y,
       )
     ) {
       return true;
@@ -317,7 +317,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     const allPointsAreOutside = this.getCoords().every(
       (point) =>
         (point.x >= br.x || point.x <= tl.x) &&
-        (point.y >= br.y || point.y <= tl.y)
+        (point.y >= br.y || point.y <= tl.y),
     );
     // check if the object is so big that it contains the entire viewport
     return allPointsAreOutside && this.containsPoint(tl.midPointFrom(br));
@@ -457,7 +457,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       +this.flipX,
       +this.flipY,
       resolveOrigin(this.originX),
-      resolveOrigin(this.originY)
+      resolveOrigin(this.originY),
     );
 
     return prefix;
@@ -483,7 +483,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     if (this.group) {
       matrix = multiplyTransformMatrices(
         this.group.calcTransformMatrix(false),
-        matrix
+        matrix,
       );
     }
     this.matrixCache = {

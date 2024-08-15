@@ -16,7 +16,7 @@ export function getCSSRules(doc: Document) {
     const styleContents = (styles[i].textContent || '').replace(
       // remove comments
       /\/\*[\s\S]*?\*\//g,
-      ''
+      '',
     );
 
     if (styleContents.trim() === '') {

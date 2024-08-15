@@ -27,18 +27,18 @@ export type PathPointControlStyle = {
 const calcPathPointPosition = (
   pathObject: Path,
   commandIndex: number,
-  pointIndex: number
+  pointIndex: number,
 ) => {
   const { path, pathOffset } = pathObject;
   const command = path[commandIndex];
   return new Point(
     (command[pointIndex] as number) - pathOffset.x,
-    (command[pointIndex + 1] as number) - pathOffset.y
+    (command[pointIndex + 1] as number) - pathOffset.y,
   ).transform(
     multiplyTransformMatrices(
       pathObject.getViewportTransform(),
-      pathObject.calcTransformMatrix()
-    )
+      pathObject.calcTransformMatrix(),
+    ),
   );
 };
 
@@ -47,7 +47,7 @@ const movePathPoint = (
   x: number,
   y: number,
   commandIndex: number,
-  pointIndex: number
+  pointIndex: number,
 ) => {
   const { path, pathOffset } = pathObject;
 
@@ -55,7 +55,7 @@ const movePathPoint = (
     path[(commandIndex > 0 ? commandIndex : path.length) - 1];
   const anchorPoint = new Point(
     anchorCommand[pointIndex] as number,
-    anchorCommand[pointIndex + 1] as number
+    anchorCommand[pointIndex + 1] as number,
   );
 
   const anchorPointInParentPlane = anchorPoint
@@ -65,7 +65,7 @@ const movePathPoint = (
   const mouseLocalPosition = sendPointToPlane(
     new Point(x, y),
     undefined,
-    pathObject.calcOwnMatrix()
+    pathObject.calcOwnMatrix(),
   );
 
   path[commandIndex][pointIndex] = mouseLocalPosition.x + pathOffset.x;
@@ -91,7 +91,7 @@ function pathPositionHandler(
   this: PathPointControl,
   dim: Point,
   finalMatrix: TMat2D,
-  pathObject: Path
+  pathObject: Path,
 ) {
   const { commandIndex, pointIndex } = this;
   return calcPathPointPosition(pathObject, commandIndex, pointIndex);
@@ -109,7 +109,7 @@ function pathActionHandler(
   eventData: TPointerEvent,
   transform: TTransformAnchor,
   x: number,
-  y: number
+  y: number,
 ) {
   const { target } = transform;
   const { commandIndex, pointIndex } = this;
@@ -118,7 +118,7 @@ function pathActionHandler(
     x,
     y,
     commandIndex,
-    pointIndex
+    pointIndex,
   );
   if (actionPerformed) {
     fireEvent(this.actionName as TModificationEvents, {
@@ -147,7 +147,7 @@ class PathPointControl extends Control {
     left: number,
     top: number,
     styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: Path
+    fabricObject: Path,
   ) {
     const overrides: ControlRenderingStyleOverride = {
       ...styleOverride,
@@ -173,7 +173,7 @@ class PathControlPointControl extends PathPointControl {
     left: number,
     top: number,
     styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: Path
+    fabricObject: Path,
   ) {
     const { path } = fabricObject;
     const {
@@ -191,7 +191,7 @@ class PathControlPointControl extends PathPointControl {
     const point = calcPathPointPosition(
       fabricObject,
       connectToCommandIndex,
-      connectToPointIndex
+      connectToPointIndex,
     );
 
     if (commandType === 'Q') {
@@ -199,7 +199,7 @@ class PathControlPointControl extends PathPointControl {
       const point2 = calcPathPointPosition(
         fabricObject,
         commandIndex,
-        pointIndex + 2
+        pointIndex + 2,
       );
       ctx.moveTo(point2.x, point2.y);
       ctx.lineTo(left, top);
@@ -223,7 +223,7 @@ const createControl = (
     pointStyle?: PathPointControlStyle;
   },
   connectToCommandIndex?: number,
-  connectToPointIndex?: number
+  connectToPointIndex?: number,
 ) =>
   new (isControlPoint ? PathControlPointControl : PathPointControl)({
     commandIndex: commandIndexPos,
@@ -242,7 +242,7 @@ export function createPathControls(
   options: Partial<Control> & {
     controlPointStyle?: PathPointControlStyle;
     pointStyle?: PathPointControlStyle;
-  } = {}
+  } = {},
 ): Record<string, Control> {
   const controls = {} as Record<string, Control>;
   let previousCommandType: TSimpleParseCommandType = 'M';
@@ -254,7 +254,7 @@ export function createPathControls(
         commandIndex,
         command.length - 2,
         false,
-        options
+        options,
       );
     }
     switch (commandType) {
@@ -265,7 +265,7 @@ export function createPathControls(
           true,
           options,
           commandIndex - 1,
-          indexFromPrevCommand(previousCommandType)
+          indexFromPrevCommand(previousCommandType),
         );
         controls[`c_${commandIndex}_C_CP_2`] = createControl(
           commandIndex,
@@ -273,7 +273,7 @@ export function createPathControls(
           true,
           options,
           commandIndex,
-          5
+          5,
         );
         break;
       case 'Q':
@@ -283,7 +283,7 @@ export function createPathControls(
           true,
           options,
           commandIndex,
-          3
+          3,
         );
         break;
     }

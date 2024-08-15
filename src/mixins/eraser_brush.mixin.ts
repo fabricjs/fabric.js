@@ -77,7 +77,7 @@ import { uid } from '../util/internals/uid';
     toObject: function (propertiesToInclude) {
       var object = _toObject.call(
         this,
-        ['erasable'].concat(propertiesToInclude)
+        ['erasable'].concat(propertiesToInclude),
       );
       if (this.eraser && !this.eraser.excludeFromExport) {
         object.eraser = this.eraser.toObject(propertiesToInclude);
@@ -154,9 +154,9 @@ import { uid } from '../util/internals/uid';
           return fabric.EraserBrush.prototype._addPathToObjectEraser.call(
             fabric.EraserBrush.prototype,
             object,
-            path
+            path,
           );
-        })
+        }),
       );
     },
 
@@ -179,7 +179,7 @@ import { uid } from '../util/internals/uid';
                 //  first we transform the path from the group's coordinate system to the canvas'
                 var originalTransform = fabric.util.multiplyTransformMatrices(
                   transform,
-                  path.calcTransformMatrix()
+                  path.calcTransformMatrix(),
                 );
                 fabric.util.applyTransformToObject(path, originalTransform);
                 return clipPath
@@ -190,14 +190,14 @@ import { uid } from '../util/internals/uid';
                             fabric.EraserBrush.prototype,
                             path,
                             _clipPath,
-                            transform
+                            transform,
                           );
                         return _this._addEraserPathToObjects(eraserPath);
                       },
-                      ['absolutePositioned', 'inverted']
+                      ['absolutePositioned', 'inverted'],
                     )
                   : _this._addEraserPathToObjects(path);
-              })
+              }),
             );
           });
         }
@@ -300,7 +300,7 @@ import { uid } from '../util/internals/uid';
       return new fabric.Eraser(
         enlivedProps[0],
         Object.assign(options, enlivedProps[1]),
-        true
+        true,
       );
     });
   };
@@ -405,7 +405,7 @@ import { uid } from '../util/internals/uid';
         collection,
         objects,
         ctx,
-        restorationContext
+        restorationContext,
       ) {
         objects.forEach(function (obj) {
           var dirty = false;
@@ -415,7 +415,7 @@ import { uid } from '../util/internals/uid';
               obj,
               obj._objects,
               ctx,
-              restorationContext
+              restorationContext,
             );
           } else if (!this.inverted && obj.erasable && obj.visible) {
             //  render only non-erasable objects
@@ -497,7 +497,7 @@ import { uid } from '../util/internals/uid';
           this.canvas,
           objects,
           patternCtx,
-          restorationContext
+          restorationContext,
         );
         this.canvas._renderObjects(patternCtx, objects);
         restorationContext.visibility.forEach(function (obj) {
@@ -661,24 +661,24 @@ import { uid } from '../util/internals/uid';
       applyClipPathToPath: function (
         path,
         clipPath,
-        clipPathContainerTransformMatrix
+        clipPathContainerTransformMatrix,
       ) {
         var pathInvTransform = fabric.util.invertTransform(
-            path.calcTransformMatrix()
+            path.calcTransformMatrix(),
           ),
           clipPathTransform = clipPath.calcTransformMatrix(),
           transform = clipPath.absolutePositioned
             ? pathInvTransform
             : fabric.util.multiplyTransformMatrices(
                 pathInvTransform,
-                clipPathContainerTransformMatrix
+                clipPathContainerTransformMatrix,
               );
         //  when passing down a clip path it becomes relative to the parent
         //  so we transform it acoordingly and set `absolutePositioned` to false
         clipPath.absolutePositioned = false;
         fabric.util.applyTransformToObject(
           clipPath,
-          fabric.util.multiplyTransformMatrices(transform, clipPathTransform)
+          fabric.util.multiplyTransformMatrices(transform, clipPathTransform),
         );
         //  We need to clip `path` with both `clipPath` and it's own clip path if existing (`path.clipPath`)
         //  so in turn `path` erases an object only where it overlaps with all it's clip paths, regardless of how many there are.
@@ -732,14 +732,14 @@ import { uid } from '../util/internals/uid';
               return Promise.all(
                 targets.map(function (_obj) {
                   return _this._addPathToObjectEraser(_obj, _path, context);
-                })
+                }),
               );
             });
           } else if (targets.length > 0) {
             return Promise.all(
               targets.map(function (_obj) {
                 return _this._addPathToObjectEraser(_obj, path, context);
-              })
+              }),
             );
           }
           return;
@@ -755,7 +755,7 @@ import { uid } from '../util/internals/uid';
           // http://fabricjs.com/using-transformations
           var desiredTransform = fabric.util.multiplyTransformMatrices(
             fabric.util.invertTransform(obj.calcTransformMatrix()),
-            path.calcTransformMatrix()
+            path.calcTransformMatrix(),
           );
           fabric.util.applyTransformToObject(path, desiredTransform);
           eraser.add(path);
@@ -795,7 +795,7 @@ import { uid } from '../util/internals/uid';
                 return path;
               })
             );
-          }, this)
+          }, this),
         );
       },
 
@@ -858,7 +858,7 @@ import { uid } from '../util/internals/uid';
             'erasing:end',
             Object.assign(context, {
               path: path,
-            })
+            }),
           );
 
           canvas.requestRenderAll();
@@ -868,7 +868,7 @@ import { uid } from '../util/internals/uid';
           canvas.fire('path:created', { path: path });
         });
       },
-    }
+    },
   );
 
   /** ERASER_END */

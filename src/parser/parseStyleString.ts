@@ -6,7 +6,7 @@
  */
 export function parseStyleString(
   style: string,
-  oStyle: Record<string, any>
+  oStyle: Record<string, any>,
 ): void {
   style
     .replace(/;\s*$/, '')

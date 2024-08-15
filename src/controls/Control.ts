@@ -177,7 +177,7 @@ export class Control {
     controlKey: string,
     fabricObject: InteractiveFabricObject,
     pointer: Point,
-    { tl, tr, br, bl }: TCornerPoint
+    { tl, tr, br, bl }: TCornerPoint,
   ) {
     // TODO: locking logic can be handled here instead of in the control handler logic
     return (
@@ -197,7 +197,7 @@ export class Control {
   getActionHandler(
     eventData: TPointerEvent,
     fabricObject: InteractiveFabricObject,
-    control: Control
+    control: Control,
   ): TransformActionHandler | undefined {
     return this.actionHandler;
   }
@@ -212,7 +212,7 @@ export class Control {
   getMouseDownHandler(
     eventData: TPointerEvent,
     fabricObject: InteractiveFabricObject,
-    control: Control
+    control: Control,
   ): ControlActionHandler | undefined {
     return this.mouseDownHandler;
   }
@@ -228,7 +228,7 @@ export class Control {
   getMouseUpHandler(
     eventData: TPointerEvent,
     fabricObject: InteractiveFabricObject,
-    control: Control
+    control: Control,
   ): ControlActionHandler | undefined {
     return this.mouseUpHandler;
   }
@@ -245,7 +245,7 @@ export class Control {
   cursorStyleHandler(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: InteractiveFabricObject
+    fabricObject: InteractiveFabricObject,
   ) {
     return control.cursorStyle;
   }
@@ -260,7 +260,7 @@ export class Control {
   getActionName(
     eventData: TPointerEvent,
     control: Control,
-    fabricObject: InteractiveFabricObject
+    fabricObject: InteractiveFabricObject,
   ) {
     return control.actionName;
   }
@@ -283,7 +283,7 @@ export class Control {
   setVisibility(
     visibility: boolean,
     name: string,
-    fabricObject: InteractiveFabricObject
+    fabricObject: InteractiveFabricObject,
   ) {
     this.visible = visibility;
   }
@@ -292,11 +292,11 @@ export class Control {
     dim: Point,
     finalMatrix: TMat2D,
     fabricObject: InteractiveFabricObject,
-    currentControl: Control
+    currentControl: Control,
   ) {
     return new Point(
       this.x * dim.x + this.offsetX,
-      this.y * dim.y + this.offsetY
+      this.y * dim.y + this.offsetY,
     ).transform(finalMatrix);
   }
 
@@ -315,14 +315,14 @@ export class Control {
     centerX: number,
     centerY: number,
     isTouch: boolean,
-    fabricObject: InteractiveFabricObject
+    fabricObject: InteractiveFabricObject,
   ) {
     const t = multiplyTransformMatrixArray([
       createTranslateMatrix(centerX, centerY),
       createRotateMatrix({ angle }),
       createScaleMatrix(
         (isTouch ? this.touchSizeX : this.sizeX) || objectCornerSize,
-        (isTouch ? this.touchSizeY : this.sizeY) || objectCornerSize
+        (isTouch ? this.touchSizeY : this.sizeY) || objectCornerSize,
       ),
     ]);
     return {
@@ -350,7 +350,7 @@ export class Control {
     left: number,
     top: number,
     styleOverride: ControlRenderingStyleOverride | undefined,
-    fabricObject: InteractiveFabricObject
+    fabricObject: InteractiveFabricObject,
   ) {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
@@ -361,7 +361,7 @@ export class Control {
           left,
           top,
           styleOverride,
-          fabricObject
+          fabricObject,
         );
         break;
       default:
@@ -371,7 +371,7 @@ export class Control {
           left,
           top,
           styleOverride,
-          fabricObject
+          fabricObject,
         );
     }
   }

@@ -72,7 +72,7 @@ export class MyFilter extends BaseFilter<'MyFilter', MyFilterOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uMyParameter, this.myParameter);
   }

@@ -39,14 +39,14 @@ describe('Color regex and conversion tests', () => {
   it('Creates a color from rgba with decimals', () => {
     const color1 = new Color('rgba(120.1, 60.2, 30.3, 0.5)');
     expect(color1.getSource().toString()).toBe(
-      [120.1, 60.2, 30.3, 0.5].toString()
+      [120.1, 60.2, 30.3, 0.5].toString(),
     );
   });
 
   it('Creates a color from rgb with decimals', () => {
     const color1 = new Color('rgb(120.1, 60.2, 30.3)');
     expect(color1.getSource().toString()).toBe(
-      [120.1, 60.2, 30.3, 1].toString()
+      [120.1, 60.2, 30.3, 1].toString(),
     );
   });
 

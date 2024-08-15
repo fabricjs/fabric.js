@@ -13,7 +13,7 @@ import type {
 const defaultAbort = () => false;
 
 export abstract class AnimationBase<
-  T extends number | number[] = number | number[]
+  T extends number | number[] = number | number[],
 > {
   declare readonly startValue: T;
   declare readonly endValue: T;
@@ -142,7 +142,7 @@ export abstract class AnimationBase<
       this._onComplete(
         this.endValue,
         this.valueProgress,
-        this.durationProgress
+        this.durationProgress,
       );
       this.unregister();
     } else {

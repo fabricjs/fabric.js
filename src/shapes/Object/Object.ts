@@ -134,7 +134,7 @@ export class FabricObject<
     Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends AnimatableObject<EventSpec>
   implements ObjectProps
@@ -355,7 +355,7 @@ export class FabricObject<
    * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
    */
   _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any
+    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any,
   ) {
     const width = dims.width,
       height = dims.height,
@@ -735,7 +735,7 @@ export class FabricObject<
       (this.dirty ||
         (isChanged &&
           (this.constructor as typeof FabricObject).stateProperties.includes(
-            key
+            key,
           ))) &&
       this.parent._set('dirty', true);
 
@@ -901,7 +901,7 @@ export class FabricObject<
    */
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject
+    clipPath: TCachedFabricObject,
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -921,7 +921,7 @@ export class FabricObject<
     ctx.drawImage(
       clipPath._cacheCanvas,
       -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
+      -clipPath.cacheTranslationY,
     );
     ctx.restore();
   }
@@ -975,7 +975,7 @@ export class FabricObject<
     ctx.drawImage(
       this._cacheCanvas,
       -this.cacheTranslationX,
-      -this.cacheTranslationY
+      -this.cacheTranslationY,
     );
   }
 
@@ -1047,7 +1047,7 @@ export class FabricObject<
       | 'strokeDashOffset'
       | 'strokeLineJoin'
       | 'strokeMiterLimit'
-    >
+    >,
   ) {
     const stroke = decl.stroke;
     if (stroke) {
@@ -1160,7 +1160,7 @@ export class FabricObject<
    */
   _applyPatternGradientTransform(
     ctx: CanvasRenderingContext2D,
-    filler: TFiller
+    filler: TFiller,
   ) {
     if (!isFiller(filler)) {
       return { offsetX: 0, offsetY: 0 };
@@ -1263,7 +1263,7 @@ export class FabricObject<
    */
   _applyPatternForTransformedGradient(
     ctx: CanvasRenderingContext2D,
-    filler: TFiller
+    filler: TFiller,
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       pCanvas = createCanvasElement(),
@@ -1287,18 +1287,18 @@ export class FabricObject<
     pCtx.translate(width / 2, height / 2);
     pCtx.scale(
       dims.zoomX / this.scaleX / retinaScaling,
-      dims.zoomY / this.scaleY / retinaScaling
+      dims.zoomY / this.scaleY / retinaScaling,
     );
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fillStyle = filler.toLive(ctx)!;
     pCtx.fill();
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,
-      -this.height / 2 - this.strokeWidth / 2
+      -this.height / 2 - this.strokeWidth / 2,
     );
     ctx.scale(
       (retinaScaling * this.scaleX) / dims.zoomX,
-      (retinaScaling * this.scaleY) / dims.zoomY
+      (retinaScaling * this.scaleY) / dims.zoomY,
     );
     ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
@@ -1321,7 +1321,7 @@ export class FabricObject<
   clone(propertiesToInclude?: string[]): Promise<this> {
     const objectForm = this.toObject(propertiesToInclude);
     return (this.constructor as typeof FabricObject).fromObject(
-      objectForm
+      objectForm,
     ) as unknown as Promise<this>;
   }
 
@@ -1422,7 +1422,7 @@ export class FabricObject<
     this.setPositionByOrigin(
       new Point(canvas.width / 2, canvas.height / 2),
       CENTER,
-      CENTER
+      CENTER,
     );
     const originalCanvas = this.canvas;
     // static canvas and canvas have both an array of InteractiveObjects
@@ -1466,7 +1466,7 @@ export class FabricObject<
     return toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
-      options.quality || 1
+      options.quality || 1,
     );
   }
 
@@ -1520,7 +1520,7 @@ export class FabricObject<
       const { x, y } = this.translateToOriginPoint(
         this.getRelativeCenterPoint(),
         originX,
-        originY
+        originY,
       );
       this.left = x;
       this.top = y;
@@ -1575,7 +1575,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     { type, ...object }: Record<string, unknown>,
-    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {},
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(cloneDeep(object), options).then(
       (enlivedMap) => {
@@ -1589,7 +1589,7 @@ export class FabricObject<
         } else {
           return new this(allOptions);
         }
-      }
+      },
     ) as Promise<S>;
   }
 
@@ -1602,7 +1602,7 @@ export class FabricObject<
    */
   static fromObject<T extends TOptions<SerializedObjectProps>>(
     object: T,
-    options?: Abortable
+    options?: Abortable,
   ) {
     return this._fromObject(object, options);
   }

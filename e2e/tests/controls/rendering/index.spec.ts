@@ -20,8 +20,8 @@ test('control box rendering', async ({ page }) => {
           padding,
           objectPadding,
           name: `${title}, padding of ${padding} and object padding of ${objectPadding}`,
-        }))
-      )
+        })),
+      ),
     )
     .flat(Infinity) as {
     data: typeof data;
@@ -63,12 +63,12 @@ test('control box rendering', async ({ page }) => {
                   });
                 });
               },
-              [data, padding, objectPadding] as const
+              [data, padding, objectPadding] as const,
             );
             expect(await canvasUtil.screenshot()).toMatchSnapshot({
               name: `${name}.png`,
             });
-          })
-    )
+          }),
+    ),
   );
 });

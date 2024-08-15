@@ -15,7 +15,7 @@ const xlinkAttr = 'xlink:href';
 
 export function recursivelyParseGradientsXlink(
   doc: Document,
-  gradient: Element
+  gradient: Element,
 ) {
   const xLink = gradient.getAttribute(xlinkAttr)?.slice(1) || '',
     referencedGradient = doc.getElementById(xLink);

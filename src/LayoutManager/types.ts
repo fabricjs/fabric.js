@@ -99,19 +99,18 @@ export type ObjectModifiedLayoutContext = CommonLayoutContext & {
   e: ModifiedEvent;
 };
 
-export type ObjectModifyingLayoutContext =
-  | CommonLayoutContext & {
-      type: typeof LAYOUT_TYPE_OBJECT_MODIFYING;
-    } & (
-        | {
-            trigger: TModificationEvents;
-            e: BasicTransformEvent;
-          }
-        | {
-            trigger: 'changed';
-            e: ITextEvents['changed'];
-          }
-      );
+export type ObjectModifyingLayoutContext = CommonLayoutContext & {
+  type: typeof LAYOUT_TYPE_OBJECT_MODIFYING;
+} & (
+    | {
+        trigger: TModificationEvents;
+        e: BasicTransformEvent;
+      }
+    | {
+        trigger: 'changed';
+        e: ITextEvents['changed'];
+      }
+  );
 
 export type ImperativeLayoutContext = CommonLayoutContext &
   ImperativeLayoutCommonOptions & {

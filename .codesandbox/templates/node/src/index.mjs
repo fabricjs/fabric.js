@@ -27,6 +27,6 @@ http
   .listen(port, (err) => {
     if (err) throw err;
     console.log(
-      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`
+      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`,
     );
   });

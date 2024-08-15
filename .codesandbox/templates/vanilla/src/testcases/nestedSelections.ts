@@ -35,7 +35,7 @@ export function testCase(canvas: fabric.Canvas, objectCaching = true) {
       subTargetCheck: true,
       interactive: true,
       objectCaching,
-    }
+    },
   );
   canvas.add(text, g);
   g.clone().then((clone) => {

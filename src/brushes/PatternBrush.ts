@@ -27,7 +27,7 @@ export class PatternBrush extends PencilBrush {
         dotWidth / 2,
         0,
         Math.PI * 2,
-        false
+        false,
       );
       patternCtx.closePath();
       patternCtx.fill();

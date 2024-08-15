@@ -28,7 +28,7 @@ const IndexPage: NextPage = () => {
               end: 9,
             },
           ],
-          textValue
+          textValue,
         ),
       });
       canvas.add(text);
@@ -44,12 +44,12 @@ const IndexPage: NextPage = () => {
             easing: toState
               ? fabric.util.ease.easeInOutQuad
               : fabric.util.ease.easeInOutSine,
-          }
+          },
         );
       };
       animate(1);
     },
-    [ref]
+    [ref],
   );
 
   return (

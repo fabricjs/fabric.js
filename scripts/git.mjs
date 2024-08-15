@@ -21,7 +21,7 @@ export function getGitInfo(branchRef = '') {
     (value) => {
       const [type, path] = value.split(' ');
       return { type, path };
-    }
+    },
   );
   const changes = execGitCommand(`git diff ${branchRef} --name-only`);
   const userName = execGitCommand('git config user.name')[0];

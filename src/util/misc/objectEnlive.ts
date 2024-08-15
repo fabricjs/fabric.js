@@ -28,7 +28,7 @@ export type LoadImageOptions = Abortable & {
  */
 export const loadImage = (
   url: string,
-  { signal, crossOrigin = null }: LoadImageOptions = {}
+  { signal, crossOrigin = null }: LoadImageOptions = {},
 ) =>
   new Promise<HTMLImageElement>(function (resolve, reject) {
     if (signal && signal.aborted) {
@@ -72,10 +72,10 @@ export type EnlivenObjectOptions = Abortable & {
       | FabricObject
       | BaseFilter<string>
       | Shadow
-      | TFiller
+      | TFiller,
   >(
     serializedObj: Record<string, any>,
-    instance: T
+    instance: T,
   ) => void;
 };
 
@@ -95,10 +95,10 @@ export const enlivenObjects = <
     | FabricObject
     | BaseFilter<string>
     | Shadow
-    | TFiller
+    | TFiller,
 >(
   objects: any[],
-  { signal, reviver = noop }: EnlivenObjectOptions = {}
+  { signal, reviver = noop }: EnlivenObjectOptions = {},
 ) =>
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
@@ -116,8 +116,8 @@ export const enlivenObjects = <
             reviver(obj, fabricInstance);
             instances.push(fabricInstance);
             return fabricInstance;
-          })
-      )
+          }),
+      ),
     )
       .then(resolve)
       .catch((error) => {
@@ -141,10 +141,10 @@ export const enlivenObjects = <
  * @returns {Promise<Record<string, FabricObject | TFiller | null>>} the input object with enlived values
  */
 export const enlivenObjectEnlivables = <
-  R = Record<string, FabricObject | TFiller | null>
+  R = Record<string, FabricObject | TFiller | null>,
 >(
   serializedObject: any,
-  { signal }: Abortable = {}
+  { signal }: Abortable = {},
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: (FabricObject | TFiller | Shadow)[] = [];

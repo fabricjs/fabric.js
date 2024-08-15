@@ -18,14 +18,14 @@ export const changeObjectWidth: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   const localPoint = getLocalPoint(
     transform,
     transform.originX,
     transform.originY,
     x,
-    y
+    y,
   );
   //  make sure the control changes width ONLY from it's side of target
   if (
@@ -41,7 +41,7 @@ export const changeObjectWidth: TransformActionHandler = (
       multiplier = isTransformCentered(transform) ? 2 : 1,
       oldWidth = target.width,
       newWidth = Math.ceil(
-        Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding
+        Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding,
       );
     target.set('width', Math.max(newWidth, 0));
     //  check against actual target width in case `newWidth` was rejected
@@ -52,5 +52,5 @@ export const changeObjectWidth: TransformActionHandler = (
 
 export const changeWidth = wrapWithFireEvent(
   RESIZING,
-  wrapWithFixedAnchor(changeObjectWidth)
+  wrapWithFixedAnchor(changeObjectWidth),
 );

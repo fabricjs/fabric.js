@@ -49,7 +49,7 @@ export interface IPathBBox extends TBBox {
 export class Path<
   Props extends TOptions<PathProps> = Partial<PathProps>,
   SProps extends SerializedPathProps = SerializedPathProps,
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Array of path points
@@ -77,7 +77,7 @@ export class Path<
   constructor(
     path: TComplexPathData | string,
     // todo: evaluate this spread here
-    { path: _, left, top, ...options }: Partial<Props> = {}
+    { path: _, left, top, ...options }: Partial<Props> = {},
   ) {
     super();
     Object.assign(this, Path.ownDefaults);
@@ -138,7 +138,7 @@ export class Path<
             command[3] + l,
             command[4] + t,
             command[5] + l,
-            command[6] + t
+            command[6] + t,
           );
           break;
 
@@ -147,7 +147,7 @@ export class Path<
             command[1] + l,
             command[2] + t,
             command[3] + l,
-            command[4] + t
+            command[4] + t,
           );
           break;
 
@@ -184,7 +184,7 @@ export class Path<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
@@ -199,7 +199,7 @@ export class Path<
    */
   toDatalessObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     const o = this.toObject<T, K>(propertiesToInclude);
     if (this.sourcePath) {
@@ -231,7 +231,7 @@ export class Path<
     const digits = config.NUM_FRACTION_DIGITS;
     return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(
       -this.pathOffset.y,
-      digits
+      digits,
     )})`;
   }
 
@@ -319,8 +319,8 @@ export class Path<
               command[3],
               command[4],
               command[5],
-              command[6]
-            )
+              command[6],
+            ),
           );
           x = command[5];
           y = command[6];
@@ -336,8 +336,8 @@ export class Path<
               command[1],
               command[2],
               command[3],
-              command[4]
-            )
+              command[4],
+            ),
           );
           x = command[3];
           y = command[4];
@@ -362,7 +362,7 @@ export class Path<
       ...bbox,
       pathOffset: new Point(
         bbox.left + bbox.width / 2,
-        bbox.top + bbox.height / 2
+        bbox.top + bbox.height / 2,
       ),
     };
   }
@@ -398,12 +398,12 @@ export class Path<
   static async fromElement(
     element: HTMLElement,
     options: Partial<PathProps>,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const { d, ...parsedAttributes } = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
-      cssRules
+      cssRules,
     );
     return new this(d, {
       ...parsedAttributes,

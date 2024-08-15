@@ -153,7 +153,7 @@ export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1fv(uniformLocations.uMatrix, this.matrix);
   }

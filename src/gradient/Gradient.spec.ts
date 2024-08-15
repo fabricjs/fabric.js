@@ -9,7 +9,7 @@ describe('Gradient', () => {
   function fromElement(
     gradientDef: SVGGradientElement,
     obj: FabricObject,
-    options: Partial<SVGOptions> = {}
+    options: Partial<SVGOptions> = {},
   ) {
     return Gradient.fromElement(gradientDef, obj, {
       width: 0,
@@ -33,7 +33,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
     const stop1 = getFabricDocument().createElement('stop');
     const stop2 = getFabricDocument().createElement('stop');
@@ -72,7 +72,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
     element.setAttributeNS(namespace, 'gradientUnits', 'objectBoundingBox');
     element.setAttributeNS(namespace, 'x1', '10%');
@@ -108,7 +108,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
     element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
     element.setAttributeNS(namespace, 'x1', '10%');
@@ -154,7 +154,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
     const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
     const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
@@ -201,7 +201,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
     const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
     const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
@@ -228,7 +228,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
 
     element.setAttributeNS(namespace, 'x1', '30%');
@@ -262,7 +262,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'radialGradient'
+      'radialGradient',
     );
 
     element.setAttributeNS(namespace, 'fx', '30%');
@@ -298,7 +298,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'radialGradient'
+      'radialGradient',
     );
 
     element.setAttributeNS(namespace, 'fx', '30');
@@ -340,7 +340,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
 
     element.setAttributeNS(namespace, 'x1', '30');
@@ -377,7 +377,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'radialGradient'
+      'radialGradient',
     );
     const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
     const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
@@ -414,7 +414,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'radialGradient'
+      'radialGradient',
     );
     const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
     const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
@@ -430,7 +430,7 @@ describe('Gradient', () => {
     element.setAttributeNS(
       namespace,
       'gradientTransform',
-      'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)'
+      'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)',
     );
     const object = new FabricObject({ width: 100, height: 100 });
     const gradient = fromElement(element, object, {});
@@ -443,7 +443,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'linearGradient'
+      'linearGradient',
     );
     const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
     const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
@@ -458,7 +458,7 @@ describe('Gradient', () => {
     stop2.setAttributeNS(
       namespace,
       'style',
-      'stop-color: black; stop-opacity:;'
+      'stop-color: black; stop-opacity:;',
     );
     stop2.setAttributeNS(namespace, 'stop-color', 'white');
 
@@ -471,7 +471,7 @@ describe('Gradient', () => {
     stop4.setAttributeNS(
       namespace,
       'style',
-      'stop-color: red; stop-opacity: 0.5;'
+      'stop-color: red; stop-opacity: 0.5;',
     );
     stop4.setAttributeNS(namespace, 'stop-opacity', '0.9');
 
@@ -510,7 +510,7 @@ describe('Gradient', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(
       namespace,
-      'radialGradient'
+      'radialGradient',
     );
     const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
     const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
@@ -525,7 +525,7 @@ describe('Gradient', () => {
     stop2.setAttributeNS(
       namespace,
       'style',
-      'stop-color: black; stop-opacity:;'
+      'stop-color: black; stop-opacity:;',
     );
     stop2.setAttributeNS(namespace, 'stop-color', 'white');
 
@@ -538,7 +538,7 @@ describe('Gradient', () => {
     stop4.setAttributeNS(
       namespace,
       'style',
-      'stop-color: red; stop-opacity: 0.5;'
+      'stop-color: red; stop-opacity: 0.5;',
     );
     stop4.setAttributeNS(namespace, 'stop-opacity', '0.9');
 

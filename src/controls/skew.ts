@@ -71,7 +71,7 @@ const skewMap = ['ns', 'nesw', 'ew', 'nwse'];
 export const skewCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject
+  fabricObject,
 ) => {
   if (control.x !== 0 && isLocked(fabricObject, 'lockSkewingY')) {
     return NOT_ALLOWED_CURSOR;
@@ -90,7 +90,7 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
 function skewObject(
   axis: TAxis,
   { target, ex, ey, skewingSide, ...transform }: SkewTransform,
-  pointer: Point
+  pointer: Point,
 ) {
   const { skew: skewKey } = AXIS_KEYS[axis],
     offset = pointer
@@ -157,7 +157,7 @@ function skewHandler(
   eventData: TPointerEvent,
   transform: Transform,
   x: number,
-  y: number
+  y: number,
 ) {
   const { target } = transform,
     {
@@ -197,8 +197,8 @@ function skewHandler(
   const finalHandler = wrapWithFireEvent<SkewTransform>(
     SKEWING,
     wrapWithFixedAnchor((eventData, transform, x, y) =>
-      skewObject(axis, transform, new Point(x, y))
-    )
+      skewObject(axis, transform, new Point(x, y)),
+    ),
   );
 
   return finalHandler(
@@ -209,7 +209,7 @@ function skewHandler(
       skewingSide,
     },
     x,
-    y
+    y,
   );
 }
 
@@ -226,7 +226,7 @@ export const skewHandlerX: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return skewHandler('x', eventData, transform, x, y);
 };
@@ -244,7 +244,7 @@ export const skewHandlerY: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return skewHandler('y', eventData, transform, x, y);
 };

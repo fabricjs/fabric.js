@@ -106,11 +106,11 @@ const parseAlign = (align: string): MinMidMax[] => {
  * @return {Object} an object containing align and meetOrSlice attribute
  */
 export const parsePreserveAspectRatioAttribute = (
-  attribute: string
+  attribute: string,
 ): TPreserveArParsed => {
   const [firstPart, secondPart] = attribute.trim().split(' ') as [
     MinMidMax,
-    MeetOrSlice | undefined
+    MeetOrSlice | undefined,
   ];
   const [alignX, alignY] = parseAlign(firstPart);
   return {
@@ -143,7 +143,7 @@ export const matrixToSVG = (transform: TMat2D) =>
 export const colorPropToSVG = (
   prop: string,
   value?: any,
-  inlineStyle = true
+  inlineStyle = true,
 ) => {
   let colorValue;
   let opacityValue;
@@ -174,11 +174,11 @@ export const colorPropToSVG = (
 export const createSVGRect = (
   color: string,
   { left, top, width, height }: TBBox,
-  precision = config.NUM_FRACTION_DIGITS
+  precision = config.NUM_FRACTION_DIGITS,
 ) => {
   const svgColor = colorPropToSVG(FILL, color, false);
   const [x, y, w, h] = [left, top, width, height].map((value) =>
-    toFixed(value, precision)
+    toFixed(value, precision),
   );
   return `<rect ${svgColor} x="${x}" y="${y}" width="${w}" height="${h}"></rect>`;
 };

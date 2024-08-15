@@ -19,7 +19,7 @@ export class ValueAnimation extends AnimationBase<number> {
       timeElapsed,
       this.startValue,
       this.byValue,
-      this.duration
+      this.duration,
     );
     return {
       value,

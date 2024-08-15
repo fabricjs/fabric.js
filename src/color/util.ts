@@ -37,7 +37,7 @@ export const rgb2Hsl = (
   r: number,
   g: number,
   b: number,
-  a: number
+  a: number,
 ): TRGBAColorSource => {
   r /= 255;
   g /= 255;

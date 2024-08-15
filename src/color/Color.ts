@@ -178,7 +178,7 @@ export class Color {
       otherAlpha = 0.5,
       otherSource = otherColor.getSource(),
       [R, G, B] = source.map((value, index) =>
-        Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha)
+        Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha),
       );
 
     this.setSource([R, G, B, source[3]]);
@@ -316,7 +316,7 @@ export class Color {
         expandedValue = value.match(/.{2}/g)!;
       }
       const [r, g, b, a = 255] = expandedValue.map((hexCouple) =>
-        parseInt(hexCouple, 16)
+        parseInt(hexCouple, 16),
       );
       return [r, g, b, a / 255];
     }

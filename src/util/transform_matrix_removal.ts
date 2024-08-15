@@ -15,11 +15,11 @@ type FabricObjectWithTransformMatrix = FabricObject & {
  * @private
  */
 const _assignTransformMatrixProps = (
-  object: FabricObjectWithTransformMatrix
+  object: FabricObjectWithTransformMatrix,
 ) => {
   if (object.transformMatrix) {
     const { scaleX, scaleY, angle, skewX } = qrDecompose(
-      object.transformMatrix
+      object.transformMatrix,
     );
     object.flipX = false;
     object.flipY = false;
@@ -39,7 +39,7 @@ const _assignTransformMatrixProps = (
  */
 export const removeTransformMatrixForSvgParsing = (
   object: FabricObjectWithTransformMatrix,
-  preserveAspectRatioOptions?: any
+  preserveAspectRatioOptions?: any,
 ) => {
   let center = object._findCenterFromElement();
   if (object.transformMatrix) {

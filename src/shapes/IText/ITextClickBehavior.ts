@@ -17,7 +17,7 @@ const notALeftClick = (e: Event) => !!(e as MouseEvent).button;
 export abstract class ITextClickBehavior<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
-  EventSpec extends ITextEvents = ITextEvents
+  EventSpec extends ITextEvents = ITextEvents,
 > extends ITextKeyBehavior<Props, SProps, EventSpec> {
   private declare __lastSelected: boolean;
   private declare __lastClickTime: number;
@@ -289,7 +289,7 @@ export abstract class ITextClickBehavior<
     return Math.min(
       // if object is horizontally flipped, mirror cursor location from the end
       this.flipX ? charLength - charIndex : charIndex,
-      this._text.length
+      this._text.length,
     );
   }
 }

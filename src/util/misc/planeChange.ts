@@ -14,7 +14,7 @@ import { applyTransformToObject } from './objectTransforms';
  */
 export const calcPlaneChangeMatrix = (
   from: TMat2D = iMatrix,
-  to: TMat2D = iMatrix
+  to: TMat2D = iMatrix,
 ) => multiplyTransformMatrices(invertTransform(to), from);
 
 /**
@@ -36,7 +36,7 @@ export const calcPlaneChangeMatrix = (
 export const sendPointToPlane = (
   point: Point,
   from: TMat2D = iMatrix,
-  to: TMat2D = iMatrix
+  to: TMat2D = iMatrix,
 ): Point => point.transform(calcPlaneChangeMatrix(from, to));
 
 /**
@@ -45,7 +45,7 @@ export const sendPointToPlane = (
 export const sendVectorToPlane = (
   point: Point,
   from: TMat2D = iMatrix,
-  to: TMat2D = iMatrix
+  to: TMat2D = iMatrix,
 ): Point => point.transform(calcPlaneChangeMatrix(from, to), true);
 
 /**
@@ -81,12 +81,12 @@ export const sendVectorToPlane = (
 export const sendObjectToPlane = (
   object: FabricObject,
   from?: TMat2D,
-  to?: TMat2D
+  to?: TMat2D,
 ): TMat2D => {
   const t = calcPlaneChangeMatrix(from, to);
   applyTransformToObject(
     object,
-    multiplyTransformMatrices(t, object.calcOwnMatrix())
+    multiplyTransformMatrices(t, object.calcOwnMatrix()),
   );
   return t;
 };

@@ -43,9 +43,9 @@ describe('InteractiveObject', () => {
           radiansToDegrees(
             Math.atan2(
               cornerPoint.corner.tr.y - cornerPoint.corner.tl.y,
-              cornerPoint.corner.tr.x - cornerPoint.corner.tl.x
-            )
-          )
+              cornerPoint.corner.tr.x - cornerPoint.corner.tl.x,
+            ),
+          ),
         );
         expect(controlAngle).toEqual(objectAngle);
       });

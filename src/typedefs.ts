@@ -63,7 +63,7 @@ export type TMat2D = [
   c: number,
   d: number,
   e: number,
-  f: number
+  f: number,
 ];
 
 /**
@@ -98,7 +98,7 @@ export type TCacheCanvasDimensions = {
 export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions<
-  T extends BaseFabricObject = BaseFabricObject
+  T extends BaseFabricObject = BaseFabricObject,
 > = {
   left?: number;
   top?: number;
