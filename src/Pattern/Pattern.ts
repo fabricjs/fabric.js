@@ -206,7 +206,7 @@ export class Pattern {
       patternTransform,
       ...otherOptions
     }: SerializedPatternOptions,
-    options?: Abortable
+    options?: Abortable,
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,

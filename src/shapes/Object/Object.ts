@@ -1574,7 +1574,7 @@ export class FabricObject<
    */
   static _fromObject<S extends FabricObject>(
     { type, ...serializedObjectOptions }: Record<string, unknown>,
-    { extraParam, ...options }: Abortable & { extraParam?: string } = {}
+    { extraParam, ...options }: Abortable & { extraParam?: string } = {},
   ): Promise<S> {
     return enlivenObjectEnlivables<any>(serializedObjectOptions, options).then(
       (enlivedObjectOptions) => {
@@ -1585,7 +1585,7 @@ export class FabricObject<
           return new this(
             serializedObjectOptions[extraParam],
             // @ts-expect-error different signature
-            enlivedObjectOptions
+            enlivedObjectOptions,
           );
         } else {
           return new this(enlivedObjectOptions);
