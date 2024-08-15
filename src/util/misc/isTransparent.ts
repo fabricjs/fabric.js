@@ -11,7 +11,7 @@ export const isTransparent = (
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  tolerance: number
+  tolerance: number,
 ): boolean => {
   tolerance = Math.round(tolerance);
   const size = tolerance * 2 + 1;

@@ -131,5 +131,16 @@ describe('Object', () => {
       rect.set('dirty', false);
       expect(group.dirty).toBe(true);
     });
+    it('when dirty is true it bubbles to the parent', () => {
+      const rect = new Rect({ width: 100, height: 100 });
+      rect.group = new Group();
+      rect.parent = new Group();
+      rect.group.dirty = false;
+      rect.parent.dirty = false;
+      rect.dirty = false;
+      rect.set('dirty', true);
+      expect(rect.group.dirty).toBe(false);
+      expect(rect.parent.dirty).toBe(true);
+    });
   });
 });

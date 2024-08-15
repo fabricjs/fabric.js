@@ -1,4 +1,5 @@
 import type { TColorArg } from '../../color/typedefs';
+import { FILL, STROKE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { TAnimation } from '../../util/animation/animate';
 import { animate, animateColor } from '../../util/animation/animate';
@@ -11,13 +12,13 @@ import type {
 import { StackedObject } from './StackedObject';
 
 export abstract class AnimatableObject<
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends StackedObject<EventSpec> {
   /**
    * List of properties to consider for animating colors.
    * @type String[]
    */
-  static colorProperties: string[] = ['fill', 'stroke', 'backgroundColor'];
+  static colorProperties: string[] = [FILL, STROKE, 'backgroundColor'];
 
   /**
    * Animates object's properties
@@ -33,12 +34,15 @@ export abstract class AnimatableObject<
    */
   animate<T extends number | number[] | TColorArg>(
     animatable: Record<string, T>,
-    options?: Partial<AnimationOptions<T>>
+    options?: Partial<AnimationOptions<T>>,
   ): Record<string, TAnimation<T>> {
-    return Object.entries(animatable).reduce((acc, [key, endValue]) => {
-      acc[key] = this._animate(key, endValue, options);
-      return acc;
-    }, {} as Record<string, TAnimation<T>>);
+    return Object.entries(animatable).reduce(
+      (acc, [key, endValue]) => {
+        acc[key] = this._animate(key, endValue, options);
+        return acc;
+      },
+      {} as Record<string, TAnimation<T>>,
+    );
   }
 
   /**
@@ -50,27 +54,25 @@ export abstract class AnimatableObject<
   _animate<T extends number | number[] | TColorArg>(
     key: string,
     endValue: T,
-    options: Partial<AnimationOptions<T>> = {}
+    options: Partial<AnimationOptions<T>> = {},
   ): TAnimation<T> {
     const path = key.split('.');
     const propIsColor = (
       this.constructor as typeof AnimatableObject
     ).colorProperties.includes(path[path.length - 1]);
-    const { easing, duration, abort, startValue, onChange, onComplete } =
-      options;
+    const { abort, startValue, onChange, onComplete } = options;
     const animationOptions = {
+      ...options,
       target: this,
       // path.reduce... is the current value in case start value isn't provided
       startValue:
         startValue ?? path.reduce((deep: any, key) => deep[key], this),
       endValue,
-      easing,
-      duration,
       abort: abort?.bind(this),
       onChange: (
         value: number | number[] | string,
         valueProgress: number,
-        durationProgress: number
+        durationProgress: number,
       ) => {
         path.reduce((deep: Record<string, any>, key, index) => {
           if (index === path.length - 1) {
@@ -85,7 +87,7 @@ export abstract class AnimatableObject<
       onComplete: (
         value: number | number[] | string,
         valueProgress: number,
-        durationProgress: number
+        durationProgress: number,
       ) => {
         this.setCoords();
         onComplete &&
@@ -98,7 +100,7 @@ export abstract class AnimatableObject<
       propIsColor
         ? animateColor(animationOptions as ColorAnimationOptions)
         : animate(
-            animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+            animationOptions as ValueAnimationOptions | ArrayAnimationOptions,
           )
     ) as TAnimation<T>;
   }

@@ -19,7 +19,14 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
-import { CENTER } from '../constants';
+import {
+  CENTER,
+  SCALE_X,
+  SCALE_Y,
+  SKEWING,
+  SKEW_X,
+  SKEW_Y,
+} from '../constants';
 
 export type SkewTransform = Transform & { skewingSide: -1 | 1 };
 
@@ -36,16 +43,16 @@ const AXIS_KEYS: Record<
 > = {
   x: {
     counterAxis: 'y',
-    scale: 'scaleX',
-    skew: 'skewX',
+    scale: SCALE_X,
+    skew: SKEW_X,
     lockSkewing: 'lockSkewingX',
     origin: 'originX',
     flip: 'flipX',
   },
   y: {
     counterAxis: 'x',
-    scale: 'scaleY',
-    skew: 'skewY',
+    scale: SCALE_Y,
+    skew: SKEW_Y,
     lockSkewing: 'lockSkewingY',
     origin: 'originY',
     flip: 'flipY',
@@ -64,7 +71,7 @@ const skewMap = ['ns', 'nesw', 'ew', 'nwse'];
 export const skewCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject
+  fabricObject,
 ) => {
   if (control.x !== 0 && isLocked(fabricObject, 'lockSkewingY')) {
     return NOT_ALLOWED_CURSOR;
@@ -83,7 +90,7 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
 function skewObject(
   axis: TAxis,
   { target, ex, ey, skewingSide, ...transform }: SkewTransform,
-  pointer: Point
+  pointer: Point,
 ) {
   const { skew: skewKey } = AXIS_KEYS[axis],
     offset = pointer
@@ -130,7 +137,7 @@ function skewObject(
       dimAfter = target._getTransformedDimensions(),
       compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
     compensationFactor !== 1 &&
-      target.set('scaleX', compensationFactor * scaleX);
+      target.set(SCALE_X, compensationFactor * scaleX);
   }
 
   return changed;
@@ -150,7 +157,7 @@ function skewHandler(
   eventData: TPointerEvent,
   transform: Transform,
   x: number,
-  y: number
+  y: number,
 ) {
   const { target } = transform,
     {
@@ -188,10 +195,10 @@ function skewHandler(
     origin = -skewingDirection * 0.5 + 0.5;
 
   const finalHandler = wrapWithFireEvent<SkewTransform>(
-    'skewing',
+    SKEWING,
     wrapWithFixedAnchor((eventData, transform, x, y) =>
-      skewObject(axis, transform, new Point(x, y))
-    )
+      skewObject(axis, transform, new Point(x, y)),
+    ),
   );
 
   return finalHandler(
@@ -202,7 +209,7 @@ function skewHandler(
       skewingSide,
     },
     x,
-    y
+    y,
   );
 }
 
@@ -219,7 +226,7 @@ export const skewHandlerX: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return skewHandler('x', eventData, transform, x, y);
 };
@@ -237,7 +244,7 @@ export const skewHandlerY: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return skewHandler('y', eventData, transform, x, y);
 };

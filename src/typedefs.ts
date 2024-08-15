@@ -11,7 +11,7 @@ interface NominalTag<T> {
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
 type TNonFunctionPropertyNames<T> = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
@@ -63,7 +63,7 @@ export type TMat2D = [
   c: number,
   d: number,
   e: number,
-  f: number
+  f: number,
 ];
 
 /**
@@ -98,7 +98,7 @@ export type TCacheCanvasDimensions = {
 export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions<
-  T extends BaseFabricObject = BaseFabricObject
+  T extends BaseFabricObject = BaseFabricObject,
 > = {
   left?: number;
   top?: number;

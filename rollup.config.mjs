@@ -12,13 +12,25 @@ const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 
 const dirname = path.dirname(buildOutput);
 const basename = path.basename(buildOutput, '.js');
-
 const plugins = [
   json(),
   ts({
     noForceEmit: true,
     tsconfig: './tsconfig.json',
-    exclude: ['dist', '**/**.spec.ts', '**/**.test.ts'],
+    exclude: ['dist', 'dist-extensions', '**/**.spec.ts', '**/**.test.ts'],
+  }),
+  babel({
+    extensions: ['.ts', '.js'],
+    babelHelpers: 'bundled',
+  }),
+];
+
+const pluginsExtensions = [
+  json(),
+  ts({
+    noForceEmit: true,
+    tsconfig: './tsconfig-extensions.json',
+    exclude: ['dist', 'dist-extensions', '**/**.spec.ts', '**/**.test.ts'],
   }),
   babel({
     extensions: ['.ts', '.js'],
@@ -51,7 +63,7 @@ function onwarn(warning, warn) {
 // https://rollupjs.org/guide/en/#configuration-files
 export default [
   {
-    input: process.env.BUILD_INPUT?.split(splitter) || ['./fabric.ts'],
+    input: ['./fabric.ts'],
     output: [
       // es modules in files
       {
@@ -94,7 +106,7 @@ export default [
             plugins: [terser()],
           }
         : null,
-      // umd in bundle
+      // umd module in bundle, the cdn one for fiddles
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
@@ -123,6 +135,7 @@ export default [
         format: 'es',
         sourcemap: true,
       },
+      // todo remove
       {
         file: path.resolve(dirname, `${basename}.node.cjs`),
         name: 'fabric',
@@ -133,5 +146,34 @@ export default [
     plugins,
     onwarn,
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+  },
+  // EXTENSIONS
+
+  {
+    input: ['./extensions/index.ts'],
+    external: ['fabric'],
+    output: [
+      // es modules in files
+      {
+        dir: path.resolve('./dist-extensions'),
+        format: 'es',
+        preserveModules: true,
+        entryFileNames: '[name].mjs',
+        sourcemap: true,
+      },
+      // umd module, the cdn one for fiddles, minified
+      {
+        file: path.resolve('./dist-extensions', `fabric-extensions.min.js`),
+        name: 'fabricExtensions',
+        format: 'umd',
+        sourcemap: true,
+        globals: {
+          fabric: 'fabric',
+        },
+        plugins: [terser()],
+      },
+    ],
+    plugins: pluginsExtensions,
+    onwarn,
   },
 ];

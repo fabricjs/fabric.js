@@ -1,13 +1,16 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/invert';
 
-export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
+export type InvertOwnProps = {
+  alpha: boolean;
+  invert: boolean;
+};
+
+export const invertDefaultValues: InvertOwnProps = {
   alpha: false,
   invert: true,
-  mainParameter: 'invert',
 };
 
 /**
@@ -16,24 +19,26 @@ export const invertDefaultValues: Partial<TClassProperties<Invert>> = {
  * object.filters.push(filter);
  * object.applyFilters(canvas.renderAll.bind(canvas));
  */
-export class Invert extends BaseFilter {
+export class Invert extends BaseFilter<'Invert', InvertOwnProps> {
   /**
    * Invert also alpha.
    * @param {Boolean} alpha
    * @default
    **/
-  declare alpha: boolean;
+  declare alpha: InvertOwnProps['alpha'];
 
   /**
    * Filter invert. if false, does nothing
    * @param {Boolean} invert
    * @default
    */
-  declare invert: boolean;
+  declare invert: InvertOwnProps['invert'];
 
   static type = 'Invert';
 
   static defaults = invertDefaultValues;
+
+  static uniformLocations = ['uInvert', 'uAlpha'];
 
   /**
    * Apply the Invert operation to a Uint8Array representing the pixels of an image.
@@ -68,22 +73,6 @@ export class Invert extends BaseFilter {
   }
 
   /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uInvert: gl.getUniformLocation(program, 'uInvert'),
-      uAlpha: gl.getUniformLocation(program, 'uAlpha'),
-    };
-  }
-
-  /**
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
@@ -91,7 +80,7 @@ export class Invert extends BaseFilter {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1i(uniformLocations.uInvert, Number(this.invert));
     gl.uniform1i(uniformLocations.uAlpha, Number(this.alpha));

@@ -23,12 +23,12 @@ program
   .command('start')
   .description('start a sandbox app')
   .addArgument(
-    new commander.Argument('<template>', 'template to use').choices(templates)
+    new commander.Argument('<template>', 'template to use').choices(templates),
   )
   .option('-w, --watch', 'build and watch fabric', true)
   .option(
     '--no-watch',
-    'use this option if you have another process watching fabric'
+    'use this option if you have another process watching fabric',
   )
   .action(async (template, { watch }) => {
     const pathToSandbox = path.resolve(codesandboxTemplatesDir, template);
@@ -42,8 +42,8 @@ sandbox
   .addOption(
     new commander.Option(
       '-t, --template <template>',
-      'template to use instead of a "path"'
-    ).choices(templates)
+      'template to use instead of a "path"',
+    ).choices(templates),
   )
   .action(async (deploy, { template }, context) => {
     if (!deploy && !template) {
@@ -62,7 +62,7 @@ sandbox
           type: 'confirm',
           name: 'confirm',
           message: `Did you mean to run ${chalk.blue(
-            `npm run sandbox deploy -- -t ${template}\n`
+            `npm run sandbox deploy -- -t ${template}\n`,
           )}?`,
           default: true,
         },
@@ -73,7 +73,7 @@ sandbox
       }
     }
     const uri = await createCodeSandbox(
-      deploy || path.resolve(codesandboxTemplatesDir, template)
+      deploy || path.resolve(codesandboxTemplatesDir, template),
     );
     console.log(chalk.yellow(`> created codesandbox ${uri}`));
   });
@@ -82,13 +82,13 @@ sandbox
   .command('build')
   .description('build and start a sandbox')
   .addArgument(
-    new commander.Argument('<template>', 'template to use').choices(templates)
+    new commander.Argument('<template>', 'template to use').choices(templates),
   )
   .argument('<destination>', 'build destination')
   .option('-w, --watch', 'build and watch fabric', true)
   .option(
     '--no-watch',
-    'use this option if you have another process watching fabric'
+    'use this option if you have another process watching fabric',
   )
   .action((template, destination, { watch }) => {
     const templateDir = path.resolve(codesandboxTemplatesDir, template);
@@ -97,8 +97,8 @@ sandbox
     });
     console.log(
       `${chalk.blue(
-        `> building ${chalk.bold(template)} sandbox`
-      )} at ${chalk.cyanBright(destination)}`
+        `> building ${chalk.bold(template)} sandbox`,
+      )} at ${chalk.cyanBright(destination)}`,
     );
     startSandbox(destination, watch, true);
   });
@@ -109,13 +109,13 @@ sandbox
   .addOption(
     new commander.Option(
       '-t, --template <template>',
-      'template to use instead of a "path"'
-    ).choices(templates)
+      'template to use instead of a "path"',
+    ).choices(templates),
   )
   .option('-w, --watch', 'build and watch fabric', true)
   .option(
     '--no-watch',
-    'use this option if you have another process watching fabric'
+    'use this option if you have another process watching fabric',
   )
   .action(async (pathToSandbox, { template, watch }, context) => {
     if (!fs.existsSync(pathToSandbox) && templates.includes(pathToSandbox)) {
@@ -124,7 +124,7 @@ sandbox
           type: 'confirm',
           name: 'confirm',
           message: `Did you mean to run ${chalk.blue(
-            `npm run sandbox start -- -t ${pathToSandbox}\n`
+            `npm run sandbox start -- -t ${pathToSandbox}\n`,
           )}?`,
           default: true,
         },
@@ -142,7 +142,7 @@ sandbox
     }
     startSandbox(
       pathToSandbox || path.resolve(codesandboxTemplatesDir, template),
-      watch
+      watch,
     );
   });
 

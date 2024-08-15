@@ -29,7 +29,7 @@ export interface SerializedLineProps
 export class Line<
     Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedLineProps = SerializedLineProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueLineProps
@@ -71,8 +71,14 @@ export class Line<
    * @param {Object} [options] Options object
    * @return {Line} thisArg
    */
-  constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Props = {} as Props) {
-    super({ ...options, x1, y1, x2, y2 });
+  constructor([x1, y1, x2, y2] = [0, 0, 0, 0], options: Partial<Props> = {}) {
+    super();
+    Object.assign(this, Line.ownDefaults);
+    this.setOptions(options);
+    this.x1 = x1;
+    this.x2 = x2;
+    this.y1 = y1;
+    this.y2 = y2;
     this._setWidthHeight();
     const { left, top } = options;
     typeof left === 'number' && this.set(LEFT, left);
@@ -158,7 +164,7 @@ export class Line<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
@@ -242,7 +248,7 @@ export class Line<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const {
       x1 = 0,
@@ -277,7 +283,7 @@ export class Line<
       },
       {
         extraParam: 'points',
-      }
+      },
     );
   }
 }

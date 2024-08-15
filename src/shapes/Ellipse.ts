@@ -1,4 +1,4 @@
-import { twoMathPi } from '../constants';
+import { SCALE_X, SCALE_Y, twoMathPi } from '../constants';
 import { SHARED_ATTRIBUTES } from '../parser/attributes';
 import { parseAttributes } from '../parser/parseAttributes';
 import type { Abortable, TClassProperties, TOptions } from '../typedefs';
@@ -8,7 +8,7 @@ import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
 
-export const ellipseDefaultValues: UniqueEllipseProps = {
+export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   rx: 0,
   ry: 0,
 };
@@ -29,7 +29,7 @@ const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 export class Ellipse<
     Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
     SProps extends SerializedEllipseProps = SerializedEllipseProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements EllipseProps
@@ -52,13 +52,23 @@ export class Ellipse<
 
   static cacheProperties = [...cacheProperties, ...ELLIPSE_PROPS];
 
-  static ownDefaults: Record<string, any> = ellipseDefaultValues;
+  static ownDefaults = ellipseDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Ellipse.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, Ellipse.ownDefaults);
+    this.setOptions(options);
   }
 
   /**
@@ -88,7 +98,7 @@ export class Ellipse<
    * @return {Number}
    */
   getRx() {
-    return this.get('rx') * this.get('scaleX');
+    return this.get('rx') * this.get(SCALE_X);
   }
 
   /**
@@ -96,7 +106,7 @@ export class Ellipse<
    * @return {Number}
    */
   getRy() {
-    return this.get('ry') * this.get('scaleY');
+    return this.get('ry') * this.get(SCALE_Y);
   }
 
   /**
@@ -106,7 +116,7 @@ export class Ellipse<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...ELLIPSE_PROPS, ...propertiesToInclude]);
   }
@@ -157,12 +167,12 @@ export class Ellipse<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const parsedAttributes = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
-      cssRules
+      cssRules,
     );
 
     parsedAttributes.left = (parsedAttributes.left || 0) - parsedAttributes.rx;

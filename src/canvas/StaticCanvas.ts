@@ -45,10 +45,19 @@ import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
 
-export type TCanvasSizeOptions = {
-  backstoreOnly?: boolean;
-  cssOnly?: boolean;
-};
+/**
+ * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
+ * Better try to restrict with types to avoid confusion.
+ */
+export type TCanvasSizeOptions =
+  | {
+      backstoreOnly?: true;
+      cssOnly?: false;
+    }
+  | {
+      backstoreOnly?: false;
+      cssOnly?: true;
+    };
 
 export type TSVGExportOptions = {
   suppressPreamble?: boolean;
@@ -75,7 +84,8 @@ export type TSVGExportOptions = {
  */
 // TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
-    EventSpec extends StaticCanvasEvents = StaticCanvasEvents
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    EventSpec extends StaticCanvasEvents = StaticCanvasEvents,
   >
   extends createCollectionMixin(CommonMethods<CanvasEvents>)
   implements StaticCanvasOptions
@@ -152,6 +162,15 @@ export class StaticCanvas<
 
   declare elements: StaticCanvasDOMManager;
 
+  /**
+   * When true control drawing is skipped.
+   * This boolean is used to avoid toDataURL to export controls.
+   * Usage of this boolean to build up other flows and features is not supported
+   * @type Boolean
+   * @default false
+   */
+  protected declare skipControlsDrawing: boolean;
+
   static ownDefaults = staticCanvasDefaults;
 
   // reference to
@@ -166,12 +185,12 @@ export class StaticCanvas<
 
   constructor(
     el?: string | HTMLCanvasElement,
-    options: TOptions<StaticCanvasOptions> = {}
+    options: TOptions<StaticCanvasOptions> = {},
   ) {
     super();
     Object.assign(
       this,
-      (this.constructor as typeof StaticCanvas).getDefaults()
+      (this.constructor as typeof StaticCanvas).getDefaults(),
     );
     this.set(options);
     this.initElements(el);
@@ -179,6 +198,7 @@ export class StaticCanvas<
       width: this.width || this.elements.lower.el.width || 0,
       height: this.height || this.elements.lower.el.height || 0,
     });
+    this.skipControlsDrawing = false;
     this.viewportTransform = [...this.viewportTransform];
     this.calcViewportBoundaries();
   }
@@ -210,7 +230,7 @@ export class StaticCanvas<
       log(
         'warn',
         'Canvas is trying to add an object that belongs to a different canvas.\n' +
-          'Resulting to default behavior: removing object from previous canvas and adding to new canvas'
+          'Resulting to default behavior: removing object from previous canvas and adding to new canvas',
       );
       obj.canvas.remove(obj);
     }
@@ -271,11 +291,19 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setWidth(value: number, options: TCanvasSizeOptions = {}) {
+  setWidth(
+    value: TSize['width'],
+    options?: { backstoreOnly?: true; cssOnly?: false },
+  ): void;
+  setWidth(
+    value: CSSDimensions['width'],
+    options?: { cssOnly?: true; backstoreOnly?: false },
+  ): void;
+  setWidth(value: number, options?: never) {
     return this.setDimensions({ width: value }, options);
   }
 
-  /**
+  /**s
    * Sets height of this canvas instance
    * @param {Number|String} value                         Value to set height to
    * @param {Object}        [options]                     Options object
@@ -283,7 +311,15 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    * @deprecated will be removed in 7.0
    */
-  setHeight(value: number, options: TCanvasSizeOptions = {}) {
+  setHeight(
+    value: TSize['height'],
+    options?: { backstoreOnly?: true; cssOnly?: false },
+  ): void;
+  setHeight(
+    value: CSSDimensions['height'],
+    options?: { cssOnly?: true; backstoreOnly?: false },
+  ): void;
+  setHeight(value: CSSDimensions['height'], options?: never) {
     return this.setDimensions({ height: value }, options);
   }
 
@@ -293,7 +329,7 @@ export class StaticCanvas<
    */
   protected _setDimensionsImpl(
     dimensions: Partial<TSize | CSSDimensions>,
-    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {},
   ) {
     if (!cssOnly) {
       const size = {
@@ -323,14 +359,20 @@ export class StaticCanvas<
    * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
    */
   setDimensions(
+    dimensions: Partial<CSSDimensions>,
+    options?: { cssOnly?: true; backstoreOnly?: false },
+  ): void;
+  setDimensions(
     dimensions: Partial<TSize>,
-    { cssOnly = false, backstoreOnly = false }: TCanvasSizeOptions = {}
+    options?: { backstoreOnly?: true; cssOnly?: false },
+  ): void;
+  setDimensions(dimensions: Partial<TSize>, options?: never): void;
+  setDimensions(
+    dimensions: Partial<TSize | CSSDimensions>,
+    options?: TCanvasSizeOptions,
   ) {
-    this._setDimensionsImpl(dimensions, {
-      cssOnly,
-      backstoreOnly,
-    });
-    if (!cssOnly) {
+    this._setDimensionsImpl(dimensions, options);
+    if (!options || !options.cssOnly) {
       this.requestRenderAll();
     }
   }
@@ -348,21 +390,7 @@ export class StaticCanvas<
    * @param {Array} vpt a Canvas 2D API transform matrix
    */
   setViewportTransform(vpt: TMat2D) {
-    const backgroundObject = this.backgroundImage,
-      overlayObject = this.overlayImage,
-      len = this._objects.length;
-
     this.viewportTransform = vpt;
-    for (let i = 0; i < len; i++) {
-      const object = this._objects[i];
-      object.group || object.setCoords();
-    }
-    if (backgroundObject) {
-      backgroundObject.setCoords();
-    }
-    if (overlayObject) {
-      overlayObject.setCoords();
-    }
     this.calcViewportBoundaries();
     this.renderOnAddRemove && this.requestRenderAll();
   }
@@ -415,8 +443,8 @@ export class StaticCanvas<
     return this.absolutePan(
       new Point(
         -point.x - this.viewportTransform[4],
-        -point.y - this.viewportTransform[5]
-      )
+        -point.y - this.viewportTransform[5],
+      ),
     );
   }
 
@@ -522,7 +550,7 @@ export class StaticCanvas<
     }
   }
 
-  drawControls(ctx: CanvasRenderingContext2D) {
+  drawControls(_ctx: CanvasRenderingContext2D) {
     // Static canvas has no controls
   }
 
@@ -551,7 +579,7 @@ export class StaticCanvas<
     ctx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
     this._renderObjects(ctx, objects);
     ctx.restore();
-    if (!this.controlsAboveOverlay) {
+    if (!this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
     if (path) {
@@ -563,7 +591,7 @@ export class StaticCanvas<
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
-    if (this.controlsAboveOverlay) {
+    if (this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
     this.fire('after:render', { ctx });
@@ -580,7 +608,7 @@ export class StaticCanvas<
    */
   drawClipPathOnCanvas(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject
+    clipPath: TCachedFabricObject,
   ) {
     const v = this.viewportTransform;
     ctx.save();
@@ -593,7 +621,7 @@ export class StaticCanvas<
     ctx.drawImage(
       clipPath._cacheCanvas,
       -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY
+      -clipPath.cacheTranslationY,
     );
     ctx.restore();
   }
@@ -616,7 +644,7 @@ export class StaticCanvas<
    */
   _renderBackgroundOrOverlay(
     ctx: CanvasRenderingContext2D,
-    property: 'background' | 'overlay'
+    property: 'background' | 'overlay',
   ) {
     const fill = this[`${property}Color`],
       object = this[`${property}Image`],
@@ -705,7 +733,7 @@ export class StaticCanvas<
   centerObjectH(object: FabricObject) {
     return this._centerObject(
       object,
-      new Point(this.getCenterPoint().x, object.getCenterPoint().y)
+      new Point(this.getCenterPoint().x, object.getCenterPoint().y),
     );
   }
 
@@ -716,7 +744,7 @@ export class StaticCanvas<
   centerObjectV(object: FabricObject) {
     return this._centerObject(
       object,
-      new Point(object.getCenterPoint().x, this.getCenterPoint().y)
+      new Point(object.getCenterPoint().x, this.getCenterPoint().y),
     );
   }
 
@@ -743,7 +771,7 @@ export class StaticCanvas<
   viewportCenterObjectH(object: FabricObject) {
     return this._centerObject(
       object,
-      new Point(this.getVpCenter().x, object.getCenterPoint().y)
+      new Point(this.getVpCenter().x, object.getCenterPoint().y),
     );
   }
 
@@ -754,7 +782,7 @@ export class StaticCanvas<
   viewportCenterObjectV(object: FabricObject) {
     return this._centerObject(
       object,
-      new Point(object.getCenterPoint().x, this.getVpCenter().y)
+      new Point(object.getCenterPoint().x, this.getVpCenter().y),
     );
   }
 
@@ -765,7 +793,7 @@ export class StaticCanvas<
   getVpCenter(): Point {
     return transformPoint(
       this.getCenterPoint(),
-      invertTransform(this.viewportTransform)
+      invertTransform(this.viewportTransform),
     );
   }
 
@@ -831,7 +859,7 @@ export class StaticCanvas<
    */
   _toObjectMethod(
     methodName: TValidToObjectMethod,
-    propertiesToInclude?: string[]
+    propertiesToInclude?: string[],
   ) {
     const clipPath = this.clipPath;
     const clipPathData =
@@ -844,7 +872,7 @@ export class StaticCanvas<
       objects: this._objects
         .filter((object) => !object.excludeFromExport)
         .map((instance) =>
-          this._toObject(instance, methodName, propertiesToInclude)
+          this._toObject(instance, methodName, propertiesToInclude),
         ),
       ...this.__serializeBgOverlay(methodName, propertiesToInclude),
       ...(clipPathData ? { clipPath: clipPathData } : null),
@@ -857,7 +885,7 @@ export class StaticCanvas<
   protected _toObject(
     instance: FabricObject,
     methodName: TValidToObjectMethod,
-    propertiesToInclude?: string[]
+    propertiesToInclude?: string[],
   ) {
     let originalValue;
 
@@ -878,7 +906,7 @@ export class StaticCanvas<
    */
   __serializeBgOverlay(
     methodName: TValidToObjectMethod,
-    propertiesToInclude?: string[]
+    propertiesToInclude?: string[],
   ) {
     const data: any = {},
       bgImage = this.backgroundImage,
@@ -906,14 +934,14 @@ export class StaticCanvas<
       data.backgroundImage = this._toObject(
         bgImage,
         methodName,
-        propertiesToInclude
+        propertiesToInclude,
       );
     }
     if (overlayImage && !overlayImage.excludeFromExport) {
       data.overlayImage = this._toObject(
         overlayImage,
         methodName,
-        propertiesToInclude
+        propertiesToInclude,
       );
     }
 
@@ -961,7 +989,7 @@ export class StaticCanvas<
    *   return svg.replace('stroke-dasharray: ; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; ', '');
    * });
    */
-  toSVG(options: TSVGExportOptions = {}, reviver: TSVGReviver) {
+  toSVG(options: TSVGExportOptions = {}, reviver?: TSVGReviver) {
     options.reviver = reviver;
     const markup: string[] = [];
 
@@ -996,7 +1024,7 @@ export class StaticCanvas<
       options.encoding || 'UTF-8',
       '" standalone="no" ?>\n',
       '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ',
-      '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+      '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n',
     );
   }
 
@@ -1015,10 +1043,10 @@ export class StaticCanvas<
       const vpt = this.viewportTransform;
       viewBox = `viewBox="${toFixed(
         -vpt[4] / vpt[0],
-        NUM_FRACTION_DIGITS
+        NUM_FRACTION_DIGITS,
       )} ${toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS)} ${toFixed(
         this.width / vpt[0],
-        NUM_FRACTION_DIGITS
+        NUM_FRACTION_DIGITS,
       )} ${toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS)}" `;
     } else {
       viewBox = `viewBox="0 0 ${this.width} ${this.height}" `;
@@ -1044,7 +1072,7 @@ export class StaticCanvas<
       this.createSVGFontFacesMarkup(),
       this.createSVGRefElementsMarkup(),
       this.createSVGClipPathMarkup(options),
-      '</defs>\n'
+      '</defs>\n',
     );
   }
 
@@ -1053,7 +1081,7 @@ export class StaticCanvas<
     if (clipPath) {
       clipPath.clipPathId = `CLIPPATH_${uid()}`;
       return `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(
-        options.reviver
+        options.reviver,
       )}</clipPath>\n`;
     }
     return '';
@@ -1127,7 +1155,7 @@ export class StaticCanvas<
     const fontListMarkup = Object.keys(fontList)
       .map(
         (fontFamily) =>
-          `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`
+          `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`,
       )
       .join('');
 
@@ -1140,7 +1168,7 @@ export class StaticCanvas<
   /**
    * @private
    */
-  _setSVGObjects(markup: string[], reviver: TSVGReviver) {
+  _setSVGObjects(markup: string[], reviver?: TSVGReviver) {
     this.forEachObject((fabricObject) => {
       if (fabricObject.excludeFromExport) {
         return;
@@ -1156,7 +1184,7 @@ export class StaticCanvas<
   _setSVGObject(
     markup: string[],
     instance: FabricObject,
-    reviver: TSVGReviver
+    reviver?: TSVGReviver,
   ) {
     markup.push(instance.toSVG(reviver));
   }
@@ -1167,7 +1195,7 @@ export class StaticCanvas<
   _setSVGBgOverlayImage(
     markup: string[],
     property: 'overlayImage' | 'backgroundImage',
-    reviver: TSVGReviver
+    reviver?: TSVGReviver,
   ) {
     const bgOrOverlay = this[property];
     if (bgOrOverlay && !bgOrOverlay.excludeFromExport && bgOrOverlay.toSVG) {
@@ -1199,13 +1227,13 @@ export class StaticCanvas<
           filler.offsetY - finalHeight / 2
         }" width="${
           (repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.width
+            ? (filler.source as HTMLImageElement).width
             : finalWidth
         }" height="${
           (repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler)
-            ? filler.source.height
+            ? (filler.source as HTMLImageElement).height
             : finalHeight
-        }" fill="url(#SVGID_${filler.id})"></rect>\n`
+        }" fill="url(#SVGID_${filler.id})"></rect>\n`,
       );
     } else {
       markup.push(
@@ -1213,7 +1241,7 @@ export class StaticCanvas<
         'fill="',
         filler,
         '"',
-        '></rect>\n'
+        '></rect>\n',
       );
     }
   }
@@ -1247,7 +1275,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: Abortable = {}
+    { signal }: Abortable = {},
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new FabricError('`json` is undefined'));
@@ -1279,7 +1307,7 @@ export class StaticCanvas<
           overlayColor: overlay,
           clipPath,
         },
-        { signal }
+        { signal },
       ),
     ]).then(([enlived, enlivedMap]) => {
       this.clear();
@@ -1363,7 +1391,7 @@ export class StaticCanvas<
     return toDataURL(
       this.toCanvasElement(finalMultiplier, options),
       format,
-      quality
+      quality,
     );
   }
 
@@ -1383,13 +1411,14 @@ export class StaticCanvas<
    */
   toCanvasElement(
     multiplier = 1,
-    { width, height, left, top, filter } = {} as TToCanvasElementOptions
+    { width, height, left, top, filter } = {} as TToCanvasElementOptions,
   ): HTMLCanvasElement {
     const scaledWidth = (width || this.width) * multiplier,
       scaledHeight = (height || this.height) * multiplier,
       zoom = this.getZoom(),
       originalWidth = this.width,
       originalHeight = this.height,
+      originalSkipControlsDrawing = this.skipControlsDrawing,
       newZoom = zoom * multiplier,
       vp = this.viewportTransform,
       translateX = (vp[4] - (left || 0)) * multiplier,
@@ -1406,6 +1435,7 @@ export class StaticCanvas<
     this.viewportTransform = newVp;
     this.width = scaledWidth;
     this.height = scaledHeight;
+    this.skipControlsDrawing = true;
     this.calcViewportBoundaries();
     this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
     this.viewportTransform = vp;
@@ -1413,6 +1443,7 @@ export class StaticCanvas<
     this.height = originalHeight;
     this.calcViewportBoundaries();
     this.enableRetinaScaling = originalRetina;
+    this.skipControlsDrawing = originalSkipControlsDrawing;
     return canvasEl;
   }
 

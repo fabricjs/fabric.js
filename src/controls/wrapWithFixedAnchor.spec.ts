@@ -38,7 +38,7 @@ describe('wrapWithFixedAnchor', () => {
       target.originX,
       target.originY,
       'left',
-      'top'
+      'top',
     );
     // target position is 100,
     expect(target.top).toBe(100);
@@ -53,7 +53,7 @@ describe('wrapWithFixedAnchor', () => {
       target.originX,
       target.originY,
       'left',
-      'top'
+      'top',
     );
     // after transform the position of the object moved.
     expect(target.top).toBe(150.5);
@@ -82,7 +82,7 @@ describe('wrapWithFixedAnchor', () => {
       target.originX,
       target.originY,
       transformData.originX,
-      transformData.originY
+      transformData.originY,
     );
     // target position is 100,
     expect(target.top).toBe(100);
@@ -97,7 +97,7 @@ describe('wrapWithFixedAnchor', () => {
       target.originX,
       target.originY,
       transformData.originX,
-      transformData.originY
+      transformData.originY,
     );
     // transform data ended up being right,bottom
     expect(transformData.originX).toBe('right');
@@ -114,7 +114,7 @@ describe('wrapWithFixedAnchor', () => {
       target.originX,
       target.originY,
       'left',
-      'top'
+      'top',
     );
     expect(newTopLeftCorner.y).toBe(-910);
     expect(newTopLeftCorner.x).toBe(-859.5);

@@ -9,6 +9,8 @@ import { Group } from './Group';
 import type { GroupProps } from './Group';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
+import { FabricImage } from './Image';
+import { SignalAbortedError } from '../util/internals/console';
 
 const makeGenericGroup = (options?: Partial<GroupProps>) => {
   const objs = [new FabricObject(), new FabricObject()];
@@ -58,6 +60,26 @@ describe('Group', () => {
     expect(group.height).toBe(100);
   });
 
+  it('fromObject with images', async () => {
+    const objs = [
+      new FabricObject(),
+      new FabricObject(),
+      new FabricImage(new Image()),
+    ];
+    const group = new Group(objs);
+    const jsonData = group.toObject();
+    const abortController = new AbortController();
+    abortController.abort();
+    return Group.fromObject(jsonData, {
+      signal: abortController.signal,
+    }).catch((e) => {
+      expect(e instanceof SignalAbortedError).toBe(true);
+      expect(e.message).toBe(
+        `fabric: loadImage 'options.signal' is in 'aborted' state`,
+      );
+    });
+  });
+
   describe('With fit-content layout manager', () => {
     test('will serialize correctly without default values', async () => {
       const { group } = makeGenericGroup({
@@ -87,7 +109,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.width).toBe(100);
       expect(group.height).toBe(100);
@@ -111,7 +133,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.left).toBe(6);
       expect(group.top).toBe(4);
@@ -131,7 +153,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.left).toBe(60);
       expect(group.top).toBe(50);
@@ -222,7 +244,7 @@ describe('Group', () => {
       const restoredGroup = await Group.fromObject(serialized);
       expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
       expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(
-        ClipPathLayout
+        ClipPathLayout,
       );
     });
     test('will serialize correctly without default values', async () => {

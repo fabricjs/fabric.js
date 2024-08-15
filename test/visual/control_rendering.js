@@ -300,5 +300,141 @@
     fabricClass: 'Canvas',
   });
 
+  function controlboxFlippedXInGroup(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 9, angle: 0, flipX: true,
+      cornerSize: 12, cornerColor: 'green', cornerStrokeColor: 'blue',
+      transparentCorners: false, borderScaleFactor: 3,
+      fill: 'red', top: 50, left: 35,
+    });
+    var group = new fabric.Group([rect], {
+      interactive: true,
+      subTargetCheck: true,
+    });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox with flipped X in group',
+    code: controlboxFlippedXInGroup,
+    golden: 'controls11group.png',
+    percentage: 0.004,
+    width: 150,
+    height: 180,
+    fabricClass: 'Canvas',
+  });
+
+  function controlboxFlippedYInRotatedGroup(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 9, angle: 0, flipX: false,
+      cornerSize: 12, cornerColor: 'green', cornerStrokeColor: 'blue',
+      transparentCorners: false, borderScaleFactor: 3,
+      fill: 'red', top: 50, left: 35,
+    });
+    var group = new fabric.Group([rect], {
+      angle: 90,
+      left: 110,
+      flipY: true,
+      interactive: true,
+      subTargetCheck: true,
+    });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox with flipped Y in rotated group',
+    code: controlboxFlippedYInRotatedGroup,
+    golden: 'controls11group90r.png',
+    percentage: 0.004,
+    width: 180,
+    height: 180,
+    fabricClass: 'Canvas',
+  });
+
+  function controlboxOpacitySingle(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 3, opacity: 0.4,
+      cornerSize: 12, cornerColor: 'black', cornerStrokeColor: 'black', borderColor: 'black',
+      borderScaleFactor: 4,
+      fill: 'cyan', top: 10, left: 10, isMoving: true, borderOpacityWhenMoving: 0.4
+    });
+    canvas.add(rect);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox opacity',
+    code: controlboxOpacitySingle,
+    golden: 'controls12.png',
+    percentage: 0.004,
+    width: 110,
+    height: 110,
+    fabricClass: 'Canvas',
+  });
+
+  function controlboxOpacitySingleInGroup(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 3, opacity: 0.4,
+      cornerSize: 12, cornerColor: 'black', cornerStrokeColor: 'black', borderColor: 'black',
+      borderScaleFactor: 4,
+      fill: 'cyan', isMoving: true, borderOpacityWhenMoving: 0.4
+    });
+    var group = new fabric.Group([rect], { interactive: true, subTargetCheck: true, top: 10, left: 10, });
+    canvas.add(group);
+    canvas.setActiveObject(rect);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox opacity',
+    code: controlboxOpacitySingleInGroup,
+    golden: 'controls13.png',
+    percentage: 0.004,
+    width: 110,
+    height: 110,
+    fabricClass: 'Canvas',
+  });
+
+  function controlboxOpacitySingleInGroupAndAs(canvas, callback) {
+    var rect = new fabric.Rect({
+      width: 90, height: 90, padding: 3, opacity: 0.4,
+      cornerSize: 12, cornerColor: 'black', cornerStrokeColor: 'black', borderColor: 'black',
+      borderScaleFactor: 4,
+      fill: 'cyan', isMoving: true, borderOpacityWhenMoving: 0.4
+    });
+    var rect2 = new fabric.Rect({
+      width: 90, height: 90, padding: 3, opacity: 0.4, top: 10, left: 120,
+      cornerSize: 12, cornerColor: 'black', cornerStrokeColor: 'black', borderColor: 'black',
+      borderScaleFactor: 4,
+      fill: 'lime', isMoving: true, borderOpacityWhenMoving: 0.4
+    });
+    var group = new fabric.Group([rect], { interactive: true, subTargetCheck: true, top: 10, left: 10, });
+    canvas.add(group, rect2);
+    const as = new fabric.ActiveSelection([rect, rect2], { canvas: canvas, isMoving: true, cornerSize: 12,
+      cornerColor: 'black', cornerStrokeColor: 'black', borderColor: 'black', borderScaleFactor: 4, });
+    canvas.setActiveObject(as);
+    canvas.renderAll();
+    callback(canvas.lowerCanvasEl);
+  }
+
+  tests.push({
+    test: 'controlbox opacity',
+    code: controlboxOpacitySingleInGroupAndAs,
+    golden: 'controls14.png',
+    percentage: 0.004,
+    width: 220,
+    height: 110,
+    fabricClass: 'Canvas',
+  });
+
   tests.forEach(visualTestLoop(QUnit));
 })();

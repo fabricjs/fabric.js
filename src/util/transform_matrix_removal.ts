@@ -1,4 +1,4 @@
-import { CENTER } from '../constants';
+import { CENTER, SCALE_X, SCALE_Y } from '../constants';
 import type { FabricImage } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
@@ -15,16 +15,16 @@ type FabricObjectWithTransformMatrix = FabricObject & {
  * @private
  */
 const _assignTransformMatrixProps = (
-  object: FabricObjectWithTransformMatrix
+  object: FabricObjectWithTransformMatrix,
 ) => {
   if (object.transformMatrix) {
     const { scaleX, scaleY, angle, skewX } = qrDecompose(
-      object.transformMatrix
+      object.transformMatrix,
     );
     object.flipX = false;
     object.flipY = false;
-    object.set('scaleX', scaleX);
-    object.set('scaleY', scaleY);
+    object.set(SCALE_X, scaleX);
+    object.set(SCALE_Y, scaleY);
     object.angle = angle;
     object.skewX = skewX;
     object.skewY = 0;
@@ -39,7 +39,7 @@ const _assignTransformMatrixProps = (
  */
 export const removeTransformMatrixForSvgParsing = (
   object: FabricObjectWithTransformMatrix,
-  preserveAspectRatioOptions?: any
+  preserveAspectRatioOptions?: any,
 ) => {
   let center = object._findCenterFromElement();
   if (object.transformMatrix) {

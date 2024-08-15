@@ -3,7 +3,9 @@ import { Point } from '../Point';
 import { StaticCanvas } from '../canvas/StaticCanvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
+import { Rect } from '../shapes/Rect';
 import { LayoutManager } from './LayoutManager';
+import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
 import {
@@ -12,12 +14,7 @@ import {
   LAYOUT_TYPE_INITIALIZATION,
   LAYOUT_TYPE_REMOVED,
 } from './constants';
-import type {
-  LayoutContext,
-  LayoutResult,
-  LayoutTrigger,
-  StrictLayoutContext,
-} from './types';
+import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
 describe('Layout Manager', () => {
   it('should set fit content strategy by default', () => {
@@ -89,23 +86,23 @@ describe('Layout Manager', () => {
           mock: {
             calls: [[arg0]],
           },
-        }) => expect(arg0).toMatchObject(context)
+        }) => expect(arg0).toMatchObject(context),
       );
       if (result) {
         [commitLayout, onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
-          }) => expect(arg1).toEqual(layoutResult)
+          }) => expect(arg1).toEqual(layoutResult),
         );
       } else {
         [onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
-          }) => expect(arg1).toBeUndefined()
+          }) => expect(arg1).toBeUndefined(),
         );
       }
     });
@@ -122,6 +119,7 @@ describe('Layout Manager', () => {
         'skewing',
         'changed',
         'modifyPoly',
+        'modifyPath',
       ];
 
       it('should subscribe object', () => {
@@ -150,15 +148,15 @@ describe('Layout Manager', () => {
         const manager = new LayoutManager();
         const performLayout = jest.spyOn(manager, 'performLayout');
         const object = new FabricObject();
-        const target = new Group();
+        const target = new Group([object], { layoutManager: manager });
         manager['subscribe'](object, { target });
-
+        performLayout.mockClear();
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => object.fire(trigger, event));
         expect(performLayout.mock.calls).toMatchObject([
           [
             {
-              e: { target: object, ...event },
+              e: event,
               target,
               trigger: 'modified',
               type: 'object_modified',
@@ -166,7 +164,7 @@ describe('Layout Manager', () => {
           ],
           ...triggers.slice(1).map((trigger) => [
             {
-              e: { target: object, ...event },
+              e: event,
               target,
               trigger,
               type: 'object_modifying',
@@ -182,39 +180,24 @@ describe('Layout Manager', () => {
         expect(performLayout).not.toHaveBeenCalled();
       });
     });
+    describe('triggers and event subscriptions', () => {
+      let manager: LayoutManager;
+      let targets: FabricObject[];
+      let target: Group;
+      let context: StrictLayoutContext;
+      beforeEach(() => {
+        manager = new LayoutManager();
 
-    it.each([
-      { trigger: LAYOUT_TYPE_INITIALIZATION, action: 'subscribe' },
-      { trigger: LAYOUT_TYPE_ADDED, action: 'subscribe' },
-      { trigger: LAYOUT_TYPE_REMOVED, action: 'unsubscribe' },
-    ] as {
-      trigger: LayoutTrigger;
-      action: 'subscribe' | 'unsubscribe';
-    }[])(
-      '$trigger trigger should $action targets and call target hooks',
-      ({ action }) => {
-        const lifecycle: jest.SpyInstance[] = [];
-
-        const manager = new LayoutManager();
-
-        const targets = [
+        targets = [
           new Group([new FabricObject()], { layoutManager: manager }),
           new FabricObject(),
         ];
-        const target = new Group(targets, { layoutManager: manager });
-        const canvasFire = jest.fn();
-        target.canvas = { fire: canvasFire };
-        const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
-          lifecycle.push(targetFire);
-        });
+        target = new Group(targets, { layoutManager: manager });
+        target.canvas = { fire: jest.fn() };
 
-        const subscription = jest
-          .spyOn(manager, action)
-          .mockImplementation(() => {
-            lifecycle.push(subscription);
-          });
+        jest.spyOn(target, 'fire');
 
-        const context: StrictLayoutContext = {
+        context = {
           bubbles: true,
           strategy: manager.strategy,
           type: LAYOUT_TYPE_INITIALIZATION,
@@ -225,18 +208,53 @@ describe('Layout Manager', () => {
             this.bubbles = false;
           },
         };
+      });
+      it(`initialization trigger should subscribe targets and call target hooks`, () => {
+        jest.spyOn(manager, 'subscribe');
+        context.type = LAYOUT_TYPE_INITIALIZATION;
         manager['onBeforeLayout'](context);
-
-        expect(lifecycle).toEqual([subscription, subscription, targetFire]);
-        expect(targetFire).toBeCalledWith('layout:before', {
+        expect(manager['subscribe']).toHaveBeenCalledTimes(targets.length);
+        expect(manager['subscribe']).toHaveBeenCalledWith(targets[0], context);
+        expect(target.fire).toBeCalledWith('layout:before', {
           context,
         });
-        expect(canvasFire).toBeCalledWith('object:layout:before', {
+        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
           context,
           target,
         });
-      }
-    );
+      });
+      it(`object removed trigger should unsubscribe targets and call target hooks`, () => {
+        jest.spyOn(manager, 'unsubscribe');
+        context.type = LAYOUT_TYPE_REMOVED;
+        manager['onBeforeLayout'](context);
+        expect(manager['unsubscribe']).toHaveBeenCalledTimes(targets.length);
+        expect(manager['unsubscribe']).toHaveBeenCalledWith(
+          targets[0],
+          context,
+        );
+        expect(target.fire).toBeCalledWith('layout:before', {
+          context,
+        });
+        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+          context,
+          target,
+        });
+      });
+      it(`object added trigger should subscribe targets and call target hooks`, () => {
+        jest.spyOn(manager, 'subscribe');
+        context.type = LAYOUT_TYPE_ADDED;
+        manager['onBeforeLayout'](context);
+        expect(manager['subscribe']).toHaveBeenCalledTimes(targets.length);
+        expect(manager['subscribe']).toHaveBeenCalledWith(targets[0], context);
+        expect(target.fire).toBeCalledWith('layout:before', {
+          context,
+        });
+        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+          context,
+          target,
+        });
+      });
+    });
 
     it('passing deep should layout the entire tree', () => {
       const manager = new LayoutManager();
@@ -319,7 +337,7 @@ describe('Layout Manager', () => {
     const prepareTest = (
       contextOptions: {
         type: typeof LAYOUT_TYPE_INITIALIZATION | typeof LAYOUT_TYPE_ADDED;
-      } & Partial<LayoutContext>
+      } & Partial<LayoutContext>,
     ) => {
       const lifecycle: jest.SpyInstance[] = [];
 
@@ -409,7 +427,7 @@ describe('Layout Manager', () => {
           left: pos.x ?? 0,
           top: pos.y ?? 0,
         });
-      }
+      },
     );
 
     it('non initialization trigger should set size, position and invalidate target', () => {
@@ -438,9 +456,7 @@ describe('Layout Manager', () => {
       ]);
       expect(targetMocks.set).nthCalledWith(1, { width, height });
       expect(layoutObjects).toBeCalledWith(context, layoutResult);
-      expect(targetMocks.set).nthCalledWith(2, {
-        dirty: true,
-      });
+      expect(targetMocks.set).nthCalledWith(2, 'dirty', true);
     });
   });
 
@@ -510,7 +526,7 @@ describe('Layout Manager', () => {
               path: [target],
             },
           ]);
-      }
+      },
     );
 
     test('bubbling', () => {
@@ -735,12 +751,79 @@ describe('Layout Manager', () => {
       jest.spyOn(child, 'toJSON').mockReturnValue('child');
       const group = new Group([child]);
       expect(
-        Array.from(group.layoutManager['_subscriptions'].keys())
+        Array.from(group.layoutManager['_subscriptions'].keys()),
       ).toMatchObject([child]);
     });
 
+    describe('fromObject restore', () => {
+      const createTestData = (type: string) => ({
+        width: 2,
+        height: 3,
+        left: 6,
+        top: 4,
+        strokeWidth: 0,
+        objects: [
+          new Rect({
+            width: 100,
+            height: 100,
+            top: 0,
+            left: 0,
+            strokeWidth: 0,
+          }).toObject(),
+          new Rect({
+            width: 100,
+            height: 100,
+            top: 0,
+            left: 0,
+            strokeWidth: 0,
+          }).toObject(),
+        ],
+        clipPath: new Rect({
+          width: 50,
+          height: 50,
+          top: 0,
+          left: 0,
+          strokeWidth: 0,
+        }).toObject(),
+        layoutManager: {
+          type: 'layoutManager',
+          strategy: type,
+        },
+      });
+      describe('Fitcontent layout', () => {
+        it('should subscribe objects', async () => {
+          const group = await Group.fromObject(
+            createTestData(FitContentLayout.type),
+          );
+          expect(
+            Array.from(group.layoutManager['_subscriptions'].keys()),
+          ).toMatchObject(group.getObjects());
+        });
+      });
+      describe('FixedLayout layout', () => {
+        it('should subscribe objects', async () => {
+          const group = await Group.fromObject(
+            createTestData(FixedLayout.type),
+          );
+          expect(
+            Array.from(group.layoutManager['_subscriptions'].keys()),
+          ).toMatchObject(group.getObjects());
+        });
+      });
+      describe('ClipPathLayout layout', () => {
+        it('should subscribe objects', async () => {
+          const group = await Group.fromObject(
+            createTestData(ClipPathLayout.type),
+          );
+          expect(
+            Array.from(group.layoutManager['_subscriptions'].keys()),
+          ).toMatchObject(group.getObjects());
+        });
+      });
+    });
+
     test.each([true, false])(
-      'initialization edge case, legacy layout %s',
+      'initialization edge case, with specified layoutManager %s',
       (legacy) => {
         const child = new FabricObject({
           width: 200,
@@ -751,13 +834,13 @@ describe('Layout Manager', () => {
           width: 200,
           height: 200,
           strokeWidth: 0,
-          layoutManager: !legacy ? new LayoutManager() : undefined,
+          layoutManager: legacy ? undefined : new LayoutManager(),
         });
         expect(group).toMatchObject({ width: 200, height: 200 });
         expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
         expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
         expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
-      }
+      },
     );
 
     it('fixed layout should respect size passed in options', () => {
@@ -774,7 +857,7 @@ describe('Layout Manager', () => {
       });
       expect(group).toMatchObject({ width: 100, height: 300 });
       expect(child.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
-      expect(group.getCenterPoint()).toMatchObject({ x: 50, y: 150 });
+      expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
     });
   });
 });

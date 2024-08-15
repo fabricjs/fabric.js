@@ -49,11 +49,11 @@ beforeAll(
             end: 36,
           },
         ],
-        textValue
+        textValue,
       ),
     });
     canvas.add(text);
     return { text };
   },
-  { width: 250, height: 600 }
+  { width: 250, height: 600 },
 );

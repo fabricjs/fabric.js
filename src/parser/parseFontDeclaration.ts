@@ -11,7 +11,7 @@ import { reFontDeclaration } from './constants';
  */
 export function parseFontDeclaration(
   value: string,
-  oStyle: Record<string, any>
+  oStyle: Record<string, any>,
 ): void {
   const match = value.match(reFontDeclaration);
 

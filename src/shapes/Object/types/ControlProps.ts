@@ -31,7 +31,7 @@ export interface ControlProps {
    * Color of controlling corners of an object (when it's active and transparentCorners false)
    * @since 1.6.2
    * @type String
-   * @default null
+   * @default ''
    */
   cornerStrokeColor: string;
 
@@ -41,7 +41,7 @@ export interface ControlProps {
    * And you can swap it with one of the alternative proposed with the control api
    * @since 1.6.2
    * @type 'rect' | 'circle'
-   * @default rect
+   * @default 'rect'
    * @deprecated
    */
   cornerStyle: 'rect' | 'circle';
@@ -50,6 +50,7 @@ export interface ControlProps {
    * Array specifying dash pattern of an object's control (hasBorder must be true)
    * @since 1.6.2
    * @type Array | null
+   * @default null
    */
   cornerDashArray: number[] | null;
 
@@ -63,7 +64,7 @@ export interface ControlProps {
   /**
    * When set to `false`, object's controls are not displayed and can not be used to manipulate object
    * @type Boolean
-   * @default
+   * @default true
    */
   hasControls: boolean;
 }

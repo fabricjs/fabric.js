@@ -25,7 +25,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
-import { NONE } from '../constants';
+import { FILL, NONE } from '../constants';
 import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize } from '../filters/Resize';
@@ -45,12 +45,11 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  filters: BaseFilter[];
+  filters: BaseFilter<string, Record<string, any>>[];
   resizeFilter?: Resize;
 }
 
-export const imageDefaultValues: Partial<UniqueImageProps> &
-  Partial<FabricObjectProps> = {
+export const imageDefaultValues: Partial<TClassProperties<FabricImage>> = {
   strokeWidth: 0,
   srcFromAttribute: false,
   minimumScaleTrigger: 0.5,
@@ -78,7 +77,7 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 export class FabricImage<
     Props extends TOptions<ImageProps> = Partial<ImageProps>,
     SProps extends SerializedImageProps = SerializedImageProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements ImageProps
@@ -167,7 +166,7 @@ export class FabricImage<
 
   protected declare src: string;
 
-  declare filters: BaseFilter[];
+  declare filters: BaseFilter<string, Record<string, any>>[];
   declare resizeFilter: Resize;
 
   declare _element: ImageSource;
@@ -178,9 +177,9 @@ export class FabricImage<
 
   static cacheProperties = [...cacheProperties, ...IMAGE_PROPS];
 
-  static ownDefaults: Record<string, any> = imageDefaultValues;
+  static ownDefaults = imageDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...FabricImage.ownDefaults,
@@ -197,8 +196,11 @@ export class FabricImage<
    */
   constructor(elementId: string, options?: Props);
   constructor(element: ImageSource, options?: Props);
-  constructor(arg0: ImageSource | string, options: Props = {} as Props) {
-    super({ filters: [], ...options });
+  constructor(arg0: ImageSource | string, options?: Props) {
+    super();
+    this.filters = [];
+    Object.assign(this, FabricImage.ownDefaults);
+    this.setOptions(options);
     this.cacheKey = `texture${uid()}`;
     this.setElement(
       typeof arg0 === 'string'
@@ -207,7 +209,7 @@ export class FabricImage<
             getFabricDocument()
           ).getElementById(arg0) as ImageSource)
         : arg0,
-      options
+      options,
     );
   }
 
@@ -325,7 +327,7 @@ export class FabricImage<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     const filters: Record<string, any>[] = [];
     this.filters.forEach((filterObj) => {
@@ -385,7 +387,7 @@ export class FabricImage<
           '" height="' +
           this.height +
           '" />\n',
-        '</clipPath>\n'
+        '</clipPath>\n',
       );
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
     }
@@ -404,7 +406,7 @@ export class FabricImage<
         element.width || (element as HTMLImageElement).naturalWidth
       }" height="${
         element.height || (element as HTMLImageElement).naturalHeight
-      }"${imageRendering}${clipPath}></image>\n`
+      }"${imageRendering}${clipPath}></image>\n`,
     );
 
     if (this.stroke || this.strokeDashArray) {
@@ -413,11 +415,11 @@ export class FabricImage<
       strokeSvg = [
         `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
           this.height
-        }" styles="${this.getSvgStyles()}" />\n`,
+        }" style="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }
-    if (this.paintFirst !== 'fill') {
+    if (this.paintFirst !== FILL) {
       svgString = svgString.concat(strokeSvg, imageMarkup);
     } else {
       svgString = svgString.concat(imageMarkup, strokeSvg);
@@ -504,11 +506,11 @@ export class FabricImage<
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
-      [filter as BaseFilter],
+      [filter],
       elementToFilter,
       sourceWidth,
       sourceHeight,
-      this._element
+      this._element,
     );
     this._filterScalingX = canvasEl.width / this._originalElement.width;
     this._filterScalingY = canvasEl.height / this._originalElement.height;
@@ -520,7 +522,9 @@ export class FabricImage<
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
-  applyFilters(filters: BaseFilter[] = this.filters || []) {
+  applyFilters(
+    filters: BaseFilter<string, Record<string, any>>[] = this.filters || [],
+  ) {
     filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 
@@ -568,7 +572,7 @@ export class FabricImage<
       this._originalElement,
       sourceWidth,
       sourceHeight,
-      this._element as HTMLCanvasElement
+      this._element as HTMLCanvasElement,
     );
     if (
       this._originalElement.width !== this._element.width ||
@@ -600,10 +604,9 @@ export class FabricImage<
    */
   drawCacheOnCanvas(
     this: TCachedFabricObject<FabricImage>,
-    ctx: CanvasRenderingContext2D
+    ctx: CanvasRenderingContext2D,
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
-    // @ts-expect-error TS doesn't respect this type casting
     super.drawCacheOnCanvas(ctx);
   }
 
@@ -688,7 +691,7 @@ export class FabricImage<
    */
   parsePreserveAspectRatioAttribute() {
     const pAR = parsePreserveAspectRatioAttribute(
-        this.preserveAspectRatio || ''
+        this.preserveAspectRatio || '',
       ),
       pWidth = this.width,
       pHeight = this.height,
@@ -791,13 +794,13 @@ export class FabricImage<
    */
   static fromObject<T extends TOptions<SerializedImageProps>>(
     { filters: f, resizeFilter: rf, src, crossOrigin, type, ...object }: T,
-    options: Abortable = {}
+    options?: Abortable,
   ) {
     return Promise.all([
       loadImage(src!, { ...options, crossOrigin }),
-      f && enlivenObjects<BaseFilter>(f, options),
+      f && enlivenObjects<BaseFilter<string>>(f, options),
       // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects<BaseFilter>([rf], options),
+      rf && enlivenObjects<BaseFilter<'Resize'>>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
       return new this(el, {
@@ -821,10 +824,10 @@ export class FabricImage<
   static fromURL<T extends TOptions<ImageProps>>(
     url: string,
     { crossOrigin = null, signal }: LoadImageOptions = {},
-    imageOptions?: T
+    imageOptions?: T,
   ): Promise<FabricImage> {
     return loadImage(url, { crossOrigin, signal }).then(
-      (img) => new this(img, imageOptions)
+      (img) => new this(img, imageOptions),
     );
   }
 
@@ -839,17 +842,17 @@ export class FabricImage<
   static async fromElement(
     element: HTMLElement,
     options: Abortable = {},
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const parsedAttributes = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
-      cssRules
+      cssRules,
     );
     return this.fromURL(
       parsedAttributes['xlink:href'],
       options,
-      parsedAttributes
+      parsedAttributes,
     ).catch((err) => {
       log('log', 'Unable to parse Image', err);
       return null;

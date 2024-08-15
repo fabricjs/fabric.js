@@ -7,7 +7,7 @@ import {
   keysMap,
   keysMapRtl,
 } from './constants';
-import type { TFiller, TOptions } from '../../typedefs';
+import type { TClassProperties, TFiller, TOptions } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import {
@@ -16,7 +16,8 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from '../Text/constants';
-import { CENTER, LEFT, RIGHT } from '../../constants';
+import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
+import type { ObjectToCanvasElementOptions } from '../Object/Object';
 
 type CursorBoundaries = {
   left: number;
@@ -25,7 +26,14 @@ type CursorBoundaries = {
   topOffset: number;
 };
 
-export const iTextDefaultValues = {
+// Declare IText protected properties to workaround TS
+const protectedDefaultValues = {
+  _selectionDirection: null,
+  _reSpace: /\s|\r?\n/,
+  inCompositionMode: false,
+};
+
+export const iTextDefaultValues: Partial<TClassProperties<IText>> = {
   selectionStart: 0,
   selectionEnd: 0,
   selectionColor: 'rgba(17,119,255,0.3)',
@@ -38,13 +46,11 @@ export const iTextDefaultValues = {
   cursorDuration: 600,
   caching: true,
   hiddenTextareaContainer: null,
-  _selectionDirection: null,
-  _reSpace: /\s|\r?\n/,
-  inCompositionMode: false,
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
   ctrlKeysMapUp,
+  ...protectedDefaultValues,
 };
 
 // @TODO this is not complete
@@ -105,7 +111,7 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
 export class IText<
     Props extends TOptions<ITextProps> = Partial<ITextProps>,
     SProps extends SerializedITextProps = SerializedITextProps,
-    EventSpec extends ITextEvents = ITextEvents
+    EventSpec extends ITextEvents = ITextEvents,
   >
   extends ITextClickBehavior<Props, SProps, EventSpec>
   implements UniqueITextProps
@@ -196,9 +202,9 @@ export class IText<
    */
   declare caching: boolean;
 
-  static ownDefaults: Record<string, any> = iTextDefaultValues;
+  static ownDefaults = iTextDefaultValues;
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return { ...super.getDefaults(), ...IText.ownDefaults };
   }
 
@@ -211,13 +217,12 @@ export class IText<
   }
 
   /**
-
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
   constructor(text: string, options?: Props) {
-    super(text, options);
+    super(text, { ...IText.ownDefaults, ...options } as Props);
     this.initBehavior();
   }
 
@@ -266,7 +271,7 @@ export class IText<
    */
   protected _updateAndFire(
     property: 'selectionStart' | 'selectionEnd',
-    index: number
+    index: number,
   ) {
     if (this[property] !== index) {
       this._fireSelectionChanged();
@@ -307,7 +312,7 @@ export class IText<
   getSelectionStyles(
     startIndex: number = this.selectionStart || 0,
     endIndex: number = this.selectionEnd,
-    complete?: boolean
+    complete?: boolean,
   ) {
     return super.getSelectionStyles(startIndex, endIndex, complete);
   }
@@ -321,7 +326,7 @@ export class IText<
   setSelectionStyles(
     styles: object,
     startIndex: number = this.selectionStart || 0,
-    endIndex: number = this.selectionEnd
+    endIndex: number = this.selectionEnd,
   ) {
     return super.setSelectionStyles(styles, startIndex, endIndex);
   }
@@ -333,7 +338,7 @@ export class IText<
    */
   get2DCursorLocation(
     selectionStart = this.selectionStart,
-    skipWrapping?: boolean
+    skipWrapping?: boolean,
   ) {
     return super.get2DCursorLocation(selectionStart, skipWrapping);
   }
@@ -354,7 +359,7 @@ export class IText<
    * @override block cursor/selection logic while rendering the exported canvas
    * @todo this workaround should be replaced with a more robust solution
    */
-  toCanvasElement(options?: any): HTMLCanvasElement {
+  toCanvasElement(options?: ObjectToCanvasElementOptions): HTMLCanvasElement {
     const isEditing = this.isEditing;
     this.isEditing = false;
     const canvas = super.toCanvasElement(options);
@@ -394,7 +399,7 @@ export class IText<
    */
   _getCursorBoundaries(
     index: number = this.selectionStart,
-    skipCaching?: boolean
+    skipCaching?: boolean,
   ): CursorBoundaries {
     const left = this._getLeftOffset(),
       top = this._getTopOffset(),
@@ -415,7 +420,7 @@ export class IText<
    */
   _getCursorBoundariesOffsets(
     index: number,
-    skipCaching?: boolean
+    skipCaching?: boolean,
   ): { left: number; top: number } {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
@@ -493,7 +498,7 @@ export class IText<
   _renderCursor(
     ctx: CanvasRenderingContext2D,
     boundaries: CursorBoundaries,
-    selectionStart: number
+    selectionStart: number,
   ) {
     const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
@@ -516,13 +521,13 @@ export class IText<
     }
     ctx.fillStyle =
       this.cursorColor ||
-      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
+      (this.getValueOfPropertyAt(lineIndex, charIndex, FILL) as string);
     ctx.globalAlpha = this._currentCursorOpacity;
     ctx.fillRect(
       boundaries.left + boundaries.leftOffset - cursorWidth / 2,
       topOffset + boundaries.top + dy,
       cursorWidth,
-      charHeight
+      charHeight,
     );
   }
 
@@ -552,7 +557,7 @@ export class IText<
     this._renderSelection(
       this.canvas!.contextTop,
       dragStartSelection,
-      this._getCursorBoundaries(dragStartSelection.selectionStart, true)
+      this._getCursorBoundaries(dragStartSelection.selectionStart, true),
     );
   }
 
@@ -571,7 +576,7 @@ export class IText<
   _renderSelection(
     ctx: CanvasRenderingContext2D,
     selection: { selectionStart: number; selectionEnd: number },
-    boundaries: CursorBoundaries
+    boundaries: CursorBoundaries,
   ) {
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
@@ -644,7 +649,7 @@ export class IText<
         drawStart,
         boundaries.top + boundaries.topOffset + extraTop,
         drawWidth,
-        drawHeight
+        drawHeight,
       );
       boundaries.topOffset += realLineHeight;
     }
@@ -672,7 +677,7 @@ export class IText<
    */
   getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
+    return this.getValueOfPropertyAt(cp.l, cp.c, FILL);
   }
 
   /**

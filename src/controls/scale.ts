@@ -17,6 +17,7 @@ import {
 } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
+import { SCALE_X, SCALE_Y, SCALING } from '../constants';
 
 type ScaleTransform = Transform & {
   gestureScale?: number;
@@ -34,7 +35,7 @@ type ScaleBy = TAxis | 'equally' | '' | undefined;
  */
 export function scaleIsProportional(
   eventData: TPointerEvent,
-  fabricObject: FabricObject
+  fabricObject: FabricObject,
 ): boolean {
   const canvas = fabricObject.canvas as Canvas,
     uniformIsToggled = eventData[canvas.uniScaleKey!];
@@ -54,7 +55,7 @@ export function scaleIsProportional(
 export function scalingIsForbidden(
   fabricObject: FabricObject,
   by: ScaleBy,
-  scaleProportionally: boolean
+  scaleProportionally: boolean,
 ) {
   const lockX = isLocked(fabricObject, 'lockScalingX'),
     lockY = isLocked(fabricObject, 'lockScalingY');
@@ -94,15 +95,15 @@ const scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'];
 export const scaleCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject
+  fabricObject,
 ) => {
   const scaleProportionally = scaleIsProportional(eventData, fabricObject),
     by =
       control.x !== 0 && control.y === 0
         ? 'x'
         : control.x === 0 && control.y !== 0
-        ? 'y'
-        : '';
+          ? 'y'
+          : '';
   if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
     return NOT_ALLOWED_CURSOR;
   }
@@ -127,7 +128,7 @@ function scaleObject(
   transform: ScaleTransform,
   x: number,
   y: number,
-  options: { by?: ScaleBy } = {}
+  options: { by?: ScaleBy } = {},
 ) {
   const target = transform.target,
     by = options.by,
@@ -147,7 +148,7 @@ function scaleObject(
       transform.originX,
       transform.originY,
       x,
-      y
+      y,
     );
     // use of sign: We use sign to detect change of direction of an action. sign usually change when
     // we cross the origin point with the mouse. So a scale flip for example. There is an issue when scaling
@@ -206,12 +207,12 @@ function scaleObject(
   const oldScaleX = target.scaleX,
     oldScaleY = target.scaleY;
   if (!by) {
-    !isLocked(target, 'lockScalingX') && target.set('scaleX', scaleX);
-    !isLocked(target, 'lockScalingY') && target.set('scaleY', scaleY);
+    !isLocked(target, 'lockScalingX') && target.set(SCALE_X, scaleX);
+    !isLocked(target, 'lockScalingY') && target.set(SCALE_Y, scaleY);
   } else {
     // forbidden cases already handled on top here.
-    by === 'x' && target.set('scaleX', scaleX);
-    by === 'y' && target.set('scaleY', scaleY);
+    by === 'x' && target.set(SCALE_X, scaleX);
+    by === 'y' && target.set(SCALE_Y, scaleY);
   }
   return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
 }
@@ -229,7 +230,7 @@ export const scaleObjectFromCorner: TransformActionHandler<ScaleTransform> = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return scaleObject(eventData, transform, x, y);
 };
@@ -247,7 +248,7 @@ const scaleObjectX: TransformActionHandler<ScaleTransform> = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return scaleObject(eventData, transform, x, y, { by: 'x' });
 };
@@ -265,22 +266,22 @@ const scaleObjectY: TransformActionHandler<ScaleTransform> = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   return scaleObject(eventData, transform, x, y, { by: 'y' });
 };
 
 export const scalingEqually = wrapWithFireEvent(
-  'scaling',
-  wrapWithFixedAnchor(scaleObjectFromCorner)
+  SCALING,
+  wrapWithFixedAnchor(scaleObjectFromCorner),
 );
 
 export const scalingX = wrapWithFireEvent(
-  'scaling',
-  wrapWithFixedAnchor(scaleObjectX)
+  SCALING,
+  wrapWithFixedAnchor(scaleObjectX),
 );
 
 export const scalingY = wrapWithFireEvent(
-  'scaling',
-  wrapWithFixedAnchor(scaleObjectY)
+  SCALING,
+  wrapWithFixedAnchor(scaleObjectY),
 );

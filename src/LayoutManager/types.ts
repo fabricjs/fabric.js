@@ -99,19 +99,18 @@ export type ObjectModifiedLayoutContext = CommonLayoutContext & {
   e: ModifiedEvent;
 };
 
-export type ObjectModifyingLayoutContext =
-  | CommonLayoutContext & {
-      type: typeof LAYOUT_TYPE_OBJECT_MODIFYING;
-    } & (
-        | {
-            trigger: TModificationEvents;
-            e: BasicTransformEvent & { target: FabricObject };
-          }
-        | {
-            trigger: 'changed';
-            e: ITextEvents['changed'] & { target: FabricObject };
-          }
-      );
+export type ObjectModifyingLayoutContext = CommonLayoutContext & {
+  type: typeof LAYOUT_TYPE_OBJECT_MODIFYING;
+} & (
+    | {
+        trigger: TModificationEvents;
+        e: BasicTransformEvent;
+      }
+    | {
+        trigger: 'changed';
+        e: ITextEvents['changed'];
+      }
+  );
 
 export type ImperativeLayoutContext = CommonLayoutContext &
   ImperativeLayoutCommonOptions & {
@@ -130,6 +129,11 @@ export type StrictLayoutContext = LayoutContext & {
   prevStrategy?: LayoutStrategy;
   bubbles: boolean;
   stopPropagation(): void;
+};
+
+export type RegistrationContext = {
+  targets: FabricObject[];
+  target: Group;
 };
 
 export type LayoutBeforeEvent = {

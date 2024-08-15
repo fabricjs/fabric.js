@@ -16,7 +16,15 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import { cloneDeep } from '../util/internals/cloneDeep';
-import { CENTER, LEFT, TOP } from '../constants';
+import {
+  CENTER,
+  LEFT,
+  SCALE_X,
+  SCALE_Y,
+  SKEW_X,
+  SKEW_Y,
+  TOP,
+} from '../constants';
 import type { CSSRules } from '../parser/typedefs';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
@@ -33,7 +41,7 @@ export interface SerializedPolylineProps extends SerializedObjectProps {
 export class Polyline<
   Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObject<Props, SProps, EventSpec> {
   /**
    * Points array
@@ -55,23 +63,24 @@ export class Polyline<
 
   private declare initialized: true | undefined;
 
-  static ownDefaults: Record<string, any> = polylineDefaultValues;
+  static ownDefaults = polylineDefaultValues;
 
   static type = 'Polyline';
 
-  static getDefaults() {
+  static getDefaults(): Record<string, any> {
     return {
       ...super.getDefaults(),
       ...Polyline.ownDefaults,
     };
   }
+
   /**
    * A list of properties that if changed trigger a recalculation of dimensions
    * @todo check if you really need to recalculate for all cases
    */
   static layoutProperties: (keyof Polyline)[] = [
-    'skewX',
-    'skewY',
+    SKEW_X,
+    SKEW_Y,
     'strokeLineCap',
     'strokeLineJoin',
     'strokeMiterLimit',
@@ -108,7 +117,10 @@ export class Polyline<
    * });
    */
   constructor(points: XY[] = [], options: Props = {} as Props) {
-    super({ points, ...options });
+    super();
+    Object.assign(this, Polyline.ownDefaults);
+    this.setOptions(options);
+    this.points = points;
     const { left, top } = options;
     this.initialized = true;
     this.setBoundingBox(true);
@@ -143,7 +155,7 @@ export class Polyline<
     };
     const points = this.exactBoundingBox
       ? this._projectStrokeOnPoints(
-          options as TProjectStrokeOnPointsOptions
+          options as TProjectStrokeOnPointsOptions,
         ).map((projection) => projection.projectedPoint)
       : this.points;
     if (points.length === 0) {
@@ -161,7 +173,7 @@ export class Polyline<
       // Remove scale effect, since it's applied after
       matrix = calcDimensionsMatrix({ ...options, scaleX: 1, scaleY: 1 }),
       bboxNoStroke = makeBoundingBoxFromPoints(
-        this.points.map((p) => transformPoint(p, matrix, true))
+        this.points.map((p) => transformPoint(p, matrix, true)),
       ),
       scale = new Point(this.scaleX, this.scaleY);
     let offsetX = bbox.left + bbox.width / 2,
@@ -208,7 +220,7 @@ export class Polyline<
       this.setPositionByOrigin(
         new Point(left + width / 2, top + height / 2),
         CENTER,
-        CENTER
+        CENTER,
       );
   }
 
@@ -248,8 +260,8 @@ export class Polyline<
           (key) =>
             this.strokeUniform ||
             (this.constructor as typeof Polyline).layoutProperties.includes(
-              key as keyof TProjectStrokeOnPointsOptions
-            )
+              key as keyof TProjectStrokeOnPointsOptions,
+            ),
         )
       ) {
         const { width, height } = this._calcDimensions(options);
@@ -257,11 +269,11 @@ export class Polyline<
       } else {
         size = new Point(
           options.width ?? this.width,
-          options.height ?? this.height
+          options.height ?? this.height,
         );
       }
       return size.multiply(
-        new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY)
+        new Point(options.scaleX || this.scaleX, options.scaleY || this.scaleY),
       );
     } else {
       return super._getTransformedDimensions(options);
@@ -278,13 +290,13 @@ export class Polyline<
     if (
       this.exactBoundingBox &&
       changed &&
-      (((key === 'scaleX' || key === 'scaleY') &&
+      (((key === SCALE_X || key === SCALE_Y) &&
         this.strokeUniform &&
         (this.constructor as typeof Polyline).layoutProperties.includes(
-          'strokeUniform'
+          'strokeUniform',
         )) ||
         (this.constructor as typeof Polyline).layoutProperties.includes(
-          key as keyof Polyline
+          key as keyof Polyline,
         ))
     ) {
       this.setDimensions();
@@ -299,7 +311,7 @@ export class Polyline<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return {
       ...super.toObject(propertiesToInclude),
@@ -323,7 +335,7 @@ export class Polyline<
         toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS),
         ',',
         toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS),
-        ' '
+        ' ',
       );
     }
     return [
@@ -389,7 +401,7 @@ export class Polyline<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       // we omit left and top to instruct the constructor to position the object using the bbox
@@ -397,7 +409,7 @@ export class Polyline<
       { left, top, ...parsedAttributes } = parseAttributes(
         element,
         this.ATTRIBUTE_NAMES,
-        cssRules
+        cssRules,
       );
     return new this(points, {
       ...parsedAttributes,

@@ -24,7 +24,7 @@ for (const splitByGrapheme of [true, false]) {
           textbox.initDimensions();
           textbox.canvas.renderAll();
         },
-        { splitByGrapheme }
+        { splitByGrapheme },
       );
 
       await expect(await canvasUtil.screenshot()).toMatchSnapshot({
@@ -120,7 +120,7 @@ for (const splitByGrapheme of [true, false]) {
             height: 120,
           },
           maxDiffPixelRatio: 0.029,
-        }
+        },
       );
     });
   });

@@ -9,4 +9,6 @@ import { readJSONSync } from 'fs-extra';
  */
 export default {
   fabric: readJSONSync('./package.json').module.slice(1),
+  ['fabric/extensions']:
+    readJSONSync('./package.json').exports['./extensions'].import.slice(1),
 };

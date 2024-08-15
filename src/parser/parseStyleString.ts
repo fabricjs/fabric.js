@@ -6,12 +6,13 @@
  */
 export function parseStyleString(
   style: string,
-  oStyle: Record<string, any>
+  oStyle: Record<string, any>,
 ): void {
   style
     .replace(/;\s*$/, '')
     .split(';')
     .forEach((chunk) => {
+      if (!chunk) return;
       const [attr, value] = chunk.split(':');
       oStyle[attr.trim().toLowerCase()] = value.trim();
     });

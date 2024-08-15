@@ -6,9 +6,11 @@ runs:
     - name: Get cache build
       if: github.event_name == 'pull_request'
       id: build-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
-        path: ./dist
+        path: |
+          ./dist
+          ./dist-extensions
         key: build-${{ github.event.pull_request.head.sha }}
     - name: Build fabric.js dist folder
       if: steps.build-cache.outputs.cache-hit != 'true'

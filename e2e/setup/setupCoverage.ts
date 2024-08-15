@@ -32,23 +32,23 @@ export default () => {
             await converter.load();
             converter.applyCoverage(functions);
             return [pathTo, converter.toIstanbul()];
-          })
+          }),
         )
       ).filter(
         ([pathTo]: [string]) =>
           !coverageIgnore.some((ignore) =>
-            pathTo.startsWith(path.resolve(process.cwd(), ignore))
-          )
-      )
+            pathTo.startsWith(path.resolve(process.cwd(), ignore)),
+          ),
+      ),
     );
     ensureDirSync(outputDir);
     writeFileSync(
       path.resolve(outputDir, 'coverage-v8.json'),
-      JSON.stringify(coverage, null, 2)
+      JSON.stringify(coverage, null, 2),
     );
     writeFileSync(
       path.resolve(outputDir, 'coverage.json'),
-      JSON.stringify(nyc, null, 2)
+      JSON.stringify(nyc, null, 2),
     );
   });
 };

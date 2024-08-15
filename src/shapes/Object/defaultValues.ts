@@ -1,10 +1,22 @@
-import { TOP, LEFT } from '../../constants';
+import {
+  TOP,
+  LEFT,
+  SCALE_Y,
+  SCALE_X,
+  SKEW_X,
+  SKEW_Y,
+  FILL,
+  STROKE,
+} from '../../constants';
+import type { TClassProperties } from '../../typedefs';
+import type { InteractiveFabricObject } from './InteractiveObject';
+import type { FabricObject } from './Object';
 
 export const stateProperties = [
   TOP,
   LEFT,
-  'scaleX',
-  'scaleY',
+  SCALE_X,
+  SCALE_Y,
   'flipX',
   'flipY',
   'originX',
@@ -14,13 +26,13 @@ export const stateProperties = [
   'globalCompositeOperation',
   'shadow',
   'visible',
-  'skewX',
-  'skewY',
+  SKEW_X,
+  SKEW_Y,
 ];
 
 export const cacheProperties = [
-  'fill',
-  'stroke',
+  FILL,
+  STROKE,
   'strokeWidth',
   'strokeDashArray',
   'width',
@@ -35,7 +47,9 @@ export const cacheProperties = [
   'clipPath',
 ];
 
-export const fabricObjectDefaultValues = {
+export const fabricObjectDefaultValues: Partial<
+  TClassProperties<FabricObject>
+> = {
   // see composeMatrix() to see order of transforms. First defaults listed based on this
   top: 0,
   left: 0,
@@ -55,7 +69,7 @@ export const fabricObjectDefaultValues = {
   strokeUniform: false,
   padding: 0,
   opacity: 1,
-  paintFirst: 'fill',
+  paintFirst: FILL,
   fill: 'rgb(0,0,0)',
   fillRule: 'nonzero',
   stroke: null,
@@ -79,7 +93,9 @@ export const fabricObjectDefaultValues = {
   dirty: true,
 } as const;
 
-export const interactiveObjectDefaultValues = {
+export const interactiveObjectDefaultValues: Partial<
+  TClassProperties<InteractiveFabricObject>
+> = {
   noScaleCache: true,
   lockMovementX: false,
   lockMovementY: false,

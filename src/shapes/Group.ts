@@ -1,6 +1,11 @@
 import type { CollectionEvents, ObjectEvents } from '../EventTypeDefs';
 import { createCollectionMixin } from '../Collection';
-import type { TClassProperties, TSVGReviver, TOptions } from '../typedefs';
+import type {
+  TClassProperties,
+  TSVGReviver,
+  TOptions,
+  Abortable,
+} from '../typedefs';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -62,7 +67,7 @@ export interface GroupProps extends FabricObjectProps, GroupOwnProps {
   layoutManager: LayoutManager;
 }
 
-export const groupDefaultValues = {
+export const groupDefaultValues: Partial<TClassProperties<Group>> = {
   strokeWidth: 0,
   subTargetCheck: false,
   interactive: false,
@@ -76,7 +81,7 @@ export const groupDefaultValues = {
  */
 export class Group
   extends createCollectionMixin(
-    FabricObject<GroupProps, SerializedGroupProps, GroupEvents>
+    FabricObject<GroupProps, SerializedGroupProps, GroupEvents>,
   )
   implements GroupProps
 {
@@ -92,7 +97,12 @@ export class Group
    * Used to allow targeting of object inside groups.
    * set to true if you want to select an object inside a group.\
    * **REQUIRES** `subTargetCheck` set to true
+   * This will be not removed but slowly replaced with a method setInteractive
+   * that will take care of enabling subTargetCheck and necessary object events.
+   * There is too much attached to group interactivity to just be evaluated by a
+   * boolean in the code
    * @default
+   * @deprecated
    * @type boolean
    */
   declare interactive: boolean;
@@ -127,17 +137,33 @@ export class Group
    * @param {Object} [options] Options object
    */
   constructor(objects: FabricObject[] = [], options: Partial<GroupProps> = {}) {
-    // @ts-expect-error options error
-    super(options);
+    super();
+    Object.assign(this, Group.ownDefaults);
+    this.setOptions(options);
+    this.groupInit(objects, options);
+  }
+
+  /**
+   * Shared code between group and active selection
+   * Meant to be used by the constructor.
+   */
+  protected groupInit(
+    objects: FabricObject[],
+    options: {
+      layoutManager?: LayoutManager;
+      top?: number;
+      left?: number;
+    },
+  ) {
     this._objects = [...objects]; // Avoid unwanted mutations of Collection to affect the caller
 
     this.__objectSelectionTracker = this.__objectSelectionMonitor.bind(
       this,
-      true
+      true,
     );
     this.__objectSelectionDisposer = this.__objectSelectionMonitor.bind(
       this,
-      false
+      false,
     );
 
     this.forEachObject((object) => {
@@ -145,11 +171,14 @@ export class Group
     });
 
     // perform initial layout
-    this.layoutManager = options.layoutManager || new LayoutManager();
+    this.layoutManager = options.layoutManager ?? new LayoutManager();
     this.layoutManager.performLayout({
       type: LAYOUT_TYPE_INITIALIZATION,
       target: this,
       targets: [...objects],
+      // @TODO remove this concept from the layout manager.
+      // Layout manager will calculate the correct position,
+      // group options can override it later.
       x: options.left,
       y: options.top,
     });
@@ -166,14 +195,14 @@ export class Group
       //  prevent circular object tree
       log(
         'error',
-        'Group: circular object trees are not supported, this call has no effect'
+        'Group: circular object trees are not supported, this call has no effect',
       );
       return false;
     } else if (this._objects.indexOf(object) !== -1) {
       // is already in the objects array
       log(
         'error',
-        'Group: duplicate objects are not supported inside group, this call has no effect'
+        'Group: duplicate objects are not supported inside group, this call has no effect',
       );
       return false;
     }
@@ -298,15 +327,18 @@ export class Group
    */
   __objectSelectionMonitor<T extends boolean>(
     selected: T,
-    { target: object }: ObjectEvents[T extends true ? 'selected' : 'deselected']
+    {
+      target: object,
+    }: ObjectEvents[T extends true ? 'selected' : 'deselected'],
   ) {
+    const activeObjects = this._activeObjects;
     if (selected) {
-      this._activeObjects.push(object);
+      activeObjects.push(object);
       this._set('dirty', true);
-    } else if (this._activeObjects.length > 0) {
-      const index = this._activeObjects.indexOf(object);
+    } else if (activeObjects.length > 0) {
+      const index = activeObjects.indexOf(object);
       if (index > -1) {
-        this._activeObjects.splice(index, 1);
+        activeObjects.splice(index, 1);
         this._set('dirty', true);
       }
     }
@@ -352,8 +384,8 @@ export class Group
         object,
         multiplyTransformMatrices(
           invertTransform(this.calcTransformMatrix()),
-          object.calcTransformMatrix()
-        )
+          object.calcTransformMatrix(),
+        ),
       );
     }
     this._shouldSetNestedCoords() && object.setCoords();
@@ -400,8 +432,8 @@ export class Group
         object,
         multiplyTransformMatrices(
           this.calcTransformMatrix(),
-          object.calcTransformMatrix()
-        )
+          object.calcTransformMatrix(),
+        ),
       );
       object.setCoords();
     }
@@ -454,7 +486,7 @@ export class Group
    * @return {Boolean}
    */
   isOnACache(): boolean {
-    return this.ownCaching || (!!this.group && this.group.isOnACache());
+    return this.ownCaching || (!!this.parent && this.parent.isOnACache());
   }
 
   /**
@@ -517,7 +549,7 @@ export class Group
    */
   __serializeObjects(
     method: 'toObject' | 'toDatalessObject',
-    propertiesToInclude?: string[]
+    propertiesToInclude?: string[],
   ) {
     const _includeDefaultValues = this.includeDefaultValues;
     return this._objects
@@ -544,7 +576,7 @@ export class Group
       GroupProps & TClassProperties<this>,
       keyof SerializedGroupProps
     >,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
     const layoutManager = this.layoutManager.toObject();
 
@@ -559,7 +591,7 @@ export class Group
         : {}),
       objects: this.__serializeObjects(
         'toObject',
-        propertiesToInclude as string[]
+        propertiesToInclude as string[],
       ),
     };
   }
@@ -569,7 +601,10 @@ export class Group
   }
 
   dispose() {
-    this.layoutManager.unsubscribeTarget(this);
+    this.layoutManager.unsubscribeTargets({
+      targets: this.getObjects(),
+      target: this,
+    });
     this._activeObjects = [];
     this.forEachObject((object) => {
       this._watchObject(false, object);
@@ -646,15 +681,13 @@ export class Group
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
-  static fromObject<T extends TOptions<SerializedGroupProps>>({
-    type,
-    objects = [],
-    layoutManager,
-    ...options
-  }: T) {
+  static fromObject<T extends TOptions<SerializedGroupProps>>(
+    { type, objects = [], layoutManager, ...options }: T,
+    abortable?: Abortable,
+  ) {
     return Promise.all([
-      enlivenObjects<FabricObject>(objects),
-      enlivenObjectEnlivables(options),
+      enlivenObjects<FabricObject>(objects, abortable),
+      enlivenObjectEnlivables(options, abortable),
     ]).then(([objects, hydratedOptions]) => {
       const group = new this(objects, {
         ...options,
@@ -663,15 +696,20 @@ export class Group
       });
       if (layoutManager) {
         const layoutClass = classRegistry.getClass<typeof LayoutManager>(
-          layoutManager.type
+          layoutManager.type,
         );
         const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
-          layoutManager.strategy
+          layoutManager.strategy,
         );
         group.layoutManager = new layoutClass(new strategyClass());
       } else {
         group.layoutManager = new LayoutManager();
       }
+      group.layoutManager.subscribeTargets({
+        type: LAYOUT_TYPE_INITIALIZATION,
+        target: group,
+        targets: group.getObjects(),
+      });
       group.setCoords();
       return group;
     });
