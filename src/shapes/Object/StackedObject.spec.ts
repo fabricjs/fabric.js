@@ -3,6 +3,44 @@ import { ActiveSelection } from '../ActiveSelection';
 import { Group } from '../Group';
 import { FabricObject } from './FabricObject';
 
+class TestObject extends FabricObject {
+  id: string;
+
+  constructor({ id }: { id: string }) {
+    super();
+    this.id = id;
+  }
+}
+
+class TestCollection extends Group {
+  id: string;
+
+  constructor({ id }: { id: string }) {
+    super();
+    this.id = id;
+  }
+}
+
+class TestCanvas extends Canvas {
+  id: string;
+
+  constructor({ id }: { id: string }) {
+    super();
+    this.id = id;
+  }
+}
+
+function prepareObjectsForTreeTesting() {
+  return {
+    object: new TestObject({ id: 'object' }),
+    other: new TestObject({ id: 'other' }),
+    a: new TestCollection({ id: 'a' }),
+    b: new TestCollection({ id: 'b' }),
+    c: new TestCollection({ id: 'c' }),
+    canvas: new TestCanvas({ id: 'canvas' }),
+  };
+}
+
 describe('FabricObject stacking', () => {
   test('isDescendantOf', function () {
     const canvas = new Canvas();
@@ -66,42 +104,6 @@ describe('FabricObject stacking', () => {
   });
 
   describe('findCommonAncestors', () => {
-    class TestObject extends FabricObject {
-      id: string;
-
-      constructor({ id }: { id: string }) {
-        super();
-        this.id = id;
-      }
-    }
-    class TestCollection extends Group {
-      id: string;
-
-      constructor({ id }: { id: string }) {
-        super();
-        this.id = id;
-      }
-    }
-    class TestCanvas extends Canvas {
-      id: string;
-
-      constructor({ id }: { id: string }) {
-        super();
-        this.id = id;
-      }
-    }
-
-    function prepareObjectsForTreeTesting() {
-      return {
-        object: new TestObject({ id: 'object' }),
-        other: new TestObject({ id: 'other' }),
-        a: new TestCollection({ id: 'a' }),
-        b: new TestCollection({ id: 'b' }),
-        c: new TestCollection({ id: 'c' }),
-        canvas: new TestCanvas({ id: 'canvas' }),
-      };
-    }
-
     const getId = (obj: unknown) =>
       (obj as TestObject | TestCollection | TestCanvas).id;
 
@@ -286,20 +288,79 @@ describe('FabricObject stacking', () => {
       otherFork: [other],
       common: [],
     });
-    // findCommonAncestors(object, canvas, true, {
-    //   fork: [object],
-    //   otherFork: [canvas],
-    //   common: [],
-    // });
-    // findCommonAncestors(object, canvas, false, {
-    //   fork: [object],
-    //   otherFork: [],
-    //   common: [canvas],
-    // });
-    // findCommonAncestors(other, canvas, false, {
-    //   fork: [other],
-    //   otherFork: [],
-    //   common: [canvas],
-    // });
+  });
+
+  test('isInFrontOf', () => {
+    const isInFrontOf = (
+      object: FabricObject,
+      other: FabricObject,
+      expected: boolean | undefined,
+    ) => {
+      const actual = object.isInFrontOf(other);
+      expect(actual).toBe(expected);
+      if (actual === expected && typeof expected === 'boolean') {
+        const actual2 = other.isInFrontOf(object);
+        expect(!expected).toBe(actual2);
+      }
+    };
+
+    const { object, other, a, b, c, canvas } = prepareObjectsForTreeTesting();
+    expect(typeof object.isInFrontOf).toBe('function');
+    expect(Array.isArray(a._objects)).toBe(true);
+    expect(a._objects !== b._objects).toBe(true);
+    //  same object
+    isInFrontOf(object, object, undefined);
+    //  foreign objects
+    isInFrontOf(object, other, undefined);
+    //  same level
+    a.add(object, other);
+    isInFrontOf(object, other, false);
+    isInFrontOf(object, a, true);
+    isInFrontOf(other, a, true);
+    // different level
+    a.remove(object);
+    b.add(object);
+    a.add(b);
+    isInFrontOf(object, b, true);
+    isInFrontOf(b, a, true);
+    isInFrontOf(object, other, true);
+    //  with common ancestor
+    expect(c.size()).toBe(0); // 'c should be empty'
+    c.add(a);
+    expect(c.size()).toBe(1); // 'c should contain a'
+    isInFrontOf(object, b, true);
+    isInFrontOf(b, a, true);
+    isInFrontOf(object, other, true);
+    isInFrontOf(object, c, true);
+    isInFrontOf(other, c, true);
+    isInFrontOf(b, c, true);
+    isInFrontOf(a, c, true);
+    //  deeper asymmetrical
+    c.removeAll();
+    expect(c.size()).toBe(0);
+    a.remove(other);
+    c.add(other, a);
+    isInFrontOf(object, b, true);
+    isInFrontOf(b, a, true);
+    isInFrontOf(a, other, true);
+    isInFrontOf(object, other, true);
+    isInFrontOf(object, c, true);
+    isInFrontOf(other, c, true);
+    isInFrontOf(b, c, true);
+    isInFrontOf(a, c, true);
+    //  with canvas
+    a.removeAll();
+    b.removeAll();
+    c.removeAll();
+    canvas.add(object, other);
+    isInFrontOf(object, other, false);
+    //  parent precedes canvas when checking ancestor
+    a.add(object);
+    expect(object.canvas).toBe(canvas);
+    expect(other.canvas).toBe(canvas);
+    isInFrontOf(object, other, false);
+    canvas.insertAt(0, a);
+    isInFrontOf(object, other, false);
+    isInFrontOf(a, other, false);
   });
 });
