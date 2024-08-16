@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(): reduce class inheritance [#10070](https://github.com/fabricjs/fabric.js/pull/10070)
+- chore(): reduce class inheritance, merge some classes together. [#10070](https://github.com/fabricjs/fabric.js/pull/10070)
 
 ## [6.3.0]
 
