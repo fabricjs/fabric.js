@@ -1737,7 +1737,8 @@ export class FabricObject<
    */
   toObject(propertiesToInclude: any[] = []): any {
     const propertiesToSerialize = propertiesToInclude.concat(
-      (this.constructor as typeof FabricObject).customProperties,
+      FabricObject.customProperties,
+      (this.constructor as typeof FabricObject).customProperties || [],
     );
     let clipPathData: Partial<SerializedObjectProps> | undefined;
     const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
