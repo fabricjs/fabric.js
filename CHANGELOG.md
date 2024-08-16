@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): reduce class inheritance, merge some classes together. [#10070](https://github.com/fabricjs/fabric.js/pull/10070)
+
 ## [6.3.0]
 
 - chore(): Remove over-protective cloneDeep from fromObject [#9621](https://github.com/fabricjs/fabric.js/pull/9621)
