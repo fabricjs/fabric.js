@@ -31,7 +31,7 @@ jobs:
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
         suite: [unit, visual]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
@@ -45,7 +45,7 @@ jobs:
         if: matrix.suite == 'visual'
         run: npm run test:visual:coverage
       - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.suite }}
           path: .nyc_output/*.json
@@ -82,7 +82,7 @@ jobs:
         node-version: ['18.x']
         suite: [unit, visual]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
@@ -95,7 +95,7 @@ jobs:
     name: Jest tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
@@ -125,13 +125,13 @@ jobs:
       - name: Run Playwright tests
         run: xvfb-run npm run test:e2e
       - name: Upload Test Output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: e2e-report
           path: ./e2e/test-report/
       - name: Upload Test Coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
@@ -163,10 +163,8 @@ jobs:
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
-      - uses: fabricjs/lcov-reporter-action@0.2.19
-        if: github.event_name == 'pull_request'
+      - uses: romeovs/lcov-reporter-action@0.4.0
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
-          update-comment: true
-          filter-changed-files: true
