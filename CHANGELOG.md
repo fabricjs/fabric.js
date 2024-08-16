@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Support easy serialization of customer properties [#10071](https://github.com/fabricjs/fabric.js/pull/10071)
 - chore(): reduce class inheritance, merge some classes together. [#10070](https://github.com/fabricjs/fabric.js/pull/10070)
 
 ## [6.3.0]
