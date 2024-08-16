@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(CI): Move test actions to Node 20 [#10073](https://github.com/fabricjs/fabric.js/pull/10073)
 - feat(Object): Object serialization for common properties [#10072](https://github.com/fabricjs/fabric.js/pull/10072)
 - feat(): Support easy serialization of custom properties [#10071](https://github.com/fabricjs/fabric.js/pull/10071)
 - chore(): reduce class inheritance, merge some classes together. [#10070](https://github.com/fabricjs/fabric.js/pull/10070)
