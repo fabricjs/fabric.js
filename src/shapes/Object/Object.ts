@@ -68,8 +68,8 @@ import type {
 } from '../../util/animation/types';
 import { ObjectGeometry } from './ObjectGeometry';
 
-type TAncestor = FabricObject | Canvas | StaticCanvas;
-type TCollection = Group | Canvas | StaticCanvas;
+type TAncestor = FabricObject;
+type TCollection = Group;
 
 export type Ancestors =
   | [FabricObject | Group]
@@ -1707,7 +1707,6 @@ export class FabricObject<
     return (
       parent === target ||
       group === target ||
-      this.canvas === target ||
       // walk up
       (!!parent && parent.isDescendantOf(target)) ||
       (!!group && group !== parent && group.isDescendantOf(target))
@@ -1722,7 +1721,7 @@ export class FabricObject<
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let parent: TAncestor | undefined = this;
     do {
-      parent = parent instanceof FabricObject ? parent.parent : undefined;
+      parent = parent.parent;
       parent && ancestors.push(parent);
     } while (parent);
     return ancestors as Ancestors;
