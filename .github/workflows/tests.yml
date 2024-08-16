@@ -163,7 +163,7 @@ jobs:
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
-      - uses: romeovs/lcov-reporter-action@0.4.0
+      - uses: romeovs/lcov-reporter-action@v0.4.0
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
