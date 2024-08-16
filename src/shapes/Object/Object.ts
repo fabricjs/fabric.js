@@ -8,11 +8,11 @@ import {
   SCALE_X,
   SCALE_Y,
   STROKE,
+  FILL,
   TOP,
   VERSION,
 } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
-import { AnimatableObject } from './AnimatableObject';
 import { Point } from '../../Point';
 import { Shadow } from '../../Shadow';
 import type {
@@ -57,6 +57,39 @@ import type { SerializedObjectProps } from './types/SerializedObjectProps';
 import type { ObjectProps } from './types/ObjectProps';
 import { getDevicePixelRatio, getEnv } from '../../env';
 import { log } from '../../util/internals/console';
+import type { TColorArg } from '../../color/typedefs';
+import type { TAnimation } from '../../util/animation/animate';
+import { animate, animateColor } from '../../util/animation/animate';
+import type {
+  AnimationOptions,
+  ArrayAnimationOptions,
+  ColorAnimationOptions,
+  ValueAnimationOptions,
+} from '../../util/animation/types';
+import { ObjectGeometry } from './ObjectGeometry';
+
+type TAncestor = FabricObject | Canvas | StaticCanvas;
+type TCollection = Group | Canvas | StaticCanvas;
+
+export type Ancestors =
+  | [FabricObject | Group]
+  | [FabricObject | Group, ...Group[]]
+  | Group[];
+
+export type AncestryComparison = {
+  /**
+   * common ancestors of `this` and`other`(may include`this` | `other`)
+   */
+  common: Ancestors;
+  /**
+   * ancestors that are of `this` only
+   */
+  fork: Ancestors;
+  /**
+   * ancestors that are of `other` only
+   */
+  otherFork: Ancestors;
+};
 
 export type TCachedFabricObject<T extends FabricObject = FabricObject> = T &
   Required<
@@ -135,7 +168,7 @@ export class FabricObject<
     SProps extends SerializedObjectProps = SerializedObjectProps,
     EventSpec extends ObjectEvents = ObjectEvents,
   >
-  extends AnimatableObject<EventSpec>
+  extends ObjectGeometry<EventSpec>
   implements ObjectProps
 {
   declare minScaleLimit: number;
@@ -1561,6 +1594,248 @@ export class FabricObject<
     this._cacheCanvas && getEnv().dispose(this._cacheCanvas);
     this._cacheCanvas = undefined;
     this._cacheContext = null;
+  }
+
+  // #region Animation methods
+  /**
+   * List of properties to consider for animating colors.
+   * @type String[]
+   */
+  static colorProperties: string[] = [FILL, STROKE, 'backgroundColor'];
+
+  /**
+   * Animates object's properties
+   * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
+   * @param {Partial<AnimationOptions<T>>} options
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
+   * @return {Record<string, TAnimation<T>>} map of animation contexts
+   *
+   * As object — multiple properties
+   *
+   * object.animate({ left: ..., top: ... });
+   * object.animate({ left: ..., top: ... }, { duration: ... });
+   */
+  animate<T extends number | number[] | TColorArg>(
+    animatable: Record<string, T>,
+    options?: Partial<AnimationOptions<T>>,
+  ): Record<string, TAnimation<T>> {
+    return Object.entries(animatable).reduce(
+      (acc, [key, endValue]) => {
+        acc[key] = this._animate(key, endValue, options);
+        return acc;
+      },
+      {} as Record<string, TAnimation<T>>,
+    );
+  }
+
+  /**
+   * @private
+   * @param {String} key Property to animate
+   * @param {String} to Value to animate to
+   * @param {Object} [options] Options object
+   */
+  _animate<T extends number | number[] | TColorArg>(
+    key: string,
+    endValue: T,
+    options: Partial<AnimationOptions<T>> = {},
+  ): TAnimation<T> {
+    const path = key.split('.');
+    const propIsColor = (
+      this.constructor as typeof FabricObject
+    ).colorProperties.includes(path[path.length - 1]);
+    const { abort, startValue, onChange, onComplete } = options;
+    const animationOptions = {
+      ...options,
+      target: this,
+      // path.reduce... is the current value in case start value isn't provided
+      startValue:
+        startValue ?? path.reduce((deep: any, key) => deep[key], this),
+      endValue,
+      abort: abort?.bind(this),
+      onChange: (
+        value: number | number[] | string,
+        valueProgress: number,
+        durationProgress: number,
+      ) => {
+        path.reduce((deep: Record<string, any>, key, index) => {
+          if (index === path.length - 1) {
+            deep[key] = value;
+          }
+          return deep[key];
+        }, this);
+        onChange &&
+          // @ts-expect-error generic callback arg0 is wrong
+          onChange(value, valueProgress, durationProgress);
+      },
+      onComplete: (
+        value: number | number[] | string,
+        valueProgress: number,
+        durationProgress: number,
+      ) => {
+        this.setCoords();
+        onComplete &&
+          // @ts-expect-error generic callback arg0 is wrong
+          onComplete(value, valueProgress, durationProgress);
+      },
+    } as AnimationOptions<T>;
+
+    return (
+      propIsColor
+        ? animateColor(animationOptions as ColorAnimationOptions)
+        : animate(
+            animationOptions as ValueAnimationOptions | ArrayAnimationOptions,
+          )
+    ) as TAnimation<T>;
+  }
+
+  // #region Object stacking methods
+
+  /**
+   * A reference to the parent of the object
+   * Used to keep the original parent ref when the object has been added to an ActiveSelection, hence loosing the `group` ref
+   */
+  declare parent?: Group;
+
+  /**
+   * Checks if object is descendant of target
+   * Should be used instead of {@link Group.contains} or {@link StaticCanvas.contains} for performance reasons
+   * @param {TAncestor} target
+   * @returns {boolean}
+   */
+  isDescendantOf(target: TAncestor): boolean {
+    const { parent, group } = this;
+    return (
+      parent === target ||
+      group === target ||
+      this.canvas === target ||
+      // walk up
+      (!!parent && parent.isDescendantOf(target)) ||
+      (!!group && group !== parent && group.isDescendantOf(target))
+    );
+  }
+
+  /**
+   * @returns {Ancestors} ancestors (excluding `ActiveSelection`) from bottom to top
+   */
+  getAncestors(): Ancestors {
+    const ancestors: TAncestor[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let parent: TAncestor | undefined = this;
+    do {
+      parent = parent instanceof FabricObject ? parent.parent : undefined;
+      parent && ancestors.push(parent);
+    } while (parent);
+    return ancestors as Ancestors;
+  }
+
+  /**
+   * Compare ancestors
+   *
+   * @param {StackedObject} other
+   * @returns {AncestryComparison} an object that represent the ancestry situation.
+   */
+  findCommonAncestors<T extends this>(other: T): AncestryComparison {
+    if (this === other) {
+      return {
+        fork: [],
+        otherFork: [],
+        common: [this, ...this.getAncestors()],
+      } as AncestryComparison;
+    }
+    const ancestors = this.getAncestors();
+    const otherAncestors = other.getAncestors();
+    //  if `this` has no ancestors and `this` is top ancestor of `other` we must handle the following case
+    if (
+      ancestors.length === 0 &&
+      otherAncestors.length > 0 &&
+      this === otherAncestors[otherAncestors.length - 1]
+    ) {
+      return {
+        fork: [],
+        otherFork: [
+          other,
+          ...otherAncestors.slice(0, otherAncestors.length - 1),
+        ],
+        common: [this],
+      } as AncestryComparison;
+    }
+    //  compare ancestors
+    for (let i = 0, ancestor; i < ancestors.length; i++) {
+      ancestor = ancestors[i];
+      if (ancestor === other) {
+        return {
+          fork: [this, ...ancestors.slice(0, i)],
+          otherFork: [],
+          common: ancestors.slice(i),
+        } as AncestryComparison;
+      }
+      for (let j = 0; j < otherAncestors.length; j++) {
+        if (this === otherAncestors[j]) {
+          return {
+            fork: [],
+            otherFork: [other, ...otherAncestors.slice(0, j)],
+            common: [this, ...ancestors],
+          } as AncestryComparison;
+        }
+        if (ancestor === otherAncestors[j]) {
+          return {
+            fork: [this, ...ancestors.slice(0, i)],
+            otherFork: [other, ...otherAncestors.slice(0, j)],
+            common: ancestors.slice(i),
+          } as AncestryComparison;
+        }
+      }
+    }
+    // nothing shared
+    return {
+      fork: [this, ...ancestors],
+      otherFork: [other, ...otherAncestors],
+      common: [],
+    } as AncestryComparison;
+  }
+
+  /**
+   *
+   * @param {StackedObject} other
+   * @returns {boolean}
+   */
+  hasCommonAncestors<T extends this>(other: T): boolean {
+    const commonAncestors = this.findCommonAncestors(other);
+    return commonAncestors && !!commonAncestors.common.length;
+  }
+
+  /**
+   *
+   * @param {FabricObject} other object to compare against
+   * @returns {boolean | undefined} if objects do not share a common ancestor or they are strictly equal it is impossible to determine which is in front of the other; in such cases the function returns `undefined`
+   */
+  isInFrontOf<T extends this>(other: T): boolean | undefined {
+    if (this === other) {
+      return undefined;
+    }
+    const ancestorData = this.findCommonAncestors(other);
+
+    if (ancestorData.fork.includes(other as any)) {
+      return true;
+    }
+    if (ancestorData.otherFork.includes(this as any)) {
+      return false;
+    }
+    // if there isn't a common ancestor, we take the canvas.
+    // if there is no canvas, there is nothing to compare
+    const firstCommonAncestor = ancestorData.common[0] || this.canvas;
+    if (!firstCommonAncestor) {
+      return undefined;
+    }
+    const headOfFork = ancestorData.fork.pop(),
+      headOfOtherFork = ancestorData.otherFork.pop(),
+      thisIndex = (firstCommonAncestor as TCollection)._objects.indexOf(
+        headOfFork as any,
+      ),
+      otherIndex = (firstCommonAncestor as TCollection)._objects.indexOf(
+        headOfOtherFork as any,
+      );
+    return thisIndex > -1 && thisIndex > otherIndex;
   }
 
   /**
