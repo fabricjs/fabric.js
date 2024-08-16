@@ -356,11 +356,12 @@ describe('FabricObject stacking', () => {
     isInFrontOf(object, other, false);
     // parent precedes canvas when checking ancestor
     a.add(object);
-    expect(object.canvas).toBe(canvas);
     expect(other.canvas).toBe(canvas);
-    isInFrontOf(object, other, false);
+    expect(object.canvas).toBe(undefined); // because a is not on canvas
+    isInFrontOf(object, other, undefined);
     canvas.insertAt(0, a);
     isInFrontOf(object, other, false);
     isInFrontOf(a, other, false);
+    expect(object.canvas).toBe(canvas); // because a is now on a canvas
   });
 });
