@@ -348,13 +348,13 @@ describe('FabricObject stacking', () => {
     isInFrontOf(other, c, true);
     isInFrontOf(b, c, true);
     isInFrontOf(a, c, true);
-    //  with canvas
+    // with canvas
     a.removeAll();
     b.removeAll();
     c.removeAll();
     canvas.add(object, other);
     isInFrontOf(object, other, false);
-    //  parent precedes canvas when checking ancestor
+    // parent precedes canvas when checking ancestor
     a.add(object);
     expect(object.canvas).toBe(canvas);
     expect(other.canvas).toBe(canvas);
