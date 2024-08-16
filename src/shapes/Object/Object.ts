@@ -553,120 +553,6 @@ export class FabricObject<
   }
 
   /**
-   * Returns an object representation of an instance
-   * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} Object representation of an instance
-   */
-  toObject(propertiesToInclude: any[] = []): any {
-    const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
-      clipPathData =
-        this.clipPath && !this.clipPath.excludeFromExport
-          ? {
-              ...this.clipPath.toObject(propertiesToInclude),
-              inverted: this.clipPath.inverted,
-              absolutePositioned: this.clipPath.absolutePositioned,
-            }
-          : null,
-      object = {
-        ...pick(this, propertiesToInclude as (keyof this)[]),
-        type: (this.constructor as typeof FabricObject).type,
-        version: VERSION,
-        originX: this.originX,
-        originY: this.originY,
-        left: toFixed(this.left, NUM_FRACTION_DIGITS),
-        top: toFixed(this.top, NUM_FRACTION_DIGITS),
-        width: toFixed(this.width, NUM_FRACTION_DIGITS),
-        height: toFixed(this.height, NUM_FRACTION_DIGITS),
-        fill: isSerializableFiller(this.fill)
-          ? this.fill.toObject()
-          : this.fill,
-        stroke: isSerializableFiller(this.stroke)
-          ? this.stroke.toObject()
-          : this.stroke,
-        strokeWidth: toFixed(this.strokeWidth, NUM_FRACTION_DIGITS),
-        strokeDashArray: this.strokeDashArray
-          ? this.strokeDashArray.concat()
-          : this.strokeDashArray,
-        strokeLineCap: this.strokeLineCap,
-        strokeDashOffset: this.strokeDashOffset,
-        strokeLineJoin: this.strokeLineJoin,
-        strokeUniform: this.strokeUniform,
-        strokeMiterLimit: toFixed(this.strokeMiterLimit, NUM_FRACTION_DIGITS),
-        scaleX: toFixed(this.scaleX, NUM_FRACTION_DIGITS),
-        scaleY: toFixed(this.scaleY, NUM_FRACTION_DIGITS),
-        angle: toFixed(this.angle, NUM_FRACTION_DIGITS),
-        flipX: this.flipX,
-        flipY: this.flipY,
-        opacity: toFixed(this.opacity, NUM_FRACTION_DIGITS),
-        shadow:
-          this.shadow && this.shadow.toObject
-            ? this.shadow.toObject()
-            : this.shadow,
-        visible: this.visible,
-        backgroundColor: this.backgroundColor,
-        fillRule: this.fillRule,
-        paintFirst: this.paintFirst,
-        globalCompositeOperation: this.globalCompositeOperation,
-        skewX: toFixed(this.skewX, NUM_FRACTION_DIGITS),
-        skewY: toFixed(this.skewY, NUM_FRACTION_DIGITS),
-        ...(clipPathData ? { clipPath: clipPathData } : null),
-      };
-
-    return !this.includeDefaultValues
-      ? this._removeDefaultValues(object)
-      : object;
-  }
-
-  /**
-   * Returns (dataless) object representation of an instance
-   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
-   * @return {Object} Object representation of an instance
-   */
-  toDatalessObject(propertiesToInclude?: any[]): any {
-    // will be overwritten by subclasses
-    return this.toObject(propertiesToInclude);
-  }
-
-  /**
-   * @private
-   * @param {Object} object
-   */
-  _removeDefaultValues<T extends object>(object: T): Partial<T> {
-    // getDefaults() ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
-    // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
-    const defaults = (this.constructor as typeof FabricObject).getDefaults();
-    const hasStaticDefaultValues = Object.keys(defaults).length > 0;
-    const baseValues = hasStaticDefaultValues
-      ? defaults
-      : Object.getPrototypeOf(this);
-
-    return pickBy(object, (value, key) => {
-      if (key === LEFT || key === TOP || key === 'type') {
-        return true;
-      }
-      const baseValue = baseValues[key];
-      return (
-        value !== baseValue &&
-        // basically a check for [] === []
-        !(
-          Array.isArray(value) &&
-          Array.isArray(baseValue) &&
-          value.length === 0 &&
-          baseValue.length === 0
-        )
-      );
-    });
-  }
-
-  /**
-   * Returns a string representation of an instance
-   * @return {String}
-   */
-  toString() {
-    return `#<${(this.constructor as typeof FabricObject).type}>`;
-  }
-
-  /**
    * Return the object scale factor counting also the group scaling
    * @return {Point}
    */
@@ -1835,6 +1721,154 @@ export class FabricObject<
         headOfOtherFork as any,
       );
     return thisIndex > -1 && thisIndex > otherIndex;
+  }
+
+  // #region Serialization
+  /**
+   * Define a list of custom properties that will be serialized when
+   * instance.toObject() gets called
+   */
+  static customProperties: string[] = [];
+
+  /**
+   * Returns an object representation of an instance
+   * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {Object} Object representation of an instance
+   */
+  toObject(propertiesToInclude: any[] = []): any {
+    const propertiesToSerialize = propertiesToInclude.concat(
+      (this.constructor as typeof FabricObject).customProperties,
+    );
+    let clipPathData: Partial<SerializedObjectProps> | undefined;
+    const NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
+    const {
+      clipPath,
+      fill,
+      stroke,
+      shadow,
+      strokeDashArray,
+      left,
+      top,
+      originX,
+      originY,
+      width,
+      height,
+      strokeWidth,
+      strokeLineCap,
+      strokeDashOffset,
+      strokeLineJoin,
+      strokeUniform,
+      strokeMiterLimit,
+      scaleX,
+      scaleY,
+      angle,
+      flipX,
+      flipY,
+      opacity,
+      visible,
+      backgroundColor,
+      fillRule,
+      paintFirst,
+      globalCompositeOperation,
+      skewX,
+      skewY,
+    } = this;
+    if (clipPath && !clipPath.excludeFromExport) {
+      clipPathData = clipPath.toObject(
+        propertiesToSerialize.concat('inverted', 'absolutePositioned'),
+      );
+    }
+    const toFixedBound = (val: number) => toFixed(val, NUM_FRACTION_DIGITS);
+    const object = {
+      ...pick(this, propertiesToSerialize as (keyof this)[]),
+      type: (this.constructor as typeof FabricObject).type,
+      version: VERSION,
+      originX,
+      originY,
+      left: toFixedBound(left),
+      top: toFixedBound(top),
+      width: toFixedBound(width),
+      height: toFixedBound(height),
+      fill: isSerializableFiller(fill) ? fill.toObject() : fill,
+      stroke: isSerializableFiller(stroke) ? stroke.toObject() : stroke,
+      strokeWidth: toFixedBound(strokeWidth),
+      strokeDashArray: strokeDashArray
+        ? strokeDashArray.concat()
+        : strokeDashArray,
+      strokeLineCap,
+      strokeDashOffset,
+      strokeLineJoin,
+      strokeUniform,
+      strokeMiterLimit: toFixedBound(strokeMiterLimit),
+      scaleX: toFixedBound(scaleX),
+      scaleY: toFixedBound(scaleY),
+      angle: toFixedBound(angle),
+      flipX,
+      flipY,
+      opacity: toFixedBound(opacity),
+      shadow: shadow ? shadow.toObject() : shadow,
+      visible,
+      backgroundColor,
+      fillRule,
+      paintFirst,
+      globalCompositeOperation,
+      skewX: toFixedBound(skewX),
+      skewY: toFixedBound(skewY),
+      ...(clipPathData ? { clipPath: clipPathData } : null),
+    };
+
+    return !this.includeDefaultValues
+      ? this._removeDefaultValues(object)
+      : object;
+  }
+
+  /**
+   * Returns (dataless) object representation of an instance
+   * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
+   * @return {Object} Object representation of an instance
+   */
+  toDatalessObject(propertiesToInclude?: any[]): any {
+    // will be overwritten by subclasses
+    return this.toObject(propertiesToInclude);
+  }
+
+  /**
+   * @private
+   * @param {Object} object
+   */
+  _removeDefaultValues<T extends object>(object: T): Partial<T> {
+    // getDefaults() ( get from static ownDefaults ) should win over prototype since anyway they get assigned to instance
+    // ownDefault vs prototype is swappable only if you change all the fabric objects consistently.
+    const defaults = (this.constructor as typeof FabricObject).getDefaults();
+    const hasStaticDefaultValues = Object.keys(defaults).length > 0;
+    const baseValues = hasStaticDefaultValues
+      ? defaults
+      : Object.getPrototypeOf(this);
+
+    return pickBy(object, (value, key) => {
+      if (key === LEFT || key === TOP || key === 'type') {
+        return true;
+      }
+      const baseValue = baseValues[key];
+      return (
+        value !== baseValue &&
+        // basically a check for [] === []
+        !(
+          Array.isArray(value) &&
+          Array.isArray(baseValue) &&
+          value.length === 0 &&
+          baseValue.length === 0
+        )
+      );
+    });
+  }
+
+  /**
+   * Returns a string representation of an instance
+   * @return {String}
+   */
+  toString() {
+    return `#<${(this.constructor as typeof FabricObject).type}>`;
   }
 
   /**
