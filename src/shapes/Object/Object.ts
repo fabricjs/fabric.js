@@ -1773,14 +1773,10 @@ export class FabricObject<
       skewX,
       skewY,
     } = this;
-    if (clipPath) {
-      const { inverted, absolutePositioned, excludeFromExport } = clipPath;
-      if (!excludeFromExport) {
-        clipPathData = Object.assign(clipPath.toObject(propertiesToSerialize), {
-          inverted,
-          absolutePositioned,
-        });
-      }
+    if (clipPath && !clipPath.excludeFromExport) {
+      clipPathData = clipPath.toObject(
+        propertiesToSerialize.concat('inverted', 'absolutePositioned'),
+      );
     }
     const toFixedBound = (val: number) => toFixed(val, NUM_FRACTION_DIGITS);
     const object = {
