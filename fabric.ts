@@ -8,6 +8,8 @@ export { runningAnimations } from './src/util/animation/AnimationRegistry';
 export * from './src/typedefs';
 
 export * from './src/EventTypeDefs';
+export type { ITextEvents } from './src/shapes/IText/ITextBehavior';
+
 export { Observable } from './src/Observable';
 
 export type {
