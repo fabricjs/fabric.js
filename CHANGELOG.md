@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(Canvas): Avoid styling the lower canvas with absolute positioning [#10077](https://github.com/fabricjs/fabric.js/pull/10077)
 - chore(TS): Add missing export type for Text events [#10076](https://github.com/fabricjs/fabric.js/pull/10076)
 - chore(CI): Move test actions to Node 20 [#10073](https://github.com/fabricjs/fabric.js/pull/10073)
 - feat(Object): Object serialization for common properties [#10072](https://github.com/fabricjs/fabric.js/pull/10072)
