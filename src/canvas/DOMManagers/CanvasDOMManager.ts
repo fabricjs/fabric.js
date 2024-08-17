@@ -37,6 +37,11 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     });
     this.applyCanvasStyle(upperCanvasEl, {
       allowTouchScrolling,
+      styles: {
+        position: 'absolute',
+        left: '0',
+        top: '0',
+      },
     });
     const container = this.createContainerElement();
     container.classList.add(containerClass);
@@ -78,14 +83,13 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
    */
   protected applyCanvasStyle(
     element: HTMLCanvasElement,
-    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean },
+    options: {
+      allowTouchScrolling?: boolean;
+      styles?: string | Record<string, string>;
+    },
   ) {
-    setStyle(element, {
-      position: 'absolute',
-      left: '0',
-      top: '0',
-    });
-    allowTouchScrolling(element, allow);
+    setStyle(element, options.styles);
+    allowTouchScrolling(element, options.allowTouchScrolling);
     makeElementUnselectable(element);
   }
 

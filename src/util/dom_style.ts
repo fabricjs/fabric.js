@@ -7,7 +7,7 @@
  */
 export function setStyle(
   element: HTMLElement,
-  styles: string | Record<string, string>,
+  styles: string | Record<string, string> = {},
 ) {
   const elementStyle = element.style;
   if (!elementStyle) {

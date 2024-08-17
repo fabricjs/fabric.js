@@ -22,7 +22,7 @@ export const setCanvasDimensions = (
   }
 };
 
-export function allowTouchScrolling(element: HTMLElement, allow: boolean) {
+export function allowTouchScrolling(element: HTMLElement, allow?: boolean) {
   const touchAction = allow ? 'manipulation' : NONE;
   setStyle(element, {
     'touch-action': touchAction,
