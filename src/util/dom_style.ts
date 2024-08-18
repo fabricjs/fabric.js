@@ -10,10 +10,10 @@ export function setStyle(
   styles: string | Record<string, string>,
 ) {
   const elementStyle = element.style;
-  if (!elementStyle) {
+  if (!elementStyle || !styles) {
     return;
   } else if (typeof styles === 'string') {
-    element.style.cssText += ';' + styles;
+    elementStyle.cssText += ';' + styles;
   } else {
     Object.entries(styles).forEach(([property, value]) =>
       elementStyle.setProperty(property, value),
