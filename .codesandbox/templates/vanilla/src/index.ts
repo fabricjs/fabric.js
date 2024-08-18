@@ -3,7 +3,9 @@ import './styles.css';
 import { testCase } from './testcases/responsive';
 
 const el = document.getElementById('canvas');
-const canvas = (window.canvas = new fabric.Canvas(el));
+const canvas = (window.canvas = new fabric.Canvas(el, {
+  allowTouchScrolling: true,
+}));
 
 //  edit from here
 canvas.setDimensions({
