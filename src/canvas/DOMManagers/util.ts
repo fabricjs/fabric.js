@@ -5,7 +5,6 @@ import {
   getWindowFromElement,
   getScrollLeftTop,
 } from '../../util/dom_misc';
-import { setStyle } from '../../util/dom_style';
 
 export const setCanvasDimensions = (
   el: HTMLCanvasElement,
@@ -21,14 +20,6 @@ export const setCanvasDimensions = (
     ctx.scale(retinaScaling, retinaScaling);
   }
 };
-
-export function allowTouchScrolling(element: HTMLElement, allow?: boolean) {
-  const touchAction = allow ? 'manipulation' : NONE;
-  setStyle(element, {
-    'touch-action': touchAction,
-    '-ms-touch-action': touchAction,
-  });
-}
 
 export type CSSDimensions = {
   width: number | string;

@@ -2,14 +2,11 @@ import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
 import { createCanvasElement, setStyle } from '../../util';
 import type { CSSDimensions } from './util';
-import {
-  allowTouchScrolling,
-  makeElementUnselectable,
-  setCSSDimensions,
-} from './util';
+import { makeElementUnselectable, setCSSDimensions } from './util';
 import type { CanvasItem } from './StaticCanvasDOMManager';
 import { StaticCanvasDOMManager } from './StaticCanvasDOMManager';
 import { setCanvasDimensions } from './util';
+import { NONE } from '../../constants';
 
 export class CanvasDOMManager extends StaticCanvasDOMManager {
   upper: CanvasItem;
@@ -85,11 +82,14 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     element: HTMLCanvasElement,
     options: {
       allowTouchScrolling?: boolean;
-      styles?: string | Record<string, string>;
+      styles?: Record<string, string>;
     },
   ) {
-    setStyle(element, options.styles);
-    allowTouchScrolling(element, options.allowTouchScrolling);
+    const { styles, allowTouchScrolling } = options;
+    setStyle(element, {
+      ...styles,
+      'touch-action': allowTouchScrolling ? 'manipulation' : NONE,
+    });
     makeElementUnselectable(element);
   }
 
