@@ -7,7 +7,7 @@ export const fragmentSource = `
   varying vec2 vTexCoord;
   void main() {
     float blockW = uBlocksize * uStepW;
-    float blockH = uBlocksize * uStepW;
+    float blockH = uBlocksize * uStepH;
     int posX = int(vTexCoord.x / blockW);
     int posY = int(vTexCoord.y / blockH);
     float fposX = float(posX);
