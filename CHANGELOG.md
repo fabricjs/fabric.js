@@ -2,6 +2,7 @@
 
 ## [next]
 
+- WIP fix(Group): Make TS more flexible fore group subclasses [#10092](https://github.com/fabricjs/fabric.js/pull/10092)
 - fix(filter): pixelate filter has non square pixels in webgl (#10081)
 - feat(Canvas): Avoid styling the lower canvas with absolute positioning [#10077](https://github.com/fabricjs/fabric.js/pull/10077)
 - chore(TS): Add missing export type for Text events [#10076](https://github.com/fabricjs/fabric.js/pull/10076)
