@@ -13,17 +13,20 @@ import {
  * @param originalFn the original fromObject function of an object,
  * @returns a wrapped fromObject function for the object
  */
-export const originUpdaterWrapper =
-  <T extends FabricObject = FabricObject>(
-    originalFn: (...args: any[]) => Promise<T>,
-  ): ((...args: any[]) => Promise<T>) =>
-  async (serializedObject, ...args) => {
+export const originUpdaterWrapper = <T extends FabricObject = FabricObject>(
+  originalFn: (...args: any[]) => Promise<T>,
+): ((...args: any[]) => Promise<T>) =>
+  async function (this: T, serializedObject, ...args) {
     // we default to left and top because those are defaults before deprecation
     const { originX = 'left', originY = 'top' } = serializedObject;
     // and we do not want to pass those properties on the object anymore
     delete serializedObject.originX;
     delete serializedObject.originY;
-    const originalObject = await originalFn(serializedObject, ...args);
+    const originalObject = await originalFn.call(
+      this,
+      serializedObject,
+      ...args,
+    );
     const actualPosition = new Point(originalObject.left, originalObject.top);
     originalObject.setPositionByOrigin(actualPosition, originX, originY);
     return originalObject;
