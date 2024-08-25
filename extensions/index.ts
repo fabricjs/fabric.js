@@ -3,4 +3,7 @@ export {
   type AligningLineConfig,
 } from './aligning_guidelines';
 
-export { originUpdaterWrapper } from './data_updaters/origins';
+export {
+  originUpdaterWrapper,
+  installOriginWrapperUpdater,
+} from './data_updaters/origins';

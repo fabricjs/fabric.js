@@ -1,4 +1,10 @@
-import { Point, type FabricObject } from 'fabric';
+import {
+  Point,
+  FabricImage,
+  Group,
+  BaseFabricObject,
+  type FabricObject,
+} from 'fabric';
 
 /**
  * Updates the fromObject function of a class to return a version that can restore old data
@@ -8,13 +14,29 @@ import { Point, type FabricObject } from 'fabric';
  * @returns a wrapped fromObject function for the object
  */
 export const originUpdaterWrapper =
-  (
-    originalFn: (...args: any[]) => Promise<FabricObject>,
-  ): ((...args: any[]) => Promise<FabricObject>) =>
+  <T extends FabricObject = FabricObject>(
+    originalFn: (...args: any[]) => Promise<T>,
+  ): ((...args: any[]) => Promise<T>) =>
   async (serializedObject, ...args) => {
-    const { originX, originY } = serializedObject;
+    // we default to left and top because those are defaults before deprecation
+    const { originX = 'left', originY = 'top' } = serializedObject;
+    // and we do not want to pass those properties on the object anymore
+    delete serializedObject.originX;
+    delete serializedObject.originY;
     const originalObject = await originalFn(serializedObject, ...args);
     const actualPosition = new Point(originalObject.left, originalObject.top);
     originalObject.setPositionByOrigin(actualPosition, originX, originY);
     return originalObject;
   };
+
+export const installOriginWrapperUpdater = () => {
+  // @ts-expect-error the _fromObject parameter could be instantiated differently
+  BaseFabricObject._fromObject = originUpdaterWrapper<FabricObject>(
+    BaseFabricObject._fromObject,
+  );
+  // FabricImage and Group do not use _fromObject
+  FabricImage.fromObject = originUpdaterWrapper<FabricImage>(
+    FabricImage.fromObject,
+  );
+  Group.fromObject = originUpdaterWrapper<Group>(Group.fromObject);
+};
