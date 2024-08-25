@@ -1,4 +1,4 @@
-import { TSimplePathData } from 'fabric/dist/src/util';
+import type { TSimplePathData } from 'fabric';
 import { installOriginWrapperUpdater } from './index';
 import { BaseFabricObject, Path } from 'fabric';
 
