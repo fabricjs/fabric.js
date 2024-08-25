@@ -12,3 +12,15 @@ import { installOriginWrapperUpdater } from 'fabric/extensions';
 
 installOriginWrapperUpdater();
 ```
+
+## Warning
+
+If you used different default values for originX and originY for your application and you exported without default values, this helper won't be useful and will return wrong position.
+
+You have to modifiy the default values in the options. when calling the function you have 2 optional arguments to specify that
+
+```ts
+import { installOriginWrapperUpdater } from 'fabric/extensions';
+
+installOriginWrapperUpdater(0.2, 'bottom');
+```

@@ -1,6 +1,6 @@
 import type { TSimplePathData } from 'fabric';
 import { installOriginWrapperUpdater } from './index';
-import { BaseFabricObject, Path } from 'fabric';
+import { BaseFabricObject, Path, Rect, Group } from 'fabric';
 
 installOriginWrapperUpdater();
 
@@ -54,5 +54,45 @@ describe('installOriginWrapperUpdater', () => {
     expect(instance.top).toBe(2);
     expect(instance.originX).toBe('center');
     expect(instance.originY).toBe('center');
+  });
+  it('works with Group objects', async () => {
+    const rect1 = new Rect({
+      top: 100,
+      left: 100,
+      width: 30,
+      height: 10,
+      originX: 'center',
+      originY: 0.1,
+    });
+    const rect2 = new Rect({
+      top: 120,
+      left: 50,
+      width: 10,
+      height: 40,
+      strokeWidth: 0,
+      originY: 'center',
+      originX: 0.1,
+    });
+
+    const g = new Group([rect1, rect2], {
+      originX: 'left',
+      originY: 'top',
+      top: 100,
+      left: 200,
+    });
+    const obj = g.toObject();
+    expect(obj.objects[0].top).toBe(-19.45);
+    expect(obj.objects[0].left).toBe(17.75);
+    expect(obj.objects[1].top).toBe(0.55);
+    expect(obj.objects[1].left).toBe(-32.25);
+    expect(obj.top).toBe(100);
+    expect(obj.left).toBe(200);
+    const instance = await Group.fromObject(obj);
+    expect(Math.round(instance._objects[0].top)).toBe(-15);
+    expect(instance._objects[0].left).toBe(17.75);
+    expect(instance._objects[1].top).toBe(0.55);
+    expect(instance._objects[1].left).toBe(-28.25);
+    expect(instance.top).toBe(120.55);
+    expect(instance.left).toBe(233.25);
   });
 });
