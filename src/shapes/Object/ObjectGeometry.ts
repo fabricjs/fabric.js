@@ -570,7 +570,13 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   declare scaleY: number;
   declare skewX: number;
   declare skewY: number;
+  /**
+   * @deprecated please use 'center' as value in new projects
+   * */
   declare originX: TOriginX;
+  /**
+   * @deprecated please use 'center' as value in new projects
+   * */
   declare originY: TOriginY;
   declare angle: TDegree;
   declare strokeWidth: number;
@@ -678,6 +684,9 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     originX: TOriginX,
     originY: TOriginY,
   ): Point {
+    if (originX === CENTER && originY === CENTER) {
+      return point;
+    }
     const p = this.translateToGivenOrigin(
       point,
       originX,
@@ -740,7 +749,12 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   }
 
   /**
-   * Returns the coordinates of the object as if it has a different origin
+   * Returns the position of the object as if it has a different origin.
+   * Take an object that has left, top set to 100, 100 with origin 'left', 'top'.
+   * Return the values of left top ( wrapped in a point ) that you would need to keep
+   * the same position if origin where different.
+   * Alternatively you can use this to also find which point in the parent plane is a specific origin
+   * ( where is the bottom right corner of my object? )
    * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
    * @return {Point}
