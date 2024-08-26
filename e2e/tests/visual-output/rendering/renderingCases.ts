@@ -228,6 +228,34 @@ export const renderTests: renderTestType[] = [
       canvas.setZoom(0.4);
     },
   },
+  {
+    size: [450, 220],
+    percentage: 0.01,
+    title: 'pixelate filter',
+    golden: 'pixelate-filter.png',
+    renderFunction: async function render(
+      canvas: Canvas,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      fabric: typeof import('fabric'),
+    ) {
+      const imgSource = fabric.getFabricDocument().createElement('canvas');
+      imgSource.width = 450;
+      imgSource.height = 220;
+      const ctx = imgSource.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 450, 220);
+      gradient.addColorStop(0, 'yellow');
+      gradient.addColorStop(0.5, 'black');
+      gradient.addColorStop(1, 'cyan');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, imgSource.width, imgSource.height);
+      const img = new fabric.FabricImage(imgSource);
+      canvas.add(img);
+      img.filters[0] = new fabric.filters.Pixelate({
+        blocksize: 20,
+      });
+      img.applyFilters();
+    },
+  },
 ];
 
 // function polygonWithStroke(canvas, callback) {
