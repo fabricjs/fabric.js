@@ -79,11 +79,16 @@ export const groupDefaultValues: Partial<TClassProperties<Group>> = {
  * @fires layout:before
  * @fires layout:after
  */
-export class Group
+// @ts-expect-error Group does not really implment Props.
+export class Group<
+    Props extends TOptions<GroupProps> = Partial<GroupProps>,
+    SProps extends SerializedGroupProps = SerializedGroupProps,
+    // EventSpec extends GroupEvents = GroupEvents, // can't do this yet
+  >
   extends createCollectionMixin(
     FabricObject<GroupProps, SerializedGroupProps, GroupEvents>,
   )
-  implements GroupProps
+  implements GroupProps, Props
 {
   /**
    * Used to optimize performance
@@ -572,12 +577,9 @@ export class Group
    * @return {Object} object representation of an instance
    */
   toObject<
-    T extends Omit<
-      GroupProps & TClassProperties<this>,
-      keyof SerializedGroupProps
-    >,
+    T extends Omit<Props & TClassProperties<this>, keyof SProps>,
     K extends keyof T = never,
-  >(propertiesToInclude: K[] = []): Pick<T, K> & SerializedGroupProps {
+  >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     const layoutManager = this.layoutManager.toObject();
 
     return {
