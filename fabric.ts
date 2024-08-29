@@ -43,6 +43,9 @@ export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
+// many path types
+export type * from './src/util/path/typedefs';
+
 export {
   FabricObject,
 
