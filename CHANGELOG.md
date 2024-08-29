@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Fix broken exports for filters that do not have a static defaults value. [#10102](https://github.com/fabricjs/fabric.js/pull/10102)
 - fix(SVGImport): Allow parsing of 'id' attribute that starts with a number [#10079](https://github.com/fabricjs/fabric.js/pull/10079)
 - fix(filter): pixelate filter has non square pixels in webgl (#10081)
 - feat(Canvas): Avoid styling the lower canvas with absolute positioning [#10077](https://github.com/fabricjs/fabric.js/pull/10077)
