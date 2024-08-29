@@ -377,11 +377,13 @@ export class BaseFilter<
 
   /**
    * Returns object representation of an instance
+   * It will automatically export the default values of a filter,
+   * stored in the static defaults property.
    * @return {Object} Object representation of an instance
    */
   toObject(): { type: Name } & OwnProps {
     const defaultKeys = Object.keys(
-      (this.constructor as typeof BaseFilter).defaults,
+      (this.constructor as typeof BaseFilter).defaults || {},
     ) as (keyof OwnProps)[];
 
     return {
