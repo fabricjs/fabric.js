@@ -4,7 +4,7 @@
 
 ## [6.4.1]
 
-- fix(): Package.json had wrong path to types for extensions
+- fix(): Package.json had wrong path to types for extensions [#10115](https://github.com/fabricjs/fabric.js/pull/10115)
 
 ## [6.4.0]
 
