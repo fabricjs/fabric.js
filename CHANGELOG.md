@@ -3,6 +3,15 @@
 ## [next]
 
 - fix(Canvas): allowTouchScrolling interactions [#10078](https://github.com/fabricjs/fabric.js/pull/10078)
+
+## [6.4.1]
+
+- fix(): Package.json had wrong path to types for extensions [#10115](https://github.com/fabricjs/fabric.js/pull/10115)
+
+## [6.4.0]
+
+- fix(): Fix broken exports for filters that do not have a static defaults value. [#10102](https://github.com/fabricjs/fabric.js/pull/10102)
+- chore(): deprecate originX, originY [#10095](https://github.com/fabricjs/fabric.js/pull/10095)
 - fix(SVGImport): Allow parsing of 'id' attribute that starts with a number [#10079](https://github.com/fabricjs/fabric.js/pull/10079)
 - fix(filter): pixelate filter has non square pixels in webgl (#10081)
 - feat(Canvas): Avoid styling the lower canvas with absolute positioning [#10077](https://github.com/fabricjs/fabric.js/pull/10077)

@@ -37,6 +37,9 @@ export interface BaseProps {
    * Horizontal origin of transformation of an object (`left`, `center`, `right`  or `[0, 1]`)
    * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
    * @type String
+   * @deprecated please set your default to 'center' in new projects and don't use it to build logic
+   * The reason is explained here: https://github.com/fabricjs/fabric.js/discussions/9736
+   * To set the default value to 'center' import BaseFabricObject and set the static BaseFabricObject.ownDefaults.originX = 'center'
    * @default 'left'
    */
   originX: TOriginX;
@@ -45,6 +48,9 @@ export interface BaseProps {
    * Vertical origin of transformation of an object (`top`, `center`, `bottom` or `[0, 1]`)
    * See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
    * @type String
+   * @deprecated please set your default to 'center' in new projects and don't use it to build logic
+   * The reason is explained here: https://github.com/fabricjs/fabric.js/discussions/9736
+   * To set the default value to 'center' import BaseFabricObject and set the static BaseFabricObject.ownDefaults.originY = 'center'
    * @default 'top'
    */
   originY: TOriginY;
