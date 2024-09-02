@@ -41,10 +41,10 @@ export function collectVerticalPoint(props: CollectPointProps) {
     activeObject.set('width', width * sx);
     if (isUniform) activeObject.set('height', height * sx);
   }
-  const dx = getDisByOriginX(activeObject, v * dirX);
+  const dx = getDisByOriginX(activeObject, v, dirX);
   if (isUniform) {
     const h = activeObject._getTransformedDimensions().y - dim.y;
-    const dy = getDisByOriginY(activeObject, h * dirY);
+    const dy = getDisByOriginY(activeObject, h, dirY);
     activeObject.set('top', top + dy);
   }
   activeObject.set('left', left + dx);
@@ -80,10 +80,10 @@ export function collectHorizontalPoint(props: CollectPointProps) {
     activeObject.set('height', height * sy);
     if (isUniform) activeObject.set('width', width * sy);
   }
-  const dy = getDisByOriginY(activeObject, v * dirY);
+  const dy = getDisByOriginY(activeObject, v, dirY);
   if (isUniform) {
     const w = activeObject._getTransformedDimensions().x - dim.x;
-    const dx = getDisByOriginX(activeObject, w * dirX);
+    const dx = getDisByOriginX(activeObject, w, dirX);
     activeObject.set('left', left + dx);
   }
   activeObject.set('top', top + dy);
@@ -111,13 +111,13 @@ function getDistanceList(point: Point, list: Point[], type: 'x' | 'y') {
   return { dis, arr };
 }
 
-function getDisByOriginX(target: FabricObject, v: number) {
-  const dArr = [0, v / 2, v];
-  if (v < 0) dArr.reverse();
+function getDisByOriginX(target: FabricObject, v: number, dir: -1 | 1) {
+  const dArr = [0, (v / 2) * dir, v * dir];
+  if (dir == -1) dArr.reverse();
   return dArr[originXArr.indexOf(target.originX)];
 }
-function getDisByOriginY(target: FabricObject, v: number) {
-  const dArr = [0, v / 2, v];
-  if (v < 0) dArr.reverse();
+function getDisByOriginY(target: FabricObject, v: number, dir: -1 | 1) {
+  const dArr = [0, (v / 2) * dir, v * dir];
+  if (dir == -1) dArr.reverse();
   return dArr[originYArr.indexOf(target.originY)];
 }
