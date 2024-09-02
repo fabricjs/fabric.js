@@ -105,6 +105,10 @@ export function initAligningGuidelines(
       index -= 4;
     }
     let point = activeObject.getCoords()[index];
+    const uniformIsToggled = e.e[canvas.uniScaleKey!];
+    const isUniform =
+      (canvas.uniformScaling && !uniformIsToggled) ||
+      (!canvas.uniformScaling && uniformIsToggled);
     for (const object of objects) {
       const [rect, coords] = getCaCheMapValue(object);
       const center = new Point(
@@ -112,7 +116,7 @@ export function initAligningGuidelines(
         rect.top + rect.height / 2,
       );
       const list = [...coords, center];
-      const props = { activeObject, point, list, isScale, index };
+      const props = { activeObject, point, list, isScale, isUniform, index };
       const vLines = collectVerticalPoint(props);
       const hLines = collectHorizontalPoint(props);
       vLines.forEach((o) => {
