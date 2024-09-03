@@ -861,32 +861,34 @@ export const parsePath = (pathString: string): TComplexPathData => {
   const chain: TComplexPathData = [];
 
   for (const [matchStr] of pathString.matchAll(rePathCmdAll)) {
-    // take match string, trim and remove first letter
+    // take match string and save the first letter as the command
     const commandLetter = matchStr[0];
+    // in case of Z we have very little to do
     if (commandLetter === 'z' || commandLetter === 'Z') {
       chain.push([commandLetter]);
       continue;
     }
+    // otherwise take the rest of the command,
     const seriesOfCoords = matchStr.slice(1);
     const commandLength =
       commandLengths[
         commandLetter.toLowerCase() as keyof typeof commandLengths
       ];
 
-    const paramArr = Array.from(seriesOfCoords.matchAll(reMyNum)).map(([num]) =>
-      parseFloat(num),
-    );
+    const paramArr = Array.from(seriesOfCoords.matchAll(reMyNum));
 
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
     for (let i = 0; i < paramArr.length; i += commandLength) {
+      const newCommand = new Array(commandLength) as TComplexParsedCommand;
+      const coords = paramArr.slice(i, i + commandLength);
       const transformedCommand = repeatedCommands[commandLetter];
-      const finalCommand =
+      newCommand[0] =
         i > 0 && transformedCommand ? transformedCommand : commandLetter;
-      chain.push([
-        finalCommand,
-        ...paramArr.slice(i, i + commandLength),
-      ] as TComplexParsedCommand);
+      for (let j = 0; j < commandLength; j++) {
+        newCommand[j + 1] = parseFloat(coords[j]);
+      }
+      chain.push(newCommand);
     }
   }
   return chain;
