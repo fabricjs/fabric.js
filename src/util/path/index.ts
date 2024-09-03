@@ -24,6 +24,7 @@ import type { XY } from '../../Point';
 import { Point } from '../../Point';
 import { rePathCommand } from './regex';
 import { cleanupSvgAttribute } from '../internals/cleanupSvgAttribute';
+import { reNum } from '../../parser/constants';
 
 /**
  * Commands that may be repeated
@@ -829,8 +830,18 @@ export const getPointOnPath = (
 };
 
 const rePathCmdAll = new RegExp(rePathCommand, 'gi');
-const rePathCmd = new RegExp(rePathCommand, 'i');
-
+const reMyNum = new RegExp(reNum, 'gi');
+const commandLengths = {
+  m: 2,
+  l: 2,
+  h: 1,
+  v: 1,
+  c: 6,
+  s: 4,
+  q: 4,
+  t: 2,
+  a: 7,
+} as const;
 /**
  *
  * @param {string} pathString
@@ -847,52 +858,38 @@ export const parsePath = (pathString: string): TComplexPathData => {
   // add spaces around the numbers
   pathString = cleanupSvgAttribute(pathString);
 
-  const res: TComplexPathData = [];
-  for (let [matchStr] of pathString.matchAll(rePathCmdAll)) {
-    const chain: TComplexPathData = [];
-    let paramArr: RegExpExecArray | null;
-    do {
-      paramArr = rePathCmd.exec(matchStr);
-      if (!paramArr) {
-        break;
-      }
-      // ignore undefined match groups
-      const filteredGroups = paramArr.filter((g) => g);
-      // remove the first element from the match array since it's just the whole command
-      filteredGroups.shift();
-      // if we can't parse the number, just interpret it as a string
-      // (since it's probably the path command)
-      const command = filteredGroups.map((g) => {
-        const numParse = Number.parseFloat(g);
-        if (Number.isNaN(numParse)) {
-          return g;
-        } else {
-          return numParse;
-        }
-      });
-      chain.push(command as any);
-      // stop now if it's a z command
-      if (filteredGroups.length <= 1) {
-        break;
-      }
-      // remove the last part of the chained command
-      filteredGroups.shift();
-      // ` ?` is to support commands with optional spaces between flags
-      matchStr = matchStr.replace(
-        new RegExp(`${filteredGroups.join(' ?')} ?$`),
-        '',
-      );
-    } while (paramArr);
-    // add the chain, convert multiple m's to l's in the process
-    chain.reverse().forEach((c, idx) => {
-      const transformed = repeatedCommands[c[0]];
-      if (idx > 0 && (transformed == 'l' || transformed == 'L')) {
-        c[0] = transformed;
-      }
-      res.push(c);
-    });
+  const chain: TComplexPathData = [];
+
+  for (const [matchStr] of pathString.matchAll(rePathCmdAll)) {
+    // take match string, trim and remove first letter
+    const commandLetter = matchStr[0];
+    if (commandLetter === 'z' || commandLetter === 'Z') {
+      chain.push([commandLetter]);
+      continue;
+    }
+    const seriesOfCoords = matchStr.slice(1);
+    const commandLength =
+      commandLengths[
+        commandLetter.toLowerCase() as keyof typeof commandLengths
+      ];
+
+    const paramArr = Array.from(seriesOfCoords.matchAll(reMyNum)).map(([num]) =>
+      parseFloat(num),
+    );
+
+    // inspect the length of paramArr, if is longer than commandLength
+    // we are dealing with repeated commands
+    for (let i = 0; i < paramArr.length; i += commandLength) {
+      const transformedCommand = repeatedCommands[commandLetter];
+      const finalCommand =
+        i > 0 && transformedCommand ? transformedCommand : commandLetter;
+      chain.push([
+        finalCommand,
+        ...paramArr.slice(i, i + commandLength),
+      ] as TComplexParsedCommand);
+    }
   }
-  return res;
+  return chain;
 };
 
 /**
