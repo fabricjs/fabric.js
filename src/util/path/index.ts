@@ -862,7 +862,6 @@ export const parsePath = (pathString: string): TComplexPathData => {
   const chain: TComplexPathData = [];
   const all = pathString.matchAll(rePathCmdAll);
   for (const [matchStr] of all) {
-    console.log(matchStr);
     // take match string and save the first letter as the command
     const commandLetter = matchStr[0] as TComplexParsedCommandType;
     // in case of Z we have very little to do

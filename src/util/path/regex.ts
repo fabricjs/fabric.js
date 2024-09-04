@@ -24,7 +24,7 @@ const reQuadraticCurveCommand = `(Q) ?(?:${p} ?${p} ?${p} ?${p} ?)+`;
 
 const reQuadraticCurveShortcutCommand = `(T) ?(?:${p} ?${p} ?)+`;
 
-export const reArcCommandPoints = `${p} ?${p} ?${p} ([01]) ?([01]) ${p} ?${p}`;
+export const reArcCommandPoints = `${p} ?${p} ?${p} ([01]) ?([01]) ?${p} ?${p}`;
 const reArcCommand = `(A) ?(?:${reArcCommandPoints} ?)+`;
 
 export const rePathCommand =
