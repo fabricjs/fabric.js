@@ -875,13 +875,10 @@ export const parsePath = (pathString: string): TComplexPathData => {
       // the arc command ha some peculariaties that requires a special regex other than numbers
       // it is possible to avoid using a space between the sweep and large arc flags, making them either
       // 00, 01, 10 or 11, making them identical to a plain number for the regex reMyNum
-      const groupedParsing = matchStr.match(
-        regExpArcCommandPoints,
-      ) as unknown as string[][];
-      paramArr = groupedParsing.reduce<string[]>(
-        (acc, item) => acc.concat(item),
-        [],
-      );
+      // reset the regexp
+      regExpArcCommandPoints.lastIndex = 0;
+      const out = regExpArcCommandPoints.exec(matchStr) || [];
+      paramArr = out.slice(1);
     } else {
       paramArr = matchStr.match(reMyNum) || [];
     }
