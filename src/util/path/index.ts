@@ -23,8 +23,7 @@ import type {
 } from './typedefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import { rePathCommand } from './regex';
-import { cleanupSvgAttribute } from '../internals/cleanupSvgAttribute';
+import { reArcCommandPoints, rePathCommand } from './regex';
 import { reNum } from '../../parser/constants';
 
 /**
@@ -831,6 +830,7 @@ export const getPointOnPath = (
 };
 
 const rePathCmdAll = new RegExp(rePathCommand, 'gi');
+const regExpArcCommandPoints = new RegExp(reArcCommandPoints, 'g');
 const reMyNum = new RegExp(reNum, 'gi');
 const commandLengths = {
   m: 2,
@@ -857,11 +857,12 @@ const commandLengths = {
 export const parsePath = (pathString: string): TComplexPathData => {
   // clean the string
   // add spaces around the numbers
-  pathString = cleanupSvgAttribute(pathString);
+  pathString = pathString.replace(/,/gi, ' ');
 
   const chain: TComplexPathData = [];
-
-  for (const [matchStr] of pathString.matchAll(rePathCmdAll)) {
+  const all = pathString.matchAll(rePathCmdAll);
+  for (const [matchStr] of all) {
+    console.log(matchStr);
     // take match string and save the first letter as the command
     const commandLetter = matchStr[0] as TComplexParsedCommandType;
     // in case of Z we have very little to do
@@ -876,9 +877,24 @@ export const parsePath = (pathString: string): TComplexPathData => {
         commandLetter.toLowerCase() as keyof typeof commandLengths
       ];
 
-    const paramArr = Array.from(
-      seriesOfCoords.matchAll(reMyNum),
-    ) as unknown as string[];
+    let paramArr;
+    if (commandLetter === 'a' || commandLetter === 'A') {
+      // the arc command ha some peculariaties that requires a special regex other than numbers
+      // it is possible to avoid using a space between the sweep and large arc flags, making them either
+      // 00, 01, 10 or 11, making them identical to a plain number for the regex reMyNum
+      const groupedParsing = Array.from(
+        seriesOfCoords.matchAll(regExpArcCommandPoints),
+      ) as unknown as string[][];
+      paramArr = groupedParsing.reduce<string[]>(
+        (acc, item) => acc.concat(item.slice(1)),
+        [],
+      );
+    } else {
+      paramArr = Array.from(
+        seriesOfCoords.matchAll(reMyNum),
+      ) as unknown as string[];
+    }
+
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
     for (let i = 0; i < paramArr.length; i += commandLength) {

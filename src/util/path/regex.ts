@@ -6,25 +6,26 @@ import { reNum } from '../../parser/constants';
  */
 const p = `(${reNum})`;
 
-const reMoveToCommand = `(M) (?:${p} ${p} ?)+`;
+const reMoveToCommand = `(M) ?(?:${p} ?${p} ?)+`;
 
-const reLineCommand = `(L) (?:${p} ${p} ?)+`;
+const reLineCommand = `(L) ?(?:${p} ?${p} ?)+`;
 
-const reHorizontalLineCommand = `(H) (?:${p} ?)+`;
+const reHorizontalLineCommand = `(H) ?(?:${p} ?)+`;
 
-const reVerticalLineCommand = `(V) (?:${p} ?)+`;
+const reVerticalLineCommand = `(V) ?(?:${p} ?)+`;
 
 const reClosePathCommand = String.raw`(Z)\s*`;
 
-const reCubicCurveCommand = `(C) (?:${p} ${p} ${p} ${p} ${p} ${p} ?)+`;
+const reCubicCurveCommand = `(C) ?(?:${p} ?${p} ?${p} ?${p} ?${p} ?${p} ?)+`;
 
-const reCubicCurveShortcutCommand = `(S) (?:${p} ${p} ${p} ${p} ?)+`;
+const reCubicCurveShortcutCommand = `(S) ?(?:${p} ?${p} ?${p} ?${p} ?)+`;
 
-const reQuadraticCurveCommand = `(Q) (?:${p} ${p} ${p} ${p} ?)+`;
+const reQuadraticCurveCommand = `(Q) ?(?:${p} ?${p} ?${p} ?${p} ?)+`;
 
-const reQuadraticCurveShortcutCommand = `(T) (?:${p} ${p} ?)+`;
+const reQuadraticCurveShortcutCommand = `(T) ?(?:${p} ?${p} ?)+`;
 
-const reArcCommand = `(A) (?:${p} ${p} ${p} ([01]) ?([01]) ${p} ${p} ?)+`;
+export const reArcCommandPoints = `${p} ?${p} ?${p} ([01]) ?([01]) ${p} ?${p}`;
+const reArcCommand = `(A) ?(?:${reArcCommandPoints} ?)+`;
 
 export const rePathCommand =
   `(?:(?:${reMoveToCommand})` +
