@@ -2,6 +2,8 @@
 
 ## [next]
 
+- Fix(): path parsing performance [#10123](https://github.com/fabricjs/fabric.js/pull/10123)
+
 ## [6.4.1]
 
 - fix(): Package.json had wrong path to types for extensions [#10115](https://github.com/fabricjs/fabric.js/pull/10115)
