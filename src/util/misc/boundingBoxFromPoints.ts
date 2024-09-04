@@ -1,5 +1,4 @@
 import type { XY } from '../../Point';
-import { Point } from '../../Point';
 import type { TBBox } from '../../typedefs';
 
 /**
@@ -8,31 +7,23 @@ import type { TBBox } from '../../typedefs';
  * @return {Object} Object with left, top, width, height properties
  */
 export const makeBoundingBoxFromPoints = (points: XY[]): TBBox => {
-  if (points.length === 0) {
-    return {
-      left: 0,
-      top: 0,
-      width: 0,
-      height: 0,
-    };
+  let left = 0,
+    top = 0,
+    width = 0,
+    height = 0;
+
+  for (let i = 0, len = points.length; i < len; i++) {
+    const p = points[i];
+    if (p.x > width || i === 0) width = p.x;
+    if (p.x < left || i === 0) left = p.x;
+    if (p.y > height || i === 0) height = p.y;
+    if (p.y < top || i === 0) top = p.y;
   }
 
-  const { min, max } = points.reduce(
-    ({ min, max }, curr) => {
-      return {
-        min: min.min(curr),
-        max: max.max(curr),
-      };
-    },
-    { min: new Point(points[0]), max: new Point(points[0]) },
-  );
-
-  const size = max.subtract(min);
-
   return {
-    left: min.x,
-    top: min.y,
-    width: size.x,
-    height: size.y,
+    left,
+    top,
+    width: width - left,
+    height: height - top,
   };
 };

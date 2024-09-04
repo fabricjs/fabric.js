@@ -879,7 +879,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
         regExpArcCommandPoints,
       ) as unknown as string[][];
       paramArr = groupedParsing.reduce<string[]>(
-        (acc, item) => acc.concat(item.slice(1)),
+        (acc, item) => acc.concat(item),
         [],
       );
     } else {
