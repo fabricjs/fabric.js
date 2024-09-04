@@ -865,8 +865,6 @@ export const parsePath = (pathString: string): TComplexPathData => {
       chain.push([commandLetter]);
       continue;
     }
-    // otherwise take the rest of the command,
-    const seriesOfCoords = matchStr.slice(1);
     const commandLength =
       commandLengths[
         commandLetter.toLowerCase() as keyof typeof commandLengths
@@ -878,28 +876,25 @@ export const parsePath = (pathString: string): TComplexPathData => {
       // it is possible to avoid using a space between the sweep and large arc flags, making them either
       // 00, 01, 10 or 11, making them identical to a plain number for the regex reMyNum
       const groupedParsing = Array.from(
-        seriesOfCoords.matchAll(regExpArcCommandPoints),
+        matchStr.matchAll(regExpArcCommandPoints),
       ) as unknown as string[][];
       paramArr = groupedParsing.reduce<string[]>(
         (acc, item) => acc.concat(item.slice(1)),
         [],
       );
     } else {
-      paramArr = Array.from(
-        seriesOfCoords.matchAll(reMyNum),
-      ) as unknown as string[];
+      paramArr = Array.from(matchStr.matchAll(reMyNum)) as unknown as string[];
     }
 
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
     for (let i = 0; i < paramArr.length; i += commandLength) {
       const newCommand = new Array(commandLength) as TComplexParsedCommand;
-      const coords = paramArr.slice(i, i + commandLength);
       const transformedCommand = repeatedCommands[commandLetter];
       newCommand[0] =
         i > 0 && transformedCommand ? transformedCommand : commandLetter;
       for (let j = 0; j < commandLength; j++) {
-        newCommand[j + 1] = parseFloat(coords[j]);
+        newCommand[j + 1] = parseFloat(paramArr[i + j]);
       }
       chain.push(newCommand);
     }
