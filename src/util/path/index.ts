@@ -856,8 +856,8 @@ const commandLengths = {
  */
 export const parsePath = (pathString: string): TComplexPathData => {
   const chain: TComplexPathData = [];
-  const all = pathString.matchAll(rePathCmdAll);
-  for (const [matchStr] of all) {
+  const all = pathString.match(rePathCmdAll) ?? [];
+  for (const matchStr of all) {
     // take match string and save the first letter as the command
     const commandLetter = matchStr[0] as TComplexParsedCommandType;
     // in case of Z we have very little to do
@@ -875,17 +875,16 @@ export const parsePath = (pathString: string): TComplexPathData => {
       // the arc command ha some peculariaties that requires a special regex other than numbers
       // it is possible to avoid using a space between the sweep and large arc flags, making them either
       // 00, 01, 10 or 11, making them identical to a plain number for the regex reMyNum
-      const groupedParsing = Array.from(
-        matchStr.matchAll(regExpArcCommandPoints),
+      const groupedParsing = matchStr.match(
+        regExpArcCommandPoints,
       ) as unknown as string[][];
       paramArr = groupedParsing.reduce<string[]>(
         (acc, item) => acc.concat(item.slice(1)),
         [],
       );
     } else {
-      paramArr = Array.from(matchStr.matchAll(reMyNum)) as unknown as string[];
+      paramArr = matchStr.match(reMyNum) || [];
     }
-
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
     for (let i = 0; i < paramArr.length; i += commandLength) {
