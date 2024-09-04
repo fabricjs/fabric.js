@@ -19,6 +19,7 @@ import type {
   TPathSegmentInfoCommon,
   TEndPathInfo,
   TParsedArcCommand,
+  TComplexParsedCommandType,
 } from './typedefs';
 import type { XY } from '../../Point';
 import { Point } from '../../Point';
@@ -29,7 +30,7 @@ import { reNum } from '../../parser/constants';
 /**
  * Commands that may be repeated
  */
-const repeatedCommands: Record<string, string | undefined> = {
+const repeatedCommands: Record<string, 'l' | 'L'> = {
   m: 'l',
   M: 'L',
 };
@@ -862,7 +863,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
 
   for (const [matchStr] of pathString.matchAll(rePathCmdAll)) {
     // take match string and save the first letter as the command
-    const commandLetter = matchStr[0];
+    const commandLetter = matchStr[0] as TComplexParsedCommandType;
     // in case of Z we have very little to do
     if (commandLetter === 'z' || commandLetter === 'Z') {
       chain.push([commandLetter]);
@@ -875,8 +876,9 @@ export const parsePath = (pathString: string): TComplexPathData => {
         commandLetter.toLowerCase() as keyof typeof commandLengths
       ];
 
-    const paramArr = Array.from(seriesOfCoords.matchAll(reMyNum));
-
+    const paramArr = Array.from(
+      seriesOfCoords.matchAll(reMyNum),
+    ) as unknown as string[];
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
     for (let i = 0; i < paramArr.length; i += commandLength) {
