@@ -855,10 +855,6 @@ const commandLengths = {
  * ];
  */
 export const parsePath = (pathString: string): TComplexPathData => {
-  // clean the string
-  // add spaces around the numbers
-  pathString = pathString.replace(/,/gi, ' ');
-
   const chain: TComplexPathData = [];
   const all = pathString.matchAll(rePathCmdAll);
   for (const [matchStr] of all) {
