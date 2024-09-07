@@ -299,7 +299,7 @@ export class Path<
         case 'L': // lineto, absolute
           x = command[1];
           y = command[2];
-          bounds.push(new Point(subpathStartX, subpathStartY), new Point(x, y));
+          bounds.push({ x: subpathStartX, y: subpathStartY }, { x, y });
           break;
 
         case 'M': // moveTo, absolute
