@@ -13,11 +13,11 @@ export const makeBoundingBoxFromPoints = (points: XY[]): TBBox => {
     height = 0;
 
   for (let i = 0, len = points.length; i < len; i++) {
-    const p = points[i];
-    if (p.x > width || i === 0) width = p.x;
-    if (p.x < left || i === 0) left = p.x;
-    if (p.y > height || i === 0) height = p.y;
-    if (p.y < top || i === 0) top = p.y;
+    const { x, y } = points[i];
+    if (x > width || !i) width = x;
+    if (x < left || !i) left = x;
+    if (y > height || !i) height = y;
+    if (y < top || !i) top = y;
   }
 
   return {
