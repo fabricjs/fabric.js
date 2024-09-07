@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(Canvas): allowTouchScrolling interactions [#10078](https://github.com/fabricjs/fabric.js/pull/10078)
+- Fix(): path parsing performance [#10123](https://github.com/fabricjs/fabric.js/pull/10123)
 
 ## [6.4.1]
 
