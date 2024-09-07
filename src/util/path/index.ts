@@ -880,10 +880,11 @@ export const parsePath = (pathString: string): TComplexPathData => {
       for (let out = null; (out = regExpArcCommandPoints.exec(matchStr)); ) {
         paramArr.push(...out.slice(1));
       }
-      console.log(paramArr);
     } else {
       paramArr = matchStr.match(reMyNum) || [];
     }
+    console.log(paramArr);
+
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
     for (let i = 0; i < paramArr.length; i += commandLength) {
