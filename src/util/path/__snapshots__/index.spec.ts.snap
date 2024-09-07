@@ -452,6 +452,51 @@ exports[`Path Utils makePathSimpler can parse paths that return NaN segments 1`]
 ]
 `;
 
+exports[`Path Utils parsePath Path written with uncommon scenario 1`] = `
+[
+  [
+    "a",
+    10.56,
+    10.56,
+    0,
+    0,
+    0,
+    -1.484,
+    -0.133,
+  ],
+  [
+    "a",
+    10.56,
+    10.56,
+    0,
+    0,
+    0,
+    -1.484,
+    -0.133,
+  ],
+  [
+    "a",
+    10.56,
+    10.56,
+    0,
+    0,
+    0,
+    -1.484,
+    -0.133,
+  ],
+  [
+    "a",
+    10.56,
+    10.56,
+    0,
+    0,
+    0,
+    -1.484,
+    -0.133,
+  ],
+]
+`;
+
 exports[`Path Utils parsePath can parse path string 1`] = `
 [
   [

@@ -17,6 +17,15 @@ describe('Path Utils', () => {
       const simplified = makePathSimpler(parsed);
       expect(simplified).toMatchSnapshot();
     });
+    test('Path written with uncommon scenario', () => {
+      const path =
+        'a10.56 10.56 0 00-1.484-.133a10.56  ,   10.56    0, 0,0-1.484-.133a10.56  ,   10.56    0, 0,0-1.484-.133a1.056e+1  ,   105.6e-1,0,0,0-1.484-.133';
+      const parsed = parsePath(path);
+      expect(parsed[0]).toEqual(parsed[1]);
+      expect(parsed[1]).toEqual(parsed[2]);
+      expect(parsed[2]).toEqual(parsed[3]);
+      expect(parsed).toMatchSnapshot();
+    });
     test('fabric.util.parsePath can parse arcs correctly when no spaces between flags', () => {
       const pathWithWeirdArc = 'a10.56 10.56 0 00-1.484-.133';
       const expected = ['a', 10.56, 10.56, 0, 0, 0, -1.484, -0.133];
