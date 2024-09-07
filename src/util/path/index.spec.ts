@@ -1,4 +1,11 @@
-import { getPathSegmentsInfo, parsePath, makePathSimpler } from '.';
+import {
+  getPathSegmentsInfo,
+  parsePath,
+  makePathSimpler,
+  getRegularPolygonPath,
+  joinPath,
+} from '.';
+import type { TSimplePathData } from './typedefs';
 
 describe('Path Utils', () => {
   describe('parsePath', () => {
@@ -142,6 +149,51 @@ describe('Path Utils', () => {
       // 'the command 11 a Q has a approximated length of 2.295',
       expect(infos[11].length.toFixed(5)).toBe('2.29556');
     });
+    test('fabric.util.getPathSegmentsInfo test Z command', () => {
+      const parsed = makePathSimpler(parsePath('M 0 0 h 20, v 20 L 0, 20 Z'));
+      const infos = getPathSegmentsInfo(parsed);
+      // 'the command 0 a M has a length 0'
+      expect(infos[0].length).toBe(0);
+      // 'the command 1 a L has length 20'
+      expect(infos[1].length).toBe(20);
+      // 'the command 2 a L has length 20'
+      expect(infos[2].length).toBe(20);
+      // 'the command 3 a L has length 20'
+      expect(infos[3].length).toBe(20);
+      // 'the command 4 a Z has length 20'
+      expect(infos[4].length).toBe(20);
+    });
+  });
+  test('fabric.util.getRegularPolygonPath', () => {
+    const penta = getRegularPolygonPath(5, 50);
+    const hexa = getRegularPolygonPath(6, 50);
+    // 'regular pentagon should match',
+    expect(penta).toMatchSnapshot();
+    // 'regular hexagon should match',
+    expect(hexa).toMatchSnapshot();
+  });
+
+  test('fabric.util.joinPath', () => {
+    const pathData: TSimplePathData = [
+      ['M', 3.12345678, 2.12345678],
+      ['L', 1.00001111, 2.40001111],
+      ['Z'],
+    ] as const;
+    const digit = 2;
+    const expected = 'M 3.12 2.12 L 1 2.4 Z';
+    const result = joinPath(pathData, digit);
+    expect(result).toBe(expected);
+  });
+
+  test('fabric.util.joinPath without rounding', () => {
+    const pathData: TSimplePathData = [
+      ['M', 3.12345678, 2.12345678],
+      ['L', 1.00001111, 2.40001111],
+      ['Z'],
+    ] as const;
+    const expected = 'M 3.12345678 2.12345678 L 1.00001111 2.40001111 Z';
+    const result = joinPath(pathData);
+    expect(result).toBe(expected);
   });
   describe('makePathSimpler', () => {
     test('can parse paths that return NaN segments', () => {
