@@ -883,7 +883,6 @@ export const parsePath = (pathString: string): TComplexPathData => {
     } else {
       paramArr = matchStr.match(reMyNum) || [];
     }
-    console.log(paramArr);
 
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
