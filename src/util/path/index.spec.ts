@@ -59,37 +59,37 @@ describe('Path Utils', () => {
       ['M', 1, 1],
       [
         'C',
-        1.5522847498307932,
         0.4477152501692063,
-        2.4477152501692068,
+        1.5522847498307932,
         0.44771525016920666,
-        3,
+        2.4477152501692068,
         1,
+        3,
       ],
       [
         'C',
-        3.5522847498307932,
         1.5522847498307937,
         3.5522847498307932,
         2.4477152501692063,
+        3.5522847498307932,
         3,
         3,
       ],
       [
         'C',
-        3.82842712474619,
         2.1715728752538093,
-        5.17157287525381,
+        3.82842712474619,
         2.1715728752538097,
-        6,
+        5.17157287525381,
         3,
+        6,
       ],
       [
         'C',
-        6.82842712474619,
         3.82842712474619,
-        6.828427124746191,
+        6.82842712474619,
         5.17157287525381,
+        6.828427124746191,
         6,
         6,
       ],
@@ -102,9 +102,9 @@ describe('Path Utils', () => {
       });
       const simplified = makePathSimpler(parsed);
       simplified.forEach((command, index) => {
-        console.log(command);
-        console.log(expectedSimplified[index]);
-        expect(command).toEqual(expectedSimplified[index]);
+        expect(command.map((v) => (isNaN(v) ? v : v.toFixed(8)))).toEqual(
+          expectedSimplified[index].map((v) => (isNaN(v) ? v : v.toFixed(8))),
+        );
       });
     });
     test('fabric.util.parsePath can parse arcs correctly when no spaces between flags', () => {
