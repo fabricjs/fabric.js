@@ -3,7 +3,7 @@
 ## [next]
 
 ## [6.4.2]
-
+- Fix(): Inconsistency of events when more buttons are used [#10027](https://github.com/fabricjs/fabric.js/issues/10027)
 - Fix(): path parsing performance [#10123](https://github.com/fabricjs/fabric.js/pull/10123)
 
 ## [6.4.1]
