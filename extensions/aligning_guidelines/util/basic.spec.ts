@@ -1,5 +1,4 @@
-import { getDistance, setPositionDir } from './basic';
-import { Rect } from '../../../src/shapes/Rect';
+import { getDistance, getDistanceList } from './basic';
 import { Point } from '../../../src/Point';
 
 describe('getDistance', () => {
@@ -11,21 +10,22 @@ describe('getDistance', () => {
   });
 });
 
-describe('setPositionDir', () => {
-  it('set the position of the object', () => {
-    const rect = new Rect({
-      width: 100,
-      height: 50,
-      originX: 'left',
-      originY: 'top',
-      left: 100,
-      top: 100,
-    });
-    setPositionDir(rect, new Point(10, 15), 'x');
-    expect(rect.left).toEqual(-40.5);
-    expect(rect.top).toEqual(100);
-    setPositionDir(rect, new Point(10, 15), 'y');
-    expect(rect.left).toEqual(-40.5);
-    expect(rect.top).toEqual(-10.5);
+describe('getDistanceList', () => {
+  it('returns the distabnce between the 2 numbers', () => {
+    // getDistanceList point: Point, list: Point[], type: 'x' | 'y'
+    const point = new Point(0, 0);
+    const list = [
+      new Point(2, 3),
+      new Point(-2, -3),
+      new Point(3, 3),
+      new Point(4, 4),
+    ];
+    const xList = getDistanceList(point, list, 'x');
+    expect(xList.dis).toBe(2);
+    expect(xList.arr).toEqual([list[0], list[1]]);
+
+    const yList = getDistanceList(point, list, 'y');
+    expect(yList.dis).toBe(3);
+    expect(yList.arr).toEqual(list.slice(0, 3));
   });
 });

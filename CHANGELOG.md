@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(AligningGuidelines): Too many shapes will result in too many reference lines [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
 - fix(AligningGuidelines): Align guidless changes aspect ratio on snapping when scaling [#10114](https://github.com/fabricjs/fabric.js/issues/10114)
 
 ## [6.4.1]

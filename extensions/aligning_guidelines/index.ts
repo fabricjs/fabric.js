@@ -2,10 +2,9 @@ import type {
   BasicTransformEvent,
   Canvas,
   FabricObject,
-  TBBox,
   TPointerEvent,
 } from 'fabric';
-import { Point, util } from 'fabric';
+import { Point } from 'fabric';
 import {
   collectHorizontalPoint,
   collectVerticalPoint,
@@ -17,11 +16,7 @@ import {
 } from './util/draw';
 import { getObjectsByTarget } from './util/get-objects-by-target';
 import { collectLine } from './util/collect-line';
-import type {
-  AligningLineConfig,
-  HorizontalLine,
-  VerticalLine,
-} from './typedefs';
+import type { AligningLineConfig, LineProps } from './typedefs';
 import { aligningLineConfig } from './constant';
 
 type TransformEvent = BasicTransformEvent<TPointerEvent> & {
@@ -32,16 +27,17 @@ export type { AligningLineConfig } from './typedefs';
 
 export function initAligningGuidelines(
   canvas: Canvas,
-  options: Partial<AligningLineConfig> = {},
+  options: Partial<AligningLineConfig> = {}
 ) {
   Object.assign(aligningLineConfig, options);
 
   const horizontalLines = new Set<string>();
   const verticalLines = new Set<string>();
   let onlyDrawPoint = false;
-  const cacheMap = new Map<string, [TBBox, Point[]]>();
+  const cacheMap = new Map<string, Point[]>();
 
   const getCaCheMapValue = (object: FabricObject) => {
+    // const cacheKey = object.id;
     const cacheKey = [
       object.calcTransformMatrix().toString(),
       object.width,
@@ -49,37 +45,30 @@ export function initAligningGuidelines(
     ].join();
     const cacheValue = cacheMap.get(cacheKey);
     if (cacheValue) return cacheValue;
-    const coords = object.getCoords();
-    const rect = util.makeBoundingBoxFromPoints(coords);
-    const value: [TBBox, Point[]] = [rect, coords];
+    const value = object.getCoords();
+    value.push(object.getCenterPoint());
     cacheMap.set(cacheKey, value);
     return value;
   };
 
   function moving(e: TransformEvent) {
-    const activeObject = e.target;
-    activeObject.setCoords();
+    const target = e.target;
+    target.setCoords();
     onlyDrawPoint = false;
     verticalLines.clear();
     horizontalLines.clear();
 
-    const objects = getObjectsByTarget(activeObject);
-    const activeObjectRect = activeObject.getBoundingRect();
+    const objects = getObjectsByTarget(target);
+    const points: Point[] = [];
+    for (const object of objects) points.push(...getCaCheMapValue(object));
 
-    for (const object of objects) {
-      const objectRect = getCaCheMapValue(object)[0];
-      const { vLines, hLines } = collectLine({
-        activeObject,
-        activeObjectRect,
-        objectRect,
-      });
-      vLines.forEach((o) => {
-        verticalLines.add(JSON.stringify(o));
-      });
-      hLines.forEach((o) => {
-        horizontalLines.add(JSON.stringify(o));
-      });
-    }
+    const { vLines, hLines } = collectLine(target, points);
+    vLines.forEach((o) => {
+      verticalLines.add(JSON.stringify(o));
+    });
+    hLines.forEach((o) => {
+      horizontalLines.add(JSON.stringify(o));
+    });
   }
 
   function scalingOrResizing(e: TransformEvent) {
@@ -95,7 +84,7 @@ export function initAligningGuidelines(
     if (activeObject.flipX) corner = corner.replace('l', 'r').replace('r', 'l');
     if (activeObject.flipY) corner = corner.replace('t', 'b').replace('b', 't');
     let index = ['tl', 'tr', 'br', 'bl', 'mt', 'mr', 'mb', 'ml'].indexOf(
-      corner,
+      corner
     );
     if (index == -1) return;
     onlyDrawPoint = index > 3;
@@ -109,25 +98,19 @@ export function initAligningGuidelines(
     const isUniform =
       (canvas.uniformScaling && !uniformIsToggled) ||
       (!canvas.uniformScaling && uniformIsToggled);
-    for (const object of objects) {
-      const [rect, coords] = getCaCheMapValue(object);
-      const center = new Point(
-        rect.left + rect.width / 2,
-        rect.top + rect.height / 2,
-      );
-      const list = [...coords, center];
-      const props = { activeObject, point, list, isScale, isUniform, index };
-      const vLines = collectVerticalPoint(props);
-      const hLines = collectHorizontalPoint(props);
-      vLines.forEach((o) => {
-        verticalLines.add(JSON.stringify(o));
-      });
-      hLines.forEach((o) => {
-        horizontalLines.add(JSON.stringify(o));
-      });
-      if (vLines.length || hLines.length)
-        point = activeObject.getCoords()[index];
-    }
+    const list: Point[] = [];
+    for (const object of objects) list.push(...getCaCheMapValue(object));
+
+    const props = { activeObject, point, list, isScale, isUniform, index };
+    const vLines = collectVerticalPoint(props);
+    const hLines = collectHorizontalPoint(props);
+    vLines.forEach((o) => {
+      verticalLines.add(JSON.stringify(o));
+    });
+    hLines.forEach((o) => {
+      horizontalLines.add(JSON.stringify(o));
+    });
+    if (vLines.length || hLines.length) point = activeObject.getCoords()[index];
   }
 
   function beforeRender() {
@@ -135,7 +118,7 @@ export function initAligningGuidelines(
   }
   function afterRender() {
     if (onlyDrawPoint) {
-      const list: Array<VerticalLine | HorizontalLine> = [];
+      const list: LineProps[] = [];
       for (const v of verticalLines) list.push(JSON.parse(v));
       for (const h of horizontalLines) list.push(JSON.parse(h));
       drawPointList(canvas, list);

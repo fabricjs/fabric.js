@@ -6,7 +6,8 @@ import type {
   TOriginY,
 } from 'fabric';
 import { aligningLineConfig } from '../constant';
-import { getDistance } from './basic';
+import { getDistanceList } from './basic';
+import type { LineProps } from '../typedefs';
 
 type CollectPointProps = {
   activeObject: FabricObject;
@@ -28,7 +29,7 @@ const originArr: [TOriginX, TOriginY][] = [
   ['left', 'top'],
   ['right', 'top'],
 ];
-export function collectVerticalPoint(props: CollectPointProps) {
+export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
   const aligningLineMargin = aligningLineConfig.margin;
   const { activeObject, isScale, isUniform, index, point, list } = props;
   const { dis, arr } = getDistanceList(point, list, 'x');
@@ -57,14 +58,10 @@ export function collectVerticalPoint(props: CollectPointProps) {
     originArr[index][1]
   );
   activeObject.setCoords();
-  return arr.map((item) => ({
-    x: item.x,
-    y1: item.y,
-    y2: point.y,
-  }));
+  return arr.map((target) => ({ origin: point, target }));
 }
 
-export function collectHorizontalPoint(props: CollectPointProps) {
+export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
   const aligningLineMargin = aligningLineConfig.margin;
   const { activeObject, isScale, isUniform, index, point, list } = props;
   const { dis, arr } = getDistanceList(point, list, 'y');
@@ -93,25 +90,5 @@ export function collectHorizontalPoint(props: CollectPointProps) {
     originArr[index][1]
   );
   activeObject.setCoords();
-  return arr.map((item) => ({
-    y: item.y,
-    x1: item.x,
-    x2: point.x,
-  }));
-}
-
-function getDistanceList(point: Point, list: Point[], type: 'x' | 'y') {
-  let dis = Infinity;
-  let arr: Point[] = [];
-  for (const item of list) {
-    const v = getDistance(point[type], item[type]);
-    if (dis > v) {
-      arr = [];
-      dis = v;
-    }
-    if (dis == v) {
-      arr.push(item);
-    }
-  }
-  return { dis, arr };
+  return arr.map((target) => ({ origin: point, target }));
 }

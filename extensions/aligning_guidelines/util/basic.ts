@@ -1,20 +1,21 @@
-import type { FabricObject, Point } from 'fabric';
+import type { Point } from 'fabric';
 
 export function getDistance(a: number, b: number) {
   return Math.abs(a - b);
 }
 
-export function setPositionDir(
-  target: FabricObject,
-  pos: Point,
-  dir: 'x' | 'y',
-) {
-  const center = target.translateToCenterPoint(pos, 'center', 'center');
-  const position = target.translateToOriginPoint(
-    center,
-    target.originX,
-    target.originY,
-  );
-  if (dir == 'x') target.setX(position.x);
-  else target.setY(position.y);
+export function getDistanceList(point: Point, list: Point[], type: 'x' | 'y') {
+  let dis = Infinity;
+  let arr: Point[] = [];
+  for (const item of list) {
+    const v = getDistance(point[type], item[type]);
+    if (dis > v) {
+      arr = [];
+      dis = v;
+    }
+    if (dis == v) {
+      arr.push(item);
+    }
+  }
+  return { dis, arr };
 }

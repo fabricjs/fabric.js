@@ -1,6 +1,6 @@
 import type { Canvas } from 'fabric';
 import { Point } from 'fabric';
-import type { HorizontalLine, VerticalLine } from '../typedefs';
+import type { LineProps } from '../typedefs';
 import { aligningLineConfig } from '../constant';
 
 function drawLine(canvas: Canvas, origin: Point, target: Point) {
@@ -46,29 +46,19 @@ function drawPoint(canvas: Canvas, arr: Point[]) {
   for (const item of arr) drawX(ctx, zoom, item);
   ctx.restore();
 }
-export function drawPointList(
-  canvas: Canvas,
-  list: Array<VerticalLine | HorizontalLine>,
-) {
-  const arr = list.map((item) => {
-    const isVertical = 'y2' in item;
-    const x = isVertical ? item.x : item.x1;
-    const y = isVertical ? item.y1 : item.y;
-    return new Point(x, y);
-  });
+export function drawPointList(canvas: Canvas, list: LineProps[]) {
+  const arr = list.map((item) => item.target);
   drawPoint(canvas, arr);
 }
 
-export function drawVerticalLine(canvas: Canvas, coords: VerticalLine) {
-  const x = coords.x;
-  const origin = new Point(x, coords.y1);
-  const target = new Point(x, coords.y2);
-  drawLine(canvas, origin, target);
+export function drawVerticalLine(canvas: Canvas, options: LineProps) {
+  const { origin, target } = options;
+  const o = new Point(target.x, origin.y);
+  drawLine(canvas, o, target);
 }
 
-export function drawHorizontalLine(canvas: Canvas, coords: HorizontalLine) {
-  const y = coords.y;
-  const origin = new Point(coords.x1, y);
-  const target = new Point(coords.x2, y);
-  drawLine(canvas, origin, target);
+export function drawHorizontalLine(canvas: Canvas, options: LineProps) {
+  const { origin, target } = options;
+  const o = new Point(origin.x, target.y);
+  drawLine(canvas, o, target);
 }
