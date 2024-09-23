@@ -4,6 +4,7 @@
 
 ## [6.4.2]
 
+- Fix(Textarea): A form field element has neither an id nor a name attribute.
 - Fix(): path parsing performance [#10123](https://github.com/fabricjs/fabric.js/pull/10123)
 
 ## [6.4.1]
