@@ -7,4 +7,8 @@ export const aligningLineConfig: AligningLineConfig = {
   width: 1,
   /** Aligning line color */
   color: 'rgba(255,0,0,0.9)',
+  /** Close Vertical line, default false. */
+  closeVLine: false,
+  /** Close horizontal line, default false. */
+  closeHLine: false,
 };

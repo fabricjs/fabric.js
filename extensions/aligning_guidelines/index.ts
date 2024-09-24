@@ -14,10 +14,11 @@ import {
   drawPointList,
   drawVerticalLine,
 } from './util/draw';
-import { getObjectsByTarget } from './util/get-objects-by-target';
 import { collectLine } from './util/collect-line';
 import type { AligningLineConfig, LineProps } from './typedefs';
 import { aligningLineConfig } from './constant';
+import { getObjectsByTarget } from './util/get-objects-by-target';
+import { getContraryMap, getPointMap } from './util/basic';
 
 type TransformEvent = BasicTransformEvent<TPointerEvent> & {
   target: FabricObject;
@@ -65,7 +66,8 @@ export function initAligningGuidelines(
     horizontalLines.clear();
 
     // Find the shapes associated with the current graphic to draw reference lines for it.
-    const objects = getObjectsByTarget(target);
+    const objects =
+      options.getObjectsByTarget?.(target) ?? getObjectsByTarget(target);
     const points: Point[] = [];
     // Collect all the points to draw reference lines.
     for (const object of objects) points.push(...getCaCheMapValue(object));
@@ -92,7 +94,8 @@ export function initAligningGuidelines(
     verticalLines.clear();
     horizontalLines.clear();
 
-    const objects = getObjectsByTarget(target);
+    const objects =
+      options.getObjectsByTarget?.(target) ?? getObjectsByTarget(target);
     let corner = e.transform.corner;
     // When the shape is flipped, the tl obtained through getCoords is actually tr,
     // and tl is actually tr. We need to make correction adjustments.
@@ -101,17 +104,8 @@ export function initAligningGuidelines(
     if (target.flipY) corner = corner.replace('t', 'b').replace('b', 't');
     const coords = target.getCoords();
     // Obtain the coordinates of the current operation point through the value of corner.
-    // In the future, users can be allowed to customize and pass in custom corners.
-    const pointMap: PointMap = {
-      tl: coords[0],
-      tr: coords[1],
-      br: coords[2],
-      bl: coords[3],
-      mt: coords[0].add(coords[1]).scalarDivide(2),
-      mr: coords[1].add(coords[2]).scalarDivide(2),
-      mb: coords[2].add(coords[3]).scalarDivide(2),
-      ml: coords[3].add(coords[0]).scalarDivide(2),
-    };
+    // users can be allowed to customize and pass in custom corners.
+    const pointMap = options.getPointMap?.(target) ?? getPointMap(target);
     if (!(corner in pointMap)) return;
     onlyDrawPoint = corner.includes('m');
     if (onlyDrawPoint) {
@@ -121,17 +115,9 @@ export function initAligningGuidelines(
     }
     // If manipulating tl, then when the shape changes size, it should be positioned by br,
     // and the same applies to others.
-    // In the future, users can be allowed to customize and pass in custom corners.
-    const contraryMap: PointMap = {
-      tl: target.aCoords.br,
-      tr: target.aCoords.bl,
-      br: target.aCoords.tl,
-      bl: target.aCoords.tr,
-      mt: target.aCoords.br.add(target.aCoords.bl).scalarDivide(2),
-      mr: target.aCoords.bl.add(target.aCoords.tl).scalarDivide(2),
-      mb: target.aCoords.tl.add(target.aCoords.tr).scalarDivide(2),
-      ml: target.aCoords.tr.add(target.aCoords.br).scalarDivide(2),
-    };
+    // users can be allowed to customize and pass in custom corners.
+    const contraryMap =
+      options.getContraryMap?.(target) ?? getContraryMap(target);
 
     const point = pointMap[corner];
     const diagonalPoint = contraryMap[corner];
@@ -174,13 +160,22 @@ export function initAligningGuidelines(
   function afterRender() {
     if (onlyDrawPoint) {
       const list: LineProps[] = [];
-      for (const v of verticalLines) list.push(JSON.parse(v));
-      for (const h of horizontalLines) list.push(JSON.parse(h));
+      if (!options.closeVLine) {
+        for (const v of verticalLines) list.push(JSON.parse(v));
+      }
+      if (!options.closeHLine) {
+        for (const h of horizontalLines) list.push(JSON.parse(h));
+      }
       drawPointList(canvas, list);
     } else {
-      for (const v of verticalLines) drawVerticalLine(canvas, JSON.parse(v));
-      for (const h of horizontalLines)
-        drawHorizontalLine(canvas, JSON.parse(h));
+      if (!options.closeVLine) {
+        for (const v of verticalLines) drawVerticalLine(canvas, JSON.parse(v));
+      }
+      if (!options.closeHLine) {
+        for (const h of horizontalLines) {
+          drawHorizontalLine(canvas, JSON.parse(h));
+        }
+      }
     }
   }
   function mouseUp() {
