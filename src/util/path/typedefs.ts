@@ -293,6 +293,28 @@ export type TSimpleParsedCommand =
 
 export type TSimpleParseCommandType = 'L' | 'M' | 'C' | 'Q' | 'Z';
 
+export type TComplexParsedCommandType =
+  | 'M'
+  | 'L'
+  | 'C'
+  | 'Q'
+  | 'Z'
+  | 'z'
+  | 'm'
+  | 'l'
+  | 'h'
+  | 'v'
+  | 'c'
+  | 's'
+  | 'q'
+  | 't'
+  | 'a'
+  | 'H'
+  | 'V'
+  | 'S'
+  | 'T'
+  | 'A';
+
 /**
  * A series of simple paths
  */
