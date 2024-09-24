@@ -2,6 +2,8 @@
 
 ## [next]
 
+- Add dist back to github [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
+
 ## [6.4.2]
 
 - Fix(): path parsing performance [#10123](https://github.com/fabricjs/fabric.js/pull/10123)
