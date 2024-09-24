@@ -1,2 +1,0 @@
-export declare function normalizeValue(attr: string, value: any, parentAttributes: Record<string, any>, fontSize: number): string | null | boolean | number[] | number;
-//# sourceMappingURL=normalizeValue.d.ts.map

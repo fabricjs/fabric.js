@@ -14,3 +14,5 @@ e2e/test-report/
 e2e/test-results/
 **/.cache/
 docs/
+dist/src/*
+dist/src/*

@@ -1,2 +1,0 @@
-import{ActiveSelection as t,Group as c}from"fabric";function o(o){const r=new Set,s=o.canvas;if(!s)return r;const f=o instanceof t?o.getObjects():[o];return s.forEachObject((t=>{t.isOnScreen()&&t.visible&&(t.constructor!=c?r.add(t):e(r,t))})),n(r,f),r}function n(t,o){for(const e of o)e.constructor==c?n(t,e.getObjects()):t.delete(e)}function e(t,o){const n=o.getObjects();for(const o of n)o.visible&&(o.constructor!=c?t.add(o):e(t,o))}export{o as getObjectsByTarget};
-//# sourceMappingURL=get-objects-by-target.min.mjs.map
