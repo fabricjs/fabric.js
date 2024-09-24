@@ -23,7 +23,6 @@ import { getContraryMap, getPointMap } from './util/basic';
 type TransformEvent = BasicTransformEvent<TPointerEvent> & {
   target: FabricObject;
 };
-type PointMap = { [props: string]: Point };
 
 export type { AligningLineConfig } from './typedefs';
 
