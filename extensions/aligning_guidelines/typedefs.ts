@@ -1,4 +1,4 @@
-import type { FabricObject, Point } from 'fabric';
+import type { FabricObject, Point, TOriginX, TOriginY } from 'fabric';
 
 export type LineProps = {
   origin: Point;
@@ -6,6 +6,8 @@ export type LineProps = {
 };
 
 export type PointMap = { [props: string]: Point };
+
+export type OriginMap = { [props: string]: [TOriginX, TOriginY] };
 
 export type AligningLineConfig = {
   /** At what distance from the shape does alignment begin? */
@@ -24,4 +26,6 @@ export type AligningLineConfig = {
   getPointMap?: (target: FabricObject) => PointMap;
   /** When the user customizes the controller, this property is used to enable or disable alignment positioning through points. */
   getContraryMap?: (target: FabricObject) => PointMap;
+  /** Alignment method is required when customizing. */
+  contraryOriginMap?: OriginMap;
 };

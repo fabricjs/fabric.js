@@ -19,7 +19,7 @@ type CollectPointProps = {
   corner: string;
 };
 // Position using diagonal points when resizing/scaling
-const originArr: { [props: string]: [TOriginX, TOriginY] } = {
+const originMap: { [props: string]: [TOriginX, TOriginY] } = {
   tl: ['right', 'bottom'],
   tr: ['left', 'bottom'],
   br: ['left', 'top'],
@@ -53,6 +53,7 @@ export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
     target.set('width', width * sx);
     if (isUniform) target.set('height', height * sx);
   }
+  const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
   target.setRelativeXY(diagonalPoint, ...originArr[corner]);
   target.setCoords();
   return arr.map((target) => ({ origin: point, target }));
@@ -82,6 +83,7 @@ export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
     target.set('height', height * sy);
     if (isUniform) target.set('width', width * sy);
   }
+  const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
   target.setRelativeXY(diagonalPoint, ...originArr[corner]);
   target.setCoords();
   return arr.map((target) => ({ origin: point, target }));

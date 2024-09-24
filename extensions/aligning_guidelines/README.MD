@@ -74,6 +74,10 @@ initAligningGuidelines(myCanvas, {
     const abc = target.aCoords.br;
     return { abc };
   },
+  contraryOriginMap: {
+    // If abc is the top-left point, then the reference point is the bottom-right.
+    abc: ['right', 'bottom'],
+  },
 });
 ```
 
