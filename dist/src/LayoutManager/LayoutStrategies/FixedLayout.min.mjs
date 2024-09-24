@@ -1,0 +1,2 @@
+import{defineProperty as t}from"../../../_virtual/_rollupPluginBabelHelpers.min.mjs";import{Point as e}from"../../Point.min.mjs";import{LayoutStrategy as i}from"./LayoutStrategy.min.mjs";import{classRegistry as r}from"../../ClassRegistry.min.mjs";class m extends i{getInitialSize(t,i){let{target:r}=t,{size:m}=i;return new e(r.width||m.x,r.height||m.y)}}t(m,"type","fixed"),r.setClass(m);export{m as FixedLayout};
+//# sourceMappingURL=FixedLayout.min.mjs.map

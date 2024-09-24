@@ -1,0 +1,2 @@
+import{config as i}from"../config.min.mjs";import{getEnv as o}from"./browser.min.mjs";let e;const t=i=>{e=i},m=()=>e||(e=o()),r=()=>m().document,n=()=>m().window,a=()=>{var o;return Math.max(null!==(o=i.devicePixelRatio)&&void 0!==o?o:n().devicePixelRatio,1)};export{a as getDevicePixelRatio,m as getEnv,r as getFabricDocument,n as getFabricWindow,t as setEnv};
+//# sourceMappingURL=index.min.mjs.map

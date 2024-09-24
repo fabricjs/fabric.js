@@ -1,0 +1,2 @@
+const o="precision highp float",n="\n    ".concat(o,";\n    varying vec2 vTexCoord;\n    uniform sampler2D uTexture;\n    void main() {\n      gl_FragColor = texture2D(uTexture, vTexCoord);\n    }"),i="\n    attribute vec2 aPosition;\n    varying vec2 vTexCoord;\n    void main() {\n      vTexCoord = aPosition;\n      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n    }";export{o as highPsourceCode,n as identityFragmentShader,i as vertexSource};
+//# sourceMappingURL=baseFilter.min.mjs.map

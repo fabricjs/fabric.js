@@ -1,0 +1,2 @@
+import{getMultipleNodes as t}from"./getMultipleNodes.min.mjs";import{recursivelyParseGradientsXlink as r}from"./recursivelyParseGradientsXlink.min.mjs";const e=["linearGradient","radialGradient","svg:linearGradient","svg:radialGradient"];function i(i){const n=t(i,e),a={};let o=n.length;for(;o--;){const t=n[o];t.getAttribute("xlink:href")&&r(i,t);const e=t.getAttribute("id");e&&(a[e]=t)}return a}export{i as getGradientDefs};
+//# sourceMappingURL=getGradientDefs.min.mjs.map

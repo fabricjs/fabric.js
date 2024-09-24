@@ -1,0 +1,1 @@
+{"version":3,"file":"uid.min.mjs","sources":["../../../../src/util/internals/uid.ts"],"sourcesContent":["let id = 0;\n\nexport const uid = () => id++;\n"],"names":["id","uid"],"mappings":"AAAA,IAAIA,EAAK,QAEIC,EAAMA,IAAMD"}

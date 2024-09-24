@@ -1,0 +1,1 @@
+{"version":3,"file":"cloneDeep.mjs","sources":["../../../../src/util/internals/cloneDeep.ts"],"sourcesContent":["export const cloneDeep = <T extends object>(object: T): T =>\n  JSON.parse(JSON.stringify(object));\n"],"names":["cloneDeep","object","JSON","parse","stringify"],"mappings":"AAAaA,MAAAA,SAAS,GAAsBC,MAAS,IACnDC,IAAI,CAACC,KAAK,CAACD,IAAI,CAACE,SAAS,CAACH,MAAM,CAAC;;;;"}

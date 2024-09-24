@@ -1,0 +1,2 @@
+import{Point as t}from"../Point.min.mjs";import{getScrollLeftTop as o}from"./dom_misc.min.mjs";const n=["touchstart","touchmove","touchend"];const e=n=>{const e=n.target,c=o(e),r=function(t){const o=t.changedTouches;return o&&o[0]?o[0]:t}(n);return new t(r.clientX+c.left,r.clientY+c.top)},c=t=>n.includes(t.type)||"touch"===t.pointerType,r=t=>{t.preventDefault(),t.stopPropagation()};export{e as getPointer,c as isTouchEvent,r as stopEvent};
+//# sourceMappingURL=dom_event.min.mjs.map

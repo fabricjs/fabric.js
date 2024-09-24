@@ -1,0 +1,1 @@
+{"version":3,"file":"getTagName.min.mjs","sources":["../../../src/parser/getTagName.ts"],"sourcesContent":["export const getTagName = (node: Element) => node.tagName.replace('svg:', '');\n"],"names":["getTagName","node","tagName","replace"],"mappings":"AAAaA,MAAAA,EAAcC,GAAkBA,EAAKC,QAAQC,QAAQ,OAAQ"}

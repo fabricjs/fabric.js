@@ -1,0 +1,2 @@
+import{iMatrix as o}from"../constants.min.mjs";const e={backgroundVpt:!0,backgroundColor:"",overlayVpt:!0,overlayColor:"",includeDefaultValues:!0,svgViewportTransformation:!0,renderOnAddRemove:!0,skipOffscreen:!0,enableRetinaScaling:!0,imageSmoothingEnabled:!0,controlsAboveOverlay:!1,allowTouchScrolling:!1,viewportTransform:[...o]};export{e as staticCanvasDefaults};
+//# sourceMappingURL=StaticCanvasOptions.min.mjs.map

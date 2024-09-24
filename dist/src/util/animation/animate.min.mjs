@@ -1,0 +1,2 @@
+import{ValueAnimation as r}from"./ValueAnimation.min.mjs";import{ArrayAnimation as n}from"./ArrayAnimation.min.mjs";import{ColorAnimation as t}from"./ColorAnimation.min.mjs";function i(t){const i=(r=>Array.isArray(r.startValue)||Array.isArray(r.endValue))(t)?new n(t):new r(t);return i.start(),i}function o(r){const n=new t(r);return n.start(),n}export{i as animate,o as animateColor};
+//# sourceMappingURL=animate.min.mjs.map

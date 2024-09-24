@@ -1,0 +1,1 @@
+{"version":3,"file":"getSvgRegex.min.mjs","sources":["../../../src/parser/getSvgRegex.ts"],"sourcesContent":["export function getSvgRegex(arr: string[]) {\n  return new RegExp('^(' + arr.join('|') + ')\\\\b', 'i');\n}\n"],"names":["getSvgRegex","arr","RegExp","join"],"mappings":"AAAO,SAASA,EAAYC,GAC1B,OAAO,IAAIC,OAAO,KAAOD,EAAIE,KAAK,KAAO,OAAQ,IACnD"}

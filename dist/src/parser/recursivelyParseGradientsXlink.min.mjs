@@ -1,0 +1,2 @@
+const t=["gradientTransform","x1","x2","y1","y2","gradientUnits","cx","cy","r","fx","fy"],e="xlink:href";function i(r,n){var o;const c=(null===(o=n.getAttribute(e))||void 0===o?void 0:o.slice(1))||"",d=r.getElementById(c);if(d&&d.getAttribute(e)&&i(r,d),d&&(t.forEach((t=>{const e=d.getAttribute(t);!n.hasAttribute(t)&&e&&n.setAttribute(t,e)})),!n.children.length)){const t=d.cloneNode(!0);for(;t.firstChild;)n.appendChild(t.firstChild)}n.removeAttribute(e)}export{i as recursivelyParseGradientsXlink};
+//# sourceMappingURL=recursivelyParseGradientsXlink.min.mjs.map

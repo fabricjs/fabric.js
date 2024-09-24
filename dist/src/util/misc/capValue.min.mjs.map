@@ -1,0 +1,1 @@
+{"version":3,"file":"capValue.min.mjs","sources":["../../../../src/util/misc/capValue.ts"],"sourcesContent":["export const capValue = (min: number, value: number, max: number) =>\n  Math.max(min, Math.min(value, max));\n"],"names":["capValue","min","value","max","Math"],"mappings":"AAAO,MAAMA,EAAWA,CAACC,EAAaC,EAAeC,IACnDC,KAAKD,IAAIF,EAAKG,KAAKH,IAAIC,EAAOC"}

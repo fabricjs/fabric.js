@@ -1,0 +1,2 @@
+import{objectWithoutProperties as t,objectSpread2 as e}from"../../../_virtual/_rollupPluginBabelHelpers.min.mjs";import{AnimationBase as a}from"./AnimationBase.min.mjs";const s=["startValue","endValue"];class r extends a{constructor(a){let{startValue:r=0,endValue:l=100}=a,u=t(a,s);super(e(e({},u),{},{startValue:r,byValue:l-r}))}calculate(t){const e=this.easing(t,this.startValue,this.byValue,this.duration);return{value:e,valueProgress:Math.abs((e-this.startValue)/this.byValue)}}}export{r as ValueAnimation};
+//# sourceMappingURL=ValueAnimation.min.mjs.map

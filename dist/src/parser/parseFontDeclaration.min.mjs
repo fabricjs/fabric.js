@@ -1,0 +1,2 @@
+import{parseUnit as t}from"../util/misc/svgParsing.min.mjs";import{reFontDeclaration as n}from"./constants.min.mjs";function o(o,i){const m=o.match(n);if(!m)return;const s=m[1],r=m[3],a=m[4],e=m[5],f=m[6];s&&(i.fontStyle=s),r&&(i.fontWeight=isNaN(parseFloat(r))?r:parseFloat(r)),a&&(i.fontSize=t(a)),f&&(i.fontFamily=f),e&&(i.lineHeight="normal"===e?1:e)}export{o as parseFontDeclaration};
+//# sourceMappingURL=parseFontDeclaration.min.mjs.map

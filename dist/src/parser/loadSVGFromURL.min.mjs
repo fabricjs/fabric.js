@@ -1,0 +1,2 @@
+import{request as e}from"../util/internals/dom_request.min.mjs";import{parseSVGDocument as n,createEmptyResponse as t}from"./parseSVGDocument.min.mjs";function o(o,r){let m=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};return new Promise(((n,t)=>{e(o.replace(/^\n\s*/,"").trim(),{onComplete:e=>{const o=e.responseXML;o&&n(o),t()},signal:m.signal})})).then((e=>n(e,r,m))).catch((()=>t()))}export{o as loadSVGFromURL};
+//# sourceMappingURL=loadSVGFromURL.min.mjs.map

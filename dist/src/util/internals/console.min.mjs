@@ -1,0 +1,2 @@
+const r=function(r){for(var t=arguments.length,n=new Array(t>1?t-1:0),o=1;o<t;o++)n[o-1]=arguments[o];return console[r]("fabric",...n)};class t extends Error{constructor(r,t){super("fabric: ".concat(r),t)}}class n extends t{constructor(r){super("".concat(r," 'options.signal' is in 'aborted' state"))}}export{t as FabricError,n as SignalAbortedError,r as log};
+//# sourceMappingURL=console.min.mjs.map

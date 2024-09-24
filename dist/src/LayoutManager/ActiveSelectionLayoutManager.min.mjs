@@ -1,0 +1,2 @@
+import{LayoutManager as e}from"./LayoutManager.min.mjs";class t extends e{subscribeTargets(e){const t=e.target;e.targets.reduce(((e,t)=>(t.parent&&e.add(t.parent),e)),new Set).forEach((e=>{e.layoutManager.subscribeTargets({target:e,targets:[t]})}))}unsubscribeTargets(e){const t=e.target,a=t.getObjects();e.targets.reduce(((e,t)=>(t.parent&&e.add(t.parent),e)),new Set).forEach((e=>{!a.some((t=>t.parent===e))&&e.layoutManager.unsubscribeTargets({target:e,targets:[t]})}))}}export{t as ActiveSelectionLayoutManager};
+//# sourceMappingURL=ActiveSelectionLayoutManager.min.mjs.map

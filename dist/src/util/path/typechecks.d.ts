@@ -1,0 +1,24 @@
+import type { TComplexParsedCommand, TParsedAbsoluteArcCommand, TParsedAbsoluteClosePathCommand, TParsedAbsoluteCubicCurveCommand, TParsedAbsoluteCubicCurveShortcutCommand, TParsedAbsoluteHorizontalLineCommand, TParsedAbsoluteLineCommand, TParsedAbsoluteMoveToCommand, TParsedAbsoluteQuadraticCurveCommand, TParsedAbsoluteQuadraticCurveShortcutCommand, TParsedAbsoluteVerticalLineCommand, TParsedClosePathCommand, TParsedLineCommand, TParsedRelativeArcCommand, TParsedRelativeClosePathCommand, TParsedRelativeCubicCurveCommand, TParsedRelativeCubicCurveShortcutCommand, TParsedRelativeHorizontalLineCommand, TParsedRelativeLineCommand, TParsedRelativeMoveToCommand, TParsedRelativeQuadraticCurveCommand, TParsedRelativeQuadraticCurveShortcutCommand, TParsedRelativeVerticalLineCommand } from './typedefs';
+export declare function isAbsMoveToCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteMoveToCommand;
+export declare function isRelMoveToCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeMoveToCommand;
+export declare function isAbsLineCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteLineCommand;
+export declare function isRelLineCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeLineCommand;
+export declare function isLineCommand(cmd: TComplexParsedCommand): cmd is TParsedLineCommand;
+export declare function isAbsHorizontalLineCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteHorizontalLineCommand;
+export declare function isRelHorizontalLineCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeHorizontalLineCommand;
+export declare function isAbsVerticalLineCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteVerticalLineCommand;
+export declare function isRelVerticalLineCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeVerticalLineCommand;
+export declare function isAbsClosePathCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteClosePathCommand;
+export declare function isRelClosePathCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeClosePathCommand;
+export declare function isClosePathCommand(cmd: TComplexParsedCommand): cmd is TParsedClosePathCommand;
+export declare function isAbsCubicCurveCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteCubicCurveCommand;
+export declare function isRelCubicCurveCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeCubicCurveCommand;
+export declare function isAbsCubicCurveShortcutCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteCubicCurveShortcutCommand;
+export declare function isRelCubicCurveShortcutCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeCubicCurveShortcutCommand;
+export declare function isAbsQuadraticCurveCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteQuadraticCurveCommand;
+export declare function isRelQuadraticCurveCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeQuadraticCurveCommand;
+export declare function isAbsQuadraticCurveShortcutCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteQuadraticCurveShortcutCommand;
+export declare function isRelQuadraticCurveShortcutCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeQuadraticCurveShortcutCommand;
+export declare function isAbsArcCmd(cmd: TComplexParsedCommand): cmd is TParsedAbsoluteArcCommand;
+export declare function isRelArcCmd(cmd: TComplexParsedCommand): cmd is TParsedRelativeArcCommand;
+//# sourceMappingURL=typechecks.d.ts.map
