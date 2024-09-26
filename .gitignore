@@ -10,7 +10,8 @@ before_commit
 e2e/dist/
 /dist-extensions/*
 !/dist-extensions/fabric-extensions.min.*
-/dist
+!/dist-extensions/**/*.ts
+/dist/*
 !/dist/**/*.d.ts
 !/dist/index.min.*
 !/dist/index.node.*
