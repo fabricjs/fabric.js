@@ -7,11 +7,13 @@ change-output.md
 before_commit
 /coverage/
 .idea/
-**/dist/
+e2e/dist/
 /dist-extensions/*
 !/dist-extensions/fabric-extensions.min.*
-/dist/*
+/dist
+!/dist/**/*.d.ts
 !/dist/index.min.*
+!/dist/index.node.*
 /cli_output/
 e2e/test-report/
 e2e/test-results/
