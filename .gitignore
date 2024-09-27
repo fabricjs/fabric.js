@@ -14,8 +14,6 @@ e2e/dist/
 /dist/*
 !/dist/index.node.mjs
 !/dist/index.node.mjs.map
-!/dist/index.node.cjs
-!/dist/index.node.cjs.map
 !/dist/index.mjs
 !/dist/index.mjs.map
 !/dist/index.min.js
