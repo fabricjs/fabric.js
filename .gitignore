@@ -12,9 +12,12 @@ e2e/dist/
 !/dist-extensions/fabric-extensions.min.*
 !/dist-extensions/**/*.ts
 /dist/*
-!/dist/**/*.d.ts
-!/dist/index.min.*
-!/dist/index.node.*
+!/dist/index.node.mjs
+!/dist/index.node.mjs
+!/dist/index.node.mjs
+!/dist/index.node.mjs
+!/dist/index.node.mjs
+!/dist/index.node.mjs
 /cli_output/
 e2e/test-report/
 e2e/test-results/
