@@ -2,7 +2,7 @@
 
 ## [next]
 
-- Add dist back to github [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
+- ci(): Add some prebuilt fabric in the dist folder [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
 
 ## [6.4.2]
 
