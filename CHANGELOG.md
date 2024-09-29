@@ -2,6 +2,7 @@
 
 ## [next]
 
+- update(IText): Add method \_enterEditing [#10187](https://github.com/fabricjs/fabric.js/issues/10187)
 - ci(): Add some prebuilt fabric in the dist folder [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
 
 ## [6.4.2]

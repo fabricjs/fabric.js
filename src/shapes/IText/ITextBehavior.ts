@@ -387,6 +387,22 @@ export abstract class ITextBehavior<
     if (this.isEditing || !this.editable) {
       return;
     }
+    this._enterEditing();
+    this.fire('editing:entered', e ? { e } : undefined);
+    this._fireSelectionChanged();
+    if (this.canvas) {
+      this.canvas.fire('text:editing:entered', {
+        target: this as unknown as IText,
+        e,
+      });
+      this.canvas.requestRenderAll();
+    }
+  }
+
+  /**
+   * runs the actual logic that enter from editing state, see {@link enterEditing}
+   */
+  protected _enterEditing() {
     if (this.canvas) {
       this.canvas.calcOffset();
       this.canvas.textEditingManager.exitTextEditing();
@@ -403,15 +419,6 @@ export abstract class ITextBehavior<
     this._textBeforeEdit = this.text;
 
     this._tick();
-    this.fire('editing:entered', e ? { e } : undefined);
-    this._fireSelectionChanged();
-    if (this.canvas) {
-      this.canvas.fire('text:editing:entered', {
-        target: this as unknown as IText,
-        e,
-      });
-      this.canvas.requestRenderAll();
-    }
   }
 
   /**
