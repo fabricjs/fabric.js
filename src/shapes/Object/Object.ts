@@ -27,7 +27,11 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { capValue } from '../../util/misc/capValue';
-import { createCanvasElement, toDataURL } from '../../util/misc/dom';
+import {
+  createCanvasElement,
+  createCanvasElementFor,
+  toDataURL,
+} from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
@@ -820,7 +824,7 @@ export class FabricObject<
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
     clipPath: FabricObject,
-    canvasWithClipPath: HTMLCanvasElement
+    canvasWithClipPath: HTMLCanvasElement,
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -864,11 +868,9 @@ export class FabricObject<
 
   private createClipPathLayer(
     this: TCachedFabricObject,
-    clipPath: FabricObject
+    clipPath: FabricObject,
   ) {
-    const canvas = createCanvasElement();
-    canvas.width = this._cacheCanvas.width;
-    canvas.height = this._cacheCanvas.height;
+    const canvas = createCanvasElementFor(this._cacheCanvas);
     const ctx = canvas.getContext('2d')!;
     ctx.translate(this.cacheTranslationX, this.cacheTranslationY);
     ctx.scale(this.zoomX, this.zoomY);
@@ -1220,14 +1222,16 @@ export class FabricObject<
     filler: TFiller,
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
-    // in case width and height are less than 1px, we have to round up.
-    // since the pattern is no-repeat, this is fine
-    pCanvas.width = Math.ceil(width);
-    pCanvas.height = Math.ceil(height);
+      height = dims.y / this.scaleY / retinaScaling,
+      pCanvas = createCanvasElementFor({
+        // in case width and height are less than 1px, we have to round up.
+        // since the pattern is no-repeat, this is fine
+        width: Math.ceil(width),
+        height: Math.ceil(height),
+      });
+
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;

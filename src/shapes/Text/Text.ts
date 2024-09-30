@@ -18,7 +18,7 @@ import type {
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
-import { createCanvasElement } from '../../util/misc/dom';
+import { createCanvasElementFor } from '../../util/misc/dom';
 import type { TextStyleArray } from '../../util/misc/textStyles';
 import {
   hasStyleChanged,
@@ -55,8 +55,10 @@ let measuringContext: CanvasRenderingContext2D | null;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    const canvas = createCanvasElement();
-    canvas.width = canvas.height = 0;
+    const canvas = createCanvasElementFor({
+      width: 0,
+      height: 0,
+    });
     measuringContext = canvas.getContext('2d');
   }
   return measuringContext;
@@ -1251,10 +1253,13 @@ export class FabricText<
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
   _applyPatternGradientTransformText(filler: TFiller) {
-    const pCanvas = createCanvasElement(),
-      // TODO: verify compatibility with strokeUniform
-      width = this.width + this.strokeWidth,
+    // TODO: verify compatibility with strokeUniform
+    const width = this.width + this.strokeWidth,
       height = this.height + this.strokeWidth,
+      pCanvas = createCanvasElementFor({
+        width,
+        height,
+      }),
       pCtx = pCanvas.getContext('2d')!;
     pCanvas.width = width;
     pCanvas.height = height;
