@@ -857,11 +857,6 @@ export class FabricObject<
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     //ctx.scale(1 / 2, 1 / 2);
-    if (clipPath.absolutePositioned) {
-      // needs fixes?
-      const m = invertTransform(this.calcTransformMatrix());
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    }
     ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
@@ -910,6 +905,11 @@ export class FabricObject<
     } else {
       context.parentClipPath = undefined;
     }
+    if (clipPath.absolutePositioned) {
+      // needs fixes?
+      const m = invertTransform(this.calcTransformMatrix());
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    }
     clipPath.transform(ctx);
     clipPath.drawObject(ctx, true, context);
     return canvas;
@@ -931,7 +931,6 @@ export class FabricObject<
     // needed to setup a couple of variables
     // path canvas gets overridden with this one.
     // TODO find a better solution?
-    clipPath._set('canvas', this.canvas);
     clipPath.shouldCache();
     clipPath._transformDone = true;
     const canvas = (this as TCachedFabricObject).createClipPathLayer(
