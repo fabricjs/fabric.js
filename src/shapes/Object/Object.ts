@@ -138,6 +138,18 @@ type toDataURLOptions = ObjectToCanvasElementOptions & {
   quality?: number;
 };
 
+export type DrawContext =
+  | {
+      parentClipPath?: FabricObject;
+      width: number;
+      height: number;
+      cacheTranslationX: number;
+      cacheTranslationY: number;
+      zoomX: number;
+      zoomY: number;
+    }
+  | Record<string, never>;
+
 /**
  * Root object class from which all 2d shape classes inherit from
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
@@ -702,11 +714,11 @@ export class FabricObject<
     this._setOpacity(ctx);
     this._setShadow(ctx);
     if (this.shouldCache()) {
-      this.renderCache();
+      (this as TCachedFabricObject).renderCache();
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.drawObject(ctx);
+      this.drawObject(ctx, false, {});
       this.dirty = false;
     }
     ctx.restore();
@@ -716,13 +728,22 @@ export class FabricObject<
     /* no op */
   }
 
-  renderCache(options?: any) {
+  renderCache(this: TCachedFabricObject, options?: any) {
     options = options || {};
     if (!this._cacheCanvas || !this._cacheContext) {
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.drawObject(this._cacheContext, options.forClipping);
+      const { zoomX, zoomY, cacheTranslationX, cacheTranslationY } = this;
+      const { width, height } = this._cacheCanvas;
+      this.drawObject(this._cacheContext, options.forClipping, {
+        zoomX,
+        zoomY,
+        cacheTranslationX,
+        cacheTranslationY,
+        width,
+        height,
+      });
       this.dirty = false;
     }
   }
@@ -849,8 +870,13 @@ export class FabricObject<
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {boolean} forClipping apply clipping styles
+   * @param {DrawContext} context additional context for rendering
    */
-  drawObject(ctx: CanvasRenderingContext2D, forClipping?: boolean) {
+  drawObject(
+    ctx: CanvasRenderingContext2D,
+    forClipping: boolean | undefined,
+    context: DrawContext,
+  ) {
     const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
@@ -861,7 +887,7 @@ export class FabricObject<
       this._renderBackground(ctx);
     }
     this._render(ctx);
-    this._drawClipPath(ctx, this.clipPath);
+    this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
     this.stroke = originalStroke;
   }
@@ -869,37 +895,23 @@ export class FabricObject<
   private createClipPathLayer(
     this: TCachedFabricObject,
     clipPath: FabricObject,
+    context: DrawContext,
   ) {
-    const canvas = createCanvasElementFor(this._cacheCanvas);
+    const canvas = createCanvasElementFor(context as TSize);
     const ctx = canvas.getContext('2d')!;
-    ctx.translate(this.cacheTranslationX, this.cacheTranslationY);
-    ctx.scale(this.zoomX, this.zoomY);
+    ctx.translate(context.cacheTranslationX, context.cacheTranslationY);
+    ctx.scale(context.zoomX, context.zoomY);
     clipPath._cacheCanvas = canvas;
-    // if the clipPath is clipped, we need its own cache for reference.
-    if (clipPath.clipPath) {
-      clipPath.clipPath.parentClipPath = clipPath;
-      // we do not use it but we need it for the next step.
-      // it is a waste, we could have just the information handy, we do not need
-      // to create a real canvas. we need cacheChanvas width/height/translationX/translationY
-      clipPath._createCacheCanvas();
-      clipPath._cacheCanvas.width = canvas.width;
-      clipPath._cacheCanvas.height = canvas.height;
-      clipPath.cacheTranslationX = this.cacheTranslationX;
-      clipPath.cacheTranslationY = this.cacheTranslationY;
-      clipPath.zoomX = this.zoomX;
-      clipPath.zoomY = this.zoomY;
+    if (context.parentClipPath) {
+      context.parentClipPath.transform(ctx);
     }
-    if (clipPath.parentClipPath) {
-      console.log(clipPath.parentClipPath);
-      clipPath.parentClipPath.transform(ctx);
+    if (clipPath.clipPath) {
+      context.parentClipPath = clipPath;
+    } else {
+      context.parentClipPath = undefined;
     }
     clipPath.transform(ctx);
-    clipPath.drawObject(ctx, true);
-    delete clipPath._cacheCanvas;
-    if (clipPath.clipPath) {
-      delete clipPath.clipPath.parentClipPath;
-    }
-    console.log(canvas);
+    clipPath.drawObject(ctx, true, context);
     return canvas;
   }
 
@@ -908,7 +920,11 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
    */
-  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
+  _drawClipPath(
+    ctx: CanvasRenderingContext2D,
+    clipPath: FabricObject | undefined,
+    context: DrawContext,
+  ) {
     if (!clipPath) {
       return;
     }
@@ -918,7 +934,10 @@ export class FabricObject<
     clipPath._set('canvas', this.canvas);
     clipPath.shouldCache();
     clipPath._transformDone = true;
-    const canvas = (this as TCachedFabricObject).createClipPathLayer(clipPath);
+    const canvas = (this as TCachedFabricObject).createClipPathLayer(
+      clipPath,
+      context,
+    );
     this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
