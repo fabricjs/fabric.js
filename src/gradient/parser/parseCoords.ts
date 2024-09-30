@@ -5,37 +5,40 @@ import { parseGradientUnits, parseType } from './misc';
 
 function convertPercentUnitsToValues<
   T extends GradientType,
-  K extends keyof GradientCoords<T>
+  K extends keyof GradientCoords<T>,
 >(
   valuesToConvert: Record<K, string | number>,
-  { width, height, gradientUnits }: TSize & { gradientUnits: GradientUnits }
+  { width, height, gradientUnits }: TSize & { gradientUnits: GradientUnits },
 ) {
   let finalValue;
-  return (Object.keys(valuesToConvert) as K[]).reduce((acc, prop) => {
-    const propValue = valuesToConvert[prop];
-    if (propValue === 'Infinity') {
-      finalValue = 1;
-    } else if (propValue === '-Infinity') {
-      finalValue = 0;
-    } else {
-      finalValue =
-        typeof propValue === 'string' ? parseFloat(propValue) : propValue;
-      if (typeof propValue === 'string' && isPercent(propValue)) {
-        finalValue *= 0.01;
-        if (gradientUnits === 'pixels') {
-          // then we need to fix those percentages here in svg parsing
-          if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
-            finalValue *= width;
-          }
-          if (prop === 'y1' || prop === 'y2') {
-            finalValue *= height;
+  return (Object.keys(valuesToConvert) as K[]).reduce(
+    (acc, prop) => {
+      const propValue = valuesToConvert[prop];
+      if (propValue === 'Infinity') {
+        finalValue = 1;
+      } else if (propValue === '-Infinity') {
+        finalValue = 0;
+      } else {
+        finalValue =
+          typeof propValue === 'string' ? parseFloat(propValue) : propValue;
+        if (typeof propValue === 'string' && isPercent(propValue)) {
+          finalValue *= 0.01;
+          if (gradientUnits === 'pixels') {
+            // then we need to fix those percentages here in svg parsing
+            if (prop === 'x1' || prop === 'x2' || prop === 'r2') {
+              finalValue *= width;
+            }
+            if (prop === 'y1' || prop === 'y2') {
+              finalValue *= height;
+            }
           }
         }
       }
-    }
-    acc[prop] = finalValue;
-    return acc;
-  }, {} as Record<K, number>);
+      acc[prop] = finalValue;
+      return acc;
+    },
+    {} as Record<K, number>,
+  );
 }
 
 function getValue(el: SVGGradientElement, key: string) {
@@ -68,6 +71,6 @@ export function parseCoords(el: SVGGradientElement, size: TSize) {
     {
       ...size,
       gradientUnits: parseGradientUnits(el),
-    }
+    },
   );
 }

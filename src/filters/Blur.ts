@@ -133,7 +133,7 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const delta = this.chooseRightDelta();
     gl.uniform2fv(uniformLocations.uDelta, delta);

@@ -85,7 +85,7 @@ export class LayoutManager {
    */
   protected attachHandlers(
     object: FabricObject,
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ): VoidFunction[] {
     const { target } = context;
     return (
@@ -115,9 +115,9 @@ export class LayoutManager {
                 trigger: key,
                 e,
                 target,
-              }
-        )
-      )
+              },
+        ),
+      ),
     );
   }
 
@@ -129,7 +129,7 @@ export class LayoutManager {
    */
   protected subscribe(
     object: FabricObject,
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     this.unsubscribe(object, context);
     const disposers = this.attachHandlers(object, context);
@@ -141,20 +141,20 @@ export class LayoutManager {
    */
   protected unsubscribe(
     object: FabricObject,
-    context?: RegistrationContext & Partial<StrictLayoutContext>
+    _context?: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
     this._subscriptions.delete(object);
   }
 
   unsubscribeTargets(
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     context.targets.forEach((object) => this.unsubscribe(object, context));
   }
 
   subscribeTargets(
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     context.targets.forEach((object) => this.subscribe(object, context));
   }
@@ -189,13 +189,13 @@ export class LayoutManager {
             ...tricklingContext,
             bubbles: false,
             target: object as Group,
-          })
+          }),
       );
     }
   }
 
   protected getLayoutResult(
-    context: StrictLayoutContext
+    context: StrictLayoutContext,
   ): Required<LayoutResult> | undefined {
     const { target, strategy, type } = context;
 
@@ -223,7 +223,7 @@ export class LayoutManager {
         type === LAYOUT_TYPE_INITIALIZATION
           ? iMatrix
           : invertTransform(target.calcOwnMatrix()),
-        true
+        true,
       )
       .add(relativeCorrection);
 
@@ -237,7 +237,7 @@ export class LayoutManager {
 
   protected commitLayout(
     context: StrictLayoutContext,
-    layoutResult: Required<LayoutResult>
+    layoutResult: Required<LayoutResult>,
   ) {
     const { target } = context;
     const {
@@ -267,7 +267,7 @@ export class LayoutManager {
 
   protected layoutObjects(
     context: StrictLayoutContext,
-    layoutResult: Required<LayoutResult>
+    layoutResult: Required<LayoutResult>,
   ) {
     const { target } = context;
     //  adjust objects to account for new center
@@ -287,7 +287,7 @@ export class LayoutManager {
   protected layoutObject(
     context: StrictLayoutContext,
     { offset }: Required<LayoutResult>,
-    object: FabricObject
+    object: FabricObject,
   ) {
     // TODO: this is here for cache invalidation.
     // verify if this is necessary since we have explicit
@@ -300,7 +300,7 @@ export class LayoutManager {
 
   protected onAfterLayout(
     context: StrictLayoutContext,
-    layoutResult?: LayoutResult
+    layoutResult?: LayoutResult,
   ) {
     const {
       target,

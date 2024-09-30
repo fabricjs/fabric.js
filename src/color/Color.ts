@@ -52,6 +52,7 @@ export class Color {
           Color.sourceFromHsl(color) ||
           // color is not recognized
           // we default to black as canvas does
+          // eslint-disable-next-line no-constant-binary-expression
           ((this.isUnrecognised = true) && ([0, 0, 0, 1] as TRGBAColorSource));
   }
 
@@ -177,7 +178,7 @@ export class Color {
       otherAlpha = 0.5,
       otherSource = otherColor.getSource(),
       [R, G, B] = source.map((value, index) =>
-        Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha)
+        Math.round(value * (1 - otherAlpha) + otherSource[index] * otherAlpha),
       );
 
     this.setSource([R, G, B, source[3]]);
@@ -315,7 +316,7 @@ export class Color {
         expandedValue = value.match(/.{2}/g)!;
       }
       const [r, g, b, a = 255] = expandedValue.map((hexCouple) =>
-        parseInt(hexCouple, 16)
+        parseInt(hexCouple, 16),
       );
       return [r, g, b, a / 255];
     }

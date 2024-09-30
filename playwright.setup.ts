@@ -33,7 +33,7 @@ const shouldBuild = (file: string) =>
 
 const getDistFileName = (file: string) => {
   const { dir, name } = path.parse(
-    path.resolve(dist, path.relative(src, file))
+    path.resolve(dist, path.relative(src, file)),
   );
   return path.format({
     dir,
@@ -60,13 +60,13 @@ export default async (config: PlaywrightTestConfig) => {
 
   rmSync(dist, { recursive: true, force: true });
   const tasks = await Promise.all(
-    files.filter((file) => shouldBuild(file)).map((file) => buildFile(file))
+    files.filter((file) => shouldBuild(file)).map((file) => buildFile(file)),
   );
   console.log(
     `Successfully compiled ${tasks.length} files from ${path.relative(
       process.cwd(),
-      src
-    )} to ${path.relative(process.cwd(), dist)}`
+      src,
+    )} to ${path.relative(process.cwd(), dist)}`,
   );
 
   // watch
@@ -77,7 +77,7 @@ export default async (config: PlaywrightTestConfig) => {
       (type, filename) => {
         const file = path.join(src, filename);
         shouldBuild(file) && buildFile(file);
-      }
+      },
     );
     process.once('exit', () => watcher.close());
   }

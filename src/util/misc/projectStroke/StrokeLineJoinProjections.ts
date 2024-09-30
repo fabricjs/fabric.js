@@ -78,20 +78,20 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     this.bisector = getUnitVector(
       // if AC is also the zero vector nothing will be projected
       // in that case the next point will handle the projection
-      rotateVector(this.AB.eq(zeroVector) ? this.AC : this.AB, this.alpha / 2)
+      rotateVector(this.AB.eq(zeroVector) ? this.AC : this.AB, this.alpha / 2),
     );
   }
 
   calcOrthogonalProjection(
     from: Point,
     to: Point,
-    magnitude: number = this.strokeProjectionMagnitude
+    magnitude: number = this.strokeProjectionMagnitude,
   ) {
     const vector = this.createSideVector(from, to);
     const orthogonalProjection = getOrthonormalVector(vector);
     const correctSide = StrokeLineJoinProjections.getOrthogonalRotationFactor(
       orthogonalProjection,
-      this.bisector
+      this.bisector,
     );
     return this.scaleUnitVector(orthogonalProjection, magnitude * correctSide);
   }
@@ -109,9 +109,9 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       (to) => {
         projections.push(this.projectOrthogonally(this.A, to));
         projections.push(
-          this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude)
+          this.projectOrthogonally(this.A, to, -this.strokeProjectionMagnitude),
         );
-      }
+      },
     );
     return projections;
   }
@@ -129,7 +129,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       hypotUnitScalar = 1 / Math.sin(alpha / 2),
       miterVector = this.scaleUnitVector(
         this.bisector,
-        -this.strokeProjectionMagnitude * hypotUnitScalar
+        -this.strokeProjectionMagnitude * hypotUnitScalar,
       );
 
     // When two line segments meet at a sharp angle, it is possible for the join to extend,
@@ -139,7 +139,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     // When the stroke is uniform, scaling changes the arrangement of points, this changes the miter-limit
     const strokeMiterLimit = this.options.strokeUniform
       ? magnitude(
-          this.scaleUnitVector(this.bisector, this.options.strokeMiterLimit)
+          this.scaleUnitVector(this.bisector, this.options.strokeMiterLimit),
         )
       : this.options.strokeMiterLimit;
 
@@ -170,8 +170,8 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       correctSide = new Point(
         StrokeLineJoinProjections.getOrthogonalRotationFactor(this.bisector),
         StrokeLineJoinProjections.getOrthogonalRotationFactor(
-          new Point(this.bisector.y, this.bisector.x)
-        )
+          new Point(this.bisector.y, this.bisector.x),
+        ),
       ),
       radiusOnAxisX = new Point(1, 0)
         .scalarMultiply(this.strokeProjectionMagnitude)
@@ -203,7 +203,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
     const { skewX, skewY, scaleX, scaleY, strokeUniform } = this.options,
       shearing = new Point(
         Math.tan(degreesToRadians(skewX)),
-        Math.tan(degreesToRadians(skewY))
+        Math.tan(degreesToRadians(skewY)),
       );
     // The points furthest from the vertex in the direction of the X and Y axes after distortion
     const circleRadius = this.strokeProjectionMagnitude,
@@ -216,20 +216,20 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
         // Safe guard due to floating point precision. In some situations the square root
         // was returning NaN because of a negative number close to zero.
         Math.sqrt(Math.max(circleRadius ** 2 - newY ** 2, 0)),
-        newY
+        newY,
       ),
       newX = strokeUniform
         ? circleRadius /
           Math.sqrt(
             1 +
               (shearing.x ** 2 * (1 / scaleY) ** 2) /
-                (1 / scaleX + (1 / scaleX) * shearing.x * shearing.y) ** 2
+                (1 / scaleX + (1 / scaleX) * shearing.x * shearing.y) ** 2,
           )
         : circleRadius /
           Math.sqrt(1 + shearing.x ** 2 / (1 + shearing.x * shearing.y) ** 2),
       furthestX = new Point(
         newX,
-        Math.sqrt(Math.max(circleRadius ** 2 - newX ** 2, 0))
+        Math.sqrt(Math.max(circleRadius ** 2 - newX ** 2, 0)),
       );
 
     [
@@ -242,8 +242,8 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       // it is between the start and end of the circle segment
       .map((vector) =>
         this.applySkew(
-          strokeUniform ? vector.multiply(this.strokeUniformScalar) : vector
-        )
+          strokeUniform ? vector.multiply(this.strokeUniformScalar) : vector,
+        ),
       )
       .forEach((vector) => {
         if (isBetweenVectors(vector, startCircle, endCircle)) {
@@ -272,7 +272,7 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       comparisonVector = isStraightLine
         ? this.applySkew(this.AB.scalarMultiply(-1))
         : this.applySkew(
-            this.bisector.multiply(this.strokeUniformScalar).scalarMultiply(-1)
+            this.bisector.multiply(this.strokeUniformScalar).scalarMultiply(-1),
           ),
       // the beginning of the circle segment is always to the right of the comparison vector (cross product > 0)
       isProj0Start = crossProduct(proj0, comparisonVector) > 0,

@@ -29,7 +29,7 @@ const RECT_PROPS = ['rx', 'ry'] as const;
 export class Rect<
     Props extends TOptions<RectProps> = Partial<RectProps>,
     SProps extends SerializedRectProps = SerializedRectProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements RectProps
@@ -108,7 +108,7 @@ export class Rect<
         x + w,
         y + kRect * ry,
         x + w,
-        y + ry
+        y + ry,
       );
 
     ctx.lineTo(x + w, y + h - ry);
@@ -119,7 +119,7 @@ export class Rect<
         x + w - kRect * rx,
         y + h,
         x + w - rx,
-        y + h
+        y + h,
       );
 
     ctx.lineTo(x + rx, y + h);
@@ -130,7 +130,7 @@ export class Rect<
         x,
         y + h - kRect * ry,
         x,
-        y + h - ry
+        y + h - ry,
       );
 
     ctx.lineTo(x, y + ry);
@@ -149,7 +149,7 @@ export class Rect<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...RECT_PROPS, ...propertiesToInclude]);
   }
@@ -198,7 +198,7 @@ export class Rect<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ) {
     const {
       left = 0,

@@ -32,7 +32,7 @@ export abstract class LayoutStrategy {
    */
   public calcLayoutResult(
     context: StrictLayoutContext,
-    objects: FabricObject[]
+    objects: FabricObject[],
   ): LayoutStrategyResult | undefined {
     if (this.shouldPerformLayout(context)) {
       return this.calcBoundingBox(objects, context);
@@ -57,7 +57,7 @@ export abstract class LayoutStrategy {
 
   getInitialSize(
     context: StrictLayoutContext & InitializationLayoutContext,
-    result: Pick<LayoutStrategyResult, 'center' | 'size'>
+    result: Pick<LayoutStrategyResult, 'center' | 'size'>,
   ) {
     return result.size;
   }
@@ -67,7 +67,7 @@ export abstract class LayoutStrategy {
    */
   calcBoundingBox(
     objects: FabricObject[],
-    context: StrictLayoutContext
+    context: StrictLayoutContext,
   ): LayoutStrategyResult | undefined {
     const { type, target } = context;
     if (type === LAYOUT_TYPE_IMPERATIVE && context.overrides) {
@@ -79,7 +79,7 @@ export abstract class LayoutStrategy {
     const { left, top, width, height } = makeBoundingBoxFromPoints(
       objects
         .map((object) => getObjectBounds(target, object))
-        .reduce<Point[]>((coords, curr) => coords.concat(curr), [])
+        .reduce<Point[]>((coords, curr) => coords.concat(curr), []),
     );
     const bboxSize = new Point(width, height);
     const bboxLeftTop = new Point(left, top);

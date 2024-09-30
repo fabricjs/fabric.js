@@ -86,23 +86,23 @@ describe('Layout Manager', () => {
           mock: {
             calls: [[arg0]],
           },
-        }) => expect(arg0).toMatchObject(context)
+        }) => expect(arg0).toMatchObject(context),
       );
       if (result) {
         [commitLayout, onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
-          }) => expect(arg1).toEqual(layoutResult)
+          }) => expect(arg1).toEqual(layoutResult),
         );
       } else {
         [onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
-          }) => expect(arg1).toBeUndefined()
+          }) => expect(arg1).toBeUndefined(),
         );
       }
     });
@@ -230,7 +230,7 @@ describe('Layout Manager', () => {
         expect(manager['unsubscribe']).toHaveBeenCalledTimes(targets.length);
         expect(manager['unsubscribe']).toHaveBeenCalledWith(
           targets[0],
-          context
+          context,
         );
         expect(target.fire).toBeCalledWith('layout:before', {
           context,
@@ -337,7 +337,7 @@ describe('Layout Manager', () => {
     const prepareTest = (
       contextOptions: {
         type: typeof LAYOUT_TYPE_INITIALIZATION | typeof LAYOUT_TYPE_ADDED;
-      } & Partial<LayoutContext>
+      } & Partial<LayoutContext>,
     ) => {
       const lifecycle: jest.SpyInstance[] = [];
 
@@ -427,7 +427,7 @@ describe('Layout Manager', () => {
           left: pos.x ?? 0,
           top: pos.y ?? 0,
         });
-      }
+      },
     );
 
     it('non initialization trigger should set size, position and invalidate target', () => {
@@ -526,7 +526,7 @@ describe('Layout Manager', () => {
               path: [target],
             },
           ]);
-      }
+      },
     );
 
     test('bubbling', () => {
@@ -751,7 +751,7 @@ describe('Layout Manager', () => {
       jest.spyOn(child, 'toJSON').mockReturnValue('child');
       const group = new Group([child]);
       expect(
-        Array.from(group.layoutManager['_subscriptions'].keys())
+        Array.from(group.layoutManager['_subscriptions'].keys()),
       ).toMatchObject([child]);
     });
 
@@ -793,30 +793,30 @@ describe('Layout Manager', () => {
       describe('Fitcontent layout', () => {
         it('should subscribe objects', async () => {
           const group = await Group.fromObject(
-            createTestData(FitContentLayout.type)
+            createTestData(FitContentLayout.type),
           );
           expect(
-            Array.from(group.layoutManager['_subscriptions'].keys())
+            Array.from(group.layoutManager['_subscriptions'].keys()),
           ).toMatchObject(group.getObjects());
         });
       });
       describe('FixedLayout layout', () => {
         it('should subscribe objects', async () => {
           const group = await Group.fromObject(
-            createTestData(FixedLayout.type)
+            createTestData(FixedLayout.type),
           );
           expect(
-            Array.from(group.layoutManager['_subscriptions'].keys())
+            Array.from(group.layoutManager['_subscriptions'].keys()),
           ).toMatchObject(group.getObjects());
         });
       });
       describe('ClipPathLayout layout', () => {
         it('should subscribe objects', async () => {
           const group = await Group.fromObject(
-            createTestData(ClipPathLayout.type)
+            createTestData(ClipPathLayout.type),
           );
           expect(
-            Array.from(group.layoutManager['_subscriptions'].keys())
+            Array.from(group.layoutManager['_subscriptions'].keys()),
           ).toMatchObject(group.getObjects());
         });
       });
@@ -840,7 +840,7 @@ describe('Layout Manager', () => {
         expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
         expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
         expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
-      }
+      },
     );
 
     it('fixed layout should respect size passed in options', () => {

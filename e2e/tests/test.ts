@@ -39,7 +39,7 @@ export function before(
   cb: (canvas: HTMLCanvasElement) => AsyncReturnValue<{
     canvas: Canvas;
     objects?: Record<string, FabricObject>;
-  }>
+  }>,
 ) {
   const task = Promise.resolve().then(async () => {
     const el = document.querySelector<HTMLCanvasElement>(selector);
@@ -48,7 +48,7 @@ export function before(
     Object.entries(objects).forEach(([key, value]) => {
       if (objectMap.has(key)) {
         throw new Error(
-          `Object identifiers must be unique: ${key} is already defined`
+          `Object identifiers must be unique: ${key} is already defined`,
         );
       }
       objectMap.set(key, value);
@@ -59,9 +59,9 @@ export function before(
 
 export async function beforeRenderTest(
   cb: (
-    canvas: Canvas
+    canvas: Canvas,
   ) => AsyncReturnValue<{ title: string; boundFunction: () => void }[]>,
-  options
+  options,
 ) {
   const el = document.querySelector<HTMLCanvasElement>('#canvas');
   const canvas = new Canvas(el, options);
@@ -70,7 +70,7 @@ export async function beforeRenderTest(
   renderingTests.forEach((renderTest) => {
     if (renderingTestMap.has(renderTest.title)) {
       throw new Error(
-        `test identifiers must be unique: ${renderTest.title} is already defined`
+        `test identifiers must be unique: ${renderTest.title} is already defined`,
       );
     }
     renderingTestMap.set(renderTest.title, renderTest.boundFunction);
@@ -85,7 +85,7 @@ export async function beforeRenderTest(
  */
 export function beforeAll(
   cb: (canvas: Canvas) => AsyncReturnValue<Record<string, FabricObject> | void>,
-  options?
+  options?,
 ) {
   before('#canvas', async (el) => {
     const canvas = new Canvas(el, options);
@@ -96,7 +96,7 @@ export function beforeAll(
 
 export function after(
   selector: string,
-  cb: (canvas: Canvas) => AsyncReturnValue<void>
+  cb: (canvas: Canvas) => AsyncReturnValue<void>,
 ) {
   teardownTasks.push(() => {
     const el = document.querySelector<HTMLCanvasElement>(selector);

@@ -79,14 +79,14 @@ describe('text imperative changes', () => {
         { fill: 'col4' },
         { fill: 'col5' },
       ],
-      1
+      1,
     );
     matchTextStateSnapshot(iText);
   });
 
   it('missingNewlineOffset', () => {
     const iText = new IText(
-      '由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂'
+      '由石墨\n分裂的石墨分\n裂\n由石墨分裂由石墨分裂的石\n墨分裂',
     );
 
     expect(iText.missingNewlineOffset(0)).toBe(1);

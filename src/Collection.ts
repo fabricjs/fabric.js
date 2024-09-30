@@ -1,5 +1,5 @@
 import type { Constructor, TBBox } from './typedefs';
-import { removeFromArray } from './util/internals';
+import { removeFromArray } from './util/internals/removeFromArray';
 import { Point } from './Point';
 import type { ActiveSelection } from './shapes/ActiveSelection';
 import type { Group } from './shapes/Group';
@@ -7,7 +7,7 @@ import type { InteractiveFabricObject } from './shapes/Object/InteractiveObject'
 import type { FabricObject } from './shapes/Object/FabricObject';
 
 export const isCollection = (
-  fabricObject?: FabricObject
+  fabricObject?: FabricObject,
 ): fabricObject is Group | ActiveSelection => {
   return !!fabricObject && Array.isArray((fabricObject as Group)._objects);
 };
@@ -92,11 +92,11 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
       callback: (
         object: FabricObject,
         index: number,
-        array: FabricObject[]
-      ) => any
+        array: FabricObject[],
+      ) => any,
     ) {
       this.getObjects().forEach((object, index, objects) =>
-        callback(object, index, objects)
+        callback(object, index, objects),
       );
     }
 
@@ -152,7 +152,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
         return this._objects.some(
           (obj) =>
             obj instanceof Collection &&
-            (obj as unknown as Collection).contains(object, true)
+            (obj as unknown as Collection).contains(object, true),
         );
       }
       return false;
@@ -272,7 +272,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     findNewLowerIndex(
       object: FabricObject,
       idx: number,
-      intersecting?: boolean
+      intersecting?: boolean,
     ) {
       let newIdx;
 
@@ -295,7 +295,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
     findNewUpperIndex(
       object: FabricObject,
       idx: number,
-      intersecting?: boolean
+      intersecting?: boolean,
     ) {
       let newIdx;
 
@@ -325,7 +325,7 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      */
     collectObjects(
       { left, top, width, height }: TBBox,
-      { includeIntersecting = true }: { includeIntersecting?: boolean } = {}
+      { includeIntersecting = true }: { includeIntersecting?: boolean } = {},
     ) {
       const objects: InteractiveFabricObject[] = [],
         tl = new Point(left, top),

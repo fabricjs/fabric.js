@@ -11,18 +11,18 @@ jobs:
   prime-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
+          node-version: 20.x
           install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
   node-coverage:
     needs: [prime-build]
     runs-on: ubuntu-latest
-    name: Node 18.x ${{ matrix.suite }} tests
+    name: Node 20.x ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
       matrix:
@@ -31,10 +31,10 @@ jobs:
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
         suite: [unit, visual]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
+          node-version: 20.x
           install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
@@ -45,7 +45,7 @@ jobs:
         if: matrix.suite == 'visual'
         run: npm run test:visual:coverage
       - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.suite }}
           path: .nyc_output/*.json
@@ -55,13 +55,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
         target: [chrome, firefox]
         suite: [unit, visual]
       fail-fast: false
     steps:
       - name: Unit tests on browser ${{ matrix.target }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
@@ -79,10 +79,10 @@ jobs:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: ['20.x']
+        node-version: ['18.x']
         suite: [unit, visual]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
@@ -95,15 +95,15 @@ jobs:
     name: Jest tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
+          node-version: 20.x
           install-system-deps: false
       - name: Run Jest unit test
         run: npm run test:jest:coverage
       - name: Upload test coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-jest
           path: .nyc_output/*.json
@@ -113,10 +113,10 @@ jobs:
     name: Playwright tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
+          node-version: 20.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install
@@ -125,13 +125,13 @@ jobs:
       - name: Run Playwright tests
         run: xvfb-run npm run test:e2e
       - name: Upload Test Output
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: e2e-report
           path: ./e2e/test-report/
       - name: Upload Test Coverage
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
@@ -140,32 +140,31 @@ jobs:
     name: Coverage reporting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 18.x
+          node-version: 20.x
           install-system-deps: false
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage-unit
           path: .nyc_output
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage-visual
           path: .nyc_output
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage-e2e
           path: .nyc_output
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: coverage-jest
           path: .nyc_output
       - run: ls -l .nyc_output
       - run: npm run coverage:report
-      - uses: ShaMan123/lcov-reporter-action@v1.2.2
-        if: github.event_name == 'pull_request'
+      - uses: romeovs/lcov-reporter-action@v0.4.0
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
-          update-comment: true

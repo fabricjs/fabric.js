@@ -16,7 +16,7 @@ import type { Group } from '../shapes/Group';
  */
 export class ActiveSelectionLayoutManager extends LayoutManager {
   subscribeTargets(
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ): void {
     const activeSelection = context.target;
     const parents = context.targets.reduce((parents, target) => {
@@ -35,7 +35,7 @@ export class ActiveSelectionLayoutManager extends LayoutManager {
    * unsubscribe from parent only if all its children were deselected
    */
   unsubscribeTargets(
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ): void {
     const activeSelection = context.target;
     const selectedObjects = activeSelection.getObjects();

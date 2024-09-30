@@ -23,7 +23,7 @@ export class ClipPathLayout extends LayoutStrategy {
 
   calcLayoutResult(
     context: StrictLayoutContext,
-    objects: FabricObject[]
+    objects: FabricObject[],
   ): LayoutStrategyResult | undefined {
     const { target } = context;
     const { clipPath, group } = target;
@@ -32,7 +32,7 @@ export class ClipPathLayout extends LayoutStrategy {
     }
     // TODO: remove stroke calculation from this case
     const { width, height } = makeBoundingBoxFromPoints(
-      getObjectBounds(target, clipPath as FabricObject)
+      getObjectBounds(target, clipPath as FabricObject),
     );
     const size = new Point(width, height);
     if (clipPath.absolutePositioned) {
@@ -40,7 +40,7 @@ export class ClipPathLayout extends LayoutStrategy {
       const clipPathCenter = sendPointToPlane(
         clipPath.getRelativeCenterPoint(),
         undefined,
-        group ? group.calcTransformMatrix() : undefined
+        group ? group.calcTransformMatrix() : undefined,
       );
       return {
         center: clipPathCenter,

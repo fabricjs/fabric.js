@@ -75,7 +75,7 @@ describe('Group', () => {
     }).catch((e) => {
       expect(e instanceof SignalAbortedError).toBe(true);
       expect(e.message).toBe(
-        `fabric: loadImage 'options.signal' is in 'aborted' state`
+        `fabric: loadImage 'options.signal' is in 'aborted' state`,
       );
     });
   });
@@ -109,7 +109,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.width).toBe(100);
       expect(group.height).toBe(100);
@@ -133,7 +133,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.left).toBe(6);
       expect(group.top).toBe(4);
@@ -153,7 +153,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.left).toBe(60);
       expect(group.top).toBe(50);
@@ -244,7 +244,7 @@ describe('Group', () => {
       const restoredGroup = await Group.fromObject(serialized);
       expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
       expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(
-        ClipPathLayout
+        ClipPathLayout,
       );
     });
     test('will serialize correctly without default values', async () => {

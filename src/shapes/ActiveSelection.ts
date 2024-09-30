@@ -59,7 +59,7 @@ export class ActiveSelection extends Group {
 
   constructor(
     objects: FabricObject[] = [],
-    options: Partial<ActiveSelectionOptions> = {}
+    options: Partial<ActiveSelectionOptions> = {},
   ) {
     super();
     Object.assign(this, ActiveSelection.ownDefaults);
@@ -115,13 +115,13 @@ export class ActiveSelection extends Group {
   canEnterGroup(object: FabricObject) {
     if (
       this.getObjects().some(
-        (o) => o.isDescendantOf(object) || object.isDescendantOf(o)
+        (o) => o.isDescendantOf(object) || object.isDescendantOf(o),
       )
     ) {
       //  prevent circular object tree
       log(
         'error',
-        'ActiveSelection: circular object trees are not supported, this call has no effect'
+        'ActiveSelection: circular object trees are not supported, this call has no effect',
       );
       return false;
     }
@@ -237,7 +237,7 @@ export class ActiveSelection extends Group {
   _renderControls(
     ctx: CanvasRenderingContext2D,
     styleOverride?: ControlRenderingStyleOverride,
-    childrenOverride?: ControlRenderingStyleOverride
+    childrenOverride?: ControlRenderingStyleOverride,
   ) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;

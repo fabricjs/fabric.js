@@ -46,7 +46,7 @@ export const isIdentityMatrix = (mat: TMat2D) =>
 export const transformPoint = (
   p: XY,
   t: TMat2D,
-  ignoreOffset?: boolean
+  ignoreOffset?: boolean,
 ): Point => new Point(p).transform(t, ignoreOffset);
 
 /**
@@ -73,7 +73,7 @@ export const invertTransform = (t: TMat2D): TMat2D => {
 export const multiplyTransformMatrices = (
   a: TMat2D,
   b: TMat2D,
-  is2x2?: boolean
+  is2x2?: boolean,
 ): TMat2D =>
   [
     a[0] * b[0] + a[2] * b[1],
@@ -95,14 +95,14 @@ export const multiplyTransformMatrices = (
  */
 export const multiplyTransformMatrixArray = (
   matrices: (TMat2D | undefined | null | false)[],
-  is2x2?: boolean
+  is2x2?: boolean,
 ) =>
   matrices.reduceRight(
     (product: TMat2D, curr) =>
       curr && product
         ? multiplyTransformMatrices(curr, product, is2x2)
         : curr || product,
-    undefined as unknown as TMat2D
+    undefined as unknown as TMat2D,
   ) || iMatrix.concat();
 
 export const calcPlaneRotation = ([a, b]: TMat2D) =>
@@ -168,7 +168,7 @@ export const createTranslateMatrix = (x: number, y = 0): TMat2D => [
  */
 export function createRotateMatrix(
   { angle = 0 }: TRotateMatrixArgs = {},
-  { x = 0, y = 0 }: Partial<XY> = {}
+  { x = 0, y = 0 }: Partial<XY> = {},
 ): TMat2D {
   const angleRadiant = degreesToRadians(angle),
     cosValue = cos(angleRadiant),
@@ -281,7 +281,7 @@ export const calcDimensionsMatrix = ({
 }: TScaleMatrixArgs) => {
   let matrix = createScaleMatrix(
     flipX ? -scaleX : scaleX,
-    flipY ? -scaleY : scaleY
+    flipY ? -scaleY : scaleY,
   );
   if (skewX) {
     matrix = multiplyTransformMatrices(matrix, createSkewXMatrix(skewX), true);

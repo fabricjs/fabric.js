@@ -48,7 +48,7 @@ function drawPoint(canvas: Canvas, arr: Point[]) {
 }
 export function drawPointList(
   canvas: Canvas,
-  list: Array<VerticalLine | HorizontalLine>
+  list: Array<VerticalLine | HorizontalLine>,
 ) {
   const arr = list.map((item) => {
     const isVertical = 'y2' in item;

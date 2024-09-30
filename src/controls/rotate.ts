@@ -19,7 +19,7 @@ import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 export const rotationStyleHandler: ControlCursorCallback = (
   eventData,
   control,
-  fabricObject
+  fabricObject,
 ) => {
   if (fabricObject.lockRotation) {
     return NOT_ALLOWED_CURSOR;
@@ -41,12 +41,12 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   eventData,
   { target, ex, ey, theta, originX, originY },
   x,
-  y
+  y,
 ) => {
   const pivotPoint = target.translateToOriginPoint(
     target.getRelativeCenterPoint(),
     originX,
-    originY
+    originY,
   );
 
   if (isLocked(target, 'lockRotation')) {
@@ -84,5 +84,5 @@ const rotateObjectWithSnapping: TransformActionHandler = (
 
 export const rotationWithSnapping = wrapWithFireEvent(
   ROTATING,
-  wrapWithFixedAnchor(rotateObjectWithSnapping)
+  wrapWithFixedAnchor(rotateObjectWithSnapping),
 );

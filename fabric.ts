@@ -8,6 +8,8 @@ export { runningAnimations } from './src/util/animation/AnimationRegistry';
 export * from './src/typedefs';
 
 export * from './src/EventTypeDefs';
+export type { ITextEvents } from './src/shapes/IText/ITextBehavior';
+
 export { Observable } from './src/Observable';
 
 export type {
@@ -40,6 +42,9 @@ export { PencilBrush } from './src/brushes/PencilBrush';
 export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
+
+// many path types
+export type * from './src/util/path/typedefs';
 
 export {
   FabricObject,

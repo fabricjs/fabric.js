@@ -8,17 +8,21 @@ import { classRegistry } from '../../ClassRegistry';
 
 // TODO somehow we have to make a tree-shakeable import
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface FabricObject<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   SProps extends SerializedObjectProps = SerializedObjectProps,
-  EventSpec extends ObjectEvents = ObjectEvents
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObjectSVGExportMixin {}
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends InteractiveFabricObject<Props, SProps, EventSpec> {}
 
 applyMixins(FabricObject, [FabricObjectSVGExportMixin]);

@@ -15,7 +15,7 @@ export function testCase(canvas: fabric.Canvas) {
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(2),
       objectCaching: false,
-    }
+    },
   );
 
   const polygonGreen = new fabric.Polygon(
@@ -32,7 +32,7 @@ export function testCase(canvas: fabric.Canvas) {
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(2),
       objectCaching: false,
-    }
+    },
   );
 
   const polygonBlue = new fabric.Polygon(
@@ -58,7 +58,7 @@ export function testCase(canvas: fabric.Canvas) {
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(3),
       objectCaching: false,
-    }
+    },
   );
 
   const polygonPurple = new fabric.Polygon(
@@ -85,7 +85,7 @@ export function testCase(canvas: fabric.Canvas) {
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(3),
       objectCaching: true,
-    }
+    },
   );
 
   const polygonYellow = new fabric.Polygon(
@@ -111,7 +111,7 @@ export function testCase(canvas: fabric.Canvas) {
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(3),
       objectCaching: false,
-    }
+    },
   );
 
   const polygonOrange = new fabric.Polygon(
@@ -136,7 +136,7 @@ export function testCase(canvas: fabric.Canvas) {
       hasBorders: false,
       controls: fabric.controlsUtils.createPolyControls(3),
       objectCaching: false,
-    }
+    },
   );
 
   canvas.add(polygonFlatRed);

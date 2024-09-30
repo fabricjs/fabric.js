@@ -1,4 +1,5 @@
 import { Path } from '../shapes/Path';
+import { Rect } from '../shapes/Rect';
 import { loadSVGFromString } from './loadSVGFromString';
 
 describe('loadSVGFromString', () => {
@@ -24,13 +25,23 @@ describe('loadSVGFromString', () => {
       </defs>
       <use clip-path="url(#myClip)" href="#heart" fill="red" />
       </svg>`;
-    // need to load Path here for it to populate in class registry; loadSvgFromString does not
-    // import Path so we'd fail the test without this.
-    const unused = Path.name;
 
     const parsedSvg = await loadSVGFromString(str);
     if (parsedSvg.objects[0] !== null) {
-      expect(parsedSvg.objects[0].isType('Path')).toBe(true);
+      expect(parsedSvg.objects[0] instanceof Path).toBe(true);
     }
+  });
+
+  it('returns successful parse of svg with id starting with number', async () => {
+    const str = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <rect id="123xyz" width="10" height="10" />
+      </svg>`;
+
+    const parsedSvg = await loadSVGFromString(str);
+
+    expect(
+      parsedSvg.objects[0] instanceof Rect &&
+        (parsedSvg.objects[0] as Rect & { id: string }).id,
+    ).toBe('123xyz');
   });
 });

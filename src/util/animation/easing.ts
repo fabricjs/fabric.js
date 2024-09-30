@@ -26,7 +26,7 @@ const elastic = (
   s: number,
   p: number,
   t: number,
-  d: number
+  d: number,
 ): number =>
   a * Math.pow(2, 10 * (t -= 1)) * Math.sin(((t * d - s) * twoMathPi) / p);
 

@@ -2,14 +2,11 @@ import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
 import { createCanvasElement, setStyle } from '../../util';
 import type { CSSDimensions } from './util';
-import {
-  allowTouchScrolling,
-  makeElementUnselectable,
-  setCSSDimensions,
-} from './util';
+import { makeElementUnselectable, setCSSDimensions } from './util';
 import type { CanvasItem } from './StaticCanvasDOMManager';
 import { StaticCanvasDOMManager } from './StaticCanvasDOMManager';
 import { setCanvasDimensions } from './util';
+import { NONE } from '../../constants';
 
 export class CanvasDOMManager extends StaticCanvasDOMManager {
   upper: CanvasItem;
@@ -26,7 +23,7 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
        * @deprecated here only for backward compatibility
        */
       containerClass?: string;
-    } = {}
+    } = {},
   ) {
     super(arg0);
     const { el: lowerCanvasEl } = this.lower;
@@ -37,6 +34,11 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     });
     this.applyCanvasStyle(upperCanvasEl, {
       allowTouchScrolling,
+      styles: {
+        position: 'absolute',
+        left: '0',
+        top: '0',
+      },
     });
     const container = this.createContainerElement();
     container.classList.add(containerClass);
@@ -78,14 +80,16 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
    */
   protected applyCanvasStyle(
     element: HTMLCanvasElement,
-    { allowTouchScrolling: allow }: { allowTouchScrolling: boolean }
+    options: {
+      allowTouchScrolling?: boolean;
+      styles?: Record<string, string>;
+    },
   ) {
+    const { styles, allowTouchScrolling } = options;
     setStyle(element, {
-      position: 'absolute',
-      left: '0',
-      top: '0',
+      ...styles,
+      'touch-action': allowTouchScrolling ? 'manipulation' : NONE,
     });
-    allowTouchScrolling(element, allow);
     makeElementUnselectable(element);
   }
 

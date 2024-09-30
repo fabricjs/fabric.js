@@ -7,7 +7,7 @@ import type { CSSRules } from './typedefs';
 
 export function getGlobalStylesForElement(
   element: HTMLElement,
-  cssRules: CSSRules = {}
+  cssRules: CSSRules = {},
 ) {
   let styles: Record<string, string> = {};
   for (const rule in cssRules) {

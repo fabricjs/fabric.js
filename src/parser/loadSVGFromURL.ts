@@ -21,7 +21,7 @@ import type { LoadImageOptions } from '../util/misc/objectEnlive';
 export function loadSVGFromURL(
   url: string,
   reviver?: TSvgReviverCallback,
-  options: LoadImageOptions = {}
+  options: LoadImageOptions = {},
 ): Promise<SVGParsingOutput> {
   // need to handle error properly
   return new Promise<Document>((resolve, reject) => {

@@ -62,7 +62,7 @@ describe('changeWidth', () => {
       eventData,
       prepareTransform(target, 'ml'),
       200,
-      300
+      300,
     );
     expect(changed).toBe(false);
     expect(target.width).toBe(100);
@@ -70,7 +70,7 @@ describe('changeWidth', () => {
       eventData,
       prepareTransform(target, 'mr'),
       -200,
-      300
+      300,
     );
     expect(changed2).toBe(false);
     expect(target.width).toBe(100);

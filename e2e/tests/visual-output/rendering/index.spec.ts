@@ -15,11 +15,11 @@ test('VISUAL RENDERING TESTS', async ({ page }, config) => {
         config.config.updateSnapshots = 'missing';
         await page.evaluate(
           (testTitle) => renderingTestMap.get(testTitle)(),
-          testCase.title
+          testCase.title,
         );
         expect(
           await new CanvasUtil(page).screenshot(),
-          `browser snapshot`
+          `browser snapshot`,
         ).toMatchSnapshot({
           name: testCase.golden || `${testCase.title}.png`,
           maxDiffPixelRatio: testCase.percentage,
@@ -41,7 +41,7 @@ test('VISUAL RENDERING TESTS', async ({ page }, config) => {
         const buffer = await canvas.getNodeCanvas().toBuffer();
         expect(
           buffer,
-          `node snapshot should match browser snapshot`
+          `node snapshot should match browser snapshot`,
         ).toMatchSnapshot({
           name: testCase.golden || `${testCase.title}.png`,
           maxDiffPixelRatio: testCase.percentage,

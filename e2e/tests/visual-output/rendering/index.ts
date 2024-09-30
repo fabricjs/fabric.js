@@ -12,6 +12,7 @@ beforeRenderTest(
       return {
         boundFunction: async () => {
           canvas.clear();
+          canvas.setZoom(1);
           canvas.setDimensions({
             width: renderTest.size[0],
             height: renderTest.size[1],
@@ -25,5 +26,5 @@ beforeRenderTest(
   },
   {
     enableRetinaScaling: false,
-  }
+  },
 );

@@ -14,7 +14,7 @@ runs:
       run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
       shell: bash
     - name: Use Node.js v${{ inputs.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
     - name: Get npm cache directory
@@ -23,7 +23,7 @@ runs:
         echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
       shell: bash
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.npm-cache-dir.outputs.dir }}
         key: npm-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}

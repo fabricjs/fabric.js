@@ -35,7 +35,7 @@ export const colorMatrixDefaultValues: ColorMatrixOwnProps = {
    */
 export class ColorMatrix<
   Name extends string = 'ColorMatrix',
-  OwnProps extends object = ColorMatrixOwnProps
+  OwnProps extends object = ColorMatrixOwnProps,
 > extends BaseFilter<Name, OwnProps> {
   /**
    * Colormatrix for pixels.
@@ -105,7 +105,7 @@ export class ColorMatrix<
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const m = this.matrix,
       matrix = [

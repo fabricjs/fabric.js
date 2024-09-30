@@ -63,7 +63,7 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
     const matchedParams = transformMatch.filter((m) => !!m);
     const [, operation, ...rawArgs] = matchedParams;
     const [arg0, arg1, arg2, arg3, arg4, arg5] = rawArgs.map((arg) =>
-      parseFloat(arg)
+      parseFloat(arg),
     );
 
     switch (operation) {

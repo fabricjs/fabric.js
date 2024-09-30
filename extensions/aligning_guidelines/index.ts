@@ -32,7 +32,7 @@ export type { AligningLineConfig } from './typedefs';
 
 export function initAligningGuidelines(
   canvas: Canvas,
-  options: Partial<AligningLineConfig> = {}
+  options: Partial<AligningLineConfig> = {},
 ) {
   Object.assign(aligningLineConfig, options);
 
@@ -95,7 +95,7 @@ export function initAligningGuidelines(
     if (activeObject.flipX) corner = corner.replace('l', 'r').replace('r', 'l');
     if (activeObject.flipY) corner = corner.replace('t', 'b').replace('b', 't');
     let index = ['tl', 'tr', 'br', 'bl', 'mt', 'mr', 'mb', 'ml'].indexOf(
-      corner
+      corner,
     );
     if (index == -1) return;
     onlyDrawPoint = index > 3;
@@ -109,7 +109,7 @@ export function initAligningGuidelines(
       const [rect, coords] = getCaCheMapValue(object);
       const center = new Point(
         rect.left + rect.width / 2,
-        rect.top + rect.height / 2
+        rect.top + rect.height / 2,
       );
       const list = [...coords, center];
       const props = { activeObject, point, list, isScale, index };

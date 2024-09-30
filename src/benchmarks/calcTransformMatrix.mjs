@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { util } from '../../dist/index.mjs';
 
 // perf(composeMatrix): 25% improv by restoring v5 implementation #9851
@@ -18,12 +19,12 @@ util2.calcDimensionsMatrix = ({
     [
       util2.createScaleMatrix(
         flipX ? -scaleX : scaleX,
-        flipY ? -scaleY : scaleY
+        flipY ? -scaleY : scaleY,
       ),
       skewX && util2.createSkewXMatrix(skewX),
       skewY && util2.createSkewYMatrix(skewY),
     ],
-    true
+    true,
   );
 };
 

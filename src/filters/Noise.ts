@@ -63,7 +63,7 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uNoise, this.noise / 255);
     gl.uniform1f(uniformLocations.uSeed, Math.random());

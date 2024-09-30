@@ -56,7 +56,7 @@ describe('animate', () => {
       startValue: 'red',
       endValue: 'blue',
       duration,
-      onChange: function (val, changePerc) {
+      onChange: function (_val, changePerc) {
         changePercSnap.push(changePerc);
       },
       onComplete: function (val, changePerc, timePerc) {
@@ -77,7 +77,7 @@ describe('animate', () => {
       startValue: 'rgba(255, 0, 0, 0.9)',
       endValue: 'rgba(0, 0, 255, 0.7)',
       duration: 16,
-      onComplete: function (val, changePerc, timePerc) {
+      onComplete: function (val, _changePerc, _timePerc) {
         // 'color is animated on all 4 values'
         expect(val).toEqual('rgba(0,0,255,0.7)');
       },
@@ -114,7 +114,7 @@ describe('animate', () => {
         expect(changePerc).toBe((0.9 - alpha) / (0.9 - 0.7));
         called = true;
       },
-      onComplete: function (val, changePerc, timePerc) {
+      onComplete: function (val, _changePerc, _timePerc) {
         // 'color is animated on all 4 values';
         expect(val).toBe('rgba(255,0,0,0.7)');
       },
@@ -353,7 +353,7 @@ describe('animate', () => {
         onComplete: function () {
           completeInvocations++;
         },
-      }
+      },
     );
     jest.advanceTimersByTime(32);
     expect(Math.round(object.get('left'))).toBe(1);
@@ -368,7 +368,7 @@ describe('animate', () => {
       startValue: [1, 2, 3],
       endValue: [2, 4, 6],
       duration,
-      onChange: (currentValue, valueProgress) => {
+      onChange: (currentValue, _valueProgress) => {
         expect(runningAnimations.length).toBe(1);
         expect(Array.isArray(currentValue)).toBe(true);
         expect(Object.isFrozen(runningAnimations[0].value)).toBe(true);
@@ -405,7 +405,7 @@ describe('animate', () => {
           context = this;
           return true;
         },
-      }
+      },
     );
     jest.advanceTimersByTime(100);
     expect(Math.round(object.get('left'))).toBe(123);
@@ -477,7 +477,7 @@ describe('easing', () => {
             });
           },
           easing: easingFunction,
-        }
+        },
       );
       jest.advanceTimersByTime(duration + 16);
       expect(snapshot).toMatchSnapshot();

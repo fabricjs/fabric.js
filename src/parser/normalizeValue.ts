@@ -7,7 +7,7 @@ export function normalizeValue(
   attr: string,
   value: any,
   parentAttributes: Record<string, any>,
-  fontSize: number
+  fontSize: number,
 ): string | null | boolean | number[] | number {
   const isArray = Array.isArray(value);
   let parsed: number | number[];
@@ -26,7 +26,7 @@ export function normalizeValue(
     if (parentAttributes && parentAttributes.transformMatrix) {
       ouputValue = multiplyTransformMatrices(
         parentAttributes.transformMatrix,
-        parseTransformAttribute(value)
+        parseTransformAttribute(value),
       );
     } else {
       ouputValue = parseTransformAttribute(value);
@@ -56,7 +56,12 @@ export function normalizeValue(
     } else if (fillIndex === -1 && strokeIndex > -1) {
       ouputValue = STROKE;
     }
-  } else if (attr === 'href' || attr === 'xlink:href' || attr === 'font') {
+  } else if (
+    attr === 'href' ||
+    attr === 'xlink:href' ||
+    attr === 'font' ||
+    attr === 'id'
+  ) {
     return value;
   } else if (attr === 'imageSmoothing') {
     return value === 'optimizeQuality';

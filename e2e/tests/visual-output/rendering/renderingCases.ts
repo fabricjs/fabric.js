@@ -13,7 +13,7 @@ export type renderTestType = {
   renderFunction: (
     canvas: Canvas,
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    fabric: typeof import('fabric')
+    fabric: typeof import('fabric'),
   ) => Promise<void>;
 };
 
@@ -25,7 +25,7 @@ const emptyTest: renderTestType = {
   renderFunction: async function render(
     canvas: Canvas,
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    fabric: typeof import('fabric')
+    fabric: typeof import('fabric'),
   ) {
     // put render code here
   },
@@ -40,7 +40,7 @@ export const renderTests: renderTestType[] = [
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      fabric: typeof import('fabric')
+      fabric: typeof import('fabric'),
     ) {
       const pts = () => [
         {
@@ -79,7 +79,7 @@ export const renderTests: renderTestType[] = [
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      fabric: typeof import('fabric')
+      fabric: typeof import('fabric'),
     ) {
       const rect = new fabric.Rect({
         width: 20,
@@ -116,7 +116,7 @@ export const renderTests: renderTestType[] = [
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      fabric: typeof import('fabric')
+      fabric: typeof import('fabric'),
     ) {
       const rect = new fabric.Rect({
         width: 10,
@@ -157,7 +157,7 @@ export const renderTests: renderTestType[] = [
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      fabric: typeof import('fabric')
+      fabric: typeof import('fabric'),
     ) {
       const obj = new fabric.Rect();
       obj.set({
@@ -177,7 +177,7 @@ export const renderTests: renderTestType[] = [
           offsetX: 8,
           offsetY: 8,
           nonScaling: true,
-        })
+        }),
       );
       canvas.add(obj);
     },
@@ -190,7 +190,7 @@ export const renderTests: renderTestType[] = [
     renderFunction: async function render(
       canvas: Canvas,
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-      fabric: typeof import('fabric')
+      fabric: typeof import('fabric'),
     ) {
       canvas.set({ backgroundColor: '#AAAA77' });
       const p1 = new fabric.Polygon(
@@ -204,7 +204,7 @@ export const renderTests: renderTestType[] = [
         ],
         {
           fill: 'white',
-        }
+        },
       );
       canvas.add(p1);
       const p2 = new fabric.Polygon(
@@ -222,10 +222,38 @@ export const renderTests: renderTestType[] = [
           strokeWidth: 15,
           originX: 'center',
           originY: 'center',
-        }
+        },
       );
       canvas.add(p2);
       canvas.setZoom(0.4);
+    },
+  },
+  {
+    size: [450, 220],
+    percentage: 0.01,
+    title: 'pixelate filter',
+    golden: 'pixelate-filter.png',
+    renderFunction: async function render(
+      canvas: Canvas,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      fabric: typeof import('fabric'),
+    ) {
+      const imgSource = fabric.getFabricDocument().createElement('canvas');
+      imgSource.width = 450;
+      imgSource.height = 220;
+      const ctx = imgSource.getContext('2d');
+      const gradient = ctx.createLinearGradient(0, 0, 450, 220);
+      gradient.addColorStop(0, 'yellow');
+      gradient.addColorStop(0.5, 'black');
+      gradient.addColorStop(1, 'cyan');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, imgSource.width, imgSource.height);
+      const img = new fabric.FabricImage(imgSource);
+      canvas.add(img);
+      img.filters[0] = new fabric.filters.Pixelate({
+        blocksize: 20,
+      });
+      img.applyFilters();
     },
   },
 ];

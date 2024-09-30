@@ -27,7 +27,6 @@ export type HorizontalLineProps = {
 };
 
 export type AligningLineConfig = {
-  offset: number;
   /** At what distance from the shape does alignment begin? */
   margin: number;
   /** Aligning line dimensions */

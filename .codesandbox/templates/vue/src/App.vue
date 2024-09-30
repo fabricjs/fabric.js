@@ -31,7 +31,7 @@ export default {
             end: 9,
           },
         ],
-        textValue
+        textValue,
       ),
     });
     canvas.add(text);

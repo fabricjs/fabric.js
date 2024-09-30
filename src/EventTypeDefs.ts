@@ -35,7 +35,7 @@ export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,
   transform: T,
   x: number,
-  y: number
+  y: number,
 ) => R;
 
 /**
@@ -54,7 +54,7 @@ export type ControlActionHandler = TransformAction<Transform, any>;
 export type ControlCallback<R = void> = (
   eventData: TPointerEvent,
   control: Control,
-  fabricObject: FabricObject
+  fabricObject: FabricObject,
 ) => R;
 
 export type ControlCursorCallback = ControlCallback<string>;

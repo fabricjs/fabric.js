@@ -29,7 +29,7 @@ export class Canvas2dFilterBackend {
     sourceElement: CanvasImageSource,
     sourceWidth: number,
     sourceHeight: number,
-    targetCanvas: HTMLCanvasElement
+    targetCanvas: HTMLCanvasElement,
   ): T2DPipelineState | void {
     const ctx = targetCanvas.getContext('2d');
     if (!ctx) {

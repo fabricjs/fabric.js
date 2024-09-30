@@ -74,7 +74,7 @@ export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const mode = 1;
     gl.uniform1i(uniformLocations.uMode, mode);

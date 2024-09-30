@@ -1,6 +1,6 @@
 import { config } from '../config';
 import type { Abortable, TCrossOrigin, TMat2D, TSize } from '../typedefs';
-import { ifNaN } from '../util/internals';
+import { ifNaN } from '../util/internals/ifNaN';
 import { uid } from '../util/internals/uid';
 import { loadImage } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
@@ -68,7 +68,7 @@ export class Pattern {
    * @type Array
    * @default
    */
-  patternTransform: TMat2D | null = null;
+  declare patternTransform?: TMat2D;
 
   /**
    * The actual pixel source of the pattern
@@ -117,8 +117,8 @@ export class Pattern {
     return this.isImageSource()
       ? this.source.src
       : this.isCanvasSource()
-      ? this.source.toDataURL()
-      : '';
+        ? this.source.toDataURL()
+        : '';
   }
 
   /**
@@ -176,14 +176,14 @@ export class Pattern {
           ? 1 + Math.abs(patternOffsetX || 0)
           : ifNaN(
               ((patternSource as HTMLImageElement).width as number) / width,
-              0
+              0,
             ),
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
           : ifNaN(
               ((patternSource as HTMLImageElement).height as number) / height,
-              0
+              0,
             );
 
     return [
@@ -200,14 +200,24 @@ export class Pattern {
   /* _TO_SVG_END_ */
 
   static async fromObject(
-    { type, source, ...serialized }: SerializedPatternOptions,
-    options?: Abortable
+    {
+      type,
+      source,
+      patternTransform,
+      ...otherOptions
+    }: SerializedPatternOptions,
+    options?: Abortable,
   ): Promise<Pattern> {
     const img = await loadImage(source, {
       ...options,
-      crossOrigin: serialized.crossOrigin,
+      crossOrigin: otherOptions.crossOrigin,
     });
-    return new this({ ...serialized, source: img });
+    return new this({
+      ...otherOptions,
+      patternTransform:
+        patternTransform && (patternTransform.slice(0) as TMat2D),
+      source: img,
+    });
   }
 }
 

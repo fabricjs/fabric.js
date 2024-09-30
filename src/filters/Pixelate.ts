@@ -76,7 +76,7 @@ export class Pixelate extends BaseFilter<'Pixelate', PixelateOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uBlocksize, this.blocksize);
   }

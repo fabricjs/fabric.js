@@ -65,7 +65,7 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uSaturation, -this.saturation);
   }

@@ -5,10 +5,9 @@ import { cloneDeepWith } from 'lodash';
 import { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
 
-type ExtendedOptions<T = unknown> =
-  | {
-      cloneDeepWith?: CloneDeepWithCustomizer<T>;
-    } & object;
+type ExtendedOptions<T = unknown> = {
+  cloneDeepWith?: CloneDeepWithCustomizer<T>;
+} & object;
 
 type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
   includeDefaultValues?: boolean;
@@ -27,13 +26,13 @@ expect.extend({
     this: any,
     received: any,
     propertiesOrHint?: ExtendedOptions,
-    hint?: string
+    hint?: string,
   ) {
     if (typeof received === 'string') {
       return toMatchSnapshot.call(
         this,
         received,
-        propertiesOrHint || hint || ''
+        propertiesOrHint || hint || '',
       );
     }
     const { cloneDeepWith: customizer, ...properties } = propertiesOrHint || {};
@@ -41,7 +40,7 @@ expect.extend({
       this,
       customizer ? cloneDeepWith(received, customizer) : received,
       properties,
-      hint
+      hint,
     );
   },
   toMatchObjectSnapshot(
@@ -52,7 +51,7 @@ expect.extend({
       includeDefaultValues,
       ...properties
     }: ObjectOptions = {},
-    hint?: string
+    hint?: string,
   ) {
     let snapshot: Record<string, any>;
     if (received instanceof FabricObject) {
@@ -76,7 +75,7 @@ expect.extend({
         }
       }),
       properties,
-      hint
+      hint,
     );
   },
   toEqualRoundedMatrix(actual: TMat2D, expected: TMat2D, precision = 10) {
@@ -84,9 +83,9 @@ expect.extend({
     return {
       message: () => {
         return `expected ${this.utils.printReceived(
-          actual
+          actual,
         )} to be rounded to ${this.utils.printExpected(
-          expected.map((x) => Math.round(x / error) * error)
+          expected.map((x) => Math.round(x / error) * error),
         )}`;
       },
       pass: actual.every((x, i) => Math.abs(x - expected[i]) < error),
@@ -111,11 +110,11 @@ declare global {
     interface AsymmetricMatchers {
       toMatchSnapshot(
         propertiesOrHint?: ExtendedOptions | string,
-        hint?: string
+        hint?: string,
       ): void;
       toMatchObjectSnapshot(
         propertiesOrHint?: ObjectOptions | string,
-        hint?: string
+        hint?: string,
       ): void;
       toEqualRoundedMatrix(expected: TMat2D, precision?: number): void;
     }
@@ -124,7 +123,7 @@ declare global {
         propertyMatchers: Partial<
           U & { cloneDeepWith: CloneDeepWithCustomizer<T> }
         >,
-        snapshotName?: string
+        snapshotName?: string,
       ): R;
       toMatchObjectSnapshot<U extends { [P in keyof T]: any }>(
         propertyMatchers?: Partial<
@@ -133,7 +132,7 @@ declare global {
             includeDefaultValues?: boolean;
           }
         >,
-        snapshotName?: string
+        snapshotName?: string,
       ): R;
       toEqualRoundedMatrix(expected: TMat2D, precision?: number): R;
     }

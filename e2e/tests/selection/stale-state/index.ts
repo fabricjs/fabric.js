@@ -23,5 +23,5 @@ beforeAll(
     canvas.add(rect1, rect2);
     return { rect1, rect2 };
   },
-  { enableRetinaScaling: false }
+  { enableRetinaScaling: false },
 );

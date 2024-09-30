@@ -7,7 +7,7 @@ const MAX_COMMENT_CHARS = 65536;
 function printSize(a, b) {
   const diff = b - a;
   return `${b.toFixed(3)} (**${Math.sign(diff) > 0 ? '+' : ''}${diff.toFixed(
-    diff !== 0 ? 3 : 0
+    diff !== 0 ? 3 : 0,
   )}**)`;
 }
 
@@ -29,7 +29,7 @@ export async function findCommentId(github, context) {
       direction: 'desc',
     });
     const found = response.data.find(
-      (comment) => !!comment.user && comment.body.startsWith(COMMENT_MARKER)
+      (comment) => !!comment.user && comment.body.startsWith(COMMENT_MARKER),
     )?.id;
     if (found) {
       return found;

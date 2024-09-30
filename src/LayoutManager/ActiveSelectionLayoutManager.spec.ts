@@ -22,7 +22,7 @@ describe('ActiveSelectionLayoutManager', () => {
       it('should subscribe activeSelection that contains object', () => {
         const manager = new ActiveSelectionLayoutManager();
         const object = new FabricObject();
-        const group = new Group([object], {
+        new Group([object], {
           interactive: true,
           subTargetCheck: true,
         });
@@ -57,11 +57,11 @@ describe('ActiveSelectionLayoutManager', () => {
         const asPerformLayout = jest.spyOn(as.layoutManager, 'performLayout');
         const groupPerformLayout = jest.spyOn(
           group.layoutManager,
-          'performLayout'
+          'performLayout',
         );
         const groupPerformLayout2 = jest.spyOn(
           group2.layoutManager,
-          'performLayout'
+          'performLayout',
         );
         groupPerformLayout.mockClear();
         groupPerformLayout2.mockClear();

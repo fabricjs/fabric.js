@@ -94,11 +94,11 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
   sendUniformData(
     this: ResizeDuringWEBGLResize,
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform2fv(
       uniformLocations.uDelta,
-      this.horizontal ? [1 / this.width, 0] : [0, 1 / this.height]
+      this.horizontal ? [1 / this.width, 0] : [0, 1 / this.height],
     );
     gl.uniform1fv(uniformLocations.uTaps, this.taps);
   }
@@ -152,7 +152,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
             (offset, i) => `
               color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
               sum += 2.0 * uTaps[${i}];
-            `
+            `,
           )
           .join('\n')}
         gl_FragColor = color / sum;
@@ -263,7 +263,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
     oW: number,
     oH: number,
     dW: number,
-    dH: number
+    dH: number,
   ) {
     const imageData = options.imageData;
     const mult = 0.5;
@@ -329,7 +329,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
     oW: number,
     oH: number,
     dW: number,
-    dH: number
+    dH: number,
   ): ImageData {
     function process(u: number): ImageData {
       let v, i, weight, idx, a, red, green, blue, alpha, fX, fY;
@@ -359,8 +359,8 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
             if (!cacheLanc[fX][fY]) {
               cacheLanc[fX][fY] = lanczos(
                 Math.sqrt(
-                  Math.pow(fX * rcpRatioX, 2) + Math.pow(fY * rcpRatioY, 2)
-                ) / 1000
+                  Math.pow(fX * rcpRatioX, 2) + Math.pow(fY * rcpRatioY, 2),
+                ) / 1000,
               );
             }
             weight = cacheLanc[fX][fY];
@@ -420,7 +420,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
     oW: number,
     oH: number,
     dW: number,
-    dH: number
+    dH: number,
   ) {
     let a;
     let b;
@@ -483,7 +483,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
     oW: number,
     oH: number,
     dW: number,
-    dH: number
+    dH: number,
   ) {
     const ratioW = this.rcpScaleX,
       ratioH = this.rcpScaleY,

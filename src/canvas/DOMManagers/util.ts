@@ -5,13 +5,12 @@ import {
   getWindowFromElement,
   getScrollLeftTop,
 } from '../../util/dom_misc';
-import { setStyle } from '../../util/dom_style';
 
 export const setCanvasDimensions = (
   el: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   { width, height }: TSize,
-  retinaScaling = 1
+  retinaScaling = 1,
 ) => {
   el.width = width;
   el.height = height;
@@ -22,14 +21,6 @@ export const setCanvasDimensions = (
   }
 };
 
-export function allowTouchScrolling(element: HTMLElement, allow: boolean) {
-  const touchAction = allow ? 'manipulation' : NONE;
-  setStyle(element, {
-    'touch-action': touchAction,
-    '-ms-touch-action': touchAction,
-  });
-}
-
 export type CSSDimensions = {
   width: number | string;
   height: number | string;
@@ -37,7 +28,7 @@ export type CSSDimensions = {
 
 export const setCSSDimensions = (
   el: HTMLElement,
-  { width, height }: Partial<CSSDimensions>
+  { width, height }: Partial<CSSDimensions>,
 ) => {
   width && (el.style.width = typeof width === 'number' ? `${width}px` : width);
   height &&

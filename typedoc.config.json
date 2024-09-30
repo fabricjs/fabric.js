@@ -1,5 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "./tsconfig.json",
-  "exclude": ["dist", "test", "e2e", "src/**/*.test.ts", "src/**/*.spec.ts"]
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "test",
+    "e2e",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

@@ -16,7 +16,7 @@ export const dragHandler: TransformActionHandler = (
   eventData,
   transform,
   x,
-  y
+  y,
 ) => {
   const { target, offsetX, offsetY } = transform,
     newLeft = x - offsetX,
