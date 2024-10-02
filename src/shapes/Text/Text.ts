@@ -1790,12 +1790,24 @@ export class FabricText<
     return 1;
   }
 
+  /**
+   * List of generic font families
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family#generic-name
+   */
   static genericFonts = [
-    'sans-serif',
     'serif',
+    'sans-serif',
+    'monospace',
     'cursive',
     'fantasy',
-    'monospace',
+    'system-ui',
+    'ui-serif',
+    'ui-sans-serif',
+    'ui-monospace',
+    'ui-rounded',
+    'math',
+    'emoji',
+    'fangsong',
   ];
 
   /* _FROM_SVG_START_ */
