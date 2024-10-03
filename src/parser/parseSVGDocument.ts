@@ -54,7 +54,6 @@ export async function parseSVGDocument(
       crossOrigin,
       signal,
     };
-
   const elements = descendants.filter((el) => {
     applyViewboxTransform(el);
     return isValidSvgTag(el) && !hasInvalidAncestor(el); // http://www.w3.org/TR/SVG/struct.html#DefsElement
