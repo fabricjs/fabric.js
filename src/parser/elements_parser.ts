@@ -147,6 +147,7 @@ export class ElementsParser {
       let clipPathOwner = usingElement;
       while (
         clipPathOwner.parentElement &&
+        clipPathOwner.getAttribute('clip-path') &&
         clipPathOwner.getAttribute('clip-path') !== obj.clipPath
       ) {
         clipPathOwner = clipPathOwner.parentElement;

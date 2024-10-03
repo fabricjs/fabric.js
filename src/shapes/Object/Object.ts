@@ -140,7 +140,7 @@ type toDataURLOptions = ObjectToCanvasElementOptions & {
 
 export type DrawContext =
   | {
-      parentClipPath?: FabricObject;
+      parentClipPaths: FabricObject[];
       width: number;
       height: number;
       cacheTranslationX: number;
@@ -743,6 +743,7 @@ export class FabricObject<
         cacheTranslationY,
         width,
         height,
+        parentClipPaths: [],
       });
       this.dirty = false;
     }
@@ -897,16 +898,11 @@ export class FabricObject<
     ctx.translate(context.cacheTranslationX, context.cacheTranslationY);
     ctx.scale(context.zoomX, context.zoomY);
     clipPath._cacheCanvas = canvas;
-    if (context.parentClipPath) {
-      context.parentClipPath.transform(ctx);
-    }
-    if (clipPath.clipPath) {
-      context.parentClipPath = clipPath;
-    } else {
-      context.parentClipPath = undefined;
-    }
+    context.parentClipPaths.forEach((prevClipPath) => {
+      prevClipPath.transform(ctx);
+    });
+    context.parentClipPaths.push(clipPath);
     if (clipPath.absolutePositioned) {
-      // needs fixes?
       const m = invertTransform(this.calcTransformMatrix());
       ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
