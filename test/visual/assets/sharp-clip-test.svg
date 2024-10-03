@@ -1,4 +1,4 @@
-<svg class="star-svg" viewBox="4 2 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/2000/xlink" width="400px" height="400px">
+<svg class="star-svg" width="300" height="300" viewBox="4 2 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/2000/xlink" width="400px" height="400px">
     <clipPath id="t">
         <circle r="0.05" transform="translate(5, 7) scale(140, 140)"  cx="0.001" cy="0.001" />
     </clipPath>

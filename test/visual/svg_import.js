@@ -43,6 +43,8 @@
   QUnit.module('Simple svg import test');
 
   var tests = [
+    'sharp-clip-test',
+    'sharp-clip-test2',
     'svg_stroke_1',
     'svg_stroke_2',
     'svg_stroke_3',
@@ -103,8 +105,6 @@
     'seaClipPath',
     'use-and-style',
     'use-svg-style-2',
-    'sharp-clip-test',
-    'sharp-clip-test2',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
