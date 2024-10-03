@@ -1612,14 +1612,10 @@ const createImage = () => getFabricDocument().createElement('img');
  */
 const copyCanvasElement = canvas => {
   var _newCanvas$getContext;
-  const newCanvas = createCanvasElementFor(canvas);
-  (_newCanvas$getContext = newCanvas.getContext('2d')) === null || _newCanvas$getContext === void 0 || _newCanvas$getContext.drawImage(canvas, 0, 0);
-  return newCanvas;
-};
-const createCanvasElementFor = canvas => {
   const newCanvas = createCanvasElement();
   newCanvas.width = canvas.width;
   newCanvas.height = canvas.height;
+  (_newCanvas$getContext = newCanvas.getContext('2d')) === null || _newCanvas$getContext === void 0 || _newCanvas$getContext.drawImage(canvas, 0, 0);
   return newCanvas;
 };
 
@@ -4141,7 +4137,9 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    */
   cloneWithoutData() {
-    const el = createCanvasElementFor(this);
+    const el = createCanvasElement();
+    el.width = this.width;
+    el.height = this.height;
     return new this.constructor(el);
   }
 
@@ -4230,11 +4228,10 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
       translateY = (vp[5] - (top || 0)) * multiplier,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
       originalRetina = this.enableRetinaScaling,
-      canvasEl = createCanvasElementFor({
-        width: scaledWidth,
-        height: scaledHeight
-      }),
+      canvasEl = createCanvasElement(),
       objectsToRender = filter ? this._objects.filter(obj => filter(obj)) : this._objects;
+    canvasEl.width = scaledWidth;
+    canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;
@@ -7123,7 +7120,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       this.drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.drawObject(ctx, false, {});
+      this.drawObject(ctx);
       this.dirty = false;
     }
     ctx.restore();
@@ -7137,25 +7134,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      const {
-        zoomX,
-        zoomY,
-        cacheTranslationX,
-        cacheTranslationY
-      } = this;
-      const {
-        width,
-        height
-      } = this._cacheCanvas;
-      this.drawObject(this._cacheContext, options.forClipping, {
-        zoomX,
-        zoomY,
-        cacheTranslationX,
-        cacheTranslationY,
-        width,
-        height,
-        parentClipPaths: []
-      });
+      this.drawObject(this._cacheContext, options.forClipping);
       this.dirty = false;
     }
   }
@@ -7243,7 +7222,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {FabricObject} clipPath
    */
-  drawClipPathOnCache(ctx, clipPath, canvasWithClipPath) {
+  drawClipPathOnCache(ctx, clipPath) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
     // ctx.globalAlpha = 0.4
@@ -7252,9 +7231,14 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
     } else {
       ctx.globalCompositeOperation = 'destination-in';
     }
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
     //ctx.scale(1 / 2, 1 / 2);
-    ctx.drawImage(canvasWithClipPath, 0, 0);
+    if (clipPath.absolutePositioned) {
+      const m = invertTransform(this.calcTransformMatrix());
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    }
+    clipPath.transform(ctx);
+    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
+    ctx.drawImage(clipPath._cacheCanvas, -clipPath.cacheTranslationX, -clipPath.cacheTranslationY);
     ctx.restore();
   }
 
@@ -7262,9 +7246,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {boolean} forClipping apply clipping styles
-   * @param {DrawContext} context additional context for rendering
    */
-  drawObject(ctx, forClipping, context) {
+  drawObject(ctx, forClipping) {
     const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
@@ -7275,27 +7258,9 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       this._renderBackground(ctx);
     }
     this._render(ctx);
-    this._drawClipPath(ctx, this.clipPath, context);
+    this._drawClipPath(ctx, this.clipPath);
     this.fill = originalFill;
     this.stroke = originalStroke;
-  }
-  createClipPathLayer(clipPath, context) {
-    const canvas = createCanvasElementFor(context);
-    const ctx = canvas.getContext('2d');
-    ctx.translate(context.cacheTranslationX, context.cacheTranslationY);
-    ctx.scale(context.zoomX, context.zoomY);
-    clipPath._cacheCanvas = canvas;
-    context.parentClipPaths.forEach(prevClipPath => {
-      prevClipPath.transform(ctx);
-    });
-    context.parentClipPaths.push(clipPath);
-    if (clipPath.absolutePositioned) {
-      const m = invertTransform(this.calcTransformMatrix());
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    }
-    clipPath.transform(ctx);
-    clipPath.drawObject(ctx, true, context);
-    return canvas;
   }
 
   /**
@@ -7303,17 +7268,20 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
    */
-  _drawClipPath(ctx, clipPath, context) {
+  _drawClipPath(ctx, clipPath) {
     if (!clipPath) {
       return;
     }
     // needed to setup a couple of variables
     // path canvas gets overridden with this one.
     // TODO find a better solution?
+    clipPath._set('canvas', this.canvas);
     clipPath.shouldCache();
     clipPath._transformDone = true;
-    const canvas = this.createClipPathLayer(clipPath, context);
-    this.drawClipPathOnCache(ctx, clipPath, canvas);
+    clipPath.renderCache({
+      forClipping: true
+    });
+    this.drawClipPathOnCache(ctx, clipPath);
   }
 
   /**
@@ -7585,15 +7553,14 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   _applyPatternForTransformedGradient(ctx, filler) {
     var _pCtx$createPattern;
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
+      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling,
-      pCanvas = createCanvasElementFor({
-        // in case width and height are less than 1px, we have to round up.
-        // since the pattern is no-repeat, this is fine
-        width: Math.ceil(width),
-        height: Math.ceil(height)
-      });
+      height = dims.y / this.scaleY / retinaScaling;
+    // in case width and height are less than 1px, we have to round up.
+    // since the pattern is no-repeat, this is fine
+    pCanvas.width = Math.ceil(width);
+    pCanvas.height = Math.ceil(height);
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
@@ -11410,6 +11377,7 @@ const _excluded$a = ["type", "objects", "layoutManager"];
  * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
  */
 class NoopLayoutManager extends LayoutManager {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   performLayout() {}
 }
 const groupDefaultValues = {
@@ -11793,22 +11761,21 @@ class Group extends createCollectionMixin(FabricObject) {
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawObject(ctx, forClipping, context) {
+  drawObject(ctx) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
       var _this$canvas;
-      const obj = this._objects[i];
       // TODO: handle rendering edge case somehow
-      if ((_this$canvas = this.canvas) !== null && _this$canvas !== void 0 && _this$canvas.preserveObjectStacking && obj.group !== this) {
+      if ((_this$canvas = this.canvas) !== null && _this$canvas !== void 0 && _this$canvas.preserveObjectStacking && this._objects[i].group !== this) {
         ctx.save();
         ctx.transform(...invertTransform(this.calcTransformMatrix()));
-        obj.render(ctx);
+        this._objects[i].render(ctx);
         ctx.restore();
-      } else if (obj.group === this) {
-        obj.render(ctx);
+      } else if (this._objects[i].group === this) {
+        this._objects[i].render(ctx);
       }
     }
-    this._drawClipPath(ctx, this.clipPath, context);
+    this._drawClipPath(ctx, this.clipPath);
   }
 
   /**
@@ -18947,10 +18914,8 @@ let measuringContext;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    const canvas = createCanvasElementFor({
-      width: 0,
-      height: 0
-    });
+    const canvas = createCanvasElement();
+    canvas.width = canvas.height = 0;
     measuringContext = canvas.getContext('2d');
   }
   return measuringContext;
@@ -19683,13 +19648,10 @@ class FabricText extends StyledText {
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
   _applyPatternGradientTransformText(filler) {
-    // TODO: verify compatibility with strokeUniform
-    const width = this.width + this.strokeWidth,
+    const pCanvas = createCanvasElement(),
+      // TODO: verify compatibility with strokeUniform
+      width = this.width + this.strokeWidth,
       height = this.height + this.strokeWidth,
-      pCanvas = createCanvasElementFor({
-        width,
-        height
-      }),
       pCtx = pCanvas.getContext('2d');
     pCanvas.width = width;
     pCanvas.height = height;
@@ -23832,10 +23794,9 @@ class WebGLFilterBackend {
    * class properties to the GLFilterBackend class.
    */
   createWebGLCanvas(width, height) {
-    const canvas = createCanvasElementFor({
-      width,
-      height
-    });
+    const canvas = createCanvasElement();
+    canvas.width = width;
+    canvas.height = height;
     const glOptions = {
         alpha: true,
         premultipliedAlpha: false,
@@ -24465,15 +24426,15 @@ class FabricImage extends FabricObject {
       this._lastScaleY = scaleY;
       return;
     }
-    const canvasEl = createCanvasElementFor(elementToFilter),
-      {
-        width,
-        height
-      } = elementToFilter;
+    const canvasEl = createCanvasElement(),
+      sourceWidth = elementToFilter.width,
+      sourceHeight = elementToFilter.height;
+    canvasEl.width = sourceWidth;
+    canvasEl.height = sourceHeight;
     this._element = canvasEl;
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
-    getFilterBackend().applyFilters([filter], elementToFilter, width, height, this._element);
+    getFilterBackend().applyFilters([filter], elementToFilter, sourceWidth, sourceHeight, this._element);
     this._filterScalingX = canvasEl.width / this._originalElement.width;
     this._filterScalingY = canvasEl.height / this._originalElement.height;
   }
@@ -24505,10 +24466,9 @@ class FabricImage extends FabricObject {
     if (this._element === this._originalElement) {
       // if the _element a reference to _originalElement
       // we need to create a new element to host the filtered pixels
-      const canvasEl = createCanvasElementFor({
-        width: sourceWidth,
-        height: sourceHeight
-      });
+      const canvasEl = createCanvasElement();
+      canvasEl.width = sourceWidth;
+      canvasEl.height = sourceHeight;
       this._element = canvasEl;
       this._filteredEl = canvasEl;
     } else if (this._filteredEl) {
@@ -25189,7 +25149,7 @@ class ElementsParser {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
       const clipPathTag = clipPathElements[0].parentElement;
       let clipPathOwner = usingElement;
-      while (clipPathOwner.parentElement && clipPathOwner.getAttribute('clip-path') && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
+      while (clipPathOwner.parentElement && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
         clipPathOwner = clipPathOwner.parentElement;
       }
       // move the clipPath tag as sibling to the real element that is using it
@@ -25626,10 +25586,7 @@ const isWebGLPipelineState = options => {
  * putImageData is faster than drawImage for that specific operation.
  */
 const isPutImageFaster = (width, height) => {
-  const targetCanvas = createCanvasElementFor({
-    width,
-    height
-  });
+  const targetCanvas = createCanvasElement();
   const sourceCanvas = createCanvasElement();
   const gl = sourceCanvas.getContext('webgl');
   // eslint-disable-next-line no-undef
@@ -25643,6 +25600,8 @@ const isPutImageFaster = (width, height) => {
     targetCanvas: targetCanvas
   };
   let startTime;
+  targetCanvas.width = width;
+  targetCanvas.height = height;
   startTime = getFabricWindow().performance.now();
   WebGLFilterBackend.prototype.copyGLTo2D.call(testContext, gl, testPipelineState);
   const drawImageTime = getFabricWindow().performance.now() - startTime;
@@ -25930,14 +25889,9 @@ class BaseFilter {
    */
   createHelpLayer(options) {
     if (!options.helpLayer) {
-      const {
-        sourceWidth,
-        sourceHeight
-      } = options;
-      const helpLayer = createCanvasElementFor({
-        width: sourceWidth,
-        height: sourceHeight
-      });
+      const helpLayer = createCanvasElement();
+      helpLayer.width = options.sourceWidth;
+      helpLayer.height = options.sourceHeight;
       options.helpLayer = helpLayer;
     }
   }
