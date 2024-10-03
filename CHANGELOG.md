@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [6.4.3]
 
 - fix(FabricObject): Render clipPath as sharp as the object [#9774](https://github.com/fabricjs/fabric.js/pull/9774)
 - fix(Controls): changeWidth can change width with decimals [#10186](https://github.com/fabricjs/fabric.js/pull/10186)
