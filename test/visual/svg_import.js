@@ -103,6 +103,8 @@
     'seaClipPath',
     'use-and-style',
     'use-svg-style-2',
+    'sharp-clip-test',
+    'sharp-clip-test2',
   ].map(createTestFromSVG);
 
   tests.forEach(visualTestLoop(QUnit));
