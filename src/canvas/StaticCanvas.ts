@@ -585,6 +585,7 @@ export class StaticCanvas<
     if (path) {
       path._set('canvas', this);
       // needed to setup a couple of variables
+      // todo migrate to the newer one
       path.shouldCache();
       path._transformDone = true;
       (path as TCachedFabricObject).renderCache({ forClipping: true });

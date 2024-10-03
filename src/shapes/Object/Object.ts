@@ -924,10 +924,8 @@ export class FabricObject<
     if (!clipPath) {
       return;
     }
-    // needed to setup a couple of variables
-    // path canvas gets overridden with this one.
+    // needed to setup _transformDone
     // TODO find a better solution?
-    clipPath.shouldCache();
     clipPath._transformDone = true;
     const canvas = (this as TCachedFabricObject).createClipPathLayer(
       clipPath,
