@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Controls): changeWidth can change width with decimals [#10186](https://github.com/fabricjs/fabric.js/pull/10186)
 - ci(): Add some prebuilt fabric in the dist folder [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
 - chore(): Add more generic font families to FabricText.genericFonts [#10167](https://github.com/fabricjs/fabric.js/pull/10167)
 
