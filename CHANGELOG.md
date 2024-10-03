@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [6.4.3]
 
 - fix(Controls): changeWidth can change width with decimals [#10186](https://github.com/fabricjs/fabric.js/pull/10186)
 - ci(): Add some prebuilt fabric in the dist folder [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
