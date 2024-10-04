@@ -625,12 +625,19 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this._onMouseDown as EventListener,
     );
   }
-
+  _checkMouseClick(e: MouseEvent) {
+    const button = e.button;
+    if (button == 1) return this.fireMiddleClick
+    if (button == 2) return this.fireRightClick
+    return true;
+  }
   /**
    * @private
    * @param {Event} e Event object fired on mousedown
    */
   _onMouseDown(e: TPointerEvent) {
+    const b = this._checkMouseClick(e as MouseEvent);
+    if (!b) return;
     this.__onMouseDown(e);
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
@@ -697,6 +704,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mouseup
    */
   _onMouseUp(e: TPointerEvent) {
+    const b = this._checkMouseClick(e as MouseEvent);
+    if (!b) return;
     this.__onMouseUp(e);
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
@@ -728,6 +737,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousemove
    */
   _onMouseMove(e: TPointerEvent) {
+    const b = this._checkMouseClick(e as MouseEvent);
+    if (!b) return;
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
       (!activeObject ||
@@ -777,17 +788,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const transform = this._currentTransform;
     const isClick = this._isClick;
     const target = this._target;
-
-    // if right/middle click just fire events and return
-    // target undefined will make the _handleEvent search the target
-    const { button } = e as MouseEvent;
-    if (button) {
-      ((this.fireMiddleClick && button === 1) ||
-        (this.fireRightClick && button === 2)) &&
-        this._handleEvent(e, 'up');
-      this._resetTransformEventData();
-      return;
-    }
 
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
       this._onMouseUpInDrawingMode(e);
@@ -988,16 +988,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._handleEvent(e, 'down:before');
 
     let target: FabricObject | undefined = this._target;
-
-    // if right/middle click just fire events
-    const { button } = e as MouseEvent;
-    if (button) {
-      ((this.fireMiddleClick && button === 1) ||
-        (this.fireRightClick && button === 2)) &&
-        this._handleEvent(e, 'down');
-      this._resetTransformEventData();
-      return;
-    }
 
     if (this.isDrawingMode) {
       this._onMouseDownInDrawingMode(e);
