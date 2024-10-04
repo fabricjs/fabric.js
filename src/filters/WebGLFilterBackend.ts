@@ -1,5 +1,5 @@
 import { config } from '../config';
-import { createCanvasElement } from '../util/misc/dom';
+import { createCanvasElementFor } from '../util/misc/dom';
 import type {
   TWebGLPipelineState,
   TProgramCache,
@@ -72,9 +72,7 @@ export class WebGLFilterBackend {
    * class properties to the GLFilterBackend class.
    */
   createWebGLCanvas(width: number, height: number): void {
-    const canvas = createCanvasElement();
-    canvas.width = width;
-    canvas.height = height;
+    const canvas = createCanvasElementFor({ width, height });
     const glOptions = {
         alpha: true,
         premultipliedAlpha: false,

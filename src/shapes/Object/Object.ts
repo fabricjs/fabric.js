@@ -27,7 +27,11 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { capValue } from '../../util/misc/capValue';
-import { createCanvasElement, toDataURL } from '../../util/misc/dom';
+import {
+  createCanvasElement,
+  createCanvasElementFor,
+  toDataURL,
+} from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
@@ -133,6 +137,18 @@ export type ObjectToCanvasElementOptions = {
 type toDataURLOptions = ObjectToCanvasElementOptions & {
   quality?: number;
 };
+
+export type DrawContext =
+  | {
+      parentClipPaths: FabricObject[];
+      width: number;
+      height: number;
+      cacheTranslationX: number;
+      cacheTranslationY: number;
+      zoomX: number;
+      zoomY: number;
+    }
+  | Record<string, never>;
 
 /**
  * Root object class from which all 2d shape classes inherit from
@@ -698,11 +714,11 @@ export class FabricObject<
     this._setOpacity(ctx);
     this._setShadow(ctx);
     if (this.shouldCache()) {
-      this.renderCache();
+      (this as TCachedFabricObject).renderCache();
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.drawObject(ctx);
+      this.drawObject(ctx, false, {});
       this.dirty = false;
     }
     ctx.restore();
@@ -712,13 +728,23 @@ export class FabricObject<
     /* no op */
   }
 
-  renderCache(options?: any) {
+  renderCache(this: TCachedFabricObject, options?: any) {
     options = options || {};
     if (!this._cacheCanvas || !this._cacheContext) {
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.drawObject(this._cacheContext, options.forClipping);
+      const { zoomX, zoomY, cacheTranslationX, cacheTranslationY } = this;
+      const { width, height } = this._cacheCanvas;
+      this.drawObject(this._cacheContext, options.forClipping, {
+        zoomX,
+        zoomY,
+        cacheTranslationX,
+        cacheTranslationY,
+        width,
+        height,
+        parentClipPaths: [],
+      });
       this.dirty = false;
     }
   }
@@ -819,7 +845,8 @@ export class FabricObject<
    */
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject,
+    clipPath: FabricObject,
+    canvasWithClipPath: HTMLCanvasElement,
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -829,18 +856,9 @@ export class FabricObject<
     } else {
       ctx.globalCompositeOperation = 'destination-in';
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     //ctx.scale(1 / 2, 1 / 2);
-    if (clipPath.absolutePositioned) {
-      const m = invertTransform(this.calcTransformMatrix());
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    }
-    clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-    ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY,
-    );
+    ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
 
@@ -848,8 +866,13 @@ export class FabricObject<
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {boolean} forClipping apply clipping styles
+   * @param {DrawContext} context additional context for rendering
    */
-  drawObject(ctx: CanvasRenderingContext2D, forClipping?: boolean) {
+  drawObject(
+    ctx: CanvasRenderingContext2D,
+    forClipping: boolean | undefined,
+    context: DrawContext,
+  ) {
     const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
@@ -860,9 +883,32 @@ export class FabricObject<
       this._renderBackground(ctx);
     }
     this._render(ctx);
-    this._drawClipPath(ctx, this.clipPath);
+    this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
     this.stroke = originalStroke;
+  }
+
+  private createClipPathLayer(
+    this: TCachedFabricObject,
+    clipPath: FabricObject,
+    context: DrawContext,
+  ) {
+    const canvas = createCanvasElementFor(context as TSize);
+    const ctx = canvas.getContext('2d')!;
+    ctx.translate(context.cacheTranslationX, context.cacheTranslationY);
+    ctx.scale(context.zoomX, context.zoomY);
+    clipPath._cacheCanvas = canvas;
+    context.parentClipPaths.forEach((prevClipPath) => {
+      prevClipPath.transform(ctx);
+    });
+    context.parentClipPaths.push(clipPath);
+    if (clipPath.absolutePositioned) {
+      const m = invertTransform(this.calcTransformMatrix());
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    }
+    clipPath.transform(ctx);
+    clipPath.drawObject(ctx, true, context);
+    return canvas;
   }
 
   /**
@@ -870,18 +916,22 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
    */
-  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
+  _drawClipPath(
+    ctx: CanvasRenderingContext2D,
+    clipPath: FabricObject | undefined,
+    context: DrawContext,
+  ) {
     if (!clipPath) {
       return;
     }
-    // needed to setup a couple of variables
-    // path canvas gets overridden with this one.
+    // needed to setup _transformDone
     // TODO find a better solution?
-    clipPath._set('canvas', this.canvas);
-    clipPath.shouldCache();
     clipPath._transformDone = true;
-    clipPath.renderCache({ forClipping: true });
-    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
+    const canvas = (this as TCachedFabricObject).createClipPathLayer(
+      clipPath,
+      context,
+    );
+    this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
   /**
@@ -1184,14 +1234,16 @@ export class FabricObject<
     filler: TFiller,
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
-    // in case width and height are less than 1px, we have to round up.
-    // since the pattern is no-repeat, this is fine
-    pCanvas.width = Math.ceil(width);
-    pCanvas.height = Math.ceil(height);
+      height = dims.y / this.scaleY / retinaScaling,
+      pCanvas = createCanvasElementFor({
+        // in case width and height are less than 1px, we have to round up.
+        // since the pattern is no-repeat, this is fine
+        width: Math.ceil(width),
+        height: Math.ceil(height),
+      });
+
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
