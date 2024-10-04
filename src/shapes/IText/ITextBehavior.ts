@@ -387,7 +387,7 @@ export abstract class ITextBehavior<
     if (this.isEditing || !this.editable) {
       return;
     }
-    this._enterEditing();
+    this.enterEditingImpl();
     this.fire('editing:entered', e ? { e } : undefined);
     this._fireSelectionChanged();
     if (this.canvas) {
@@ -402,7 +402,7 @@ export abstract class ITextBehavior<
   /**
    * runs the actual logic that enter from editing state, see {@link enterEditing}
    */
-  protected _enterEditing() {
+  enterEditingImpl() {
     if (this.canvas) {
       this.canvas.calcOffset();
       this.canvas.textEditingManager.exitTextEditing();
