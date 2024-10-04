@@ -405,7 +405,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.4.2";
+var version = "6.4.3";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -8227,8 +8227,8 @@ const changeObjectWidth = (eventData, transform, x, y) => {
       strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
       multiplier = isTransformCentered(transform) ? 2 : 1,
       oldWidth = target.width,
-      newWidth = Math.ceil(Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding);
-    target.set('width', Math.max(newWidth, 0));
+      newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
+    target.set('width', Math.max(newWidth, 1));
     //  check against actual target width in case `newWidth` was rejected
     return oldWidth !== target.width;
   }
@@ -20032,6 +20032,12 @@ class FabricText extends StyledText {
   complexity() {
     return 1;
   }
+
+  /**
+   * List of generic font families
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/font-family#generic-name
+   */
+
   /**
    * Returns FabricText instance from an SVG element (<b>not yet implemented</b>)
    * @static
@@ -20116,7 +20122,7 @@ _defineProperty(FabricText, "textLayoutProperties", textLayoutProperties);
 _defineProperty(FabricText, "cacheProperties", [...cacheProperties, ...additionalProps]);
 _defineProperty(FabricText, "ownDefaults", textDefaultValues);
 _defineProperty(FabricText, "type", 'Text');
-_defineProperty(FabricText, "genericFonts", ['sans-serif', 'serif', 'cursive', 'fantasy', 'monospace']);
+_defineProperty(FabricText, "genericFonts", ['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded', 'math', 'emoji', 'fangsong']);
 /* _FROM_SVG_START_ */
 /**
  * List of attribute names to account for when parsing SVG element (used by {@link FabricText.fromElement})

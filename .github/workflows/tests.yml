@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.suite == 'unit'
-        run: npm run test:coverage
+        run: npm run test:coverage && sleep 5
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.suite == 'visual'
         run: npm run test:visual:coverage
@@ -49,6 +49,7 @@ jobs:
         with:
           name: coverage-${{ matrix.suite }}
           path: .nyc_output/*.json
+
   browser:
     needs: [prime-build]
     name: ${{ matrix.target }} ${{ matrix.suite }} tests

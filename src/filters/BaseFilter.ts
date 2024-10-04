@@ -1,5 +1,4 @@
 import { getEnv } from '../env';
-import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
   TWebGLAttributeLocationMap,
@@ -15,6 +14,7 @@ import {
 } from './shaders/baseFilter';
 import type { Abortable } from '../typedefs';
 import { FabricError } from '../util/internals/console';
+import { createCanvasElementFor } from '../util/misc/dom';
 
 const regex = new RegExp(highPsourceCode, 'g');
 
@@ -368,9 +368,11 @@ export class BaseFilter<
    */
   createHelpLayer(options: T2DPipelineState) {
     if (!options.helpLayer) {
-      const helpLayer = createCanvasElement();
-      helpLayer.width = options.sourceWidth;
-      helpLayer.height = options.sourceHeight;
+      const { sourceWidth, sourceHeight } = options;
+      const helpLayer = createCanvasElementFor({
+        width: sourceWidth,
+        height: sourceHeight,
+      });
       options.helpLayer = helpLayer;
     }
   }

@@ -3,7 +3,14 @@
 ## [next]
 
 - update(IText): Add method enterEditingImpl that executes the logic of enterEditing without events [#10187](https://github.com/fabricjs/fabric.js/issues/10187)
+- fix(FabricObject): Fix clipPath blurryness with scale [#9774](https://github.com/fabricjs/fabric.js/pull/9774)
+
+## [6.4.3]
+
+- fix(FabricObject): Render clipPath as sharp as the object [#9774](https://github.com/fabricjs/fabric.js/pull/9774)
+- fix(Controls): changeWidth can change width with decimals [#10186](https://github.com/fabricjs/fabric.js/pull/10186)
 - ci(): Add some prebuilt fabric in the dist folder [#10178](https://github.com/fabricjs/fabric.js/pull/10178)
+- chore(): Add more generic font families to FabricText.genericFonts [#10167](https://github.com/fabricjs/fabric.js/pull/10167)
 
 ## [6.4.2]
 

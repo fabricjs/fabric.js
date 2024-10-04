@@ -22,8 +22,10 @@
       getAsset(svgName, function(err, string) {
         fabric.loadSVGFromString(string).then(({ objects, options }) => {
           // something is disabling objectCaching and i cannot find where it is.
-          var group = fabric.util.groupSVGElements(objects, options);
-          canvas.setDimensions({ width: group.width + group.left, height: group.height + group.top });
+          var nonNullObj = objects.filter(obj => !!obj);
+          var group = fabric.util.groupSVGElements(nonNullObj, options);
+          var dims = group._getTransformedDimensions()
+          canvas.setDimensions({ width: dims.x + group.left, height: dims.y + group.top });
           group.includeDefaultValues = false;
           canvas.includeDefaultValues = false;
           canvas.add(group);
@@ -43,6 +45,8 @@
   QUnit.module('Simple svg import test');
 
   var tests = [
+    'sharp-clip-test',
+    'sharp-clip-test2',
     'svg_stroke_1',
     'svg_stroke_2',
     'svg_stroke_3',
@@ -80,7 +84,7 @@
     'vector-effect',
     'svg-with-no-dim-rect',
     'notoemoji-person',
-    // 'clippath-8',
+    'clippath-8',
     'emoji-b',
     'gold-logo',
     'svg_missing_clippath',
