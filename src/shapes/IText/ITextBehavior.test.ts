@@ -193,3 +193,33 @@ describe('IText _tick', () => {
     expect(_tickMock).toHaveBeenCalledWith(0);
   });
 });
+
+describe("Itext enterEditing and exitEditing", () => {
+  let iText: IText;
+  const enterMock = jest.fn();
+  const exitMock = jest.fn();
+  
+  beforeEach(() => {
+    iText = new IText('some word');
+    iText.on("editing:entered", enterMock);
+    iText.on("editing:exited", exitMock);
+  });
+  afterEach(() => {
+    iText.dispose();
+    enterMock.mockClear();
+    exitMock.mockClear();
+  });
+
+  test("Entering and leaving edit triggers the listener", () => {
+    iText.enterEditing();
+    expect(enterMock).toHaveBeenCalledTimes(1);
+    iText.exitEditing();
+    expect(exitMock).toHaveBeenCalledTimes(1);
+  });
+  test("Entering and leaving edit does not trigger the listener", () => {
+    iText.enterEditingImpl();
+    expect(enterMock).toHaveBeenCalledTimes(0);
+    iText.exitEditingImpl();
+    expect(exitMock).toHaveBeenCalledTimes(0);
+  })
+});
