@@ -106,6 +106,9 @@ describe('IText cursor animation snapshot', () => {
       });
     jest.useFakeTimers();
   });
+  afterAll(() => {
+    ValueAnimation.prototype.calculate = origCalculate;
+  });
   beforeEach(() => {
     jest.runAllTimers();
     currentAnimation = [];
@@ -191,5 +194,34 @@ describe('IText _tick', () => {
       },
     });
     expect(_tickMock).toHaveBeenCalledWith(0);
+  });
+});
+
+describe('Itext enterEditing and exitEditing', () => {
+  const enterMock = jest.fn();
+  const exitMock = jest.fn();
+
+  afterEach(() => {
+    enterMock.mockClear();
+    exitMock.mockClear();
+  });
+
+  test('Entering and leaving edit triggers the listener', () => {
+    const iText = new IText('some word');
+    iText.on('editing:entered', enterMock);
+    iText.on('editing:exited', exitMock);
+    iText.enterEditing();
+    expect(enterMock).toHaveBeenCalledTimes(1);
+    iText.exitEditing();
+    expect(exitMock).toHaveBeenCalledTimes(1);
+  });
+  test('Entering and leaving edit does not trigger the listener', () => {
+    const iText = new IText('some word');
+    iText.on('editing:entered', enterMock);
+    iText.on('editing:exited', exitMock);
+    iText.enterEditingImpl();
+    expect(enterMock).toHaveBeenCalledTimes(0);
+    iText.exitEditingImpl();
+    expect(exitMock).toHaveBeenCalledTimes(0);
   });
 });
