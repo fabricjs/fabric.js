@@ -676,8 +676,11 @@ export abstract class ITextBehavior<
 
   /**
    * runs the actual logic that exits from editing state, see {@link exitEditing}
+   * Please use exitEditingImpl, this function was kept to avoid breaking changes.
+   * Will be removed in fabric 7.0
+   * @deprecated use "exitEditingImpl"
    */
-  exitEditingImpl() {
+  protected _exitEditing() {
     const hiddenTextarea = this.hiddenTextarea;
     this.selected = false;
     this.isEditing = false;
@@ -690,9 +693,20 @@ export abstract class ITextBehavior<
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
     this.selectionStart !== this.selectionEnd && this.clearContextTop();
-  
+  }
+
+  /**
+   * runs the actual logic that exits from editing state, see {@link exitEditing}
+   * But it does not fire events
+   */  
+  exitEditingImpl() {
+    this._exitEditing();
     this.selectionEnd = this.selectionStart;
     this._restoreEditingProps();
+    if (this._forceClearCache) {
+      this.initDimensions();
+      this.setCoords();
+    }
   }
 
   /**
@@ -701,10 +715,7 @@ export abstract class ITextBehavior<
   exitEditing() {
     const isTextChanged = this._textBeforeEdit !== this.text;
     this.exitEditingImpl();
-    if (this._forceClearCache) {
-      this.initDimensions();
-      this.setCoords();
-    }
+
     this.fire('editing:exited');
     isTextChanged && this.fire(MODIFIED);
     if (this.canvas) {
