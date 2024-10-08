@@ -698,7 +698,7 @@ export abstract class ITextBehavior<
   /**
    * runs the actual logic that exits from editing state, see {@link exitEditing}
    * But it does not fire events
-   */  
+   */
   exitEditingImpl() {
     this._exitEditing();
     this.selectionEnd = this.selectionStart;
