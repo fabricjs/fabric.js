@@ -677,7 +677,7 @@ export abstract class ITextBehavior<
   /**
    * runs the actual logic that exits from editing state, see {@link exitEditing}
    */
-  protected _exitEditing() {
+  exitEditingImpl() {
     const hiddenTextarea = this.hiddenTextarea;
     this.selected = false;
     this.isEditing = false;
@@ -690,6 +690,9 @@ export abstract class ITextBehavior<
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
     this.selectionStart !== this.selectionEnd && this.clearContextTop();
+  
+    this.selectionEnd = this.selectionStart;
+    this._restoreEditingProps();
   }
 
   /**
@@ -697,9 +700,7 @@ export abstract class ITextBehavior<
    */
   exitEditing() {
     const isTextChanged = this._textBeforeEdit !== this.text;
-    this._exitEditing();
-    this.selectionEnd = this.selectionStart;
-    this._restoreEditingProps();
+    this.exitEditingImpl();
     if (this._forceClearCache) {
       this.initDimensions();
       this.setCoords();
