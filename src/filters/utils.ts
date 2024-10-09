@@ -1,5 +1,5 @@
 import { getFabricWindow } from '../env';
-import { createCanvasElement } from '../util/misc/dom';
+import { createCanvasElement, createCanvasElementFor } from '../util/misc/dom';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
 import type { TWebGLPipelineState, T2DPipelineState } from './typedefs';
 
@@ -16,7 +16,7 @@ export const isWebGLPipelineState = (
  * putImageData is faster than drawImage for that specific operation.
  */
 export const isPutImageFaster = (width: number, height: number): boolean => {
-  const targetCanvas = createCanvasElement();
+  const targetCanvas = createCanvasElementFor({ width, height });
   const sourceCanvas = createCanvasElement();
   const gl = sourceCanvas.getContext('webgl')!;
   // eslint-disable-next-line no-undef
@@ -31,8 +31,6 @@ export const isPutImageFaster = (width: number, height: number): boolean => {
     targetCanvas: targetCanvas,
   } as unknown as TWebGLPipelineState;
   let startTime;
-  targetCanvas.width = width;
-  targetCanvas.height = height;
 
   startTime = getFabricWindow().performance.now();
   WebGLFilterBackend.prototype.copyGLTo2D.call(

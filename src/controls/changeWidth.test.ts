@@ -43,6 +43,15 @@ describe('changeWidth', () => {
     expect(target.top).toBe(0);
   });
 
+  test('changeWidth changes the width with decimals', () => {
+    expect(target.width).toBe(100);
+    const changed = changeWidth(eventData, transform, 200.2, 300);
+    expect(changed).toBe(true);
+    expect(target.width).toBe(199.2);
+    expect(target.left).toBe(0);
+    expect(target.top).toBe(0);
+  });
+
   test('changeWidth does not change the width', () => {
     const target = new Rect({ width: 100, height: 100, canvas });
     jest.spyOn(target, '_set').mockImplementation(function _set(this: Rect) {

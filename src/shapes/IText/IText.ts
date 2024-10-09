@@ -692,7 +692,7 @@ export class IText<
   }
 
   dispose() {
-    this._exitEditing();
+    this.exitEditingImpl();
     this.draggableTextDelegate.dispose();
     super.dispose();
   }

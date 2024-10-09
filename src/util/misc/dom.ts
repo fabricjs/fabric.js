@@ -1,5 +1,5 @@
 import { getFabricDocument } from '../../env';
-import type { ImageFormat } from '../../typedefs';
+import type { ImageFormat, TSize } from '../../typedefs';
 import { FabricError } from '../internals/console';
 /**
  * Creates canvas element
@@ -28,10 +28,17 @@ export const createImage = (): HTMLImageElement =>
 export const copyCanvasElement = (
   canvas: HTMLCanvasElement,
 ): HTMLCanvasElement => {
+  const newCanvas = createCanvasElementFor(canvas);
+  newCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
+  return newCanvas;
+};
+
+export const createCanvasElementFor = (
+  canvas: HTMLCanvasElement | ImageData | HTMLImageElement | TSize,
+): HTMLCanvasElement => {
   const newCanvas = createCanvasElement();
   newCanvas.width = canvas.width;
   newCanvas.height = canvas.height;
-  newCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
   return newCanvas;
 };
 
