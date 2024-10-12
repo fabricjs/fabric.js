@@ -116,6 +116,8 @@ export {
 export type {
   ITextProps,
   SerializedITextProps,
+  CursorRenderingData,
+  CursorBoundaries,
 } from './src/shapes/IText/IText';
 export { IText } from './src/shapes/IText/IText';
 export type {
