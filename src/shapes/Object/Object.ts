@@ -349,6 +349,7 @@ export class FabricObject<
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
    * The setter exists to avoid type errors in old code and possibly current deserialization code.
+   * DO NOT build new code around this type value
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
