@@ -152,6 +152,9 @@ export interface StaticCanvasOptions
 
   /**
    * Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
+   * It gives PRIORITY to DOM scrolling, it doesn't make it always possible.
+   * If is true, when using a touch event on the canvas, the canvas will scroll if scroll is possible.
+   * If we are in drawing mode or if we are selecting an object the canvas preventDefault and so it won't scroll
    * @type Boolean
    * @default
    *
