@@ -507,9 +507,15 @@ export class IText<
     this._renderCursor(ctx, boundaries, this.selectionStart);
   }
 
+  /**
+   * Return the data needed to render the cursor for given selection start
+   * The left,top are relative to the object, while width and height are prescaled
+   * to look think with canvas zoom and object scaling,
+   * so they depend on canvas and object scaling
+   */
   getCursorRenderingData(
-    selectionStart: number,
-    boundaries: CursorBoundaries,
+    selectionStart: number = this.selectionStart,
+    boundaries: CursorBoundaries = this._getCursorBoundaries(selectionStart),
   ): CursorRenderingData {
     const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
