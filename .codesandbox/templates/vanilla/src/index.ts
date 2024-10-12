@@ -3,9 +3,7 @@ import './styles.css';
 import { testCase } from './testcases/loadingSvgs';
 
 const el = document.getElementById('canvas');
-const canvas = (window.canvas = new fabric.Canvas(el, {
-  allowTouchScrolling: true,
-}));
+const canvas = (window.canvas = new fabric.Canvas(el));
 
 //  edit from here
 canvas.setDimensions({
