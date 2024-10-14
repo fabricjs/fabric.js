@@ -98,7 +98,7 @@ import { fabric } from 'fabric';
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/fabric"></script>
+<script src="https://cdn.jsdelivr.net/npm/fabric@6.4.3/dist/index.js"></script>
 <script>
   const canvas = new fabric.Canvas('canvas');
   const rect = new fabric.Rect({
