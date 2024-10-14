@@ -15,6 +15,7 @@ import type {
   TClassProperties,
   TFiller,
   TOptions,
+  TRadian,
 } from '../../typedefs';
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
@@ -46,6 +47,9 @@ import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
+import { Point } from '../../Point';
+import { createRotateMatrix } from '../../util/misc/matrix';
+import { makeBoundingBoxFromPoints, radiansToDegrees } from '../../util';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -88,7 +92,7 @@ export type GraphemeBBox = {
   deltaY: number;
   renderLeft?: number;
   renderTop?: number;
-  angle?: number;
+  angle?: TRadian;
 };
 
 // @TODO this is not complete
@@ -412,6 +416,8 @@ export class FabricText<
   declare __lineWidths: number[];
   declare initialized?: true;
 
+  declare pathOffset: Point;
+
   static cacheProperties = [...cacheProperties, ...additionalProps];
 
   static ownDefaults = textDefaultValues;
@@ -472,12 +478,36 @@ export class FabricText<
     this._clearCache();
     this.dirty = true;
     if (this.path) {
-      this.width = this.path.width;
-      this.height = this.path.height;
+      this.calcTextWidth();
+      // gets all the charboxes and transform by the path angle
+      const points: Point[] = [];
+      this.__charBounds.forEach((lineBoxes) => {
+        lineBoxes.forEach(({ width, height, renderLeft, renderTop, angle }) => {
+          const wBy2 = width / 2;
+          const h = height * 0.75;
+          const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
+          m[4] = renderLeft!;
+          m[5] = renderTop!;
+          points.push(
+            new Point(-wBy2, -h).transform(m),
+            new Point(wBy2, -h).transform(m),
+            new Point(wBy2, h).transform(m),
+            new Point(-wBy2, h).transform(m),
+          );
+        });
+      });
+      const bbox = makeBoundingBoxFromPoints(points);
+      this.pathOffset = new Point(
+        bbox.width / 2 + bbox.left,
+        bbox.height / 2 + bbox.top,
+      );
+      this.width = bbox.width;
+      this.height = bbox.height;
     } else {
       this.width =
         this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
       this.height = this.calcTextHeight();
+      this.pathOffset = new Point(0, 0);
     }
     if (this.textAlign.includes(JUSTIFY)) {
       // once text is measured we need to make space fatter to make justified text.
@@ -609,6 +639,7 @@ export class FabricText<
    */
   _render(ctx: CanvasRenderingContext2D) {
     const path = this.path;
+    ctx.translate(-this.pathOffset.x, -this.pathOffset.y);
     path && !path.isNotVisible() && path._render(ctx);
     this._setTextStyles(ctx);
     this._renderTextLinesBackground(ctx);
@@ -898,7 +929,6 @@ export class FabricText<
       line = this._textLines[lineIndex],
       llength = line.length,
       lineBounds = new Array<GraphemeBBox>(llength);
-
     this.__charBounds[lineIndex] = lineBounds;
     for (let i = 0; i < llength; i++) {
       const grapheme = line[i];

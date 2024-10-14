@@ -1,40 +1,20 @@
 import * as fabric from 'fabric';
 
 export function testCase(canvas: fabric.Canvas) {
-  const textValue = 'fabric.js sandbox';
-  const text = new fabric.Textbox(textValue, {
-    originX: 'center',
-    splitByGrapheme: true,
+  const textValue = 'LOL';
+  const path = new fabric.Path(
+    'M0 200 v-200 h200      a100,100 90 0,1 0,200     a100,100 90 0,1 -200,0     z',
+    {
+      fill: '',
+      stroke: 'red',
+    },
+  );
+  const text = new fabric.IText(textValue, {
     width: 200,
     top: 20,
-    styles: fabric.util.stylesFromArray(
-      [
-        {
-          style: {
-            fontWeight: 'bold',
-            fontSize: 64,
-          },
-          start: 0,
-          end: 9,
-        },
-      ],
-      textValue,
-    ),
+    path,
+    objectCaching: false,
   });
   canvas.add(text);
   canvas.centerObjectH(text);
-  function animate(toState) {
-    text.animate(
-      { scaleX: Math.max(toState, 0.1) * 2 },
-      {
-        onChange: () => canvas.renderAll(),
-        onComplete: () => animate(!toState),
-        duration: 1000,
-        easing: toState
-          ? fabric.util.ease.easeInOutQuad
-          : fabric.util.ease.easeInOutSine,
-      },
-    );
-  }
-  // animate(1);
 }
