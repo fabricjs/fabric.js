@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Custom group inherited from the group, and the bug of the custom layout type. [10198](https://github.com/fabricjs/fabric.js/issues/10198)
 - feat(IText): expose getCursorRenderingData() function. [#10204](https://github.com/fabricjs/fabric.js/pull/10204)
 - fix(Canvas): allowTouchScrolling interactions [#10078](https://github.com/fabricjs/fabric.js/pull/10078)
 - update(IText): Add method enterEditingImpl/exitEditingImpl that executes the logic of enterEditing/exitEditing without events [#10187](https://github.com/fabricjs/fabric.js/issues/10187)

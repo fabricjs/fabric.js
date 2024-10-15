@@ -691,11 +691,8 @@ export class Group
       enlivenObjects<FabricObject>(objects, abortable),
       enlivenObjectEnlivables(options, abortable),
     ]).then(([objects, hydratedOptions]) => {
-      const group = new this(objects, {
-        ...options,
-        ...hydratedOptions,
-        layoutManager: new NoopLayoutManager(),
-      });
+      const isCustomGroup = type && type != Group.type;
+      let layout;
       if (layoutManager) {
         const layoutClass = classRegistry.getClass<typeof LayoutManager>(
           layoutManager.type,
@@ -703,16 +700,26 @@ export class Group
         const strategyClass = classRegistry.getClass<typeof FitContentLayout>(
           layoutManager.strategy,
         );
-        group.layoutManager = new layoutClass(new strategyClass());
-      } else {
-        group.layoutManager = new LayoutManager();
+        layout = new layoutClass(new strategyClass());
       }
-      group.layoutManager.subscribeTargets({
-        type: LAYOUT_TYPE_INITIALIZATION,
-        target: group,
-        targets: group.getObjects(),
+      const manage = isCustomGroup ? layout : new NoopLayoutManager();
+
+      const group = new this(objects, {
+        ...options,
+        ...hydratedOptions,
+        layoutManager: manage,
       });
-      group.setCoords();
+      if (!isCustomGroup) {
+        group.layoutManager = layout ?? new LayoutManager();
+
+        group.layoutManager.subscribeTargets({
+          type: LAYOUT_TYPE_INITIALIZATION,
+          target: group,
+          targets: group.getObjects(),
+        });
+        group.setCoords();
+      }
+
       return group;
     });
   }

@@ -3,6 +3,7 @@ import {
   LayoutManager,
   ClipPathLayout,
   FitContentLayout,
+  LayoutStrategy,
 } from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
 import { Group } from './Group';
@@ -11,6 +12,7 @@ import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
 import { FabricImage } from './Image';
 import { SignalAbortedError } from '../util/internals/console';
+import { classRegistry } from '../ClassRegistry';
 
 const makeGenericGroup = (options?: Partial<GroupProps>) => {
   const objs = [new FabricObject(), new FabricObject()];
@@ -336,4 +338,34 @@ describe('Group', () => {
 
     expect(eventsSpy).toBeCalledTimes(3);
   });
+
+  it("fromObject of the custom group", async () => {
+    const group = new Group();
+    const customGroup = new CustomGroup();
+    const groupData = group.toObject();
+    const customGroupData = customGroup.toObject();
+    const gLayoutManager = (await Group.fromObject(groupData)).layoutManager;
+    const cLayoutManager = (await CustomGroup.fromObject(customGroupData)).layoutManager;
+
+    const fakeGroupData = { type: Group.type };
+    const fakeCustomGroupData = { type: CustomGroup.type };
+    const fakeGLayoutManager = (await Group.fromObject(fakeGroupData)).layoutManager;
+    const fakeCLayoutManager = (await CustomGroup.fromObject(fakeCustomGroupData)).layoutManager;
+
+    expect(gLayoutManager).toEqual(fakeGLayoutManager);
+    expect(cLayoutManager).toEqual(fakeCLayoutManager);
+  })
 });
+
+class CustomGroup extends Group {
+  static type = "CustomGroup";
+  constructor(objects = [], opts: any = {}) {
+    if (!opts.layoutManager) opts.layoutManager = new LayoutManager(new CustomLayout());
+    super(objects, opts);
+  }
+}
+class CustomLayout extends LayoutStrategy {
+  static type = "custom-layout";
+}
+classRegistry.setClass(CustomGroup);
+classRegistry.setClass(CustomLayout);
