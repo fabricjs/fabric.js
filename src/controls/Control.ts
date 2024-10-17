@@ -139,6 +139,14 @@ export class Control {
    */
   withConnection = false;
 
+  /**
+   * It specifies the size of the controlling corners
+   * @type {Number}
+   * @default 0
+   */
+  cornerSize = 0
+
+
   constructor(options?: Partial<Control>) {
     Object.assign(this, options);
   }
