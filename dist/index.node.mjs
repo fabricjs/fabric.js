@@ -1612,10 +1612,14 @@ const createImage = () => getFabricDocument().createElement('img');
  */
 const copyCanvasElement = canvas => {
   var _newCanvas$getContext;
+  const newCanvas = createCanvasElementFor(canvas);
+  (_newCanvas$getContext = newCanvas.getContext('2d')) === null || _newCanvas$getContext === void 0 || _newCanvas$getContext.drawImage(canvas, 0, 0);
+  return newCanvas;
+};
+const createCanvasElementFor = canvas => {
   const newCanvas = createCanvasElement();
   newCanvas.width = canvas.width;
   newCanvas.height = canvas.height;
-  (_newCanvas$getContext = newCanvas.getContext('2d')) === null || _newCanvas$getContext === void 0 || _newCanvas$getContext.drawImage(canvas, 0, 0);
   return newCanvas;
 };
 
@@ -3520,6 +3524,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
     if (path) {
       path._set('canvas', this);
       // needed to setup a couple of variables
+      // todo migrate to the newer one
       path.shouldCache();
       path._transformDone = true;
       path.renderCache({
@@ -4137,9 +4142,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    */
   cloneWithoutData() {
-    const el = createCanvasElement();
-    el.width = this.width;
-    el.height = this.height;
+    const el = createCanvasElementFor(this);
     return new this.constructor(el);
   }
 
@@ -4228,10 +4231,11 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
       translateY = (vp[5] - (top || 0)) * multiplier,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY],
       originalRetina = this.enableRetinaScaling,
-      canvasEl = createCanvasElement(),
+      canvasEl = createCanvasElementFor({
+        width: scaledWidth,
+        height: scaledHeight
+      }),
       objectsToRender = filter ? this._objects.filter(obj => filter(obj)) : this._objects;
-    canvasEl.width = scaledWidth;
-    canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;
@@ -6779,6 +6783,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
    * The setter exists to avoid type errors in old code and possibly current deserialization code.
+   * DO NOT build new code around this type value
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
@@ -7120,7 +7125,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       this.drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.drawObject(ctx);
+      this.drawObject(ctx, false, {});
       this.dirty = false;
     }
     ctx.restore();
@@ -7134,7 +7139,25 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.drawObject(this._cacheContext, options.forClipping);
+      const {
+        zoomX,
+        zoomY,
+        cacheTranslationX,
+        cacheTranslationY
+      } = this;
+      const {
+        width,
+        height
+      } = this._cacheCanvas;
+      this.drawObject(this._cacheContext, options.forClipping, {
+        zoomX,
+        zoomY,
+        cacheTranslationX,
+        cacheTranslationY,
+        width,
+        height,
+        parentClipPaths: []
+      });
       this.dirty = false;
     }
   }
@@ -7222,7 +7245,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {FabricObject} clipPath
    */
-  drawClipPathOnCache(ctx, clipPath) {
+  drawClipPathOnCache(ctx, clipPath, canvasWithClipPath) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
     // ctx.globalAlpha = 0.4
@@ -7231,14 +7254,9 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
     } else {
       ctx.globalCompositeOperation = 'destination-in';
     }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     //ctx.scale(1 / 2, 1 / 2);
-    if (clipPath.absolutePositioned) {
-      const m = invertTransform(this.calcTransformMatrix());
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    }
-    clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-    ctx.drawImage(clipPath._cacheCanvas, -clipPath.cacheTranslationX, -clipPath.cacheTranslationY);
+    ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
 
@@ -7246,8 +7264,9 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {boolean} forClipping apply clipping styles
+   * @param {DrawContext} context additional context for rendering
    */
-  drawObject(ctx, forClipping) {
+  drawObject(ctx, forClipping, context) {
     const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
@@ -7258,9 +7277,27 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       this._renderBackground(ctx);
     }
     this._render(ctx);
-    this._drawClipPath(ctx, this.clipPath);
+    this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
     this.stroke = originalStroke;
+  }
+  createClipPathLayer(clipPath, context) {
+    const canvas = createCanvasElementFor(context);
+    const ctx = canvas.getContext('2d');
+    ctx.translate(context.cacheTranslationX, context.cacheTranslationY);
+    ctx.scale(context.zoomX, context.zoomY);
+    clipPath._cacheCanvas = canvas;
+    context.parentClipPaths.forEach(prevClipPath => {
+      prevClipPath.transform(ctx);
+    });
+    context.parentClipPaths.push(clipPath);
+    if (clipPath.absolutePositioned) {
+      const m = invertTransform(this.calcTransformMatrix());
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    }
+    clipPath.transform(ctx);
+    clipPath.drawObject(ctx, true, context);
+    return canvas;
   }
 
   /**
@@ -7268,20 +7305,15 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
    */
-  _drawClipPath(ctx, clipPath) {
+  _drawClipPath(ctx, clipPath, context) {
     if (!clipPath) {
       return;
     }
-    // needed to setup a couple of variables
-    // path canvas gets overridden with this one.
+    // needed to setup _transformDone
     // TODO find a better solution?
-    clipPath._set('canvas', this.canvas);
-    clipPath.shouldCache();
     clipPath._transformDone = true;
-    clipPath.renderCache({
-      forClipping: true
-    });
-    this.drawClipPathOnCache(ctx, clipPath);
+    const canvas = this.createClipPathLayer(clipPath, context);
+    this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
   /**
@@ -7553,14 +7585,15 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   _applyPatternForTransformedGradient(ctx, filler) {
     var _pCtx$createPattern;
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
-    // in case width and height are less than 1px, we have to round up.
-    // since the pattern is no-repeat, this is fine
-    pCanvas.width = Math.ceil(width);
-    pCanvas.height = Math.ceil(height);
+      height = dims.y / this.scaleY / retinaScaling,
+      pCanvas = createCanvasElementFor({
+        // in case width and height are less than 1px, we have to round up.
+        // since the pattern is no-repeat, this is fine
+        width: Math.ceil(width),
+        height: Math.ceil(height)
+      });
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
@@ -11377,7 +11410,6 @@ const _excluded$a = ["type", "objects", "layoutManager"];
  * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
  */
 class NoopLayoutManager extends LayoutManager {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   performLayout() {}
 }
 const groupDefaultValues = {
@@ -11761,21 +11793,22 @@ class Group extends createCollectionMixin(FabricObject) {
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawObject(ctx) {
+  drawObject(ctx, forClipping, context) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
       var _this$canvas;
+      const obj = this._objects[i];
       // TODO: handle rendering edge case somehow
-      if ((_this$canvas = this.canvas) !== null && _this$canvas !== void 0 && _this$canvas.preserveObjectStacking && this._objects[i].group !== this) {
+      if ((_this$canvas = this.canvas) !== null && _this$canvas !== void 0 && _this$canvas.preserveObjectStacking && obj.group !== this) {
         ctx.save();
         ctx.transform(...invertTransform(this.calcTransformMatrix()));
-        this._objects[i].render(ctx);
+        obj.render(ctx);
         ctx.restore();
-      } else if (this._objects[i].group === this) {
-        this._objects[i].render(ctx);
+      } else if (obj.group === this) {
+        obj.render(ctx);
       }
     }
-    this._drawClipPath(ctx, this.clipPath);
+    this._drawClipPath(ctx, this.clipPath, context);
   }
 
   /**
@@ -14908,17 +14941,28 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   _onTouchStart(e) {
-    e.preventDefault();
+    // we will prevent scrolling if allowTouchScrolling is not enabled and
+    let shouldPreventScrolling = !this.allowTouchScrolling;
+    const currentActiveObject = this._activeObject;
     if (this.mainTouchId === undefined) {
       this.mainTouchId = this.getPointerId(e);
     }
     this.__onMouseDown(e);
+    // after executing fabric logic for mouse down let's see
+    // if we didn't change target or if we are drawing
+    // we want to prevent scrolling anyway
+    if (this.isDrawingMode || currentActiveObject && this._target === currentActiveObject) {
+      shouldPreventScrolling = true;
+    }
+    // prevent default, will block scrolling from start
+    shouldPreventScrolling && e.preventDefault();
     this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(canvasElement);
     addListener(doc, 'touchend', this._onTouchEnd, addEventOptions);
-    addListener(doc, 'touchmove', this._onMouseMove, addEventOptions);
+    // if we scroll don't register the touch move event
+    shouldPreventScrolling && addListener(doc, 'touchmove', this._onMouseMove, addEventOptions);
     // Unbind mousedown to prevent double triggers from touch devices
     removeListener(canvasElement, "".concat(eventTypePrefix, "down"), this._onMouseDown);
   }
@@ -18769,12 +18813,22 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       textBgRects
     };
   }
-  _createTextCharSpan(char, styleDecl, left, top) {
+  _createTextCharSpan(char, styleDecl, left, top, charBox) {
     const styleProps = this.getSvgSpanStyles(styleDecl, char !== char.trim() || !!char.match(multipleSpacesRegex)),
       fillStyles = styleProps ? "style=\"".concat(styleProps, "\"") : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? " dy=\"".concat(toFixed(dy, config.NUM_FRACTION_DIGITS), "\" ") : '';
-    return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
+      dySpan = dy ? " dy=\"".concat(toFixed(dy, config.NUM_FRACTION_DIGITS), "\" ") : '',
+      {
+        angle,
+        renderLeft,
+        renderTop,
+        width
+      } = charBox,
+      angleAttr = angle ? " rotate=\"".concat(toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS), "\"") : '';
+    if (renderLeft !== undefined) {
+      left = renderLeft + width / 2;
+    }
+    return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(renderTop !== null && renderTop !== void 0 ? renderTop : top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(angleAttr).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
   }
   _setSVGTextLineText(textSpans, lineIndex, textLeftOffset, textTopOffset) {
     const lineHeight = this.getHeightOfLine(lineIndex),
@@ -18789,7 +18843,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       timeToRender;
     textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
     for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing;
+      timeToRender = i === len || this.charSpacing || this.path;
       charsToRender += line[i];
       charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
@@ -18804,14 +18858,14 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         }
       }
       if (!timeToRender) {
-        // if we have charSpacing, we render char by char
+        // if we have charSpacing or a path, we render char by char
         actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
         nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
         timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
       }
       if (timeToRender) {
         style = this._getStyleDeclaration(lineIndex, i);
-        textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
+        textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset, charBox));
         charsToRender = '';
         actualStyle = nextStyle;
         if (this.direction === 'rtl') {
@@ -18914,8 +18968,10 @@ let measuringContext;
  */
 function getMeasuringContext() {
   if (!measuringContext) {
-    const canvas = createCanvasElement();
-    canvas.width = canvas.height = 0;
+    const canvas = createCanvasElementFor({
+      width: 0,
+      height: 0
+    });
     measuringContext = canvas.getContext('2d');
   }
   return measuringContext;
@@ -19648,10 +19704,13 @@ class FabricText extends StyledText {
    * @return {CanvasPattern} a pattern to use as fill/stroke style
    */
   _applyPatternGradientTransformText(filler) {
-    const pCanvas = createCanvasElement(),
-      // TODO: verify compatibility with strokeUniform
-      width = this.width + this.strokeWidth,
+    // TODO: verify compatibility with strokeUniform
+    const width = this.width + this.strokeWidth,
       height = this.height + this.strokeWidth,
+      pCanvas = createCanvasElementFor({
+        width,
+        height
+      }),
       pCtx = pCanvas.getContext('2d');
     pCanvas.width = width;
     pCanvas.height = height;
@@ -20811,6 +20870,24 @@ class ITextBehavior extends FabricText {
     if (this.isEditing || !this.editable) {
       return;
     }
+    this.enterEditingImpl();
+    this.fire('editing:entered', e ? {
+      e
+    } : undefined);
+    this._fireSelectionChanged();
+    if (this.canvas) {
+      this.canvas.fire('text:editing:entered', {
+        target: this,
+        e
+      });
+      this.canvas.requestRenderAll();
+    }
+  }
+
+  /**
+   * runs the actual logic that enter from editing state, see {@link enterEditing}
+   */
+  enterEditingImpl() {
     if (this.canvas) {
       this.canvas.calcOffset();
       this.canvas.textEditingManager.exitTextEditing();
@@ -20824,17 +20901,6 @@ class ITextBehavior extends FabricText {
     this._setEditingProps();
     this._textBeforeEdit = this.text;
     this._tick();
-    this.fire('editing:entered', e ? {
-      e
-    } : undefined);
-    this._fireSelectionChanged();
-    if (this.canvas) {
-      this.canvas.fire('text:editing:entered', {
-        target: this,
-        e
-      });
-      this.canvas.requestRenderAll();
-    }
   }
 
   /**
@@ -21055,6 +21121,9 @@ class ITextBehavior extends FabricText {
 
   /**
    * runs the actual logic that exits from editing state, see {@link exitEditing}
+   * Please use exitEditingImpl, this function was kept to avoid breaking changes.
+   * Will be removed in fabric 7.0
+   * @deprecated use "exitEditingImpl"
    */
   _exitEditing() {
     const hiddenTextarea = this.hiddenTextarea;
@@ -21070,10 +21139,10 @@ class ITextBehavior extends FabricText {
   }
 
   /**
-   * Exits from editing state and fires relevant events
+   * runs the actual logic that exits from editing state, see {@link exitEditing}
+   * But it does not fire events
    */
-  exitEditing() {
-    const isTextChanged = this._textBeforeEdit !== this.text;
+  exitEditingImpl() {
     this._exitEditing();
     this.selectionEnd = this.selectionStart;
     this._restoreEditingProps();
@@ -21081,6 +21150,14 @@ class ITextBehavior extends FabricText {
       this.initDimensions();
       this.setCoords();
     }
+  }
+
+  /**
+   * Exits from editing state and fires relevant events
+   */
+  exitEditing() {
+    const isTextChanged = this._textBeforeEdit !== this.text;
+    this.exitEditingImpl();
     this.fire('editing:exited');
     isTextChanged && this.fire(MODIFIED);
     if (this.canvas) {
@@ -22546,7 +22623,7 @@ class IText extends ITextClickBehavior {
       return;
     }
     const boundaries = this._getCursorBoundaries();
-    if (this.selectionStart === this.selectionEnd) {
+    if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
       this.renderCursor(ctx, boundaries);
     } else {
       this.renderSelection(ctx, boundaries);
@@ -22636,8 +22713,7 @@ class IText extends ITextClickBehavior {
    * If contextTop is not available, do nothing.
    */
   renderCursorAt(selectionStart) {
-    const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas.contextTop, boundaries, selectionStart);
+    this._renderCursor(this.canvas.contextTop, this._getCursorBoundaries(selectionStart, true), selectionStart);
   }
 
   /**
@@ -22648,7 +22724,16 @@ class IText extends ITextClickBehavior {
   renderCursor(ctx, boundaries) {
     this._renderCursor(ctx, boundaries, this.selectionStart);
   }
-  _renderCursor(ctx, boundaries, selectionStart) {
+
+  /**
+   * Return the data needed to render the cursor for given selection start
+   * The left,top are relative to the object, while width and height are prescaled
+   * to look think with canvas zoom and object scaling,
+   * so they depend on canvas and object scaling
+   */
+  getCursorRenderingData() {
+    let selectionStart = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.selectionStart;
+    let boundaries = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this._getCursorBoundaries(selectionStart);
     const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex = cursorLocation.charIndex > 0 ? cursorLocation.charIndex - 1 : 0,
@@ -22657,14 +22742,32 @@ class IText extends ITextClickBehavior {
       cursorWidth = this.cursorWidth / multiplier,
       dy = this.getValueOfPropertyAt(lineIndex, charIndex, 'deltaY'),
       topOffset = boundaries.topOffset + (1 - this._fontSizeFraction) * this.getHeightOfLine(lineIndex) / this.lineHeight - charHeight * (1 - this._fontSizeFraction);
-    if (this.inCompositionMode) {
-      // TODO: investigate why there isn't a return inside the if,
-      // and why can't happen at the top of the function
-      this.renderSelection(ctx, boundaries);
-    }
-    ctx.fillStyle = this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, FILL);
-    ctx.globalAlpha = this._currentCursorOpacity;
-    ctx.fillRect(boundaries.left + boundaries.leftOffset - cursorWidth / 2, topOffset + boundaries.top + dy, cursorWidth, charHeight);
+    return {
+      color: this.cursorColor || this.getValueOfPropertyAt(lineIndex, charIndex, 'fill'),
+      opacity: this._currentCursorOpacity,
+      left: boundaries.left + boundaries.leftOffset - cursorWidth / 2,
+      top: topOffset + boundaries.top + dy,
+      width: cursorWidth,
+      height: charHeight
+    };
+  }
+
+  /**
+   * Render the cursor at the given selectionStart.
+   *
+   */
+  _renderCursor(ctx, boundaries, selectionStart) {
+    const {
+      color,
+      opacity,
+      left,
+      top,
+      width,
+      height
+    } = this.getCursorRenderingData(selectionStart, boundaries);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(left, top, width, height);
   }
 
   /**
@@ -22795,7 +22898,7 @@ class IText extends ITextClickBehavior {
     };
   }
   dispose() {
-    this._exitEditing();
+    this.exitEditingImpl();
     this.draggableTextDelegate.dispose();
     super.dispose();
   }
@@ -23800,9 +23903,10 @@ class WebGLFilterBackend {
    * class properties to the GLFilterBackend class.
    */
   createWebGLCanvas(width, height) {
-    const canvas = createCanvasElement();
-    canvas.width = width;
-    canvas.height = height;
+    const canvas = createCanvasElementFor({
+      width,
+      height
+    });
     const glOptions = {
         alpha: true,
         premultipliedAlpha: false,
@@ -24432,15 +24536,15 @@ class FabricImage extends FabricObject {
       this._lastScaleY = scaleY;
       return;
     }
-    const canvasEl = createCanvasElement(),
-      sourceWidth = elementToFilter.width,
-      sourceHeight = elementToFilter.height;
-    canvasEl.width = sourceWidth;
-    canvasEl.height = sourceHeight;
+    const canvasEl = createCanvasElementFor(elementToFilter),
+      {
+        width,
+        height
+      } = elementToFilter;
     this._element = canvasEl;
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
-    getFilterBackend().applyFilters([filter], elementToFilter, sourceWidth, sourceHeight, this._element);
+    getFilterBackend().applyFilters([filter], elementToFilter, width, height, this._element);
     this._filterScalingX = canvasEl.width / this._originalElement.width;
     this._filterScalingY = canvasEl.height / this._originalElement.height;
   }
@@ -24472,9 +24576,10 @@ class FabricImage extends FabricObject {
     if (this._element === this._originalElement) {
       // if the _element a reference to _originalElement
       // we need to create a new element to host the filtered pixels
-      const canvasEl = createCanvasElement();
-      canvasEl.width = sourceWidth;
-      canvasEl.height = sourceHeight;
+      const canvasEl = createCanvasElementFor({
+        width: sourceWidth,
+        height: sourceHeight
+      });
       this._element = canvasEl;
       this._filteredEl = canvasEl;
     } else if (this._filteredEl) {
@@ -25149,13 +25254,13 @@ class ElementsParser {
 
   // TODO: resolveClipPath could be run once per clippath with minor work per object.
   // is a refactor that i m not sure is worth on this code
-  async resolveClipPath(obj, usingElement) {
+  async resolveClipPath(obj, usingElement, exactOwner) {
     const clipPathElements = this.extractPropertyDefinition(obj, 'clipPath', this.clipPaths);
     if (clipPathElements) {
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
       const clipPathTag = clipPathElements[0].parentElement;
       let clipPathOwner = usingElement;
-      while (clipPathOwner.parentElement && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
+      while (!exactOwner && clipPathOwner.parentElement && clipPathOwner.getAttribute('clip-path') !== obj.clipPath) {
         clipPathOwner = clipPathOwner.parentElement;
       }
       // move the clipPath tag as sibling to the real element that is using it
@@ -25178,7 +25283,11 @@ class ElementsParser {
       const clipPath = container.length === 1 ? container[0] : new Group(container);
       const gTransform = multiplyTransformMatrices(objTransformInv, clipPath.calcTransformMatrix());
       if (clipPath.clipPath) {
-        await this.resolveClipPath(clipPath, clipPathOwner);
+        await this.resolveClipPath(clipPath, clipPathOwner,
+        // this is tricky.
+        // it tries to differentiate from when clipPaths are inherited by outside groups
+        // or when are really clipPaths referencing other clipPaths
+        clipPathTag.getAttribute('clip-path') ? clipPathOwner : undefined);
       }
       const {
         scaleX,
@@ -25592,7 +25701,10 @@ const isWebGLPipelineState = options => {
  * putImageData is faster than drawImage for that specific operation.
  */
 const isPutImageFaster = (width, height) => {
-  const targetCanvas = createCanvasElement();
+  const targetCanvas = createCanvasElementFor({
+    width,
+    height
+  });
   const sourceCanvas = createCanvasElement();
   const gl = sourceCanvas.getContext('webgl');
   // eslint-disable-next-line no-undef
@@ -25606,8 +25718,6 @@ const isPutImageFaster = (width, height) => {
     targetCanvas: targetCanvas
   };
   let startTime;
-  targetCanvas.width = width;
-  targetCanvas.height = height;
   startTime = getFabricWindow().performance.now();
   WebGLFilterBackend.prototype.copyGLTo2D.call(testContext, gl, testPipelineState);
   const drawImageTime = getFabricWindow().performance.now() - startTime;
@@ -25895,9 +26005,14 @@ class BaseFilter {
    */
   createHelpLayer(options) {
     if (!options.helpLayer) {
-      const helpLayer = createCanvasElement();
-      helpLayer.width = options.sourceWidth;
-      helpLayer.height = options.sourceHeight;
+      const {
+        sourceWidth,
+        sourceHeight
+      } = options;
+      const helpLayer = createCanvasElementFor({
+        width: sourceWidth,
+        height: sourceHeight
+      });
       options.helpLayer = helpLayer;
     }
   }

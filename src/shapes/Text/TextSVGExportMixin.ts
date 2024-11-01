@@ -9,6 +9,8 @@ import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
 import type { FabricText } from './Text';
 import { STROKE, FILL } from '../../constants';
+import { GraphemeBBox } from 'fabric/*';
+import { radiansToDegrees } from '../../util';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -142,6 +144,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     styleDecl: TextStyleDeclaration,
     left: number,
     top: number,
+    charBox: GraphemeBBox,
   ) {
     const styleProps = this.getSvgSpanStyles(
         styleDecl,
@@ -149,15 +152,22 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       ),
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '';
+      dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '',
+      { angle, renderLeft, renderTop, width } = charBox,
+      angleAttr = angle
+        ? ` rotate="${toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS)}"`
+        : '';
+    if (renderLeft !== undefined) {
+      left = renderLeft + width / 2;
+    }
 
     return `<tspan x="${toFixed(
       left,
       config.NUM_FRACTION_DIGITS,
     )}" y="${toFixed(
-      top,
+      renderTop ?? top,
       config.NUM_FRACTION_DIGITS,
-    )}" ${dySpan}${fillStyles}>${escapeXml(char)}</tspan>`;
+    )}" ${dySpan}${angleAttr}${fillStyles}>${escapeXml(char)}</tspan>`;
   }
 
   private _setSVGTextLineText(
@@ -181,7 +191,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textTopOffset +=
       (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
     for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing;
+      timeToRender = i === len || this.charSpacing || this.path;
       charsToRender += line[i];
       charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
@@ -196,7 +206,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         }
       }
       if (!timeToRender) {
-        // if we have charSpacing, we render char by char
+        // if we have charSpacing or a path, we render char by char
         actualStyle =
           actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
         nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
@@ -210,6 +220,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
             style,
             textLeftOffset,
             textTopOffset,
+            charBox,
           ),
         );
         charsToRender = '';
