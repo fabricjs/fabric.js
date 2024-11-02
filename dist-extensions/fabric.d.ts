@@ -80,7 +80,7 @@ export { FabricText,
  *
  */
 FabricText as Text, } from './src/shapes/Text/Text';
-export type { ITextProps, SerializedITextProps, } from './src/shapes/IText/IText';
+export type { ITextProps, SerializedITextProps, CursorRenderingData, CursorBoundaries, } from './src/shapes/IText/IText';
 export { IText } from './src/shapes/IText/IText';
 export type { GraphemeData, SerializedTextboxProps, TextboxProps, } from './src/shapes/Textbox';
 export { Textbox } from './src/shapes/Textbox';

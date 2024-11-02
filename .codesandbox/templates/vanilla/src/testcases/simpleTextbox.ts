@@ -41,12 +41,15 @@ export function testCase(canvas: fabric.Canvas) {
   const text = new fabric.FabricText(textValue, {
     width: 200,
     top: 20,
+    fill: 'transparent',
+    stroke: 'red',
     objectCaching: false,
   });
   const pathString = makePath(text);
   const pathObject = new fabric.Path(pathString, {
     fill: 'transparent',
     stroke: 'red',
+    objectCaching: false,
   });
   text.set('path', pathObject);
   canvas.add(text);

@@ -9,7 +9,7 @@ import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
 import type { FabricText } from './Text';
 import { STROKE, FILL } from '../../constants';
-import { GraphemeBBox } from 'fabric/*';
+import type { GraphemeBBox } from 'fabric/*';
 import { radiansToDegrees } from '../../util';
 
 const multipleSpacesRegex = /  +/g;
@@ -33,11 +33,21 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   toSVG(this: TextSVGExportMixin & FabricText, reviver?: TSVGReviver): string {
-    return this._createBaseSVGMarkup(this._toSVG(), {
+    const textSvg = this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
       withShadow: true,
     });
+    if (this.path) {
+      return (
+        textSvg +
+        this._createBaseSVGMarkup(this.path._toSVG(), {
+          reviver,
+          withShadow: true,
+        })
+      );
+    }
+    return textSvg;
   }
 
   private _getSVGLeftTopOffsets(this: TextSVGExportMixin & FabricText) {
@@ -158,7 +168,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         ? ` rotate="${toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS)}"`
         : '';
     if (renderLeft !== undefined) {
-      left = renderLeft + width / 2;
+      left = renderLeft;
     }
 
     return `<tspan x="${toFixed(

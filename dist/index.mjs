@@ -18702,11 +18702,18 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return this._wrapSVGTextAndBg(textAndBg);
   }
   toSVG(reviver) {
-    return this._createBaseSVGMarkup(this._toSVG(), {
+    const textSvg = this._createBaseSVGMarkup(this._toSVG(), {
       reviver,
       noStyle: true,
       withShadow: true
     });
+    if (this.path) {
+      return textSvg + this._createBaseSVGMarkup(this.path._toSVG(), {
+        reviver,
+        withShadow: true
+      });
+    }
+    return textSvg;
   }
   _getSVGLeftTopOffsets() {
     return {
@@ -18770,7 +18777,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       } = charBox,
       angleAttr = angle ? " rotate=\"".concat(toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS), "\"") : '';
     if (renderLeft !== undefined) {
-      left = renderLeft + width / 2;
+      left = renderLeft;
     }
     return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(renderTop !== null && renderTop !== void 0 ? renderTop : top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(angleAttr).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
   }
