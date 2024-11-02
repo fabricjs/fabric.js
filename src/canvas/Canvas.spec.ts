@@ -110,5 +110,30 @@ describe('Canvas', () => {
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).not.toHaveBeenCalled();
     });
+    test('dispose after _onTouchStart', () => {
+      const canvas = new Canvas(undefined, {
+        allowTouchScrolling: true,
+        isDrawingMode: true,
+      });
+      const touch = {
+        clientX: 10,
+        clientY: 0,
+        identifier: 1,
+        target: canvas.upperCanvasEl,
+      };
+      const evtStart = new TouchEvent('touchstart', {
+        touches: [touch],
+        changedTouches: [touch],
+      });
+      canvas._onTouchStart(evtStart);
+      const evtEnd = new TouchEvent('touchend', {
+        touches: [],
+        changedTouches: [touch],
+      });
+      canvas._onTouchEnd(evtEnd);
+      expect(canvas._willAddMouseDown).toBeGreaterThan(0);
+      canvas.dispose();
+      expect(canvas._willAddMouseDown).toBe(0);
+    });
   });
 });
