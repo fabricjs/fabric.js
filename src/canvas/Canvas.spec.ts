@@ -111,6 +111,7 @@ describe('Canvas', () => {
       expect(evt.preventDefault).not.toHaveBeenCalled();
     });
     test('dispose after _onTouchStart', () => {
+      jest.spyOn(global, 'clearTimeout');
       const canvas = new Canvas(undefined, {
         allowTouchScrolling: true,
         isDrawingMode: true,
@@ -133,7 +134,9 @@ describe('Canvas', () => {
       canvas._onTouchEnd(evtEnd);
       expect(canvas._willAddMouseDown).toBeGreaterThan(0);
       canvas.dispose();
-      expect(canvas._willAddMouseDown).toBe(0);
+      expect(global.clearTimeout).toHaveBeenCalledWith(
+        canvas._willAddMouseDown,
+      );
     });
   });
 });
