@@ -14568,7 +14568,7 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
   }
 
   /**
-   * Removes all event listeners
+   * Removes all event listeners, used when disposing the instance
    */
   removeListeners() {
     this.addOrRemove(removeListener, 'remove');
@@ -14579,10 +14579,7 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
     removeListener(doc, 'touchend', this._onTouchEnd, addEventOptions);
     removeListener(doc, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
     removeListener(doc, 'touchmove', this._onMouseMove, addEventOptions);
-    if (this._willAddMouseDown) {
-      clearTimeout(this._willAddMouseDown);
-      this._willAddMouseDown = 0;
-    }
+    clearTimeout(this._willAddMouseDown);
   }
 
   /**

@@ -198,7 +198,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   }
 
   /**
-   * Removes all event listeners
+   * Removes all event listeners, used when disposing the instance
    */
   removeListeners() {
     this.addOrRemove(removeListener, 'remove');
@@ -228,10 +228,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this._onMouseMove as EventListener,
       addEventOptions,
     );
-    if (this._willAddMouseDown) {
-      clearTimeout(this._willAddMouseDown);
-      this._willAddMouseDown = 0;
-    }
+    clearTimeout(this._willAddMouseDown);
   }
 
   /**
