@@ -18777,9 +18777,17 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       } = charBox,
       angleAttr = angle ? " rotate=\"".concat(toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS), "\"") : '';
     if (renderLeft !== undefined) {
-      left = renderLeft;
+      const wBy2 = width / 2;
+      const m = createRotateMatrix({
+        angle: radiansToDegrees(angle)
+      });
+      m[4] = renderLeft;
+      m[5] = renderTop;
+      const renderPoint = new Point(-wBy2, 0).transform(m);
+      left = renderPoint.x;
+      top = renderPoint.y;
     }
-    return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(renderTop !== null && renderTop !== void 0 ? renderTop : top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(angleAttr).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
+    return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(angleAttr).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
   }
   _setSVGTextLineText(textSpans, lineIndex, textLeftOffset, textTopOffset) {
     const lineHeight = this.getHeightOfLine(lineIndex),

@@ -7,10 +7,11 @@ import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
-import type { FabricText } from './Text';
+import type { FabricText, GraphemeBBox } from './Text';
 import { STROKE, FILL } from '../../constants';
-import type { GraphemeBBox } from 'fabric/*';
-import { radiansToDegrees } from '../../util';
+import { createRotateMatrix } from '../../util/misc/matrix';
+import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
+import { Point } from '../../Point';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -168,14 +169,20 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         ? ` rotate="${toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS)}"`
         : '';
     if (renderLeft !== undefined) {
-      left = renderLeft;
+      const wBy2 = width / 2;
+      const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
+      m[4] = renderLeft!;
+      m[5] = renderTop!;
+      const renderPoint = new Point(-wBy2, 0).transform(m);
+      left = renderPoint.x;
+      top = renderPoint.y;
     }
 
     return `<tspan x="${toFixed(
       left,
       config.NUM_FRACTION_DIGITS,
     )}" y="${toFixed(
-      renderTop ?? top,
+      top,
       config.NUM_FRACTION_DIGITS,
     )}" ${dySpan}${angleAttr}${fillStyles}>${escapeXml(char)}</tspan>`;
   }

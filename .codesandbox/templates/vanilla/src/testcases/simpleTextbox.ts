@@ -41,9 +41,37 @@ export function testCase(canvas: fabric.Canvas) {
   const text = new fabric.FabricText(textValue, {
     width: 200,
     top: 20,
-    fill: 'transparent',
+    fill: '',
     stroke: 'red',
     objectCaching: false,
+    styles: {
+      0: {
+        0: {
+          fontSize: 60,
+          fill: 'blue',
+        },
+        1: {
+          fontSize: 90,
+          fill: 'green',
+        },
+        2: {
+          fontSize: 20,
+          fill: 'Yellow',
+        },
+        3: {
+          fontWeigth: 'bold',
+          fill: 'transparent',
+          strokeWidth: 4,
+          strole: 'blue',
+        },
+        4: {
+          fontWeigth: 'bold',
+          fill: 'transparent',
+          strokeWidth: 4,
+          strole: 'blue',
+        },
+      },
+    },
   });
   const pathString = makePath(text);
   const pathObject = new fabric.Path(pathString, {
