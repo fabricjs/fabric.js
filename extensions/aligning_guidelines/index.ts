@@ -101,7 +101,7 @@ export function initAligningGuidelines(
     // tr <-> tl、 bl <-> br、  mb <-> mt、 ml <-> mr
     if (target.flipX) corner = corner.replace('l', 'r').replace('r', 'l');
     if (target.flipY) corner = corner.replace('t', 'b').replace('b', 't');
-    const coords = target.getCoords();
+
     // Obtain the coordinates of the current operation point through the value of corner.
     // users can be allowed to customize and pass in custom corners.
     const pointMap = options.getPointMap?.(target) ?? getPointMap(target);
