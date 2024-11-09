@@ -1,6 +1,10 @@
 /* _TO_SVG_START_ */
 (function() {
   var toFixed = fabric.util.toFixed,
+      radiansToDegrees = fabric.util.radiansToDegrees,
+      calcRotateMatrix = fabric.util.calcRotateMatrix,
+      Point = fabric.Point,
+      transformPoint = fabric.util.transformPoint,
       multipleSpacesRegex = /  +/g;
 
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
@@ -91,19 +95,31 @@
     /**
      * @private
      */
-    _createTextCharSpan: function(_char, styleDecl, left, top) {
+    _createTextCharSpan: function(_char, styleDecl, left, top, charBox) {
       var shouldUseWhitespace = _char !== _char.trim() || _char.match(multipleSpacesRegex),
           styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
           dy = styleDecl.deltaY, dySpan = '',
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
+          angleAttr = '';
       if (dy) {
         dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
+      }
+      if (charbox.renderLeft !== undefined) {
+        var angle = charBox.angle;
+        angleAttr = ' rotate="' + toFixed(radiansToDegrees(angle), fabric.Object.NUM_FRACTION_DIGITS) + '" ';
+        var wBy2 = width / 2,
+            m = calcRotateMatrix({ angle: radiansToDegrees(angle) });
+        m[4] = charBox.renderLeft;
+        m[5] = charBox.renderTop;
+        var renderPoint = transformPoint({ x: -wBy2, y: 0 }, m);
+        left = renderPoint.x;
+        top = renderPoint.y;
       }
       return [
         '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
         toFixed(top, NUM_FRACTION_DIGITS), '" ', dySpan,
-        fillStyles, '>',
+        fillStyles, angleAttr, '>',
         fabric.util.string.escapeXml(_char),
         '</tspan>'
       ].join('');
@@ -146,7 +162,7 @@
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
-          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
+          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset, charBox));
           charsToRender = '';
           actualStyle = nextStyle;
           textLeftOffset += boxWidth;
