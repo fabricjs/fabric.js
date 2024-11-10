@@ -105,10 +105,10 @@
       if (dy) {
         dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
       }
-      if (charbox.renderLeft !== undefined) {
+      if (charBox.renderLeft !== undefined) {
         var angle = charBox.angle;
         angleAttr = ' rotate="' + toFixed(radiansToDegrees(angle), fabric.Object.NUM_FRACTION_DIGITS) + '" ';
-        var wBy2 = width / 2,
+        var wBy2 = charBox.width / 2,
             m = calcRotateMatrix({ angle: radiansToDegrees(angle) });
         m[4] = charBox.renderLeft;
         m[5] = charBox.renderTop;
@@ -139,7 +139,7 @@
 
       textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
       for (var i = 0, len = line.length - 1; i <= len; i++) {
-        timeToRender = i === len || this.charSpacing;
+        timeToRender = i === len || this.charSpacing || this.path;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
