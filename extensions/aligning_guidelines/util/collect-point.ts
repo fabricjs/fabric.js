@@ -46,6 +46,8 @@ export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
   const dStrokeWidth = target.strokeUniform ? 0 : target.strokeWidth;
   const scaleWidth = scaleX * width + dStrokeWidth;
   const sx = (v + scaleWidth) / scaleWidth;
+  // When the value of v is very small, the value of sx may be 0.
+  if (sx == 0) return [];
   if (isScale) {
     target.set('scaleX', scaleX * sx);
     if (isUniform) target.set('scaleY', scaleY * sx);
@@ -76,6 +78,8 @@ export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
   const dStrokeWidth = target.strokeUniform ? 0 : target.strokeWidth;
   const scaleHeight = scaleY * height + dStrokeWidth;
   const sy = (v + scaleHeight) / scaleHeight;
+  // When the value of v is very small, the value of sy may be 0.
+  if (sy == 0) return [];
   if (isScale) {
     target.set('scaleY', scaleY * sy);
     if (isUniform) target.set('scaleX', scaleX * sy);
