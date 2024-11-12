@@ -444,5 +444,57 @@
     width: 100,
     height: 100,
   });
+
+  function textWithPath(canvas, callback) {
+    // eslint-disable-next-line max-len
+    var circlePath = new fabric.Path('M 9.184850993605149e-15 150 A 150 150 0 0 1 9.184850993605149e-15 150 A 150 150 0 0 1 -48.70492038070252 141.8725862550952 A 150 150 0 0 1 -92.13190690345013 118.37107640945909 A 150 150 0 0 1 -125.57497173937925 82.04222371836408 A 150 150 0 0 1 -145.41003989089958 36.82282307111986 A 150 150 0 0 1 -149.4876739510005 -12.386901820849799 A 150 150 0 0 1 -137.36599899825862 -60.25431369794538 A 150 150 0 0 1 -110.35858660096977 -101.59223574386112 A 150 150 0 0 1 -71.39210895556111 -131.9210626809733 A 150 150 0 0 1 -24.68918854211018 -147.95419551040834 A 150 150 0 0 1 24.689188542109864 -147.9541955104084 A 150 150 0 0 1 71.39210895556072 -131.92106268097353 A 150 150 0 0 1 110.3585866009695 -101.59223574386141 A 150 150 0 0 1 137.36599899825842 -60.254313697945854 A 150 150 0 0 1 149.48767395100043 -12.386901820850317 A 150 150 0 0 1 145.4100398908997 36.82282307111929 A 150 150 0 0 1 125.57497173937968 82.04222371836342 A 150 150 0 0 1 92.13190690345085 118.37107640945852 A 150 150 0 0 1 48.70492038070333 141.87258625509492 A 150 150 0 0 1 9.785115956531574e-13 150', { visible: false });
+    var text = new fabric.Text('testing 123 123 123 ', {
+      left: 30,
+      top: 30,
+      fill: '',
+      stroke: 'red',
+      objectCaching: false,
+      path: circlePath,
+      styles: {
+        0: {
+          0: {
+            fontSize: 60,
+            fill: 'blue',
+          },
+          1: {
+            fontSize: 90,
+            fill: 'green',
+          },
+          2: {
+            fontSize: 20,
+            fill: 'Yellow',
+          },
+          3: {
+            fontWeigth: 'bold',
+            fill: 'transparent',
+            strokeWidth: 4,
+            strole: 'blue',
+          },
+          4: {
+            fontWeigth: 'bold',
+            fill: 'transparent',
+            strokeWidth: 4,
+            strole: 'blue',
+          },
+        },
+      },
+    });
+    canvas.add(text);
+    toSVGCanvas(canvas, callback);
+  }
+
+  tests.push({
+    test: 'Text with a path has working svg export',
+    code: textWithPath,
+    golden: 'textWithPathSvg.png',
+    percentage: 0.06,
+    width: 400,
+    height: 400,
+  });
   tests.forEach(visualTestLoop(QUnit));
 })();

@@ -69,7 +69,7 @@
     "testem:ci": "testem ci"
   },
   "optionalDependencies": {
-    "canvas": "^2.8.0",
+    "canvas": "2.11",
     "jsdom": "^19.0.0"
   },
   "devDependencies": {
@@ -87,6 +87,5 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "main": "./dist/fabric.js",
-  "dependencies": {}
+  "main": "./dist/fabric.js"
 }
