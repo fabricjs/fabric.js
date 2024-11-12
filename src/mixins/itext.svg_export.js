@@ -25,10 +25,20 @@
      * @return {String} svg representation of an instance
      */
     toSVG: function(reviver) {
-      return this._createBaseSVGMarkup(
+      var textSvg = this._createBaseSVGMarkup(
         this._toSVG(),
         { reviver: reviver, noStyle: true, withShadow: true }
       );
+      if (this.path) {
+        return (
+          textSvg +
+          this._createBaseSVGMarkup(this.path._toSVG(), {
+            reviver: reviver,
+            withShadow: true,
+          })
+        );
+      }
+      return textSvg;
     },
 
     /**
