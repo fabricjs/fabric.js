@@ -3,7 +3,6 @@
   var toFixed = fabric.util.toFixed,
       radiansToDegrees = fabric.util.radiansToDegrees,
       calcRotateMatrix = fabric.util.calcRotateMatrix,
-      Point = fabric.Point,
       transformPoint = fabric.util.transformPoint,
       multipleSpacesRegex = /  +/g;
 
