@@ -30392,10 +30392,6 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 /* _TO_SVG_START_ */
 (function() {
   var toFixed = fabric.util.toFixed,
-      radiansToDegrees = fabric.util.radiansToDegrees,
-      calcRotateMatrix = fabric.util.calcRotateMatrix,
-      Point = fabric.Point,
-      transformPoint = fabric.util.transformPoint,
       multipleSpacesRegex = /  +/g;
 
   fabric.util.object.extend(fabric.Text.prototype, /** @lends fabric.Text.prototype */ {
@@ -30486,31 +30482,19 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
     /**
      * @private
      */
-    _createTextCharSpan: function(_char, styleDecl, left, top, charBox) {
+    _createTextCharSpan: function(_char, styleDecl, left, top) {
       var shouldUseWhitespace = _char !== _char.trim() || _char.match(multipleSpacesRegex),
           styleProps = this.getSvgSpanStyles(styleDecl, shouldUseWhitespace),
           fillStyles = styleProps ? 'style="' + styleProps + '"' : '',
           dy = styleDecl.deltaY, dySpan = '',
-          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-          angleAttr = '';
+          NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS;
       if (dy) {
         dySpan = ' dy="' + toFixed(dy, NUM_FRACTION_DIGITS) + '" ';
-      }
-      if (charBox.renderLeft !== undefined) {
-        var angle = charBox.angle;
-        angleAttr = ' rotate="' + toFixed(radiansToDegrees(angle), fabric.Object.NUM_FRACTION_DIGITS) + '" ';
-        var wBy2 = charBox.width / 2,
-            m = calcRotateMatrix({ angle: radiansToDegrees(angle) });
-        m[4] = charBox.renderLeft;
-        m[5] = charBox.renderTop;
-        var renderPoint = transformPoint({ x: -wBy2, y: 0 }, m);
-        left = renderPoint.x;
-        top = renderPoint.y;
       }
       return [
         '<tspan x="', toFixed(left, NUM_FRACTION_DIGITS), '" y="',
         toFixed(top, NUM_FRACTION_DIGITS), '" ', dySpan,
-        fillStyles, angleAttr, '>',
+        fillStyles, '>',
         fabric.util.string.escapeXml(_char),
         '</tspan>'
       ].join('');
@@ -30530,7 +30514,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
 
       textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
       for (var i = 0, len = line.length - 1; i <= len; i++) {
-        timeToRender = i === len || this.charSpacing || this.path;
+        timeToRender = i === len || this.charSpacing;
         charsToRender += line[i];
         charBox = this.__charBounds[lineIndex][i];
         if (boxWidth === 0) {
@@ -30553,7 +30537,7 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
         }
         if (timeToRender) {
           style = this._getStyleDeclaration(lineIndex, i) || { };
-          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset, charBox));
+          textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
           charsToRender = '';
           actualStyle = nextStyle;
           textLeftOffset += boxWidth;
