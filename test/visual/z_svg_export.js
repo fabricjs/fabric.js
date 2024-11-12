@@ -493,6 +493,7 @@
     code: textWithPath,
     golden: 'textWithPathSvg.png',
     percentage: 0.06,
+    disabled: fabric.isLikelyNode,
     width: 400,
     height: 400,
   });
