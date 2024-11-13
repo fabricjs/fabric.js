@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [6.5.0]
+
 - fix(Canvas): Holding down Shift to select multiple shapes unexpectedly triggers the text exit event. [#10228](https://github.com/fabricjs/fabric.js/issues/10228)
 - fix(): mousedown restore after touch end on dospose [#10250](https://github.com/fabricjs/fabric.js/pull/10250)
 - feat(IText): expose getCursorRenderingData() function. [#10204](https://github.com/fabricjs/fabric.js/pull/10204)
