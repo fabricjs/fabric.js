@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.4.1]
+
+- fix() Fix the svg export of text with path [`#10268`](https://github.com/fabricjs/fabric.js/pull/10268)
+
 ## [5.4.0]
 
 - fix() fix an issue with offScreen detection and background/overlay Vpt setting [`#8896`](https://github.com/fabricjs/fabric.js/pull/8896)
