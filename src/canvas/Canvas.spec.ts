@@ -1,5 +1,7 @@
 import { Canvas } from './Canvas';
 import { Rect } from '../shapes/Rect';
+import { IText } from '../shapes/IText/IText';
+import '../shapes/ActiveSelection';
 
 describe('Canvas', () => {
   describe('touchStart', () => {
@@ -137,6 +139,33 @@ describe('Canvas', () => {
       expect(global.clearTimeout).toHaveBeenCalledWith(
         canvas._willAddMouseDown,
       );
+    });
+  });
+
+  describe('handleMultiSelection', () => {
+    const canvas = new Canvas();
+    const rect = new Rect({ left: 100, width: 100, height: 100 });
+    const iText = new IText('itext');
+    canvas.add(rect, iText);
+    test('Selecting shapes containing text does not trigger the exit event', () => {
+      const exitMock = jest.fn();
+      iText.on('editing:exited', exitMock);
+
+      const firstClick = new MouseEvent('click', {
+        clientX: 0,
+        clientY: 0,
+      });
+      canvas._onMouseDown(firstClick);
+      canvas._onMouseUp(firstClick);
+      const secondClick = new MouseEvent('click', {
+        shiftKey: true,
+        clientX: 100,
+        clientY: 0,
+      });
+      canvas._onMouseDown(secondClick);
+      canvas._onMouseUp(secondClick);
+
+      expect(exitMock).toHaveBeenCalledTimes(0);
     });
   });
 });

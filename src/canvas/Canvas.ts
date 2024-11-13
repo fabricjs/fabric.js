@@ -1446,7 +1446,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {
-        (activeObject as IText).exitEditing &&
+        (activeObject as IText).isEditing &&
           (activeObject as IText).exitEditing();
         // add the active object and the target to the active selection and set it as the active object
         const klass =
