@@ -169,6 +169,8 @@ export class FabricImage<
   declare filters: BaseFilter<string, Record<string, any>>[];
   declare resizeFilter: Resize;
 
+  declare metadata: Record<string, any>;
+
   declare _element: ImageSource;
   declare _filteredEl?: HTMLCanvasElement;
   declare _originalElement: ImageSource;
@@ -211,6 +213,7 @@ export class FabricImage<
         : arg0,
       options,
     );
+    this.metadata = {};
   }
 
   /**
@@ -218,6 +221,25 @@ export class FabricImage<
    */
   getElement() {
     return this._element;
+  }
+
+  /**
+   * Set metadata to the Image object
+   * @param {Object} metadata
+   */
+  setMetadata(metadata: Record<string, any>) {
+    this.metadata = metadata;
+  }
+
+  /**
+   * Returns the metadata of the Image object, the value if key is passed, all metadata if no key is passed
+   * @param {String} key?
+   */
+  getMetadata(key?: string) {
+    if (key) {
+      return this.metadata[key];
+    }
+    return this.metadata;
   }
 
   /**
