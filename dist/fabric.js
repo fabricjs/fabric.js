@@ -30417,13 +30417,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     toSVG: function(reviver) {
       var textSvg = this._createBaseSVGMarkup(
-        this._toSVG(),
-        { reviver: reviver, noStyle: true, withShadow: true }
-      );
-      if (this.path) {
+            this._toSVG(),
+            { reviver: reviver, noStyle: true, withShadow: true }
+          ),
+          path = this.path;
+
+      if (path) {
         return (
           textSvg +
-          this._createBaseSVGMarkup(this.path._toSVG(), {
+          path._createBaseSVGMarkup(path._toSVG(), {
             reviver: reviver,
             withShadow: true,
           })
