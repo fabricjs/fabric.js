@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.4.2]
+
+- fix() Use correct Path context when creating the svg for the path [`#10276`](https://github.com/fabricjs/fabric.js/pull/10276)
+
 ## [5.4.1]
 
 - fix() Fix the svg export of text with path [`#10268`](https://github.com/fabricjs/fabric.js/pull/10268)
