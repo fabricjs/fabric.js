@@ -35,14 +35,15 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
 
   toSVG(this: TextSVGExportMixin & FabricText, reviver?: TSVGReviver): string {
     const textSvg = this._createBaseSVGMarkup(this._toSVG(), {
-      reviver,
-      noStyle: true,
-      withShadow: true,
-    });
-    if (this.path) {
+        reviver,
+        noStyle: true,
+        withShadow: true,
+      }),
+      path = this.path;
+    if (path) {
       return (
         textSvg +
-        this._createBaseSVGMarkup(this.path._toSVG(), {
+        path._createBaseSVGMarkup(path._toSVG(), {
           reviver,
           withShadow: true,
         })
