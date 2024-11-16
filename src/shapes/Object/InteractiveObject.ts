@@ -449,7 +449,7 @@ export class InteractiveFabricObject<
     const options = qrDecompose(matrix);
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
+    ctx.lineWidth = this.borderScaleFactor; // 1 * this.borderScaleFactor;
     // since interactive groups have been introduced, an object could be inside a group and needing controls
     // the following equality check `this.group === this.parent` covers:
     // object without a group ( undefined === undefined )
