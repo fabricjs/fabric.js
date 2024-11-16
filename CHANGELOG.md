@@ -2,7 +2,7 @@
 
 ## [next]
 
-- add missing export [#10281](https://github.com/fabricjs/fabric.js/pull/10281)
+- fix(TS): Add missing export for type DrawContext [#10281](https://github.com/fabricjs/fabric.js/pull/10281)
 
 ## [6.5.0]
 
