@@ -29,10 +29,11 @@ export interface BorderProps {
   borderOpacityWhenMoving: number;
 
   /**
-   * Scale factor of object's controlling borders
-   * bigger number will make a thicker border
-   * border is 1, so this is basically a border thickness
-   * since there is no way to change the border itself.
+   * Scale factor for the border of the objects ( selection box and controls stroke ).
+   * Bigger number will make a thicker border
+   * border default value is 1, so this scale value is equal to a border and control strokeWidth.
+   * Id you need to divide border from control strokeWidth
+   * you will need to write your own render function for controls
    * @type Number
    * @default 1
    */
