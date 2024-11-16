@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(Control): Borderscalefactor should apply to controls as well [#10283](https://github.com/fabricjs/fabric.js/pull/10283)
+
 ## [6.5.0]
 
 - fix(Canvas): Holding down Shift to select multiple shapes unexpectedly triggers the text exit event. [#10228](https://github.com/fabricjs/fabric.js/issues/10228)
