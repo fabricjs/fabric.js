@@ -2,6 +2,8 @@
 
 ## [next]
 
+- add missing export [#10281](https://github.com/fabricjs/fabric.js/pull/10281)
+
 ## [6.5.0]
 
 - fix(Canvas): Holding down Shift to select multiple shapes unexpectedly triggers the text exit event. [#10228](https://github.com/fabricjs/fabric.js/issues/10228)
