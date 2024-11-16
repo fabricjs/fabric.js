@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
 - fix(TS): Add missing export for type DrawContext [#10281](https://github.com/fabricjs/fabric.js/pull/10281)
 - fix(Control): Borderscalefactor should apply to controls as well [#10283](https://github.com/fabricjs/fabric.js/pull/10283)
 
