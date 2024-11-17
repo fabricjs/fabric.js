@@ -165,12 +165,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
       dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '',
-      { angle, renderLeft, renderTop, width } = charBox,
-      angleAttr = angle
-        ? ` rotate="${toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS)}"`
-        : '';
+      { angle, renderLeft, renderTop, width } = charBox;
+    let angleAttr = '';
     if (renderLeft !== undefined) {
       const wBy2 = width / 2;
+      angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS)}"`;
       const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
       m[4] = renderLeft!;
       m[5] = renderTop!;
