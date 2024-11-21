@@ -2,6 +2,8 @@
 
 ## [next]
 
+-fix(): The _setLineDash method has additional side effects, altering the value of strokeDashArray [#10292](https://github.com/fabricjs/fabric.js/issues/10292)
+
 ## [6.5.1]
 
 - fix(TS): Add missing export for type DrawContext [#10281](https://github.com/fabricjs/fabric.js/pull/10281)

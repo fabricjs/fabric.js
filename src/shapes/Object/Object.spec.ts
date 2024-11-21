@@ -2,6 +2,7 @@ import { Shadow } from '../../Shadow';
 import { Rect } from '../Rect';
 import { FabricObject } from './Object';
 import { Group } from '../Group';
+import { createCanvasElement } from '../../util';
 
 describe('Object', () => {
   it('tests constructor & properties', () => {
@@ -143,4 +144,13 @@ describe('Object', () => {
       expect(rect.parent.dirty).toBe(true);
     });
   });
+
+  it('test strokeDashArray with an odd number of elements.', () => {
+    const dashArrayBase = [1];
+    const dashArray = dashArrayBase.slice(0);
+    const ctx = createCanvasElement().getContext("2d");
+    if (!ctx) return;
+    FabricObject.prototype['_setLineDash'].call(new FabricObject(), ctx, dashArray);
+    expect(dashArray).toStrictEqual(dashArrayBase);
+  })
 });
