@@ -1038,10 +1038,6 @@ export class FabricObject<
     if (!dashArray || dashArray.length === 0) {
       return;
     }
-    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
-    if (1 & dashArray.length) {
-      dashArray.push(...dashArray);
-    }
     ctx.setLineDash(dashArray);
   }
 
