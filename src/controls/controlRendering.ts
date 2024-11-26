@@ -75,8 +75,6 @@ export function renderCircleControl(
   } else {
     size = xSize;
   }
-  // this is still wrong
-  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
   ctx[methodName]();
@@ -123,8 +121,6 @@ export function renderSquareControl(
   ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
     styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
-  // this is still wrong
-  ctx.lineWidth = 1;
   ctx.translate(left, top);
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle();

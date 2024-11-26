@@ -107,6 +107,7 @@ export default [
           }
         : null,
       // umd module in bundle, the cdn one for fiddles
+      // deprecated, this will be available only minified for cdn.
       {
         file: path.resolve(dirname, `${basename}.js`),
         name: 'fabric',
@@ -135,7 +136,7 @@ export default [
         format: 'es',
         sourcemap: true,
       },
-      // todo remove
+      // deprecated remove
       {
         file: path.resolve(dirname, `${basename}.node.cjs`),
         name: 'fabric',

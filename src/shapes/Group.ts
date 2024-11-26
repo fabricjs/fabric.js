@@ -34,6 +34,7 @@ import {
 } from '../LayoutManager/constants';
 import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 import type { FitContentLayout } from '../LayoutManager';
+import type { DrawContext } from './Object/Object';
 
 /**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
@@ -42,7 +43,6 @@ import type { FitContentLayout } from '../LayoutManager';
  * This layout manager doesn't do anything and therefore keeps the exact layout the group had when {@link Group#toObject} was called.
  */
 class NoopLayoutManager extends LayoutManager {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   performLayout() {}
 }
 
@@ -493,23 +493,25 @@ export class Group
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
-  drawObject(ctx: CanvasRenderingContext2D) {
+  drawObject(
+    ctx: CanvasRenderingContext2D,
+    forClipping: boolean | undefined,
+    context: DrawContext,
+  ) {
     this._renderBackground(ctx);
     for (let i = 0; i < this._objects.length; i++) {
+      const obj = this._objects[i];
       // TODO: handle rendering edge case somehow
-      if (
-        this.canvas?.preserveObjectStacking &&
-        this._objects[i].group !== this
-      ) {
+      if (this.canvas?.preserveObjectStacking && obj.group !== this) {
         ctx.save();
         ctx.transform(...invertTransform(this.calcTransformMatrix()));
-        this._objects[i].render(ctx);
+        obj.render(ctx);
         ctx.restore();
-      } else if (this._objects[i].group === this) {
-        this._objects[i].render(ctx);
+      } else if (obj.group === this) {
+        obj.render(ctx);
       }
     }
-    this._drawClipPath(ctx, this.clipPath);
+    this._drawClipPath(ctx, this.clipPath, context);
   }
 
   /**

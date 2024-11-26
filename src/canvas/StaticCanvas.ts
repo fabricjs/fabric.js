@@ -26,7 +26,7 @@ import {
 } from '../util/animation/AnimationFrameProvider';
 import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement, toDataURL } from '../util/misc/dom';
+import { createCanvasElementFor, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
@@ -585,9 +585,10 @@ export class StaticCanvas<
     if (path) {
       path._set('canvas', this);
       // needed to setup a couple of variables
+      // todo migrate to the newer one
       path.shouldCache();
       path._transformDone = true;
-      path.renderCache({ forClipping: true });
+      (path as TCachedFabricObject).renderCache({ forClipping: true });
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
@@ -1334,9 +1335,7 @@ export class StaticCanvas<
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    */
   cloneWithoutData() {
-    const el = createCanvasElement();
-    el.width = this.width;
-    el.height = this.height;
+    const el = createCanvasElementFor(this);
     return new (this.constructor as Constructor<this>)(el);
   }
 
@@ -1425,12 +1424,13 @@ export class StaticCanvas<
       translateY = (vp[5] - (top || 0)) * multiplier,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
-      canvasEl = createCanvasElement(),
+      canvasEl = createCanvasElementFor({
+        width: scaledWidth,
+        height: scaledHeight,
+      }),
       objectsToRender = filter
         ? this._objects.filter((obj) => filter(obj))
         : this._objects;
-    canvasEl.width = scaledWidth;
-    canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;

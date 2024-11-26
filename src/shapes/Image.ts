@@ -11,7 +11,7 @@ import type {
   TOptions,
 } from '../typedefs';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement } from '../util/misc/dom';
+import { createCanvasElementFor } from '../util/misc/dom';
 import { findScaleToCover, findScaleToFit } from '../util/misc/findScaleTo';
 import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import {
@@ -497,19 +497,16 @@ export class FabricImage<
       this._lastScaleY = scaleY;
       return;
     }
-    const canvasEl = createCanvasElement(),
-      sourceWidth = elementToFilter.width,
-      sourceHeight = elementToFilter.height;
-    canvasEl.width = sourceWidth;
-    canvasEl.height = sourceHeight;
+    const canvasEl = createCanvasElementFor(elementToFilter),
+      { width, height } = elementToFilter;
     this._element = canvasEl;
     this._lastScaleX = filter.scaleX = scaleX;
     this._lastScaleY = filter.scaleY = scaleY;
     getFilterBackend().applyFilters(
       [filter],
       elementToFilter,
-      sourceWidth,
-      sourceHeight,
+      width,
+      height,
       this._element,
     );
     this._filterScalingX = canvasEl.width / this._originalElement.width;
@@ -549,9 +546,10 @@ export class FabricImage<
     if (this._element === this._originalElement) {
       // if the _element a reference to _originalElement
       // we need to create a new element to host the filtered pixels
-      const canvasEl = createCanvasElement();
-      canvasEl.width = sourceWidth;
-      canvasEl.height = sourceHeight;
+      const canvasEl = createCanvasElementFor({
+        width: sourceWidth,
+        height: sourceHeight,
+      });
       this._element = canvasEl;
       this._filteredEl = canvasEl;
     } else if (this._filteredEl) {

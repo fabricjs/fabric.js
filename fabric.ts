@@ -64,7 +64,10 @@ export {
 /**
  * Exported so we can tweak default values
  */
-export { FabricObject as BaseFabricObject } from './src/shapes/Object/Object';
+export {
+  FabricObject as BaseFabricObject,
+  type DrawContext,
+} from './src/shapes/Object/Object';
 /**
  * Exported so we can tweak default values
  */
@@ -116,6 +119,8 @@ export {
 export type {
   ITextProps,
   SerializedITextProps,
+  CursorRenderingData,
+  CursorBoundaries,
 } from './src/shapes/IText/IText';
 export { IText } from './src/shapes/IText/IText';
 export type {
