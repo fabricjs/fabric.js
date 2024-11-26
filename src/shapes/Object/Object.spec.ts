@@ -2,7 +2,6 @@ import { Shadow } from '../../Shadow';
 import { Rect } from '../Rect';
 import { FabricObject } from './Object';
 import { Group } from '../Group';
-import { createCanvasElement } from '../../util';
 
 describe('Object', () => {
   it('tests constructor & properties', () => {
@@ -147,10 +146,14 @@ describe('Object', () => {
 
   it('test strokeDashArray with an odd number of elements.', () => {
     const dashArrayBase = [1];
-    const dashArray = dashArrayBase.slice(0);
-    const ctx = createCanvasElement().getContext("2d");
-    if (!ctx) return;
-    FabricObject.prototype['_setLineDash'].call(new FabricObject(), ctx, dashArray);
-    expect(dashArray).toStrictEqual(dashArrayBase);
-  })
+    const ctx = {
+      setLineDash: jest.fn(),
+    } as unknown as CanvasRenderingContext2D;
+    const obj = new FabricObject({
+      strokeDashArray: [1],
+    });
+    obj._setLineDash(ctx, dashArrayBase);
+    expect(ctx.setLineDash).toHaveBeenCalledWith(dashArrayBase);
+    expect(obj.strokeDashArray).toEqual([1]);
+  });
 });
