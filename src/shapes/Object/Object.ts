@@ -1075,12 +1075,7 @@ export class FabricObject<
     if (!dashArray || dashArray.length === 0) {
       return;
     }
-    const lineDash = dashArray.slice(0);
-    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
-    if (1 & lineDash.length) {
-      lineDash.push(...lineDash);
-    }
-    ctx.setLineDash(lineDash);
+    ctx.setLineDash(dashArray);
   }
 
   /**
