@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): for object caching over invalidating the cache [#10294](https://github.com/fabricjs/fabric.js/pull/10294)
+
 ## [6.5.1]
 
 - fix(TS): Add missing export for type DrawContext [#10281](https://github.com/fabricjs/fabric.js/pull/10281)
