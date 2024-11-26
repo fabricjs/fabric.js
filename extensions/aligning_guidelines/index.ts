@@ -28,7 +28,7 @@ export type { AligningLineConfig } from './typedefs';
 
 export function initAligningGuidelines(
   canvas: Canvas,
-  options: Partial<AligningLineConfig> = {}
+  options: Partial<AligningLineConfig> = {},
 ) {
   Object.assign(aligningLineConfig, options);
 
@@ -119,7 +119,11 @@ export function initAligningGuidelines(
       options.getContraryMap?.(target) ?? getContraryMap(target);
 
     const point = pointMap[corner];
-    const diagonalPoint = contraryMap[corner];
+    let diagonalPoint = contraryMap[corner];
+    // When holding the centerKey (default is altKey), the shape will scale based on the center point, with the reference point being the center.
+    const isCenter = e.transform.altKey;
+    if (isCenter) diagonalPoint = diagonalPoint.add(point).scalarDivide(2);
+
     const uniformIsToggled = e.e[canvas.uniScaleKey!];
     let isUniform =
       (canvas.uniformScaling && !uniformIsToggled) ||
@@ -139,6 +143,7 @@ export function initAligningGuidelines(
       list,
       isScale,
       isUniform,
+      isCenter,
     };
     // Obtain horizontal and vertical reference lines.
     const vLines = collectVerticalPoint(props);
