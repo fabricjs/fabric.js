@@ -133,7 +133,12 @@ export function initAligningGuidelines(
     if (onlyDrawPoint) isUniform = false;
 
     const list: Point[] = [];
-    for (const object of objects) list.push(...getCaCheMapValue(object));
+    for (const object of objects) {
+      const d = getCaCheMapValue(object);
+      // When only drawing reference points, the reference shape's center point becomes irrelevant. Disable it.
+      const count = onlyDrawPoint ? d.length - 1 : d.length;
+      list.push(...d.slice(0, count));
+    }
 
     const props = {
       target,
