@@ -3,6 +3,11 @@
 ## [next]
 
 - fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
+- fix(): The \_setLineDash method has additional side effects, altering the value of strokeDashArray [#10292](https://github.com/fabricjs/fabric.js/issues/10292)
+- fix(): for object caching over invalidating the cache [#10294](https://github.com/fabricjs/fabric.js/pull/10294)
+
+## [6.5.1]
+
 - fix(TS): Add missing export for type DrawContext [#10281](https://github.com/fabricjs/fabric.js/pull/10281)
 - fix(Control): Borderscalefactor should apply to controls as well [#10283](https://github.com/fabricjs/fabric.js/pull/10283)
 

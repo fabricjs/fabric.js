@@ -461,7 +461,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.4.3";
+var version = "6.5.1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -7437,10 +7437,6 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
     if (!dashArray || dashArray.length === 0) {
       return;
     }
-    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
-    if (1 & dashArray.length) {
-      dashArray.push(...dashArray);
-    }
     ctx.setLineDash(dashArray);
   }
 
@@ -8361,8 +8357,6 @@ function renderCircleControl(ctx, left, top, styleOverride, fabricObject) {
   } else {
     size = xSize;
   }
-  // this is still wrong
-  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
   ctx[methodName]();
@@ -8395,8 +8389,6 @@ function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
   ctx.save();
   ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
-  // this is still wrong
-  ctx.lineWidth = 1;
   ctx.translate(left, top);
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle();
@@ -9524,7 +9516,7 @@ class InteractiveFabricObject extends FabricObject$1 {
     const options = qrDecompose(matrix);
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
+    ctx.lineWidth = this.borderScaleFactor; // 1 * this.borderScaleFactor;
     // since interactive groups have been introduced, an object could be inside a group and needing controls
     // the following equality check `this.group === this.parent` covers:
     // object without a group ( undefined === undefined )
