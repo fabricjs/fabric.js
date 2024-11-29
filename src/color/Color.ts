@@ -42,6 +42,7 @@ export class Color {
    * @returns {TRGBAColorSource}
    */
   protected _tryParsingColor(color: string) {
+    color = color.toLowerCase();
     if (color in ColorNameMap) {
       color = ColorNameMap[color as keyof typeof ColorNameMap];
     }
