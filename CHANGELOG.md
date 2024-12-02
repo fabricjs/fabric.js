@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(Color): Support uppercase keywords [#10300](https://github.com/fabricjs/fabric.js/pull/10300)
 - fix(): The \_setLineDash method has additional side effects, altering the value of strokeDashArray [#10292](https://github.com/fabricjs/fabric.js/issues/10292)
 - fix(): for object caching over invalidating the cache [#10294](https://github.com/fabricjs/fabric.js/pull/10294)
 
