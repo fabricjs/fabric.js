@@ -57,9 +57,9 @@ describe('Color regex and conversion tests', () => {
   });
 
   it('Create colors through keywords', () => {
-    const color1 = new Color("red");
-    const color2 = new Color("RED");
-    const red = "rgb(255,0,0)";
+    const color1 = new Color('red');
+    const color2 = new Color('RED');
+    const red = 'rgb(255,0,0)';
     expect(color1.toRgb()).toBe(red);
     expect(color2.toRgb()).toBe(red);
   });
