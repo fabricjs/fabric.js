@@ -62,5 +62,5 @@ describe('Color regex and conversion tests', () => {
     const red = "rgb(255,0,0)";
     expect(color1.toRgb()).toBe(red);
     expect(color2.toRgb()).toBe(red);
-  })
+  });
 });
