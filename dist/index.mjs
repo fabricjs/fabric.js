@@ -2375,6 +2375,7 @@ class Color {
    * @returns {TRGBAColorSource}
    */
   _tryParsingColor(color) {
+    color = color.toLowerCase();
     if (color in ColorNameMap) {
       color = ColorNameMap[color];
     }
@@ -6844,8 +6845,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       // for sure this ALIASING_LIMIT is slightly creating problem
       // in situation in which the cache canvas gets an upper limit
       // also objectScale contains already scaleX and scaleY
-      width: neededX + ALIASING_LIMIT,
-      height: neededY + ALIASING_LIMIT,
+      width: Math.ceil(neededX + ALIASING_LIMIT),
+      height: Math.ceil(neededY + ALIASING_LIMIT),
       zoomX: objectScale.x,
       zoomY: objectScale.y,
       x: neededX,
@@ -6862,51 +6863,30 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas,
       context = this._cacheContext,
-      dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      minCacheSize = config.minCacheSideLimit,
-      width = dims.width,
-      height = dims.height,
-      zoomX = dims.zoomX,
-      zoomY = dims.zoomY,
+      {
+        width,
+        height,
+        zoomX,
+        zoomY,
+        x,
+        y
+      } = this._limitCacheSize(this._getCacheCanvasDimensions()),
       dimensionsChanged = width !== canvas.width || height !== canvas.height,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
     if (!canvas || !context) {
       return false;
     }
-    let drawingWidth,
-      drawingHeight,
-      shouldRedraw = dimensionsChanged || zoomChanged,
-      additionalWidth = 0,
-      additionalHeight = 0,
-      shouldResizeCanvas = false;
-    if (dimensionsChanged) {
-      const canvasWidth = this._cacheCanvas.width,
-        canvasHeight = this._cacheCanvas.height,
-        sizeGrowing = width > canvasWidth || height > canvasHeight,
-        sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) && canvasWidth > minCacheSize && canvasHeight > minCacheSize;
-      shouldResizeCanvas = sizeGrowing || sizeShrinking;
-      if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
-        additionalWidth = width * 0.1;
-        additionalHeight = height * 0.1;
-      }
-    }
-    if (isTextObject(this) && this.path) {
-      shouldRedraw = true;
-      shouldResizeCanvas = true;
-      // IMHO in those lines we are using zoomX and zoomY not the this version.
-      additionalWidth += this.getHeightOfLine(0) * this.zoomX;
-      additionalHeight += this.getHeightOfLine(0) * this.zoomY;
-    }
+    const shouldRedraw = dimensionsChanged || zoomChanged;
     if (shouldRedraw) {
-      if (shouldResizeCanvas) {
-        canvas.width = Math.ceil(width + additionalWidth);
-        canvas.height = Math.ceil(height + additionalHeight);
+      if (width !== canvas.width || height !== canvas.height) {
+        canvas.width = width;
+        canvas.height = height;
       } else {
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
-      drawingWidth = dims.x / 2;
-      drawingHeight = dims.y / 2;
+      const drawingWidth = x / 2;
+      const drawingHeight = y / 2;
       this.cacheTranslationX = Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY = Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
       context.translate(this.cacheTranslationX, this.cacheTranslationY);
