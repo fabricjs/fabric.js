@@ -22,7 +22,7 @@ jobs:
   node-coverage:
     needs: [prime-build]
     runs-on: ubuntu-latest
-    name: Node 20.x ${{ matrix.suite }} tests
+    name: Node 18.x ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
       matrix:
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [20]
         target: [chrome, firefox]
         suite: [unit, visual]
       fail-fast: false
@@ -80,14 +80,14 @@ jobs:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: ['18.x']
+        node-version: [18, 22]
         suite: [unit, visual]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-          install-system-deps: 'false'
+          install-system-deps: ${{ matrix.node-version >= 22 }}
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
@@ -144,7 +144,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 18.x
           install-system-deps: false
       - uses: actions/download-artifact@v4
         with:
