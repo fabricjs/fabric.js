@@ -50,10 +50,13 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
     const adjust = -this.saturation;
     for (let i = 0; i < data.length; i += 4) {
-      const max = Math.max(data[i], data[i + 1], data[i + 2]);
-      data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
-      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
-      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const max = Math.max(r, g, b);
+      data[i] += max !== r ? (max - r) * adjust : 0;
+      data[i + 1] += max !== g ? (max - g) * adjust : 0;
+      data[i + 2] += max !== b ? (max - b) * adjust : 0;
     }
   }
 

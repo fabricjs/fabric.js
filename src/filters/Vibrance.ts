@@ -50,12 +50,15 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
     const adjust = -this.vibrance;
     for (let i = 0; i < data.length; i += 4) {
-      const max = Math.max(data[i], data[i + 1], data[i + 2]);
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const max = Math.max(r, g, b);
+      const avg = (r + g + b) / 3;
       const amt = ((Math.abs(max - avg) * 2) / 255) * adjust;
-      data[i] += max !== data[i] ? (max - data[i]) * amt : 0;
-      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
-      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
+      data[i] += max !== r ? (max - r) * amt : 0;
+      data[i + 1] += max !== g ? (max - g) * amt : 0;
+      data[i + 2] += max !== b ? (max - b) * amt : 0;
     }
   }
 
