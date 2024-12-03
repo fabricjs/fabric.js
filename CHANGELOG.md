@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Test node 22 again [#10310](https://github.com/fabricjs/fabric.js/pull/10310)
 - chore(TS): Try to remove all TS-ERROR directives [#10309](https://github.com/fabricjs/fabric.js/pull/10309)
 - chore(): Make TS config more strict [#10308](https://github.com/fabricjs/fabric.js/pull/10308)
 - fix(Color): Support uppercase keywords [#10300](https://github.com/fabricjs/fabric.js/pull/10300)
