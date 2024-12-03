@@ -9,7 +9,7 @@ on:
 
 jobs:
   prime-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -21,8 +21,8 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
   node-coverage:
     needs: [prime-build]
-    runs-on: ubuntu-latest
-    name: Node 18.x ${{ matrix.suite }} tests
+    runs-on: ubuntu-24.04
+    name: Node 20.x ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
       matrix:
@@ -53,7 +53,7 @@ jobs:
   browser:
     needs: [prime-build]
     name: ${{ matrix.target }} ${{ matrix.suite }} tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         node-version: [20]
@@ -72,7 +72,7 @@ jobs:
         run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     needs: [prime-build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
@@ -94,7 +94,7 @@ jobs:
         run: npm run test -- -c node -s ${{ matrix.suite }}
   jest:
     name: Jest tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
@@ -112,7 +112,7 @@ jobs:
   e2e:
     needs: [prime-build]
     name: Playwright tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
@@ -139,7 +139,7 @@ jobs:
   coverage:
     needs: [node-coverage, e2e]
     name: Coverage reporting
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install

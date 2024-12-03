@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Uglified build
         uses: actions/checkout@v4
@@ -17,7 +17,7 @@ jobs:
       - run: npm run build
   stats:
     name: Build stats
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       minified: dist/index.min.js
       bundled: dist/index.mjs
@@ -69,7 +69,7 @@ jobs:
               b: JSON.parse('${{ steps.b.outputs.result }}'),
             });
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Linting
         uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
           node-version: 20.x
       - run: npm run lint
   prettier:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Prettier check
         uses: actions/checkout@v4

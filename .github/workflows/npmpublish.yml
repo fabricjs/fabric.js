@@ -9,7 +9,7 @@ on:
 
 jobs:
   publish-npm:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,7 +23,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
           PRE_RELEASE: ${{github.event.release.prerelease}}
   update-bug-report:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # wait for publishing to complete
     needs: publish-npm
     if: always()
