@@ -4,13 +4,21 @@ import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 
 type ComposedOwnProps = {
-  subFilters: BaseFilter<string, object>[];
+  subFilters: BaseFilter<string, object, object>[];
+};
+
+type ComposedSerializedProps = {
+  subFilters: Record<string, unknown>[];
 };
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
-export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
+export class Composed extends BaseFilter<
+  'Composed',
+  ComposedOwnProps,
+  ComposedSerializedProps
+> {
   /**
    * A non sparse array of filters to apply
    */
@@ -47,11 +55,7 @@ export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
    * Serialize this filter into JSON.
    * @returns {Object} A JSON representation of this filter.
    */
-  //@ts-expect-error TS doesn't like this toObject
-  toObject(): {
-    type: 'Composed';
-    subFilters: ReturnType<BaseFilter<string, object>['toObject']>[];
-  } {
+  toObject() {
     return {
       type: this.type,
       subFilters: this.subFilters.map((filter) => filter.toObject()),
