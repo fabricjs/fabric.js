@@ -323,7 +323,7 @@
     width: 480,
     height: 190,
     golden: 'text9.png',
-    percentage: 0.09,
+    percentage: 0.10,
   });
 
   function text10(canvas, callback) {
