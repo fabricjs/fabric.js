@@ -52,7 +52,7 @@ export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
           break;
       }
 
-      data[i] = data[i + 1] = data[i + 2] = value;
+      data[i + 2] = data[i + 1] = data[i] = value;
     }
   }
 
