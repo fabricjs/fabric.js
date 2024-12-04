@@ -91,7 +91,8 @@ export class ColorMatrix<
         data[i] += a * m[3];
         data[i + 1] += a * m[8];
         data[i + 2] += a * m[13];
-        data[i + 3] += a * m[18];
+        data[i + 3] =
+          r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
       }
     }
   }
