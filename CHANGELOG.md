@@ -2,7 +2,7 @@
 
 ## [next]
 
-- chore(): Remove verbose code in filters [#10311](https://github.com/fabricjs/fabric.js/pull/10311)
+- chore(): Reduce some verbose code [#10311](https://github.com/fabricjs/fabric.js/pull/10311)
 - ci(): Test node 22 again [#10310](https://github.com/fabricjs/fabric.js/pull/10310)
 - chore(TS): Try to remove all TS-ERROR directives [#10309](https://github.com/fabricjs/fabric.js/pull/10309)
 - chore(): Make TS config more strict [#10308](https://github.com/fabricjs/fabric.js/pull/10308)
