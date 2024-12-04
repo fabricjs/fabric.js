@@ -45,17 +45,12 @@ jobs:
         if: matrix.suite == 'visual'
         run: npm run test:visual:coverage
       - name: Upload test coverage unit
-        if: matrix.suite == 'unit'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-unit
-          path: .nyc_output/*.json
-      - name: Upload test coverage visual
-        if: matrix.suite == 'visual'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-visual
-          path: .nyc_output/*.json
+          name: coverage-${{ matrix.suite }}
+          path: .nyc_output/*
+          include-hidden-files: true
+
   browser:
     needs: [prime-build]
     name: ${{ matrix.target }} ${{ matrix.suite }} tests
