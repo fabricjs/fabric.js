@@ -405,7 +405,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.5.2";
+var version = "6.5.3";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -26557,7 +26557,7 @@ class ColorMatrix extends BaseFilter {
         data[i] += a * m[3];
         data[i + 1] += a * m[8];
         data[i + 2] += a * m[13];
-        data[i + 3] += a * m[18];
+        data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
       }
     }
   }
