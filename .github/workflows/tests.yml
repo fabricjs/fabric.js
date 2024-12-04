@@ -44,11 +44,13 @@ jobs:
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.suite == 'visual'
         run: npm run test:visual:coverage
-      - name: Upload test coverage unit
+      - name: Verify coverage files
+        run: ls -l ./.nyc_output/*.json
+      - name: Upload test coverage ${{ matrix.suite }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.suite }}
-          path: .nyc_output/*
+          path: ./.nyc_output/*.json
           include-hidden-files: true
 
   browser:
@@ -108,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-jest
-          path: .nyc_output/*.json
+          path: ./.nyc_output/*.json
 
   e2e:
     needs: [prime-build]
@@ -150,20 +152,20 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: coverage-e2e
-          path: .nyc_output
+          path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-jest
-          path: .nyc_output
+          path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-unit
-          path: .nyc_output
+          path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-visual
-          path: .nyc_output
-      - run: ls -l .nyc_output
+          path: ./.nyc_output
+      - run: ls -l ./.nyc_output
       - run: npm run coverage:report
       - uses: romeovs/lcov-reporter-action@v0.4.0
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
