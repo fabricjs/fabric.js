@@ -111,6 +111,7 @@ jobs:
         with:
           name: coverage-jest
           path: ./.nyc_output/*.json
+          include-hidden-files: true
 
   e2e:
     needs: [prime-build]
@@ -134,11 +135,13 @@ jobs:
         with:
           name: e2e-report
           path: ./e2e/test-report/
+          include-hidden-files: true
       - name: Upload Test Coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
+          include-hidden-files: true
   coverage:
     needs: [node-coverage, e2e]
     name: Coverage reporting
