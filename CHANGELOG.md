@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(ColorMatrix): Restore correct alpha for JS colorMatrix filter [#10313](https://github.com/fabricjs/fabric.js/pull/10313)
+
 ## [6.5.2]
 
 - chore(): Reduce some verbose code [#10311](https://github.com/fabricjs/fabric.js/pull/10311)
