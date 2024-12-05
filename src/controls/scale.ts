@@ -37,6 +37,7 @@ export function scaleIsProportional(
   eventData: TPointerEvent,
   fabricObject: FabricObject,
 ): boolean {
+  if (fabricObject.lockUniScaling) return true;
   const canvas = fabricObject.canvas as Canvas,
     uniformIsToggled = eventData[canvas.uniScaleKey!];
   return (
@@ -139,6 +140,13 @@ function scaleObject(
   if (forbidScaling) {
     return false;
   }
+
+  if (target.canvas?.snapPointFn && !target.angle) {
+    const snapped = target.canvas.snapPointFn([x, y]);
+    x = snapped[0];
+    y = snapped[1];
+  }
+
   if (transform.gestureScale) {
     scaleX = transform.scaleX * transform.gestureScale;
     scaleY = transform.scaleY * transform.gestureScale;
@@ -175,14 +183,21 @@ function scaleObject(
     // missing detection of flip and logic to switch the origin
     if (scaleProportionally && !by) {
       // uniform scaling
-      const distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
-        { original } = transform,
-        originalDistance =
-          Math.abs((dim.x * original.scaleX) / target.scaleX) +
-          Math.abs((dim.y * original.scaleY) / target.scaleY),
-        scale = distance / originalDistance;
-      scaleX = original.scaleX * scale;
-      scaleY = original.scaleY * scale;
+      // const distance = Math.abs(newPoint.x) + Math.abs(newPoint.y),
+      //   { original } = transform,
+      //   originalDistance =
+      //     Math.abs((dim.x * original.scaleX) / target.scaleX) +
+      //     Math.abs((dim.y * original.scaleY) / target.scaleY),
+      //   scale = distance / originalDistance;
+      // scaleX = original.scaleX * scale;
+      // scaleY = original.scaleY * scale;
+
+      // new logic to scale upto furthest point
+      scaleX = Math.abs(newPoint.x * target.scaleX / dim.x) / transform.original.scaleX;
+      scaleY = Math.abs(newPoint.y * target.scaleY / dim.y) / transform.original.scaleY;
+      const scale = Math.max(scaleX, scaleY);
+      scaleX = transform.original.scaleX * scale;
+      scaleY = transform.original.scaleY * scale;
     } else {
       scaleX = Math.abs((newPoint.x * target.scaleX) / dim.x);
       scaleY = Math.abs((newPoint.y * target.scaleY) / dim.y);

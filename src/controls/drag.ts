@@ -18,10 +18,17 @@ export const dragHandler: TransformActionHandler = (
   x,
   y,
 ) => {
-  const { target, offsetX, offsetY } = transform,
-    newLeft = x - offsetX,
-    newTop = y - offsetY,
-    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
+  const { target, offsetX, offsetY } = transform;
+  let newLeft = x - offsetX, newTop = y - offsetY;
+
+  if (target.canvas?.snapObjectFn) {
+    const change = [newLeft - target.left, newTop - target.top] as [number, number];
+    const offset = target.canvas?.snapObjectFn(target, change);
+    newLeft += offset[0];
+    newTop += offset[1];
+  }
+
+  const moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
     moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
   moveX && target.set(LEFT, newLeft);
   moveY && target.set(TOP, newTop);

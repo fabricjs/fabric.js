@@ -148,8 +148,7 @@ import { isActiveSelection } from '../util/typeAssertions';
  */
 export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   extends StaticCanvas<EventSpec>
-  implements Omit<CanvasOptions, 'enablePointerEvents'>
-{
+  implements Omit<CanvasOptions, 'enablePointerEvents'> {
   declare _objects: FabricObject[];
 
   // transform config
@@ -159,6 +158,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare centeredRotation: boolean;
   declare centeredKey: TOptionalModifierKey;
   declare altActionKey: TOptionalModifierKey;
+  declare snapAngleKey: TOptionalModifierKey;
 
   // selection config
   declare selection: boolean;
@@ -183,6 +183,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare perPixelTargetFind: boolean;
   declare targetFindTolerance: number;
   declare skipTargetFind: boolean;
+
+  // snapping
+  declare snapPointFn?: (point: [number, number]) => [number, number];
+  declare snapObjectFn?: (object: FabricObject, diff: [number, number]) => [number, number];
 
   /**
    * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
@@ -361,8 +365,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const activeObject = this._activeObject;
     return !this.preserveObjectStacking && activeObject
       ? this._objects
-          .filter((object) => !object.group && object !== activeObject)
-          .concat(activeObject)
+        .filter((object) => !object.group && object !== activeObject)
+        .concat(activeObject)
       : this._objects;
   }
 
@@ -594,11 +598,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   ): void {
     const pointer = target.group
       ? // transform pointer to target's containing coordinate plane
-        sendPointToPlane(
-          this.getScenePoint(e),
-          undefined,
-          target.group.calcTransformMatrix(),
-        )
+      sendPointToPlane(
+        this.getScenePoint(e),
+        undefined,
+        target.group.calcTransformMatrix(),
+      )
       : this.getScenePoint(e);
     const { key: corner = '', control } = target.getActiveControl() || {},
       actionHandler =
@@ -985,9 +989,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       boundsWidth === 0 || boundsHeight === 0
         ? new Point(1, 1)
         : new Point(
-            upperCanvasEl.width / boundsWidth,
-            upperCanvasEl.height / boundsHeight,
-          );
+          upperCanvasEl.width / boundsWidth,
+          upperCanvasEl.height / boundsHeight,
+        );
 
     return pointer.multiply(cssScale);
   }

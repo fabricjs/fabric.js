@@ -26,6 +26,8 @@ export interface CanvasTransformOptions {
    */
   uniScaleKey: TOptionalModifierKey;
 
+  snapAngleKey: TOptionalModifierKey;
+
   /**
    * When true, objects use center point as the origin of scale transformation.
    * <b>Backwards incompatibility note:</b> This property replaces "centerTransform" (Boolean).
@@ -65,6 +67,9 @@ export interface CanvasTransformOptions {
    * @default
    */
   altActionKey: TOptionalModifierKey;
+
+  // snapPointFn?: (point: [number, number]) => [number, number];
+  // snapObjectFn?: (obj: FabricObject, change: [number, number]) => [number, number];
 }
 
 export interface CanvasSelectionOptions {
@@ -237,11 +242,11 @@ export interface CanvasEventsOptions {
 
 export interface CanvasOptions
   extends StaticCanvasOptions,
-    CanvasTransformOptions,
-    CanvasSelectionOptions,
-    CanvasCursorOptions,
-    TargetFindOptions,
-    CanvasEventsOptions {
+  CanvasTransformOptions,
+  CanvasSelectionOptions,
+  CanvasCursorOptions,
+  TargetFindOptions,
+  CanvasEventsOptions {
   /**
    * Default element class that's given to wrapper (div) element of canvas
    * @type String
@@ -268,6 +273,7 @@ export const canvasDefaults: TOptions<CanvasOptions> = {
   centeredRotation: false,
   centeredKey: 'altKey',
   altActionKey: 'shiftKey',
+  snapAngleKey: 'shiftKey',
 
   selection: true,
   selectionKey: 'shiftKey',

@@ -857,7 +857,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       (transform.target !== target || transform.corner !== corner)
     ) {
       const originalControl =
-          transform.target && transform.target.controls[transform.corner],
+        transform.target && transform.target.controls[transform.corner],
         originalMouseUpHandler =
           originalControl &&
           originalControl.getMouseUpHandler(
@@ -921,11 +921,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         transform: this._currentTransform,
         ...(eventType === 'up:before' || eventType === 'up'
           ? {
-              isClick: this._isClick,
-              currentTarget: this.findTarget(e),
-              // set by the preceding `findTarget` call
-              currentSubTargets: this.targets,
-            }
+            isClick: this._isClick,
+            currentTarget: this.findTarget(e),
+            // set by the preceding `findTarget` call
+            currentSubTargets: this.targets,
+          }
           : {}),
       } as CanvasEvents[`mouse:${T}`];
     this.fire(`mouse:${eventType}`, options);
@@ -1300,10 +1300,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       //  both pointer and object should agree on every point
       localPointer = target.group
         ? sendPointToPlane(
-            scenePoint,
-            undefined,
-            target.group.calcTransformMatrix(),
-          )
+          scenePoint,
+          undefined,
+          target.group.calcTransformMatrix(),
+        )
         : scenePoint;
     transform.shiftKey = e.shiftKey;
     transform.altKey = !!this.centeredKey && e[this.centeredKey];
@@ -1347,8 +1347,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     let hoverCursor = target.hoverCursor || this.hoverCursor;
     const activeSelection = isActiveSelection(this._activeObject)
-        ? this._activeObject
-        : null,
+      ? this._activeObject
+      : null,
       // only show proper corner when group selection is not active
       corner =
         (!activeSelection || target.group !== activeSelection) &&
@@ -1507,10 +1507,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           : []
         : collectedObjects.length > 1
           ? collectedObjects
-              .filter((object) => !object.onSelect({ e }))
-              .reverse()
+            .filter((object) => !object.onSelect({ e }))
+            .reverse()
           : // `setActiveObject` will call `onSelect(collectedObjects[0])` in this case
-            collectedObjects;
+          collectedObjects;
 
     // set active object
     if (objects.length === 1) {

@@ -139,6 +139,11 @@ export class Control {
    */
   withConnection = false;
 
+  /** fills Width of object */
+  fillX = false;
+  /** fills Height of object */
+  fillY = false;
+
   constructor(options?: Partial<Control>) {
     Object.assign(this, options);
   }
@@ -321,10 +326,11 @@ export class Control {
       createTranslateMatrix(centerX, centerY),
       createRotateMatrix({ angle }),
       createScaleMatrix(
-        (isTouch ? this.touchSizeX : this.sizeX) || objectCornerSize,
-        (isTouch ? this.touchSizeY : this.sizeY) || objectCornerSize,
+        this.fillX ? fabricObject.getScaledWidth() : (isTouch ? this.touchSizeX : this.sizeX) || objectCornerSize,
+        this.fillY ? fabricObject.getScaledHeight() : (isTouch ? this.touchSizeY : this.sizeY) || objectCornerSize,
       ),
     ]);
+
     return {
       tl: new Point(-0.5, -0.5).transform(t),
       tr: new Point(0.5, -0.5).transform(t),

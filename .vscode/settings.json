@@ -29,5 +29,8 @@
     "e2e/test-report": true,
     "test/visual/assets": true
   },
-  "search.useIgnoreFiles": true
+  "search.useIgnoreFiles": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

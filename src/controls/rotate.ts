@@ -54,10 +54,11 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   }
 
   const lastAngle = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x),
-    curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x);
+    curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x),
+    snapKey = eventData[target.canvas!.snapAngleKey!];
   let angle = radiansToDegrees(curAngle - lastAngle + theta);
 
-  if (target.snapAngle && target.snapAngle > 0) {
+  if (snapKey && target.snapAngle && target.snapAngle > 0) {
     const snapAngle = target.snapAngle,
       snapThreshold = target.snapThreshold || snapAngle,
       rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle,
