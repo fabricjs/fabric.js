@@ -36,6 +36,26 @@ export const scaleOrSkewActionName: ControlCallback<
   return '';
 };
 
+
+/**
+ * Inspect event, control and fabricObject to return the correct action name
+ * @param {Event} eventData the javascript event that is causing the scale
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
+ * @return {String} an action name
+ */
+export const scaleActionName: ControlCallback<
+  TAxisKey<'skew' | 'scale'> | ''
+> = (eventData, control) => {
+  if (control.x === 0) {
+    return SCALE_Y;
+  }
+  if (control.y === 0) {
+    return SCALE_X;
+  }
+  return '';
+};
+
 /**
  * Combine skew and scale style handlers to cover fabric standard use case
  * @param {Event} eventData the javascript event that is causing the scale

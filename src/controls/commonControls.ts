@@ -2,12 +2,13 @@ import { RESIZING, ROTATE } from '../constants';
 import { changeWidth } from './changeWidth';
 import { Control } from './Control';
 import { rotationStyleHandler, rotationWithSnapping } from './rotate';
-import { scaleCursorStyleHandler, scalingEqually } from './scale';
+import { scaleCursorStyleHandler, scalingEqually, scalingX, scalingY } from './scale';
 import {
-  scaleOrSkewActionName,
+  scaleActionName,
   scaleSkewCursorStyleHandler,
-  scalingXOrSkewingY,
-  scalingYOrSkewingX,
+  // scaleOrSkewActionName,
+  // scalingXOrSkewingY,
+  // scalingYOrSkewingX,
 } from './scaleSkew';
 
 // use this function if you want to generate new controls for every instance
@@ -16,32 +17,40 @@ export const createObjectDefaultControls = () => ({
     x: -0.5,
     y: 0,
     cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingXOrSkewingY,
-    getActionName: scaleOrSkewActionName,
+    actionHandler: scalingX,
+    getActionName: scaleActionName,
+    // actionHandler: scalingXOrSkewingY,
+    // getActionName: scaleOrSkewActionName,
   }),
 
   mr: new Control({
     x: 0.5,
     y: 0,
     cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingXOrSkewingY,
-    getActionName: scaleOrSkewActionName,
+    actionHandler: scalingX,
+    getActionName: scaleActionName,
+    // actionHandler: scalingXOrSkewingY,
+    // getActionName: scaleOrSkewActionName,
   }),
 
   mb: new Control({
     x: 0,
     y: 0.5,
     cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingYOrSkewingX,
-    getActionName: scaleOrSkewActionName,
+    actionHandler: scalingY,
+    getActionName: scaleActionName,
+    // actionHandler: scalingYOrSkewingX,
+    // getActionName: scaleOrSkewActionName,
   }),
 
   mt: new Control({
     x: 0,
     y: -0.5,
     cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingYOrSkewingX,
-    getActionName: scaleOrSkewActionName,
+    actionHandler: scalingY,
+    getActionName: scaleActionName,
+    // actionHandler: scalingYOrSkewingX,
+    // getActionName: scaleOrSkewActionName,
   }),
 
   tl: new Control({
