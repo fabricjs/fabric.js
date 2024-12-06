@@ -99,8 +99,14 @@ export function initAligningGuidelines(
     // When the shape is flipped, the tl obtained through getCoords is actually tr,
     // and tl is actually tr. We need to make correction adjustments.
     // tr <-> tl、 bl <-> br、  mb <-> mt、 ml <-> mr
-    if (target.flipX) corner = corner.replace('l', 'r').replace('r', 'l');
-    if (target.flipY) corner = corner.replace('t', 'b').replace('b', 't');
+    if (target.flipX) {
+      if (corner.includes('l')) corner = corner.replace('l', 'r');
+      else if (corner.includes('r')) corner = corner.replace('r', 'l');
+    }
+    if (target.flipY) {
+      if (corner.includes('t')) corner = corner.replace('t', 'b');
+      else if (corner.includes('b')) corner = corner.replace('b', 't');
+    }
 
     // Obtain the coordinates of the current operation point through the value of corner.
     // users can be allowed to customize and pass in custom corners.
