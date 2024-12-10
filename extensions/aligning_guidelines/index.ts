@@ -141,9 +141,7 @@ export function initAligningGuidelines(
     const list: Point[] = [];
     for (const object of objects) {
       const d = getCaCheMapValue(object);
-      // When only drawing reference points, the reference shape's center point becomes irrelevant. Disable it.
-      const count = onlyDrawPoint ? d.length - 1 : d.length;
-      list.push(...d.slice(0, count));
+      list.push(...d);
     }
 
     const props = {
@@ -157,8 +155,12 @@ export function initAligningGuidelines(
       isCenter,
     };
     // Obtain horizontal and vertical reference lines.
-    const vLines = collectVerticalPoint(props);
-    const hLines = collectHorizontalPoint(props);
+    const noNeedToCollectV =
+      onlyDrawPoint && (corner.includes('t') || corner.includes('b'));
+    const noNeedToCollectH =
+      onlyDrawPoint && (corner.includes('l') || corner.includes('r'));
+    const vLines = noNeedToCollectV ? [] : collectVerticalPoint(props);
+    const hLines = noNeedToCollectH ? [] : collectHorizontalPoint(props);
     vLines.forEach((o) => {
       // Objects cannot be deduplicated; convert them to strings for deduplication.
       verticalLines.add(JSON.stringify(o));
