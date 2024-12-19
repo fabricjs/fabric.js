@@ -254,7 +254,7 @@ Don't forget to unlink the package once you're done.
 [website]: http://fabricjs.com/
 [docs]: http://fabricjs.com/docs
 [demos]: http://fabricjs.com/demos/
-[gotchas]: http://fabricjs.com/fabric-gotchas
+[gotchas]: https://fabricjs.com/docs/old-docs/gotchas/
 [demo_file]: https://github.com/fabricjs/fabricjs.com/blob/gh-pages/posts/demos/_posts/2020-2-15-custom-control-render.md
 [jsfiddles]: https://jsfiddle.net/user/fabricjs/fiddles/
 [codepens]: https://codepen.io/tag/fabricjs
