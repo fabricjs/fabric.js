@@ -5,6 +5,7 @@
 A **simple and powerful Javascript HTML5 canvas library**.
 
 - [**Website**][website]
+- [**Old V5 documentation**][https://fabric5.fabricjs.com]
 - [**GOTCHAS**][gotchas]
 - [**Contributing, Developing and More**](CONTRIBUTING.md)
 
