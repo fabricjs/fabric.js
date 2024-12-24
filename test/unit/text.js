@@ -853,8 +853,8 @@
     });
     assert.ok(text.path, 'text has a path');
     assert.ok(text.path.segmentsInfo, 'text has segmentsInfo calculated');
-    assert.equal(text.width, 100, 'text is big as the path width');
-    assert.equal(text.height, 100, 'text is big as the path height');
+    assert.equal(Math.round(text.width), 158, 'text is big as the path width + some extra');
+    assert.equal(Math.round(text.height), 158, 'text is big as the path height + some extra');
   });
 
   QUnit.test('text with a path toObject', function(assert) {

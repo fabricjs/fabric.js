@@ -76,18 +76,18 @@
   });
 
   function textpath4(canvas, callback) {
-    var path = new fabric.Path('M 0 0 Q 180 0 180 -101.25 Q 180 -180 90 -180 Q 0 -180 0 -112.5 Q 0 -45 78.75 -45 Q 135 -45 146.25 -90', { visible: false });
+    var path = new fabric.Path('M 0 0 Q 180 0 180 -101.25 Q 180 -180 90 -180 Q 0 -180 0 -112.5 Q 0 -45 78.75 -45 Q 135 -45 146.25 -90', { fill: 'transparent', stroke: 'red' });
     var text = new fabric.Text('Text on a swirl path with textAlign right', {
-      left: 50,
-      top: 50,
+      left: 0,
+      top: 0,
       fontSize: 28,
       textAlign: 'right',
       charSpacing: 50,
       path: path
     });
     var text2 = new fabric.Text('Text on a swirl path with textAlign center', {
-      left: 50,
-      top: 50,
+      left: 250,
+      top: 0,
       fontSize: 28,
       textAlign: 'center',
       charSpacing: 50,
@@ -104,12 +104,18 @@
     code: textpath4,
     golden: 'textpath4.png',
     percentage: 0.09,
-    width: 300,
+    width: 500,
     height: 300,
   });
 
   function textpath5(canvas, callback) {
     canvas.loadFromJSON('{"version":"4.5.1","objects":[{"type":"path","version":"4.5.1","left":213,"top":163,"width":180,"height":180,"fill":"","stroke":"red","strokeWidth":2,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},{"type":"path","version":"4.5.1","left":200,"top":6,"width":180,"height":180,"fill":"","stroke":"red","strokeWidth":2,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},{"type":"path","version":"4.5.1","left":18,"top":164,"width":180,"height":180,"fill":"","stroke":"red","strokeWidth":2,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},{"type":"path","version":"4.5.1","left":9,"top":14,"width":180,"height":180,"fill":"","stroke":"red","strokeWidth":2,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},{"type":"text","version":"4.5.1","left":10,"top":14,"width":180,"height":180,"text":"Text on a swirl textAlign right","fontSize":28,"textAlign":"right","charSpacing":50,"path":{"type":"path","version":"4.5.1","originX":"left","originY":"top","left":-0.5,"top":-180.5,"width":180,"height":180,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":false,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},"direction":"ltr","styles":{}},{"type":"text","version":"4.5.1","left":15,"top":165,"width":180,"height":180,"text":"Text on a swirl textAlign left","fontSize":28,"charSpacing":50,"path":{"type":"path","version":"4.5.1","originX":"left","originY":"top","left":-0.5,"top":-180.5,"width":180,"height":180,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":false,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},"direction":"ltr","styles":{}},{"type":"text","version":"4.5.1","left":201,"top":9,"width":180,"height":180,"text":"Text on a swirl textAlign center","fontSize":28,"textAlign":"center","charSpacing":50,"path":{"type":"path","version":"4.5.1","originX":"left","originY":"top","left":-0.5,"top":-180.5,"width":180,"height":180,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":false,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},"direction":"ltr","styles":{}},{"type":"text","version":"4.5.1","left":213,"top":164,"width":180,"height":180,"text":"full text to understand better a Text on a swirl textAlign","fontSize":28,"charSpacing":50,"path":{"type":"path","version":"4.5.1","originX":"left","originY":"top","left":-0.5,"top":-180.5,"width":180,"height":180,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":false,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"path":[["M",0,0],["Q",180,0,180,-101.25],["Q",180,-180,90,-180],["Q",0,-180,0,-112.5],["Q",0,-45,78.75,-45],["Q",135,-45,146.25,-90]]},"direction":"ltr","styles":{}}]}', function() {
+      canvas.getObjects().forEach(function(obj) {
+        obj.left += 100;
+        obj.top += 100;
+        obj.originX = 'center';
+        obj.originY = 'center';
+      });
       canvas.renderAll();
       callback(canvas.lowerCanvasEl);
     });
