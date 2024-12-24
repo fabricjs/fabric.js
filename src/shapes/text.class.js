@@ -434,7 +434,7 @@
       this._clearCache();
       if (this.path) {
         // Add the space of a line around the path. This is an approximation
-        const additionalWidth = this.getHeightOfLine(0) * 1.1;
+        var additionalWidth = this.getHeightOfLine(0) * 1.1;
         this.width = this.path.width + additionalWidth;
         this.height = this.path.height + additionalWidth;
       }
