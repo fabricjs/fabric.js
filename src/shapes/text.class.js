@@ -433,8 +433,10 @@
       this._splitText();
       this._clearCache();
       if (this.path) {
-        this.width = this.path.width;
-        this.height = this.path.height;
+        // Add the space of a line around the path. This is an approximation
+        const additionalWidth = this.getHeightOfLine(0) * 1.1;
+        this.width = this.path.width + additionalWidth;
+        this.height = this.path.height + additionalWidth;
       }
       else {
         this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
