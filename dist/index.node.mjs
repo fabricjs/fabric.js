@@ -36,8 +36,8 @@ function _objectWithoutProperties(e, t) {
     r,
     i = _objectWithoutPropertiesLoose(e, t);
   if (Object.getOwnPropertySymbols) {
-    var n = Object.getOwnPropertySymbols(e);
-    for (r = 0; r < n.length; r++) o = n[r], t.indexOf(o) >= 0 || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
+    var s = Object.getOwnPropertySymbols(e);
+    for (r = 0; r < s.length; r++) o = s[r], t.includes(o) || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
   }
   return i;
 }
@@ -45,7 +45,7 @@ function _objectWithoutPropertiesLoose(r, e) {
   if (null == r) return {};
   var t = {};
   for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
-    if (e.indexOf(n) >= 0) continue;
+    if (e.includes(n)) continue;
     t[n] = r[n];
   }
   return t;
@@ -8301,6 +8301,73 @@ const changeObjectWidth = (eventData, transform, x, y) => {
 };
 const changeWidth = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectWidth));
 
+function renderPointControl(ctx, left, top, styleOverride, fabricObject) {
+  styleOverride = styleOverride || {};
+  const xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize;
+  const ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize;
+  let myLeft = left;
+  let myTop = top;
+  let size = undefined;
+  ctx.save();
+  ctx.fillStyle = styleOverride.cornerSecondColor || fabricObject.cornerSecondColor;
+  ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || "";
+  if (xSize > ySize) {
+    size = xSize;
+    ctx.scale(1.0, ySize / xSize);
+    myTop = top * xSize / ySize;
+  } else if (ySize > xSize) {
+    size = ySize;
+    ctx.scale(xSize / ySize, 1.0);
+    myLeft = left * ySize / xSize;
+  } else {
+    size = xSize;
+  }
+  ctx.beginPath();
+  ctx.arc(myLeft, myTop, size / 1.5, 0, Math.PI * 2, false);
+  ctx.fill();
+  ctx.closePath();
+  ctx.arc(myLeft, myTop, size / 1.5, 0, Math.PI * 2, false);
+  ctx.stroke();
+  ctx.restore();
+}
+function renderRoundedPointControl(ctx, left, top, styleOverride, fabricObject) {
+  styleOverride = styleOverride || {};
+  const xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize;
+  const ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize;
+  let myLeft = left;
+  let myTop = top;
+  let size = undefined;
+  ctx.save();
+  ctx.fillStyle = styleOverride.cornerSecondColor || fabricObject.cornerSecondColor;
+  ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || "";
+  if (xSize > ySize) {
+    size = xSize;
+    ctx.scale(1.0, ySize / xSize);
+    myTop = top * xSize / ySize;
+  } else if (ySize > xSize) {
+    size = ySize;
+    ctx.scale(xSize / ySize, 1.0);
+    myLeft = left * ySize / xSize;
+  } else {
+    size = xSize;
+  }
+  ctx.beginPath();
+  ctx.fillStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || "";
+  ctx.arc(myLeft, myTop, size / 1, 0, Math.PI * 2, false);
+  ctx.fill();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.fillStyle = styleOverride.cornerSecondColor || fabricObject.cornerSecondColor || "";
+  ctx.arc(myLeft, myTop, size / 2, 0, Math.PI * 2, false);
+  ctx.fill();
+  ctx.closePath();
+  ctx.beginPath();
+  ctx.strokeStyle = styleOverride.cornerSecondColor || fabricObject.cornerSecondColor || "";
+  ctx.arc(myLeft, myTop, size / 1.2, 0, Math.PI * 2, false);
+  ctx.stroke();
+  ctx.restore();
+}
+
 /**
  * Render a round control, as per fabric features.
  * This function is written to respect object properties like transparentCorners, cornerSize
@@ -8651,6 +8718,12 @@ class Control {
   render(ctx, left, top, styleOverride, fabricObject) {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
+      case 'point':
+        renderPointControl.call(this, ctx, left, top, styleOverride, fabricObject);
+        break;
+      case 'roundedPoint':
+        renderRoundedPointControl.call(this, ctx, left, top, styleOverride, fabricObject);
+        break;
       case 'circle':
         renderCircleControl.call(this, ctx, left, top, styleOverride, fabricObject);
         break;
@@ -9001,7 +9074,7 @@ function skewObject(axis, _ref, pointer) {
       scaleY: 1
     }).y;
   const shearing = 2 * offset * skewingSide /
-  // we max out fractions to safeguard from asymptotic behavior
+   // we max out fractions to safeguard from asymptotic behavior
   Math.max(b, 1) +
   // add starting state
   shearingStart;
@@ -10837,7 +10910,7 @@ function parseAttributes(element, attributes, cssRules) {
     const normalizedValue = normalizeValue(normalizedAttr, ownAttributes[attr], parentAttributes, fontSize);
     normalizedStyle[normalizedAttr] = normalizedValue;
   }
-  if (normalizedStyle && normalizedStyle.font) {
+  if (normalizedStyle.font) {
     parseFontDeclaration(normalizedStyle.font, normalizedStyle);
   }
   const mergedAttrs = _objectSpread2(_objectSpread2({}, parentAttributes), normalizedStyle);
@@ -24666,7 +24739,7 @@ class FabricImage extends FabricObject {
       cropX = 0,
       cropY = 0,
       offset;
-    if (pAR && (pAR.alignX !== NONE || pAR.alignY !== NONE)) {
+    if ((pAR.alignX !== NONE || pAR.alignY !== NONE)) {
       if (pAR.meetOrSlice === 'meet') {
         scaleX = scaleY = findScaleToFit(this._element, parsedAttributes);
         offset = (pWidth - rWidth * scaleX) / 2;

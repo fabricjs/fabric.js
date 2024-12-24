@@ -11,7 +11,8 @@ export type ControlRenderingStyleOverride = Partial<
     | 'cornerColor'
     | 'cornerStrokeColor'
     | 'cornerDashArray'
-    | 'transparentCorners'
+    | 'transparentCorners' 
+    | 'cornerSecondColor'
   >
 >;
 
@@ -24,6 +25,120 @@ export type ControlRenderer<
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: O,
 ) => void;
+
+export function renderPointControl(
+    this: Control,
+    ctx: CanvasRenderingContext2D,
+    left: number,
+    top: number,
+    styleOverride: ControlRenderingStyleOverride,
+    fabricObject: InteractiveFabricObject
+  ) {
+    styleOverride = styleOverride || {};
+    const xSize =
+      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize;
+    const ySize =
+      this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize;
+
+    let myLeft = left;
+    let myTop = top;
+    let size = undefined;
+
+    ctx.save();
+    ctx.fillStyle =
+      styleOverride.cornerSecondColor || fabricObject.cornerSecondColor;
+    ctx.strokeStyle =
+      styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || "";
+
+    if (xSize > ySize) {
+      size = xSize;
+      ctx.scale(1.0, ySize / xSize);
+      myTop = (top * xSize) / ySize;
+    } else if (ySize > xSize) {
+      size = ySize;
+      ctx.scale(xSize / ySize, 1.0);
+      myLeft = (left * ySize) / xSize;
+    } else {
+      size = xSize;
+    }
+
+    ctx.beginPath();
+    ctx.arc(myLeft, myTop, size / 1.5, 0, Math.PI * 2, false);
+    ctx.fill();
+
+    ctx.closePath();
+
+    ctx.arc(myLeft, myTop, size / 1.5, 0, Math.PI * 2, false);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  export function renderRoundedPointControl(
+    this: Control,
+    ctx: CanvasRenderingContext2D,
+    left: number,
+    top: number,
+    styleOverride: ControlRenderingStyleOverride,
+    fabricObject: InteractiveFabricObject
+  ) {
+    styleOverride = styleOverride || {};
+    const xSize =
+      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize;
+    const ySize =
+      this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize;
+
+    let myLeft = left;
+    let myTop = top;
+    let size = undefined;
+
+    ctx.save();
+    ctx.fillStyle =
+      styleOverride.cornerSecondColor || fabricObject.cornerSecondColor;
+    ctx.strokeStyle =
+      styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || "";
+
+    if (xSize > ySize) {
+      size = xSize;
+      ctx.scale(1.0, ySize / xSize);
+      myTop = (top * xSize) / ySize;
+    } else if (ySize > xSize) {
+      size = ySize;
+      ctx.scale(xSize / ySize, 1.0);
+      myLeft = (left * ySize) / xSize;
+    } else {
+      size = xSize;
+    }
+
+    ctx.beginPath();
+
+    ctx.fillStyle =
+      styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || "";
+
+    ctx.arc(myLeft, myTop, size / 1, 0, Math.PI * 2, false);
+    ctx.fill();
+
+    ctx.closePath();
+
+    ctx.beginPath();
+
+    ctx.fillStyle =
+      styleOverride.cornerSecondColor || fabricObject.cornerSecondColor || "";
+
+    ctx.arc(myLeft, myTop, size / 2, 0, Math.PI * 2, false);
+    ctx.fill();
+
+    ctx.closePath();
+    ctx.beginPath();
+
+    ctx.strokeStyle =
+      styleOverride.cornerSecondColor || fabricObject.cornerSecondColor || "";
+
+    ctx.arc(myLeft, myTop, size / 1.2, 0, Math.PI * 2, false);
+    ctx.stroke();
+
+    ctx.restore();
+  }
 
 /**
  * Render a round control, as per fabric features.
@@ -82,7 +197,7 @@ export function renderCircleControl(
     ctx.stroke();
   }
   ctx.restore();
-}
+} 
 
 /**
  * Render a square control, as per fabric features.

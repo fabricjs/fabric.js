@@ -16,7 +16,7 @@ import {
   multiplyTransformMatrixArray,
 } from '../util/misc/matrix';
 import type { ControlRenderingStyleOverride } from './controlRendering';
-import { renderCircleControl, renderSquareControl } from './controlRendering';
+import { renderCircleControl, renderSquareControl, renderPointControl, renderRoundedPointControl } from './controlRendering';
 
 export class Control {
   /**
@@ -354,6 +354,27 @@ export class Control {
   ) {
     styleOverride = styleOverride || {};
     switch (styleOverride.cornerStyle || fabricObject.cornerStyle) {
+      case 'point': 
+      renderPointControl.call(
+         this,
+          ctx,
+          left,
+          top,
+          styleOverride,
+          fabricObject,
+      )
+      break;
+
+      case 'roundedPoint':
+      renderRoundedPointControl.call(
+         this,
+          ctx,
+          left,
+          top,
+          styleOverride,
+          fabricObject,
+      )
+      break;
       case 'circle':
         renderCircleControl.call(
           this,
