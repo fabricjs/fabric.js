@@ -1,5 +1,9 @@
 ## Fabric.js
 
+If you are still using Fabric.js v5 because you are maintaining a complex project you don't want to migrate, we made an effort to keep old documentation online.
+Please keep in mind the Fabric.js development team moved on to v6 and beyond and does not have time to keep updated 2 versions.
+All the resources of Fabric.js v5 are deployed [here](https://fabric5.fabricjs.com)] while (fabricjs.com)[https://fabricjs.com] focuses on v6 onward.
+
 <!-- build/coverage status, climate -->
 
 [![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
@@ -21,7 +25,7 @@
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
 
-<a href="http://fabricjs.com/kitchensink" target="_blank"><img src="https://github.com/kangax/fabric.js/raw/master/lib/screenshot.png" style="width:300px;box-shadow:rgba(0,0,0,0.3) 0 0 5px"></a>
+<a href="http://fabric5.fabricjs.com/kitchensink" target="_blank"><img src="https://github.com/kangax/fabric.js/raw/master/lib/screenshot.png" style="width:300px;box-shadow:rgba(0,0,0,0.3) 0 0 5px"></a>
 
 Using Fabric.js, you can create and populate objects on canvas; objects like simple geometrical shapes — rectangles, circles, ellipses, polygons, or more complex shapes consisting of hundreds or thousands of simple paths. You can then scale, move, and rotate these objects with the mouse; modify their properties — color, transparency, z-index, etc. You can also manipulate these objects altogether — grouping them with a simple mouse selection.
 
@@ -35,7 +39,7 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 ### Goals
 
 - Unit tested (1150+ tests at the moment, 79%+ coverage)
-- Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
+- Modular (~60 small ["classes", modules, mixins](http://fabric5.fabricjs.com/docs/))
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
@@ -53,7 +57,7 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 - Edge (chromium based, all versions)
 - IE11 and Edge legacy, not supported. Fabric up to 5.0 is written with ES5 in mind, but no specific tests are run for those browsers.
 
-You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the browser.
+You can [run automated unit tests](http://fabric5.fabricjs.com/test/unit/) right in the browser.
 
 ### History
 
@@ -171,17 +175,17 @@ See testem docs for more info: https://github.com/testem/testem
 
 ### Demos
 
-- [Demos](http://fabricjs.com/demos/)
-- [Kitchensink demo](http://fabricjs.com/kitchensink)
-- [Benchmarks](http://fabricjs.com/benchmarks/)
+- [Demos](http://fabric5.fabricjs.com/demos/)
+- [Kitchensink demo](http://fabric5.fabricjs.com/kitchensink)
+- [Benchmarks](http://fabric5.fabricjs.com/benchmarks/)
 
 [Who's using Fabric?](http://trends.builtwith.com/javascript/FabricJS)
 
 ### Documentation
 
-Documentation is always available at [http://fabricjs.com/docs/](http://fabricjs.com/docs/).
+Documentation is always available at [http://fabric5./docs/](http://fabric5.fabricjs.com/docs/).
 
-Also see [official 4-part intro series](http://fabricjs.com/articles), [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
+Also see [official 4-part intro series](http://fabric5.fabricjs.com/articles), [presentation from BK.js](http://www.slideshare.net/kangax/fabricjs-building-acanvaslibrarybk) and [presentation from Falsy Values](http://www.slideshare.net/kangax/fabric-falsy-values-8067834) for an overview of fabric.js, how it works, and its features.
 
 ### Optional modules
 
