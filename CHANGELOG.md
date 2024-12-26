@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.5.0]
+
+- refactor() Possibly breaking: Include text line height in text on a path size calculation to avoid cut off from cache. [`#10355`](https://github.com/fabricjs/fabric.js/pull/10355)
+
 ## [5.4.2]
 
 - fix() Use correct Path context when creating the svg for the path [`#10276`](https://github.com/fabricjs/fabric.js/pull/10276)
