@@ -43,7 +43,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Out of the box interactions such as scale, move, rotate, skew, group...
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
-- [Typed and modular](https://fabricjs.com/docs/old-docs/upgrade-guide/)
+- Typed and modular
 - [Unit tested](CONTRIBUTING.md#-testing)
 
 #### Supported Browsers/Environments
@@ -59,7 +59,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 |    IE11     |        ❌         |
 |   Node.js   |        ✔️         | [Node.js installation](#nodejs) |
 
-Fabric.js does not use transpilation by default, the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
+Fabric.js does not use polyfills by default, or tries to keep it at minimum. the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
 
 ## Installation
 
