@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.4.1' };
+var fabric = fabric || { version: '5.4.2' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -15225,12 +15225,6 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           additionalHeight = height * 0.1;
         }
       }
-      if (this instanceof fabric.Text && this.path) {
-        shouldRedraw = true;
-        shouldResizeCanvas = true;
-        additionalWidth += this.getHeightOfLine(0) * this.zoomX;
-        additionalHeight += this.getHeightOfLine(0) * this.zoomY;
-      }
       if (shouldRedraw) {
         if (shouldResizeCanvas) {
           canvas.width = Math.ceil(width + additionalWidth);
@@ -26337,8 +26331,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
       this._splitText();
       this._clearCache();
       if (this.path) {
-        this.width = this.path.width;
-        this.height = this.path.height;
+        // Add the space of a line around the path. This is an approximation
+        var additionalWidth = this.getHeightOfLine(0) * 1.1;
+        this.width = this.path.width + additionalWidth;
+        this.height = this.path.height + additionalWidth;
       }
       else {
         this.width = this.calcTextWidth() || this.cursorWidth || this.MIN_TEXT_WIDTH;
@@ -30417,13 +30413,15 @@ fabric.util.object.extend(fabric.IText.prototype, /** @lends fabric.IText.protot
      */
     toSVG: function(reviver) {
       var textSvg = this._createBaseSVGMarkup(
-        this._toSVG(),
-        { reviver: reviver, noStyle: true, withShadow: true }
-      );
-      if (this.path) {
+            this._toSVG(),
+            { reviver: reviver, noStyle: true, withShadow: true }
+          ),
+          path = this.path;
+
+      if (path) {
         return (
           textSvg +
-          this._createBaseSVGMarkup(this.path._toSVG(), {
+          path._createBaseSVGMarkup(path._toSVG(), {
             reviver: reviver,
             withShadow: true,
           })
