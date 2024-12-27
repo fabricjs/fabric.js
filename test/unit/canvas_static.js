@@ -1636,7 +1636,7 @@
     var done = assert.async();
     assert.ok(typeof canvas.fxRemove === 'function');
 
-    var rect = new fabric.Rect();
+    var rect = new fabric.Rect({ width: 1, height: 1 });
     canvas.add(rect);
 
     var callbackFired = false;
