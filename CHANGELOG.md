@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): When holding Shift to enable multi-selection, mouse:over and mouse:out do not behave as expected [#10037](https://github.com/fabricjs/fabric.js/issues/10337)
+
 ## [6.5.3]
 
 - fix(ColorMatrix): Restore correct alpha for JS colorMatrix filter [#10313](https://github.com/fabricjs/fabric.js/pull/10313)

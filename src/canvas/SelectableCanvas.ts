@@ -51,6 +51,7 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import type { ActiveSelection } from '../shapes/ActiveSelection';
 
 /**
  * Canvas class
@@ -729,6 +730,16 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         // check pointer is over active selection and possibly perform `subTargetCheck`
         this.searchPossibleTargets([activeObject], pointer)
       ) {
+        // If you hold down selection key, you can select elements that are blocked by active selection.
+        if (this._isSelectionKeyPressed(e)) {
+          const other = this.searchPossibleTargets(this._objects, pointer);
+          if (
+            other &&
+            !(activeObject as ActiveSelection).contains(other, true)
+          ) {
+            return other;
+          }
+        }
         // active selection does not select sub targets like normal groups
         return activeObject;
       } else if (

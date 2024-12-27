@@ -499,4 +499,28 @@ describe('Selectable Canvas', () => {
       expect(canvas._hoveredTarget).toBe(undefined);
     });
   });
+
+  describe('findTarget', () => {
+    test('Holding down selection key allows you to select shapes that are covered by the active selection.', () => {
+      const a = new FabricObject({ width: 100, height: 100 });
+      const b = new FabricObject({ width: 100, height: 100 });
+      const c = new FabricObject({ width: 100, height: 100 });
+      const canvas = new Canvas();
+      canvas.add(a, b, c);
+      const as = new ActiveSelection([a, b]);
+      canvas.setActiveObject(as);
+
+      const fakeMouse = new MouseEvent('mousemove', {
+        clientX: 50,
+        clientY: 50,
+      });
+      const fakeMouseShift = new MouseEvent('mousemove', {
+        clientX: 50,
+        clientY: 50,
+        shiftKey: true,
+      });
+      expect(canvas.findTarget(fakeMouse)).toBe(as);
+      expect(canvas.findTarget(fakeMouseShift)).toBe(c);
+    });
+  });
 });
