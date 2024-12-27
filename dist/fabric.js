@@ -15180,8 +15180,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         // for sure this ALIASING_LIMIT is slightly creating problem
         // in situation in which the cache canvas gets an upper limit
         // also objectScale contains already scaleX and scaleY
-        width: neededX + ALIASING_LIMIT,
-        height: neededY + ALIASING_LIMIT,
+        width: Math.ceil(neededX + ALIASING_LIMIT),
+        height: Math.ceil(neededY + ALIASING_LIMIT),
         zoomX: objectScale.scaleX,
         zoomY: objectScale.scaleY,
         x: neededX,
@@ -15206,29 +15206,16 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
       }
       var canvas = this._cacheCanvas,
           dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-          minCacheSize = fabric.minCacheSideLimit,
           width = dims.width, height = dims.height, drawingWidth, drawingHeight,
           zoomX = dims.zoomX, zoomY = dims.zoomY,
           dimensionsChanged = width !== this.cacheWidth || height !== this.cacheHeight,
           zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY,
-          shouldRedraw = dimensionsChanged || zoomChanged,
-          additionalWidth = 0, additionalHeight = 0, shouldResizeCanvas = false;
-      if (dimensionsChanged) {
-        var canvasWidth = this._cacheCanvas.width,
-            canvasHeight = this._cacheCanvas.height,
-            sizeGrowing = width > canvasWidth || height > canvasHeight,
-            sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
-              canvasWidth > minCacheSize && canvasHeight > minCacheSize;
-        shouldResizeCanvas = sizeGrowing || sizeShrinking;
-        if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
-          additionalWidth = width * 0.1;
-          additionalHeight = height * 0.1;
-        }
-      }
+          shouldRedraw = dimensionsChanged || zoomChanged;
+
       if (shouldRedraw) {
-        if (shouldResizeCanvas) {
-          canvas.width = Math.ceil(width + additionalWidth);
-          canvas.height = Math.ceil(height + additionalHeight);
+        if (dimensionsChanged) {
+          canvas.width = width;
+          canvas.height = height;
         }
         else {
           this._cacheContext.setTransform(1, 0, 0, 1, 0, 0);

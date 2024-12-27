@@ -1304,7 +1304,7 @@
 
   QUnit.test('loadFromJSON with text', function(assert) {
     var done = assert.async();
-    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
+    var json = '{"objects":[{"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":1.16,"textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}],"background":"#ffffff"}';
     canvas.loadFromJSON(json, function() {
 
       canvas.renderAll();
@@ -1319,11 +1319,12 @@
   });
 
   QUnit.test('loadFromJSON with clipPath', function(assert) {
+    var canvas2 = new fabric.StaticCanvas(null, { width: 400, height: 400, renderOnAddRemove: false });
     var done = assert.async();
-    var json = '{"clipPath": {"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
-    canvas.loadFromJSON(json, function() {
-      canvas.renderAll();
-      assert.equal('text', canvas.clipPath.type);
+    var json = '{"clipPath": {"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":1.16,"textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
+    canvas2.loadFromJSON(json, function() {
+      assert.equal('text', canvas2.clipPath.type);
+      canvas2.dispose();
       done();
     });
   });
@@ -1644,7 +1645,7 @@
       callbackFired = true;
       assert.equal(canvas.item(0), undefined);
       assert.ok(callbackFired);
-      canvas.cancelRequestedRender();
+      canvas.renderAll();
       done();
     }
 

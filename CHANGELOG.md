@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.5.1]
+
+- fix(): Cache over invalidation bug backport from 6.x
+
 ## [5.5.0]
 
 - refactor() Possibly breaking: Include text line height in text on a path size calculation to avoid cut off from cache. [`#10355`](https://github.com/fabricjs/fabric.js/pull/10355)
