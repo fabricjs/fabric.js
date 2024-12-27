@@ -1319,11 +1319,12 @@
   });
 
   QUnit.test('loadFromJSON with clipPath', function(assert) {
+    var canvas2 = new fabric.StaticCanvas(null, { width: 400, height: 400 });
     var done = assert.async();
     var json = '{"clipPath": {"type":"text","left":150,"top":200,"width":128,"height":64.32,"fill":"#000000","stroke":"","strokeWidth":"","scaleX":0.8,"scaleY":0.8,"angle":0,"flipX":false,"flipY":false,"opacity":1,"text":"NAME HERE","fontSize":24,"fontWeight":"","fontFamily":"Delicious_500","fontStyle":"","lineHeight":"","textDecoration":"","textAlign":"center","path":"","strokeStyle":"","backgroundColor":""}}';
-    canvas.loadFromJSON(json, function() {
-      canvas.renderAll();
-      assert.equal('text', canvas.clipPath.type);
+    canvas2.loadFromJSON(json, function() {
+      canvas2.renderAll();
+      assert.equal('text', canvas2.clipPath.type);
       done();
     });
   });
@@ -1636,7 +1637,7 @@
     var done = assert.async();
     assert.ok(typeof canvas.fxRemove === 'function');
 
-    var rect = new fabric.Rect({ width: 1, height: 1 });
+    var rect = new fabric.Rect();
     canvas.add(rect);
 
     var callbackFired = false;
@@ -1644,7 +1645,7 @@
       callbackFired = true;
       assert.equal(canvas.item(0), undefined);
       assert.ok(callbackFired);
-      canvas.cancelRequestedRender();
+      canvas.renderAll();
       done();
     }
 
