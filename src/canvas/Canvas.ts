@@ -917,6 +917,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       options: CanvasEvents[`mouse:${T}`] = {
         e,
         target,
+        multiSelectTarget: this._multiSelectTarget,
         subTargets: targets,
         ...getEventPoints(this, e),
         transform: this._currentTransform,

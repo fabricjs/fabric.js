@@ -15300,7 +15300,7 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
    * @private
    */
   _resetTransformEventData() {
-    this._multiSelectTarget = this._target = this._pointer = this._absolutePointer = undefined;
+    this._target = this._pointer = this._absolutePointer = undefined;
   }
 
   /**
@@ -15311,17 +15311,9 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
   _cacheTransformEventData(e) {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
-    const pointer = this.getViewportPoint(e);
-    this._pointer = pointer;
+    this._pointer = this.getViewportPoint(e);
     this._absolutePointer = sendPointToPlane(this._pointer, undefined, this.viewportTransform);
     this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e);
-    // in case we have a multi selection as a target, search additional targets
-    this._multiSelectTarget = isActiveSelection(this._target) ?
-    // first search active objects for a target to remove
-    this.searchPossibleTargets(this._target.getObjects(), pointer) ||
-    //  if not found, search under active selection for a target to add
-    // `prevActiveObjects` will be searched but we already know they will not be found
-    this.searchPossibleTargets(this._objects, pointer) : undefined;
   }
 
   /**
@@ -15580,7 +15572,13 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
       if (isAS) {
         const prevActiveObjects = activeObject.getObjects();
         if (target === activeObject) {
-          target = this._multiSelectTarget;
+          const pointer = this.getViewportPoint(e);
+          target =
+          // first search active objects for a target to remove
+          this.searchPossibleTargets(prevActiveObjects, pointer) ||
+          //  if not found, search under active selection for a target to add
+          // `prevActiveObjects` will be searched but we already know they will not be found
+          this.searchPossibleTargets(this._objects, pointer);
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;

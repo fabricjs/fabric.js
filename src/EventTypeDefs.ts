@@ -152,10 +152,18 @@ type CanvasModificationEvents = {
   'object:modified': ModifiedEvent;
 };
 
+interface SimpleEventHandler<T extends Event = TPointerEvent>
+  extends TEvent<T> {
+  target?: FabricObject;
+  multiSelectTarget?: FabricObject;
+  subTargets: FabricObject[];
+}
+
 export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   extends TEvent<E> {
   target?: FabricObject;
-  subTargets?: FabricObject[];
+  multiSelecttarget?: FabricObject;
+  subTargets: FabricObject[];
   transform?: Transform | null;
   /**
    * @deprecated
@@ -171,12 +179,6 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   absolutePointer: Point;
   scenePoint: Point;
   viewportPoint: Point;
-}
-
-interface SimpleEventHandler<T extends Event = TPointerEvent>
-  extends TEvent<T> {
-  target?: FabricObject;
-  subTargets: FabricObject[];
 }
 
 interface InEvent {
