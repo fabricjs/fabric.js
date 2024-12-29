@@ -752,7 +752,7 @@ export class FabricObject<
   }
 
   /**
-   * When set to `true`, force the object to have its own cache, even if it is inside a group
+   * When returns `true`, force the object to have its own cache, even if it is inside a group
    * it may be needed when your object behave in a particular way on the cache and always needs
    * its own isolated canvas to render correctly.
    * Created to be overridden
@@ -785,8 +785,8 @@ export class FabricObject<
    */
   shouldCache() {
     this.ownCaching =
-      this.needsItsOwnCache() ||
-      (this.objectCaching && (!this.parent || !this.parent.isOnACache()));
+      (this.objectCaching && (!this.parent || !this.parent.isOnACache())) ||
+      this.needsItsOwnCache();
     return this.ownCaching;
   }
 
