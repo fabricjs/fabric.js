@@ -760,6 +760,7 @@ export class FabricObject<
    * @returns Boolean
    */
   needsItsOwnCache() {
+    // TODO re-evaluate this shadow condition
     if (
       this.paintFirst === STROKE &&
       this.hasFill() &&
