@@ -390,27 +390,21 @@ export class Path<
 
   /**
    * Creates an instance of Path from an SVG <path> element
-   * @static
-   * @memberOf Path
-   * @param {HTMLElement} element to parse
-   * @param {Partial<PathProps>} [options] Options object
    */
   static async fromElement(
     element: HTMLElement,
     options: Partial<PathProps>,
     cssRules?: CSSRules,
-  ) {
-    const { d, ...parsedAttributes } = parseAttributes(
+  ): Promise<Path> {
+    const { left: _left, top: _top, ...otherOptions } = options;
+    const { d, left, top, ...parsedAttributes } = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
       cssRules,
     );
     return new this(d, {
       ...parsedAttributes,
-      ...options,
-      // we pass undefined to instruct the constructor to position the object using the bbox
-      left: undefined,
-      top: undefined,
+      ...otherOptions,
     });
   }
 }

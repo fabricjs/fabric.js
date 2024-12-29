@@ -285,6 +285,16 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   protected declare _target?: FabricObject;
 
+  /**
+   * During a mouse event we may need the target multiple times in multiple functions.
+   * _multiSelectTarget holds a reference to the target that is inside or outside the multi selection
+   * and that may be the object added or removed from the multi selection.
+   * This reference is valid for the lifespan of the event.
+   * Every fabricJS mouse event create and delete the cache every time.
+   * @type {FabricObject}
+   */
+  protected declare _multiSelectTarget?: FabricObject;
+
   static ownDefaults = canvasDefaults;
 
   static getDefaults(): Record<string, any> {
