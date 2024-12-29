@@ -2,6 +2,8 @@
 
 ## [next]
 
+- docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
+
 ## [6.5.3]
 
 - fix(ColorMatrix): Restore correct alpha for JS colorMatrix filter [#10313](https://github.com/fabricjs/fabric.js/pull/10313)

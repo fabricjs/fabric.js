@@ -611,6 +611,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       width: this.width,
       height: this.height,
       strokeWidth: this.strokeWidth,
+      // TODO remove this spread. is visible in the performance inspection
       ...options,
     };
     // stroke is applied before/after transformations are applied according to `strokeUniform`
