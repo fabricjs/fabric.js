@@ -779,7 +779,7 @@ export class FabricObject<
    * Decide if the object should cache or not. Create its own cache level
    * objectCaching is a global flag, wins over everything
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group outside is cached.
    * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
    * @return {Boolean}
@@ -913,7 +913,10 @@ export class FabricObject<
   }
 
   /**
-   * Check if cache is dirty
+   * Check if cache is dirty and if is dirty clear the context.
+   * This check has a big side effect, it changes the underlying cache canvas if necessary.
+   * Do not call this method on your own to check if the cache is dirty, because if it is,
+   * it is also going to wipe the cache. This is badly designed and needs to be fixed.
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */

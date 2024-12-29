@@ -209,11 +209,7 @@ export class ActiveSelection extends Group {
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
-   * objectCaching is a global flag, wins over everything
-   * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
-   * Generally you do not cache objects in groups because the group outside is cached.
+   * Decide if the object should cache or not. The Active selection never caches
    * @return {Boolean}
    */
   shouldCache() {
