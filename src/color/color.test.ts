@@ -4,8 +4,55 @@ describe('Color regex and conversion tests', () => {
   it('test color constructor', () => {
     const color1 = new Color();
     const color2 = new Color(color1);
+    const color3 = new Color('ff5555');
+    const color4 = new Color('rgb(100,100,100)');
+    const color5 = new Color('rgba(100,100,100, 0.5)');
+    const color6 = new Color('hsl(262,80%,12%)');
+    // empty args
+    const color7 = new Color();
+    // toHexa rounds
+    const color8 = new Color([211.23213213, 0, 128.1233123131]);
+
+    // transparent
+    const color9 = new Color('transparent');
+
     expect(color1.getSource().toString()).toBe([0, 0, 0, 1].toString());
     expect(color2.getSource().toString()).toBe([0, 0, 0, 1].toString());
+
+    expect(color3.toHex()).toBe('FF5555');
+    expect(color3 instanceof Color).toBe(true);
+
+    expect(color4.toRgb()).toBe('rgb(100,100,100)');
+    expect(color4 instanceof Color).toBe(true);
+
+    expect(color5.toRgba()).toBe('rgba(100,100,100,0.5)');
+    expect(color5 instanceof Color).toBe(true);
+
+    expect(color6.toHsl()).toBe('hsl(262,80%,12%)');
+    expect(color6 instanceof Color).toBe(true);
+
+    expect(color7.toHex()).toBe('000000');
+    expect(color7 instanceof Color).toBe(true);
+
+    expect(color8.toHexa()).toBe('D30080FF');
+
+    expect(color9.getSource()).toEqual([255, 255, 255, 0]);
+  });
+
+  it('test getSource & setSource for color', () => {
+    const color = new Color('ffffff');
+    expect(typeof color.getSource).toBe('function');
+    expect(color.getSource()).toEqual([255, 255, 255, 1]);
+
+    expect(typeof color.setSource).toBe('function');
+    color.setSource([0, 0, 0, 1]);
+    expect(color.getSource()).toEqual([0, 0, 0, 1]);
+  });
+
+  it('test sourceFromRgb for color', () => {
+    expect(typeof Color.sourceFromRgb).toBe('function');
+    expect(Color.sourceFromRgb('rgb(255,255,255)')).toEqual([255, 255, 255, 1]);
+    expect(Color.sourceFromRgb('rgb(100,150,200)')).toEqual([100, 150, 200, 1]);
   });
 
   it('test static functions for Color class', () => {
@@ -73,18 +120,24 @@ describe('Color regex and conversion tests', () => {
     expect(color1.getSource().toString()).toBe([0, 0, 0, 1].toString());
   });
 
-  it('test setAlpha & getAlpha for colors', () => {
+  it('test toGrayscale for colors', () => {
     const color1 = new Color('red');
+    const color2 = new Color('ff5555');
     expect(color1.getSource().toString()).toBe([255, 0, 0, 1].toString());
     color1.toGrayscale();
     expect(color1.getSource().toString()).toBe([77, 77, 77, 1].toString());
+    color2.toGrayscale();
+    expect(color2.toHex()).toBe('888888');
   });
 
-  it('test toGrayscale for colors', () => {
+  it('test setAlpha & getAlpha  for colors', () => {
     const color1 = new Color('red');
     expect(color1.getAlpha()).toBe(1);
     color1.setAlpha(0.5);
     expect(color1.getAlpha()).toBe(0.5);
+
+    const color2 = new Color('ffffffcc');
+    expect(color2.getAlpha()).toBe(0.8);
   });
 
   it('test overlayWith for colors', () => {
@@ -100,12 +153,16 @@ describe('Color regex and conversion tests', () => {
 
   it('test toBlackWhite for colors', () => {
     const color1 = new Color('red');
+    const color2 = new Color('333333');
     expect(color1.getSource().toString()).toBe([255, 0, 0, 1].toString());
     color1.toBlackWhite(1);
     expect(color1.getSource().toString()).toBe([255, 255, 255, 1].toString());
     // @ts-expect-error
     color1.toBlackWhite();
     expect(color1.getSource().toString()).toBe([255, 255, 255, 1].toString());
+    // @ts-expect-error
+    color2.toBlackWhite();
+    expect(color2.toHex()).toBe('000000');
   });
 
   it('Create colors through keywords', () => {
@@ -132,5 +189,135 @@ describe('Color regex and conversion tests', () => {
     expect(color1.toHexa()).toBe(hexaRed);
     expect(color2.getAlpha()).toBe(1);
     expect(color1.getAlpha()).toBe(1);
+  });
+});
+
+describe('test Color.fromHsla for color', () => {
+  test.each([
+    {
+      name: 'fromHsl',
+      stringToParse: 'hsl(262,80%,12%)',
+      expectedSource: [24, 6, 55, 1],
+    },
+    {
+      name: 'fromHsl (with whitespaces)',
+      stringToParse: 'hsl( 262 , 80% , 12% )',
+      expectedSource: [24, 6, 55, 1],
+    },
+    {
+      name: 'fromHsla',
+      stringToParse: 'hsla(108,50%,50%,0.7)',
+      expectedSource: [89, 191, 64, 0.7],
+    },
+    {
+      name: 'fromHsla (with whitespaces)',
+      stringToParse: 'hsla(  108  ,50%  , 50%    ,.2)',
+      expectedSource: [89, 191, 64, 0.2],
+    },
+    {
+      name: 'fromHsla no commas(with whitespaces)',
+      stringToParse: 'hsl( 108  50%   50%  / .5)',
+      expectedSource: [89, 191, 64, 0.5],
+    },
+    {
+      name: 'fromHsla with very counterClockwise value)',
+      stringToParse: 'hsl( -450,  50%,   50%, .5)',
+      expectedSource: [127, 64, 191, 0.5],
+    },
+  ])('$name', ({ stringToParse, expectedSource }) => {
+    const color = Color.fromHsla(stringToParse);
+    expect(color).toBeTruthy();
+    expect(color).toBeInstanceOf(Color);
+    expect(color.getSource()).toEqual(expectedSource);
+
+    const colorUppercase = Color.fromHsla(stringToParse.toUpperCase());
+    expect(colorUppercase).toBeTruthy();
+    expect(colorUppercase).toBeInstanceOf(Color);
+    expect(colorUppercase.getSource()).toEqual(expectedSource);
+  });
+});
+
+describe('parsing colors for color', () => {
+  test.each([
+    {
+      name: 'fromRgb',
+      stringToParse: 'rgb(255,255,255)',
+      expectedSource: [255, 255, 255, 1],
+    },
+    {
+      name: 'fromRgb no commas',
+      stringToParse: 'rgb(255 0 255)',
+      expectedSource: [255, 0, 255, 1],
+    },
+    {
+      name: 'fromRgb (with whitespaces)',
+      stringToParse: 'rgb( 255 , 128 , 64 )',
+      expectedSource: [255, 128, 64, 1],
+    },
+    {
+      name: 'fromRgb no commas (with whitespaces)',
+      stringToParse: 'rgb( 255    128 64 )',
+      expectedSource: [255, 128, 64, 1],
+    },
+    {
+      name: 'fromRgb (percentage values)',
+      stringToParse: 'rgb(100%,50%,25%)',
+      expectedSource: [255, 127, 64, 1],
+    },
+    {
+      name: 'fromRgb (percentage values with whitespaces)',
+      stringToParse: 'rgb(100% ,   50% ,  25%)',
+      expectedSource: [255, 127, 64, 1],
+    },
+    {
+      name: 'fromRgba',
+      stringToParse: 'rgba(255,12,10,0.5)',
+      expectedSource: [255, 12, 10, 0.5],
+    },
+    {
+      name: 'fromRgba without commas',
+      stringToParse: 'rgba(255 12 10 / 0.5)',
+      expectedSource: [255, 12, 10, 0.5],
+    },
+    {
+      name: 'fromRgba (with spaces and missing 0)',
+      stringToParse: 'rgba( 255 , 12 , 10 , .3 )',
+      expectedSource: [255, 12, 10, 0.3],
+    },
+    {
+      name: 'fromRgba (with whitespaces)',
+      stringToParse: 'rgba( 255 , 33 , 44 , 0.6 )',
+      expectedSource: [255, 33, 44, 0.6],
+    },
+    {
+      name: 'fromRgba (percentage values)',
+      stringToParse: 'rgba(100%,50%,25%,33%)',
+      expectedSource: [255, 127, 64, 0.33],
+    },
+    {
+      name: 'fromRgba (percentage values)',
+      stringToParse: 'rgba(  100.00%  ,50.40%,   25.1%   ,  33%  )',
+      expectedSource: [255, 129, 64, 0.33],
+    },
+    {
+      name: 'fromRgba (percentage values with whitespaces)',
+      stringToParse: 'rgba(  100.00%  ,50.80%,   25.1%   ,  33%  )',
+      expectedSource: [255, 130, 64, 0.33],
+    },
+    {
+      name: 'fromRgba (percentage values with whitespaces no zeroes)',
+      stringToParse: 'rgba(  .99%  ,50.40%,   25.1%   ,  .33  )',
+      expectedSource: [3, 129, 64, 0.33],
+    },
+  ])('$name', ({ stringToParse, expectedSource }) => {
+    const color = Color.fromRgba(stringToParse);
+    expect(color).toBeTruthy();
+    expect(color).toBeInstanceOf(Color);
+    expect(color.getSource()).toEqual(expectedSource);
+
+    const colorUppercase = Color.fromRgb(stringToParse.toUpperCase());
+    expect(colorUppercase).toBeTruthy();
+    expect(colorUppercase).toBeInstanceOf(Color);
+    expect(colorUppercase.getSource()).toEqual(expectedSource);
   });
 });
