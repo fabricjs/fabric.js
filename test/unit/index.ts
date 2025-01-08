@@ -6,7 +6,6 @@ import './canvas_events';
 import './canvas_static';
 import './circle';
 import './collection';
-import './color';
 import './controls_handlers';
 import './ellipse';
 import './gradient';
