@@ -12,7 +12,6 @@ describe('Color regex and conversion tests', () => {
     const color7 = new Color();
     // toHexa rounds
     const color8 = new Color([211.23213213, 0, 128.1233123131]);
-
     // transparent
     const color9 = new Color('transparent');
 
@@ -223,6 +222,11 @@ describe('test Color.fromHsla for color', () => {
       name: 'fromHsla with very counterClockwise value)',
       stringToParse: 'hsl( -450,  50%,   50%, .5)',
       expectedSource: [127, 64, 191, 0.5],
+    },
+      {
+      name: 'fromHsla with Saturation 0',
+      stringToParse: 'hsla(0, 0%, 50%, 1)',
+      expectedSource: [128, 128, 128, 1],
     },
   ])('$name', ({ stringToParse, expectedSource }) => {
     const color = Color.fromHsla(stringToParse);
