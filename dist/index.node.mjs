@@ -461,7 +461,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.5.1";
+var version = "6.5.3";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -2431,6 +2431,7 @@ class Color {
    * @returns {TRGBAColorSource}
    */
   _tryParsingColor(color) {
+    color = color.toLowerCase();
     if (color in ColorNameMap) {
       color = ColorNameMap[color];
     }
@@ -6900,8 +6901,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       // for sure this ALIASING_LIMIT is slightly creating problem
       // in situation in which the cache canvas gets an upper limit
       // also objectScale contains already scaleX and scaleY
-      width: neededX + ALIASING_LIMIT,
-      height: neededY + ALIASING_LIMIT,
+      width: Math.ceil(neededX + ALIASING_LIMIT),
+      height: Math.ceil(neededY + ALIASING_LIMIT),
       zoomX: objectScale.x,
       zoomY: objectScale.y,
       x: neededX,
@@ -6918,51 +6919,30 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas,
       context = this._cacheContext,
-      dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      minCacheSize = config.minCacheSideLimit,
-      width = dims.width,
-      height = dims.height,
-      zoomX = dims.zoomX,
-      zoomY = dims.zoomY,
+      {
+        width,
+        height,
+        zoomX,
+        zoomY,
+        x,
+        y
+      } = this._limitCacheSize(this._getCacheCanvasDimensions()),
       dimensionsChanged = width !== canvas.width || height !== canvas.height,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
     if (!canvas || !context) {
       return false;
     }
-    let drawingWidth,
-      drawingHeight,
-      shouldRedraw = dimensionsChanged || zoomChanged,
-      additionalWidth = 0,
-      additionalHeight = 0,
-      shouldResizeCanvas = false;
-    if (dimensionsChanged) {
-      const canvasWidth = this._cacheCanvas.width,
-        canvasHeight = this._cacheCanvas.height,
-        sizeGrowing = width > canvasWidth || height > canvasHeight,
-        sizeShrinking = (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) && canvasWidth > minCacheSize && canvasHeight > minCacheSize;
-      shouldResizeCanvas = sizeGrowing || sizeShrinking;
-      if (sizeGrowing && !dims.capped && (width > minCacheSize || height > minCacheSize)) {
-        additionalWidth = width * 0.1;
-        additionalHeight = height * 0.1;
-      }
-    }
-    if (isTextObject(this) && this.path) {
-      shouldRedraw = true;
-      shouldResizeCanvas = true;
-      // IMHO in those lines we are using zoomX and zoomY not the this version.
-      additionalWidth += this.getHeightOfLine(0) * this.zoomX;
-      additionalHeight += this.getHeightOfLine(0) * this.zoomY;
-    }
+    const shouldRedraw = dimensionsChanged || zoomChanged;
     if (shouldRedraw) {
-      if (shouldResizeCanvas) {
-        canvas.width = Math.ceil(width + additionalWidth);
-        canvas.height = Math.ceil(height + additionalHeight);
+      if (width !== canvas.width || height !== canvas.height) {
+        canvas.width = width;
+        canvas.height = height;
       } else {
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
-      drawingWidth = dims.x / 2;
-      drawingHeight = dims.y / 2;
+      const drawingWidth = x / 2;
+      const drawingHeight = y / 2;
       this.cacheTranslationX = Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY = Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
       context.translate(this.cacheTranslationX, this.cacheTranslationY);
@@ -15320,9 +15300,7 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
    * @private
    */
   _resetTransformEventData() {
-    this._target = undefined;
-    this._pointer = undefined;
-    this._absolutePointer = undefined;
+    this._target = this._pointer = this._absolutePointer = undefined;
   }
 
   /**
@@ -18526,8 +18504,6 @@ class StyledText extends FabricObject {
    * has no other properties, then it is also deleted.  Finally,
    * if the line containing that character has no other characters
    * then it also is deleted.
-   *
-   * @param {string} property The property to compare between characters and text.
    */
   cleanStyle(property) {
     if (!this.styles) {
@@ -18573,7 +18549,6 @@ class StyledText extends FabricObject {
       graphemeCount += this._textLines[i].length;
     }
     if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-      // @ts-expect-error conspiracy theory of TS
       this[property] = stylePropertyValue;
       this.removeStyle(property);
     }
@@ -21566,10 +21541,8 @@ class ITextKeyBehavior extends ITextBehavior {
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
     if (e.keyCode in keyMap) {
-      // @ts-expect-error legacy method calling pattern
       this[keyMap[e.keyCode]](e);
     } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-      // @ts-expect-error legacy method calling pattern
       this[this.ctrlKeysMapDown[e.keyCode]](e);
     } else {
       return;
@@ -21598,7 +21571,6 @@ class ITextKeyBehavior extends ITextBehavior {
       return;
     }
     if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
-      // @ts-expect-error legacy method calling pattern
       this[this.ctrlKeysMapUp[e.keyCode]](e);
     } else {
       return;
@@ -22089,8 +22061,6 @@ class ITextClickBehavior extends ITextKeyBehavior {
     this.__lastLastClickTime = +new Date();
     this.__lastPointer = {};
     this.on('mousedown', this.onMouseDown);
-
-    // @ts-expect-error in reality it is an IText instance
     this.draggableTextDelegate = new DraggableTextDelegate(this);
     super.initBehavior();
   }
@@ -23930,12 +23900,8 @@ class WebGLFilterBackend {
       cachedTexture = this.getCachedTexture(cacheKey, source);
     }
     const pipelineState = {
-      originalWidth: source.width ||
-      // @ts-expect-error is this a bug? should this be naturalWidth? or is this the pipeline state?
-      source.originalWidth || 0,
-      originalHeight: source.height ||
-      // @ts-expect-error is this a bug? should this be naturalHeight? or is this the pipeline state?
-      source.originalHeight || 0,
+      originalWidth: source.width || source.naturalWidth || 0,
+      originalHeight: source.height || source.naturalHeight || 0,
       sourceWidth: width,
       sourceHeight: height,
       destinationWidth: width,
@@ -26093,65 +26059,70 @@ class BlendColor extends BaseFilter {
       }
     } = _ref;
     const source = new Color(this.color).getSource();
-    const tr = source[0] * this.alpha;
-    const tg = source[1] * this.alpha;
-    const tb = source[2] * this.alpha;
-    const alpha1 = 1 - this.alpha;
+    const alpha = this.alpha;
+    const tr = source[0] * alpha;
+    const tg = source[1] * alpha;
+    const tb = source[2] * alpha;
+    const alpha1 = 1 - alpha;
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
+      let oR, oG, oB;
       switch (this.mode) {
         case 'multiply':
-          data[i] = r * tr / 255;
-          data[i + 1] = g * tg / 255;
-          data[i + 2] = b * tb / 255;
+          oR = r * tr / 255;
+          oG = g * tg / 255;
+          oB = b * tb / 255;
           break;
         case 'screen':
-          data[i] = 255 - (255 - r) * (255 - tr) / 255;
-          data[i + 1] = 255 - (255 - g) * (255 - tg) / 255;
-          data[i + 2] = 255 - (255 - b) * (255 - tb) / 255;
+          oR = 255 - (255 - r) * (255 - tr) / 255;
+          oG = 255 - (255 - g) * (255 - tg) / 255;
+          oB = 255 - (255 - b) * (255 - tb) / 255;
           break;
         case 'add':
-          data[i] = r + tr;
-          data[i + 1] = g + tg;
-          data[i + 2] = b + tb;
+          oR = r + tr;
+          oG = g + tg;
+          oB = b + tb;
           break;
         case 'difference':
-          data[i] = Math.abs(r - tr);
-          data[i + 1] = Math.abs(g - tg);
-          data[i + 2] = Math.abs(b - tb);
+          oR = Math.abs(r - tr);
+          oG = Math.abs(g - tg);
+          oB = Math.abs(b - tb);
           break;
         case 'subtract':
-          data[i] = r - tr;
-          data[i + 1] = g - tg;
-          data[i + 2] = b - tb;
+          oR = r - tr;
+          oG = g - tg;
+          oB = b - tb;
           break;
         case 'darken':
-          data[i] = Math.min(r, tr);
-          data[i + 1] = Math.min(g, tg);
-          data[i + 2] = Math.min(b, tb);
+          oR = Math.min(r, tr);
+          oG = Math.min(g, tg);
+          oB = Math.min(b, tb);
           break;
         case 'lighten':
-          data[i] = Math.max(r, tr);
-          data[i + 1] = Math.max(g, tg);
-          data[i + 2] = Math.max(b, tb);
+          oR = Math.max(r, tr);
+          oG = Math.max(g, tg);
+          oB = Math.max(b, tb);
           break;
         case 'overlay':
-          data[i] = tr < 128 ? 2 * r * tr / 255 : 255 - 2 * (255 - r) * (255 - tr) / 255;
-          data[i + 1] = tg < 128 ? 2 * g * tg / 255 : 255 - 2 * (255 - g) * (255 - tg) / 255;
-          data[i + 2] = tb < 128 ? 2 * b * tb / 255 : 255 - 2 * (255 - b) * (255 - tb) / 255;
+          oR = tr < 128 ? 2 * r * tr / 255 : 255 - 2 * (255 - r) * (255 - tr) / 255;
+          oG = tg < 128 ? 2 * g * tg / 255 : 255 - 2 * (255 - g) * (255 - tg) / 255;
+          oB = tb < 128 ? 2 * b * tb / 255 : 255 - 2 * (255 - b) * (255 - tb) / 255;
           break;
         case 'exclusion':
-          data[i] = tr + r - 2 * tr * r / 255;
-          data[i + 1] = tg + g - 2 * tg * g / 255;
-          data[i + 2] = tb + b - 2 * tb * b / 255;
+          oR = tr + r - 2 * tr * r / 255;
+          oG = tg + g - 2 * tg * g / 255;
+          oB = tb + b - 2 * tb * b / 255;
           break;
         case 'tint':
-          data[i] = tr + r * alpha1;
-          data[i + 1] = tg + g * alpha1;
-          data[i + 2] = tb + b * alpha1;
+          oR = tr + r * alpha1;
+          oG = tg + g * alpha1;
+          oB = tb + b * alpha1;
       }
+      data[i] = oR;
+      data[i + 1] = oG;
+      data[i + 2] = oB;
     }
   }
 
@@ -26560,9 +26531,9 @@ class Brightness extends BaseFilter {
     } = _ref;
     const brightness = Math.round(this.brightness * 255);
     for (let i = 0; i < data.length; i += 4) {
-      data[i] = data[i] + brightness;
-      data[i + 1] = data[i + 1] + brightness;
-      data[i + 2] = data[i + 2] + brightness;
+      data[i] += brightness;
+      data[i + 1] += brightness;
+      data[i + 2] += brightness;
     }
   }
   isNeutralState() {
@@ -26634,15 +26605,14 @@ class ColorMatrix extends BaseFilter {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
-      if (colorsOnly) {
-        data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
-        data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
-        data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
-      } else {
+      data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
+      data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
+      data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
+      if (!colorsOnly) {
         const a = data[i + 3];
-        data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
-        data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
-        data[i + 2] = r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
+        data[i] += a * m[3];
+        data[i + 1] += a * m[8];
+        data[i + 2] += a * m[13];
         data[i + 3] = r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
       }
     }
@@ -26689,7 +26659,6 @@ classRegistry.setClass(ColorMatrix);
 function createColorMatrixFilter(key, matrix) {
   var _Class;
   const newClass = (_Class = class newClass extends ColorMatrix {
-    //@ts-expect-error TS wants matrix to be exported.
     toObject() {
       return {
         type: this.type,
@@ -26740,7 +26709,6 @@ class Composed extends BaseFilter {
    * Serialize this filter into JSON.
    * @returns {Object} A JSON representation of this filter.
    */
-  //@ts-expect-error TS doesn't like this toObject
   toObject() {
     return {
       type: this.type,
@@ -27120,20 +27088,21 @@ class Grayscale extends BaseFilter {
       }
     } = _ref;
     for (let i = 0, value; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
       switch (this.mode) {
         case 'average':
-          value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          value = (r + g + b) / 3;
           break;
         case 'lightness':
-          value = (Math.min(data[i], data[i + 1], data[i + 2]) + Math.max(data[i], data[i + 1], data[i + 2])) / 2;
+          value = (Math.min(r, g, b) + Math.max(r, g, b)) / 2;
           break;
         case 'luminosity':
-          value = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
+          value = 0.21 * r + 0.72 * g + 0.07 * b;
           break;
       }
-      data[i] = value;
-      data[i + 1] = value;
-      data[i + 2] = value;
+      data[i + 2] = data[i + 1] = data[i] = value;
     }
   }
   getCacheKey() {
@@ -27168,9 +27137,9 @@ _defineProperty(Grayscale, "defaults", grayscaleDefaultValues);
 _defineProperty(Grayscale, "uniformLocations", ['uMode']);
 classRegistry.setClass(Grayscale);
 
-const hueRotationDefaultValues = {
+const hueRotationDefaultValues = _objectSpread2(_objectSpread2({}, colorMatrixDefaultValues), {}, {
   rotation: 0
-};
+});
 
 /**
  * HueRotation filter class
@@ -27189,16 +27158,7 @@ class HueRotation extends ColorMatrix {
       aThird = 1 / 3,
       aThirdSqtSin = Math.sqrt(aThird) * sine,
       OneMinusCos = 1 - cosine;
-    this.matrix = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
-    this.matrix[0] = cosine + OneMinusCos / 3;
-    this.matrix[1] = aThird * OneMinusCos - aThirdSqtSin;
-    this.matrix[2] = aThird * OneMinusCos + aThirdSqtSin;
-    this.matrix[5] = aThird * OneMinusCos + aThirdSqtSin;
-    this.matrix[6] = cosine + aThird * OneMinusCos;
-    this.matrix[7] = aThird * OneMinusCos - aThirdSqtSin;
-    this.matrix[10] = aThird * OneMinusCos - aThirdSqtSin;
-    this.matrix[11] = aThird * OneMinusCos + aThirdSqtSin;
-    this.matrix[12] = cosine + aThird * OneMinusCos;
+    this.matrix = [cosine + OneMinusCos / 3, aThird * OneMinusCos - aThirdSqtSin, aThird * OneMinusCos + aThirdSqtSin, 0, 0, aThird * OneMinusCos + aThirdSqtSin, cosine + aThird * OneMinusCos, aThird * OneMinusCos - aThirdSqtSin, 0, 0, aThird * OneMinusCos - aThirdSqtSin, aThird * OneMinusCos + aThirdSqtSin, cosine + aThird * OneMinusCos, 0, 0, 0, 0, 0, 1, 0];
   }
   isNeutralState() {
     return this.rotation === 0;
@@ -27207,8 +27167,6 @@ class HueRotation extends ColorMatrix {
     this.calculateMatrix();
     super.applyTo(options);
   }
-
-  //@ts-expect-error TS and classes with different methods
   toObject() {
     return {
       type: this.type,
@@ -27978,10 +27936,13 @@ class Saturation extends BaseFilter {
     } = _ref;
     const adjust = -this.saturation;
     for (let i = 0; i < data.length; i += 4) {
-      const max = Math.max(data[i], data[i + 1], data[i + 2]);
-      data[i] += max !== data[i] ? (max - data[i]) * adjust : 0;
-      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * adjust : 0;
-      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * adjust : 0;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const max = Math.max(r, g, b);
+      data[i] += max !== r ? (max - r) * adjust : 0;
+      data[i + 1] += max !== g ? (max - g) * adjust : 0;
+      data[i + 2] += max !== b ? (max - b) * adjust : 0;
     }
   }
 
@@ -28045,12 +28006,15 @@ class Vibrance extends BaseFilter {
     } = _ref;
     const adjust = -this.vibrance;
     for (let i = 0; i < data.length; i += 4) {
-      const max = Math.max(data[i], data[i + 1], data[i + 2]);
-      const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const max = Math.max(r, g, b);
+      const avg = (r + g + b) / 3;
       const amt = Math.abs(max - avg) * 2 / 255 * adjust;
-      data[i] += max !== data[i] ? (max - data[i]) * amt : 0;
-      data[i + 1] += max !== data[i + 1] ? (max - data[i + 1]) * amt : 0;
-      data[i + 2] += max !== data[i + 2] ? (max - data[i + 2]) * amt : 0;
+      data[i] += max !== r ? (max - r) * amt : 0;
+      data[i + 1] += max !== g ? (max - g) * amt : 0;
+      data[i + 2] += max !== b ? (max - b) * amt : 0;
     }
   }
 

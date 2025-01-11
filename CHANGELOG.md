@@ -3,6 +3,20 @@
 ## [next]
 
 - fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
+
+## [6.5.4]
+
+- docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
+
+## [6.5.3]
+
+- fix(ColorMatrix): Restore correct alpha for JS colorMatrix filter [#10313](https://github.com/fabricjs/fabric.js/pull/10313)
+
+## [6.5.2]
+
+- chore(): Reduce some verbose code [#10311](https://github.com/fabricjs/fabric.js/pull/10311)
+- ci(): Test node 22 again [#10310](https://github.com/fabricjs/fabric.js/pull/10310)
+- chore(TS): Try to remove all TS-ERROR directives [#10309](https://github.com/fabricjs/fabric.js/pull/10309)
 - chore(): Make TS config more strict [#10308](https://github.com/fabricjs/fabric.js/pull/10308)
 - fix(Color): Support uppercase keywords [#10300](https://github.com/fabricjs/fabric.js/pull/10300)
 - fix(): The \_setLineDash method has additional side effects, altering the value of strokeDashArray [#10292](https://github.com/fabricjs/fabric.js/issues/10292)

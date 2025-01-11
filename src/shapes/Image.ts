@@ -609,11 +609,11 @@ export class FabricImage<
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
+   * Decide if the FabricImage should cache or not. Create its own cache level
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group outside is cached.
-   * This is the special image version where we would like to avoid caching where possible.
+   * This is the special Image version where we would like to avoid caching where possible.
    * Essentially images do not benefit from caching. They may require caching, and in that
    * case we do it. Also caching an image usually ends in a loss of details.
    * A full performance audit should be done.
