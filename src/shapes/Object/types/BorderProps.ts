@@ -32,7 +32,7 @@ export interface BorderProps {
    * Scale factor for the border of the objects ( selection box and controls stroke ).
    * Bigger number will make a thicker border
    * border default value is 1, so this scale value is equal to a border and control strokeWidth.
-   * Id you need to divide border from control strokeWidth
+   * If you need to divide border from control strokeWidth
    * you will need to write your own render function for controls
    * @type Number
    * @default 1

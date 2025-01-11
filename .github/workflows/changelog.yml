@@ -16,7 +16,7 @@ on:
 
 jobs:
   changelog:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       file: CHANGELOG.md
     steps:
@@ -30,7 +30,7 @@ jobs:
             exit 1
           fi
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: changelog
     if: (inputs.create && failure()) || (inputs.update && success())
     continue-on-error: true

@@ -21,6 +21,7 @@ const regex = new RegExp(highPsourceCode, 'g');
 export class BaseFilter<
   Name extends string,
   OwnProps extends Record<string, any> = object,
+  SerializedProps extends Record<string, any> = OwnProps,
 > {
   /**
    * Filter type
@@ -383,19 +384,19 @@ export class BaseFilter<
    * stored in the static defaults property.
    * @return {Object} Object representation of an instance
    */
-  toObject(): { type: Name } & OwnProps {
+  toObject(): { type: Name } & SerializedProps {
     const defaultKeys = Object.keys(
       (this.constructor as typeof BaseFilter).defaults || {},
-    ) as (keyof OwnProps)[];
+    ) as (keyof SerializedProps)[];
 
     return {
       type: this.type,
-      ...defaultKeys.reduce<OwnProps>((acc, key) => {
+      ...defaultKeys.reduce<SerializedProps>((acc, key) => {
         acc[key] = this[
           key as keyof this
         ] as unknown as (typeof acc)[typeof key];
         return acc;
-      }, {} as OwnProps),
+      }, {} as SerializedProps),
     };
   }
 

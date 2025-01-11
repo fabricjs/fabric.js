@@ -8,7 +8,7 @@ import type { ITextEvents } from './ITextBehavior';
 import { ITextKeyBehavior } from './ITextKeyBehavior';
 import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
-
+import type { IText } from './IText';
 /**
  * `LEFT_CLICK === 0`
  */
@@ -42,8 +42,9 @@ export abstract class ITextClickBehavior<
     this.__lastPointer = {};
     this.on('mousedown', this.onMouseDown);
 
-    // @ts-expect-error in reality it is an IText instance
-    this.draggableTextDelegate = new DraggableTextDelegate(this);
+    this.draggableTextDelegate = new DraggableTextDelegate(
+      this as unknown as IText,
+    );
 
     super.initBehavior();
   }

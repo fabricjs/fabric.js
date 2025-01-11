@@ -9,7 +9,7 @@ on:
 
 jobs:
   prime-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
   node-coverage:
     needs: [prime-build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Node 20.x ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
@@ -44,19 +44,22 @@ jobs:
       - name: Run ${{ matrix.suite }} tests with coverage
         if: matrix.suite == 'visual'
         run: npm run test:visual:coverage
-      - name: Upload test coverage
+      - name: Verify coverage files
+        run: ls -l ./.nyc_output/*.json
+      - name: Upload test coverage ${{ matrix.suite }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.suite }}
-          path: .nyc_output/*.json
+          path: ./.nyc_output/*.json
+          include-hidden-files: true
 
   browser:
     needs: [prime-build]
     name: ${{ matrix.target }} ${{ matrix.suite }} tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [20]
         target: [chrome, firefox]
         suite: [unit, visual]
       fail-fast: false
@@ -72,7 +75,7 @@ jobs:
         run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
   node:
     needs: [prime-build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
     strategy:
       fail-fast: false
@@ -80,21 +83,21 @@ jobs:
         # For more information see:
         # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
         # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: ['18.x']
+        node-version: [18, 22]
         suite: [unit, visual]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-          install-system-deps: 'false'
+          install-system-deps: ${{ matrix.node-version >= 22 }}
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
   jest:
     name: Jest tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
@@ -107,12 +110,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-jest
-          path: .nyc_output/*.json
+          path: ./.nyc_output/*.json
+          include-hidden-files: true
 
   e2e:
     needs: [prime-build]
     name: Playwright tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
@@ -131,38 +135,40 @@ jobs:
         with:
           name: e2e-report
           path: ./e2e/test-report/
+          include-hidden-files: true
       - name: Upload Test Coverage
         uses: actions/upload-artifact@v4
         with:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
+          include-hidden-files: true
   coverage:
     needs: [node-coverage, e2e]
     name: Coverage reporting
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 18.x
           install-system-deps: false
       - uses: actions/download-artifact@v4
         with:
-          name: coverage-unit
-          path: .nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-visual
-          path: .nyc_output
-      - uses: actions/download-artifact@v4
-        with:
           name: coverage-e2e
-          path: .nyc_output
+          path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-jest
-          path: .nyc_output
-      - run: ls -l .nyc_output
+          path: ./.nyc_output
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-unit
+          path: ./.nyc_output
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-visual
+          path: ./.nyc_output
+      - run: ls -l ./.nyc_output
       - run: npm run coverage:report
       - uses: romeovs/lcov-reporter-action@v0.4.0
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'

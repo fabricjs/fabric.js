@@ -7,7 +7,11 @@ type FixedFiltersOwnProps = {
 };
 
 export function createColorMatrixFilter(key: string, matrix: TMatColorMatrix) {
-  const newClass = class extends ColorMatrix<typeof key, FixedFiltersOwnProps> {
+  const newClass = class extends ColorMatrix<
+    typeof key,
+    FixedFiltersOwnProps,
+    FixedFiltersOwnProps
+  > {
     static type = key;
 
     static defaults = {
@@ -15,7 +19,6 @@ export function createColorMatrixFilter(key: string, matrix: TMatColorMatrix) {
       matrix,
     };
 
-    //@ts-expect-error TS wants matrix to be exported.
     toObject(): { type: string } & FixedFiltersOwnProps {
       return { type: this.type, colorsOnly: this.colorsOnly };
     }

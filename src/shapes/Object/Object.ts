@@ -752,7 +752,7 @@ export class FabricObject<
   }
 
   /**
-   * When set to `true`, force the object to have its own cache, even if it is inside a group
+   * When returns `true`, force the object to have its own cache, even if it is inside a group
    * it may be needed when your object behave in a particular way on the cache and always needs
    * its own isolated canvas to render correctly.
    * Created to be overridden
@@ -760,6 +760,7 @@ export class FabricObject<
    * @returns Boolean
    */
   needsItsOwnCache() {
+    // TODO re-evaluate this shadow condition
     if (
       this.paintFirst === STROKE &&
       this.hasFill() &&
@@ -778,15 +779,15 @@ export class FabricObject<
    * Decide if the object should cache or not. Create its own cache level
    * objectCaching is a global flag, wins over everything
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group outside is cached.
    * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
    * @return {Boolean}
    */
   shouldCache() {
     this.ownCaching =
-      this.needsItsOwnCache() ||
-      (this.objectCaching && (!this.parent || !this.parent.isOnACache()));
+      (this.objectCaching && (!this.parent || !this.parent.isOnACache())) ||
+      this.needsItsOwnCache();
     return this.ownCaching;
   }
 
@@ -912,7 +913,10 @@ export class FabricObject<
   }
 
   /**
-   * Check if cache is dirty
+   * Check if cache is dirty and if is dirty clear the context.
+   * This check has a big side effect, it changes the underlying cache canvas if necessary.
+   * Do not call this method on your own to check if the cache is dirty, because if it is,
+   * it is also going to wipe the cache. This is badly designed and needs to be fixed.
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */
@@ -1037,10 +1041,6 @@ export class FabricObject<
   _setLineDash(ctx: CanvasRenderingContext2D, dashArray?: number[] | null) {
     if (!dashArray || dashArray.length === 0) {
       return;
-    }
-    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
-    if (1 & dashArray.length) {
-      dashArray.push(...dashArray);
     }
     ctx.setLineDash(dashArray);
   }

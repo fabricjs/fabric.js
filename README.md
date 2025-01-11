@@ -5,6 +5,7 @@
 A **simple and powerful Javascript HTML5 canvas library**.
 
 - [**Website**][website]
+- [**Old V5 documentation**](https://fabric5.fabricjs.com)
 - [**GOTCHAS**][gotchas]
 - [**Contributing, Developing and More**](CONTRIBUTING.md)
 
@@ -42,8 +43,8 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Out of the box interactions such as scale, move, rotate, skew, group...
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
-- [Typed and modular](#migrating-to-v6)
-- [Unit tested](CONTRIBUTING.md#%F0%9F%A7%AA%20testing)
+- Typed and modular
+- [Unit tested](CONTRIBUTING.md#-testing)
 
 #### Supported Browsers/Environments
 
@@ -58,14 +59,16 @@ A **simple and powerful Javascript HTML5 canvas library**.
 |    IE11     |        ❌         |
 |   Node.js   |        ✔️         | [Node.js installation](#nodejs) |
 
-Fabric.js Does not use transpilation by default, the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
+Fabric.js does not use polyfills by default, or tries to keep it at minimum. the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
 
 ## Installation
 
 ```bash
 $ npm install fabric --save
-// or
+# or use yarn
 $ yarn add fabric
+# or use pnpm
+$ pnpm install fabric
 ```
 
 #### Browser
@@ -114,7 +117,7 @@ import { fabric } from 'fabric';
 
 </details>
 
-<details><summary><b>ReactJS</b></summary>
+<details><summary><b>React.js</b></summary>
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
@@ -224,7 +227,7 @@ See our ready to use [templates](./.codesandbox/templates/).
 [codepens]: https://codepen.io/tag/fabricjs
 [contributors]: https://github.com/fabricjs/fabric.js/graphs/contributors
 [demos]: http://fabricjs.com/demos/
-[gotchas]: http://fabricjs.com/fabric-gotchas
+[gotchas]: https://fabricjs.com/docs/old-docs/gotchas/
 [html-to-image]: https://github.com/bubkoo/html-to-image
 [jsdelivr]: https://www.jsdelivr.com/package/npm/fabric
 [jsdom]: https://github.com/jsdom/jsdom

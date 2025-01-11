@@ -143,4 +143,17 @@ describe('Object', () => {
       expect(rect.parent.dirty).toBe(true);
     });
   });
+
+  it('test strokeDashArray with an odd number of elements.', () => {
+    const dashArrayBase = [1];
+    const ctx = {
+      setLineDash: jest.fn(),
+    } as unknown as CanvasRenderingContext2D;
+    const obj = new FabricObject({
+      strokeDashArray: [1],
+    });
+    obj._setLineDash(ctx, dashArrayBase);
+    expect(ctx.setLineDash).toHaveBeenCalledWith(dashArrayBase);
+    expect(obj.strokeDashArray).toEqual([1]);
+  });
 });

@@ -1099,9 +1099,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    */
   _resetTransformEventData() {
-    this._target = undefined;
-    this._pointer = undefined;
-    this._absolutePointer = undefined;
+    this._target = this._pointer = this._absolutePointer = undefined;
   }
 
   /**

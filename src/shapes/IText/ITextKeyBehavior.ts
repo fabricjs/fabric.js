@@ -118,11 +118,15 @@ export abstract class ITextKeyBehavior<
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
     if (e.keyCode in keyMap) {
-      // @ts-expect-error legacy method calling pattern
-      this[keyMap[e.keyCode]](e);
+      (this[keyMap[e.keyCode] as keyof this] as (arg: KeyboardEvent) => void)(
+        e,
+      );
     } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-      // @ts-expect-error legacy method calling pattern
-      this[this.ctrlKeysMapDown[e.keyCode]](e);
+      (
+        this[this.ctrlKeysMapDown[e.keyCode] as keyof this] as (
+          arg: KeyboardEvent,
+        ) => void
+      )(e);
     } else {
       return;
     }
@@ -150,8 +154,11 @@ export abstract class ITextKeyBehavior<
       return;
     }
     if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
-      // @ts-expect-error legacy method calling pattern
-      this[this.ctrlKeysMapUp[e.keyCode]](e);
+      (
+        this[this.ctrlKeysMapUp[e.keyCode] as keyof this] as (
+          arg: KeyboardEvent,
+        ) => void
+      )(e);
     } else {
       return;
     }
