@@ -1,13 +1,16 @@
-import type { FabricObject, TOriginX, TOriginY } from 'fabric';
-import { Point } from 'fabric';
+import type { FabricObject, Point, TOriginX, TOriginY } from 'fabric';
+import type { AligningGuidelines } from '..';
 import type { LineProps } from '../typedefs';
-import { aligningLineConfig } from '../constant';
 import { getDistanceList } from './basic';
 
-export function collectLine(target: FabricObject, points: Point[]) {
+export function collectLine(
+  this: AligningGuidelines,
+  target: FabricObject,
+  points: Point[],
+) {
   const list = target.getCoords();
   list.push(target.getCenterPoint());
-  const margin = aligningLineConfig.margin / (target.canvas?.getZoom() ?? 1);
+  const margin = this.margin / this.canvas.getZoom();
   const opts = { target, list, points, margin };
   const vLines = collectPoints({ ...opts, type: 'x' });
   const hLines = collectPoints({ ...opts, type: 'y' });

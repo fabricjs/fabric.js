@@ -16,6 +16,10 @@ export type AligningLineConfig = {
   width: number;
   /** Aligning line color */
   color: string;
+  /** The size of endpoint x, default is 2.4 */
+  xSize: number;
+  /** Dashed Line Style */
+  lineDash: number[] | undefined;
   /** Close Vertical line, default false. */
   closeVLine: boolean;
   /** Close horizontal line, default false. */
@@ -28,4 +32,10 @@ export type AligningLineConfig = {
   getContraryMap?: (target: FabricObject) => PointMap;
   /** Alignment method is required when customizing. */
   contraryOriginMap?: OriginMap;
+  /** Custom Line Drawing */
+  drawLine?: (origin: Point, target: Point) => void;
+  /** Custom Endpoint Drawing */
+  drawX?: (point: Point, dir: number) => void;
+  /** When moving a shape, the coordinates of other shapes are calculated only once. You can customize how to cache or clear them */
+  getCaCheMapValue?: Point[];
 };

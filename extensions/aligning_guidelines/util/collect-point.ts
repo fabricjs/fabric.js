@@ -1,7 +1,7 @@
-import type { FabricObject, Point, TOriginX, TOriginY } from 'fabric';
-import { aligningLineConfig } from '../constant';
-import { getDistanceList } from './basic';
+import type { FabricObject, Point } from 'fabric';
+import type { AligningGuidelines } from '..';
 import type { LineProps } from '../typedefs';
+import { getDistanceList } from './basic';
 
 type CollectPointProps = {
   target: FabricObject;
@@ -20,18 +20,11 @@ type CollectPointProps = {
   /** tl、tr、br、bl、mt、mr、mb、ml */
   corner: string;
 };
-// Position using diagonal points when resizing/scaling
-const originMap: { [props: string]: [TOriginX, TOriginY] } = {
-  tl: ['right', 'bottom'],
-  tr: ['left', 'bottom'],
-  br: ['left', 'top'],
-  bl: ['right', 'top'],
-  mt: ['center', 'bottom'],
-  mr: ['left', 'center'],
-  mb: ['center', 'top'],
-  ml: ['right', 'center'],
-};
-export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
+
+export function collectVerticalPoint(
+  this: AligningGuidelines,
+  props: CollectPointProps,
+): LineProps[] {
   const {
     target,
     isScale,
@@ -43,7 +36,7 @@ export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
     isCenter,
   } = props;
   const { dis, arr } = getDistanceList(point, list, 'x');
-  const margin = aligningLineConfig.margin / (target.canvas?.getZoom() ?? 1);
+  const margin = this.margin / this.canvas.getZoom();
   if (dis > margin) return [];
   let v = arr[arr.length - 1].x - point.x;
   // tl bl ml
@@ -68,14 +61,17 @@ export function collectVerticalPoint(props: CollectPointProps): LineProps[] {
   if (isCenter) {
     target.setRelativeXY(diagonalPoint, 'center', 'center');
   } else {
-    const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
+    const originArr = this.contraryOriginMap;
     target.setRelativeXY(diagonalPoint, ...originArr[corner]);
   }
   target.setCoords();
   return arr.map((target) => ({ origin: point, target }));
 }
 
-export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
+export function collectHorizontalPoint(
+  this: AligningGuidelines,
+  props: CollectPointProps,
+): LineProps[] {
   const {
     target,
     isScale,
@@ -87,7 +83,7 @@ export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
     isCenter,
   } = props;
   const { dis, arr } = getDistanceList(point, list, 'y');
-  const margin = aligningLineConfig.margin / (target.canvas?.getZoom() ?? 1);
+  const margin = this.margin / this.canvas.getZoom();
   if (dis > margin) return [];
   let v = arr[arr.length - 1].y - point.y;
   // tl mt tr
@@ -112,7 +108,7 @@ export function collectHorizontalPoint(props: CollectPointProps): LineProps[] {
   if (isCenter) {
     target.setRelativeXY(diagonalPoint, 'center', 'center');
   } else {
-    const originArr = aligningLineConfig.contraryOriginMap ?? originMap;
+    const originArr = this.contraryOriginMap;
     target.setRelativeXY(diagonalPoint, ...originArr[corner]);
   }
   target.setCoords();

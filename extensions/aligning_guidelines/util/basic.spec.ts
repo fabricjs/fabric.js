@@ -47,7 +47,7 @@ describe('getPointMap', () => {
     const coords = target.getCoords();
     const pointMap = getPointMap(target);
     expect([pointMap.tl, pointMap.tr, pointMap.br, pointMap.bl]).toEqual(
-      coords
+      coords,
     );
     const arr = [];
     const p = coords.concat(coords[0]);
