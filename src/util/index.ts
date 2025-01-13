@@ -51,6 +51,7 @@ export {
   createImage,
   copyCanvasElement,
   toDataURL,
+  toBlob,
 } from './misc/dom';
 export { toFixed } from './misc/toFixed';
 export {
