@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
+
 ## [6.5.4]
 
 - docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
