@@ -759,7 +759,9 @@ export class FabricImage<
 
   /**
    * Default CSS class name for canvas
+   * Will be removed from fabric 7
    * @static
+   * @deprecated
    * @type String
    * @default
    */
