@@ -26,7 +26,7 @@ import {
 } from '../util/animation/AnimationFrameProvider';
 import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
-import { createCanvasElementFor, toDataURL } from '../util/misc/dom';
+import { createCanvasElementFor, toBlob, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
@@ -1388,6 +1388,22 @@ export class StaticCanvas<
       multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
 
     return toDataURL(
+      this.toCanvasElement(finalMultiplier, options),
+      format,
+      quality,
+    );
+  }
+  toBlob(options = {} as TDataUrlOptions): Promise<Blob | null> {
+    const {
+      format = 'png',
+      quality = 1,
+      multiplier = 1,
+      enableRetinaScaling = false,
+    } = options;
+    const finalMultiplier =
+      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+
+    return toBlob(
       this.toCanvasElement(finalMultiplier, options),
       format,
       quality,
