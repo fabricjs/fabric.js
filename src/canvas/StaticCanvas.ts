@@ -571,7 +571,7 @@ export class StaticCanvas<
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
     // @ts-expect-error node-canvas stuff
     ctx.patternQuality = 'best';
-    this.fire('before:render', { ctx });
+    if (!this.skipControlsDrawing) this.fire('before:render', { ctx });
     this._renderBackground(ctx);
 
     ctx.save();
@@ -595,7 +595,7 @@ export class StaticCanvas<
     if (this.controlsAboveOverlay && !this.skipControlsDrawing) {
       this.drawControls(ctx);
     }
-    this.fire('after:render', { ctx });
+    if (!this.skipControlsDrawing) this.fire('after:render', { ctx });
 
     if (this.__cleanupTask) {
       this.__cleanupTask();

@@ -57,4 +57,15 @@ describe('Canvas', () => {
       expect(canvas._objectsToRender).toBeUndefined();
     });
   });
+
+  it('toDataURL will not trigger render hooks', () => {
+    const canvas = new Canvas();
+    const beforeMock = jest.fn();
+    const afterMock = jest.fn();
+    canvas.on('before:render', beforeMock);
+    canvas.on('after:render', afterMock);
+    canvas.toDataURL();
+    expect(beforeMock).toHaveBeenCalledTimes(0);
+    expect(afterMock).toHaveBeenCalledTimes(0);
+  });
 });

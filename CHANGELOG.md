@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): toDataURL will incorrectly trigger the before:render and after:render [#10397](https://github.com/fabricjs/fabric.js/issues/10397)
+
 ## [6.5.4]
 
 - docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
