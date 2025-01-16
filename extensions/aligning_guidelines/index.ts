@@ -25,8 +25,6 @@ type TransformEvent = BasicTransformEvent<TPointerEvent> & {
   target: FabricObject;
 };
 
-export type { AligningLineConfig } from './typedefs';
-
 export class AligningGuidelines {
   canvas: Canvas;
   horizontalLines = new Set<string>();
