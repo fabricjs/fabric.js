@@ -381,7 +381,7 @@ export class IText<
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
   renderCursorOrSelection() {
-    if (!this.isEditing) {
+    if (!this.isEditing || !this.canvas) {
       return;
     }
     const ctx = this.clearContextTop(true);
@@ -389,13 +389,60 @@ export class IText<
       return;
     }
     const boundaries = this._getCursorBoundaries();
+    const clipPaths = this.findClipPathAncestors();
+
+    if (clipPaths.length > 0) {
+      this._applyClipPathToContext(ctx, clipPaths);
+    }
     if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
       this.renderCursor(ctx, boundaries);
     } else {
       this.renderSelection(ctx, boundaries);
     }
-    this.canvas!.contextTopDirty = true;
+
+    if (clipPaths.length > 0) {
+      ctx.restore();
+    }
+
+    this.canvas.contextTopDirty = true;
     ctx.restore();
+  }
+
+  /**
+   * @private
+   * @param {CanvasRenderingContext2D} ctx Context to render on
+   * @param {FabricObject[]} clipPathAncestors  clipPaths
+   */
+  private _applyClipPathToContext(
+    ctx: CanvasRenderingContext2D,
+    clipPathAncestors: FabricObject[],
+  ) {
+    ctx.save();
+    for (const clipPath of clipPathAncestors) {
+      if (clipPath.absolutePositioned) {
+        const m = clipPath.calcTransformMatrix();
+        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+      }
+      const { width, height } = this;
+      if (clipPath && !clipPath.isNotVisible()) {
+        (clipPath as any).drawObject(ctx, true);
+        ctx.clip();
+      }
+    }
+  }
+
+  /**
+   * finds if the current instance has parent groups that have clip paths applied.
+   */
+  findClipPathAncestors() {
+    const clipPathAncestors: FabricObject[] = [];
+    let parent: FabricObject | undefined = this;
+    while (parent && (parent = parent.parent)) {
+      if (parent.clipPath && !(parent as any).clipPath.absolutePositioned) {
+        clipPathAncestors.push(parent.clipPath);
+      }
+    }
+    return clipPathAncestors;
   }
 
   /**
