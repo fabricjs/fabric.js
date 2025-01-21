@@ -18,6 +18,7 @@ import {
 } from '../Text/constants';
 import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
+import type { FabricObject } from '../Object/FabricObject';
 
 export type CursorBoundaries = {
   left: number;
@@ -73,6 +74,10 @@ export interface SerializedITextProps
     UniqueITextProps {}
 
 export interface ITextProps extends TextProps, UniqueITextProps {}
+
+interface DrawableClipPath extends FabricObject {
+  drawObject: (ctx: CanvasRenderingContext2D, hidden?: boolean) => void;
+}
 
 /**
  * @fires changed
@@ -409,9 +414,18 @@ export class IText<
   }
 
   /**
-   * @private
-   * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {FabricObject[]} clipPathAncestors  clipPaths
+   * Applies a series of clip paths to a given 2D rendering context.
+   * This method iterates through an array of Fabric.js objects (`clipPathAncestors`),
+   * applying each as a clip path to the canvas context. It handles both
+   * absolute and non-absolute positioned clip paths. For absolute positioned
+   * clip paths, it applies the necessary transformations to the context. Each
+   * clip path is drawn onto the (hidden) context and then `ctx.clip()` is
+   * called to set it as the current clipping region.
+   *
+   * @param {CanvasRenderingContext2D} ctx The canvas rendering context to which
+   *    the clip paths will be applied.
+   * @param {FabricObject[]} clipPathAncestors An array of Fabric.js objects
+   *    that serve as clip paths.
    */
   private _applyClipPathToContext(
     ctx: CanvasRenderingContext2D,
@@ -423,25 +437,38 @@ export class IText<
         const m = clipPath.calcTransformMatrix();
         ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
       }
-      const { width, height } = this;
       if (clipPath && !clipPath.isNotVisible()) {
-        (clipPath as any).drawObject(ctx, true);
+        (clipPath as DrawableClipPath).drawObject(ctx, true);
         ctx.clip();
       }
     }
   }
 
   /**
-   * finds if the current instance has parent groups that have clip paths applied.
+   * Finds and returns an array of clip paths that are applied to the parent
+   * group(s) of the current FabricObject instance. The object's hierarchy is
+   * traversed upwards (from the current object towards the root of the canvas),
+   * checking each parent object for the presence of a `clipPath` that is not
+   * absolutely positioned.
    */
   findClipPathAncestors() {
     const clipPathAncestors: FabricObject[] = [];
-    let parent: FabricObject | undefined = this;
-    while (parent && (parent = parent.parent)) {
-      if (parent.clipPath && !(parent as any).clipPath.absolutePositioned) {
-        clipPathAncestors.push(parent.clipPath);
+
+    const getClipPathAncestors = (
+      obj: FabricObject | undefined,
+    ): FabricObject[] => {
+      const ancestors: fabric.Object[] = [];
+      while (obj) {
+        if (obj.clipPath && !obj.clipPath.absolutePositioned) {
+          ancestors.push(obj.clipPath);
+        }
+        obj = obj.parent;
       }
-    }
+      return ancestors;
+    };
+
+    clipPathAncestors.push(...getClipPathAncestors(this));
+
     return clipPathAncestors;
   }
 
