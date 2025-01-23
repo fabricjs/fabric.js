@@ -233,7 +233,7 @@ export class FabricImage<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(FabricImage.CSS_CANVAS);
+    element.classList?.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
