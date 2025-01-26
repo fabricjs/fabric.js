@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Allow for brush subclassing moving some properties from private to protected. [#10416](https://github.com/fabricjs/fabric.js/pull/10416)
 - feat(): Add method toBlob. [#3283](https://github.com/fabricjs/fabric.js/issues/3283)
 
 ## [6.5.4]
