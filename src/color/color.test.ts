@@ -223,7 +223,7 @@ describe('test Color.fromHsla for color', () => {
       stringToParse: 'hsl( -450,  50%,   50%, .5)',
       expectedSource: [127, 64, 191, 0.5],
     },
-      {
+    {
       name: 'fromHsla with Saturation 0',
       stringToParse: 'hsla(0, 0%, 50%, 1)',
       expectedSource: [128, 128, 128, 1],
