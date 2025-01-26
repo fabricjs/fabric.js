@@ -31,6 +31,7 @@ import {
   createCanvasElement,
   createCanvasElementFor,
   toDataURL,
+  toBlob,
 } from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
@@ -1398,6 +1399,13 @@ export class FabricObject<
    */
   toDataURL(options: toDataURLOptions = {}) {
     return toDataURL(
+      this.toCanvasElement(options),
+      options.format || 'png',
+      options.quality || 1,
+    );
+  }
+  toBlob(options: toDataURLOptions = {}) {
+    return toBlob(
       this.toCanvasElement(options),
       options.format || 'png',
       options.quality || 1,
