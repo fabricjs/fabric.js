@@ -61,3 +61,12 @@ export const isHTMLCanvas = (
 ): canvas is HTMLCanvasElement => {
   return !!canvas && (canvas as HTMLCanvasElement).getContext !== undefined;
 };
+
+export const toBlob = (
+  canvasEl: HTMLCanvasElement,
+  format?: ImageFormat,
+  quality?: number,
+) =>
+  new Promise((resolve, _) => {
+    canvasEl.toBlob(resolve, `image/${format}`, quality);
+  }) as Promise<Blob | null>;

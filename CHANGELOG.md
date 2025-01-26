@@ -2,6 +2,8 @@
 
 ## [next]
 
+- feat(): Add method toBlob. [#3283](https://github.com/fabricjs/fabric.js/issues/3283)
+
 ## [6.5.4]
 
 - docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
