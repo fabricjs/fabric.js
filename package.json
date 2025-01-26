@@ -101,7 +101,6 @@
     "inquirer": "^8.2.1",
     "inquirer-checkbox-plus-prompt": "^1.0.1",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.5.0",
     "kill-port": "^2.0.1",
     "micromatch": "^4.0.5",
     "moment": "^2.29.1",
@@ -120,6 +119,11 @@
   },
   "engines": {
     "node": ">=16.20.0"
+  },
+  "overrides": {
+    "canvas": {
+      "canvas": "3.1.0"
+    }
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
