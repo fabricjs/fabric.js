@@ -64,8 +64,8 @@ export const isHTMLCanvas = (
 
 export const toBlob = (
   canvasEl: HTMLCanvasElement,
-  format: ImageFormat,
-  quality: number,
+  format?: ImageFormat,
+  quality?: number,
 ) =>
   new Promise((resolve, _) => {
     canvasEl.toBlob(resolve, `image/${format}`, quality);
