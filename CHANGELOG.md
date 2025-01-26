@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): Allow for node-canvas images to work with the FabricImage class by making classList optional. [#10412](https://github.com/fabricjs/fabric.js/pull/10412)
+
 ## [6.5.4]
 
 - docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
