@@ -136,6 +136,8 @@ export class InteractiveFabricObject<
 
   declare canvas?: Canvas;
 
+  declare oid?: number;
+
   static ownDefaults = interactiveObjectDefaultValues;
 
   static getDefaults(): Record<string, any> {

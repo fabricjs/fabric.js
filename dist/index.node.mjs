@@ -9179,6 +9179,23 @@ const scaleOrSkewActionName = (eventData, control, fabricObject) => {
 };
 
 /**
+ * Inspect event, control and fabricObject to return the correct action name
+ * @param {Event} eventData the javascript event that is causing the scale
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
+ * @return {String} an action name
+ */
+const scaleActionName = (eventData, control) => {
+  if (control.x === 0) {
+    return SCALE_Y;
+  }
+  if (control.y === 0) {
+    return SCALE_X;
+  }
+  return '';
+};
+
+/**
  * Combine skew and scale style handlers to cover fabric standard use case
  * @param {Event} eventData the javascript event that is causing the scale
  * @param {Control} control the control that is interested in the action
@@ -9219,30 +9236,42 @@ const createObjectDefaultControls = () => ({
   ml: new Control({
     x: -0.5,
     y: 0,
-    cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingXOrSkewingY,
-    getActionName: scaleOrSkewActionName
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: scalingX,
+    getActionName: scaleActionName
+    // cursorStyleHandler: scaleSkewCursorStyleHandler,
+    // actionHandler: scalingXOrSkewingY,
+    // getActionName: scaleOrSkewActionName,
   }),
   mr: new Control({
     x: 0.5,
     y: 0,
-    cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingXOrSkewingY,
-    getActionName: scaleOrSkewActionName
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: scalingX,
+    getActionName: scaleActionName
+    // cursorStyleHandler: scaleSkewCursorStyleHandler,
+    // actionHandler: scalingXOrSkewingY,
+    // getActionName: scaleOrSkewActionName,
   }),
   mb: new Control({
     x: 0,
     y: 0.5,
-    cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingYOrSkewingX,
-    getActionName: scaleOrSkewActionName
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: scalingY,
+    getActionName: scaleActionName
+    // cursorStyleHandler: scaleSkewCursorStyleHandler,
+    // actionHandler: scalingYOrSkewingX,
+    // getActionName: scaleOrSkewActionName,
   }),
   mt: new Control({
     x: 0,
     y: -0.5,
-    cursorStyleHandler: scaleSkewCursorStyleHandler,
-    actionHandler: scalingYOrSkewingX,
-    getActionName: scaleOrSkewActionName
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: scalingY,
+    getActionName: scaleActionName
+    // cursorStyleHandler: scaleSkewCursorStyleHandler,
+    // actionHandler: scalingYOrSkewingX,
+    // getActionName: scaleOrSkewActionName,
   }),
   tl: new Control({
     x: -0.5,
