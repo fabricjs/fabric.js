@@ -95,8 +95,8 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests
         run: npm run test -- -c node -s ${{ matrix.suite }}
-  jest:
-    name: Jest tests
+  vitest:
+    name: Vitest tests
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -104,12 +104,12 @@ jobs:
         with:
           node-version: 20.x
           install-system-deps: false
-      - name: Run Jest unit test
-        run: npm run test:jest:coverage
+      - name: Run Vitest unit test
+        run: npm run test:vitest:coverage
       - name: Upload test coverage
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-jest
+          name: coverage-vitest
           path: ./.nyc_output/*.json
           include-hidden-files: true
 
@@ -158,7 +158,7 @@ jobs:
           path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
-          name: coverage-jest
+          name: coverage-vitest
           path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:

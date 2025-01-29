@@ -1,9 +1,10 @@
-import { expect } from '@jest/globals';
 import { getFabricDocument } from '../env';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Gradient } from './Gradient';
 import type { SVGOptions } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+
+import { describe, expect, it, test } from 'vitest';
 
 describe('Gradient', () => {
   function fromElement(

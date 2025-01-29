@@ -1,6 +1,8 @@
 import { Polyline } from './Polyline';
 import { Point } from '../Point';
 
+import { describe, expect, it } from 'vitest';
+
 const points = [
   { x: 2, y: 2 },
   { x: 12, y: 2 },

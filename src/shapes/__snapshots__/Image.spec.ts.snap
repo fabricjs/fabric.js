@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FabricImage Svg export It exports an svg with styles for an image with stroke 1`] = `
+exports[`FabricImage > Svg export > It exports an svg with styles for an image with stroke 1`] = `
 "<g transform="matrix(1 0 0 1 83.5 83.5)"  >
 <filter id="SVGID_0" y="-45.33%" height="190.66%" x="-36%" width="172%" >
 	<feGaussianBlur in="SourceAlpha" stdDeviation="12"></feGaussianBlur>

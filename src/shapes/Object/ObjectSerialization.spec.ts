@@ -2,6 +2,8 @@ import { FabricObject } from './FabricObject';
 import { Rect } from '../Rect';
 import { FabricObject as BaseFabricObject } from './Object';
 
+import { describe, expect, test } from 'vitest';
+
 describe('FabricObject toObject', () => {
   test('without custom properties', () => {
     const obj = new FabricObject({ name: 'test1', key2: 'value2' });

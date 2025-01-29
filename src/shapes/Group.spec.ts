@@ -12,6 +12,8 @@ import { FabricObject } from './Object/FabricObject';
 import { FabricImage } from './Image';
 import { SignalAbortedError } from '../util/internals/console';
 
+import { describe, expect, it, test, vi } from 'vitest';
+
 const makeGenericGroup = (options?: Partial<GroupProps>) => {
   const objs = [new FabricObject(), new FabricObject()];
   const group = new Group(objs, options);
@@ -284,7 +286,7 @@ describe('Group', () => {
   it('triggerLayout should preform layout, layoutManager is defined', () => {
     const group = new Group();
     expect(group.layoutManager).toBeDefined();
-    const performLayout = jest.spyOn(group.layoutManager, 'performLayout');
+    const performLayout = vi.spyOn(group.layoutManager, 'performLayout');
 
     group.triggerLayout();
     const fixedLayout = new FixedLayout();
@@ -306,10 +308,10 @@ describe('Group', () => {
     const group2 = new Group();
     const canvas = new Canvas();
 
-    const eventsSpy = jest.spyOn(object, 'fire');
-    const removeSpy = jest.spyOn(group, 'remove');
-    const exitSpy = jest.spyOn(group, 'exitGroup');
-    const enterSpy = jest.spyOn(group2, 'enterGroup');
+    const eventsSpy = vi.spyOn(object, 'fire');
+    const removeSpy = vi.spyOn(group, 'remove');
+    const exitSpy = vi.spyOn(group, 'exitGroup');
+    const enterSpy = vi.spyOn(group2, 'enterGroup');
 
     expect(object.group).toBe(group);
     expect(object.parent).toBe(group);

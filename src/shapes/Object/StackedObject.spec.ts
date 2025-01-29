@@ -3,6 +3,8 @@ import { ActiveSelection } from '../ActiveSelection';
 import { Group } from '../Group';
 import { FabricObject } from './FabricObject';
 
+import { describe, expect, it, test } from 'vitest';
+
 class TestObject extends FabricObject {
   id: string;
 

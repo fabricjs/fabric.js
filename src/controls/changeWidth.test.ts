@@ -5,6 +5,8 @@ import { Canvas } from '../canvas/Canvas';
 import { Rect } from '../shapes/Rect';
 import { changeWidth } from './changeWidth';
 
+import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
+
 describe('changeWidth', () => {
   let canvas: Canvas;
   let target: Rect;
@@ -54,7 +56,7 @@ describe('changeWidth', () => {
 
   test('changeWidth does not change the width', () => {
     const target = new Rect({ width: 100, height: 100, canvas });
-    jest.spyOn(target, '_set').mockImplementation(function _set(this: Rect) {
+    vi.spyOn(target, '_set').mockImplementation(function _set(this: Rect) {
       return this;
     });
     expect(target.width).toBe(100);
@@ -125,18 +127,21 @@ describe('changeWidth', () => {
     expect(Math.ceil(target.width)).toBe(52);
   });
 
-  test('changeWidth will fire events on canvas and target resizing', (done) => {
+  test('changeWidth will fire events on canvas and target resizing', () => {
     target.canvas?.on('object:resizing', (options) => {
       expect(options.target).toBe(target);
     });
-    target.on('resizing', (options) => {
-      expect(options).toEqual({
-        e: eventData,
-        transform,
-        pointer: new Point(200, 300),
+    const resizePromise = new Promise<void>((resolve) => {
+      target.on('resizing', (options) => {
+        expect(options).toEqual({
+          e: eventData,
+          transform,
+          pointer: new Point(200, 300),
+        });
+        resolve();
       });
-      done();
     });
     changeWidth(eventData, transform, 200, 300);
+    return resizePromise;
   });
 });

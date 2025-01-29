@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`IText cursor animation snapshot Animation is configurable - fast cursor with delay 1`] = `
+exports[`IText cursor animation snapshot > Animation is configurable - fast cursor with delay 1`] = `
 [
   "0.000",
   "1.000",
@@ -44,7 +44,7 @@ exports[`IText cursor animation snapshot Animation is configurable - fast cursor
 ]
 `;
 
-exports[`IText cursor animation snapshot Animation is configurable - fast cursor with no delay 1`] = `
+exports[`IText cursor animation snapshot > Animation is configurable - fast cursor with no delay 1`] = `
 [
   "0.000",
   "1.000",
@@ -95,18 +95,7 @@ exports[`IText cursor animation snapshot Animation is configurable - fast cursor
 ]
 `;
 
-exports[`IText cursor animation snapshot exiting from a canvas will abort animation 1`] = `
-[
-  "0.000",
-  "1.000",
-  "0.996",
-  "0.986",
-  "0.969",
-  "0.944",
-]
-`;
-
-exports[`IText cursor animation snapshot initDelayedCursor false - with delay 1`] = `
+exports[`IText cursor animation snapshot > exiting from a canvas will abort animation 1`] = `
 [
   "0.000",
   "1.000",
@@ -114,66 +103,10 @@ exports[`IText cursor animation snapshot initDelayedCursor false - with delay 1`
   "0.986",
   "0.969",
   "0.944",
-  "0.914",
-  "0.876",
-  "0.833",
-  "0.784",
-  "0.729",
-  "0.669",
-  "0.605",
-  "0.536",
-  "0.463",
-  "0.388",
-  "0.309",
-  "0.228",
-  "0.146",
-  "0.063",
-  "0.000",
-  "1.000",
-  "0.000",
-  "0.001",
-  "0.004",
-  "0.008",
-  "0.014",
-  "0.022",
-  "0.031",
-  "0.043",
-  "0.056",
-  "0.070",
-  "0.086",
-  "0.104",
-  "0.124",
-  "0.145",
-  "0.167",
-  "0.191",
-  "0.216",
-  "0.243",
-  "0.271",
-  "0.300",
-  "0.331",
-  "0.363",
-  "0.395",
-  "0.429",
-  "0.464",
-  "0.500",
-  "0.537",
-  "0.574",
-  "0.612",
-  "0.651",
-  "0.691",
-  "0.731",
-  "0.772",
-  "0.813",
-  "0.854",
-  "0.895",
-  "0.937",
-  "0.979",
-  "1.000",
-  "0.000",
 ]
 `;
 
-exports[`IText cursor animation snapshot initDelayedCursor true - with NO delay 1`] = `
+exports[`IText cursor animation snapshot > initDelayedCursor false - with delay 1`] = `
 [
   "0.000",
   "1.000",
@@ -237,6 +170,73 @@ exports[`IText cursor animation snapshot initDelayedCursor true - with NO delay 
   "0.979",
   "1.000",
   "0.000",
+]
+`;
+
+exports[`IText cursor animation snapshot > initDelayedCursor true - with NO delay 1`] = `
+[
+  "0.000",
+  "1.000",
+  "0.996",
+  "0.986",
+  "0.969",
+  "0.944",
+  "0.914",
+  "0.876",
+  "0.833",
+  "0.784",
+  "0.729",
+  "0.669",
+  "0.605",
+  "0.536",
+  "0.463",
+  "0.388",
+  "0.309",
+  "0.228",
+  "0.146",
+  "0.063",
+  "0.000",
+  "1.000",
+  "0.000",
+  "0.001",
+  "0.004",
+  "0.008",
+  "0.014",
+  "0.022",
+  "0.031",
+  "0.043",
+  "0.056",
+  "0.070",
+  "0.086",
+  "0.104",
+  "0.124",
+  "0.145",
+  "0.167",
+  "0.191",
+  "0.216",
+  "0.243",
+  "0.271",
+  "0.300",
+  "0.331",
+  "0.363",
+  "0.395",
+  "0.429",
+  "0.464",
+  "0.500",
+  "0.537",
+  "0.574",
+  "0.612",
+  "0.651",
+  "0.691",
+  "0.731",
+  "0.772",
+  "0.813",
+  "0.854",
+  "0.895",
+  "0.937",
+  "0.979",
+  "1.000",
+  "0.000",
   "1.000",
   "0.996",
   "0.986",
@@ -295,7 +295,7 @@ exports[`IText cursor animation snapshot initDelayedCursor true - with NO delay 
 ]
 `;
 
-exports[`IText cursor animation snapshot selectionStart/selection end will abort animation 1`] = `
+exports[`IText cursor animation snapshot > selectionStart/selection end will abort animation 1`] = `
 [
   "0.000",
   "1.000",
@@ -306,7 +306,7 @@ exports[`IText cursor animation snapshot selectionStart/selection end will abort
 ]
 `;
 
-exports[`text imperative changes insertChars 1`] = `
+exports[`text imperative changes > insertChars 1`] = `
 {
   "charBounds": [
     [
@@ -404,7 +404,7 @@ exports[`text imperative changes insertChars 1`] = `
 }
 `;
 
-exports[`text imperative changes insertChars 2`] = `
+exports[`text imperative changes > insertChars 2`] = `
 {
   "fontSize": 25,
   "height": 28.25,
@@ -446,7 +446,7 @@ exports[`text imperative changes insertChars 2`] = `
 }
 `;
 
-exports[`text imperative changes insertChars and removes chars 1`] = `
+exports[`text imperative changes > insertChars and removes chars 1`] = `
 {
   "charBounds": [
     [
@@ -532,7 +532,7 @@ exports[`text imperative changes insertChars and removes chars 1`] = `
 }
 `;
 
-exports[`text imperative changes insertChars and removes chars 2`] = `
+exports[`text imperative changes > insertChars and removes chars 2`] = `
 {
   "fontSize": 25,
   "height": 28.25,
@@ -567,7 +567,7 @@ exports[`text imperative changes insertChars and removes chars 2`] = `
 }
 `;
 
-exports[`text imperative changes insertChars and removes chars 3`] = `
+exports[`text imperative changes > insertChars and removes chars 3`] = `
 {
   "charBounds": [
     [
@@ -629,7 +629,7 @@ exports[`text imperative changes insertChars and removes chars 3`] = `
 }
 `;
 
-exports[`text imperative changes insertChars and removes chars 4`] = `
+exports[`text imperative changes > insertChars and removes chars 4`] = `
 {
   "fontSize": 25,
   "height": 28.25,
@@ -650,7 +650,7 @@ exports[`text imperative changes insertChars and removes chars 4`] = `
 }
 `;
 
-exports[`text imperative changes insertChars can accept some style for the new text 1`] = `
+exports[`text imperative changes > insertChars can accept some style for the new text 1`] = `
 {
   "charBounds": [
     [
@@ -792,7 +792,7 @@ exports[`text imperative changes insertChars can accept some style for the new t
 }
 `;
 
-exports[`text imperative changes insertChars can accept some style for the new text 2`] = `
+exports[`text imperative changes > insertChars can accept some style for the new text 2`] = `
 {
   "fontSize": 25,
   "height": 93.79,
@@ -857,7 +857,7 @@ aest",
 }
 `;
 
-exports[`text imperative changes insertChars handles new lines correctly 1`] = `
+exports[`text imperative changes > insertChars handles new lines correctly 1`] = `
 {
   "charBounds": [
     [
@@ -987,7 +987,7 @@ exports[`text imperative changes insertChars handles new lines correctly 1`] = `
 }
 `;
 
-exports[`text imperative changes insertChars handles new lines correctly 2`] = `
+exports[`text imperative changes > insertChars handles new lines correctly 2`] = `
 {
   "fontSize": 25,
   "height": 93.79,
@@ -1031,7 +1031,7 @@ est",
 }
 `;
 
-exports[`text imperative changes removeChars 1`] = `
+exports[`text imperative changes > removeChars 1`] = `
 {
   "charBounds": [
     [
@@ -1081,7 +1081,7 @@ exports[`text imperative changes removeChars 1`] = `
 }
 `;
 
-exports[`text imperative changes removeChars 2`] = `
+exports[`text imperative changes > removeChars 2`] = `
 {
   "fontSize": 25,
   "height": 28.25,

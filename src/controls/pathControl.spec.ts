@@ -3,6 +3,8 @@ import { Canvas } from '../canvas/Canvas';
 import { Path } from '../shapes/Path';
 import { createPathControls } from './pathControl';
 
+import { describe, expect, it, vi } from 'vitest';
+
 describe('pathControls', () => {
   it('should fire events', () => {
     const path = new Path('M 50 50 C 150 100, 50 100, 50 150');
@@ -16,8 +18,8 @@ describe('pathControls', () => {
     const canvas = new Canvas();
     canvas.add(path);
     canvas.setActiveObject(path);
-    const spyModifyPath = jest.fn();
-    const spyModified = jest.fn();
+    const spyModifyPath = vi.fn();
+    const spyModified = vi.fn();
     path.on('modifyPath', spyModifyPath);
     path.on('modified', spyModified);
     canvas

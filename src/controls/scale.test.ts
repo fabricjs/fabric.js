@@ -4,6 +4,8 @@ import { Rect } from '../shapes/Rect';
 import type { RectProps } from '../shapes/Rect';
 import { scalingX, scalingY } from './scale';
 
+import { describe, expect, it } from 'vitest';
+
 //
 // prep for tests
 //

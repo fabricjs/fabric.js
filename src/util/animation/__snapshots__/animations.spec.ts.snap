@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`animate animateColor change percentage is calculated from a changed value 1`] = `
+exports[`animate > animateColor change percentage is calculated from a changed value 1`] = `
 [
   0,
   0.03529411764705882,
@@ -12,7 +12,7 @@ exports[`animate animateColor change percentage is calculated from a changed val
 ]
 `;
 
-exports[`easing defaultEasing 1`] = `
+exports[`easing > defaultEasing 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -101,7 +101,7 @@ exports[`easing defaultEasing 1`] = `
 ]
 `;
 
-exports[`easing easeInBack 1`] = `
+exports[`easing > easeInBack 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -190,7 +190,7 @@ exports[`easing easeInBack 1`] = `
 ]
 `;
 
-exports[`easing easeInBounce 1`] = `
+exports[`easing > easeInBounce 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -279,7 +279,7 @@ exports[`easing easeInBounce 1`] = `
 ]
 `;
 
-exports[`easing easeInCirc 1`] = `
+exports[`easing > easeInCirc 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -368,7 +368,7 @@ exports[`easing easeInCirc 1`] = `
 ]
 `;
 
-exports[`easing easeInCubic 1`] = `
+exports[`easing > easeInCubic 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -457,7 +457,7 @@ exports[`easing easeInCubic 1`] = `
 ]
 `;
 
-exports[`easing easeInElastic 1`] = `
+exports[`easing > easeInElastic 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -546,7 +546,7 @@ exports[`easing easeInElastic 1`] = `
 ]
 `;
 
-exports[`easing easeInExpo 1`] = `
+exports[`easing > easeInExpo 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -635,7 +635,7 @@ exports[`easing easeInExpo 1`] = `
 ]
 `;
 
-exports[`easing easeInOutBack 1`] = `
+exports[`easing > easeInOutBack 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -724,7 +724,7 @@ exports[`easing easeInOutBack 1`] = `
 ]
 `;
 
-exports[`easing easeInOutBounce 1`] = `
+exports[`easing > easeInOutBounce 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -813,7 +813,7 @@ exports[`easing easeInOutBounce 1`] = `
 ]
 `;
 
-exports[`easing easeInOutCirc 1`] = `
+exports[`easing > easeInOutCirc 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -902,7 +902,7 @@ exports[`easing easeInOutCirc 1`] = `
 ]
 `;
 
-exports[`easing easeInOutCubic 1`] = `
+exports[`easing > easeInOutCubic 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -991,7 +991,7 @@ exports[`easing easeInOutCubic 1`] = `
 ]
 `;
 
-exports[`easing easeInOutElastic 1`] = `
+exports[`easing > easeInOutElastic 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1080,7 +1080,7 @@ exports[`easing easeInOutElastic 1`] = `
 ]
 `;
 
-exports[`easing easeInOutExpo 1`] = `
+exports[`easing > easeInOutExpo 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1169,7 +1169,7 @@ exports[`easing easeInOutExpo 1`] = `
 ]
 `;
 
-exports[`easing easeInOutQuad 1`] = `
+exports[`easing > easeInOutQuad 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1258,7 +1258,7 @@ exports[`easing easeInOutQuad 1`] = `
 ]
 `;
 
-exports[`easing easeInOutQuart 1`] = `
+exports[`easing > easeInOutQuart 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1347,7 +1347,7 @@ exports[`easing easeInOutQuart 1`] = `
 ]
 `;
 
-exports[`easing easeInOutQuint 1`] = `
+exports[`easing > easeInOutQuint 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1436,7 +1436,7 @@ exports[`easing easeInOutQuint 1`] = `
 ]
 `;
 
-exports[`easing easeInOutSine 1`] = `
+exports[`easing > easeInOutSine 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1525,7 +1525,7 @@ exports[`easing easeInOutSine 1`] = `
 ]
 `;
 
-exports[`easing easeInQuad 1`] = `
+exports[`easing > easeInQuad 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1614,7 +1614,7 @@ exports[`easing easeInQuad 1`] = `
 ]
 `;
 
-exports[`easing easeInQuart 1`] = `
+exports[`easing > easeInQuart 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1703,7 +1703,7 @@ exports[`easing easeInQuart 1`] = `
 ]
 `;
 
-exports[`easing easeInQuint 1`] = `
+exports[`easing > easeInQuint 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1792,7 +1792,7 @@ exports[`easing easeInQuint 1`] = `
 ]
 `;
 
-exports[`easing easeInSine 1`] = `
+exports[`easing > easeInSine 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1881,7 +1881,7 @@ exports[`easing easeInSine 1`] = `
 ]
 `;
 
-exports[`easing easeOutBack 1`] = `
+exports[`easing > easeOutBack 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -1970,7 +1970,7 @@ exports[`easing easeOutBack 1`] = `
 ]
 `;
 
-exports[`easing easeOutBounce 1`] = `
+exports[`easing > easeOutBounce 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2059,7 +2059,7 @@ exports[`easing easeOutBounce 1`] = `
 ]
 `;
 
-exports[`easing easeOutCirc 1`] = `
+exports[`easing > easeOutCirc 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2148,7 +2148,7 @@ exports[`easing easeOutCirc 1`] = `
 ]
 `;
 
-exports[`easing easeOutCubic 1`] = `
+exports[`easing > easeOutCubic 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2237,7 +2237,7 @@ exports[`easing easeOutCubic 1`] = `
 ]
 `;
 
-exports[`easing easeOutElastic 1`] = `
+exports[`easing > easeOutElastic 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2326,7 +2326,7 @@ exports[`easing easeOutElastic 1`] = `
 ]
 `;
 
-exports[`easing easeOutExpo 1`] = `
+exports[`easing > easeOutExpo 1`] = `
 [
   {
     "percentage": "2.0000",
@@ -2415,7 +2415,7 @@ exports[`easing easeOutExpo 1`] = `
 ]
 `;
 
-exports[`easing easeOutQuad 1`] = `
+exports[`easing > easeOutQuad 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2504,7 +2504,7 @@ exports[`easing easeOutQuad 1`] = `
 ]
 `;
 
-exports[`easing easeOutQuart 1`] = `
+exports[`easing > easeOutQuart 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2593,7 +2593,7 @@ exports[`easing easeOutQuart 1`] = `
 ]
 `;
 
-exports[`easing easeOutQuint 1`] = `
+exports[`easing > easeOutQuint 1`] = `
 [
   {
     "percentage": "0.0000",
@@ -2682,7 +2682,7 @@ exports[`easing easeOutQuint 1`] = `
 ]
 `;
 
-exports[`easing easeOutSine 1`] = `
+exports[`easing > easeOutSine 1`] = `
 [
   {
     "percentage": "0.0000",

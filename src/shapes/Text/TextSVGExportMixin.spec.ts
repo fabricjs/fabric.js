@@ -1,5 +1,7 @@
 import { FabricText } from './Text';
 
+import { describe, expect, it } from 'vitest';
+
 describe('TextSvgExport', () => {
   it('exports text background color correctly', () => {
     const myText = new FabricText('text', {
