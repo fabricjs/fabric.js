@@ -405,7 +405,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.5.4";
+var version = "6.5.3";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -7123,7 +7123,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   }
 
   /**
-   * When returns `true`, force the object to have its own cache, even if it is inside a group
+   * When set to `true`, force the object to have its own cache, even if it is inside a group
    * it may be needed when your object behave in a particular way on the cache and always needs
    * its own isolated canvas to render correctly.
    * Created to be overridden
@@ -7131,7 +7131,6 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @returns Boolean
    */
   needsItsOwnCache() {
-    // TODO re-evaluate this shadow condition
     if (this.paintFirst === STROKE && this.hasFill() && this.hasStroke() && !!this.shadow) {
       return true;
     }
@@ -7145,13 +7144,13 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Decide if the object should cache or not. Create its own cache level
    * objectCaching is a global flag, wins over everything
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step.
+   * a cache step. None of the fabric classes requires it.
    * Generally you do not cache objects in groups because the group outside is cached.
    * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
    * @return {Boolean}
    */
   shouldCache() {
-    this.ownCaching = this.objectCaching && (!this.parent || !this.parent.isOnACache()) || this.needsItsOwnCache();
+    this.ownCaching = this.needsItsOwnCache() || this.objectCaching && (!this.parent || !this.parent.isOnACache());
     return this.ownCaching;
   }
 
@@ -7251,10 +7250,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   }
 
   /**
-   * Check if cache is dirty and if is dirty clear the context.
-   * This check has a big side effect, it changes the underlying cache canvas if necessary.
-   * Do not call this method on your own to check if the cache is dirty, because if it is,
-   * it is also going to wipe the cache. This is badly designed and needs to be fixed.
+   * Check if cache is dirty
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */
@@ -11666,9 +11662,9 @@ class Group extends createCollectionMixin(FabricObject) {
   }
 
   /**
-   * Decide if the group should cache or not. Create its own cache level
+   * Decide if the object should cache or not. Create its own cache level
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step.
+   * a cache step. None of the fabric classes requires it.
    * Generally you do not cache objects in groups because the group is already cached.
    * @return {Boolean}
    */
@@ -22516,7 +22512,7 @@ class IText extends ITextClickBehavior {
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
   renderCursorOrSelection() {
-    if (!this.isEditing || !this.canvas) {
+    if (!this.isEditing) {
       return;
     }
     const ctx = this.clearContextTop(true);
@@ -22524,71 +22520,13 @@ class IText extends ITextClickBehavior {
       return;
     }
     const boundaries = this._getCursorBoundaries();
-    const clipPaths = this.findClipPathAncestors();
-    if (clipPaths.length > 0) {
-      this._applyClipPathToContext(ctx, clipPaths);
-    }
     if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
       this.renderCursor(ctx, boundaries);
     } else {
       this.renderSelection(ctx, boundaries);
     }
-    if (clipPaths.length > 0) {
-      ctx.restore();
-    }
     this.canvas.contextTopDirty = true;
     ctx.restore();
-  }
-
-  /**
-   * Applies a series of clip paths to a given 2D rendering context.
-   * This method iterates through an array of Fabric.js objects (`clipPathAncestors`),
-   * applying each as a clip path to the canvas context. It handles both
-   * absolute and non-absolute positioned clip paths. For absolute positioned
-   * clip paths, it applies the necessary transformations to the context. Each
-   * clip path is drawn onto the (hidden) context and then `ctx.clip()` is
-   * called to set it as the current clipping region.
-   *
-   * @param {CanvasRenderingContext2D} ctx The canvas rendering context to which
-   *    the clip paths will be applied.
-   * @param {FabricObject[]} clipPathAncestors An array of Fabric.js objects
-   *    that serve as clip paths.
-   */
-  _applyClipPathToContext(ctx, clipPathAncestors) {
-    ctx.save();
-    for (const clipPath of clipPathAncestors) {
-      if (clipPath.absolutePositioned) {
-        const m = clipPath.calcTransformMatrix();
-        ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-      }
-      if (clipPath && !clipPath.isNotVisible()) {
-        clipPath.drawObject(ctx, true);
-        ctx.clip();
-      }
-    }
-  }
-
-  /**
-   * Finds and returns an array of clip paths that are applied to the parent
-   * group(s) of the current FabricObject instance. The object's hierarchy is
-   * traversed upwards (from the current object towards the root of the canvas),
-   * checking each parent object for the presence of a `clipPath` that is not
-   * absolutely positioned.
-   */
-  findClipPathAncestors() {
-    const clipPathAncestors = [];
-    const getClipPathAncestors = obj => {
-      const ancestors = [];
-      while (obj) {
-        if (obj.clipPath && !obj.clipPath.absolutePositioned) {
-          ancestors.push(obj.clipPath);
-        }
-        obj = obj.parent;
-      }
-      return ancestors;
-    };
-    clipPathAncestors.push(...getClipPathAncestors(this));
-    return clipPathAncestors;
   }
 
   /**
@@ -23724,7 +23662,11 @@ class ActiveSelection extends Group {
   }
 
   /**
-   * Decide if the object should cache or not. The Active selection never caches
+   * Decide if the object should cache or not. Create its own cache level
+   * objectCaching is a global flag, wins over everything
+   * needsItsOwnCache should be used when the object drawing method requires
+   * a cache step. None of the fabric classes requires it.
+   * Generally you do not cache objects in groups because the group outside is cached.
    * @return {Boolean}
    */
   shouldCache() {
@@ -24575,11 +24517,11 @@ class FabricImage extends FabricObject {
   }
 
   /**
-   * Decide if the FabricImage should cache or not. Create its own cache level
+   * Decide if the object should cache or not. Create its own cache level
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step.
+   * a cache step. None of the fabric classes requires it.
    * Generally you do not cache objects in groups because the group outside is cached.
-   * This is the special Image version where we would like to avoid caching where possible.
+   * This is the special image version where we would like to avoid caching where possible.
    * Essentially images do not benefit from caching. They may require caching, and in that
    * case we do it. Also caching an image usually ends in a loss of details.
    * A full performance audit should be done.
@@ -24723,9 +24665,7 @@ class FabricImage extends FabricObject {
 
   /**
    * Default CSS class name for canvas
-   * Will be removed from fabric 7
    * @static
-   * @deprecated
    * @type String
    * @default
    */
