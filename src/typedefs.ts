@@ -43,7 +43,7 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export type ImageFormat = 'jpeg' | 'png';
+export type ImageFormat = 'jpeg' | 'png' | 'webp';
 
 export type SVGElementName = 'linearGradient' | 'radialGradient' | 'stop';
 
