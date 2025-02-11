@@ -11,9 +11,4 @@ canvas.setDimensions({
   height: 500,
 });
 
-canvas.toDataURL({
-  format: 'webp',
-  multiplier: 2,
-});
-
 testCase(canvas);
