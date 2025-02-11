@@ -10,7 +10,7 @@ describe('StaticCanvas', () => {
     expect(blob?.type).toBe('image/png');
   });
   it('attempts webp format but may fallback to png in node environment', () => {
-    const canvas = new StaticCanvas(undefined, { width: 300, height: 300 }); 
+    const canvas = new StaticCanvas(undefined, { width: 300, height: 300 });
     const dataURL = canvas.toDataURL({
       format: 'webp',
       multiplier: 1,
