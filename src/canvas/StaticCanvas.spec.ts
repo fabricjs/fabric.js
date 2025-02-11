@@ -15,8 +15,11 @@ describe('StaticCanvas', () => {
       format: 'webp',
       multiplier: 1,
     });
-    // In browser environments this would be 'data:image/webp'
-    // In Node.js it falls back to PNG per HTML spec
+    /**
+     * In browser environments this would be 'data:image/webp'
+     * In Node.js environment (node-canvas) it falls back to PNG.
+     * @see https://github.com/Automattic/node-canvas/issues/1258 for possible workaround
+     */
     expect(dataURL).toMatch(/^data:image\/(webp|png)/);
   });
 });
