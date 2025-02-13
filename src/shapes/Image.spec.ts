@@ -1,6 +1,8 @@
 import { FabricImage } from './Image';
 import { Shadow } from '../Shadow';
 
+import { describe, expect, test } from 'vitest';
+
 describe('FabricImage', () => {
   describe('Svg export', () => {
     test('It exports an svg with styles for an image with stroke', () => {

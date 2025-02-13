@@ -3,6 +3,8 @@ import { Rect } from '../shapes/Rect';
 import { IText } from '../shapes/IText/IText';
 import '../shapes/ActiveSelection';
 
+import { describe, expect, test, vi } from 'vitest';
+
 describe('Canvas', () => {
   describe('touchStart', () => {
     test('will prevent default to not allow dom scrolling on canvas touch drag', () => {
@@ -19,7 +21,7 @@ describe('Canvas', () => {
         touches: [touch],
         changedTouches: [touch],
       });
-      evt.preventDefault = jest.fn();
+      evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).toHaveBeenCalled();
     });
@@ -37,7 +39,7 @@ describe('Canvas', () => {
         touches: [touch],
         changedTouches: [touch],
       });
-      evt.preventDefault = jest.fn();
+      evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).not.toHaveBeenCalled();
     });
@@ -56,7 +58,7 @@ describe('Canvas', () => {
         touches: [touch],
         changedTouches: [touch],
       });
-      evt.preventDefault = jest.fn();
+      evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).toHaveBeenCalled();
     });
@@ -82,7 +84,7 @@ describe('Canvas', () => {
         touches: [touch],
         changedTouches: [touch],
       });
-      evt.preventDefault = jest.fn();
+      evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).toHaveBeenCalled();
     });
@@ -108,12 +110,12 @@ describe('Canvas', () => {
         touches: [touch],
         changedTouches: [touch],
       });
-      evt.preventDefault = jest.fn();
+      evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).not.toHaveBeenCalled();
     });
     test('dispose after _onTouchStart', () => {
-      jest.spyOn(global, 'clearTimeout');
+      const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
       const canvas = new Canvas(undefined, {
         allowTouchScrolling: true,
         isDrawingMode: true,
@@ -134,11 +136,9 @@ describe('Canvas', () => {
         changedTouches: [touch],
       });
       canvas._onTouchEnd(evtEnd);
-      expect(canvas._willAddMouseDown).toBeGreaterThan(0);
+      expect(+canvas._willAddMouseDown).toBeGreaterThan(0);
       canvas.dispose();
-      expect(global.clearTimeout).toHaveBeenCalledWith(
-        canvas._willAddMouseDown,
-      );
+      expect(clearTimeoutSpy).toHaveBeenCalledWith(canvas._willAddMouseDown);
     });
   });
 
@@ -148,7 +148,7 @@ describe('Canvas', () => {
     const iText = new IText('itext');
     canvas.add(rect, iText);
     test('Selecting shapes containing text does not trigger the exit event', () => {
-      const exitMock = jest.fn();
+      const exitMock = vi.fn();
       iText.on('editing:exited', exitMock);
 
       const firstClick = new MouseEvent('click', {

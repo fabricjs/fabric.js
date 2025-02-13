@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "noEmit": true,
+    "paths": {
+      "fabric": ["./src"],
+      "fabric/node": ["./src/node"],
+      "fabric/extensions": ["./extensions"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "extensions/**/*",
+    "vitest.d.ts",
+    "vitest.setup.ts",
+    "vitest.config.ts",
+    "vitest.extend.ts"
+  ],
+  "exclude": ["dist", "dist-extensions", "e2e", "test"]
+}

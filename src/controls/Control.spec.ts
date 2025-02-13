@@ -4,11 +4,13 @@ import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Control } from './Control';
 
+import { describe, expect, test, vi } from 'vitest';
+
 describe('Controls', () => {
   test('method binding', () => {
-    const actionHandler = jest.fn();
-    const mouseDownHandler = jest.fn();
-    const mouseUpHandler = jest.fn();
+    const actionHandler = vi.fn();
+    const mouseDownHandler = vi.fn();
+    const mouseUpHandler = vi.fn();
 
     const control = new Control({
       actionHandler,
@@ -23,7 +25,7 @@ describe('Controls', () => {
 
     target.setCoords();
 
-    jest.spyOn(target, 'findControl').mockImplementation(function (
+    vi.spyOn(target, 'findControl').mockImplementation(function (
       this: FabricObject,
     ) {
       this.__corner = 'test';

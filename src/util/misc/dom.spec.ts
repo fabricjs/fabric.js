@@ -1,5 +1,7 @@
 import { toBlob, createCanvasElement } from './dom';
 
+import { it, expect, describe } from 'vitest';
+
 describe('DOM utils', () => {
   it('toBlob without format', async () => {
     const canvas = createCanvasElement();

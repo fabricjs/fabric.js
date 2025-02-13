@@ -3,6 +3,8 @@ import { Rect, type RectProps } from '../../shapes/Rect';
 import { Shadow } from '../../Shadow';
 import { classRegistry } from '../../ClassRegistry';
 
+import { describe, expect, it } from 'vitest';
+
 const mockedRectWithCustomProperty = {
   type: 'rect',
   width: 100,

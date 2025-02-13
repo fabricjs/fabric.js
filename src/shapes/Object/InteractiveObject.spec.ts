@@ -5,6 +5,8 @@ import { Group } from '../Group';
 import { FabricObject } from './FabricObject';
 import { InteractiveFabricObject, type TOCoord } from './InteractiveObject';
 
+import { describe, expect, it, test } from 'vitest';
+
 describe('InteractiveObject', () => {
   it('tests constructor & properties', () => {
     const obj = new InteractiveFabricObject();

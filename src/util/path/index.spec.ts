@@ -7,6 +7,8 @@ import {
 } from '.';
 import type { TSimplePathData } from './typedefs';
 
+import { describe, expect, test } from 'vitest';
+
 describe('Path Utils', () => {
   describe('parsePath', () => {
     const path =

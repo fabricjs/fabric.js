@@ -1,5 +1,7 @@
 import { BaseFilter } from './BaseFilter';
 
+import { describe, expect, it } from 'vitest';
+
 class SimpleFilter extends BaseFilter<'?'> {
   static type = '?';
   declare property: string;

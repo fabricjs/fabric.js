@@ -17,6 +17,8 @@ import { ActiveSelection } from '../shapes/ActiveSelection';
 import { Canvas } from '../canvas/Canvas';
 import { Group } from '../shapes/Group';
 
+import { describe, expect, test } from 'vitest';
+
 describe('typeAssertions', () => {
   describe('isTextObject', () => {
     test('can detect FabricText', () => {

@@ -6,7 +6,9 @@ import { FabricObject } from '../../shapes/Object/FabricObject';
 import { ValueAnimation } from './ValueAnimation';
 import { Shadow } from '../../Shadow';
 
-jest.useFakeTimers();
+import { describe, expect, it, afterEach, vi } from 'vitest';
+
+vi.useFakeTimers();
 const findAnimationsByTarget = (target: any) =>
   runningAnimations.filter(({ target: t }) => target === t);
 
@@ -15,7 +17,7 @@ describe('animate', () => {
     // 'runningAnimations should be empty at the end of a test'
     expect(runningAnimations.length).toBe(0);
     runningAnimations.cancelAll();
-    jest.runAllTimers();
+    vi.runAllTimers();
   });
   it('animateColor', async () => {
     let expectRun = 0;
@@ -46,7 +48,7 @@ describe('animate', () => {
         expect(typeof val === 'string').toBe(true);
       },
     });
-    jest.advanceTimersByTime(32);
+    vi.advanceTimersByTime(32);
     expect(expectRun).toEqual(3);
   });
   it('animateColor change percentage is calculated from a changed value', async () => {
@@ -68,7 +70,7 @@ describe('animate', () => {
         expect(timePerc).toBe(1);
       },
     });
-    jest.advanceTimersByTime(duration + 16);
+    vi.advanceTimersByTime(duration + 16);
     expect(changePercSnap).toMatchSnapshot();
   });
   it('animateColor with opacity', async () => {
@@ -82,7 +84,7 @@ describe('animate', () => {
         expect(val).toEqual('rgba(0,0,255,0.7)');
       },
     });
-    jest.advanceTimersByTime(duration + 16);
+    vi.advanceTimersByTime(duration + 16);
   });
   it('animateColor, opacity out of bounds value are ignored', async () => {
     const duration = 16;
@@ -99,7 +101,7 @@ describe('animate', () => {
         expect(val).toEqual('rgba(255,255,255,1)');
       },
     });
-    jest.advanceTimersByTime(duration + 16);
+    vi.advanceTimersByTime(duration + 16);
   });
   it('animateColor opacity only', async () => {
     let called = false;
@@ -119,7 +121,7 @@ describe('animate', () => {
         expect(val).toBe('rgba(255,0,0,0.7)');
       },
     });
-    jest.advanceTimersByTime(duration + 16);
+    vi.advanceTimersByTime(duration + 16);
     expect(called).toBe(true);
   });
   it('endValue', async () => {
@@ -137,7 +139,7 @@ describe('animate', () => {
         expect(timePerc).toBe(1);
       },
     });
-    jest.advanceTimersByTime(duration + 16);
+    vi.advanceTimersByTime(duration + 16);
   });
   it('animation context', async () => {
     const options = { foo: 'bar' };
@@ -146,9 +148,9 @@ describe('animate', () => {
     expect(typeof context.abort === 'function').toBe(true);
     expect(context.duration).toEqual(500);
     expect(runningAnimations.length).toBe(1);
-    jest.advanceTimersByTime(32);
+    vi.advanceTimersByTime(32);
     expect(context.state).toBe('running');
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(context.state).toBe('completed');
     // 'animation should not exist in registry'
     expect(runningAnimations.length).toBe(0);
@@ -163,7 +165,7 @@ describe('animate', () => {
     const context = animate({
       target,
     });
-    jest.advanceTimersByTime(32);
+    vi.advanceTimersByTime(32);
     // 'should have registered animation'
     expect(runningAnimations.length).toBe(1);
     expect(context.state).toBe('running');
@@ -174,7 +176,7 @@ describe('animate', () => {
     expect(byTarget.length).toBe(1);
     //  'should have found registered animation by target'
     expect(byTarget[0]).toEqual(context);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(context.state).toBe('completed');
     expect(runningAnimations.length).toBe(0);
   });
@@ -186,12 +188,12 @@ describe('animate', () => {
       },
     };
     const context = animate(options);
-    jest.advanceTimersByTime(100);
+    vi.advanceTimersByTime(100);
     expect(runningAnimations.length).toBe(1);
     expect(runningAnimations.indexOf(context)).toBe(0);
     expect(context.state).toBe('running');
     abort = true;
-    jest.advanceTimersByTime(100);
+    vi.advanceTimersByTime(100);
     expect(runningAnimations.length).toBe(0);
     expect(runningAnimations.indexOf(context)).toBe(-1);
     expect(context.state).toBe('aborted');
@@ -200,10 +202,10 @@ describe('animate', () => {
     const options = { foo: 'bar' };
     const context = animate(options);
     expect(context.state).toBe('pending');
-    jest.advanceTimersByTime(32);
+    vi.advanceTimersByTime(32);
     expect(context.state).toBe('running');
     context.abort();
-    jest.advanceTimersByTime(32);
+    vi.advanceTimersByTime(32);
     expect(context.state).toBe('aborted');
   });
   it('runningAnimations cancelAll', async () => {
@@ -239,7 +241,7 @@ describe('animate', () => {
     expect(cancelledAnimations[0].target.canvas).toBe(canvas);
     // 'should have left registered animation'
     expect(runningAnimations.length).toBe(3);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
   });
   it('runningAnimations cancelByTarget', async () => {
     const options = { foo: 'bar', target: 'pip' },
@@ -256,7 +258,7 @@ describe('animate', () => {
     expect(cancelledAnimations.length).toBe(3);
     expect(runningAnimations.length).toBe(1);
     expect(runningAnimations[0]).toBe(baz);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
   });
   it('animate', async () => {
     const object = new FabricObject({
@@ -272,7 +274,7 @@ describe('animate', () => {
     expect(context.left instanceof ValueAnimation).toBe(true);
     expect(runningAnimations.length).toBe(1);
     expect(runningAnimations[0].target).toBe(object);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(Math.round(object.left)).toBe(40);
   });
   it('animate with increment and without options', async () => {
@@ -284,7 +286,7 @@ describe('animate', () => {
       angle: 43,
     });
     object.animate({ left: object.left + 40 });
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(Math.round(object.left)).toBe(60);
   });
   it('animate with keypath', async () => {
@@ -297,7 +299,7 @@ describe('animate', () => {
       shadow: new Shadow({ offsetX: 20 }),
     });
     object.animate({ 'shadow.offsetX': 100 });
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(Math.round(object.shadow!.offsetX)).toBe(100);
   });
   it('animate with color', async () => {
@@ -309,7 +311,7 @@ describe('animate', () => {
       expect(runningAnimations.length).toBe(index + 1);
       expect(findAnimationsByTarget(object).length).toBe(index + 1);
     });
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     properties.forEach((prop) => {
       expect(object[prop]).toBe('rgba(0,0,255,1)');
     });
@@ -324,7 +326,7 @@ describe('animate', () => {
     });
 
     object.animate({ left: object.left - 40 });
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(Math.round(object.left)).toBe(-20);
   });
   it('animate multiple properties', async () => {
@@ -333,7 +335,7 @@ describe('animate', () => {
     expect(Object.keys(context)).toEqual(['left', 'top']);
     expect(context.left instanceof ValueAnimation).toBe(true);
     expect(context.top instanceof ValueAnimation).toBe(true);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(Math.round(object.get('left'))).toBe(223);
     expect(Math.round(object.get('top'))).toBe(224);
   });
@@ -355,7 +357,7 @@ describe('animate', () => {
         },
       },
     );
-    jest.advanceTimersByTime(32);
+    vi.advanceTimersByTime(32);
     expect(Math.round(object.get('left'))).toBe(1);
     expect(Math.round(object.get('top'))).toBe(1);
     expect(changedInvocations).toBe(4);
@@ -390,9 +392,9 @@ describe('animate', () => {
         expect(endValue).toEqual([2, 4, 6]);
       },
     });
-    jest.advanceTimersByTime(duration + 20);
+    vi.advanceTimersByTime(duration + 20);
     expect(run).toBeGreaterThanOrEqual(3);
-    jest.advanceTimersByTime(duration + 20);
+    vi.advanceTimersByTime(duration + 20);
   });
   it('abort function is calle with object as context', async () => {
     const object = new FabricObject({ left: 123, top: 124 });
@@ -407,11 +409,11 @@ describe('animate', () => {
         },
       },
     );
-    jest.advanceTimersByTime(100);
+    vi.advanceTimersByTime(100);
     expect(Math.round(object.get('left'))).toBe(123);
     expect(Math.round(object.get('top'))).toBe(124);
     expect(context).toBe(object);
-    jest.advanceTimersByTime(500);
+    vi.advanceTimersByTime(500);
   });
   it('animate with imperative abort', async () => {
     const object = new FabricObject({ left: 123, top: 124 });
@@ -428,7 +430,7 @@ describe('animate', () => {
     expect(context.state).toBe('pending');
     context.abort();
     expect(context.state).toBe('aborted');
-    jest.advanceTimersByTime(100);
+    vi.advanceTimersByTime(100);
     expect(Math.round(object.get('left'))).toBe(123);
     expect(called).toBe(0);
   });
@@ -442,19 +444,19 @@ describe('animate', () => {
       duration,
     });
     expect(context.state).toBe('pending');
-    jest.advanceTimersByTime(delay - offset);
+    vi.advanceTimersByTime(delay - offset);
     expect(context.state).toBe('pending');
-    jest.advanceTimersByTime(offset * 2);
+    vi.advanceTimersByTime(offset * 2);
     expect(context.state).toBe('running');
-    jest.advanceTimersByTime(duration + offset);
+    vi.advanceTimersByTime(duration + offset);
     expect(context.state).toBe('completed');
   });
 });
 
 describe('easing', () => {
   afterEach(() => {
-    jest.clearAllTimers();
-    jest.runAllTimers();
+    vi.clearAllTimers();
+    vi.runAllTimers();
   });
   Object.entries(ease).map(([easingName, easingFunction]) => {
     it(easingName, async () => {
@@ -479,7 +481,7 @@ describe('easing', () => {
           easing: easingFunction,
         },
       );
-      jest.advanceTimersByTime(duration + 16);
+      vi.advanceTimersByTime(duration + 16);
       expect(snapshot).toMatchSnapshot();
     });
   });
