@@ -18,6 +18,8 @@ import {
 } from '../Text/constants';
 import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
+import type { FabricObject } from '../Object/FabricObject';
+import { createCanvasElementFor } from '../../util/misc/dom';
 
 export type CursorBoundaries = {
   left: number;
@@ -381,7 +383,7 @@ export class IText<
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
   renderCursorOrSelection() {
-    if (!this.isEditing) {
+    if (!this.isEditing || !this.canvas) {
       return;
     }
     const ctx = this.clearContextTop(true);
@@ -389,13 +391,61 @@ export class IText<
       return;
     }
     const boundaries = this._getCursorBoundaries();
-    if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
-      this.renderCursor(ctx, boundaries);
-    } else {
-      this.renderSelection(ctx, boundaries);
+
+    const ancestors = this.findAncestorsWithClipPath();
+
+    let drawingCtx: CanvasRenderingContext2D = ctx;
+    let drawingCanvas: HTMLCanvasElement | undefined = undefined;
+    if (ancestors.length > 0) {
+      // we have some clipPath, we need to draw the selection on an intermediate layer.
+      drawingCanvas = createCanvasElementFor(ctx.canvas);
+      drawingCtx = drawingCanvas.getContext('2d')!;
+      const v = this.canvas.viewportTransform;
+      const scaling = this.canvas.getRetinaScaling();
+      drawingCtx.scale(scaling, scaling);
+      drawingCtx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      this.transform(drawingCtx);
     }
-    this.canvas!.contextTopDirty = true;
+
+    if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
+      this.renderCursor(drawingCtx, boundaries);
+    } else {
+      this.renderSelection(drawingCtx, boundaries);
+    }
+
+    for (const ancestor of ancestors) {
+      // each ancestor will creat a clipPath as big as the
+      console.log({ ancestor });
+    }
+
+    if (ctx !== drawingCtx) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(drawingCanvas!, 0, 0);
+    }
+
+    this.canvas.contextTopDirty = true;
     ctx.restore();
+  }
+
+  /**
+   * Finds and returns an array of clip paths that are applied to the parent
+   * group(s) of the current FabricObject instance. The object's hierarchy is
+   * traversed upwards (from the current object towards the root of the canvas),
+   * checking each parent object for the presence of a `clipPath` that is not
+   * absolutely positioned.
+   */
+  findAncestorsWithClipPath(): FabricObject[] {
+    const clipPathAncestors: FabricObject[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let obj: FabricObject | undefined = this;
+    while (obj) {
+      if (obj.clipPath && !obj.clipPath.absolutePositioned) {
+        clipPathAncestors.push(obj);
+      }
+      obj = obj.parent;
+    }
+
+    return clipPathAncestors;
   }
 
   /**
