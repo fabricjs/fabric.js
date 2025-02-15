@@ -571,6 +571,7 @@ export class FabricImage<
       sourceWidth,
       sourceHeight,
       this._element as HTMLCanvasElement,
+      this.cacheKey,
     );
     if (
       this._originalElement.width !== this._element.width ||
