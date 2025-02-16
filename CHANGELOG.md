@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [6.6.1]
+
 - fix(): FabricImage was missing cachekey when filtering [#10441](https://github.com/fabricjs/fabric.js/pull/10441)
 
 ## [6.6.0]
