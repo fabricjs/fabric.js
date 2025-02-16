@@ -3,6 +3,13 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {},
   test: {
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        minThreads: '10%',
+        maxThreads: '90%',
+      },
+    },
     clearMocks: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
