@@ -405,7 +405,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.5.3";
+var version = "6.6.1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -1579,6 +1579,9 @@ const toDataURL = (canvasEl, format, quality) => canvasEl.toDataURL("image/".con
 const isHTMLCanvas = canvas => {
   return !!canvas && canvas.getContext !== undefined;
 };
+const toBlob = (canvasEl, format, quality) => new Promise((resolve, _) => {
+  canvasEl.toBlob(resolve, "image/".concat(format), quality);
+});
 
 /**
  * Transforms degrees to radians.
@@ -4139,6 +4142,17 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
     } = options;
     const finalMultiplier = multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
     return toDataURL(this.toCanvasElement(finalMultiplier, options), format, quality);
+  }
+  toBlob() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    const {
+      format = 'png',
+      quality = 1,
+      multiplier = 1,
+      enableRetinaScaling = false
+    } = options;
+    const finalMultiplier = multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+    return toBlob(this.toCanvasElement(finalMultiplier, options), format, quality);
   }
 
   /**
@@ -7123,7 +7137,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   }
 
   /**
-   * When set to `true`, force the object to have its own cache, even if it is inside a group
+   * When returns `true`, force the object to have its own cache, even if it is inside a group
    * it may be needed when your object behave in a particular way on the cache and always needs
    * its own isolated canvas to render correctly.
    * Created to be overridden
@@ -7131,6 +7145,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @returns Boolean
    */
   needsItsOwnCache() {
+    // TODO re-evaluate this shadow condition
     if (this.paintFirst === STROKE && this.hasFill() && this.hasStroke() && !!this.shadow) {
       return true;
     }
@@ -7144,13 +7159,13 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Decide if the object should cache or not. Create its own cache level
    * objectCaching is a global flag, wins over everything
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group outside is cached.
    * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
    * @return {Boolean}
    */
   shouldCache() {
-    this.ownCaching = this.needsItsOwnCache() || this.objectCaching && (!this.parent || !this.parent.isOnACache());
+    this.ownCaching = this.objectCaching && (!this.parent || !this.parent.isOnACache()) || this.needsItsOwnCache();
     return this.ownCaching;
   }
 
@@ -7250,7 +7265,10 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   }
 
   /**
-   * Check if cache is dirty
+   * Check if cache is dirty and if is dirty clear the context.
+   * This check has a big side effect, it changes the underlying cache canvas if necessary.
+   * Do not call this method on your own to check if the cache is dirty, because if it is,
+   * it is also going to wipe the cache. This is badly designed and needs to be fixed.
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */
@@ -7682,6 +7700,10 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   toDataURL() {
     let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     return toDataURL(this.toCanvasElement(options), options.format || 'png', options.quality || 1);
+  }
+  toBlob() {
+    let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    return toBlob(this.toCanvasElement(options), options.format || 'png', options.quality || 1);
   }
 
   /**
@@ -11662,9 +11684,9 @@ class Group extends createCollectionMixin(FabricObject) {
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
+   * Decide if the group should cache or not. Create its own cache level
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group is already cached.
    * @return {Boolean}
    */
@@ -13036,6 +13058,7 @@ var index$1 = /*#__PURE__*/Object.freeze({
   string: lang_string,
   stylesFromArray: stylesFromArray,
   stylesToArray: stylesToArray,
+  toBlob: toBlob,
   toDataURL: toDataURL,
   toFixed: toFixed,
   transformPath: transformPath,
@@ -23662,11 +23685,7 @@ class ActiveSelection extends Group {
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
-   * objectCaching is a global flag, wins over everything
-   * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
-   * Generally you do not cache objects in groups because the group outside is cached.
+   * Decide if the object should cache or not. The Active selection never caches
    * @return {Boolean}
    */
   shouldCache() {
@@ -24192,13 +24211,14 @@ class FabricImage extends FabricObject {
    * @param {Partial<TSize>} [size] Options object
    */
   setElement(element) {
+    var _element$classList;
     let size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     this.removeTexture(this.cacheKey);
     this.removeTexture("".concat(this.cacheKey, "_filtered"));
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList.add(FabricImage.CSS_CANVAS);
+    (_element$classList = element.classList) === null || _element$classList === void 0 || _element$classList.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -24486,7 +24506,7 @@ class FabricImage extends FabricObject {
       this._lastScaleX = 1;
       this._lastScaleY = 1;
     }
-    getFilterBackend().applyFilters(filters, this._originalElement, sourceWidth, sourceHeight, this._element);
+    getFilterBackend().applyFilters(filters, this._originalElement, sourceWidth, sourceHeight, this._element, this.cacheKey);
     if (this._originalElement.width !== this._element.width || this._originalElement.height !== this._element.height) {
       this._filterScalingX = this._element.width / this._originalElement.width;
       this._filterScalingY = this._element.height / this._originalElement.height;
@@ -24517,11 +24537,11 @@ class FabricImage extends FabricObject {
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
+   * Decide if the FabricImage should cache or not. Create its own cache level
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group outside is cached.
-   * This is the special image version where we would like to avoid caching where possible.
+   * This is the special Image version where we would like to avoid caching where possible.
    * Essentially images do not benefit from caching. They may require caching, and in that
    * case we do it. Also caching an image usually ends in a loss of details.
    * A full performance audit should be done.
@@ -24665,7 +24685,9 @@ class FabricImage extends FabricObject {
 
   /**
    * Default CSS class name for canvas
+   * Will be removed from fabric 7
    * @static
+   * @deprecated
    * @type String
    * @default
    */
