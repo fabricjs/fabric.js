@@ -18,7 +18,7 @@ const genericVpt = [2.3, 0, 0, 2.3, 120, 80] as TMat2D;
 
 const registerTestObjects = (objects: Record<string, FabricObject>) => {
   Object.entries(objects).forEach(([key, object]) => {
-    vi.spyOn(object, 'toJSON').mockReturnValue(key);
+    object.toJSON = vi.fn(() => key);
   });
 };
 
@@ -97,7 +97,7 @@ describe('Canvas event data', () => {
       vi.spyOn(dragTarget, 'renderDragSourceEffect').mockImplementation(
         vi.fn(),
       );
-      vi.spyOn(dragTarget, 'toJSON').mockReturnValue('Drag Target');
+      dragTarget.toJSON = vi.fn(() => 'Drag Target');
       canvas.add(dragTarget);
       canvas.setActiveObject(dragTarget);
       spy.mockReset();
@@ -884,9 +884,7 @@ describe('Event targets', () => {
     const target = new FabricObject({ width: 10, height: 10 });
     const canvas = new Canvas();
     canvas.add(target);
-
-    vi.spyOn(target, 'toJSON').mockReturnValue('target');
-
+    target.toJSON = vi.fn(() => 'target');
     const targetSpy = vi.spyOn(target, 'fire');
     const canvasSpy = vi.spyOn(canvas, 'fire');
     const enter = new MouseEvent('mousemove', { clientX: 5, clientY: 5 });

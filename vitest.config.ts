@@ -6,7 +6,8 @@ export default defineConfig({
     pool: 'threads',
     poolOptions: {
       threads: {
-        maxThreads: '90%',
+        minThreads: '40%',
+        maxThreads: '75%',
       },
     },
     clearMocks: true,
