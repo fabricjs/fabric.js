@@ -140,32 +140,32 @@
   "sideEffects": false,
   "exports": {
     ".": {
+      "node": null,
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.min.mjs",
       "require": "./dist/index.min.js",
-      "default": "./dist/index.min.js",
-      "node": null,
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.min.js"
     },
     "./es": {
+      "node": null,
+      "types": "./dist/index.d.ts",
       "import": "./dist/fabric.min.mjs",
       "require": null,
-      "default": null,
-      "node": null,
-      "types": "./dist/index.d.ts"
+      "default": null
     },
     "./node": {
+      "node": "./dist/index.node.cjs",
+      "types": "./dist/index.node.d.ts",
       "import": "./dist/index.node.mjs",
       "require": "./dist/index.node.cjs",
-      "default": "./dist/index.node.cjs",
-      "node": "./dist/index.node.cjs",
-      "types": "./dist/index.node.d.ts"
+      "default": "./dist/index.node.cjs"
     },
     "./extensions": {
+      "node": "./dist-extensions/index.mjs",
+      "types": "./dist-extensions/extensions/index.d.ts",
       "import": "./dist-extensions/index.mjs",
       "require": null,
-      "default": "./dist-extensions/fabric-extensions.min.js",
-      "node": "./dist-extensions/index.mjs",
-      "types": "./dist-extensions/extensions/index.d.ts"
+      "default": "./dist-extensions/fabric-extensions.min.js"
     }
   }
 }
