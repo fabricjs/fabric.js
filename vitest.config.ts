@@ -4,12 +4,6 @@ export default defineConfig({
   resolve: {},
   test: {
     pool: 'threads',
-    poolOptions: {
-      threads: {
-        minThreads: '40%',
-        maxThreads: '75%',
-      },
-    },
     clearMocks: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
