@@ -2,9 +2,11 @@ import { FabricImage } from './Image';
 import { Shadow } from '../Shadow';
 import { Brightness } from '../filters/Brightness';
 
-const mockApplyFilter = jest.fn();
+import { describe, expect, test, vi } from 'vitest';
 
-jest.mock('../filters/FilterBackend', () => ({
+const mockApplyFilter = vi.fn();
+
+vi.mock('../filters/FilterBackend', () => ({
   getFilterBackend: () => ({
     applyFilters: mockApplyFilter,
   }),
@@ -33,7 +35,7 @@ describe('FabricImage', () => {
       expect(img.toSVG()).toMatchSnapshot();
     });
   });
-  describe('ApplyFilter use cacheKey', () => {
+  test('ApplyFilter use cacheKey', () => {
     const imgElement = new Image(200, 200);
     const img = new FabricImage(imgElement);
     img.filters = [new Brightness({ brightness: 0.2 })];
@@ -44,7 +46,7 @@ describe('FabricImage', () => {
       200,
       200,
       img.getElement(),
-      'texture0',
+      'texture3',
     );
   });
 });

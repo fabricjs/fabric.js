@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Shadow fromObject 1`] = `
+exports[`Shadow > fromObject 1`] = `
 {
   "affectStroke": false,
   "blur": 0,
@@ -13,7 +13,7 @@ exports[`Shadow fromObject 1`] = `
 }
 `;
 
-exports[`Shadow fromObject 2`] = `
+exports[`Shadow > fromObject 2`] = `
 {
   "affectStroke": false,
   "blur": 0,

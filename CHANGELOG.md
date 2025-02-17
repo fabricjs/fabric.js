@@ -2,6 +2,8 @@
 
 ## [next]
 
+- ci(): Switch from Jest to Vitest [#10420](https://github.com/fabricjs/fabric.js/pull/10420)
+
 ## [6.6.1]
 
 - fix(): FabricImage was missing cachekey when filtering [#10441](https://github.com/fabricjs/fabric.js/pull/10441)

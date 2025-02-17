@@ -1,5 +1,6 @@
-import '../jest.extend';
 import { Shadow } from './Shadow';
+
+import { describe, expect, it } from 'vitest';
 
 describe('Shadow', () => {
   it('fromObject', async () => {

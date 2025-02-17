@@ -16,6 +16,8 @@ import {
   sendVectorToPlane,
 } from './planeChange';
 
+import { describe, expect, test, vi } from 'vitest';
+
 describe('Plane Change', () => {
   test('calcPlaneChangeMatrix', () => {
     const m1: TMat2D = [1, 2, 3, 4, 5, 6];
@@ -63,7 +65,7 @@ describe('Plane Change', () => {
     const group2 = new Group();
     const obj = new FabricObject();
 
-    jest.spyOn(group, 'isOnACache').mockReturnValue(false);
+    vi.spyOn(group, 'isOnACache').mockReturnValue(false);
 
     applyTransformToObject(obj, m);
     applyTransformToObject(group, m1);

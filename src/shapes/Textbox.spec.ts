@@ -1,5 +1,7 @@
-import '../../jest.extend';
+import '../../vitest.extend';
 import { Textbox } from './Textbox';
+
+import { describe, expect, it } from 'vitest';
 
 describe('Textbox', () => {
   it('fromObject', async () => {

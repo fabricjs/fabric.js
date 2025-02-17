@@ -1,6 +1,8 @@
 import { Intersection } from './Intersection';
 import { Point } from './Point';
 
+import { describe, expect, test } from 'vitest';
+
 const polygonPoints = [
   new Point(4, 1),
   new Point(6, 2),

@@ -2,6 +2,8 @@ import { makeElementUnselectable } from './util';
 import { getFabricDocument } from '../../env';
 import { NONE } from '../../constants';
 
+import { describe, expect, it } from 'vitest';
+
 describe('DOMManagers utils', () => {
   describe('makeElementUnselectable', () => {
     it('makes element not selectable', () => {

@@ -3,6 +3,8 @@ import { Rect } from '../Rect';
 import { FabricObject } from './Object';
 import { Group } from '../Group';
 
+import { describe, expect, it, vi } from 'vitest';
+
 describe('Object', () => {
   it('tests constructor & properties', () => {
     expect(typeof FabricObject).toBe('function');
@@ -147,7 +149,7 @@ describe('Object', () => {
   it('test strokeDashArray with an odd number of elements.', () => {
     const dashArrayBase = [1];
     const ctx = {
-      setLineDash: jest.fn(),
+      setLineDash: vi.fn(),
     } as unknown as CanvasRenderingContext2D;
     const obj = new FabricObject({
       strokeDashArray: [1],

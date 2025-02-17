@@ -4,6 +4,8 @@ import { Canvas } from './Canvas';
 import { Group } from '../shapes/Group';
 import { ActiveSelection } from '../shapes/ActiveSelection';
 
+import { describe, expect, it, test, vi } from 'vitest';
+
 describe('Selectable Canvas', () => {
   describe('_pointIsInObjectSelectionArea', () => {
     it('points and selection area', () => {
@@ -457,9 +459,9 @@ describe('Selectable Canvas', () => {
       zoom && canvas.zoomToPoint(new Point(25, 25), 2);
       expect(canvas._currentTransform).toBeFalsy();
 
-      const spy = jest.fn();
+      const spy = vi.fn();
       canvas.on('before:transform', spy);
-      const setupCurrentTransformSpy = jest.spyOn(
+      const setupCurrentTransformSpy = vi.spyOn(
         canvas,
         '_setupCurrentTransform',
       );

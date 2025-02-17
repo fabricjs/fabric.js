@@ -1,4 +1,5 @@
 import { cleanupSvgAttribute } from './cleanupSvgAttribute';
+import { expect, it, describe } from 'vitest';
 
 describe('cleanupSvgAttribute', () => {
   it('add space around a single number', () => {

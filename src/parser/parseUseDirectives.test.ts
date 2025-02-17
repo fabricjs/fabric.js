@@ -1,6 +1,8 @@
 import { getFabricWindow } from '../env';
 import { parseUseDirectives } from './parseUseDirectives';
 
+import { describe, expect, it } from 'vitest';
+
 describe('parseUseDirectives', () => {
   it('returns successful parse where use tag uses fill style prioritizing path tag when both tags have a style', async () => {
     const str = `<svg id="svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -53,7 +55,7 @@ describe('parseUseDirectives', () => {
   });
   it('returns successful parse where use tag uses fill style from path when its style tag is empty', async () => {
     const str = `<svg id="svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <path id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" 
+      <path id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z"
         style="stroke:#000000;fill:#ff0000" />
       <use x="100" y="0" xlink:href="#heart" />
       </svg>`;

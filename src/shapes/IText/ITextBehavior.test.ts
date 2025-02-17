@@ -1,5 +1,16 @@
-import { roundSnapshotOptions } from '../../../jest.extend';
+import { roundSnapshotOptions } from '../../../vitest.extend';
 import { IText } from './IText';
+import {
+  describe,
+  expect,
+  it,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  test,
+  vi,
+} from 'vitest';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
 
@@ -97,56 +108,56 @@ describe('IText cursor animation snapshot', () => {
   let currentAnimation: string[] = [];
   const origCalculate = ValueAnimation.prototype.calculate;
   beforeAll(() => {
-    jest
-      .spyOn(ValueAnimation.prototype, 'calculate')
-      .mockImplementation(function (timeElapsed: number) {
+    vi.spyOn(ValueAnimation.prototype, 'calculate').mockImplementation(
+      function (timeElapsed: number) {
         const value = origCalculate.call(this, timeElapsed);
         currentAnimation.push(value.value.toFixed(3));
         return value;
-      });
-    jest.useFakeTimers();
+      },
+    );
+    vi.useFakeTimers();
   });
   afterAll(() => {
     ValueAnimation.prototype.calculate = origCalculate;
   });
   beforeEach(() => {
-    jest.runAllTimers();
+    vi.runAllTimers();
     currentAnimation = [];
   });
   afterAll(() => {
-    jest.resetAllMocks();
-    jest.useRealTimers();
+    vi.resetAllMocks();
+    vi.useRealTimers();
   });
   test('initDelayedCursor false - with delay', () => {
     const iText = new IText('', { canvas: {} });
     iText.initDelayedCursor();
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('initDelayedCursor true - with NO delay', () => {
     const iText = new IText('', { canvas: {} });
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('selectionStart/selection end will abort animation', () => {
     const iText = new IText('asd', { canvas: {} });
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(160);
+    vi.advanceTimersByTime(160);
     iText.selectionStart = 0;
     iText.selectionEnd = 3;
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('exiting from a canvas will abort animation', () => {
     const iText = new IText('asd', { canvas: {} });
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(160);
+    vi.advanceTimersByTime(160);
     iText.canvas = undefined;
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
@@ -155,7 +166,7 @@ describe('IText cursor animation snapshot', () => {
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor();
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
@@ -164,26 +175,26 @@ describe('IText cursor animation snapshot', () => {
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
 });
 
 describe('IText _tick', () => {
-  const _tickMock = jest.fn();
+  const _tickMock = vi.fn();
   beforeEach(() => {
     _tickMock.mockClear();
   });
   test('enter Editing will call _tick', () => {
     const iText = new IText('hello\nhello');
-    jest.spyOn(iText, '_tick').mockImplementation(_tickMock);
+    vi.spyOn(iText, '_tick').mockImplementation(_tickMock);
     iText.enterEditing();
     expect(_tickMock).toHaveBeenCalledWith();
   });
   test('mouse up will fire an animation restart with 0 delay if is a click', () => {
     const iText = new IText('hello\nhello');
-    jest.spyOn(iText, '_tick').mockImplementation(_tickMock);
+    vi.spyOn(iText, '_tick').mockImplementation(_tickMock);
     iText.enterEditing();
     expect(_tickMock).toHaveBeenCalledWith();
     _tickMock.mockClear();
@@ -198,8 +209,8 @@ describe('IText _tick', () => {
 });
 
 describe('Itext enterEditing and exitEditing', () => {
-  const enterMock = jest.fn();
-  const exitMock = jest.fn();
+  const enterMock = vi.fn();
+  const exitMock = vi.fn();
 
   afterEach(() => {
     enterMock.mockClear();

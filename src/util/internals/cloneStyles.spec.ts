@@ -4,6 +4,8 @@ import type {
   CompleteTextStyleDeclaration,
 } from '../../shapes/Text/StyledText';
 
+import { describe, expect, it } from 'vitest';
+
 describe('cloneStyles', () => {
   it('clones a styles object deeply', () => {
     const style: CompleteTextStyleDeclaration = {

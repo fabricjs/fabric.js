@@ -2,6 +2,8 @@ import { Path } from '../shapes/Path';
 import { Rect } from '../shapes/Rect';
 import { loadSVGFromString } from './loadSVGFromString';
 
+import { describe, expect, it } from 'vitest';
+
 describe('loadSVGFromString', () => {
   it('returns successful parse of svg with use tag containing bad reference', async () => {
     // in this case, ignore bad use but still load rest of svg
