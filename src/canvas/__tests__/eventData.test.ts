@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import '../../../vitest.extend';
 import { Point } from '../../Point';
 import { ActiveSelection } from '../../shapes/ActiveSelection';
 import { Circle } from '../../shapes/Circle';

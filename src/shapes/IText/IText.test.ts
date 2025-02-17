@@ -1,4 +1,3 @@
-import '../../../vitest.extend';
 import { Group } from '../Group';
 import { IText } from './IText';
 

@@ -1,4 +1,3 @@
-import '../vitest.extend';
 import { Shadow } from './Shadow';
 
 import { describe, expect, it } from 'vitest';
