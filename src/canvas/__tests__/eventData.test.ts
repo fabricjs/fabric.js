@@ -627,6 +627,13 @@ describe('Event targets', () => {
         target: triangle,
         targets: [],
       });
+
+      canvas.setActiveObject(triangle);
+
+      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+        target: triangle,
+        targets: [],
+      });
     });
 
     describe('findTarget with perPixelTargetFind in nested group', () => {
@@ -869,7 +876,7 @@ describe('Event targets', () => {
       });
 
       expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
-        target: undefined,
+        target: activeSelection,
         targets: [],
       });
     });

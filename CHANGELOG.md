@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): When the perPixelTargetFind is set to true, the selected transparent graphic cannot be moved [10444](https://github.com/fabricjs/fabric.js/issues/10444)
+
 ## [6.6.1]
 
 - fix(): FabricImage was missing cachekey when filtering [#10441](https://github.com/fabricjs/fabric.js/pull/10441)

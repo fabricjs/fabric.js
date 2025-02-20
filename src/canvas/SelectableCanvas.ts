@@ -820,7 +820,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
-        !(obj as unknown as IText).isEditing
+        !(obj as unknown as IText).isEditing &&
+        this._activeObject != obj
       ) {
         if (!this.isTargetTransparent(obj, pointer.x, pointer.y)) {
           return true;
