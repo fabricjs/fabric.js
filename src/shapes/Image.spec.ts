@@ -1,6 +1,21 @@
 import { FabricImage } from './Image';
 import { Shadow } from '../Shadow';
 import { Brightness } from '../filters/Brightness';
+import { loadSVGFromString } from '../parser/loadSVGFromString';
+
+const mockImage = new Image(100, 100);
+
+jest.mock('../util/misc/objectEnlive', () => {
+  const all = jest.requireActual('../util/misc/objectEnlive');
+  return {
+    ...all,
+    loadImage: jest.fn(async (src) => {
+      const img = mockImage;
+      img.src = src;
+      return img;
+    }),
+  };
+});
 
 const mockApplyFilter = jest.fn();
 
@@ -46,5 +61,33 @@ describe('FabricImage', () => {
       img.getElement(),
       'texture0',
     );
+  });
+  describe('SVG import', () => {
+    it('can import images when xlink:href attribute is set', async () => {
+      const { objects } =
+        await loadSVGFromString(`<svg viewBox="0 0 745 1040" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:space="preserve">
+  <image zaparoo-no-print="true" xlink:href="https://design.zaparoo.org/ZapTradingCard.png" width="745" height="1040">
+  </image>
+</svg>`);
+      const image = objects[0] as FabricImage;
+      expect(image instanceof FabricImage).toBe(true);
+      expect((image._originalElement as HTMLImageElement).src).toBe(
+        'https://design.zaparoo.org/ZapTradingCard.png',
+      );
+    });
+    it('can import images when href attribute has no xlink', async () => {
+      const { objects } =
+        await loadSVGFromString(`<svg viewBox="0 0 745 1040" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:space="preserve">
+  <image zaparoo-no-print="true" href="https://design.zaparoo.org/ZapTradingCard.png" width="745" height="1040">
+  </image>
+</svg>`);
+      const image = objects[0] as FabricImage;
+      expect(image instanceof FabricImage).toBe(true);
+      expect((image._originalElement as HTMLImageElement).src).toBe(
+        'https://design.zaparoo.org/ZapTradingCard.png',
+      );
+    });
   });
 });
