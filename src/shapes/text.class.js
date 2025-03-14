@@ -568,7 +568,7 @@
      * @param {String} [charStyle.fontStyle] Font style (italic|normal)
      */
     _setTextStyles: function(ctx, charStyle, forMeasuring) {
-      ctx.textBaseline = 'alphabetical';
+      ctx.textBaseline = 'alphabetic';
       if (this.path) {
         switch (this.pathAlign) {
           case 'center':
