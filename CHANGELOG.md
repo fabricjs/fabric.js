@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(FabricImage): add href parsing fixes for #10421 [#10465](https://github.com/fabricjs/fabric.js/pull/10465)
+
 ## [6.6.1]
 
 - fix(): FabricImage was missing cachekey when filtering [#10441](https://github.com/fabricjs/fabric.js/pull/10441)
