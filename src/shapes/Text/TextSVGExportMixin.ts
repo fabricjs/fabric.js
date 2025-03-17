@@ -12,6 +12,7 @@ import { STROKE, FILL } from '../../constants';
 import { createRotateMatrix } from '../../util/misc/matrix';
 import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 import { Point } from '../../Point';
+import { matrixToSVG } from '../../util/misc/svgExport';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -46,6 +47,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         path._createBaseSVGMarkup(path._toSVG(), {
           reviver,
           withShadow: true,
+          additionalTransform: matrixToSVG(this.calcOwnMatrix()),
         })
       );
     }

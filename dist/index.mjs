@@ -18693,11 +18693,19 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return this._wrapSVGTextAndBg(textAndBg);
   }
   toSVG(reviver) {
-    return this._createBaseSVGMarkup(this._toSVG(), {
-      reviver,
-      noStyle: true,
-      withShadow: true
-    });
+    const textSvg = this._createBaseSVGMarkup(this._toSVG(), {
+        reviver,
+        noStyle: true,
+        withShadow: true
+      }),
+      path = this.path;
+    if (path) {
+      return textSvg + path._createBaseSVGMarkup(path._toSVG(), {
+        reviver,
+        withShadow: true
+      });
+    }
+    return textSvg;
   }
   _getSVGLeftTopOffsets() {
     return {
@@ -18748,12 +18756,31 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       textBgRects
     };
   }
-  _createTextCharSpan(char, styleDecl, left, top) {
+  _createTextCharSpan(char, styleDecl, left, top, charBox) {
     const styleProps = this.getSvgSpanStyles(styleDecl, char !== char.trim() || !!char.match(multipleSpacesRegex)),
       fillStyles = styleProps ? "style=\"".concat(styleProps, "\"") : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? " dy=\"".concat(toFixed(dy, config.NUM_FRACTION_DIGITS), "\" ") : '';
-    return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
+      dySpan = dy ? " dy=\"".concat(toFixed(dy, config.NUM_FRACTION_DIGITS), "\" ") : '',
+      {
+        angle,
+        renderLeft,
+        renderTop,
+        width
+      } = charBox;
+    let angleAttr = '';
+    if (renderLeft !== undefined) {
+      const wBy2 = width / 2;
+      angleAttr = " rotate=\"".concat(toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS), "\"");
+      const m = createRotateMatrix({
+        angle: radiansToDegrees(angle)
+      });
+      m[4] = renderLeft;
+      m[5] = renderTop;
+      const renderPoint = new Point(-wBy2, 0).transform(m);
+      left = renderPoint.x;
+      top = renderPoint.y;
+    }
+    return "<tspan x=\"".concat(toFixed(left, config.NUM_FRACTION_DIGITS), "\" y=\"").concat(toFixed(top, config.NUM_FRACTION_DIGITS), "\" ").concat(dySpan).concat(angleAttr).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
   }
   _setSVGTextLineText(textSpans, lineIndex, textLeftOffset, textTopOffset) {
     const lineHeight = this.getHeightOfLine(lineIndex),
@@ -18768,7 +18795,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       timeToRender;
     textTopOffset += lineHeight * (1 - this._fontSizeFraction) / this.lineHeight;
     for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing;
+      timeToRender = i === len || this.charSpacing || this.path;
       charsToRender += line[i];
       charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
@@ -18783,14 +18810,14 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         }
       }
       if (!timeToRender) {
-        // if we have charSpacing, we render char by char
+        // if we have charSpacing or a path, we render char by char
         actualStyle = actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
         nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
         timeToRender = hasStyleChanged(actualStyle, nextStyle, true);
       }
       if (timeToRender) {
         style = this._getStyleDeclaration(lineIndex, i);
-        textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset));
+        textSpans.push(this._createTextCharSpan(charsToRender, style, textLeftOffset, textTopOffset, charBox));
         charsToRender = '';
         actualStyle = nextStyle;
         if (this.direction === 'rtl') {
@@ -24755,7 +24782,7 @@ class FabricImage extends FabricObject {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     let cssRules = arguments.length > 2 ? arguments[2] : undefined;
     const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
-    return this.fromURL(parsedAttributes['xlink:href'], options, parsedAttributes).catch(err => {
+    return this.fromURL(parsedAttributes['xlink:href'] || parsedAttributes['href'], options, parsedAttributes).catch(err => {
       log('log', 'Unable to parse Image', err);
       return null;
     });
@@ -24770,7 +24797,7 @@ _defineProperty(FabricImage, "CSS_CANVAS", 'canvas-img');
  * @static
  * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
  */
-_defineProperty(FabricImage, "ATTRIBUTE_NAMES", [...SHARED_ATTRIBUTES, 'x', 'y', 'width', 'height', 'preserveAspectRatio', 'xlink:href', 'crossOrigin', 'image-rendering']);
+_defineProperty(FabricImage, "ATTRIBUTE_NAMES", [...SHARED_ATTRIBUTES, 'x', 'y', 'width', 'height', 'preserveAspectRatio', 'xlink:href', 'href', 'crossOrigin', 'image-rendering']);
 classRegistry.setClass(FabricImage);
 classRegistry.setSVGClass(FabricImage);
 
