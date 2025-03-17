@@ -9919,7 +9919,7 @@ fabric.ElementsParser = function(elements, callback, options, reviver, parsingOp
 
     /**
      * Returns coordinates of a center of canvas.
-     * @return {fabric.Point}
+     * @return {fabric.Point} 
      */
     getCenterPoint: function () {
       return new fabric.Point(this.width / 2, this.height / 2);
