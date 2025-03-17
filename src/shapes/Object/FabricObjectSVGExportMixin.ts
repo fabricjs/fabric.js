@@ -1,9 +1,10 @@
 import type { TSVGReviver } from '../../typedefs';
 import { uid } from '../../util/internals/uid';
-import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
+import { colorPropToSVG } from '../../util/misc/svgParsing';
 import { FILL, NONE, STROKE } from '../../constants';
 import type { FabricObject } from './FabricObject';
 import { isFiller } from '../../util/typeAssertions';
+import { matrixToSVG } from '../../util/misc/svgExport';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -191,6 +192,7 @@ export class FabricObjectSVGExportMixin {
       additionalTransform?: string;
     } = {},
   ): string {
+    console.log({ additionalTransform });
     const styleInfo = noStyle ? '' : `style="${this.getSvgStyles()}" `,
       shadowInfo = withShadow ? `style="${this.getSvgFilter()}" ` : '',
       clipPath = this.clipPath as FabricObjectSVGExportMixin & FabricObject,

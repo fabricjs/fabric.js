@@ -160,18 +160,20 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     top: number,
     charBox: GraphemeBBox,
   ) {
+    const numFractionDigit = config.NUM_FRACTION_DIGITS;
     const styleProps = this.getSvgSpanStyles(
         styleDecl,
         char !== char.trim() || !!char.match(multipleSpacesRegex),
       ),
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '',
+      dySpan = dy ? ` dy="${toFixed(dy, numFractionDigit)}" ` : '',
       { angle, renderLeft, renderTop, width } = charBox;
     let angleAttr = '';
     if (renderLeft !== undefined) {
       const wBy2 = width / 2;
-      angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), config.NUM_FRACTION_DIGITS)}"`;
+      angle &&
+        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}"`);
       const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
       m[4] = renderLeft!;
       m[5] = renderTop!;
@@ -180,12 +182,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       top = renderPoint.y;
     }
 
-    return `<tspan x="${toFixed(
-      left,
-      config.NUM_FRACTION_DIGITS,
-    )}" y="${toFixed(
+    return `<tspan x="${toFixed(left, numFractionDigit)}" y="${toFixed(
       top,
-      config.NUM_FRACTION_DIGITS,
+      numFractionDigit,
     )}" ${dySpan}${angleAttr}${fillStyles}>${escapeXml(char)}</tspan>`;
   }
 
