@@ -2936,7 +2936,7 @@ fabric.CommonMethods = {
 
   /**
    * Creates an empty object and copies all enumerable properties of another object to it
-   * This method is mostly for internal use, and not intended for duplicating shapes in canvas.
+   * This method is mostly for internal use, and not intended for duplicating shapes in canvas. 
    * @memberOf fabric.util.object
    * @param {Object} object Object to clone
    * @param {Boolean} [deep] Whether to clone nested objects
