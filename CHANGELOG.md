@@ -2,6 +2,21 @@
 
 ## [next]
 
+- chore(): Update qunit and nyc to latest [#10468](https://github.com/fabricjs/fabric.js/pull/10468)
+- fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
+- fix(FabricImage): add href parsing fixes for #10421 [#10465](https://github.com/fabricjs/fabric.js/pull/10465)
+
+## [6.6.1]
+
+- fix(): FabricImage was missing cachekey when filtering [#10441](https://github.com/fabricjs/fabric.js/pull/10441)
+
+## [6.6.0]
+
+- feat(): Add webp to ImageFormat [#10435](https://github.com/fabricjs/fabric.js/pull/10435)
+- fix(): Allow for node-canvas images to work with the FabricImage class by making classList optional. [#10412](https://github.com/fabricjs/fabric.js/pull/10412)
+- fix(): Allow for brush subclassing moving some properties from private to protected. [#10416](https://github.com/fabricjs/fabric.js/pull/10416)
+- feat(): Add method toBlob. [#3283](https://github.com/fabricjs/fabric.js/issues/3283)
+
 ## [6.5.4]
 
 - docs() perf(): Reorder caching conditions for most common scenario and docs fixes. [#10366](https://github.com/fabricjs/fabric.js/pull/10366)
