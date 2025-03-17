@@ -192,7 +192,6 @@ export class FabricObjectSVGExportMixin {
       additionalTransform?: string;
     } = {},
   ): string {
-    console.log({ additionalTransform });
     const styleInfo = noStyle ? '' : `style="${this.getSvgStyles()}" `,
       shadowInfo = withShadow ? `style="${this.getSvgFilter()}" ` : '',
       clipPath = this.clipPath as FabricObjectSVGExportMixin & FabricObject,

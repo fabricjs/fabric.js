@@ -4777,9 +4777,6 @@ class FabricObjectSVGExportMixin {
       withShadow,
       additionalTransform
     } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    console.log({
-      additionalTransform
-    });
     const styleInfo = noStyle ? '' : "style=\"".concat(this.getSvgStyles(), "\" "),
       shadowInfo = withShadow ? "style=\"".concat(this.getSvgFilter(), "\" ") : '',
       clipPath = this.clipPath,
