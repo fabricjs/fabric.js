@@ -413,9 +413,22 @@ export class IText<
       this.renderSelection(drawingCtx, boundaries);
     }
 
-    for (const ancestor of ancestors) {
-      // each ancestor will creat a clipPath as big as the
-      console.log({ ancestor });
+    if (ancestors.length > 0) {
+      const clippingCanvas = createCanvasElementFor(ctx.canvas);
+      const clippingCtx = clippingCanvas.getContext('2d')!;
+      for (const ancestor of ancestors) {
+        // each ancestor will creat a clipPath as big as it needs,
+        const context = {
+          zoomX: this.zoomX,
+          zoomY: this.zoomY,
+          cacheTranslationX: this.cacheTranslationX,
+          cacheTranslationY: this.cacheTranslationY,
+          width,
+          height,
+          parentClipPaths: [],
+        };
+        this._drawClipPath(ctx, this.clipPath, context);
+      }
     }
 
     if (ctx !== drawingCtx) {
