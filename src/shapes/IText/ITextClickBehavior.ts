@@ -1,7 +1,5 @@
 import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
-import type { XY } from '../../Point';
 import { Point } from '../../Point';
-import { stopEvent } from '../../util/dom_event';
 import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
 import type { ITextEvents } from './ITextBehavior';
@@ -19,12 +17,6 @@ export abstract class ITextClickBehavior<
   SProps extends SerializedTextProps = SerializedTextProps,
   EventSpec extends ITextEvents = ITextEvents,
 > extends ITextKeyBehavior<Props, SProps, EventSpec> {
-  private declare __lastSelected: boolean;
-  private declare __lastClickTime: number;
-  private declare __lastLastClickTime: number;
-  private declare __lastPointer: XY | Record<string, never>;
-  private declare __newClickTime: number;
-
   protected draggableTextDelegate: DraggableTextDelegate;
 
   initBehavior() {
@@ -33,14 +25,7 @@ export abstract class ITextClickBehavior<
     this.on('mousedown:before', this._mouseDownHandlerBefore);
     this.on('mouseup', this.mouseUpHandler);
     this.on('mousedblclick', this.doubleClickHandler);
-    this.on('tripleclick', this.tripleClickHandler);
-
-    // Initializes "dbclick" event handler
-    this.__lastClickTime = +new Date();
-    // for triple click
-    this.__lastLastClickTime = +new Date();
-    this.__lastPointer = {};
-    this.on('mousedown', this.onMouseDown);
+    this.on('mousetripleclick', this.tripleClickHandler);
 
     this.draggableTextDelegate = new DraggableTextDelegate(
       this as unknown as IText,
@@ -78,35 +63,6 @@ export abstract class ITextClickBehavior<
   }
 
   /**
-   * Default event handler to simulate triple click
-   * @private
-   */
-  onMouseDown(options: TPointerEventInfo) {
-    if (!this.canvas) {
-      return;
-    }
-    this.__newClickTime = +new Date();
-    const newPointer = options.pointer;
-    if (this.isTripleClick(newPointer)) {
-      this.fire('tripleclick', options);
-      stopEvent(options.e);
-    }
-    this.__lastLastClickTime = this.__lastClickTime;
-    this.__lastClickTime = this.__newClickTime;
-    this.__lastPointer = newPointer;
-    this.__lastSelected = this.selected && !this.getActiveControl();
-  }
-
-  isTripleClick(newPointer: XY) {
-    return (
-      this.__newClickTime - this.__lastClickTime < 500 &&
-      this.__lastClickTime - this.__lastLastClickTime < 500 &&
-      this.__lastPointer.x === newPointer.x &&
-      this.__lastPointer.y === newPointer.y
-    );
-  }
-
-  /**
    * Default handler for double click, select a word
    */
   doubleClickHandler(options: TPointerEventInfo) {
@@ -114,6 +70,7 @@ export abstract class ITextClickBehavior<
       return;
     }
     this.selectWord(this.getSelectionStartFromPointer(options.e));
+    this.renderCursorOrSelection();
   }
 
   /**
@@ -124,6 +81,7 @@ export abstract class ITextClickBehavior<
       return;
     }
     this.selectLine(this.getSelectionStartFromPointer(options.e));
+    this.renderCursorOrSelection();
   }
 
   /**
@@ -205,9 +163,8 @@ export abstract class ITextClickBehavior<
       return;
     }
 
-    if (this.__lastSelected && !this.getActiveControl()) {
+    if (this.selected && !this.getActiveControl()) {
       this.selected = false;
-      this.__lastSelected = false;
       this.enterEditing(e);
       if (this.selectionStart === this.selectionEnd) {
         this.initDelayedCursor(true);

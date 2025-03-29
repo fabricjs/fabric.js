@@ -134,7 +134,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         '_onMouseOut',
         '_onMouseEnter',
         '_onContextMenu',
-        '_onDoubleClick',
+        '_onClick',
         '_onDragStart',
         '_onDragEnd',
         '_onDragProgress',
@@ -174,7 +174,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
     functor(canvasElement, 'wheel', this._onMouseWheel);
     functor(canvasElement, 'contextmenu', this._onContextMenu);
-    functor(canvasElement, 'dblclick', this._onDoubleClick);
+    functor(canvasElement, 'click', this._onClick);
     functor(canvasElement, 'dragstart', this._onDragStart);
     functor(canvasElement, 'dragend', this._onDragEnd);
     functor(canvasElement, 'dragover', this._onDragOver);
@@ -544,9 +544,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    * @param {Event} e Event object fired on mousedown
    */
-  private _onDoubleClick(e: TPointerEvent) {
+  private _onClick(e: TPointerEvent) {
+    const clicks = e.detail;
+    if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
-    this._handleEvent(e, 'dblclick');
+    clicks == 2 && this._handleEvent(e, 'dblclick');
+    clicks == 3 && this._handleEvent(e, 'tripleclick');
     this._resetTransformEventData();
   }
 

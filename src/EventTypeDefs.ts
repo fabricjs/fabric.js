@@ -258,7 +258,8 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | 'dblclick'}`,
+    | 'dblclick'
+    | 'tripleclick'}`,
   TPointerEventInfo
 > &
   Record<
@@ -278,6 +279,7 @@ export type TPointerEventNames =
   | WithBeforeSuffix<'move'>
   | WithBeforeSuffix<'up'>
   | 'dblclick'
+  | 'tripleclick'
   | 'wheel';
 
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
