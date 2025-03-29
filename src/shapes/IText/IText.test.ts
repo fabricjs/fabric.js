@@ -1,4 +1,4 @@
-import type { Canvas } from '../../canvas/Canvas';
+import { Canvas } from '../../canvas/Canvas';
 import '../../../jest.extend';
 import { Group } from '../Group';
 import { IText } from './IText';
@@ -39,5 +39,16 @@ describe('IText', () => {
         });
       },
     );
+  });
+  describe('Interaction with mouse and editing', () => {
+    it('_mouseDownHandlerBefore set up selected property', () => {
+      const iText = new IText('test need some word\nsecond line');
+      iText.canvas = new Canvas();
+      expect(iText.selected).toBe(undefined);
+      iText._mouseDownHandler({ e: { button: 0 }, alreadySelected: false });
+      expect(iText.selected).toBe(false);
+      iText._mouseDownHandler({ e: {}, alreadySelected: true });
+      expect(iText.selected).toBe(true);
+    });
   });
 });
