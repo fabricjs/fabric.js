@@ -402,7 +402,8 @@ export class IText<
       drawingCanvas = createCanvasElementFor(ctx.canvas);
       drawingCtx = drawingCanvas.getContext('2d')!;
       applyCanvasTransform(drawingCtx, this.canvas);
-      this.transform(drawingCtx);
+      const m = this.calcTransformMatrix();
+      drawingCtx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
 
     if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {

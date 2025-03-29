@@ -54,4 +54,8 @@ export async function testCase(canvas: fabric.Canvas) {
   canvas.centerObject(progenitor);
 
   canvas.add(progenitor);
+
+  canvas.setActiveObject(textbox);
+  textbox.enterEditing();
+  textbox.selectAll();
 }
