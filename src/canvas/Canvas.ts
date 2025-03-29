@@ -182,6 +182,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     functor(canvasElement, 'wheel', this._onMouseWheel);
     functor(canvasElement, 'contextmenu', this._onContextMenu);
     functor(canvasElement, 'click', this._onClick);
+    functor(canvasElement, 'dblclick', this._onClick);
     functor(canvasElement, 'dragstart', this._onDragStart);
     functor(canvasElement, 'dragend', this._onDragEnd);
     functor(canvasElement, 'dragover', this._onDragOver);
@@ -555,7 +556,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const clicks = e.detail;
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
-    clicks == 2 && this._handleEvent(e, 'dblclick');
+    clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
     clicks == 3 && this._handleEvent(e, 'tripleclick');
     this._resetTransformEventData();
   }
