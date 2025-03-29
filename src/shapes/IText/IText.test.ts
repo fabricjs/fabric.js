@@ -50,6 +50,5 @@ describe('IText', () => {
       iText._mouseDownHandler({ e: {}, alreadySelected: true });
       expect(iText.selected).toBe(true);
     });
-    it('_mouseUpHandler set selected as true if i');
   });
 });
