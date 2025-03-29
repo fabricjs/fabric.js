@@ -1,4 +1,4 @@
-import type { Canvas } from '../../canvas/Canvas';
+import { Canvas } from '../../canvas/Canvas';
 import '../../../jest.extend';
 import { Group } from '../Group';
 import { IText } from './IText';
@@ -40,41 +40,16 @@ describe('IText', () => {
       },
     );
   });
+  describe('Interaction with mouse and editing', () => {
+    it('_mouseDownHandlerBefore set up selected property', () => {
+      const iText = new IText('test need some word\nsecond line');
+      iText.canvas = new Canvas();
+      expect(iText.selected).toBe(undefined);
+      iText._mouseDownHandler({ e: { button: 0 }, alreadySelected: false });
+      expect(iText.selected).toBe(false);
+      iText._mouseDownHandler({ e: {}, alreadySelected: true });
+      expect(iText.selected).toBe(true);
+    });
+    it('_mouseUpHandler set selected as true if i');
+  });
 });
-
-// QUnit.test(
-//   '_mouseDownHandlerBefore set up selected property',
-//   function (assert) {
-//     var iText = new fabric.IText('test need some word\nsecond line');
-//     assert.equal(
-//       iText.selected,
-//       undefined,
-//       'iText has no selected property',
-//     );
-//     canvas.setActiveObject(iText);
-//     iText.canvas = canvas;
-//     iText._mouseDownHandlerBefore({ e: {} });
-//     assert.equal(iText.selected, true, 'iText has selected property');
-//     assert.equal(
-//       iText.__lastSelected,
-//       undefined,
-//       'iText has no __lastSelected property',
-//     );
-//   },
-// );
-
-// QUnit.test('_mouseUpHandler set selected as true', function (assert) {
-//   var iText = new fabric.IText('test');
-//   iText.initDelayedCursor = function () {};
-//   iText.renderCursorOrSelection = function () {};
-//   assert.equal(iText.selected, undefined, 'iText has no selected property');
-//   assert.equal(
-//     iText.__lastSelected,
-//     undefined,
-//     'iText has no __lastSelected property',
-//   );
-//   canvas.setActiveObject(iText);
-//   iText.canvas = canvas;
-//   iText.mouseUpHandler({ e: {} });
-//   assert.equal(iText.selected, true, 'iText has selected property');
-// });

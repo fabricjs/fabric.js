@@ -123,7 +123,7 @@ export abstract class ITextClickBehavior<
       }
       this.renderCursorOrSelection();
     }
-    this.selected = alreadySelected || this.isEditing;
+    this.selected ||= alreadySelected || this.isEditing;
   }
 
   /**
@@ -132,6 +132,7 @@ export abstract class ITextClickBehavior<
    */
   mouseUpHandler({ e, transform }: ObjectPointerEvents['mouseup']) {
     const didDrag = this.draggableTextDelegate.end(e);
+
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
 
@@ -143,6 +144,7 @@ export abstract class ITextClickBehavior<
         return;
       }
     }
+
     if (
       !this.editable ||
       (this.group && !this.group.interactive) ||
