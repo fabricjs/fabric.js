@@ -366,6 +366,8 @@ export abstract class ITextBehavior<
     this.selectionEnd = newSelectionEnd;
     this._fireSelectionChanged();
     this._updateTextarea();
+    // remove next major, for now it renders twice :(
+    this.renderCursorOrSelection();
   }
 
   /**
