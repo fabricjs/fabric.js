@@ -54,17 +54,4 @@ export async function testCase(canvas: fabric.Canvas) {
   canvas.centerObject(progenitor);
 
   canvas.add(progenitor);
-
-  renderLoop();
-
-  function renderLoop() {
-    canvas.renderAll();
-    const active = canvas.getActiveObject();
-    if (active && active.renderCursorOrSelection) {
-      active.renderCursorOrSelection();
-    }
-    fabric.util.requestAnimFrame(() => {
-      renderLoop();
-    });
-  }
 }

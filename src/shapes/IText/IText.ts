@@ -20,6 +20,7 @@ import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
 import type { FabricObject } from '../Object/FabricObject';
 import { createCanvasElementFor } from '../../util/misc/dom';
+import { applyCanvasTransform } from '../../util/internals/applyCanvasTransform';
 
 export type CursorBoundaries = {
   left: number;
@@ -393,17 +394,14 @@ export class IText<
     const boundaries = this._getCursorBoundaries();
 
     const ancestors = this.findAncestorsWithClipPath();
-
+    const hasAncestorsWithClipping = ancestors.length > 0;
     let drawingCtx: CanvasRenderingContext2D = ctx;
     let drawingCanvas: HTMLCanvasElement | undefined = undefined;
-    if (ancestors.length > 0) {
+    if (hasAncestorsWithClipping) {
       // we have some clipPath, we need to draw the selection on an intermediate layer.
       drawingCanvas = createCanvasElementFor(ctx.canvas);
       drawingCtx = drawingCanvas.getContext('2d')!;
-      const v = this.canvas.viewportTransform;
-      const scaling = this.canvas.getRetinaScaling();
-      drawingCtx.scale(scaling, scaling);
-      drawingCtx.transform(v[0], v[1], v[2], v[3], v[4], v[5]);
+      applyCanvasTransform(drawingCtx, this.canvas);
       this.transform(drawingCtx);
     }
 
@@ -413,25 +411,28 @@ export class IText<
       this.renderSelection(drawingCtx, boundaries);
     }
 
-    if (ancestors.length > 0) {
-      const clippingCanvas = createCanvasElementFor(ctx.canvas);
-      const clippingCtx = clippingCanvas.getContext('2d')!;
+    if (hasAncestorsWithClipping) {
+      // we need a neutral context.
+      // this won't work for nested clippaths in which a clippath
+      // has its own clippath
       for (const ancestor of ancestors) {
-        // each ancestor will creat a clipPath as big as it needs,
-        const context = {
-          zoomX: this.zoomX,
-          zoomY: this.zoomY,
-          cacheTranslationX: this.cacheTranslationX,
-          cacheTranslationY: this.cacheTranslationY,
-          width,
-          height,
-          parentClipPaths: [],
-        };
-        this._drawClipPath(ctx, this.clipPath, context);
+        const clipPath = ancestor.clipPath!;
+        const clippingCanvas = createCanvasElementFor(ctx.canvas);
+        const clippingCtx = clippingCanvas.getContext('2d')!;
+        applyCanvasTransform(clippingCtx, this.canvas);
+        // position the ctx in the center of the outer ancestor
+        if (!clipPath.absolutePositioned) {
+          const m = ancestor.calcTransformMatrix();
+          clippingCtx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+        clipPath.transform(clippingCtx);
+        // we assign an empty drawing context, we don't plan to have this working for nested clippaths for now
+        clipPath.drawObject(clippingCtx, true, {});
+        this.drawClipPathOnCache(drawingCtx, clipPath, clippingCanvas);
       }
     }
 
-    if (ctx !== drawingCtx) {
+    if (hasAncestorsWithClipping) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.drawImage(drawingCanvas!, 0, 0);
     }
@@ -452,7 +453,7 @@ export class IText<
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let obj: FabricObject | undefined = this;
     while (obj) {
-      if (obj.clipPath && !obj.clipPath.absolutePositioned) {
+      if (obj.clipPath) {
         clipPathAncestors.push(obj);
       }
       obj = obj.parent;
@@ -608,7 +609,7 @@ export class IText<
 
   /**
    * Render the cursor at the given selectionStart.
-   *
+   * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
   _renderCursor(
     ctx: CanvasRenderingContext2D,
