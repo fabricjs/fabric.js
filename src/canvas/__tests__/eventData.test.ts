@@ -54,9 +54,13 @@ describe('Canvas event data', () => {
     'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
-      canvas
-        .getSelectionElement()
-        .dispatchEvent(new MouseEvent(type, { clientX: 50, clientY: 50 }));
+      canvas.getSelectionElement().dispatchEvent(
+        new MouseEvent(type, {
+          clientX: 50,
+          clientY: 50,
+          detail: type === 'dblclick' ? 2 : undefined,
+        }),
+      );
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
     },
   );
