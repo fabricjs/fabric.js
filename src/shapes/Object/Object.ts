@@ -823,7 +823,6 @@ export class FabricObject<
       ctx.globalCompositeOperation = 'destination-in';
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    //ctx.scale(1 / 2, 1 / 2);
     ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
