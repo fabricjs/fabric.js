@@ -277,11 +277,6 @@ type TPointerEvents<Prefix extends string> = Record<
     TPointerEventInfo & {
       isClick: boolean;
       /**
-       * Indicates if the target or current target where already selected
-       * before the cycle of mouse down -> mouse up started
-       */
-      alreadySelected: boolean;
-      /**
        * The targets at the moment of mouseup that could be different from the
        * target at the moment of mouse down in case of a drag action for example
        */

@@ -65,6 +65,10 @@ export abstract class ITextBehavior<
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
 
+  /**
+   * Keeps track if the IText object was selected before the actual click.
+   * This because we want to delay enter editing by a click.
+   */
   protected declare selected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
   protected declare _savedProps?: {
@@ -217,6 +221,14 @@ export abstract class ITextBehavior<
     this._fireSelectionChanged();
     this._updateTextarea();
     return this;
+  }
+
+  /**
+   * Selects entire text and updates the visual state
+   */
+  cmdAll() {
+    this.selectAll();
+    this.renderCursorOrSelection();
   }
 
   /**

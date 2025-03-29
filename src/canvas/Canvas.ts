@@ -111,6 +111,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
 
+  /**
+   * a boolean that keeps track of the click state during a cycle of mouse down/up.
+   * If a mouse move occurs it becomes false.
+   * Is true by default, turns false on mouse move.
+   * Used to determine if a mouseUp is a click
+   */
   private _isClick: boolean;
 
   textEditingManager = new TextEditingManager(this);

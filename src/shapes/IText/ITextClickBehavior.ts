@@ -123,17 +123,14 @@ export abstract class ITextClickBehavior<
       }
       this.renderCursorOrSelection();
     }
+    this.selected = alreadySelected || this.isEditing;
   }
 
   /**
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler({
-    e,
-    transform,
-    alreadySelected,
-  }: ObjectPointerEvents['mouseup']) {
+  mouseUpHandler({ e, transform }: ObjectPointerEvents['mouseup']) {
     const didDrag = this.draggableTextDelegate.end(e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
@@ -156,7 +153,7 @@ export abstract class ITextClickBehavior<
       return;
     }
 
-    if (alreadySelected && !this.getActiveControl()) {
+    if (this.selected && !this.getActiveControl()) {
       this.enterEditing(e);
       if (this.selectionStart === this.selectionEnd) {
         this.initDelayedCursor(true);
