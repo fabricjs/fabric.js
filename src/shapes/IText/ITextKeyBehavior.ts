@@ -173,6 +173,7 @@ export abstract class ITextKeyBehavior<
    */
   onInput(this: this & { hiddenTextarea: HTMLTextAreaElement }, e: Event) {
     const fromPaste = this.fromPaste;
+    const { value, selectionStart, selectionEnd } = this.hiddenTextarea;
     this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
@@ -192,14 +193,12 @@ export abstract class ITextKeyBehavior<
       return;
     }
     // decisions about style changes.
-    const nextText = this._splitTextIntoLines(
-        this.hiddenTextarea.value,
-      ).graphemeText,
+    const nextText = this._splitTextIntoLines(value).graphemeText,
       charCount = this._text.length,
       nextCharCount = nextText.length,
-      selectionStart = this.selectionStart,
-      selectionEnd = this.selectionEnd,
-      selection = selectionStart !== selectionEnd;
+      _selectionStart = this.selectionStart,
+      _selectionEnd = this.selectionEnd,
+      selection = _selectionStart !== _selectionEnd;
     let copiedStyle: TextStyleDeclaration[] | undefined,
       removedText,
       charDiff = nextCharCount - charCount,
@@ -207,22 +206,22 @@ export abstract class ITextKeyBehavior<
       removeTo;
 
     const textareaSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value,
+      selectionStart,
+      selectionEnd,
+      value,
     );
-    const backDelete = selectionStart > textareaSelection.selectionStart;
+    const backDelete = _selectionStart > textareaSelection.selectionStart;
 
     if (selection) {
-      removedText = this._text.slice(selectionStart, selectionEnd);
-      charDiff += selectionEnd - selectionStart;
+      removedText = this._text.slice(_selectionStart, _selectionEnd);
+      charDiff += _selectionEnd - _selectionStart;
     } else if (nextCharCount < charCount) {
       if (backDelete) {
-        removedText = this._text.slice(selectionEnd + charDiff, selectionEnd);
+        removedText = this._text.slice(_selectionEnd + charDiff, _selectionEnd);
       } else {
         removedText = this._text.slice(
-          selectionStart,
-          selectionStart - charDiff,
+          _selectionStart,
+          _selectionStart - charDiff,
         );
       }
     }
@@ -236,8 +235,8 @@ export abstract class ITextKeyBehavior<
         // we want to copy the style before the cursor OR the style at the cursor if selection
         // is bigger than 0.
         copiedStyle = this.getSelectionStyles(
-          selectionStart,
-          selectionStart + 1,
+          _selectionStart,
+          _selectionStart + 1,
           false,
         );
         // now duplicate the style one for each inserted text.
@@ -249,15 +248,15 @@ export abstract class ITextKeyBehavior<
         );
       }
       if (selection) {
-        removeFrom = selectionStart;
-        removeTo = selectionEnd;
+        removeFrom = _selectionStart;
+        removeTo = _selectionEnd;
       } else if (backDelete) {
         // detect differences between forwardDelete and backDelete
-        removeFrom = selectionEnd - removedText.length;
-        removeTo = selectionEnd;
+        removeFrom = _selectionEnd - removedText.length;
+        removeTo = _selectionEnd;
       } else {
-        removeFrom = selectionEnd;
-        removeTo = selectionEnd + removedText.length;
+        removeFrom = _selectionEnd;
+        removeTo = _selectionEnd + removedText.length;
       }
       this.removeStyleFromTo(removeFrom, removeTo);
     }
@@ -270,7 +269,7 @@ export abstract class ITextKeyBehavior<
       ) {
         copiedStyle = copyPasteData.copiedTextStyle;
       }
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+      this.insertNewStyleBlock(insertedText, _selectionStart, copiedStyle);
     }
     updateAndFire();
   }
