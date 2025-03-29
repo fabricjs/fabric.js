@@ -187,7 +187,7 @@ describe('IText _tick', () => {
     iText.enterEditing();
     expect(_tickMock).toHaveBeenCalledWith();
     _tickMock.mockClear();
-    iText.__lastSelected = true;
+    iText.selected = true;
     iText.mouseUpHandler({
       e: {
         button: 0,
