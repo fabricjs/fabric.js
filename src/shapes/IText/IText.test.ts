@@ -41,3 +41,40 @@ describe('IText', () => {
     );
   });
 });
+
+// QUnit.test(
+//   '_mouseDownHandlerBefore set up selected property',
+//   function (assert) {
+//     var iText = new fabric.IText('test need some word\nsecond line');
+//     assert.equal(
+//       iText.selected,
+//       undefined,
+//       'iText has no selected property',
+//     );
+//     canvas.setActiveObject(iText);
+//     iText.canvas = canvas;
+//     iText._mouseDownHandlerBefore({ e: {} });
+//     assert.equal(iText.selected, true, 'iText has selected property');
+//     assert.equal(
+//       iText.__lastSelected,
+//       undefined,
+//       'iText has no __lastSelected property',
+//     );
+//   },
+// );
+
+// QUnit.test('_mouseUpHandler set selected as true', function (assert) {
+//   var iText = new fabric.IText('test');
+//   iText.initDelayedCursor = function () {};
+//   iText.renderCursorOrSelection = function () {};
+//   assert.equal(iText.selected, undefined, 'iText has no selected property');
+//   assert.equal(
+//     iText.__lastSelected,
+//     undefined,
+//     'iText has no __lastSelected property',
+//   );
+//   canvas.setActiveObject(iText);
+//   iText.canvas = canvas;
+//   iText.mouseUpHandler({ e: {} });
+//   assert.equal(iText.selected, true, 'iText has selected property');
+// });

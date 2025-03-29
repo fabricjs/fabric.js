@@ -571,6 +571,9 @@
       event.initEvent(eventType, true, true);
       event.clientX = 5;
       event.clientY = 5;
+      if (eventType === 'dblclick') {
+        event.details = 2;
+      }
       c.upperCanvasEl.dispatchEvent(event);
       assert.equal(counter, 1, eventname + ' fabric event fired');
       assert.equal(target, rect, eventname + ' on canvas has rect as a target');
