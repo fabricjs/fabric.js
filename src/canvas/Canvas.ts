@@ -4,6 +4,7 @@ import type {
   CanvasEvents,
   DragEventData,
   ObjectEvents,
+  TEventsExtraData,
   TPointerEvent,
   TPointerEventNames,
   Transform,
@@ -914,7 +915,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {TPointerEvent} e event from mouse
    * @param {TPointerEventNames} eventType
    */
-  _handleEvent<T extends TPointerEventNames>(e: TPointerEvent, eventType: T) {
+  _handleEvent<T extends TPointerEventNames>(
+    e: TPointerEvent,
+    eventType: T,
+    extraData?: TEventsExtraData[T],
+  ) {
     const target = this._target,
       targets = this.targets || [],
       options: CanvasEvents[`mouse:${T}`] = {
@@ -930,6 +935,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
               // set by the preceding `findTarget` call
               currentSubTargets: this.targets,
             }
+          : {}),
+        ...(eventType === 'down:before' || eventType === 'down'
+          ? extraData
           : {}),
       } as CanvasEvents[`mouse:${T}`];
     this.fire(`mouse:${eventType}`, options);
@@ -954,7 +962,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const pointer = this.getScenePoint(e);
     this.freeDrawingBrush &&
       this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
-    this._handleEvent(e, 'down');
+    this._handleEvent(e, 'down', { alreadySelected: false });
   }
 
   /**
@@ -1007,13 +1015,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._handleEvent(e, 'down:before');
 
     let target: FabricObject | undefined = this._target;
-
+    let alreadySelected = !!target && target === this._activeObject;
     // if right/middle click just fire events
     const { button } = e as MouseEvent;
     if (button) {
       ((this.fireMiddleClick && button === 1) ||
         (this.fireRightClick && button === 2)) &&
-        this._handleEvent(e, 'down');
+        this._handleEvent(e, 'down', {
+          alreadySelected,
+        });
       this._resetTransformEventData();
       return;
     }
@@ -1064,8 +1074,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       };
     }
 
+    // check again because things could have changed
+    alreadySelected = !!target && target === this._activeObject;
     if (target) {
-      const alreadySelected = target === this._activeObject;
       if (target.selectable && target.activeOn === 'down') {
         this.setActiveObject(target, e);
       }
@@ -1092,7 +1103,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
     //  run before firing the `down` event to give the dev a chance to populate it themselves
     shouldRender && (this._objectsToRender = undefined);
-    this._handleEvent(e, 'down');
+    this._handleEvent(e, 'down', { alreadySelected: alreadySelected });
     // we must renderAll so that we update the visuals
     shouldRender && this.requestRenderAll();
   }

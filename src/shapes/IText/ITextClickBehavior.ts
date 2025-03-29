@@ -1,4 +1,8 @@
-import type { TPointerEvent, TPointerEventInfo } from '../../EventTypeDefs';
+import type {
+  ObjectPointerEvents,
+  TPointerEvent,
+  TPointerEventInfo,
+} from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import { invertTransform } from '../../util/misc/matrix';
 import { DraggableTextDelegate } from './DraggableTextDelegate';
@@ -22,7 +26,6 @@ export abstract class ITextClickBehavior<
   initBehavior() {
     // Initializes event handlers related to cursor or selection
     this.on('mousedown', this._mouseDownHandler);
-    this.on('mousedown:before', this._mouseDownHandlerBefore);
     this.on('mouseup', this.mouseUpHandler);
     this.on('mousedblclick', this.doubleClickHandler);
     this.on('mousetripleclick', this.tripleClickHandler);
@@ -92,7 +95,7 @@ export abstract class ITextClickBehavior<
    * initializing a mousedDown on a text area will cancel fabricjs knowledge of
    * current compositionMode. It will be set to false.
    */
-  _mouseDownHandler({ e }: TPointerEventInfo) {
+  _mouseDownHandler({ e, alreadySelected }: ObjectPointerEvents['mousedown']) {
     if (
       !this.canvas ||
       !this.editable ||
@@ -108,7 +111,7 @@ export abstract class ITextClickBehavior<
 
     this.canvas.textEditingManager.register(this);
 
-    if (this.selected) {
+    if (alreadySelected) {
       this.inCompositionMode = false;
       this.setCursorByClick(e);
     }
@@ -123,24 +126,14 @@ export abstract class ITextClickBehavior<
   }
 
   /**
-   * Default event handler for the basic functionalities needed on mousedown:before
-   * can be overridden to do something different.
-   * Scope of this implementation is: verify the object is already selected when mousing down
-   */
-  _mouseDownHandlerBefore({ e }: TPointerEventInfo) {
-    if (!this.canvas || !this.editable || notALeftClick(e)) {
-      return;
-    }
-    // we want to avoid that an object that was selected and then becomes unselectable,
-    // may trigger editing mode in some way.
-    this.selected = this === this.canvas._activeObject;
-  }
-
-  /**
    * standard handler for mouse up, overridable
    * @private
    */
-  mouseUpHandler({ e, transform }: TPointerEventInfo) {
+  mouseUpHandler({
+    e,
+    transform,
+    alreadySelected,
+  }: ObjectPointerEvents['mouseup']) {
     const didDrag = this.draggableTextDelegate.end(e);
     if (this.canvas) {
       this.canvas.textEditingManager.unregister(this);
@@ -163,16 +156,13 @@ export abstract class ITextClickBehavior<
       return;
     }
 
-    if (this.selected && !this.getActiveControl()) {
-      this.selected = false;
+    if (alreadySelected && !this.getActiveControl()) {
       this.enterEditing(e);
       if (this.selectionStart === this.selectionEnd) {
         this.initDelayedCursor(true);
       } else {
         this.renderCursorOrSelection();
       }
-    } else {
-      this.selected = true;
     }
   }
 
