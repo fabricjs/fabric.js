@@ -2,7 +2,7 @@ import type { renderTestType } from '../renderingCases';
 
 export const selectedTextWithClipPath: renderTestType = {
   size: [450, 450],
-  percentage: 0.05,
+  percentage: 0.03,
   title: 'Selected text with clipping',
   golden: 'selectedClippedText.png',
   renderFunction: async function render(canvas, fabric) {
@@ -36,7 +36,6 @@ export const selectedTextWithClipPath: renderTestType = {
       originX: 'center',
       originY: 'center',
       radius: 150,
-      width: textbox.width,
     });
 
     textbox.clipPath = circle;
@@ -63,12 +62,13 @@ export const selectedTextWithClipPath: renderTestType = {
     canvas.centerObject(progenitor);
 
     canvas.add(progenitor);
-    canvas.setActiveObject(textbox);
+    // canvas.setActiveObject(textbox);
     textbox.enterEditing();
     textbox.selectAll();
     textbox.renderCursorOrSelection();
     await new Promise((resolve) => {
       setTimeout(resolve, 32);
     });
+    canvas.preserveObjectStacking = false;
   },
 };

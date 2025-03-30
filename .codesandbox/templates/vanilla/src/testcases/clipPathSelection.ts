@@ -31,6 +31,14 @@ export async function testCase(canvas: fabric.Canvas) {
     noScaleCache: false,
   });
 
+  const circle = new fabric.Circle({
+    fill: '#ccc',
+    objectCaching: false,
+    radius: 150,
+  });
+
+  textbox.clipPath = circle;
+
   const rect2 = new fabric.Rect({
     fill: '#ccc',
     objectCaching: false,
@@ -58,4 +66,5 @@ export async function testCase(canvas: fabric.Canvas) {
   canvas.setActiveObject(textbox);
   textbox.enterEditing();
   textbox.selectAll();
+  textbox.renderCursorOrSelection();
 }
