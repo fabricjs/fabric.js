@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(IText): Allow text or container clipPath to clip the text selection or cursor [#104634](https://github.com/fabricjs/fabric.js/pull/10434)
 - refactor(): Remove custom triple click logic [#10478](https://github.com/fabricjs/fabric.js/pull/10478)
 - chore(): Update qunit and nyc to latest [#10468](https://github.com/fabricjs/fabric.js/pull/10468)
 - fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)

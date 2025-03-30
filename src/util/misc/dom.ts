@@ -33,6 +33,11 @@ export const copyCanvasElement = (
   return newCanvas;
 };
 
+/**
+ * Creates a canvas element as big as another
+ * @param {CanvasElement} canvas to copy size and content of
+ * @return {CanvasElement} initialized canvas element
+ */
 export const createCanvasElementFor = (
   canvas: HTMLCanvasElement | ImageData | HTMLImageElement | TSize,
 ): HTMLCanvasElement => {
@@ -47,7 +52,7 @@ export const createCanvasElementFor = (
  * possibly useless
  * @param {CanvasElement} canvasEl to copy size and content of
  * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
- * @param {Number} quality <= 1 and > 0
+ * @param {number} quality <= 1 and > 0
  * @return {String} data url
  */
 export const toDataURL = (

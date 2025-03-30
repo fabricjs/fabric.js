@@ -293,6 +293,6 @@ export const canvasDefaults: TOptions<CanvasOptions> = {
   enablePointerEvents: false,
 
   containerClass: 'canvas-container',
-
+  // turn to true for fabric 7.0
   preserveObjectStacking: false,
 };
