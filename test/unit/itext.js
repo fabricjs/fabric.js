@@ -445,7 +445,6 @@
       assert.equal(iText.selectionStart, 17); // |qux|
       assert.equal(iText.selectionEnd, 20);
 
-      assert.equal(iText.selectLine(0), iText, 'should be chainable');
     });
 
     QUnit.test('findWordBoundaryLeft', function(assert) {

@@ -7,8 +7,12 @@ import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
-import type { FabricText } from './Text';
+import type { FabricText, GraphemeBBox } from './Text';
 import { STROKE, FILL } from '../../constants';
+import { createRotateMatrix } from '../../util/misc/matrix';
+import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
+import { Point } from '../../Point';
+import { matrixToSVG } from '../../util/misc/svgExport';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -31,11 +35,23 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   toSVG(this: TextSVGExportMixin & FabricText, reviver?: TSVGReviver): string {
-    return this._createBaseSVGMarkup(this._toSVG(), {
-      reviver,
-      noStyle: true,
-      withShadow: true,
-    });
+    const textSvg = this._createBaseSVGMarkup(this._toSVG(), {
+        reviver,
+        noStyle: true,
+        withShadow: true,
+      }),
+      path = this.path;
+    if (path) {
+      return (
+        textSvg +
+        path._createBaseSVGMarkup(path._toSVG(), {
+          reviver,
+          withShadow: true,
+          additionalTransform: matrixToSVG(this.calcOwnMatrix()),
+        })
+      );
+    }
+    return textSvg;
   }
 
   private _getSVGLeftTopOffsets(this: TextSVGExportMixin & FabricText) {
@@ -142,22 +158,34 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     styleDecl: TextStyleDeclaration,
     left: number,
     top: number,
+    charBox: GraphemeBBox,
   ) {
+    const numFractionDigit = config.NUM_FRACTION_DIGITS;
     const styleProps = this.getSvgSpanStyles(
         styleDecl,
         char !== char.trim() || !!char.match(multipleSpacesRegex),
       ),
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '';
+      dySpan = dy ? ` dy="${toFixed(dy, numFractionDigit)}" ` : '',
+      { angle, renderLeft, renderTop, width } = charBox;
+    let angleAttr = '';
+    if (renderLeft !== undefined) {
+      const wBy2 = width / 2;
+      angle &&
+        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}"`);
+      const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
+      m[4] = renderLeft!;
+      m[5] = renderTop!;
+      const renderPoint = new Point(-wBy2, 0).transform(m);
+      left = renderPoint.x;
+      top = renderPoint.y;
+    }
 
-    return `<tspan x="${toFixed(
-      left,
-      config.NUM_FRACTION_DIGITS,
-    )}" y="${toFixed(
+    return `<tspan x="${toFixed(left, numFractionDigit)}" y="${toFixed(
       top,
-      config.NUM_FRACTION_DIGITS,
-    )}" ${dySpan}${fillStyles}>${escapeXml(char)}</tspan>`;
+      numFractionDigit,
+    )}" ${dySpan}${angleAttr}${fillStyles}>${escapeXml(char)}</tspan>`;
   }
 
   private _setSVGTextLineText(
@@ -181,7 +209,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textTopOffset +=
       (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
     for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing;
+      timeToRender = i === len || this.charSpacing || this.path;
       charsToRender += line[i];
       charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
@@ -196,7 +224,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         }
       }
       if (!timeToRender) {
-        // if we have charSpacing, we render char by char
+        // if we have charSpacing or a path, we render char by char
         actualStyle =
           actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
         nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
@@ -210,6 +238,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
             style,
             textLeftOffset,
             textTopOffset,
+            charBox,
           ),
         );
         charsToRender = '';

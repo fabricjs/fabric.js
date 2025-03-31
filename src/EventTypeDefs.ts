@@ -258,14 +258,33 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | 'dblclick'}`,
+    | 'dblclick'
+    | 'tripleclick'}`,
   TPointerEventInfo
 > &
+  Record<
+    `${Prefix}down`,
+    TPointerEventInfo & {
+      /**
+       * Indicates if the target or current target where already selected
+       * before the cycle of mouse down -> mouse up started
+       */
+      alreadySelected: boolean;
+    }
+  > &
   Record<
     `${Prefix}${WithBeforeSuffix<'up'>}`,
     TPointerEventInfo & {
       isClick: boolean;
+      /**
+       * The targets at the moment of mouseup that could be different from the
+       * target at the moment of mouse down in case of a drag action for example
+       */
       currentTarget?: FabricObject;
+      /**
+       * The subtargets at the moment of mouseup that could be different from the
+       * target at the moment of mouse down in case of a drag action for example
+       */
       currentSubTargets: FabricObject[];
     }
   > &
@@ -278,6 +297,7 @@ export type TPointerEventNames =
   | WithBeforeSuffix<'move'>
   | WithBeforeSuffix<'up'>
   | 'dblclick'
+  | 'tripleclick'
   | 'wheel';
 
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
@@ -351,3 +371,6 @@ export interface CanvasEvents
   'text:editing:entered': { target: IText } & Partial<TEvent>;
   'text:editing:exited': { target: IText };
 }
+
+export type TEventsExtraData = Record<PropertyKey, Record<PropertyKey, never>> &
+  Record<'down', { alreadySelected: boolean }>;

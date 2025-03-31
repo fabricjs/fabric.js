@@ -1,12 +1,7 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE, FILL, NONE } from '../../constants';
-import type {
-  TBBox,
-  TMat2D,
-  SVGElementName,
-  SupportedSVGUnit,
-} from '../../typedefs';
+import type { TBBox, SVGElementName, SupportedSVGUnit } from '../../typedefs';
 import { toFixed } from './toFixed';
 
 /**
@@ -119,18 +114,6 @@ export const parsePreserveAspectRatioAttribute = (
     alignY,
   };
 };
-
-/**
- * given an array of 6 number returns something like `"matrix(...numbers)"`
- * @param {TMat2D} transform an array with 6 numbers
- * @return {String} transform matrix for svg
- */
-export const matrixToSVG = (transform: TMat2D) =>
-  'matrix(' +
-  transform
-    .map((value) => toFixed(value, config.NUM_FRACTION_DIGITS))
-    .join(' ') +
-  ')';
 
 /**
  * Adobe Illustrator (at least CS5) is unable to render rgba()-based fill values
