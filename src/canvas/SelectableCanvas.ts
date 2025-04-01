@@ -1026,7 +1026,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
-    document.body.appendChild(this.pixelFindCanvasEl);
     this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
