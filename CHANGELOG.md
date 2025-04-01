@@ -1,8 +1,11 @@
 # Changelog
 
-## [6.6.2]
+## [next]
 
 - chore(): Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
+
+## [6.6.2]
+
 - feat(IText): Allow text or container clipPath to clip the text selection or cursor [#104634](https://github.com/fabricjs/fabric.js/pull/10434)
 - refactor(): Remove custom triple click logic [#10478](https://github.com/fabricjs/fabric.js/pull/10478)
 - chore(): Update qunit and nyc to latest [#10468](https://github.com/fabricjs/fabric.js/pull/10468)
