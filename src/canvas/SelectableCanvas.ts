@@ -702,13 +702,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
   }
 
-  // targetInAS = this.searchPossibleTargets([activeObject], pointer);
-  // // searchPossibleTargets mutates this.targets so we have to save it internally.
-  // // this is subpar and needs to be fixed
-  // subTargetAs = this.targets;
-  // target = this.searchPossibleTargets(this._objects, pointer);
-  // subTargets = this.targets;
-
   /**
    * Method that determines what object we are clicking on
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
