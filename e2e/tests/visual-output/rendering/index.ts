@@ -13,6 +13,7 @@ beforeRenderTest(
         boundFunction: async () => {
           canvas.clear();
           canvas.setZoom(1);
+          canvas.backgroundColor = 'white';
           canvas.setDimensions({
             width: renderTest.size[0],
             height: renderTest.size[1],

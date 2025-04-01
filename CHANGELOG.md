@@ -3,6 +3,15 @@
 ## [next]
 
 - ci(): Switch from Jest to Vitest [#10420](https://github.com/fabricjs/fabric.js/pull/10420)
+- chore(): Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
+
+## [6.6.2]
+
+- feat(IText): Allow text or container clipPath to clip the text selection or cursor [#104634](https://github.com/fabricjs/fabric.js/pull/10434)
+- refactor(): Remove custom triple click logic [#10478](https://github.com/fabricjs/fabric.js/pull/10478)
+- chore(): Update qunit and nyc to latest [#10468](https://github.com/fabricjs/fabric.js/pull/10468)
+- fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
+- fix(FabricImage): add href parsing fixes for #10421 [#10465](https://github.com/fabricjs/fabric.js/pull/10465)
 
 ## [6.6.1]
 

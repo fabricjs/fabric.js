@@ -34,7 +34,7 @@ import {
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
-import { matrixToSVG } from '../util/misc/svgParsing';
+import { matrixToSVG } from '../util/misc/svgExport';
 import { toFixed } from '../util/misc/toFixed';
 import { isFiller, isPattern, isTextObject } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';

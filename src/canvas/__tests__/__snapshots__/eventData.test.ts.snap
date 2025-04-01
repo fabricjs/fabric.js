@@ -458,6 +458,7 @@ exports[`Canvas event data > HTML event "mousedown" should fire a corresponding 
         "x": -30,
         "y": -13,
       },
+      "alreadySelected": false,
       "e": MouseEvent {
         "isTrusted": false,
       },

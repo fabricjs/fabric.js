@@ -2,7 +2,7 @@
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
-  "version": "6.6.1",
+  "version": "6.6.2",
   "author": "Juriy Zaytsev <kangax@gmail.com>",
   "contributors": [
     {
@@ -68,10 +68,6 @@
     "babel-constants": "babel --no-babelrc src/constants.ts --extensions '.ts' --out-dir dist/src/ --config-file ./.babelrcAlt --plugins=babel-plugin-import-json-value",
     "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt"
   },
-  "optionalDependencies": {
-    "canvas": "^3.1.0",
-    "jsdom": "^26.0.0"
-  },
   "devDependencies": {
     "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.9",
@@ -108,11 +104,11 @@
     "kill-port": "^2.0.1",
     "micromatch": "^4.0.5",
     "moment": "^2.29.1",
-    "nyc": "^15.1.0",
+    "nyc": "^17.x",
     "pixelmatch": "^4.0.2",
     "prettier": "^3.3.1",
     "ps-list": "^8.1.0",
-    "qunit": "^2.17.2",
+    "qunit": "^2.24.1",
     "rollup": "^4.20.0",
     "semver": "^7.3.8",
     "source-map-support": "^0.5.21",
@@ -124,6 +120,11 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "overrides": {
+    "canvas": {
+      "canvas": "3.1.0"
+    }
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -167,5 +168,9 @@
       "require": null,
       "default": "./dist-extensions/fabric-extensions.min.js"
     }
+  },
+  "optionalDependencies": {
+    "canvas": "^3.1.0",
+    "jsdom": "^26.0.0"
   }
 }
