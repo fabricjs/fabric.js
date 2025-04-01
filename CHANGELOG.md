@@ -8,6 +8,8 @@
 - fix(Fabtictext) Svg export for text on a path [#10284](https://github.com/fabricjs/fabric.js/pull/10284)
 - fix(FabricImage): add href parsing fixes for #10421 [#10465](https://github.com/fabricjs/fabric.js/pull/10465)
 
+- fix(): When the perPixelTargetFind is set to true, the selected transparent graphic cannot be moved [10444](https://github.com/fabricjs/fabric.js/issues/10444)
+
 ## [6.6.1]
 
 - fix(): FabricImage was missing cachekey when filtering [#10441](https://github.com/fabricjs/fabric.js/pull/10441)
