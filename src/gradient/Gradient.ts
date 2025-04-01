@@ -5,7 +5,7 @@ import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
-import { matrixToSVG } from '../util/misc/svgParsing';
+import { matrixToSVG } from '../util/misc/svgExport';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
 import { parseColorStops } from './parser/parseColorStops';
 import { parseCoords } from './parser/parseCoords';

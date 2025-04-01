@@ -571,6 +571,7 @@ export class FabricImage<
       sourceWidth,
       sourceHeight,
       this._element as HTMLCanvasElement,
+      this.cacheKey,
     );
     if (
       this._originalElement.width !== this._element.width ||
@@ -780,6 +781,7 @@ export class FabricImage<
     'height',
     'preserveAspectRatio',
     'xlink:href',
+    'href',
     'crossOrigin',
     'image-rendering',
   ];
@@ -850,7 +852,7 @@ export class FabricImage<
       cssRules,
     );
     return this.fromURL(
-      parsedAttributes['xlink:href'],
+      parsedAttributes['xlink:href'] || parsedAttributes['href'],
       options,
       parsedAttributes,
     ).catch((err) => {

@@ -55,11 +55,11 @@ export {
 } from './misc/dom';
 export { toFixed } from './misc/toFixed';
 export {
-  matrixToSVG,
   parsePreserveAspectRatioAttribute,
   parseUnit,
   getSvgAttributes,
 } from './misc/svgParsing';
+export { matrixToSVG } from './misc/svgExport';
 export { groupSVGElements } from './misc/groupSVGElements';
 export { findScaleToFit, findScaleToCover } from './misc/findScaleTo';
 export { capValue } from './misc/capValue';

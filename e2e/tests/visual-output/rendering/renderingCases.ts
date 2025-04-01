@@ -3,7 +3,7 @@
  */
 
 import type { Canvas } from 'fabric';
-
+import { selectedTextWithClipPath } from './testcases/textWithClipPath';
 export type renderTestType = {
   size: [number, number];
   percentage: number;
@@ -256,6 +256,7 @@ export const renderTests: renderTestType[] = [
       img.applyFilters();
     },
   },
+  selectedTextWithClipPath,
 ];
 
 // function polygonWithStroke(canvas, callback) {

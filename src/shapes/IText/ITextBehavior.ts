@@ -1,8 +1,4 @@
-import type {
-  ObjectEvents,
-  TPointerEvent,
-  TPointerEventInfo,
-} from '../../EventTypeDefs';
+import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { FabricObject } from '../Object/FabricObject';
 import { FabricText } from '../Text/Text';
@@ -34,7 +30,6 @@ const reNonWord = /[ \n\.,;!\?\-]/;
 export type ITextEvents = ObjectEvents & {
   'selection:changed': never;
   changed: never | { index: number; action: string };
-  tripleclick: TPointerEventInfo;
   'editing:entered': never | { e: TPointerEvent };
   'editing:exited': never;
 };
@@ -70,6 +65,10 @@ export abstract class ITextBehavior<
   private declare _textBeforeEdit: string;
   protected declare __selectionStartOnMouseDown: number;
 
+  /**
+   * Keeps track if the IText object was selected before the actual click.
+   * This because we want to delay enter editing by a click.
+   */
   protected declare selected: boolean;
   protected declare cursorOffsetCache: { left?: number; top?: number };
   protected declare _savedProps?: {
@@ -225,6 +224,14 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * Selects entire text and updates the visual state
+   */
+  cmdAll() {
+    this.selectAll();
+    this.renderCursorOrSelection();
+  }
+
+  /**
    * Returns selected text
    * @return {String}
    */
@@ -342,12 +349,11 @@ export abstract class ITextBehavior<
   }
 
   /**
-   * TODO fix: selectionStart set as 0 will be ignored?
-   * Selects a word based on the index
+   * Selects the word that contains the char at index selectionStart
    * @param {Number} selectionStart Index of a character
    */
   selectWord(selectionStart?: number) {
-    selectionStart = selectionStart || this.selectionStart;
+    selectionStart = selectionStart ?? this.selectionStart;
     // search backwards
     const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
       // search forward
@@ -360,16 +366,16 @@ export abstract class ITextBehavior<
     this.selectionEnd = newSelectionEnd;
     this._fireSelectionChanged();
     this._updateTextarea();
+    // remove next major, for now it renders twice :(
     this.renderCursorOrSelection();
   }
 
   /**
-   * TODO fix: selectionStart set as 0 will be ignored?
-   * Selects a line based on the index
+   * Selects the line that contains selectionStart
    * @param {Number} selectionStart Index of a character
    */
   selectLine(selectionStart?: number) {
-    selectionStart = selectionStart || this.selectionStart;
+    selectionStart = selectionStart ?? this.selectionStart;
     const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
       newSelectionEnd = this.findLineBoundaryRight(selectionStart);
 
@@ -377,7 +383,6 @@ export abstract class ITextBehavior<
     this.selectionEnd = newSelectionEnd;
     this._fireSelectionChanged();
     this._updateTextarea();
-    return this;
   }
 
   /**
