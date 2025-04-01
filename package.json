@@ -168,7 +168,7 @@
       "types": "./dist-extensions/extensions/index.d.ts"
     }
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "canvas": "^3.1.0",
     "jsdom": "^26.0.0"
   }
