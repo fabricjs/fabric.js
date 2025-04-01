@@ -728,6 +728,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         // This is a common sense thing that works for everyone
         return activeObject;
       }
+      // We need to look for this in many cases, doesn't make sense to skip it.
       const globalTarget = this.searchPossibleTargets(this._objects, pointer);
       if (
         // otherwise if is an active selection
@@ -750,7 +751,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         } else {
           const subTargets = this.targets;
           this.targets = [];
-          const target = this.searchPossibleTargets(this._objects, pointer);
+          const target = globalTarget;
           if (
             e[this.altSelectionKey as ModifierKey] &&
             target &&
