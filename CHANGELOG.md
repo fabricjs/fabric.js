@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- chore(): Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
+
 ## [6.6.2]
 
 - feat(IText): Allow text or container clipPath to clip the text selection or cursor [#104634](https://github.com/fabricjs/fabric.js/pull/10434)
