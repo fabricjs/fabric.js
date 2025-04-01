@@ -702,6 +702,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
   }
 
+  // targetInAS = this.searchPossibleTargets([activeObject], pointer);
+  // // searchPossibleTargets mutates this.targets so we have to save it internally.
+  // // this is subpar and needs to be fixed
+  // subTargetAs = this.targets;
+  // target = this.searchPossibleTargets(this._objects, pointer);
+  // subTargets = this.targets;
+
   /**
    * Method that determines what object we are clicking on
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
@@ -720,17 +727,27 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
     this.targets = [];
 
+    // a lot of special cases for when the object is already active
     if (activeObject && aObjects.length >= 1) {
+      // it there is an active object and we click its corner
       if (activeObject.findControl(pointer, isTouchEvent(e))) {
-        // if we hit the corner of the active object, let's return that.
+        // let's keep the target on the corner.
+        // This is a common sense thing that works for everyone
         return activeObject;
-      } else if (
+      }
+      const globalTarget = this.searchPossibleTargets(this._objects, pointer);
+      if (
+        // otherwise if is an active selection
         aObjects.length > 1 &&
         // check pointer is over active selection and possibly perform `subTargetCheck`
-        this.searchPossibleTargets([activeObject], pointer)
+        activeObject === this._searchPossibleTargets([activeObject], pointer)
       ) {
-        // active selection does not select sub targets like normal groups
-        return activeObject;
+        if (globalTarget && globalTarget.group === activeObject) {
+          // active selection does not select sub targets like normal groups
+          return activeObject;
+        } else {
+          return globalTarget ?? activeObject;
+        }
       } else if (
         activeObject === this.searchPossibleTargets([activeObject], pointer)
       ) {
@@ -755,7 +772,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         }
       }
     }
-
     return this.searchPossibleTargets(this._objects, pointer);
   }
 
@@ -833,7 +849,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+   * Internal Function used to search inside objects an object that contains pointer in bounding box
    * @param {Array} [objects] objects array to look into
    * @param {Object} [pointer] x,y object of point coordinates we want to check.
    * @return {FabricObject} **top most object from given `objects`** that contains pointer
@@ -855,6 +871,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
             target._objects as FabricObject[],
             pointer,
           );
+          // being recursive this targets is filled up in reverse.
+          // target[0] is the last found target deep in the stack
           subTarget && this.targets.push(subTarget);
         }
         return target;
@@ -863,7 +881,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
+   * Function used to search inside objects an object that could be selected
    * @see {@link _searchPossibleTargets}
    * @param {FabricObject[]} [objects] objects array to look into
    * @param {Point} [pointer] coordinates from viewport to check.
@@ -1014,6 +1032,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this.pixelFindContext = this.pixelFindCanvasEl.getContext('2d', {
       willReadFrequently: true,
     })!;
+    document.body.appendChild(this.pixelFindCanvasEl);
     this.setTargetFindTolerance(this.targetFindTolerance);
   }
 
