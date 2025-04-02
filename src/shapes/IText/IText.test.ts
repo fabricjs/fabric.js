@@ -44,7 +44,7 @@ describe('IText', () => {
     );
   });
   describe('Interaction with mouse and editing', () => {
-    it('_mouseDownHandlerBefore set up selected property', () => {
+    test('_mouseDownHandlerBefore set up selected property', () => {
       const iText = new IText('test need some word\nsecond line');
       iText.canvas = new Canvas();
       expect(iText.selected).toBe(undefined);
