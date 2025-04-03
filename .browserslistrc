@@ -3,3 +3,6 @@
 chrome >= 88
 safari >= 13
 firefox >= 85
+edge >= 88
+Opera >= 73
+not ie > 0
