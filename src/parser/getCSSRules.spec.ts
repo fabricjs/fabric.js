@@ -1,5 +1,7 @@
 import { loadSVGFromString } from './loadSVGFromString';
 
+import { describe, expect, test } from 'vitest';
+
 describe('getCSSRules', () => {
   test('can load svgs with style tags with import statement', async () => {
     const loaded =

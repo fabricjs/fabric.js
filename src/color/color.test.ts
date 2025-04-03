@@ -1,5 +1,7 @@
 import { Color } from './Color';
 
+import { describe, expect, it, test } from 'vitest';
+
 describe('Color regex and conversion tests', () => {
   it('test color constructor', () => {
     const color1 = new Color();

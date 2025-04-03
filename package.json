@@ -49,15 +49,15 @@
     "start": "npm run sandboxscript -- start",
     "export": "npm run cli -- website export",
     "build-tests": "rollup -c ./rollup.test.config.js",
-    "test:jest": "jest",
+    "test:vitest": "vitest --run",
     "test": "npm run cli -- test",
     "sandbox": "npm run sandboxscript -- sandbox",
     "test:unit-browser": "npm run cli -- test --suite unit --launch --context chrome",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
     "test:coverage": "nyc --silent qunit test/node_test_setup.js test/lib test/unit",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
-    "test:jest:coverage": "jest --coverage=true",
-    "test:jest:coverage:watch": "jest --coverage=true --watch",
+    "test:vitest:coverage": "vitest --coverage=true --run",
+    "test:vitest:coverage:watch": "vitest --coverage=true",
     "coverage:merge": "nyc merge coveragefiles .nyc_output/merged-coverage.json",
     "local-server": "http-server ./ -d=false",
     "test:e2e": "npx playwright test --headed",
@@ -79,13 +79,13 @@
     "@rollup/plugin-terser": "^0.4.1",
     "@rollup/plugin-typescript": "^11.1.1",
     "@types/fs-extra": "^9.0.13",
-    "@types/jest": "^29.5.2",
     "@types/jsdom": "^20.0.1",
     "@types/lodash": "^4.14.180",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^17.0.21",
+    "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
+    "@vitest/coverage-v8": "^3.0.4",
     "axios": "^0.27.2",
     "babel-plugin-import-json-value": "^0.1.2",
     "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
@@ -100,7 +100,7 @@
     "http-server": "^14.1.1",
     "inquirer": "^8.2.1",
     "inquirer-checkbox-plus-prompt": "^1.0.1",
-    "jest": "^29.7.0",
+    "jest-snapshot": "^29.7.0",
     "kill-port": "^2.0.1",
     "micromatch": "^4.0.5",
     "moment": "^2.29.1",
@@ -115,10 +115,11 @@
     "testem": "^3.8.0",
     "tslib": "^2.6.3",
     "typescript": "^5.5.4",
-    "v8-to-istanbul": "^9.3.0"
+    "v8-to-istanbul": "^9.3.0",
+    "vitest": "^3.1.1"
   },
   "engines": {
-    "node": ">=16.20.0"
+    "node": ">=18.0.0"
   },
   "overrides": {
     "canvas": {
@@ -140,32 +141,32 @@
   "sideEffects": false,
   "exports": {
     ".": {
+      "node": null,
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.min.mjs",
       "require": "./dist/index.min.js",
-      "default": "./dist/index.min.js",
-      "node": null,
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.min.js"
     },
     "./es": {
+      "node": null,
+      "types": "./dist/index.d.ts",
       "import": "./dist/fabric.min.mjs",
       "require": null,
-      "default": null,
-      "node": null,
-      "types": "./dist/index.d.ts"
+      "default": null
     },
     "./node": {
+      "node": "./dist/index.node.cjs",
+      "types": "./dist/index.node.d.ts",
       "import": "./dist/index.node.mjs",
       "require": "./dist/index.node.cjs",
-      "default": "./dist/index.node.cjs",
-      "node": "./dist/index.node.cjs",
-      "types": "./dist/index.node.d.ts"
+      "default": "./dist/index.node.cjs"
     },
     "./extensions": {
+      "node": "./dist-extensions/index.mjs",
+      "types": "./dist-extensions/extensions/index.d.ts",
       "import": "./dist-extensions/index.mjs",
       "require": null,
-      "default": "./dist-extensions/fabric-extensions.min.js",
-      "node": "./dist-extensions/index.mjs",
-      "types": "./dist-extensions/extensions/index.d.ts"
+      "default": "./dist-extensions/fabric-extensions.min.js"
     }
   },
   "optionalDependencies": {

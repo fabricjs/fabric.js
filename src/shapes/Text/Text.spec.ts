@@ -1,8 +1,10 @@
-import { roundSnapshotOptions } from '../../../jest.extend';
+import { roundSnapshotOptions } from '../../../vitest.extend';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { Path } from '../Path';
 import { FabricText } from './Text';
+
+import { describe, expect, it, afterEach } from 'vitest';
 
 afterEach(() => {
   config.restoreDefaults();

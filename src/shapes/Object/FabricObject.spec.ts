@@ -1,5 +1,7 @@
 import { FabricObject } from './FabricObject';
 
+import { describe, expect, it, vi } from 'vitest';
+
 describe('FabricObject', () => {
   it('setCoords should calculate control coords only if canvas ref is set', () => {
     const object = new FabricObject();
@@ -8,7 +10,7 @@ describe('FabricObject', () => {
     object.setCoords();
     expect(object.aCoords).toBeDefined();
     expect(object.oCoords).toBeUndefined();
-    object.canvas = jest.fn();
+    object.canvas = vi.fn();
     object.setCoords();
     expect(object.aCoords).toBeDefined();
     expect(object.oCoords).toBeDefined();

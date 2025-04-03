@@ -1,5 +1,7 @@
 import { ClassRegistry } from './ClassRegistry';
 
+import { describe, expect, beforeEach, it } from 'vitest';
+
 describe('ClassRegistry', () => {
   let classRegistry: ClassRegistry;
   beforeEach(() => {

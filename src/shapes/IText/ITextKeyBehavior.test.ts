@@ -3,6 +3,7 @@ import { config } from '../../config';
 import { noop } from '../../constants';
 import { getEnv, getFabricWindow } from '../../env';
 import { IText } from './IText';
+import { expect, vi, describe, test, beforeEach, afterEach } from 'vitest';
 
 const keybEventShiftFalse = { shiftKey: false } as KeyboardEvent;
 const keybEventShiftTrue = { shiftKey: true } as KeyboardEvent;
@@ -10,8 +11,8 @@ const keybEventShiftTrue = { shiftKey: true } as KeyboardEvent;
 describe('IText move cursor', () => {
   let iText: IText;
   describe('selection changes', () => {
-    const _initDelayedMock = jest.fn(),
-      selectionMock = jest.fn();
+    const _initDelayedMock = vi.fn(),
+      selectionMock = vi.fn();
     beforeEach(() => {
       _initDelayedMock.mockClear();
       iText = new IText('test need some word\nsecond line');
@@ -23,7 +24,7 @@ describe('IText move cursor', () => {
       selectionMock.mockClear();
     });
     test('enterEditing does not use delayedCursor', () => {
-      jest.spyOn(iText, '_tick');
+      vi.spyOn(iText, '_tick');
       iText.enterEditing();
       // enter editing will set the cursor and set selection to 1
       expect(selectionMock).toHaveBeenCalledTimes(1);

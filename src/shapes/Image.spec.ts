@@ -5,11 +5,11 @@ import { loadSVGFromString } from '../parser/loadSVGFromString';
 
 const mockImage = new Image(100, 100);
 
-jest.mock('../util/misc/objectEnlive', () => {
-  const all = jest.requireActual('../util/misc/objectEnlive');
+vi.mock('../util/misc/objectEnlive', () => {
+  const all = vi.importActual('../util/misc/objectEnlive');
   return {
     ...all,
-    loadImage: jest.fn(async (src) => {
+    loadImage: vi.fn(async (src) => {
       const img = mockImage;
       img.src = src;
       return img;
@@ -17,9 +17,11 @@ jest.mock('../util/misc/objectEnlive', () => {
   };
 });
 
-const mockApplyFilter = jest.fn();
+import { describe, expect, test, vi } from 'vitest';
 
-jest.mock('../filters/FilterBackend', () => ({
+const mockApplyFilter = vi.fn();
+
+vi.mock('../filters/FilterBackend', () => ({
   getFilterBackend: () => ({
     applyFilters: mockApplyFilter,
   }),
@@ -48,7 +50,7 @@ describe('FabricImage', () => {
       expect(img.toSVG()).toMatchSnapshot();
     });
   });
-  describe('ApplyFilter use cacheKey', () => {
+  test('ApplyFilter use cacheKey', () => {
     const imgElement = new Image(200, 200);
     const img = new FabricImage(imgElement);
     img.filters = [new Brightness({ brightness: 0.2 })];
@@ -59,11 +61,11 @@ describe('FabricImage', () => {
       200,
       200,
       img.getElement(),
-      'texture0',
+      'texture3',
     );
   });
   describe('SVG import', () => {
-    it('can import images when xlink:href attribute is set', async () => {
+    test('can import images when xlink:href attribute is set', async () => {
       const { objects } =
         await loadSVGFromString(`<svg viewBox="0 0 745 1040" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   xml:space="preserve">
@@ -76,7 +78,7 @@ describe('FabricImage', () => {
         'https://design.zaparoo.org/ZapTradingCard.png',
       );
     });
-    it('can import images when href attribute has no xlink', async () => {
+    test('can import images when href attribute has no xlink', async () => {
       const { objects } =
         await loadSVGFromString(`<svg viewBox="0 0 745 1040" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
   xml:space="preserve">

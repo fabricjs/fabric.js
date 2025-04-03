@@ -1,5 +1,7 @@
 import { StaticCanvas } from './StaticCanvas';
 
+import { it, expect, describe } from 'vitest';
+
 describe('StaticCanvas', () => {
   it('toBlob', async () => {
     const canvas = new StaticCanvas(undefined, { width: 300, height: 300 });

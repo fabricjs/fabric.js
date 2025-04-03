@@ -1,13 +1,13 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FabricText measuring, splitting measuring 1`] = `
+exports[`FabricText > measuring, splitting > measuring 1`] = `
 {
   "kernedWidth": 18,
   "width": 18,
 }
 `;
 
-exports[`FabricText measuring, splitting splits into lines 1`] = `
+exports[`FabricText > measuring, splitting > splits into lines 1`] = `
 {
   "_unwrappedLines": [
     [
@@ -89,7 +89,7 @@ exports[`FabricText measuring, splitting splits into lines 1`] = `
 }
 `;
 
-exports[`FabricText subscript/superscript 1`] = `
+exports[`FabricText > subscript/superscript 1`] = `
 [
   {
     "end": 1,
@@ -146,7 +146,7 @@ exports[`FabricText subscript/superscript 1`] = `
 ]
 `;
 
-exports[`FabricText toObject 1`] = `
+exports[`FabricText > toObject 1`] = `
 {
   "angle": 0,
   "backgroundColor": "",
@@ -199,21 +199,21 @@ exports[`FabricText toObject 1`] = `
 }
 `;
 
-exports[`FabricText toSVG with NUM_FRACTION_DIGITS 1`] = `
+exports[`FabricText > toSVG with NUM_FRACTION_DIGITS 1`] = `
 "<g transform="matrix(1 0 0 1 60.5 23.1)" style=""  >
 		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="12.6" style="fill: rgb(255,0,0); ">x</tspan><tspan x="-40" y="12.6" style="fill: rgb(0,0,255); ">x</tspan><tspan x="-20" y="12.6" style="fill: rgb(0,128,0); ">x</tspan><tspan x="0" y="12.6" style="fill: rgb(255,255,0); ">x</tspan><tspan x="20" y="12.6" style="fill: rgb(255,192,203); ">x</tspan><tspan x="40" y="12.6" >x</tspan></text>
 </g>
 "
 `;
 
-exports[`FabricText toSVG with NUM_FRACTION_DIGITS 2`] = `
+exports[`FabricText > toSVG with NUM_FRACTION_DIGITS 2`] = `
 "<g transform="matrix(1 0 0 1 60.5 23.1)" style=""  >
 		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="12.566" style="fill: rgb(255,0,0); ">x</tspan><tspan x="-40" y="12.566" style="fill: rgb(0,0,255); ">x</tspan><tspan x="-20" y="12.566" style="fill: rgb(0,128,0); ">x</tspan><tspan x="0" y="12.566" style="fill: rgb(255,255,0); ">x</tspan><tspan x="20" y="12.566" style="fill: rgb(255,192,203); ">x</tspan><tspan x="40" y="12.566" >x</tspan></text>
 </g>
 "
 `;
 
-exports[`FabricText toSVG with a path 1`] = `
+exports[`FabricText > toSVG with a path 1`] = `
 "<g transform="matrix(2 0 0 2 1061 46.2)" style=""  >
 		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-530" y="12.5656" >x</tspan><tspan x="-510" y="12.5656" >x</tspan><tspan x="-490" y="12.5656" >x</tspan><tspan x="-470" y="12.5656" >x</tspan><tspan x="-450" y="12.5656" >x</tspan><tspan x="-430" y="12.5656" >x</tspan><tspan x="-410" y="12.5656" >x</tspan><tspan x="-390" y="12.5656" >x</tspan><tspan x="-370" y="12.5656" >x</tspan><tspan x="-350" y="12.5656" >x</tspan><tspan x="-330" y="12.5656" >x</tspan><tspan x="-310" y="12.5656" >x</tspan><tspan x="-290" y="12.5656" >x</tspan><tspan x="-270" y="12.5656" >x</tspan><tspan x="-250" y="12.5656" >x</tspan><tspan x="-230" y="12.5656" >x</tspan><tspan x="-210" y="12.5656" >x</tspan><tspan x="-190" y="12.5656" >x</tspan><tspan x="-170" y="12.5656" >x</tspan><tspan x="-150" y="12.5656" >x</tspan><tspan x="-130" y="12.5656" >x</tspan><tspan x="-110" y="12.5656" >x</tspan><tspan x="-90" y="12.5656" >x</tspan><tspan x="-70" y="12.5656" >x</tspan><tspan x="-50" y="12.5656" >x</tspan><tspan x="-30" y="12.5656" >x</tspan><tspan x="-10" y="12.5656" >x</tspan><tspan x="10" y="12.5656" >x</tspan><tspan x="30" y="12.5656" >x</tspan><tspan x="50" y="12.5656" >x</tspan><tspan x="70" y="12.5656" >x</tspan><tspan x="90" y="12.5656" >x</tspan><tspan x="110" y="12.5656" >x</tspan><tspan x="130" y="12.5656" >x</tspan><tspan x="150" y="12.5656" >x</tspan><tspan x="170" y="12.5656" >x</tspan><tspan x="190" y="12.5656" >x</tspan><tspan x="210" y="12.5656" >x</tspan><tspan x="230" y="12.5656" >x</tspan><tspan x="250" y="12.5656" >x</tspan><tspan x="270" y="12.5656" >x</tspan><tspan x="290" y="12.5656" >x</tspan><tspan x="310" y="12.5656" >x</tspan><tspan x="330" y="12.5656" >x</tspan><tspan x="350" y="12.5656" >x</tspan><tspan x="370" y="12.5656" >x</tspan><tspan x="390" y="12.5656" >x</tspan><tspan x="410" y="12.5656" >x</tspan><tspan x="430" y="12.5656" >x</tspan><tspan x="450" y="12.5656" >x</tspan><tspan x="470" y="12.5656" >x</tspan><tspan x="490" y="12.5656" >x</tspan><tspan x="510" y="12.5656" >x</tspan></text>
 </g>

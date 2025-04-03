@@ -1,17 +1,10 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
+
 import { toMatchSnapshot } from 'jest-snapshot';
-import type { CloneDeepWithCustomizer } from 'lodash';
 import { cloneDeepWith } from 'lodash';
 import { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
-
-type ExtendedOptions<T = unknown> = {
-  cloneDeepWith?: CloneDeepWithCustomizer<T>;
-} & object;
-
-type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
-  includeDefaultValues?: boolean;
-};
+import type { ExtendedOptions, ObjectOptions } from './vitest';
 
 export const roundSnapshotOptions = {
   cloneDeepWith: (value: any) => {
@@ -92,49 +85,3 @@ expect.extend({
     };
   },
 });
-
-// // written in official docs but DOESN'T work
-// declare module 'expect' {
-//   interface AsymmetricMatchers {
-//     toMatchSnapshot(propertiesOrHint?: ExtendedOptions, hint?: string): void;
-//   }
-//   interface Matchers<R, T> {
-//     toMatchSnapshot(propertiesOrHint?: ExtendedOptions<T>, hint?: string): R;
-//   }
-// }
-
-// not written in official docs but DOES work
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace jest {
-    interface AsymmetricMatchers {
-      toMatchSnapshot(
-        propertiesOrHint?: ExtendedOptions | string,
-        hint?: string,
-      ): void;
-      toMatchObjectSnapshot(
-        propertiesOrHint?: ObjectOptions | string,
-        hint?: string,
-      ): void;
-      toEqualRoundedMatrix(expected: TMat2D, precision?: number): void;
-    }
-    interface Matchers<R, T> {
-      toMatchSnapshot<U extends { [P in keyof T]: any }>(
-        propertyMatchers: Partial<
-          U & { cloneDeepWith: CloneDeepWithCustomizer<T> }
-        >,
-        snapshotName?: string,
-      ): R;
-      toMatchObjectSnapshot<U extends { [P in keyof T]: any }>(
-        propertyMatchers?: Partial<
-          U & {
-            cloneDeepWith: CloneDeepWithCustomizer<T>;
-            includeDefaultValues?: boolean;
-          }
-        >,
-        snapshotName?: string,
-      ): R;
-      toEqualRoundedMatrix(expected: TMat2D, precision?: number): R;
-    }
-  }
-}
