@@ -352,7 +352,7 @@
   });
 
   function export12(canvas, callback) {
-    var jsonData = '{"version":"2.4.6","objects":[{"type":"Ellipse","version":"2.4.6","left":2.5,"top":-56.5,"width":220,"height":300,"fill":{"type":"radial","coords":{"x1":110.00000000000001,"y1":110.00000000000001,"x2":110.00000000000001,"y2":110.00000000000001,"r1":0,"r2":110.00000000000001},"colorStops":[{"offset":1,"color":"rgb(0,0,255)","opacity":1},{"offset":0.6,"color":"rgb(0,153,153)","opacity":0.5},{"offset":0.3,"color":"rgb(0,0,255)","opacity":1},{"offset":0,"color":"rgb(255,0,0)","opacity":0.8}],"offsetX":0,"offsetY":0,"gradientTransform":[1,0,0,1.3636363636363635,0,0]},"scaleX":0.69,"scaleY":1.07,"skewY":-32.03,"rx":110,"ry":150}]}';
+    var jsonData = '{"version":"2.4.6","objects":[{"type":"Ellipse","version":"2.4.6","left":2.5,"top":-56.5,"width":220,"height":300,"fill":{"type":"radial","coords":{"x1":110.00000000000001,"y1":110.00000000000001,"x2":110.00000000000001,"y2":110.00000000000001,"r1":0,"r2":110.00000000000001},"colorStops":[{"offset":1,"color":"rgb(0,0,255)","opacity":1},{"offset":0.6,"color":"rgba(0,153,153,0.5)"},{"offset":0.3,"color":"rgb(0,0,255)","opacity":1},{"offset":0,"color":"rgba(255,0,0, 0.8)"}],"offsetX":0,"offsetY":0,"gradientTransform":[1,0,0,1.3636363636363635,0,0]},"scaleX":0.69,"scaleY":1.07,"skewY":-32.03,"rx":110,"ry":150}]}';
     canvas.loadFromJSON(jsonData).then(function() {
       toSVGCanvas(canvas, callback);
     });
