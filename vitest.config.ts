@@ -16,8 +16,10 @@ export default defineConfig({
       reportsDirectory: '.nyc_output',
       reporter: ['json'],
       exclude: [
+        'src/benchmarks/**',
         'vitest*',
         'rollup*',
+        'eslint*',
         'playwright*',
         '**/node_modules/**',
         '.codesandbox/**',
