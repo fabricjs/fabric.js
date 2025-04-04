@@ -1,5 +1,4 @@
 import { noop } from '../../constants';
-import type { Pattern } from '../../Pattern';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type {
   Abortable,
@@ -29,7 +28,7 @@ export type LoadImageOptions = Abortable & {
  */
 export const loadImage = (
   url: string,
-  { signal, crossOrigin = null }: LoadImageOptions = {}
+  { signal, crossOrigin = null }: LoadImageOptions = {},
 ) =>
   new Promise<HTMLImageElement>(function (resolve, reject) {
     if (signal && signal.aborted) {
@@ -68,14 +67,20 @@ export type EnlivenObjectOptions = Abortable & {
    * called after each fabric object created.
    */
   reviver?: <
-    T extends BaseFabricObject | FabricObject | BaseFilter | Shadow | TFiller
+    T extends
+      | BaseFabricObject
+      | FabricObject
+      | BaseFilter<string>
+      | Shadow
+      | TFiller,
   >(
     serializedObj: Record<string, any>,
-    instance: T
+    instance: T,
   ) => void;
 };
 
 /**
+ * @TODO type this correctly.
  * Creates corresponding fabric instances from their object representations
  * @param {Object[]} objects Objects to enliven
  * @param {EnlivenObjectOptions} [options]
@@ -85,10 +90,15 @@ export type EnlivenObjectOptions = Abortable & {
  * @returns {Promise<FabricObject[]>}
  */
 export const enlivenObjects = <
-  T extends BaseFabricObject | FabricObject | BaseFilter | Shadow | TFiller
+  T extends
+    | BaseFabricObject
+    | FabricObject
+    | BaseFilter<string>
+    | Shadow
+    | TFiller,
 >(
   objects: any[],
-  { signal, reviver = noop }: EnlivenObjectOptions = {}
+  { signal, reviver = noop }: EnlivenObjectOptions = {},
 ) =>
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
@@ -106,8 +116,8 @@ export const enlivenObjects = <
             reviver(obj, fabricInstance);
             instances.push(fabricInstance);
             return fabricInstance;
-          })
-      )
+          }),
+      ),
     )
       .then(resolve)
       .catch((error) => {
@@ -131,10 +141,10 @@ export const enlivenObjects = <
  * @returns {Promise<Record<string, FabricObject | TFiller | null>>} the input object with enlived values
  */
 export const enlivenObjectEnlivables = <
-  R = Record<string, FabricObject | TFiller | null>
+  R = Record<string, FabricObject | TFiller | null>,
 >(
   serializedObject: any,
-  { signal }: Abortable = {}
+  { signal }: Abortable = {},
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: (FabricObject | TFiller | Shadow)[] = [];
@@ -144,24 +154,19 @@ export const enlivenObjectEnlivables = <
       if (!value) {
         return value;
       }
-      // clipPath or shadow or gradient
-      if (value.type) {
+      /**
+       * clipPath or shadow or gradient or text on a path or a pattern,
+       * or the backgroundImage or overlayImage of canvas
+       * If we have a type and there is a classe registered for it, we enlive it.
+       * If there is no class registered for it we return the value as is
+       * */
+      if (value.type && classRegistry.has(value.type)) {
         return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
           signal,
         }).then(([enlived]) => {
           instances.push(enlived);
           return enlived;
         });
-      }
-      // pattern
-      if (value.source) {
-        return classRegistry
-          .getClass<typeof Pattern>('pattern')
-          .fromObject(value, { signal })
-          .then((pattern: Pattern) => {
-            instances.push(pattern);
-            return pattern;
-          });
       }
       return value;
     });

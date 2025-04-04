@@ -5,6 +5,8 @@ import { Group } from '../Group';
 import { FabricObject } from './FabricObject';
 import { InteractiveFabricObject, type TOCoord } from './InteractiveObject';
 
+import { describe, expect, it, test } from 'vitest';
+
 describe('InteractiveObject', () => {
   it('tests constructor & properties', () => {
     const obj = new InteractiveFabricObject();
@@ -43,9 +45,9 @@ describe('InteractiveObject', () => {
           radiansToDegrees(
             Math.atan2(
               cornerPoint.corner.tr.y - cornerPoint.corner.tl.y,
-              cornerPoint.corner.tr.x - cornerPoint.corner.tl.x
-            )
-          )
+              cornerPoint.corner.tr.x - cornerPoint.corner.tl.x,
+            ),
+          ),
         );
         expect(controlAngle).toEqual(objectAngle);
       });

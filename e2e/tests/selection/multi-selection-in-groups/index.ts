@@ -26,7 +26,7 @@ beforeAll(async (canvas) => {
       backgroundColor: 'blue',
       subTargetCheck: true,
       interactive: true,
-    }
+    },
   );
   canvas.add(g);
   const clone1 = await g.clone();

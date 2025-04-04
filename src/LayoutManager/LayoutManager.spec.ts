@@ -16,6 +16,9 @@ import {
 } from './constants';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
+import { describe, expect, it, beforeEach, test, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
+
 describe('Layout Manager', () => {
   it('should set fit content strategy by default', () => {
     expect(new LayoutManager().strategy).toBeInstanceOf(FitContentLayout);
@@ -23,7 +26,7 @@ describe('Layout Manager', () => {
 
   describe('Lifecycle', () => {
     test.each([true, false])('performLayout with result of %s', (result) => {
-      const lifecycle: jest.SpyInstance[] = [];
+      const lifecycle: MockInstance[] = [];
       const layoutResult: LayoutResult | undefined = result
         ? {
             result: { center: new Point(), size: new Point() },
@@ -34,23 +37,23 @@ describe('Layout Manager', () => {
         : undefined;
 
       const manager = new LayoutManager();
-      const onBeforeLayout = jest
+      const onBeforeLayout = vi
         .spyOn(manager, 'onBeforeLayout')
         .mockImplementation(() => {
           lifecycle.push(onBeforeLayout);
         });
-      const getLayoutResult = jest
+      const getLayoutResult = vi
         .spyOn(manager, 'getLayoutResult')
         .mockImplementation(() => {
           lifecycle.push(getLayoutResult);
           return layoutResult;
         });
-      const commitLayout = jest
+      const commitLayout = vi
         .spyOn(manager, 'commitLayout')
         .mockImplementation(() => {
           lifecycle.push(commitLayout);
         });
-      const onAfterLayout = jest
+      const onAfterLayout = vi
         .spyOn(manager, 'onAfterLayout')
         .mockImplementation(() => {
           lifecycle.push(onAfterLayout);
@@ -86,23 +89,23 @@ describe('Layout Manager', () => {
           mock: {
             calls: [[arg0]],
           },
-        }) => expect(arg0).toMatchObject(context)
+        }) => expect(arg0).toMatchObject(context),
       );
       if (result) {
         [commitLayout, onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
-          }) => expect(arg1).toEqual(layoutResult)
+          }) => expect(arg1).toEqual(layoutResult),
         );
       } else {
         [onAfterLayout].forEach(
           ({
             mock: {
-              calls: [[arg0, arg1]],
+              calls: [[, arg1]],
             },
-          }) => expect(arg1).toBeUndefined()
+          }) => expect(arg1).toBeUndefined(),
         );
       }
     });
@@ -119,18 +122,19 @@ describe('Layout Manager', () => {
         'skewing',
         'changed',
         'modifyPoly',
+        'modifyPath',
       ];
 
       it('should subscribe object', () => {
-        const lifecycle: jest.SpyInstance[] = [];
+        const lifecycle: MockInstance[] = [];
         const manager = new LayoutManager();
-        const unsubscribe = jest
+        const unsubscribe = vi
           .spyOn(manager, 'unsubscribe')
           .mockImplementation(() => {
             lifecycle.push(unsubscribe);
           });
         const object = new FabricObject();
-        const on = jest.spyOn(object, 'on').mockImplementation(() => {
+        const on = vi.spyOn(object, 'on').mockImplementation(() => {
           lifecycle.push(on);
         });
 
@@ -145,7 +149,7 @@ describe('Layout Manager', () => {
 
       it('a subscribed object should trigger layout', () => {
         const manager = new LayoutManager();
-        const performLayout = jest.spyOn(manager, 'performLayout');
+        const performLayout = vi.spyOn(manager, 'performLayout');
         const object = new FabricObject();
         const target = new Group([object], { layoutManager: manager });
         manager['subscribe'](object, { target });
@@ -192,9 +196,9 @@ describe('Layout Manager', () => {
           new FabricObject(),
         ];
         target = new Group(targets, { layoutManager: manager });
-        target.canvas = { fire: jest.fn() };
+        target.canvas = { fire: vi.fn() };
 
-        jest.spyOn(target, 'fire');
+        vi.spyOn(target, 'fire');
 
         context = {
           bubbles: true,
@@ -209,7 +213,7 @@ describe('Layout Manager', () => {
         };
       });
       it(`initialization trigger should subscribe targets and call target hooks`, () => {
-        jest.spyOn(manager, 'subscribe');
+        vi.spyOn(manager, 'subscribe');
         context.type = LAYOUT_TYPE_INITIALIZATION;
         manager['onBeforeLayout'](context);
         expect(manager['subscribe']).toHaveBeenCalledTimes(targets.length);
@@ -223,13 +227,13 @@ describe('Layout Manager', () => {
         });
       });
       it(`object removed trigger should unsubscribe targets and call target hooks`, () => {
-        jest.spyOn(manager, 'unsubscribe');
+        vi.spyOn(manager, 'unsubscribe');
         context.type = LAYOUT_TYPE_REMOVED;
         manager['onBeforeLayout'](context);
         expect(manager['unsubscribe']).toHaveBeenCalledTimes(targets.length);
         expect(manager['unsubscribe']).toHaveBeenCalledWith(
           targets[0],
-          context
+          context,
         );
         expect(target.fire).toBeCalledWith('layout:before', {
           context,
@@ -240,7 +244,7 @@ describe('Layout Manager', () => {
         });
       });
       it(`object added trigger should subscribe targets and call target hooks`, () => {
-        jest.spyOn(manager, 'subscribe');
+        vi.spyOn(manager, 'subscribe');
         context.type = LAYOUT_TYPE_ADDED;
         manager['onBeforeLayout'](context);
         expect(manager['subscribe']).toHaveBeenCalledTimes(targets.length);
@@ -264,7 +268,7 @@ describe('Layout Manager', () => {
       const targets = [child, new FabricObject()];
       const target = new Group(targets, { layoutManager: manager });
 
-      const performLayout = jest.spyOn(manager, 'performLayout');
+      const performLayout = vi.spyOn(manager, 'performLayout');
 
       const context: StrictLayoutContext = {
         bubbles: true,
@@ -301,7 +305,7 @@ describe('Layout Manager', () => {
       { type: LAYOUT_TYPE_IMPERATIVE },
     ] as const)('$type trigger', (options) => {
       const manager = new LayoutManager();
-      jest.spyOn(manager.strategy, 'calcLayoutResult').mockReturnValue({
+      vi.spyOn(manager.strategy, 'calcLayoutResult').mockReturnValue({
         center: new Point(50, 100),
         size: new Point(200, 250),
         correction: new Point(10, 20),
@@ -336,28 +340,28 @@ describe('Layout Manager', () => {
     const prepareTest = (
       contextOptions: {
         type: typeof LAYOUT_TYPE_INITIALIZATION | typeof LAYOUT_TYPE_ADDED;
-      } & Partial<LayoutContext>
+      } & Partial<LayoutContext>,
     ) => {
-      const lifecycle: jest.SpyInstance[] = [];
+      const lifecycle: vi.SpyInstance[] = [];
 
       const targets = [new Group([new FabricObject()]), new FabricObject()];
       const target = new Group(targets, { strokeWidth: 0 });
-      const targetSet = jest.spyOn(target, 'set').mockImplementation(() => {
+      const targetSet = vi.spyOn(target, 'set').mockImplementation(() => {
         lifecycle.push(targetSet);
       });
-      const targetSetCoords = jest
+      const targetSetCoords = vi
         .spyOn(target, 'setCoords')
         .mockImplementation(() => {
           lifecycle.push(targetSetCoords);
         });
-      const targetSetPositionByOrigin = jest
+      const targetSetPositionByOrigin = vi
         .spyOn(target, 'setPositionByOrigin')
         .mockImplementation(() => {
           lifecycle.push(targetSetPositionByOrigin);
         });
 
       const manager = new LayoutManager();
-      const layoutObjects = jest
+      const layoutObjects = vi
         .spyOn(manager, 'layoutObjects')
         .mockImplementation(() => {
           lifecycle.push(layoutObjects);
@@ -426,7 +430,7 @@ describe('Layout Manager', () => {
           left: pos.x ?? 0,
           top: pos.y ?? 0,
         });
-      }
+      },
     );
 
     it('non initialization trigger should set size, position and invalidate target', () => {
@@ -463,25 +467,25 @@ describe('Layout Manager', () => {
     it.each([true, false])(
       'should call target hooks with bubbling %s',
       (bubbles) => {
-        const lifecycle: jest.SpyInstance[] = [];
+        const lifecycle: vi.SpyInstance[] = [];
         const manager = new LayoutManager();
         const targets = [
           new Group([new FabricObject()], { layoutManager: manager }),
           new FabricObject(),
         ];
         const target = new Group(targets, { layoutManager: manager });
-        const targetFire = jest.spyOn(target, 'fire').mockImplementation(() => {
+        const targetFire = vi.spyOn(target, 'fire').mockImplementation(() => {
           lifecycle.push(targetFire);
         });
 
         const parent = new Group([target], { layoutManager: manager });
-        const parentPerformLayout = jest
+        const parentPerformLayout = vi
           .spyOn(parent.layoutManager, 'performLayout')
           .mockImplementation(() => {
             lifecycle.push(parentPerformLayout);
           });
 
-        const canvasFire = jest.fn();
+        const canvasFire = vi.fn();
         target.canvas = { fire: canvasFire };
 
         const context: StrictLayoutContext = {
@@ -525,7 +529,7 @@ describe('Layout Manager', () => {
               path: [target],
             },
           ]);
-      }
+      },
     );
 
     test('bubbling', () => {
@@ -539,7 +543,7 @@ describe('Layout Manager', () => {
       const parent = new Group([target], { layoutManager: manager });
       const grandParent = new Group([parent], { layoutManager: manager2 });
 
-      const grandParentPerformLayout = jest.spyOn(manager2, 'performLayout');
+      const grandParentPerformLayout = vi.spyOn(manager2, 'performLayout');
 
       const context: StrictLayoutContext = {
         bubbles: true,
@@ -596,7 +600,7 @@ describe('Layout Manager', () => {
         stopPropagation: expect.any(Function),
       };
       canvas.add(grandParent);
-      jest.spyOn(canvas, 'fire');
+      vi.spyOn(canvas, 'fire');
       grandParent.triggerLayout({
         bubbles: false,
         deep: false,
@@ -649,7 +653,7 @@ describe('Layout Manager', () => {
         stopPropagation: expect.any(Function),
       };
       canvas.add(grandParent);
-      jest.spyOn(canvas, 'fire');
+      vi.spyOn(canvas, 'fire');
       grandParent.triggerLayout({
         bubbles: false,
         deep: true,
@@ -747,10 +751,10 @@ describe('Layout Manager', () => {
         height: 200,
         strokeWidth: 0,
       });
-      jest.spyOn(child, 'toJSON').mockReturnValue('child');
+      vi.spyOn(child, 'toJSON').mockReturnValue('child');
       const group = new Group([child]);
       expect(
-        Array.from(group.layoutManager['_subscriptions'].keys())
+        Array.from(group.layoutManager['_subscriptions'].keys()),
       ).toMatchObject([child]);
     });
 
@@ -792,30 +796,30 @@ describe('Layout Manager', () => {
       describe('Fitcontent layout', () => {
         it('should subscribe objects', async () => {
           const group = await Group.fromObject(
-            createTestData(FitContentLayout.type)
+            createTestData(FitContentLayout.type),
           );
           expect(
-            Array.from(group.layoutManager['_subscriptions'].keys())
+            Array.from(group.layoutManager['_subscriptions'].keys()),
           ).toMatchObject(group.getObjects());
         });
       });
       describe('FixedLayout layout', () => {
         it('should subscribe objects', async () => {
           const group = await Group.fromObject(
-            createTestData(FixedLayout.type)
+            createTestData(FixedLayout.type),
           );
           expect(
-            Array.from(group.layoutManager['_subscriptions'].keys())
+            Array.from(group.layoutManager['_subscriptions'].keys()),
           ).toMatchObject(group.getObjects());
         });
       });
       describe('ClipPathLayout layout', () => {
         it('should subscribe objects', async () => {
           const group = await Group.fromObject(
-            createTestData(ClipPathLayout.type)
+            createTestData(ClipPathLayout.type),
           );
           expect(
-            Array.from(group.layoutManager['_subscriptions'].keys())
+            Array.from(group.layoutManager['_subscriptions'].keys()),
           ).toMatchObject(group.getObjects());
         });
       });
@@ -839,7 +843,7 @@ describe('Layout Manager', () => {
         expect(child.getRelativeCenterPoint()).toMatchObject({ x: 0, y: 0 });
         expect(group.getCenterPoint()).toMatchObject({ x: 100, y: 100 });
         expect(child.getCenterPoint()).toMatchObject(group.getCenterPoint());
-      }
+      },
     );
 
     it('fixed layout should respect size passed in options', () => {

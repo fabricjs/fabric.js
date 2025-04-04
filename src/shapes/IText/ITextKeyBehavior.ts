@@ -7,14 +7,14 @@ import type { TKeyMapIText } from './constants';
 import type { TOptions } from '../../typedefs';
 import type { TextProps, SerializedTextProps } from '../Text/Text';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, RIGHT } from '../../constants';
+import { CHANGED, LEFT, RIGHT } from '../../constants';
 import type { IText } from './IText';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 
 export abstract class ITextKeyBehavior<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
-  EventSpec extends ITextEvents = ITextEvents
+  EventSpec extends ITextEvents = ITextEvents,
 > extends ITextBehavior<Props, SProps, EventSpec> {
   /**
    * For functionalities on keyDown
@@ -94,8 +94,8 @@ export abstract class ITextKeyBehavior<
     } as Record<string, keyof this>).map(([eventName, handler]) =>
       textarea.addEventListener(
         eventName,
-        (this[handler] as Function).bind(this)
-      )
+        (this[handler] as EventListener).bind(this),
+      ),
     );
     this.hiddenTextarea = textarea;
   }
@@ -118,11 +118,15 @@ export abstract class ITextKeyBehavior<
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
     if (e.keyCode in keyMap) {
-      // @ts-expect-error legacy method calling pattern
-      this[keyMap[e.keyCode]](e);
+      (this[keyMap[e.keyCode] as keyof this] as (arg: KeyboardEvent) => void)(
+        e,
+      );
     } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-      // @ts-expect-error legacy method calling pattern
-      this[this.ctrlKeysMapDown[e.keyCode]](e);
+      (
+        this[this.ctrlKeysMapDown[e.keyCode] as keyof this] as (
+          arg: KeyboardEvent,
+        ) => void
+      )(e);
     } else {
       return;
     }
@@ -150,8 +154,11 @@ export abstract class ITextKeyBehavior<
       return;
     }
     if (e.keyCode in this.ctrlKeysMapUp && (e.ctrlKey || e.metaKey)) {
-      // @ts-expect-error legacy method calling pattern
-      this[this.ctrlKeysMapUp[e.keyCode]](e);
+      (
+        this[this.ctrlKeysMapUp[e.keyCode] as keyof this] as (
+          arg: KeyboardEvent,
+        ) => void
+      )(e);
     } else {
       return;
     }
@@ -166,6 +173,7 @@ export abstract class ITextKeyBehavior<
    */
   onInput(this: this & { hiddenTextarea: HTMLTextAreaElement }, e: Event) {
     const fromPaste = this.fromPaste;
+    const { value, selectionStart, selectionEnd } = this.hiddenTextarea;
     this.fromPaste = false;
     e && e.stopPropagation();
     if (!this.isEditing) {
@@ -173,7 +181,7 @@ export abstract class ITextKeyBehavior<
     }
     const updateAndFire = () => {
       this.updateFromTextArea();
-      this.fire('changed');
+      this.fire(CHANGED);
       if (this.canvas) {
         this.canvas.fire('text:changed', { target: this as unknown as IText });
         this.canvas.requestRenderAll();
@@ -185,14 +193,12 @@ export abstract class ITextKeyBehavior<
       return;
     }
     // decisions about style changes.
-    const nextText = this._splitTextIntoLines(
-        this.hiddenTextarea.value
-      ).graphemeText,
+    const nextText = this._splitTextIntoLines(value).graphemeText,
       charCount = this._text.length,
       nextCharCount = nextText.length,
-      selectionStart = this.selectionStart,
-      selectionEnd = this.selectionEnd,
-      selection = selectionStart !== selectionEnd;
+      _selectionStart = this.selectionStart,
+      _selectionEnd = this.selectionEnd,
+      selection = _selectionStart !== _selectionEnd;
     let copiedStyle: TextStyleDeclaration[] | undefined,
       removedText,
       charDiff = nextCharCount - charCount,
@@ -200,28 +206,28 @@ export abstract class ITextKeyBehavior<
       removeTo;
 
     const textareaSelection = this.fromStringToGraphemeSelection(
-      this.hiddenTextarea.selectionStart,
-      this.hiddenTextarea.selectionEnd,
-      this.hiddenTextarea.value
+      selectionStart,
+      selectionEnd,
+      value,
     );
-    const backDelete = selectionStart > textareaSelection.selectionStart;
+    const backDelete = _selectionStart > textareaSelection.selectionStart;
 
     if (selection) {
-      removedText = this._text.slice(selectionStart, selectionEnd);
-      charDiff += selectionEnd - selectionStart;
+      removedText = this._text.slice(_selectionStart, _selectionEnd);
+      charDiff += _selectionEnd - _selectionStart;
     } else if (nextCharCount < charCount) {
       if (backDelete) {
-        removedText = this._text.slice(selectionEnd + charDiff, selectionEnd);
+        removedText = this._text.slice(_selectionEnd + charDiff, _selectionEnd);
       } else {
         removedText = this._text.slice(
-          selectionStart,
-          selectionStart - charDiff
+          _selectionStart,
+          _selectionStart - charDiff,
         );
       }
     }
     const insertedText = nextText.slice(
       textareaSelection.selectionEnd - charDiff,
-      textareaSelection.selectionEnd
+      textareaSelection.selectionEnd,
     );
     if (removedText && removedText.length) {
       if (insertedText.length) {
@@ -229,28 +235,28 @@ export abstract class ITextKeyBehavior<
         // we want to copy the style before the cursor OR the style at the cursor if selection
         // is bigger than 0.
         copiedStyle = this.getSelectionStyles(
-          selectionStart,
-          selectionStart + 1,
-          false
+          _selectionStart,
+          _selectionStart + 1,
+          false,
         );
         // now duplicate the style one for each inserted text.
         copiedStyle = insertedText.map(
           () =>
             // this return an array of references, but that is fine since we are
             // copying the style later.
-            copiedStyle![0]
+            copiedStyle![0],
         );
       }
       if (selection) {
-        removeFrom = selectionStart;
-        removeTo = selectionEnd;
+        removeFrom = _selectionStart;
+        removeTo = _selectionEnd;
       } else if (backDelete) {
         // detect differences between forwardDelete and backDelete
-        removeFrom = selectionEnd - removedText.length;
-        removeTo = selectionEnd;
+        removeFrom = _selectionEnd - removedText.length;
+        removeTo = _selectionEnd;
       } else {
-        removeFrom = selectionEnd;
-        removeTo = selectionEnd + removedText.length;
+        removeFrom = _selectionEnd;
+        removeTo = _selectionEnd + removedText.length;
       }
       this.removeStyleFromTo(removeFrom, removeTo);
     }
@@ -263,7 +269,7 @@ export abstract class ITextKeyBehavior<
       ) {
         copiedStyle = copyPasteData.copiedTextStyle;
       }
-      this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle);
+      this.insertNewStyleBlock(insertedText, _selectionStart, copiedStyle);
     }
     updateAndFire();
   }
@@ -303,7 +309,7 @@ export abstract class ITextKeyBehavior<
       copyPasteData.copiedTextStyle = this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd,
-        true
+        true,
       );
     } else {
       copyPasteData.copiedTextStyle = undefined;
@@ -477,7 +483,7 @@ export abstract class ITextKeyBehavior<
   _moveCursorUpOrDown(direction: 'Up' | 'Down', e: KeyboardEvent) {
     const offset = this[`get${direction}CursorOffset`](
       e,
-      this._selectionDirection === RIGHT
+      this._selectionDirection === RIGHT,
     );
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
@@ -488,8 +494,9 @@ export abstract class ITextKeyBehavior<
       const max = this.text.length;
       this.selectionStart = capValue(0, this.selectionStart, max);
       this.selectionEnd = capValue(0, this.selectionEnd, max);
+      // TODO fix: abort and init should be an alternative depending
+      // on selectionStart/End being equal or different
       this.abortCursorAnimation();
-      this._currentCursorOpacity = 1;
       this.initDelayedCursor();
       this._fireSelectionChanged();
       this._updateTextarea();
@@ -508,7 +515,7 @@ export abstract class ITextKeyBehavior<
     this.setSelectionStartEndWithShift(
       this.selectionStart,
       this.selectionEnd,
-      newSelection
+      newSelection,
     );
     return offset !== 0;
   }
@@ -548,7 +555,7 @@ export abstract class ITextKeyBehavior<
   _move(
     e: KeyboardEvent,
     prop: 'selectionStart' | 'selectionEnd',
-    direction: 'Left' | 'Right'
+    direction: 'Left' | 'Right',
   ): boolean {
     let newValue: number | undefined;
     if (e.altKey) {
@@ -641,6 +648,8 @@ export abstract class ITextKeyBehavior<
     }` as const;
     this._currentCursorOpacity = 1;
     if (this[actionName](e)) {
+      // TODO fix: abort and init should be an alternative depending
+      // on selectionStart/End being equal or different
       this.abortCursorAnimation();
       this.initDelayedCursor();
       this._fireSelectionChanged();

@@ -5,7 +5,10 @@ import os from 'node:os';
 import type { ObjectUtil } from './ObjectUtil';
 
 export class CanvasUtil {
-  constructor(readonly page: Page, readonly selector = '#canvas') {}
+  constructor(
+    readonly page: Page,
+    readonly selector = '#canvas',
+  ) {}
 
   click(clickProperties: Parameters<Page['click']>[1]) {
     return this.page.click(`canvas_top=${this.selector}`, clickProperties);
@@ -18,6 +21,23 @@ export class CanvasUtil {
         position: await objectUtil.getObjectCenter(),
       });
     }
+  }
+
+  async makeActiveSelectionByDragging(objects: ObjectUtil[]) {
+    const points = [];
+    for (const objectUtil of objects) {
+      points.push(...(await objectUtil.getObjectCoords()));
+    }
+    const bbox = await this.executeInBrowser(
+      (_, { points }) => {
+        return fabric.util.makeBoundingBoxFromPoints(points);
+      },
+      { points },
+    );
+    await this.clickAndDrag(
+      { x: bbox.left - 20, y: bbox.top - 20 },
+      { x: bbox.left + bbox.width + 20, y: bbox.top + bbox.height + 20 },
+    );
   }
 
   async clickAndDrag(point: XY, dragTo: XY, steps = 20) {
@@ -58,20 +78,20 @@ export class CanvasUtil {
   evaluateSelf() {
     return this.page.evaluateHandle<Canvas>(
       ([selector]) => canvasMap.get(document.querySelector(selector)),
-      [this.selector]
+      [this.selector],
     );
   }
 
   async executeInBrowser<C, R>(
     runInBrowser: (canvas: Canvas, context: C) => R,
-    context?: C
+    context?: C,
   ): Promise<R> {
     return (await this.evaluateSelf()).evaluate(runInBrowser, context);
   }
 
   async evaluateHandle<C, R>(
     runInBrowser: (canvas: Canvas, context: C) => R,
-    context?: C
+    context?: C,
   ): Promise<JSHandle<R>> {
     return (await this.evaluateSelf()).evaluateHandle(runInBrowser, context);
   }

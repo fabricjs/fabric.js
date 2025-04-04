@@ -11,6 +11,16 @@ import type {
   LayoutBeforeEvent,
   LayoutAfterEvent,
 } from './LayoutManager/types';
+import type {
+  MODIFIED,
+  MODIFY_PATH,
+  MODIFY_POLY,
+  MOVING,
+  RESIZING,
+  ROTATING,
+  SCALING,
+  SKEWING,
+} from './constants';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -25,7 +35,7 @@ export type TransformAction<T extends Transform = Transform, R = void> = (
   eventData: TPointerEvent,
   transform: T,
   x: number,
-  y: number
+  y: number,
 ) => R;
 
 /**
@@ -44,7 +54,7 @@ export type ControlActionHandler = TransformAction<Transform, any>;
 export type ControlCallback<R = void> = (
   eventData: TPointerEvent,
   control: Control,
-  fabricObject: FabricObject
+  fabricObject: FabricObject,
 ) => R;
 
 export type ControlCursorCallback = ControlCallback<string>;
@@ -97,37 +107,49 @@ export interface BasicTransformEvent<E extends Event = TPointerEvent>
 }
 
 export type TModificationEvents =
-  | 'moving'
-  | 'scaling'
-  | 'rotating'
-  | 'skewing'
-  | 'resizing'
-  | 'modifyPoly';
+  | typeof MOVING
+  | typeof SCALING
+  | typeof ROTATING
+  | typeof SKEWING
+  | typeof RESIZING
+  | typeof MODIFY_POLY
+  | typeof MODIFY_PATH;
 
 export interface ModifiedEvent<E extends Event = TPointerEvent> {
   e?: E;
-  transform: Transform;
+  transform?: Transform;
   target: FabricObject;
   action?: string;
 }
 
-type ModificationEventsSpec<
-  Prefix extends string = '',
-  Modification = BasicTransformEvent,
-  Modified = ModifiedEvent | never
-> = Record<`${Prefix}${TModificationEvents}`, Modification> &
-  Record<`${Prefix}modified`, Modified>;
+export interface ModifyPathEvent {
+  commandIndex: number;
+  pointIndex: number;
+}
 
-type ObjectModificationEvents = ModificationEventsSpec;
+export type ObjectModificationEvents = {
+  [MOVING]: BasicTransformEvent;
+  [SCALING]: BasicTransformEvent;
+  [ROTATING]: BasicTransformEvent;
+  [SKEWING]: BasicTransformEvent;
+  [RESIZING]: BasicTransformEvent;
+  [MODIFY_POLY]: BasicTransformEvent;
+  [MODIFY_PATH]: BasicTransformEvent & ModifyPathEvent;
+  [MODIFIED]: ModifiedEvent;
+};
 
-type CanvasModificationEvents = ModificationEventsSpec<
-  'object:',
-  BasicTransformEvent & { target: FabricObject },
-  // TODO: this typing makes not possible to use properties from modified event
-  // in object:modified
-  ModifiedEvent | { target: FabricObject }
-> & {
+type CanvasModificationEvents = {
   'before:transform': TEvent & { transform: Transform };
+  'object:moving': BasicTransformEvent & { target: FabricObject };
+  'object:scaling': BasicTransformEvent & { target: FabricObject };
+  'object:rotating': BasicTransformEvent & { target: FabricObject };
+  'object:skewing': BasicTransformEvent & { target: FabricObject };
+  'object:resizing': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPoly': BasicTransformEvent & { target: FabricObject };
+  'object:modifyPath': BasicTransformEvent & {
+    target: FabricObject;
+  } & ModifyPathEvent;
+  'object:modified': ModifiedEvent;
 };
 
 export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
@@ -236,14 +258,33 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | 'dblclick'}`,
+    | 'dblclick'
+    | 'tripleclick'}`,
   TPointerEventInfo
 > &
+  Record<
+    `${Prefix}down`,
+    TPointerEventInfo & {
+      /**
+       * Indicates if the target or current target where already selected
+       * before the cycle of mouse down -> mouse up started
+       */
+      alreadySelected: boolean;
+    }
+  > &
   Record<
     `${Prefix}${WithBeforeSuffix<'up'>}`,
     TPointerEventInfo & {
       isClick: boolean;
+      /**
+       * The targets at the moment of mouseup that could be different from the
+       * target at the moment of mouse down in case of a drag action for example
+       */
       currentTarget?: FabricObject;
+      /**
+       * The subtargets at the moment of mouseup that could be different from the
+       * target at the moment of mouse down in case of a drag action for example
+       */
       currentSubTargets: FabricObject[];
     }
   > &
@@ -256,6 +297,7 @@ export type TPointerEventNames =
   | WithBeforeSuffix<'move'>
   | WithBeforeSuffix<'up'>
   | 'dblclick'
+  | 'tripleclick'
   | 'wheel';
 
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
@@ -326,6 +368,9 @@ export interface CanvasEvents
   // IText
   'text:selection:changed': { target: IText };
   'text:changed': { target: IText };
-  'text:editing:entered': { target: IText };
+  'text:editing:entered': { target: IText } & Partial<TEvent>;
   'text:editing:exited': { target: IText };
 }
+
+export type TEventsExtraData = Record<PropertyKey, Record<PropertyKey, never>> &
+  Record<'down', { alreadySelected: boolean }>;

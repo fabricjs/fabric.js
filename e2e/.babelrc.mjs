@@ -34,14 +34,14 @@ export default {
           skipDefaultConversion: true,
           transform: function (importName, matches, filename) {
             const file = resolve(
-              path.resolve(path.dirname(filename), `${matches[0]}`)
+              path.resolve(path.dirname(filename), `${matches[0]}`),
             );
             return `/${path
               .relative(
                 process.cwd(),
                 file.startsWith(testsDir)
                   ? path.resolve(testsBuiltDir, path.relative(testsDir, file))
-                  : file
+                  : file,
               )
               .replaceAll('\\', '/')}`;
           },

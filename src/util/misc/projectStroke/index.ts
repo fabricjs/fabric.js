@@ -1,5 +1,5 @@
 import { Point, type XY } from '../../../Point';
-import { findIndexRight } from '../../internals';
+import { findIndexRight } from '../../internals/findRight';
 import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
@@ -16,7 +16,7 @@ export * from './types';
 export const projectStrokeOnPoints = (
   points: XY[],
   options: TProjectStrokeOnPointsOptions,
-  openPath = false
+  openPath = false,
 ): TProjection[] => {
   const projections: TProjection[] = [];
 
@@ -32,7 +32,7 @@ export const projectStrokeOnPoints = (
       }
       return reduced;
     },
-    [new Point(points[0])]
+    [new Point(points[0])],
   );
 
   if (reduced.length === 1) {
@@ -60,19 +60,19 @@ export const projectStrokeOnPoints = (
 
     if (openPath && points.length === 1) {
       projections.push(
-        ...new StrokeLineCapProjections(A, A, options).project()
+        ...new StrokeLineCapProjections(A, A, options).project(),
       );
     } else if (openPath && (index === 0 || index === points.length - 1)) {
       projections.push(
         ...new StrokeLineCapProjections(
           A,
           index === 0 ? C : B,
-          options
-        ).project()
+          options,
+        ).project(),
       );
     } else {
       projections.push(
-        ...new StrokeLineJoinProjections(A, B, C, options).project()
+        ...new StrokeLineJoinProjections(A, B, C, options).project(),
       );
     }
   });

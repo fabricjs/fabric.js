@@ -1,5 +1,7 @@
 import { FabricText } from './Text';
 
+import { describe, expect, it } from 'vitest';
+
 describe('TextSvgExport', () => {
   it('exports text background color correctly', () => {
     const myText = new FabricText('text', {
@@ -22,7 +24,7 @@ describe('TextSvgExport', () => {
     const myText = new FabricText('text', { fill: 'rgba(100, 0, 100, 0.5)' });
     const svgStyles = myText.getSvgStyles();
     expect(svgStyles.includes('fill: rgb(100,0,100); fill-opacity: 0.5;')).toBe(
-      true
+      true,
     );
     expect(svgStyles.includes('stroke="none"')).toBe(false);
   });

@@ -38,7 +38,7 @@ export const createEmptyResponse = (): SVGParsingOutput => ({
 export async function parseSVGDocument(
   doc: Document,
   reviver?: TSvgReviverCallback,
-  { crossOrigin, signal }: LoadImageOptions = {}
+  { crossOrigin, signal }: LoadImageOptions = {},
 ): Promise<SVGParsingOutput> {
   if (signal && signal.aborted) {
     log('log', new SignalAbortedError('parseSVGDocument'));
@@ -54,7 +54,6 @@ export async function parseSVGDocument(
       crossOrigin,
       signal,
     };
-
   const elements = descendants.filter((el) => {
     applyViewboxTransform(el);
     return isValidSvgTag(el) && !hasInvalidAncestor(el); // http://www.w3.org/TR/SVG/struct.html#DefsElement
@@ -73,7 +72,7 @@ export async function parseSVGDocument(
       el.setAttribute('originalTransform', el.getAttribute('transform') || '');
       const id = el.getAttribute('id')!;
       localClipPaths[id] = Array.from(el.getElementsByTagName('*')).filter(
-        (el) => isValidSvgTag(el)
+        (el) => isValidSvgTag(el),
       );
     });
 
@@ -83,7 +82,7 @@ export async function parseSVGDocument(
     options,
     reviver,
     doc,
-    localClipPaths
+    localClipPaths,
   );
 
   const instances = await elementParser.parse();

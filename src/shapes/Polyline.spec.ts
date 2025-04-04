@@ -1,6 +1,8 @@
 import { Polyline } from './Polyline';
 import { Point } from '../Point';
 
+import { describe, expect, it } from 'vitest';
+
 const points = [
   { x: 2, y: 2 },
   { x: 12, y: 2 },
@@ -105,5 +107,12 @@ describe('Polyline', () => {
         strokeOffset: new Point(0.7053079228338603, 4),
       });
     });
+  });
+  it('should safeguard passing points in options', () => {
+    expect(new Polyline(points, { points: [{ x: 1, y: 1 }] })).toEqual(
+      expect.objectContaining({
+        points: points,
+      }),
+    );
   });
 });

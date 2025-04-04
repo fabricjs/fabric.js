@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-globals */
-import '../../../jest.extend';
 import { Point } from '../../Point';
 import { ActiveSelection } from '../../shapes/ActiveSelection';
 import { Circle } from '../../shapes/Circle';
@@ -11,17 +10,20 @@ import { Triangle } from '../../shapes/Triangle';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
+import { describe, expect, test, vi, beforeEach, afterEach, it } from 'vitest';
+import type { MockInstance } from 'vitest';
+
 const genericVpt = [2.3, 0, 0, 2.3, 120, 80] as TMat2D;
 
 const registerTestObjects = (objects: Record<string, FabricObject>) => {
   Object.entries(objects).forEach(([key, object]) => {
-    jest.spyOn(object, 'toJSON').mockReturnValue(key);
+    object.toJSON = vi.fn(() => key);
   });
 };
 
 describe('Canvas event data', () => {
   let canvas: Canvas;
-  let spy: jest.SpyInstance;
+  let spy: MockInstance;
 
   const snapshotOptions = {
     cloneDeepWith: (value: any) => {
@@ -33,7 +35,7 @@ describe('Canvas event data', () => {
 
   beforeEach(() => {
     canvas = new Canvas();
-    spy = jest.spyOn(canvas, 'fire');
+    spy = vi.spyOn(canvas, 'fire');
   });
 
   afterEach(() => {
@@ -54,11 +56,15 @@ describe('Canvas event data', () => {
     'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
-      canvas
-        .getSelectionElement()
-        .dispatchEvent(new MouseEvent(type, { clientX: 50, clientY: 50 }));
+      canvas.getSelectionElement().dispatchEvent(
+        new MouseEvent(type, {
+          clientX: 50,
+          clientY: 50,
+          detail: type === 'dblclick' ? 2 : undefined,
+        }),
+      );
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
-    }
+    },
   );
 
   // must call mousedown for mouseup to be listened to
@@ -69,7 +75,7 @@ describe('Canvas event data', () => {
       .dispatchEvent(new MouseEvent('mousedown', { clientX: 50, clientY: 50 }));
     spy.mockReset();
     document.dispatchEvent(
-      new MouseEvent('mouseup', { clientX: 50, clientY: 50 })
+      new MouseEvent('mouseup', { clientX: 50, clientY: 50 }),
     );
     expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
   });
@@ -90,9 +96,11 @@ describe('Canvas event data', () => {
         originX: 'center',
         originY: 'center',
       });
-      jest.spyOn(dragTarget, 'onDragStart').mockReturnValue(true);
-      jest.spyOn(dragTarget, 'renderDragSourceEffect').mockImplementation();
-      jest.spyOn(dragTarget, 'toJSON').mockReturnValue('Drag Target');
+      vi.spyOn(dragTarget, 'onDragStart').mockReturnValue(true);
+      vi.spyOn(dragTarget, 'renderDragSourceEffect').mockImplementation(
+        vi.fn(),
+      );
+      dragTarget.toJSON = vi.fn(() => 'Drag Target');
       canvas.add(dragTarget);
       canvas.setActiveObject(dragTarget);
       spy.mockReset();
@@ -100,16 +108,16 @@ describe('Canvas event data', () => {
         new MouseEvent('dragstart', {
           clientX: 50,
           clientY: 50,
-        })
+        }),
       );
       canvas.getSelectionElement().dispatchEvent(
         new MouseEvent(type, {
           clientX: 50,
           clientY: 50,
-        })
+        }),
       );
       expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
-    }
+    },
   );
 
   test('getScenePoint', () => {
@@ -118,14 +126,14 @@ describe('Canvas event data', () => {
       width: 200,
       height: 200,
     });
-    jest.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
-    const spy = jest.spyOn(canvas, 'getPointer');
-    jest.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
+    const spy = vi.spyOn(canvas, 'getPointer');
+    vi.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
       width: 500,
       height: 500,
     });
-    jest.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
-    jest.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
+    vi.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
+    vi.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
     const ev = new MouseEvent('mousemove', {
       clientX: 50,
       clientY: 50,
@@ -149,14 +157,14 @@ describe('Event targets', () => {
     });
     const canvas = new Canvas();
     canvas.add(group);
-    const targetSpy = jest.fn();
+    const targetSpy = vi.fn();
     target.on('mousedown', targetSpy);
-    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+    vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
     canvas.getSelectionElement().dispatchEvent(
       new MouseEvent('mousedown', {
         clientX: 50,
         clientY: 50,
-      })
+      }),
     );
     expect(targetSpy).toHaveBeenCalledTimes(1);
   });
@@ -209,10 +217,10 @@ describe('Event targets', () => {
       subTargetCheck: true,
     });
 
-    const enter = jest.fn();
-    const exit = jest.fn();
+    const enter = vi.fn();
+    const exit = vi.fn();
 
-    const getTargetsFromEventStream = (mock: jest.Mock) =>
+    const getTargetsFromEventStream = (mock: MockInstance) =>
       mock.mock.calls.map((args) => args[0].target);
 
     registerTestObjects({
@@ -276,15 +284,15 @@ describe('Event targets', () => {
       const e = new MouseEvent('mousedown', {
         ...init,
       });
-      jest
-        .spyOn(e, 'target', 'get')
-        .mockReturnValue(canvas.getSelectionElement());
+      vi.spyOn(e, 'target', 'get').mockReturnValue(
+        canvas.getSelectionElement(),
+      );
       return e;
     };
 
     const findTarget = (canvas: Canvas, ev?: MouseEventInit) => {
       const target = canvas.findTarget(
-        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev })
+        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev }),
       );
       const targets = canvas.targets;
       canvas.targets = [];
@@ -318,19 +326,19 @@ describe('Event targets', () => {
         const canvas = new Canvas();
         canvas.add(parent);
 
-        jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+        vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
         const found = canvas['findTargetsTraversal']([parent], new Point(), {
           searchStrategy: searchAll ? 'search-all' : 'first-hit',
         });
         expect(found).toEqual(
           searchAll
             ? [subTarget2, target2, subTarget1, target1, parent]
-            : [subTarget2, target2, parent]
+            : [subTarget2, target2, parent],
         );
-      }
+      },
     );
 
-    test.failing('searchPossibleTargets', () => {
+    test.fails('searchPossibleTargets', () => {
       const subTarget = new FabricObject();
       const target = new Group([subTarget], {
         subTargetCheck: true,
@@ -344,7 +352,7 @@ describe('Event targets', () => {
       const canvas = new Canvas();
       canvas.add(parent);
 
-      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+      vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets([parent], new Point());
       expect(found).toBe(target);
       expect(canvas.targets).toEqual([subTarget, target, parent]);
@@ -364,10 +372,10 @@ describe('Event targets', () => {
       activeSelection.add(target, other);
       canvas.setActiveObject(activeSelection);
 
-      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+      vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets(
         [activeSelection],
-        new Point()
+        new Point(),
       );
       expect(found).toBe(activeSelection);
       expect(canvas.targets).toEqual([]);
@@ -430,24 +438,24 @@ describe('Event targets', () => {
       const e2 = { clientX: 4, clientY: 4 };
 
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] }
+        { target: rectOver, targets: [] },
         // 'Should return the rectOver, rect is not considered'
       );
 
       canvas.setActiveObject(rect);
       expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] }
+        { target: rectOver, targets: [] },
         // 'Should still return rectOver because is above active object'
       );
 
       expect(findTarget(canvas, e2)).toEqual(
-        { target: rect, targets: [] }
+        { target: rect, targets: [] },
         // 'Should rect because a corner of the activeObject has been hit'
       );
 
       canvas.altSelectionKey = 'shiftKey';
       expect(findTarget(canvas, e)).toEqual(
-        { target: rect, targets: [] }
+        { target: rect, targets: [] },
         // 'Should rect because active and altSelectionKey is pressed'
       );
     });
@@ -602,7 +610,7 @@ describe('Event targets', () => {
           target: group,
           targets: [rect],
         });
-      }
+      },
     );
 
     test('findTarget with perPixelTargetFind', () => {
@@ -825,7 +833,7 @@ describe('Event targets', () => {
         {
           target: activeSelection,
           targets: [],
-        }
+        },
         // 'Should not return the rect behind active selection'
       );
 
@@ -834,7 +842,7 @@ describe('Event targets', () => {
         {
           target: rect3,
           targets: [],
-        }
+        },
         // 'Should return the rect after clearing selection'
       );
     });
@@ -879,11 +887,9 @@ describe('Event targets', () => {
     const target = new FabricObject({ width: 10, height: 10 });
     const canvas = new Canvas();
     canvas.add(target);
-
-    jest.spyOn(target, 'toJSON').mockReturnValue('target');
-
-    const targetSpy = jest.spyOn(target, 'fire');
-    const canvasSpy = jest.spyOn(canvas, 'fire');
+    target.toJSON = vi.fn(() => 'target');
+    const targetSpy = vi.spyOn(target, 'fire');
+    const canvasSpy = vi.spyOn(canvas, 'fire');
     const enter = new MouseEvent('mousemove', { clientX: 5, clientY: 5 });
     const exit = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
     canvas._onMouseMove(enter);

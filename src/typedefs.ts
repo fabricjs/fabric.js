@@ -11,7 +11,7 @@ interface NominalTag<T> {
 type Nominal<Type, Tag> = NominalTag<Tag> & Type;
 
 type TNonFunctionPropertyNames<T> = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 export type TClassProperties<T> = Pick<T, TNonFunctionPropertyNames<T>>;
@@ -43,7 +43,11 @@ export type TBBox = {
 
 export type Percent = `${number}%`;
 
-export type ImageFormat = 'jpeg' | 'png';
+/**
+ * In order to support webp on node canvas a workaround is needed and is shared here:
+ * https://github.com/Automattic/node-canvas/issues/1258
+ */
+export type ImageFormat = 'jpeg' | 'png' | 'webp';
 
 export type SVGElementName = 'linearGradient' | 'radialGradient' | 'stop';
 
@@ -63,7 +67,7 @@ export type TMat2D = [
   c: number,
   d: number,
   e: number,
-  f: number
+  f: number,
 ];
 
 /**
@@ -98,7 +102,7 @@ export type TCacheCanvasDimensions = {
 export type TRectBounds = [min: XY, max: XY];
 
 export type TToCanvasElementOptions<
-  T extends BaseFabricObject = BaseFabricObject
+  T extends BaseFabricObject = BaseFabricObject,
 > = {
   left?: number;
   top?: number;

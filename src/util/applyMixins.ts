@@ -5,7 +5,7 @@ import type { Constructor } from '../typedefs';
  */
 export function applyMixins<T extends Constructor, S extends Constructor>(
   derivedCtor: T,
-  constructors: S[]
+  constructors: S[],
 ) {
   constructors.forEach((baseCtor) => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
@@ -14,7 +14,7 @@ export function applyMixins<T extends Constructor, S extends Constructor>(
           derivedCtor.prototype,
           name,
           Object.getOwnPropertyDescriptor(baseCtor.prototype, name) ||
-            Object.create(null)
+            Object.create(null),
         );
     });
   });

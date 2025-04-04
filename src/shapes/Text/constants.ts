@@ -1,4 +1,4 @@
-import { LEFT, reNewline } from '../../constants';
+import { FILL, LEFT, STROKE, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { FabricText } from './Text';
 
@@ -52,9 +52,9 @@ export type StylePropertiesType =
 export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
   ...textDecorationProperties,
-  'stroke',
+  STROKE,
   'strokeWidth',
-  'fill',
+  FILL,
   'deltaY',
   'textBackgroundColor',
 ] as const;

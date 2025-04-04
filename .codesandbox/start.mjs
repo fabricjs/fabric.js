@@ -44,7 +44,7 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
           ...packageJSON,
           trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
         },
-        { spaces: 2 }
+        { spaces: 2 },
       );
       fs.writeJSONSync(pathToTrigger, packageJSON, { spaces: 2 });
     }
@@ -53,9 +53,9 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
   console.log(
     chalk.blue(
       `\n> starting ${chalk.bold(
-        JSON.parse(fs.readFileSync(pathToTrigger)).name
-      )}`
-    )
+        JSON.parse(fs.readFileSync(pathToTrigger)).name,
+      )}`,
+    ),
   );
 
   try {

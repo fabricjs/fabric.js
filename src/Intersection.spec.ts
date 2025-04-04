@@ -1,6 +1,8 @@
 import { Intersection } from './Intersection';
 import { Point } from './Point';
 
+import { describe, expect, test } from 'vitest';
+
 const polygonPoints = [
   new Point(4, 1),
   new Point(6, 2),
@@ -56,7 +58,7 @@ describe('Intersection', () => {
         [new Point(9.5, 8.5), false],
       ])('%p is in polygon %p, case index %#', (point, result) => {
         expect(Intersection.isPointInPolygon(point, polygonPoints)).toBe(
-          result
+          result,
         );
       });
     });
@@ -66,7 +68,7 @@ describe('Intersection', () => {
         [new Point(6, 2), true],
       ])('%p is in polygon %p, case index %#', (point, result) => {
         expect(Intersection.isPointInPolygon(point, polygonPoints)).toBe(
-          result
+          result,
         );
       });
     });

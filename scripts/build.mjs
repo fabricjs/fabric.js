@@ -20,7 +20,7 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
       (type) =>
         `--watch.${type} "node ./scripts/buildReporter.mjs ${type
           .toLowerCase()
-          .slice(2)}"`
+          .slice(2)}"`,
     ),
   ].join(' ');
   const processOptions = {

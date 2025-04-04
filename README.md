@@ -5,6 +5,7 @@
 A **simple and powerful Javascript HTML5 canvas library**.
 
 - [**Website**][website]
+- [**Old V5 documentation**](https://fabric5.fabricjs.com)
 - [**GOTCHAS**][gotchas]
 - [**Contributing, Developing and More**](CONTRIBUTING.md)
 
@@ -42,41 +43,32 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - Out of the box interactions such as scale, move, rotate, skew, group...
 - Built in shapes, controls, animations, image filters, gradients, patterns, brushes...
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
-- [Typed and modular](#migrating-to-v6)
-- [Unit tested](CONTRIBUTING.md#%F0%9F%A7%AA%20testing)
+- Typed and modular
+- [Unit tested](CONTRIBUTING.md#-testing)
 
 #### Supported Browsers/Environments
 
 |   Context   | Supported Version | Notes                           |
 | :---------: | :---------------: | ------------------------------- |
-|   Firefox   |        ✔️         | modern version (tbd)            |
-|   Safari    |        ✔️         | version >= 10.1                 |
+|   Firefox   |        ✔️         | 58                              |
+|   Safari    |        ✔️         | 11                              |
 |    Opera    |        ✔️         | chromium based                  |
-|   Chrome    |        ✔️         | modern version (tbd)            |
+|   Chrome    |        ✔️         | 64                              |
 |    Edge     |        ✔️         | chromium based                  |
 | Edge Legacy |        ❌         |
 |    IE11     |        ❌         |
 |   Node.js   |        ✔️         | [Node.js installation](#nodejs) |
 
-Fabric.js Does not use transpilation by default, the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
-
-## Migrating to v6
-
-v6 is a **MAJOR** effort including migrating to TS and es6, countless fixes, rewrites and features.\
-Currently in beta, refer to [#8299](../../issues/8299) for guidance.
-
-```bash
-$ npm install fabric@beta --save
-// or
-$ yarn add fabric@beta
-```
+Fabric.js does not use polyfills by default, or tries to keep it at minimum. the browser version we support is determined by the level of canvas api we want to use and some js syntax. While JS can be easily transpiled, canvas API can't.
 
 ## Installation
 
 ```bash
 $ npm install fabric --save
-// or
+# or use yarn
 $ yarn add fabric
+# or use pnpm
+$ pnpm install fabric
 ```
 
 #### Browser
@@ -87,6 +79,11 @@ $ yarn add fabric
 See [browser modules][mdn_es6] for using es6 imports in the browser or use a dedicated bundler.
 
 #### Node.js
+
+We strongly recommend to run your applications only LTS versions of node.
+
+Said so the minimum supported version of node is 18.
+We bump up the minimum version of node with a Major release only when the dependencies force us to do so.
 
 Fabric.js depends on [node-canvas][node_canvas] for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom][jsdom] for a `window` implementation on node.
 This means that you may encounter `node-canvas` limitations and [bugs][node_canvas_issues].
@@ -109,7 +106,7 @@ import { fabric } from 'fabric';
 ```html
 <canvas id="canvas" width="300" height="300"></canvas>
 
-<script src="https://cdn.jsdelivr.net/npm/fabric"></script>
+<script src="https://cdn.jsdelivr.net/npm/fabric@6.4.3/dist/index.js"></script>
 <script>
   const canvas = new fabric.Canvas('canvas');
   const rect = new fabric.Rect({
@@ -125,7 +122,7 @@ import { fabric } from 'fabric';
 
 </details>
 
-<details><summary><b>ReactJS</b></summary>
+<details><summary><b>React.js</b></summary>
 
 ```tsx
 import React, { useEffect, useRef } from 'react';
@@ -184,7 +181,7 @@ http
   .listen(port, (err) => {
     if (err) throw err;
     console.log(
-      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`
+      `> Ready on http://localhost:${port}, http://localhost:${port}/view, http://localhost:${port}/download`,
     );
   });
 ```
@@ -197,15 +194,16 @@ See our ready to use [templates](./.codesandbox/templates/).
 
 ## Other Solutions
 
-| Project                        | Description          | Demo |
-| ------------------------------ | -------------------- | :--: |
+| Project                        | Description          |
+| ------------------------------ | -------------------- |
 | [Three.js][three.js]           | 3D graphics          |
 | [PixiJS][pixijs]               | WebGL renderer       |
-| [Konva][konva]                 | Similar features     |  ❌  |
+| [Konva][konva]                 | Similar features     |
 | [html-to-image][html-to-image] | HTML to image/canvas |
 
 ## More Resources
 
+- [WIP new fabricjs.com](https://fabricjs.github.io)
 - [Demos on `fabricjs.com`][demos]
 - [Fabric.js on `Twitter`][twitter]
 - [Fabric.js on `CodeTriage`][code_triage]
@@ -218,8 +216,8 @@ See our ready to use [templates](./.codesandbox/templates/).
 - [kangax][kagnax]
 - [asturur][asturur] on [`Twitter`][asturur_twitter]
   [![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
-- [melchiar][melchiar] [![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
 - [ShaMan123][shaman123] [![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
+- [melchiar][melchiar] [![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
@@ -234,7 +232,7 @@ See our ready to use [templates](./.codesandbox/templates/).
 [codepens]: https://codepen.io/tag/fabricjs
 [contributors]: https://github.com/fabricjs/fabric.js/graphs/contributors
 [demos]: http://fabricjs.com/demos/
-[gotchas]: http://fabricjs.com/fabric-gotchas
+[gotchas]: https://fabricjs.com/docs/old-docs/gotchas/
 [html-to-image]: https://github.com/bubkoo/html-to-image
 [jsdelivr]: https://www.jsdelivr.com/package/npm/fabric
 [jsdom]: https://github.com/jsdom/jsdom

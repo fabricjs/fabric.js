@@ -1,4 +1,3 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
@@ -6,9 +5,12 @@ import { fragmentSource } from './shaders/grayscale';
 
 export type TGrayscaleMode = 'average' | 'lightness' | 'luminosity';
 
-export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
+type GrayscaleOwnProps = {
+  mode: TGrayscaleMode;
+};
+
+export const grayscaleDefaultValues: GrayscaleOwnProps = {
   mode: 'average',
-  mainParameter: 'mode',
 };
 
 /**
@@ -18,12 +20,14 @@ export const grayscaleDefaultValues: Partial<TClassProperties<Grayscale>> = {
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class Grayscale extends BaseFilter {
+export class Grayscale extends BaseFilter<'Grayscale', GrayscaleOwnProps> {
   declare mode: TGrayscaleMode;
 
   static type = 'Grayscale';
 
   static defaults = grayscaleDefaultValues;
+
+  static uniformLocations = ['uMode'];
 
   /**
    * Apply the Grayscale operation to a Uint8Array representing the pixels of an image.
@@ -33,24 +37,22 @@ export class Grayscale extends BaseFilter {
    */
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
     for (let i = 0, value: number; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
       switch (this.mode) {
         case 'average':
-          value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          value = (r + g + b) / 3;
           break;
         case 'lightness':
-          value =
-            (Math.min(data[i], data[i + 1], data[i + 2]) +
-              Math.max(data[i], data[i + 1], data[i + 2])) /
-            2;
+          value = (Math.min(r, g, b) + Math.max(r, g, b)) / 2;
           break;
         case 'luminosity':
-          value = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
+          value = 0.21 * r + 0.72 * g + 0.07 * b;
           break;
       }
 
-      data[i] = value;
-      data[i + 1] = value;
-      data[i + 2] = value;
+      data[i + 2] = data[i + 1] = data[i] = value;
     }
   }
 
@@ -63,21 +65,6 @@ export class Grayscale extends BaseFilter {
   }
 
   /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uMode: gl.getUniformLocation(program, 'uMode'),
-    };
-  }
-
-  /**
    * Send data from this filter to its shader program's uniforms.
    *
    * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
@@ -85,7 +72,7 @@ export class Grayscale extends BaseFilter {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const mode = 1;
     gl.uniform1i(uniformLocations.uMode, mode);

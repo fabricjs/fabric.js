@@ -36,7 +36,7 @@ class AnimationRegistry extends Array<AnimationBase> {
       (animation) =>
         animation.target === canvas ||
         (typeof animation.target === 'object' &&
-          (animation.target as FabricObject)?.canvas === canvas)
+          (animation.target as FabricObject)?.canvas === canvas),
     );
     animations.forEach((animation) => animation.abort());
     return animations;

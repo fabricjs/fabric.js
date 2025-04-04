@@ -1,6 +1,8 @@
 import { FabricText } from './Text';
 import { graphemeSplit } from '../../util/lang_string';
 
+import { describe, expect, it, test } from 'vitest';
+
 describe('setSelectionStyles', () => {
   test('will set properties at the correct position', () => {
     const text = new FabricText('Hello', {
@@ -25,7 +27,7 @@ describe('setSelectionStyles', () => {
         deltaY: 0,
       },
       0,
-      2
+      2,
     );
     const [style1After, style2After] = text.getSelectionStyles(0, 2);
     expect(Object.hasOwn(style1After, 'fontSize')).toBe(false);
@@ -53,7 +55,7 @@ describe('toObject', () => {
       { start: 2, end: 3, style: { fontSize: 40 } },
     ]);
     expect(serializedStyles[0].start).toEqual(
-      graphemeSplit(text.textLines[0]).length
+      graphemeSplit(text.textLines[0]).length,
     );
   });
 });

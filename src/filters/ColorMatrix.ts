@@ -1,14 +1,21 @@
-import type { TClassProperties } from '../typedefs';
 import { BaseFilter } from './BaseFilter';
-import type { T2DPipelineState, TWebGLUniformLocationMap } from './typedefs';
+import type {
+  T2DPipelineState,
+  TMatColorMatrix,
+  TWebGLUniformLocationMap,
+} from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { fragmentSource } from './shaders/colorMatrix';
-export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
-  {
-    matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-    mainParameter: 'matrix',
-    colorsOnly: true,
-  };
+
+export type ColorMatrixOwnProps = {
+  matrix: TMatColorMatrix;
+  colorsOnly: boolean;
+};
+
+export const colorMatrixDefaultValues: ColorMatrixOwnProps = {
+  matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+  colorsOnly: true,
+};
 
 /**
    * Color Matrix filter class
@@ -26,7 +33,11 @@ export const colorMatrixDefaultValues: Partial<TClassProperties<ColorMatrix>> =
    * object.filters.push(filter);
    * object.applyFilters();
    */
-export class ColorMatrix extends BaseFilter {
+export class ColorMatrix<
+  Name extends string = 'ColorMatrix',
+  OwnProps extends object = ColorMatrixOwnProps,
+  SerializedProps extends object = ColorMatrixOwnProps,
+> extends BaseFilter<Name, OwnProps, SerializedProps> {
   /**
    * Colormatrix for pixels.
    * array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
@@ -35,7 +46,7 @@ export class ColorMatrix extends BaseFilter {
    * @param {Array} matrix array of 20 numbers.
    * @default
    */
-  declare matrix: number[];
+  declare matrix: ColorMatrixOwnProps['matrix'];
 
   /**
    * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
@@ -43,19 +54,13 @@ export class ColorMatrix extends BaseFilter {
    * @type Boolean
    * @default true
    */
-  declare colorsOnly: boolean;
+  declare colorsOnly: ColorMatrixOwnProps['colorsOnly'];
 
   static type = 'ColorMatrix';
 
   static defaults = colorMatrixDefaultValues;
 
-  setOptions({ matrix, ...options }: Record<string, any>) {
-    if (matrix) {
-      // safeguard against mutation
-      this.matrix = [...matrix];
-    }
-    Object.assign(this, options);
-  }
+  static uniformLocations = ['uColorMatrix', 'uConstants'];
 
   getFragmentSource(): string {
     return fragmentSource;
@@ -77,36 +82,19 @@ export class ColorMatrix extends BaseFilter {
       const r = data[i];
       const g = data[i + 1];
       const b = data[i + 2];
-      if (colorsOnly) {
-        data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
-        data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
-        data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
-      } else {
+
+      data[i] = r * m[0] + g * m[1] + b * m[2] + m[4] * 255;
+      data[i + 1] = r * m[5] + g * m[6] + b * m[7] + m[9] * 255;
+      data[i + 2] = r * m[10] + g * m[11] + b * m[12] + m[14] * 255;
+      if (!colorsOnly) {
         const a = data[i + 3];
-        data[i] = r * m[0] + g * m[1] + b * m[2] + a * m[3] + m[4] * 255;
-        data[i + 1] = r * m[5] + g * m[6] + b * m[7] + a * m[8] + m[9] * 255;
-        data[i + 2] =
-          r * m[10] + g * m[11] + b * m[12] + a * m[13] + m[14] * 255;
+        data[i] += a * m[3];
+        data[i + 1] += a * m[8];
+        data[i + 2] += a * m[13];
         data[i + 3] =
           r * m[15] + g * m[16] + b * m[17] + a * m[18] + m[19] * 255;
       }
     }
-  }
-
-  /**
-   * Return WebGL uniform locations for this filter's shader.
-   *
-   * @param {WebGLRenderingContext} gl The GL canvas context used to compile this filter's shader.
-   * @param {WebGLShaderProgram} program This filter's compiled shader program.
-   */
-  getUniformLocations(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): TWebGLUniformLocationMap {
-    return {
-      uColorMatrix: gl.getUniformLocation(program, 'uColorMatrix'),
-      uConstants: gl.getUniformLocation(program, 'uConstants'),
-    };
   }
 
   /**
@@ -117,7 +105,7 @@ export class ColorMatrix extends BaseFilter {
    */
   sendUniformData(
     gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    uniformLocations: TWebGLUniformLocationMap,
   ) {
     const m = this.matrix,
       matrix = [
@@ -141,6 +129,13 @@ export class ColorMatrix extends BaseFilter {
       constants = [m[4], m[9], m[14], m[19]];
     gl.uniformMatrix4fv(uniformLocations.uColorMatrix, false, matrix);
     gl.uniform4fv(uniformLocations.uConstants, constants);
+  }
+
+  toObject(): { type: Name } & SerializedProps {
+    return {
+      ...super.toObject(),
+      matrix: [...this.matrix] as TMatColorMatrix,
+    };
   }
 }
 

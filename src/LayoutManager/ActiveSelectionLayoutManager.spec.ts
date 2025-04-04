@@ -4,6 +4,8 @@ import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { ActiveSelectionLayoutManager } from './ActiveSelectionLayoutManager';
 
+import { describe, expect, it, vi } from 'vitest';
+
 describe('ActiveSelectionLayoutManager', () => {
   describe('onBeforeLayout', () => {
     describe('triggers', () => {
@@ -16,19 +18,20 @@ describe('ActiveSelectionLayoutManager', () => {
         'skewing',
         'changed',
         'modifyPoly',
+        'modifyPath',
       ];
 
       it('should subscribe activeSelection that contains object', () => {
         const manager = new ActiveSelectionLayoutManager();
         const object = new FabricObject();
-        const group = new Group([object], {
+        new Group([object], {
           interactive: true,
           subTargetCheck: true,
         });
         const as = new ActiveSelection([object], { layoutManager: manager });
-        const objectOn = jest.spyOn(object, 'on');
-        const objectOff = jest.spyOn(object, 'off');
-        const asOn = jest.spyOn(as, 'on');
+        const objectOn = vi.spyOn(object, 'on');
+        const objectOff = vi.spyOn(object, 'off');
+        const asOn = vi.spyOn(as, 'on');
         manager.subscribeTargets({
           targets: [object],
           target: as,
@@ -53,14 +56,14 @@ describe('ActiveSelectionLayoutManager', () => {
           subTargetCheck: true,
         });
         const as = new ActiveSelection([object, object2, object3, object4]);
-        const asPerformLayout = jest.spyOn(as.layoutManager, 'performLayout');
-        const groupPerformLayout = jest.spyOn(
+        const asPerformLayout = vi.spyOn(as.layoutManager, 'performLayout');
+        const groupPerformLayout = vi.spyOn(
           group.layoutManager,
-          'performLayout'
+          'performLayout',
         );
-        const groupPerformLayout2 = jest.spyOn(
+        const groupPerformLayout2 = vi.spyOn(
           group2.layoutManager,
-          'performLayout'
+          'performLayout',
         );
         groupPerformLayout.mockClear();
         groupPerformLayout2.mockClear();

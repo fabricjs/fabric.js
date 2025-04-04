@@ -8,6 +8,7 @@ coverage/
 test/
 test*
 e2e/
+src/benchmarks
 .DS_Store
 .codesandbox/
 .devcontainer/

@@ -9,6 +9,10 @@ import { Group } from './Group';
 import type { GroupProps } from './Group';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
+import { FabricImage } from './Image';
+import { SignalAbortedError } from '../util/internals/console';
+
+import { describe, expect, it, test, vi } from 'vitest';
 
 const makeGenericGroup = (options?: Partial<GroupProps>) => {
   const objs = [new FabricObject(), new FabricObject()];
@@ -58,6 +62,26 @@ describe('Group', () => {
     expect(group.height).toBe(100);
   });
 
+  it('fromObject with images', async () => {
+    const objs = [
+      new FabricObject(),
+      new FabricObject(),
+      new FabricImage(new Image()),
+    ];
+    const group = new Group(objs);
+    const jsonData = group.toObject();
+    const abortController = new AbortController();
+    abortController.abort();
+    return Group.fromObject(jsonData, {
+      signal: abortController.signal,
+    }).catch((e) => {
+      expect(e instanceof SignalAbortedError).toBe(true);
+      expect(e.message).toBe(
+        `fabric: loadImage 'options.signal' is in 'aborted' state`,
+      );
+    });
+  });
+
   describe('With fit-content layout manager', () => {
     test('will serialize correctly without default values', async () => {
       const { group } = makeGenericGroup({
@@ -87,7 +111,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.width).toBe(100);
       expect(group.height).toBe(100);
@@ -111,7 +135,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.left).toBe(6);
       expect(group.top).toBe(4);
@@ -131,7 +155,7 @@ describe('Group', () => {
             strokeWidth: 0,
           }),
         ],
-        objectOptions
+        objectOptions,
       );
       expect(group.left).toBe(60);
       expect(group.top).toBe(50);
@@ -222,7 +246,7 @@ describe('Group', () => {
       const restoredGroup = await Group.fromObject(serialized);
       expect(restoredGroup.layoutManager).toBeInstanceOf(LayoutManager);
       expect(restoredGroup.layoutManager.strategy).toBeInstanceOf(
-        ClipPathLayout
+        ClipPathLayout,
       );
     });
     test('will serialize correctly without default values', async () => {
@@ -262,7 +286,7 @@ describe('Group', () => {
   it('triggerLayout should preform layout, layoutManager is defined', () => {
     const group = new Group();
     expect(group.layoutManager).toBeDefined();
-    const performLayout = jest.spyOn(group.layoutManager, 'performLayout');
+    const performLayout = vi.spyOn(group.layoutManager, 'performLayout');
 
     group.triggerLayout();
     const fixedLayout = new FixedLayout();
@@ -284,10 +308,10 @@ describe('Group', () => {
     const group2 = new Group();
     const canvas = new Canvas();
 
-    const eventsSpy = jest.spyOn(object, 'fire');
-    const removeSpy = jest.spyOn(group, 'remove');
-    const exitSpy = jest.spyOn(group, 'exitGroup');
-    const enterSpy = jest.spyOn(group2, 'enterGroup');
+    const eventsSpy = vi.spyOn(object, 'fire');
+    const removeSpy = vi.spyOn(group, 'remove');
+    const exitSpy = vi.spyOn(group, 'exitGroup');
+    const enterSpy = vi.spyOn(group2, 'enterGroup');
 
     expect(object.group).toBe(group);
     expect(object.parent).toBe(group);

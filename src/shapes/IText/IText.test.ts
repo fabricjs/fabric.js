@@ -1,7 +1,8 @@
-import type { Canvas } from '../../canvas/Canvas';
-import '../../../jest.extend';
+import { Canvas } from '../../canvas/Canvas';
 import { Group } from '../Group';
 import { IText } from './IText';
+
+import { describe, expect, test, vi } from 'vitest';
 
 describe('IText', () => {
   describe('cursor drawing width', () => {
@@ -25,11 +26,13 @@ describe('IText', () => {
         const group = new Group([text]);
         group.set({ scaleX: scale, scaleY: scale, angle });
         group.setCoords();
-        const fillRect = jest.fn();
-        const getZoom = jest.fn().mockReturnValue(zoom);
+        const fillRect = vi.fn();
+        const getZoom = vi.fn().mockReturnValue(zoom);
         const mockContext = { fillRect };
         const mockCanvas = { contextTop: mockContext, getZoom };
-        jest.replaceProperty(text, 'canvas', mockCanvas as unknown as Canvas);
+        Object.assign(text, {
+          canvas: mockCanvas,
+        });
 
         text.renderCursorAt(1);
         const call = fillRect.mock.calls[0];
@@ -37,7 +40,18 @@ describe('IText', () => {
           cloneDeepWith: (value) =>
             typeof value === 'number' ? value.toFixed(3) : undefined,
         });
-      }
+      },
     );
+  });
+  describe('Interaction with mouse and editing', () => {
+    test('_mouseDownHandlerBefore set up selected property', () => {
+      const iText = new IText('test need some word\nsecond line');
+      iText.canvas = new Canvas();
+      expect(iText.selected).toBe(undefined);
+      iText._mouseDownHandler({ e: { button: 0 }, alreadySelected: false });
+      expect(iText.selected).toBe(false);
+      iText._mouseDownHandler({ e: {}, alreadySelected: true });
+      expect(iText.selected).toBe(true);
+    });
   });
 });

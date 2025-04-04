@@ -31,15 +31,14 @@ import { rotateVector } from './util/misc/vectors';
 
 const shadowOffsetRegex = '(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?';
 
-const reOffsetsAndBlur = () =>
-  new RegExp(
-    '(?:\\s|^)' +
-      shadowOffsetRegex +
-      shadowOffsetRegex +
-      '(' +
-      reNum +
-      '?(?:px)?)?(?:\\s?|$)(?:$|\\s)'
-  );
+const reOffsetsAndBlur = new RegExp(
+  '(?:\\s|^)' +
+    shadowOffsetRegex +
+    shadowOffsetRegex +
+    '(' +
+    reNum +
+    '?(?:px)?)?(?:\\s?|$)(?:$|\\s)',
+);
 
 export const shadowDefaultValues: Partial<TClassProperties<Shadow>> = {
   color: 'rgb(0,0,0)',
@@ -127,12 +126,7 @@ export class Shadow {
   constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
     const options: Partial<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
-    Object.assign(this, (this.constructor as typeof Shadow).ownDefaults);
-    for (const prop in options) {
-      // @ts-expect-error for loops are so messy in TS
-      this[prop] = options[prop];
-    }
-
+    Object.assign(this, Shadow.ownDefaults, options);
     this.id = uid();
   }
 
@@ -142,11 +136,10 @@ export class Shadow {
    */
   static parseShadow(value: string) {
     const shadowStr = value.trim(),
-      regex = reOffsetsAndBlur(),
       [, offsetX = 0, offsetY = 0, blur = 0] = (
-        regex.exec(shadowStr) || []
+        reOffsetsAndBlur.exec(shadowStr) || []
       ).map((value) => parseFloat(value) || 0),
-      color = (shadowStr.replace(regex, '') || 'rgb(0,0,0)').trim();
+      color = (shadowStr.replace(reOffsetsAndBlur, '') || 'rgb(0,0,0)').trim();
 
     return {
       color,
@@ -173,7 +166,7 @@ export class Shadow {
   toSVG(object: FabricObject) {
     const offset = rotateVector(
         new Point(this.offsetX, this.offsetY),
-        degreesToRadians(-object.angle)
+        degreesToRadians(-object.angle),
       ),
       BLUR_BOX = 20,
       color = new Color(this.color);
@@ -186,14 +179,14 @@ export class Shadow {
       fBoxX =
         toFixed(
           (Math.abs(offset.x) + this.blur) / object.width,
-          config.NUM_FRACTION_DIGITS
+          config.NUM_FRACTION_DIGITS,
         ) *
           100 +
         BLUR_BOX;
       fBoxY =
         toFixed(
           (Math.abs(offset.y) + this.blur) / object.height,
-          config.NUM_FRACTION_DIGITS
+          config.NUM_FRACTION_DIGITS,
         ) *
           100 +
         BLUR_BOX;
@@ -211,13 +204,13 @@ export class Shadow {
       100 + 2 * fBoxX
     }%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(
       this.blur ? this.blur / 2 : 0,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(
       offset.x,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}" dy="${toFixed(
       offset.y,
-      config.NUM_FRACTION_DIGITS
+      config.NUM_FRACTION_DIGITS,
     )}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
   }
 

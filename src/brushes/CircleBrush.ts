@@ -3,7 +3,7 @@ import type { Point } from '../Point';
 import { Shadow } from '../Shadow';
 import { Circle } from '../shapes/Circle';
 import { Group } from '../shapes/Group';
-import { getRandomInt } from '../util/internals';
+import { getRandomInt } from '../util/internals/getRandomInt';
 import type { Canvas } from '../canvas/Canvas';
 import { BaseBrush } from './BaseBrush';
 import type { CircleBrushPoint } from './typedefs';

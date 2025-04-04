@@ -1,4 +1,13 @@
-import { TOP, LEFT } from '../../constants';
+import {
+  TOP,
+  LEFT,
+  SCALE_Y,
+  SCALE_X,
+  SKEW_X,
+  SKEW_Y,
+  FILL,
+  STROKE,
+} from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { InteractiveFabricObject } from './InteractiveObject';
 import type { FabricObject } from './Object';
@@ -6,8 +15,8 @@ import type { FabricObject } from './Object';
 export const stateProperties = [
   TOP,
   LEFT,
-  'scaleX',
-  'scaleY',
+  SCALE_X,
+  SCALE_Y,
   'flipX',
   'flipY',
   'originX',
@@ -17,13 +26,13 @@ export const stateProperties = [
   'globalCompositeOperation',
   'shadow',
   'visible',
-  'skewX',
-  'skewY',
+  SKEW_X,
+  SKEW_Y,
 ];
 
 export const cacheProperties = [
-  'fill',
-  'stroke',
+  FILL,
+  STROKE,
   'strokeWidth',
   'strokeDashArray',
   'width',
@@ -60,7 +69,7 @@ export const fabricObjectDefaultValues: Partial<
   strokeUniform: false,
   padding: 0,
   opacity: 1,
-  paintFirst: 'fill',
+  paintFirst: FILL,
   fill: 'rgb(0,0,0)',
   fillRule: 'nonzero',
   stroke: null,

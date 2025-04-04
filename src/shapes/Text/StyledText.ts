@@ -22,7 +22,7 @@ export type TextStyle = {
 export abstract class StyledText<
   Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
-  EventSpec extends ObjectEvents = ObjectEvents
+  EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObject<Props, SProps, EventSpec> {
   declare abstract styles: TextStyle;
   protected declare abstract _textLines: string[][];
@@ -30,7 +30,7 @@ export abstract class StyledText<
   static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
   abstract get2DCursorLocation(
     selectionStart: number,
-    skipWrapping?: boolean
+    skipWrapping?: boolean,
   ): { charIndex: number; lineIndex: number };
 
   /**
@@ -97,8 +97,6 @@ export abstract class StyledText<
    * has no other properties, then it is also deleted.  Finally,
    * if the line containing that character has no other characters
    * then it also is deleted.
-   *
-   * @param {string} property The property to compare between characters and text.
    */
   cleanStyle(property: keyof TextStyleDeclaration) {
     if (!this.styles) {
@@ -149,8 +147,7 @@ export abstract class StyledText<
       graphemeCount += this._textLines[i].length;
     }
     if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-      // @ts-expect-error conspiracy theory of TS
-      this[property as keyof this] = stylePropertyValue;
+      this[property as keyof this] = stylePropertyValue as any;
       this.removeStyle(property);
     }
   }
@@ -196,7 +193,7 @@ export abstract class StyledText<
         ...style,
         // use the predicate to discard undefined values
       },
-      (value) => value !== undefined
+      (value) => value !== undefined,
     );
 
     // finally assign to the old position the new style
@@ -213,7 +210,7 @@ export abstract class StyledText<
   getSelectionStyles(
     startIndex: number,
     endIndex?: number,
-    complete?: boolean
+    complete?: boolean,
   ): TextStyleDeclaration[] {
     const styles: TextStyleDeclaration[] = [];
     for (let i = startIndex; i < (endIndex || startIndex); i++) {
@@ -263,7 +260,7 @@ export abstract class StyledText<
    */
   _getStyleDeclaration(
     lineIndex: number,
-    charIndex: number
+    charIndex: number,
   ): TextStyleDeclaration {
     const lineStyle = this.styles && this.styles[lineIndex];
     return lineStyle ? lineStyle[charIndex] ?? {} : {};
@@ -278,11 +275,14 @@ export abstract class StyledText<
    */
   getCompleteStyleDeclaration(
     lineIndex: number,
-    charIndex: number
+    charIndex: number,
   ): CompleteTextStyleDeclaration {
     return {
-      // @ts-expect-error readonly
-      ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
+      ...pick(
+        this,
+        (this.constructor as typeof StyledText)
+          ._styleProperties as (keyof this)[],
+      ),
       ...this._getStyleDeclaration(lineIndex, charIndex),
     } as CompleteTextStyleDeclaration;
   }
@@ -296,7 +296,7 @@ export abstract class StyledText<
   protected _setStyleDeclaration(
     lineIndex: number,
     charIndex: number,
-    style: object
+    style: object,
   ) {
     this.styles[lineIndex][charIndex] = style;
   }

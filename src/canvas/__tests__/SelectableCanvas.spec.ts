@@ -1,6 +1,8 @@
 import { FabricObject } from '../../shapes/Object/FabricObject';
 import { Canvas } from '../Canvas';
 
+import { describe, expect, test } from 'vitest';
+
 describe('Canvas', () => {
   describe('invalidating `_objectsToRender`', () => {
     test('initial state', () => {

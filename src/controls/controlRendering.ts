@@ -1,4 +1,4 @@
-import { twoMathPi } from '../constants';
+import { FILL, STROKE, twoMathPi } from '../constants';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
@@ -15,12 +15,14 @@ export type ControlRenderingStyleOverride = Partial<
   >
 >;
 
-export type ControlRenderer = (
+export type ControlRenderer<
+  O extends InteractiveFabricObject = InteractiveFabricObject,
+> = (
   ctx: CanvasRenderingContext2D,
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: O,
 ) => void;
 
 /**
@@ -40,7 +42,7 @@ export function renderCircleControl(
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: InteractiveFabricObject,
 ) {
   styleOverride = styleOverride || {};
   const xSize =
@@ -50,7 +52,7 @@ export function renderCircleControl(
       typeof styleOverride.transparentCorners !== 'undefined'
         ? styleOverride.transparentCorners
         : fabricObject.transparentCorners,
-    methodName = transparentCorners ? 'stroke' : 'fill',
+    methodName = transparentCorners ? STROKE : FILL,
     stroke =
       !transparentCorners &&
       (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
@@ -73,8 +75,6 @@ export function renderCircleControl(
   } else {
     size = xSize;
   }
-  // this is still wrong
-  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
   ctx[methodName]();
@@ -101,7 +101,7 @@ export function renderSquareControl(
   left: number,
   top: number,
   styleOverride: ControlRenderingStyleOverride,
-  fabricObject: InteractiveFabricObject
+  fabricObject: InteractiveFabricObject,
 ) {
   styleOverride = styleOverride || {};
   const xSize =
@@ -111,7 +111,7 @@ export function renderSquareControl(
       typeof styleOverride.transparentCorners !== 'undefined'
         ? styleOverride.transparentCorners
         : fabricObject.transparentCorners,
-    methodName = transparentCorners ? 'stroke' : 'fill',
+    methodName = transparentCorners ? STROKE : FILL,
     stroke =
       !transparentCorners &&
       (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
@@ -121,8 +121,6 @@ export function renderSquareControl(
   ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
   ctx.strokeStyle =
     styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
-  // this is still wrong
-  ctx.lineWidth = 1;
   ctx.translate(left, top);
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle();

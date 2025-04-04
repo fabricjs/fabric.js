@@ -30,3 +30,15 @@ export const fragmentSource: Record<TBlendImageMode, string> = {
     }
     `,
 } as const;
+
+export const vertexSource = `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    varying vec2 vTexCoord2;
+    uniform mat3 uTransformMatrix;
+    void main() {
+      vTexCoord = aPosition;
+      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }
+    ` as const;

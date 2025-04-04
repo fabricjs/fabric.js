@@ -1,5 +1,17 @@
 import { Point } from '../Point';
-import { CENTER, iMatrix } from '../constants';
+import {
+  CENTER,
+  CHANGED,
+  MODIFIED,
+  MODIFY_PATH,
+  MODIFY_POLY,
+  MOVING,
+  RESIZING,
+  ROTATING,
+  SCALING,
+  SKEWING,
+  iMatrix,
+} from '../constants';
 import type { Group } from '../shapes/Group';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import { invertTransform } from '../util/misc/matrix';
@@ -73,24 +85,25 @@ export class LayoutManager {
    */
   protected attachHandlers(
     object: FabricObject,
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ): VoidFunction[] {
     const { target } = context;
     return (
       [
-        'modified',
-        'moving',
-        'resizing',
-        'rotating',
-        'scaling',
-        'skewing',
-        'changed',
-        'modifyPoly',
+        MODIFIED,
+        MOVING,
+        RESIZING,
+        ROTATING,
+        SCALING,
+        SKEWING,
+        CHANGED,
+        MODIFY_POLY,
+        MODIFY_PATH,
       ] as (TModificationEvents & 'modified')[]
     ).map((key) =>
       object.on(key, (e) =>
         this.performLayout(
-          key === 'modified'
+          key === MODIFIED
             ? {
                 type: LAYOUT_TYPE_OBJECT_MODIFIED,
                 trigger: key,
@@ -102,9 +115,9 @@ export class LayoutManager {
                 trigger: key,
                 e,
                 target,
-              }
-        )
-      )
+              },
+        ),
+      ),
     );
   }
 
@@ -116,7 +129,7 @@ export class LayoutManager {
    */
   protected subscribe(
     object: FabricObject,
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     this.unsubscribe(object, context);
     const disposers = this.attachHandlers(object, context);
@@ -128,20 +141,20 @@ export class LayoutManager {
    */
   protected unsubscribe(
     object: FabricObject,
-    context?: RegistrationContext & Partial<StrictLayoutContext>
+    _context?: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     (this._subscriptions.get(object) || []).forEach((d) => d());
     this._subscriptions.delete(object);
   }
 
   unsubscribeTargets(
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     context.targets.forEach((object) => this.unsubscribe(object, context));
   }
 
   subscribeTargets(
-    context: RegistrationContext & Partial<StrictLayoutContext>
+    context: RegistrationContext & Partial<StrictLayoutContext>,
   ) {
     context.targets.forEach((object) => this.subscribe(object, context));
   }
@@ -176,27 +189,24 @@ export class LayoutManager {
             ...tricklingContext,
             bubbles: false,
             target: object as Group,
-          })
+          }),
       );
     }
   }
 
   protected getLayoutResult(
-    context: StrictLayoutContext
+    context: StrictLayoutContext,
   ): Required<LayoutResult> | undefined {
-    const { target } = context;
+    const { target, strategy, type } = context;
 
-    const result = context.strategy.calcLayoutResult(
-      context,
-      target.getObjects()
-    );
+    const result = strategy.calcLayoutResult(context, target.getObjects());
 
     if (!result) {
       return;
     }
 
     const prevCenter =
-      context.type === LAYOUT_TYPE_INITIALIZATION
+      type === LAYOUT_TYPE_INITIALIZATION
         ? new Point()
         : target.getRelativeCenterPoint();
 
@@ -210,10 +220,10 @@ export class LayoutManager {
       .add(correction)
       .transform(
         // in `initialization` we do not account for target's transformation matrix
-        context.type === LAYOUT_TYPE_INITIALIZATION
+        type === LAYOUT_TYPE_INITIALIZATION
           ? iMatrix
           : invertTransform(target.calcOwnMatrix()),
-        true
+        true,
       )
       .add(relativeCorrection);
 
@@ -227,7 +237,7 @@ export class LayoutManager {
 
   protected commitLayout(
     context: StrictLayoutContext,
-    layoutResult: Required<LayoutResult>
+    layoutResult: Required<LayoutResult>,
   ) {
     const { target } = context;
     const {
@@ -257,7 +267,7 @@ export class LayoutManager {
 
   protected layoutObjects(
     context: StrictLayoutContext,
-    layoutResult: Required<LayoutResult>
+    layoutResult: Required<LayoutResult>,
   ) {
     const { target } = context;
     //  adjust objects to account for new center
@@ -277,7 +287,7 @@ export class LayoutManager {
   protected layoutObject(
     context: StrictLayoutContext,
     { offset }: Required<LayoutResult>,
-    object: FabricObject
+    object: FabricObject,
   ) {
     // TODO: this is here for cache invalidation.
     // verify if this is necessary since we have explicit
@@ -290,7 +300,7 @@ export class LayoutManager {
 
   protected onAfterLayout(
     context: StrictLayoutContext,
-    layoutResult?: LayoutResult
+    layoutResult?: LayoutResult,
   ) {
     const {
       target,
@@ -328,8 +338,9 @@ export class LayoutManager {
   }
 
   dispose() {
-    this._subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
-    this._subscriptions.clear();
+    const { _subscriptions } = this;
+    _subscriptions.forEach((disposers) => disposers.forEach((d) => d()));
+    _subscriptions.clear();
   }
 
   toObject() {

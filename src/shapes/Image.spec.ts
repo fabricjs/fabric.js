@@ -1,5 +1,31 @@
 import { FabricImage } from './Image';
 import { Shadow } from '../Shadow';
+import { Brightness } from '../filters/Brightness';
+import { loadSVGFromString } from '../parser/loadSVGFromString';
+
+const mockImage = new Image(100, 100);
+
+vi.mock('../util/misc/objectEnlive', () => {
+  const all = vi.importActual('../util/misc/objectEnlive');
+  return {
+    ...all,
+    loadImage: vi.fn(async (src) => {
+      const img = mockImage;
+      img.src = src;
+      return img;
+    }),
+  };
+});
+
+import { describe, expect, test, vi } from 'vitest';
+
+const mockApplyFilter = vi.fn();
+
+vi.mock('../filters/FilterBackend', () => ({
+  getFilterBackend: () => ({
+    applyFilters: mockApplyFilter,
+  }),
+}));
 
 describe('FabricImage', () => {
   describe('Svg export', () => {
@@ -22,6 +48,48 @@ describe('FabricImage', () => {
         }),
       });
       expect(img.toSVG()).toMatchSnapshot();
+    });
+  });
+  test('ApplyFilter use cacheKey', () => {
+    const imgElement = new Image(200, 200);
+    const img = new FabricImage(imgElement);
+    img.filters = [new Brightness({ brightness: 0.2 })];
+    img.applyFilters();
+    expect(mockApplyFilter).toHaveBeenCalledWith(
+      img.filters,
+      img._originalElement,
+      200,
+      200,
+      img.getElement(),
+      'texture3',
+    );
+  });
+  describe('SVG import', () => {
+    test('can import images when xlink:href attribute is set', async () => {
+      const { objects } =
+        await loadSVGFromString(`<svg viewBox="0 0 745 1040" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:space="preserve">
+  <image zaparoo-no-print="true" xlink:href="https://design.zaparoo.org/ZapTradingCard.png" width="745" height="1040">
+  </image>
+</svg>`);
+      const image = objects[0] as FabricImage;
+      expect(image instanceof FabricImage).toBe(true);
+      expect((image._originalElement as HTMLImageElement).src).toBe(
+        'https://design.zaparoo.org/ZapTradingCard.png',
+      );
+    });
+    test('can import images when href attribute has no xlink', async () => {
+      const { objects } =
+        await loadSVGFromString(`<svg viewBox="0 0 745 1040" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:space="preserve">
+  <image zaparoo-no-print="true" href="https://design.zaparoo.org/ZapTradingCard.png" width="745" height="1040">
+  </image>
+</svg>`);
+      const image = objects[0] as FabricImage;
+      expect(image instanceof FabricImage).toBe(true);
+      expect((image._originalElement as HTMLImageElement).src).toBe(
+        'https://design.zaparoo.org/ZapTradingCard.png',
+      );
     });
   });
 });

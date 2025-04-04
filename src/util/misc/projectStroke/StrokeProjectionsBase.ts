@@ -35,12 +35,12 @@ export abstract class StrokeProjectionsBase {
   protected abstract calcOrthogonalProjection(
     from: Point,
     to: Point,
-    magnitude?: number
+    magnitude?: number,
   ): Point;
 
   protected projectOrthogonally(from: Point, to: Point, magnitude?: number) {
     return this.applySkew(
-      from.add(this.calcOrthogonalProjection(from, to, magnitude))
+      from.add(this.calcOrthogonalProjection(from, to, magnitude)),
     );
   }
 

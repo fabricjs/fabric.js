@@ -1,6 +1,6 @@
 export function getMultipleNodes(
   doc: Document,
-  nodeNames: string[]
+  nodeNames: string[],
 ): Element[] {
   let nodeName,
     nodeArray: Element[] = [],
@@ -11,7 +11,7 @@ export function getMultipleNodes(
     nodeName = nodeNames[i];
     nodeList = doc.getElementsByTagNameNS(
       'http://www.w3.org/2000/svg',
-      nodeName
+      nodeName,
     );
     nodeArray = nodeArray.concat(Array.from(nodeList));
   }

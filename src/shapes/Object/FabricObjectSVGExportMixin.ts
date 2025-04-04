@@ -1,9 +1,10 @@
 import type { TSVGReviver } from '../../typedefs';
 import { uid } from '../../util/internals/uid';
-import { colorPropToSVG, matrixToSVG } from '../../util/misc/svgParsing';
-import { NONE } from '../../constants';
+import { colorPropToSVG } from '../../util/misc/svgParsing';
+import { FILL, NONE, STROKE } from '../../constants';
 import type { FabricObject } from './FabricObject';
 import { isFiller } from '../../util/typeAssertions';
+import { matrixToSVG } from '../../util/misc/svgExport';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -20,7 +21,7 @@ export class FabricObjectSVGExportMixin {
    */
   getSvgStyles(
     this: FabricObjectSVGExportMixin & FabricObject,
-    skipShadow?: boolean
+    skipShadow?: boolean,
   ) {
     const fillRule = this.fillRule ? this.fillRule : 'nonzero',
       strokeWidth = this.strokeWidth ? this.strokeWidth : '0',
@@ -34,8 +35,8 @@ export class FabricObjectSVGExportMixin {
       opacity = typeof this.opacity !== 'undefined' ? this.opacity : '1',
       visibility = this.visible ? '' : ' visibility: hidden;',
       filter = skipShadow ? '' : this.getSvgFilter(),
-      fill = colorPropToSVG('fill', this.fill),
-      stroke = colorPropToSVG('stroke', this.stroke);
+      fill = colorPropToSVG(FILL, this.fill),
+      stroke = colorPropToSVG(STROKE, this.stroke);
 
     return [
       stroke,
@@ -82,7 +83,7 @@ export class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgCommons(
-    this: FabricObjectSVGExportMixin & FabricObject & { id?: string }
+    this: FabricObjectSVGExportMixin & FabricObject & { id?: string },
   ) {
     return [
       this.id ? `id="${this.id}" ` : '',
@@ -103,7 +104,7 @@ export class FabricObjectSVGExportMixin {
   getSvgTransform(
     this: FabricObjectSVGExportMixin & FabricObject,
     full?: boolean,
-    additionalTransform = ''
+    additionalTransform = '',
   ) {
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
       svgTransform = `transform="${matrixToSVG(transform)}`;
@@ -117,7 +118,7 @@ export class FabricObjectSVGExportMixin {
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
    */
-  _toSVG(reviver?: TSVGReviver): string[] {
+  _toSVG(_reviver?: TSVGReviver): string[] {
     return [''];
   }
 
@@ -128,7 +129,7 @@ export class FabricObjectSVGExportMixin {
    */
   toSVG(
     this: FabricObjectSVGExportMixin & FabricObject,
-    reviver?: TSVGReviver
+    reviver?: TSVGReviver,
   ) {
     return this._createBaseSVGMarkup(this._toSVG(reviver), {
       reviver,
@@ -142,7 +143,7 @@ export class FabricObjectSVGExportMixin {
    */
   toClipPathSVG(
     this: FabricObjectSVGExportMixin & FabricObject,
-    reviver?: TSVGReviver
+    reviver?: TSVGReviver,
   ) {
     return (
       '\t' +
@@ -161,7 +162,7 @@ export class FabricObjectSVGExportMixin {
     {
       reviver,
       additionalTransform = '',
-    }: { reviver?: TSVGReviver; additionalTransform?: string } = {}
+    }: { reviver?: TSVGReviver; additionalTransform?: string } = {},
   ) {
     const commonPieces = [
         this.getSvgTransform(true, additionalTransform),
@@ -189,7 +190,7 @@ export class FabricObjectSVGExportMixin {
       reviver?: TSVGReviver;
       withShadow?: boolean;
       additionalTransform?: string;
-    } = {}
+    } = {},
   ): string {
     const styleInfo = noStyle ? '' : `style="${this.getSvgStyles()}" `,
       shadowInfo = withShadow ? `style="${this.getSvgFilter()}" ` : '',
@@ -218,7 +219,7 @@ export class FabricObjectSVGExportMixin {
       '<g ',
       this.getSvgTransform(false),
       !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
-      ' >\n'
+      ' >\n',
     );
     const commonPieces = [
       styleInfo,
@@ -247,8 +248,6 @@ export class FabricObjectSVGExportMixin {
   }
 
   addPaintOrder(this: FabricObjectSVGExportMixin & FabricObject) {
-    return this.paintFirst !== 'fill'
-      ? ` paint-order="${this.paintFirst}" `
-      : '';
+    return this.paintFirst !== FILL ? ` paint-order="${this.paintFirst}" ` : '';
   }
 }

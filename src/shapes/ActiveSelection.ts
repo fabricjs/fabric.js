@@ -59,12 +59,16 @@ export class ActiveSelection extends Group {
 
   constructor(
     objects: FabricObject[] = [],
-    options: Partial<ActiveSelectionOptions> = {}
+    options: Partial<ActiveSelectionOptions> = {},
   ) {
-    super(objects, {
-      ...options,
-      layoutManager:
-        options.layoutManager ?? new ActiveSelectionLayoutManager(),
+    super();
+    Object.assign(this, ActiveSelection.ownDefaults);
+    this.setOptions(options);
+    const { left, top, layoutManager } = options;
+    this.groupInit(objects, {
+      left,
+      top,
+      layoutManager: layoutManager ?? new ActiveSelectionLayoutManager(),
     });
   }
 
@@ -111,13 +115,13 @@ export class ActiveSelection extends Group {
   canEnterGroup(object: FabricObject) {
     if (
       this.getObjects().some(
-        (o) => o.isDescendantOf(object) || object.isDescendantOf(o)
+        (o) => o.isDescendantOf(object) || object.isDescendantOf(o),
       )
     ) {
       //  prevent circular object tree
       log(
         'error',
-        'ActiveSelection: circular object trees are not supported, this call has no effect'
+        'ActiveSelection: circular object trees are not supported, this call has no effect',
       );
       return false;
     }
@@ -205,11 +209,7 @@ export class ActiveSelection extends Group {
   }
 
   /**
-   * Decide if the object should cache or not. Create its own cache level
-   * objectCaching is a global flag, wins over everything
-   * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
-   * Generally you do not cache objects in groups because the group outside is cached.
+   * Decide if the object should cache or not. The Active selection never caches
    * @return {Boolean}
    */
   shouldCache() {
@@ -233,11 +233,10 @@ export class ActiveSelection extends Group {
   _renderControls(
     ctx: CanvasRenderingContext2D,
     styleOverride?: ControlRenderingStyleOverride,
-    childrenOverride?: ControlRenderingStyleOverride
+    childrenOverride?: ControlRenderingStyleOverride,
   ) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    super._renderControls(ctx, styleOverride);
     const options = {
       hasControls: false,
       ...childrenOverride,
@@ -246,6 +245,7 @@ export class ActiveSelection extends Group {
     for (let i = 0; i < this._objects.length; i++) {
       this._objects[i]._renderControls(ctx, options);
     }
+    super._renderControls(ctx, styleOverride);
     ctx.restore();
   }
 }

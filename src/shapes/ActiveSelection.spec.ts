@@ -4,12 +4,14 @@ import { ActiveSelection } from './ActiveSelection';
 import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
 
+import { describe, expect, it, test, vi } from 'vitest';
+
 describe('ActiveSelection', () => {
   it('should set the layoutManager in the constructor', () => {
     const activeSelection = new ActiveSelection();
     expect(activeSelection.layoutManager).toBeDefined();
     expect(activeSelection.layoutManager?.strategy).toBeInstanceOf(
-      FitContentLayout
+      FitContentLayout,
     );
   });
 
@@ -19,7 +21,7 @@ describe('ActiveSelection', () => {
       top: 100,
       angle: 45,
     });
-    const spy = jest.spyOn(selection, 'removeAll');
+    const spy = vi.spyOn(selection, 'removeAll');
     selection.onDeselect();
     expect(spy).toHaveBeenCalled();
     expect(selection).toMatchObject({
@@ -40,7 +42,7 @@ describe('ActiveSelection', () => {
   });
 
   it('should not set coords in the constructor', () => {
-    const spy = jest.spyOn(ActiveSelection.prototype, 'setCoords');
+    const spy = vi.spyOn(ActiveSelection.prototype, 'setCoords');
     new ActiveSelection([
       new FabricObject({
         left: 100,
@@ -58,7 +60,7 @@ describe('ActiveSelection', () => {
     const obj2 = new FabricObject();
     canvas.add(obj1, obj2);
     const activeSelection = new ActiveSelection([obj1, obj2]);
-    const spy = jest.spyOn(activeSelection, 'setCoords');
+    const spy = vi.spyOn(activeSelection, 'setCoords');
     canvas.setActiveObject(activeSelection);
     expect(canvas.getActiveObject()).toBe(activeSelection);
     expect(canvas.getActiveObjects()).toEqual([obj1, obj2]);
@@ -75,10 +77,10 @@ describe('ActiveSelection', () => {
     const group = new Group([object]);
     const activeSelection = new ActiveSelection();
 
-    const eventsSpy = jest.spyOn(object, 'fire');
-    const removeSpy = jest.spyOn(group, 'remove');
-    const exitSpy = jest.spyOn(group, '_exitGroup');
-    const enterSpy = jest.spyOn(activeSelection, 'enterGroup');
+    const eventsSpy = vi.spyOn(object, 'fire');
+    const removeSpy = vi.spyOn(group, 'remove');
+    const exitSpy = vi.spyOn(group, '_exitGroup');
+    const enterSpy = vi.spyOn(activeSelection, 'enterGroup');
 
     expect(object.group).toBe(group);
     expect(object.parent).toBe(group);
@@ -110,15 +112,15 @@ describe('ActiveSelection', () => {
     expect(object.group).toBe(activeSelection1);
     expect(object.parent).toBe(group);
 
-    const eventsSpy = jest.spyOn(object, 'fire');
-    const removeSpy = jest.spyOn(activeSelection1, 'remove');
+    const eventsSpy = vi.spyOn(object, 'fire');
+    const removeSpy = vi.spyOn(activeSelection1, 'remove');
 
     Object.entries({
       object,
       group,
       activeSelection1,
       activeSelection2,
-    }).forEach(([key, obj]) => jest.spyOn(obj, 'toJSON').mockReturnValue(key));
+    }).forEach(([key, obj]) => vi.spyOn(obj, 'toJSON').mockReturnValue(key));
 
     activeSelection2.add(object);
     expect(object.group).toBe(activeSelection2);
@@ -144,7 +146,7 @@ describe('ActiveSelection', () => {
     const object = new FabricObject();
     const group = new Group([object]);
     const activeSelection = new ActiveSelection([group]);
-    const spy = jest.spyOn(activeSelection, 'canEnterGroup');
+    const spy = vi.spyOn(activeSelection, 'canEnterGroup');
     activeSelection.add(object);
     expect(activeSelection.getObjects()).toEqual([group]);
     expect(spy).toHaveBeenCalledTimes(1);
@@ -155,7 +157,7 @@ describe('ActiveSelection', () => {
     const object = new FabricObject();
     const group = new Group([object]);
     const activeSelection = new ActiveSelection([object]);
-    const spy = jest.spyOn(activeSelection, 'canEnterGroup');
+    const spy = vi.spyOn(activeSelection, 'canEnterGroup');
     activeSelection.add(group);
     expect(activeSelection.getObjects()).toEqual([object]);
     expect(spy).toHaveBeenCalledTimes(1);

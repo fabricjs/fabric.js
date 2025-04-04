@@ -1,7 +1,10 @@
-import { roundSnapshotOptions } from '../../../jest.extend';
+import { roundSnapshotOptions } from '../../../vitest.extend';
 import { cache } from '../../cache';
 import { config } from '../../config';
+import { Path } from '../Path';
 import { FabricText } from './Text';
+
+import { describe, expect, it, afterEach } from 'vitest';
 
 afterEach(() => {
   config.restoreDefaults();
@@ -14,7 +17,7 @@ describe('FabricText', () => {
 
   it('fromObject', async () => {
     expect((await FabricText.fromObject({ text: 'text' })).toObject()).toEqual(
-      new FabricText('text').toObject()
+      new FabricText('text').toObject(),
     );
   });
 
@@ -50,6 +53,19 @@ describe('FabricText', () => {
     expect(text.toSVG()).toMatchSnapshot();
     config.configure({ NUM_FRACTION_DIGITS: 3 });
     expect(text.toSVG()).toMatchSnapshot();
+  });
+
+  it('toSVG with a path', async () => {
+    const path = new Path('M 10 10 H 50 V 60', { fill: '', stroke: 'red' });
+    const text = new FabricText(
+      'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+      { scaleX: 2, scaleY: 2 },
+    );
+    const plainSvg = text.toSVG();
+    text.path = path;
+    const svg = text.toSVG();
+    expect(svg).toMatchSnapshot();
+    expect(svg.includes(plainSvg)).toBe(false);
   });
 
   it('subscript/superscript', async () => {

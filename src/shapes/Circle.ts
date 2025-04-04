@@ -9,6 +9,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { CSSRules } from '../parser/typedefs';
+import { SCALE_X, SCALE_Y } from '../constants';
 
 interface UniqueCircleProps {
   /**
@@ -64,7 +65,7 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 export class Circle<
     Props extends TOptions<CircleProps> = Partial<CircleProps>,
     SProps extends SerializedCircleProps = SerializedCircleProps,
-    EventSpec extends ObjectEvents = ObjectEvents
+    EventSpec extends ObjectEvents = ObjectEvents,
   >
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueCircleProps
@@ -85,6 +86,16 @@ export class Circle<
       ...super.getDefaults(),
       ...Circle.ownDefaults,
     };
+  }
+
+  /**
+   * Constructor
+   * @param {Object} [options] Options object
+   */
+  constructor(options?: Props) {
+    super();
+    Object.assign(this, Circle.ownDefaults);
+    this.setOptions(options);
   }
 
   /**
@@ -114,7 +125,7 @@ export class Circle<
       this.radius,
       degreesToRadians(this.startAngle),
       degreesToRadians(this.endAngle),
-      this.counterClockwise
+      this.counterClockwise,
     );
     this._renderPaintInOrder(ctx);
   }
@@ -124,7 +135,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusX(): number {
-    return this.get('radius') * this.get('scaleX');
+    return this.get('radius') * this.get(SCALE_X);
   }
 
   /**
@@ -132,7 +143,7 @@ export class Circle<
    * @return {Number}
    */
   getRadiusY(): number {
-    return this.get('radius') * this.get('scaleY');
+    return this.get('radius') * this.get(SCALE_Y);
   }
 
   /**
@@ -150,7 +161,7 @@ export class Circle<
    */
   toObject<
     T extends Omit<Props & TClassProperties<this>, keyof SProps>,
-    K extends keyof T = never
+    K extends keyof T = never,
   >(propertiesToInclude: K[] = []): Pick<T, K> & SProps {
     return super.toObject([...CIRCLE_PROPS, ...propertiesToInclude]);
   }
@@ -213,7 +224,7 @@ export class Circle<
   static async fromElement(
     element: HTMLElement,
     options: Abortable,
-    cssRules?: CSSRules
+    cssRules?: CSSRules,
   ): Promise<Circle> {
     const {
       left = 0,
@@ -223,7 +234,7 @@ export class Circle<
     } = parseAttributes(
       element,
       this.ATTRIBUTE_NAMES,
-      cssRules
+      cssRules,
     ) as Partial<CircleProps>;
 
     // this probably requires to be fixed for default origins not being top/left.

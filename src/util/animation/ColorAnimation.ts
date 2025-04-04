@@ -13,14 +13,14 @@ const defaultColorEasing: TEasingFunction = (
   timeElapsed,
   startValue,
   byValue,
-  duration
+  duration,
 ) => {
   const durationProgress = 1 - Math.cos((timeElapsed / duration) * halfPI);
   return startValue + byValue * durationProgress;
 };
 
 const wrapColorCallback = <R>(
-  callback?: TOnAnimationChangeCallback<string, R>
+  callback?: TOnAnimationChangeCallback<string, R>,
 ) =>
   callback &&
   ((rgba: TRGBAColorSource, valueProgress: number, durationProgress: number) =>
@@ -42,7 +42,7 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
       ...options,
       startValue: startColor,
       byValue: endColor.map(
-        (value, i) => value - startColor[i]
+        (value, i) => value - startColor[i],
       ) as TRGBAColorSource,
       easing,
       onChange: wrapColorCallback(onChange),
@@ -52,7 +52,7 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
   }
   protected calculate(timeElapsed: number) {
     const [r, g, b, a] = this.startValue.map((value, i) =>
-      this.easing(timeElapsed, value, this.byValue[i], this.duration, i)
+      this.easing(timeElapsed, value, this.byValue[i], this.duration, i),
     ) as TRGBAColorSource;
     const value = [
       ...[r, g, b].map(Math.round),
@@ -66,7 +66,7 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
           .map((p, i) =>
             this.byValue[i] !== 0
               ? Math.abs((p - this.startValue[i]) / this.byValue[i])
-              : 0
+              : 0,
           )
           .find((p) => p !== 0) || 0,
     };

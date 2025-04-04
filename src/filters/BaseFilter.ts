@@ -1,5 +1,4 @@
 import { getEnv } from '../env';
-import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
   TWebGLAttributeLocationMap,
@@ -15,15 +14,22 @@ import {
 } from './shaders/baseFilter';
 import type { Abortable } from '../typedefs';
 import { FabricError } from '../util/internals/console';
+import { createCanvasElementFor } from '../util/misc/dom';
 
-export class BaseFilter {
+const regex = new RegExp(highPsourceCode, 'g');
+
+export class BaseFilter<
+  Name extends string,
+  OwnProps extends Record<string, any> = object,
+  SerializedProps extends Record<string, any> = OwnProps,
+> {
   /**
    * Filter type
    * @param {String} type
    * @default
    */
-  get type(): string {
-    return (this.constructor as typeof BaseFilter).type;
+  get type(): Name {
+    return (this.constructor as typeof BaseFilter).type as Name;
   }
 
   /**
@@ -35,36 +41,36 @@ export class BaseFilter {
    */
   static type = 'BaseFilter';
 
-  declare static defaults: Record<string, any>;
-
   /**
-   * Array of attributes to send with buffers. do not modify
-   * @private
+   * Contains the uniform locations for the fragment shader.
+   * uStepW and uStepH are handled by the BaseFilter, each filter class
+   * needs to specify all the one that are needed
    */
-  vertexSource = vertexSource;
+  static uniformLocations: string[] = [];
 
-  /**
-   * Name of the parameter that can be changed in the filter.
-   * Some filters have more than one parameter and there is no
-   * mainParameter
-   * @private
-   */
-  declare mainParameter?: keyof this | undefined;
+  declare static defaults: Record<string, unknown>;
 
   /**
    * Constructor
    * @param {Object} [options] Options object
    */
-  constructor({ type, ...options }: Record<string, any> = {}) {
+  constructor({
+    type,
+    ...options
+  }: { type?: never } & Partial<OwnProps> & Record<string, any> = {}) {
     Object.assign(
       this,
       (this.constructor as typeof BaseFilter).defaults,
-      options
+      options,
     );
   }
 
   protected getFragmentSource(): string {
     return identityFragmentShader;
+  }
+
+  getVertexSource(): string {
+    return vertexSource;
   }
 
   /**
@@ -77,15 +83,15 @@ export class BaseFilter {
   createProgram(
     gl: WebGLRenderingContext,
     fragmentSource: string = this.getFragmentSource(),
-    vertexSource: string = this.vertexSource
+    vertexSource: string = this.getVertexSource(),
   ) {
     const {
       WebGLProbe: { GLPrecision = 'highp' },
     } = getEnv();
     if (GLPrecision !== 'highp') {
       fragmentSource = fragmentSource.replace(
-        new RegExp(highPsourceCode, 'g'),
-        highPsourceCode.replace('highp', GLPrecision)
+        regex,
+        highPsourceCode.replace('highp', GLPrecision),
       );
     }
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -94,7 +100,7 @@ export class BaseFilter {
 
     if (!vertexShader || !fragmentShader || !program) {
       throw new FabricError(
-        'Vertex, fragment shader or program creation error'
+        'Vertex, fragment shader or program creation error',
       );
     }
     gl.shaderSource(vertexShader, vertexSource);
@@ -102,8 +108,8 @@ export class BaseFilter {
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
       throw new FabricError(
         `Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(
-          vertexShader
-        )}`
+          vertexShader,
+        )}`,
       );
     }
 
@@ -112,8 +118,8 @@ export class BaseFilter {
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
       throw new FabricError(
         `Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(
-          fragmentShader
-        )}`
+          fragmentShader,
+        )}`,
       );
     }
 
@@ -122,13 +128,14 @@ export class BaseFilter {
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       throw new FabricError(
-        `Shader link error for "${this.type}" ${gl.getProgramInfoLog(program)}`
+        `Shader link error for "${this.type}" ${gl.getProgramInfoLog(program)}`,
       );
     }
 
     const uniformLocations = this.getUniformLocations(gl, program) || {};
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
     uniformLocations.uStepH = gl.getUniformLocation(program, 'uStepH');
+
     return {
       program,
       attributeLocations: this.getAttributeLocations(gl, program),
@@ -145,7 +152,7 @@ export class BaseFilter {
    */
   getAttributeLocations(
     gl: WebGLRenderingContext,
-    program: WebGLProgram
+    program: WebGLProgram,
   ): TWebGLAttributeLocationMap {
     return {
       aPosition: gl.getAttribLocation(program, 'aPosition'),
@@ -155,17 +162,25 @@ export class BaseFilter {
   /**
    * Return a map of uniform names to WebGLUniformLocation objects.
    *
-   * Intended to be overridden by subclasses.
-   *
    * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
    * @param {WebGLShaderProgram} program The shader program from which to take uniform locations.
    * @returns {Object} A map of uniform names to uniform locations.
    */
   getUniformLocations(
     gl: WebGLRenderingContext,
-    program: WebGLProgram
+    program: WebGLProgram,
   ): TWebGLUniformLocationMap {
-    return {};
+    const locations = (this.constructor as unknown as typeof BaseFilter<string>)
+      .uniformLocations;
+
+    const uniformLocations: Record<string, WebGLUniformLocation | null> = {};
+    for (let i = 0; i < locations.length; i++) {
+      uniformLocations[locations[i]] = gl.getUniformLocation(
+        program,
+        locations[i],
+      );
+    }
+    return uniformLocations;
   }
 
   /**
@@ -177,7 +192,7 @@ export class BaseFilter {
   sendAttributeData(
     gl: WebGLRenderingContext,
     attributeLocations: Record<string, number>,
-    aPositionData: Float32Array
+    aPositionData: Float32Array,
   ) {
     const attributeLocation = attributeLocations.aPosition;
     const buffer = gl.createBuffer();
@@ -197,7 +212,7 @@ export class BaseFilter {
         options.targetTexture = options.filterBackend.createTexture(
           gl,
           width,
-          height
+          height,
         );
       }
       gl.framebufferTexture2D(
@@ -205,7 +220,7 @@ export class BaseFilter {
         gl.COLOR_ATTACHMENT0,
         gl.TEXTURE_2D,
         options.targetTexture,
-        0
+        0,
       );
     } else {
       // draw last filter on canvas and not to framebuffer.
@@ -231,22 +246,7 @@ export class BaseFilter {
    **/
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isNeutralState(options?: any): boolean {
-    const main = this.mainParameter,
-      defaultValue = (this.constructor as typeof BaseFilter).defaults[
-        main as string
-      ];
-    if (main) {
-      const thisValue = this[main];
-      if (Array.isArray(defaultValue) && Array.isArray(thisValue)) {
-        return defaultValue.every(
-          (value: any, i: number) => value === thisValue[i]
-        );
-      } else {
-        return defaultValue === thisValue;
-      }
-    } else {
-      return false;
-    }
+    return false;
   }
 
   /**
@@ -272,7 +272,7 @@ export class BaseFilter {
     }
   }
 
-  applyTo2d(options: T2DPipelineState): void {
+  applyTo2d(_options: T2DPipelineState): void {
     // override by subclass
   }
 
@@ -281,7 +281,7 @@ export class BaseFilter {
    * Used to force recompilation when parameters change or to retrieve the shader from cache
    * @type string
    **/
-  getCacheKey() {
+  getCacheKey(): string {
     return this.type;
   }
 
@@ -334,7 +334,7 @@ export class BaseFilter {
   bindAdditionalTexture(
     gl: WebGLRenderingContext,
     texture: WebGLTexture,
-    textureUnit: number
+    textureUnit: number,
   ) {
     gl.activeTexture(textureUnit);
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -348,27 +348,17 @@ export class BaseFilter {
     gl.activeTexture(gl.TEXTURE0);
   }
 
-  getMainParameter() {
-    return this.mainParameter ? this[this.mainParameter] : undefined;
-  }
-
-  setMainParameter(value: any) {
-    if (this.mainParameter) {
-      this[this.mainParameter] = value;
-    }
-  }
-
   /**
    * Send uniform data from this filter to its shader program on the GPU.
    *
    * Intended to be overridden by subclasses.
    *
-   * @param {WebGLRenderingContext} gl The canvas context used to compile the shader program.
-   * @param {Object} uniformLocations A map of shader uniform names to their locations.
+   * @param {WebGLRenderingContext} _gl The canvas context used to compile the shader program.
+   * @param {Object} _uniformLocations A map of shader uniform names to their locations.
    */
   sendUniformData(
-    gl: WebGLRenderingContext,
-    uniformLocations: TWebGLUniformLocationMap
+    _gl: WebGLRenderingContext,
+    _uniformLocations: TWebGLUniformLocationMap,
   ): void {
     // override by subclass
   }
@@ -379,22 +369,34 @@ export class BaseFilter {
    */
   createHelpLayer(options: T2DPipelineState) {
     if (!options.helpLayer) {
-      const helpLayer = createCanvasElement();
-      helpLayer.width = options.sourceWidth;
-      helpLayer.height = options.sourceHeight;
+      const { sourceWidth, sourceHeight } = options;
+      const helpLayer = createCanvasElementFor({
+        width: sourceWidth,
+        height: sourceHeight,
+      });
       options.helpLayer = helpLayer;
     }
   }
 
   /**
    * Returns object representation of an instance
+   * It will automatically export the default values of a filter,
+   * stored in the static defaults property.
    * @return {Object} Object representation of an instance
    */
-  toObject() {
-    const mainP = this.mainParameter;
+  toObject(): { type: Name } & SerializedProps {
+    const defaultKeys = Object.keys(
+      (this.constructor as typeof BaseFilter).defaults || {},
+    ) as (keyof SerializedProps)[];
+
     return {
       type: this.type,
-      ...(mainP ? { [mainP]: this[mainP] } : {}),
+      ...defaultKeys.reduce<SerializedProps>((acc, key) => {
+        acc[key] = this[
+          key as keyof this
+        ] as unknown as (typeof acc)[typeof key];
+        return acc;
+      }, {} as SerializedProps),
     };
   }
 
@@ -409,8 +411,8 @@ export class BaseFilter {
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    options: Abortable
-  ) {
+    _options: Abortable,
+  ): Promise<BaseFilter<string, object>> {
     return new this(filterOptions);
   }
 }

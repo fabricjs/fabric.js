@@ -40,9 +40,9 @@ export class PencilBrush extends BaseBrush {
    */
   straightLineKey: ModifierKey | undefined | null = 'shiftKey';
 
-  private declare _points: Point[];
-  private declare _hasStraightLine: boolean;
-  private declare oldEnd?: Point;
+  protected declare _points: Point[];
+  protected declare _hasStraightLine: boolean;
+  protected declare oldEnd?: Point;
 
   constructor(canvas: Canvas) {
     super(canvas);
@@ -107,7 +107,7 @@ export class PencilBrush extends BaseBrush {
         this.oldEnd = PencilBrush.drawSegment(
           ctx,
           points[length - 2],
-          points[length - 1]
+          points[length - 1],
         );
         ctx.stroke();
         ctx.restore();

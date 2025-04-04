@@ -8,6 +8,8 @@ export { runningAnimations } from './src/util/animation/AnimationRegistry';
 export * from './src/typedefs';
 
 export * from './src/EventTypeDefs';
+export type { ITextEvents } from './src/shapes/IText/ITextBehavior';
+
 export { Observable } from './src/Observable';
 
 export type {
@@ -41,6 +43,9 @@ export { CircleBrush } from './src/brushes/CircleBrush';
 export { SprayBrush } from './src/brushes/SprayBrush';
 export { PatternBrush } from './src/brushes/PatternBrush';
 
+// many path types
+export type * from './src/util/path/typedefs';
+
 export {
   FabricObject,
 
@@ -56,6 +61,17 @@ export {
    */
   FabricObject as Object,
 } from './src/shapes/Object/FabricObject';
+/**
+ * Exported so we can tweak default values
+ */
+export {
+  FabricObject as BaseFabricObject,
+  type DrawContext,
+} from './src/shapes/Object/Object';
+/**
+ * Exported so we can tweak default values
+ */
+export { InteractiveFabricObject } from './src/shapes/Object/InteractiveObject';
 
 export type {
   TFabricObjectProps,
@@ -103,6 +119,8 @@ export {
 export type {
   ITextProps,
   SerializedITextProps,
+  CursorRenderingData,
+  CursorBoundaries,
 } from './src/shapes/IText/IText';
 export { IText } from './src/shapes/IText/IText';
 export type {
@@ -158,7 +176,7 @@ export { loadSVGFromString } from './src/parser/loadSVGFromString';
 export { loadSVGFromURL } from './src/parser/loadSVGFromURL';
 export { parseSVGDocument } from './src/parser/parseSVGDocument';
 
-// todo convert tests to jest and stop exporting those.
+// todo convert tests to vitest and stop exporting those.
 export { parseAttributes } from './src/parser/parseAttributes';
 export { parseStyleAttribute } from './src/parser/parseStyleAttribute';
 export { parsePointsAttribute } from './src/parser/parsePointsAttribute';

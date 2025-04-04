@@ -16,14 +16,26 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from '../Text/constants';
-import { CENTER, LEFT, RIGHT } from '../../constants';
+import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
+import type { FabricObject } from '../Object/FabricObject';
+import { createCanvasElementFor } from '../../util/misc/dom';
+import { applyCanvasTransform } from '../../util/internals/applyCanvasTransform';
 
-type CursorBoundaries = {
+export type CursorBoundaries = {
   left: number;
   top: number;
   leftOffset: number;
   topOffset: number;
+};
+
+export type CursorRenderingData = {
+  color: string;
+  opacity: number;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 };
 
 // Declare IText protected properties to workaround TS
@@ -111,7 +123,7 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
 export class IText<
     Props extends TOptions<ITextProps> = Partial<ITextProps>,
     SProps extends SerializedITextProps = SerializedITextProps,
-    EventSpec extends ITextEvents = ITextEvents
+    EventSpec extends ITextEvents = ITextEvents,
   >
   extends ITextClickBehavior<Props, SProps, EventSpec>
   implements UniqueITextProps
@@ -217,13 +229,12 @@ export class IText<
   }
 
   /**
-
    * Constructor
    * @param {String} text Text string
    * @param {Object} [options] Options object
    */
   constructor(text: string, options?: Props) {
-    super(text, options);
+    super(text, { ...IText.ownDefaults, ...options } as Props);
     this.initBehavior();
   }
 
@@ -272,7 +283,7 @@ export class IText<
    */
   protected _updateAndFire(
     property: 'selectionStart' | 'selectionEnd',
-    index: number
+    index: number,
   ) {
     if (this[property] !== index) {
       this._fireSelectionChanged();
@@ -313,7 +324,7 @@ export class IText<
   getSelectionStyles(
     startIndex: number = this.selectionStart || 0,
     endIndex: number = this.selectionEnd,
-    complete?: boolean
+    complete?: boolean,
   ) {
     return super.getSelectionStyles(startIndex, endIndex, complete);
   }
@@ -327,7 +338,7 @@ export class IText<
   setSelectionStyles(
     styles: object,
     startIndex: number = this.selectionStart || 0,
-    endIndex: number = this.selectionEnd
+    endIndex: number = this.selectionEnd,
   ) {
     return super.setSelectionStyles(styles, startIndex, endIndex);
   }
@@ -339,7 +350,7 @@ export class IText<
    */
   get2DCursorLocation(
     selectionStart = this.selectionStart,
-    skipWrapping?: boolean
+    skipWrapping?: boolean,
   ) {
     return super.get2DCursorLocation(selectionStart, skipWrapping);
   }
@@ -373,7 +384,7 @@ export class IText<
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
   renderCursorOrSelection() {
-    if (!this.isEditing) {
+    if (!this.isEditing || !this.canvas) {
       return;
     }
     const ctx = this.clearContextTop(true);
@@ -381,13 +392,75 @@ export class IText<
       return;
     }
     const boundaries = this._getCursorBoundaries();
-    if (this.selectionStart === this.selectionEnd) {
-      this.renderCursor(ctx, boundaries);
-    } else {
-      this.renderSelection(ctx, boundaries);
+
+    const ancestors = this.findAncestorsWithClipPath();
+    const hasAncestorsWithClipping = ancestors.length > 0;
+    let drawingCtx: CanvasRenderingContext2D = ctx;
+    let drawingCanvas: HTMLCanvasElement | undefined = undefined;
+    if (hasAncestorsWithClipping) {
+      // we have some clipPath, we need to draw the selection on an intermediate layer.
+      drawingCanvas = createCanvasElementFor(ctx.canvas);
+      drawingCtx = drawingCanvas.getContext('2d')!;
+      applyCanvasTransform(drawingCtx, this.canvas);
+      const m = this.calcTransformMatrix();
+      drawingCtx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
-    this.canvas!.contextTopDirty = true;
+
+    if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
+      this.renderCursor(drawingCtx, boundaries);
+    } else {
+      this.renderSelection(drawingCtx, boundaries);
+    }
+
+    if (hasAncestorsWithClipping) {
+      // we need a neutral context.
+      // this won't work for nested clippaths in which a clippath
+      // has its own clippath
+      for (const ancestor of ancestors) {
+        const clipPath = ancestor.clipPath!;
+        const clippingCanvas = createCanvasElementFor(ctx.canvas);
+        const clippingCtx = clippingCanvas.getContext('2d')!;
+        applyCanvasTransform(clippingCtx, this.canvas);
+        // position the ctx in the center of the outer ancestor
+        if (!clipPath.absolutePositioned) {
+          const m = ancestor.calcTransformMatrix();
+          clippingCtx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+        clipPath.transform(clippingCtx);
+        // we assign an empty drawing context, we don't plan to have this working for nested clippaths for now
+        clipPath.drawObject(clippingCtx, true, {});
+        this.drawClipPathOnCache(drawingCtx, clipPath, clippingCanvas);
+      }
+    }
+
+    if (hasAncestorsWithClipping) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(drawingCanvas!, 0, 0);
+    }
+
+    this.canvas.contextTopDirty = true;
     ctx.restore();
+  }
+
+  /**
+   * Finds and returns an array of clip paths that are applied to the parent
+   * group(s) of the current FabricObject instance. The object's hierarchy is
+   * traversed upwards (from the current object towards the root of the canvas),
+   * checking each parent object for the presence of a `clipPath` that is not
+   * absolutely positioned.
+   */
+  findAncestorsWithClipPath(): FabricObject[] {
+    const clipPathAncestors: FabricObject[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let obj: FabricObject | undefined = this;
+    while (obj) {
+      if (obj.clipPath) {
+        clipPathAncestors.push(obj);
+      }
+      obj = obj.parent;
+    }
+
+    return clipPathAncestors;
   }
 
   /**
@@ -400,7 +473,7 @@ export class IText<
    */
   _getCursorBoundaries(
     index: number = this.selectionStart,
-    skipCaching?: boolean
+    skipCaching?: boolean,
   ): CursorBoundaries {
     const left = this._getLeftOffset(),
       top = this._getTopOffset(),
@@ -421,7 +494,7 @@ export class IText<
    */
   _getCursorBoundariesOffsets(
     index: number,
-    skipCaching?: boolean
+    skipCaching?: boolean,
   ): { left: number; top: number } {
     if (skipCaching) {
       return this.__getCursorBoundariesOffsets(index);
@@ -483,8 +556,11 @@ export class IText<
    * If contextTop is not available, do nothing.
    */
   renderCursorAt(selectionStart: number) {
-    const boundaries = this._getCursorBoundaries(selectionStart, true);
-    this._renderCursor(this.canvas!.contextTop, boundaries, selectionStart);
+    this._renderCursor(
+      this.canvas!.contextTop,
+      this._getCursorBoundaries(selectionStart, true),
+      selectionStart,
+    );
   }
 
   /**
@@ -496,11 +572,16 @@ export class IText<
     this._renderCursor(ctx, boundaries, this.selectionStart);
   }
 
-  _renderCursor(
-    ctx: CanvasRenderingContext2D,
-    boundaries: CursorBoundaries,
-    selectionStart: number
-  ) {
+  /**
+   * Return the data needed to render the cursor for given selection start
+   * The left,top are relative to the object, while width and height are prescaled
+   * to look think with canvas zoom and object scaling,
+   * so they depend on canvas and object scaling
+   */
+  getCursorRenderingData(
+    selectionStart: number = this.selectionStart,
+    boundaries: CursorBoundaries = this._getCursorBoundaries(selectionStart),
+  ): CursorRenderingData {
     const cursorLocation = this.get2DCursorLocation(selectionStart),
       lineIndex = cursorLocation.lineIndex,
       charIndex =
@@ -515,21 +596,32 @@ export class IText<
           this.lineHeight -
         charHeight * (1 - this._fontSizeFraction);
 
-    if (this.inCompositionMode) {
-      // TODO: investigate why there isn't a return inside the if,
-      // and why can't happen at the top of the function
-      this.renderSelection(ctx, boundaries);
-    }
-    ctx.fillStyle =
-      this.cursorColor ||
-      (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string);
-    ctx.globalAlpha = this._currentCursorOpacity;
-    ctx.fillRect(
-      boundaries.left + boundaries.leftOffset - cursorWidth / 2,
-      topOffset + boundaries.top + dy,
-      cursorWidth,
-      charHeight
-    );
+    return {
+      color:
+        this.cursorColor ||
+        (this.getValueOfPropertyAt(lineIndex, charIndex, 'fill') as string),
+      opacity: this._currentCursorOpacity,
+      left: boundaries.left + boundaries.leftOffset - cursorWidth / 2,
+      top: topOffset + boundaries.top + dy,
+      width: cursorWidth,
+      height: charHeight,
+    };
+  }
+
+  /**
+   * Render the cursor at the given selectionStart.
+   * @param {CanvasRenderingContext2D} ctx transformed context to draw on
+   */
+  _renderCursor(
+    ctx: CanvasRenderingContext2D,
+    boundaries: CursorBoundaries,
+    selectionStart: number,
+  ) {
+    const { color, opacity, left, top, width, height } =
+      this.getCursorRenderingData(selectionStart, boundaries);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(left, top, width, height);
   }
 
   /**
@@ -558,7 +650,7 @@ export class IText<
     this._renderSelection(
       this.canvas!.contextTop,
       dragStartSelection,
-      this._getCursorBoundaries(dragStartSelection.selectionStart, true)
+      this._getCursorBoundaries(dragStartSelection.selectionStart, true),
     );
   }
 
@@ -577,7 +669,7 @@ export class IText<
   _renderSelection(
     ctx: CanvasRenderingContext2D,
     selection: { selectionStart: number; selectionEnd: number },
-    boundaries: CursorBoundaries
+    boundaries: CursorBoundaries,
   ) {
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
@@ -650,7 +742,7 @@ export class IText<
         drawStart,
         boundaries.top + boundaries.topOffset + extraTop,
         drawWidth,
-        drawHeight
+        drawHeight,
       );
       boundaries.topOffset += realLineHeight;
     }
@@ -678,7 +770,7 @@ export class IText<
    */
   getCurrentCharColor(): string | TFiller | null {
     const cp = this._getCurrentCharIndex();
-    return this.getValueOfPropertyAt(cp.l, cp.c, 'fill');
+    return this.getValueOfPropertyAt(cp.l, cp.c, FILL);
   }
 
   /**
@@ -693,7 +785,7 @@ export class IText<
   }
 
   dispose() {
-    this._exitEditing();
+    this.exitEditingImpl();
     this.draggableTextDelegate.dispose();
     super.dispose();
   }

@@ -14,7 +14,7 @@ const tagArray = [
  * @return {Object} Gradient definitions; key corresponds to element id, value -- to gradient definition element
  */
 export function getGradientDefs(
-  doc: Document
+  doc: Document,
 ): Record<string, SVGGradientElement> {
   const elList = getMultipleNodes(doc, tagArray);
   const gradientDefs: Record<string, SVGGradientElement> = {};
