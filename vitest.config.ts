@@ -15,7 +15,13 @@ export default defineConfig({
     coverage: {
       reportsDirectory: '.nyc_output',
       reporter: ['json'],
-      exclude: ['**/node_modules/**', 'vitest.extend.ts'],
+      exclude: [
+        '**/node_modules/**',
+        'vitest.extend.ts',
+        '.codesandbox/**',
+        'lib/**',
+        'e2e/**',
+      ],
       provider: 'v8',
     },
   },
