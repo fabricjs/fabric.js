@@ -16,6 +16,9 @@ export default defineConfig({
       reportsDirectory: '.nyc_output',
       reporter: ['json'],
       exclude: [
+        'test/**',
+        'dist/**',
+        'dist-extensions/**',
         'src/benchmarks/**',
         'vitest*',
         'rollup*',
