@@ -269,7 +269,7 @@ export class Gradient<
 
     colorStops.forEach(({ color, offset }) => {
       markup.push(
-        `<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`
+        `<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`,
       );
     });
 
@@ -303,7 +303,7 @@ export class Gradient<
 
   static async fromObject(
     options: GradientOptions<'linear'>,
-  ): Promise<Gradient<'radial'>>;
+  ): Promise<Gradient<'linear'>>;
   static async fromObject(
     options: GradientOptions<'radial'>,
   ): Promise<Gradient<'radial'>>;
