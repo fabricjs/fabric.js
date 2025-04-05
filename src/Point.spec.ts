@@ -1,461 +1,573 @@
-(function() {
+import { describe, expect, it } from 'vitest';
+import { Point } from './Point';
 
-  QUnit.module('fabric.Point');
+describe('Point', () => {
+  it('constructor & properties', () => {
+    expect(Point).toBeTypeOf('function');
 
-  QUnit.test('constructor & properties', function(assert) {
-    assert.ok(typeof fabric.Point === 'function');
+    const point = new Point();
 
-    var point = new fabric.Point();
+    expect(point).toBeTruthy();
+    expect(point).toBeInstanceOf(Point);
+    expect(point.constructor === Point).toBeTruthy();
+    expect(point.constructor).toBeTypeOf('function');
+    expect(point.x, 'constructor assign x value').toBe(0);
+    expect(point.y, 'constructor assign y value').toBe(0);
 
-    assert.ok(point);
-    assert.ok(point instanceof fabric.Point);
-    assert.ok(point.constructor === fabric.Point);
-    assert.ok(typeof point.constructor === 'function');
-    assert.strictEqual(point.x, 0, 'constructor assign x value');
-    assert.strictEqual(point.y, 0, 'constructor assign y value');
-
-    var x = 5, y = 6;
-    point = new fabric.Point(x, y);
-    assert.equal(point.x, x, 'constructor pass x value');
-    assert.equal(point.y, y, 'constructor pass y value');
+    const x = 5,
+      y = 6;
+    const point2 = new Point(x, y);
+    expect(point2.x, 'constructor pass x value').toBe(x);
+    expect(point2.y, 'constructor pass y value').toBe(y);
   });
 
-  QUnit.test('point add', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point add', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.add === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.add(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, x1 + x2, 'x coords should be added');
-    assert.equal(returned.y, y1 + y2, 'y coords should be added');
-    assert.equal(point.x, x1, 'point is not changed');
-    assert.equal(point.y, y1, 'point is not changed');
-    assert.equal(point2.x, x2, 'point 2 is not changed');
-    assert.equal(point2.y, y2, 'point 2 is not changed');
+    expect(point.add).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.add(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be added').toBe(x1 + x2);
+    expect(returned.y, 'y coords should be added').toBe(y1 + y2);
+    expect(point.x, 'point is not changed').toBe(x1);
+    expect(point.y, 'point is not changed').toBe(y1);
+    expect(point2.x, 'point 2 is not changed').toBe(x2);
+    expect(point2.y, 'point 2 is not changed').toBe(y2);
   });
 
-  QUnit.test('point addEquals', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point addEquals', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.addEquals === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.addEquals(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'is chainable');
-    assert.equal(point.x, x1 + x2, 'x coords should be added');
-    assert.equal(point.y, y1 + y2, 'y coords should be added');
-    assert.equal(point2.x, x2, 'point 2 is not changed');
-    assert.equal(point2.y, y2, 'point 2 is not changed');
+    expect(point.addEquals).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.addEquals(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is chainable').toBe(point);
+    expect(point.x, 'x coords should be added').toBe(x1 + x2);
+    expect(point.y, 'y coords should be added').toBe(y1 + y2);
+    expect(point2.x, 'point 2 is not changed').toBe(x2);
+    expect(point2.y, 'point 2 is not changed').toBe(y2);
   });
 
-  QUnit.test('scalarAdd', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarAdd', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarAdd === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarAdd(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, x1 + scalar, 'x coords should be added');
-    assert.equal(returned.y, y1 + scalar, 'y coords should be added');
+    expect(point.scalarAdd).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarAdd(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be added').toBe(x1 + scalar);
+    expect(returned.y, 'y coords should be added').toBe(y1 + scalar);
   });
 
-  QUnit.test('scalarAddEquals', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarAddEquals', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarAddEquals === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarAddEquals(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'is chainable');
-    assert.equal(point.x, x1 + scalar, 'x coords should be added');
-    assert.equal(point.y, y1 + scalar, 'y coords should be added');
+    expect(point.scalarAddEquals).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarAddEquals(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is chainable').toBe(point);
+    expect(point.x, 'x coords should be added').toBe(x1 + scalar);
+    expect(point.y, 'y coords should be added').toBe(y1 + scalar);
   });
 
-  QUnit.test('point subtract', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point subtract', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.subtract === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.subtract(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, x1 - x2, 'x coords should be added');
-    assert.equal(returned.y, y1 - y2, 'y coords should be added');
-    assert.equal(point.x, x1, 'point is not changed');
-    assert.equal(point.y, y1, 'point is not changed');
-    assert.equal(point2.x, x2, 'point 2 is not changed');
-    assert.equal(point2.y, y2, 'point 2 is not changed');
+    expect(point.subtract).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.subtract(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be added').toBe(x1 - x2);
+    expect(returned.y, 'y coords should be added').toBe(y1 - y2);
+    expect(point.x, 'point is not changed').toBe(x1);
+    expect(point.y, 'point is not changed').toBe(y1);
+    expect(point2.x, 'point 2 is not changed').toBe(x2);
+    expect(point2.y, 'point 2 is not changed').toBe(y2);
   });
 
-  QUnit.test('point subtractEquals', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point subtractEquals', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.subtractEquals === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.subtractEquals(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'is chainable');
-    assert.equal(point.x, x1 - x2, 'x coords should be added');
-    assert.equal(point.y, y1 - y2, 'y coords should be added');
-    assert.equal(point2.x, x2, 'point 2 is not changed');
-    assert.equal(point2.y, y2, 'point 2 is not changed');
+    expect(point.subtractEquals).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.subtractEquals(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is chainable').toBe(point);
+    expect(point.x, 'x coords should be added').toBe(x1 - x2);
+    expect(point.y, 'y coords should be added').toBe(y1 - y2);
+    expect(point2.x, 'point 2 is not changed').toBe(x2);
+    expect(point2.y, 'point 2 is not changed').toBe(y2);
   });
 
-  QUnit.test('scalarSubtract', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarSubtract', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarSubtract === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarSubtract(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, x1 - scalar, 'x coords should be added');
-    assert.equal(returned.y, y1 - scalar, 'y coords should be added');
+    expect(point.scalarSubtract).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarSubtract(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be added').toBe(x1 - scalar);
+    expect(returned.y, 'y coords should be added').toBe(y1 - scalar);
   });
 
-  QUnit.test('scalarSubtractEquals', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarSubtractEquals', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarSubtractEquals === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarSubtractEquals(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'is chainable');
-    assert.equal(point.x, x1 - scalar, 'x coords should be added');
-    assert.equal(point.y, y1 - scalar, 'y coords should be added');
+    expect(point.scalarSubtractEquals).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarSubtractEquals(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is chainable').toBe(point);
+    expect(point.x, 'x coords should be added').toBe(x1 - scalar);
+    expect(point.y, 'y coords should be added').toBe(y1 - scalar);
   });
 
-  QUnit.test('multiply', function (assert) {
-    var a = new fabric.Point(2, 3), b = new fabric.Point(4, 5);
+  it('multiply', () => {
+    const a = new Point(2, 3),
+      b = new Point(4, 5);
 
-    assert.ok(typeof a.multiply === 'function');
-    var returned = a.multiply(b);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned.x, a.x * b.x, 'should be the product of the x coords');
-    assert.equal(returned.y, a.y * b.y, 'should be the product of the y coords');
+    expect(a.multiply).toBeTypeOf('function');
+    const returned = a.multiply(b);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned.x, 'should be the product of the x coords').toBe(a.x * b.x);
+    expect(returned.y, 'should be the product of the y coords').toBe(a.y * b.y);
   });
 
-  QUnit.test('scalarMultiply', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarMultiply', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarMultiply === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarMultiply(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, x1 * scalar, 'x coords should be added');
-    assert.equal(returned.y, y1 * scalar, 'y coords should be added');
+    expect(point.scalarMultiply).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarMultiply(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be added').toBe(x1 * scalar);
+    expect(returned.y, 'y coords should be added').toBe(y1 * scalar);
   });
 
-  QUnit.test('scalarMultiplyEquals', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarMultiplyEquals', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarMultiplyEquals === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarMultiplyEquals(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'is chainable');
-    assert.equal(point.x, x1 * scalar, 'x coords should be added');
-    assert.equal(point.y, y1 * scalar, 'y coords should be added');
+    expect(point.scalarMultiplyEquals).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarMultiplyEquals(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is chainable').toBe(point);
+    expect(point.x, 'x coords should be added').toBe(x1 * scalar);
+    expect(point.y, 'y coords should be added').toBe(y1 * scalar);
   });
 
-  QUnit.test('divide', function (assert) {
-    var a = new fabric.Point(2, 3), b = new fabric.Point(4, 5);
+  it('divide', () => {
+    const a = new Point(2, 3),
+      b = new Point(4, 5);
 
-    assert.ok(typeof a.divide === 'function');
-    var returned = a.divide(b);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned.x, a.x / b.x, 'should be the quotient of the x coords');
-    assert.equal(returned.y, a.y / b.y, 'should be the quotient of the y coords');
+    expect(a.divide).toBeTypeOf('function');
+    const returned = a.divide(b);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned.x, 'should be the quotient of the x coords').toBe(
+      a.x / b.x,
+    );
+    expect(returned.y, 'should be the quotient of the y coords').toBe(
+      a.y / b.y,
+    );
   });
 
-  QUnit.test('scalarDivide', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarDivide', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarDivide === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarDivide(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, x1 / scalar, 'x coords should be added');
-    assert.equal(returned.y, y1 / scalar, 'y coords should be added');
+    expect(point.scalarDivide).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarDivide(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be added').toBe(x1 / scalar);
+    expect(returned.y, 'y coords should be added').toBe(y1 / scalar);
   });
 
-  QUnit.test('scalarDivideEquals', function(assert) {
-    var x1 = 2, y1 = 3, scalar = 3,
-        point = new fabric.Point(x1, y1);
+  it('scalarDivideEquals', () => {
+    const x1 = 2,
+      y1 = 3,
+      scalar = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.scalarDivideEquals === 'function');
-    assert.equal(point.x, x1, 'constructor pass x value');
-    assert.equal(point.y, y1, 'constructor pass y value');
-    var returned = point.scalarDivideEquals(scalar);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'is chainable');
-    assert.equal(point.x, x1 / scalar, 'x coords should be added');
-    assert.equal(point.y, y1 / scalar, 'y coords should be added');
+    expect(point.scalarDivideEquals).toBeTypeOf('function');
+    expect(point.x, 'constructor pass x value').toBe(x1);
+    expect(point.y, 'constructor pass y value').toBe(y1);
+    const returned = point.scalarDivideEquals(scalar);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is chainable').toBe(point);
+    expect(point.x, 'x coords should be added').toBe(x1 / scalar);
+    expect(point.y, 'y coords should be added').toBe(y1 / scalar);
   });
 
-  QUnit.test('point eq', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point3 = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point eq', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point3 = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.eq === 'function');
-    assert.ok(!point.eq(point2), 'points are not equals');
-    assert.ok(point.eq(point), 'a point should be equal to itself');
-    assert.ok(point.eq(point3), 'point constructed from save var are equals');
+    expect(point.eq).toBeTypeOf('function');
+    expect(point.eq(point2), 'points are not equals').toBeFalsy();
+    expect(point.eq(point), 'a point should be equal to itself').toBeTruthy();
+    expect(
+      point.eq(point3),
+      'point constructed from save var are equals',
+    ).toBeTruthy();
   });
 
-  QUnit.test('point lt', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point lt', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.lt === 'function');
-    assert.ok(point.x < point2.x, 'x1 should be less than x2');
-    assert.ok(point.y < point2.y, 'y1 should be less than y2');
-    assert.ok(point.lt(point2), 'point should be lt than point 2');
+    expect(point.lt).toBeTypeOf('function');
+    expect(point.x < point2.x, 'x1 should be less than x2').toBeTruthy();
+    expect(point.y < point2.y, 'y1 should be less than y2').toBeTruthy();
+    expect(point.lt(point2), 'point should be lt than point 2').toBeTruthy();
   });
 
-  QUnit.test('point gt', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point gt', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.gt === 'function');
-    assert.ok(point2.x > point.x, 'x1 should be gt than x2');
-    assert.ok(point2.y > point.y, 'y1 should be gt than y2');
-    assert.ok(point2.gt(point), 'point2 should be gt than point');
+    expect(point.gt).toBeTypeOf('function');
+    expect(point2.x > point.x, 'x1 should be gt than x2').toBeTruthy();
+    expect(point2.y > point.y, 'y1 should be gt than y2').toBeTruthy();
+    expect(point2.gt(point), 'point2 should be gt than point').toBeTruthy();
   });
 
-  QUnit.test('point lte', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point3 = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point lte', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point3 = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.lte === 'function');
-    assert.ok(point.x <= point2.x, 'x1 should be less than x2');
-    assert.ok(point.y <= point2.y, 'y1 should be less than y2');
-    assert.ok(point.lte(point2), 'point should be lt than point 2');
-    assert.ok(point.x <= point3.x, 'x1 should be less than x2');
-    assert.ok(point.y <= point3.y, 'y1 should be less than y2');
-    assert.ok(point.eq(point3) && point.lte(point3), 'lte return true on equal points');
-    assert.ok(point.lte(point), 'point is lte than itselft');
+    expect(point.lte).toBeTypeOf('function');
+    expect(point.x <= point2.x, 'x1 should be less than x2').toBeTruthy();
+    expect(point.y <= point2.y, 'y1 should be less than y2').toBeTruthy();
+    expect(point.lte(point2), 'point should be lt than point 2').toBeTruthy();
+    expect(point.x <= point3.x, 'x1 should be less than x2').toBeTruthy();
+    expect(point.y <= point3.y, 'y1 should be less than y2').toBeTruthy();
+    expect(
+      point.eq(point3) && point.lte(point3),
+      'lte return true on equal points',
+    ).toBeTruthy();
+    expect(point.lte(point), 'point is lte than itselft').toBeTruthy();
   });
 
-  QUnit.test('point gte', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point3 = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point gte', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point3 = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.gte === 'function');
-    assert.ok(point2.x >= point.x, 'x1 should be greater than x2');
-    assert.ok(point2.y >= point.y, 'y1 should be greater than y2');
-    assert.ok(point2.gte(point), 'point2 should be gte than point');
-    assert.ok(point3.x >= point.x, 'x1 should be greater than x2');
-    assert.ok(point3.y >= point.y, 'y1 should be greater than y2');
-    assert.ok(point3.eq(point) && point3.gte(point), 'gte returns true on equal points');
-    assert.ok(point.gte(point), 'point should be gte than itself');
+    expect(point.gte).toBeTypeOf('function');
+    expect(point2.x >= point.x, 'x1 should be greater than x2').toBeTruthy();
+    expect(point2.y >= point.y, 'y1 should be greater than y2').toBeTruthy();
+    expect(point2.gte(point), 'point2 should be gte than point').toBeTruthy();
+    expect(point3.x >= point.x, 'x1 should be greater than x2').toBeTruthy();
+    expect(point3.y >= point.y, 'y1 should be greater than y2').toBeTruthy();
+    expect(
+      point3.eq(point) && point3.gte(point),
+      'gte returns true on equal points',
+    ).toBeTruthy();
+    expect(point.gte(point), 'point should be gte than itself').toBeTruthy();
   });
 
-  QUnit.test('point lerp', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point lerp', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.lerp === 'function');
-    var returned = point.lerp(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'not chainable');
-    assert.equal(returned.x, point.x + (point2.x - point.x) / 2, 'default is in the middle');
-    assert.equal(returned.y, point.y + (point2.y - point.y) / 2, 'default is in the middle');
-    returned = point.lerp(point2, 0);
-    assert.deepEqual(returned, point, '0 gives you the original point');
-    returned = point.lerp(point2, 1);
-    assert.deepEqual(returned, point2, '1 gives you the destination point');
-    returned = point.lerp(point2, -1);
-    assert.deepEqual(returned, point, '-1 < 0 so t = 0 gives you the original point');
-    returned = point.lerp(point2, 2);
-    assert.deepEqual(returned, point2, '2 > 1 so t = 1 gives you the destination point');
+    expect(point.lerp).toBeTypeOf('function');
+    const returned = point.lerp(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'not chainable').not.toBe(point);
+    expect(returned.x, 'default is in the middle').toBe(
+      point.x + (point2.x - point.x) / 2,
+    );
+    expect(returned.y, 'default is in the middle').toBe(
+      point.y + (point2.y - point.y) / 2,
+    );
+    const returned2 = point.lerp(point2, 0);
+    expect(returned2, '0 gives you the original point').toEqual(point);
+    const returned3 = point.lerp(point2, 1);
+    expect(returned3, '1 gives you the destination point').toEqual(point2);
+    const returned4 = point.lerp(point2, -1);
+    expect(returned4, '-1 < 0 so t = 0 gives you the original point').toEqual(
+      point,
+    );
+    const returned5 = point.lerp(point2, 2);
+    expect(returned5, '2 > 1 so t = 1 gives you the destination point').toEqual(
+      point2,
+    );
   });
 
-  QUnit.test('point distance from', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('point distance from', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.distanceFrom === 'function');
-    var returned = point.distanceFrom(point2, 0.5);
-    assert.ok(typeof returned === 'number', 'returns a number');
-    assert.equal(returned, Math.sqrt(Math.pow(point2.x - point.x, 2) + Math.pow(point2.y - point.y, 2)), 'return the geometric distance between coords');
+    expect(point.distanceFrom).toBeTypeOf('function');
+    const returned = point.distanceFrom(point2);
+    expect(typeof returned, 'returns a number').toBe('number');
+    expect(returned, 'return the geometric distance between coords').toBe(
+      Math.sqrt(
+        Math.pow(point2.x - point.x, 2) + Math.pow(point2.y - point.y, 2),
+      ),
+    );
   });
 
-  QUnit.test('midPointFrom', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 5,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('midPointFrom', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 5;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.midPointFrom === 'function');
-    var returned = point.midPointFrom(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'not chainable');
-    assert.equal(returned.x, point.x + (point2.x - point.x) / 2, 'point.x is in the middle');
-    assert.equal(returned.y, point.y + (point2.y - point.y) / 2, 'point.y is in the middle');
+    expect(point.midPointFrom).toBeTypeOf('function');
+    const returned = point.midPointFrom(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'not chainable').not.toBe(point);
+    expect(returned.x, 'point.x is in the middle').toBe(
+      point.x + (point2.x - point.x) / 2,
+    );
+    expect(returned.y, 'point.y is in the middle').toBe(
+      point.y + (point2.y - point.y) / 2,
+    );
   });
 
-  QUnit.test('min', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 1,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('min', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 1;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.min === 'function');
-    var returned = point.min(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'not chainable');
-    assert.equal(returned.x, Math.min(point.x, point2.x), 'point.x is the min from the points');
-    assert.equal(returned.y, Math.min(point.y, point2.y), 'point.y is the min from the points');
+    expect(point.min).toBeTypeOf('function');
+    const returned = point.min(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'not chainable').not.toBe(point);
+    expect(returned.x, 'point.x is the min from the points').toBe(
+      Math.min(point.x, point2.x),
+    );
+    expect(returned.y, 'point.y is the min from the points').toBe(
+      Math.min(point.y, point2.y),
+    );
   });
 
-  QUnit.test('max', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 1,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('max', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 1;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.max === 'function');
-    var returned = point.max(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'not chainable');
-    assert.equal(returned.x, Math.max(point.x, point2.x), 'point.x is the max from the points');
-    assert.equal(returned.y, Math.max(point.y, point2.y), 'point.y is the max from the points');
+    expect(point.max).toBeTypeOf('function');
+    const returned = point.max(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'not chainable').not.toBe(point);
+    expect(returned.x, 'point.x is the max from the points').toBe(
+      Math.max(point.x, point2.x),
+    );
+    expect(returned.y, 'point.y is the max from the points').toBe(
+      Math.max(point.y, point2.y),
+    );
   });
 
-  QUnit.test('toString', function(assert) {
-    var x1 = 2, y1 = 3,
-        point = new fabric.Point(x1, y1);
+  it('toString', () => {
+    const x1 = 2,
+      y1 = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.toString === 'function');
-    var returned = point.toString();
-    assert.ok(typeof returned === 'string', 'returns a string');
-    assert.equal(returned, point.x + ',' + point.y, 'coords concat with ,');
+    expect(point.toString).toBeTypeOf('function');
+    const returned = point.toString();
+    expect(typeof returned, 'returns a string').toBe('string');
+    expect(returned, 'coords concat with ,').toBe(point.x + ',' + point.y);
   });
 
-  QUnit.test('setXY', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 8,
-        point = new fabric.Point(x1, y1);
+  it('setXY', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 8;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.setXY === 'function');
-    var returned = point.setXY(x2, y2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'chainable');
-    assert.equal(returned.x, x2, 'it changed x property');
-    assert.equal(returned.y, y2, 'it changed x property');
+    expect(point.setXY).toBeTypeOf('function');
+    const returned = point.setXY(x2, y2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'chainable').toBe(point);
+    expect(returned.x, 'it changed x property').toBe(x2);
+    expect(returned.y, 'it changed x property').toBe(y2);
   });
 
-  QUnit.test('setX', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4,
-        point = new fabric.Point(x1, y1);
+  it('setX', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.setX === 'function');
-    var returned = point.setX(x2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'chainable');
-    assert.equal(returned.x, x2, 'it changed x property');
+    expect(point.setX).toBeTypeOf('function');
+    const returned = point.setX(x2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'chainable').toBe(point);
+    expect(returned.x, 'it changed x property').toBe(x2);
   });
 
-  QUnit.test('setY', function(assert) {
-    var x1 = 2, y1 = 3, y2 = 8,
-        point = new fabric.Point(x1, y1);
+  it('setY', () => {
+    const x1 = 2,
+      y1 = 3,
+      y2 = 8;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.setY === 'function');
-    var returned = point.setY(y2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'chainable');
-    assert.equal(returned.y, y2, 'it changed y property');
+    expect(point.setY).toBeTypeOf('function');
+    const returned = point.setY(y2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'chainable').toBe(point);
+    expect(returned.y, 'it changed y property').toBe(y2);
   });
 
-  QUnit.test('setFromPoint', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 8,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('setFromPoint', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 8;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.setFromPoint === 'function');
-    var returned = point.setFromPoint(point2);
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.equal(returned, point, 'chainable');
-    assert.equal(returned.x, point2.x, 'it changed x property');
-    assert.equal(returned.y, point2.y, 'it changed x property');
+    expect(point.setFromPoint).toBeTypeOf('function');
+    const returned = point.setFromPoint(point2);
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'chainable').toBe(point);
+    expect(returned.x, 'it changed x property').toBe(point2.x);
+    expect(returned.y, 'it changed x property').toBe(point2.y);
   });
 
-  QUnit.test('swap', function(assert) {
-    var x1 = 2, y1 = 3, x2 = 4, y2 = 8,
-        point = new fabric.Point(x1, y1),
-        point2 = new fabric.Point(x2, y2);
+  it('swap', () => {
+    const x1 = 2,
+      y1 = 3,
+      x2 = 4,
+      y2 = 8;
+    const point = new Point(x1, y1);
+    const point2 = new Point(x2, y2);
 
-    assert.ok(typeof point.swap === 'function');
-    var returned = point.swap(point2);
-    assert.equal(returned, undefined, 'it does not return anything');
-    assert.equal(point.x, x2, 'swapped x');
-    assert.equal(point.y, y2, 'swapped y');
-    assert.equal(point2.x, x1, 'swapped x');
-    assert.equal(point2.y, y1, 'swapped y');
+    expect(point.swap).toBeTypeOf('function');
+    const returned = point.swap(point2);
+    expect(returned, 'it does not return anything').toBe(undefined);
+    expect(point.x, 'swapped x').toBe(x2);
+    expect(point.y, 'swapped y').toBe(y2);
+    expect(point2.x, 'swapped x').toBe(x1);
+    expect(point2.y, 'swapped y').toBe(y1);
   });
 
-  QUnit.test('clone', function(assert) {
-    var x1 = 2, y1 = 3,
-        point = new fabric.Point(x1, y1);
+  it('clone', () => {
+    const x1 = 2,
+      y1 = 3;
+    const point = new Point(x1, y1);
 
-    assert.ok(typeof point.clone === 'function');
-    var returned = point.clone();
-    assert.ok(returned instanceof fabric.Point, 'returns a point class');
-    assert.notEqual(returned, point, 'is not chainable');
-    assert.equal(returned.x, point.x, 'x coords should be same');
-    assert.equal(returned.y, point.y, 'y coords should be same');
+    expect(point.clone).toBeTypeOf('function');
+    const returned = point.clone();
+    expect(returned, 'returns a point class').toBeInstanceOf(Point);
+    expect(returned, 'is not chainable').not.toBe(point);
+    expect(returned.x, 'x coords should be same').toBe(point.x);
+    expect(returned.y, 'y coords should be same').toBe(point.y);
   });
 
-  QUnit.test('rotate', function(assert) {
-    var point = new fabric.Point(5, 1);
-    var rotated = point.rotate(Math.PI);
-    assert.equal(rotated.x, -5, 'rotated x');
-    assert.equal(rotated.y, -1, 'rotated y');
+  it('rotate', () => {
+    const point = new Point(5, 1);
+    const rotated = point.rotate(Math.PI);
+    expect(rotated.x, 'rotated x').toBe(-5);
+    expect(rotated.y, 'rotated y').toBe(-1);
   });
 
-  QUnit.test('rotate with origin point', function(assert) {
-    var point = new fabric.Point(5, 1);
-    var rotated = point.rotate(Math.PI, new fabric.Point(4, 1));
-    assert.equal(rotated.x, 3, 'rotated x around 4');
-    assert.equal(rotated.y, 1, 'rotated y around 1');
+  it('rotate with origin point', () => {
+    const point = new Point(5, 1);
+    const rotated = point.rotate(Math.PI, new Point(4, 1));
+    expect(rotated.x, 'rotated x around 4').toBe(3);
+    expect(rotated.y, 'rotated y around 1').toBe(1);
   });
-
-})();
+});
