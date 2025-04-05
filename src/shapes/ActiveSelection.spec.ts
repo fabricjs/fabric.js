@@ -4,9 +4,188 @@ import { ActiveSelection } from './ActiveSelection';
 import { Group } from './Group';
 import { FabricObject } from './Object/FabricObject';
 
-import { describe, expect, it, test, vi } from 'vitest';
+import { afterEach, describe, expect, it, test, vi } from 'vitest';
+import { Rect } from './Rect';
+import { version } from '../../fabric';
 
 describe('ActiveSelection', () => {
+  const canvas = new Canvas(undefined, {
+    enableRetinaScaling: false,
+    width: 600,
+    height: 600,
+  });
+
+  afterEach(() => {
+    canvas.clear();
+    canvas.backgroundColor = Canvas.getDefaults().backgroundColor;
+    canvas.calcOffset();
+  });
+
+  it('constructor', function () {
+    const group = makeAsWith2Objects();
+
+    expect(group).toBeTruthy();
+    expect(group, 'should be instance of fabric.ActiveSelection').toBeInstanceOf(ActiveSelection);
+    expect(group.item(0).parent, 'parent ref is undefined').toBeUndefined();
+  });
+
+  it('toString', () => {
+    const group = makeAsWith2Objects();
+    expect(group.toString(), 'should return proper representation').toBe('#<ActiveSelection: (2)>');
+  });
+
+  it('toObject', () => {
+    const group = makeAsWith2Objects();
+    expect(group.toObject).toBeTypeOf('function');
+
+    const clone = group.toObject();
+    const expectedObject = {
+      version: version,
+      type: 'ActiveSelection',
+      originX: 'left',
+      originY: 'top',
+      left: 50,
+      top: 100,
+      width: 80,
+      height: 60,
+      fill: 'rgb(0,0,0)',
+      // layout: 'fit-content',
+      stroke: null,
+      strokeWidth: 0,
+      strokeDashArray: null,
+      strokeLineCap: 'butt',
+      strokeDashOffset: 0,
+      strokeLineJoin: 'miter',
+      strokeMiterLimit: 4,
+      scaleX: 1,
+      scaleY: 1,
+      shadow: null,
+      subTargetCheck: false,
+      interactive: false,
+      visible: true,
+      backgroundColor: '',
+      angle: 0,
+      flipX: false,
+      flipY: false,
+      opacity: 1,
+      fillRule: 'nonzero',
+      paintFirst: 'fill',
+      globalCompositeOperation: 'source-over',
+      skewX: 0,
+      skewY: 0,
+      strokeUniform: false,
+      objects: clone.objects,
+      layoutManager: {
+        type: 'layoutManager',
+        strategy: 'fit-content',
+      },
+    };
+
+    expect(clone).toEqual(expectedObject);
+
+    expect(group, 'should produce different object').not.toBe(clone);
+    expect(group.getObjects(), 'should produce different object array').not.toBe(clone.objects);
+    expect(group.getObjects()[0], 'should produce different objects in array').not.toBe(clone.objects[0]);
+  });
+
+  it('toObject without default values', () => {
+    const group = makeAsWith2Objects();
+    group.includeDefaultValues = false;
+
+    const clone = group.toObject();
+    const objects = [
+      {
+        version: version,
+        type: 'Rect',
+        left: 10,
+        top: -30,
+        width: 30,
+        height: 10,
+        strokeWidth: 0,
+      },
+      {
+        version: version,
+        type: 'Rect',
+        left: -40,
+        top: -10,
+        width: 10,
+        height: 40,
+        strokeWidth: 0,
+      },
+    ];
+    const expectedObject = {
+      version: version,
+      type: 'ActiveSelection',
+      left: 50,
+      top: 100,
+      width: 80,
+      height: 60,
+      objects: objects,
+    };
+
+    expect(clone).toEqual(expectedObject);
+  });
+
+  it('_renderControls', () => {
+    expect(ActiveSelection.prototype._renderControls).toBeTypeOf('function');
+  });
+
+  test('fromObject', async () => {
+    const group = makeAsWith2ObjectsWithOpacity();
+
+    expect(ActiveSelection.fromObject).toBeTypeOf('function');
+    const groupObject = group.toObject();
+
+    const newGroupFromObject = await ActiveSelection.fromObject(groupObject);
+    const objectFromOldGroup = group.toObject();
+    const objectFromNewGroup = newGroupFromObject.toObject();
+
+    expect(newGroupFromObject).toBeInstanceOf(ActiveSelection);
+
+    expect(objectFromOldGroup.objects[0]).toEqual(
+      objectFromNewGroup.objects[0],
+    );
+    expect(objectFromOldGroup.objects[1]).toEqual(
+      objectFromNewGroup.objects[1],
+    );
+
+    expect(objectFromOldGroup).toEqual(objectFromNewGroup);
+  });
+
+  it('ActiveSelection shouldCache', () => {
+    const rect1 = new Rect({
+      top: 1,
+      left: 1,
+      width: 2,
+      height: 2,
+      strokeWidth: 0,
+      fill: 'red',
+      opacity: 1,
+      objectCaching: true,
+    });
+    const rect2 = new Rect({
+      top: 5,
+      left: 5,
+      width: 2,
+      height: 2,
+      strokeWidth: 0,
+      fill: 'red',
+      opacity: 1,
+      objectCaching: true,
+    });
+    const group = new ActiveSelection([rect1, rect2], { objectCaching: true });
+
+    expect(group.shouldCache(), 'Active selection do not cache').toBe(false);
+  });
+
+  it('canvas property propagation', () => {
+    const g2 = makeAsWith4Objects();
+
+    canvas.add(g2);
+    expect(g2.canvas).toBe(canvas);
+    expect(g2._objects[3].canvas).toBe(canvas);
+  });
+
   it('should set the layoutManager in the constructor', () => {
     const activeSelection = new ActiveSelection();
     expect(activeSelection.layoutManager).toBeDefined();
@@ -164,3 +343,52 @@ describe('ActiveSelection', () => {
     expect(spy).toHaveNthReturnedWith(1, false);
   });
 });
+
+function makeAsWith2Objects() {
+  const rect1 = new Rect({
+    top: 100,
+    left: 100,
+    width: 30,
+    height: 10,
+    strokeWidth: 0,
+  });
+  const rect2 = new Rect({
+    top: 120,
+    left: 50,
+    width: 10,
+    height: 40,
+    strokeWidth: 0,
+  });
+
+  return new ActiveSelection([rect1, rect2], { strokeWidth: 0 });
+}
+
+function makeAsWith4Objects() {
+  const rect1 = new Rect({ top: 100, left: 100, width: 30, height: 10 });
+  const rect2 = new Rect({ top: 120, left: 50, width: 10, height: 40 });
+  const rect3 = new Rect({ top: 40, left: 0, width: 20, height: 40 });
+  const rect4 = new Rect({ top: 75, left: 75, width: 40, height: 40 });
+
+  return new ActiveSelection([rect1, rect2, rect3, rect4]);
+}
+
+function makeAsWith2ObjectsWithOpacity() {
+  const rect1 = new Rect({
+    top: 100,
+    left: 100,
+    width: 30,
+    height: 10,
+    strokeWidth: 0,
+    opacity: 0.5,
+  });
+  const rect2 = new Rect({
+    top: 120,
+    left: 50,
+    width: 10,
+    height: 40,
+    strokeWidth: 0,
+    opacity: 0.8,
+  });
+
+  return new ActiveSelection([rect1, rect2], { strokeWidth: 0 });
+}
