@@ -3,6 +3,7 @@
 ## [next]
 
 - refactor(tests): migrate remaining active selection tests from qunit to vitest [#10490](https://github.com/fabricjs/fabric.js/pull/10490)
+- ci(): update playwright to latest
 - chore(): BREAKING: Update browser versions and some dependencies [#10488](https://github.com/fabricjs/fabric.js/pull/10488)
 - ci(): Switch from Jest to Vitest [#10420](https://github.com/fabricjs/fabric.js/pull/10420)
 - chore(): BREAKING: drop node 16 support. Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
