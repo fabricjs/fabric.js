@@ -3,6 +3,9 @@
 ## [next]
 
 - BREAKING: remove opacity from colorstops in live Gradient class [#9622](https://github.com/fabricjs/fabric.js/pull/9622)
+- refactor(tests): move circle tests from qunit to vitest [#10491](https://github.com/fabricjs/fabric.js/pull/10491)
+- refactor(tests): migrate remaining active selection tests from qunit to vitest [#10490](https://github.com/fabricjs/fabric.js/pull/10490)
+- ci(): update playwright to latest [#10496](https://github.com/fabricjs/fabric.js/pull/10496)
 - chore(): BREAKING: Update browser versions and some dependencies [#10488](https://github.com/fabricjs/fabric.js/pull/10488)
 - ci(): Switch from Jest to Vitest [#10420](https://github.com/fabricjs/fabric.js/pull/10420)
 - chore(): BREAKING: drop node 16 support. Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
