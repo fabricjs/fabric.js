@@ -25,13 +25,18 @@ describe('ActiveSelection', () => {
     const group = makeAsWith2Objects();
 
     expect(group).toBeTruthy();
-    expect(group, 'should be instance of fabric.ActiveSelection').toBeInstanceOf(ActiveSelection);
+    expect(
+      group,
+      'should be instance of fabric.ActiveSelection',
+    ).toBeInstanceOf(ActiveSelection);
     expect(group.item(0).parent, 'parent ref is undefined').toBeUndefined();
   });
 
   it('toString', () => {
     const group = makeAsWith2Objects();
-    expect(group.toString(), 'should return proper representation').toBe('#<ActiveSelection: (2)>');
+    expect(group.toString(), 'should return proper representation').toBe(
+      '#<ActiveSelection: (2)>',
+    );
   });
 
   it('toObject', () => {
@@ -84,8 +89,14 @@ describe('ActiveSelection', () => {
     expect(clone).toEqual(expectedObject);
 
     expect(group, 'should produce different object').not.toBe(clone);
-    expect(group.getObjects(), 'should produce different object array').not.toBe(clone.objects);
-    expect(group.getObjects()[0], 'should produce different objects in array').not.toBe(clone.objects[0]);
+    expect(
+      group.getObjects(),
+      'should produce different object array',
+    ).not.toBe(clone.objects);
+    expect(
+      group.getObjects()[0],
+      'should produce different objects in array',
+    ).not.toBe(clone.objects[0]);
   });
 
   it('toObject without default values', () => {
