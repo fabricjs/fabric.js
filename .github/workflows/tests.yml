@@ -90,7 +90,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: ${{ matrix.node-version }}
-          install-system-deps: ${{ matrix.node-version >= 22 }}
+          install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.suite }} tests

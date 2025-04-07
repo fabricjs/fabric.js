@@ -3,6 +3,8 @@
 ## [next]
 
 - BREAKING: remove opacity from colorstops in live Gradient class [#9622](https://github.com/fabricjs/fabric.js/pull/9622)
+- refactor(tests): move point tests from qunit to vitest [#10492](https://github.com/fabricjs/fabric.js/pull/10492)
+- ci(): Remove system deps installation for node22, use prebuilt. [#10498](https://github.com/fabricjs/fabric.js/pull/10498)
 - refactor(tests): move circle tests from qunit to vitest [#10491](https://github.com/fabricjs/fabric.js/pull/10491)
 - refactor(tests): migrate remaining active selection tests from qunit to vitest [#10490](https://github.com/fabricjs/fabric.js/pull/10490)
 - ci(): update playwright to latest [#10496](https://github.com/fabricjs/fabric.js/pull/10496)
