@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move group tests from qunit to vitest [#10495](https://github.com/fabricjs/fabric.js/pull/10495)
 - refactor(tests): move point tests from qunit to vitest [#10492](https://github.com/fabricjs/fabric.js/pull/10492)
 - ci(): Remove system deps installation for node22, use prebuilt. [#10498](https://github.com/fabricjs/fabric.js/pull/10498)
 - refactor(tests): move circle tests from qunit to vitest [#10491](https://github.com/fabricjs/fabric.js/pull/10491)
