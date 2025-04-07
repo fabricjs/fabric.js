@@ -164,7 +164,7 @@ export class FabricImage<
 
   declare preserveAspectRatio: string;
 
-  protected declare src: string;
+  declare protected src: string;
 
   declare filters: BaseFilter<string, Record<string, any>>[];
   declare resizeFilter: Resize;

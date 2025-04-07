@@ -43,8 +43,8 @@ export type SerializedLayoutManager = {
 };
 
 export class LayoutManager {
-  private declare _prevLayoutStrategy?: LayoutStrategy;
-  protected declare _subscriptions: Map<FabricObject, VoidFunction[]>;
+  declare private _prevLayoutStrategy?: LayoutStrategy;
+  declare protected _subscriptions: Map<FabricObject, VoidFunction[]>;
 
   strategy: LayoutStrategy;
 

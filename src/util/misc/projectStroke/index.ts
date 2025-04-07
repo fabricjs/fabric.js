@@ -4,7 +4,7 @@ import { StrokeLineCapProjections } from './StrokeLineCapProjections';
 import { StrokeLineJoinProjections } from './StrokeLineJoinProjections';
 import type { TProjection, TProjectStrokeOnPointsOptions } from './types';
 
-export * from './types';
+export type * from './types';
 
 /**
  *
