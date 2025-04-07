@@ -40,9 +40,9 @@ export class PencilBrush extends BaseBrush {
    */
   straightLineKey: ModifierKey | undefined | null = 'shiftKey';
 
-  protected declare _points: Point[];
-  protected declare _hasStraightLine: boolean;
-  protected declare oldEnd?: Point;
+  declare protected _points: Point[];
+  declare protected _hasStraightLine: boolean;
+  declare protected oldEnd?: Point;
 
   constructor(canvas: Canvas) {
     super(canvas);

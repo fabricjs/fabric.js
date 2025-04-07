@@ -15,7 +15,7 @@ import {
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 export class Color {
-  private declare _source: TRGBAColorSource;
+  declare private _source: TRGBAColorSource;
   isUnrecognised = false;
 
   /**

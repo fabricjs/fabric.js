@@ -25,8 +25,8 @@ export abstract class StyledText<
   EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObject<Props, SProps, EventSpec> {
   declare abstract styles: TextStyle;
-  protected declare abstract _textLines: string[][];
-  protected declare _forceClearCache: boolean;
+  declare protected abstract _textLines: string[][];
+  declare protected _forceClearCache: boolean;
   static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
   abstract get2DCursorLocation(
     selectionStart: number,
@@ -263,7 +263,7 @@ export abstract class StyledText<
     charIndex: number,
   ): TextStyleDeclaration {
     const lineStyle = this.styles && this.styles[lineIndex];
-    return lineStyle ? lineStyle[charIndex] ?? {} : {};
+    return lineStyle ? (lineStyle[charIndex] ?? {}) : {};
   }
 
   /**

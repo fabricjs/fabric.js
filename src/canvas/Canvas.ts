@@ -86,21 +86,21 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type number
    * @private
    */
-  private declare _willAddMouseDown: number;
+  declare private _willAddMouseDown: number;
 
   /**
    * Holds a reference to an object on the canvas that is receiving the drag over event.
    * @type FabricObject
    * @private
    */
-  private declare _draggedoverTarget?: FabricObject;
+  declare private _draggedoverTarget?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas from where the drag operation started
    * @type FabricObject
    * @private
    */
-  private declare _dragSource?: FabricObject;
+  declare private _dragSource?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas that is the current drop target
@@ -109,7 +109,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type FabricObject
    * @private
    */
-  private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
+  declare private _dropTarget: FabricObject<ObjectEvents> | undefined;
 
   /**
    * a boolean that keeps track of the click state during a cycle of mouse down/up.

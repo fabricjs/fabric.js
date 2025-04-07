@@ -15,7 +15,8 @@
     "vitest.d.ts",
     "vitest.setup.ts",
     "vitest.config.ts",
-    "vitest.extend.ts"
+    "vitest.extend.ts",
+    "playwright.setup.ts"
   ],
   "exclude": ["dist", "dist-extensions", "e2e", "test"]
 }
