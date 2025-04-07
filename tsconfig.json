@@ -111,7 +111,8 @@
     "src/**/*.spec.ts",
     "vitest.extend.ts",
     "vitest.config.ts",
-    "vitest.d.ts"
+    "vitest.d.ts",
+    "playwright.setup.ts"
   ],
   "include": ["src", "fabric.ts", "index.ts", "index.node.ts", "extensions"]
 }
