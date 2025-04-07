@@ -99,7 +99,7 @@
     "inquirer-checkbox-plus-prompt": "^1.0.1",
     "jest-snapshot": "^29.7.0",
     "kill-port": "^2.0.1",
-    "micromatch": "^4.0.5",
+    "micromatch": "^4.0.8",
     "moment": "^2.29.1",
     "nyc": "^17.x",
     "pixelmatch": "^4.0.2",
