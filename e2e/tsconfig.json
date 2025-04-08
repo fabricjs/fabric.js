@@ -5,6 +5,7 @@
     "moduleResolution": "Node",
     "sourceMap": true,
     "outDir": "./dist",
+    "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     /**
      * A reflection of the configured imports used by test scripts

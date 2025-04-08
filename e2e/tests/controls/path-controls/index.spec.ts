@@ -1,13 +1,8 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../../fixtures/base';
 import type { Path } from 'fabric';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
 
-setup();
-
-test(`path controls can modify path`, async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test(`path controls can modify path`, async ({ page, canvasUtil }) => {
   const pathUtil = new ObjectUtil<Path>(page, 'testPath');
 
   expect(await canvasUtil.screenshot()).toMatchSnapshot({

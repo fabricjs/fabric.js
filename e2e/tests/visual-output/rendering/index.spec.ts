@@ -1,13 +1,9 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 import { TestingCanvas } from '../../../utils/createNodeSnapshot';
 import { renderTests } from './renderingCases';
 import * as fabric from 'fabric/node';
 
-setup();
-
-test('VISUAL RENDERING TESTS', async ({ page }, config) => {
+test('VISUAL RENDERING TESTS', async ({ page, canvasUtil }, config) => {
   for (const testCase of renderTests) {
     if (testCase.disabled !== 'browser') {
       await test.step(`browser - ${testCase.title}`, async () => {
@@ -18,7 +14,7 @@ test('VISUAL RENDERING TESTS', async ({ page }, config) => {
           testCase.title,
         );
         expect(
-          await new CanvasUtil(page).screenshot(),
+          await canvasUtil.screenshot(),
           `browser snapshot`,
         ).toMatchSnapshot({
           name: testCase.golden || `${testCase.title}.png`,

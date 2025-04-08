@@ -1,12 +1,7 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
 
-setup();
-
-test('textbox typing and resizing', async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test('textbox typing and resizing', async ({ page, canvasUtil }) => {
   const textboxUtil = new ObjectUtil(page, 'textbox');
   const textCenter = await textboxUtil.getObjectCenter();
 
@@ -24,7 +19,7 @@ test('textbox typing and resizing', async ({ page }) => {
 
   await page
     .locator('textarea')
-    .type(
+    .pressSequentially(
       'insert text in a textbox from the keyboard will wrap text on current textbox width',
       {
         // delay: 160,

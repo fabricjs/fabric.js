@@ -65,6 +65,7 @@
     "lint": "eslint src extensions",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write .",
+    "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
     "babel-constants": "babel --no-babelrc src/constants.ts --extensions '.ts' --out-dir dist/src/ --config-file ./.babelrcAlt --plugins=babel-plugin-import-json-value",
     "babel-src": "babel --no-babelrc src --extensions '.ts' --ignore 'src/constants.ts' --out-dir dist/src --config-file ./.babelrcAlt"
   },

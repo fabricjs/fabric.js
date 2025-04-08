@@ -1,10 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../../fixtures/base';
 import type { Polygon } from 'fabric';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
-
-setup();
 
 const toSnapshotName = (name: string, exact: boolean) =>
   `${name}${exact ? '-exact' : ''}.png`;
@@ -12,8 +8,8 @@ const toSnapshotName = (name: string, exact: boolean) =>
 for (const exact of [true, false]) {
   test(`polygon controls can modify polygon - exactBoundingBox ${exact}`, async ({
     page,
+    canvasUtil,
   }) => {
-    const canvasUtil = new CanvasUtil(page);
     const starUtil = new ObjectUtil<Polygon>(page, 'star');
 
     exact &&
