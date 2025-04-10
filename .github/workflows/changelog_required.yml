@@ -1,4 +1,4 @@
-name: '📋'
+name: 'Check 📋'
 
 on:
   pull_request:
