@@ -3,6 +3,9 @@
 ## [next]
 
 - refactor(tests): move observable tests from qunit to vitest [#10501](https://github.com/fabricjs/fabric.js/pull/10501)
+- chore(): remove axios in favor of native fetch [#10500](https://github.com/fabricjs/fabric.js/pull/10500)
+- ci(): Refine changelog warn action [#10505](https://github.com/fabricjs/fabric.js/pull/10505)
+- ci(): Try to write an alternative action for CHANGELOG.MD [#10504](https://github.com/fabricjs/fabric.js/pull/10504)
 - refactor(tests): move point tests from qunit to vitest [#10492](https://github.com/fabricjs/fabric.js/pull/10492)
 - ci(): Remove system deps installation for node22, use prebuilt. [#10498](https://github.com/fabricjs/fabric.js/pull/10498)
 - refactor(tests): move circle tests from qunit to vitest [#10491](https://github.com/fabricjs/fabric.js/pull/10491)
