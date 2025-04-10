@@ -13,6 +13,11 @@ on:
         type: boolean
         required: false
         default: false
+      suggest:
+        description: Just warn the user he needs to update the changelog
+        type: boolean
+        required: false
+        default: false
 
 jobs:
   changelog:
@@ -98,3 +103,28 @@ jobs:
           git add ${{ env.file }}
           git commit -m "update ${{ env.file }}"
           git push
+  suggest:
+    runs-on: ubuntu-24.04
+    needs: changelog
+    if: inputs.suggest && failure()
+    env:
+      unique_id: <!-- changelog-suggestion -->
+      file: CHANGELOG.md
+      next_version: next
+      link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
+    steps:
+      - name: Comment on the PR for a request to edit changelog
+        uses: edumserrano/find-create-or-update-comment@v3.0.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '${{ env.unique_id }}'
+          comment-author: 'github-actions[bot]'
+          body:
+            | # can be a single value or you can compose text with multi-line values
+            ${{ env.unique_id }}
+            It seems that you opened a PR but you didn't add a line to the changelog file
+            Please under the `## [next]` version tag, add a line describing the changes of your pr with this format:
+            ci/chore/tests/feature/fix(): Some extended description ${{env.link}}
+          edit-mode: replace
+      - name: Exit with error
+        run: exit 1
