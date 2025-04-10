@@ -1,5 +1,5 @@
 # Fabric.js
-
+-TEST-
 <a href="http://fabricjs.com/kitchensink" target="_blank"><img align="right" src="/lib/screenshot.png" style="width:400px"></a>
 
 A **simple and powerful Javascript HTML5 canvas library**.
