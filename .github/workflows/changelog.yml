@@ -116,6 +116,7 @@ jobs:
       - name: Comment on the PR for a request to edit changelog
         uses: edumserrano/find-create-or-update-comment@v3.0.0
         with:
+          token: ${{ secrets.GHA_GRANULAR_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: '${{ env.unique_id }}'
           comment-author: 'github-actions[bot]'
