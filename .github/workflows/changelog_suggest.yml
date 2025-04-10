@@ -1,0 +1,14 @@
+name: 'Warn about 📋'
+
+on:
+  pull_request_target:
+    branches: [master]
+    types: [opened, edited]
+
+jobs:
+  changelog-suggestion:
+    # If it has NOT write permission because is from a fork, we inform the user he needs to update the changelog
+    if: (github.event.pull_request.head.repo.full_name != github.repository) && (github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title)
+    uses: ./.github/workflows/changelog.yml
+    with:
+      suggest: true
