@@ -173,5 +173,5 @@ jobs:
       - uses: romeovs/lcov-reporter-action@v0.4.0
         if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GHA_GRANULAR_TOKEN }}
           delete-old-comments: true
