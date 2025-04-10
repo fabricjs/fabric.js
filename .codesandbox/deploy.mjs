@@ -80,18 +80,22 @@ export async function createCodeSandbox(appPath) {
   };
   fs.readdirSync(appPath).forEach(processFile);
   try {
-    const response = await fetch('https://codesandbox.io/api/v1/sandboxes/define?json=1', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      'https://codesandbox.io/api/v1/sandboxes/define?json=1',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template: JSON.parse(
+            fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) ||
+              null,
+          ).template,
+          files,
+        }),
       },
-      body: JSON.stringify({
-        template: JSON.parse(
-          fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) || null,
-        ).template,
-        files,
-      }),
-    });
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
