@@ -5,6 +5,11 @@ on:
     branches: [master]
     types: [opened, edited]
 
+permissions:
+  actions: read
+  issues: write
+  pull-requests: write
+
 jobs:
   changelog-suggestion:
     # If it has NOT write permission because is from a fork, we inform the user he needs to update the changelog
@@ -30,7 +35,7 @@ jobs:
         uses: edumserrano/find-create-or-update-comment@v3.0.0
         if: failure()
         with:
-          token: ${{ secrets.GHA_GRANULAR_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: '${{ env.unique_id }}'
           comment-author: 'github-actions[bot]'
@@ -43,5 +48,5 @@ jobs:
             Example:
               ${{ github.event.pull_request.title }} ${{env.link}}
           edit-mode: replace
-      - name: Exit with error
-        run: exit 1
+      - name: Exit OK after the warn
+        run: exit 0
