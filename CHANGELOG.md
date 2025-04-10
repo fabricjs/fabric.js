@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): remove axios in favor of native fetch [#10500](https://github.com/fabricjs/fabric.js/pull/10500)
 - ci(): Refine changelog warn action [#10505](https://github.com/fabricjs/fabric.js/pull/10505)
 - ci(): Try to write an alternative action for CHANGELOG.MD [#10504](https://github.com/fabricjs/fabric.js/pull/10504)
 - refactor(tests): move point tests from qunit to vitest [#10492](https://github.com/fabricjs/fabric.js/pull/10492)
