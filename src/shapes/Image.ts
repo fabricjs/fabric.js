@@ -804,7 +804,8 @@ export class FabricImage<
       // TODO: redundant - handled by enlivenObjectEnlivables
       rf && enlivenObjects<BaseFilter<'Resize'>>([rf], options),
       enlivenObjectEnlivables(object, options),
-    ]).then(([el, filters = [], [resizeFilter] = [], hydratedProps = {}]) => {
+    ]).then(([el, filters = [], resizeFilterArr = [], hydratedProps = {}]) => {
+      const resizeFilter = resizeFilterArr[0];
       return new this(el, {
         ...object,
         // TODO: this creates a difference between image creation and restoring from JSON
