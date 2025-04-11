@@ -1,20 +1,16 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../../fixtures/base';
 import type { Textbox } from 'fabric';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { TextUtil } from '../../../utils/TextUtil';
-
-setup();
 
 test.describe.configure({ mode: 'serial' });
 
 for (const splitByGrapheme of [true, false]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
+    canvasUtil,
     context,
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    const canvasUtil = new CanvasUtil(page);
     const textBoxutil = new TextUtil<Textbox>(page, 'text');
     await test.step('initial render', async () => {
       await textBoxutil.executeInBrowser(

@@ -1,17 +1,10 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../setup';
-import { CanvasUtil } from '../../utils/CanvasUtil';
+import { expect, test } from '../../fixtures/base';
 import { createNodeSnapshot } from '../../utils/createNodeSnapshot';
 import { render } from './common';
 
-setup();
-
-test('TEST NAME', async ({ page }, config) => {
+test('TEST NAME', async ({ page, canvasUtil }, config) => {
   await test.step('browser', async () => {
-    expect(
-      await new CanvasUtil(page).screenshot(),
-      'browser snapshot',
-    ).toMatchSnapshot({
+    expect(await canvasUtil.screenshot(), 'browser snapshot').toMatchSnapshot({
       name: 'textbox.png',
       maxDiffPixelRatio: 0.05,
     });

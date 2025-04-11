@@ -1,11 +1,6 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 
-setup();
-
-test('Control hit regions', async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test('Control hit regions', async ({ page, canvasUtil }) => {
   await canvasUtil.executeInBrowser((canvas) => {
     const rect = canvas.getActiveObject();
     const render = ({ x, y }: fabric.Point, fill: string) => {
@@ -23,5 +18,5 @@ test('Control hit regions', async ({ page }) => {
       }
     }
   });
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot();
+  expect(await canvasUtil.screenshot()).toMatchSnapshot();
 });

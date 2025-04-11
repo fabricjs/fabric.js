@@ -1,15 +1,9 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 import { ObjectUtil } from '../../../utils/ObjectUtil';
 import type { Rect } from 'fabric';
 
-setup();
-
-test('Snapping and guideline render', async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test('Snapping and guideline render', async ({ page, canvasUtil }) => {
   const rect1Util = new ObjectUtil<Rect>(page, 'rect1');
-  const rect2Util = new ObjectUtil<Rect>(page, 'rect2');
 
   await test.step('drag rect1 till snapping happen', async () => {
     const rect1Pos = await rect1Util.getObjectCenter();

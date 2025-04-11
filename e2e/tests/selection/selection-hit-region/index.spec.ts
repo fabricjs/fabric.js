@@ -1,11 +1,6 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 
-setup();
-
-test('Selection hit regions', async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test('Selection hit regions', async ({ canvasUtil }) => {
   // prepare some common functions
   await canvasUtil.executeInBrowser((canvas) => {
     const render = ({ x, y }: fabric.XY, fill: string) => {
@@ -36,7 +31,7 @@ test('Selection hit regions', async ({ page }) => {
     window.renderRectsPadding(rects);
   });
 
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'group-padding.png',
   });
 
@@ -52,7 +47,7 @@ test('Selection hit regions', async ({ page }) => {
     window.renderRectsPadding(rects);
   });
 
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'transformed-group-padding.png',
   });
 
@@ -66,7 +61,7 @@ test('Selection hit regions', async ({ page }) => {
     window.renderRectsPadding(rects);
   });
 
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'zoomed-transformed-group-padding.png',
   });
 });
