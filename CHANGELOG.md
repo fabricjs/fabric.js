@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(playwright): use fixtures instead of calling setup in every test file [#10511](https://github.com/fabricjs/fabric.js/pull/10511)
 - ci(): Avoid failure status when the intent is to comment [#10508](https://github.com/fabricjs/fabric.js/pull/10508)
 - refactor(tests): move observable tests from qunit to vitest [#10501](https://github.com/fabricjs/fabric.js/pull/10501)
 - chore(): remove axios in favor of native fetch [#10500](https://github.com/fabricjs/fabric.js/pull/10500)
