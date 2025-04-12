@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move canvas tests from qunit to vitest [#10499](https://github.com/fabricjs/fabric.js/pull/10499)
 - refactor(tests): move group tests from qunit to vitest [#10495](https://github.com/fabricjs/fabric.js/pull/10495)
 - ci(): New safe worflow for build stats [#10518](https://github.com/fabricjs/fabric.js/pull/10518)
 - ci(): Write a workflow that can comment coverage on the PR. [#10516](https://github.com/fabricjs/fabric.js/pull/10516)
