@@ -147,36 +147,11 @@ jobs:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
           include-hidden-files: true
-  coverage:
-    needs: [node-coverage, e2e]
-    name: Coverage reporting
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/cached-install
+      - name: Create prnumber artifact
+        run: echo "${{ github.event.pull_request.number }}" >> "./prnumber.txt"
+      - name: Upload Pr Number
+        uses: actions/upload-artifact@v4
         with:
-          node-version: 18.x
-          install-system-deps: false
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-e2e
-          path: ./.nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-vitest
-          path: ./.nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-unit
-          path: ./.nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-visual
-          path: ./.nyc_output
-      - run: ls -l ./.nyc_output
-      - run: npm run coverage:report
-      - uses: romeovs/lcov-reporter-action@v0.4.0
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-old-comments: true
+          name: prnumber
+          path: ./prnumber.txt
+          include-hidden-files: true
