@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): New safe worflow for build stats [#10518](https://github.com/fabricjs/fabric.js/pull/10518)
 - ci(): Write a workflow that can comment coverage on the PR. [#10516](https://github.com/fabricjs/fabric.js/pull/10516)
 - chore(): update typescript to 5.8 [#10514](https://github.com/fabricjs/fabric.js/pull/10514)
 - ci(): Avoid failure status when the intent is to comment [#10508](https://github.com/fabricjs/fabric.js/pull/10508)

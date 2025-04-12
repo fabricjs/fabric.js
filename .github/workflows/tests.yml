@@ -148,10 +148,9 @@ jobs:
           path: ./e2e/test-results/**/coverage.json
           include-hidden-files: true
       - name: Create prnumber artifact
-        run: echo "${{ github.event.pull_request.number }}" >> "./prnumber.txt"
+        run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
         uses: actions/upload-artifact@v4
         with:
           name: prnumber
           path: ./prnumber.txt
-          include-hidden-files: true
