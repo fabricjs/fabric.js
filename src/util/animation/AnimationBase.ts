@@ -20,13 +20,13 @@ export abstract class AnimationBase<
   declare readonly duration: number;
   declare readonly delay: number;
 
-  protected declare readonly byValue: T;
-  protected declare readonly easing: TEasingFunction<T>;
+  declare protected readonly byValue: T;
+  declare protected readonly easing: TEasingFunction<T>;
 
-  private declare readonly _onStart: VoidFunction;
-  private declare readonly _onChange: TOnAnimationChangeCallback<T, void>;
-  private declare readonly _onComplete: TOnAnimationChangeCallback<T, void>;
-  private declare readonly _abort: TAbortCallback<T>;
+  declare private readonly _onStart: VoidFunction;
+  declare private readonly _onChange: TOnAnimationChangeCallback<T, void>;
+  declare private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
+  declare private readonly _abort: TAbortCallback<T>;
 
   /**
    * Used to register the animation to a target object
@@ -51,7 +51,7 @@ export abstract class AnimationBase<
   /**
    * Animation start time ms
    */
-  private declare startTime: number;
+  declare private startTime: number;
 
   constructor({
     startValue,
