@@ -20,26 +20,31 @@ jobs:
         with:
           name: coverage-e2e
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-vitest
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-unit
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: coverage-visual
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
       - uses: actions/download-artifact@v4
         with:
           name: prnumber
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./
       - run: ls -l ./.nyc_output
       - name: Build the report
