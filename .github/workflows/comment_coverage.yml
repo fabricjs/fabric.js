@@ -36,17 +36,27 @@ jobs:
           name: coverage-visual
           run-id: ${{ github.event.workflow_run.id }}
           path: ./.nyc_output
+      - uses: actions/download-artifact@v4
+        with:
+          name: prnumber
+          run-id: ${{ github.event.workflow_run.id }}
+          path: ./
       - run: ls -l ./.nyc_output
       - name: Build the report
         id: report
         run: |
           npm run coverage:report > cov.txt
           echo "report=$(cat cov.txt)" >> $GITHUB_OUTPUT
+      - name: Add pr number to output
+        id: prnumber
+        run: |
+          npm run coverage:report > cov.txt
+          echo "pr_number=$(cat prnumber.txt)" >> $GITHUB_OUTPUT
       - name: Comment on PR for coverage
         uses: edumserrano/find-create-or-update-comment@v3.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ steps.prnumber.outputs.pr_number }}
           body-includes: '${{ env.unique_id }}'
           comment-author: 'github-actions[bot]'
           body: |
