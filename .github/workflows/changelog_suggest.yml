@@ -38,7 +38,7 @@ jobs:
           exit 0
       - name: Comment on the PR for a request to edit changelog
         uses: edumserrano/find-create-or-update-comment@v3.0.0
-        if: steps.check.outputs.changelog_updated == false
+        if: steps.check.outputs.changelog_updated == 'false'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
@@ -51,7 +51,9 @@ jobs:
             Please under the `## [next]` version tag, add a line describing the changes of your pr with this format:
             ci/chore/tests/feature/fix(): Some extended description ${{env.link}}
             Example:
+            ```
               ${{ github.event.pull_request.title }} ${{env.link}}
+            ```
           edit-mode: replace
       - name: Exit OK after the warn
         run: exit 0
