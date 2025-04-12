@@ -6,6 +6,23 @@ import { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
 
+const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
+const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
+
+function basename(link: string) {
+  return link.split(/[\\/]/).pop()?.replace(/"/gm, '') || '';
+}
+
+function replaceLinks(value: string) {
+  return (value.match(SVG_XLINK_HREF_RE) || []).reduce(function (final, curr) {
+    return final.replace(curr, `xlink:href="assets/${basename(curr)}"`);
+  }, value);
+}
+
+function sanitizeSVG(value: string) {
+  return replaceLinks(value).replace(SVG_RE, 'SVGID');
+}
+
 export const roundSnapshotOptions = {
   cloneDeepWith: (value: any) => {
     if (typeof value === 'number') {
@@ -15,6 +32,20 @@ export const roundSnapshotOptions = {
 };
 
 expect.extend({
+  toEqualSVG(actual: string, expected: string) {
+    const sanitizedActual = sanitizeSVG(actual);
+    const sanitizedExpected = sanitizeSVG(expected);
+    const pass = sanitizedActual === sanitizedExpected;
+
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected SVG to not equal the normalized reference`
+          : `Expected SVG to equal the normalized reference\nReceived: ${sanitizedActual}\nExpected: ${sanitizedExpected}`,
+    };
+  },
+
   toMatchSnapshot(
     this: any,
     received: any,
