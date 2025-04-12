@@ -51,7 +51,7 @@ jobs:
         id: prnumber
         run: |
           npm run coverage:report > cov.txt
-          echo "pr_number=$(cat prnumber.txt)" >> $GITHUB_OUTPUT
+          echo "pr_number=$(cat ./prnumber.txt)" >> $GITHUB_OUTPUT
       - name: Comment on PR for coverage
         uses: edumserrano/find-create-or-update-comment@v3.0.0
         with:
