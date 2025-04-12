@@ -18,6 +18,8 @@ export type ResizeOwnProps = {
   lanczosLobes: number;
 };
 
+export type ResizeSerializedProps = ResizeOwnProps;
+
 export const resizeDefaultValues: ResizeOwnProps = {
   resizeType: 'hermite',
   scaleX: 1,
