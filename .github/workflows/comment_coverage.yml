@@ -53,9 +53,9 @@ jobs:
       - name: Build the report
         id: report
         run: |
-          echo "```" > ./cov.txt
+          echo "\`\`\`" > ./cov.txt
           npm run coverage:report:ci >> ./cov.txt
-          echo "```" >> ./cov.txt
+          echo "\`\`\`" >> ./cov.txt
           echo "${{ env.unique_id }}" >> ./cov.txt
       - name: Comment on PR for coverage
         uses: edumserrano/find-create-or-update-comment@v3.0.0
