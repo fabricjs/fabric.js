@@ -266,7 +266,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  protected declare _absolutePointer?: Point;
+  declare protected _absolutePointer?: Point;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
@@ -275,7 +275,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  protected declare _pointer?: Point;
+  declare protected _pointer?: Point;
 
   /**
    * During a mouse event we may need the target multiple times in multiple functions.
@@ -283,7 +283,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * @type {FabricObject}
    */
-  protected declare _target?: FabricObject;
+  declare protected _target?: FabricObject;
 
   static ownDefaults = canvasDefaults;
 
@@ -301,10 +301,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   get wrapperEl() {
     return this.elements.container;
   }
-  private declare pixelFindCanvasEl: HTMLCanvasElement;
-  private declare pixelFindContext: CanvasRenderingContext2D;
+  declare private pixelFindCanvasEl: HTMLCanvasElement;
+  declare private pixelFindContext: CanvasRenderingContext2D;
 
-  protected declare _isCurrentlyDrawing: boolean;
+  declare protected _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
 

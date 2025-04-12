@@ -157,8 +157,8 @@ export class StaticCanvas<
   declare disposed?: boolean;
 
   declare _offset: { left: number; top: number };
-  protected declare hasLostContext: boolean;
-  protected declare nextRenderHandle: number;
+  declare protected hasLostContext: boolean;
+  declare protected nextRenderHandle: number;
 
   declare elements: StaticCanvasDOMManager;
 
@@ -169,12 +169,12 @@ export class StaticCanvas<
    * @type Boolean
    * @default false
    */
-  protected declare skipControlsDrawing: boolean;
+  declare protected skipControlsDrawing: boolean;
 
   static ownDefaults = staticCanvasDefaults;
 
   // reference to
-  protected declare __cleanupTask?: {
+  declare protected __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
