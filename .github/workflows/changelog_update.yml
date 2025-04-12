@@ -7,7 +7,8 @@ on:
 
 jobs:
   changelog:
-    if: github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title
+    # If it has write permission because is not from a fork, we try to update
+    if: (github.event.pull_request.head.repo.full_name == github.repository) && (github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title)
     uses: ./.github/workflows/changelog.yml
     with:
       create: ${{ github.event.action == 'opened' }}

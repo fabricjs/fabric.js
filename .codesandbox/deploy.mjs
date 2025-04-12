@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import Axios from 'axios';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import match from 'micromatch';
@@ -81,19 +80,31 @@ export async function createCodeSandbox(appPath) {
   };
   fs.readdirSync(appPath).forEach(processFile);
   try {
-    const {
-      data: { sandbox_id },
-    } = await Axios.post(
+    const response = await fetch(
       'https://codesandbox.io/api/v1/sandboxes/define?json=1',
       {
-        template: JSON.parse(
-          fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) || null,
-        ).template,
-        files,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template: JSON.parse(
+            fs.readFileSync(path.resolve(appPath, 'sandbox.config.json')) ||
+              null,
+          ).template,
+          files,
+        }),
       },
     );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw errorData || new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const { sandbox_id } = await response.json();
     return `https://codesandbox.io/s/${sandbox_id}`;
   } catch (error) {
-    throw error.response?.data || error;
+    throw error;
   }
 }

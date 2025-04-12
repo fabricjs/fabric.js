@@ -56,22 +56,22 @@ export abstract class ITextBehavior<
    * Helps determining when the text is in composition, so that the cursor
    * rendering is altered.
    */
-  protected declare inCompositionMode: boolean;
+  declare protected inCompositionMode: boolean;
 
-  protected declare _reSpace: RegExp;
-  private declare _currentTickState?: ValueAnimation;
-  private declare _currentTickCompleteState?: ValueAnimation;
+  declare protected _reSpace: RegExp;
+  declare private _currentTickState?: ValueAnimation;
+  declare private _currentTickCompleteState?: ValueAnimation;
   protected _currentCursorOpacity = 1;
-  private declare _textBeforeEdit: string;
-  protected declare __selectionStartOnMouseDown: number;
+  declare private _textBeforeEdit: string;
+  declare protected __selectionStartOnMouseDown: number;
 
   /**
    * Keeps track if the IText object was selected before the actual click.
    * This because we want to delay enter editing by a click.
    */
-  protected declare selected: boolean;
-  protected declare cursorOffsetCache: { left?: number; top?: number };
-  protected declare _savedProps?: {
+  declare protected selected: boolean;
+  declare protected cursorOffsetCache: { left?: number; top?: number };
+  declare protected _savedProps?: {
     hasControls: boolean;
     borderColor: string;
     lockMovementX: boolean;
@@ -81,7 +81,7 @@ export abstract class ITextBehavior<
     defaultCursor?: CSSStyleDeclaration['cursor'];
     moveCursor?: CSSStyleDeclaration['cursor'];
   };
-  protected declare _selectionDirection: 'left' | 'right' | null;
+  declare protected _selectionDirection: 'left' | 'right' | null;
 
   abstract initHiddenTextarea(): void;
   abstract _fireSelectionChanged(): void;
