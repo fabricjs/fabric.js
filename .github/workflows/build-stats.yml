@@ -23,7 +23,7 @@ jobs:
           node-version: 20.x
           install-system-deps: false
       - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
+        run: npm run build
       - name: Recover build stats
         uses: actions/download-artifact@v4
         with:

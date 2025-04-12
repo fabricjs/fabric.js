@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: 20.x
       - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
+        run: npm run build
       - name: Create prnumber artifact
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
