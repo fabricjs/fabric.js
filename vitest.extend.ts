@@ -16,7 +16,7 @@ function basename(link: string) {
 function replaceLinks(value: string) {
   return (value.match(SVG_XLINK_HREF_RE) || []).reduce(function (final, curr) {
     return final.replace(curr, `xlink:href="assets/${basename(curr)}"`);
-  }, value)
+  }, value);
 }
 
 function sanitizeSVG(value: string) {
