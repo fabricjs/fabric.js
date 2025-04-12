@@ -1,7 +1,12 @@
 import { defineConfig } from 'vitest/config';
+import path from 'node:path';
 
 export default defineConfig({
-  resolve: {},
+  resolve: {
+    alias: {
+      fabric: path.resolve(__dirname, './fabric.ts'),
+    },
+  },
   test: {
     pool: 'threads',
     clearMocks: true,
@@ -10,6 +15,7 @@ export default defineConfig({
     include: [
       'src/**/*.test.{ts,tsx}',
       'src/**/*.spec.{ts,tsx}',
+      'extensions/**/*.spec.{ts,tsx}',
       'extensions/**/*.test.{ts,tsx}',
     ],
     coverage: {

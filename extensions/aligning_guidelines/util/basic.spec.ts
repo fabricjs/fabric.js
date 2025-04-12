@@ -1,6 +1,7 @@
 import { getDistance, setPositionDir } from './basic';
 import { Rect } from '../../../src/shapes/Rect';
 import { Point } from '../../../src/Point';
+import { describe, expect, it } from 'vitest';
 
 describe('getDistance', () => {
   it('returns the distabnce between the 2 numbers', () => {
