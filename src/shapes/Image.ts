@@ -802,10 +802,9 @@ export class FabricImage<
       loadImage(src!, { ...options, crossOrigin }),
       f && enlivenObjects<BaseFilter<string>>(f, options),
       // redundant - handled by enlivenObjectEnlivables, but nicely explicit
-      rf && enlivenObjects<Resize>([rf], options),
+      rf ? enlivenObjects<Resize>([rf], options) : [],
       enlivenObjectEnlivables(object, options),
-    ]).then(([el, filters = [], resizeFilterArr = [], hydratedProps = {}]) => {
-      const resizeFilter = resizeFilterArr[0];
+    ]).then(([el, filters = [], [resizeFilter], hydratedProps = {}]) => {
       return new this(el, {
         ...object,
         // TODO: passing src creates a difference between image creation and restoring from JSON
