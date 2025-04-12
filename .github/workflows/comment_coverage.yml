@@ -47,16 +47,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./
       - run: ls -l ./.nyc_output
+      - name: Add pr number to output
+        id: prnumber
+        run: echo "pr_number=$(cat ./prnumber.txt)" >> $GITHUB_OUTPUT
       - name: Build the report
         id: report
         run: |
-          npm run coverage:report > cov.txt
-          echo "report=$(cat cov.txt)" >> $GITHUB_OUTPUT
-      - name: Add pr number to output
-        id: prnumber
-        run: |
-          npm run coverage:report > cov.txt
-          echo "pr_number=$(cat ./prnumber.txt)" >> $GITHUB_OUTPUT
+          npm run coverage:report > ./cov.txt
+          echo "${{ env.unique_id }}" >> ./cov.txt
       - name: Comment on PR for coverage
         uses: edumserrano/find-create-or-update-comment@v3.0.0
         with:
@@ -64,7 +62,5 @@ jobs:
           issue-number: ${{ steps.prnumber.outputs.pr_number }}
           body-includes: '${{ env.unique_id }}'
           comment-author: 'github-actions[bot]'
-          body: |
-            ${{ env.unique_id }}
-            ${{ steps.report.outputs.report }}
+          body-path: ./cov.txt
           edit-mode: replace
