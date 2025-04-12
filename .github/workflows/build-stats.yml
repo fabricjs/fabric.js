@@ -55,24 +55,19 @@ jobs:
               size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: process
+        id: stats-message
         uses: actions/github-script@v6
         with:
           result-encoding: string
           script: |
             const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
-            const res = await run_simple({
+            return await run_simple({
               github,
               context,
               core,
               a: JSON.parse('${{ steps.pr_stats.outputs.pr_stats }}'),
               b: JSON.parse('${{ steps.upstream_stats.outputs.result }}'),
             });
-      - name: Build the message
-        run: |
-          echo "\`\`\`" > ./cov.txt
-          npm run coverage:report:ci >> ./cov.txt
-          echo "\`\`\`" >> ./cov.txt
-          echo "${{ env.unique_id }}" >> ./cov.txt
       - name: Comment on PR for build stats
         uses: edumserrano/find-create-or-update-comment@v3.0.0
         with:
@@ -80,5 +75,7 @@ jobs:
           issue-number: ${{ steps.prnumber.outputs.pr_number }}
           body-includes: '${{ env.unique_id }}'
           comment-author: 'github-actions[bot]'
-          body-path: ./cov.txt
+          body: |
+            ${{ env.unique_id }}
+            ${{ steps.stats-message.outputs.result }}
           edit-mode: replace
