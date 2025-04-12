@@ -1,0 +1,59 @@
+name: 'Warn about 📋'
+
+on:
+  pull_request_target:
+    branches: [master]
+    types: [opened, edited]
+
+permissions:
+  actions: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  changelog-suggestion:
+    # If it has NOT write permission because is from a fork, we inform the user he needs to update the changelog
+    if: (github.event.pull_request.head.repo.full_name != github.repository) && (github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title)
+    runs-on: ubuntu-24.04
+    env:
+      unique_id: <!-- changelog-suggestion -->
+      file: CHANGELOG.md
+      next_version: next
+      link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check ${{ env.file }}
+        id: check
+
+        run: |
+          if [[ $(git diff --name-only origin/master HEAD -- ${{ env.file }} | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
+            echo "Expected '${{ env.file }}' to be modified"
+            echo "changelog_updated=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "changelog_updated=true" >> $GITHUB_OUTPUT
+          exit 0
+      - name: Comment on the PR for a request to edit changelog
+        uses: edumserrano/find-create-or-update-comment@v3.0.0
+        if: steps.check.outputs.changelog_updated == 'false'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '${{ env.unique_id }}'
+          comment-author: 'github-actions[bot]'
+          body:
+            | # can be a single value or you can compose text with multi-line values
+            ${{ env.unique_id }}
+            It seems that you opened a PR but you didn't add a line to the changelog file
+            Please under the `## [next]` version tag, add a line describing the changes of your pr with this format:
+            ci/chore/tests/feature/fix(): Some extended description ${{env.link}}
+            Example:
+            ```
+              ${{ github.event.pull_request.title }} ${{env.link}}
+            ```
+          edit-mode: replace
+      - name: Exit OK after the warn
+        run: exit 0

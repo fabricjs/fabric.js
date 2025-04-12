@@ -89,7 +89,7 @@ export {
   enlivenObjectEnlivables,
 } from './misc/objectEnlive';
 export { pick } from './misc/pick';
-export * from './path/typedefs';
+export type * from './path/typedefs';
 export {
   joinPath,
   parsePath,

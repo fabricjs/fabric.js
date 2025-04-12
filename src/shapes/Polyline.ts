@@ -60,7 +60,7 @@ export class Polyline<
    */
   declare exactBoundingBox: boolean;
 
-  private declare initialized: true | undefined;
+  declare private initialized: true | undefined;
 
   static ownDefaults = polylineDefaultValues;
 
