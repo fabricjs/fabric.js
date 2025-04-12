@@ -28,7 +28,7 @@ import { WebGLFilterBackend } from '../filters/WebGLFilterBackend';
 import { FILL, NONE } from '../constants';
 import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
-import type { Resize } from '../filters/Resize';
+import type { Resize, ResizeSerializedProps } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
 import { log } from '../util/internals/console';
 
@@ -62,7 +62,7 @@ export interface SerializedImageProps extends SerializedObjectProps {
   src: string;
   crossOrigin: TCrossOrigin;
   filters: any[];
-  resizeFilter?: any;
+  resizeFilter?: ResizeSerializedProps;
   cropX: number;
   cropY: number;
 }
@@ -801,14 +801,14 @@ export class FabricImage<
     return Promise.all([
       loadImage(src!, { ...options, crossOrigin }),
       f && enlivenObjects<BaseFilter<string>>(f, options),
-      // TODO: redundant - handled by enlivenObjectEnlivables
-      rf && enlivenObjects<BaseFilter<'Resize'>>([rf], options),
+      // redundant - handled by enlivenObjectEnlivables, but nicely explicit
+      rf && enlivenObjects<Resize>([rf], options),
       enlivenObjectEnlivables(object, options),
     ]).then(([el, filters = [], resizeFilterArr = [], hydratedProps = {}]) => {
       const resizeFilter = resizeFilterArr[0];
       return new this(el, {
         ...object,
-        // TODO: this creates a difference between image creation and restoring from JSON
+        // TODO: passing src creates a difference between image creation and restoring from JSON
         src,
         filters,
         resizeFilter,
