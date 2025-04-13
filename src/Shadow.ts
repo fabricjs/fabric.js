@@ -121,9 +121,9 @@ export class Shadow {
    * @see {@link http://fabricjs.com/shadows|Shadow demo}
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
    */
-  constructor(options: Partial<TClassProperties<Shadow>>);
+  constructor(options?: Partial<TClassProperties<Shadow>>);
   constructor(svgAttribute: string);
-  constructor(arg0: string | Partial<TClassProperties<Shadow>>) {
+  constructor(arg0: string | Partial<TClassProperties<Shadow>> = {}) {
     const options: Partial<TClassProperties<Shadow>> =
       typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
     Object.assign(this, Shadow.ownDefaults, options);
