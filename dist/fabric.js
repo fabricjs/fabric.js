@@ -1,7 +1,7 @@
 /* build: `node build.js modules=ALL exclude=gestures,accessors,erasing requirejs minifier=uglifyjs` */
 /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
 
-var fabric = fabric || { version: '5.4.2' };
+var fabric = fabric || { version: '5.5.2' };
 if (typeof exports !== 'undefined') {
   exports.fabric = fabric;
 }
@@ -26453,7 +26453,7 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {String} [charStyle.fontStyle] Font style (italic|normal)
      */
     _setTextStyles: function(ctx, charStyle, forMeasuring) {
-      ctx.textBaseline = 'alphabetical';
+      ctx.textBaseline = 'alphabetic';
       if (this.path) {
         switch (this.pathAlign) {
           case 'center':

@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.5.2]
+
+- fix(): Remove browser warning from incorrect text baseline assignment [`#10466`](https://github.com/fabricjs/fabric.js/pull/10466)
+
 ## [5.5.1]
 
 - fix(): Cache over invalidation bug backport from 6.x
