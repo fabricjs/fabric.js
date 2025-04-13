@@ -1,7 +1,12 @@
 import { defineConfig } from 'vitest/config';
+import path from 'node:path';
 
 export default defineConfig({
-  resolve: {},
+  resolve: {
+    alias: {
+      fabric: path.resolve(__dirname, './fabric.ts'),
+    },
+  },
   test: {
     pool: 'threads',
     clearMocks: true,
@@ -10,12 +15,29 @@ export default defineConfig({
     include: [
       'src/**/*.test.{ts,tsx}',
       'src/**/*.spec.{ts,tsx}',
+      'extensions/**/*.spec.{ts,tsx}',
       'extensions/**/*.test.{ts,tsx}',
     ],
     coverage: {
       reportsDirectory: '.nyc_output',
       reporter: ['json'],
-      exclude: ['**/node_modules/**', 'vitest.extend.ts'],
+      exclude: [
+        'test/**',
+        'dist/**',
+        'dist-extensions/**',
+        'src/benchmarks/**',
+        'vitest*',
+        'rollup*',
+        'eslint*',
+        'playwright*',
+        '**/node_modules/**',
+        '.codesandbox/**',
+        'lib/**',
+        'e2e/**',
+        'scripts/**',
+        'publish-next.js',
+        'publish.js',
+      ],
       provider: 'v8',
     },
   },
