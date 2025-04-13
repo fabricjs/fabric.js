@@ -16,6 +16,7 @@ import type {
   GradientType,
   GradientUnits,
   SVGOptions,
+  SerializedGradientProps,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { isPath } from '../util/typeAssertions';
@@ -144,11 +145,13 @@ export class Gradient<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: (keyof this | string)[]) {
+  toObject(
+    propertiesToInclude?: (keyof this | string)[],
+  ): SerializedGradientProps<T> {
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
-      coords: { ...this.coords },
+      coords: { ...this.coords } as GradientCoords<T>,
       colorStops: this.colorStops.map((colorStop) => ({ ...colorStop })),
       offsetX: this.offsetX,
       offsetY: this.offsetY,

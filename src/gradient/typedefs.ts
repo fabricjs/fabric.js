@@ -101,3 +101,8 @@ export type SVGOptions = {
 
   opacity: string | null;
 };
+
+export type SerializedGradientProps<T extends GradientType> = Omit<
+  GradientOptions<T>,
+  'id'
+>;

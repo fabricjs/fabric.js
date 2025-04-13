@@ -1,0 +1,20 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`installGradientUpdater > Without using it opacity information is lost > Init gradient from options preserve old color stops 1`] = `
+[
+  {
+    "color": "red",
+    "offset": 1,
+    "opacity": 0.5,
+  },
+  {
+    "color": "rgba(0,0,255,0.5)",
+    "offset": 0.5,
+  },
+  {
+    "color": "rgba(0,255,0,0.5)",
+    "offset": 0,
+    "opacity": 0.3,
+  },
+]
+`;
