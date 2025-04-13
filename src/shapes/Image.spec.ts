@@ -3,20 +3,6 @@ import { Shadow } from '../Shadow';
 import { Brightness } from '../filters/Brightness';
 import { loadSVGFromString } from '../parser/loadSVGFromString';
 
-const mockImage = new Image(100, 100);
-
-vi.mock('../util/misc/objectEnlive', () => {
-  const all = vi.importActual('../util/misc/objectEnlive');
-  return {
-    ...all,
-    loadImage: vi.fn(async (src) => {
-      const img = mockImage;
-      img.src = src;
-      return img;
-    }),
-  };
-});
-
 import { describe, expect, test, vi } from 'vitest';
 
 const mockApplyFilter = vi.fn();

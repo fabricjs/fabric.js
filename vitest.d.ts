@@ -1,6 +1,7 @@
 import 'vitest';
 import type { TMat2D } from './src/typedefs';
 import type { CloneDeepWithCustomizer } from 'lodash';
+import type { FabricImage } from './src/shapes/Image';
 
 type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
   includeDefaultValues?: boolean;
@@ -18,6 +19,8 @@ interface CustomMatchers<R = unknown, T = unknown> {
   toEqualRoundedMatrix(expected: TMat2D, precision?: number): R;
 
   toEqualSVG(expected: string): void;
+
+  toSameImageObject(expected: Partial<FabricImage>): void;
 }
 
 declare module 'vitest' {

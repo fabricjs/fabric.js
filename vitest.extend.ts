@@ -5,6 +5,7 @@ import { cloneDeepWith } from 'lodash';
 import { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
+import type { FabricImage } from './dist-extensions';
 
 const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
 const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
@@ -32,6 +33,30 @@ export const roundSnapshotOptions = {
 };
 
 expect.extend({
+  toSameImageObject(actual: FabricImage, expected: FabricImage) {
+    const normalizedActual = {
+      ...actual,
+      // @ts-expect-error -- src is protected in FabricImage class
+      src: basename(actual.src),
+    };
+
+    const normalizedExpected = {
+      ...expected,
+      // @ts-expect-error -- src is protected in FabricImage class
+      src: basename(expected.src),
+    };
+
+    const pass = this.equals(normalizedActual, normalizedExpected);
+
+    return {
+      pass,
+      message: () =>
+        pass
+          ? `Expected image object to not equal the reference`
+          : `Expected image object to equal the reference\nReceived: ${JSON.stringify(normalizedActual)}\nExpected: ${JSON.stringify(normalizedExpected)}`,
+    };
+  },
+
   toEqualSVG(actual: string, expected: string) {
     const sanitizedActual = sanitizeSVG(actual);
     const sanitizedExpected = sanitizeSVG(expected);
