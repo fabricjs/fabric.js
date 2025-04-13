@@ -35,6 +35,8 @@ export default defineConfig({
         'lib/**',
         'e2e/**',
         'scripts/**',
+        'publish-next.js',
+        'publish.js',
       ],
       provider: 'v8',
     },
