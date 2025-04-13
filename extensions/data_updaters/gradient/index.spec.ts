@@ -1,10 +1,11 @@
-import { describe, vitest, expect, test } from 'vitest';
+import { describe, vitest, expect, test, beforeAll } from 'vitest';
 import type {
   SerializedGradientProps,
   GradientOptions,
   ColorStop,
 } from 'fabric';
 import { Gradient } from 'fabric';
+import { installGradientUpdater } from './index';
 
 const oldGradientOptions: GradientOptions<'linear'> & {
   colorStops: (ColorStop & { opacity?: number })[];
@@ -28,7 +29,7 @@ const oldGradientOptions: GradientOptions<'linear'> & {
   ],
 };
 
-const oldSerializedGradient: SerializedGradientProps & {
+const oldSerializedGradient: SerializedGradientProps<'linear'> & {
   colorStops: (ColorStop & { opacity?: number })[];
 } = {
   type: 'linear',
@@ -71,6 +72,53 @@ describe('installGradientUpdater', () => {
         expect(addColorStopMock).toHaveBeenCalledWith(
           colorStop.offset,
           colorStop.color,
+        );
+      });
+    });
+    test('FromObject will preserve the old color stop', async () => {
+      const gradient = await Gradient.fromObject(oldSerializedGradient);
+      expect(gradient.colorStops).toMatchSnapshot();
+    });
+    test('FromObject will preserve the but wont render the old opacity', async () => {
+      const gradient = await Gradient.fromObject(oldSerializedGradient);
+      gradient.toLive(ctxMock);
+      oldGradientOptions.colorStops.forEach((colorStop) => {
+        expect(addColorStopMock).toHaveBeenCalledWith(
+          colorStop.offset,
+          colorStop.color,
+        );
+      });
+    });
+  });
+  describe('After intalling the wrapper', () => {
+    beforeAll(() => {
+      installGradientUpdater();
+    });
+    test('Init gradient from options still preserve old color stops', () => {
+      const gradient = new Gradient(oldGradientOptions);
+      expect(gradient.colorStops).toMatchSnapshot();
+    });
+    test('old color stops do not render the old opacity', () => {
+      const gradient = new Gradient(oldGradientOptions);
+      gradient.toLive(ctxMock);
+      oldGradientOptions.colorStops.forEach((colorStop) => {
+        expect(addColorStopMock).toHaveBeenCalledWith(
+          colorStop.offset,
+          colorStop.color,
+        );
+      });
+    });
+    test('FromObject will merge the old opacity into color', async () => {
+      const gradient = await Gradient.fromObject(oldSerializedGradient);
+      expect(gradient.colorStops).toMatchSnapshot();
+    });
+    test('FromObject will render with the new colors', async () => {
+      const gradient = await Gradient.fromObject(oldSerializedGradient);
+      gradient.toLive(ctxMock);
+      oldGradientOptions.colorStops.forEach((colorStop, index) => {
+        expect(addColorStopMock).toHaveBeenCalledWith(
+          colorStop.offset,
+          gradient.colorStops[index].color,
         );
       });
     });
