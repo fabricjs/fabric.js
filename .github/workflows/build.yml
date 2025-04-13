@@ -23,8 +23,6 @@ jobs:
       bundled: dist/index.mjs
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
