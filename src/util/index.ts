@@ -100,7 +100,6 @@ export {
   transformPath,
   getRegularPolygonPath,
 } from './path';
-export { setStyle } from './dom_style';
 export { isTouchEvent, getPointer } from './dom_event';
 export { isTransparent } from './misc/isTransparent';
 export { mergeClipPaths } from './misc/mergeClipPaths';

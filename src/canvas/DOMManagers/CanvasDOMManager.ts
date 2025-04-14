@@ -1,6 +1,7 @@
 import { getEnv, getFabricDocument } from '../../env';
 import type { TSize } from '../../typedefs';
-import { createCanvasElement, setStyle } from '../../util';
+import { createCanvasElement } from '../../util/misc/dom';
+import { setStyle } from '../../util/internals/dom_style';
 import type { CSSDimensions } from './util';
 import { makeElementUnselectable, setCSSDimensions } from './util';
 import type { CanvasItem } from './StaticCanvasDOMManager';
