@@ -107,7 +107,6 @@ exports[`util > exports expected utility functions 1`] = `
   "sendObjectToPlane": "function",
   "sendPointToPlane": "function",
   "sendVectorToPlane": "function",
-  "setStyle": "function",
   "sin": "function",
   "sizeAfterTransform": "function",
   "string": {
