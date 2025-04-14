@@ -20,16 +20,6 @@ import {
   version,
 } from '../../fabric';
 
-vi.mock('../util/misc/objectEnlive', async (importOriginal) => ({
-  ...(await importOriginal()),
-  loadImage: vi.fn().mockImplementation(() => {
-    const img = globalThis.document.createElement('img');
-    img.width = 100;
-    img.height = 100;
-    return Promise.resolve(img);
-  }),
-}));
-
 const EMPTY_JSON = '{"version":"' + version + '","objects":[]}';
 
 const PATH_JSON =
