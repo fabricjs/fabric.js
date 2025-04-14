@@ -300,27 +300,6 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   /**
-   * @deprecated unused
-   */
-  _getSVGLineTopOffset(
-    this: TextSVGExportMixin & FabricText,
-    lineIndex: number,
-  ) {
-    let lineTopOffset = 0,
-      j;
-    for (j = 0; j < lineIndex; j++) {
-      lineTopOffset += this.getHeightOfLine(j);
-    }
-    const lastHeight = this.getHeightOfLine(j);
-    return {
-      lineTop: lineTopOffset,
-      offset:
-        ((this._fontSizeMult - this._fontSizeFraction) * lastHeight) /
-        (this.lineHeight * this._fontSizeMult),
-    };
-  }
-
-  /**
    * Returns styles-string for svg-export
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}

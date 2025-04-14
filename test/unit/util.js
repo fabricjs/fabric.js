@@ -713,18 +713,6 @@
     assert.ok(typeof fabric.util.rotateVector === 'function');
   });
 
-  QUnit.test('rotatePoint', function(assert) {
-    assert.ok(typeof fabric.util.rotatePoint === 'function');
-    var origin = new fabric.Point(3, 0);
-    var point = new fabric.Point(4, 0);
-    var rotated = fabric.util.rotatePoint(point, origin, Math.PI);
-    assert.equal(Math.round(rotated.x), 2);
-    assert.equal(Math.round(rotated.y), 0);
-    var rotated = fabric.util.rotatePoint(point, origin, Math.PI / 2);
-    assert.equal(Math.round(rotated.x), 3);
-    assert.equal(Math.round(rotated.y), 1);
-  });
-
   QUnit.test('transformPoint', function(assert) {
     assert.ok(typeof fabric.util.transformPoint === 'function');
     var point = new fabric.Point(2, 2);

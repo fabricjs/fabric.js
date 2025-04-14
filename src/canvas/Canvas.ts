@@ -30,8 +30,6 @@ const getEventPoints = (canvas: Canvas, e: TPointerEvent) => {
   return {
     viewportPoint,
     scenePoint,
-    pointer: viewportPoint,
-    absolutePointer: scenePoint,
   };
 };
 
@@ -1121,7 +1119,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    */
   _resetTransformEventData() {
-    this._target = this._pointer = this._absolutePointer = undefined;
+    this._target = this._viewportPoint = this._scenePoint = undefined;
   }
 
   /**
@@ -1132,9 +1130,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _cacheTransformEventData(e: TPointerEvent) {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
-    this._pointer = this.getViewportPoint(e);
-    this._absolutePointer = sendPointToPlane(
-      this._pointer,
+    this._viewportPoint = this.getViewportPoint(e);
+    this._scenePoint = sendPointToPlane(
+      this._viewportPoint,
       undefined,
       this.viewportTransform,
     );

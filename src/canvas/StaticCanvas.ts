@@ -284,46 +284,6 @@ export class StaticCanvas<
   }
 
   /**
-   * Sets width of this canvas instance
-   * @param {Number|String} value                         Value to set width to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-  setWidth(
-    value: TSize['width'],
-    options?: { backstoreOnly?: true; cssOnly?: false },
-  ): void;
-  setWidth(
-    value: CSSDimensions['width'],
-    options?: { cssOnly?: true; backstoreOnly?: false },
-  ): void;
-  setWidth(value: number, options?: never) {
-    return this.setDimensions({ width: value }, options);
-  }
-
-  /**s
-   * Sets height of this canvas instance
-   * @param {Number|String} value                         Value to set height to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-  setHeight(
-    value: TSize['height'],
-    options?: { backstoreOnly?: true; cssOnly?: false },
-  ): void;
-  setHeight(
-    value: CSSDimensions['height'],
-    options?: { cssOnly?: true; backstoreOnly?: false },
-  ): void;
-  setHeight(value: CSSDimensions['height'], options?: never) {
-    return this.setDimensions({ height: value }, options);
-  }
-
-  /**
    * Internal use only
    * @protected
    */
@@ -705,19 +665,6 @@ export class StaticCanvas<
    */
   _renderOverlay(ctx: CanvasRenderingContext2D) {
     this._renderBackgroundOrOverlay(ctx, 'overlay');
-  }
-
-  /**
-   * Returns coordinates of a center of canvas.
-   * Returned value is an object with top and left properties
-   * @return {Object} object with "top" and "left" number values
-   * @deprecated migrate to `getCenterPoint`
-   */
-  getCenter() {
-    return {
-      top: this.height / 2,
-      left: this.width / 2,
-    };
   }
 
   /**

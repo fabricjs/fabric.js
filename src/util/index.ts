@@ -16,7 +16,6 @@ export {
   degreesToRadians,
   radiansToDegrees,
 } from './misc/radiansDegreesConversion';
-export { rotatePoint } from './misc/rotatePoint';
 export * from './misc/projectStroke';
 export type {
   TComposeMatrixArgs,

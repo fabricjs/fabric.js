@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { cloneStyles } from '../../dist/src/util/internals/cloneStyles.mjs';
-import { cloneDeep } from '../../dist/src/util/internals/cloneDeep.mjs';
+import { cloneDeep } from './cloneDeep.mjs';
 
 const style = {
   fill: 'blue',

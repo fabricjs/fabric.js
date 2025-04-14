@@ -1227,17 +1227,6 @@ describe('Canvas', () => {
     );
   });
 
-  it('implements getCenter method that returns canvas center', () => {
-    expect(canvas.getCenter).toBeTypeOf('function');
-    const center = canvas.getCenter();
-    expect(center.left, 'center left is half width').toBe(
-      upperCanvasEl.width / 2,
-    );
-    expect(center.top, 'center top is half height').toBe(
-      upperCanvasEl.height / 2,
-    );
-  });
-
   it('implements getCenterPoint method that returns canvas center as Point', () => {
     expect(canvas.getCenterPoint).toBeTypeOf('function');
     const center = canvas.getCenterPoint();

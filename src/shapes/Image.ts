@@ -233,7 +233,6 @@ export class FabricImage<
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    element.classList?.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -757,16 +756,6 @@ export class FabricImage<
       cropY,
     };
   }
-
-  /**
-   * Default CSS class name for canvas
-   * Will be removed from fabric 7
-   * @static
-   * @deprecated
-   * @type String
-   * @default
-   */
-  static CSS_CANVAS = 'canvas-img';
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link FabricImage.fromElement})

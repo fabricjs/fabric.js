@@ -142,7 +142,7 @@ describe('Canvas event data', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenNthCalledWith(1, ev);
     canvas._cacheTransformEventData(ev);
-    expect(point).toEqual(canvas['_absolutePointer']);
+    expect(point).toEqual(canvas['_scenePoint']);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenNthCalledWith(2, ev, true);
   });
