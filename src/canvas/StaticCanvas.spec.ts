@@ -687,59 +687,53 @@ describe('StaticCanvas', () => {
     });
   });
 
-  it(
-    'handles enableRetinaScaling: false with multiplier = 1',
-    async () => {
-      config.configure({ devicePixelRatio: 2 });
-      const c = new StaticCanvas(undefined, {
-        enableRetinaScaling: true,
-        width: 10,
-        height: 10,
-      });
-      const dataUrl = c.toDataURL({
-        enableRetinaScaling: false,
-        multiplier: 1,
-      });
-      c.cancelRequestedRender();
+  it('handles enableRetinaScaling: false with multiplier = 1', async () => {
+    config.configure({ devicePixelRatio: 2 });
+    const c = new StaticCanvas(undefined, {
+      enableRetinaScaling: true,
+      width: 10,
+      height: 10,
+    });
+    const dataUrl = c.toDataURL({
+      enableRetinaScaling: false,
+      multiplier: 1,
+    });
+    c.cancelRequestedRender();
 
-      return new Promise<void>((resolve) => {
-        const img = getFabricDocument().createElement('img');
-        img.onload = () => {
-          expect(img.width).toBe(c.width);
-          expect(img.height).toBe(c.height);
-          resolve();
-        };
-        img.src = dataUrl;
-      });
-    },
-  );
+    return new Promise<void>((resolve) => {
+      const img = getFabricDocument().createElement('img');
+      img.onload = () => {
+        expect(img.width).toBe(c.width);
+        expect(img.height).toBe(c.height);
+        resolve();
+      };
+      img.src = dataUrl;
+    });
+  });
 
-  it(
-    'handles enableRetinaScaling: false with multiplier = 3',
-    async () => {
-      config.configure({ devicePixelRatio: 2 });
-      const c = new StaticCanvas(undefined, {
-        enableRetinaScaling: true,
-        width: 10,
-        height: 10,
-      });
-      const dataUrl = c.toDataURL({
-        enableRetinaScaling: false,
-        multiplier: 3,
-      });
-      c.cancelRequestedRender();
+  it('handles enableRetinaScaling: false with multiplier = 3', async () => {
+    config.configure({ devicePixelRatio: 2 });
+    const c = new StaticCanvas(undefined, {
+      enableRetinaScaling: true,
+      width: 10,
+      height: 10,
+    });
+    const dataUrl = c.toDataURL({
+      enableRetinaScaling: false,
+      multiplier: 3,
+    });
+    c.cancelRequestedRender();
 
-      return new Promise<void>((resolve) => {
-        const img = getFabricDocument().createElement('img');
-        img.onload = () => {
-          expect(img.width).toBe(c.width * 3);
-          expect(img.height).toBe(c.height * 3);
-          resolve();
-        };
-        img.src = dataUrl;
-      });
-    },
-  );
+    return new Promise<void>((resolve) => {
+      const img = getFabricDocument().createElement('img');
+      img.onload = () => {
+        expect(img.width).toBe(c.width * 3);
+        expect(img.height).toBe(c.height * 3);
+        resolve();
+      };
+      img.src = dataUrl;
+    });
+  });
 
   it('generates JPEG data URL correctly', () => {
     try {
@@ -1189,21 +1183,18 @@ describe('StaticCanvas', () => {
     canvas.backgroundImage = undefined;
   });
 
-  it(
-    'includes custom props for backgroundImage when specified',
-    async () => {
-      const image = await createImageObject();
-      canvas.backgroundImage = image;
-      // @ts-expect-error -- custom prop
-      image.custom = 'yes';
+  it('includes custom props for backgroundImage when specified', async () => {
+    const image = await createImageObject();
+    canvas.backgroundImage = image;
+    // @ts-expect-error -- custom prop
+    image.custom = 'yes';
 
-      const json = canvas.toObject(['custom']);
+    const json = canvas.toObject(['custom']);
 
-      expect(json.backgroundImage.custom).toBe('yes');
+    expect(json.backgroundImage.custom).toBe('yes');
 
-      canvas.backgroundImage = undefined;
-    },
-  );
+    canvas.backgroundImage = undefined;
+  });
 
   it('serializes overlayImage to JSON correctly', async () => {
     canvas.overlayImage = await createImageObject();
@@ -2374,9 +2365,9 @@ function createImageObject(): Promise<FabricImage> {
 }
 
 function setSrc(img: HTMLImageElement, src: string, callback: () => void) {
-  img.onload = function() {
+  img.onload = function () {
     callback();
-  }
+  };
   img.src = src;
 }
 
