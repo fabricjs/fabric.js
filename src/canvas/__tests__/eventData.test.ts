@@ -127,7 +127,7 @@ describe('Canvas event data', () => {
       height: 200,
     });
     vi.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
-    const spy = vi.spyOn(canvas, 'getPointer');
+    const spy = vi.spyOn(canvas, '_getPointerImpl');
     vi.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
       width: 500,
       height: 500,
