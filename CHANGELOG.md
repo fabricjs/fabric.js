@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci() fix the action for build stats [#10525](https://github.com/fabricjs/fabric.js/pull/10525)
 - chore(tests): Convert shadow tests from qunit to vitest [#10522](https://github.com/fabricjs/fabric.js/pull/10522)
 - feat(Gradient): BREAKING: remove opacity from colorstops in live Gradient class [#9622](https://github.com/fabricjs/fabric.js/pull/9622)
 - refactor(tests): move canvas tests from qunit to vitest [#10499](https://github.com/fabricjs/fabric.js/pull/10499)
