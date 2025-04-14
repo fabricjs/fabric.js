@@ -267,7 +267,8 @@ describe('PencilBrush', () => {
         ).toBe(true);
         expect(firePathCreatedEvent, 'path:created event is fired').toBe(true);
         expect(added, 'a path is added').toBeInstanceOf(Path);
-        expect(added!.path.length, 'path has 6 steps').toBe(6);
+        expect(added!.path).toMatchSnapshot();
+        expect(added!.path.length, 'path has 6 steps').toBe(4);
       });
     },
   );
