@@ -63,11 +63,8 @@ jobs:
           script: |
             const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
             return await run_simple({
-              github,
-              context,
-              core,
-              a: JSON.parse('${{ steps.pr_stats.outputs.pr_stats }}'),
-              b: JSON.parse('${{ steps.upstream_stats.outputs.result }}'),
+              new: JSON.parse('${{ steps.pr_stats.outputs.pr_stats }}'),
+              old: JSON.parse('${{ steps.upstream_stats.outputs.result }}'),
             });
       - name: Comment on PR for build stats
         uses: edumserrano/find-create-or-update-comment@v3.0.0
