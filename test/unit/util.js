@@ -505,10 +505,6 @@
     assert.deepEqual(m3, [-2, 1, 1.5, -0.5, 1, -2]);
   });
 
-  QUnit.test('fabric.util.request', function(assert) {
-    assert.ok(typeof fabric.util.request === 'function', 'fabric.util.request is a function');
-  });
-
   QUnit.test('fabric.util.getPointer', function(assert) {
     assert.ok(typeof fabric.util.getPointer === 'function', 'fabric.util.getPointer is a function');
   });
