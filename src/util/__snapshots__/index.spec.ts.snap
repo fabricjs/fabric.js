@@ -102,7 +102,6 @@ exports[`util > exports expected utility functions 1`] = `
   "request": "function",
   "requestAnimFrame": "function",
   "resetObjectTransform": "function",
-  "rotatePoint": "function",
   "rotateVector": "function",
   "saveObjectTransform": "function",
   "sendObjectToPlane": "function",
