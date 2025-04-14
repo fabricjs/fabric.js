@@ -15,20 +15,24 @@ function printSizeKByte(a, b) {
   return printSize(a / 1024, b / 1024);
 }
 
-export async function run_simple({ old, new }) {
+export async function run_simple({ github, context, a, b }) {
+  const {
+    repo: { owner, repo },
+  } = context;
+
   const table = [
     ['file / KB (diff)', 'bundled', 'minified'],
     ['---', '---', '---'],
-    ...Object.entries(new.size).map(([file, _new]) => {
-      const _old = {
+    ...Object.entries(b.size).map(([file, _b]) => {
+      const _a = {
         bundled: 0,
         minified: 0,
-        ...(old.size[file] || {}),
+        ...(a.size[file] || {}),
       };
       return [
         file,
-        printSizeKByte(_old.bundled, new.bundled),
-        printSizeKByte(_old.minified, new.minified),
+        printSizeKByte(_a.bundled, _b.bundled),
+        printSizeKByte(_a.minified, _b.minified),
       ];
     }),
   ];
