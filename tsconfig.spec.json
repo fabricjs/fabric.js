@@ -3,6 +3,7 @@
   "compilerOptions": {
     "types": [],
     "noEmit": true,
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "fabric": ["./src"],
       "fabric/node": ["./src/node"],

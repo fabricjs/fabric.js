@@ -1,13 +1,13 @@
 import { getRandomInt } from './getRandomInt';
-import { describe, beforeAll, expect, afterAll, vi, it } from 'vitest';
+import { describe, expect, vi, it, beforeEach, afterEach } from 'vitest';
 
 const originalMathRandom = global.Math.random;
 
 describe('getRandomInt', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     global.Math.random = vi.fn(() => 0.1);
   });
-  afterAll(() => {
+  afterEach(() => {
     global.Math.random = originalMathRandom;
   });
   it('return a number between min and max', () => {
@@ -30,5 +30,20 @@ describe('getRandomInt', () => {
     vi.mocked(global.Math.random).mockReturnValue(0.9999999999999999999);
     const semiRandom = getRandomInt(4, 9);
     expect(semiRandom).toBe(10);
+  });
+
+  it('generates random integers within specified range', () => {
+    global.Math.random = originalMathRandom;
+
+    const randomInts: number[] = [];
+    for (let i = 100; i--; ) {
+      const randomInt = getRandomInt(100, 200);
+      randomInts.push(randomInt);
+      expect(randomInt).toBeGreaterThanOrEqual(100);
+      expect(randomInt).toBeLessThanOrEqual(200);
+    }
+
+    const areAllTheSame = randomInts.every((value) => value === randomInts[0]);
+    expect(areAllTheSame).toBeFalsy();
   });
 });
