@@ -371,7 +371,7 @@
   }
 
   tests.push({
-    test: 'controlbox opacity',
+    test: 'controlbox opacity single',
     code: controlboxOpacitySingle,
     golden: 'controls12.png',
     percentage: 0.004,
@@ -388,6 +388,7 @@
       fill: 'cyan', isMoving: true, borderOpacityWhenMoving: 0.4
     });
     var group = new fabric.Group([rect], { interactive: true, subTargetCheck: true, top: 10, left: 10, });
+    canvas.preserveObjectStacking = false;
     canvas.add(group);
     canvas.setActiveObject(rect);
     canvas.renderAll();
@@ -395,7 +396,7 @@
   }
 
   tests.push({
-    test: 'controlbox opacity',
+    test: 'controlbox opacity in group',
     code: controlboxOpacitySingleInGroup,
     golden: 'controls13.png',
     percentage: 0.004,
@@ -427,7 +428,7 @@
   }
 
   tests.push({
-    test: 'controlbox opacity',
+    test: 'controlbox opacity group and as',
     code: controlboxOpacitySingleInGroupAndAs,
     golden: 'controls14.png',
     percentage: 0.004,
