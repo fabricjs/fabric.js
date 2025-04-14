@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move polyline tests from qunit to vitest [#10533](https://github.com/fabricjs/fabric.js/pull/10533)
 - refactor(tests): move StaticCanvas tests from qunit to vitest [#10521](https://github.com/fabricjs/fabric.js/pull/10521)
 - ci() fix the action for build stats [#10525](https://github.com/fabricjs/fabric.js/pull/10525)
 - chore(tests): Convert shadow tests from qunit to vitest [#10522](https://github.com/fabricjs/fabric.js/pull/10522)
