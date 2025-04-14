@@ -8,7 +8,7 @@ export default defineConfig({
     },
   },
   test: {
-    pool: 'threads',
+    pool: 'vmThreads',
     clearMocks: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
