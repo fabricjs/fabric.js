@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move object origin tests from qunit to vitest [#10538](https://github.com/fabricjs/fabric.js/pull/10538)
 - chore(): BREAKING: Remove minore deprecations [#10524](https://github.com/fabricjs/fabric.js/pull/10524)
 - refactor(tests): move polyline tests from qunit to vitest [#10533](https://github.com/fabricjs/fabric.js/pull/10533)
 - refactor(tests): move pattern tests from qunit to vitest [#10532](https://github.com/fabricjs/fabric.js/pull/10532)
