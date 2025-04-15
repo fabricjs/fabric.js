@@ -1,0 +1,59 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PencilBrush > with canvas.enableRetinaScaling = false > fires events and creates path on mouse up 1`] = `
+[
+  [
+    "M",
+    9.999,
+    9.999,
+  ],
+  [
+    "Q",
+    10,
+    10,
+    12.5,
+    12.5,
+  ],
+  [
+    "Q",
+    15,
+    15,
+    17.5,
+    17.5,
+  ],
+  [
+    "L",
+    20,
+    20,
+  ],
+]
+`;
+
+exports[`PencilBrush > with canvas.enableRetinaScaling = true > fires events and creates path on mouse up 1`] = `
+[
+  [
+    "M",
+    9.999,
+    9.999,
+  ],
+  [
+    "Q",
+    10,
+    10,
+    12.5,
+    12.5,
+  ],
+  [
+    "Q",
+    15,
+    15,
+    17.5,
+    17.5,
+  ],
+  [
+    "L",
+    20,
+    20,
+  ],
+]
+`;

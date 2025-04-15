@@ -247,7 +247,7 @@ export class Line<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options?: Abortable,
     cssRules?: CSSRules,
   ) {
     const {
