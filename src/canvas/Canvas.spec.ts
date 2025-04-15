@@ -356,7 +356,7 @@ describe('Canvas', () => {
 
   it('preserveObjectStacking property', () => {
     expect(canvas.preserveObjectStacking).toBeTypeOf('boolean');
-    expect(canvas.preserveObjectStacking, 'default is false').toBeFalsy();
+    expect(canvas.preserveObjectStacking, 'default is true').toBeTruthy();
   });
 
   it('uniformScaling property', () => {
@@ -415,7 +415,7 @@ describe('Canvas', () => {
 
   it('implements _chooseObjectsToRender method', () => {
     expect(canvas._chooseObjectsToRender).toBeTypeOf('function');
-
+    canvas.preserveObjectStacking = false;
     const rect = makeRect(),
       rect2 = makeRect(),
       rect3 = makeRect();
@@ -1217,17 +1217,6 @@ describe('Canvas', () => {
     );
   });
 
-  it('implements getCenter method that returns canvas center', () => {
-    expect(canvas.getCenter).toBeTypeOf('function');
-    const center = canvas.getCenter();
-    expect(center.left, 'center left is half width').toBe(
-      upperCanvasEl.width / 2,
-    );
-    expect(center.top, 'center top is half height').toBe(
-      upperCanvasEl.height / 2,
-    );
-  });
-
   it('implements getCenterPoint method that returns canvas center as Point', () => {
     expect(canvas.getCenterPoint).toBeTypeOf('function');
     const center = canvas.getCenterPoint();
@@ -1702,7 +1691,7 @@ describe('Canvas', () => {
     // @ts-expect-error -- custom prop
     serialized.controlsAboveOverlay = true;
     // @ts-expect-error -- custom prop
-    serialized.preserveObjectStacking = true;
+    serialized.preserveObjectStacking = false;
 
     expect(canvas.controlsAboveOverlay).toBe(
       Canvas.getDefaults().controlsAboveOverlay,
@@ -1713,13 +1702,13 @@ describe('Canvas', () => {
 
     // before callback the properties are still false.
     expect(canvas.controlsAboveOverlay).toBe(false);
-    expect(canvas.preserveObjectStacking).toBe(false);
+    expect(canvas.preserveObjectStacking).toBe(true);
 
     await canvas.loadFromJSON(serialized);
 
     expect(canvas.isEmpty(), 'canvas is not empty').toBeFalsy();
     expect(canvas.controlsAboveOverlay).toBe(true);
-    expect(canvas.preserveObjectStacking).toBe(true);
+    expect(canvas.preserveObjectStacking).toBe(false);
   });
 
   // TODO: does this test makes sense in vitest?
@@ -2181,7 +2170,7 @@ describe('Canvas', () => {
     expect(canvas.getWidth).toBeTypeOf('function');
     expect(canvas.getWidth()).toBe(600);
 
-    canvas.setWidth(444);
+    canvas.setDimensions({ width: 444 });
     expect(canvas.getWidth()).toBe(444);
     expect(canvas.lowerCanvasEl.style.width).toBe('444px');
   });
@@ -2190,14 +2179,14 @@ describe('Canvas', () => {
     expect(canvas.getHeight).toBeTypeOf('function');
     expect(canvas.getHeight()).toBe(600);
 
-    canvas.setHeight(765);
+    canvas.setDimensions({ height: 765 });
     expect(canvas.getHeight()).toBe(765);
     expect(canvas.lowerCanvasEl.style.height).toBe('765px');
   });
 
   it('sets width with cssOnly option', () => {
-    canvas.setWidth(123);
-    canvas.setWidth('100%', { cssOnly: true });
+    canvas.setDimensions({ width: 123 });
+    canvas.setDimensions({ width: '100%' }, { cssOnly: true });
 
     expect(
       canvas.lowerCanvasEl.style.width,
@@ -2215,8 +2204,8 @@ describe('Canvas', () => {
   });
 
   it('sets height with cssOnly option', () => {
-    canvas.setHeight(123);
-    canvas.setHeight('100%', { cssOnly: true });
+    canvas.setDimensions({ height: 123 });
+    canvas.setDimensions({ height: '100%' }, { cssOnly: true });
 
     expect(
       canvas.lowerCanvasEl.style.height,
@@ -2236,8 +2225,8 @@ describe('Canvas', () => {
   });
 
   it('sets width with backstoreOnly option', () => {
-    canvas.setWidth(123);
-    canvas.setWidth(500, { backstoreOnly: true });
+    canvas.setDimensions({ width: 123 });
+    canvas.setDimensions({ width: 500 }, { backstoreOnly: true });
 
     expect(
       canvas.lowerCanvasEl.style.width,
@@ -2257,8 +2246,8 @@ describe('Canvas', () => {
   });
 
   it('sets height with backstoreOnly option', () => {
-    canvas.setHeight(123);
-    canvas.setHeight(500, { backstoreOnly: true });
+    canvas.setDimensions({ height: 123 });
+    canvas.setDimensions({ height: 500 }, { backstoreOnly: true });
 
     expect(
       canvas.lowerCanvasEl.style.height,

@@ -1913,7 +1913,7 @@ describe('StaticCanvas', () => {
     expect(canvas.getWidth).toBeTypeOf('function');
     expect(canvas.getWidth()).toBe(200);
 
-    canvas.setWidth(444);
+    canvas.setDimensions({ width: 444 });
     expect(canvas.getWidth()).toBe(444);
     expect(canvas.lowerCanvasEl.style.width).toBe('444px');
   });
@@ -1922,22 +1922,22 @@ describe('StaticCanvas', () => {
     expect(canvas.getHeight).toBeTypeOf('function');
     expect(canvas.getHeight()).toBe(200);
 
-    canvas.setHeight(765);
+    canvas.setDimensions({ height: 765 });
     expect(canvas.getHeight()).toBe(765);
     expect(canvas.lowerCanvasEl.style.height).toBe('765px');
   });
 
   it('supports css-only width setting', () => {
-    canvas.setWidth(123);
-    canvas.setWidth('100%', { cssOnly: true });
+    canvas.setDimensions({ width: 123 });
+    canvas.setDimensions({ width: '100%' }, { cssOnly: true });
 
     expect(canvas.lowerCanvasEl.style.width).toBe('100%');
     expect(canvas.getWidth()).toBe(123);
   });
 
   it('supports css-only height setting', () => {
-    canvas.setHeight(123);
-    canvas.setHeight('100%', { cssOnly: true });
+    canvas.setDimensions({ height: 123 });
+    canvas.setDimensions({ height: '100%' }, { cssOnly: true });
 
     expect(canvas.lowerCanvasEl.style.height).toBe('100%');
     expect(canvas.getHeight()).toBe(123);
@@ -1957,16 +1957,16 @@ describe('StaticCanvas', () => {
   });
 
   it('supports backstore-only width setting', () => {
-    canvas.setWidth(123);
-    canvas.setWidth(500, { backstoreOnly: true });
+    canvas.setDimensions({ width: 123 });
+    canvas.setDimensions({ width: 500 }, { backstoreOnly: true });
 
     expect(canvas.lowerCanvasEl.style.width).toBe('123px');
     expect(canvas.getWidth()).toBe(500);
   });
 
   it('supports backstore-only height setting', () => {
-    canvas.setHeight(123);
-    canvas.setHeight(500, { backstoreOnly: true });
+    canvas.setDimensions({ height: 123 });
+    canvas.setDimensions({ height: 500 }, { backstoreOnly: true });
 
     expect(canvas.lowerCanvasEl.style.height).toBe('123px');
     expect(canvas.getHeight()).toBe(500);

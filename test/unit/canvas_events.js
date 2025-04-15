@@ -31,12 +31,12 @@
     var rect = new fabric.Rect({ width: 60, height: 60 });
     function cacheAndAssertTransformEvent() {
       canvas._cacheTransformEventData(e);
-      assert.deepEqual(canvas._pointer, new fabric.Point(30, 30), 'pointer has been cached');
-      assert.deepEqual(canvas._absolutePointer, new fabric.Point(15, 15), 'absolute pointer has been cached');
+      assert.deepEqual(canvas._viewportPoint, new fabric.Point(30, 30), 'pointer has been cached');
+      assert.deepEqual(canvas._scenePoint, new fabric.Point(15, 15), 'absolute pointer has been cached');
     }
     function assertTransformEventCacheIsReset() {
-      assert.equal(canvas._pointer, null);
-      assert.equal(canvas._absolutePointer, null);
+      assert.equal(canvas._viewportPoint, null);
+      assert.equal(canvas._scenePoint, null);
       assert.equal(canvas._target, null);
     }
     canvas._currentTransform = null;

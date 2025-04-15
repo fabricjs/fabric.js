@@ -5,7 +5,7 @@ import type {
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import type { IText } from './IText';
-import { setStyle } from '../../util/dom_style';
+import { setStyle } from '../../util/internals/dom_style';
 import { cloneStyles } from '../../util/internals/cloneStyles';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import { getDocumentFromElement } from '../../util/dom_misc';
