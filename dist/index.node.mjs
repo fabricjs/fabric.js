@@ -6139,35 +6139,35 @@ class ObjectGeometry extends CommonMethods {
    */
 
   /**
-   * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
+   * @returns {number} x position according to object's {@link FabricObject#originX} property in canvas coordinate plane
    */
   getX() {
     return this.getXY().x;
   }
 
   /**
-   * @param {number} value x position according to object's {@link originX} property in canvas coordinate plane
+   * @param {number} value x position according to object's {@link FabricObject#originX} property in canvas coordinate plane
    */
   setX(value) {
     this.setXY(this.getXY().setX(value));
   }
 
   /**
-   * @returns {number} y position according to object's {@link originY} property in canvas coordinate plane
+   * @returns {number} y position according to object's {@link FabricObject#originY} property in canvas coordinate plane
    */
   getY() {
     return this.getXY().y;
   }
 
   /**
-   * @param {number} value y position according to object's {@link originY} property in canvas coordinate plane
+   * @param {number} value y position according to object's {@link FabricObject#originY} property in canvas coordinate plane
    */
   setY(value) {
     this.setXY(this.getXY().setY(value));
   }
 
   /**
-   * @returns {number} x position according to object's {@link originX} property in parent's coordinate plane\
+   * @returns {number} x position according to object's {@link FabricObject#originX} property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link getX}
    */
   getRelativeX() {
@@ -6175,7 +6175,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @param {number} value x position according to object's {@link originX} property in parent's coordinate plane\
+   * @param {number} value x position according to object's {@link FabricObject#originX} property in parent's coordinate plane\
    * if parent is canvas then this method is identical to {@link setX}
    */
   setRelativeX(value) {
@@ -6183,7 +6183,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {number} y position according to object's {@link originY} property in parent's coordinate plane\
+   * @returns {number} y position according to object's {@link FabricObject#originY} property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link getY}
    */
   getRelativeY() {
@@ -6191,7 +6191,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @param {number} value y position according to object's {@link originY} property in parent's coordinate plane\
+   * @param {number} value y position according to object's {@link FabricObject#originY} property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link setY}
    */
   setRelativeY(value) {
@@ -6199,7 +6199,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
+   * @returns {Point} x position according to object's {@link FabricObject#originX} {@link FabricObject#originY} properties in canvas coordinate plane
    */
   getXY() {
     const relativePosition = this.getRelativeXY();
@@ -6208,7 +6208,7 @@ class ObjectGeometry extends CommonMethods {
 
   /**
    * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-   * You can specify {@link originX} and {@link originY} values,
+   * You can specify {@link FabricObject#originX} and {@link FabricObject#originY} values,
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
    * object.setXY(new Point(5, 5), 'left', 'bottom').
@@ -6224,7 +6224,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
+   * @returns {Point} x,y position according to object's {@link FabricObject#originX} {@link FabricObject#originY} properties in parent's coordinate plane
    */
   getRelativeXY() {
     return new Point(this.left, this.top);
@@ -6232,7 +6232,7 @@ class ObjectGeometry extends CommonMethods {
 
   /**
    * As {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
-   * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
+   * @param {Point} point position according to object's {@link FabricObject#originX} {@link FabricObject#originY} properties in parent's coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
