@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move line tests from qunit to vitest [#10531](https://github.com/fabricjs/fabric.js/pull/10531)
 - refactor(tests): move ellipse tests from qunit to vitest [#10530](https://github.com/fabricjs/fabric.js/pull/10530)
 - refactor(tests): move cache tests from qunit to vitest [#10529](https://github.com/fabricjs/fabric.js/pull/10529)
 - refactor(tests): move brushes tests from qunit to vitest [#10528](https://github.com/fabricjs/fabric.js/pull/10528)
