@@ -82,7 +82,7 @@ export class Intersection {
   }
 
   /**
-   * Use the ray casting algorithm to determine if {@link point} is in the polygon defined by {@link points}
+   * Use the ray casting algorithm to determine if {@link Point} is in the polygon defined by [points]{@link Point}
    * @see https://en.wikipedia.org/wiki/Point_in_polygon
    * @param point
    * @param points polygon points
