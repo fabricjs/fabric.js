@@ -47,14 +47,6 @@
       "scenePoint": {
         "x": 117,
         "y": 50
-      },
-      "pointer": {
-        "x": 117,
-        "y": 50
-      },
-      "absolutePointer": {
-        "x": 117,
-        "y": 50
       }
     },
     "a"
@@ -74,14 +66,6 @@
         "y": 110
       },
       "scenePoint": {
-        "x": 39,
-        "y": 110
-      },
-      "pointer": {
-        "x": 39,
-        "y": 110
-      },
-      "absolutePointer": {
         "x": 39,
         "y": 110
       }
@@ -105,14 +89,6 @@
       "scenePoint": {
         "x": 87,
         "y": 123
-      },
-      "pointer": {
-        "x": 87,
-        "y": 123
-      },
-      "absolutePointer": {
-        "x": 87,
-        "y": 123
       }
     },
     "a"
@@ -132,14 +108,6 @@
         "y": 89
       },
       "scenePoint": {
-        "x": 261,
-        "y": 89
-      },
-      "pointer": {
-        "x": 261,
-        "y": 89
-      },
-      "absolutePointer": {
         "x": 261,
         "y": 89
       }
@@ -163,14 +131,6 @@
       "scenePoint": {
         "x": 435,
         "y": 55
-      },
-      "pointer": {
-        "x": 435,
-        "y": 55
-      },
-      "absolutePointer": {
-        "x": 435,
-        "y": 55
       }
     },
     "b"
@@ -192,14 +152,6 @@
       "scenePoint": {
         "x": 385,
         "y": 76
-      },
-      "pointer": {
-        "x": 385,
-        "y": 76
-      },
-      "absolutePointer": {
-        "x": 385,
-        "y": 76
       }
     },
     "b"
@@ -219,14 +171,6 @@
         "y": 130
       },
       "scenePoint": {
-        "x": 250,
-        "y": 130
-      },
-      "pointer": {
-        "x": 250,
-        "y": 130
-      },
-      "absolutePointer": {
         "x": 250,
         "y": 130
       }
@@ -250,15 +194,7 @@
         "x": 240,
         "y": 140
       },
-      "didDrop": false,
-      "pointer": {
-        "x": 240,
-        "y": 140
-      },
-      "absolutePointer": {
-        "x": 240,
-        "y": 140
-      }
+      "didDrop": false
     },
     "canvas"
   ],
@@ -295,15 +231,7 @@
         "y": 140
       },
       "didDrop": true,
-      "dropTarget": "a",
-      "pointer": {
-        "x": 240,
-        "y": 140
-      },
-      "absolutePointer": {
-        "x": 240,
-        "y": 140
-      }
+      "dropTarget": "a"
     },
     "a"
   ],
