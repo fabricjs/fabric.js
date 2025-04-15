@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - 5.x
+      - 6.x
     types: [published]
 
 jobs:
