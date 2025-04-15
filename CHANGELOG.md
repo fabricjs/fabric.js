@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.6.4]
+
+- chore() properly updated version number
+
+## [6.6.3]
+
+- docs(): Fixed JSDOCS for astro and typedoc
+
 ## [6.6.2]
 
 - feat(IText): Allow text or container clipPath to clip the text selection or cursor [#104634](https://github.com/fabricjs/fabric.js/pull/10434)
