@@ -3,6 +3,8 @@
 ## [next]
 
 - refactor(tests): move ellipse tests from qunit to vitest [#10530](https://github.com/fabricjs/fabric.js/pull/10530)
+- refactor(tests): move cache tests from qunit to vitest [#10529](https://github.com/fabricjs/fabric.js/pull/10529)
+- refactor(tests): move brushes tests from qunit to vitest [#10528](https://github.com/fabricjs/fabric.js/pull/10528)
 - refactor(tests): move StaticCanvas tests from qunit to vitest [#10521](https://github.com/fabricjs/fabric.js/pull/10521)
 - ci() fix the action for build stats [#10525](https://github.com/fabricjs/fabric.js/pull/10525)
 - chore(tests): Convert shadow tests from qunit to vitest [#10522](https://github.com/fabricjs/fabric.js/pull/10522)

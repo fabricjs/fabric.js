@@ -49,7 +49,7 @@
     "start": "npm run sandboxscript -- start",
     "export": "npm run cli -- website export",
     "build-tests": "rollup -c ./rollup.test.config.js",
-    "test:vitest": "vitest --run",
+    "test:vitest": "vitest --run --disable-console-intercept",
     "test": "npm run cli -- test",
     "sandbox": "npm run sandboxscript -- sandbox",
     "test:unit-browser": "npm run cli -- test --suite unit --launch --context chrome",
