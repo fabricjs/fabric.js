@@ -1,6 +1,6 @@
 import { selectorMatches } from './selectorMatches';
 
-export function doesSomeParentMatch(element: HTMLElement, selectors: string[]) {
+export function doesSomeParentMatch(element: HTMLElement | SVGElement, selectors: string[]) {
   let selector: string,
     parentMatching = true;
   while (
