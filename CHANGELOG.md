@@ -3,6 +3,8 @@
 ## [next]
 
 - refactor(tests): move parser tests from qunit to vitest [#10542](https://github.com/fabricjs/fabric.js/pull/10542)
+- refactor(tests): move intersection tests from qunit to vitest [#10541](https://github.com/fabricjs/fabric.js/pull/10541)
+- refactor(tests): move Text.toSVG tests from qunit to vitest [#10540](https://github.com/fabricjs/fabric.js/pull/10540)
 - refactor(tests): move object geometry tests from qunit to vitest [#10539](https://github.com/fabricjs/fabric.js/pull/10539)
 - refactor(tests): move object origin tests from qunit to vitest [#10538](https://github.com/fabricjs/fabric.js/pull/10538)
 - refactor(tests): move canvas dispose tests from qunit to vitest [#10536](https://github.com/fabricjs/fabric.js/pull/10536)
