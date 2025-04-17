@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move image tests from qunit to vitest [#10546](https://github.com/fabricjs/fabric.js/pull/10546)
 - refactor(tests): move parser tests from qunit to vitest [#10542](https://github.com/fabricjs/fabric.js/pull/10542)
 - refactor(tests): move intersection tests from qunit to vitest [#10541](https://github.com/fabricjs/fabric.js/pull/10541)
 - refactor(tests): move Text.toSVG tests from qunit to vitest [#10540](https://github.com/fabricjs/fabric.js/pull/10540)
