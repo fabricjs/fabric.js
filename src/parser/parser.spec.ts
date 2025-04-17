@@ -60,7 +60,7 @@ describe('fabric.Parser', () => {
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(namespace, 'path');
     element.setAttributeNS(namespace, 'fill', 'none');
-    element.setAttributeNS(namespace, 'stroke','none');
+    element.setAttributeNS(namespace, 'stroke', 'none');
 
     expect(parseAttributes(element, 'fill stroke'.split(' '))).toEqual({
       fill: '',
