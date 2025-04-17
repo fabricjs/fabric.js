@@ -3,6 +3,7 @@
 ## [next]
 
 - refactor(tests): remove jest-snapshot package [#10543](https://github.com/fabricjs/fabric.js/pull/10543)
+- refactor(tests): move control handlers tests from qunit to vitest [#10545](https://github.com/fabricjs/fabric.js/pull/10545)
 - refactor(tests): move parser tests from qunit to vitest [#10542](https://github.com/fabricjs/fabric.js/pull/10542)
 - refactor(tests): move intersection tests from qunit to vitest [#10541](https://github.com/fabricjs/fabric.js/pull/10541)
 - refactor(tests): move Text.toSVG tests from qunit to vitest [#10540](https://github.com/fabricjs/fabric.js/pull/10540)
