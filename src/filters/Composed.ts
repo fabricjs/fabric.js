@@ -76,7 +76,7 @@ export class Composed extends BaseFilter<
    */
   static fromObject(
     object: Record<string, any>,
-    options: { signal: AbortSignal },
+    options?: { signal: AbortSignal },
   ): Promise<Composed> {
     return Promise.all(
       ((object.subFilters || []) as BaseFilter<string, object>[]).map(
