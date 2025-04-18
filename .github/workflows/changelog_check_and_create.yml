@@ -35,9 +35,9 @@ jobs:
           result-encoding: string
           script: |
             return JSON.stringify({
-              log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n',
-              prev_log: '- ${{ github.event.changes.title.from }} ${{ env.link }}\n',
-              pr_ref: '${{ github.event.pull_request.head.ref }}'
+              log: `- ${{ github.event.pull_request.title }} ${{ env.link }}\n`,
+              prev_log: `- ${{ github.event.changes.title.from }} ${{ env.link }}\n`,
+              pr_ref: `${{ github.event.pull_request.head.ref }}`
             });
       - name: Create changelog artifact
         if: steps.check.outputs.changelog_updated == 'false'
