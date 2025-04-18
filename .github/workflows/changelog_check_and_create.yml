@@ -9,6 +9,7 @@ jobs:
   changelog-creation:
     runs-on: ubuntu-24.04
     env:
+      file: CHANGELOG.md
       link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
     steps:
       - name: Checkout
