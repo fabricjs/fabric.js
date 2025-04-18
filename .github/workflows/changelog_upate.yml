@@ -1,0 +1,7 @@
+name: 'Update CHANGELOG.md file'
+on:
+  workflow_run:
+    workflows: ['Check and create Changelog 📋']
+    types:
+      - completed
+jobs:
