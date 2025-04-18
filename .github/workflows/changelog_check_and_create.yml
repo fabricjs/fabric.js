@@ -6,12 +6,9 @@ on:
     types: [opened, edited]
 
 jobs:
-  changelog-suggestion:
+  changelog-creation:
     runs-on: ubuntu-24.04
     env:
-      unique_id: <!-- changelog-suggestion -->
-      file: CHANGELOG.md
-      next_version: next
       link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
     steps:
       - name: Checkout
