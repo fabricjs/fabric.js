@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { scalingXOrSkewingY, scalingYOrSkewingX } from './scaleSkew';
 import { Point } from '../Point';
-import type { FabricObject, TPointerEvent, Transform, TransformActionHandler } from '../../fabric';
+import type {
+  FabricObject,
+  TPointerEvent,
+  Transform,
+  TransformActionHandler,
+} from '../../fabric';
 import { Canvas, controlsUtils, Rect } from '../../fabric';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
@@ -174,7 +179,12 @@ describe('fabric.controlsUtils', () => {
     const testEventData = { some: 'data' } as unknown as TPointerEvent;
     const x = 15;
     const y = 25;
-    const actionHandler: TransformActionHandler<any> = (eventDataIn, transformIn, xIn, yIn) => {
+    const actionHandler: TransformActionHandler<any> = (
+      eventDataIn,
+      transformIn,
+      xIn,
+      yIn,
+    ) => {
       expect(eventDataIn).toBe(testEventData);
       expect(transformIn).toBe(transform);
       expect(xIn).toBe(x);
@@ -206,9 +216,13 @@ describe('fabric.controlsUtils', () => {
 
     it(`scaling ${AXIS} from ${controlKey} keeps the same sign when scale = 0`, () => {
       transform = prepareTransform(transform.target, controlKey);
-      const size = transform.target._getTransformedDimensions()[axis as keyof Point] as number;
+      const size = transform.target._getTransformedDimensions()[
+        axis as keyof Point
+      ] as number;
       const factor = 0.5;
-      const fn = controlsUtils[`scaling${AXIS}` as keyof typeof controlsUtils] as ((...args: any[]) => any);
+      const fn = controlsUtils[
+        `scaling${AXIS}` as keyof typeof controlsUtils
+      ] as (...args: any[]) => any;
       const exec = (point: Point) => {
         const { target } = transform;
         const origin = target.translateToGivenOrigin(
