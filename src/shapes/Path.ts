@@ -396,8 +396,8 @@ export class Path<
    * @param {Partial<PathProps>} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
-    options: Partial<PathProps>,
+    element: HTMLElement | SVGElement,
+    options?: Partial<PathProps>,
     cssRules?: CSSRules,
   ) {
     const { d, ...parsedAttributes } = parseAttributes(
