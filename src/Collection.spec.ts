@@ -146,9 +146,10 @@ describe('fabric.Collection', () => {
       Array.isArray(collection.remove()),
       'should return empty array',
     ).toBeTruthy();
-    expect(collection.remove({ prop: 'foo' } as unknown as FabricObject).length, 'nothing removed').toBe(
-      0,
-    );
+    expect(
+      collection.remove({ prop: 'foo' } as unknown as FabricObject).length,
+      'nothing removed',
+    ).toBe(0);
     expect(collection._objects.indexOf(obj), 'obj is no more in array').toBe(
       -1,
     );
