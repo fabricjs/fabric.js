@@ -7,8 +7,6 @@ on:
 
 jobs:
   changelog-suggestion:
-    # If it has NOT write permission because is from a fork, we inform the user he needs to update the changelog
-    if: (github.event.pull_request.head.repo.full_name != github.repository) && (github.event.action == 'opened' || github.event.changes.title.from != github.event.pull_request.title)
     runs-on: ubuntu-24.04
     env:
       unique_id: <!-- changelog-suggestion -->
