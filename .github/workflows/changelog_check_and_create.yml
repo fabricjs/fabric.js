@@ -1,14 +1,9 @@
-name: 'Warn about 📋'
+name: 'Check and create Changelog 📋'
 
 on:
-  pull_request_target:
-    branches: [master]
+  pull_request:
+    branches: [master, 6.x]
     types: [opened, edited]
-
-permissions:
-  actions: read
-  issues: write
-  pull-requests: write
 
 jobs:
   changelog-suggestion:
@@ -36,24 +31,29 @@ jobs:
           fi
           echo "changelog_updated=true" >> $GITHUB_OUTPUT
           exit 0
-      - name: Comment on the PR for a request to edit changelog
-        uses: edumserrano/find-create-or-update-comment@v3.0.0
+      - name: Create and upload the changelog line
+        id: changelog_string
         if: steps.check.outputs.changelog_updated == 'false'
+        uses: actions/github-script@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body-includes: '${{ env.unique_id }}'
-          comment-author: 'github-actions[bot]'
-          body:
-            | # can be a single value or you can compose text with multi-line values
-            ${{ env.unique_id }}
-            It seems that you opened a PR but you didn't add a line to the changelog file
-            Please under the `## [next]` version tag, add a line describing the changes of your pr with this format:
-            ci/chore/tests/feature/fix(): Some extended description ${{env.link}}
-            Example:
-            ```
-              ${{ github.event.pull_request.title }} ${{env.link}}
-            ```
-          edit-mode: replace
-      - name: Exit OK after the warn
+          result-encoding: string
+          script: |
+            return JSON.stringify({
+              log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n',
+              prev_log: '- ${{ github.event.changes.title.from }} ${{ env.link }}\n'
+              pr_ref: '${{ github.event.pull_request.head.ref }}'
+            });
+      - name: Create changelog artifact
+        if: steps.check.outputs.changelog_updated == 'false'
+        run: echo "${{ steps.changelog_string.outputs.result }}" >> ./changelog_artifact.txt
+      - name: Upload changelog artifact
+        if: steps.check.outputs.changelog_updated == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog_artifact
+          path: ./changelog_artifact.txt
+      - name: Exit 1 if we need the changelog to be updated
+        if: steps.check.outputs.changelog_updated == 'false'
+        run: exit 1
+      - name: Exit 0 otherwise
         run: exit 0
