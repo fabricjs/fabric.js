@@ -36,7 +36,7 @@ jobs:
           script: |
             return JSON.stringify({
               log: '- ${{ github.event.pull_request.title }} ${{ env.link }}\n',
-              prev_log: '- ${{ github.event.changes.title.from }} ${{ env.link }}\n'
+              prev_log: '- ${{ github.event.changes.title.from }} ${{ env.link }}\n',
               pr_ref: '${{ github.event.pull_request.head.ref }}'
             });
       - name: Create changelog artifact
