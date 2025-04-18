@@ -38,6 +38,7 @@ jobs:
               log: `- ${{ github.event.pull_request.title }} ${{ env.link }}`,
               prev_log: `- ${{ github.event.changes.title.from }} ${{ env.link }}`,
               pr_ref: `${{ github.event.pull_request.head.ref }}`
+              full_name: `${{ github.event.pull_request.head.repo.full_name }}`
             });
       - name: Create changelog artifact
         if: steps.check.outputs.changelog_updated == 'false'
