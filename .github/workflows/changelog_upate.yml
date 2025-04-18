@@ -5,3 +5,23 @@ on:
     types:
       - completed
 jobs:
+  update_changelog:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Recover build stats
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog_artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./
+      - name: Parse the artifact in github output
+        id: changelog_data
+        run: |
+          echo "log=$(cat ./changelog_artifact.txt | jq '.log')" >> $GITHUB_OUTPUT
+          echo "prev_log=$(cat ./changelog_artifact.txt | jq '.prev_log')" >> $GITHUB_OUTPUT
+          echo "full_name=$(cat ./changelog_artifact.txt | jq '.full_name')" >> $GITHUB_OUTPUT
+          echo "pr_ref=$(cat ./changelog_artifact.txt | jq '.pr_ref')" >> $GITHUB_OUTPUT
+      - name: Test i m doing good so far
+        run: |
+          echo "log: ${{ steps.changelog_data.outputs.log }} prev_log: ${{ steps.changelog_data.outputs.prev_log }} full_name: ${{ steps.changelog_data.outputs.full_name }} pr_ref: ${{ steps.changelog_data.outputs.pr_ref }}"
