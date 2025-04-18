@@ -35,13 +35,13 @@ jobs:
           result-encoding: string
           script: |
             return JSON.stringify({
-              log: `- ${{ github.event.pull_request.title }} ${{ env.link }}\n`,
-              prev_log: `- ${{ github.event.changes.title.from }} ${{ env.link }}\n`,
+              log: `- ${{ github.event.pull_request.title }} ${{ env.link }}`,
+              prev_log: `- ${{ github.event.changes.title.from }} ${{ env.link }}`,
               pr_ref: `${{ github.event.pull_request.head.ref }}`
             });
       - name: Create changelog artifact
         if: steps.check.outputs.changelog_updated == 'false'
-        run: echo "${{ steps.changelog_string.outputs.result }}" >> ./changelog_artifact.txt
+        run: echo "${{ steps.changelog_string.outputs.result }}" > ./changelog_artifact.txt
       - name: Upload changelog artifact
         if: steps.check.outputs.changelog_updated == 'false'
         uses: actions/upload-artifact@v4
