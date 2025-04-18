@@ -3,7 +3,6 @@ name: 'Check and create Changelog 📋'
 on:
   pull_request:
     branches: [master, 6.x]
-    types: [opened, edited]
 
 jobs:
   changelog-creation:
