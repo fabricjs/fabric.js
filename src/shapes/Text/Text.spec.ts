@@ -228,23 +228,26 @@ describe('FabricText', () => {
     );
   });
 
-  it.each(FabricText.genericFonts)('_getFontDeclaration with genericFont: %s', (fontName) => {
-    const text = createTextObject();
+  it.each(FabricText.genericFonts)(
+    '_getFontDeclaration with genericFont: %s',
+    (fontName) => {
+      const text = createTextObject();
 
-    text.fontFamily = fontName;
-    let fontDecl = text._getFontDeclaration();
+      text.fontFamily = fontName;
+      let fontDecl = text._getFontDeclaration();
 
-    expect(fontDecl, 'it does not quote genericFont').toBe(
-      'normal normal 40px ' + fontName,
-    );
+      expect(fontDecl, 'it does not quote genericFont').toBe(
+        'normal normal 40px ' + fontName,
+      );
 
-    text.fontFamily = fontName.toUpperCase();
-    fontDecl = text._getFontDeclaration();
+      text.fontFamily = fontName.toUpperCase();
+      fontDecl = text._getFontDeclaration();
 
-    expect(fontDecl, 'it uses a non case sensitive logic').toBe(
-      'normal normal 40px ' + fontName.toUpperCase(),
-    );
-  });
+      expect(fontDecl, 'it uses a non case sensitive logic').toBe(
+        'normal normal 40px ' + fontName.toUpperCase(),
+      );
+    },
+  );
 
   it('complexity', () => {
     const text = createTextObject();
