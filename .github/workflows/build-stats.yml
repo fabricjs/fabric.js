@@ -52,9 +52,6 @@ jobs:
             return JSON.stringify({
               size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
-      - run: |
-          echo "a ${{ steps.pr_stats.outputs.pr_stats }}"
-          echo "b ${{ steps.upstream_stats.outputs.result }}"
       - name: process
         id: stats-message
         uses: actions/github-script@v6
