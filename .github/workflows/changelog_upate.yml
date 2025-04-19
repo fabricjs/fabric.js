@@ -26,3 +26,67 @@ jobs:
       - name: Test i m doing good so far
         run: |
           echo "log: ${{ steps.changelog_data.outputs.log }} prev_log: ${{ steps.changelog_data.outputs.prev_log }} full_name: ${{ steps.changelog_data.outputs.full_name }} pr_ref: ${{ steps.changelog_data.outputs.pr_ref }}"
+      - name: Pull down the correct branch and repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.changelog_data.outputs.pr_ref }}
+          repository: ${{ steps.changelog_data.outputs.full_name }}
+      - name: Update ${{ env.file }} from PR title
+        id: update
+        uses: actions/github-script@v6
+        env:
+          log: '${{ steps.changelog_data.outputs.log }}\n'
+          prev_log: '${{ steps.changelog_data.outputs.prev_log }}\n'
+          file: CHANGELOG.md
+          next_version: next
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            const file = './${{ env.file }}';
+            let content = fs.readFileSync(file).toString();
+            const title = '[${{ env.next_version }}]';
+            const log = '${{ env.log }}';
+            let exists = ${{ github.event.workflow_run.conclusion == 'success' }};
+
+            if (!content.includes(title)) {
+            const insertAt = content.indexOf('\n') + 1;
+            content =
+                content.slice(0, insertAt) +
+                `\n## ${title}\n\n\n` +
+                content.slice(insertAt);
+            }
+
+            const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
+            if ('${{ env.prev_log }}') {
+                const prevLog = '${{ env.prev_log }}';
+                const index = content.indexOf(prevLog, insertAt);
+                if (index > -1) {
+                    content = content.slice(0, index) + content.slice(index + prevLog.length);
+                    exists = false;
+                }
+            }
+
+            if (!exists) {
+                content = content.slice(0, insertAt) + log + content.slice(insertAt);
+                fs.writeFileSync(file, content);
+                return true;
+            }
+
+            return false;
+      - name: Setup node
+        if: fromJson(steps.update.outputs.result)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Commit & Push
+        if: fromJson(steps.update.outputs.result)
+        run: |
+          npm ci
+          npx prettier --write ${{ env.file }}
+          git diff
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add ${{ env.file }}
+          git commit -m "update ${{ env.file }}"
+          git push
