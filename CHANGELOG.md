@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move image tests from qunit to vitest [#10546](https://github.com/fabricjs/fabric.js/pull/10546)
 - refactor(tests): move collection mixin tests from qunit to vitest - [#10544](https://github.com/fabricjs/fabric.js/pull/10544)
 - refactor(tests): remove jest-snapshot package [#10543](https://github.com/fabricjs/fabric.js/pull/10543)
 - refactor(tests): move control handlers tests from qunit to vitest [#10545](https://github.com/fabricjs/fabric.js/pull/10545)
