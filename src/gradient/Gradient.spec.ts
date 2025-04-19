@@ -4,10 +4,10 @@ import { Gradient } from './Gradient';
 import type { GradientUnits, SVGOptions } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
-import { describe, expect, it, test, vitest } from 'vitest';
+import { describe, expect, it, test, vi } from 'vitest';
 import { StaticCanvas } from '../canvas/StaticCanvas';
 
-vitest.mock('../util/internals/uid', () => ({
+vi.mock('../util/internals/uid', () => ({
   uid: () => 0,
 }));
 

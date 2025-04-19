@@ -675,7 +675,8 @@ describe('fabric.Parser', () => {
   it('getCssRule', () => {
     expect(getCSSRules).toBeDefined();
     const rules: Record<PropertyKey, any> = {};
-    const doc = getFabricDocument();
+    // NOTE: We need to use a new fresh document here because vitest in browser mode already adds some stylesheets which pollutes the test
+    const doc = getFabricDocument().implementation.createHTMLDocument('');
     const svgUid = 'uniqueId';
     const styleElement = doc.createElement('style');
 
@@ -723,7 +724,8 @@ describe('fabric.Parser', () => {
   it('getCssRule with same selectors', () => {
     expect(getCSSRules).toBeDefined();
     const rules: Record<PropertyKey, unknown> = {};
-    const doc = getFabricDocument();
+    // NOTE: We need to use a new fresh document here because vitest in browser mode already adds some stylesheets which pollutes the test
+    const doc = getFabricDocument().implementation.createHTMLDocument('');
     const svgUid = 'uniqueId';
     const styleElement = doc.createElement('style');
 
