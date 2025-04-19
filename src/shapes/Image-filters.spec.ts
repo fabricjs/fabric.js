@@ -964,8 +964,7 @@ describe('Image filters', () => {
     });
 
     it('toObject', () => {
-      // @ts-expect-error -- TODO -- check this why 1 is passed instead of boolean
-      const filter = new Convolute({ opaque: 1 });
+      const filter = new Convolute({ opaque: true });
 
       expect(filter.toObject, 'should have toObject method').toBeTypeOf(
         'function',
@@ -976,12 +975,11 @@ describe('Image filters', () => {
       expect(
         JSON.stringify(object),
         'serialized object should match expected value',
-      ).toBe('{"type":"Convolute","opaque":1,"matrix":[0,0,0,0,1,0,0,0,0]}');
+      ).toBe('{"type":"Convolute","opaque":true,"matrix":[0,0,0,0,1,0,0,0,0]}');
     });
 
     it('toJSON', () => {
-      // @ts-expect-error -- TODO: check this -- it is typed as boolean but we are passing number here
-      const filter = new Convolute({ opaque: 1 });
+      const filter = new Convolute({ opaque: true });
 
       expect(filter.toJSON, 'should have toJSON method').toBeTypeOf('function');
 
@@ -990,7 +988,7 @@ describe('Image filters', () => {
       expect(
         JSON.stringify(json),
         'JSON representation should match expected value',
-      ).toBe('{"type":"Convolute","opaque":1,"matrix":[0,0,0,0,1,0,0,0,0]}');
+      ).toBe('{"type":"Convolute","opaque":true,"matrix":[0,0,0,0,1,0,0,0,0]}');
     });
 
     it('fromObject', async () => {
