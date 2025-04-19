@@ -1,14 +1,6 @@
 import { roundSnapshotOptions } from '../../../vitest.extend';
 import { IText } from './IText';
-import {
-  describe,
-  expect,
-  it,
-  beforeEach,
-  afterEach,
-  test,
-  vi,
-} from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, test, vi } from 'vitest';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
 
