@@ -19,10 +19,10 @@ jobs:
       - name: Parse the artifact in github output
         id: changelog_data
         run: |
-          echo "log=$(cat ./changelog_artifact.txt | jq '.log')" >> $GITHUB_OUTPUT
-          echo "prev_log=$(cat ./changelog_artifact.txt | jq '.prev_log')" >> $GITHUB_OUTPUT
-          echo "full_name=$(cat ./changelog_artifact.txt | jq '.full_name')" >> $GITHUB_OUTPUT
-          echo "pr_ref=$(cat ./changelog_artifact.txt | jq '.pr_ref')" >> $GITHUB_OUTPUT
+          echo "log=$(cat ./changelog_artifact.txt | jq -r '.log')" >> $GITHUB_OUTPUT
+          echo "prev_log=$(cat ./changelog_artifact.txt | jq -r '.prev_log')" >> $GITHUB_OUTPUT
+          echo "full_name=$(cat ./changelog_artifact.txt | jq -r '.full_name')" >> $GITHUB_OUTPUT
+          echo "pr_ref=$(cat ./changelog_artifact.txt | jq -r '.pr_ref')" >> $GITHUB_OUTPUT
       - name: Pull down the correct branch and repo
         uses: actions/checkout@v4
         with:
