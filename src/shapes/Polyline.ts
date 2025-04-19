@@ -398,7 +398,7 @@ export class Polyline<
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
+    element: HTMLElement | SVGElement,
     options?: Abortable,
     cssRules?: CSSRules,
   ) {

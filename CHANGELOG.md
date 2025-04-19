@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): migrate polygon tests from qunit to vitest [#10551](https://github.com/fabricjs/fabric.js/pull/10551)
 - refactor(tests): move image filters tests from qunit to vitest [#10547](https://github.com/fabricjs/fabric.js/pull/10547)
 - refactor(tests): move image tests from qunit to vitest [#10546](https://github.com/fabricjs/fabric.js/pull/10546)
 - refactor(tests): move collection mixin tests from qunit to vitest - [#10544](https://github.com/fabricjs/fabric.js/pull/10544)
