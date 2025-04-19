@@ -8,6 +8,8 @@ jobs:
   update_changelog:
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-24.04
+    env:
+      file: CHANGELOG.md
     steps:
       - name: Recover build stats
         uses: actions/download-artifact@v4
@@ -34,7 +36,6 @@ jobs:
         env:
           log: '${{ steps.changelog_data.outputs.log }}\n'
           prev_log: '${{ steps.changelog_data.outputs.prev_log }}\n'
-          file: CHANGELOG.md
           next_version: next
         with:
           result-encoding: string
