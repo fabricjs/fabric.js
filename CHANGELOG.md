@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move textbox tests from qunit to vitest [#10556](https://github.com/fabricjs/fabric.js/pull/10556)
 - refactor(tests): migrate itext tests from qunit to vitest [#10555](https://github.com/fabricjs/fabric.js/pull/10555)
 - refactor(tests): move object interactivity tests from qunit to vitest [#10554](https://github.com/fabricjs/fabric.js/pull/10554)
 - refactor(tests): move text tests from qunit to vitest [#10553](https://github.com/fabricjs/fabric.js/pull/10553)
