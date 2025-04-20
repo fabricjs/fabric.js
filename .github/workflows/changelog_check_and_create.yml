@@ -20,7 +20,7 @@ jobs:
 
         run: |
           files=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            ${{ github.event.pull_request.diff_url }} \
+            https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
             | jq -r '.[].filename')
           echo "Changed files: $files"
           if echo "$files" | grep -q "^${{ env.file }}$"; then
