@@ -3,7 +3,9 @@ import { version } from '../../fabric';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
 import { Gradient } from '../gradient/Gradient';
-
+import { Pattern } from '../Pattern';
+// will require some kind of handling here
+import { getEnv } from '../env/node';
 const REFERENCE_RECT = {
   version,
   type: 'Rect',
@@ -94,94 +96,72 @@ describe('Rect', () => {
     expect(rect2.fill).toBeInstanceOf(Gradient);
     expect(rect2.stroke).toBeInstanceOf(Gradient);
   });
+  it('Rect.fromObject with pattern fill', async () => {
+    const fillObj = {
+      type: 'Pattern',
+      source:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==',
+    };
+    const rect = await Rect.fromObject({ fill: fillObj });
+    expect(rect.fill).toBeInstanceOf(Pattern);
+  });
 });
 
-//   QUnit.test('fabric.Rect.fromObject with pattern fill', function (assert) {
-//     var done = assert.async();
-//     var fillObj = {
-//       type: 'Pattern',
-//       source:
-//         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==',
-//     };
-//     fabric.Rect.fromObject({ fill: fillObj }).then(function (rect) {
-//       assert.ok(rect.fill instanceof fabric.Pattern);
-//       done();
-//     });
-//   });
+it('Rect.fromElement', async () => {
+  const elRect = getEnv().document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'rect',
+  );
+  const rect = await Rect.fromElement(elRect);
+  expect(rect).toBeInstanceOf(Rect);
+  expect(rect.toObject()).toEqual({ ...REFERENCE_RECT, visible: false });
+});
 
-//   QUnit.test('fabric.Rect.fromElement', function (assert) {
-//     var done = assert.async();
-//     assert.ok(typeof fabric.Rect.fromElement === 'function');
-
-//     var elRect = fabric
-//       .getFabricDocument()
-//       .createElementNS('http://www.w3.org/2000/svg', 'rect');
-//     fabric.Rect.fromElement(elRect).then((rect) => {
-//       assert.ok(rect instanceof fabric.Rect);
-//       assert.deepEqual(rect.toObject(), { ...REFERENCE_RECT, visible: false });
-//       done();
-//     });
-//   });
-
-//   QUnit.test(
-//     'fabric.Rect.fromElement with custom attributes',
-//     function (assert) {
-//       var done = assert.async();
-//       var namespace = 'http://www.w3.org/2000/svg';
-//       var elRectWithAttrs = fabric
-//         .getFabricDocument()
-//         .createElementNS(namespace, 'rect');
-
-//       elRectWithAttrs.setAttributeNS(namespace, 'x', 10);
-//       elRectWithAttrs.setAttributeNS(namespace, 'y', 20);
-//       elRectWithAttrs.setAttributeNS(namespace, 'width', 222);
-//       elRectWithAttrs.setAttributeNS(namespace, 'height', 333);
-//       elRectWithAttrs.setAttributeNS(namespace, 'rx', 11);
-//       elRectWithAttrs.setAttributeNS(namespace, 'ry', 12);
-//       elRectWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
-//       elRectWithAttrs.setAttributeNS(namespace, 'opacity', 0.45);
-//       elRectWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
-//       elRectWithAttrs.setAttributeNS(namespace, 'stroke-width', 3);
-//       elRectWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-//       elRectWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-//       elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-//       elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', 5);
-//       elRectWithAttrs.setAttributeNS(
-//         namespace,
-//         'vector-effect',
-//         'non-scaling-stroke',
-//       );
-//       //elRectWithAttrs.setAttributeNS(namespace, 'transform', 'translate(-10,-20) scale(2) rotate(45) translate(5,10)');
-//       fabric.Rect.fromElement(elRectWithAttrs).then((rectWithAttrs) => {
-//         assert.ok(rectWithAttrs instanceof fabric.Rect);
-//         assert.equal(
-//           rectWithAttrs.strokeUniform,
-//           true,
-//           'strokeUniform is parsed',
-//         );
-//         var expectedObject = {
-//           ...REFERENCE_RECT,
-//           left: 10,
-//           top: 20,
-//           width: 222,
-//           height: 333,
-//           fill: 'rgb(255,255,255)',
-//           opacity: 0.45,
-//           stroke: 'blue',
-//           strokeWidth: 3,
-//           strokeDashArray: [5, 2],
-//           strokeLineCap: 'round',
-//           strokeLineJoin: 'bevel',
-//           strokeMiterLimit: 5,
-//           rx: 11,
-//           ry: 12,
-//           strokeUniform: true,
-//         };
-//         assert.deepEqual(rectWithAttrs.toObject(), expectedObject);
-//         done();
-//       });
-//     },
-//   );
+it('fromElement with custom attributes', async () => {
+  const namespace = 'http://www.w3.org/2000/svg';
+  const elRectWithAttrs = getEnv().document.createElementNS(namespace, 'rect');
+  elRectWithAttrs.setAttributeNS(namespace, 'x', '10');
+  elRectWithAttrs.setAttributeNS(namespace, 'y', '20');
+  elRectWithAttrs.setAttributeNS(namespace, 'width', '222');
+  elRectWithAttrs.setAttributeNS(namespace, 'height', '333');
+  elRectWithAttrs.setAttributeNS(namespace, 'rx', '11');
+  elRectWithAttrs.setAttributeNS(namespace, 'ry', '12');
+  elRectWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
+  elRectWithAttrs.setAttributeNS(namespace, 'opacity', '0.45');
+  elRectWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
+  elRectWithAttrs.setAttributeNS(namespace, 'stroke-width', '3');
+  elRectWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
+  elRectWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
+  elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
+  elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
+  elRectWithAttrs.setAttributeNS(
+    namespace,
+    'vector-effect',
+    'non-scaling-stroke',
+  );
+  const rectWithAttrs = await Rect.fromElement(elRectWithAttrs);
+  expect(rectWithAttrs).toBeInstanceOf(Rect);
+  expect(rectWithAttrs.strokeUniform, 'strokeUniform is parsed').toBe(true);
+  const expectedObject = {
+    ...REFERENCE_RECT,
+    left: 10,
+    top: 20,
+    width: 222,
+    height: 333,
+    fill: 'rgb(255,255,255)',
+    opacity: 0.45,
+    stroke: 'blue',
+    strokeWidth: 3,
+    strokeDashArray: [5, 2],
+    strokeLineCap: 'round',
+    strokeLineJoin: 'bevel',
+    strokeMiterLimit: 5,
+    rx: 11,
+    ry: 12,
+    strokeUniform: true,
+  };
+  expect(rectWithAttrs.toObject()).toEqual(expectedObject);
+});
 
 //   QUnit.test('clone with rounded corners', function (assert) {
 //     var done = assert.async();

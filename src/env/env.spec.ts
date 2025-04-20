@@ -1,6 +1,9 @@
-import { describe } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('env', () => {
+  it('passes', () => {
+    expect(true).toBeTruthy();
+  });
   // afterEach(() => {
   //   delete globalThis.window;
   //   delete globalThis.document;
