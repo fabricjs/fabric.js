@@ -34,8 +34,8 @@ jobs:
         id: update
         uses: actions/github-script@v6
         env:
-          log: '${{ steps.changelog_data.outputs.log }}\n'
-          prev_log: '${{ steps.changelog_data.outputs.prev_log }}\n'
+          log: '${{ steps.changelog_data.outputs.log }}'
+          prev_log: '${{ steps.changelog_data.outputs.prev_log }}'
           next_version: next
         with:
           result-encoding: string
@@ -45,8 +45,10 @@ jobs:
             let content = fs.readFileSync(file).toString();
             const title = '[${{ env.next_version }}]';
             const log = '${{ env.log }}';
-            let exists = ${{ github.event.workflow_run.conclusion == 'success' }};
-
+            const prev_log = '${{ env.prev_log }}';
+            const prev_log_exists = prev_log && content.includes(prev_log);
+            const log_exists = log && content.includes(log);
+            let modified = false;
             if (!content.includes(title)) {
             const insertAt = content.indexOf('\n') + 1;
             content =
@@ -55,23 +57,16 @@ jobs:
                 content.slice(insertAt);
             }
 
-            const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
-            if ('${{ env.prev_log }}') {
-                const prevLog = '${{ env.prev_log }}';
-                const index = content.indexOf(prevLog, insertAt);
-                if (index > -1) {
-                    content = content.slice(0, index) + content.slice(index + prevLog.length);
-                    exists = false;
-                }
+            if (prev_log_exists && log) {
+                modified = true;
+                content = content.replace(prev_log, log);
+            } else if (log && !log_exists) {
+                modified = true;
+                const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
+                content = content.slice(0, insertAt) + log + '\n' + content.slice(insertAt);
             }
-
-            if (!exists) {
-                content = content.slice(0, insertAt) + log + content.slice(insertAt);
-                fs.writeFileSync(file, content);
-                return true;
-            }
-
-            return false;
+            fs.writeFileSync(file, content);
+            return modified;
       - name: Setup node
         if: fromJson(steps.update.outputs.result)
         uses: actions/setup-node@v4
