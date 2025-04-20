@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { Point } from '../Point';
-import {
-  FabricObject,
-  getFabricDocument,
-  Polyline,
-  version,
-} from '../../fabric';
+import { getFabricDocument } from '../env';
+import { VERSION as version } from '../constants';
 import { Polygon } from './Polygon';
+import { Polyline } from './Polyline';
+import { FabricObject } from './Object/FabricObject';
 
 function getPoints() {
   return [
