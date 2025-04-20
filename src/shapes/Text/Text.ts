@@ -1845,8 +1845,8 @@ export class FabricText<
    * @param {Object} [options] Options object
    */
   static async fromElement(
-    element: HTMLElement,
-    options: Abortable,
+    element: HTMLElement | SVGElement,
+    options?: Abortable,
     cssRules?: CSSRules,
   ) {
     const parsedAttributes = parseAttributes(

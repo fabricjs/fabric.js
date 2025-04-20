@@ -3,6 +3,7 @@
 ## [next]
 
 - refactor(tests): move object interactivity tests from qunit to vitest [#10554](https://github.com/fabricjs/fabric.js/pull/10554)
+- refactor(tests): move text tests from qunit to vitest [#10553](https://github.com/fabricjs/fabric.js/pull/10553)
 - refactor(tests): migrate polygon tests from qunit to vitest [#10551](https://github.com/fabricjs/fabric.js/pull/10551)
 - refactor(tests): move image filters tests from qunit to vitest [#10547](https://github.com/fabricjs/fabric.js/pull/10547)
 - refactor(tests): move image tests from qunit to vitest [#10546](https://github.com/fabricjs/fabric.js/pull/10546)
