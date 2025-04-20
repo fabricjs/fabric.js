@@ -734,7 +734,7 @@ export class FabricObject<
    */
   hasStroke() {
     return (
-      this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0
+      !!this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0
     );
   }
 
@@ -749,7 +749,7 @@ export class FabricObject<
    * @returns Boolean
    */
   hasFill() {
-    return this.fill && this.fill !== 'transparent';
+    return !!this.fill && this.fill !== 'transparent';
   }
 
   /**
