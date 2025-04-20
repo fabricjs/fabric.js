@@ -13,8 +13,8 @@ describe('env', () => {
   it('import/require sets env', async () => {
     globalThis.window = { devicePixelRatio: 1.25 };
     globalThis.document = { foo: 'bar' };
-    const imported = await import('../../dist/index.node.cjs');
-    const required = require('../../dist/index.node.cjs');
+    const imported = await import('../../index.node');
+    const required = require('../../index.node');
     expect(imported.getEnv().document.foo, 'should be node env').toBe(
       undefined,
     );
