@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): migrate object clip path tests to vitest [#10561](https://github.com/fabricjs/fabric.js/pull/10561)
 - refactor(tests): migrate webgl tests to vitest [#10560](https://github.com/fabricjs/fabric.js/pull/10560)
 - refactor(tests): migrate itext click behavior tests from qunit to vitest [#10559](https://github.com/fabricjs/fabric.js/pull/10559)
 - refactor(tests): migrate object tests to vitest [#10562](https://github.com/fabricjs/fabric.js/pull/10562)
