@@ -2,7 +2,17 @@
 
 ## [next]
 
+- refactor(tests): Migrate Env, ClassRegistry, Rect to vitest [#10557](https://github.com/fabricjs/fabric.js/pull/10557)
+- refactor(tests): move textbox tests from qunit to vitest [#10556](https://github.com/fabricjs/fabric.js/pull/10556)
+- refactor(tests): migrate itext tests from qunit to vitest [#10555](https://github.com/fabricjs/fabric.js/pull/10555)
+- refactor(tests): move object interactivity tests from qunit to vitest [#10554](https://github.com/fabricjs/fabric.js/pull/10554)
+- refactor(tests): move text tests from qunit to vitest [#10553](https://github.com/fabricjs/fabric.js/pull/10553)
+- refactor(tests): migrate polygon tests from qunit to vitest [#10551](https://github.com/fabricjs/fabric.js/pull/10551)
+- refactor(tests): move image filters tests from qunit to vitest [#10547](https://github.com/fabricjs/fabric.js/pull/10547)
+- refactor(tests): move image tests from qunit to vitest [#10546](https://github.com/fabricjs/fabric.js/pull/10546)
+- refactor(tests): move collection mixin tests from qunit to vitest - [#10544](https://github.com/fabricjs/fabric.js/pull/10544)
 - refactor(tests): remove jest-snapshot package [#10543](https://github.com/fabricjs/fabric.js/pull/10543)
+- refactor(tests): move control handlers tests from qunit to vitest [#10545](https://github.com/fabricjs/fabric.js/pull/10545)
 - refactor(tests): move parser tests from qunit to vitest [#10542](https://github.com/fabricjs/fabric.js/pull/10542)
 - refactor(tests): move intersection tests from qunit to vitest [#10541](https://github.com/fabricjs/fabric.js/pull/10541)
 - refactor(tests): move Text.toSVG tests from qunit to vitest [#10540](https://github.com/fabricjs/fabric.js/pull/10540)

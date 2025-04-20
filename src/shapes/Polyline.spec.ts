@@ -3,7 +3,9 @@ import { Point } from '../Point';
 
 import { describe, expect, it } from 'vitest';
 import { getFabricDocument } from '../env';
-import { FabricObject, Polygon, version } from '../../fabric';
+import { version } from '../../fabric';
+import { Polygon } from './Polygon';
+import { FabricObject } from './Object/FabricObject';
 
 const points = [
   { x: 2, y: 2 },
