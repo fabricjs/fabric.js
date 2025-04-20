@@ -9,6 +9,10 @@ import type { FabricImage } from './dist-extensions';
 const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
 const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
 
+export function isJSDOM(): boolean {
+  return 'jsdom' in globalThis;
+}
+
 function basename(link: string) {
   return link.split(/[\\/]/).pop()?.replace(/"/gm, '') || '';
 }
