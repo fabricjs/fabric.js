@@ -1,16 +1,6 @@
 import { roundSnapshotOptions } from '../../../vitest.extend';
 import { IText } from './IText';
-import {
-  describe,
-  expect,
-  it,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-  test,
-  vi,
-} from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, test, vi } from 'vitest';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
 
@@ -107,7 +97,8 @@ describe('text imperative changes', () => {
 describe('IText cursor animation snapshot', () => {
   let currentAnimation: string[] = [];
   const origCalculate = ValueAnimation.prototype.calculate;
-  beforeAll(() => {
+
+  beforeEach(() => {
     vi.spyOn(ValueAnimation.prototype, 'calculate').mockImplementation(
       function (timeElapsed: number) {
         const value = origCalculate.call(this, timeElapsed);
@@ -116,15 +107,12 @@ describe('IText cursor animation snapshot', () => {
       },
     );
     vi.useFakeTimers();
-  });
-  afterAll(() => {
-    ValueAnimation.prototype.calculate = origCalculate;
-  });
-  beforeEach(() => {
     vi.runAllTimers();
     currentAnimation = [];
   });
-  afterAll(() => {
+
+  afterEach(() => {
+    ValueAnimation.prototype.calculate = origCalculate;
     vi.resetAllMocks();
     vi.useRealTimers();
   });
