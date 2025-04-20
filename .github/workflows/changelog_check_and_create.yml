@@ -19,18 +19,17 @@ jobs:
         id: check
 
         run: |
-          echo "${{ github.event.pull_request.diff_url }}"
-          curl -s \
-            -H "Accept: application/vnd.github.v3+json" \
-            "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
-            | jq -r '.[].filename'
-          if [[ $(git diff --name-only origin/master HEAD -- ${{ env.file }} | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
-            echo "Expected '${{ env.file }}' to be modified"
+          files=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            ${{ github.event.pull_request.diff_url }} \
+            | jq -r '.[].filename')
+          echo "Changed files: $files"
+          if echo "$files" | grep -q "^${{ env.file }}$"; then
+            echo "OK '${{ env.file }}' was modified"
+            echo "changelog_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "KO '${{ env.file }}' was NOT modified"
             echo "changelog_updated=false" >> $GITHUB_OUTPUT
-            exit 0
           fi
-          echo "changelog_updated=true" >> $GITHUB_OUTPUT
-          exit 0
       - name: Create and upload the changelog line
         id: changelog_string
         if: steps.check.outputs.changelog_updated == 'false'
