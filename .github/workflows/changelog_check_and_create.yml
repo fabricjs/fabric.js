@@ -3,7 +3,7 @@ name: 'Check and create Changelog 📋'
 on:
   pull_request:
     branches: [master, 6.x]
-
+    types: [opened, synchronize, reopened, edited]
 jobs:
   changelog-creation:
     runs-on: ubuntu-24.04
@@ -19,13 +19,17 @@ jobs:
         id: check
 
         run: |
-          if [[ $(git diff --name-only origin/master HEAD -- ${{ env.file }} | grep '^${{ env.file }}$' -c) -eq 0 ]]; then
-            echo "Expected '${{ env.file }}' to be modified"
+          files=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
+            | jq -r '.[].filename')
+          echo "Changed files: $files"
+          if echo "$files" | grep -q "^${{ env.file }}$"; then
+            echo "OK '${{ env.file }}' was modified"
+            echo "changelog_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "KO '${{ env.file }}' was NOT modified"
             echo "changelog_updated=false" >> $GITHUB_OUTPUT
-            exit 0
           fi
-          echo "changelog_updated=true" >> $GITHUB_OUTPUT
-          exit 0
       - name: Create and upload the changelog line
         id: changelog_string
         if: steps.check.outputs.changelog_updated == 'false'
