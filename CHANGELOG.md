@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move path tests from qunit to vitest [#10552](https://github.com/fabricjs/fabric.js/pull/10552)
 - refactor(tests): Migrate Env, ClassRegistry, Rect to vitest [#10557](https://github.com/fabricjs/fabric.js/pull/10557)
 - refactor(tests): move textbox tests from qunit to vitest [#10556](https://github.com/fabricjs/fabric.js/pull/10556)
 - refactor(tests): migrate itext tests from qunit to vitest [#10555](https://github.com/fabricjs/fabric.js/pull/10555)
