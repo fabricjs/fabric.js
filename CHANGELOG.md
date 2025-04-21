@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update vitest [#10565](https://github.com/fabricjs/fabric.js/pull/10565)
 - chore(tests): Remove old unit test harness [#10567](https://github.com/fabricjs/fabric.js/pull/10567)
 - refactor(tests): move canvas events tests from qunit to vitest [#10563](https://github.com/fabricjs/fabric.js/pull/10563)
 - refactor(tests): migrate object clip path tests to vitest [#10561](https://github.com/fabricjs/fabric.js/pull/10561)
