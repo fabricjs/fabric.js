@@ -29,7 +29,7 @@ function looksLikeFabricObject(val: unknown): val is FabricObject {
     typeof val === 'object' &&
     // all FabricObjects implement these three members
     typeof (val as any).toObject === 'function' &&
-    typeof (val as any).getObjectScaling === 'function' &&
+    typeof (val as any).render === 'function' &&
     typeof (val as any).constructor?.type === 'string'
   );
 }

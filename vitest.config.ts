@@ -33,7 +33,7 @@ export default defineConfig({
               url: fixturesUrl,
             },
           },
-          name: 'unit-jsdom',
+          name: 'unit-node',
         },
       },
       {
