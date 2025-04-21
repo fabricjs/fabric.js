@@ -55,7 +55,6 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node-version: [20]
         target: [chrome, firefox]
       fail-fast: false
     steps:
@@ -63,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
       - name: Run ${{ matrix.target }} visual headless test
