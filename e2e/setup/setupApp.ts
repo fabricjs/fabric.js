@@ -6,14 +6,19 @@ import { JSDOM } from 'jsdom';
 
 export default () => {
   test.beforeEach(async ({ page }, { file }) => {
+    await page.addInitScript(() => {
+      globalThis.getAssetName = (name) => `/test/visual/assets/${name}`;
+    });
+
     await page.goto('/e2e/site');
     // expose imports for consumption
-    page.addScriptTag({
+    await page.addScriptTag({
       type: 'importmap',
       content: JSON.stringify({
         imports,
       }),
     });
+
     // add test script
     const testDir = path.relative(
       path.resolve(process.cwd(), 'e2e', 'tests'),
