@@ -676,7 +676,7 @@ describe('fabric.Parser', () => {
     expect(getCSSRules).toBeDefined();
     const rules: Record<PropertyKey, any> = {};
     // NOTE: We need to use a new fresh document here because vitest in browser mode already adds some stylesheets which pollutes the test
-    const doc = getFabricDocument().implementation.createHTMLDocument('');
+    const doc = globalThis.document.implementation.createHTMLDocument('');
     const svgUid = 'uniqueId';
     const styleElement = doc.createElement('style');
 
@@ -725,7 +725,7 @@ describe('fabric.Parser', () => {
     expect(getCSSRules).toBeDefined();
     const rules: Record<PropertyKey, unknown> = {};
     // NOTE: We need to use a new fresh document here because vitest in browser mode already adds some stylesheets which pollutes the test
-    const doc = getFabricDocument().implementation.createHTMLDocument('');
+    const doc = globalThis.document.implementation.createHTMLDocument('');
     const svgUid = 'uniqueId';
     const styleElement = doc.createElement('style');
 
