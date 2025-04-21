@@ -86,7 +86,7 @@
     "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^8.29.0",
     "@typescript-eslint/parser": "^8.29.0",
-    "@vitest/coverage-v8": "^3.1.1",
+    "@vitest/coverage-v8": "^3.1.2",
     "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
     "busboy": "^1.6.0",
     "chalk": "^2.4.1",
@@ -113,7 +113,7 @@
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
     "v8-to-istanbul": "^9.3.0",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.2"
   },
   "engines": {
     "node": ">=18.0.0"
