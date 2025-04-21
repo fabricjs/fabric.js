@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update playwright [#10564](https://github.com/fabricjs/fabric.js/pull/10564)
 - chore(): update vitest [#10565](https://github.com/fabricjs/fabric.js/pull/10565)
 - chore(tests): Remove old unit test harness [#10567](https://github.com/fabricjs/fabric.js/pull/10567)
 - refactor(tests): move canvas events tests from qunit to vitest [#10563](https://github.com/fabricjs/fabric.js/pull/10563)
