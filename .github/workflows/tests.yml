@@ -27,7 +27,7 @@ jobs:
   node-coverage:
     needs: [prime-build]
     runs-on: ubuntu-24.04
-    name: Node 22.x visual tests qunit
+    name: Qunit visual tests Node 22
     strategy:
       fail-fast: false
     steps:
@@ -51,7 +51,7 @@ jobs:
 
   browser:
     needs: [prime-build]
-    name: ${{ matrix.target }} visual tests qunit
+    name: QUnit visual tests ${{ matrix.target }}
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -70,7 +70,7 @@ jobs:
   node:
     needs: [prime-build]
     runs-on: ubuntu-24.04
-    name: Node 18 visual tests qunit
+    name: QUnit visual tests Node 18
     strategy:
       fail-fast: false
     steps:
@@ -84,7 +84,7 @@ jobs:
       - name: Run visual qunit tests
         run: npm run test -- -c node -s visual
   vitest-coverage:
-    name: Vitest tests on node 22
+    name: Vitest tests Node 22
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -101,7 +101,7 @@ jobs:
           path: ./.nyc_output/*.json
           include-hidden-files: true
   vitest-browser:
-    name: Vitest tests
+    name: Vitest tests Chromium
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
