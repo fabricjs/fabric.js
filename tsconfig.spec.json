@@ -14,6 +14,7 @@
     "src/**/*",
     "extensions/**/*",
     "vitest.d.ts",
+    "vitest.env.d.ts",
     "vitest.setup.ts",
     "vitest.config.ts",
     "vitest.extend.ts",

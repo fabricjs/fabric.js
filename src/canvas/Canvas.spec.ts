@@ -19,6 +19,8 @@ import {
   Path,
   version,
 } from '../../fabric';
+import TEST_IMAGE from '../../test/fixtures/test_image.gif';
+import { isJSDOM } from '../../vitest.extend';
 
 const EMPTY_JSON = '{"version":"' + version + '","objects":[]}';
 
@@ -130,15 +132,15 @@ describe('Canvas', () => {
       const canvas = new Canvas(undefined, {
         allowTouchScrolling: false,
       });
-      const touch = {
+      const touch = new Touch({
         clientX: 10,
         clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      };
+      });
       const evt = new TouchEvent('touchstart', {
-        touches: [touch as unknown as Touch],
-        changedTouches: [touch as unknown as Touch],
+        touches: [touch],
+        changedTouches: [touch],
       });
       evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
@@ -148,15 +150,15 @@ describe('Canvas', () => {
       const canvas = new Canvas(undefined, {
         allowTouchScrolling: true,
       });
-      const touch = {
+      const touch = new Touch({
         clientX: 10,
         clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      };
+      });
       const evt = new TouchEvent('touchstart', {
-        touches: [touch as unknown as Touch],
-        changedTouches: [touch as unknown as Touch],
+        touches: [touch],
+        changedTouches: [touch],
       });
       evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
@@ -167,15 +169,15 @@ describe('Canvas', () => {
         allowTouchScrolling: true,
         isDrawingMode: true,
       });
-      const touch = {
+      const touch = new Touch({
         clientX: 10,
         clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      };
+      });
       const evt = new TouchEvent('touchstart', {
-        touches: [touch as unknown as Touch],
-        changedTouches: [touch as unknown as Touch],
+        touches: [touch],
+        changedTouches: [touch],
       });
       evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
@@ -193,15 +195,15 @@ describe('Canvas', () => {
       });
       canvas.add(rect);
       canvas.setActiveObject(rect);
-      const touch = {
+      const touch = new Touch({
         clientX: 10,
         clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      };
+      });
       const evt = new TouchEvent('touchstart', {
-        touches: [touch as unknown as Touch],
-        changedTouches: [touch as unknown as Touch],
+        touches: [touch],
+        changedTouches: [touch],
       });
       evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
@@ -219,40 +221,40 @@ describe('Canvas', () => {
       });
       canvas.add(rect);
       canvas.setActiveObject(rect);
-      const touch = {
+      const touch = new Touch({
         clientX: 10,
         clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      };
+      });
       const evt = new TouchEvent('touchstart', {
-        touches: [touch as unknown as Touch],
-        changedTouches: [touch as unknown as Touch],
+        touches: [touch],
+        changedTouches: [touch],
       });
       evt.preventDefault = vi.fn();
       canvas._onTouchStart(evt);
       expect(evt.preventDefault).not.toHaveBeenCalled();
     });
     test('dispose after _onTouchStart', () => {
-      const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+      const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
       const canvas = new Canvas(undefined, {
         allowTouchScrolling: true,
         isDrawingMode: true,
       });
-      const touch = {
+      const touch = new Touch({
         clientX: 10,
         clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      };
+      });
       const evtStart = new TouchEvent('touchstart', {
-        touches: [touch as unknown as Touch],
-        changedTouches: [touch as unknown as Touch],
+        touches: [touch],
+        changedTouches: [touch],
       });
       canvas._onTouchStart(evtStart);
       const evtEnd = new TouchEvent('touchend', {
         touches: [],
-        changedTouches: [touch as unknown as Touch],
+        changedTouches: [touch],
       });
       canvas._onTouchEnd(evtEnd);
       // @ts-expect-error -- private method
@@ -1680,7 +1682,7 @@ describe('Canvas', () => {
           globalCompositeOperation: 'source-over',
           skewX: 0,
           skewY: 0,
-          src: '../../test/fixtures/test_image.gif',
+          src: isJSDOM() ? 'test_image.gif' : TEST_IMAGE,
           filters: [],
           crossOrigin: '',
         },

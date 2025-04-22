@@ -3,6 +3,7 @@
 ## [next]
 
 - Chore() more qunit post cleanup [#10569](https://github.com/fabricjs/fabric.js/pull/10569)
+- feat(tests): add chromium browser mode for unit tests [#10568](https://github.com/fabricjs/fabric.js/pull/10568)
 - chore(): update playwright [#10564](https://github.com/fabricjs/fabric.js/pull/10564)
 - chore(): update vitest [#10565](https://github.com/fabricjs/fabric.js/pull/10565)
 - chore(tests): Remove old unit test harness [#10567](https://github.com/fabricjs/fabric.js/pull/10567)

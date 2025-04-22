@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type -- augmenting vitest matchers */
 import 'vitest';
 import type { TMat2D } from './src/typedefs';
 import type { CloneDeepWithCustomizer } from 'lodash';

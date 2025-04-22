@@ -1,17 +1,13 @@
 import { expect, chai } from 'vitest';
 
 import { cloneDeepWith } from 'lodash';
-import { FabricObject } from './src/shapes/Object/Object';
+import type { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
 import type { FabricImage } from './dist-extensions';
 
 const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
 const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
-
-export function isJSDOM(): boolean {
-  return 'jsdom' in globalThis;
-}
 
 function basename(link: string) {
   return link.split(/[\\/]/).pop()?.replace(/"/gm, '') || '';
@@ -25,6 +21,21 @@ function replaceLinks(value: string) {
 
 function sanitizeSVG(value: string) {
   return replaceLinks(value).replace(SVG_RE, 'SVGID');
+}
+
+function looksLikeFabricObject(val: unknown): val is FabricObject {
+  return (
+    !!val &&
+    typeof val === 'object' &&
+    // all FabricObjects implement these three members
+    typeof (val as any).toObject === 'function' &&
+    typeof (val as any).render === 'function' &&
+    typeof (val as any).constructor?.type === 'string'
+  );
+}
+
+export function isJSDOM(): boolean {
+  return 'jsdom' in globalThis;
 }
 
 export const roundSnapshotOptions = {
@@ -49,17 +60,15 @@ chai.util.addMethod(
     }: ObjectOptions = {},
     hint?: string,
   ) {
-    let snap: Record<string, unknown>;
     const received = chai.util.flag(this, 'object');
+    let snap: Record<string, unknown> = received;
 
-    if (received instanceof FabricObject) {
+    if (looksLikeFabricObject(received)) {
       const restore = received.includeDefaultValues;
       if (typeof includeDefaultValues === 'boolean')
         received.includeDefaultValues = includeDefaultValues;
       snap = received.toObject();
       received.includeDefaultValues = restore;
-    } else {
-      snap = received;
     }
     delete snap.version;
 
