@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(TS): remove @ts-nocheck in straighten.ts [#10572](https://github.com/fabricjs/fabric.js/pull/10572)
 - refactor(tests): move svg export visual tests to playwright [#10575](https://github.com/fabricjs/fabric.js/pull/10575)
 - ci(): Modify test run action [#10570](https://github.com/fabricjs/fabric.js/pull/10570)
 - Chore() more qunit post cleanup [#10569](https://github.com/fabricjs/fabric.js/pull/10569)
