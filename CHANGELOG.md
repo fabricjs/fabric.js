@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move svg export visual tests to playwright [#10575](https://github.com/fabricjs/fabric.js/pull/10575)
 - ci(): Modify test run action [#10570](https://github.com/fabricjs/fabric.js/pull/10570)
 - Chore() more qunit post cleanup [#10569](https://github.com/fabricjs/fabric.js/pull/10569)
 - feat(tests): add chromium browser mode for unit tests [#10568](https://github.com/fabricjs/fabric.js/pull/10568)
