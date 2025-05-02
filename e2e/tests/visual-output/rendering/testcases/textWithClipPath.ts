@@ -1,4 +1,4 @@
-import type { renderTestType } from '../renderingCases';
+import type { renderTestType } from '../../../types';
 
 export const selectedTextWithClipPath: renderTestType = {
   size: [450, 450],
