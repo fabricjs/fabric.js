@@ -31,17 +31,38 @@ export const escapeXml = (string: string): string =>
  */
 export const graphemeSplit = (textstring: string): string[] => {
   const graphemes = [];
-  for (let i = 0, chr; i < textstring.length; i++) {
+  for (let i = 0, chr: string | false, lastChr: string | undefined; i < textstring.length; i++) {
     if ((chr = getWholeChar(textstring, i)) === false) {
       continue;
     }
+
+    // On first char do regular
+    if(lastChr === undefined) {
+      graphemes.push(chr as string);
+      lastChr = chr;
+      continue;
+    }
+
+    // Join two regional indicator symbols in case it represents flag emoji.
+    const charCode = chr.codePointAt(0);
+    if(charCode >= 0x1F1E6 && charCode <= 0x1F1FF) {
+      const lastCharCode = lastChr.codePointAt(0);
+      if(lastCharCode >= 0x1F1E6 && lastCharCode <= 0x1F1FF) {
+        graphemes.push(graphemes.pop() + chr);
+        lastChr = undefined;
+        continue;
+      }
+    }
+
+    // Do regular
     graphemes.push(chr as string);
+    lastChr = chr;
   }
   return graphemes;
 };
 
 // taken from mdn in the charAt doc page.
-const getWholeChar = (str: string, i: number): string | boolean => {
+const getWholeChar = (str: string, i: number): string | false => {
   const code = str.charCodeAt(i);
   if (isNaN(code)) {
     return ''; // Position not found

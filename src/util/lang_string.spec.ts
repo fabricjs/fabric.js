@@ -7,6 +7,10 @@ describe('lang_string', () => {
       expect(graphemeSplit('foo')).toEqual(['f', 'o', 'o']);
       expect(graphemeSplit('f🙂o')).toEqual(['f', '🙂', 'o']);
     });
+
+    it('correctly splits strings including flag emojis into graphmes', () => {
+      expect(graphemeSplit('f🇱🇹🇱🇹o')).toEqual(['f', '🇱🇹', '🇱🇹', 'o']);
+    });
   });
 
   describe('string.escapeXml', () => {
