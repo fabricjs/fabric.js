@@ -42,34 +42,59 @@ describe('text imperative changes', () => {
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars', async () => {
+  it('insertChars', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab', undefined, 1);
     expect(iText.text).toBe('tabest');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars and removes chars', async () => {
+  it('insertChars and removes chars', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab', undefined, 1, 2);
     expect(iText.text).toBe('tabst');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars and removes chars', async () => {
+  it('insertChars and removes chars', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab', undefined, 1, 4);
     expect(iText.text).toBe('tab');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars handles new lines correctly', async () => {
+  it('insertChars handles new lines correctly', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab\n\n', undefined, 1);
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars can accept some style for the new text', async () => {
+  it('insertChars can accept some style for the new text', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars(
       'ab\n\na',
