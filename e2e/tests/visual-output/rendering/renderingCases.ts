@@ -5,6 +5,7 @@
 import { selectedTextWithClipPath } from './testcases/textWithClipPath';
 import { renderTestType } from '../../types';
 import { zSvgExport } from './testcases/z-svg-export';
+import { dataURLExports } from './testcases/to-data-url';
 
 const emptyTest: renderTestType = {
   size: [450, 220],
@@ -219,6 +220,7 @@ export const renderTests: renderTestType[] = [
   },
   selectedTextWithClipPath,
   ...zSvgExport,
+  ...dataURLExports,
 ];
 
 // function polygonWithStroke(canvas, callback) {
