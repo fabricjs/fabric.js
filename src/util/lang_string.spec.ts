@@ -11,6 +11,10 @@ describe('lang_string', () => {
     it('correctly splits strings including flag emojis into graphmes', () => {
       expect(graphemeSplit('f🇱🇹🇱🇹o')).toEqual(['f', '🇱🇹', '🇱🇹', 'o']);
     });
+
+    it('correctly splits strings including new emojis into graphmes', () => {
+      expect(graphemeSplit('f🧚🏿‍♂️o')).toEqual(['f', '🧚🏿‍♂️', 'o']);
+    });
   });
 
   describe('string.escapeXml', () => {

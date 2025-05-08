@@ -30,6 +30,17 @@ export const escapeXml = (string: string): string =>
  * @return {Array} array containing the graphemes
  */
 export const graphemeSplit = (textstring: string): string[] => {
+  if ('Intl' in window && 'Segmenter' in Intl) {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(segment => segment.segment);
+  }
+
+  //Fallback
+  return _graphemeSplit(textstring);
+};
+
+const _graphemeSplit = (textstring: string): string[] => {
   const graphemes: string[] = [];
   for (let i = 0, chr: string | false, lastChr: string | undefined; i < textstring.length; i++) {
     if ((chr = getWholeChar(textstring, i)) === false) {
@@ -37,7 +48,7 @@ export const graphemeSplit = (textstring: string): string[] => {
     }
 
     // On first char do regular
-    if(lastChr === undefined) {
+    if (lastChr === undefined) {
       graphemes.push(chr as string);
       lastChr = chr;
       continue;
@@ -45,9 +56,9 @@ export const graphemeSplit = (textstring: string): string[] => {
 
     // Join two regional indicator symbols in case it represents flag emoji.
     const charCode = chr.codePointAt(0);
-    if(charCode !== undefined && charCode >= 0x1F1E6 && charCode <= 0x1F1FF) {
+    if (charCode !== undefined && charCode >= 0x1F1E6 && charCode <= 0x1F1FF) {
       const lastCharCode = lastChr.codePointAt(0);
-      if(lastCharCode !== undefined && lastCharCode >= 0x1F1E6 && lastCharCode <= 0x1F1FF) {
+      if (lastCharCode !== undefined && lastCharCode >= 0x1F1E6 && lastCharCode <= 0x1F1FF) {
         graphemes.push(graphemes.pop() + chr);
         lastChr = undefined;
         continue;
