@@ -3,6 +3,7 @@
 ## [next]
 
 - feat(tests): add firefox to vitest browser tests [#10571](https://github.com/fabricjs/fabric.js/pull/10571)
+- refactor(tests): move to data url tests from qunit to playwright [#10581](https://github.com/fabricjs/fabric.js/pull/10581)
 - chore(TS): remove @ts-nocheck in straighten.ts [#10572](https://github.com/fabricjs/fabric.js/pull/10572)
 - refactor(tests): move svg export visual tests to playwright [#10575](https://github.com/fabricjs/fabric.js/pull/10575)
 - ci(): Modify test run action [#10570](https://github.com/fabricjs/fabric.js/pull/10570)
