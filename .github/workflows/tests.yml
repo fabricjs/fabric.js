@@ -116,7 +116,7 @@ jobs:
       - name: Install Playwright Browsers ${{matrix.browser}}
         run: npx playwright install --with-deps ${{matrix.browser}}
       - name: Run Vitest unit test
-        run: npm run ${{matrix.browser}}
+        run: npm run test:vitest:${{matrix.browser}}
   vitest-node-18:
     name: Vitest tests node 18
     runs-on: ubuntu-24.04
