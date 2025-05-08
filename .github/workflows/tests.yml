@@ -101,24 +101,22 @@ jobs:
           path: ./.nyc_output/*.json
           include-hidden-files: true
   vitest-browser:
-    name: Vitest tests Chromium
+    name: Vitest tests ${{matrix.browser}}
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        browser: [chromium, firefox]
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
           node-version: 22.x
           install-system-deps: false
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright Browsers ${{matrix.browser}}
+        run: npx playwright install --with-deps ${{matrix.browser}}
       - name: Run Vitest unit test
-        run: npm run test:vitest:chromium
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-vitest
-          path: ./.nyc_output/*.json
-          include-hidden-files: true
+        run: npm run test:vitest:${{matrix.browser}}
   vitest-node-18:
     name: Vitest tests node 18
     runs-on: ubuntu-24.04
@@ -130,12 +128,6 @@ jobs:
           install-system-deps: false
       - name: Run Vitest unit test
         run: npm run test:vitest
-      - name: Upload test coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-vitest
-          path: ./.nyc_output/*.json
-          include-hidden-files: true
   e2e:
     needs: [prime-build]
     name: Playwright tests
