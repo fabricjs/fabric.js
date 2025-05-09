@@ -402,14 +402,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * Override at will
    */
   protected findDragTargets(e: DragEvent) {
-    this.targets = [];
+    const targets: FabricObject[] = [];
     const target = this._searchPossibleTargets(
       this._objects,
       this.getViewportPoint(e),
+      targets,
     );
     return {
       target,
-      targets: [...this.targets],
+      targets,
     };
   }
 
