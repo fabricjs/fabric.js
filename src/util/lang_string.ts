@@ -33,7 +33,9 @@ export const escapeXml = (string: string): string =>
  */
 export const graphemeSplit = (textstring: string): string[] => {
   if ('Intl' in getFabricWindow() && 'Segmenter' in Intl) {
-    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    const segmenter = new Intl.Segmenter(undefined, {
+      granularity: 'grapheme',
+    });
     const segments = segmenter.segment(textstring);
     return Array.from(segments).map(({ segment }) => segment);
   }
