@@ -26,12 +26,18 @@ export const escapeXml = (string: string): string =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-const segmenter =
-  'Intl' in getFabricWindow() &&
-  'Segmenter' in Intl &&
-  new Intl.Segmenter(undefined, {
-    granularity: 'grapheme',
-  });
+let segmenter: Intl.Segmenter;
+
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter = 'Intl' in getFabricWindow() &&
+      'Segmenter' in Intl &&
+      new Intl.Segmenter(undefined, {
+        granularity: 'grapheme',
+      });
+  }
+  return segmenter;
+}
 
 /**
  * Divide a string in the user perceived single units
@@ -39,7 +45,7 @@ const segmenter =
  * @return {Array} array containing the graphemes
  */
 export const graphemeSplit = (textstring: string): string[] => {
-  if (segmenter) {
+  if (getSegmenter()) {
     const segments = segmenter.segment(textstring);
     return Array.from(segments).map(({ segment }) => segment);
   }
