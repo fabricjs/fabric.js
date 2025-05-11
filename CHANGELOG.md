@@ -2,7 +2,7 @@
 
 ## [6.6.5]
 
-- feat(Text): Support for intl.segmenter in fabric.Text
+- feat(Text): Support for intl.segmenter in fabric.Text [#10595](https://github.com/fabricjs/fabric.js/pull/10595)
 
 ## [6.6.4]
 
@@ -11,7 +11,6 @@
 ## [6.6.3]
 
 - docs(): Fixed JSDOCS for astro and typedoc
-- fix: flag emojis in text [#10584](https://github.com/fabricjs/fabric.js/pull/10584)
 
 ## [6.6.2]
 
