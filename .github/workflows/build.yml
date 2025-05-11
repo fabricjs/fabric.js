@@ -2,7 +2,7 @@ name: '🩺'
 
 on:
   pull_request:
-    branches: [master]
+    branches: [master, 6.x]
     paths-ignore: [CHANGELOG.md]
 
 jobs:

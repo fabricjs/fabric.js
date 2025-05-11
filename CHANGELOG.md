@@ -1,8 +1,12 @@
 # Changelog
 
+## [6.6.5]
+
+- feat(Text): Support for intl.segmenter in fabric.Text [#10595](https://github.com/fabricjs/fabric.js/pull/10595)
+
 ## [6.6.4]
 
-- chore() properly updated version number
+- chore(): properly updated version number
 
 ## [6.6.3]
 
