@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { capitalize, escapeXml, graphemeSplit } from './lang_string';
 
 describe('lang_string', () => {
