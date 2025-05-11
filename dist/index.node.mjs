@@ -461,7 +461,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.6.4";
+var version = "6.6.5";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -10324,6 +10324,15 @@ const capitalize = function (string) {
  * @return {String} Escaped version of a string
  */
 const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+let segmenter;
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
+      granularity: 'grapheme'
+    });
+  }
+  return segmenter;
+};
 
 /**
  * Divide a string in the user perceived single units
@@ -10331,6 +10340,21 @@ const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;'
  * @return {Array} array containing the graphemes
  */
 const graphemeSplit = textstring => {
+  segmenter || getSegmenter();
+  if (segmenter) {
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(_ref => {
+      let {
+        segment
+      } = _ref;
+      return segment;
+    });
+  }
+
+  //Fallback
+  return graphemeSplitImpl(textstring);
+};
+const graphemeSplitImpl = textstring => {
   const graphemes = [];
   for (let i = 0, chr; i < textstring.length; i++) {
     if ((chr = getWholeChar(textstring, i)) === false) {
