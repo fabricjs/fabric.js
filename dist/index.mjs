@@ -1,9 +1,9 @@
 function _defineProperty(e, r, t) {
   return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
     value: t,
-    enumerable: true,
-    configurable: true,
-    writable: true
+    enumerable: !0,
+    configurable: !0,
+    writable: !0
   }) : e[r] = t, e;
 }
 function ownKeys(e, r) {
@@ -19,7 +19,7 @@ function ownKeys(e, r) {
 function _objectSpread2(e) {
   for (var r = 1; r < arguments.length; r++) {
     var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys(Object(t), true).forEach(function (r) {
+    r % 2 ? ownKeys(Object(t), !0).forEach(function (r) {
       _defineProperty(e, r, t[r]);
     }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) {
       Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
@@ -58,7 +58,7 @@ function _toPrimitive(t, r) {
   if ("object" != typeof t || !t) return t;
   var e = t[Symbol.toPrimitive];
   if (void 0 !== e) {
-    var i = e.call(t, r);
+    var i = e.call(t, r || "default");
     if ("object" != typeof i) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
@@ -405,7 +405,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.6.4";
+var version = "6.6.5";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -8153,10 +8153,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @returns {Promise<FabricObject>}
    */
   static _fromObject(_ref3) {
-    let {
-        type
-      } = _ref3,
-      serializedObjectOptions = _objectWithoutProperties(_ref3, _excluded$e);
+    let serializedObjectOptions = _objectWithoutProperties(_ref3, _excluded$e);
     let _ref4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
       {
         extraParam
@@ -10268,6 +10265,15 @@ const capitalize = function (string) {
  * @return {String} Escaped version of a string
  */
 const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+let segmenter;
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
+      granularity: 'grapheme'
+    });
+  }
+  return segmenter;
+};
 
 /**
  * Divide a string in the user perceived single units
@@ -10275,6 +10281,21 @@ const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;'
  * @return {Array} array containing the graphemes
  */
 const graphemeSplit = textstring => {
+  segmenter || getSegmenter();
+  if (segmenter) {
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(_ref => {
+      let {
+        segment
+      } = _ref;
+      return segment;
+    });
+  }
+
+  //Fallback
+  return graphemeSplitImpl(textstring);
+};
+const graphemeSplitImpl = textstring => {
   const graphemes = [];
   for (let i = 0, chr; i < textstring.length; i++) {
     if ((chr = getWholeChar(textstring, i)) === false) {
@@ -11201,10 +11222,7 @@ class LayoutManager {
       context
     });
     if (type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
-      const {
-          strategy: _
-        } = context,
-        tricklingContext = _objectWithoutProperties(context, _excluded$b);
+      const tricklingContext = _objectWithoutProperties(context, _excluded$b);
       // traverse the tree
       target.forEachObject(object => object.layoutManager && object.layoutManager.performLayout(_objectSpread2(_objectSpread2({}, tricklingContext), {}, {
         bubbles: false,
@@ -12089,7 +12107,7 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
     _rx *= s;
     _ry *= s;
   } else {
-    root = (large === sweep ? -1 : 1.0) * Math.sqrt(pl / (rx2 * py2 + ry2 * px2));
+    root = (large === sweep ? -1.0 : 1.0) * Math.sqrt(pl / (rx2 * py2 + ry2 * px2));
   }
   const cx = root * _rx * py / _ry,
     cy = -root * _ry * px / _rx,
@@ -18332,12 +18350,6 @@ class Polyline extends FabricObject {
   static async fromElement(element, options, cssRules) {
     const points = parsePointsAttribute(element.getAttribute('points')),
       _parseAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules),
-      // we omit left and top to instruct the constructor to position the object using the bbox
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      {
-        left,
-        top
-      } = _parseAttributes,
       parsedAttributes = _objectWithoutProperties(_parseAttributes, _excluded$4);
     return new this(points, _objectSpread2(_objectSpread2({}, parsedAttributes), options));
   }
@@ -25781,9 +25793,6 @@ class BaseFilter {
    */
   constructor() {
     let _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      {
-        type
-      } = _ref,
       options = _objectWithoutProperties(_ref, _excluded$1);
     Object.assign(this, this.constructor.defaults, options);
   }
@@ -26068,10 +26077,7 @@ class BaseFilter {
     return this.toObject();
   }
   static async fromObject(_ref2, _options) {
-    let {
-        type
-      } = _ref2,
-      filterOptions = _objectWithoutProperties(_ref2, _excluded2);
+    let filterOptions = _objectWithoutProperties(_ref2, _excluded2);
     return new this(filterOptions);
   }
 }
@@ -26497,7 +26503,7 @@ class Blur extends BaseFilter {
     // load first canvas
     ctx1.putImageData(imageData, 0, 0);
     ctx2.clearRect(0, 0, width, height);
-    for (i = -15; i <= nSamples; i++) {
+    for (i = -nSamples; i <= nSamples; i++) {
       random = (Math.random() - 0.5) / 4;
       percent = i / nSamples;
       j = blur * percent * width + random;
@@ -26507,7 +26513,7 @@ class Blur extends BaseFilter {
       ctx2.globalAlpha = 1;
       ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
     }
-    for (i = -15; i <= nSamples; i++) {
+    for (i = -nSamples; i <= nSamples; i++) {
       random = (Math.random() - 0.5) / 4;
       percent = i / nSamples;
       j = blur * percent * height + random;
