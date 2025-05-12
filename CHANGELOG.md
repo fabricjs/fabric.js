@@ -2,8 +2,9 @@
 
 ## [next]
 
+- refactor(tests): move text path tests from qunit to playwright [#10590](https://github.com/fabricjs/fabric.js/pull/10590)
 - chore(): Deprecate line [#10598](https://github.com/fabricjs/fabric.js/pull/10598)
-- fix: flag emojis in text [#10584](https://github.com/fabricjs/fabric.js/pull/10584)
+- feat(): Add support for Intl.segmenter [#10584](https://github.com/fabricjs/fabric.js/pull/10584)
 - ci(): Add firefox vitest to ci [#10586](https://github.com/fabricjs/fabric.js/pull/10586)
 - feat(tests): add firefox to vitest browser tests [#10571](https://github.com/fabricjs/fabric.js/pull/10571)
 - refactor(tests): move to data url tests from qunit to playwright [#10581](https://github.com/fabricjs/fabric.js/pull/10581)
