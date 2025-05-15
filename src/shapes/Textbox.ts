@@ -431,6 +431,7 @@ export class Textbox<
     reservedSpace = 0,
   ): string[][] {
     const additionalSpace = this._getWidthOfCharSpacing(),
+      splitByGrapheme = this.splitByGrapheme,
       graphemeLines = []
 
     let lineWidth = 0,
@@ -458,7 +459,7 @@ export class Textbox<
 
       if (!lineJustStarted && lineWidth - additionalSpace > maxWidth) {
         // ignore only one space at the line end
-        if (line[line.length -1] === ' ')
+        if (!splitByGrapheme && line[line.length -1] === ' ')
           line.pop();
         graphemeLines.push(line);
         line = [];
@@ -468,7 +469,7 @@ export class Textbox<
 
       if (lineJustStarted) {
         // ignore only one space at the line start
-        if (word.length > 0 && word[0] === ' ') {
+        if (!splitByGrapheme && word.length > 0 && word[0] === ' ') {
           word.shift();
           lineWidth = lineWidth - this._measureWord([' '], lineIndex, offset - word.length) - additionalSpace;
         }
