@@ -8,9 +8,9 @@ import { beforeRenderTest } from '../../test';
 
 beforeRenderTest(
   (canvas) => {
-    const boundTests = renderTests.map((renderTest) => {
+    return renderTests.map((renderTest) => {
       return {
-        boundFunction: async () => {
+        async boundFunction() {
           canvas.clear();
           canvas.setZoom(1);
           canvas.backgroundColor = 'white';
@@ -18,12 +18,11 @@ beforeRenderTest(
             width: renderTest.size[0],
             height: renderTest.size[1],
           });
-          await renderTest.renderFunction(canvas, fabric);
+          return await renderTest.renderFunction(canvas, fabric);
         },
         title: renderTest.title,
       };
     });
-    return boundTests;
   },
   {
     enableRetinaScaling: false,

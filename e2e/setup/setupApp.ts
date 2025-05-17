@@ -8,6 +8,7 @@ export default () => {
   test.beforeEach(async ({ page }, { file }) => {
     await page.addInitScript(() => {
       globalThis.getAssetName = (name) => `/test/visual/assets/${name}`;
+      globalThis.getFixtureName = (name) => `/test/fixtures/${name}`;
     });
 
     await page.goto('/e2e/site');
