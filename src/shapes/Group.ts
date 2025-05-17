@@ -35,6 +35,7 @@ import {
 import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 import type { FitContentLayout } from '../LayoutManager';
 import type { DrawContext } from './Object/Object';
+import { IText } from './IText/IText';
 
 /**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
@@ -512,6 +513,29 @@ export class Group
       }
     }
     this._drawClipPath(ctx, this.clipPath, context);
+  }
+
+  /**
+   * @override
+   */
+  renderCache(options?: any) {
+    super.renderCache(options);
+
+    const isITextAndHasSelection = (obj: FabricObject): obj is IText =>
+      obj instanceof IText &&
+      obj.isEditing &&
+      obj.selectionStart !== obj.selectionEnd;
+
+    // If there's an active IText, ensure its selection gets rendered
+    if (this._objects.some(isITextAndHasSelection) && this.canvas) {
+      this.canvas.contextTopDirty = true;
+
+      this._objects.forEach((obj) => {
+        if (isITextAndHasSelection(obj)) {
+          obj.renderCursorOrSelection();
+        }
+      });
+    }
   }
 
   /**
