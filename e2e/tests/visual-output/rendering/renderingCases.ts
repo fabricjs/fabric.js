@@ -7,6 +7,7 @@ import { renderTestType } from '../../types';
 import { zSvgExport } from './testcases/z-svg-export';
 import { dataURLExports } from './testcases/to-data-url';
 import { textPathTests } from './testcases/text-path';
+import { controlsRenderingTests } from './testcases/controls-rendering';
 import { clipPathRenderingTests } from './testcases/clip-path';
 
 const emptyTest: renderTestType = {
@@ -224,6 +225,7 @@ export const renderTests: renderTestType[] = [
   ...zSvgExport,
   ...dataURLExports,
   ...textPathTests,
+  ...controlsRenderingTests,
   ...clipPathRenderingTests,
 ];
 

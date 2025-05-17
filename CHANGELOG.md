@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move controls rendering test cases from qunit to playwright [#10605](https://github.com/fabricjs/fabric.js/pull/10605)
 - chore(tests): replace unmaintained http-server with vercels serve [#10603](https://github.com/fabricjs/fabric.js/pull/10603)
 - refactor(tests): move clip path tests from qunit to playwright [#10602](https://github.com/fabricjs/fabric.js/pull/10602)
 - chore(): run npm audit fix to fix a vulnerability report [#10599](https://github.com/fabricjs/fabric.js/pull/10599)
