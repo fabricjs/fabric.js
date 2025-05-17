@@ -268,6 +268,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
   /**
    * @private
+   * Used when the mouse cursor enter the canvas from outside
    * @param {Event} e Event object fired on mouseenter
    */
   private _onMouseEnter(e: TPointerEvent) {
@@ -277,7 +278,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // as a short term fix we are not firing this if we are currently transforming.
     // as a long term fix we need to separate the action of finding a target with the
     // side effects we added to it.
-    if (!this._currentTransform && !this.findTarget(e)) {
+    const { target } = this.findTarget(e);
+    // we fire the event only when there is no target, if there is a target, the specific
+    // target event will fire.
+    if (!this._currentTransform && !target) {
       this.fire('mouse:over', {
         e,
         ...getEventPoints(this, e),
@@ -359,12 +363,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {DragEvent} e
    */
   private _onDragEnd(e: DragEvent) {
+    const { targets } = this.findDragTargets(e);
     const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== NONE,
       dropTarget = didDrop ? this._activeObject : undefined,
       options = {
         e,
         target: this._dragSource as FabricObject,
-        subTargets: this.targets,
+        subTargets: targets,
         dragSource: this._dragSource as FabricObject,
         didDrop,
         dropTarget: dropTarget as FabricObject,
@@ -402,15 +407,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * Override at will
    */
   protected findDragTargets(e: DragEvent) {
-    const targets: FabricObject[] = [];
-    const target = this._searchPossibleTargets(
+    const { target, subTargets } = this._searchPossibleTargets(
       this._objects,
       this.getViewportPoint(e),
-      targets,
+      [],
     );
     return {
       target,
-      targets,
+      targets: subTargets,
     };
   }
 
@@ -484,10 +488,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragLeave(e: DragEvent) {
+    const { targets } = this.findDragTargets(e);
     const options = {
       e,
       target: this._draggedoverTarget,
-      subTargets: this.targets,
+      subTargets: targets,
       dragSource: this._dragSource,
     };
     this.fire('dragleave', options);
@@ -496,8 +501,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._fireEnterLeaveEvents(undefined, options);
     this._renderDragEffects(e, this._dragSource);
     this._dropTarget = undefined;
-    //  clear targets
-    this.targets = [];
     this._hoveredTargets = [];
   }
 
@@ -535,8 +538,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onContextMenu(e: TPointerEvent): false {
-    const target = this.findTarget(e),
-      subTargets = this.targets || [];
+    const { target, subTargets } = this.findTarget(e);
     const options = this._basicEventHandler('contextmenu:before', {
       e,
       target,
@@ -928,30 +930,31 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     extraData?: TEventsExtraData[T],
   ) {
     const target = this._target,
-      targets = this.targets || [],
+      subTargets = this._subTargets,
       options: CanvasEvents[`mouse:${T}`] = {
         e,
         target,
-        subTargets: targets,
+        subTargets,
         ...getEventPoints(this, e),
         transform: this._currentTransform,
-        ...(eventType === 'up:before' || eventType === 'up'
-          ? {
-              isClick: this._isClick,
-              currentTarget: this.findTarget(e),
-              // set by the preceding `findTarget` call
-              currentSubTargets: this.targets,
-            }
-          : {}),
         ...(eventType === 'down:before' || eventType === 'down'
           ? extraData
           : {}),
       } as CanvasEvents[`mouse:${T}`];
+    if (eventType === 'up:before' || eventType === 'up') {
+      const { target: currentTarget, subTargets: currentSubTargets } =
+        this.findTarget(e);
+      (options as CanvasEvents[`mouse:up`]).isClick = this._isClick;
+      (options as CanvasEvents[`mouse:up`]).currentTarget = currentTarget;
+      (options as CanvasEvents[`mouse:up`]).currentSubTargets =
+        currentSubTargets;
+    }
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
-    for (let i = 0; i < targets.length; i++) {
-      targets[i] !== target && targets[i].fire(`mouse${eventType}`, options);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i] !== target &&
+        subTargets[i].fire(`mouse${eventType}`, options);
     }
   }
 
@@ -1137,9 +1140,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       undefined,
       this.viewportTransform,
     );
+    const { target, subTargets } = this.findTarget(e);
     this._target = this._currentTransform
       ? this._currentTransform.target
-      : this.findTarget(e);
+      : target;
+    this._subTargets = subTargets;
   }
 
   /**
@@ -1176,9 +1181,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
       this.renderTop();
     } else if (!this._currentTransform) {
-      const target = this.findTarget(e);
-      this._setCursorFromEvent(e, target);
-      this._fireOverOutEvents(e, target);
+      this._setCursorFromEvent(e, this._target);
+      this._fireOverOutEvents(e, this._target);
     } else {
       this._transformObject(e);
     }
@@ -1196,7 +1200,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
     const _hoveredTarget = this._hoveredTarget,
       _hoveredTargets = this._hoveredTargets,
-      targets = this.targets,
+      targets = this._subTargets,
       length = Math.max(_hoveredTargets.length, targets.length);
 
     this.fireSyntheticInOutEvents('mouse', {
@@ -1213,7 +1217,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       });
     }
     this._hoveredTarget = target;
-    this._hoveredTargets = this.targets.concat();
+    this._hoveredTargets = this._subTargets.concat();
   }
 
   /**
@@ -1225,7 +1229,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _fireEnterLeaveEvents(target: FabricObject | undefined, data: DragEventData) {
     const draggedoverTarget = this._draggedoverTarget,
       _hoveredTargets = this._hoveredTargets,
-      targets = this.targets,
+      targets = this._subTargets,
       length = Math.max(_hoveredTargets.length, targets.length);
 
     this.fireSyntheticInOutEvents('drag', {
@@ -1381,7 +1385,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       if ((target as Group).subTargetCheck) {
         // hoverCursor should come from top-most subTarget,
         // so we walk the array backwards
-        this.targets
+        // TODO 2025: i think this shouldn't revert at all. add a test.
+        this._subTargets
           .concat()
           .reverse()
           .map((_target) => {
@@ -1437,10 +1442,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           const pointer = this.getViewportPoint(e);
           target =
             // first search active objects for a target to remove
-            this.searchPossibleTargets(prevActiveObjects, pointer) ||
+            this.searchPossibleTargets(prevActiveObjects, pointer).target ||
             //  if not found, search under active selection for a target to add
             // `prevActiveObjects` will be searched but we already know they will not be found
-            this.searchPossibleTargets(this._objects, pointer);
+            this.searchPossibleTargets(this._objects, pointer).target;
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;
@@ -1450,7 +1455,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           // `target` is part of active selection => remove it
           activeObject.remove(target);
           this._hoveredTarget = target;
-          this._hoveredTargets = [...this.targets];
+          this._hoveredTargets = [...this._subTargets];
           // if after removing an object we are left with one only...
           if (activeObject.size() === 1) {
             // activate last remaining object
@@ -1461,7 +1466,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           // `target` isn't part of active selection => add it
           activeObject.multiSelectAdd(target);
           this._hoveredTarget = activeObject;
-          this._hoveredTargets = [...this.targets];
+          this._hoveredTargets = [...this._subTargets];
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {

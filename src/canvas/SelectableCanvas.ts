@@ -211,12 +211,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare fireMiddleClick: boolean;
 
   /**
-   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost nested subTarget
-   * @type FabricObject[]
-   */
-  targets: FabricObject[] = [];
-
-  /**
    * Keep track of the hovered target
    * @type FabricObject | null
    * @private
@@ -293,6 +287,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @type {FabricObject}
    */
   declare protected _target?: FabricObject;
+
+  /**
+   * During a mouse event we may need the subTargets multiple times in multiple functions.
+   * _subTargets holds a reference to the target that is valid for the event
+   * lifespan. Every fabricJS mouse event create and delete the cache every time
+   * @type {FabricObject}
+   */
+  declare protected _subTargets: FabricObject[];
 
   static ownDefaults = canvasDefaults;
 

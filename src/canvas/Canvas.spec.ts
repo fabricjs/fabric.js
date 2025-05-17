@@ -1189,22 +1189,21 @@ describe('Canvas', () => {
   it('finds target objects correctly with findTarget', () => {
     expect(canvas.findTarget).toBeTypeOf('function');
     const rect = makeRect({ left: 0, top: 0 });
-    let target;
     canvas.add(rect);
 
-    target = canvas.findTarget({
+    const { target } = canvas.findTarget({
       clientX: 5,
       clientY: 5,
       target: canvas.upperCanvasEl,
     } as unknown as TPointerEvent);
     expect(target, 'Should return the rect').toBe(rect);
 
-    target = canvas.findTarget({
+    const { target: target2 } = canvas.findTarget({
       clientX: 30,
       clientY: 30,
       target: canvas.upperCanvasEl,
     } as unknown as TPointerEvent);
-    expect(target, 'Should not find target').toBeUndefined();
+    expect(target2, 'Should not find target').toBeUndefined();
 
     canvas.remove(rect);
   });

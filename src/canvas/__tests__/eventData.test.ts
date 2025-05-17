@@ -291,12 +291,10 @@ describe('Event targets', () => {
     };
 
     const findTarget = (canvas: Canvas, ev?: MouseEventInit) => {
-      const target = canvas.findTarget(
+      const { target, subTargets } = canvas.findTarget(
         mockEvent({ canvas, clientX: 0, clientY: 0, ...ev }),
       );
-      const targets = canvas.targets;
-      canvas.targets = [];
-      return { target, targets };
+      return { target, targets: subTargets };
     };
 
     test.skip.each([true, false])(
