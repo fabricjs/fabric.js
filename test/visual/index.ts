@@ -1,5 +1,3 @@
-import './clippath';
-import './control_rendering';
 import './freedraw';
 import './generic_rendering';
 import './group_layout';
