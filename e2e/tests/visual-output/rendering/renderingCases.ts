@@ -9,6 +9,7 @@ import { dataURLExports } from './testcases/to-data-url';
 import { textPathTests } from './testcases/text-path';
 import { controlsRenderingTests } from './testcases/controls-rendering';
 import { clipPathRenderingTests } from './testcases/clip-path';
+import { groupLayoutTests } from './testcases/group-layout';
 
 const emptyTest: renderTestType = {
   size: [450, 220],
@@ -227,6 +228,7 @@ export const renderTests: renderTestType[] = [
   ...textPathTests,
   ...controlsRenderingTests,
   ...clipPathRenderingTests,
+  ...groupLayoutTests,
 ];
 
 // function polygonWithStroke(canvas, callback) {
