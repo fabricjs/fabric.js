@@ -710,9 +710,9 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {FabricObject | null} the target found
    */
   findTarget(e: TPointerEvent): FabricObject | undefined {
-    if (this.skipTargetFind) {
-      return undefined;
-    }
+    // if (this.skipTargetFind) {
+    //   return undefined;
+    // }
 
     const pointer = this.getViewportPoint(e),
       activeObject = this._activeObject,
@@ -722,11 +722,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const activeObjectControl =
       activeObject && activeObject.findControl(pointer, isTouchEvent(e));
 
-    const subTargets: FabricObject[] = [];
-    const naturalTarget = this.searchPossibleTargets(
+    const pointerSubTarget: FabricObject[] = [];
+    const pointerTarget = this.searchPossibleTargets(
       this._objects,
       pointer,
-      subTargets,
+      pointerSubTarget,
     );
 
     const activeObjectSubTargets: FabricObject[] = [];
@@ -734,53 +734,29 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const activeObjectIsInTarget =
       activeObject &&
       activeObject ===
-        this.searchPossibleTargets(
+        this._searchPossibleTargets(
           [activeObject],
           pointer,
           activeObjectSubTargets,
         );
+    const isActiveSelectionEmptySpace =
+      isActiveSelection &&
+      activeObjectIsInTarget &&
+      activeObjectSubTargets.length === 0;
+    const twoTargets =
+      activeObject && pointerTarget && pointerTarget !== activeObject;
+    const activeIsInFront =
+      twoTargets &&
+      (this.preserveObjectStacking ||
+        this._objects.indexOf(activeObject) >
+          this._objects.indexOf(pointerTarget));
+    const altSelectionPossible = isActiveSelectionEmptySpace && activeIsInFront;
 
-    if (activeObject && aObjects.length >= 1) {
-      if (activeObject.findControl(pointer, isTouchEvent(e))) {
-        // if we hit the corner of the active object, let's return that.
-        return activeObject;
-      } else if (
-        aObjects.length > 1 &&
-        // check pointer is over active selection and possibly perform `subTargetCheck`
-        this.searchPossibleTargets(
-          [activeObject],
-          pointer,
-          activeObjectSubTargets,
-        )
-      ) {
-        // active selection does not select sub targets like normal groups
-        return activeObject;
-      } else if (
-        activeObject === this.searchPossibleTargets([activeObject], pointer)
-      ) {
-        // active object is not an active selection
-        if (!this.preserveObjectStacking) {
-          return activeObject;
-        } else {
-          const subTargets = this.targets;
-          this.targets = [];
-          const target = this.searchPossibleTargets(this._objects, pointer);
-          if (
-            e[this.altSelectionKey as ModifierKey] &&
-            target &&
-            target !== activeObject
-          ) {
-            // alt selection: select active object even though it is not the top most target
-            // restore targets
-            this.targets = subTargets;
-            return activeObject;
-          }
-          return target;
-        }
-      }
-    }
-
-    return this.searchPossibleTargets(this._objects, pointer);
+    return {
+      altSelectionPossible,
+      activeObjectControl,
+      natur,
+    };
   }
 
   /**
