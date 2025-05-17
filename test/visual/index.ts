@@ -1,4 +1,3 @@
-import './clippath';
 import './control_rendering';
 import './freedraw';
 import './generic_rendering';
