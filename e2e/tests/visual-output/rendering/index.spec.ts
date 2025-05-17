@@ -14,6 +14,11 @@ test.describe('VISUAL RENDERING TESTS', () => {
     }
 
     test(testCase.title, async ({ page }, config) => {
+      const goldenName = testCase.golden || `${testCase.title}.png`;
+      const snapshotName = testCase.snapshotSuffix
+        ? [testCase.snapshotSuffix, goldenName]
+        : goldenName;
+
       if (testCase.disabled !== 'browser') {
         await test.step(`browser - ${testCase.title}`, async () => {
           // enable and disable this inside the loop
@@ -26,7 +31,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
             await new CanvasUtil(page).screenshot(),
             `browser snapshot`,
           ).toMatchSnapshot({
-            name: testCase.golden || `${testCase.title}.png`,
+            name: snapshotName,
             maxDiffPixelRatio: testCase.percentage,
           });
         });
@@ -48,7 +53,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
             buffer,
             `node snapshot should match browser snapshot`,
           ).toMatchSnapshot({
-            name: testCase.golden || `${testCase.title}.png`,
+            name: snapshotName,
             maxDiffPixelRatio: testCase.percentage,
           });
         });

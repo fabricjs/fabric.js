@@ -6,6 +6,7 @@ export type renderTestType = {
   size: [number, number];
   percentage: number;
   title: string;
+  snapshotSuffix?: string;
   golden: string;
   disabled?: 'node' | 'browser' | boolean;
   renderFunction: (canvas: Canvas, fabric: FabricNamespace) => Promise<void>;
