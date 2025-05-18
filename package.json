@@ -49,7 +49,7 @@
     "start": "npm run sandboxscript -- start",
     "export": "npm run cli -- website export",
     "build-tests": "rollup -c ./rollup.test.config.js",
-    "test:vitest": "vitest --run  --project unit-node",
+    "test:vitest": "vitest --run --project unit-node",
     "test:vitest:chromium": "vitest --run --project unit-chromium",
     "test:vitest:firefox": "vitest --run --project unit-firefox",
     "test:vitest:all": "vitest --run",
