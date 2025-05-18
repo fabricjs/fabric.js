@@ -11,6 +11,7 @@ import { controlsRenderingTests } from './testcases/controls-rendering';
 import { clipPathRenderingTests } from './testcases/clip-path';
 import { groupLayoutTests } from './testcases/group-layout';
 import { genericRenderingTests } from './testcases/generic-rendering';
+import { globalCompositeOperationTests } from './testcases/global-composite-operation';
 
 export const renderTests: renderTestType[] = [
   {
@@ -80,4 +81,5 @@ export const renderTests: renderTestType[] = [
   ...clipPathRenderingTests,
   ...groupLayoutTests,
   ...genericRenderingTests,
+  ...globalCompositeOperationTests,
 ];
