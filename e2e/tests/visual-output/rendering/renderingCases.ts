@@ -12,17 +12,6 @@ import { clipPathRenderingTests } from './testcases/clip-path';
 import { groupLayoutTests } from './testcases/group-layout';
 import { genericRenderingTests } from './testcases/generic-rendering';
 
-const emptyTest: renderTestType = {
-  size: [450, 220],
-  percentage: 0.05,
-  title: '',
-  golden: '*.png',
-  renderFunction: async function render(canvas, fabric) {
-    // put render code here
-  },
-};
-
-
 export const renderTests: renderTestType[] = [
   {
     size: [450, 220],
