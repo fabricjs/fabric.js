@@ -8,6 +8,10 @@ export type renderTestType = {
   title: string;
   snapshotSuffix?: string;
   golden: string;
+  only?: boolean;
   disabled?: 'node' | 'browser' | boolean;
-  renderFunction: (canvas: Canvas, fabric: FabricNamespace) => Promise<void>;
+  renderFunction: (
+    canvas: Canvas,
+    fabric: FabricNamespace,
+  ) => Promise<void | string>;
 };
