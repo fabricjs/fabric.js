@@ -28,7 +28,7 @@ const config: PlaywrightTestConfig = {
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   /* Do not update snapshot on CI */
   updateSnapshots: process.env.CI ? 'none' : 'missing',
   /* Configure snapshot names to be the same across platforms for CI */

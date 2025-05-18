@@ -9,6 +9,7 @@ import { dataURLExports } from './testcases/to-data-url';
 import { textPathTests } from './testcases/text-path';
 import { controlsRenderingTests } from './testcases/controls-rendering';
 import { clipPathRenderingTests } from './testcases/clip-path';
+import { groupLayoutTests } from './testcases/group-layout';
 import { genericRenderingTests } from './testcases/generic-rendering';
 
 export const renderTests: renderTestType[] = [
@@ -77,5 +78,6 @@ export const renderTests: renderTestType[] = [
   ...textPathTests,
   ...controlsRenderingTests,
   ...clipPathRenderingTests,
+  ...groupLayoutTests,
   ...genericRenderingTests,
 ];

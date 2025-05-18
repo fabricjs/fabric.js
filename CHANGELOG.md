@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move group layout tests from qunit to playwright [#10609](https://github.com/fabricjs/fabric.js/pull/10609)
 - refactor(tests): move generic rendering tests from qunit to playwright [#10608](https://github.com/fabricjs/fabric.js/pull/10608)
 - refactor(tests): move controls rendering test cases from qunit to playwright [#10605](https://github.com/fabricjs/fabric.js/pull/10605)
 - chore(tests): replace unmaintained http-server with vercels serve [#10603](https://github.com/fabricjs/fabric.js/pull/10603)
