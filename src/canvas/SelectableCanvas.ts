@@ -714,22 +714,24 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * This method returns information about the targets under the cursor represented by e
+   * This function is in charge of deciding which is the object that is the current target of an interaction event.
+   * For interaction event we mean a pointer related action on the canvas.
+   * Which is the
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
-   * @return {FabricObject | null} the target found
+   * @return {TargetsInfoWithContainer} the target found
    */
   findTarget(e: TPointerEvent): TargetsInfoWithContainer {
-    // if (this.skipTargetFind) {
-    //   return undefined;
-    // }
+    if (this.skipTargetFind) {
+      return {
+        subTargets: [],
+      };
+    }
 
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
-      aObjects = this.getActiveObjects(),
-      isActiveSelection = aObjects.length > 1;
-    const targetInfo = this.searchPossibleTargets(this._objects, pointer);
+      targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
     // simplest case no active object, return a new target
     if (!activeObject) {
@@ -740,11 +742,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       [activeObject],
       pointer,
     );
-
-    // there is an activeObject and is also the one we are hovering, or both undefined
-    if (activeObjectTargetInfo.target === targetInfo.target) {
-      return activeObjectTargetInfo;
-    }
 
     const activeObjectControl = activeObject.findControl(
       pointer.transform(this.viewportTransform),
@@ -759,8 +756,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       };
     }
 
+    // there is an activeObject and is also the one we are hovering, or both undefined
+    if (activeObjectTargetInfo.target === targetInfo.target) {
+      return activeObjectTargetInfo;
+    }
+
     if (this.preserveObjectStacking) {
       // there may be situations in which we still want to prefer the active object over the new target
+      return targetInfo;
     } else {
       // if we have activeObject always drawn on top, and we are over it, we return that target
       if (activeObjectTargetInfo.target) {
