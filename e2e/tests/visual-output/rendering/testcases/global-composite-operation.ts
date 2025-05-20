@@ -142,7 +142,6 @@ function createPreview(
     width: 30,
     height: 30,
     fill: 'red',
-    globalCompositeOperation: operation,
   });
 
   return new fabric.Group([r1, r2]);
