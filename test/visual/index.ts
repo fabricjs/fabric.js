@@ -1,1 +1,0 @@
-import './svg_import';
