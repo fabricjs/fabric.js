@@ -142,9 +142,10 @@ function createPreview(
     width: 30,
     height: 30,
     fill: 'red',
+    globalCompositeOperation: operation,
   });
 
-  return new fabric.Group([r1, r2]);
+  return new fabric.Group([r1, r2], { objectCaching: true });
 }
 
 function generateGlobalCompositeTests(): renderTestType[] {
