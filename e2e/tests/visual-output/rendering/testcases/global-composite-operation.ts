@@ -160,12 +160,12 @@ function generateGlobalCompositeTests(): renderTestType[] {
         // goldens are transparent
         canvas.backgroundColor = 'transparent';
 
-        const bg = await createExisting(fabric).clone();
+        const bg = createExisting(fabric);
         bg.canvas = canvas;
         canvas.backgroundImage = bg;
         canvas.add(
-          createNew(fabric, operation),
           createPreview(fabric, operation),
+          createNew(fabric, operation),
         );
         canvas.renderAll();
       },
