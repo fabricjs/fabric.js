@@ -11,6 +11,11 @@ beforeRenderTest(
     return renderTests.map((renderTest) => {
       return {
         async boundFunction() {
+          if (renderTest.hasOwnProperty('enableGLFiltering')) {
+            fabric.config.configure({
+              enableGLFiltering: renderTest.enableGLFiltering,
+            });
+          }
           canvas.clear();
           canvas.setZoom(1);
           canvas.backgroundColor = 'white';

@@ -13,6 +13,7 @@ import { groupLayoutTests } from './testcases/group-layout';
 import { genericRenderingTests } from './testcases/generic-rendering';
 import { globalCompositeOperationTests } from './testcases/global-composite-operation';
 import { resizeFilterTests } from './testcases/resize-filter';
+import { textRenderingTests } from './testcases/text';
 
 export const renderTests: renderTestType[] = [
   {
@@ -84,4 +85,5 @@ export const renderTests: renderTestType[] = [
   ...genericRenderingTests,
   ...globalCompositeOperationTests,
   ...resizeFilterTests,
+  ...textRenderingTests,
 ];

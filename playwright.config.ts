@@ -61,6 +61,9 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices['Desktop Chrome'],
         browserName: 'chromium',
+        launchOptions: {
+          args: ['--disable-gpu'],
+        },
       },
     },
   ],
