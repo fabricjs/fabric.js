@@ -3,12 +3,32 @@ import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import imports from '../imports';
 import { JSDOM } from 'jsdom';
+import { FabricNamespace } from '../tests/types';
 
 export default () => {
   test.beforeEach(async ({ page }, { file }) => {
     await page.addInitScript(() => {
-      globalThis.getAssetName = (name) => `/test/visual/assets/${name}`;
-      globalThis.getFixtureName = (name) => `/test/fixtures/${name}`;
+      globalThis.getAssetName = (name: string) => `/test/visual/assets/${name}`;
+      globalThis.getFixtureName = (name: string) => `/test/fixtures/${name}`;
+      globalThis.getImage = async (
+        fabric: FabricNamespace,
+        filename: string,
+      ): Promise<HTMLImageElement> => {
+        return new Promise((resolve, reject) => {
+          const img = fabric.getFabricDocument().createElement('img');
+          img.onload = function () {
+            img.onerror = null;
+            img.onload = null;
+            resolve(img);
+          };
+          img.onerror = function (err) {
+            img.onerror = null;
+            img.onload = null;
+            reject(err);
+          };
+          img.src = globalThis.getFixtureName(filename);
+        });
+      };
     });
 
     await page.goto('/e2e/site');

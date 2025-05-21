@@ -12,6 +12,7 @@ import { clipPathRenderingTests } from './testcases/clip-path';
 import { groupLayoutTests } from './testcases/group-layout';
 import { genericRenderingTests } from './testcases/generic-rendering';
 import { globalCompositeOperationTests } from './testcases/global-composite-operation';
+import { resizeFilterTests } from './testcases/resize-filter';
 
 export const renderTests: renderTestType[] = [
   {
@@ -82,4 +83,5 @@ export const renderTests: renderTestType[] = [
   ...groupLayoutTests,
   ...genericRenderingTests,
   ...globalCompositeOperationTests,
+  ...resizeFilterTests,
 ];
