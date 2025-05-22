@@ -1,25 +1,4 @@
-import type { FabricNamespace, renderTestType } from '../../../types';
-
-async function getImage(
-  fabric: FabricNamespace,
-  filename: string,
-): Promise<HTMLImageElement> {
-  const fixtureName = globalThis.getFixtureName(filename);
-  return new Promise((resolve, reject) => {
-    const img = fabric.getFabricDocument().createElement('img');
-    img.onload = function () {
-      img.onerror = null;
-      img.onload = null;
-      resolve(img);
-    };
-    img.onerror = function (err) {
-      img.onerror = null;
-      img.onload = null;
-      reject(err);
-    };
-    img.src = fixtureName;
-  });
-}
+import type { renderTestType } from '../../../types';
 
 const generic1: renderTestType = {
   title: 'Rect with strokeUniform: true',
@@ -332,7 +311,7 @@ const canvasPattern: renderTestType = {
   percentage: 0.09,
   size: [500, 500],
   async renderFunction(canvas, fabric) {
-    const img = await getImage(fabric, 'diet.jpeg');
+    const img = await globalThis.getImage(fabric, 'diet.jpeg');
 
     canvas.backgroundColor = new fabric.Pattern({
       source: img,
@@ -350,7 +329,7 @@ const canvasPatternMultiplier: renderTestType = {
   percentage: 0.09,
   size: [500, 500],
   async renderFunction(canvas, fabric) {
-    const img = await getImage(fabric, 'diet.jpeg');
+    const img = await globalThis.getImage(fabric, 'diet.jpeg');
 
     canvas.backgroundColor = new fabric.Pattern({
       source: img,
@@ -369,7 +348,7 @@ const imageSmoothing: renderTestType = {
   percentage: 0.09,
   size: [800, 400],
   async renderFunction(canvas, fabric) {
-    const img = await getImage(fabric, 'greyfloral.png');
+    const img = await globalThis.getImage(fabric, 'greyfloral.png');
 
     const fImg = new fabric.FabricImage(img, {
       imageSmoothing: false,
