@@ -319,7 +319,7 @@ describe('Selectable Canvas', () => {
       });
       const groupB = new Group([object], {
         id: 'b',
-        interactive: true,
+        interactive: false,
         subTargetCheck: true,
       });
       const groupC = new Group([groupB], {
