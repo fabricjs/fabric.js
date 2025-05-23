@@ -1,8 +1,20 @@
-// @ts-nocheck
 import { noop } from '../constants';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { TDegree } from '../typedefs';
 import { animate } from '../util/animation/animate';
+
+export interface StraightenableFabricObject extends FabricObject {
+  FX_DURATION: number;
+
+  _getAngleValueForStraighten(): number;
+
+  straighten(): void;
+
+  fxStraighten(callbacks?: {
+    onChange?(value: TDegree): any;
+    onComplete?(): any;
+  }): () => void;
+}
 
 Object.assign(FabricObject.prototype, {
   /**
@@ -27,7 +39,7 @@ Object.assign(FabricObject.prototype, {
   /**
    * Straightens an object (rotating it from current angle to one of 0, 90, 180, 270, etc. depending on which is closer)
    */
-  straighten(this: FabricObject) {
+  straighten(this: StraightenableFabricObject) {
     this.rotate(this._getAngleValueForStraighten());
   },
 
@@ -38,7 +50,7 @@ Object.assign(FabricObject.prototype, {
    * @param {Function} [callbacks.onChange] Invoked on every step of animation
    */
   fxStraighten(
-    this: FabricObject,
+    this: StraightenableFabricObject,
     callbacks: {
       onChange?(value: TDegree): any;
       onComplete?(): any;

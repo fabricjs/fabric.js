@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": [],
+    "types": ["@vitest/browser/providers/playwright"],
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
@@ -14,6 +14,7 @@
     "src/**/*",
     "extensions/**/*",
     "vitest.d.ts",
+    "vitest.env.d.ts",
     "vitest.setup.ts",
     "vitest.config.ts",
     "vitest.extend.ts",

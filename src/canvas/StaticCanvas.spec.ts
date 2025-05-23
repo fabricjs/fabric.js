@@ -1,6 +1,5 @@
 import { StaticCanvas } from './StaticCanvas';
 import { Canvas } from './Canvas';
-import { Canvas as FabricNodeCanvas } from '../../index.node';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { TMat2D } from '../typedefs';
@@ -19,6 +18,9 @@ import { Line } from '../shapes/Line';
 import { Polyline } from '../shapes/Polyline';
 import { Triangle } from '../shapes/Triangle';
 import { Polygon } from '../shapes/Polygon';
+
+import TEST_IMAGE_GIF from '../../test/fixtures/test_image.gif';
+import { isJSDOM } from '../../vitest.extend';
 
 const CANVAS_SVG =
   '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
@@ -104,7 +106,7 @@ const RECT_JSON_WITH_PADDING =
   '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
   '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
 
-const IMG_SRC = 'test_image.gif';
+const IMG_SRC = isJSDOM() ? 'test_image.gif' : TEST_IMAGE_GIF;
 const IMG_WIDTH = 276;
 const IMG_HEIGHT = 110;
 const REFERENCE_IMG_OBJECT: Partial<
@@ -2183,10 +2185,11 @@ describe('StaticCanvas', () => {
     expect(scaling).toBe(1);
   });
 
-  it('provides Node.js stream methods when in Node environment', () => {
-    if (!('jsdom' in globalThis)) {
+  it('provides Node.js stream methods when in Node environment', async () => {
+    if (!isJSDOM()) {
       expect(true).toBeTruthy();
     } else {
+      const { Canvas: FabricNodeCanvas } = await import('../../index.node');
       const canvas = new FabricNodeCanvas();
       expect(canvas.createPNGStream).toBeTypeOf('function');
       expect(canvas.createJPEGStream).toBeTypeOf('function');

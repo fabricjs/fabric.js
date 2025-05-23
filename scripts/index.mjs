@@ -178,12 +178,7 @@ function exportAssetsToWebsite(options) {
 
 function exportTestsToWebsite(options) {
   const exportTests = () => {
-    const paths = [
-      './test/unit',
-      './test/visual',
-      './test/fixtures',
-      './test/lib',
-    ];
+    const paths = ['./test/visual', './test/fixtures', './test/lib'];
     paths.forEach((location) =>
       copy(path.resolve(wd, location), path.resolve(websiteDir, location)),
     );
@@ -269,7 +264,7 @@ async function runTestem({
 
 /**
  *
- * @param {'unit' | 'visual'} suite
+ * @param {'visual'} suite
  * @param {string[] | null} tests file paths
  * @param {{debug?:boolean,recreate?:boolean,verbose?:boolean,filter?:string}} [options]
  * @returns {Promise<boolean | undefined>} true if some tests failed

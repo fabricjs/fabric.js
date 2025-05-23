@@ -20,94 +20,77 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 22.x
           install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
   node-coverage:
     needs: [prime-build]
     runs-on: ubuntu-24.04
-    name: Node 20.x ${{ matrix.suite }} tests
+    name: Qunit visual tests Node 22
     strategy:
       fail-fast: false
-      matrix:
-        # For more information see:
-        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        suite: [unit, visual]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 22.x
           install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-      - name: Run ${{ matrix.suite }} tests with coverage
-        if: matrix.suite == 'unit'
-        run: npm run test:coverage && sleep 5
-      - name: Run ${{ matrix.suite }} tests with coverage
-        if: matrix.suite == 'visual'
+      - name: Run visual qunit tests with coverage
         run: npm run test:visual:coverage
       - name: Verify coverage files
         run: ls -l ./.nyc_output/*.json
-      - name: Upload test coverage ${{ matrix.suite }}
+      - name: Upload test coverage visual qunit
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.suite }}
+          name: coverage-visual
           path: ./.nyc_output/*.json
           include-hidden-files: true
 
   browser:
     needs: [prime-build]
-    name: ${{ matrix.target }} ${{ matrix.suite }} tests
+    name: QUnit visual tests ${{ matrix.target }}
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node-version: [20]
         target: [chrome, firefox]
-        suite: [unit, visual]
       fail-fast: false
     steps:
       - name: Unit tests on browser ${{ matrix.target }}
         uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
+      - name: Run ${{ matrix.target }} visual headless test
+        run: xvfb-run npm run test -- -c ${{ matrix.target }} -s visual
   node:
     needs: [prime-build]
     runs-on: ubuntu-24.04
-    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
+    name: QUnit visual tests Node 18
     strategy:
       fail-fast: false
-      matrix:
-        # For more information see:
-        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [18, 22]
-        suite: [unit, visual]
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.x
           install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-      - name: Run ${{ matrix.suite }} tests
-        run: npm run test -- -c node -s ${{ matrix.suite }}
-  vitest:
-    name: Vitest tests
+      - name: Run visual qunit tests
+        run: npm run test -- -c node -s visual
+  vitest-coverage:
+    name: Vitest tests Node 22
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 22.x
           install-system-deps: false
       - name: Run Vitest unit test
         run: npm run test:vitest:coverage
@@ -117,7 +100,34 @@ jobs:
           name: coverage-vitest
           path: ./.nyc_output/*.json
           include-hidden-files: true
-
+  vitest-browser:
+    name: Vitest tests ${{matrix.browser}}
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        browser: [chromium, firefox]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 22.x
+          install-system-deps: false
+      - name: Install Playwright Browsers ${{matrix.browser}}
+        run: npx playwright install --with-deps ${{matrix.browser}}
+      - name: Run Vitest unit test
+        run: npm run test:vitest:${{matrix.browser}}
+  vitest-node-18:
+    name: Vitest tests node 18
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 18.x
+          install-system-deps: false
+      - name: Run Vitest unit test
+        run: npm run test:vitest
   e2e:
     needs: [prime-build]
     name: Playwright tests
@@ -126,7 +136,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 22.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install

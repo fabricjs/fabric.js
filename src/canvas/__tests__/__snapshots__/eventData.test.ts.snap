@@ -145,18 +145,7 @@ exports[`Canvas event data > HTML event "dragend" should fire a corresponding ca
   [
     "after:render",
     {
-      "ctx": CanvasRenderingContext2D {
-        "canvas": <canvas
-          class="upper-canvas"
-          data-fabric="top"
-          draggable="true"
-          height="150"
-          style="position: absolute; left: 0px; top: 0px; user-select: none; width: 300px; height: 150px; cursor: move;"
-          width="300"
-        />,
-        "createPattern": [Function],
-        "drawImage": [Function],
-      },
+      "ctx": CanvasRenderingContext2d,
     },
   ],
 ]

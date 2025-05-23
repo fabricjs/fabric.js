@@ -25,3 +25,4 @@ e2e/test-report/
 e2e/test-results/
 **/.cache/
 docs/
+__screenshots__

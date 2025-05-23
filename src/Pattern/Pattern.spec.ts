@@ -4,9 +4,11 @@ import { Pattern } from './Pattern';
 import { getFabricDocument } from '../env';
 import { StaticCanvas } from '../canvas/StaticCanvas';
 import type { SerializedPatternOptions } from './types';
+import GrayFloralImage from '../../test/fixtures/greyfloral.png';
+import { isJSDOM } from '../../vitest.extend';
 
 describe('Pattern', () => {
-  const IMG_SRC = 'greyfloral.png';
+  const IMG_SRC = isJSDOM() ? 'greyfloral.png' : GrayFloralImage;
 
   async function setSrc(img: HTMLImageElement, src: string) {
     return new Promise((resolve) => {

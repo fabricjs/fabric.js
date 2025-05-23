@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { version } from '../../fabric';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
-import { Gradient } from '../gradient/Gradient';
+import { Gradient } from '../gradient';
 import { Pattern } from '../Pattern';
 // will require some kind of handling here
-import { getEnv } from '../env/node';
+import { getEnv } from '../env';
 import { loadSVGFromString } from '../parser/loadSVGFromString';
 
 const REFERENCE_RECT = {
