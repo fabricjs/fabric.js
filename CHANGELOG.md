@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat: use Intl.Segmenter as default wordSplit method [#10606](https://github.com/fabricjs/fabric.js/pull/10606)
 - chore(): run npm audit fix to fix a vulnerability report [#10599](https://github.com/fabricjs/fabric.js/pull/10599)
 - refactor(tests): move text path tests from qunit to playwright [#10590](https://github.com/fabricjs/fabric.js/pull/10590)
 - chore(): Deprecate line [#10598](https://github.com/fabricjs/fabric.js/pull/10598)
