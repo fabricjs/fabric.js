@@ -6,6 +6,14 @@ import type {
   TPointerEvent,
 } from 'fabric';
 import { Point, util } from 'fabric';
+
+import { aligningLineConfig } from './constant';
+import type {
+  AligningLineConfig,
+  HorizontalLine,
+  VerticalLine,
+} from './typedefs';
+import { collectLine } from './util/collect-line';
 import {
   collectHorizontalPoint,
   collectVerticalPoint,
@@ -16,13 +24,6 @@ import {
   drawVerticalLine,
 } from './util/draw';
 import { getObjectsByTarget } from './util/get-objects-by-target';
-import { collectLine } from './util/collect-line';
-import type {
-  AligningLineConfig,
-  HorizontalLine,
-  VerticalLine,
-} from './typedefs';
-import { aligningLineConfig } from './constant';
 
 type TransformEvent = BasicTransformEvent<TPointerEvent> & {
   target: FabricObject;
@@ -33,6 +34,7 @@ export type { AligningLineConfig } from './typedefs';
 export function initAligningGuidelines(
   canvas: Canvas,
   options: Partial<AligningLineConfig> = {},
+  shouldExclude?: (obj: FabricObject) => boolean,
 ) {
   Object.assign(aligningLineConfig, options);
 
@@ -63,7 +65,7 @@ export function initAligningGuidelines(
     verticalLines.clear();
     horizontalLines.clear();
 
-    const objects = getObjectsByTarget(activeObject);
+    const objects = getObjectsByTarget(activeObject, shouldExclude);
     const activeObjectRect = activeObject.getBoundingRect();
 
     for (const object of objects) {
@@ -90,7 +92,7 @@ export function initAligningGuidelines(
     verticalLines.clear();
     horizontalLines.clear();
 
-    const objects = getObjectsByTarget(activeObject);
+    const objects = getObjectsByTarget(activeObject, shouldExclude);
     let corner = e.transform.corner;
     if (activeObject.flipX) corner = corner.replace('l', 'r').replace('r', 'l');
     if (activeObject.flipY) corner = corner.replace('t', 'b').replace('b', 't');
@@ -132,13 +134,16 @@ export function initAligningGuidelines(
   function afterRender() {
     if (onlyDrawPoint) {
       const list: Array<VerticalLine | HorizontalLine> = [];
-      for (const v of verticalLines) list.push(JSON.parse(v));
-      for (const h of horizontalLines) list.push(JSON.parse(h));
+      for (const v of verticalLines)
+        list.push(JSON.parse(v) as VerticalLine | HorizontalLine);
+      for (const h of horizontalLines)
+        list.push(JSON.parse(h) as VerticalLine | HorizontalLine);
       drawPointList(canvas, list);
     } else {
-      for (const v of verticalLines) drawVerticalLine(canvas, JSON.parse(v));
+      for (const v of verticalLines)
+        drawVerticalLine(canvas, JSON.parse(v) as VerticalLine);
       for (const h of horizontalLines)
-        drawHorizontalLine(canvas, JSON.parse(h));
+        drawHorizontalLine(canvas, JSON.parse(h) as HorizontalLine);
     }
   }
   function mouseUp() {
