@@ -5,7 +5,10 @@ import { doesSomeParentMatch } from './doesSomeParentMatch';
  * @private
  */
 
-export function elementMatchesRule(element: HTMLElement, selectors: string[]) {
+export function elementMatchesRule(
+  element: HTMLElement | SVGElement,
+  selectors: string[],
+) {
   let parentMatching = true;
   // start from rightmost selector.
   const firstMatching = selectorMatches(element, selectors.pop()!);

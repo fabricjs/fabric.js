@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["@vitest/browser/providers/playwright"],
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "fabric": ["./src"],
+      "fabric/node": ["./src/node"],
+      "fabric/extensions": ["./extensions"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "extensions/**/*",
+    "vitest.d.ts",
+    "vitest.env.d.ts",
+    "vitest.setup.ts",
+    "vitest.config.ts",
+    "vitest.extend.ts",
+    "playwright.setup.ts"
+  ],
+  "exclude": ["dist", "dist-extensions", "e2e", "test"]
+}

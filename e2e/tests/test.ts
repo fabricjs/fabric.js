@@ -65,6 +65,7 @@ export async function beforeRenderTest(
 ) {
   const el = document.querySelector<HTMLCanvasElement>('#canvas');
   const canvas = new Canvas(el, options);
+  canvasMap.set(el, canvas);
   // cb has to bind the rendering test to the specific canvas and add a clear before the test
   const renderingTests = await cb(canvas);
   renderingTests.forEach((renderTest) => {

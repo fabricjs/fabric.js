@@ -8,7 +8,7 @@ import type { Canvas } from './Canvas';
  */
 export class TextEditingManager {
   private targets: ITextBehavior[] = [];
-  private declare target?: ITextBehavior;
+  declare private target?: ITextBehavior;
   private __disposer: VoidFunction;
 
   constructor(canvas: Canvas) {

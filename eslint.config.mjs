@@ -39,7 +39,7 @@ export default [
         console: 'readonly',
       },
       parserOptions: {
-        project: true,
+        project: 'tsconfig.spec.json',
         tsconfigRootDir: './',
       },
     },
@@ -104,5 +104,11 @@ export default [
   },
   {
     files: ['**/*.ts'],
+  },
+  {
+    files: ['playwright.setup.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
   },
 ];

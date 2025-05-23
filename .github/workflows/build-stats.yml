@@ -1,0 +1,76 @@
+name: 'Comment build stats on PR'
+on:
+  workflow_run:
+    workflows: ['🩺']
+    types:
+      - completed
+jobs:
+  build-stats:
+    env:
+      unique_id: <!-- build-stats -->
+      minified: dist/index.min.js
+      bundled: dist/index.mjs
+    name: Build stats
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        uses: ./.github/actions/cached-install
+        with:
+          node-version: 20.x
+          install-system-deps: false
+      - name: Build fabric.js
+        run: npm run build
+      - name: Recover build stats
+        uses: actions/download-artifact@v4
+        with:
+          name: prstats
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./
+      - name: Put stats in GITHUB_OUTPUT
+        id: pr_stats
+        run: echo "pr_stats=$(cat ./prstats.txt)" >> $GITHUB_OUTPUT
+      - name: Recover pr number
+        uses: actions/download-artifact@v4
+        with:
+          name: prnumber
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./
+      - name: Add pr number to output
+        id: prnumber
+        run: echo "pr_number=$(cat ./prnumber.txt)" >> $GITHUB_OUTPUT
+      - name: Create upstream stats
+        id: upstream_stats
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return JSON.stringify({
+              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
+            });
+      - name: process
+        id: stats-message
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            return await run_simple({
+              modified: JSON.parse('${{ steps.pr_stats.outputs.pr_stats }}'),
+              original: JSON.parse('${{ steps.upstream_stats.outputs.result }}'),
+            });
+      - name: Comment on PR for build stats
+        uses: edumserrano/find-create-or-update-comment@v3.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.prnumber.outputs.pr_number }}
+          body-includes: '${{ env.unique_id }}'
+          comment-author: 'github-actions[bot]'
+          body: |
+            ${{ env.unique_id }}
+            ${{ steps.stats-message.outputs.result }}
+          edit-mode: replace

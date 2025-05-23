@@ -3,6 +3,8 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { Point } from '../Point';
 
+import { describe, expect, it } from 'vitest';
+
 const createTransformData = (): Transform => {
   return {
     target: new FabricObject({

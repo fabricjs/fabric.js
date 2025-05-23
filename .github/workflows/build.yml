@@ -23,16 +23,20 @@ jobs:
       bundled: dist/index.mjs
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
-      - run: npm ci
-      - name: build stats
+      - name: Build fabric.js
         run: npm run build
-      - name: persist
-        id: b
+      - name: Create prnumber artifact
+        run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
+      - name: Upload Pr Number
+        uses: actions/upload-artifact@v4
+        with:
+          name: prnumber
+          path: ./prnumber.txt
+      - name: Prepare pr stats
+        id: stats
         uses: actions/github-script@v6
         with:
           result-encoding: string
@@ -41,33 +45,13 @@ jobs:
             return JSON.stringify({
               size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
-      - name: checkout src files
-        run: git checkout ${{ github.event.pull_request.base.sha }}
-      - name: upstream build stats
-        run: npm run build -- -s
-      - name: persist
-        id: a
-        uses: actions/github-script@v6
+      - name: Create the artifact for stats
+        run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
+      - name: Upload Pr stats
+        uses: actions/upload-artifact@v4
         with:
-          result-encoding: string
-          script: |
-            const fs = require('fs');
-            return JSON.stringify({
-              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
-            });
-      - name: process
-        uses: actions/github-script@v6
-        with:
-          result-encoding: string
-          script: |
-            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
-            const res = await run_simple({
-              github,
-              context,
-              core,
-              a: JSON.parse('${{ steps.a.outputs.result }}'),
-              b: JSON.parse('${{ steps.b.outputs.result }}'),
-            });
+          name: prstats
+          path: ./prstats.txt
   lint:
     runs-on: ubuntu-24.04
     steps:

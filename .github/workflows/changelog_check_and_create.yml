@@ -1,0 +1,59 @@
+name: 'Check and create Changelog 📋'
+
+on:
+  pull_request:
+    branches: [master, 6.x]
+    types: [opened, synchronize, reopened, edited]
+jobs:
+  changelog-creation:
+    runs-on: ubuntu-24.04
+    env:
+      file: CHANGELOG.md
+      link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check ${{ env.file }}
+        id: check
+
+        run: |
+          files=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
+            | jq -r '.[].filename')
+          echo "Changed files: $files"
+          if echo "$files" | grep -q "^${{ env.file }}$"; then
+            echo "OK '${{ env.file }}' was modified"
+            echo "changelog_updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "KO '${{ env.file }}' was NOT modified"
+            echo "changelog_updated=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create and upload the changelog line
+        id: changelog_string
+        if: steps.check.outputs.changelog_updated == 'false'
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            return JSON.stringify({
+              log: `- ${{ github.event.pull_request.title }} ${{ env.link }}`,
+              prev_log: !!'${{ github.event.changes.title.from }}' ? `- ${{ github.event.changes.title.from }} ${{ env.link }}` : '',
+              pr_ref: `${{ github.event.pull_request.head.ref }}`,
+              full_name: `${{ github.event.pull_request.head.repo.full_name }}`
+            });
+      - name: Create changelog artifact
+        if: steps.check.outputs.changelog_updated == 'false'
+        run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
+      - name: Upload changelog artifact
+        if: steps.check.outputs.changelog_updated == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog_artifact
+          path: ./changelog_artifact.txt
+      - name: Exit 1 if we need the changelog to be updated
+        if: steps.check.outputs.changelog_updated == 'false'
+        run: exit 1
+      - name: Exit 0 otherwise
+        run: exit 0

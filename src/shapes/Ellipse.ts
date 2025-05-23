@@ -166,7 +166,7 @@ export class Ellipse<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options?: Abortable,
     cssRules?: CSSRules,
   ) {
     const parsedAttributes = parseAttributes(

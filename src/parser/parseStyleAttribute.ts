@@ -8,7 +8,9 @@ import { parseStyleString } from './parseStyleString';
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */
-export function parseStyleAttribute(element: HTMLElement): Record<string, any> {
+export function parseStyleAttribute(
+  element: HTMLElement | SVGElement,
+): Record<string, any> {
   const oStyle: Record<string, any> = {},
     style = element.getAttribute('style');
 

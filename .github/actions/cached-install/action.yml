@@ -11,7 +11,7 @@ runs:
   steps:
     - name: Install system deps for node canvas
       if: inputs.install-system-deps == 'true'
-      run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg8-dev librsvg2-dev libcairo2-dev
+      run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg-dev librsvg2-dev libcairo2-dev
       shell: bash
     - name: Use Node.js v${{ inputs.node-version }}
       uses: actions/setup-node@v4

@@ -26,6 +26,13 @@ export interface SerializedLineProps
   extends SerializedObjectProps,
     UniqueLineProps {}
 
+/**
+ * A Class to draw a line
+ * A bunch of methods will be added to Polyline to handle the line case
+ * The line class is very strange to work with, is all special, it hardly aligns
+ * to what a developer want everytime there is an angle
+ * @deprecated
+ */
 export class Line<
     Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedLineProps = SerializedLineProps,
@@ -247,7 +254,7 @@ export class Line<
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options?: Abortable,
     cssRules?: CSSRules,
   ) {
     const {

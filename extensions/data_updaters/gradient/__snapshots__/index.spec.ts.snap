@@ -1,0 +1,75 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`installGradientUpdater > After intalling the wrapper > FromObject will merge the old opacity into color 1`] = `
+[
+  {
+    "color": "rgba(255,0,0,0.5)",
+    "offset": 1,
+  },
+  {
+    "color": "rgba(0,0,255,0.5)",
+    "offset": 0.5,
+  },
+  {
+    "color": "rgba(0,255,0,0.3)",
+    "offset": 0,
+  },
+]
+`;
+
+exports[`installGradientUpdater > After intalling the wrapper > Init gradient from options still preserve old color stops 1`] = `
+[
+  {
+    "color": "red",
+    "offset": 1,
+    "opacity": 0.5,
+  },
+  {
+    "color": "rgba(0,0,255,0.5)",
+    "offset": 0.5,
+  },
+  {
+    "color": "rgba(0,255,0,0.5)",
+    "offset": 0,
+    "opacity": 0.3,
+  },
+]
+`;
+
+exports[`installGradientUpdater > Without using it opacity information is lost > FromObject will preserve the old color stop 1`] = `
+[
+  {
+    "color": "red",
+    "offset": 1,
+    "opacity": 0.5,
+  },
+  {
+    "color": "rgba(0,0,255,0.5)",
+    "offset": 0.5,
+  },
+  {
+    "color": "rgba(0,255,0,0.5)",
+    "offset": 0,
+    "opacity": 0.3,
+  },
+]
+`;
+
+exports[`installGradientUpdater > Without using it opacity information is lost > Init gradient from options preserve old color stops 1`] = `
+[
+  {
+    "color": "red",
+    "offset": 1,
+    "opacity": 0.5,
+  },
+  {
+    "color": "rgba(0,0,255,0.5)",
+    "offset": 0.5,
+  },
+  {
+    "color": "rgba(0,255,0,0.5)",
+    "offset": 0,
+    "opacity": 0.3,
+  },
+]
+`;

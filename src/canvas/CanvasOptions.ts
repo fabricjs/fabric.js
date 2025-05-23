@@ -254,7 +254,7 @@ export interface CanvasOptions
    * Indicates whether objects should remain in current stack position when selected.
    * When false objects are brought to top and rendered as part of the selection group
    * @type Boolean
-   * @default
+   * @default true
    */
   preserveObjectStacking: boolean;
 }
@@ -293,6 +293,5 @@ export const canvasDefaults: TOptions<CanvasOptions> = {
   enablePointerEvents: false,
 
   containerClass: 'canvas-container',
-  // turn to true for fabric 7.0
-  preserveObjectStacking: false,
+  preserveObjectStacking: true,
 };

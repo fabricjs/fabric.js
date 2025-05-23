@@ -80,6 +80,11 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 #### Node.js
 
+We strongly recommend to run your applications only LTS versions of node.
+
+Said so the minimum supported version of node is 18.
+We bump up the minimum version of node with a Major release only when the dependencies force us to do so.
+
 Fabric.js depends on [node-canvas][node_canvas] for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom][jsdom] for a `window` implementation on node.
 This means that you may encounter `node-canvas` limitations and [bugs][node_canvas_issues].
 

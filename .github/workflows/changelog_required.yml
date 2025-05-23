@@ -1,9 +1,0 @@
-name: '📋'
-
-on:
-  pull_request:
-    branches: [master]
-
-jobs:
-  changelog:
-    uses: ./.github/workflows/changelog.yml

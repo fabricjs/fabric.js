@@ -157,8 +157,8 @@ export class StaticCanvas<
   declare disposed?: boolean;
 
   declare _offset: { left: number; top: number };
-  protected declare hasLostContext: boolean;
-  protected declare nextRenderHandle: number;
+  declare protected hasLostContext: boolean;
+  declare protected nextRenderHandle: number;
 
   declare elements: StaticCanvasDOMManager;
 
@@ -169,12 +169,12 @@ export class StaticCanvas<
    * @type Boolean
    * @default false
    */
-  protected declare skipControlsDrawing: boolean;
+  declare protected skipControlsDrawing: boolean;
 
   static ownDefaults = staticCanvasDefaults;
 
   // reference to
-  protected declare __cleanupTask?: {
+  declare protected __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
@@ -281,46 +281,6 @@ export class StaticCanvas<
    */
   getHeight(): number {
     return this.height;
-  }
-
-  /**
-   * Sets width of this canvas instance
-   * @param {Number|String} value                         Value to set width to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-  setWidth(
-    value: TSize['width'],
-    options?: { backstoreOnly?: true; cssOnly?: false },
-  ): void;
-  setWidth(
-    value: CSSDimensions['width'],
-    options?: { cssOnly?: true; backstoreOnly?: false },
-  ): void;
-  setWidth(value: number, options?: never) {
-    return this.setDimensions({ width: value }, options);
-  }
-
-  /**s
-   * Sets height of this canvas instance
-   * @param {Number|String} value                         Value to set height to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-  setHeight(
-    value: TSize['height'],
-    options?: { backstoreOnly?: true; cssOnly?: false },
-  ): void;
-  setHeight(
-    value: CSSDimensions['height'],
-    options?: { cssOnly?: true; backstoreOnly?: false },
-  ): void;
-  setHeight(value: CSSDimensions['height'], options?: never) {
-    return this.setDimensions({ height: value }, options);
   }
 
   /**
@@ -709,19 +669,6 @@ export class StaticCanvas<
 
   /**
    * Returns coordinates of a center of canvas.
-   * Returned value is an object with top and left properties
-   * @return {Object} object with "top" and "left" number values
-   * @deprecated migrate to `getCenterPoint`
-   */
-  getCenter() {
-    return {
-      top: this.height / 2,
-      left: this.width / 2,
-    };
-  }
-
-  /**
-   * Returns coordinates of a center of canvas.
    * @return {Point}
    */
   getCenterPoint() {
@@ -832,15 +779,14 @@ export class StaticCanvas<
    * this alias is provided because if you call JSON.stringify on an instance,
    * the toJSON object will be invoked if it exists.
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
+   * JSON does not support additional properties because toJSON has its own signature
    * @return {Object} JSON compatible object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
-   * @example <caption>JSON without additional properties</caption>
-   * var json = canvas.toJSON();
-   * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
-   * @example <caption>JSON without default values</caption>
-   * var json = canvas.toJSON();
+   * @example <caption>JSON representation of canvas </caption>
+   * const json = canvas.toJSON();
+   * @example <caption>JSON representation of canvas </caption>
+   * const json = JSON.stringify(canvas);
    */
   toJSON() {
     return this.toObject();

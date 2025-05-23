@@ -5,9 +5,9 @@ export { config } from './src/config';
 export { classRegistry } from './src/ClassRegistry';
 export { runningAnimations } from './src/util/animation/AnimationRegistry';
 
-export * from './src/typedefs';
+export type * from './src/typedefs';
 
-export * from './src/EventTypeDefs';
+export type * from './src/EventTypeDefs';
 export type { ITextEvents } from './src/shapes/IText/ITextBehavior';
 
 export { Observable } from './src/Observable';
@@ -28,7 +28,7 @@ export { Point } from './src/Point';
 export type { IntersectionType } from './src/Intersection';
 export { Intersection } from './src/Intersection';
 export { Color } from './src/color/Color';
-export * from './src/color/typedefs';
+export type * from './src/color/typedefs';
 
 export * from './src/gradient';
 export * from './src/Pattern';
@@ -36,7 +36,7 @@ export { Shadow } from './src/Shadow';
 export type { SerializedShadowOptions } from './src/Shadow';
 
 export { BaseBrush } from './src/brushes/BaseBrush';
-export * from './src/brushes/typedefs';
+export type * from './src/brushes/typedefs';
 
 export { PencilBrush } from './src/brushes/PencilBrush';
 export { CircleBrush } from './src/brushes/CircleBrush';
@@ -176,7 +176,7 @@ export { loadSVGFromString } from './src/parser/loadSVGFromString';
 export { loadSVGFromURL } from './src/parser/loadSVGFromURL';
 export { parseSVGDocument } from './src/parser/parseSVGDocument';
 
-// todo convert tests to jest and stop exporting those.
+// todo convert tests to vitest and stop exporting those.
 export { parseAttributes } from './src/parser/parseAttributes';
 export { parseStyleAttribute } from './src/parser/parseStyleAttribute';
 export { parsePointsAttribute } from './src/parser/parsePointsAttribute';

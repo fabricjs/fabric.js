@@ -103,6 +103,9 @@ interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
 export interface BasicTransformEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
   transform: Transform;
+  /* This pointer is usually a scenePoint. It isn't in the case of actions inside groups,
+   * where it becomes a point relative to the group center
+   */
   pointer: Point;
 }
 
@@ -157,18 +160,6 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   target?: FabricObject;
   subTargets?: FabricObject[];
   transform?: Transform | null;
-  /**
-   * @deprecated
-   * use viewportPoint instead.
-   * Kept for compatibility
-   */
-  pointer: Point;
-  /**
-   * @deprecated
-   * use scenePoint instead.
-   * Kept for compatibility
-   */
-  absolutePointer: Point;
   scenePoint: Point;
   viewportPoint: Point;
 }
@@ -197,18 +188,6 @@ export interface DragEventData extends TEvent<DragEvent> {
 }
 
 export interface DropEventData extends DragEventData {
-  /**
-   * @deprecated
-   * use viewportPoint instead.
-   * Kept for compatibility
-   */
-  pointer: Point;
-  /**
-   * @deprecated
-   * use scenePoint instead.
-   * Kept for compatibility
-   */
-  absolutePointer: Point;
   scenePoint: Point;
   viewportPoint: Point;
 }

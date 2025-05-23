@@ -1,0 +1,85 @@
+name: 'Update CHANGELOG.md file'
+on:
+  workflow_run:
+    workflows: ['Check and create Changelog 📋']
+    types:
+      - completed
+jobs:
+  update_changelog:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-24.04
+    env:
+      file: CHANGELOG.md
+    steps:
+      - name: Recover build stats
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog_artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./
+      - name: Parse the artifact in github output
+        id: changelog_data
+        run: |
+          echo "log=$(cat ./changelog_artifact.txt | jq -r '.log')" >> $GITHUB_OUTPUT
+          echo "prev_log=$(cat ./changelog_artifact.txt | jq -r '.prev_log')" >> $GITHUB_OUTPUT
+          echo "full_name=$(cat ./changelog_artifact.txt | jq -r '.full_name')" >> $GITHUB_OUTPUT
+          echo "pr_ref=$(cat ./changelog_artifact.txt | jq -r '.pr_ref')" >> $GITHUB_OUTPUT
+      - name: Pull down the correct branch and repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.changelog_data.outputs.pr_ref }}
+          repository: ${{ steps.changelog_data.outputs.full_name }}
+      - name: Update ${{ env.file }} from PR title
+        id: update
+        uses: actions/github-script@v6
+        env:
+          log: '${{ steps.changelog_data.outputs.log }}'
+          prev_log: '${{ steps.changelog_data.outputs.prev_log }}'
+          next_version: next
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            const file = './${{ env.file }}';
+            let content = fs.readFileSync(file).toString();
+            const title = '[${{ env.next_version }}]';
+            const log = '${{ env.log }}';
+            const prev_log = '${{ env.prev_log }}';
+            const prev_log_exists = prev_log && content.includes(prev_log);
+            const log_exists = log && content.includes(log);
+            let modified = false;
+            if (!content.includes(title)) {
+            const insertAt = content.indexOf('\n') + 1;
+            content =
+                content.slice(0, insertAt) +
+                `\n## ${title}\n\n\n` +
+                content.slice(insertAt);
+            }
+
+            if (prev_log_exists && log) {
+                modified = true;
+                content = content.replace(prev_log, log);
+            } else if (log && !log_exists) {
+                modified = true;
+                const insertAt = content.indexOf('\n', content.indexOf(title) + title.length + 1) + 1;
+                content = content.slice(0, insertAt) + log + '\n' + content.slice(insertAt);
+            }
+            fs.writeFileSync(file, content);
+            return modified;
+      - name: Setup node
+        if: fromJson(steps.update.outputs.result)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Commit & Push
+        if: fromJson(steps.update.outputs.result)
+        run: |
+          npm ci
+          npx prettier --write ${{ env.file }}
+          git diff
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
+          git add ${{ env.file }}
+          git commit -m "update ${{ env.file }}"
+          git push

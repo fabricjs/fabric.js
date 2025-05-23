@@ -30,8 +30,6 @@ const getEventPoints = (canvas: Canvas, e: TPointerEvent) => {
   return {
     viewportPoint,
     scenePoint,
-    pointer: viewportPoint,
-    absolutePointer: scenePoint,
   };
 };
 
@@ -86,21 +84,21 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type number
    * @private
    */
-  private declare _willAddMouseDown: number;
+  declare private _willAddMouseDown: number;
 
   /**
    * Holds a reference to an object on the canvas that is receiving the drag over event.
    * @type FabricObject
    * @private
    */
-  private declare _draggedoverTarget?: FabricObject;
+  declare private _draggedoverTarget?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas from where the drag operation started
    * @type FabricObject
    * @private
    */
-  private declare _dragSource?: FabricObject;
+  declare private _dragSource?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas that is the current drop target
@@ -109,7 +107,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type FabricObject
    * @private
    */
-  private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
+  declare private _dropTarget: FabricObject<ObjectEvents> | undefined;
 
   /**
    * a boolean that keeps track of the click state during a cycle of mouse down/up.
@@ -1121,7 +1119,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    */
   _resetTransformEventData() {
-    this._target = this._pointer = this._absolutePointer = undefined;
+    this._target = this._viewportPoint = this._scenePoint = undefined;
   }
 
   /**
@@ -1132,9 +1130,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _cacheTransformEventData(e: TPointerEvent) {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
-    this._pointer = this.getViewportPoint(e);
-    this._absolutePointer = sendPointToPlane(
-      this._pointer,
+    this._viewportPoint = this.getViewportPoint(e);
+    this._scenePoint = sendPointToPlane(
+      this._viewportPoint,
       undefined,
       this.viewportTransform,
     );

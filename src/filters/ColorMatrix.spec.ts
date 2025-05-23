@@ -1,6 +1,8 @@
 import { ColorMatrix } from './ColorMatrix';
 import type { T2DPipelineState } from './typedefs';
 
+import { describe, expect, it } from 'vitest';
+
 describe('ColorMatrix', () => {
   it('apply2D colorsOnly: true', () => {
     const filter = new ColorMatrix({

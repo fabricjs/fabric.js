@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - 5.x
+      - 6.x
     types: [published]
 
 jobs:
@@ -20,8 +21,9 @@ jobs:
       - run: npm run build
       - run: node publish.js
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-          PRE_RELEASE: ${{github.event.release.prerelease}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          PRE_RELEASE: ${{ github.event.release.prerelease }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
   update-bug-report:
     runs-on: ubuntu-24.04
     # wait for publishing to complete
