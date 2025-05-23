@@ -7,6 +7,7 @@ export type renderTestType = {
   percentage: number;
   title: string;
   snapshotSuffix?: string;
+  enableGLFiltering?: boolean;
   golden: string;
   only?: boolean;
   disabled?: 'node' | 'browser' | boolean;
