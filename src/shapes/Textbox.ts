@@ -17,7 +17,7 @@ export const textboxDefaultValues: Partial<TClassProperties<Textbox>> = {
   dynamicMinWidth: 2,
   lockScalingFlip: true,
   noScaleCache: false,
-  _wordJoiners: /[ \t\r]/,
+  _wordJoiners: /( +|[\t\r])/,
   splitByGrapheme: false,
 };
 
@@ -232,7 +232,7 @@ export class Textbox<
       for (const p2 in obj[p1]) {
         const p2Number = parseInt(p2, 10);
         if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
-          // eslint-disable-next-line no-unused-vars
+
           for (const p3 in obj[p1][p2]) {
             return false;
           }
@@ -341,8 +341,7 @@ export class Textbox<
    *
    */
   getGraphemeDataForRender(lines: string[]): GraphemeData {
-    const splitByGrapheme = this.splitByGrapheme,
-      infix = splitByGrapheme ? '' : ' ';
+    const splitByGrapheme = this.splitByGrapheme
 
     let largestWordWidth = 0;
 
@@ -363,7 +362,7 @@ export class Textbox<
           : this.graphemeSplit(word);
         const width = this._measureWord(graphemeArray, lineIndex, offset);
         largestWordWidth = Math.max(width, largestWordWidth);
-        offset += graphemeArray.length + infix.length;
+        offset += graphemeArray.length;
         return { word: graphemeArray, width };
       });
     });
@@ -411,7 +410,7 @@ export class Textbox<
    * @returns {string[]} array of words
    */
   wordSplit(value: string): string[] {
-    return value.split(this._wordJoiners);
+    return value.split(this._wordJoiners).filter(Boolean);
   }
 
   /**
@@ -433,14 +432,12 @@ export class Textbox<
   ): string[][] {
     const additionalSpace = this._getWidthOfCharSpacing(),
       splitByGrapheme = this.splitByGrapheme,
-      graphemeLines = [],
-      infix = splitByGrapheme ? '' : ' ';
+      graphemeLines = []
 
     let lineWidth = 0,
       line: string[] = [],
       // spaces in different languages?
       offset = 0,
-      infixWidth = 0,
       lineJustStarted = true;
 
     desiredWidth -= reservedSpace;
@@ -458,25 +455,27 @@ export class Textbox<
       const { word, width: wordWidth } = data[i];
       offset += word.length;
 
-      lineWidth += infixWidth + wordWidth - additionalSpace;
-      if (lineWidth > maxWidth && !lineJustStarted) {
+      lineWidth += wordWidth;
+
+      if (!lineJustStarted && lineWidth - additionalSpace > maxWidth) {
+        // ignore only one space at the line end
+        if (!splitByGrapheme && line[line.length -1] === ' ')
+          line.pop();
         graphemeLines.push(line);
         line = [];
         lineWidth = wordWidth;
         lineJustStarted = true;
-      } else {
-        lineWidth += additionalSpace;
       }
 
-      if (!lineJustStarted && !splitByGrapheme) {
-        line.push(infix);
+      if (lineJustStarted) {
+        // ignore only one space at the line start
+        if (!splitByGrapheme && word.length > 0 && word[0] === ' ') {
+          word.shift();
+          lineWidth = lineWidth - this._measureWord([' '], lineIndex, offset - word.length) - additionalSpace;
+        }
       }
+
       line = line.concat(word);
-
-      infixWidth = splitByGrapheme
-        ? 0
-        : this._measureWord([infix], lineIndex, offset);
-      offset++;
       lineJustStarted = false;
     }
 

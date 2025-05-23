@@ -360,6 +360,7 @@ describe('Textbox', () => {
 
     expect(wordsData[0], 'All words have the same length line 0').toEqual([
       { word: ['w', 'o', 'r', 'd'], width: largestWordWidth },
+      { word: [' '], width: 10 },
       { word: ['w', 'o', 'r', 'd'], width: largestWordWidth },
     ]);
     expect(wordsData[1], 'All words have the same length line1').toEqual([
@@ -409,7 +410,7 @@ describe('Textbox', () => {
     expect(Math.round(wordsData[0][0].width), 'unstyle word is 82 wide').toBe(
       82,
     );
-    expect(Math.round(wordsData[0][1].width), 'unstyle word is 206 wide').toBe(
+    expect(Math.round(wordsData[0][2].width), 'unstyle word is 206 wide').toBe(
       206,
     );
     expect(wordsData[2], 'All words have the same length line1').toEqual([
@@ -425,11 +426,13 @@ describe('Textbox', () => {
 
     expect(textbox.textLines[0], '0 line match expectations').toBe('xa');
     expect(textbox.textLines[1], '1 line match expectations').toBe('xb');
-    expect(textbox.textLines[2], '2 line match expectations').toBe('xc');
-    expect(textbox.textLines[3], '3 line match expectations').toBe('xd');
-    expect(textbox.textLines[4], '4 line match expectations').toBe('xe');
-    expect(textbox.textLines[5], '5 line match expectations').toBe('ya');
-    expect(textbox.textLines[6], '6 line match expectations').toBe('yb');
+    expect(textbox.textLines[2], '1 line match expectations').toBe('\t');
+    expect(textbox.textLines[3], '2 line match expectations').toBe('xc');
+    expect(textbox.textLines[4], '2 line match expectations').toBe('\r');
+    expect(textbox.textLines[5], '3 line match expectations').toBe('xd');
+    expect(textbox.textLines[6], '4 line match expectations').toBe('xe');
+    expect(textbox.textLines[7], '5 line match expectations').toBe('ya');
+    expect(textbox.textLines[8], '6 line match expectations').toBe('yb');
   });
 
   it('wrapping with splitByGrapheme', () => {
