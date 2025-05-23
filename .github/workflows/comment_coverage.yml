@@ -45,7 +45,7 @@ jobs:
           find ./.nyc_output -type f -name 'coverage.json' | while read file; do       
             dir=$(dirname "$file");
             base=$(basename "$dir");
-            cp "$file" "../.nyc_output/${base}.json";
+            cp "$file" "./.nyc_output/${base}.json";
             rm -rf "$dir"
           done;
       - run: ls -l ./.nyc_output
