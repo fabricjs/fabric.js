@@ -110,7 +110,6 @@
     "qunit": "^2.24.1",
     "rollup": "4.39",
     "semver": "^7.3.8",
-    "serve": "^14.2.4",
     "source-map-support": "^0.5.21",
     "testem": "^3.8.0",
     "tslib": "^2.8.1",

@@ -27,8 +27,6 @@ const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 4 : undefined,
   /* Do not update snapshot on CI */
   updateSnapshots: process.env.CI ? 'none' : 'missing',
   /* Configure snapshot names to be the same across platforms for CI */
@@ -45,7 +43,7 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://test.local',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',
@@ -62,14 +60,6 @@ const config: PlaywrightTestConfig = {
         ...devices['Desktop Chrome'],
         browserName: 'chromium',
       },
-    },
-  ],
-
-  /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-      command: 'npm run local-server',
-      port: 8080,
     },
   ],
 };
