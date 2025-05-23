@@ -16,7 +16,6 @@ const createTestFromSVG = (svgName: string): renderTestType => {
     percentage: 0.055,
     snapshotSuffix: 'svg-import',
     size: [100, 100],
-    only: true,
     async renderFunction(canvas, fabric) {
       const asset = await globalThis.getAsset(`${svgName}.svg`);
       const { objects, options } = await fabric.loadSVGFromString(asset);
