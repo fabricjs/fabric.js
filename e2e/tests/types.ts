@@ -1,6 +1,6 @@
-import type { Canvas } from '../../fabric';
+import type { Canvas } from 'fabric';
 
-export type FabricNamespace = typeof import('../../fabric');
+export type FabricNamespace = typeof import('fabric');
 
 export type renderTestType = {
   size: [number, number];

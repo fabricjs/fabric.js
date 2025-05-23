@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): move free draw rendering tests from qunit to playwright [#10616](https://github.com/fabricjs/fabric.js/pull/10616)
 - refactor(tests): move resize filter test cases from qunit to playwright [#10615](https://github.com/fabricjs/fabric.js/pull/10615)
 - refactor(tests): move text rendering cases from qunit to playwright [#10613](https://github.com/fabricjs/fabric.js/pull/10613)
 - refactor(tests): move global composite operation tests from qunit to playwright [#10610](https://github.com/fabricjs/fabric.js/pull/10610)

@@ -14,6 +14,7 @@ import { genericRenderingTests } from './testcases/generic-rendering';
 import { globalCompositeOperationTests } from './testcases/global-composite-operation';
 import { resizeFilterTests } from './testcases/resize-filter';
 import { textRenderingTests } from './testcases/text';
+import { freedrawTests } from './testcases/free-draw';
 
 export const renderTests: renderTestType[] = [
   {
@@ -86,4 +87,5 @@ export const renderTests: renderTestType[] = [
   ...globalCompositeOperationTests,
   ...resizeFilterTests,
   ...textRenderingTests,
+  ...freedrawTests,
 ];
