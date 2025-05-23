@@ -76,7 +76,7 @@ export default defineConfig({
     ],
     coverage: {
       reportsDirectory: '.nyc_output',
-      reporter: ['json'],
+      reporter: ['json', 'text'],
       exclude: [
         'test/**',
         'dist/**',
