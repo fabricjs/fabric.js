@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Additional controls examples in extensions [#10558](https://github.com/fabricjs/fabric.js/pull/10558)
 - ci(): fix Coverage is not being reported anymore [#10617](https://github.com/fabricjs/fabric.js/pull/10617)
 - refactor(tests): move free draw rendering tests from qunit to playwright [#10616](https://github.com/fabricjs/fabric.js/pull/10616)
 - refactor(tests): move resize filter test cases from qunit to playwright [#10615](https://github.com/fabricjs/fabric.js/pull/10615)
