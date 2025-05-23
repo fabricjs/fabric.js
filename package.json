@@ -57,7 +57,7 @@
     "sandbox": "npm run sandboxscript -- sandbox",
     "test:visual-browser": "npm run test -- -s visual -p 8081 -l -c chrome firefox",
     "test:visual:coverage": "nyc --silent --no-clean qunit test/node_test_setup.js test/lib test/visual",
-    "test:vitest:coverage": "npm run test:vitest --coverage=true --run",
+    "test:vitest:coverage": "vitest --run --coverage --project unit-node",
     "test:vitest:coverage:watch": "npm run test:vitest --coverage=true",
     "coverage:merge": "nyc merge coveragefiles .nyc_output/merged-coverage.json",
     "local-server": "serve ./ -l tcp://localhost:8080",

@@ -40,6 +40,14 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./
+      - name: 'copy all coverage files at the same root level'
+        run: |
+          find ./.nyc_output -type f -name 'coverage.json' | while read file; do       
+            dir=$(dirname "$file");
+            base=$(basename "$dir");
+            cp "$file" "./.nyc_output/${base}.json";
+            rm -rf "$dir"
+          done;
       - run: ls -l ./.nyc_output
       - name: Add pr number to output
         id: prnumber
