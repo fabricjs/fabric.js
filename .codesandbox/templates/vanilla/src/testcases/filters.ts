@@ -2,19 +2,25 @@ import * as fabric from 'fabric';
 
 export async function testCase(canvas: fabric.Canvas) {
   const canvasImage = new fabric.StaticCanvas(undefined, {
-    width: 200,
-    height: 200,
+    width: 500,
+    height: 500,
   });
   canvasImage.add(
-    new fabric.Rect({ fill: 'red', width: 100, height: 100, top: 0, left: 0 }),
+    new fabric.Rect({
+      fill: 'red',
+      width: 100,
+      height: 100,
+      top: 200,
+      left: 200,
+    }),
   );
   canvasImage.add(
     new fabric.Rect({
       fill: 'blue',
       width: 100,
       height: 100,
-      top: 0,
-      left: 100,
+      top: 200,
+      left: 300,
     }),
   );
   canvasImage.add(
@@ -22,8 +28,8 @@ export async function testCase(canvas: fabric.Canvas) {
       fill: 'green',
       width: 100,
       height: 100,
-      top: 100,
-      left: 0,
+      top: 300,
+      left: 200,
     }),
   );
   canvasImage.add(
@@ -31,18 +37,15 @@ export async function testCase(canvas: fabric.Canvas) {
       fill: 'purple',
       width: 100,
       height: 100,
-      top: 100,
-      left: 100,
+      top: 300,
+      left: 300,
     }),
   );
   canvasImage.renderAll();
   const image = new fabric.Image(canvasImage.lowerCanvasEl);
-  image.filters = [
-    new fabric.filters.Noise({ noise: 0.2 }),
-    new fabric.filters.Vibrance({ vibrance: 0.3 }),
-    new fabric.filters.Vintage(),
-    new fabric.filters.Grayscale(),
-  ];
+  image.filters = [new fabric.filters.Blur({ blur: 1 })];
   image.applyFilters();
+  image.scaleX = 0.5;
+  image.scaleY = 0.5;
   canvas.add(image);
 }
