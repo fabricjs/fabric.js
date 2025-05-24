@@ -1,10 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Gradient } from '../gradient';
-import {
-  loadSVGFromString,
-  getFabricDocument,
-  Path,
-} from '../../fabric';
+import { loadSVGFromString, getFabricDocument, Path } from '../../fabric';
 import { Rect } from '../shapes/Rect';
 import { cos, sin } from '../util';
 import { parseAttributes } from './parseAttributes';
