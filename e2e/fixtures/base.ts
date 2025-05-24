@@ -18,7 +18,6 @@ async function getImage(
   fabric: FabricNamespace,
   filename: string,
 ): Promise<HTMLImageElement> {
-  const fixtureName = globalThis.getFixtureName(filename);
   return new Promise((resolve, reject) => {
     const img = fabric.getFabricDocument().createElement('img');
     img.onload = function () {
@@ -31,14 +30,14 @@ async function getImage(
       img.onload = null;
       reject(err);
     };
-    img.src = fixtureName;
+    img.src = globalThis.getFixtureName(filename);
   });
 }
 
 // Used to resolve assert path for fetching
 // browser equivalent is installed in setupApp in test.beforeEach
 globalThis.getAssetName = function (f: string) {
-  return 'file://' + path.join(ASSET_DIR_NODE, `${f}`);
+  return 'file://' + path.join(ASSET_DIR_NODE, f);
 };
 
 globalThis.getAsset = async function (name: string): Promise<string> {
@@ -48,7 +47,7 @@ globalThis.getAsset = async function (name: string): Promise<string> {
 };
 
 globalThis.getFixtureName = function (f: string) {
-  return 'file://' + path.join(FIXTURE_DIR_NODE, `${f}`);
+  return 'file://' + path.join(FIXTURE_DIR_NODE, f);
 };
 
 globalThis.getImage = getImage;
@@ -62,6 +61,10 @@ export const test = base.extend<TestFixtures>({
   page: async ({ page }, use, testInfo) => {
     await page.coverage.startJSCoverage({ reportAnonymousScripts: false });
     await setupSelectors();
+    const getImageFunctionString = getImage.toString();
+    await page.addInitScript(
+      `globalThis.getImage = ${getImageFunctionString};`,
+    );
     await setupApp(page, testInfo.file);
     await use(page);
     await page.evaluate(() => window.__teardownFabricHook());

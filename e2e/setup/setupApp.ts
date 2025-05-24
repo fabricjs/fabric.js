@@ -3,7 +3,6 @@ import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import imports from '../imports';
 import { JSDOM } from 'jsdom';
-import { FabricNamespace } from '../tests/types';
 
 export async function setupApp(page: Page, file: string) {
   await page.addInitScript(() => {
@@ -13,25 +12,6 @@ export async function setupApp(page: Page, file: string) {
       const finalName = globalThis.getAssetName(name);
       const res = await fetch(finalName);
       return res.text();
-    };
-    globalThis.getImage = async (
-      fabric: FabricNamespace,
-      filename: string,
-    ): Promise<HTMLImageElement> => {
-      return new Promise((resolve, reject) => {
-        const img = fabric.getFabricDocument().createElement('img');
-        img.onload = function () {
-          img.onerror = null;
-          img.onload = null;
-          resolve(img);
-        };
-        img.onerror = function (err) {
-          img.onerror = null;
-          img.onload = null;
-          reject(err);
-        };
-        img.src = globalThis.getFixtureName(filename);
-      });
     };
   });
 
