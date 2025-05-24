@@ -1,9 +1,15 @@
-import setupApp from './setupApp';
-import setupCoverage from './setupCoverage';
-import setupSelectors from './setupSelectors';
+import { test as base } from '@playwright/test';
+import { setupSelectors } from '../setup/setupSelectors';
+import { CanvasUtil } from '../utils/CanvasUtil';
+import { stopCoverage } from '../setup/setupCoverage';
+import { setupApp } from '../setup/setupApp';
 import path from 'node:path';
 import { FabricNamespace } from '../tests/types';
 import { readFile } from 'node:fs/promises';
+
+interface TestFixtures {
+  canvasUtil: CanvasUtil;
+}
 
 const ASSET_DIR_NODE = path.resolve(process.cwd(), 'test', 'visual', 'assets');
 const FIXTURE_DIR_NODE = path.resolve(process.cwd(), 'test', 'fixtures');
@@ -47,11 +53,20 @@ globalThis.getFixtureName = function (f: string) {
 
 globalThis.getImage = getImage;
 
-export default () => {
-  // call first
-  setupSelectors();
-  // call before using fabric
-  setupCoverage();
-  // call at the end - navigates the page
-  setupApp();
-};
+export const test = base.extend<TestFixtures>({
+  canvasUtil: async ({ page }, use) => {
+    const canvasUtil = new CanvasUtil(page);
+    await use(canvasUtil);
+  },
+
+  page: async ({ page }, use, testInfo) => {
+    await page.coverage.startJSCoverage({ reportAnonymousScripts: false });
+    await setupSelectors();
+    await setupApp(page, testInfo.file);
+    await use(page);
+    await page.evaluate(() => window.__teardownFabricHook());
+    await stopCoverage(page, testInfo.outputDir);
+  },
+});
+
+export { expect } from '@playwright/test';
