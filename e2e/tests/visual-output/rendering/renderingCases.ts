@@ -15,6 +15,7 @@ import { globalCompositeOperationTests } from './testcases/global-composite-oper
 import { resizeFilterTests } from './testcases/resize-filter';
 import { textRenderingTests } from './testcases/text';
 import { freedrawTests } from './testcases/free-draw';
+import { svgImportTests } from './testcases/svg-import';
 
 export const renderTests: renderTestType[] = [
   {
@@ -88,4 +89,5 @@ export const renderTests: renderTestType[] = [
   ...resizeFilterTests,
   ...textRenderingTests,
   ...freedrawTests,
+  ...svgImportTests,
 ];
