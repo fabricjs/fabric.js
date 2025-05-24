@@ -3,6 +3,7 @@ import setupCoverage from './setupCoverage';
 import setupSelectors from './setupSelectors';
 import path from 'node:path';
 import { FabricNamespace } from '../tests/types';
+import { readFile } from 'node:fs/promises';
 
 const ASSET_DIR_NODE = path.resolve(process.cwd(), 'test', 'visual', 'assets');
 const FIXTURE_DIR_NODE = path.resolve(process.cwd(), 'test', 'fixtures');
@@ -32,6 +33,12 @@ async function getImage(
 // browser equivalent is installed in setupApp in test.beforeEach
 globalThis.getAssetName = function (f: string) {
   return 'file://' + path.join(ASSET_DIR_NODE, `${f}`);
+};
+
+globalThis.getAsset = async function (name: string): Promise<string> {
+  const finalName = globalThis.getAssetName(name);
+  const plainFileName = finalName.replace('file://', '');
+  return readFile(plainFileName, { encoding: 'utf8' });
 };
 
 globalThis.getFixtureName = function (f: string) {

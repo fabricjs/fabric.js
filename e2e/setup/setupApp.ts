@@ -10,6 +10,11 @@ export default () => {
     await page.addInitScript(() => {
       globalThis.getAssetName = (name: string) => `/test/visual/assets/${name}`;
       globalThis.getFixtureName = (name: string) => `/test/fixtures/${name}`;
+      globalThis.getAsset = async function (name: string) {
+        const finalName = globalThis.getAssetName(name);
+        const res = await fetch(finalName);
+        return res.text();
+      };
       globalThis.getImage = async (
         fabric: FabricNamespace,
         filename: string,
