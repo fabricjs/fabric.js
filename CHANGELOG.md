@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): cleanup after qunit removal [#10621](https://github.com/fabricjs/fabric.js/pull/10621)
 - refactor(tests): move svg import tests from qunit to playwright [#10618](https://github.com/fabricjs/fabric.js/pull/10618)
 - ci(): fix Coverage is not being reported anymore [#10617](https://github.com/fabricjs/fabric.js/pull/10617)
 - refactor(tests): move free draw rendering tests from qunit to playwright [#10616](https://github.com/fabricjs/fabric.js/pull/10616)
