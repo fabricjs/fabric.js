@@ -176,14 +176,6 @@ export { loadSVGFromString } from './src/parser/loadSVGFromString';
 export { loadSVGFromURL } from './src/parser/loadSVGFromURL';
 export { parseSVGDocument } from './src/parser/parseSVGDocument';
 
-// todo convert tests to vitest and stop exporting those.
-export { parseAttributes } from './src/parser/parseAttributes';
-export { parseStyleAttribute } from './src/parser/parseStyleAttribute';
-export { parsePointsAttribute } from './src/parser/parsePointsAttribute';
-export { parseTransformAttribute } from './src/parser/parseTransformAttribute';
-export { getCSSRules } from './src/parser/getCSSRules';
-export { parseFontDeclaration } from './src/parser/parseFontDeclaration';
-
 export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
 
