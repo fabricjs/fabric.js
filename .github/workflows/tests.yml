@@ -57,7 +57,9 @@ jobs:
       - name: Install Playwright Browsers ${{matrix.browser}}
         run: npx playwright install --with-deps ${{matrix.browser}}
       - name: Run Vitest unit test
-        run: npm run test:vitest:${{matrix.browser}}
+        run: xvfb-run npm run test:vitest:${{matrix.browser}}
+        env:
+          LIBGL_ALWAYS_SOFTWARE: 1
   vitest-node-18:
     name: Vitest tests node 18
     runs-on: ubuntu-24.04
