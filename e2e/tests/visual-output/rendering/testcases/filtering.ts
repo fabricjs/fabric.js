@@ -4,8 +4,8 @@ const imageAlphaBlurFilterTest = (): renderTestType[] => {
   return [true, false].map((configValue) => ({
     title: `Image blur with transparency webgl ${configValue ? 'enabled' : 'disabled'}`,
     golden: `blur-with-alpha-webgl-${configValue ? 'enabled' : 'disabled'}.png`,
-    percentage: 0.02,
-    size: [256, 256],
+    percentage: 0.01,
+    size: [1000, 1000],
     snapshotSuffix: 'color-filters',
     async renderFunction(canvas, fabric) {
       fabric.config.configure({
@@ -26,7 +26,7 @@ const imageBlurFilterTest = (): renderTestType[] => {
   return [true, false].map((configValue) => ({
     title: `Image blur webgl ${configValue ? 'enabled' : 'disabled'}`,
     golden: `dog_image-webgl-${configValue ? 'enabled' : 'disabled'}.png`,
-    percentage: 0.02,
+    percentage: 0.01,
     size: [1024, 683],
     snapshotSuffix: 'color-filters',
     async renderFunction(canvas, fabric) {
