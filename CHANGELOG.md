@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
 - chore(): modernize eslint config [#10624](https://github.com/fabricjs/fabric.js/pull/10624)
 - chore(): enable no-unnecessary-type-assertion lint rule [#10626](https://github.com/fabricjs/fabric.js/pull/10626)
 - fix(): Remove black border in blur and also align JS with WEBGL blur filtering [#10623](https://github.com/fabricjs/fabric.js/pull/10623)
