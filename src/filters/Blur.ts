@@ -73,58 +73,76 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
     this.aspectRatio = width / height;
     this.horizontal = true;
     let blurValue = this.getBlurValue() * width;
+    const imageData = new Uint8ClampedArray(data);
     const samples = 15;
+    const bytesInRow = 4 * width;
     for (let i = 0; i < data.length; i += 4) {
       let r = 0.0,
         g = 0.0,
         b = 0.0,
         a = 0.0;
-      const minIRow = i - (i % (width * 4));
-      const maxIRow = minIRow + 4 * width;
-      for (let j = -samples + 1; j < samples; j += 1) {
+      const minIRow = i - (i % bytesInRow);
+      const maxIRow = minIRow + bytesInRow;
+      let pixelOffset = 0;
+      const offset = Math.random() * 3;
+      if (offset > 2) {
+        pixelOffset = 4;
+      } else if (offset < 1) {
+        pixelOffset = -4;
+      }
+      for (let j = -samples + 1; j < samples; j++) {
         const percent = j / samples;
         const distance = Math.floor(blurValue * percent) * 4;
         const weight = 1 - Math.abs(percent);
-        let displacement = i + distance;
+        let sampledPixel = i + distance + pixelOffset;
         // try to implement edge mirroring
-        if (displacement < minIRow) {
-          displacement += minIRow - displacement;
-        } else if (displacement > maxIRow) {
-          displacement -= displacement - maxIRow;
+        if (sampledPixel < minIRow) {
+          sampledPixel = minIRow + minIRow - sampledPixel;
+        } else if (sampledPixel > maxIRow) {
+          sampledPixel = maxIRow - (sampledPixel - maxIRow);
         }
-        const localAlpha = (data[displacement + 3] * weight) / 255 / samples;
-        r += data[displacement] * localAlpha;
-        g += data[displacement + 1] * localAlpha;
-        b += data[displacement + 2] * localAlpha;
+        const localAlpha = (data[sampledPixel + 3] * weight) / samples;
+        r += data[sampledPixel] * localAlpha;
+        g += data[sampledPixel + 1] * localAlpha;
+        b += data[sampledPixel + 2] * localAlpha;
         a += localAlpha;
       }
-      data[i] = r;
-      data[i + 1] = g;
-      data[i + 2] = b;
-      data[i + 3] = a * 255;
+      imageData[i] = r / 255;
+      imageData[i + 1] = g / 255;
+      imageData[i + 2] = b / 255;
+      imageData[i + 3] = a;
     }
-    for (let i = 0; i < data.length; i += 4) {
+    this.horizontal = false;
+    blurValue = this.getBlurValue() * height;
+    for (let i = 0; i < imageData.length; i += 4) {
       let r = 0.0,
         g = 0.0,
         b = 0.0,
         a = 0.0;
-      const minIRow = 0;
-      const maxIRow = data.length;
-      for (let j = -samples + 1; j < samples; j += 1) {
+      const minIRow = i % bytesInRow;
+      const maxIRow = imageData.length - bytesInRow + minIRow;
+      let pixelOffset = 0;
+      const offset = Math.random() * 3;
+      if (offset > 2) {
+        pixelOffset = bytesInRow;
+      } else if (offset < 1) {
+        pixelOffset = -bytesInRow;
+      }
+      for (let j = -samples + 1; j < samples; j++) {
         const percent = j / samples;
-        const distance = Math.floor(blurValue * percent) * 4 * width;
+        const distance = Math.floor(blurValue * percent) * bytesInRow;
         const weight = 1 - Math.abs(percent);
-        let displacement = i + distance;
+        let sampledPixel = i + distance + pixelOffset;
         // try to implement edge mirroring
-        if (displacement < minIRow) {
-          displacement += minIRow - displacement;
-        } else if (displacement > maxIRow) {
-          displacement -= displacement - maxIRow;
+        if (sampledPixel < minIRow) {
+          sampledPixel = minIRow + minIRow - sampledPixel;
+        } else if (sampledPixel > maxIRow) {
+          sampledPixel = maxIRow - (sampledPixel - maxIRow);
         }
-        const localAlpha = (data[displacement + 3] * weight) / samples;
-        r += data[displacement] * localAlpha;
-        g += data[displacement + 1] * localAlpha;
-        b += data[displacement + 2] * localAlpha;
+        const localAlpha = (imageData[sampledPixel + 3] * weight) / samples;
+        r += imageData[sampledPixel] * localAlpha;
+        g += imageData[sampledPixel + 1] * localAlpha;
+        b += imageData[sampledPixel + 2] * localAlpha;
         a += localAlpha;
       }
       data[i] = r / 255;

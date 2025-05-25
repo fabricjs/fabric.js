@@ -2,48 +2,22 @@ import * as fabric from 'fabric';
 
 export async function testCase(canvas: fabric.Canvas) {
   fabric.config.configure({
-    enableGLFiltering: true,
+    enableGLFiltering: false,
   });
   const canvasImage = new fabric.StaticCanvas(undefined, {
     width: 128,
     height: 128,
   });
   canvasImage.add(
-    new fabric.Rect({
+    new fabric.Circle({
+      strokeWidth: 0,
       fill: 'red',
-      width: 35,
-      height: 35,
-      top: 29,
-      left: 29,
+      radius: 60,
+      top: 4,
+      left: 4,
     }),
   );
-  canvasImage.add(
-    new fabric.Rect({
-      fill: 'blue',
-      width: 35,
-      height: 35,
-      top: 29,
-      left: 64,
-    }),
-  );
-  canvasImage.add(
-    new fabric.Rect({
-      fill: 'green',
-      width: 35,
-      height: 35,
-      top: 64,
-      left: 29,
-    }),
-  );
-  canvasImage.add(
-    new fabric.Rect({
-      fill: 'purple',
-      width: 35,
-      height: 35,
-      top: 64,
-      left: 64,
-    }),
-  );
+  canvas.backgroundColor = 'white';
   canvasImage.renderAll();
   const image = new fabric.Image(canvasImage.lowerCanvasEl);
   image.filters = [new fabric.filters.Blur({ blur: 0.6 })];

@@ -11,6 +11,8 @@ export const fragmentSource = `
     }
     void main() {
       vec4 color = vec4(0.0);
+      float totalC = 0.0;
+      float totalA = 0.0;
       float offset = random(v3offset);
       for (float t = -nSamples; t <= nSamples; t++) {
         float percent = (t + offset - 0.5) / nSamples;
@@ -19,8 +21,10 @@ export const fragmentSource = `
         float alpha = weight * sample.a;
         color.rgb += sample.rgb * alpha;
         color.a += alpha;
+        totalA += weight;
+        totalC += alpha;
       }
-      gl_FragColor.rgb = color.rgb / color.a;
-      gl_FragColor.a = color.a / nSamples;
+      gl_FragColor.rgb = color.rgb / totalC;
+      gl_FragColor.a = color.a / totalA;
     }
   ` as const;
