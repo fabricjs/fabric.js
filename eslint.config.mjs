@@ -49,6 +49,7 @@ export default [
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-restricted-types': 1,
       '@typescript-eslint/ban-ts-comment': 1,
+      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
 
       'no-restricted-globals': [
         'error',

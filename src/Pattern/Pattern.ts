@@ -174,17 +174,11 @@ export class Pattern {
       patternWidth =
         repeat === 'repeat-y' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetX || 0)
-          : ifNaN(
-              ((patternSource as HTMLImageElement).width as number) / width,
-              0,
-            ),
+          : ifNaN((patternSource as HTMLImageElement).width / width, 0),
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
-          : ifNaN(
-              ((patternSource as HTMLImageElement).height as number) / height,
-              0,
-            );
+          : ifNaN((patternSource as HTMLImageElement).height / height, 0);
 
     return [
       `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
