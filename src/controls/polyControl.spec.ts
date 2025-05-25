@@ -10,6 +10,7 @@ describe('polyControl', () => {
       [new Point(), new Point(50, 0), new Point(50, 50), new Point(0, 50)],
       { controls: createPolyControls(4) },
     );
+    vi.spyOn(poly, 'set');
     const canvas = new Canvas();
     canvas.add(poly);
     canvas.setActiveObject(poly);
@@ -40,5 +41,9 @@ describe('polyControl', () => {
         ]) => action,
       ),
     ).toMatchObject(['modifyPoly', 'modifyPoly']);
+    expect(
+      poly.set,
+      'call set method with dirty for cache invalidation of point changes that do not change polygon size',
+    ).toHaveBeenCalledWith('dirty', true);
   });
 });
