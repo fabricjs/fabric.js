@@ -1,8 +1,10 @@
 import type { JSHandle } from '@playwright/test';
-import { type LocatorScreenshotOptions, type Page } from '@playwright/test';
+import type { PageFunctionOn } from 'playwright-core/types/structs';
+import type { LocatorScreenshotOptions, Page } from '@playwright/test';
 import type { Canvas, XY } from 'fabric';
 import os from 'node:os';
 import type { ObjectUtil } from './ObjectUtil';
+import * as fabric from 'fabric';
 
 export class CanvasUtil {
   constructor(
@@ -16,7 +18,7 @@ export class CanvasUtil {
 
   async makeActiveSelectionWith(objects: ObjectUtil[]) {
     for (const objectUtil of objects) {
-      this.page.click(`canvas_top=${this.selector}`, {
+      await this.page.click(`canvas_top=${this.selector}`, {
         modifiers: ['Shift'],
         position: await objectUtil.getObjectCenter(),
       });
@@ -76,22 +78,22 @@ export class CanvasUtil {
   }
 
   evaluateSelf() {
-    return this.page.evaluateHandle<Canvas>(
-      ([selector]) => canvasMap.get(document.querySelector(selector)),
-      [this.selector],
+    return this.page.evaluateHandle(
+      (selector) => canvasMap.get(document.querySelector(selector)!),
+      this.selector,
     );
   }
 
   async executeInBrowser<C, R>(
-    runInBrowser: (canvas: Canvas, context: C) => R,
-    context?: C,
+    runInBrowser: PageFunctionOn<Canvas, C, R>,
+    context: C,
   ): Promise<R> {
     return (await this.evaluateSelf()).evaluate(runInBrowser, context);
   }
 
   async evaluateHandle<C, R>(
-    runInBrowser: (canvas: Canvas, context: C) => R,
-    context?: C,
+    runInBrowser: PageFunctionOn<Canvas, C, R>,
+    context: C,
   ): Promise<JSHandle<R>> {
     return (await this.evaluateSelf()).evaluateHandle(runInBrowser, context);
   }

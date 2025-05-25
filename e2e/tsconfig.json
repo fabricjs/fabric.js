@@ -1,12 +1,17 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "strict": true,
     "sourceMap": true,
     "outDir": "./dist",
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
     /**
      * A reflection of the configured imports used by test scripts
      * **IMPORTANT**: be sure to keep this updated to reflect `./imports.ts` correctly
@@ -17,5 +22,7 @@
       "fabric/extensions": ["../dist-extensions"]
     },
     "resolveJsonModule": true
-  }
+  },
+  "include": ["./**/*.ts", "env.d.ts"],
+  "exclude": []
 }

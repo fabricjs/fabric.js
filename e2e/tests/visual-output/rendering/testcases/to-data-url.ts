@@ -1,4 +1,4 @@
-import type { Canvas } from '../../../../../fabric';
+import type { Canvas } from 'fabric';
 import type { FabricNamespace, renderTestType } from '../../../types';
 
 const canvasWithObjects =
@@ -373,7 +373,7 @@ function wrapWithExportedBitmap<
 
     const FabricObject = fabric.FabricObject;
     const origObjToDataURL = fabric.FabricObject.prototype.toDataURL;
-    FabricObject.prototype.toDataURL = function (...args: unknown[]) {
+    FabricObject.prototype.toDataURL = function (...args) {
       lastDataUrl = origObjToDataURL.apply(this, args);
       return lastDataUrl;
     };

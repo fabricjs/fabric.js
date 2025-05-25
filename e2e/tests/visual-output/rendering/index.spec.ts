@@ -28,7 +28,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
           // enable and disable this inside the loop
           config.config.updateSnapshots = 'missing';
           const output = await page.evaluate(
-            (testTitle) => renderingTestMap.get(testTitle)(),
+            (testTitle) => renderingTestMap.get(testTitle)!(),
             testCase.title,
           );
           if (output) {
@@ -54,7 +54,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
         await test.step(`node - ${testCase.title}`, async () => {
           // we want the browser snapshot of a test to be committed and not the node snapshot
           config.config.updateSnapshots = 'none';
-          const canvas = new TestingCanvas(null, {
+          const canvas = new TestingCanvas(undefined, {
             enableRetinaScaling: false,
             renderOnAddRemove: false,
             width: testCase.size[0],

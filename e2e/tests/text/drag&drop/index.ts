@@ -84,7 +84,7 @@ const roundPoint = (point: fabric.Point) => ({
 
 const parseEvent = (
   type: string,
-  { pointer, absolutePointer, ...ev } = {},
+  { pointer, absolutePointer, ...ev }: Record<string, any> = {},
   caller: fabric.Textbox | fabric.Canvas,
 ) =>
   JSON.parse(
@@ -102,7 +102,7 @@ const parseEvent = (
   );
 
 class TestCanvas extends fabric.Canvas {
-  eventStream = [];
+  eventStream: any[] = [];
   readEventStream() {
     const data = this.eventStream;
     this.eventStream = [];
@@ -151,6 +151,7 @@ before('#canvas', (el) => {
     top: 20,
     objectCaching: false,
     fontFamily: 'Arial',
+    // @ts-expect-error -- styles mock
     styles,
   });
 

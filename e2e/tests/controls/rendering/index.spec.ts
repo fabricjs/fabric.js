@@ -42,8 +42,8 @@ test('control box rendering', async ({ canvasUtil }) => {
                   object.transparentCorners = false;
                   const color = object.fill;
                   object._renderControls(canvas.contextContainer, {
-                    borderColor: color,
-                    cornerColor: color,
+                    borderColor: color as string,
+                    cornerColor: color as string,
                   });
                   object.getObjects?.().forEach((subTarget) => {
                     subTarget.padding = objectPadding;
