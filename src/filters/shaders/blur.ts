@@ -11,19 +11,16 @@ export const fragmentSource = `
     }
     void main() {
       vec4 color = vec4(0.0);
-      float totalC = 0.0;
-      float totalA = 0.0;
       float offset = random(v3offset);
       for (float t = -nSamples; t <= nSamples; t++) {
         float percent = (t + offset - 0.5) / nSamples;
         vec4 sample = texture2D(uTexture, vTexCoord + uDelta * percent);
         float weight = 1.0 - abs(percent);
-        color.rgb += sample.rgb * weight * sample.a;
-        color.a += sample.a * weight;
-        totalA += weight;
-        totalC += weight * sample.a;
+        float alpha = weight * sample.a;
+        color.rgb += sample.rgb * alpha;
+        color.a += alpha;
       }
-      gl_FragColor.rgb = color.rgb / totalC;
-      gl_FragColor.a = color.a / totalA;
+      gl_FragColor.rgb = color.rgb / color.a;
+      gl_FragColor.a = color.a / nSamples;
     }
   ` as const;
