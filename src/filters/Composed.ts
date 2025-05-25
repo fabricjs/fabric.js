@@ -85,9 +85,7 @@ export class Composed extends BaseFilter<
             .getClass<typeof BaseFilter>(filter.type)
             .fromObject(filter, options),
       ),
-    ).then(
-      (enlivedFilters) => new this({ subFilters: enlivedFilters }) as Composed,
-    );
+    ).then((enlivedFilters) => new this({ subFilters: enlivedFilters }));
   }
 }
 

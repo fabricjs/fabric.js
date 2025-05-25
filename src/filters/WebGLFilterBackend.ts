@@ -148,7 +148,7 @@ export class WebGLFilterBackend {
           width,
           height,
           !cachedTexture ? source : undefined,
-        )!,
+        ),
       passes: filters.length,
       webgl: true,
       aPosition: this.aPosition,

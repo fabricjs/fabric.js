@@ -852,7 +852,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
           const subTarget = this._searchPossibleTargets(
-            target._objects as FabricObject[],
+            target._objects,
             pointer,
           );
           subTarget && this.targets.push(subTarget);

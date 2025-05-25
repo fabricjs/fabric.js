@@ -82,7 +82,7 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
       resources.blurLayer1 = createCanvasElement();
       resources.blurLayer2 = createCanvasElement();
     }
-    const canvas1 = resources.blurLayer1!;
+    const canvas1 = resources.blurLayer1;
     const canvas2 = resources.blurLayer2!;
     if (canvas1.width !== width || canvas1.height !== height) {
       canvas2.width = canvas1.width = width;

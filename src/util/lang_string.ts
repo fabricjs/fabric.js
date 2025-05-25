@@ -62,7 +62,7 @@ const graphemeSplitImpl = (textstring: string): string[] => {
     if ((chr = getWholeChar(textstring, i)) === false) {
       continue;
     }
-    graphemes.push(chr as string);
+    graphemes.push(chr);
   }
   return graphemes;
 };

@@ -151,7 +151,7 @@ export class Gradient<
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
-      coords: { ...this.coords } as GradientCoords<T>,
+      coords: { ...this.coords },
       colorStops: this.colorStops.map((colorStop) => ({ ...colorStop })),
       offsetX: this.offsetX,
       offsetY: this.offsetY,

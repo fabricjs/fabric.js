@@ -214,8 +214,7 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
     options: { signal: AbortSignal },
   ): Promise<BaseFilter<'BlendImage', BlendImageOwnProps>> {
     return FabricImage.fromObject(image, options).then(
-      (enlivedImage) =>
-        new this({ ...filterOptions, image: enlivedImage }) as BlendImage,
+      (enlivedImage) => new this({ ...filterOptions, image: enlivedImage }),
     );
   }
 }
