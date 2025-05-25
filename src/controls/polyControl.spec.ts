@@ -41,9 +41,6 @@ describe('polyControl', () => {
         ]) => action,
       ),
     ).toMatchObject(['modifyPoly', 'modifyPoly']);
-    expect(
-      poly.set,
-      'call set method with dirty for cache invalidation of point changes that do not change polygon size',
-    ).toHaveBeenCalledWith('dirty', true);
+    expect(poly.set).toHaveBeenCalledWith('dirty', true);
   });
 });
