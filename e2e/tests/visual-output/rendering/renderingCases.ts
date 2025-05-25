@@ -16,6 +16,7 @@ import { resizeFilterTests } from './testcases/resize-filter';
 import { textRenderingTests } from './testcases/text';
 import { freedrawTests } from './testcases/free-draw';
 import { svgImportTests } from './testcases/svg-import';
+import { colorFilteringTests } from './testcases/filtering';
 
 export const renderTests: renderTestType[] = [
   {
@@ -90,4 +91,5 @@ export const renderTests: renderTestType[] = [
   ...textRenderingTests,
   ...freedrawTests,
   ...svgImportTests,
+  ...colorFilteringTests,
 ];
