@@ -49,7 +49,7 @@ export default tseslint.config(
           argsIgnorePattern: '^_',
         },
       ],
-
+      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       'no-restricted-globals': [
         'error',
         {

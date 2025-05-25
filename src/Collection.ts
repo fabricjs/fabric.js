@@ -351,5 +351,5 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
   }
 
   // https://github.com/microsoft/TypeScript/issues/32080
-  return Collection as typeof Collection & TBase;
+  return Collection;
 }
