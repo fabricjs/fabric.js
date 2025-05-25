@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(): enable no-unnecessary-type-assertion lint rule [#10626](https://github.com/fabricjs/fabric.js/pull/10626)
+- fix(): Remove black border in blur and also align JS with WEBGL blur filtering [#10623](https://github.com/fabricjs/fabric.js/pull/10623)
+- chore(): try to fix firefox vitest test [#10625](https://github.com/fabricjs/fabric.js/pull/10625)
 - chore(): Remove old test suite dependencies [#10621](https://github.com/fabricjs/fabric.js/pull/10621)
 - chore(): BREAKING remove exports for parseAttributes, parseStyleAttribute, parseFontDeclaration, parsePointsAttribute, parseTransformAttribute and getCSSRules [#10620](https://github.com/fabricjs/fabric.js/pull/10620)
 - refactor(tests): move svg import tests from qunit to playwright [#10618](https://github.com/fabricjs/fabric.js/pull/10618)
