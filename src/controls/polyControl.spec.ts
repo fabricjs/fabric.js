@@ -10,7 +10,7 @@ describe('polyControl', () => {
       [new Point(), new Point(50, 0), new Point(50, 50), new Point(0, 50)],
       { controls: createPolyControls(4) },
     );
-    vi.spyOn(poly, 'set');
+    jest.spyOn(poly, 'set');
     const canvas = new Canvas();
     canvas.add(poly);
     canvas.setActiveObject(poly);
