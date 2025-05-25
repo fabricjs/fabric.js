@@ -23,7 +23,7 @@ const imageAlphaBlurFilterTest = (): renderTestType[] => {
 };
 
 const imageBlurFilterTest = (): renderTestType[] => {
-  return [true, false].map((configValue) => ({
+  return ['enabled', 'disabled'].map((configValue) => ({
     title: `Image blur webgl ${configValue}`,
     golden: `dog_image-webgl-${configValue}.png`,
     percentage: 0.01,
@@ -31,7 +31,7 @@ const imageBlurFilterTest = (): renderTestType[] => {
     snapshotSuffix: 'color-filters',
     async renderFunction(canvas, fabric) {
       fabric.config.configure({
-        enableGLFiltering: configValue,
+        enableGLFiltering: configValue === 'enabled',
       });
       const img = await globalThis.getImage(fabric, 'dog_image.jpg');
       const image = new fabric.Image(img);
