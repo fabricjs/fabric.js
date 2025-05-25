@@ -5,16 +5,16 @@ export async function testCase(canvas: fabric.Canvas) {
     enableGLFiltering: false,
   });
   const canvasImage = new fabric.StaticCanvas(undefined, {
-    width: 128,
-    height: 128,
+    width: 136,
+    height: 136,
   });
   canvasImage.add(
     new fabric.Circle({
       strokeWidth: 0,
-      fill: 'red',
+      fill: 'blue',
       radius: 60,
-      top: 4,
-      left: 4,
+      top: 8,
+      left: 8,
     }),
   );
   canvas.backgroundColor = 'white';

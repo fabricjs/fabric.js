@@ -80,37 +80,40 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
       let r = 0.0,
         g = 0.0,
         b = 0.0,
-        a = 0.0;
+        a = 0.0,
+        totalA = 0;
       const minIRow = i - (i % bytesInRow);
       const maxIRow = minIRow + bytesInRow;
-      let pixelOffset = 0;
-      const offset = Math.random() * 3;
-      if (offset > 2) {
-        pixelOffset = 4;
-      } else if (offset < 1) {
-        pixelOffset = -4;
-      }
+      // for now let's keep noise out of the way
+      // let pixelOffset = 0;
+      // const offset = Math.random() * 3;
+      // if (offset > 2) {
+      //   pixelOffset = 4;
+      // } else if (offset < 1) {
+      //   pixelOffset = -4;
+      // }
       for (let j = -samples + 1; j < samples; j++) {
         const percent = j / samples;
         const distance = Math.floor(blurValue * percent) * 4;
         const weight = 1 - Math.abs(percent);
-        let sampledPixel = i + distance + pixelOffset;
+        let sampledPixel = i + distance; // + pixelOffset;
         // try to implement edge mirroring
         if (sampledPixel < minIRow) {
-          sampledPixel = minIRow + minIRow - sampledPixel;
+          sampledPixel = minIRow;
         } else if (sampledPixel > maxIRow) {
-          sampledPixel = maxIRow - (sampledPixel - maxIRow);
+          sampledPixel = maxIRow;
         }
-        const localAlpha = (data[sampledPixel + 3] * weight) / samples;
+        const localAlpha = data[sampledPixel + 3] * weight;
         r += data[sampledPixel] * localAlpha;
         g += data[sampledPixel + 1] * localAlpha;
         b += data[sampledPixel + 2] * localAlpha;
         a += localAlpha;
+        totalA += weight;
       }
-      imageData[i] = r / 255;
-      imageData[i + 1] = g / 255;
-      imageData[i + 2] = b / 255;
-      imageData[i + 3] = a;
+      imageData[i] = r / a;
+      imageData[i + 1] = g / a;
+      imageData[i + 2] = b / a;
+      imageData[i + 3] = a / totalA;
     }
     this.horizontal = false;
     blurValue = this.getBlurValue() * height;
@@ -118,37 +121,40 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
       let r = 0.0,
         g = 0.0,
         b = 0.0,
-        a = 0.0;
+        a = 0.0,
+        totalA = 0;
       const minIRow = i % bytesInRow;
       const maxIRow = imageData.length - bytesInRow + minIRow;
-      let pixelOffset = 0;
-      const offset = Math.random() * 3;
-      if (offset > 2) {
-        pixelOffset = bytesInRow;
-      } else if (offset < 1) {
-        pixelOffset = -bytesInRow;
-      }
+      // for now let's keep noise out of the way
+      // let pixelOffset = 0;
+      // const offset = Math.random() * 3;
+      // if (offset > 2) {
+      //   pixelOffset = bytesInRow;
+      // } else if (offset < 1) {
+      //   pixelOffset = -bytesInRow;
+      // }
       for (let j = -samples + 1; j < samples; j++) {
         const percent = j / samples;
         const distance = Math.floor(blurValue * percent) * bytesInRow;
         const weight = 1 - Math.abs(percent);
-        let sampledPixel = i + distance + pixelOffset;
+        let sampledPixel = i + distance; // + pixelOffset;
         // try to implement edge mirroring
         if (sampledPixel < minIRow) {
-          sampledPixel = minIRow + minIRow - sampledPixel;
+          sampledPixel = minIRow;
         } else if (sampledPixel > maxIRow) {
-          sampledPixel = maxIRow - (sampledPixel - maxIRow);
+          sampledPixel = maxIRow;
         }
-        const localAlpha = (imageData[sampledPixel + 3] * weight) / samples;
+        const localAlpha = imageData[sampledPixel + 3] * weight;
         r += imageData[sampledPixel] * localAlpha;
         g += imageData[sampledPixel + 1] * localAlpha;
         b += imageData[sampledPixel + 2] * localAlpha;
         a += localAlpha;
+        totalA += weight;
       }
-      data[i] = r / 255;
-      data[i + 1] = g / 255;
-      data[i + 2] = b / 255;
-      data[i + 3] = a;
+      data[i] = r / a;
+      data[i + 1] = g / a;
+      data[i + 2] = b / a;
+      data[i + 3] = a / totalA;
     }
   }
 
