@@ -461,7 +461,7 @@ export const zSvgExport: renderTestType[] = [
     async renderFunction(canvas, fabric) {
       const assetName = globalThis.getAssetName('svg_linear_9.svg');
       const { objects } = await fabric.loadSVGFromURL(assetName);
-      const nonNullObjects = objects.filter((obj) => !!obj)
+      const nonNullObjects = objects.filter((obj) => !!obj);
       const group = fabric.util.groupSVGElements(nonNullObjects);
       canvas.add(group);
       await new Promise((resolve) => {

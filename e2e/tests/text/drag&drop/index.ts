@@ -101,7 +101,7 @@ const parseEvent = (
     ]),
   );
 
-class TestCanvas extends fabric.Canvas {
+export class DragDropTestCanvas extends fabric.Canvas {
   eventStream: any[] = [];
   readEventStream() {
     const data = this.eventStream;
@@ -124,7 +124,7 @@ const commonEvents = [
 ] as const;
 
 before('#canvas', (el) => {
-  const canvas = new TestCanvas(el, { width: 800, height: 500 });
+  const canvas = new DragDropTestCanvas(el, { width: 800, height: 500 });
   const textValue = 'fabric.js sandbox';
   const a = new fabric.Textbox(textValue, {
     originX: 'center',

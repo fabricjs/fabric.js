@@ -1,5 +1,10 @@
 import { expect, test } from '../../../fixtures/base';
 import type * as fabric from 'fabric';
+import type { FabricObject } from 'fabric';
+
+declare const globalThis: {
+  renderRectsPadding(rects: FabricObject[]): void;
+};
 
 test('Selection hit regions', async ({ canvasUtil }) => {
   // prepare some common functions
@@ -13,7 +18,7 @@ test('Selection hit regions', async ({ canvasUtil }) => {
       ctx.fill();
     };
 
-    window.renderRectsPadding = (rects) => {
+    globalThis.renderRectsPadding = (rects) => {
       for (let y = 0; y <= canvas.height; y += 2) {
         for (let x = 0; x < canvas.width; x += 2) {
           rects.some((rect) => {
@@ -29,7 +34,7 @@ test('Selection hit regions', async ({ canvasUtil }) => {
   await canvasUtil.executeInBrowser((canvas) => {
     const group = canvas.getObjects()[0] as fabric.Group;
     const rects = group.getObjects();
-    window.renderRectsPadding(rects);
+    globalThis.renderRectsPadding(rects);
   }, null);
 
   expect(await canvasUtil.screenshot()).toMatchSnapshot({
@@ -45,7 +50,7 @@ test('Selection hit regions', async ({ canvasUtil }) => {
     canvas.centerObject(group);
     canvas.contextTopDirty = true;
     canvas.renderAll();
-    window.renderRectsPadding(rects);
+    globalThis.renderRectsPadding(rects);
   }, null);
 
   expect(await canvasUtil.screenshot()).toMatchSnapshot({
@@ -59,7 +64,7 @@ test('Selection hit regions', async ({ canvasUtil }) => {
     canvas.viewportCenterObject(group);
     canvas.contextTopDirty = true;
     canvas.renderAll();
-    window.renderRectsPadding(rects);
+    globalThis.renderRectsPadding(rects);
   }, null);
 
   expect(await canvasUtil.screenshot()).toMatchSnapshot({

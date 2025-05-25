@@ -19,7 +19,7 @@
     "paths": {
       "fabric": ["../dist"],
       "fabric/node": ["../dist/index.node"],
-      "fabric/extensions": ["../dist-extensions"]
+      "fabric/extensions": ["../dist-extensions/extensions"]
     },
     "resolveJsonModule": true
   },
