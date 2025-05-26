@@ -25,4 +25,12 @@ describe('reViewBoxAttrValue', () => {
   test('can detect invalid viewbox with extra numbers', () => {
     expect(reViewBoxAttrValue.test('0 0 408 1 1')).toBe(false);
   });
+  test('viewbox with mixed separator', () => {
+    expect(reViewBoxAttrValue.test('0,0 100,50')).toBe(true);
+    const parsed = '0,0 100,50'.match(reViewBoxAttrValue)!;
+    expect(parsed[1]).toEqual('0');
+    expect(parsed[2]).toEqual('0');
+    expect(parsed[3]).toEqual('100');
+    expect(parsed[4]).toEqual('50');
+  });
 });
