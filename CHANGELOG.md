@@ -2,6 +2,9 @@
 
 ## [6.6.6]
 
+- fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
+- chore(): enable @typescript-eslint/no-unnecessary-type-arguments lint rule [#10631](https://github.com/fabricjs/fabric.js/pull/10631)
+- ci(): Changelog update action syncs with pr title [#10632](https://github.com/fabricjs/fabric.js/pull/10632)
 - fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
 - fix(): Remove black border in blur and also align JS with WEBGL blur filtering [#10623](https://github.com/fabricjs/fabric.js/pull/10623)
 
