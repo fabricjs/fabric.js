@@ -3,7 +3,7 @@ import { LEFT, TOP } from '../constants';
 
 // matches, e.g.: +14.56e-12, etc.
 export const reNum = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
-export const viewportSeparator = String.raw`(\s|,|\s*,?\s*)`;
+export const viewportSeparator = String.raw`(?:\s*,?\s+|\s*,\s*)`;
 
 export const svgNS = 'http://www.w3.org/2000/svg';
 
