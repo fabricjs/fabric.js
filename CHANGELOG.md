@@ -2,7 +2,7 @@
 
 ## [next]
 
-- ci(): Changelog update action syncs with pr title [#10632](https://github.com/fabricjs/fabric.js/pull/10632)
+- ci(): Changelog update action syncs with pr title \_ v2 [#10632](https://github.com/fabricjs/fabric.js/pull/10632)
 - ci(): Changelog update action on pr title [#10632](https://github.com/fabricjs/fabric.js/pull/10632)
 - fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
 - chore(): modernize eslint config [#10624](https://github.com/fabricjs/fabric.js/pull/10624)
