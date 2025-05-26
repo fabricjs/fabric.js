@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): enable @typescript-eslint/no-unnecessary-type-arguments lint rule [#10631](https://github.com/fabricjs/fabric.js/pull/10631)
 - ci(): Changelog update action syncs with pr title [#10632](https://github.com/fabricjs/fabric.js/pull/10632)
 - fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
 - chore(): modernize eslint config [#10624](https://github.com/fabricjs/fabric.js/pull/10624)

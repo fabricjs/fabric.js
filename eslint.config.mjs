@@ -33,6 +33,7 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/consistent-type-exports': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unnecessary-type-arguments': 'error',
       '@typescript-eslint/no-restricted-types': 1,
       '@typescript-eslint/ban-ts-comment': 1,
       '@typescript-eslint/no-explicit-any': ['warn'],
