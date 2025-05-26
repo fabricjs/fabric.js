@@ -1,5 +1,8 @@
 import { describe, test, expect } from 'vitest';
 import { applyViewboxTransform } from './applyViewboxTransform';
+import { getFabricDocument } from '../env';
+
+const document = getFabricDocument();
 
 describe('applyViewboxTransform()', () => {
   test('return empty object for non-viewBox elements', () => {
