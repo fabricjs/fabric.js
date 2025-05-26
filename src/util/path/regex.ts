@@ -1,4 +1,6 @@
-import { commaWsp, reNum } from '../../parser/constants';
+import { reNum } from '../../parser/constants';
+
+const commaWsp = `\\s*,?\\s*`;
 
 /**
  * p for param
