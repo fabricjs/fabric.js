@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
 - fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
 - chore(): modernize eslint config [#10624](https://github.com/fabricjs/fabric.js/pull/10624)
 - chore(): enable no-unnecessary-type-assertion lint rule [#10626](https://github.com/fabricjs/fabric.js/pull/10626)
