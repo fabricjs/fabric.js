@@ -47,7 +47,7 @@ jobs:
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
       - name: Upload changelog artifact
-        if: steps.check.outputs.changelog_updated == 'false'
+        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         uses: actions/upload-artifact@v4
         with:
           name: changelog_artifact
