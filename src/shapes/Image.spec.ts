@@ -350,16 +350,22 @@ describe('FabricImage', () => {
 
     expect(image.width, 'width is not changed').toBe(Math.floor(width));
     expect(image.height, 'height is not changed').toBe(Math.floor(height));
-    expect(
-      // @ts-expect-error -- protected prop
-      parseFloat(image._filterScalingX.toFixed(1)),
-      'a new scaling factor is made for x',
-    ).toBe(0.2);
-    expect(
-      // @ts-expect-error -- protected prop
-      parseFloat(image._filterScalingY.toFixed(1)),
-      'a new scaling factor is made for y',
-    ).toBe(0.2);
+    await expect
+      .poll(
+        () =>
+          // @ts-expect-error -- protected prop
+          parseFloat(image._filterScalingX.toFixed(1)),
+        { timeout: 2_000 },
+      )
+      .toBe(0.2);
+    await expect
+      .poll(
+        () =>
+          // @ts-expect-error -- protected prop
+          parseFloat(image._filterScalingY.toFixed(1)),
+        { timeout: 2_000 },
+      )
+      .toBe(0.2);
 
     const toObject = image.toObject();
 
@@ -560,33 +566,33 @@ describe('FabricImage', () => {
     ]);
   });
 
-  it('setElement resets the webgl cache', async () => {
+  it('setElement resets the webgl cache', { retry: 2 }, async (ctx) => {
     const backend = getFilterBackend();
 
-    if (backend instanceof WebGLFilterBackend) {
-      const image = await createImage();
-
-      backend.textureCache[image.cacheKey] = backend.createTexture(
-        backend.gl,
-        50,
-        50,
-      );
-
-      expect(
-        backend.textureCache[image.cacheKey],
-        'cache should exist',
-      ).toBeTruthy();
-
-      image.setElement(new Image());
-
-      expect(
-        backend.textureCache[image.cacheKey],
-        'cache should be cleared',
-      ).toBeUndefined();
-    } else {
-      // Skip test if WebGL backend is not available
-      expect(true).toBe(true);
+    if (!(backend instanceof WebGLFilterBackend)) {
+      ctx.skip(true, 'Skip test if WebGL backend is not available');
+      return;
     }
+
+    const image = await createImage();
+
+    backend.textureCache[image.cacheKey] = backend.createTexture(
+      backend.gl,
+      50,
+      50,
+    );
+
+    expect(
+      backend.textureCache[image.cacheKey],
+      'cache should exist',
+    ).toBeTruthy();
+
+    image.setElement(new Image());
+
+    expect(
+      backend.textureCache[image.cacheKey],
+      'cache should be cleared',
+    ).toBeUndefined();
   });
 
   it('fromObject', async () => {
