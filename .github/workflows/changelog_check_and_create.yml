@@ -32,7 +32,7 @@ jobs:
           fi
       - name: Create and upload the changelog line
         id: changelog_string
-        if: steps.check.outputs.changelog_updated == 'false'
+        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         uses: actions/github-script@v6
         with:
           result-encoding: string
@@ -44,16 +44,16 @@ jobs:
               full_name: `${{ github.event.pull_request.head.repo.full_name }}`
             });
       - name: Create changelog artifact
-        if: steps.check.outputs.changelog_updated == 'false'
+        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
       - name: Upload changelog artifact
-        if: steps.check.outputs.changelog_updated == 'false'
+        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         uses: actions/upload-artifact@v4
         with:
           name: changelog_artifact
           path: ./changelog_artifact.txt
       - name: Exit 1 if we need the changelog to be updated
-        if: steps.check.outputs.changelog_updated == 'false'
+        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         run: exit 1
       - name: Exit 0 otherwise
         run: exit 0
