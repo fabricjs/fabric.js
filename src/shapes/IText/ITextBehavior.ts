@@ -125,7 +125,7 @@ export abstract class ITextBehavior<
     toValue: number;
     duration: number;
     delay?: number;
-    onComplete?: TOnAnimationChangeCallback<number, void>;
+    onComplete?: TOnAnimationChangeCallback<number>;
   }) {
     return animate({
       startValue: this._currentCursorOpacity,

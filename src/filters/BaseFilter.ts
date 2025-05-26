@@ -412,7 +412,7 @@ export class BaseFilter<
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
     _options?: Abortable,
-  ): Promise<BaseFilter<string, object>> {
+  ): Promise<BaseFilter<string>> {
     return new this(filterOptions);
   }
 }
