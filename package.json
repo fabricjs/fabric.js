@@ -57,7 +57,7 @@
     "coverage:merge": "nyc merge coveragefiles .nyc_output/merged-coverage.json",
     "coverage:report": "nyc report --skip-full=true --reporter=lcov --reporter=text --reporter=text-summary",
     "coverage:report:ci": "nyc report --reporter=text-summary",
-    "test:e2e": "playwright test",
+    "test:e2e": "npm run playwright:typecheck && playwright test",
     "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
     "sandbox": "npm run sandboxscript -- sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
