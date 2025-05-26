@@ -24,8 +24,8 @@ export abstract class AnimationBase<
   declare protected readonly easing: TEasingFunction<T>;
 
   declare private readonly _onStart: VoidFunction;
-  declare private readonly _onChange: TOnAnimationChangeCallback<T, void>;
-  declare private readonly _onComplete: TOnAnimationChangeCallback<T, void>;
+  declare private readonly _onChange: TOnAnimationChangeCallback<T>;
+  declare private readonly _onComplete: TOnAnimationChangeCallback<T>;
   declare private readonly _abort: TAbortCallback<T>;
 
   /**
