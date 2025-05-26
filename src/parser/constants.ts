@@ -3,6 +3,7 @@ import { LEFT, TOP } from '../constants';
 
 // matches, e.g.: +14.56e-12, etc.
 export const reNum = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
+export const commaWsp = String.raw`\s*[,\s]+\s*`;
 
 export const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -81,5 +82,5 @@ export const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
 
 export const reViewBoxAttrValue = new RegExp(
-  String.raw`^\s*(${reNum})\s*,?\s+(${reNum})\s*,?\s+(${reNum})\s*,?\s+(${reNum})\s*$`,
+  String.raw`^\s*(${reNum})${commaWsp}(${reNum})${commaWsp}(${reNum})${commaWsp}(${reNum})\s*$`,
 );
