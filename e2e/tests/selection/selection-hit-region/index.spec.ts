@@ -6,6 +6,7 @@ declare const globalThis: {
   renderRectsPadding(rects: FabricObject[]): void;
 };
 
+
 test('Selection hit regions', async ({ canvasUtil }) => {
   // prepare some common functions
   await canvasUtil.executeInBrowser((canvas) => {
