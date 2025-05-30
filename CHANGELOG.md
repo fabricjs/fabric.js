@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): introduce strict playwright typecheck and fix all type issues [#10637](https://github.com/fabricjs/fabric.js/pull/10637)
 - test(Textbox): add edge cases when wrapping line [#10639](https://github.com/fabricjs/fabric.js/pull/10639)
 - fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
 - chore(): enable @typescript-eslint/no-unnecessary-type-arguments lint rule [#10631](https://github.com/fabricjs/fabric.js/pull/10631)
