@@ -735,7 +735,7 @@ describe('Textbox', () => {
 
     const expected = {
       lines: ['aaa', 'aaaaaa', 'a', 'aaaaaaaaaaaa', ' aaa'],
-      hardBreaks: [1, 1, 1, 1, 1],
+      hardBreaks: [1, 1, 1, 1, 1], // it has to always return 1
       cursor: [
         { selection: 1, lineIndex: 0, charIndex: 1 }, //  a|aa
         { selection: 4, lineIndex: 1, charIndex: 0 }, //  |aaaaaa
