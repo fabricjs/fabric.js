@@ -1,5 +1,6 @@
 import { ObjectUtil } from './ObjectUtil';
 import type { IText, Point } from 'fabric';
+import * as fabric from 'fabric';
 
 export class TextUtil<T extends IText = IText> extends ObjectUtil<T> {
   async getCanvasCursorPositionAt(index: number): Promise<Point> {
@@ -13,8 +14,7 @@ export class TextUtil<T extends IText = IText> extends ObjectUtil<T> {
           top + topOffset + 10,
         );
 
-        const t = point.transform(object.calcTransformMatrix());
-        return t;
+        return point.transform(object.calcTransformMatrix());
       },
       { index },
     );
@@ -26,6 +26,6 @@ export class TextUtil<T extends IText = IText> extends ObjectUtil<T> {
         object['_currentTickState'],
         object['_currentTickCompleteState'],
       ].some((cursorAnimation) => cursorAnimation && !cursorAnimation.isDone());
-    });
+    }, null);
   }
 }

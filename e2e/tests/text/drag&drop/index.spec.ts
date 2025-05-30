@@ -1,9 +1,10 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '../../../fixtures/base';
-import type { IText } from '../../../..';
+import type { IText } from 'fabric';
 import { TextUtil } from '../../../utils/TextUtil';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
 import type { CanvasUtil } from '../../../utils/CanvasUtil';
+import type { DragDropTestCanvas } from './index';
 
 const dragA = 'fabric';
 const dragB = 'em ipsum\ndolor\nsit Amet2\nconsectge';
@@ -28,8 +29,9 @@ const selectFabricInA = (page: Page) => {
 };
 
 const readEventStream = async (canvasUtil: CanvasUtil) => {
-  const data = await canvasUtil.executeInBrowser((canvas) =>
-    canvas.readEventStream(),
+  const data = await canvasUtil.executeInBrowser(
+    (canvas) => (canvas as DragDropTestCanvas).readEventStream(),
+    null,
   );
   return JSON.stringify(data, null, 2);
 };
@@ -46,18 +48,24 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
     await page.mouse.move(130, 50);
     await page.mouse.down();
     expect(
-      await a.executeInBrowser((text) => [
-        text['draggableTextDelegate'].isActive(),
-        text.shouldStartDragging(),
-      ]),
+      await a.executeInBrowser(
+        (text) => [
+          text['draggableTextDelegate'].isActive(),
+          text.shouldStartDragging(),
+        ],
+        null,
+      ),
     ).toEqual([true, true]);
     expect(await a.isCursorActive()).toBeFalsy();
     await page.mouse.up();
     expect(
-      await a.executeInBrowser((text) => [
-        text['draggableTextDelegate'].isActive(),
-        text.shouldStartDragging(),
-      ]),
+      await a.executeInBrowser(
+        (text) => [
+          text['draggableTextDelegate'].isActive(),
+          text.shouldStartDragging(),
+        ],
+        null,
+      ),
     ).toEqual([false, false]);
     await a.expectObjectToMatch({
       selectionStart: 3,
@@ -245,7 +253,8 @@ for (const options of [
     canvasUtil,
   }) => {
     const a = new TextUtil(page, 'a');
-    await test.step('disable dragging', () => a.executeInBrowser(options.exec));
+    await test.step('disable dragging', () =>
+      a.executeInBrowser(options.exec, null));
     await selectFabricInA(page);
     await readEventStream(canvasUtil);
 
@@ -265,8 +274,8 @@ test('Disabling Drop', async ({ page, canvasUtil }) => {
   const a = new TextUtil(page, 'a');
   const b = new TextUtil(page, 'b');
   await test.step('disable dropping', () => {
-    a.executeInBrowser((text) => (text.canDrop = () => false));
-    b.executeInBrowser((text) => (text.canDrop = () => false));
+    a.executeInBrowser((text) => (text.canDrop = () => false), null);
+    b.executeInBrowser((text) => (text.canDrop = () => false), null);
   });
 
   await test.step('drop A on self', async () => {
@@ -330,7 +339,7 @@ async function waitForDataTransfer(
           value: {},
         },
         setDragImage: {
-          value(image, x, y) {
+          value(image: HTMLImageElement, x: number, y: number) {
             window.dispatchEvent(
               new CustomEvent('drag:data', {
                 detail: { image, x, y, data: this.__data },
@@ -339,7 +348,7 @@ async function waitForDataTransfer(
           },
         },
         setData: {
-          value(type, value) {
+          value(type: any, value: any) {
             let out = value;
             try {
               out = JSON.parse(value);
@@ -362,7 +371,7 @@ async function waitForDataTransfer(
             }>((resolve) =>
               window.addEventListener(
                 'drag:data',
-                ({ detail: { image, ...rest } }) =>
+                ({ detail: { image, ...rest } }: Record<PropertyKey, any>) =>
                   resolve({
                     image: image.toDataURL(`image/png`, 1),
                     ...rest,

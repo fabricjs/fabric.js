@@ -19,8 +19,8 @@ for (const exact of [true, false]) {
         object.exactBoundingBox = true;
         object.setDimensions();
         object.set('dirty', true);
-        object.canvas.renderAll();
-      }));
+        object.canvas!.renderAll();
+      }, null));
 
     expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: toSnapshotName('initial', exact),

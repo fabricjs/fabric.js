@@ -14,7 +14,7 @@ export async function createNodeSnapshot(
   ) => any | Promise<any>,
   options: Partial<fabric.StaticCanvasOptions> = {},
 ) {
-  const canvas = new TestingCanvas(null, {
+  const canvas = new TestingCanvas(undefined, {
     enableRetinaScaling: false,
     renderOnAddRemove: false,
     width: 200,

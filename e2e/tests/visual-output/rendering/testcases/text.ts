@@ -120,7 +120,7 @@ function createTextBoxSubclass(fabric: FabricNamespace) {
   class TestTextbox extends fabric.Textbox {
     __calledInitDimensions = 0;
 
-    constructor(text, opts: any) {
+    constructor(text: string, opts: any) {
       super(text, {
         ...opts,
         objectCaching: false,
@@ -483,7 +483,7 @@ const cases: renderTestType[] = [
       const canvasP = fabric.util.createCanvasElement();
       canvasP.width = 10;
       canvasP.height = 10;
-      const ctx = canvasP.getContext('2d');
+      const ctx = canvasP.getContext('2d')!;
       ctx.fillStyle = 'blue';
       ctx.fillRect(0, 0, 5, 5);
       ctx.fillStyle = 'red';
@@ -717,7 +717,7 @@ const cases: renderTestType[] = [
           clientX: 0,
           clientY: 0,
           dataTransfer: {
-            setDragImage(imageSource, x, y) {
+            setDragImage(imageSource: CanvasImageSource) {
               canvas.getContext().drawImage(imageSource, 0, 0);
               resolve(canvas.lowerCanvasEl.toDataURL());
             },
@@ -752,7 +752,7 @@ const cases: renderTestType[] = [
           clientX: 0,
           clientY: 0,
           dataTransfer: {
-            setDragImage(imageSource, x, y) {
+            setDragImage(imageSource: CanvasImageSource) {
               canvas.getContext().drawImage(imageSource, 0, 0);
               resolve(canvas.lowerCanvasEl.toDataURL());
             },
@@ -791,7 +791,7 @@ const cases: renderTestType[] = [
           clientX: 0,
           clientY: 0,
           dataTransfer: {
-            setDragImage(imageSource, x, y) {
+            setDragImage(imageSource: CanvasImageSource) {
               canvas.getContext().drawImage(imageSource, 0, 0);
               resolve(canvas.lowerCanvasEl.toDataURL());
             },
@@ -841,10 +841,9 @@ const cases: renderTestType[] = [
         target: canvas.upperCanvasEl,
         preventDefault() {},
         stopPropagation() {},
-        // @ts-expect-error -- partial mock of DataTransfer
         dataTransfer: {
           setData() {},
-          setDragImage(imageSource, x, y) {},
+          setDragImage() {},
         },
       });
 

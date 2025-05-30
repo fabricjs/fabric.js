@@ -63,7 +63,7 @@ export const renderTests: renderTestType[] = [
       const imgSource = fabric.getFabricDocument().createElement('canvas');
       imgSource.width = 450;
       imgSource.height = 220;
-      const ctx = imgSource.getContext('2d');
+      const ctx = imgSource.getContext('2d')!;
       const gradient = ctx.createLinearGradient(0, 0, 450, 220);
       gradient.addColorStop(0, 'yellow');
       gradient.addColorStop(0.5, 'black');

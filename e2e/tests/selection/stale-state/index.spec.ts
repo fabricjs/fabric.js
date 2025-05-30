@@ -18,9 +18,9 @@ const tests = [
       test.step('replace selection', () =>
         canvasUtil.executeInBrowser((canvas) => {
           canvas.setActiveObject(
-            new fabric.ActiveSelection(canvas.getActiveObjects()),
+            new window.fabric.ActiveSelection(canvas.getActiveObjects()),
           );
-        })),
+        }, null)),
   },
 ];
 

@@ -1,4 +1,4 @@
-import type { FabricImage } from '../../../../../fabric';
+import type { FabricImage } from 'fabric';
 import type { FabricNamespace, renderTestType } from '../../../types';
 
 // based on https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#operations
@@ -46,7 +46,7 @@ const size = {
 const colorSphere = (fabric: FabricNamespace, r: number) => {
   const c = fabric.util.createCanvasElement();
   c.width = c.height = r * 2;
-  const ctx = c.getContext('2d');
+  const ctx = c.getContext('2d')!;
   const rotate = (1 / 360) * Math.PI * 2; // per degree
   const oleft = 0;
   const otop = 0;

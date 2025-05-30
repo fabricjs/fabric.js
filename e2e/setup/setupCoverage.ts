@@ -30,9 +30,9 @@ export async function stopCoverage(page: Page, outputDir: string) {
         }),
       )
     ).filter(
-      ([pathTo]: [string]) =>
+      ([pathTo]) =>
         !coverageIgnore.some((ignore) =>
-          pathTo.startsWith(path.resolve(process.cwd(), ignore)),
+          (pathTo as string).startsWith(path.resolve(process.cwd(), ignore)),
         ),
     ),
   );
