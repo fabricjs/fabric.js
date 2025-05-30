@@ -326,6 +326,31 @@ describe('Textbox', () => {
     ).toEqual(['xaxbx', 'cxdeyay', 'bid']);
   });
 
+  it('wrapping with largestWordWidth and styles', () => {
+    const value = 'xaxbxc xdeyayb id sdgjhgsdg';
+    const textbox = new Textbox(value, {
+      width: 190,
+      styles: stylesFromArray(
+        [
+          {
+            style: {
+              fontWeight: 'bold',
+              fontSize: 64,
+            },
+            start: 0,
+            end: 10,
+          },
+        ],
+        value,
+      ),
+    });
+
+    expect(
+      textbox.textLines,
+      'lines match largestWordWidth with styles',
+    ).toEqual(['xaxbxc', 'xdeyayb', 'id', 'sdgjhgsdg']);
+  });
+
   it('wrapping with charspacing and splitByGrapheme positive', () => {
     const textbox = new Textbox('xaxbxcxdeyaybid', {
       width: 190,
@@ -654,36 +679,150 @@ describe('Textbox', () => {
   });
 
   it('missingNewlineOffset with splitByGrapheme', () => {
-    const textbox = new Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa', {
+    const textbox = new Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\n aaa', {
       width: 80,
       splitByGrapheme: true,
     });
 
-    const offset = textbox.missingNewlineOffset(0);
-    expect(offset, 'line 0 is interrupted by a \\n so has an offset of 1').toBe(
-      1,
-    );
+    const expected = {
+      lines: ['aaa', 'aaaa', 'aa', 'a', 'aaaa', 'aaaa', 'aaaa', ' aaa'],
+      hardBreaks: [1, 0, 1, 1, 0, 0, 1, 1],
+      cursor: [
+        { selection: 1, lineIndex: 0, charIndex: 1 }, //  a|aa
+        { selection: 4, lineIndex: 1, charIndex: 0 }, //  |aaaa
+        { selection: 9, lineIndex: 2, charIndex: 1 }, //  a|a
+        { selection: 11, lineIndex: 3, charIndex: 0 }, // |a
+        { selection: 14, lineIndex: 4, charIndex: 1 }, // a|aaa
+        { selection: 20, lineIndex: 5, charIndex: 3 }, // aaa|a
+        { selection: 22, lineIndex: 6, charIndex: 1 }, // a|aaa
+        { selection: 29, lineIndex: 7, charIndex: 3 }, //  aa|a
+      ],
+    };
 
-    const offset2 = textbox.missingNewlineOffset(1);
-    expect(
-      offset2,
-      'line 1 is wrapped without a \\n so it does have an extra char count',
-    ).toBe(0);
+    expect(textbox.textLines, 'wrap line by width').toEqual(expected.lines);
+
+    for (let i = 0; i < expected.hardBreaks.length; i++) {
+      const offset = textbox.missingNewlineOffset(i);
+      expect(
+        offset,
+        `line ${i} expect missingNewlineOffset: ${expected.hardBreaks[i]}`,
+      ).toBe(expected.hardBreaks[i]);
+    }
+
+    let loc = textbox.get2DCursorLocation();
+    expect(loc.lineIndex, 'initial cursor line should be 0').toBe(0);
+    expect(loc.charIndex, 'initial cursor position should be 0').toBe(0);
+
+    for (let i = 0; i < expected.cursor.length; i++) {
+      const { selection, lineIndex, charIndex } = expected.cursor[i];
+      textbox.selectionStart = textbox.selectionEnd = selection;
+      loc = textbox.get2DCursorLocation();
+      expect(
+        loc.lineIndex,
+        `selection end ${selection} line ${lineIndex}`,
+      ).toBe(lineIndex);
+      expect(
+        loc.charIndex,
+        `selection end ${selection} char ${charIndex}`,
+      ).toBe(charIndex);
+    }
   });
 
-  it('missingNewlineOffset with normal split', () => {
-    const texbox = new Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\naaa', {
-      width: 160,
+  it('missingNewlineOffset with normal split 1', () => {
+    const textbox = new Textbox('aaa\naaaaaa\na\naaaaaaaaaaaa\n aaa', {
+      width: 80,
     });
 
-    const offset = texbox.missingNewlineOffset(0);
-    expect(offset, 'it returns always 1').toBe(1);
+    const expected = {
+      lines: ['aaa', 'aaaaaa', 'a', 'aaaaaaaaaaaa', ' aaa'],
+      hardBreaks: [1, 1, 1, 1, 1], // it has to always return 1
+      cursor: [
+        { selection: 1, lineIndex: 0, charIndex: 1 }, //  a|aa
+        { selection: 4, lineIndex: 1, charIndex: 0 }, //  |aaaaaa
+        { selection: 12, lineIndex: 2, charIndex: 1 }, //  a|
+        { selection: 22, lineIndex: 3, charIndex: 9 }, // aaaaaaaaa|aaa
+        { selection: 28, lineIndex: 4, charIndex: 2 }, //  a|aa
+      ],
+    };
 
-    const offset2 = texbox.missingNewlineOffset(1);
-    expect(offset2, 'it returns always 1').toBe(1);
+    expect(textbox.textLines, 'wrap by largestWordWidth').toEqual(
+      expected.lines,
+    );
+    for (let i = 0; i < expected.hardBreaks.length; i++) {
+      const offset = textbox.missingNewlineOffset(i);
+      expect(offset, `line ${i} expect ${expected.hardBreaks[i]}`).toBe(
+        expected.hardBreaks[i],
+      );
+    }
 
-    const offset3 = texbox.missingNewlineOffset(2);
-    expect(offset3, 'it returns always 1').toBe(1);
+    let loc = textbox.get2DCursorLocation();
+    expect(loc.lineIndex, 'initial cursor line should be 0').toBe(0);
+    expect(loc.charIndex, 'initial cursor position should be 0').toBe(0);
+
+    for (let i = 0; i < expected.cursor.length; i++) {
+      const { selection, lineIndex, charIndex } = expected.cursor[i];
+      textbox.selectionStart = textbox.selectionEnd = selection;
+      loc = textbox.get2DCursorLocation();
+      expect(
+        loc.lineIndex,
+        `selection end ${selection} line ${lineIndex}`,
+      ).toBe(lineIndex);
+      expect(
+        loc.charIndex,
+        `selection end ${selection} char ${charIndex}`,
+      ).toBe(charIndex);
+    }
+  });
+
+  it('missingNewlineOffset with normal split and short word', () => {
+    const textbox = new Textbox(
+      'aaa\naaaaaa          \na\naaaaaaa aaaaa\n aaa',
+      {
+        width: 80,
+      },
+    );
+
+    const expected = {
+      lines: ['aaa', 'aaaaaa ', '        ', 'a', 'aaaaaaa', 'aaaaa', ' aaa'],
+      hardBreaks: [1, 1, 1, 1, 1, 1, 1], // Note: currently, lineIndex 2 and 4 no hardBreak but still removed a space
+      cursor: [
+        { selection: 1, lineIndex: 0, charIndex: 1 }, //  a|aa
+        { selection: 4, lineIndex: 1, charIndex: 0 }, //  |aaaaaa
+        { selection: 13, lineIndex: 2, charIndex: 1 }, // 8 space
+        { selection: 22, lineIndex: 3, charIndex: 1 }, // a|
+        { selection: 29, lineIndex: 4, charIndex: 6 }, // aaaaaa|a
+        { selection: 32, lineIndex: 5, charIndex: 1 }, // a|aaaa
+        { selection: 38, lineIndex: 6, charIndex: 1 }, //  |aaa
+      ],
+    };
+
+    expect(textbox.textLines, 'wrap by largestWordWidth').toEqual(
+      expected.lines,
+    );
+    for (let i = 0; i < expected.hardBreaks.length; i++) {
+      const offset = textbox.missingNewlineOffset(i);
+      expect(offset, `line ${i} expect ${expected.hardBreaks[i]}`).toBe(
+        expected.hardBreaks[i],
+      );
+    }
+
+    let loc = textbox.get2DCursorLocation();
+    expect(loc.lineIndex, 'initial cursor line should be 0').toBe(0);
+    expect(loc.charIndex, 'initial cursor position should be 0').toBe(0);
+
+    for (let i = 0; i < expected.cursor.length; i++) {
+      const { selection, lineIndex, charIndex } = expected.cursor[i];
+      textbox.selectionStart = textbox.selectionEnd = selection;
+      loc = textbox.get2DCursorLocation();
+      expect(
+        loc.lineIndex,
+        `selection end ${selection} line ${lineIndex}`,
+      ).toBe(lineIndex);
+      expect(
+        loc.charIndex,
+        `selection end ${selection} char ${charIndex}`,
+      ).toBe(charIndex);
+    }
   });
 
   it('_getLineStyle', () => {
