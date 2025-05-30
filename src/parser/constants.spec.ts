@@ -1,5 +1,4 @@
 // Yes a file for testing contansts
-import { describe, test, expect } from 'vitest';
 import { reViewBoxAttrValue } from './constants';
 
 describe('reViewBoxAttrValue', () => {

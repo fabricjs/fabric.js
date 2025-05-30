@@ -1,4 +1,3 @@
-import { describe, test, expect } from 'vitest';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import { getFabricDocument } from '../env';
 
