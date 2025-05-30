@@ -33,6 +33,7 @@ export const additionalProps = [
   ...textDecorationProperties,
   'textBackgroundColor',
   'direction',
+  'textDecorationTickness',
 ] as const;
 
 export type StylePropertiesType =
@@ -47,7 +48,8 @@ export type StylePropertiesType =
   | 'deltaY'
   | 'overline'
   | 'underline'
-  | 'linethrough';
+  | 'linethrough'
+  | 'textDecorationTickness';
 
 export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
@@ -57,6 +59,7 @@ export const styleProperties: Readonly<StylePropertiesType[]> = [
   FILL,
   'deltaY',
   'textBackgroundColor',
+  'textDecorationTickness',
 ] as const;
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
@@ -103,6 +106,7 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   direction: 'ltr',
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
+  textDecorationTickness: 66.667,
 };
 
 export const JUSTIFY = 'justify';

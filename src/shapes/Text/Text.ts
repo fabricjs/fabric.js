@@ -107,6 +107,7 @@ interface UniqueTextProps {
   textAlign: string;
   direction: CanvasDirection;
   path?: Path;
+  textDecorationTickness: number;
 }
 
 export interface SerializedTextProps
@@ -294,6 +295,16 @@ export class FabricText<
    * @default
    */
   declare path?: Path;
+
+  /**
+   * The text decoration tickness for underline, overline and strikethrough
+   * The tickness is expressed in thousandths of fontSize ( em ).
+   * The original value was 1/15 that translates to 66.6667 thousandths.
+   * The choice of unit of measure is to align with charSpacing.
+   * @type Number
+   * @default
+   */
+  declare textDecorationTickness: number;
 
   /**
    * Offset amount for text path starting position
@@ -1599,7 +1610,7 @@ export class FabricText<
             -charBox.kernedWidth / 2,
             offsetY * currentSize + currentDy,
             charBox.kernedWidth,
-            this.fontSize / 15,
+            this.fontSize * this.textDecorationTickness,
           );
           ctx.restore();
         } else if (
@@ -1620,7 +1631,7 @@ export class FabricText<
               drawStart,
               top + offsetY * size + dy,
               boxWidth,
-              this.fontSize / 15,
+              this.fontSize * this.textDecorationTickness,
             );
           }
           boxStart = charBox.left;
@@ -1644,7 +1655,7 @@ export class FabricText<
           drawStart,
           top + offsetY * size + dy,
           boxWidth - charSpacing,
-          this.fontSize / 15,
+          this.fontSize * this.textDecorationTickness,
         );
       topOffset += heightOfLine;
     }
