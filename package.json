@@ -58,6 +58,7 @@
     "coverage:report": "nyc report --skip-full=true --reporter=lcov --reporter=text --reporter=text-summary",
     "coverage:report:ci": "nyc report --reporter=text-summary",
     "test:e2e": "playwright test",
+    "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
     "sandbox": "npm run sandboxscript -- sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
     "lint": "eslint src extensions",

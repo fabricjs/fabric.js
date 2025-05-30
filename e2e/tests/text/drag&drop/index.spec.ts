@@ -1,12 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../../fixtures/base';
 import type { IText } from '../../../..';
-import setup from '../../../setup';
 import { TextUtil } from '../../../utils/TextUtil';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
-
-setup();
+import type { CanvasUtil } from '../../../utils/CanvasUtil';
 
 const dragA = 'fabric';
 const dragB = 'em ipsum\ndolor\nsit Amet2\nconsectge';
@@ -30,14 +27,14 @@ const selectFabricInA = (page: Page) => {
   });
 };
 
-const readEventStream = async (page: Page) => {
-  const data = await new CanvasUtil(page).executeInBrowser((canvas) =>
+const readEventStream = async (canvasUtil: CanvasUtil) => {
+  const data = await canvasUtil.executeInBrowser((canvas) =>
     canvas.readEventStream(),
   );
   return JSON.stringify(data, null, 2);
 };
 
-test('Drag & Drop', async ({ page }) => {
+test('Drag & Drop', async ({ page, canvasUtil }) => {
   const canvas = page.locator('canvas').nth(1);
   const textarea = page.locator('#textarea');
   const a = new TextUtil(page, 'a');
@@ -72,7 +69,7 @@ test('Drag & Drop', async ({ page }) => {
   await selectFabricInA(page);
 
   // clean the stream
-  await readEventStream(page);
+  await readEventStream(canvasUtil);
 
   await test.step('drag A & drop on self at end', async () => {
     await page.mouse.down();
@@ -100,7 +97,7 @@ test('Drag & Drop', async ({ page }) => {
     ).toMatchSnapshot({
       name: '3.drop-fabric-after-sandbox.png',
     });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: '3.events.json',
     });
   });
@@ -125,7 +122,7 @@ test('Drag & Drop', async ({ page }) => {
     ).toMatchSnapshot({
       name: '4.drop--lor|fabric|em.png',
     });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: '4.events.json',
     });
   });
@@ -140,7 +137,7 @@ test('Drag & Drop', async ({ page }) => {
     await page.mouse.down();
     await page.mouse.move(580, 300, { steps: 40 });
     await page.mouse.up();
-    await readEventStream(page);
+    await readEventStream(canvasUtil);
   });
 
   await test.step(`drag & drop to A(4) = ".js |${dragB}|sandbox"`, async () => {
@@ -163,7 +160,7 @@ test('Drag & Drop', async ({ page }) => {
     ).toMatchSnapshot({
       name: '5..js |em ips.png',
     });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: '5.events.json',
     });
   });
@@ -184,7 +181,7 @@ test('Drag & Drop', async ({ page }) => {
     ).toMatchSnapshot({
       name: '6.drop-textarea.png',
     });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: '6.events.json',
     });
   });
@@ -207,7 +204,7 @@ test('Drag & Drop', async ({ page }) => {
     ).toMatchSnapshot({
       name: '7.drop-textarea-to-B-lor|dolor|fabrictur.png',
     });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: '7.events.json',
     });
   });
@@ -245,24 +242,25 @@ for (const options of [
 ] as const) {
   test(`Disabling Drag & Drop by disabling ${options.disabled}`, async ({
     page,
+    canvasUtil,
   }) => {
     const a = new TextUtil(page, 'a');
     await test.step('disable dragging', () => a.executeInBrowser(options.exec));
     await selectFabricInA(page);
-    await readEventStream(page);
+    await readEventStream(canvasUtil);
 
     await test.step('drag to end of text', async () => {
       await page.mouse.down();
       await page.mouse.move(240, 140, { steps: 40 });
       a.expectObjectToMatch(options.expected);
-      expect(await readEventStream(page)).toMatchSnapshot({
+      expect(await readEventStream(canvasUtil)).toMatchSnapshot({
         name: `disabling-drag-${options.disabled}.events.json`,
       });
     });
   });
 }
 
-test('Disabling Drop', async ({ page }) => {
+test('Disabling Drop', async ({ page, canvasUtil }) => {
   const canvas = page.locator('canvas').nth(1);
   const a = new TextUtil(page, 'a');
   const b = new TextUtil(page, 'b');
@@ -273,7 +271,7 @@ test('Disabling Drop', async ({ page }) => {
 
   await test.step('drop A on self', async () => {
     await selectFabricInA(page);
-    await readEventStream(page);
+    await readEventStream(canvasUtil);
     await canvas.dragTo(canvas, {
       sourcePosition: {
         x: 130,
@@ -285,14 +283,14 @@ test('Disabling Drop', async ({ page }) => {
       },
     });
     await a.expectObjectToMatch({ text: 'fabric.js sandbox' });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: 'disabling-drop-A.events.json',
     });
   });
 
   await test.step('drop A on B', async () => {
     await selectFabricInA(page);
-    await readEventStream(page);
+    await readEventStream(canvasUtil);
     await canvas.dragTo(canvas, {
       sourcePosition: {
         x: 130,
@@ -307,7 +305,7 @@ test('Disabling Drop', async ({ page }) => {
     await b.expectObjectToMatch({
       text: 'lorem ipsum\ndolor\nsit Amet2\nconsectgetur',
     });
-    expect(await readEventStream(page)).toMatchSnapshot({
+    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
       name: 'disabling-drop-B.events.json',
     });
   });

@@ -1,13 +1,9 @@
-import { expect, test } from '@playwright/test';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 import { promiseSequence } from '../../../utils/promiseSequence';
 import data from './data.json';
 import data2 from './data2.json';
-import setup from '../../../setup';
 
-setup();
-
-test('control box rendering', async ({ page }) => {
+test('control box rendering', async ({ canvasUtil }) => {
   const cases = [
     { data, title: 'skewY, flipX' },
     { data: data2, title: 'skewY' },
@@ -36,7 +32,6 @@ test('control box rendering', async ({ page }) => {
       ({ data, padding, objectPadding, name }) =>
         async () =>
           test.step(name, async () => {
-            const canvasUtil = new CanvasUtil(page);
             await canvasUtil.executeInBrowser(
               async (canvas, [data, padding, objectPadding]) => {
                 await canvas.loadFromJSON(data);

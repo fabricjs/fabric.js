@@ -1,11 +1,7 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 import { TestingCanvas } from '../../../utils/createNodeSnapshot';
 import { renderTests } from './renderingCases';
 import * as fabric from 'fabric/node';
-
-setup();
 
 function dataURLOutputToBuffer(dataURL: string) {
   const base64Data = dataURL.replace(/^data:image\/png;base64,/, '');
@@ -21,7 +17,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
       continue;
     }
 
-    test(testCase.title, async ({ page }, config) => {
+    test(testCase.title, async ({ page, canvasUtil }, config) => {
       const goldenName = testCase.golden || `${testCase.title}.png`;
       const snapshotName = testCase.snapshotSuffix
         ? [testCase.snapshotSuffix, goldenName]
@@ -45,7 +41,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
             });
           } else {
             expect(
-              await new CanvasUtil(page).screenshot(),
+              await canvasUtil.screenshot(),
               `browser snapshot`,
             ).toMatchSnapshot({
               name: snapshotName,
