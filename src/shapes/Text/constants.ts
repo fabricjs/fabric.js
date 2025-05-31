@@ -79,6 +79,19 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   textAlign: LEFT,
   fontStyle: 'normal',
   lineHeight: 1.16,
+  textBackgroundColor: '',
+  stroke: null,
+  shadow: null,
+  path: undefined,
+  pathStartOffset: 0,
+  pathSide: LEFT,
+  pathAlign: 'baseline',
+  charSpacing: 0,
+  deltaY: 0,
+  direction: 'ltr',
+  CACHE_FONT_SIZE: 400,
+  MIN_TEXT_WIDTH: 2,
+  // Text magic numbers
   superscript: {
     size: 0.6, // fontSize factor
     baseline: -0.35, // baseline-shift factor (upwards)
@@ -87,26 +100,14 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
     size: 0.6, // fontSize factor
     baseline: 0.11, // baseline-shift factor (downwards)
   },
-  textBackgroundColor: '',
-  stroke: null,
-  shadow: null,
-  path: undefined,
-  pathStartOffset: 0,
-  pathSide: LEFT,
-  pathAlign: 'baseline',
   _fontSizeFraction: 0.222,
   offsets: {
     underline: 0.1,
-    linethrough: -0.315 + 1 / 30,
-    overline: -0.88 + 1 / 15,
+    linethrough: -0.28167, // added 1/30 to original number
+    overline: -0.81333, // added 1/15 to original number
   },
   _fontSizeMult: 1.13,
-  charSpacing: 0,
-  deltaY: 0,
-  direction: 'ltr',
-  CACHE_FONT_SIZE: 400,
-  MIN_TEXT_WIDTH: 2,
-  textDecorationTickness: 66.667,
+  textDecorationTickness: 66.667, // before implementation was 1/15
 };
 
 export const JUSTIFY = 'justify';
