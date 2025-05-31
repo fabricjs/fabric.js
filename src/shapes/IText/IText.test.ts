@@ -65,6 +65,7 @@ const ITEXT_OBJECT = {
   pathStartOffset: 0,
   pathSide: 'left' as const,
   pathAlign: 'baseline' as const,
+  textDecorationTickness: 66.67,
 };
 
 describe('IText', () => {

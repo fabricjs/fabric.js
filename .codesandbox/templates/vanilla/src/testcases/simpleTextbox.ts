@@ -35,15 +35,102 @@ const makePath = (textObj): string => {
   return pathString;
 };
 
+const LOREM_IPSUM_TEXT_OPTS: Record<PropertyKey, any> = {
+  objectCaching: false,
+  fontFamily: 'Arial',
+  styles: {
+    0: {
+      0: { fill: 'red', fontSize: 20, underline: true },
+      1: { fill: 'red', fontSize: 30 },
+      2: { fill: 'red', fontSize: 40 },
+      3: { fill: 'red', fontSize: 50 },
+      4: { fill: 'red', fontSize: 60 },
+      6: { textBackgroundColor: 'yellow' },
+      7: {
+        textBackgroundColor: 'yellow',
+        linethrough: true,
+      },
+      8: {
+        textBackgroundColor: 'yellow',
+        linethrough: true,
+      },
+      9: { textBackgroundColor: 'yellow' },
+    },
+    1: {
+      0: { underline: true },
+      1: { underline: true },
+      2: {
+        fill: 'green',
+        fontStyle: 'italic',
+        textDecoration: 'underline',
+      },
+      3: {
+        fill: 'green',
+        fontStyle: 'italic',
+        textDecoration: 'underline',
+      },
+      4: {
+        fill: 'green',
+        fontStyle: 'italic',
+        textDecoration: 'underline',
+      },
+    },
+    2: {
+      0: { fill: 'blue', fontWeight: 'bold' },
+      1: { fill: 'blue', fontWeight: 'bold' },
+      2: { fill: 'blue', fontWeight: 'bold', fontSize: 63 },
+      4: {
+        fontFamily: 'Courier',
+        textDecoration: ' underline',
+        underline: true,
+      },
+      5: {
+        fontFamily: 'Courier',
+        textDecoration: ' underline',
+        underline: true,
+      },
+      6: {
+        fontFamily: 'Courier',
+        textDecoration: ' overline',
+        overline: true,
+      },
+      7: {
+        fontFamily: 'Courier',
+        textDecoration: ' overline',
+        overline: true,
+      },
+      8: {
+        fontFamily: 'Courier',
+        textDecoration: ' overline',
+        overline: true,
+      },
+    },
+    3: {
+      0: { fill: '#666', textDecoration: 'line-through' },
+      1: { fill: '#666', textDecoration: 'line-through' },
+      2: { fill: '#666', textDecoration: 'line-through' },
+      3: { fill: '#666', textDecoration: 'line-through' },
+      4: { fill: '#666', textDecoration: 'line-through' },
+      7: { textDecoration: ' underline', underline: true },
+      8: { stroke: '#ff1e15', strokeWidth: 2 },
+      9: { stroke: '#ff1e15', strokeWidth: 2 },
+    },
+  },
+};
+
 export function testCase(canvas: fabric.Canvas) {
   fabric.config.NUM_FRACTION_DIGITS = 9;
-  const textValue = 'testing 123 123 123 ';
+  const textValue = 'ABCDEFGHIL';
   const text = new fabric.FabricText(textValue, {
     width: 200,
     top: 20,
-    fill: '',
+    fill: 'green',
     stroke: 'red',
-    objectCaching: false,
+    objectCaching: true,
+    textDecorationTickness: 66.67,
+    underline: true,
+    overline: true,
+    linethrough: true,
     styles: {
       0: {
         0: {
@@ -51,36 +138,35 @@ export function testCase(canvas: fabric.Canvas) {
           fill: 'blue',
         },
         1: {
-          fontSize: 90,
-          fill: 'green',
+          fontSize: 60,
+          textDecorationTickness: 150,
         },
         2: {
-          fontSize: 20,
-          fill: 'Yellow',
+          fontSize: 40,
+          fill: 'blue',
         },
         3: {
-          fontWeigth: 'bold',
-          fill: 'transparent',
-          strokeWidth: 4,
-          strole: 'blue',
-        },
-        4: {
-          fontWeigth: 'bold',
-          fill: 'transparent',
-          strokeWidth: 4,
-          strole: 'blue',
+          fontSize: 40,
+          textDecorationTickness: 30,
         },
       },
     },
   });
+
+  const text2 = new fabric.FabricText(
+    'lorem ipsum\ndolor\nsit Amet2\nconsectgetur',
+    LOREM_IPSUM_TEXT_OPTS,
+  );
+
+  canvas.add(text2);
+
   const pathString = makePath(text);
   const pathObject = new fabric.Path(pathString, {
     fill: 'transparent',
     stroke: 'red',
     objectCaching: false,
   });
-  text.set('path', pathObject);
+  // text.set('path', pathObject);
   canvas.add(text);
   canvas.centerObjectH(text);
-  document.getElementById('svgout')?.innerHTML = canvas.toSVG();
 }
