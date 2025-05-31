@@ -306,13 +306,6 @@ export class FabricText<
   declare textDecorationTickness: number;
 
   /**
-   * The text decoration color, a valid css color.
-   * As of now gradients and patterns aren't supported
-   * @default
-   */
-  declare textDecorationColor: string;
-
-  /**
    * Offset amount for text path starting position
    * Only used when text has a path
    * @default
