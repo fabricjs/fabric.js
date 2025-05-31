@@ -2,6 +2,8 @@ import { FILL, LEFT, STROKE, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { FabricText } from './Text';
 
+export const TEXT_DECORATION_TICKNESS = 'textDecorationTickness';
+
 const fontProperties = [
   'fontSize',
   'fontWeight',
@@ -33,7 +35,7 @@ export const additionalProps = [
   ...textDecorationProperties,
   'textBackgroundColor',
   'direction',
-  'textDecorationTickness',
+  TEXT_DECORATION_TICKNESS,
 ] as const;
 
 export type StylePropertiesType =
@@ -49,7 +51,7 @@ export type StylePropertiesType =
   | 'overline'
   | 'underline'
   | 'linethrough'
-  | 'textDecorationTickness';
+  | typeof TEXT_DECORATION_TICKNESS;
 
 export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
@@ -59,7 +61,7 @@ export const styleProperties: Readonly<StylePropertiesType[]> = [
   FILL,
   'deltaY',
   'textBackgroundColor',
-  'textDecorationTickness',
+  TEXT_DECORATION_TICKNESS,
 ] as const;
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
@@ -107,7 +109,7 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
     overline: -0.81333, // added 1/15 to original number
   },
   _fontSizeMult: 1.13,
-  textDecorationTickness: 66.667, // before implementation was 1/15
+  [TEXT_DECORATION_TICKNESS]: 66.667, // before implementation was 1/15
 };
 
 export const JUSTIFY = 'justify';

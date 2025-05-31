@@ -1591,7 +1591,7 @@ export class FabricText<
       let lastTickness = this.getValueOfPropertyAt(
         i,
         0,
-        'textDecorationTickness',
+        TEXT_DECORATION_TICKNESS,
       );
       let currentDecoration = lastDecoration;
       let currentFill = lastFill;
@@ -1606,7 +1606,7 @@ export class FabricText<
         currentTickness = this.getValueOfPropertyAt(
           i,
           j,
-          'textDecorationTickness',
+          TEXT_DECORATION_TICKNESS,
         );
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
