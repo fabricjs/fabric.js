@@ -47,6 +47,9 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 6.6.7
+        - 6.6.6
+        - 6.6.5
         - 6.6.4
         - 6.6.2
         - 6.6.1
