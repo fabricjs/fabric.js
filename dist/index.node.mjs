@@ -461,7 +461,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.6.6";
+var version = "6.6.7";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -4887,8 +4887,11 @@ function getSvgRegex(arr) {
   return new RegExp('^(' + arr.join('|') + ')\\b', 'i');
 }
 
-var _templateObject$1;
-const reNum = String.raw(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["(?:[-+]?(?:d*.d+|d+.?)(?:[eE][-+]?d+)?)"], ["(?:[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?)"])));
+var _templateObject$1, _templateObject2$1, _templateObject3$1;
+
+// matches, e.g.: +14.56e-12, etc.
+const reNum = String.raw(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["[-+]?(?:d*.d+|d+.?)(?:[eE][-+]?d+)?"], ["[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?"])));
+const viewportSeparator = String.raw(_templateObject2$1 || (_templateObject2$1 = _taggedTemplateLiteral(["(?:s*,?s+|s*,s*)"], ["(?:\\s*,?\\s+|\\s*,\\s*)"])));
 const svgNS = 'http://www.w3.org/2000/svg';
 const reFontDeclaration = new RegExp('(normal|italic)?\\s*(normal|small-caps)?\\s*' + '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(' + reNum + '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + reNum + '))?\\s+(.*)');
 const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line', 'image', 'text'],
@@ -4934,8 +4937,8 @@ const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
 const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 
 // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-// matches, e.g.: +14.56e-12, etc.
-const reViewBoxAttrValue = new RegExp('^' + '\\s*(' + reNum + '+)\\s*,?' + '\\s*(' + reNum + '+)\\s*,?' + '\\s*(' + reNum + '+)\\s*,?' + '\\s*(' + reNum + '+)\\s*' + '$');
+
+const reViewBoxAttrValue = new RegExp(String.raw(_templateObject3$1 || (_templateObject3$1 = _taggedTemplateLiteral(["^s*(", ")", "(", ")", "(", ")", "(", ")s*$"], ["^\\s*(", ")", "(", ")", "(", ")", "(", ")\\s*$"])), reNum, viewportSeparator, reNum, viewportSeparator, reNum, viewportSeparator, reNum));
 
 const unitVectorX = new Point(1, 0);
 const zero = new Point();

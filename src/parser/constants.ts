@@ -1,7 +1,9 @@
 import { getSvgRegex } from './getSvgRegex';
 import { LEFT, TOP } from '../constants';
 
-export const reNum = String.raw`(?:[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?)`;
+// matches, e.g.: +14.56e-12, etc.
+export const reNum = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
+export const viewportSeparator = String.raw`(?:\s*,?\s+|\s*,\s*)`;
 
 export const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -78,20 +80,7 @@ export const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
 export const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 
 // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-// matches, e.g.: +14.56e-12, etc.
+
 export const reViewBoxAttrValue = new RegExp(
-  '^' +
-    '\\s*(' +
-    reNum +
-    '+)\\s*,?' +
-    '\\s*(' +
-    reNum +
-    '+)\\s*,?' +
-    '\\s*(' +
-    reNum +
-    '+)\\s*,?' +
-    '\\s*(' +
-    reNum +
-    '+)\\s*' +
-    '$',
+  String.raw`^\s*(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})\s*$`,
 );

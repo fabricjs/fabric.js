@@ -1,5 +1,9 @@
 # Changelog
 
+## [6.6.7]
+
+- fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
+
 ## [6.6.6]
 
 - fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
