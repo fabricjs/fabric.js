@@ -1617,8 +1617,8 @@ export class FabricText<
         );
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
-        const finalTickness = this.fontSize * currentTickness;
         if (path && currentDecoration && currentFill) {
+          const finalTickness = (this.fontSize * currentTickness) / 1000;
           ctx.save();
           // bug? verify lastFill is a valid fill here.
           ctx.fillStyle = lastFill as string;
@@ -1639,11 +1639,12 @@ export class FabricText<
             currentDy !== dy) &&
           boxWidth > 0
         ) {
+          const finalTickness = (this.fontSize * lastTickness) / 1000;
           let drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === 'rtl') {
             drawStart = this.width - drawStart - boxWidth;
           }
-          if (lastDecoration && lastFill && currentTickness) {
+          if (lastDecoration && lastFill && lastTickness) {
             // bug? verify lastFill is a valid fill here.
             ctx.fillStyle = lastFill as string;
             ctx.fillRect(
@@ -1669,7 +1670,7 @@ export class FabricText<
         drawStart = this.width - drawStart - boxWidth;
       }
       ctx.fillStyle = currentFill as string;
-      const finalTickness = this.fontSize * currentTickness;
+      const finalTickness = (this.fontSize * currentTickness) / 1000;
       currentDecoration &&
         currentFill &&
         currentTickness &&
