@@ -37,13 +37,17 @@ const makePath = (textObj): string => {
 
 export function testCase(canvas: fabric.Canvas) {
   fabric.config.NUM_FRACTION_DIGITS = 9;
-  const textValue = 'testing 123 123 123 ';
+  const textValue = 'ABCDEFGHIL';
   const text = new fabric.FabricText(textValue, {
     width: 200,
     top: 20,
-    fill: '',
+    fill: 'green',
     stroke: 'red',
-    objectCaching: false,
+    objectCaching: true,
+    textDecorationTickness: 0.06667,
+    underline: true,
+    overline: true,
+    linethrough: true,
     styles: {
       0: {
         0: {
@@ -51,24 +55,16 @@ export function testCase(canvas: fabric.Canvas) {
           fill: 'blue',
         },
         1: {
-          fontSize: 90,
-          fill: 'green',
+          fontSize: 60,
+          textDecorationTickness: 0.15,
         },
         2: {
-          fontSize: 20,
-          fill: 'Yellow',
+          fontSize: 40,
+          fill: 'blue',
         },
         3: {
-          fontWeigth: 'bold',
-          fill: 'transparent',
-          strokeWidth: 4,
-          strole: 'blue',
-        },
-        4: {
-          fontWeigth: 'bold',
-          fill: 'transparent',
-          strokeWidth: 4,
-          strole: 'blue',
+          fontSize: 40,
+          textDecorationTickness: 0.03,
         },
       },
     },
@@ -79,8 +75,7 @@ export function testCase(canvas: fabric.Canvas) {
     stroke: 'red',
     objectCaching: false,
   });
-  text.set('path', pathObject);
+  // text.set('path', pathObject);
   canvas.add(text);
   canvas.centerObjectH(text);
-  document.getElementById('svgout')?.innerHTML = canvas.toSVG();
 }

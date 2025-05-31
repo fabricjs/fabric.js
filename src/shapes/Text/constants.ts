@@ -97,8 +97,8 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   _fontSizeFraction: 0.222,
   offsets: {
     underline: 0.1,
-    linethrough: -0.315,
-    overline: -0.88,
+    linethrough: -0.315 + 1 / 30,
+    overline: -0.88 + 1 / 15,
   },
   _fontSizeMult: 1.13,
   charSpacing: 0,

@@ -48,7 +48,7 @@
     "dev": "npm run cli -- dev",
     "start": "npm run sandboxscript -- start",
     "export": "npm run cli -- website export",
-    "test:vitest": "vitest --update --run --project unit-node",
+    "test:vitest": "vitest --run --project unit-node",
     "test:vitest:chromium": "vitest --run --project unit-chromium",
     "test:vitest:firefox": "vitest --run --project unit-firefox",
     "test:vitest:all": "vitest --run",
