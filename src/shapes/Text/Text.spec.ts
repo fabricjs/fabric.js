@@ -66,7 +66,7 @@ const REFERENCE_TEXT_OBJECT = {
   pathStartOffset: 0,
   pathSide: 'left',
   pathAlign: 'baseline',
-  textDecorationTickness: 66.667,
+  textDecorationThickness: 66.667,
 };
 
 function createTextObject() {
@@ -915,7 +915,7 @@ describe('FabricText', () => {
       linethrough: false,
       textBackgroundColor: '',
       deltaY: 0,
-      textDecorationTickness: 66.667,
+      textDecorationThickness: 66.667,
     };
 
     const expectedStyle2 = {
@@ -931,7 +931,7 @@ describe('FabricText', () => {
       linethrough: false,
       textBackgroundColor: '',
       deltaY: 0,
-      textDecorationTickness: 66.667,
+      textDecorationThickness: 66.667,
     };
 
     expect(
@@ -1202,7 +1202,7 @@ describe('FabricText', () => {
       FabricText.cacheProperties.join('-'),
       'cache properties include text-specific ones',
     ).toBe(
-      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationTickness',
+      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness',
     );
   });
 

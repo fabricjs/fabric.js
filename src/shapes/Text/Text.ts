@@ -40,7 +40,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
-  TEXT_DECORATION_TICKNESS,
+  TEXT_DECORATION_THICKNESS,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
@@ -108,7 +108,7 @@ interface UniqueTextProps {
   textAlign: string;
   direction: CanvasDirection;
   path?: Path;
-  textDecorationTickness: number;
+  textDecorationThickness: number;
 }
 
 export interface SerializedTextProps
@@ -309,7 +309,7 @@ export class FabricText<
    * workaround
    * @default 66.667
    */
-  declare textDecorationTickness: number;
+  declare textDecorationThickness: number;
 
   /**
    * Offset amount for text path starting position
@@ -1597,7 +1597,7 @@ export class FabricText<
       let lastTickness = this.getValueOfPropertyAt(
         i,
         0,
-        TEXT_DECORATION_TICKNESS,
+        TEXT_DECORATION_THICKNESS,
       );
       let currentDecoration = lastDecoration;
       let currentFill = lastFill;
@@ -1612,7 +1612,7 @@ export class FabricText<
         currentTickness = this.getValueOfPropertyAt(
           i,
           j,
-          TEXT_DECORATION_TICKNESS,
+          TEXT_DECORATION_THICKNESS,
         );
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');

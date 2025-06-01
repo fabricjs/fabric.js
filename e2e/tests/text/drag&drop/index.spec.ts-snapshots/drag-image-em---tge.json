@@ -21,7 +21,7 @@
           "fill": "red",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 60,
@@ -36,7 +36,7 @@
           "fill": "red",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -51,7 +51,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -66,7 +66,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "yellow",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -81,7 +81,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "yellow",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " line-through"
         },
         {
@@ -97,7 +97,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "yellow",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " line-through"
         },
         {
@@ -113,7 +113,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "yellow",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -128,7 +128,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -143,7 +143,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -158,7 +158,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -174,23 +174,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
-          "textDecoration": "underline"
-        },
-        {
-          "fontSize": 40,
-          "fontWeight": "normal",
-          "fontFamily": "Arial",
-          "fontStyle": "italic",
-          "underline": false,
-          "overline": false,
-          "linethrough": false,
-          "stroke": null,
-          "strokeWidth": 1,
-          "fill": "green",
-          "deltaY": 0,
-          "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -206,7 +190,7 @@
           "fill": "green",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -222,7 +206,23 @@
           "fill": "green",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
+          "textDecoration": "underline"
+        },
+        {
+          "fontSize": 40,
+          "fontWeight": "normal",
+          "fontFamily": "Arial",
+          "fontStyle": "italic",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "green",
+          "deltaY": 0,
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -238,7 +238,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -253,7 +253,7 @@
           "fill": "blue",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -268,7 +268,7 @@
           "fill": "blue",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 63,
@@ -283,7 +283,7 @@
           "fill": "blue",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -298,7 +298,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -313,7 +313,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " underline"
         },
         {
@@ -329,7 +329,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " underline"
         },
         {
@@ -345,7 +345,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " overline"
         },
         {
@@ -361,7 +361,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " overline"
         },
         {
@@ -377,7 +377,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " overline"
         },
         {
@@ -393,7 +393,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -408,7 +408,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -424,7 +424,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -440,7 +440,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -456,7 +456,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -472,7 +472,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -488,7 +488,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -503,7 +503,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -518,7 +518,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667,
+          "textDecorationThickness": 66.667,
           "textDecoration": " underline"
         },
         {
@@ -534,7 +534,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecorationTickness": 66.667
+          "textDecorationThickness": 66.667
         }
       ]
     }

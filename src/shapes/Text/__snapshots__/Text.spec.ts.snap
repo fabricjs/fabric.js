@@ -191,7 +191,7 @@ exports[`FabricText > toObject 1`] = `
   "text": "text",
   "textAlign": "left",
   "textBackgroundColor": "",
-  "textDecorationTickness": 66.667,
+  "textDecorationThickness": 66.667,
   "top": 0,
   "type": "Text",
   "underline": false,
