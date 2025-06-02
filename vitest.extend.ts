@@ -122,6 +122,24 @@ chai.util.addMethod(
   },
 );
 
+chai.util.addMethod(
+  chai.Assertion.prototype,
+  'toMatchSVGSnapshot',
+  function (
+    this: Chai.AssertionStatic,
+    propertiesOrHint?: ExtendedOptions | string,
+    hint?: string,
+  ) {
+    const received = chai.util.flag(this, 'object');
+
+    const value = sanitizeSVG(received);
+
+    chai.util.flag(this, 'object', value);
+
+    return rawToMatchSnapshot.call(this, propertiesOrHint, hint);
+  },
+);
+
 expect.extend({
   toSameImageObject(actual: FabricImage, expected: FabricImage) {
     const normalizedActual = {

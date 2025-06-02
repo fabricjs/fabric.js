@@ -3,7 +3,6 @@ import { FabricText } from './Text';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Rect } from '../Rect';
-import { sanitizeSVG } from '../../../vitest.extend';
 
 describe('TextSvgExport', () => {
   it('exports text background color correctly', () => {
@@ -43,9 +42,9 @@ describe('TextSvgExport', () => {
 
     it('toSVG', () => {
       const text = new FabricText('x');
-      expect(sanitizeSVG(text.toSVG())).toMatchSnapshot();
+      expect(text.toSVG()).toMatchSVGSnapshot();
       text.set('fontFamily', 'Arial');
-      expect(sanitizeSVG(text.toSVG())).toMatchSnapshot();
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG justified', () => {
@@ -53,12 +52,12 @@ describe('TextSvgExport', () => {
         textAlign: 'justify',
       });
 
-      expect(sanitizeSVG(text.toSVG())).toMatchSnapshot();
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with multiple spaces', () => {
       const text = new FabricText('x                 y');
-      expect(sanitizeSVG(text.toSVG())).toMatchSnapshot();
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with deltaY', () => {
@@ -73,7 +72,7 @@ describe('TextSvgExport', () => {
           },
         },
       });
-      expect(sanitizeSVG(text.toSVG())).toMatchSnapshot();
+      expect(text.toSVG()).toMatchSVGSnapshot();
       config.configure({ NUM_FRACTION_DIGITS: 2 });
     });
 
@@ -91,7 +90,7 @@ describe('TextSvgExport', () => {
           },
         },
       });
-      expect(sanitizeSVG(text.toSVG())).toMatchSnapshot();
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with text as a clipPath', () => {
@@ -99,7 +98,7 @@ describe('TextSvgExport', () => {
       const clipPath = new FabricText('text as clipPath');
       const rect = new Rect({ width: 200, height: 100 });
       rect.clipPath = clipPath;
-      expect(sanitizeSVG(rect.toSVG())).toMatchSnapshot();
+      expect(rect.toSVG()).toMatchSVGSnapshot();
     });
   });
 });
