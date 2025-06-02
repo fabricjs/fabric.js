@@ -99,6 +99,7 @@ const svgFiles = [
   'seaClipPath',
   'use-and-style',
   'use-svg-style-2',
+  'svg_text_underline_thick',
 ];
 
 export const svgImportTests: renderTestType[] = svgFiles.map(createTestFromSVG);
