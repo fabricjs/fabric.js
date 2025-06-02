@@ -66,6 +66,7 @@ const REFERENCE_TEXT_OBJECT = {
   pathStartOffset: 0,
   pathSide: 'left',
   pathAlign: 'baseline',
+  textDecorationThickness: 66.667,
 };
 
 function createTextObject() {
@@ -116,9 +117,9 @@ describe('FabricText', () => {
       ].map((style, index) => ({ style, start: index, end: index + 1 })),
     });
     config.configure({ NUM_FRACTION_DIGITS: 1 });
-    expect(text.toSVG()).toMatchSnapshot();
+    expect(text.toSVG()).toMatchSVGSnapshot();
     config.configure({ NUM_FRACTION_DIGITS: 3 });
-    expect(text.toSVG()).toMatchSnapshot();
+    expect(text.toSVG()).toMatchSVGSnapshot();
   });
 
   it('toSVG with a path', async () => {
@@ -130,7 +131,7 @@ describe('FabricText', () => {
     const plainSvg = text.toSVG();
     text.path = path;
     const svg = text.toSVG();
-    expect(svg).toMatchSnapshot();
+    expect(text.toSVG()).toMatchSVGSnapshot();
     expect(svg.includes(plainSvg)).toBe(false);
   });
 
@@ -914,6 +915,7 @@ describe('FabricText', () => {
       linethrough: false,
       textBackgroundColor: '',
       deltaY: 0,
+      textDecorationThickness: 66.667,
     };
 
     const expectedStyle2 = {
@@ -929,6 +931,7 @@ describe('FabricText', () => {
       linethrough: false,
       textBackgroundColor: '',
       deltaY: 0,
+      textDecorationThickness: 66.667,
     };
 
     expect(
@@ -1199,7 +1202,7 @@ describe('FabricText', () => {
       FabricText.cacheProperties.join('-'),
       'cache properties include text-specific ones',
     ).toBe(
-      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction',
+      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness',
     );
   });
 

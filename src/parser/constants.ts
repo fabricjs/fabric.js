@@ -1,5 +1,6 @@
 import { getSvgRegex } from './getSvgRegex';
 import { LEFT, TOP } from '../constants';
+import { TEXT_DECORATION_THICKNESS } from '../shapes/Text/constants';
 
 // matches, e.g.: +14.56e-12, etc.
 export const reNum = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
@@ -69,6 +70,7 @@ export const svgValidTagNames = [
     'clip-rule': 'clipRule',
     'vector-effect': 'strokeUniform',
     'image-rendering': 'imageSmoothing',
+    'text-decoration-thickness': TEXT_DECORATION_THICKNESS,
   },
   fSize = 'font-size',
   cPath = 'clip-path';

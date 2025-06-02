@@ -20,7 +20,8 @@
           "strokeWidth": 1,
           "fill": "red",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 60,
@@ -34,7 +35,8 @@
           "strokeWidth": 1,
           "fill": "red",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -48,7 +50,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -62,7 +65,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": "yellow"
+          "textBackgroundColor": "yellow",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -77,6 +81,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "yellow",
+          "textDecorationThickness": 66.667,
           "textDecoration": " line-through"
         },
         {
@@ -92,6 +97,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "yellow",
+          "textDecorationThickness": 66.667,
           "textDecoration": " line-through"
         },
         {
@@ -106,35 +112,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": "yellow"
-        },
-        {
-          "fontSize": 40,
-          "fontWeight": "normal",
-          "fontFamily": "Arial",
-          "fontStyle": "normal",
-          "underline": false,
-          "overline": false,
-          "linethrough": false,
-          "stroke": null,
-          "strokeWidth": 1,
-          "fill": "rgb(0,0,0)",
-          "deltaY": 0,
-          "textBackgroundColor": ""
-        },
-        {
-          "fontSize": 40,
-          "fontWeight": "normal",
-          "fontFamily": "Arial",
-          "fontStyle": "normal",
-          "underline": false,
-          "overline": false,
-          "linethrough": false,
-          "stroke": null,
-          "strokeWidth": 1,
-          "fill": "rgb(0,0,0)",
-          "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "yellow",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -149,6 +128,37 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
+        },
+        {
+          "fontSize": 40,
+          "fontWeight": "normal",
+          "fontFamily": "Arial",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
+        },
+        {
+          "fontSize": 40,
+          "fontWeight": "normal",
+          "fontFamily": "Arial",
+          "fontStyle": "normal",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "rgb(0,0,0)",
+          "deltaY": 0,
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -164,21 +174,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
-          "textDecoration": "underline"
-        },
-        {
-          "fontSize": 40,
-          "fontWeight": "normal",
-          "fontFamily": "Arial",
-          "fontStyle": "italic",
-          "underline": false,
-          "overline": false,
-          "linethrough": false,
-          "stroke": null,
-          "strokeWidth": 1,
-          "fill": "green",
-          "deltaY": 0,
-          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -194,6 +190,7 @@
           "fill": "green",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -209,6 +206,23 @@
           "fill": "green",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
+          "textDecoration": "underline"
+        },
+        {
+          "fontSize": 40,
+          "fontWeight": "normal",
+          "fontFamily": "Arial",
+          "fontStyle": "italic",
+          "underline": false,
+          "overline": false,
+          "linethrough": false,
+          "stroke": null,
+          "strokeWidth": 1,
+          "fill": "green",
+          "deltaY": 0,
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "underline"
         },
         {
@@ -223,7 +237,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -237,7 +252,8 @@
           "strokeWidth": 1,
           "fill": "blue",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -251,7 +267,8 @@
           "strokeWidth": 1,
           "fill": "blue",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 63,
@@ -265,7 +282,8 @@
           "strokeWidth": 1,
           "fill": "blue",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -279,7 +297,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -294,6 +313,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": " underline"
         },
         {
@@ -309,6 +329,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": " underline"
         },
         {
@@ -324,6 +345,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": " overline"
         },
         {
@@ -339,6 +361,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": " overline"
         },
         {
@@ -354,6 +377,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": " overline"
         },
         {
@@ -368,7 +392,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -383,6 +408,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -398,6 +424,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -413,6 +440,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -428,6 +456,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -443,6 +472,7 @@
           "fill": "#666",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": "line-through"
         },
         {
@@ -457,7 +487,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -471,7 +502,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 40,
@@ -486,6 +518,7 @@
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
           "textBackgroundColor": "",
+          "textDecorationThickness": 66.667,
           "textDecoration": " underline"
         },
         {
@@ -500,7 +533,8 @@
           "strokeWidth": 2,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         }
       ]
     }

@@ -41,48 +41,27 @@ describe('TextSvgExport', () => {
     });
 
     it('toSVG', () => {
-      const TEXT_SVG =
-        '<g transform="" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-10" y="12.57" >x</tspan></text>\n</g>\n';
       const text = new FabricText('x');
-      expect(removeTranslate(text.toSVG())).toEqualSVG(
-        removeTranslate(TEXT_SVG),
-      );
+      expect(text.toSVG()).toMatchSVGSnapshot();
       text.set('fontFamily', 'Arial');
-      expect(removeTranslate(text.toSVG())).toEqualSVG(
-        removeTranslate(
-          TEXT_SVG.replace(
-            'font-family="Times New Roman"',
-            'font-family="Arial"',
-          ),
-        ),
-      );
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG justified', () => {
-      const TEXT_SVG_JUSTIFIED =
-        '<g transform="" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="-13.65" >xxxxxx</tspan><tspan x="-60" y="38.78" style="white-space: pre; ">x </tspan><tspan x="40" y="38.78" >y</tspan></text>\n</g>\n';
       const text = new FabricText('xxxxxx\nx y', {
         textAlign: 'justify',
       });
 
-      expect(removeTranslate(text.toSVG())).toEqualSVG(
-        removeTranslate(TEXT_SVG_JUSTIFIED),
-      );
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with multiple spaces', () => {
-      const TEXT_SVG_MULTIPLESPACES =
-        '<g transform="" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-105" y="12.57" style="white-space: pre; ">x                 y</tspan></text>\n</g>\n';
       const text = new FabricText('x                 y');
-      expect(removeTranslate(text.toSVG())).toEqualSVG(
-        removeTranslate(TEXT_SVG_MULTIPLESPACES),
-      );
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with deltaY', () => {
       config.configure({ NUM_FRACTION_DIGITS: 0 });
-      const TEXT_SVG =
-        '<g transform="" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-16" y="13" >x</tspan><tspan x="4" y="13"  dy="-14" style="font-size: 24px; baseline-shift: 14; ">x</tspan></text>\n</g>\n';
       const text = new FabricText('xx', {
         styles: {
           0: {
@@ -93,15 +72,11 @@ describe('TextSvgExport', () => {
           },
         },
       });
-      expect(removeTranslate(text.toSVG())).toEqualSVG(
-        removeTranslate(TEXT_SVG),
-      );
+      expect(text.toSVG()).toMatchSVGSnapshot();
       config.configure({ NUM_FRACTION_DIGITS: 2 });
     });
 
     it('toSVG with font', () => {
-      const TEXT_SVG_WITH_FONT =
-        '<g transform="" style=""  >\n\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-60" y="-13.65" style="font-family: \'Times New Roman\'; ">xxxxxx</tspan><tspan x="-60" y="38.78" style="white-space: pre; ">x </tspan><tspan x="40" y="38.78" >y</tspan></text>\n</g>\n';
       const text = new FabricText('xxxxxx\nx y', {
         textAlign: 'justify',
         styles: {
@@ -115,28 +90,15 @@ describe('TextSvgExport', () => {
           },
         },
       });
-      expect(removeTranslate(text.toSVG())).toEqualSVG(
-        removeTranslate(TEXT_SVG_WITH_FONT),
-      );
+      expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with text as a clipPath', () => {
       config.configure({ NUM_FRACTION_DIGITS: 0 });
-      const EXPECTED =
-        '<g transform="" clip-path="url(#CLIPPATH_0)"  >\n<clipPath id="CLIPPATH_0" >\n\t\t\t<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-122" y="13" >text as clipPath</tspan></text>\n</clipPath>\n<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-100" y="-50" rx="0" ry="0" width="200" height="100" />\n</g>\n';
       const clipPath = new FabricText('text as clipPath');
       const rect = new Rect({ width: 200, height: 100 });
       rect.clipPath = clipPath;
-      expect(removeTranslate(rect.toSVG())).toEqualSVG(
-        removeTranslate(EXPECTED),
-      );
+      expect(rect.toSVG()).toMatchSVGSnapshot();
     });
   });
 });
-
-/**
- * Remove translate matrix transformations from SVG string for comparison
- */
-function removeTranslate(str: string) {
-  return str.replace(/matrix\(.*?\)/, '');
-}
