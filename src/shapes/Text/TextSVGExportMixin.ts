@@ -303,7 +303,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${(this.textDecorationThickness * this.getObjectScaling().y) / 10}%; white-space: pre;`;
+    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed((this.textDecorationThickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; white-space: pre;`;
   }
 
   /**
@@ -352,7 +352,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontStyle ? `font-style: ${fontStyle}; ` : '',
       fontWeight ? `font-weight: ${fontWeight}; ` : '',
       textDecoration
-        ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${(thickness * this.getObjectScaling().y) / 10}%; `
+        ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; `
         : '',
       fill ? colorPropToSVG(FILL, fill) : '',
       deltaY ? `baseline-shift: ${-deltaY}; ` : '',
