@@ -1,0 +1,5 @@
+<svg height="260" width="400" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<text x="0" y="60" style="font-size: 40px; text-decoration: underline overline; text-decoration-thickness: 0.5em">Chunky text decoration</text>
+<text x="0" y="120" style="font-size: 40px; text-decoration: underline line-through; text-decoration-thickness: 1px;">1px letter decoration</text>
+<text x="0" y="180" style="font-size: 40px; text-decoration: underline line-through; text-decoration-thickness: 2px;">2px letter decoration</text>
+</svg>

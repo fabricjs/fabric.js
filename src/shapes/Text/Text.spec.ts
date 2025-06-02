@@ -48,9 +48,9 @@ describe('FabricText', () => {
       ].map((style, index) => ({ style, start: index, end: index + 1 })),
     });
     config.configure({ NUM_FRACTION_DIGITS: 1 });
-    expect(text.toSVG()).toMatchSnapshot();
+    expect(text.toSVG()).toMatchSVGSnapshot();
     config.configure({ NUM_FRACTION_DIGITS: 3 });
-    expect(text.toSVG()).toMatchSnapshot();
+    expect(text.toSVG()).toMatchSVGSnapshot();
   });
 
   it('toSVG with a path', async () => {
@@ -62,7 +62,7 @@ describe('FabricText', () => {
     const plainSvg = text.toSVG();
     text.path = path;
     const svg = text.toSVG();
-    expect(svg).toMatchSnapshot();
+    expect(text.toSVG()).toMatchSVGSnapshot();
     expect(svg.includes(plainSvg)).toBe(false);
   });
 

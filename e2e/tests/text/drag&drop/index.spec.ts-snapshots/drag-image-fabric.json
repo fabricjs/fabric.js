@@ -20,7 +20,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 64,
@@ -34,7 +35,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 64,
@@ -48,7 +50,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 64,
@@ -62,7 +65,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 64,
@@ -76,7 +80,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         },
         {
           "fontSize": 64,
@@ -90,7 +95,8 @@
           "strokeWidth": 1,
           "fill": "rgb(0,0,0)",
           "deltaY": 0,
-          "textBackgroundColor": ""
+          "textBackgroundColor": "",
+          "textDecorationThickness": 66.667
         }
       ]
     }
