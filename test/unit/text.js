@@ -64,7 +64,8 @@
     direction:                  'ltr',
     pathStartOffset:            0,
     pathSide:                   'left',
-    pathAlign:                  'baseline'
+    pathAlign:                  'baseline',
+    textDecorationThickness:    66.667,
   };
 
   QUnit.test('constructor', function(assert) {
@@ -260,6 +261,7 @@
         fontWeight:       'bold',
         fontSize:         123,
         underline:        true,
+        textDecorationThickness: 66.667,
       };
       assert.deepEqual(textWithAttrs.toObject(), expectedObject);
       done();
@@ -561,6 +563,7 @@
       linethrough: false,
       textBackgroundColor: '',
       deltaY: 0,
+      textDecorationThickness: 66.667,
     };
 
     var expectedStyle2 = {
@@ -576,6 +579,7 @@
       linethrough: false,
       textBackgroundColor: '',
       deltaY: 0,
+      textDecorationThickness: 66.667,
     };
 
     assert.equal(typeof iText.getStyleAtPosition, 'function');
@@ -790,7 +794,7 @@
 
   QUnit.test('cacheProperties for text', function(assert) {
     var text = new fabric.Text('a');
-    assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction');
+    assert.equal(fabric.Text.cacheProperties.join('-'), 'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness');
   });
 
   QUnit.test('_getLineLeftOffset', function(assert) {
