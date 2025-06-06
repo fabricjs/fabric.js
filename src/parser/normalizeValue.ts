@@ -2,6 +2,7 @@ import { multiplyTransformMatrices } from '../util/misc/matrix';
 import { parseUnit } from '../util/misc/svgParsing';
 import { parseTransformAttribute } from './parseTransformAttribute';
 import { CENTER, LEFT, RIGHT, NONE, FILL, STROKE } from '../constants';
+import { TEXT_DECORATION_THICKNESS } from '../shapes/Text/constants';
 
 export function normalizeValue(
   attr: string,
@@ -44,7 +45,7 @@ export function normalizeValue(
     }
   } else if (attr === 'textAnchor' /* text-anchor */) {
     ouputValue = value === 'start' ? LEFT : value === 'end' ? RIGHT : CENTER;
-  } else if (attr === 'charSpacing') {
+  } else if (attr === 'charSpacing' || attr === TEXT_DECORATION_THICKNESS) {
     // parseUnit returns px and we convert it to em
     parsed = (parseUnit(value, fontSize) / fontSize) * 1000;
   } else if (attr === 'paintFirst') {

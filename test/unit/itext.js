@@ -50,7 +50,8 @@
     direction:                'ltr',
     pathStartOffset:          0,
     pathSide:                 'left',
-    pathAlign:                'baseline'
+    pathAlign:                'baseline',
+    textDecorationThickness: 66.667,
   };
 
 

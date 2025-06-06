@@ -1,5 +1,9 @@
 # Changelog
 
+## [6.7.0]
+
+- feat(Text): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
+
 ## [6.6.7]
 
 - fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
