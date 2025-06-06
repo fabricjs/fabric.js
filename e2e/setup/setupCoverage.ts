@@ -1,9 +1,9 @@
 import { Page } from '@playwright/test';
 import { ensureDirSync, writeFileSync } from 'fs-extra';
-import _ from 'lodash';
 import path from 'path';
 import { URL } from 'url';
 import v8toIstanbul from 'v8-to-istanbul';
+import { fromPairs } from 'es-toolkit/compat';
 
 // https://playwright.dev/docs/api/class-coverage
 
@@ -11,7 +11,7 @@ const coverageIgnore = ['node_modules', 'e2e'];
 
 export async function stopCoverage(page: Page, outputDir: string) {
   const coverage = await page.coverage.stopJSCoverage();
-  const nyc = _.fromPairs(
+  const nyc = fromPairs(
     (
       await Promise.all(
         coverage.map(async ({ url, source, functions }) => {

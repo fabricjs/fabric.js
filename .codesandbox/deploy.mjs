@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import fs from 'fs-extra';
-import _ from 'lodash';
 import match from 'micromatch';
 import path from 'path';
 import { getGitInfo } from '../scripts/git.mjs';
+import { compact, flatten } from 'es-toolkit/compat';
 
 const BINARY_EXT = ['png', 'jpg', 'jpeg', 'ico'];
 
@@ -16,7 +16,7 @@ function globToRegex(glob, opts) {
 }
 
 function parseIgnoreFile(file) {
-  return _.compact(fs.readFileSync(file).toString().split('\n')).map((p) =>
+  return compact(fs.readFileSync(file).toString().split('\n')).map((p) =>
     globToRegex(p.trim()),
   );
 }
@@ -24,7 +24,7 @@ function parseIgnoreFile(file) {
 export function ignore(appPath, fileName) {
   const gitignore = path.resolve(appPath, '.gitignore');
   const codesandboxignore = path.resolve(appPath, '.codesandboxignore');
-  const ignore = _.flatten(
+  const ignore = flatten(
     [gitignore, codesandboxignore].filter(fs.existsSync).map(parseIgnoreFile),
   );
   return ignore.some((r) => r.test(fileName));

@@ -1,6 +1,6 @@
 import { expect, chai } from 'vitest';
 
-import { cloneDeepWith } from 'lodash';
+import { cloneDeepWith } from 'es-toolkit/compat';
 import type { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
