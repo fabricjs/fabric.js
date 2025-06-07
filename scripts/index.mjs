@@ -15,13 +15,13 @@ import chalk from 'chalk';
 import cp from 'child_process';
 import * as commander from 'commander';
 import fs from 'fs-extra';
-import _ from 'lodash';
 import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
 import os from 'os';
 import { build } from './build.mjs';
 import { CLI_CACHE, wd } from './dirname.mjs';
+import { debounce, defaultsDeep } from 'es-toolkit/compat';
 
 const program = new commander.Command()
   .showHelpAfterError()
@@ -59,11 +59,11 @@ function startWebsite() {
   });
 }
 
-function watch(path, callback, debounce = 500) {
+function watch(path, callback, debounceVal = 500) {
   fs.watch(
     path,
     { recursive: true },
-    _.debounce(
+    debounce(
       (type, location) => {
         try {
           callback(type, location);
@@ -71,7 +71,7 @@ function watch(path, callback, debounce = 500) {
           console.error(error);
         }
       },
-      debounce,
+      debounceVal,
       { trailing: true },
     ),
   );
@@ -95,7 +95,7 @@ function copy(from, to) {
 const BUILD_SOURCE = ['src', 'lib'];
 
 function exportBuildToWebsite(options = {}) {
-  _.defaultsDeep(options, { gestures: true });
+  defaultsDeep(options, { gestures: true });
   build({
     output: path.resolve(websiteDir, './lib/fabric.js'),
     fast: true,
