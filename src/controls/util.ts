@@ -88,7 +88,9 @@ export function findCornerQuadrant(
   control: Control,
 ): number {
   //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle(),
+  const angle =
+      fabricObject.getTotalAngle() +
+      (!!fabricObject.group && fabricObject.flipX ? 180 : 0),
     cornerAngle =
       angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
   return Math.round((cornerAngle % 360) / 45);
