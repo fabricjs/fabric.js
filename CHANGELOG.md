@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): After horizontally flipping the child elements within the group, the cursor display is incorrect [#10649](https://github.com/fabricjs/fabric.js/issues/10649)
 - refactor(): swap lodash with es-toolkit [#10651](https://github.com/fabricjs/fabric.js/pull/10651)
 - chore(): update vitest [#10648](https://github.com/fabricjs/fabric.js/pull/10648)
 - feat(): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
