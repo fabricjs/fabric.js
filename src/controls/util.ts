@@ -14,6 +14,7 @@ import {
 } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 import { CENTER } from '../constants';
+import { sendPointToPlane } from '../util/misc/planeChange';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -84,16 +85,29 @@ export const commonEventInfo: TransformAction<
  * @return {Number} 0 - 7 a quadrant number
  */
 export function findCornerQuadrant(
-  fabricObject: FabricObject,
+  eventData: TPointerEvent,
   control: Control,
+  fabricObject: FabricObject,
 ): number {
-  //  angle is relative to canvas plane
-  const angle =
-      fabricObject.getTotalAngle() +
-      (!!fabricObject.group && fabricObject.flipX ? 180 : 0),
-    cornerAngle =
-      angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
-  return Math.round((cornerAngle % 360) / 45);
+  const target = sendPointToPlane(
+    fabricObject.canvas!.getViewportPoint(eventData),
+    undefined,
+    fabricObject.canvas!.viewportTransform,
+  );
+  const center = fabricObject.getCenterPoint();
+  let point: Point;
+  if (control.x !== 0 && control.y !== 0) {
+    point = center;
+  } else {
+    const { E, F } = calculateProjections(
+      center,
+      target,
+      fabricObject.getTotalAngle(),
+    );
+    point = control.x == 0 ? F : E;
+  }
+  const n = getDirection(point, target);
+  return n;
 }
 
 /**
@@ -157,4 +171,47 @@ export function getLocalPoint(
   localPoint.x -= control.offsetX;
   localPoint.y -= control.offsetY;
   return localPoint;
+}
+
+function getDirection(point: Point, target: Point) {
+  const dx = target.x - point.x;
+  const dy = target.y - point.y;
+
+  const radians = Math.atan2(dy, dx);
+  const degrees = radiansToDegrees(radians);
+  return Math.floor((degrees + 382.5) / 45) % 8;
+}
+
+/**
+ * Given rectangle ABCD with its center at O, it is rotated by an angle around the center O, and there exists a point P outside O.
+ * Draw segment OY perpendicular to the base AB of the rectangle, and draw segment OX perpendicular to the side AD of the rectangle.
+ * Draw PE perpendicular to OY with foot E, and draw PF perpendicular to OX with foot F. Find points E and F.
+ * @param O
+ * @param P
+ * @param angle
+ * @returns
+ */
+function calculateProjections(O: Point, P: Point, angle: number) {
+  const rad = degreesToRadians(angle);
+  const cosA = Math.cos(rad);
+  const sinA = Math.sin(rad);
+
+  // Calculate vector OP
+  const opX = P.x - O.x;
+  const opY = P.y - O.y;
+
+  // Vector in the direction of the OX axis (base direction): (cosA, sinA)
+  // Vector in the direction of the OY axis (side direction): (-sinA, cosA)
+
+  // Calculate the projection of point F on the OX axis (foot)
+  // Using the vector projection formula: projection scalar t = (OP · OX) / (|OX|^2), since |OX| is a unit vector, |OX|^2=1
+  const tF = opX * cosA + opY * sinA;
+  const F = new Point(O.x + tF * cosA, O.y + tF * sinA);
+
+  // Calculate the projection of point E on the OY axis (foot)
+  // Similarly: projection scalar t = (OP · OY) / (|OY|^2), |OY|^2=1
+  const tE = opX * -sinA + opY * cosA;
+  const E = new Point(O.x + tE * -sinA, O.y + tE * cosA);
+
+  return { E, F };
 }
