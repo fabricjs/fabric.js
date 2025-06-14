@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update playwright [#10657](https://github.com/fabricjs/fabric.js/pull/10657)
 - refactor(): swap lodash with es-toolkit [#10651](https://github.com/fabricjs/fabric.js/pull/10651)
 - chore(): update vitest [#10648](https://github.com/fabricjs/fabric.js/pull/10648)
 - feat(): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
