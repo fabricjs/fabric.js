@@ -133,7 +133,7 @@ export class ElementsParser {
       property,
       this.gradientDefs,
     );
-    if (gradientDef) {
+    if (gradientDef && gradientDef.def) {
       const opacityAttr = el.getAttribute(property + '-opacity');
       const gradient = Gradient.fromElement(gradientDef.def, obj, {
         ...this.options,
