@@ -12,7 +12,7 @@ import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
 import { CENTER, quarterPI, twoMathPi } from '../constants';
 import { calcVectorRotation, createVector } from '../util/misc/vectors';
-import { TOCoord } from '../shapes/Object/InteractiveObject';
+import type { TOCoord } from '../shapes/Object/InteractiveObject';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 

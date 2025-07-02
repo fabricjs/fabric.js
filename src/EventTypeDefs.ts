@@ -21,7 +21,7 @@ import type {
   SCALING,
   SKEWING,
 } from './constants';
-import { TOCoord } from './shapes/Object/InteractiveObject';
+import type { TOCoord } from './shapes/Object/InteractiveObject';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
