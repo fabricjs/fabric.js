@@ -43,6 +43,7 @@ describe('fabric.controls.cursor', () => {
           eventData,
           target.controls[name],
           target,
+          target.oCoords[name],
         );
         expect(res).toBe(cursor);
       }

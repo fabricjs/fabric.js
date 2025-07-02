@@ -47,10 +47,11 @@ export const scaleSkewCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
   fabricObject,
+  coord,
 ) => {
   return isAltAction(eventData, fabricObject)
-    ? skewCursorStyleHandler(eventData, control, fabricObject)
-    : scaleCursorStyleHandler(eventData, control, fabricObject);
+    ? skewCursorStyleHandler(eventData, control, fabricObject, coord)
+    : scaleCursorStyleHandler(eventData, control, fabricObject, coord);
 };
 /**
  * Composed action handler to either scale X or skew Y

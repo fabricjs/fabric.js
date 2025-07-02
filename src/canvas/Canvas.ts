@@ -1389,8 +1389,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = corner.control;
-      this.setCursor(control.cursorStyleHandler(e, control, target));
+      const { control, coord } = corner;
+      console.log(corner);
+      this.setCursor(control.cursorStyleHandler(e, control, target, coord));
     }
   }
 

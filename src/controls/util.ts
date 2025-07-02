@@ -13,8 +13,9 @@ import {
   radiansToDegrees,
 } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
-import { CENTER } from '../constants';
-import { sendPointToPlane } from '../util/misc/planeChange';
+import { CENTER, quarterPI, twoMathPi } from '../constants';
+import { calcVectorRotation, createVector } from '../util/misc/vectors';
+import { TOCoord } from '../shapes/Object/InteractiveObject';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -85,29 +86,14 @@ export const commonEventInfo: TransformAction<
  * @return {Number} 0 - 7 a quadrant number
  */
 export function findCornerQuadrant(
-  eventData: TPointerEvent,
-  control: Control,
   fabricObject: FabricObject,
+  control: Control,
+  coord: TOCoord,
 ): number {
-  const target = sendPointToPlane(
-    fabricObject.canvas!.getViewportPoint(eventData),
-    undefined,
-    fabricObject.canvas!.viewportTransform,
-  );
+  const target = coord;
   const center = fabricObject.getCenterPoint();
-  let point: Point;
-  if (control.x !== 0 && control.y !== 0) {
-    point = center;
-  } else {
-    const { E, F } = calculateProjections(
-      center,
-      target,
-      fabricObject.getTotalAngle(),
-    );
-    point = control.x == 0 ? F : E;
-  }
-  const n = getDirection(point, target);
-  return n;
+  const angle = calcVectorRotation(createVector(center, target)) + twoMathPi;
+  return Math.round((angle % twoMathPi) / quarterPI);
 }
 
 /**
