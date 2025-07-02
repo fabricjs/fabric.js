@@ -80,9 +80,9 @@
     "@types/jsdom": "^20.0.1",
     "@types/micromatch": "^4.0.9",
     "@types/node": "^18.19.113",
-    "@vitest/browser": "3.2.1",
-    "@vitest/coverage-v8": "3.2.1",
-    "@vitest/ui": "3.2.1",
+    "@vitest/browser": "^3.2.1",
+    "@vitest/coverage-v8": "^3.2.1",
+    "@vitest/ui": "^3.2.1",
     "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
     "chalk": "^2.4.2",
     "commander": "^9.5.0",
@@ -102,7 +102,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1",
     "v8-to-istanbul": "^9.3.0",
-    "vitest": "3.2.1"
+    "vitest": "^3.2.1",
+    "vite": "6.x"
   },
   "engines": {
     "node": ">=18.0.0"
