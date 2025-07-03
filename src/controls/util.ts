@@ -13,6 +13,7 @@ import type { Control } from './Control';
 import { CENTER, quarterPI, twoMathPi } from '../constants';
 import { calcVectorRotation, createVector } from '../util/misc/vectors';
 import type { TOCoord } from '../shapes/Object/InteractiveObject';
+import { sendPointToPlane } from '../util/misc/planeChange';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -88,7 +89,11 @@ export function findCornerQuadrant(
   coord: TOCoord,
 ): number {
   const target = coord;
-  const center = fabricObject.getCenterPoint();
+  const center = sendPointToPlane(
+    fabricObject.getCenterPoint(),
+    fabricObject.canvas!.viewportTransform,
+    undefined,
+  );
   const angle = calcVectorRotation(createVector(center, target)) + twoMathPi;
   return Math.round((angle % twoMathPi) / quarterPI);
 }

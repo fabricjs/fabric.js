@@ -1,73 +1,65 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, test, beforeAll } from 'vitest';
 import { scaleSkewCursorStyleHandler } from './scaleSkew';
-import type { TPointerEvent } from '../../fabric';
 import { Group } from '../shapes/Group';
 import { Canvas } from '../canvas/Canvas';
 import { Rect } from '../shapes/Rect';
+import { Point } from '../Point';
+import type { TOCoord } from '../shapes/Object/InteractiveObject';
+import type { TPointerEvent } from '../EventTypeDefs';
+
+const points = [
+  [new Point(0, 0), 'nw-resize'],
+  [new Point(0, 50), 'w-resize'],
+  [new Point(0, 100), 'sw-resize'],
+  [new Point(50, 100), 's-resize'],
+  [new Point(100, 100), 'se-resize'],
+  [new Point(100, 50), 'e-resize'],
+  [new Point(100, 0), 'ne-resize'],
+  [new Point(50, 0), 'n-resize'],
+] as const;
 
 describe('fabric.controls.cursor', () => {
-  const canvas = new Canvas(undefined);
-  const rect = new Rect({ width: 100, height: 100 });
-  const groupRect = new Rect({ width: 100, height: 100 });
-  const group = new Group([groupRect], {
-    interactive: true,
-    subTargetCheck: true,
+  let canvas: Canvas;
+  let rect, groupRect: Rect;
+  let group: Group;
+  beforeAll(() => {
+    canvas = new Canvas(undefined);
+    rect = new Rect({ width: 100, height: 100 });
+    groupRect = new Rect({ width: 100, height: 100 });
+    group = new Group([groupRect], {
+      interactive: true,
+      subTargetCheck: true,
+    });
+    canvas.add(rect, group);
   });
-  canvas.add(rect, group);
 
-  const cornerControls = ['tl', 'tr', 'br', 'bl'];
-
-  function makeEventData(clientX: number, clientY: number) {
-    return {
-      clientX,
-      clientY,
-    } as TPointerEvent;
-  }
-
-  function test(target: Rect) {
-    const topRightEventData = makeEventData(1000, -1000);
-    const bottomRightEventData = makeEventData(1000, 1000);
-    const bottomLeftEventData = makeEventData(-1000, 1000);
-    const topLeftEventData = makeEventData(-1000, -1000);
-    const list = [
-      { eventData: topRightEventData, cursor: 'ne-resize' },
-      { eventData: bottomRightEventData, cursor: 'se-resize' },
-      { eventData: bottomLeftEventData, cursor: 'sw-resize' },
-      { eventData: topLeftEventData, cursor: 'nw-resize' },
-    ];
-
-    for (const item of list) {
-      const { eventData, cursor } = item;
-      for (const name of cornerControls) {
+  describe.for(points)(
+    'For a cursor on %s and an object with center on 50,50 we expect %s',
+    ([oCoord, expectedCursor]) => {
+      test.for([
+        [false, false],
+        [false, true],
+        [true, false],
+        [true, true],
+      ])('when flipX is %s and flipY is %s', ([flipX, flipY]) => {
+        const pointerEvent = {} as TPointerEvent;
+        rect.set({ flipX, flipY });
+        groupRect.set({ flipX, flipY });
         const res = scaleSkewCursorStyleHandler(
-          eventData,
-          target.controls[name],
-          target,
-          target.oCoords[name],
+          pointerEvent,
+          rect.controls.tr,
+          rect,
+          oCoord as TOCoord,
         );
-        expect(res).toBe(cursor);
-      }
-    }
-  }
-
-  it('scaleSkewCursorStyleHandler', () => {
-    const angle = Math.random() * 360;
-    const groupAngle = Math.random() * 360;
-    rect.set('angle', angle);
-    groupRect.set('angle', angle);
-    group.set('angle', groupAngle);
-    const list = [
-      [false, false],
-      [false, true],
-      [true, false],
-      [true, true],
-    ];
-    for (const [flipX, flipY] of list) {
-      rect.set({ flipX, flipY });
-      groupRect.set({ flipX, flipY });
-
-      test(rect);
-      test(groupRect);
-    }
-  });
+        expect(res).toBe(expectedCursor);
+        const resGroup = scaleSkewCursorStyleHandler(
+          pointerEvent,
+          groupRect.controls.tr,
+          groupRect,
+          oCoord as TOCoord,
+        );
+        expect(resGroup).toBe(expectedCursor);
+      });
+    },
+  );
 });
