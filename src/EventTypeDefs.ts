@@ -21,6 +21,7 @@ import type {
   SCALING,
   SKEWING,
 } from './constants';
+import type { TOCoord } from './shapes/Object/InteractiveObject';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -57,7 +58,12 @@ export type ControlCallback<R = void> = (
   fabricObject: FabricObject,
 ) => R;
 
-export type ControlCursorCallback = ControlCallback<string>;
+export type ControlCursorCallback<R = string> = (
+  eventData: TPointerEvent,
+  control: Control,
+  fabricObject: FabricObject,
+  coord: TOCoord,
+) => R;
 
 /**
  * relative to target's containing coordinate plane

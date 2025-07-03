@@ -7,7 +7,10 @@ import type {
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
 import { SCALE } from '../constants';
-import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
+import type {
+  InteractiveFabricObject,
+  TOCoord,
+} from '../shapes/Object/InteractiveObject';
 import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
 import {
   createRotateMatrix,
@@ -246,6 +249,7 @@ export class Control {
     eventData: TPointerEvent,
     control: Control,
     fabricObject: InteractiveFabricObject,
+    coord: TOCoord,
   ) {
     return control.cursorStyle;
   }
