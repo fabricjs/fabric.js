@@ -867,7 +867,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (this._checkTarget(target, pointer)) {
         if (subTargets && isCollection(target) && target.subTargetCheck) {
           const { target: subTarget } = this._searchPossibleTargets(
-            target._objects as FabricObject[],
+            target._objects,
             pointer,
             subTargets,
           );

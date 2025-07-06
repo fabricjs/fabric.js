@@ -8,12 +8,12 @@ import { resolveOrigin } from '../util/misc/resolveOrigin';
 import { Point } from '../Point';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TOriginX, TOriginY } from '../typedefs';
-import {
-  degreesToRadians,
-  radiansToDegrees,
-} from '../util/misc/radiansDegreesConversion';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
-import { CENTER } from '../constants';
+import { CENTER, quarterPI, twoMathPi } from '../constants';
+import { calcVectorRotation, createVector } from '../util/misc/vectors';
+import type { TOCoord } from '../shapes/Object/InteractiveObject';
+import { sendPointToPlane } from '../util/misc/planeChange';
 
 export const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -86,12 +86,16 @@ export const commonEventInfo: TransformAction<
 export function findCornerQuadrant(
   fabricObject: FabricObject,
   control: Control,
+  coord: TOCoord,
 ): number {
-  //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle(),
-    cornerAngle =
-      angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
-  return Math.round((cornerAngle % 360) / 45);
+  const target = coord;
+  const center = sendPointToPlane(
+    fabricObject.getCenterPoint(),
+    fabricObject.canvas!.viewportTransform,
+    undefined,
+  );
+  const angle = calcVectorRotation(createVector(center, target)) + twoMathPi;
+  return Math.round((angle % twoMathPi) / quarterPI);
 }
 
 /**

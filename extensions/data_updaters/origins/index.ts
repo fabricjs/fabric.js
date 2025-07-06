@@ -52,7 +52,7 @@ export const installOriginWrapperUpdater = (
   originY?: TOriginY,
 ) => {
   // @ts-expect-error the _fromObject parameter could be instantiated differently
-  BaseFabricObject._fromObject = originUpdaterWrapper<FabricObject>(
+  BaseFabricObject._fromObject = originUpdaterWrapper(
     BaseFabricObject._fromObject,
     originX,
     originY,

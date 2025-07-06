@@ -208,7 +208,7 @@ describe('fabric.controlsUtils', () => {
       mb: 'y',
     }[controlKey];
 
-    const AXIS = axis!.toUpperCase();
+    const AXIS = axis.toUpperCase();
     const signKey = `sign${AXIS}`;
     const scaleKey = `scale${AXIS}`;
     const flipKey = `flip${AXIS}`;

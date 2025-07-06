@@ -1,5 +1,5 @@
 import { FabricNamespace, renderTestType } from '../../../types';
-import { Canvas } from '../../../../../fabric';
+import { Canvas } from 'fabric';
 
 function toSVGCanvas(
   canvas: Canvas,
@@ -14,7 +14,7 @@ function toSVGCanvas(
     newCanvas.width = canvas.width;
     newCanvas.height = canvas.height;
     newCanvas
-      .getContext('2d')
+      .getContext('2d')!
       .drawImage(image, 0, 0, canvas.width, canvas.height);
     callback(newCanvas);
   };
@@ -461,7 +461,8 @@ export const zSvgExport: renderTestType[] = [
     async renderFunction(canvas, fabric) {
       const assetName = globalThis.getAssetName('svg_linear_9.svg');
       const { objects } = await fabric.loadSVGFromURL(assetName);
-      const group = fabric.util.groupSVGElements(objects);
+      const nonNullObjects = objects.filter((obj) => !!obj);
+      const group = fabric.util.groupSVGElements(nonNullObjects);
       canvas.add(group);
       await new Promise((resolve) => {
         toSVGCanvas(canvas, resolve, fabric);

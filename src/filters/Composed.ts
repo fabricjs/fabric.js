@@ -27,10 +27,7 @@ export class Composed extends BaseFilter<
   static type = 'Composed';
 
   constructor(
-    options: { subFilters?: BaseFilter<string, object>[] } & Record<
-      string,
-      any
-    > = {},
+    options: { subFilters?: BaseFilter<string>[] } & Record<string, any> = {},
   ) {
     super(options);
     this.subFilters = options.subFilters || [];
@@ -79,15 +76,12 @@ export class Composed extends BaseFilter<
     options?: { signal: AbortSignal },
   ): Promise<Composed> {
     return Promise.all(
-      ((object.subFilters || []) as BaseFilter<string, object>[]).map(
-        (filter) =>
-          classRegistry
-            .getClass<typeof BaseFilter>(filter.type)
-            .fromObject(filter, options),
+      ((object.subFilters || []) as BaseFilter<string>[]).map((filter) =>
+        classRegistry
+          .getClass<typeof BaseFilter>(filter.type)
+          .fromObject(filter, options),
       ),
-    ).then(
-      (enlivedFilters) => new this({ subFilters: enlivedFilters }) as Composed,
-    );
+    ).then((enlivedFilters) => new this({ subFilters: enlivedFilters }));
   }
 }
 

@@ -66,7 +66,7 @@ export function parseUseDirectives(doc: Document) {
         // priority is by feature. an attribute for fill on the original element
         // will overwrite the fill in style or attribute for tha use
         const styleRecord: Record<string, any> = {};
-        parseStyleString(value!, styleRecord);
+        parseStyleString(value, styleRecord);
         // cleanup styleRecord from attributes of original
         Object.entries(originalAttrMap).forEach(([name, value]) => {
           styleRecord[name] = value;
@@ -79,7 +79,7 @@ export function parseUseDirectives(doc: Document) {
         clonedOriginal.setAttribute(name, mergedStyles);
       } else {
         // set the attribute from use element only if the original does not have it already
-        !originalAttrMap[name] && clonedOriginal.setAttribute(name, value!);
+        !originalAttrMap[name] && clonedOriginal.setAttribute(name, value);
       }
     }
 

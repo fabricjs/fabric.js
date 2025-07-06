@@ -30,6 +30,7 @@ export const hasStyleChanged = (
   prevStyle.fontFamily !== thisStyle.fontFamily ||
   prevStyle.fontWeight !== thisStyle.fontWeight ||
   prevStyle.fontStyle !== thisStyle.fontStyle ||
+  prevStyle.textDecorationThickness !== thisStyle.textDecorationThickness ||
   prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor ||
   prevStyle.deltaY !== thisStyle.deltaY ||
   (forTextSpans &&

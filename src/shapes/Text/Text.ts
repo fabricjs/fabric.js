@@ -40,6 +40,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
+  TEXT_DECORATION_THICKNESS,
 } from './constants';
 import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
 import { isFiller } from '../../util/typeAssertions';
@@ -107,6 +108,7 @@ interface UniqueTextProps {
   textAlign: string;
   direction: CanvasDirection;
   path?: Path;
+  textDecorationThickness: number;
 }
 
 export interface SerializedTextProps
@@ -296,9 +298,22 @@ export class FabricText<
   declare path?: Path;
 
   /**
+   * The text decoration tickness for underline, overline and strikethrough
+   * The tickness is expressed in thousandths of fontSize ( em ).
+   * The original value was 1/15 that translates to 66.6667 thousandths.
+   * The choice of unit of measure is to align with charSpacing.
+   * You can slim the tickness without issues, while large underline or overline may end up
+   * outside the bounding box of the text. In order to fix that a bigger refactor of the code
+   * is needed and is out of scope for now. If you need such large overline on the first line
+   * of text or large underline on the last line of text, consider disabling caching as a
+   * workaround
+   * @default 66.667
+   */
+  declare textDecorationThickness: number;
+
+  /**
    * Offset amount for text path starting position
    * Only used when text has a path
-   * @type Number
    * @default
    */
   declare pathStartOffset: number;
@@ -1563,8 +1578,9 @@ export class FabricText<
     const leftOffset = this._getLeftOffset(),
       path = this.path,
       charSpacing = this._getWidthOfCharSpacing(),
+      offsetAligner =
+        type === 'linethrough' ? 0.5 : type === 'overline' ? 1 : 0,
       offsetY = this.offsets[type];
-
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       const heightOfLine = this.getHeightOfLine(i);
       if (!this[type] && !this.styleHas(type, i)) {
@@ -1578,8 +1594,14 @@ export class FabricText<
       let boxWidth = 0;
       let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
       let lastFill = this.getValueOfPropertyAt(i, 0, FILL);
-      let currentDecoration;
-      let currentFill;
+      let lastTickness = this.getValueOfPropertyAt(
+        i,
+        0,
+        TEXT_DECORATION_THICKNESS,
+      );
+      let currentDecoration = lastDecoration;
+      let currentFill = lastFill;
+      let currentTickness = lastTickness;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
       let size = this.getHeightOfChar(i, 0);
       let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
@@ -1587,9 +1609,15 @@ export class FabricText<
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
         currentDecoration = this.getValueOfPropertyAt(i, j, type);
         currentFill = this.getValueOfPropertyAt(i, j, FILL);
+        currentTickness = this.getValueOfPropertyAt(
+          i,
+          j,
+          TEXT_DECORATION_THICKNESS,
+        );
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
+          const finalTickness = (this.fontSize * currentTickness) / 1000;
           ctx.save();
           // bug? verify lastFill is a valid fill here.
           ctx.fillStyle = lastFill as string;
@@ -1597,35 +1625,38 @@ export class FabricText<
           ctx.rotate(charBox.angle);
           ctx.fillRect(
             -charBox.kernedWidth / 2,
-            offsetY * currentSize + currentDy,
+            offsetY * currentSize + currentDy - offsetAligner * finalTickness,
             charBox.kernedWidth,
-            this.fontSize / 15,
+            finalTickness,
           );
           ctx.restore();
         } else if (
           (currentDecoration !== lastDecoration ||
             currentFill !== lastFill ||
             currentSize !== size ||
+            currentTickness !== lastTickness ||
             currentDy !== dy) &&
           boxWidth > 0
         ) {
+          const finalTickness = (this.fontSize * lastTickness) / 1000;
           let drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === 'rtl') {
             drawStart = this.width - drawStart - boxWidth;
           }
-          if (lastDecoration && lastFill) {
+          if (lastDecoration && lastFill && lastTickness) {
             // bug? verify lastFill is a valid fill here.
             ctx.fillStyle = lastFill as string;
             ctx.fillRect(
               drawStart,
-              top + offsetY * size + dy,
+              top + offsetY * size + dy - offsetAligner * finalTickness,
               boxWidth,
-              this.fontSize / 15,
+              finalTickness,
             );
           }
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastDecoration = currentDecoration;
+          lastTickness = currentTickness;
           lastFill = currentFill;
           size = currentSize;
           dy = currentDy;
@@ -1638,13 +1669,15 @@ export class FabricText<
         drawStart = this.width - drawStart - boxWidth;
       }
       ctx.fillStyle = currentFill as string;
+      const finalTickness = (this.fontSize * currentTickness) / 1000;
       currentDecoration &&
         currentFill &&
+        currentTickness &&
         ctx.fillRect(
           drawStart,
-          top + offsetY * size + dy,
+          top + offsetY * size + dy - offsetAligner * finalTickness,
           boxWidth - charSpacing,
-          this.fontSize / 15,
+          finalTickness,
         );
       topOffset += heightOfLine;
     }

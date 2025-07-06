@@ -1,7 +1,3 @@
-const REQUESTED_COMMENTS_PER_PAGE = 20;
-
-const COMMENT_MARKER = '<!-- BUILD STATS COMMENT -->';
-
 const MAX_COMMENT_CHARS = 65536;
 
 function printSize(a, b) {

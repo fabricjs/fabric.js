@@ -1,18 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import type { Gradient } from '../gradient';
-import {
-  parseAttributes,
-  parseStyleAttribute,
-  parseFontDeclaration,
-  parsePointsAttribute,
-  parseTransformAttribute,
-  getCSSRules,
-  loadSVGFromString,
-  getFabricDocument,
-  Path,
-} from '../../fabric';
+import { loadSVGFromString, getFabricDocument, Path } from '../../fabric';
 import { Rect } from '../shapes/Rect';
 import { cos, sin } from '../util';
+import { parseAttributes } from './parseAttributes';
+import { parseStyleAttribute } from './parseStyleAttribute';
+import { parseFontDeclaration } from './parseFontDeclaration';
+import { parsePointsAttribute } from './parsePointsAttribute';
+import { parseTransformAttribute } from './parseTransformAttribute';
+import { getCSSRules } from './getCSSRules';
 
 function makeElement() {
   const element = getFabricDocument().createElementNS(
@@ -155,8 +151,6 @@ describe('fabric.Parser', () => {
   });
 
   it('parseStyleAttribute', () => {
-    expect(parseStyleAttribute).toBeDefined();
-
     const element = getFabricDocument().createElementNS(
       'http://www.w3.org/2000/svg',
       'path',
@@ -309,8 +303,6 @@ describe('fabric.Parser', () => {
   });
 
   it('parsePointsAttribute', () => {
-    expect(parsePointsAttribute).toBeDefined();
-
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(namespace, 'polygon');
     element.setAttributeNS(
@@ -340,7 +332,6 @@ describe('fabric.Parser', () => {
   it('parseTransformAttribute', () => {
     let parsedValue;
 
-    expect(parseTransformAttribute).toBeDefined();
     const namespace = 'http://www.w3.org/2000/svg';
     const element = getFabricDocument().createElementNS(namespace, 'path');
 
@@ -673,7 +664,6 @@ describe('fabric.Parser', () => {
   });
 
   it('getCssRule', () => {
-    expect(getCSSRules).toBeDefined();
     const rules: Record<PropertyKey, any> = {};
     // NOTE: We need to use a new fresh document here because vitest in browser mode already adds some stylesheets which pollutes the test
     const doc = globalThis.document.implementation.createHTMLDocument('');

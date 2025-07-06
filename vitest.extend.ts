@@ -1,6 +1,6 @@
 import { expect, chai } from 'vitest';
 
-import { cloneDeepWith } from 'lodash';
+import { cloneDeepWith } from 'es-toolkit/compat';
 import type { FabricObject } from './src/shapes/Object/Object';
 import type { TMat2D } from './src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
@@ -119,6 +119,24 @@ chai.util.addMethod(
     }
 
     return rawToMatchSnapshot.apply(this, args);
+  },
+);
+
+chai.util.addMethod(
+  chai.Assertion.prototype,
+  'toMatchSVGSnapshot',
+  function (
+    this: Chai.AssertionStatic,
+    propertiesOrHint?: ExtendedOptions | string,
+    hint?: string,
+  ) {
+    const received = chai.util.flag(this, 'object');
+
+    const value = sanitizeSVG(received);
+
+    chai.util.flag(this, 'object', value);
+
+    return rawToMatchSnapshot.call(this, propertiesOrHint, hint);
   },
 );
 

@@ -77,10 +77,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return [
       textBgRects.join(''),
       '\t\t<text xml:space="preserve" ',
-      this.fontFamily
-        ? `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `
-        : '',
-      this.fontSize ? `font-size="${this.fontSize}" ` : '',
+      `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `,
+      `font-size="${this.fontSize}" `,
       this.fontStyle ? `font-style="${this.fontStyle}" ` : '',
       this.fontWeight ? `font-weight="${this.fontWeight}" ` : '',
       textDecoration ? `text-decoration="${textDecoration}" ` : '',
@@ -305,7 +303,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
+    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed((this.textDecorationThickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; white-space: pre;`;
   }
 
   /**
@@ -328,10 +326,18 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontStyle,
       fontWeight,
       deltaY,
+      textDecorationThickness,
+      linethrough,
+      overline,
+      underline,
     } = style;
 
-    const textDecoration = this.getSvgTextDecoration(style);
-
+    const textDecoration = this.getSvgTextDecoration({
+      underline: underline ?? this.underline,
+      overline: overline ?? this.overline,
+      linethrough: linethrough ?? this.linethrough,
+    });
+    const thickness = textDecorationThickness || this.textDecorationThickness;
     return [
       stroke ? colorPropToSVG(STROKE, stroke) : '',
       strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
@@ -345,7 +351,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontSize ? `font-size: ${fontSize}px; ` : '',
       fontStyle ? `font-style: ${fontStyle}; ` : '',
       fontWeight ? `font-weight: ${fontWeight}; ` : '',
-      textDecoration ? `text-decoration: ${textDecoration}; ` : textDecoration,
+      textDecoration
+        ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; `
+        : '',
       fill ? colorPropToSVG(FILL, fill) : '',
       deltaY ? `baseline-shift: ${-deltaY}; ` : '',
       useWhiteSpace ? 'white-space: pre; ' : '',

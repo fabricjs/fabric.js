@@ -394,8 +394,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _onDragProgress(e: DragEvent) {
     const options = {
       e,
-      target: this._dragSource as FabricObject | undefined,
-      dragSource: this._dragSource as FabricObject | undefined,
+      target: this._dragSource,
+      dragSource: this._dragSource,
       dropTarget: this._draggedoverTarget as FabricObject,
     };
     this.fire('drag', options);
@@ -1395,8 +1395,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = corner.control;
-      this.setCursor(control.cursorStyleHandler(e, control, target));
+      const { control, coord } = corner;
+      this.setCursor(control.cursorStyleHandler(e, control, target, coord));
     }
   }
 

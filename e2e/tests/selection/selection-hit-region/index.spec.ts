@@ -1,11 +1,12 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
+import type * as fabric from 'fabric';
+import type { FabricObject } from 'fabric';
 
-setup();
+declare const globalThis: {
+  renderRectsPadding(rects: FabricObject[]): void;
+};
 
-test('Selection hit regions', async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test('Selection hit regions', async ({ canvasUtil }) => {
   // prepare some common functions
   await canvasUtil.executeInBrowser((canvas) => {
     const render = ({ x, y }: fabric.XY, fill: string) => {
@@ -17,26 +18,26 @@ test('Selection hit regions', async ({ page }) => {
       ctx.fill();
     };
 
-    window.renderRectsPadding = (rects) => {
+    globalThis.renderRectsPadding = (rects) => {
       for (let y = 0; y <= canvas.height; y += 2) {
         for (let x = 0; x < canvas.width; x += 2) {
           rects.some((rect) => {
-            if (canvas._checkTarget(rect, new fabric.Point(x, y))) {
+            if (canvas._checkTarget(rect, new window.fabric.Point(x, y))) {
               render({ x, y }, rect.fill as string);
             }
           });
         }
       }
     };
-  });
+  }, null);
 
   await canvasUtil.executeInBrowser((canvas) => {
     const group = canvas.getObjects()[0] as fabric.Group;
     const rects = group.getObjects();
-    window.renderRectsPadding(rects);
-  });
+    globalThis.renderRectsPadding(rects);
+  }, null);
 
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'group-padding.png',
   });
 
@@ -49,10 +50,10 @@ test('Selection hit regions', async ({ page }) => {
     canvas.centerObject(group);
     canvas.contextTopDirty = true;
     canvas.renderAll();
-    window.renderRectsPadding(rects);
-  });
+    globalThis.renderRectsPadding(rects);
+  }, null);
 
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'transformed-group-padding.png',
   });
 
@@ -63,10 +64,10 @@ test('Selection hit regions', async ({ page }) => {
     canvas.viewportCenterObject(group);
     canvas.contextTopDirty = true;
     canvas.renderAll();
-    window.renderRectsPadding(rects);
-  });
+    globalThis.renderRectsPadding(rects);
+  }, null);
 
-  expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'zoomed-transformed-group-padding.png',
   });
 });

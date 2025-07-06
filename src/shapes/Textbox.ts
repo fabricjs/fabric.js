@@ -232,7 +232,6 @@ export class Textbox<
       for (const p2 in obj[p1]) {
         const p2Number = parseInt(p2, 10);
         if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
-          // eslint-disable-next-line no-unused-vars
           for (const p3 in obj[p1][p2]) {
             return false;
           }
@@ -576,7 +575,7 @@ export class Textbox<
       'minWidth',
       'splitByGrapheme',
       ...propertiesToInclude,
-    ] as K[]) as Pick<T, K> & SProps;
+    ] as K[]);
   }
 }
 
