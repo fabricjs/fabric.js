@@ -1438,16 +1438,24 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     ) {
       if (isAS) {
         const prevActiveObjects = activeObject.getObjects();
+        let newTarget: FabricObject | undefined;
+        let subTargets: FabricObject[] = [];
         if (target === activeObject) {
           const pointer = this.getViewportPoint(e);
-          target =
-            // first search active objects for a target to remove
-            this.searchPossibleTargets(prevActiveObjects, pointer).target ||
-            //  if not found, search under active selection for a target to add
-            // `prevActiveObjects` will be searched but we already know they will not be found
-            this.searchPossibleTargets(this._objects, pointer).target;
+          let targetInfo = this.searchPossibleTargets(
+            prevActiveObjects,
+            pointer,
+          );
+          if (targetInfo.target) {
+            newTarget = targetInfo.target;
+            subTargets = targetInfo.subTargets;
+          } else {
+            targetInfo = this.searchPossibleTargets(this._objects, pointer);
+            newTarget = targetInfo.target;
+            subTargets = targetInfo.subTargets;
+          }
           // if nothing is found bail out
-          if (!target || !target.selectable) {
+          if (!newTarget || !newTarget.selectable) {
             return false;
           }
         }
@@ -1455,7 +1463,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           // `target` is part of active selection => remove it
           activeObject.remove(target);
           this._hoveredTarget = target;
-          this._hoveredTargets = [...this._subTargets];
+          this._hoveredTargets = subTargets;
           // if after removing an object we are left with one only...
           if (activeObject.size() === 1) {
             // activate last remaining object
@@ -1466,7 +1474,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           // `target` isn't part of active selection => add it
           activeObject.multiSelectAdd(target);
           this._hoveredTarget = activeObject;
-          this._hoveredTargets = [...this._subTargets];
+          this._hoveredTargets = subTargets;
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {
