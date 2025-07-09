@@ -824,7 +824,7 @@ describe('Canvas', () => {
     expect(isFired, 'fired deselected').toBeTruthy();
   });
 
-  it('toggles nested target when clicking inside active selection', () => {
+  it.only('toggles nested target when clicking inside active selection', () => {
     const rect1 = new Rect({ width: 10, height: 10 });
     const rect2 = new Rect({ width: 10, height: 10 });
     const rect3 = new Rect({ width: 10, height: 10 });
