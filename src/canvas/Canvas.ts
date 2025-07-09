@@ -1407,6 +1407,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * ---
    * - If the active object is the active selection we add/remove `target` from it
    * - If not, add the active object and `target` to the active selection and make it the active object.
+   * @TODO rewrite this after find target is refactored
    * @private
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target target of event to select/deselect
@@ -1438,7 +1439,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     ) {
       if (isAS) {
         const prevActiveObjects = activeObject.getObjects();
-        let newTarget: FabricObject | undefined;
         let subTargets: FabricObject[] = [];
         if (target === activeObject) {
           const pointer = this.getViewportPoint(e);
@@ -1447,15 +1447,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             pointer,
           );
           if (targetInfo.target) {
-            newTarget = targetInfo.target;
+            target = targetInfo.target;
             subTargets = targetInfo.subTargets;
           } else {
             targetInfo = this.searchPossibleTargets(this._objects, pointer);
-            newTarget = targetInfo.target;
+            target = targetInfo.target;
             subTargets = targetInfo.subTargets;
           }
           // if nothing is found bail out
-          if (!newTarget || !newTarget.selectable) {
+          if (!target || !target.selectable) {
             return false;
           }
         }
