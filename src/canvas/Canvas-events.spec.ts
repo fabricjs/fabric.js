@@ -1022,6 +1022,15 @@ describe('Canvas events mixin', () => {
       const registry: string[] = [],
         canvasRegistry: string[] = [];
 
+      // create a mousdown event so we do cache event data
+      const mdown = getFabricDocument().createEvent('HTMLEvents');
+      mdown.initEvent('mousedown', true, true);
+      // @ts-expect-error - properties not in Event type
+      mdown.clientX = 5;
+      // @ts-expect-error - properties not in Event type
+      mdown.clientY = 5;
+      c.upperCanvasEl.dispatchEvent(mdown);
+
       for (const eventName of cycle) {
         rect.once(eventName, function () {
           registry.push(eventName);
@@ -1034,7 +1043,7 @@ describe('Canvas events mixin', () => {
           ).toBe(rect);
           canvasRegistry.push(eventName);
         });
-
+        // create a mouseDownEvent
         const event = getFabricDocument().createEvent('HTMLEvents');
         event.initEvent(eventName, true, true);
         // @ts-expect-error - properties not in Event type
@@ -1209,7 +1218,8 @@ describe('Canvas events mixin', () => {
     // perform MouseOver event on a deeply nested subTarget
     const moveEvent = { bubbles: true, target: testCanvas.upperCanvasEl };
     const target = testCanvas.item(1) as any;
-    testCanvas.targets = [
+    // @ts-expect-error protected
+    testCanvas._subTargets = [
       target.item(1),
       target.item(1).item(1),
       target.item(1).item(1).item(1),
@@ -1230,7 +1240,8 @@ describe('Canvas events mixin', () => {
     ).toBe(3);
 
     // perform MouseOut even on all hoveredTargets
-    testCanvas.targets = [];
+    // @ts-expect-error protected
+    testCanvas._subTargets = [];
     // @ts-expect-error private method
     testCanvas._fireOverOutEvents(moveEvent, null);
     expect(
