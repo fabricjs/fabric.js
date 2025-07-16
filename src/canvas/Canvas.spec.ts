@@ -886,7 +886,7 @@ describe('Canvas', () => {
     ).toBeTruthy();
     expect(canvas.getActiveObjects(), 'created').toEqual([rect1, rect3]);
 
-    canvas.__onMouseDown({
+    canvas._onMouseDown({
       clientX: 7,
       clientY: 7,
       [canvas.selectionKey as string]: true,
@@ -938,7 +938,7 @@ describe('Canvas', () => {
       deltaX: 5,
       deltaY: 5,
     });
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       target: canvas.upperCanvasEl,
     } as unknown as TPointerEvent);
 
@@ -961,7 +961,7 @@ describe('Canvas', () => {
       deltaX: 5,
       deltaY: 5,
     });
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       target: canvas.upperCanvasEl,
     } as unknown as TPointerEvent);
 
@@ -993,7 +993,7 @@ describe('Canvas', () => {
       deltaX: 5,
       deltaY: 5,
     });
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       target: canvas.upperCanvasEl,
     } as unknown as TPointerEvent);
 

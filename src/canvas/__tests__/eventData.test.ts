@@ -104,12 +104,12 @@ describe('Canvas event data', () => {
       canvas.add(dragTarget);
       canvas.setActiveObject(dragTarget);
       spy.mockReset();
-      canvas.getSelectionElement().dispatchEvent(
-        new MouseEvent('dragstart', {
-          clientX: 50,
-          clientY: 50,
-        }),
-      );
+      const evt = new MouseEvent('dragstart', {
+        clientX: 50,
+        clientY: 50,
+      });
+      canvas._cacheTransformEventData(evt);
+      canvas.getSelectionElement().dispatchEvent(evt);
       canvas.getSelectionElement().dispatchEvent(
         new MouseEvent(type, {
           clientX: 50,
@@ -373,10 +373,10 @@ describe('Event targets', () => {
       vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets(
         [activeSelection],
-        new Point(),
+        new Point(0, 0),
       );
-      expect(found).toBe(activeSelection);
-      expect(canvas.targets).toEqual([]);
+      expect(found.target).toBe(activeSelection);
+      expect(found.subTargets).toEqual([]);
     });
 
     test('findTarget clears prev targets', () => {

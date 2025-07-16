@@ -101,8 +101,6 @@ exports[`Canvas event data > HTML event "dragend" should fire a corresponding ca
   [
     "mouse:up:before",
     {
-      "currentSubTargets": [],
-      "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -123,8 +121,6 @@ exports[`Canvas event data > HTML event "dragend" should fire a corresponding ca
   [
     "mouse:up",
     {
-      "currentSubTargets": [],
-      "currentTarget": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -486,8 +482,6 @@ exports[`Canvas event data > HTML event "mouseup" should fire a corresponding ca
   [
     "mouse:up:before",
     {
-      "currentSubTargets": [],
-      "currentTarget": undefined,
       "e": MouseEvent {
         "isTrusted": false,
       },
@@ -508,8 +502,6 @@ exports[`Canvas event data > HTML event "mouseup" should fire a corresponding ca
   [
     "mouse:up",
     {
-      "currentSubTargets": [],
-      "currentTarget": undefined,
       "e": MouseEvent {
         "isTrusted": false,
       },
