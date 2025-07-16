@@ -1142,6 +1142,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.viewportTransform,
     );
     this._targetInfo = this.findTarget(e);
+    if (this._currentTransform) {
+      this._targetInfo.target = this._currentTransform.target;
+    }
   }
 
   /**
