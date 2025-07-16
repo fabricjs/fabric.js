@@ -58,27 +58,27 @@ describe('Canvas events mixin', () => {
     canvas.isDrawingMode = false;
 
     // @ts-expect-error private method
-    canvas.__onMouseDown({ button: 0, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ button: 0, target: canvas.upperCanvasEl });
     expect(clickCount, 'mouse down fired').toBe(1);
 
     clickCount = 0;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ button: 2, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ button: 2, target: canvas.upperCanvasEl });
     expect(clickCount, 'rightclick did not fire a mouse:down event').toBe(0);
 
     canvas.fireRightClick = true;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ button: 2, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ button: 2, target: canvas.upperCanvasEl });
     expect(clickCount, 'rightclick did fire a mouse:down event').toBe(1);
 
     clickCount = 0;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ button: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ button: 1, target: canvas.upperCanvasEl });
     expect(clickCount, 'middleClick did not fire a mouse:down event').toBe(0);
 
     canvas.fireMiddleClick = true;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ button: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ button: 1, target: canvas.upperCanvasEl });
     expect(clickCount, 'middleClick did fire a mouse:down event').toBe(1);
   });
 
@@ -97,22 +97,22 @@ describe('Canvas events mixin', () => {
     canvas.isDrawingMode = false;
 
     // @ts-expect-error private method
-    canvas.__onMouseDown({ which: 1, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ which: 1, target: canvas.upperCanvasEl });
     expect(clickCount, 'mouse:down:before fired').toBe(1);
 
     clickCount = 0;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ which: 3, target: canvas.upperCanvasEl });
     expect(clickCount, 'rightclick fired a mouse:down:before event').toBe(1);
 
     canvas.fireRightClick = true;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ which: 3, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ which: 3, target: canvas.upperCanvasEl });
     expect(clickCount, 'rightclick did fire a mouse:down:before event').toBe(2);
 
     clickCount = 0;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ which: 2, target: canvas.upperCanvasEl });
     expect(
       clickCount,
       'middleClick did not fire a mouse:down:before event',
@@ -120,7 +120,7 @@ describe('Canvas events mixin', () => {
 
     canvas.fireMiddleClick = true;
     // @ts-expect-error private method
-    canvas.__onMouseDown({ which: 2, target: canvas.upperCanvasEl });
+    canvas._onMouseDown({ which: 2, target: canvas.upperCanvasEl });
     expect(clickCount, 'middleClick did fire a mouse:down:before event').toBe(
       2,
     );
@@ -138,7 +138,7 @@ describe('Canvas events mixin', () => {
 
     canvas.absolutePan(new Point(50, 80));
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private property
     expect(canvas._groupSelector, 'a new groupSelector is created').toEqual(
       expectedGroupSelector,
@@ -146,9 +146,9 @@ describe('Canvas events mixin', () => {
 
     canvas.add(rect);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     expect(
       // @ts-expect-error private property
       canvas._groupSelector,
@@ -157,9 +157,9 @@ describe('Canvas events mixin', () => {
 
     rect.selectable = false;
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     expect(
       // @ts-expect-error private property
       canvas._groupSelector,
@@ -167,12 +167,12 @@ describe('Canvas events mixin', () => {
     ).toBeNull();
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     canvas.discardActiveObject();
     // @ts-expect-error -- custom prop
     rect.isEditing = true;
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     expect(
       // @ts-expect-error private property
       canvas._groupSelector,
@@ -180,19 +180,19 @@ describe('Canvas events mixin', () => {
     ).toBeNull();
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     canvas.discardActiveObject();
     // @ts-expect-error -- custom prop
     rect.isEditing = false;
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private property
     expect(canvas._groupSelector, 'a new groupSelector is created').toEqual(
       expectedGroupSelector,
     );
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
   });
 
   it('handles activeOn object selection', () => {
@@ -206,26 +206,26 @@ describe('Canvas events mixin', () => {
     };
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     expect(
       canvas._activeObject,
       'with activeOn of down object is selected on mouse down',
     ).toBe(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     canvas.discardActiveObject();
     rect.activeOn = 'up';
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     expect(
       canvas._activeObject,
       'with activeOn of up object is not selected on mouse down',
     ).toBeUndefined();
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     expect(
       canvas._activeObject,
       'with activeOn of up object is selected on mouse up',
@@ -270,14 +270,14 @@ describe('Canvas events mixin', () => {
       target: canvas.upperCanvasEl,
     };
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     expect(
       canvas._activeObject,
       'blue circle is selected with first click',
     ).toBe(blueCircle);
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
     const e2 = {
       clientX: 240,
       clientY: 140,
@@ -286,7 +286,7 @@ describe('Canvas events mixin', () => {
       shiftKey: true,
     };
     // @ts-expect-error private method
-    canvas.__onMouseDown(e2);
+    canvas._onMouseDown(e2);
 
     const selection = canvas.getActiveObjects();
     expect(selection[1], 'blue circle is still selected').toBe(blueCircle);
@@ -295,7 +295,7 @@ describe('Canvas events mixin', () => {
     );
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
     const e3 = {
       clientX: 140,
       clientY: 90,
@@ -313,7 +313,7 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e3);
+    canvas._onMouseDown(e3);
     const nextSelection = canvas.getActiveObjects();
     expect(nextSelection[1], 'blue circle is still selected 2').toBe(
       blueCircle,
@@ -322,7 +322,7 @@ describe('Canvas events mixin', () => {
     expect(nextSelection.length, 'no other object have been selected').toBe(2);
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e3);
+    canvas._onMouseUp(e3);
     const e4 = {
       clientX: 290,
       clientY: 290,
@@ -337,7 +337,7 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e4);
+    canvas._onMouseDown(e4);
     const finalSelection = canvas.getActiveObjects();
     expect(
       finalSelection.length,
@@ -345,7 +345,7 @@ describe('Canvas events mixin', () => {
     ).toBe(0);
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e4);
+    canvas._onMouseUp(e4);
   });
 
   it('handles specific bug #6314 for partial intersection with drag', () => {
@@ -415,9 +415,9 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e);
+    canvas._onMouseUp(e);
 
     expect(isClick, 'without moving the pointer, the click is true').toBe(true);
   });
@@ -442,11 +442,11 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(isClick, 'moving the pointer, the click is false').toBe(false);
   });
@@ -471,7 +471,7 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas._onDragStart({
       preventDefault() {},
@@ -479,7 +479,7 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(isClick, 'moving the pointer, the click is false').toBe(false);
   });
@@ -544,11 +544,11 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e1);
+    canvas._onMouseDown(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(opt!.target, 'options match model - target').toBe(rect1);
     expect(opt!.currentTarget, 'options match model - currentTarget').toBe(
@@ -581,11 +581,11 @@ describe('Canvas events mixin', () => {
     });
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(count, 'object:modified fired').toBe(1);
     expect(opt!.e, 'options match model - event').toBe(e2);
@@ -622,13 +622,13 @@ describe('Canvas events mixin', () => {
 
     canvas.add(rect);
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(rect.top, 'rect moved by 4 pixels top').toBe(4);
     expect(rect.left, 'rect moved by 4 pixels left').toBe(4);
@@ -670,13 +670,13 @@ describe('Canvas events mixin', () => {
     canvas.setActiveObject(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(rect.scaleX, 'rect scaled X').toBe(3);
     expect(rect.scaleY, 'rect scaled Y').toBe(3);
@@ -734,13 +734,13 @@ describe('Canvas events mixin', () => {
     canvas.setActiveObject(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(mouseUpCalled, 'mouse up handler for control has been called').toBe(
       true,
@@ -794,13 +794,13 @@ describe('Canvas events mixin', () => {
     canvas.setActiveObject(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(rect.calcTransformMatrix()).toEqual([1, 0, 0, 1, 9.5, 9.5]);
     expect(rect.getXY()).toEqual(new Point(8, 8));
@@ -849,13 +849,13 @@ describe('Canvas events mixin', () => {
     canvas.setActiveObject(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e2);
+    canvas._onMouseUp(e2);
 
     expect(mouseUpCalled, 'mouse up handler for control has been called').toBe(
       true,
@@ -911,13 +911,13 @@ describe('Canvas events mixin', () => {
     canvas.setActiveObject(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e3);
+    canvas._onMouseUp(e3);
 
     expect(
       mouseUpCalled,
@@ -975,13 +975,13 @@ describe('Canvas events mixin', () => {
     canvas.setActiveObject(rect);
 
     // @ts-expect-error private method
-    canvas.__onMouseDown(e);
+    canvas._onMouseDown(e);
     // @ts-expect-error private method
     canvas.__onMouseMove(e1);
     // @ts-expect-error private method
     canvas.__onMouseMove(e2);
     // @ts-expect-error private method
-    canvas.__onMouseUp(e3);
+    canvas._onMouseUp(e3);
 
     expect(
       mouseUpCalled1,
@@ -1022,15 +1022,6 @@ describe('Canvas events mixin', () => {
       const registry: string[] = [],
         canvasRegistry: string[] = [];
 
-      // create a mousdown event so we do cache event data
-      const mdown = getFabricDocument().createEvent('HTMLEvents');
-      mdown.initEvent('mousedown', true, true);
-      // @ts-expect-error - properties not in Event type
-      mdown.clientX = 5;
-      // @ts-expect-error - properties not in Event type
-      mdown.clientY = 5;
-      c.upperCanvasEl.dispatchEvent(mdown);
-
       for (const eventName of cycle) {
         rect.once(eventName, function () {
           registry.push(eventName);
@@ -1050,6 +1041,7 @@ describe('Canvas events mixin', () => {
         event.clientX = 5;
         // @ts-expect-error - properties not in Event type
         event.clientY = 5;
+        c._cacheTransformEventData(event as TPointerEvent);
         c.upperCanvasEl.dispatchEvent(event);
       }
 
@@ -1219,11 +1211,13 @@ describe('Canvas events mixin', () => {
     const moveEvent = { bubbles: true, target: testCanvas.upperCanvasEl };
     const target = testCanvas.item(1) as any;
     // @ts-expect-error protected
-    testCanvas._subTargets = [
-      target.item(1),
-      target.item(1).item(1),
-      target.item(1).item(1).item(1),
-    ];
+    testCanvas._targetInfo = {
+      subTargets: [
+        target.item(1),
+        target.item(1).item(1),
+        target.item(1).item(1).item(1),
+      ],
+    };
 
     // @ts-expect-error private method
     testCanvas._fireOverOutEvents(moveEvent, target);
@@ -1241,7 +1235,7 @@ describe('Canvas events mixin', () => {
 
     // perform MouseOut even on all hoveredTargets
     // @ts-expect-error protected
-    testCanvas._subTargets = [];
+    testCanvas._targetInfo.subTargets = [];
     // @ts-expect-error private method
     testCanvas._fireOverOutEvents(moveEvent, null);
     expect(
@@ -1729,7 +1723,7 @@ describe('Canvas events mixin', () => {
     a.updateSelectionOnMouseMove = () => called.push(a);
     b.updateSelectionOnMouseMove = () => called.push(b);
 
-    testCanvas.__onMouseMove(e);
+    testCanvas._onMouseMove(e);
     expect(called, 'manager is called from mouse move').toEqual([b]);
 
     manager.unregister(a);
@@ -1739,7 +1733,7 @@ describe('Canvas events mixin', () => {
 
     expect(getTarget(), 'should not unregister b').toBe(b);
 
-    testCanvas.__onMouseUp(e);
+    testCanvas._onMouseUp(e);
     expect(getTarget(), 'should unregister b').toBeFalsy();
 
     manager.register(a);

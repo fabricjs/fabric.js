@@ -281,20 +281,11 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare protected _viewportPoint?: Point;
 
   /**
-   * During a mouse event we may need the target multiple times in multiple functions.
-   * _target holds a reference to the target that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * @type {FabricObject}
+   * Holds the informations we cache during an event lifespan
+   * This data is needed many times during an event and we want to avoid to recalculate it
+   * multuple times.
    */
-  declare protected _target?: FabricObject;
-
-  /**
-   * During a mouse event we may need the subTargets multiple times in multiple functions.
-   * _subTargets holds a reference to the target that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * @type {FabricObject}
-   */
-  declare protected _subTargets: FabricObject[];
+  declare protected _targetInfo: TargetsInfoWithContainer | undefined;
 
   static ownDefaults = canvasDefaults;
 

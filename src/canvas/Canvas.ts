@@ -243,7 +243,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on wheel event
    */
   private _onMouseWheel(e: MouseEvent) {
-    this.__onMouseWheel(e);
+    this._cacheTransformEventData(e);
+    this._handleEvent(e, 'wheel');
+    this._resetTransformEventData();
   }
 
   /**
@@ -611,6 +613,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   _onTouchStart(e: TouchEvent) {
+    this._cacheTransformEventData(e);
     // we will prevent scrolling if allowTouchScrolling is not enabled and
     let shouldPreventScrolling = !this.allowTouchScrolling;
     const currentActiveObject = this._activeObject;
@@ -618,18 +621,18 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.mainTouchId = this.getPointerId(e);
     }
     this.__onMouseDown(e);
+    const { target } = this._targetInfo!;
     // after executing fabric logic for mouse down let's see
     // if we didn't change target or if we are drawing
     // we want to prevent scrolling anyway
     if (
       this.isDrawingMode ||
-      (currentActiveObject && this._target === currentActiveObject)
+      (currentActiveObject && target === currentActiveObject)
     ) {
       shouldPreventScrolling = true;
     }
     // prevent default, will block scrolling from start
     shouldPreventScrolling && e.preventDefault();
-    this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(canvasElement);
@@ -653,6 +656,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       `${eventTypePrefix}down`,
       this._onMouseDown as EventListener,
     );
+    this._resetTransformEventData();
   }
 
   /**
@@ -660,10 +664,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   _onMouseDown(e: TPointerEvent) {
+    this._cacheTransformEventData(e);
     this.__onMouseDown(e);
-    this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
+    // switch from moving on the canvas element to moving on the document
     removeListener(
       canvasElement,
       `${eventTypePrefix}move`,
@@ -678,6 +683,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this._onMouseMove as EventListener,
       addEventOptions,
     );
+    this._resetTransformEventData();
   }
 
   /**
@@ -689,6 +695,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       // if there are still touches stop here
       return;
     }
+    this._cacheTransformEventData(e);
     this.__onMouseUp(e);
     this._resetTransformEventData();
     delete this.mainTouchId;
@@ -726,8 +733,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mouseup
    */
   _onMouseUp(e: TPointerEvent) {
+    this._cacheTransformEventData(e);
     this.__onMouseUp(e);
-    this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
@@ -750,6 +757,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         addEventOptions,
       );
     }
+    this._resetTransformEventData();
   }
 
   /**
@@ -757,6 +765,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousemove
    */
   _onMouseMove(e: TPointerEvent) {
+    this._cacheTransformEventData(e);
+
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
       (!activeObject ||
@@ -766,6 +776,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       e.preventDefault &&
       e.preventDefault();
     this.__onMouseMove(e);
+    this._resetTransformEventData();
   }
 
   /**
@@ -800,12 +811,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mouseup
    */
   __onMouseUp(e: TPointerEvent) {
-    this._cacheTransformEventData(e);
     this._handleEvent(e, 'up:before');
 
     const transform = this._currentTransform;
     const isClick = this._isClick;
-    const target = this._target;
+    const target = this._targetInfo!.target;
 
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
@@ -814,7 +824,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       ((this.fireMiddleClick && button === 1) ||
         (this.fireRightClick && button === 2)) &&
         this._handleEvent(e, 'up');
-      this._resetTransformEventData();
       return;
     }
 
@@ -929,8 +938,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     eventType: T,
     extraData?: TEventsExtraData[T],
   ) {
-    const target = this._target,
-      subTargets = this._subTargets,
+    const { target, subTargets } = this._targetInfo || this.findTarget(e),
       options: CanvasEvents[`mouse:${T}`] = {
         e,
         target,
@@ -942,12 +950,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           : {}),
       } as CanvasEvents[`mouse:${T}`];
     if (eventType === 'up:before' || eventType === 'up') {
-      const { target: currentTarget, subTargets: currentSubTargets } =
-        this.findTarget(e);
       (options as CanvasEvents[`mouse:up`]).isClick = this._isClick;
-      (options as CanvasEvents[`mouse:up`]).currentTarget = currentTarget;
-      (options as CanvasEvents[`mouse:up`]).currentSubTargets =
-        currentSubTargets;
     }
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
@@ -1021,10 +1024,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   __onMouseDown(e: TPointerEvent) {
     this._isClick = true;
-    this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
 
-    let target: FabricObject | undefined = this._target;
+    let { target } = this._targetInfo!;
     let alreadySelected = !!target && target === this._activeObject;
     // if right/middle click just fire events
     const { button } = e as MouseEvent;
@@ -1034,7 +1036,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         this._handleEvent(e, 'down', {
           alreadySelected,
         });
-      this._resetTransformEventData();
       return;
     }
 
@@ -1123,7 +1124,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    */
   _resetTransformEventData() {
-    this._target = this._viewportPoint = this._scenePoint = undefined;
+    this._targetInfo = this._viewportPoint = this._scenePoint = undefined;
   }
 
   /**
@@ -1140,11 +1141,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       undefined,
       this.viewportTransform,
     );
-    const { target, subTargets } = this.findTarget(e);
-    this._target = this._currentTransform
-      ? this._currentTransform.target
-      : target;
-    this._subTargets = subTargets;
+    this._targetInfo = this.findTarget(e);
   }
 
   /**
@@ -1158,7 +1155,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   __onMouseMove(e: TPointerEvent) {
     this._isClick = false;
-    this._cacheTransformEventData(e);
     this._handleEvent(e, 'move:before');
 
     if (this.isDrawingMode) {
@@ -1181,14 +1177,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
       this.renderTop();
     } else if (!this._currentTransform) {
-      this._setCursorFromEvent(e, this._target);
-      this._fireOverOutEvents(e, this._target);
+      const { target } = this._targetInfo!;
+      this._setCursorFromEvent(e, target);
+      this._fireOverOutEvents(e, target);
     } else {
       this._transformObject(e);
     }
     this.textEditingManager.onMouseMove(e);
     this._handleEvent(e, 'move');
-    this._resetTransformEventData();
   }
 
   /**
@@ -1200,7 +1196,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
     const _hoveredTarget = this._hoveredTarget,
       _hoveredTargets = this._hoveredTargets,
-      targets = this._subTargets,
+      targets = this._targetInfo!.subTargets,
       length = Math.max(_hoveredTargets.length, targets.length);
 
     this.fireSyntheticInOutEvents('mouse', {
@@ -1217,7 +1213,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       });
     }
     this._hoveredTarget = target;
-    this._hoveredTargets = this._subTargets.concat();
+    this._hoveredTargets = targets.concat();
   }
 
   /**
@@ -1229,7 +1225,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _fireEnterLeaveEvents(target: FabricObject | undefined, data: DragEventData) {
     const draggedoverTarget = this._draggedoverTarget,
       _hoveredTargets = this._hoveredTargets,
-      targets = this._subTargets,
+      targets = this._targetInfo!.subTargets,
       length = Math.max(_hoveredTargets.length, targets.length);
 
     this.fireSyntheticInOutEvents('drag', {
@@ -1300,16 +1296,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
     }
-  }
-
-  /**
-   * Method that defines actions when an Event Mouse Wheel
-   * @param {Event} e Event object fired on mouseup
-   */
-  __onMouseWheel(e: TPointerEvent) {
-    this._cacheTransformEventData(e);
-    this._handleEvent(e, 'wheel');
-    this._resetTransformEventData();
   }
 
   /**
@@ -1386,8 +1372,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // hoverCursor should come from top-most subTarget,
         // so we walk the array backwards
         // TODO 2025: i think this shouldn't revert at all. add a test.
-        this._subTargets
-          .concat()
+        this._targetInfo!.subTargets.concat()
           .reverse()
           .map((_target) => {
             hoverCursor = _target.hoverCursor || hoverCursor;
