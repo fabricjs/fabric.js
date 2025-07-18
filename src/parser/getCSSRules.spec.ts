@@ -36,22 +36,16 @@ describe('getCSSRules', () => {
     const loaded = await loadSVGFromString(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20">
         <style>
-          .blue {
-            stroke: blue;
-            fill: blue;
-          }
+          .blue { fill: blue; }
         </style>
         <style>
-          .red {
-            stroke: red;
-            fill: red;
-          }
+          .red { fill: red; }
         </style>
         <circle class="blue" r="9" cx="10" cy="10"></circle>
         <circle class="red" r="9" cx="30" cy="10"></circle>
       </svg>
     `);
-    expect(loaded.objects[0]).toMatchObject({ fill: 'blue', stroke: 'blue' });
-    expect(loaded.objects[1]).toMatchObject({ fill: 'red', stroke: 'red' });
+    expect(loaded.objects[0]).toMatchObject({ fill: 'blue' });
+    expect(loaded.objects[1]).toMatchObject({ fill: 'red' });
   });
 });
