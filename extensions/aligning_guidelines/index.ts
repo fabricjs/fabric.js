@@ -1,9 +1,10 @@
-import type {
-  BasicTransformEvent,
-  Canvas,
-  FabricObject,
-  TPointerEvent,
-  Point,
+import {
+  type BasicTransformEvent,
+  type Canvas,
+  type FabricObject,
+  type TPointerEvent,
+  type Point,
+  util,
 } from 'fabric';
 import {
   collectHorizontalPoint,
@@ -162,7 +163,14 @@ export class AligningGuidelines {
     const isCenter =
       e.transform.original.originX == 'center' &&
       e.transform.original.originY == 'center';
-    if (isCenter) diagonalPoint = diagonalPoint.add(point).scalarDivide(2);
+    if (isCenter) {
+      const p = target.group
+        ? point.transform(
+            util.invertTransform(target.group.calcTransformMatrix()),
+          )
+        : point;
+      diagonalPoint = diagonalPoint.add(p).scalarDivide(2);
+    }
     const uniformIsToggled = e.e[this.canvas.uniScaleKey!];
     let isUniform =
       (this.canvas.uniformScaling && !uniformIsToggled) ||
