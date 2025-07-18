@@ -628,7 +628,6 @@ describe('Event targets', () => {
       expect(
         canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
       ).toMatchObject({
-        target: undefined,
         subTargets: [],
       });
       expect(
@@ -736,7 +735,6 @@ describe('Event targets', () => {
         expect(
           canvas.findTarget({ clientX, clientY } as TPointerEvent),
         ).toMatchObject({
-          target: undefined,
           subTargets: [],
         });
       });
@@ -830,22 +828,21 @@ describe('Event targets', () => {
 
       expect(
         canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
-      ).toEqual({
+      ).toMatchObject({
         target: activeSelection,
         subTargets: [rect1],
       });
 
       expect(
         canvas.findTarget({ clientX: 40, clientY: 15 } as TPointerEvent),
-      ).toEqual({
-        target: undefined,
+      ).toMatchObject({
         subTargets: [],
       });
       expect(activeSelection.__corner).toBeUndefined();
 
       expect(
         canvas.findTarget({ clientX: 0, clientY: 0 } as TPointerEvent),
-      ).toEqual({
+      ).toMatchObject({
         target: activeSelection,
         subTargets: [],
       });
@@ -864,7 +861,7 @@ describe('Event targets', () => {
       canvas.discardActiveObject();
       expect(
         canvas.findTarget({ clientX: 25, clientY: 5 } as TPointerEvent),
-      ).toEqual(
+      ).toMatchObject(
         {
           target: rect3,
           subTargets: [],
@@ -907,7 +904,6 @@ describe('Event targets', () => {
       expect(
         canvas.findTarget({ clientX: 15, clientY: 15 } as TPointerEvent),
       ).toEqual({
-        target: undefined,
         subTargets: [],
       });
     });

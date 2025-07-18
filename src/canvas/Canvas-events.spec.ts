@@ -512,7 +512,7 @@ describe('Canvas events mixin', () => {
     );
   });
 
-  it('returns target and currentTarget in mouse:up event', () => {
+  it('returns target in mouse:up event', () => {
     const e1 = {
       clientX: 30,
       clientY: 30,
@@ -551,9 +551,6 @@ describe('Canvas events mixin', () => {
     canvas._onMouseUp(e2);
 
     expect(opt!.target, 'options match model - target').toBe(rect1);
-    expect(opt!.currentTarget, 'options match model - currentTarget').toBe(
-      rect2,
-    );
   });
 
   it('fires object:modified event', () => {

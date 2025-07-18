@@ -714,54 +714,104 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {TargetsInfoWithContainer} the target found
    */
   findTarget(e: TPointerEvent): TargetsInfoWithContainer {
+    // if (this.skipTargetFind) {
+    //   return {
+    //     subTargets: [],
+    //   };
+    // }
+
+    // const pointer = this.getScenePoint(e),
+    //   activeObject = this._activeObject,
+    //   targetInfo = this.searchPossibleTargets(this._objects, pointer);
+
+    // // simplest case no active object, return a new target
+    // if (!activeObject) {
+    //   return targetInfo;
+    // }
+
+    // const activeObjectTargetInfo = this.searchPossibleTargets(
+    //   [activeObject],
+    //   pointer,
+    // );
+
+    // const activeObjectControl = activeObject.findControl(
+    //   pointer.transform(this.viewportTransform),
+    //   isTouchEvent(e),
+    // );
+
+    // // we are clicking exactly the control of an active object, shortcut to that object.
+    // if (activeObjectControl) {
+    //   return {
+    //     ...activeObjectTargetInfo,
+    //     target: activeObject, // we override target in case we are in the outside part of the corner.
+    //   };
+    // }
+
+    // // there is an activeObject and is also the one we are hovering, or both undefined
+    // if (activeObjectTargetInfo.target === targetInfo.target) {
+    //   return activeObjectTargetInfo;
+    // }
+
+    // if (this.preserveObjectStacking) {
+    //   // there may be situations in which we still want to prefer the active object over the new target
+    //   return targetInfo;
+    // } else {
+    //   // if we have activeObject always drawn on top, and we are over it, we return that target
+    //   if (activeObjectTargetInfo.target) {
+    //     return activeObjectTargetInfo;
+    //   }
+    //   return targetInfo;
+    // }
     if (this.skipTargetFind) {
-      return {
-        subTargets: [],
-      };
+      return { subTargets: [] };
     }
 
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
-      targetInfo = this.searchPossibleTargets(this._objects, pointer);
+      aObjects = this.getActiveObjects();
 
-    // simplest case no active object, return a new target
-    if (!activeObject) {
-      return targetInfo;
-    }
-
-    const activeObjectTargetInfo = this.searchPossibleTargets(
-      [activeObject],
-      pointer,
-    );
-
-    const activeObjectControl = activeObject.findControl(
-      pointer.transform(this.viewportTransform),
-      isTouchEvent(e),
-    );
-
-    // we are clicking exactly the control of an active object, shortcut to that object.
-    if (activeObjectControl) {
-      return {
-        ...activeObjectTargetInfo,
-        target: activeObject, // we override target in case we are in the outside part of the corner.
-      };
-    }
-
-    // there is an activeObject and is also the one we are hovering, or both undefined
-    if (activeObjectTargetInfo.target === targetInfo.target) {
-      return activeObjectTargetInfo;
-    }
-
-    if (this.preserveObjectStacking) {
-      // there may be situations in which we still want to prefer the active object over the new target
-      return targetInfo;
-    } else {
-      // if we have activeObject always drawn on top, and we are over it, we return that target
-      if (activeObjectTargetInfo.target) {
-        return activeObjectTargetInfo;
+    if (activeObject && aObjects.length >= 1) {
+      const aObjectInfo = this.searchPossibleTargets([activeObject], pointer);
+      if (
+        activeObject.findControl(
+          pointer.transform(this.viewportTransform),
+          isTouchEvent(e),
+        )
+      ) {
+        // if we hit the corner of the active object, let's return that.
+        return { target: activeObject, subTargets: [] };
+      } else if (
+        aObjects.length > 1 &&
+        // check pointer is over active selection and possibly perform `subTargetCheck`
+        aObjectInfo.target
+      ) {
+        // active selection does not select sub targets like normal groups
+        return { target: activeObject, subTargets: aObjectInfo.subTargets };
       }
-      return targetInfo;
+      const activeObjectInfo = this.searchPossibleTargets(
+        [activeObject],
+        pointer,
+      );
+      if (activeObject === activeObjectInfo.target) {
+        // active object is not an active selection
+        if (!this.preserveObjectStacking) {
+          return activeObjectInfo;
+        } else {
+          const info = this.searchPossibleTargets(this._objects, pointer);
+          if (
+            e[this.altSelectionKey as ModifierKey] &&
+            info.target &&
+            info.target !== activeObject
+          ) {
+            // alt selection: select active object even though it is not the top most target
+            // restore targets
+            return activeObjectInfo;
+          }
+          return info;
+        }
+      }
     }
+    return this.searchPossibleTargets(this._objects, pointer);
   }
 
   /**
@@ -866,7 +916,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         }
         return {
           target,
-          subTargets: [...subTargets],
+          subTargets,
         };
       }
     }
@@ -886,11 +936,15 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     objects: FabricObject[],
     pointer: Point,
   ): TargetsInfoWithContainer {
-    const { target: container, subTargets } = this._searchPossibleTargets(
+    const targetInfo: TargetsInfoWithContainer = this._searchPossibleTargets(
       objects,
       pointer,
       [],
     );
+
+    // outermost target is the container.
+    targetInfo.container = targetInfo.target;
+    const { container, subTargets } = targetInfo;
 
     if (
       container &&
@@ -907,25 +961,15 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         if (!(isCollection(t) && t.interactive)) {
           // one of the subtargets was not interactive. that is the last subtarget we can return.
           // we can't dig more deep;
-          return {
-            container,
-            target: t,
-            subTargets,
-          };
+          targetInfo.target = t;
+          return targetInfo;
         }
       }
-      return {
-        container,
-        target: subTargets[0],
-        subTargets,
-      };
+      targetInfo.target = subTargets[0];
+      return targetInfo;
     }
 
-    return {
-      target: container,
-      subTargets,
-      container,
-    };
+    return targetInfo;
   }
 
   /**
