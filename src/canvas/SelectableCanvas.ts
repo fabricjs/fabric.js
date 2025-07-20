@@ -724,6 +724,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {TargetsInfoWithContainer} the target found
    */
   findTarget(e: TPointerEvent): TargetsInfoWithContainer {
+    // this._targetInfo is cached by _cacheTransformEventData
+    // and destroyed by _resetTransformEventData
+    if (this._targetInfo) {
+      return this._targetInfo;
+    }
+
     if (this.skipTargetFind) {
       return {
         subTargets: [],
