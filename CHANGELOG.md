@@ -1,11 +1,24 @@
 # Changelog
 
+## [6.7.1]
+
+- fix(SVGImport)
+
 ## [6.7.0]
 
 - feat(Text): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
 
 ## [6.6.7]
 
+- fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10683](https://github.com/fabricjs/fabric.js/issues/10683)
+- fix(): Refactor findCornerQuadrant to fix the flip + cursor issue. [#10654](https://github.com/fabricjs/fabric.js/issues/10654)
+- chore(): A simple npm-update [#10674](https://github.com/fabricjs/fabric.js/pull/10674)
+- chore(): update playwright [#10657](https://github.com/fabricjs/fabric.js/pull/10657)
+- refactor(): swap lodash with es-toolkit [#10651](https://github.com/fabricjs/fabric.js/pull/10651)
+- chore(): update vitest [#10648](https://github.com/fabricjs/fabric.js/pull/10648)
+- feat(): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
+- refactor(tests): introduce strict playwright typecheck and fix all type issues [#10637](https://github.com/fabricjs/fabric.js/pull/10637)
+- test(Textbox): add edge cases when wrapping line [#10639](https://github.com/fabricjs/fabric.js/pull/10639)
 - fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
 
 ## [6.6.6]
