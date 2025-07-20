@@ -128,14 +128,12 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "node": null,
       "types": "./dist/index.d.ts",
       "import": "./dist/index.min.mjs",
       "require": "./dist/index.min.js",
       "default": "./dist/index.min.js"
     },
     "./es": {
-      "node": null,
       "types": "./dist/index.d.ts",
       "import": "./dist/fabric.min.mjs",
       "require": null,
