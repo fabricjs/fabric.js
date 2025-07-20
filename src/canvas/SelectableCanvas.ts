@@ -735,7 +735,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       aObjects = this.getActiveObjects(),
       targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
-    // // simplest case no active object, return a new target
+    // simplest case no active object, return a new target
     if (!activeObject) {
       return targetInfo;
     }
@@ -759,46 +759,37 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       };
     }
 
-    // in case of active selection and target hit over the activeSelection
-    if (aObjects.length > 1 && activeObjectTargetInfo.target) {
-      return activeObjectTargetInfo;
-    }
+    // in case we are over the active object
+    if (activeObjectTargetInfo.target) {
+      if (aObjects.length > 1) {
+        // in case of active selection and target hit over the activeSelection, just exit
+        return activeObjectTargetInfo;
+      }
+      // from here onward not an active selection, just an activeOject that maybe is a group
 
-    // // there is an activeObject and is also the one we are hovering, or both undefined
-    // if (activeObjectTargetInfo.target === targetInfo.target) {
-    //   return activeObjectTargetInfo;
-    // }
-
-    // if (this.preserveObjectStacking) {
-    //   // there may be situations in which we still want to prefer the active object over the new target
-    //   return targetInfo;
-    // } else {
-    //   // if we have activeObject always drawn on top, and we are over it, we return that target
-    //   if (activeObjectTargetInfo.target) {
-    //     return activeObjectTargetInfo;
-    //   }
-    //   return targetInfo;
-    // }
-
-    if (activeObject && aObjects.length >= 1) {
-      if (activeObject === activeObjectTargetInfo.target) {
-        // active object is not an active selection
-        if (!this.preserveObjectStacking) {
-          return activeObjectTargetInfo;
-        } else {
-          if (
-            e[this.altSelectionKey as ModifierKey] &&
-            targetInfo.target &&
-            targetInfo.target !== activeObject
-          ) {
-            // alt selection: select active object even though it is not the top most target
-            // restore targets
-            return activeObjectTargetInfo;
-          }
-          return targetInfo;
-        }
+      // preserveObjectStacking is false, so activeObject is drawn on top, just return activeObject
+      if (!this.preserveObjectStacking) {
+        return activeObjectTargetInfo;
       }
     }
+
+    // this last if needs checks
+    if (activeObject === activeObjectTargetInfo.target) {
+      // active object is not an active selection
+      if (this.preserveObjectStacking) {
+        if (
+          e[this.altSelectionKey as ModifierKey] &&
+          targetInfo.target &&
+          targetInfo.target !== activeObject
+        ) {
+          // alt selection: select active object even though it is not the top most target
+          // restore targets
+          return activeObjectTargetInfo;
+        }
+        return targetInfo;
+      }
+    }
+
     return targetInfo;
   }
 
