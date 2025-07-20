@@ -365,13 +365,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {DragEvent} e
    */
   private _onDragEnd(e: DragEvent) {
-    const { targets } = this.findDragTargets(e);
+    const { subTargets } = this.findDragTargets(e);
     const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== NONE,
       dropTarget = didDrop ? this._activeObject : undefined,
       options = {
         e,
         target: this._dragSource as FabricObject,
-        subTargets: targets,
+        subTargets,
         dragSource: this._dragSource as FabricObject,
         didDrop,
         dropTarget: dropTarget as FabricObject,
@@ -409,15 +409,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * Override at will
    */
   protected findDragTargets(e: DragEvent) {
-    const { target, subTargets } = this._searchPossibleTargets(
-      this._objects,
-      this.getScenePoint(e),
-      [],
-    );
-    return {
-      target,
-      targets: subTargets,
-    };
+    return this.searchPossibleTargets(this._objects, this.getScenePoint(e));
   }
 
   /**
@@ -428,12 +420,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   private _onDragOver(e: DragEvent) {
     const eventType = 'dragover';
-    const { target, targets } = this.findDragTargets(e);
+    const { container: target, subTargets } = this.findDragTargets(e);
     const dragSource = this._dragSource as FabricObject;
     const options = {
       e,
       target,
-      subTargets: targets,
+      subTargets,
       dragSource,
       canDrop: false,
       dropTarget: undefined,
@@ -451,8 +443,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       target.fire(eventType, options);
     }
     //  propagate the event to subtargets
-    for (let i = 0; i < targets.length; i++) {
-      const subTarget = targets[i];
+    for (let i = 0; i < subTargets.length; i++) {
+      const subTarget = subTargets[i];
       // accept event only if previous targets didn't (the accepting target calls `preventDefault` to inform that the event is taken)
       // TODO: verify if those should loop in inverse order then?
       // what is the order of subtargets?
@@ -472,16 +464,16 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragEnter(e: DragEvent) {
-    const { target, targets } = this.findDragTargets(e);
+    const { container, subTargets } = this.findDragTargets(e);
     const options = {
       e,
-      target,
-      subTargets: targets,
+      target: container,
+      subTargets,
       dragSource: this._dragSource,
     };
     this.fire('dragenter', options);
     //  fire dragenter on targets
-    this._fireEnterLeaveEvents(target, options);
+    this._fireEnterLeaveEvents(container, options);
   }
 
   /**
@@ -490,11 +482,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   private _onDragLeave(e: DragEvent) {
-    const { targets } = this.findDragTargets(e);
+    const { subTargets } = this.findDragTargets(e);
     const options = {
       e,
       target: this._draggedoverTarget,
-      subTargets: targets,
+      subTargets,
       dragSource: this._dragSource,
     };
     this.fire('dragleave', options);
@@ -515,11 +507,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e
    */
   private _onDrop(e: DragEvent) {
-    const { target, targets } = this.findDragTargets(e);
+    const { container, subTargets } = this.findDragTargets(e);
     const options = this._basicEventHandler('drop:before', {
       e,
-      target,
-      subTargets: targets,
+      target: container,
+      subTargets,
       dragSource: this._dragSource,
       ...getEventPoints(this, e),
     });

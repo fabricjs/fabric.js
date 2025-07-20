@@ -57,8 +57,18 @@ export type TargetsInfo = {
   subTargets: FabricObject[];
 };
 
-export type TargetsInfoWithContainer = TargetsInfo & {
+export type TargetsInfoWithContainer = {
+  // the target we think is the most continuing the selection action.
+  // could be hoveredTarget or the currently selected object
+  target?: FabricObject;
+  // the nested targets under the pointer for target
+  subTargets: FabricObject[];
+  // the container for target, or target itself if there are no selectable nested targets
   container?: FabricObject;
+  // hoveredTarget
+  hoveredTarget?: FabricObject;
+  // the container for hoveredTarget, or container itself
+  hoveredContainer?: FabricObject;
 };
 
 /**
@@ -714,38 +724,45 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @return {TargetsInfoWithContainer} the target found
    */
   findTarget(e: TPointerEvent): TargetsInfoWithContainer {
-    // if (this.skipTargetFind) {
-    //   return {
-    //     subTargets: [],
-    //   };
-    // }
+    if (this.skipTargetFind) {
+      return {
+        subTargets: [],
+      };
+    }
 
-    // const pointer = this.getScenePoint(e),
-    //   activeObject = this._activeObject,
-    //   targetInfo = this.searchPossibleTargets(this._objects, pointer);
+    const pointer = this.getScenePoint(e),
+      activeObject = this._activeObject,
+      aObjects = this.getActiveObjects(),
+      targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
     // // simplest case no active object, return a new target
-    // if (!activeObject) {
-    //   return targetInfo;
-    // }
+    if (!activeObject) {
+      return targetInfo;
+    }
 
-    // const activeObjectTargetInfo = this.searchPossibleTargets(
-    //   [activeObject],
-    //   pointer,
-    // );
+    // check pointer is over active selection and possibly perform `subTargetCheck`
+    const activeObjectTargetInfo = this.searchPossibleTargets(
+      [activeObject],
+      pointer,
+    );
 
-    // const activeObjectControl = activeObject.findControl(
-    //   pointer.transform(this.viewportTransform),
-    //   isTouchEvent(e),
-    // );
+    const activeObjectControl = activeObject.findControl(
+      pointer.transform(this.viewportTransform),
+      isTouchEvent(e),
+    );
 
-    // // we are clicking exactly the control of an active object, shortcut to that object.
-    // if (activeObjectControl) {
-    //   return {
-    //     ...activeObjectTargetInfo,
-    //     target: activeObject, // we override target in case we are in the outside part of the corner.
-    //   };
-    // }
+    // we are clicking exactly the control of an active object, shortcut to that object.
+    if (activeObjectControl) {
+      return {
+        ...activeObjectTargetInfo,
+        target: activeObject, // we override target in case we are in the outside part of the corner.
+      };
+    }
+
+    // in case of active selection and target hit over the activeSelection
+    if (aObjects.length > 1 && activeObjectTargetInfo.target) {
+      return activeObjectTargetInfo;
+    }
 
     // // there is an activeObject and is also the one we are hovering, or both undefined
     // if (activeObjectTargetInfo.target === targetInfo.target) {
@@ -762,56 +779,27 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     //   }
     //   return targetInfo;
     // }
-    if (this.skipTargetFind) {
-      return { subTargets: [] };
-    }
-
-    const pointer = this.getScenePoint(e),
-      activeObject = this._activeObject,
-      aObjects = this.getActiveObjects();
 
     if (activeObject && aObjects.length >= 1) {
-      const aObjectInfo = this.searchPossibleTargets([activeObject], pointer);
-      if (
-        activeObject.findControl(
-          pointer.transform(this.viewportTransform),
-          isTouchEvent(e),
-        )
-      ) {
-        // if we hit the corner of the active object, let's return that.
-        return { target: activeObject, subTargets: [] };
-      } else if (
-        aObjects.length > 1 &&
-        // check pointer is over active selection and possibly perform `subTargetCheck`
-        aObjectInfo.target
-      ) {
-        // active selection does not select sub targets like normal groups
-        return { target: activeObject, subTargets: aObjectInfo.subTargets };
-      }
-      const activeObjectInfo = this.searchPossibleTargets(
-        [activeObject],
-        pointer,
-      );
-      if (activeObject === activeObjectInfo.target) {
+      if (activeObject === activeObjectTargetInfo.target) {
         // active object is not an active selection
         if (!this.preserveObjectStacking) {
-          return activeObjectInfo;
+          return activeObjectTargetInfo;
         } else {
-          const info = this.searchPossibleTargets(this._objects, pointer);
           if (
             e[this.altSelectionKey as ModifierKey] &&
-            info.target &&
-            info.target !== activeObject
+            targetInfo.target &&
+            targetInfo.target !== activeObject
           ) {
             // alt selection: select active object even though it is not the top most target
             // restore targets
-            return activeObjectInfo;
+            return activeObjectTargetInfo;
           }
-          return info;
+          return targetInfo;
         }
       }
     }
-    return this.searchPossibleTargets(this._objects, pointer);
+    return targetInfo;
   }
 
   /**
@@ -899,14 +887,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     pointer: Point,
     subTargets: FabricObject[],
   ): TargetsInfo {
-    // Cache all targets where their bounding box contains point.
     let i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
     while (i--) {
       const target = objects[i];
       if (this._checkTarget(target, pointer)) {
-        if (subTargets && isCollection(target) && target.subTargetCheck) {
+        if (isCollection(target) && target.subTargetCheck) {
           const { target: subTarget } = this._searchPossibleTargets(
             target._objects,
             pointer,

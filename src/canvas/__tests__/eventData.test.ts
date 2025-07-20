@@ -799,8 +799,8 @@ describe('Event targets', () => {
 
     test('findTarget on active selection', () => {
       const rect1 = new FabricObject({
-        left: 0,
-        top: 0,
+        left: 1,
+        top: 1,
         width: 10,
         height: 10,
       });
@@ -841,6 +841,14 @@ describe('Event targets', () => {
       expect(activeSelection.__corner).toBeUndefined();
 
       expect(
+        canvas.findTarget({ clientX: 1, clientY: 1 } as TPointerEvent),
+      ).toMatchObject({
+        target: activeSelection,
+        subTargets: [rect1],
+      });
+      expect(activeSelection.__corner).toBe('tl');
+
+      expect(
         canvas.findTarget({ clientX: 0, clientY: 0 } as TPointerEvent),
       ).toMatchObject({
         target: activeSelection,
@@ -850,7 +858,7 @@ describe('Event targets', () => {
 
       expect(
         canvas.findTarget({ clientX: 25, clientY: 5 } as TPointerEvent),
-      ).toEqual(
+      ).toMatchObject(
         {
           target: activeSelection,
           subTargets: [],
@@ -896,7 +904,7 @@ describe('Event targets', () => {
 
       expect(
         canvas.findTarget({ clientX: 8, clientY: 8 } as TPointerEvent),
-      ).toEqual({
+      ).toMatchObject({
         target: activeSelection,
         subTargets: [],
       });
