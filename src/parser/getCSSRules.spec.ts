@@ -1,6 +1,7 @@
-import { loadSVGFromString } from './loadSVGFromString';
-
 import { describe, expect, test } from 'vitest';
+import { loadSVGFromString } from './loadSVGFromString';
+// Add `Circle` to the class registry, making it available during SVG parsing.
+import '../shapes/Circle';
 
 describe('getCSSRules', () => {
   test('can load svgs with style tags with import statement', async () => {
@@ -29,5 +30,22 @@ describe('getCSSRules', () => {
       </svg>
     `);
     expect(loaded.objects).toHaveLength(1);
+  });
+
+  test('can load svgs with multiple style tags', async () => {
+    const loaded = await loadSVGFromString(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20">
+        <style>
+          .blue { fill: blue; }
+        </style>
+        <style>
+          .red { fill: red; }
+        </style>
+        <circle class="blue" r="9" cx="10" cy="10"></circle>
+        <circle class="red" r="9" cx="30" cy="10"></circle>
+      </svg>
+    `);
+    expect(loaded.objects[0]).toMatchObject({ fill: 'blue' });
+    expect(loaded.objects[1]).toMatchObject({ fill: 'red' });
   });
 });
