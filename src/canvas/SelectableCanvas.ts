@@ -771,25 +771,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (!this.preserveObjectStacking) {
         return activeObjectTargetInfo;
       }
-    }
 
-    // this last if needs checks
-    if (activeObject === activeObjectTargetInfo.target) {
-      // active object is not an active selection
-      if (this.preserveObjectStacking) {
-        if (
-          e[this.altSelectionKey as ModifierKey] &&
-          targetInfo.target &&
-          targetInfo.target !== activeObject
-        ) {
-          // alt selection: select active object even though it is not the top most target
-          // restore targets
-          return activeObjectTargetInfo;
-        }
-        return targetInfo;
+      if (
+        this.preserveObjectStacking &&
+        e[this.altSelectionKey as ModifierKey]
+      ) {
+        return activeObjectTargetInfo;
       }
     }
-
     return targetInfo;
   }
 

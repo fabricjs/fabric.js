@@ -1421,7 +1421,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         const prevActiveObjects = activeObject.getObjects();
         let subTargets: FabricObject[] = [];
         if (target === activeObject) {
-          const pointer = this.getViewportPoint(e);
+          const pointer = this.getScenePoint(e);
           let targetInfo = this.searchPossibleTargets(
             prevActiveObjects,
             pointer,
