@@ -61,14 +61,19 @@ export type TargetsInfoWithContainer = {
   // the target we think is the most continuing the selection action.
   // could be hoveredTarget or the currently selected object
   target?: FabricObject;
-  // the nested targets under the pointer for target
+  // the nested targets under the pointer for container
   subTargets: FabricObject[];
   // the container for target, or target itself if there are no selectable nested targets
   container?: FabricObject;
+};
+
+export type FullTargetsInfoWithContainer = TargetsInfoWithContainer & {
   // hoveredTarget
-  hoveredTarget?: FabricObject;
+  currentTarget?: FabricObject;
   // the container for hoveredTarget, or container itself
-  hoveredContainer?: FabricObject;
+  currentContainer?: FabricObject;
+  // nested targets of current container
+  currentSubTargets: FabricObject[];
 };
 
 /**
@@ -295,7 +300,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * This data is needed many times during an event and we want to avoid to recalculate it
    * multuple times.
    */
-  declare protected _targetInfo: TargetsInfoWithContainer | undefined;
+  declare protected _targetInfo: FullTargetsInfoWithContainer | undefined;
 
   static ownDefaults = canvasDefaults;
 
@@ -723,7 +728,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @param {Event} e mouse event
    * @return {TargetsInfoWithContainer} the target found
    */
-  findTarget(e: TPointerEvent): TargetsInfoWithContainer {
+  findTarget(e: TPointerEvent): FullTargetsInfoWithContainer {
     // this._targetInfo is cached by _cacheTransformEventData
     // and destroyed by _resetTransformEventData
     if (this._targetInfo) {
@@ -733,6 +738,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     if (this.skipTargetFind) {
       return {
         subTargets: [],
+        currentSubTargets: [],
       };
     }
 
@@ -741,16 +747,31 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       aObjects = this.getActiveObjects(),
       targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
+    const {
+      subTargets: currentSubTargets,
+      container: currentContainer,
+      target: currentTarget,
+    } = targetInfo;
+
+    const fullTargetInfo: FullTargetsInfoWithContainer = {
+      ...targetInfo,
+      currentSubTargets,
+      currentContainer,
+      currentTarget,
+    };
+
     // simplest case no active object, return a new target
     if (!activeObject) {
-      return targetInfo;
+      return fullTargetInfo;
     }
 
     // check pointer is over active selection and possibly perform `subTargetCheck`
-    const activeObjectTargetInfo = this.searchPossibleTargets(
-      [activeObject],
-      pointer,
-    );
+    const activeObjectTargetInfo: FullTargetsInfoWithContainer = {
+      ...this.searchPossibleTargets([activeObject], pointer),
+      currentSubTargets,
+      currentContainer,
+      currentTarget,
+    };
 
     const activeObjectControl = activeObject.findControl(
       this.getViewportPoint(e),
@@ -785,7 +806,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         return activeObjectTargetInfo;
       }
     }
-    return targetInfo;
+
+    return fullTargetInfo;
   }
 
   /**

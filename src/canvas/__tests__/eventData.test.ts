@@ -911,7 +911,8 @@ describe('Event targets', () => {
 
       expect(
         canvas.findTarget({ clientX: 15, clientY: 15 } as TPointerEvent),
-      ).toEqual({
+      ).toMatchObject({
+        currentSubTargets: [],
         subTargets: [],
       });
     });
