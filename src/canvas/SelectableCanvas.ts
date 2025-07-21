@@ -753,7 +753,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     );
 
     const activeObjectControl = activeObject.findControl(
-      pointer.transform(this.viewportTransform),
+      this.getViewportPoint(e),
       isTouchEvent(e),
     );
 
