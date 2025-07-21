@@ -25261,12 +25261,10 @@ function getGradientDefs(doc) {
  */
 function getCSSRules(doc) {
   const styles = doc.getElementsByTagName('style');
-  let i;
-  let len;
   const allRules = {};
 
   // very crude parsing of style contents
-  for (i = 0, len = styles.length; i < len; i++) {
+  for (let i = 0; i < styles.length; i++) {
     const styleContents = (styles[i].textContent || '').replace(
     // remove comments
     /\/\*[\s\S]*?\*\//g, '');
@@ -25292,8 +25290,8 @@ function getCSSRules(doc) {
         propertyValuePairs = declaration.split(';').filter(function (pair) {
           return pair.trim();
         });
-      for (i = 0, len = propertyValuePairs.length; i < len; i++) {
-        const pair = propertyValuePairs[i].split(':'),
+      for (let j = 0; j < propertyValuePairs.length; j++) {
+        const pair = propertyValuePairs[j].split(':'),
           property = pair[0].trim(),
           value = pair[1].trim();
         ruleObj[property] = value;

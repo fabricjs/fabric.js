@@ -1,5 +1,9 @@
 # Changelog
 
+## [6.7.1]
+
+- fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10688](https://github.com/fabricjs/fabric.js/issues/10683)
+
 ## [6.7.0]
 
 - feat(Text): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
