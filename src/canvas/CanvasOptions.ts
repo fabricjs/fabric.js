@@ -89,7 +89,9 @@ export interface CanvasSelectionOptions {
 
   /**
    * Indicates which key enable alternative selection
-   * in case of target overlapping with active object
+   * in case of a target overlapping with active object and we don't want to loose the
+   * active selection, we can press this modifier key and continue selecting the current
+   * selected object also when is covered by another or many valid targets for selection.
    * values: 'altKey', 'shiftKey', 'ctrlKey'.
    * For a series of reason that come from the general expectations on how
    * things should work, this feature works only for preserveObjectStacking true.

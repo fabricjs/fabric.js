@@ -572,14 +572,14 @@ describe('Textbox', () => {
 
     const originalWidth = text.width;
 
-    canvas.__onMouseDown(eventStub);
-    canvas.__onMouseMove({
+    canvas._onMouseDown(eventStub);
+    canvas._onMouseMove({
       ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
       type: 'mousemove',
     });
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,
@@ -607,14 +607,14 @@ describe('Textbox', () => {
 
     const originalWidth = text.width;
 
-    canvas.__onMouseDown(eventStub);
-    canvas.__onMouseMove({
+    canvas._onMouseDown(eventStub);
+    canvas._onMouseMove({
       ...eventStub,
       clientX: eventStub.clientX - 20,
       clientY: eventStub.clientY,
       type: 'mousemove',
     });
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       ...eventStub,
       clientX: eventStub.clientX + 20,
       clientY: eventStub.clientY,

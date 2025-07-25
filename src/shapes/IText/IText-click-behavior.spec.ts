@@ -270,17 +270,21 @@ describe('iText click interaction', () => {
     canvas.add(group);
     // @ts-expect-error -- protected member
     iText.selected = true;
-
-    canvas.__onMouseUp({
+    const evt = {
       clientX: 1,
       clientY: 1,
       target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    } as unknown as TPointerEvent;
+    canvas._cacheTransformEventData(evt);
+    canvas.__onMouseUp(evt);
     // @ts-expect-error -- protected member
-    expect(canvas._target, 'group should be found as target').toBe(group);
+    expect(canvas._targetInfo.target, 'group should be found as target').toBe(
+      group,
+    );
     expect(iText.isEditing, 'iText should not enter editing').toBe(false);
 
     iText.exitEditing();
+    canvas._resetTransformEventData();
   });
 
   test('_mouseUpHandler on a text in a group', () => {
@@ -300,7 +304,7 @@ describe('iText click interaction', () => {
     // @ts-expect-error -- protected member
     iText.selected = true;
 
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       clientX: 1,
       clientY: 1,
       target: canvas.upperCanvasEl,
@@ -313,7 +317,7 @@ describe('iText click interaction', () => {
     // @ts-expect-error -- protected member
     iText.selected = true;
 
-    canvas.__onMouseUp({
+    canvas._onMouseUp({
       clientX: 1,
       clientY: 1,
       target: canvas.upperCanvasEl,
