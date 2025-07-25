@@ -63,8 +63,7 @@ describe('Pattern', () => {
   it('includes custom props in toObject', () => {
     const pattern = createPattern();
     pattern.patternTransform = [1, 0, 0, 2, 0, 0];
-    // @ts-expect-error -- readonly
-    pattern.id = 'myId';
+    Object.assign(pattern, { id: 'myId' });
     const object = pattern.toObject(['id']);
     expect(object.id).toBe('myId');
     expect(object.patternTransform).toEqual(pattern.patternTransform);
@@ -72,8 +71,7 @@ describe('Pattern', () => {
 
   it('includes crossOrigin in toObject', () => {
     const pattern = new Pattern({
-      // @ts-expect-error -- TODO: check types, seems like string is not assignable here
-      source: IMG_SRC,
+      source: img,
       crossOrigin: 'anonymous',
     });
     const object = pattern.toObject();
