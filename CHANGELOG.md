@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Fix Next.js compatibility by removing node export restriction [#10687](https://github.com/fabricjs/fabric.js/pull/10687)
 - chore(): BREAKING: remove request util [#10690](https://github.com/fabricjs/fabric.js/pull/10690)
 - chore(): update dev deps [#10685](https://github.com/fabricjs/fabric.js/pull/10685)
 - fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10683](https://github.com/fabricjs/fabric.js/issues/10683)
