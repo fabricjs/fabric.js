@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update dev deps [#10685](https://github.com/fabricjs/fabric.js/pull/10685)
 - fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10683](https://github.com/fabricjs/fabric.js/issues/10683)
 - fix(): Refactor findCornerQuadrant to fix the flip + cursor issue. [#10654](https://github.com/fabricjs/fabric.js/issues/10654)
 - chore(): A simple npm-update [#10674](https://github.com/fabricjs/fabric.js/pull/10674)
