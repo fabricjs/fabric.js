@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Fix Next.js compatibility by removing node export restriction [#10687](https://github.com/fabricjs/fabric.js/pull/10687)
 - fix(): Refactor findCornerQuadrant to fix the flip + cursor issue. [#10654](https://github.com/fabricjs/fabric.js/issues/10654)
 - chore(): A simple npm-update [#10674](https://github.com/fabricjs/fabric.js/pull/10674)
 - chore(): update playwright [#10657](https://github.com/fabricjs/fabric.js/pull/10657)
