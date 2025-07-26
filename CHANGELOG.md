@@ -108,6 +108,35 @@
 - ci(): Switch from Jest to Vitest [#10420](https://github.com/fabricjs/fabric.js/pull/10420)
 - chore(): BREAKING: drop node 16 support. Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
 
+## [6.7.1]
+
+- fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10688](https://github.com/fabricjs/fabric.js/issues/10683)
+
+## [6.7.0]
+
+- feat(Text): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
+
+## [6.6.7]
+
+- fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
+
+## [6.6.6]
+
+- fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
+- fix(): Remove black border in blur and also align JS with WEBGL blur filtering [#10623](https://github.com/fabricjs/fabric.js/pull/10623)
+
+## [6.6.5]
+
+- feat(Text): Support for intl.segmenter in fabric.Text [#10595](https://github.com/fabricjs/fabric.js/pull/10595)
+
+## [6.6.4]
+
+- chore(): properly updated version number
+
+## [6.6.3]
+
+- docs(): Fixed JSDOCS for astro and typedoc
+
 ## [6.6.2]
 
 - feat(IText): Allow text or container clipPath to clip the text selection or cursor [#104634](https://github.com/fabricjs/fabric.js/pull/10434)
