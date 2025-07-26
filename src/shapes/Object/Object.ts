@@ -390,19 +390,13 @@ export class FabricObject<
    * and each side do not cross fabric.cacheSideLimit
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
-   * @param {Object} dims
-   * @param {Object} dims.width width of canvas
-   * @param {Object} dims.height height of canvas
-   * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * It mutates the input object dims.
+   * @param {TCacheCanvasDimensions} dims
+   * @return {TCacheCanvasDimensions} dims
    */
   _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any,
-  ) {
+    dims: TCacheCanvasDimensions & { capped?: boolean },
+  ): TCacheCanvasDimensions & { capped?: boolean } {
     const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
@@ -441,12 +435,7 @@ export class FabricObject<
    * Return the dimension and the zoom level needed to create a cache canvas
    * big enough to host the object to be cached.
    * @private
-   * @return {Object}.x width of object to be cached
-   * @return {Object}.y height of object to be cached
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @return {TCacheCanvasDimensions} Informations about the object to be cached
    */
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
@@ -641,10 +630,8 @@ export class FabricObject<
     return this;
   }
 
-  /*
-   * @private
+  /**
    * return if the object would be visible in rendering
-   * @memberOf FabricObject.prototype
    * @return {Boolean}
    */
   isNotVisible() {
@@ -1413,7 +1400,7 @@ export class FabricObject<
 
   /**
    * Returns true if any of the specified types is identical to the type of an instance
-   * @param {String} type Type to check against
+   * @param {String[]} type Type to check against
    * @return {Boolean}
    */
   isType(...types: string[]) {

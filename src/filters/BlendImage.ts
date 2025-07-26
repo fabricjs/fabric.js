@@ -203,7 +203,6 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
 
   /**
    * Create filter instance from an object representation
-   * @static
    * @param {object} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal

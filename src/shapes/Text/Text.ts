@@ -1852,8 +1852,6 @@ export class FabricText<
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link FabricText.fromElement})
-   * @static
-   * @memberOf Text
    * @see: http://www.w3.org/TR/SVG/text.html#TextElement
    */
   static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat(
@@ -1872,8 +1870,6 @@ export class FabricText<
 
   /**
    * Returns FabricText instance from an SVG element (<b>not yet implemented</b>)
-   * @static
-   * @memberOf Text
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */

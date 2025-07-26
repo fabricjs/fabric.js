@@ -678,8 +678,6 @@ export class Group
   /**
    * @todo support loading from svg
    * @private
-   * @static
-   * @memberOf Group
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */

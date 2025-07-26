@@ -238,16 +238,12 @@ export class Line<
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Line.fromElement})
-   * @static
-   * @memberOf Line
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
   static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat(coordProps);
 
   /**
    * Returns Line instance from an SVG element
-   * @static
-   * @memberOf Line
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
@@ -271,8 +267,6 @@ export class Line<
 
   /**
    * Returns Line instance from an object representation
-   * @static
-   * @memberOf Line
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */
