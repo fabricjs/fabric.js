@@ -790,23 +790,30 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     if (activeObjectTargetInfo.target) {
       if (aObjects.length > 1) {
         // in case of active selection and target hit over the activeSelection, just exit
+        // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }
       // from here onward not an active selection, just an activeOject that maybe is a group
 
       // preserveObjectStacking is false, so activeObject is drawn on top, just return activeObject
       if (!this.preserveObjectStacking) {
+        // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }
 
+      // In case we are in preserveObjectStacking ( selection in stack )
+      // there is the possibility to force with `altSelectionKey` to return the activeObject
+      // from any point in the stack, even if we have another object completely on top of it.
       if (
         this.preserveObjectStacking &&
         e[this.altSelectionKey as ModifierKey]
       ) {
+        // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }
     }
 
+    // we have an active object, but we ruled out it being our target in any way.
     return fullTargetInfo;
   }
 
