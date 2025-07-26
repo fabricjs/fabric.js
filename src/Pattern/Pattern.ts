@@ -45,20 +45,17 @@ export class Pattern {
   /**
    * Pattern horizontal offset from object's left/top corner
    * @type Number
-   * @default
    */
   offsetX = 0;
 
   /**
    * Pattern vertical offset from object's left/top corner
    * @type Number
-   * @default
    */
   offsetY = 0;
 
   /**
    * @type TCrossOrigin
-   * @default
    */
   crossOrigin: TCrossOrigin = '';
 
@@ -66,7 +63,6 @@ export class Pattern {
    * transform matrix to change the pattern, imported from svgs.
    * @todo verify if using the identity matrix as default makes the rest of the code more easy
    * @type Array
-   * @default
    */
   declare patternTransform?: TMat2D;
 

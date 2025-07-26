@@ -4,7 +4,6 @@ import { parseStyleString } from './parseStyleString';
 /**
  * Parses "style" attribute, retuning an object with values
  * @static
- * @memberOf fabric
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */

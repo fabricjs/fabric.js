@@ -17,7 +17,6 @@ export interface BorderProps {
   /**
    * When set to `false`, object's controlling borders are not rendered
    * @type Boolean
-   * @default
    */
   hasBorders: boolean;
 

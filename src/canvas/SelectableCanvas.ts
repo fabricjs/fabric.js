@@ -190,7 +190,6 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
    * @type Boolean
-   * @default
    */
   declare isDrawingMode: boolean;
 

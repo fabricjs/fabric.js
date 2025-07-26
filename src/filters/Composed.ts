@@ -65,7 +65,6 @@ export class Composed extends BaseFilter<
 
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
-   * @static
    * @param {oject} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal

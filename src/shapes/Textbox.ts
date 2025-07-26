@@ -62,7 +62,6 @@ export class Textbox<
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
-   * @default
    */
   declare minWidth: number;
 
@@ -71,7 +70,6 @@ export class Textbox<
    * fixed to 2 so that an empty textbox cannot go to 0
    * and is still selectable without text.
    * @type Number
-   * @default
    */
   declare dynamicMinWidth: number;
 

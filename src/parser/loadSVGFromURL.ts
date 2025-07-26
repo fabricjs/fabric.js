@@ -7,7 +7,6 @@ import { FabricError } from '../util/internals/console';
 /**
  * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
  * Note that SVG is fetched via fetch API, so it needs to conform to SOP (Same Origin Policy)
- * @memberOf fabric
  * @param {string} url where the SVG is
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * {@link TSvgParsedCallback} also receives `allElements` array as the last argument. This is the full list of svg nodes available in the document.

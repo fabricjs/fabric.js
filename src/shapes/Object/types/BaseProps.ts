@@ -22,14 +22,12 @@ export interface BaseProps {
   /**
    * Object width
    * @type Number
-   * @default
    */
   width: number;
 
   /**
    * Object height
    * @type Number
-   * @default
    */
   height: number;
 
