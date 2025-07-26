@@ -1399,9 +1399,18 @@ export class FabricObject<
   }
 
   /**
-   * Returns true if any of the specified types is identical to the type of an instance
-   * @param {String[]} type Type to check against
-   * @return {Boolean}
+   * Checks if the instance is of any of the specified types.
+   * We use this to filter a list of objects for the `getObjects` function.
+   *
+   * For detecting an instance type `instanceOf` is a better check,
+   * but to avoid to make specific classes a dependency of generic code
+   * internally we use this.
+   *
+   * This compares both the static class `type` and the instance's own `type` property
+   * against the provided list of types.
+   *
+   * @param types - A list of type strings to check against.
+   * @returns `true` if the object's type or class type matches any in the list, otherwise `false`.
    */
   isType(...types: string[]) {
     return (
