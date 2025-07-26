@@ -133,7 +133,6 @@ export class FabricImage<
    * key used to retrieve the texture representing this image
    * @since 2.0.0
    * @type String
-   * @default
    */
   declare cacheKey: string;
 
@@ -141,7 +140,6 @@ export class FabricImage<
    * Image crop in pixels from original image size.
    * @since 2.0.0
    * @type Number
-   * @default
    */
   declare cropX: number;
 
@@ -149,7 +147,6 @@ export class FabricImage<
    * Image crop in pixels from original image size.
    * @since 2.0.0
    * @type Number
-   * @default
    */
   declare cropY: number;
 
@@ -158,7 +155,6 @@ export class FabricImage<
    * Also influence if the cacheCanvas for this image uses imageSmoothing
    * @since 4.0.0-beta.11
    * @type Boolean
-   * @default
    */
   declare imageSmoothing: boolean;
 

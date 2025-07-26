@@ -27,7 +27,6 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
    * A value of 0 has no effect.
    *
    * @param {Number} saturation
-   * @default
    */
   declare saturation: SaturationOwnProps['saturation'];
 

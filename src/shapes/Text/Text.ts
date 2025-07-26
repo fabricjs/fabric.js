@@ -171,42 +171,36 @@ export class FabricText<
   /**
    * Font size (in pixels)
    * @type Number
-   * @default
    */
   declare fontSize: number;
 
   /**
    * Font weight (e.g. bold, normal, 400, 600, 800)
    * @type {(Number|String)}
-   * @default
    */
   declare fontWeight: string | number;
 
   /**
    * Font family
    * @type String
-   * @default
    */
   declare fontFamily: string;
 
   /**
    * Text decoration underline.
    * @type Boolean
-   * @default
    */
   declare underline: boolean;
 
   /**
    * Text decoration overline.
    * @type Boolean
-   * @default
    */
   declare overline: boolean;
 
   /**
    * Text decoration linethrough.
    * @type Boolean
-   * @default
    */
   declare linethrough: boolean;
 
@@ -214,21 +208,18 @@ export class FabricText<
    * Text alignment. Possible values: "left", "center", "right", "justify",
    * "justify-left", "justify-center" or "justify-right".
    * @type String
-   * @default
    */
   declare textAlign: string;
 
   /**
    * Font style . Possible values: "", "normal", "italic" or "oblique".
    * @type String
-   * @default
    */
   declare fontStyle: string;
 
   /**
    * Line height
    * @type Number
-   * @default
    */
   declare lineHeight: number;
 
@@ -267,7 +258,6 @@ export class FabricText<
   /**
    * Background color of text lines
    * @type String
-   * @default
    */
   declare textBackgroundColor: string;
 
@@ -293,7 +283,6 @@ export class FabricText<
    *     pathSide: 'left',
    *     pathStartOffset: 0
    * });
-   * @default
    */
   declare path?: Path;
 
@@ -314,7 +303,6 @@ export class FabricText<
   /**
    * Offset amount for text path starting position
    * Only used when text has a path
-   * @default
    */
   declare pathStartOffset: number;
 
@@ -322,7 +310,6 @@ export class FabricText<
    * Which side of the path the text should be drawn on.
    * Only used when text has a path
    * @type {TPathSide} 'left|right'
-   * @default
    */
   declare pathSide: TPathSide;
 
@@ -332,7 +319,6 @@ export class FabricText<
    * (one of "baseline", "center", "ascender", "descender")
    * This feature is in BETA, and its behavior may change
    * @type TPathAlign
-   * @default
    */
   declare pathAlign: TPathAlign;
 
@@ -349,7 +335,6 @@ export class FabricText<
   /**
    * Text Line proportion to font Size (in pixels)
    * @type Number
-   * @default
    */
   declare _fontSizeMult: number;
 
@@ -357,14 +342,12 @@ export class FabricText<
    * additional space between characters
    * expressed in thousands of em unit
    * @type Number
-   * @default
    */
   declare charSpacing: number;
 
   /**
    * Baseline shift, styles only, keep at 0 for the main text object
    * @type {Number}
-   * @default
    */
   declare deltaY: number;
 
@@ -377,7 +360,6 @@ export class FabricText<
    * https://www.w3.org/International/questions/qa-bidi-unicode-controls
    * @since 4.5.0
    * @type {CanvasDirection} 'ltr|rtl'
-   * @default
    */
   declare direction: CanvasDirection;
 
@@ -392,7 +374,6 @@ export class FabricText<
   /**
    * use this size when measuring text. To avoid IE11 rounding errors
    * @type {Number}
-   * @default
    * @readonly
    * @private
    */
@@ -401,7 +382,6 @@ export class FabricText<
   /**
    * contains the min text width to avoid getting 0
    * @type {Number}
-   * @default
    */
   declare MIN_TEXT_WIDTH: number;
 
@@ -409,14 +389,12 @@ export class FabricText<
    * contains the the text of the object, divided in lines as they are displayed
    * on screen. Wrapping will divide the text independently of line breaks
    * @type {string[]}
-   * @default
    */
   declare textLines: string[];
 
   /**
    * same as textlines, but each line is an array of graphemes as split by splitByGrapheme
    * @type {string[]}
-   * @default
    */
   declare _textLines: string[][];
 

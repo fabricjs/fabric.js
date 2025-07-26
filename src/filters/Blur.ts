@@ -32,7 +32,6 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
    * specific to keep the image blur constant at different resolutions
    * range between 0 and 1.
    * @type Number
-   * @default
    */
   declare blur: BlurOwnProps['blur'];
 

@@ -37,14 +37,12 @@ export class Ellipse<
   /**
    * Horizontal radius
    * @type Number
-   * @default
    */
   declare rx: number;
 
   /**
    * Vertical radius
    * @type Number
-   * @default
    */
   declare ry: number;
 

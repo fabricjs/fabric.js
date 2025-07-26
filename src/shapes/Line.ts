@@ -44,28 +44,24 @@ export class Line<
   /**
    * x value or first line edge
    * @type number
-   * @default
    */
   declare x1: number;
 
   /**
    * y value or first line edge
    * @type number
-   * @default
    */
   declare y1: number;
 
   /**
    * x value or second line edge
    * @type number
-   * @default
    */
   declare x2: number;
 
   /**
    * y value or second line edge
    * @type number
-   * @default
    */
   declare y2: number;
 

@@ -64,7 +64,6 @@ export class Shadow {
   /**
    * Shadow color
    * @type String
-   * @default
    */
   declare color: string;
 
@@ -77,28 +76,24 @@ export class Shadow {
   /**
    * Shadow horizontal offset
    * @type Number
-   * @default
    */
   declare offsetX: number;
 
   /**
    * Shadow vertical offset
    * @type Number
-   * @default
    */
   declare offsetY: number;
 
   /**
    * Whether the shadow should affect stroke operations
    * @type Boolean
-   * @default
    */
   declare affectStroke: boolean;
 
   /**
    * Indicates whether toObject should include default values
    * @type Boolean
-   * @default
    */
   declare includeDefaultValues: boolean;
 
@@ -107,7 +102,6 @@ export class Shadow {
    * When `true`, the shadow's offsetX, offsetY, and blur will not be affected by the object's scale.
    * default to false
    * @type Boolean
-   * @default
    */
   declare nonScaling: boolean;
 

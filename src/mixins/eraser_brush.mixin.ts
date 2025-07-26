@@ -217,12 +217,10 @@ import { uid } from '../util/internals/uid';
     type: 'eraser',
 
     /**
-     * @default
      */
     originX: 'center',
 
     /**
-     * @default
      */
     originY: 'center',
 

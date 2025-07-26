@@ -131,14 +131,12 @@ export class IText<
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
-   * @default
    */
   declare selectionStart: number;
 
   /**
    * Index where text selection ends
    * @type Number
-   * @default
    */
   declare selectionEnd: number;
 
@@ -149,35 +147,30 @@ export class IText<
   /**
    * Color of text selection
    * @type String
-   * @default
    */
   declare selectionColor: string;
 
   /**
    * Indicates whether text is in editing mode
    * @type Boolean
-   * @default
    */
   declare isEditing: boolean;
 
   /**
    * Indicates whether a text can be edited
    * @type Boolean
-   * @default
    */
   declare editable: boolean;
 
   /**
    * Border color of text object while it's in editing mode
    * @type String
-   * @default
    */
   declare editingBorderColor: string;
 
   /**
    * Width of cursor (in px)
    * @type Number
-   * @default
    */
   declare cursorWidth: number;
 
@@ -187,21 +180,18 @@ export class IText<
    * if set to a color value that fabric can understand, it will
    * be used instead of the color of the text at the current position.
    * @type String
-   * @default
    */
   declare cursorColor: string;
 
   /**
    * Delay between cursor blink (in ms)
    * @type Number
-   * @default
    */
   declare cursorDelay: number;
 
   /**
    * Duration of cursor fade in (in ms)
    * @type Number
-   * @default
    */
   declare cursorDuration: number;
 
@@ -210,7 +200,6 @@ export class IText<
   /**
    * Indicates whether internal text char widths can be cached
    * @type Boolean
-   * @default
    */
   declare caching: boolean;
 

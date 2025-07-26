@@ -45,7 +45,6 @@ export class Polyline<
   /**
    * Points array
    * @type Array
-   * @default
    */
   declare points: XY[];
 

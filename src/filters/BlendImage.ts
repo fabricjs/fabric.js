@@ -51,7 +51,6 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
    * alpha channel of the filter image, and apply those values to the base
    * image's alpha channel.
    * @type String
-   * @default
    **/
   declare mode: BlendImageOwnProps['mode'];
 

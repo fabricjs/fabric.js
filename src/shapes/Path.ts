@@ -54,7 +54,6 @@ export class Path<
   /**
    * Array of path points
    * @type Array
-   * @default
    */
   declare path: TSimplePathData;
 

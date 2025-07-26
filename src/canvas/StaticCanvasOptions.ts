@@ -8,14 +8,12 @@ interface CanvasDrawableOptions {
    * @since 1.6.3
    * @type Boolean
    * @todo we should really find a different way to do this
-   * @default
    */
   backgroundVpt: boolean;
 
   /**
    * Background color of canvas instance.
    * @type {(String|TFiller)}
-   * @default
    */
   backgroundColor: TFiller | string;
 
@@ -25,7 +23,6 @@ interface CanvasDrawableOptions {
    * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
    * vale. As an alternative you can disable image objectCaching
    * @type FabricObject
-   * @default
    */
   backgroundImage?: FabricObject;
 
@@ -34,7 +31,6 @@ interface CanvasDrawableOptions {
    * @since 1.6.3
    * @type Boolean
    * @todo we should really find a different way to do this
-   * @default
    */
   overlayVpt: boolean;
 
@@ -42,7 +38,6 @@ interface CanvasDrawableOptions {
    * Overlay color of canvas instance.
    * @since 1.3.9
    * @type {(String|TFiller)}
-   * @default
    */
   overlayColor: TFiller | string;
 
@@ -52,7 +47,6 @@ interface CanvasDrawableOptions {
    * canvas property a reference to the canvas it is on. Otherwise the image cannot detect the zoom
    * vale. As an alternative you can disable image objectCaching
    * @type FabricObject
-   * @default
    */
   overlayImage?: FabricObject;
 }
@@ -66,7 +60,6 @@ interface CanvasRenderingOptions {
    * Disabling is suggested anyway and managing the renders of the app manually is not a big effort ( canvas.requestRenderAll() )
    * Left default to true to do not break documentation and old app, fiddles.
    * @type Boolean
-   * @default
    */
   renderOnAddRemove: boolean;
 
@@ -84,14 +77,12 @@ interface CanvasRenderingOptions {
   /**
    * When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
    * @type Boolean
-   * @default
    */
   enableRetinaScaling: boolean;
 
   /**
    * Indicates whether this canvas will use image smoothing, this is on by default in browsers
    * @type Boolean
-   * @default
    */
   imageSmoothingEnabled: boolean;
 
@@ -110,7 +101,6 @@ export interface CanvasExportOptions {
    * Indicates whether toObject/toDatalessObject should include default values
    * if set to false, takes precedence over the object value.
    * @type Boolean
-   * @default
    */
   includeDefaultValues: boolean;
 
@@ -118,7 +108,6 @@ export interface CanvasExportOptions {
    * When true, getSvgTransform() will apply the StaticCanvas.viewportTransform to the SVG transformation. When true,
    * a zoomed canvas will then produce zoomed SVG output.
    * @type Boolean
-   * @default
    */
   svgViewportTransformation: boolean;
 }
@@ -144,7 +133,6 @@ export interface StaticCanvasOptions
   /**
    * Indicates whether object controls (borders/controls) are rendered above overlay image
    * @type Boolean
-   * @default
    *
    * @todo move to Canvas
    */
@@ -156,7 +144,6 @@ export interface StaticCanvasOptions
    * If is true, when using a touch event on the canvas, the canvas will scroll if scroll is possible.
    * If we are in drawing mode or if we are selecting an object the canvas preventDefault and so it won't scroll
    * @type Boolean
-   * @default
    *
    * @todo move to Canvas
    */
@@ -169,7 +156,6 @@ export interface StaticCanvasOptions
    * canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
    * @example <caption>Scale by 70% and translate toward bottom-right by 50, without skewing</caption>
    * canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
-   * @default
    */
   viewportTransform: TMat2D;
 }

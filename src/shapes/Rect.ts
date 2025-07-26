@@ -37,14 +37,12 @@ export class Rect<
   /**
    * Horizontal border radius
    * @type Number
-   * @default
    */
   declare rx: number;
 
   /**
    * Vertical border radius
    * @type Number
-   * @default
    */
   declare ry: number;
 
