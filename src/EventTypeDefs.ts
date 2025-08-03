@@ -261,16 +261,6 @@ type TPointerEvents<Prefix extends string> = Record<
     `${Prefix}${WithBeforeSuffix<'up'>}`,
     TPointerEventInfo & {
       isClick: boolean;
-      /**
-       * The targets at the moment of mouseup that could be different from the
-       * target at the moment of mouse down in case of a drag action for example
-       */
-      currentTarget?: FabricObject;
-      /**
-       * The subtargets at the moment of mouseup that could be different from the
-       * target at the moment of mouse down in case of a drag action for example
-       */
-      currentSubTargets: FabricObject[];
     }
   > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
