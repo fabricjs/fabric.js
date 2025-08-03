@@ -49,7 +49,6 @@ export abstract class ITextKeyBehavior<
    * Useful to reduce laggish redraw of the full document.body tree and
    * also with modals event capturing that won't let the textarea take focus.
    * @type HTMLElement
-   * @default
    */
   declare hiddenTextareaContainer?: HTMLElement | null;
 

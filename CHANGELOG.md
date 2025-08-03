@@ -2,6 +2,11 @@
 
 ## [next]
 
+- chore(): Reduce noise in inline docs [#10694](https://github.com/fabricjs/fabric.js/pull/10694)
+- chore(): Reduce noise in unit tests [#10693](https://github.com/fabricjs/fabric.js/pull/10693)
+- Fix Next.js compatibility by removing node export restriction [#10687](https://github.com/fabricjs/fabric.js/pull/10687)
+- chore(): BREAKING: remove request util [#10690](https://github.com/fabricjs/fabric.js/pull/10690)
+- chore(): update dev deps [#10685](https://github.com/fabricjs/fabric.js/pull/10685)
 - fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10683](https://github.com/fabricjs/fabric.js/issues/10683)
 - fix(): Refactor findCornerQuadrant to fix the flip + cursor issue. [#10654](https://github.com/fabricjs/fabric.js/issues/10654)
 - chore(): A simple npm-update [#10674](https://github.com/fabricjs/fabric.js/pull/10674)
@@ -104,6 +109,35 @@
 - chore(): BREAKING: Update browser versions and some dependencies [#10488](https://github.com/fabricjs/fabric.js/pull/10488)
 - ci(): Switch from Jest to Vitest [#10420](https://github.com/fabricjs/fabric.js/pull/10420)
 - chore(): BREAKING: drop node 16 support. Update canvas and jsdom [#10417](https://github.com/fabricjs/fabric.js/pull/10417)
+
+## [6.7.1]
+
+- fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10688](https://github.com/fabricjs/fabric.js/issues/10683)
+
+## [6.7.0]
+
+- feat(Text): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
+
+## [6.6.7]
+
+- fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
+
+## [6.6.6]
+
+- fix(): Polygon controls util should invalidate cache [#10628](https://github.com/fabricjs/fabric.js/pull/10628)
+- fix(): Remove black border in blur and also align JS with WEBGL blur filtering [#10623](https://github.com/fabricjs/fabric.js/pull/10623)
+
+## [6.6.5]
+
+- feat(Text): Support for intl.segmenter in fabric.Text [#10595](https://github.com/fabricjs/fabric.js/pull/10595)
+
+## [6.6.4]
+
+- chore(): properly updated version number
+
+## [6.6.3]
+
+- docs(): Fixed JSDOCS for astro and typedoc
 
 ## [6.6.2]
 

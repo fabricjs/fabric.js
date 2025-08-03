@@ -23,14 +23,12 @@ export class Invert extends BaseFilter<'Invert', InvertOwnProps> {
   /**
    * Invert also alpha.
    * @param {Boolean} alpha
-   * @default
    **/
   declare alpha: InvertOwnProps['alpha'];
 
   /**
    * Filter invert. if false, does nothing
    * @param {Boolean} invert
-   * @default
    */
   declare invert: InvertOwnProps['invert'];
 

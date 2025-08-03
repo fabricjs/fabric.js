@@ -49,7 +49,6 @@ export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
    * Color to make the blend operation with. default to a reddish color since black or white
    * gives always strong result.
    * @type String
-   * @default
    **/
   declare color: BlendColorOwnProps['color'];
 
@@ -57,13 +56,11 @@ export class BlendColor extends BaseFilter<'BlendColor', BlendColorOwnProps> {
    * Blend mode for the filter: one of multiply, add, difference, screen, subtract,
    * darken, lighten, overlay, exclusion, tint.
    * @type String
-   * @default
    **/
   declare mode: BlendColorOwnProps['mode'];
   /**
    * alpha value. represent the strength of the blend color operation.
    * @type Number
-   * @default
    **/
   declare alpha: BlendColorOwnProps['alpha'];
 

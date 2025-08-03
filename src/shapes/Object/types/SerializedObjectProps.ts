@@ -13,7 +13,6 @@ export interface SerializedObjectProps extends BaseProps, FillStrokeProps {
   /**
    * Composite rule used for canvas globalCompositeOperation
    * @type String
-   * @default
    */
   globalCompositeOperation: GlobalCompositeOperation;
 
@@ -21,7 +20,6 @@ export interface SerializedObjectProps extends BaseProps, FillStrokeProps {
    * Background color of an object.
    * takes css colors https://www.w3.org/TR/css-color-3/
    * @type String
-   * @default
    */
   backgroundColor: string;
 
@@ -35,7 +33,6 @@ export interface SerializedObjectProps extends BaseProps, FillStrokeProps {
   /**
    * When set to `false`, an object is not rendered on canvas
    * @type Boolean
-   * @default
    */
   visible: boolean;
 

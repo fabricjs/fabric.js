@@ -209,23 +209,18 @@ import { uid } from '../util/internals/uid';
    * An object's Eraser
    * @private
    * @class fabric.Eraser
-   * @extends fabric.Group
-   * @memberof fabric
    */
   fabric.Eraser = fabric.util.createClass(fabric.Group, {
     /**
      * @readonly
-     * @static
      */
     type: 'eraser',
 
     /**
-     * @default
      */
     originX: 'center',
 
     /**
-     * @default
      */
     originY: 'center',
 
@@ -284,7 +279,6 @@ import { uid } from '../util/internals/uid';
 
   /**
    * Returns instance from an object representation
-   * @static
    * @memberOf fabric.Eraser
    * @param {Object} object Object to create an Eraser from
    * @returns {Promise<fabric.Eraser>}

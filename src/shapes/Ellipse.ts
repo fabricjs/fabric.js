@@ -37,14 +37,12 @@ export class Ellipse<
   /**
    * Horizontal radius
    * @type Number
-   * @default
    */
   declare rx: number;
 
   /**
    * Vertical radius
    * @type Number
-   * @default
    */
   declare ry: number;
 
@@ -151,16 +149,12 @@ export class Ellipse<
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Ellipse.fromElement})
-   * @static
-   * @memberOf Ellipse
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
   static ATTRIBUTE_NAMES = [...SHARED_ATTRIBUTES, 'cx', 'cy', 'rx', 'ry'];
 
   /**
    * Returns {@link Ellipse} instance from an SVG element
-   * @static
-   * @memberOf Ellipse
    * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */

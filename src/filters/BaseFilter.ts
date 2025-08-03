@@ -25,8 +25,6 @@ export class BaseFilter<
 > {
   /**
    * Filter type
-   * @param {String} type
-   * @default
    */
   get type(): Name {
     return (this.constructor as typeof BaseFilter).type as Name;

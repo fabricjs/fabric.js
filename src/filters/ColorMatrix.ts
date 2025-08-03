@@ -44,7 +44,6 @@ export class ColorMatrix<
    * outside the -1, 1 range.
    * 0.0039215686 is the part of 1 that get translated to 1 in 2d
    * @param {Array} matrix array of 20 numbers.
-   * @default
    */
   declare matrix: ColorMatrixOwnProps['matrix'];
 
