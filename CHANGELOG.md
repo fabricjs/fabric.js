@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): The mouse enter and leave events of child elements will be executed twice. [10698](https://github.com/fabricjs/fabric.js/issues/10698)
 - chore(): Reduce noise in inline docs [#10694](https://github.com/fabricjs/fabric.js/pull/10694)
 - chore(): Reduce noise in unit tests [#10693](https://github.com/fabricjs/fabric.js/pull/10693)
 - Fix Next.js compatibility by removing node export restriction [#10687](https://github.com/fabricjs/fabric.js/pull/10687)

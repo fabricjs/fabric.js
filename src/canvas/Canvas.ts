@@ -1205,6 +1205,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       fireCanvas: true,
     });
     for (let i = 0; i < length; i++) {
+      if (target == targets[i]) {
+        continue;
+      }
       this.fireSyntheticInOutEvents('mouse', {
         e,
         target: targets[i],
