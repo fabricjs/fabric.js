@@ -1,64 +1,16 @@
 function _defineProperty(e, r, t) {
   return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
     value: t,
-    enumerable: !0,
-    configurable: !0,
-    writable: !0
+    enumerable: true,
+    configurable: true,
+    writable: true
   }) : e[r] = t, e;
-}
-function ownKeys(e, r) {
-  var t = Object.keys(e);
-  if (Object.getOwnPropertySymbols) {
-    var o = Object.getOwnPropertySymbols(e);
-    r && (o = o.filter(function (r) {
-      return Object.getOwnPropertyDescriptor(e, r).enumerable;
-    })), t.push.apply(t, o);
-  }
-  return t;
-}
-function _objectSpread2(e) {
-  for (var r = 1; r < arguments.length; r++) {
-    var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys(Object(t), !0).forEach(function (r) {
-      _defineProperty(e, r, t[r]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) {
-      Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
-    });
-  }
-  return e;
-}
-function _objectWithoutProperties(e, t) {
-  if (null == e) return {};
-  var o,
-    r,
-    i = _objectWithoutPropertiesLoose(e, t);
-  if (Object.getOwnPropertySymbols) {
-    var n = Object.getOwnPropertySymbols(e);
-    for (r = 0; r < n.length; r++) o = n[r], t.indexOf(o) >= 0 || {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
-  }
-  return i;
-}
-function _objectWithoutPropertiesLoose(r, e) {
-  if (null == r) return {};
-  var t = {};
-  for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
-    if (e.indexOf(n) >= 0) continue;
-    t[n] = r[n];
-  }
-  return t;
-}
-function _taggedTemplateLiteral(e, t) {
-  return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, {
-    raw: {
-      value: Object.freeze(t)
-    }
-  }));
 }
 function _toPrimitive(t, r) {
   if ("object" != typeof t || !t) return t;
   var e = t[Symbol.toPrimitive];
   if (void 0 !== e) {
-    var i = e.call(t, r || "default");
+    var i = e.call(t, r);
     if ("object" != typeof i) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
@@ -100,21 +52,18 @@ class BaseConfiguration {
      * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
      * @since 1.7.14
      * @type Number
-     * @default
      */
     _defineProperty(this, "perfLimitSizeTotal", 2097152);
     /**
      * Pixel limit for cache canvases width or height. IE fixes the maximum at 5000
      * @since 1.7.14
      * @type Number
-     * @default
      */
     _defineProperty(this, "maxCacheSideLimit", 4096);
     /**
      * Lowest pixel limit for cache canvases, set at 256PX
      * @since 1.7.14
      * @type Number
-     * @default
      */
     _defineProperty(this, "minCacheSideLimit", 256);
     /**
@@ -122,7 +71,6 @@ class BaseConfiguration {
      * pasted text use destination style.
      * Defaults to 'false'.
      * @type Boolean
-     * @default
      * @deprecated
      */
     _defineProperty(this, "disableStyleCopyPaste", false);
@@ -132,7 +80,6 @@ class BaseConfiguration {
      * time since a default 2048x2048 canvas will be created for the gl context
      * @since 2.0.0
      * @type Boolean
-     * @default
      */
     _defineProperty(this, "enableGLFiltering", true);
     /**
@@ -143,7 +90,6 @@ class BaseConfiguration {
      *
      * @since 2.0.0
      * @type Number
-     * @default
      */
     _defineProperty(this, "textureSize", 4096);
     /**
@@ -191,7 +137,10 @@ class Configuration extends BaseConfiguration {
    */
   addFonts() {
     let paths = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    this.fontPaths = _objectSpread2(_objectSpread2({}, this.fontPaths), paths);
+    this.fontPaths = {
+      ...this.fontPaths,
+      ...paths
+    };
   }
   removeFonts() {
     let fontFamilys = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -224,12 +173,12 @@ const log = function (severity) {
 };
 class FabricError extends Error {
   constructor(message, options) {
-    super("fabric: ".concat(message), options);
+    super(`fabric: ${message}`, options);
   }
 }
 class SignalAbortedError extends FabricError {
   constructor(context) {
-    super("".concat(context, " 'options.signal' is in 'aborted' state"));
+    super(`${context} 'options.signal' is in 'aborted' state`);
   }
 }
 
@@ -246,7 +195,7 @@ class WebGLProbe extends GLProbe {
    * @returns {Boolean} Whether the user's browser WebGL supports given precision.
    */
   testPrecision(gl, precision) {
-    const fragmentSource = "precision ".concat(precision, " float;\nvoid main(){}");
+    const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     if (!fragmentShader) {
       return false;
@@ -265,7 +214,7 @@ class WebGLProbe extends GLProbe {
       this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
       this.GLPrecision = ['highp', 'mediump', 'lowp'].find(precision => this.testPrecision(gl, precision));
       gl.getExtension('WEBGL_lose_context').loseContext();
-      log('log', "WebGL: max texture size ".concat(this.maxTextureSize));
+      log('log', `WebGL: max texture size ${this.maxTextureSize}`);
     }
   }
   isSupported(textureSize) {
@@ -360,7 +309,7 @@ class Cache {
       this.charWidthsCache[fontFamily] = {};
     }
     const fontCache = this.charWidthsCache[fontFamily];
-    const cacheKey = "".concat(fontStyle.toLowerCase(), "_").concat((fontWeight + '').toLowerCase());
+    const cacheKey = `${fontStyle.toLowerCase()}_${(fontWeight + '').toLowerCase()}`;
     if (!fontCache[cacheKey]) {
       fontCache[cacheKey] = {};
     }
@@ -412,6 +361,7 @@ const VERSION = version;
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 function noop() {}
 const halfPI = Math.PI / 2;
+const quarterPI = Math.PI / 4;
 const twoMathPi = Math.PI * 2;
 const PiBy180 = Math.PI / 180;
 const iMatrix = Object.freeze([1, 0, 0, 1, 0, 0]);
@@ -470,7 +420,7 @@ class ClassRegistry {
   getClass(classType) {
     const constructor = this[JSON$1].get(classType);
     if (!constructor) {
-      throw new FabricError("No class registered for ".concat(classType));
+      throw new FabricError(`No class registered for ${classType}`);
     }
     return constructor;
   }
@@ -779,7 +729,7 @@ class Point {
   }
 
   /**
-   * Adds another point to this one and returns another one
+   * Adds another point to this one and returns a new one with the sum
    * @param {XY} that
    * @return {Point} new Point instance with added values
    */
@@ -1028,7 +978,7 @@ class Point {
    * @return {String}
    */
   toString() {
-    return "".concat(this.x, ",").concat(this.y);
+    return `${this.x},${this.y}`;
   }
 
   /**
@@ -1097,8 +1047,6 @@ class Point {
 
   /**
    * Rotates `point` around `origin` with `radians`
-   * @static
-   * @memberOf fabric.util
    * @param {XY} origin The origin of the rotation
    * @param {TRadian} radians The radians of the angle for the rotation
    * @return {Point} The new rotated point
@@ -1116,8 +1064,6 @@ class Point {
 
   /**
    * Apply transform t to point p
-   * @static
-   * @memberOf fabric.util
    * @param  {TMat2D} t The transform
    * @param  {Boolean} [ignoreOffset] Indicates that the offset should not be applied
    * @return {Point} The transformed point
@@ -1581,12 +1527,12 @@ const createCanvasElementFor = canvas => {
  * @param {number} quality <= 1 and > 0
  * @return {String} data url
  */
-const toDataURL = (canvasEl, format, quality) => canvasEl.toDataURL("image/".concat(format), quality);
+const toDataURL = (canvasEl, format, quality) => canvasEl.toDataURL(`image/${format}`, quality);
 const isHTMLCanvas = canvas => {
   return !!canvas && canvas.getContext !== undefined;
 };
 const toBlob = (canvasEl, format, quality) => new Promise((resolve, _) => {
-  canvasEl.toBlob(resolve, "image/".concat(format), quality);
+  canvasEl.toBlob(resolve, `image/${format}`, quality);
 });
 
 /**
@@ -1882,7 +1828,7 @@ const loadImage = function (url) {
     img.onload = done;
     img.onerror = function () {
       abort && (signal === null || signal === void 0 ? void 0 : signal.removeEventListener('abort', abort));
-      reject(new FabricError("Error loading ".concat(img.src)));
+      reject(new FabricError(`Error loading ${img.src}`));
     };
     crossOrigin && (img.crossOrigin = crossOrigin);
     img.src = url;
@@ -2108,8 +2054,8 @@ const setCSSDimensions = (el, _ref2) => {
     width,
     height
   } = _ref2;
-  width && (el.style.width = typeof width === 'number' ? "".concat(width, "px") : width);
-  height && (el.style.height = typeof height === 'number' ? "".concat(height, "px") : height);
+  width && (el.style.width = typeof width === 'number' ? `${width}px` : width);
+  height && (el.style.height = typeof height === 'number' ? `${height}px` : height);
 };
 
 /**
@@ -2198,8 +2144,8 @@ class StaticCanvasDOMManager {
     el.classList.remove('lower-canvas');
     el.removeAttribute('data-fabric');
     // restore canvas size to original size in case retina scaling was applied
-    el.setAttribute('width', "".concat(width));
-    el.setAttribute('height', "".concat(height));
+    el.setAttribute('width', `${width}`);
+    el.setAttribute('height', `${height}`);
     el.style.cssText = this._originalCanvasStyle || '';
     this._originalCanvasStyle = undefined;
   }
@@ -2418,36 +2364,6 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
   }
 
   /**
-   * Sets width of this canvas instance
-   * @param {Number|String} value                         Value to set width to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-
-  setWidth(value, options) {
-    return this.setDimensions({
-      width: value
-    }, options);
-  }
-
-  /**s
-   * Sets height of this canvas instance
-   * @param {Number|String} value                         Value to set height to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-
-  setHeight(value, options) {
-    return this.setDimensions({
-      height: value
-    }, options);
-  }
-
-  /**
    * Internal use only
    * @protected
    */
@@ -2457,10 +2373,11 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
       backstoreOnly = false
     } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (!cssOnly) {
-      const size = _objectSpread2({
+      const size = {
         width: this.width,
-        height: this.height
-      }, dimensions);
+        height: this.height,
+        ...dimensions
+      };
       this.elements.setDimensions(size, this.getRetinaScaling());
       this.hasLostContext = true;
       this.width = size.width;
@@ -2751,10 +2668,10 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * @param {string} property 'background' or 'overlay'
    */
   _renderBackgroundOrOverlay(ctx, property) {
-    const fill = this["".concat(property, "Color")],
-      object = this["".concat(property, "Image")],
+    const fill = this[`${property}Color`],
+      object = this[`${property}Image`],
       v = this.viewportTransform,
-      needsVpt = this["".concat(property, "Vpt")];
+      needsVpt = this[`${property}Vpt`];
     if (!fill && !object) {
       return;
     }
@@ -2810,19 +2727,6 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    */
   _renderOverlay(ctx) {
     this._renderBackgroundOrOverlay(ctx, 'overlay');
-  }
-
-  /**
-   * Returns coordinates of a center of canvas.
-   * Returned value is an object with top and left properties
-   * @return {Object} object with "top" and "left" number values
-   * @deprecated migrate to `getCenterPoint`
-   */
-  getCenter() {
-    return {
-      top: this.height / 2,
-      left: this.width / 2
-    };
   }
 
   /**
@@ -2922,15 +2826,14 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * this alias is provided because if you call JSON.stringify on an instance,
    * the toJSON object will be invoked if it exists.
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
+   * JSON does not support additional properties because toJSON has its own signature
    * @return {Object} JSON compatible object
    * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
-   * @example <caption>JSON without additional properties</caption>
-   * var json = canvas.toJSON();
-   * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
-   * @example <caption>JSON without default values</caption>
-   * var json = canvas.toJSON();
+   * @example <caption>JSON representation of canvas </caption>
+   * const json = canvas.toJSON();
+   * @example <caption>JSON representation of canvas </caption>
+   * const json = JSON.stringify(canvas);
    */
   toJSON() {
     return this.toObject();
@@ -2951,13 +2854,15 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
   _toObjectMethod(methodName, propertiesToInclude) {
     const clipPath = this.clipPath;
     const clipPathData = clipPath && !clipPath.excludeFromExport ? this._toObject(clipPath, methodName, propertiesToInclude) : null;
-    return _objectSpread2(_objectSpread2(_objectSpread2({
-      version: VERSION
-    }, pick(this, propertiesToInclude)), {}, {
-      objects: this._objects.filter(object => !object.excludeFromExport).map(instance => this._toObject(instance, methodName, propertiesToInclude))
-    }, this.__serializeBgOverlay(methodName, propertiesToInclude)), clipPathData ? {
-      clipPath: clipPathData
-    } : null);
+    return {
+      version: VERSION,
+      ...pick(this, propertiesToInclude),
+      objects: this._objects.filter(object => !object.excludeFromExport).map(instance => this._toObject(instance, methodName, propertiesToInclude)),
+      ...this.__serializeBgOverlay(methodName, propertiesToInclude),
+      ...(clipPathData ? {
+        clipPath: clipPathData
+      } : null)
+    };
   }
 
   /**
@@ -3055,7 +2960,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
     this._setSVGPreamble(markup, options);
     this._setSVGHeader(markup, options);
     if (this.clipPath) {
-      markup.push("<g clip-path=\"url(#".concat(this.clipPath.clipPathId, ")\" >\n"));
+      markup.push(`<g clip-path="url(#${this.clipPath.clipPathId})" >\n`);
     }
     this._setSVGBgOverlayColor(markup, 'background');
     this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
@@ -3083,26 +2988,26 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * @private
    */
   _setSVGHeader(markup, options) {
-    const width = options.width || "".concat(this.width),
-      height = options.height || "".concat(this.height),
+    const width = options.width || `${this.width}`,
+      height = options.height || `${this.height}`,
       NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       optViewBox = options.viewBox;
     let viewBox;
     if (optViewBox) {
-      viewBox = "viewBox=\"".concat(optViewBox.x, " ").concat(optViewBox.y, " ").concat(optViewBox.width, " ").concat(optViewBox.height, "\" ");
+      viewBox = `viewBox="${optViewBox.x} ${optViewBox.y} ${optViewBox.width} ${optViewBox.height}" `;
     } else if (this.svgViewportTransformation) {
       const vpt = this.viewportTransform;
-      viewBox = "viewBox=\"".concat(toFixed(-vpt[4] / vpt[0], NUM_FRACTION_DIGITS), " ").concat(toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS), " ").concat(toFixed(this.width / vpt[0], NUM_FRACTION_DIGITS), " ").concat(toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS), "\" ");
+      viewBox = `viewBox="${toFixed(-vpt[4] / vpt[0], NUM_FRACTION_DIGITS)} ${toFixed(-vpt[5] / vpt[3], NUM_FRACTION_DIGITS)} ${toFixed(this.width / vpt[0], NUM_FRACTION_DIGITS)} ${toFixed(this.height / vpt[3], NUM_FRACTION_DIGITS)}" `;
     } else {
-      viewBox = "viewBox=\"0 0 ".concat(this.width, " ").concat(this.height, "\" ");
+      viewBox = `viewBox="0 0 ${this.width} ${this.height}" `;
     }
     markup.push('<svg ', 'xmlns="http://www.w3.org/2000/svg" ', 'xmlns:xlink="http://www.w3.org/1999/xlink" ', 'version="1.1" ', 'width="', width, '" ', 'height="', height, '" ', viewBox, 'xml:space="preserve">\n', '<desc>Created with Fabric.js ', VERSION, '</desc>\n', '<defs>\n', this.createSVGFontFacesMarkup(), this.createSVGRefElementsMarkup(), this.createSVGClipPathMarkup(options), '</defs>\n');
   }
   createSVGClipPathMarkup(options) {
     const clipPath = this.clipPath;
     if (clipPath) {
-      clipPath.clipPathId = "CLIPPATH_".concat(uid());
-      return "<clipPath id=\"".concat(clipPath.clipPathId, "\" >\n").concat(clipPath.toClipPathSVG(options.reviver), "</clipPath>\n");
+      clipPath.clipPathId = `CLIPPATH_${uid()}`;
+      return `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(options.reviver)}</clipPath>\n`;
     }
     return '';
   }
@@ -3113,9 +3018,9 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    */
   createSVGRefElementsMarkup() {
     return ['background', 'overlay'].map(prop => {
-      const fill = this["".concat(prop, "Color")];
+      const fill = this[`${prop}Color`];
       if (isFiller(fill)) {
-        const shouldTransform = this["".concat(prop, "Vpt")],
+        const shouldTransform = this[`${prop}Vpt`],
           vpt = this.viewportTransform,
           object = {
             // otherwise circular dependency
@@ -3173,9 +3078,9 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
         });
       });
     });
-    const fontListMarkup = Object.keys(fontList).map(fontFamily => "\t\t@font-face {\n\t\t\tfont-family: '".concat(fontFamily, "';\n\t\t\tsrc: url('").concat(fontPaths[fontFamily], "');\n\t\t}\n")).join('');
+    const fontListMarkup = Object.keys(fontList).map(fontFamily => `\t\t@font-face {\n\t\t\tfont-family: '${fontFamily}';\n\t\t\tsrc: url('${fontPaths[fontFamily]}');\n\t\t}\n`).join('');
     if (fontListMarkup) {
-      return "\t<style type=\"text/css\"><![CDATA[\n".concat(fontListMarkup, "]]></style>\n");
+      return `\t<style type="text/css"><![CDATA[\n${fontListMarkup}]]></style>\n`;
     }
     return '';
   }
@@ -3215,7 +3120,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * @private
    */
   _setSVGBgOverlayColor(markup, property) {
-    const filler = this["".concat(property, "Color")];
+    const filler = this[`${property}Color`];
     if (!filler) {
       return;
     }
@@ -3223,9 +3128,9 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
       const repeat = filler.repeat || '',
         finalWidth = this.width,
         finalHeight = this.height,
-        shouldInvert = this["".concat(property, "Vpt")],
+        shouldInvert = this[`${property}Vpt`],
         additionalTransform = shouldInvert ? matrixToSVG(invertTransform(this.viewportTransform)) : '';
-      markup.push("<rect transform=\"".concat(additionalTransform, " translate(").concat(finalWidth / 2, ",").concat(finalHeight / 2, ")\" x=\"").concat(filler.offsetX - finalWidth / 2, "\" y=\"").concat(filler.offsetY - finalHeight / 2, "\" width=\"").concat((repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler) ? filler.source.width : finalWidth, "\" height=\"").concat((repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler) ? filler.source.height : finalHeight, "\" fill=\"url(#SVGID_").concat(filler.id, ")\"></rect>\n"));
+      markup.push(`<rect transform="${additionalTransform} translate(${finalWidth / 2},${finalHeight / 2})" x="${filler.offsetX - finalWidth / 2}" y="${filler.offsetY - finalHeight / 2}" width="${(repeat === 'repeat-y' || repeat === 'no-repeat') && isPattern(filler) ? filler.source.width : finalWidth}" height="${(repeat === 'repeat-x' || repeat === 'no-repeat') && isPattern(filler) ? filler.source.height : finalHeight}" fill="url(#SVGID_${filler.id})"></rect>\n`);
     } else {
       markup.push('<rect x="0" y="0" width="100%" height="100%" ', 'fill="', filler, '"', '></rect>\n');
     }
@@ -3501,7 +3406,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * @return {String} string representation of an instance
    */
   toString() {
-    return "#<Canvas (".concat(this.complexity(), "): { objects: ").concat(this._objects.length, " }>");
+    return `#<Canvas (${this.complexity()}): { objects: ${this._objects.length} }>`;
   }
 }
 _defineProperty(StaticCanvas, "ownDefaults", staticCanvasDefaults);
@@ -3554,8 +3459,6 @@ const makeBoundingBoxFromPoints = points => {
   };
 };
 
-const _excluded$i = ["translateX", "translateY", "scaleX", "scaleY"];
-
 /**
  * given an object and a transform, apply the inverse transform to the object,
  * this is equivalent to remove from that object that transformation, so that
@@ -3589,14 +3492,13 @@ const addTransformToObject = (object, transform) => applyTransformToObject(objec
  * @param {Array} transform the destination transform
  */
 const applyTransformToObject = (object, transform) => {
-  const _qrDecompose = qrDecompose(transform),
-    {
+  const {
       translateX,
       translateY,
       scaleX,
-      scaleY
-    } = _qrDecompose,
-    otherOptions = _objectWithoutProperties(_qrDecompose, _excluded$i),
+      scaleY,
+      ...otherOptions
+    } = qrDecompose(transform),
     center = new Point(translateX, translateY);
   object.flipX = false;
   object.flipY = false;
@@ -3742,9 +3644,10 @@ const fireEvent = (eventName, options) => {
       target
     }
   } = options;
-  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire("object:".concat(eventName), _objectSpread2(_objectSpread2({}, options), {}, {
+  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
+    ...options,
     target
-  }));
+  });
   target.fire(eventName, options);
 };
 
@@ -3763,6 +3666,96 @@ const originOffset = {
  */
 
 const resolveOrigin = originValue => typeof originValue === 'string' ? originOffset[originValue] : originValue - 0.5;
+
+const unitVectorX = new Point(1, 0);
+const zero = new Point();
+
+/**
+ * Rotates `vector` with `radians`
+ * @param {Point} vector The vector to rotate (x and y)
+ * @param {Number} radians The radians of the angle for the rotation
+ * @return {Point} The new rotated point
+ */
+const rotateVector = (vector, radians) => vector.rotate(radians);
+
+/**
+ * Creates a vector from points represented as a point
+ *
+ * @param {Point} from
+ * @param {Point} to
+ * @returns {Point} vector
+ */
+const createVector = (from, to) => new Point(to).subtract(from);
+
+/**
+ * return the magnitude of a vector
+ * @return {number}
+ */
+const magnitude = point => point.distanceFrom(zero);
+
+/**
+ * Calculates the angle between 2 vectors
+ * @param {Point} a
+ * @param {Point} b
+ * @returns the angle in radians from `a` to `b`
+ */
+const calcAngleBetweenVectors = (a, b) => Math.atan2(crossProduct(a, b), dotProduct(a, b));
+
+/**
+ * Calculates the angle between the x axis and the vector
+ * @param {Point} v
+ * @returns the angle in radians of `v`
+ */
+const calcVectorRotation = v => calcAngleBetweenVectors(unitVectorX, v);
+
+/**
+ * @param {Point} v
+ * @returns {Point} vector representing the unit vector pointing to the direction of `v`
+ */
+const getUnitVector = v => v.eq(zero) ? v : v.scalarDivide(magnitude(v));
+
+/**
+ * @param {Point} v
+ * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
+ * @returns {Point} the unit orthogonal vector
+ */
+const getOrthonormalVector = function (v) {
+  let counterClockwise = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  return getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));
+};
+
+/**
+ * Cross product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number} the magnitude of Z vector
+ */
+const crossProduct = (a, b) => a.x * b.y - a.y * b.x;
+
+/**
+ * Dot product of two vectors in 2D
+ * @param {Point} a
+ * @param {Point} b
+ * @returns {number}
+ */
+const dotProduct = (a, b) => a.x * b.x + a.y * b.y;
+
+/**
+ * Checks if the vector is between two others. It is considered
+ * to be inside when the vector to be tested is between the
+ * initial vector and the final vector (included) in a counterclockwise direction.
+ * @param {Point} t vector to be tested
+ * @param {Point} a initial vector
+ * @param {Point} b final vector
+ * @returns {boolean} true if the vector is among the others
+ */
+const isBetweenVectors = (t, a, b) => {
+  if (t.eq(a) || t.eq(b)) return true;
+  const AxB = crossProduct(a, b),
+    AxT = crossProduct(a, t),
+    BxT = crossProduct(b, t);
+  return AxB >= 0 ? AxT >= 0 && BxT <= 0 : !(AxT <= 0 && BxT >= 0);
+};
 
 const NOT_ALLOWED_CURSOR = 'not-allowed';
 
@@ -3807,11 +3800,11 @@ const commonEventInfo = (eventData, transform, x, y) => {
  * @param {Control} control the control class
  * @return {Number} 0 - 7 a quadrant number
  */
-function findCornerQuadrant(fabricObject, control) {
-  //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle(),
-    cornerAngle = angle + radiansToDegrees(Math.atan2(control.y, control.x)) + 360;
-  return Math.round(cornerAngle % 360 / 45);
+function findCornerQuadrant(fabricObject, control, coord) {
+  const target = coord;
+  const center = sendPointToPlane(fabricObject.getCenterPoint(), fabricObject.canvas.viewportTransform, undefined);
+  const angle = calcVectorRotation(createVector(center, target)) + twoMathPi;
+  return Math.round(angle % twoMathPi / quarterPI);
 }
 
 /**
@@ -4298,7 +4291,7 @@ class Color {
    */
   toRgb() {
     const [r, g, b] = this.getSource();
-    return "rgb(".concat(r, ",").concat(g, ",").concat(b, ")");
+    return `rgb(${r},${g},${b})`;
   }
 
   /**
@@ -4306,7 +4299,7 @@ class Color {
    * @return {String} ex: rgba(0-255,0-255,0-255,0-1)
    */
   toRgba() {
-    return "rgba(".concat(this.getSource().join(','), ")");
+    return `rgba(${this.getSource().join(',')})`;
   }
 
   /**
@@ -4315,7 +4308,7 @@ class Color {
    */
   toHsl() {
     const [h, s, l] = rgb2Hsl(...this.getSource());
-    return "hsl(".concat(h, ",").concat(s, "%,").concat(l, "%)");
+    return `hsl(${h},${s}%,${l}%)`;
   }
 
   /**
@@ -4324,7 +4317,7 @@ class Color {
    */
   toHsla() {
     const [h, s, l, a] = rgb2Hsl(...this.getSource());
-    return "hsla(".concat(h, ",").concat(s, "%,").concat(l, "%,").concat(a, ")");
+    return `hsla(${h},${s}%,${l}%,${a})`;
   }
 
   /**
@@ -4342,7 +4335,7 @@ class Color {
    */
   toHexa() {
     const [r, g, b, a] = this.getSource();
-    return "".concat(hexify(r)).concat(hexify(g)).concat(hexify(b)).concat(hexify(Math.round(a * 255)));
+    return `${hexify(r)}${hexify(g)}${hexify(b)}${hexify(Math.round(a * 255))}`;
   }
 
   /**
@@ -4403,7 +4396,6 @@ class Color {
 
   /**
    * Returns new color object, when given a color in RGB format
-   * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255)
    * @return {Color}
    */
@@ -4413,9 +4405,7 @@ class Color {
 
   /**
    * Returns new color object, when given a color in RGBA format
-   * @static
    * @function
-   * @memberOf Color
    * @param {String} color
    * @return {Color}
    */
@@ -4425,7 +4415,6 @@ class Color {
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
-   * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {TRGBAColorSource | undefined} source
    */
@@ -4443,7 +4432,6 @@ class Color {
   /**
    * Returns new color object, when given a color in HSL format
    * @param {String} color Color value ex: hsl(0-260,0%-100%,0%-100%)
-   * @memberOf Color
    * @return {Color}
    */
   static fromHsl(color) {
@@ -4452,9 +4440,7 @@ class Color {
 
   /**
    * Returns new color object, when given a color in HSLA format
-   * @static
    * @function
-   * @memberOf Color
    * @param {String} color
    * @return {Color}
    */
@@ -4465,7 +4451,6 @@ class Color {
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
-   * @memberOf Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
    * @return {TRGBAColorSource | undefined} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
@@ -4494,8 +4479,6 @@ class Color {
 
   /**
    * Returns new color object, when given a color in HEX format
-   * @static
-   * @memberOf Color
    * @param {String} color Color value ex: FF5555
    * @return {Color}
    */
@@ -4505,8 +4488,6 @@ class Color {
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HEX format
-   * @static
-   * @memberOf Color
    * @param {String} color ex: FF5555 or FF5544CC (RGBa)
    * @return {TRGBAColorSource | undefined} source
    */
@@ -4528,8 +4509,6 @@ class Color {
   /**
    * Converts a string that could be any angle notation (50deg, 0.5turn, 2rad)
    * into degrees without the 'deg' suffix
-   * @static
-   * @memberOf Color
    * @param {String} value ex: 0deg, 0.5turn, 2rad
    * @return {Number} number in degrees or NaN if inputs are invalid
    */
@@ -4641,7 +4620,7 @@ const colorPropToSVG = function (prop, value) {
   if (!value) {
     colorValue = 'none';
   } else if (value.toLive) {
-    colorValue = "url(#SVGID_".concat(value.id, ")");
+    colorValue = `url(#SVGID_${value.id})`;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
@@ -4651,9 +4630,9 @@ const colorPropToSVG = function (prop, value) {
     }
   }
   if (inlineStyle) {
-    return "".concat(prop, ": ").concat(colorValue, "; ").concat(opacityValue ? "".concat(prop, "-opacity: ").concat(opacityValue, "; ") : '');
+    return `${prop}: ${colorValue}; ${opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ''}`;
   } else {
-    return "".concat(prop, "=\"").concat(colorValue, "\" ").concat(opacityValue ? "".concat(prop, "-opacity=\"").concat(opacityValue, "\" ") : '');
+    return `${prop}="${colorValue}" ${opacityValue ? `${prop}-opacity="${opacityValue}" ` : ''}`;
   }
 };
 const createSVGRect = function (color, _ref) {
@@ -4666,7 +4645,7 @@ const createSVGRect = function (color, _ref) {
   let precision = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : config.NUM_FRACTION_DIGITS;
   const svgColor = colorPropToSVG(FILL, color, false);
   const [x, y, w, h] = [left, top, width, height].map(value => toFixed(value, precision));
-  return "<rect ".concat(svgColor, " x=\"").concat(x, "\" y=\"").concat(y, "\" width=\"").concat(w, "\" height=\"").concat(h, "\"></rect>");
+  return `<rect ${svgColor} x="${x}" y="${y}" width="${w}" height="${h}"></rect>`;
 };
 
 class FabricObjectSVGExportMixin {
@@ -4702,7 +4681,7 @@ class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgFilter() {
-    return this.shadow ? "filter: url(#SVGID_".concat(this.shadow.id, ");") : '';
+    return this.shadow ? `filter: url(#SVGID_${this.shadow.id});` : '';
   }
 
   /**
@@ -4710,7 +4689,7 @@ class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgCommons() {
-    return [this.id ? "id=\"".concat(this.id, "\" ") : '', this.clipPath ? "clip-path=\"url(#".concat(this.clipPath.clipPathId, ")\" ") : ''].join('');
+    return [this.id ? `id="${this.id}" ` : '', this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : ''].join('');
   }
 
   /**
@@ -4721,8 +4700,8 @@ class FabricObjectSVGExportMixin {
   getSvgTransform(full) {
     let additionalTransform = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     const transform = full ? this.calcTransformMatrix() : this.calcOwnMatrix(),
-      svgTransform = "transform=\"".concat(matrixToSVG(transform));
-    return "".concat(svgTransform).concat(additionalTransform, "\" ");
+      svgTransform = `transform="${matrixToSVG(transform)}`;
+    return `${svgTransform}${additionalTransform}" `;
   }
 
   /**
@@ -4783,8 +4762,8 @@ class FabricObjectSVGExportMixin {
       withShadow,
       additionalTransform
     } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    const styleInfo = noStyle ? '' : "style=\"".concat(this.getSvgStyles(), "\" "),
-      shadowInfo = withShadow ? "style=\"".concat(this.getSvgFilter(), "\" ") : '',
+    const styleInfo = noStyle ? '' : `style="${this.getSvgStyles()}" `,
+      shadowInfo = withShadow ? `style="${this.getSvgFilter()}" ` : '',
       clipPath = this.clipPath,
       vectorEffect = this.strokeUniform ? 'vector-effect="non-scaling-stroke" ' : '',
       absoluteClipPath = clipPath && clipPath.absolutePositioned,
@@ -4796,14 +4775,14 @@ class FabricObjectSVGExportMixin {
       index = objectMarkup.indexOf('COMMON_PARTS');
     let clipPathMarkup;
     if (clipPath) {
-      clipPath.clipPathId = "CLIPPATH_".concat(uid());
-      clipPathMarkup = "<clipPath id=\"".concat(clipPath.clipPathId, "\" >\n").concat(clipPath.toClipPathSVG(reviver), "</clipPath>\n");
+      clipPath.clipPathId = `CLIPPATH_${uid()}`;
+      clipPathMarkup = `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(reviver)}</clipPath>\n`;
     }
     if (absoluteClipPath) {
       markup.push('<g ', shadowInfo, this.getSvgCommons(), ' >\n');
     }
     markup.push('<g ', this.getSvgTransform(false), !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '', ' >\n');
-    const commonPieces = [styleInfo, vectorEffect, noStyle ? '' : this.addPaintOrder(), ' ', additionalTransform ? "transform=\"".concat(additionalTransform, "\" ") : ''].join('');
+    const commonPieces = [styleInfo, vectorEffect, noStyle ? '' : this.addPaintOrder(), ' ', additionalTransform ? `transform="${additionalTransform}" ` : ''].join('');
     objectMarkup[index] = commonPieces;
     if (isFiller(fill)) {
       markup.push(fill.toSVG(this));
@@ -4823,7 +4802,7 @@ class FabricObjectSVGExportMixin {
     return reviver ? reviver(markup.join('')) : markup.join('');
   }
   addPaintOrder() {
-    return this.paintFirst !== FILL ? " paint-order=\"".concat(this.paintFirst, "\" ") : '';
+    return this.paintFirst !== FILL ? ` paint-order="${this.paintFirst}" ` : '';
   }
 }
 
@@ -4831,8 +4810,71 @@ function getSvgRegex(arr) {
   return new RegExp('^(' + arr.join('|') + ')\\b', 'i');
 }
 
-var _templateObject$1;
-const reNum = String.raw(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["(?:[-+]?(?:d*.d+|d+.?)(?:[eE][-+]?d+)?)"], ["(?:[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?)"])));
+const TEXT_DECORATION_THICKNESS = 'textDecorationThickness';
+const fontProperties = ['fontSize', 'fontWeight', 'fontFamily', 'fontStyle'];
+const textDecorationProperties = ['underline', 'overline', 'linethrough'];
+const textLayoutProperties = [...fontProperties, 'lineHeight', 'text', 'charSpacing', 'textAlign', 'styles', 'path', 'pathStartOffset', 'pathSide', 'pathAlign'];
+const additionalProps = [...textLayoutProperties, ...textDecorationProperties, 'textBackgroundColor', 'direction', TEXT_DECORATION_THICKNESS];
+const styleProperties = [...fontProperties, ...textDecorationProperties, STROKE, 'strokeWidth', FILL, 'deltaY', 'textBackgroundColor', TEXT_DECORATION_THICKNESS];
+
+// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
+// regexes, list of properties that are not suppose to change by instances, magic consts.
+// this will be a separated effort
+const textDefaultValues = {
+  _reNewline: reNewline,
+  _reSpacesAndTabs: /[ \t\r]/g,
+  _reSpaceAndTab: /[ \t\r]/,
+  _reWords: /\S+/g,
+  fontSize: 40,
+  fontWeight: 'normal',
+  fontFamily: 'Times New Roman',
+  underline: false,
+  overline: false,
+  linethrough: false,
+  textAlign: LEFT,
+  fontStyle: 'normal',
+  lineHeight: 1.16,
+  textBackgroundColor: '',
+  stroke: null,
+  shadow: null,
+  path: undefined,
+  pathStartOffset: 0,
+  pathSide: LEFT,
+  pathAlign: 'baseline',
+  charSpacing: 0,
+  deltaY: 0,
+  direction: 'ltr',
+  CACHE_FONT_SIZE: 400,
+  MIN_TEXT_WIDTH: 2,
+  // Text magic numbers
+  superscript: {
+    size: 0.6,
+    // fontSize factor
+    baseline: -0.35 // baseline-shift factor (upwards)
+  },
+  subscript: {
+    size: 0.6,
+    // fontSize factor
+    baseline: 0.11 // baseline-shift factor (downwards)
+  },
+  _fontSizeFraction: 0.222,
+  offsets: {
+    underline: 0.1,
+    linethrough: -0.28167,
+    // added 1/30 to original number
+    overline: -0.81333 // added 1/15 to original number
+  },
+  _fontSizeMult: 1.13,
+  [TEXT_DECORATION_THICKNESS]: 66.667 // before implementation was 1/15
+};
+const JUSTIFY = 'justify';
+const JUSTIFY_LEFT = 'justify-left';
+const JUSTIFY_RIGHT = 'justify-right';
+const JUSTIFY_CENTER = 'justify-center';
+
+// matches, e.g.: +14.56e-12, etc.
+const reNum = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
+const viewportSeparator = String.raw`(?:\s*,?\s+|\s*,\s*)`;
 const svgNS = 'http://www.w3.org/2000/svg';
 const reFontDeclaration = new RegExp('(normal|italic)?\\s*(normal|small-caps)?\\s*' + '(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)?\\s*(' + reNum + '(?:px|cm|mm|em|pt|pc|in)*)(?:\\/(normal|' + reNum + '))?\\s+(.*)');
 const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'rect', 'line', 'image', 'text'],
@@ -4869,7 +4911,8 @@ const svgValidTagNames = ['path', 'circle', 'polygon', 'polyline', 'ellipse', 'r
     'clip-path': 'clipPath',
     'clip-rule': 'clipRule',
     'vector-effect': 'strokeUniform',
-    'image-rendering': 'imageSmoothing'
+    'image-rendering': 'imageSmoothing',
+    'text-decoration-thickness': TEXT_DECORATION_THICKNESS
   },
   fSize = 'font-size',
   cPath = 'clip-path';
@@ -4878,98 +4921,8 @@ const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
 const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 
 // http://www.w3.org/TR/SVG/coords.html#ViewBoxAttribute
-// matches, e.g.: +14.56e-12, etc.
-const reViewBoxAttrValue = new RegExp('^' + '\\s*(' + reNum + '+)\\s*,?' + '\\s*(' + reNum + '+)\\s*,?' + '\\s*(' + reNum + '+)\\s*,?' + '\\s*(' + reNum + '+)\\s*' + '$');
 
-const unitVectorX = new Point(1, 0);
-const zero = new Point();
-
-/**
- * Rotates `vector` with `radians`
- * @param {Point} vector The vector to rotate (x and y)
- * @param {Number} radians The radians of the angle for the rotation
- * @return {Point} The new rotated point
- */
-const rotateVector = (vector, radians) => vector.rotate(radians);
-
-/**
- * Creates a vector from points represented as a point
- *
- * @param {Point} from
- * @param {Point} to
- * @returns {Point} vector
- */
-const createVector = (from, to) => new Point(to).subtract(from);
-
-/**
- * return the magnitude of a vector
- * @return {number}
- */
-const magnitude = point => point.distanceFrom(zero);
-
-/**
- * Calculates the angle between 2 vectors
- * @param {Point} a
- * @param {Point} b
- * @returns the angle in radians from `a` to `b`
- */
-const calcAngleBetweenVectors = (a, b) => Math.atan2(crossProduct(a, b), dotProduct(a, b));
-
-/**
- * Calculates the angle between the x axis and the vector
- * @param {Point} v
- * @returns the angle in radians of `v`
- */
-const calcVectorRotation = v => calcAngleBetweenVectors(unitVectorX, v);
-
-/**
- * @param {Point} v
- * @returns {Point} vector representing the unit vector pointing to the direction of `v`
- */
-const getUnitVector = v => v.eq(zero) ? v : v.scalarDivide(magnitude(v));
-
-/**
- * @param {Point} v
- * @param {Boolean} [counterClockwise] the direction of the orthogonal vector, defaults to `true`
- * @returns {Point} the unit orthogonal vector
- */
-const getOrthonormalVector = function (v) {
-  let counterClockwise = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-  return getUnitVector(new Point(-v.y, v.x).scalarMultiply(counterClockwise ? 1 : -1));
-};
-
-/**
- * Cross product of two vectors in 2D
- * @param {Point} a
- * @param {Point} b
- * @returns {number} the magnitude of Z vector
- */
-const crossProduct = (a, b) => a.x * b.y - a.y * b.x;
-
-/**
- * Dot product of two vectors in 2D
- * @param {Point} a
- * @param {Point} b
- * @returns {number}
- */
-const dotProduct = (a, b) => a.x * b.x + a.y * b.y;
-
-/**
- * Checks if the vector is between two others. It is considered
- * to be inside when the vector to be tested is between the
- * initial vector and the final vector (included) in a counterclockwise direction.
- * @param {Point} t vector to be tested
- * @param {Point} a initial vector
- * @param {Point} b final vector
- * @returns {boolean} true if the vector is among the others
- */
-const isBetweenVectors = (t, a, b) => {
-  if (t.eq(a) || t.eq(b)) return true;
-  const AxB = crossProduct(a, b),
-    AxT = crossProduct(a, t),
-    BxT = crossProduct(b, t);
-  return AxB >= 0 ? AxT >= 0 && BxT <= 0 : !(AxT <= 0 && BxT >= 0);
-};
+const reViewBoxAttrValue = new RegExp(String.raw`^\s*(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})\s*$`);
 
 /**
    * Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
@@ -5006,7 +4959,8 @@ class Shadow {
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
    */
 
-  constructor(arg0) {
+  constructor() {
+    let arg0 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     const options = typeof arg0 === 'string' ? Shadow.parseShadow(arg0) : arg0;
     Object.assign(this, Shadow.ownDefaults, options);
     this.id = uid();
@@ -5060,7 +5014,7 @@ class Shadow {
     if (object.flipY) {
       offset.y *= -1;
     }
-    return "<filter id=\"SVGID_".concat(this.id, "\" y=\"-").concat(fBoxY, "%\" height=\"").concat(100 + 2 * fBoxY, "%\" x=\"-").concat(fBoxX, "%\" width=\"").concat(100 + 2 * fBoxX, "%\" >\n\t<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"").concat(toFixed(this.blur ? this.blur / 2 : 0, config.NUM_FRACTION_DIGITS), "\"></feGaussianBlur>\n\t<feOffset dx=\"").concat(toFixed(offset.x, config.NUM_FRACTION_DIGITS), "\" dy=\"").concat(toFixed(offset.y, config.NUM_FRACTION_DIGITS), "\" result=\"oBlur\" ></feOffset>\n\t<feFlood flood-color=\"").concat(color.toRgb(), "\" flood-opacity=\"").concat(color.getAlpha(), "\"/>\n\t<feComposite in2=\"oBlur\" operator=\"in\" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in=\"SourceGraphic\"></feMergeNode>\n\t</feMerge>\n</filter>\n");
+    return `<filter id="SVGID_${this.id}" y="-${fBoxY}%" height="${100 + 2 * fBoxY}%" x="-${fBoxX}%" width="${100 + 2 * fBoxX}%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(this.blur ? this.blur / 2 : 0, config.NUM_FRACTION_DIGITS)}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(offset.x, config.NUM_FRACTION_DIGITS)}" dy="${toFixed(offset.y, config.NUM_FRACTION_DIGITS)}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
   }
 
   /**
@@ -5087,7 +5041,6 @@ class Shadow {
 /**
  * Shadow color
  * @type String
- * @default
  */
 /**
  * Shadow blur
@@ -5096,29 +5049,24 @@ class Shadow {
 /**
  * Shadow horizontal offset
  * @type Number
- * @default
  */
 /**
  * Shadow vertical offset
  * @type Number
- * @default
  */
 /**
  * Whether the shadow should affect stroke operations
  * @type Boolean
- * @default
  */
 /**
  * Indicates whether toObject should include default values
  * @type Boolean
- * @default
  */
 /**
  * When `false`, the shadow will scale with the object.
  * When `true`, the shadow's offsetX, offsetY, and blur will not be affected by the object's scale.
  * default to false
  * @type Boolean
- * @default
  */
 _defineProperty(Shadow, "ownDefaults", shadowDefaultValues);
 _defineProperty(Shadow, "type", 'shadow');
@@ -5669,18 +5617,18 @@ class AnimationBase {
   }
 }
 
-const _excluded$h = ["startValue", "endValue"];
 class ValueAnimation extends AnimationBase {
   constructor(_ref) {
     let {
-        startValue = 0,
-        endValue = 100
-      } = _ref,
-      otherOptions = _objectWithoutProperties(_ref, _excluded$h);
-    super(_objectSpread2(_objectSpread2({}, otherOptions), {}, {
+      startValue = 0,
+      endValue = 100,
+      ...otherOptions
+    } = _ref;
+    super({
+      ...otherOptions,
       startValue,
       byValue: endValue - startValue
-    }));
+    });
   }
   calculate(timeElapsed) {
     const value = this.easing(timeElapsed, this.startValue, this.byValue, this.duration);
@@ -5691,18 +5639,18 @@ class ValueAnimation extends AnimationBase {
   }
 }
 
-const _excluded$g = ["startValue", "endValue"];
 class ArrayAnimation extends AnimationBase {
   constructor(_ref) {
     let {
-        startValue = [0],
-        endValue = [100]
-      } = _ref,
-      options = _objectWithoutProperties(_ref, _excluded$g);
-    super(_objectSpread2(_objectSpread2({}, options), {}, {
+      startValue = [0],
+      endValue = [100],
+      ...options
+    } = _ref;
+    super({
+      ...options,
       startValue,
       byValue: endValue.map((value, i) => value - startValue[i])
-    }));
+    });
   }
   calculate(timeElapsed) {
     const values = this.startValue.map((value, i) => this.easing(timeElapsed, value, this.byValue[i], this.duration, i));
@@ -5713,7 +5661,6 @@ class ArrayAnimation extends AnimationBase {
   }
 }
 
-const _excluded$f = ["startValue", "endValue", "easing", "onChange", "onComplete", "abort"];
 const defaultColorEasing = (timeElapsed, startValue, byValue, duration) => {
   const durationProgress = 1 - Math.cos(timeElapsed / duration * halfPI);
   return startValue + byValue * durationProgress;
@@ -5722,24 +5669,25 @@ const wrapColorCallback = callback => callback && ((rgba, valueProgress, duratio
 class ColorAnimation extends AnimationBase {
   constructor(_ref) {
     let {
-        startValue,
-        endValue,
-        easing = defaultColorEasing,
-        onChange,
-        onComplete,
-        abort
-      } = _ref,
-      options = _objectWithoutProperties(_ref, _excluded$f);
+      startValue,
+      endValue,
+      easing = defaultColorEasing,
+      onChange,
+      onComplete,
+      abort,
+      ...options
+    } = _ref;
     const startColor = new Color(startValue).getSource();
     const endColor = new Color(endValue).getSource();
-    super(_objectSpread2(_objectSpread2({}, options), {}, {
+    super({
+      ...options,
       startValue: startColor,
       byValue: endColor.map((value, i) => value - startColor[i]),
       easing,
       onChange: wrapColorCallback(onChange),
       onComplete: wrapColorCallback(onComplete),
       abort: wrapColorCallback(abort)
-    }));
+    });
   }
   calculate(timeElapsed) {
     const [r, g, b, a] = this.startValue.map((value, i) => this.easing(timeElapsed, value, this.byValue[i], this.duration, i));
@@ -5892,7 +5840,6 @@ class Intersection {
    * Checks if a line intersects another
    * @see {@link https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection line intersection}
    * @see {@link https://en.wikipedia.org/wiki/Cramer%27s_rule Cramer's rule}
-   * @static
    * @param {Point} a1
    * @param {Point} a2
    * @param {Point} b1
@@ -5934,7 +5881,6 @@ class Intersection {
   /**
    * Checks if a segment intersects a line
    * @see {@link intersectLineLine} for line intersection
-   * @static
    * @param {Point} s1 boundary point of segment
    * @param {Point} s2 other boundary point of segment
    * @param {Point} l1 point on line
@@ -5948,7 +5894,6 @@ class Intersection {
   /**
    * Checks if a segment intersects another
    * @see {@link intersectLineLine} for line intersection
-   * @static
    * @param {Point} a1 boundary point of segment
    * @param {Point} a2 other boundary point of segment
    * @param {Point} b1 boundary point of segment
@@ -5964,7 +5909,6 @@ class Intersection {
    *
    * @todo account for stroke
    *
-   * @static
    * @see {@link intersectSegmentPolygon} for segment intersection
    * @param {Point} a1 point on line
    * @param {Point} a2 other point on line
@@ -5993,7 +5937,6 @@ class Intersection {
 
   /**
    * Checks if segment intersects polygon
-   * @static
    * @see {@link intersectLinePolygon} for line intersection
    * @param {Point} a1 boundary point of segment
    * @param {Point} a2 other boundary point of segment
@@ -6009,7 +5952,6 @@ class Intersection {
    *
    * @todo account for stroke
    *
-   * @static
    * @param {Point[]} points1
    * @param {Point[]} points2
    * @return {Intersection}
@@ -6039,7 +5981,6 @@ class Intersection {
 
   /**
    * Checks if polygon intersects rectangle
-   * @static
    * @see {@link intersectPolygonPolygon} for polygon intersection
    * @param {Point[]} points polygon points
    * @param {Point} r1 top left point of rect
@@ -6555,7 +6496,7 @@ class ObjectGeometry extends CommonMethods {
    */
   _getTransformedDimensions() {
     let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    const dimOptions = _objectSpread2({
+    const dimOptions = {
       // if scaleX or scaleY are negative numbers,
       // this will return dimensions that are negative.
       // and this will break assumptions around the codebase
@@ -6565,8 +6506,10 @@ class ObjectGeometry extends CommonMethods {
       skewY: this.skewY,
       width: this.width,
       height: this.height,
-      strokeWidth: this.strokeWidth
-    }, options);
+      strokeWidth: this.strokeWidth,
+      // TODO remove this spread. is visible in the performance inspection
+      ...options
+    };
     // stroke is applied before/after transformations are applied according to `strokeUniform`
     const strokeWidth = dimOptions.strokeWidth;
     let preScalingStrokeValue = strokeWidth,
@@ -6698,8 +6641,6 @@ class ObjectGeometry extends CommonMethods {
   }
 }
 
-const _excluded$e = ["type"],
-  _excluded2$4 = ["extraParam"];
 /**
  * Root object class from which all 2d shape classes inherit from
  * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
@@ -6800,15 +6741,9 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * and each side do not cross fabric.cacheSideLimit
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
-   * @param {Object} dims
-   * @param {Object} dims.width width of canvas
-   * @param {Object} dims.height height of canvas
-   * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * It mutates the input object dims.
+   * @param {TCacheCanvasDimensions} dims
+   * @return {TCacheCanvasDimensions} dims
    */
   _limitCacheSize(dims) {
     const width = dims.width,
@@ -6845,12 +6780,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Return the dimension and the zoom level needed to create a cache canvas
    * big enough to host the object to be cached.
    * @private
-   * @return {Object}.x width of object to be cached
-   * @return {Object}.y height of object to be cached
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @return {TCacheCanvasDimensions} Informations about the object to be cached
    */
   _getCacheCanvasDimensions() {
     const objectScale = this.getTotalObjectScaling(),
@@ -7036,10 +6966,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
     return this;
   }
 
-  /*
-   * @private
+  /**
    * return if the object would be visible in rendering
-   * @memberOf FabricObject.prototype
    * @return {Boolean}
    */
   isNotVisible() {
@@ -7125,7 +7053,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @returns Boolean
    */
   hasStroke() {
-    return this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0;
+    return !!this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0;
   }
 
   /**
@@ -7139,7 +7067,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @returns Boolean
    */
   hasFill() {
-    return this.fill && this.fill !== 'transparent';
+    return !!this.fill && this.fill !== 'transparent';
   }
 
   /**
@@ -7712,9 +7640,18 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   }
 
   /**
-   * Returns true if any of the specified types is identical to the type of an instance
-   * @param {String} type Type to check against
-   * @return {Boolean}
+   * Checks if the instance is of any of the specified types.
+   * We use this to filter a list of objects for the `getObjects` function.
+   *
+   * For detecting an instance type `instanceOf` is a better check,
+   * but to avoid to make specific classes a dependency of generic code
+   * internally we use this.
+   *
+   * This compares both the static class `type` and the instance's own `type` property
+   * against the provided list of types.
+   *
+   * @param types - A list of type strings to check against.
+   * @returns `true` if the object's type or class type matches any in the list, otherwise `false`.
    */
   isType() {
     for (var _len = arguments.length, types = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -7850,7 +7787,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       onChange,
       onComplete
     } = options;
-    const animationOptions = _objectSpread2(_objectSpread2({}, options), {}, {
+    const animationOptions = {
+      ...options,
       target: this,
       // path.reduce... is the current value in case start value isn't provided
       startValue: startValue !== null && startValue !== void 0 ? startValue : path.reduce((deep, key) => deep[key], this),
@@ -7873,7 +7811,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
         // @ts-expect-error generic callback arg0 is wrong
         onComplete(value, valueProgress, durationProgress);
       }
-    });
+    };
     return propIsColor ? animateColor(animationOptions) : animate(animationOptions);
   }
 
@@ -8064,7 +8002,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       clipPathData = clipPath.toObject(propertiesToSerialize.concat('inverted', 'absolutePositioned'));
     }
     const toFixedBound = val => toFixed(val, NUM_FRACTION_DIGITS);
-    const object = _objectSpread2(_objectSpread2({}, pick(this, propertiesToSerialize)), {}, {
+    const object = {
+      ...pick(this, propertiesToSerialize),
       type: this.constructor.type,
       version: VERSION,
       originX,
@@ -8095,10 +8034,11 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       paintFirst,
       globalCompositeOperation,
       skewX: toFixedBound(skewX),
-      skewY: toFixedBound(skewY)
-    }, clipPathData ? {
-      clipPath: clipPathData
-    } : null);
+      skewY: toFixedBound(skewY),
+      ...(clipPathData ? {
+        clipPath: clipPathData
+      } : null)
+    };
     return !this.includeDefaultValues ? this._removeDefaultValues(object) : object;
   }
 
@@ -8138,7 +8078,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @return {String}
    */
   toString() {
-    return "#<".concat(this.constructor.type, ">");
+    return `#<${this.constructor.type}>`;
   }
 
   /**
@@ -8151,12 +8091,14 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * @returns {Promise<FabricObject>}
    */
   static _fromObject(_ref3) {
-    let serializedObjectOptions = _objectWithoutProperties(_ref3, _excluded$e);
-    let _ref4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-      {
-        extraParam
-      } = _ref4,
-      options = _objectWithoutProperties(_ref4, _excluded2$4);
+    let {
+      type,
+      ...serializedObjectOptions
+    } = _ref3;
+    let {
+      extraParam,
+      ...options
+    } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     return enlivenObjectEnlivables(serializedObjectOptions, options).then(enlivedObjectOptions => {
       // from the resulting enlived options, extract options.extraParam to arg0
       // to avoid accidental overrides later
@@ -8215,7 +8157,10 @@ const wrapWithFireEvent = (eventName, actionHandler, extraEventInfo) => {
   return (eventData, transform, x, y) => {
     const actionPerformed = actionHandler(eventData, transform, x, y);
     if (actionPerformed) {
-      fireEvent(eventName, _objectSpread2(_objectSpread2({}, commonEventInfo(eventData, transform, x, y)), extraEventInfo));
+      fireEvent(eventName, {
+        ...commonEventInfo(eventData, transform, x, y),
+        ...extraEventInfo
+      });
     }
     return actionPerformed;
   };
@@ -8347,7 +8292,7 @@ function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
   // this does not work, and fixed with ( && ) does not make sense.
   // to have real transparent corners we need the controls on upperCanvas
   // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-  ctx["".concat(methodName, "Rect")](-xSizeBy2, -ySizeBy2, xSize, ySize);
+  ctx[`${methodName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
   if (stroke) {
     ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
   }
@@ -8548,7 +8493,7 @@ class Control {
    * @param {FabricObject} object on which the control is displayed
    * @return {String}
    */
-  cursorStyleHandler(eventData, control, fabricObject) {
+  cursorStyleHandler(eventData, control, fabricObject, coord) {
     return control.cursorStyle;
   }
 
@@ -8754,14 +8699,14 @@ const scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'];
  * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-const scaleCursorStyleHandler = (eventData, control, fabricObject) => {
+const scaleCursorStyleHandler = (eventData, control, fabricObject, coord) => {
   const scaleProportionally = scaleIsProportional(eventData, fabricObject),
     by = control.x !== 0 && control.y === 0 ? 'x' : control.x === 0 && control.y !== 0 ? 'y' : '';
   if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
     return NOT_ALLOWED_CURSOR;
   }
-  const n = findCornerQuadrant(fabricObject, control);
-  return "".concat(scaleMap[n], "-resize");
+  const n = findCornerQuadrant(fabricObject, control, coord);
+  return `${scaleMap[n]}-resize`;
 };
 
 /**
@@ -8899,7 +8844,6 @@ const scalingEqually = wrapWithFireEvent(SCALING, wrapWithFixedAnchor(scaleObjec
 const scalingX = wrapWithFireEvent(SCALING, wrapWithFixedAnchor(scaleObjectX));
 const scalingY = wrapWithFireEvent(SCALING, wrapWithFixedAnchor(scaleObjectY));
 
-const _excluded$d = ["target", "ex", "ey", "skewingSide"];
 const AXIS_KEYS = {
   x: {
     counterAxis: 'y',
@@ -8927,15 +8871,15 @@ const skewMap = ['ns', 'nesw', 'ew', 'nwse'];
  * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-const skewCursorStyleHandler = (eventData, control, fabricObject) => {
+const skewCursorStyleHandler = (eventData, control, fabricObject, coord) => {
   if (control.x !== 0 && isLocked(fabricObject, 'lockSkewingY')) {
     return NOT_ALLOWED_CURSOR;
   }
   if (control.y !== 0 && isLocked(fabricObject, 'lockSkewingX')) {
     return NOT_ALLOWED_CURSOR;
   }
-  const n = findCornerQuadrant(fabricObject, control) % 4;
-  return "".concat(skewMap[n], "-resize");
+  const n = findCornerQuadrant(fabricObject, control, coord) % 4;
+  return `${skewMap[n]}-resize`;
 };
 
 /**
@@ -8944,12 +8888,12 @@ const skewCursorStyleHandler = (eventData, control, fabricObject) => {
  */
 function skewObject(axis, _ref, pointer) {
   let {
-      target,
-      ex,
-      ey,
-      skewingSide
-    } = _ref,
-    transform = _objectWithoutProperties(_ref, _excluded$d);
+    target,
+    ex,
+    ey,
+    skewingSide,
+    ...transform
+  } = _ref;
   const {
       skew: skewKey
     } = AXIS_KEYS[axis],
@@ -8972,7 +8916,7 @@ function skewObject(axis, _ref, pointer) {
       scaleY: 1
     }).y;
   const shearing = 2 * offset * skewingSide /
-  // we max out fractions to safeguard from asymptotic behavior
+   // we max out fractions to safeguard from asymptotic behavior
   Math.max(b, 1) +
   // add starting state
   shearingStart;
@@ -9038,10 +8982,11 @@ function skewHandler(axis, eventData, transform, x, y) {
     // normalize value from [-1, 1] to origin value [0, 1]
     origin = -skewingDirection * 0.5 + 0.5;
   const finalHandler = wrapWithFireEvent(SKEWING, wrapWithFixedAnchor((eventData, transform, x, y) => skewObject(axis, transform, new Point(x, y))));
-  return finalHandler(eventData, _objectSpread2(_objectSpread2({}, transform), {}, {
+  return finalHandler(eventData, {
+    ...transform,
     [originKey]: origin,
     skewingSide
-  }), x, y);
+  }, x, y);
 }
 
 /**
@@ -9101,8 +9046,8 @@ const scaleOrSkewActionName = (eventData, control, fabricObject) => {
  * @param {FabricObject} fabricObject the fabric object that is interested in the action
  * @return {String} a valid css string for the cursor
  */
-const scaleSkewCursorStyleHandler = (eventData, control, fabricObject) => {
-  return isAltAction(eventData, fabricObject) ? skewCursorStyleHandler(eventData, control, fabricObject) : scaleCursorStyleHandler(eventData, control, fabricObject);
+const scaleSkewCursorStyleHandler = (eventData, control, fabricObject, coord) => {
+  return isAltAction(eventData, fabricObject) ? skewCursorStyleHandler(eventData, control, fabricObject, coord) : scaleCursorStyleHandler(eventData, control, fabricObject, coord);
 };
 /**
  * Composed action handler to either scale X or skew Y
@@ -9210,11 +9155,17 @@ const createResizeControls = () => ({
     actionName: RESIZING
   })
 });
-const createTextboxDefaultControls = () => _objectSpread2(_objectSpread2({}, createObjectDefaultControls()), createResizeControls());
+const createTextboxDefaultControls = () => ({
+  ...createObjectDefaultControls(),
+  ...createResizeControls()
+});
 
 class InteractiveFabricObject extends FabricObject$1 {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), InteractiveFabricObject.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...InteractiveFabricObject.ownDefaults
+    };
   }
 
   /**
@@ -9268,7 +9219,7 @@ class InteractiveFabricObject extends FabricObject$1 {
 
   /**
    * Determines which corner is under the mouse cursor, represented by `pointer`.
-   * This function is return a corner only if the object is the active one.
+   * This function returns a corner only if the object is the active one.
    * This is done to avoid selecting corner of non active object and activating transformations
    * rather than drag action. The default behavior of fabricJS is that if you want to transform
    * an object, first you select it to show the control set
@@ -9430,11 +9381,12 @@ class InteractiveFabricObject extends FabricObject$1 {
    */
   _drawBorders(ctx, size) {
     let styleOverride = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    const options = _objectSpread2({
+    const options = {
       hasControls: this.hasControls,
       borderColor: this.borderColor,
-      borderDashArray: this.borderDashArray
-    }, styleOverride);
+      borderDashArray: this.borderDashArray,
+      ...styleOverride
+    };
     ctx.save();
     ctx.strokeStyle = options.borderColor;
     this._setLineDash(ctx, options.borderDashArray);
@@ -9456,10 +9408,11 @@ class InteractiveFabricObject extends FabricObject$1 {
       hasBorders,
       hasControls
     } = this;
-    const styleOptions = _objectSpread2({
+    const styleOptions = {
       hasBorders,
-      hasControls
-    }, styleOverride);
+      hasControls,
+      ...styleOverride
+    };
     const vpt = this.getViewportTransform(),
       shouldDrawBorders = styleOptions.hasBorders,
       shouldDrawControls = styleOptions.hasControls;
@@ -9550,11 +9503,12 @@ class InteractiveFabricObject extends FabricObject$1 {
       cornerDashArray,
       cornerColor
     } = this;
-    const options = _objectSpread2({
+    const options = {
       cornerStrokeColor,
       cornerDashArray,
-      cornerColor
-    }, styleOverride);
+      cornerColor,
+      ...styleOverride
+    };
     ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
     ctx.strokeStyle = ctx.fillStyle = options.cornerColor;
     if (!this.transparentCorners) {
@@ -9797,16 +9751,6 @@ const isTransparent = (ctx, x, y, tolerance) => {
   }
   return true;
 };
-
-/**
- * Rotates `point` around `origin` with `radians`
- * @deprecated use the Point.rotate
- * @param {Point} origin The origin of the rotation
- * @param {Point} origin The origin of the rotation
- * @param {TRadian} radians The radians of the angle for the rotation
- * @return {Point} The new rotated point
- */
-const rotatePoint = (point, origin, radians) => point.rotate(radians, origin);
 
 const findIndexRight = (array, predicate) => {
   for (let index = array.length - 1; index >= 0; index--) {
@@ -10238,7 +10182,9 @@ const cloneStyles = style => {
   Object.keys(style).forEach(key => {
     newObj[key] = {};
     Object.keys(style[key]).forEach(keyInner => {
-      newObj[key][keyInner] = _objectSpread2({}, style[key][keyInner]);
+      newObj[key][keyInner] = {
+        ...style[key][keyInner]
+      };
     });
   });
   return newObj;
@@ -10254,7 +10200,7 @@ const cloneStyles = style => {
  */
 const capitalize = function (string) {
   let firstLetterOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  return "".concat(string.charAt(0).toUpperCase()).concat(firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase());
+  return `${string.charAt(0).toUpperCase()}${firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase()}`;
 };
 
 /**
@@ -10263,6 +10209,15 @@ const capitalize = function (string) {
  * @return {String} Escaped version of a string
  */
 const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+let segmenter;
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
+      granularity: 'grapheme'
+    });
+  }
+  return segmenter;
+};
 
 /**
  * Divide a string in the user perceived single units
@@ -10270,6 +10225,21 @@ const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;'
  * @return {Array} array containing the graphemes
  */
 const graphemeSplit = textstring => {
+  segmenter || getSegmenter();
+  if (segmenter) {
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(_ref => {
+      let {
+        segment
+      } = _ref;
+      return segment;
+    });
+  }
+
+  //Fallback
+  return graphemeSplitImpl(textstring);
+};
+const graphemeSplitImpl = textstring => {
   const graphemes = [];
   for (let i = 0, chr; i < textstring.length; i++) {
     if ((chr = getWholeChar(textstring, i)) === false) {
@@ -10333,7 +10303,7 @@ var lang_string = /*#__PURE__*/Object.freeze({
  */
 const hasStyleChanged = function (prevStyle, thisStyle) {
   let forTextSpans = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  return prevStyle.fill !== thisStyle.fill || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.deltaY !== thisStyle.deltaY || forTextSpans && (prevStyle.overline !== thisStyle.overline || prevStyle.underline !== thisStyle.underline || prevStyle.linethrough !== thisStyle.linethrough);
+  return prevStyle.fill !== thisStyle.fill || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.textDecorationThickness !== thisStyle.textDecorationThickness || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.deltaY !== thisStyle.deltaY || forTextSpans && (prevStyle.overline !== thisStyle.overline || prevStyle.underline !== thisStyle.underline || prevStyle.linethrough !== thisStyle.linethrough);
 };
 
 /**
@@ -10413,7 +10383,9 @@ const stylesFromArray = (styles, text) => {
         //create object for line index if it doesn't exist
         stylesObject[i] = stylesObject[i] || {};
         //assign a style at this character's index
-        stylesObject[i][c] = _objectSpread2({}, styles[styleIndex].style);
+        stylesObject[i][c] = {
+          ...styles[styleIndex].style
+        };
         //if character is at the end of the current style collection, move to the next
         if (charIndex === styles[styleIndex].end - 1) {
           styleIndex++;
@@ -10490,7 +10462,10 @@ function getGlobalStylesForElement(element) {
   let styles = {};
   for (const rule in cssRules) {
     if (elementMatchesRule(element, rule.split(' '))) {
-      styles = _objectSpread2(_objectSpread2({}, styles), cssRules[rule]);
+      styles = {
+        ...styles,
+        ...cssRules[rule]
+      };
     }
   }
   return styles;
@@ -10501,24 +10476,22 @@ const normalizeAttr = attr => {
   return (_attributesMap = attributesMap[attr]) !== null && _attributesMap !== void 0 ? _attributesMap : attr;
 };
 
-const regex$1 = new RegExp("(".concat(reNum, ")"), 'gi');
+const regex$1 = new RegExp(`(${reNum})`, 'gi');
 const cleanupSvgAttribute = attributeValue => attributeValue.replace(regex$1, ' $1 ')
 // replace annoying commas and arbitrary whitespace with single spaces
 .replace(/,/gi, ' ').replace(/\s+/gi, ' ');
 
-var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7;
-
 // == begin transform regexp
-const p$1 = "(".concat(reNum, ")");
-const skewX = String.raw(_templateObject || (_templateObject = _taggedTemplateLiteral(["(skewX)(", ")"], ["(skewX)\\(", "\\)"])), p$1);
-const skewY = String.raw(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["(skewY)(", ")"], ["(skewY)\\(", "\\)"])), p$1);
-const rotate = String.raw(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["(rotate)(", "(?: ", " ", ")?)"], ["(rotate)\\(", "(?: ", " ", ")?\\)"])), p$1, p$1, p$1);
-const scale = String.raw(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["(scale)(", "(?: ", ")?)"], ["(scale)\\(", "(?: ", ")?\\)"])), p$1, p$1);
-const translate = String.raw(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["(translate)(", "(?: ", ")?)"], ["(translate)\\(", "(?: ", ")?\\)"])), p$1, p$1);
-const matrix = String.raw(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["(matrix)(", " ", " ", " ", " ", " ", ")"], ["(matrix)\\(", " ", " ", " ", " ", " ", "\\)"])), p$1, p$1, p$1, p$1, p$1, p$1);
-const transform = "(?:".concat(matrix, "|").concat(translate, "|").concat(rotate, "|").concat(scale, "|").concat(skewX, "|").concat(skewY, ")");
-const transforms = "(?:".concat(transform, "*)");
-const transformList = String.raw(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["^s*(?:", "?)s*$"], ["^\\s*(?:", "?)\\s*$"])), transforms);
+const p$1 = `(${reNum})`;
+const skewX = String.raw`(skewX)\(${p$1}\)`;
+const skewY = String.raw`(skewY)\(${p$1}\)`;
+const rotate = String.raw`(rotate)\(${p$1}(?: ${p$1} ${p$1})?\)`;
+const scale = String.raw`(scale)\(${p$1}(?: ${p$1})?\)`;
+const translate = String.raw`(translate)\(${p$1}(?: ${p$1})?\)`;
+const matrix = String.raw`(matrix)\(${p$1} ${p$1} ${p$1} ${p$1} ${p$1} ${p$1}\)`;
+const transform = `(?:${matrix}|${translate}|${rotate}|${scale}|${skewX}|${skewY})`;
+const transforms = `(?:${transform}*)`;
+const transformList = String.raw`^\s*(?:${transforms}?)\s*$`;
 // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
 const reTransformList = new RegExp(transformList);
 const reTransform = new RegExp(transform);
@@ -10529,7 +10502,6 @@ const reTransformAll = new RegExp(transform, 'g');
  * Parses "transform" attribute, returning an array of values
  * @static
  * @function
- * @memberOf fabric
  * @param {String} attributeValue String containing attribute value
  * @return {TTransformMatrix} Array of 6 elements representing transformation matrix
  */
@@ -10621,7 +10593,7 @@ function normalizeValue(attr, value, parentAttributes, fontSize) {
     }
   } else if (attr === 'textAnchor' /* text-anchor */) {
     ouputValue = value === 'start' ? LEFT : value === 'end' ? RIGHT : CENTER;
-  } else if (attr === 'charSpacing') {
+  } else if (attr === 'charSpacing' || attr === TEXT_DECORATION_THICKNESS) {
     // parseUnit returns px and we convert it to em
     parsed = parseUnit(value, fontSize) / fontSize * 1000;
   } else if (attr === 'paintFirst') {
@@ -10647,7 +10619,6 @@ function normalizeValue(attr, value, parentAttributes, fontSize) {
  * Parses a short font declaration, building adding its properties to a style object
  * @static
  * @function
- * @memberOf fabric
  * @param {String} value font declaration
  * @param {Object} oStyle definition
  */
@@ -10713,7 +10684,6 @@ function parseStyleString(style, oStyle) {
 /**
  * Parses "style" attribute, retuning an object with values
  * @static
- * @memberOf fabric
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */
@@ -10785,20 +10755,26 @@ function parseAttributes(element, attributes, cssRules) {
       fontSize = parentFontSize = parseUnit(parentAttributes.fontSize);
     }
   }
-  const ownAttributes = _objectSpread2(_objectSpread2(_objectSpread2({}, attributes.reduce((memo, attr) => {
-    const value = element.getAttribute(attr);
-    if (value) {
-      memo[attr] = value;
-    }
-    return memo;
-  }, {})), getGlobalStylesForElement(element, cssRules)), parseStyleAttribute(element));
+  const ownAttributes = {
+    ...attributes.reduce((memo, attr) => {
+      const value = element.getAttribute(attr);
+      if (value) {
+        memo[attr] = value;
+      }
+      return memo;
+    }, {}),
+    // add values parsed from style, which take precedence over attributes
+    // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
+    ...getGlobalStylesForElement(element, cssRules),
+    ...parseStyleAttribute(element)
+  };
   if (ownAttributes[cPath]) {
     element.setAttribute(cPath, ownAttributes[cPath]);
   }
   if (ownAttributes[fSize]) {
     // looks like the minimum should be 9px when dealing with ems. this is what looks like in browsers.
     fontSize = parseUnit(ownAttributes[fSize], parentFontSize);
-    ownAttributes[fSize] = "".concat(fontSize);
+    ownAttributes[fSize] = `${fontSize}`;
   }
 
   // this should have its own complex type
@@ -10811,11 +10787,13 @@ function parseAttributes(element, attributes, cssRules) {
   if (normalizedStyle && normalizedStyle.font) {
     parseFontDeclaration(normalizedStyle.font, normalizedStyle);
   }
-  const mergedAttrs = _objectSpread2(_objectSpread2({}, parentAttributes), normalizedStyle);
+  const mergedAttrs = {
+    ...parentAttributes,
+    ...normalizedStyle
+  };
   return svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : setStrokeFillOpacity(mergedAttrs);
 }
 
-const _excluded$c = ["left", "top", "width", "height", "visible"];
 const rectDefaultValues = {
   rx: 0,
   ry: 0
@@ -10823,7 +10801,10 @@ const rectDefaultValues = {
 const RECT_PROPS = ['rx', 'ry'];
 class Rect extends FabricObject {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Rect.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Rect.ownDefaults
+    };
   }
 
   /**
@@ -10902,13 +10883,11 @@ class Rect extends FabricObject {
       rx,
       ry
     } = this;
-    return ['<rect ', 'COMMON_PARTS', "x=\"".concat(-width / 2, "\" y=\"").concat(-height / 2, "\" rx=\"").concat(rx, "\" ry=\"").concat(ry, "\" width=\"").concat(width, "\" height=\"").concat(height, "\" />\n")];
+    return ['<rect ', 'COMMON_PARTS', `x="${-width / 2}" y="${-height / 2}" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`];
   }
 
   /**
    * List of attribute names to account for when parsing SVG element (used by `Rect.fromElement`)
-   * @static
-   * @memberOf Rect
    * @see: http://www.w3.org/TR/SVG/shapes.html#RectElement
    */
 
@@ -10916,28 +10895,27 @@ class Rect extends FabricObject {
 
   /**
    * Returns {@link Rect} instance from an SVG element
-   * @static
-   * @memberOf Rect
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
   static async fromElement(element, options, cssRules) {
-    const _parseAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules),
-      {
-        left = 0,
-        top = 0,
-        width = 0,
-        height = 0,
-        visible = true
-      } = _parseAttributes,
-      restOfparsedAttributes = _objectWithoutProperties(_parseAttributes, _excluded$c);
-    return new this(_objectSpread2(_objectSpread2(_objectSpread2({}, options), restOfparsedAttributes), {}, {
+    const {
+      left = 0,
+      top = 0,
+      width = 0,
+      height = 0,
+      visible = true,
+      ...restOfparsedAttributes
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
+    return new this({
+      ...options,
+      ...restOfparsedAttributes,
       left,
       top,
       width,
       height,
       visible: Boolean(visible && width && height)
-    }));
+    });
   }
 
   /* _FROM_SVG_END_ */
@@ -10945,12 +10923,10 @@ class Rect extends FabricObject {
 /**
  * Horizontal border radius
  * @type Number
- * @default
  */
 /**
  * Vertical border radius
  * @type Number
- * @default
  */
 _defineProperty(Rect, "type", 'Rect');
 _defineProperty(Rect, "cacheProperties", [...cacheProperties, ...RECT_PROPS]);
@@ -11093,8 +11069,6 @@ class FitContentLayout extends LayoutStrategy {
 _defineProperty(FitContentLayout, "type", 'fit-content');
 classRegistry.setClass(FitContentLayout);
 
-const _excluded$b = ["strategy"],
-  _excluded2$3 = ["target", "strategy", "bubbles", "prevStrategy"];
 const LAYOUT_MANAGER = 'layoutManager';
 class LayoutManager {
   constructor() {
@@ -11104,15 +11078,15 @@ class LayoutManager {
     this._subscriptions = new Map();
   }
   performLayout(context) {
-    const strictContext = _objectSpread2(_objectSpread2({
+    const strictContext = {
       bubbles: true,
-      strategy: this.strategy
-    }, context), {}, {
+      strategy: this.strategy,
+      ...context,
       prevStrategy: this._prevLayoutStrategy,
       stopPropagation() {
         this.bubbles = false;
       }
-    });
+    };
     this.onBeforeLayout(strictContext);
     const layoutResult = this.getLayoutResult(strictContext);
     if (layoutResult) {
@@ -11196,12 +11170,16 @@ class LayoutManager {
       context
     });
     if (type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
-      const tricklingContext = _objectWithoutProperties(context, _excluded$b);
+      const {
+        strategy: _,
+        ...tricklingContext
+      } = context;
       // traverse the tree
-      target.forEachObject(object => object.layoutManager && object.layoutManager.performLayout(_objectSpread2(_objectSpread2({}, tricklingContext), {}, {
+      target.forEachObject(object => object.layoutManager && object.layoutManager.performLayout({
+        ...tricklingContext,
         bubbles: false,
         target: object
-      })));
+      }));
     }
   }
   getLayoutResult(context) {
@@ -11293,12 +11271,12 @@ class LayoutManager {
   }
   onAfterLayout(context, layoutResult) {
     const {
-        target,
-        strategy,
-        bubbles,
-        prevStrategy: _
-      } = context,
-      bubblingContext = _objectWithoutProperties(context, _excluded2$3);
+      target,
+      strategy,
+      bubbles,
+      prevStrategy: _,
+      ...bubblingContext
+    } = context;
     const {
       canvas
     } = target;
@@ -11320,9 +11298,10 @@ class LayoutManager {
       //  add target to context#path
       (bubblingContext.path || (bubblingContext.path = [])).push(target);
       //  all parents should invalidate their layout
-      parent.layoutManager.performLayout(_objectSpread2(_objectSpread2({}, bubblingContext), {}, {
+      parent.layoutManager.performLayout({
+        ...bubblingContext,
         target: parent
-      }));
+      });
     }
     target.set('dirty', true);
   }
@@ -11345,7 +11324,6 @@ class LayoutManager {
 }
 classRegistry.setClass(LayoutManager, LAYOUT_MANAGER);
 
-const _excluded$a = ["type", "objects", "layoutManager"];
 /**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
  * We could have used a boolean in the constructor, as we did previously, but we think the boolean
@@ -11369,7 +11347,10 @@ const groupDefaultValues = {
  */
 class Group extends createCollectionMixin(FabricObject) {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Group.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Group.ownDefaults
+    };
   }
 
   /**
@@ -11385,7 +11366,6 @@ class Group extends createCollectionMixin(FabricObject) {
     /**
      * Used to optimize performance
      * set to `false` if you don't need contained objects to be targets of events
-     * @default
      * @type boolean
      */
     /**
@@ -11396,7 +11376,6 @@ class Group extends createCollectionMixin(FabricObject) {
      * that will take care of enabling subTargetCheck and necessary object events.
      * There is too much attached to group interactivity to just be evaluated by a
      * boolean in the code
-     * @default
      * @deprecated
      * @type boolean
      */
@@ -11764,10 +11743,11 @@ class Group extends createCollectionMixin(FabricObject) {
   }
   triggerLayout() {
     let options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    this.layoutManager.performLayout(_objectSpread2({
+    this.layoutManager.performLayout({
       target: this,
-      type: LAYOUT_TYPE_IMPERATIVE
-    }, options));
+      type: LAYOUT_TYPE_IMPERATIVE,
+      ...options
+    });
   }
 
   /**
@@ -11809,14 +11789,16 @@ class Group extends createCollectionMixin(FabricObject) {
   toObject() {
     let propertiesToInclude = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
     const layoutManager = this.layoutManager.toObject();
-    return _objectSpread2(_objectSpread2(_objectSpread2({}, super.toObject(['subTargetCheck', 'interactive', ...propertiesToInclude])), layoutManager.strategy !== 'fit-content' || this.includeDefaultValues ? {
-      layoutManager
-    } : {}), {}, {
+    return {
+      ...super.toObject(['subTargetCheck', 'interactive', ...propertiesToInclude]),
+      ...(layoutManager.strategy !== 'fit-content' || this.includeDefaultValues ? {
+        layoutManager
+      } : {}),
       objects: this.__serializeObjects('toObject', propertiesToInclude)
-    });
+    };
   }
   toString() {
-    return "#<Group: (".concat(this.complexity(), ")>");
+    return `#<Group: (${this.complexity()})>`;
   }
   dispose() {
     this.layoutManager.unsubscribeTargets({
@@ -11866,7 +11848,7 @@ class Group extends createCollectionMixin(FabricObject) {
    * @return {String}
    */
   getSvgStyles() {
-    const opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ? "opacity: ".concat(this.opacity, ";") : '',
+    const opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ? `opacity: ${this.opacity};` : '',
       visibility = this.visible ? '' : ' visibility: hidden;';
     return [opacity, this.getSvgFilter(), visibility].join('');
   }
@@ -11891,23 +11873,23 @@ class Group extends createCollectionMixin(FabricObject) {
   /**
    * @todo support loading from svg
    * @private
-   * @static
-   * @memberOf Group
    * @param {Object} object Object to create a group from
    * @returns {Promise<Group>}
    */
   static fromObject(_ref2, abortable) {
     let {
-        type,
-        objects = [],
-        layoutManager
-      } = _ref2,
-      options = _objectWithoutProperties(_ref2, _excluded$a);
+      type,
+      objects = [],
+      layoutManager,
+      ...options
+    } = _ref2;
     return Promise.all([enlivenObjects(objects, abortable), enlivenObjectEnlivables(options, abortable)]).then(_ref3 => {
       let [objects, hydratedOptions] = _ref3;
-      const group = new this(objects, _objectSpread2(_objectSpread2(_objectSpread2({}, options), hydratedOptions), {}, {
+      const group = new this(objects, {
+        ...options,
+        ...hydratedOptions,
         layoutManager: new NoopLayoutManager()
-      }));
+      });
       if (layoutManager) {
         const layoutClass = classRegistry.getClass(layoutManager.type);
         const strategyClass = classRegistry.getClass(layoutManager.strategy);
@@ -11963,7 +11945,7 @@ const findScaleToFit = (source, destination) => Math.min(destination.width / sou
  */
 const findScaleToCover = (source, destination) => Math.max(destination.width / source.width, destination.height / source.height);
 
-const commaWsp = "\\s*,?\\s*";
+const commaWsp = `\\s*,?\\s*`;
 
 /**
  * p for param
@@ -11971,7 +11953,7 @@ const commaWsp = "\\s*,?\\s*";
  * p is a number that is preceded by an arbitary number of spaces, maybe 0,
  * a comma or not, and then possibly more spaces or not.
  */
-const p = "".concat(commaWsp, "(").concat(reNum, ")");
+const p = `${commaWsp}(${reNum})`;
 
 // const reMoveToCommand = `(M) ?(?:${p}${p} ?)+`;
 
@@ -11991,7 +11973,7 @@ const p = "".concat(commaWsp, "(").concat(reNum, ")");
 
 // const reQuadraticCurveShortcutCommand = `(T) ?(?:${p}${p} ?)+`;
 
-const reArcCommandPoints = "".concat(p).concat(p).concat(p).concat(commaWsp, "([01])").concat(commaWsp, "([01])").concat(p).concat(p);
+const reArcCommandPoints = `${p}${p}${p}${commaWsp}([01])${commaWsp}([01])${p}${p}`;
 // const reArcCommand = `(A) ?(?:${reArcCommandPoints} ?)+`;
 
 // export const rePathCommandGroups =
@@ -12081,7 +12063,7 @@ const arcToSegments = (toX, toY, rx, ry, large, sweep, rotateX) => {
     _rx *= s;
     _ry *= s;
   } else {
-    root = (large === sweep ? -1.0 : 1.0) * Math.sqrt(pl / (rx2 * py2 + ry2 * px2));
+    root = (large === sweep ? -1 : 1.0) * Math.sqrt(pl / (rx2 * py2 + ry2 * px2));
   }
   const cx = root * _rx * py / _ry,
     cy = -root * _ry * px / _rx,
@@ -12494,7 +12476,9 @@ const findPercentageForDistance = (segInfo, distance) => {
       x: segInfo.x,
       y: segInfo.y
     },
-    p = _objectSpread2({}, tempP),
+    p = {
+      ...tempP
+    },
     nextLen,
     nextStep = 0.01,
     lastPerc = 0;
@@ -12517,9 +12501,10 @@ const findPercentageForDistance = (segInfo, distance) => {
       tmpLen += nextLen;
     }
   }
-  return _objectSpread2(_objectSpread2({}, p), {}, {
+  return {
+    ...p,
     angle: angleFinder(lastPerc)
-  });
+  };
 };
 
 /**
@@ -12621,13 +12606,15 @@ const getPointOnPath = function (path, distance) {
         angle: 0
       };
     case 'Z':
-      return _objectSpread2(_objectSpread2({}, new Point(segInfo.x, segInfo.y).lerp(new Point(segInfo.destX, segInfo.destY), segPercent)), {}, {
+      return {
+        ...new Point(segInfo.x, segInfo.y).lerp(new Point(segInfo.destX, segInfo.destY), segPercent),
         angle: Math.atan2(segInfo.destY - segInfo.y, segInfo.destX - segInfo.x)
-      });
+      };
     case 'L':
-      return _objectSpread2(_objectSpread2({}, new Point(segInfo.x, segInfo.y).lerp(new Point(segment[1], segment[2]), segPercent)), {}, {
+      return {
+        ...new Point(segInfo.x, segInfo.y).lerp(new Point(segment[1], segment[2]), segPercent),
         angle: Math.atan2(segment[2] - segInfo.y, segment[1] - segInfo.x)
-      });
+      };
     case 'C':
       return findPercentageForDistance(segInfo, distance);
     case 'Q':
@@ -12816,27 +12803,6 @@ const joinPath = (pathData, fractionDigits) => pathData.map(segment => {
   }).join(' ');
 }).join(' ');
 
-// TODO this file needs to go away, cross browser style support is not fabricjs domain.
-
-/**
- * wrapper for setting element's style
- * @param {HTMLElement} element
- * @param {Object | string} styles
- */
-function setStyle(element, styles) {
-  const elementStyle = element.style;
-  if (!elementStyle || !styles) {
-    return;
-  } else if (typeof styles === 'string') {
-    elementStyle.cssText += ';' + styles;
-  } else {
-    Object.entries(styles).forEach(_ref => {
-      let [property, value] = _ref;
-      return elementStyle.setProperty(property, value);
-    });
-  }
-}
-
 /**
  * Merges 2 clip paths into one visually equal clip path
  *
@@ -12851,7 +12817,6 @@ function setStyle(element, styles) {
  * **(2)** one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one to produce an identical visual effect.\
  * **(3)** both clip paths are not inverted - wrapper and clip paths remain unchanged.
  *
- * @memberOf fabric.util
  * @param {fabric.Object} c1
  * @param {fabric.Object} c2
  * @returns {fabric.Object} merged clip path
@@ -12886,50 +12851,6 @@ const mergeClipPaths = (c1, c2) => {
  * @return {Number} random value (between min and max)
  */
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-/**
- * Cross-browser abstraction for sending XMLHttpRequest
- * @deprecated this has to go away, we can use a modern browser method to do the same.
- * @param {String} url URL to send XMLHttpRequest to
- * @param {Object} [options] Options object
- * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
- * @param {Function} options.onComplete Callback to invoke when request is completed
- * @return {XMLHttpRequest} request
- */
-
-function request(url) {
-  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const onComplete = options.onComplete || noop,
-    xhr = new (getFabricWindow().XMLHttpRequest)(),
-    signal = options.signal,
-    abort = function () {
-      xhr.abort();
-    },
-    removeListener = function () {
-      signal && signal.removeEventListener('abort', abort);
-      xhr.onerror = xhr.ontimeout = noop;
-    };
-  if (signal && signal.aborted) {
-    throw new SignalAbortedError('request');
-  } else if (signal) {
-    signal.addEventListener('abort', abort, {
-      once: true
-    });
-  }
-
-  /** @ignore */
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      removeListener();
-      onComplete(xhr);
-      xhr.onreadystatechange = noop;
-    }
-  };
-  xhr.onerror = xhr.ontimeout = removeListener;
-  xhr.open('get', url, true);
-  xhr.send();
-  return xhr;
-}
 
 /**
  * This function is an helper for svg import. it decompose the transformMatrix
@@ -13048,16 +12969,13 @@ var index$1 = /*#__PURE__*/Object.freeze({
   removeFromArray: removeFromArray,
   removeTransformFromObject: removeTransformFromObject,
   removeTransformMatrixForSvgParsing: removeTransformMatrixForSvgParsing,
-  request: request,
   requestAnimFrame: requestAnimFrame,
   resetObjectTransform: resetObjectTransform,
-  rotatePoint: rotatePoint,
   rotateVector: rotateVector,
   saveObjectTransform: saveObjectTransform,
   sendObjectToPlane: sendObjectToPlane,
   sendPointToPlane: sendPointToPlane,
   sendVectorToPlane: sendVectorToPlane,
-  setStyle: setStyle,
   sin: sin,
   sizeAfterTransform: sizeAfterTransform,
   string: lang_string,
@@ -13069,6 +12987,24 @@ var index$1 = /*#__PURE__*/Object.freeze({
   transformPath: transformPath,
   transformPoint: transformPoint
 });
+
+// TODO this file needs to go away, cross browser style support is not fabricjs domain.
+
+/**
+ * wrapper for setting element's style
+ * @param {HTMLElement} element an HTMLElement
+ * @param {Object} styles to apply to element
+ */
+function setStyle(element, styles) {
+  const elementStyle = element.style;
+  if (!elementStyle) {
+    return;
+  }
+  Object.entries(styles).forEach(_ref => {
+    let [property, value] = _ref;
+    return elementStyle.setProperty(property, value);
+  });
+}
 
 class CanvasDOMManager extends StaticCanvasDOMManager {
   constructor(arg0) {
@@ -13141,9 +13077,10 @@ class CanvasDOMManager extends StaticCanvasDOMManager {
       styles,
       allowTouchScrolling
     } = options;
-    setStyle(element, _objectSpread2(_objectSpread2({}, styles), {}, {
+    setStyle(element, {
+      ...styles,
       'touch-action': allowTouchScrolling ? 'manipulation' : NONE
-    }));
+    });
     makeElementUnselectable(element);
   }
   setDimensions(size, retinaScaling) {
@@ -13211,8 +13148,7 @@ const canvasDefaults = {
   fireMiddleClick: false,
   enablePointerEvents: false,
   containerClass: 'canvas-container',
-  // turn to true for fabric 7.0
-  preserveObjectStacking: false
+  preserveObjectStacking: true
 };
 
 /**
@@ -13322,14 +13258,13 @@ class SelectableCanvas extends StaticCanvas {
      * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
      * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
      * @type Boolean
-     * @default
      */
     // event config
     /**
-     * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost nested subTarget
-     * @type FabricObject[]
+     * Keep track of the hovered target
+     * @type FabricObject | null
+     * @private
      */
-    _defineProperty(this, "targets", []);
     /**
      * hold the list of nested targets hovered
      * @type FabricObject[]
@@ -13367,7 +13302,10 @@ class SelectableCanvas extends StaticCanvas {
     _defineProperty(this, "contextTopDirty", false);
   }
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), SelectableCanvas.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...SelectableCanvas.ownDefaults
+    };
   }
   get upperCanvasEl() {
     var _this$elements$upper;
@@ -13667,10 +13605,11 @@ class SelectableCanvas extends StaticCanvas {
         height: target.height,
         shiftKey: e.shiftKey,
         altKey,
-        original: _objectSpread2(_objectSpread2({}, saveObjectTransform(target)), {}, {
+        original: {
+          ...saveObjectTransform(target),
           originX: origin.x,
           originY: origin.y
-        })
+        }
       };
     this._currentTransform = transform;
     this.fire('before:transform', {
@@ -13726,48 +13665,90 @@ class SelectableCanvas extends StaticCanvas {
   }
 
   /**
-   * Method that determines what object we are clicking on
+   * This function is in charge of deciding which is the object that is the current target of an interaction event.
+   * For interaction event we mean a pointer related action on the canvas.
+   * Which is the
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
-   * @return {FabricObject | null} the target found
+   * @return {TargetsInfoWithContainer} the target found
    */
   findTarget(e) {
-    if (this.skipTargetFind) {
-      return undefined;
+    // this._targetInfo is cached by _cacheTransformEventData
+    // and destroyed by _resetTransformEventData
+    if (this._targetInfo) {
+      return this._targetInfo;
     }
-    const pointer = this.getViewportPoint(e),
+    if (this.skipTargetFind) {
+      return {
+        subTargets: [],
+        currentSubTargets: []
+      };
+    }
+    const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
-      aObjects = this.getActiveObjects();
-    this.targets = [];
-    if (activeObject && aObjects.length >= 1) {
-      if (activeObject.findControl(pointer, isTouchEvent(e))) {
-        // if we hit the corner of the active object, let's return that.
-        return activeObject;
-      } else if (aObjects.length > 1 &&
-      // check pointer is over active selection and possibly perform `subTargetCheck`
-      this.searchPossibleTargets([activeObject], pointer)) {
-        // active selection does not select sub targets like normal groups
-        return activeObject;
-      } else if (activeObject === this.searchPossibleTargets([activeObject], pointer)) {
-        // active object is not an active selection
-        if (!this.preserveObjectStacking) {
-          return activeObject;
-        } else {
-          const subTargets = this.targets;
-          this.targets = [];
-          const target = this.searchPossibleTargets(this._objects, pointer);
-          if (e[this.altSelectionKey] && target && target !== activeObject) {
-            // alt selection: select active object even though it is not the top most target
-            // restore targets
-            this.targets = subTargets;
-            return activeObject;
-          }
-          return target;
-        }
+      aObjects = this.getActiveObjects(),
+      targetInfo = this.searchPossibleTargets(this._objects, pointer);
+    const {
+      subTargets: currentSubTargets,
+      container: currentContainer,
+      target: currentTarget
+    } = targetInfo;
+    const fullTargetInfo = {
+      ...targetInfo,
+      currentSubTargets,
+      currentContainer,
+      currentTarget
+    };
+
+    // simplest case no active object, return a new target
+    if (!activeObject) {
+      return fullTargetInfo;
+    }
+
+    // check pointer is over active selection and possibly perform `subTargetCheck`
+    const activeObjectTargetInfo = {
+      ...this.searchPossibleTargets([activeObject], pointer),
+      currentSubTargets,
+      currentContainer,
+      currentTarget
+    };
+    const activeObjectControl = activeObject.findControl(this.getViewportPoint(e), isTouchEvent(e));
+
+    // we are clicking exactly the control of an active object, shortcut to that object.
+    if (activeObjectControl) {
+      return {
+        ...activeObjectTargetInfo,
+        target: activeObject // we override target in case we are in the outside part of the corner.
+      };
+    }
+
+    // in case we are over the active object
+    if (activeObjectTargetInfo.target) {
+      if (aObjects.length > 1) {
+        // in case of active selection and target hit over the activeSelection, just exit
+        // TODO Verify if we need to override target with container
+        return activeObjectTargetInfo;
+      }
+      // from here onward not an active selection, just an activeOject that maybe is a group
+
+      // preserveObjectStacking is false, so activeObject is drawn on top, just return activeObject
+      if (!this.preserveObjectStacking) {
+        // TODO Verify if we need to override target with container
+        return activeObjectTargetInfo;
+      }
+
+      // In case we are in preserveObjectStacking ( selection in stack )
+      // there is the possibility to force with `altSelectionKey` to return the activeObject
+      // from any point in the stack, even if we have another object completely on top of it.
+      if (this.preserveObjectStacking && e[this.altSelectionKey]) {
+        // TODO Verify if we need to override target with container
+        return activeObjectTargetInfo;
       }
     }
-    return this.searchPossibleTargets(this._objects, pointer);
+
+    // we have an active object, but we ruled out it being our target in any way.
+    return fullTargetInfo;
   }
 
   /**
@@ -13809,14 +13790,15 @@ class SelectableCanvas extends StaticCanvas {
    * Checks point is inside the object selection condition. Either area with padding
    * or over pixels if perPixelTargetFind is enabled
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [pointer] point from viewport.
+   * @param {Point} pointer point from scene.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
   _checkTarget(obj, pointer) {
-    if (obj && obj.visible && obj.evented && this._pointIsInObjectSelectionArea(obj, sendPointToPlane(pointer, undefined, this.viewportTransform))) {
+    if (obj && obj.visible && obj.evented && this._pointIsInObjectSelectionArea(obj, pointer)) {
       if ((this.perPixelTargetFind || obj.perPixelTargetFind) && !obj.isEditing) {
-        if (!this.isTargetTransparent(obj, pointer.x, pointer.y)) {
+        const viewportPoint = pointer.transform(this.viewportTransform);
+        if (!this.isTargetTransparent(obj, viewportPoint.x, viewportPoint.y)) {
           return true;
         }
       } else {
@@ -13827,14 +13809,15 @@ class SelectableCanvas extends StaticCanvas {
   }
 
   /**
-   * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @param {Array} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object from given `objects`** that contains pointer
+   * Given an array of objects search possible targets under the pointer position
+   * Returns an
+   * @param {Array} objects objects array to look into
+   * @param {Object} pointer x,y object of point of scene coordinates we want to check.
+   * @param {Object} subTargets If passed, subtargets will be collected inside the array
+   * @return {TargetsInfo} **top most object from given `objects`** that contains pointer
    * @private
    */
-  _searchPossibleTargets(objects, pointer) {
-    // Cache all targets where their bounding box contains point.
+  _searchPossibleTargets(objects, pointer, subTargets) {
     let i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
@@ -13842,42 +13825,56 @@ class SelectableCanvas extends StaticCanvas {
       const target = objects[i];
       if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
-          const subTarget = this._searchPossibleTargets(target._objects, pointer);
-          subTarget && this.targets.push(subTarget);
+          const {
+            target: subTarget
+          } = this._searchPossibleTargets(target._objects, pointer, subTargets);
+          subTarget && subTargets.push(subTarget);
         }
-        return target;
+        return {
+          target,
+          subTargets
+        };
       }
     }
+    return {
+      subTargets: []
+    };
   }
 
   /**
-   * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link _searchPossibleTargets}
-   * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Point} [pointer] coordinates from viewport to check.
+   * Search inside an objects array the fiurst object that contains pointer
+   * Collect subTargets of that object inside the subTargets array passed as parameter
+   * @param {FabricObject[]} objects objects array to look into
+   * @param {Point} pointer coordinates from viewport to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(objects, pointer) {
-    const target = this._searchPossibleTargets(objects, pointer);
+    const targetInfo = this._searchPossibleTargets(objects, pointer, []);
 
-    // if we found something in this.targets, and the group is interactive, return the innermost subTarget
-    // that is still interactive
-    // TODO: reverify why interactive. the target should be returned always, but selected only
-    // if interactive.
-    if (target && isCollection(target) && target.interactive && this.targets[0]) {
-      /** targets[0] is the innermost nested target, but it could be inside non interactive groups and so not a selection target */
-      const targets = this.targets;
-      for (let i = targets.length - 1; i > 0; i--) {
-        const t = targets[i];
+    // outermost target is the container.
+    targetInfo.container = targetInfo.target;
+    const {
+      container,
+      subTargets
+    } = targetInfo;
+    if (container && isCollection(container) && container.interactive && subTargets[0]) {
+      /** subTargets[0] is the innermost nested target, but it could be inside non interactive groups
+       * and so not a possible selection target.
+       * We loop the array from the end that is outermost innertarget.
+       */
+      for (let i = subTargets.length - 1; i > 0; i--) {
+        const t = subTargets[i];
         if (!(isCollection(t) && t.interactive)) {
           // one of the subtargets was not interactive. that is the last subtarget we can return.
           // we can't dig more deep;
-          return t;
+          targetInfo.target = t;
+          return targetInfo;
         }
       }
-      return targets[0];
+      targetInfo.target = subTargets[0];
+      return targetInfo;
     }
-    return target;
+    return targetInfo;
   }
 
   /**
@@ -13895,10 +13892,10 @@ class SelectableCanvas extends StaticCanvas {
    *
    */
   getViewportPoint(e) {
-    if (this._pointer) {
-      return this._pointer;
+    if (this._viewportPoint) {
+      return this._viewportPoint;
     }
-    return this.getPointer(e, true);
+    return this._getPointerImpl(e, true);
   }
 
   /**
@@ -13914,23 +13911,22 @@ class SelectableCanvas extends StaticCanvas {
    *
    */
   getScenePoint(e) {
-    if (this._absolutePointer) {
-      return this._absolutePointer;
+    if (this._scenePoint) {
+      return this._scenePoint;
     }
-    return this.getPointer(e);
+    return this._getPointerImpl(e);
   }
 
   /**
    * Returns pointer relative to canvas.
    *
-   * @deprecated This method is deprecated since v6 to protect you from misuse.
    * Use {@link getViewportPoint} or {@link getScenePoint} instead.
    *
    * @param {Event} e
    * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
    * @return {Point}
    */
-  getPointer(e) {
+  _getPointerImpl(e) {
     let fromViewport = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
@@ -14376,7 +14372,6 @@ class TextEditingManager {
   }
 }
 
-const _excluded$9 = ["target", "oldTarget", "fireCanvas", "e"];
 const addEventOptions = {
   passive: false
 };
@@ -14385,9 +14380,7 @@ const getEventPoints = (canvas, e) => {
   const scenePoint = canvas.getScenePoint(e);
   return {
     viewportPoint,
-    scenePoint,
-    pointer: viewportPoint,
-    absolutePointer: scenePoint
+    scenePoint
   };
 };
 
@@ -14490,9 +14483,9 @@ class Canvas extends SelectableCanvas {
       eventTypePrefix = this._getEventPrefix();
     functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
     functor(canvasElement, eventTypePrefix + 'down', this._onMouseDown);
-    functor(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
-    functor(canvasElement, "".concat(eventTypePrefix, "out"), this._onMouseOut);
-    functor(canvasElement, "".concat(eventTypePrefix, "enter"), this._onMouseEnter);
+    functor(canvasElement, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
+    functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
+    functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
     functor(canvasElement, 'wheel', this._onMouseWheel);
     functor(canvasElement, 'contextmenu', this._onContextMenu);
     functor(canvasElement, 'click', this._onClick);
@@ -14528,9 +14521,9 @@ class Canvas extends SelectableCanvas {
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(this.upperCanvasEl);
-    removeListener(doc, "".concat(eventTypePrefix, "up"), this._onMouseUp);
+    removeListener(doc, `${eventTypePrefix}up`, this._onMouseUp);
     removeListener(doc, 'touchend', this._onTouchEnd, addEventOptions);
-    removeListener(doc, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+    removeListener(doc, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
     removeListener(doc, 'touchmove', this._onMouseMove, addEventOptions);
     clearTimeout(this._willAddMouseDown);
   }
@@ -14540,7 +14533,9 @@ class Canvas extends SelectableCanvas {
    * @param {Event} [e] Event object fired on wheel event
    */
   _onMouseWheel(e) {
-    this.__onMouseWheel(e);
+    this._cacheTransformEventData(e);
+    this._handleEvent(e, 'wheel');
+    this._resetTransformEventData();
   }
 
   /**
@@ -14549,25 +14544,33 @@ class Canvas extends SelectableCanvas {
    */
   _onMouseOut(e) {
     const target = this._hoveredTarget;
-    const shared = _objectSpread2({
-      e
-    }, getEventPoints(this, e));
-    this.fire('mouse:out', _objectSpread2(_objectSpread2({}, shared), {}, {
+    const shared = {
+      e,
+      ...getEventPoints(this, e)
+    };
+    this.fire('mouse:out', {
+      ...shared,
       target
-    }));
+    });
     this._hoveredTarget = undefined;
-    target && target.fire('mouseout', _objectSpread2({}, shared));
+    target && target.fire('mouseout', {
+      ...shared
+    });
     this._hoveredTargets.forEach(nestedTarget => {
-      this.fire('mouse:out', _objectSpread2(_objectSpread2({}, shared), {}, {
+      this.fire('mouse:out', {
+        ...shared,
         target: nestedTarget
-      }));
-      nestedTarget && nestedTarget.fire('mouseout', _objectSpread2({}, shared));
+      });
+      nestedTarget && nestedTarget.fire('mouseout', {
+        ...shared
+      });
     });
     this._hoveredTargets = [];
   }
 
   /**
    * @private
+   * Used when the mouse cursor enter the canvas from outside
    * @param {Event} e Event object fired on mouseenter
    */
   _onMouseEnter(e) {
@@ -14577,10 +14580,16 @@ class Canvas extends SelectableCanvas {
     // as a short term fix we are not firing this if we are currently transforming.
     // as a long term fix we need to separate the action of finding a target with the
     // side effects we added to it.
-    if (!this._currentTransform && !this.findTarget(e)) {
-      this.fire('mouse:over', _objectSpread2({
-        e
-      }, getEventPoints(this, e)));
+    const {
+      target
+    } = this.findTarget(e);
+    // we fire the event only when there is no target, if there is a target, the specific
+    // target event will fire.
+    if (!this._currentTransform && !target) {
+      this.fire('mouse:over', {
+        e,
+        ...getEventPoints(this, e)
+      });
       this._hoveredTarget = undefined;
       this._hoveredTargets = [];
     }
@@ -14653,12 +14662,15 @@ class Canvas extends SelectableCanvas {
    * @param {DragEvent} e
    */
   _onDragEnd(e) {
+    const {
+      currentSubTargets
+    } = this.findTarget(e);
     const didDrop = !!e.dataTransfer && e.dataTransfer.dropEffect !== NONE,
       dropTarget = didDrop ? this._activeObject : undefined,
       options = {
         e,
         target: this._dragSource,
-        subTargets: this.targets,
+        subTargets: currentSubTargets,
         dragSource: this._dragSource,
         didDrop,
         dropTarget: dropTarget
@@ -14688,19 +14700,6 @@ class Canvas extends SelectableCanvas {
   }
 
   /**
-   * As opposed to {@link findTarget} we want the top most object to be returned w/o the active object cutting in line.
-   * Override at will
-   */
-  findDragTargets(e) {
-    this.targets = [];
-    const target = this._searchPossibleTargets(this._objects, this.getViewportPoint(e));
-    return {
-      target,
-      targets: [...this.targets]
-    };
-  }
-
-  /**
    * prevent default to allow drop event to be fired
    * https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Drag_operations#specifying_drop_targets
    * @private
@@ -14709,14 +14708,14 @@ class Canvas extends SelectableCanvas {
   _onDragOver(e) {
     const eventType = 'dragover';
     const {
-      target,
-      targets
-    } = this.findDragTargets(e);
+      currentContainer: target,
+      currentSubTargets
+    } = this.findTarget(e);
     const dragSource = this._dragSource;
     const options = {
       e,
       target,
-      subTargets: targets,
+      subTargets: currentSubTargets,
       dragSource,
       canDrop: false,
       dropTarget: undefined
@@ -14726,7 +14725,7 @@ class Canvas extends SelectableCanvas {
     this.fire(eventType, options);
     //  make sure we fire dragenter events before dragover
     //  if dragleave is needed, object will not fire dragover so we don't need to trouble ourselves with it
-    this._fireEnterLeaveEvents(target, options);
+    this._fireEnterLeaveEvents(e, target, options);
     if (target) {
       if (target.canDrop(e)) {
         dropTarget = target;
@@ -14734,8 +14733,8 @@ class Canvas extends SelectableCanvas {
       target.fire(eventType, options);
     }
     //  propagate the event to subtargets
-    for (let i = 0; i < targets.length; i++) {
-      const subTarget = targets[i];
+    for (let i = 0; i < currentSubTargets.length; i++) {
+      const subTarget = currentSubTargets[i];
       // accept event only if previous targets didn't (the accepting target calls `preventDefault` to inform that the event is taken)
       // TODO: verify if those should loop in inverse order then?
       // what is the order of subtargets?
@@ -14756,18 +14755,18 @@ class Canvas extends SelectableCanvas {
    */
   _onDragEnter(e) {
     const {
-      target,
-      targets
-    } = this.findDragTargets(e);
+      currentContainer,
+      currentSubTargets
+    } = this.findTarget(e);
     const options = {
       e,
-      target,
-      subTargets: targets,
+      target: currentContainer,
+      subTargets: currentSubTargets,
       dragSource: this._dragSource
     };
     this.fire('dragenter', options);
     //  fire dragenter on targets
-    this._fireEnterLeaveEvents(target, options);
+    this._fireEnterLeaveEvents(e, currentContainer, options);
   }
 
   /**
@@ -14776,20 +14775,21 @@ class Canvas extends SelectableCanvas {
    * @param {Event} [e] Event object fired on Event.js shake
    */
   _onDragLeave(e) {
+    const {
+      currentSubTargets
+    } = this.findTarget(e);
     const options = {
       e,
       target: this._draggedoverTarget,
-      subTargets: this.targets,
+      subTargets: currentSubTargets,
       dragSource: this._dragSource
     };
     this.fire('dragleave', options);
 
     //  fire dragleave on targets
-    this._fireEnterLeaveEvents(undefined, options);
+    this._fireEnterLeaveEvents(e, undefined, options);
     this._renderDragEffects(e, this._dragSource);
     this._dropTarget = undefined;
-    //  clear targets
-    this.targets = [];
     this._hoveredTargets = [];
   }
 
@@ -14803,15 +14803,16 @@ class Canvas extends SelectableCanvas {
    */
   _onDrop(e) {
     const {
-      target,
-      targets
-    } = this.findDragTargets(e);
-    const options = this._basicEventHandler('drop:before', _objectSpread2({
+      currentContainer,
+      currentSubTargets
+    } = this.findTarget(e);
+    const options = this._basicEventHandler('drop:before', {
       e,
-      target,
-      subTargets: targets,
-      dragSource: this._dragSource
-    }, getEventPoints(this, e)));
+      target: currentContainer,
+      subTargets: currentSubTargets,
+      dragSource: this._dragSource,
+      ...getEventPoints(this, e)
+    });
     //  will be set by the drop target
     options.didDrop = false;
     //  will be set by the drop target, used in case options.target refuses the drop
@@ -14829,8 +14830,10 @@ class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   _onContextMenu(e) {
-    const target = this.findTarget(e),
-      subTargets = this.targets || [];
+    const {
+      target,
+      subTargets
+    } = this.findTarget(e);
     const options = this._basicEventHandler('contextmenu:before', {
       e,
       target,
@@ -14898,6 +14901,7 @@ class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   _onTouchStart(e) {
+    this._cacheTransformEventData(e);
     // we will prevent scrolling if allowTouchScrolling is not enabled and
     let shouldPreventScrolling = !this.allowTouchScrolling;
     const currentActiveObject = this._activeObject;
@@ -14905,15 +14909,17 @@ class Canvas extends SelectableCanvas {
       this.mainTouchId = this.getPointerId(e);
     }
     this.__onMouseDown(e);
+    const {
+      target
+    } = this.findTarget(e);
     // after executing fabric logic for mouse down let's see
     // if we didn't change target or if we are drawing
     // we want to prevent scrolling anyway
-    if (this.isDrawingMode || currentActiveObject && this._target === currentActiveObject) {
+    if (this.isDrawingMode || currentActiveObject && target === currentActiveObject) {
       shouldPreventScrolling = true;
     }
     // prevent default, will block scrolling from start
     shouldPreventScrolling && e.preventDefault();
-    this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(canvasElement);
@@ -14921,7 +14927,8 @@ class Canvas extends SelectableCanvas {
     // if we scroll don't register the touch move event
     shouldPreventScrolling && addListener(doc, 'touchmove', this._onMouseMove, addEventOptions);
     // Unbind mousedown to prevent double triggers from touch devices
-    removeListener(canvasElement, "".concat(eventTypePrefix, "down"), this._onMouseDown);
+    removeListener(canvasElement, `${eventTypePrefix}down`, this._onMouseDown);
+    this._resetTransformEventData();
   }
 
   /**
@@ -14929,14 +14936,16 @@ class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousedown
    */
   _onMouseDown(e) {
+    this._cacheTransformEventData(e);
     this.__onMouseDown(e);
-    this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
-    removeListener(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+    // switch from moving on the canvas element to moving on the document
+    removeListener(canvasElement, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
     const doc = getDocumentFromElement(canvasElement);
-    addListener(doc, "".concat(eventTypePrefix, "up"), this._onMouseUp);
-    addListener(doc, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+    addListener(doc, `${eventTypePrefix}up`, this._onMouseUp);
+    addListener(doc, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
+    this._resetTransformEventData();
   }
 
   /**
@@ -14948,6 +14957,7 @@ class Canvas extends SelectableCanvas {
       // if there are still touches stop here
       return;
     }
+    this._cacheTransformEventData(e);
     this.__onMouseUp(e);
     this._resetTransformEventData();
     delete this.mainTouchId;
@@ -14961,7 +14971,7 @@ class Canvas extends SelectableCanvas {
     this._willAddMouseDown = setTimeout(() => {
       // Wait 400ms before rebinding mousedown to prevent double triggers
       // from touch devices
-      addListener(this.upperCanvasEl, "".concat(eventTypePrefix, "down"), this._onMouseDown);
+      addListener(this.upperCanvasEl, `${eventTypePrefix}down`, this._onMouseDown);
       this._willAddMouseDown = 0;
     }, 400);
   }
@@ -14971,16 +14981,17 @@ class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mouseup
    */
   _onMouseUp(e) {
+    this._cacheTransformEventData(e);
     this.__onMouseUp(e);
-    this._resetTransformEventData();
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {
       const doc = getDocumentFromElement(this.upperCanvasEl);
-      removeListener(doc, "".concat(eventTypePrefix, "up"), this._onMouseUp);
-      removeListener(doc, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
-      addListener(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
+      removeListener(doc, `${eventTypePrefix}up`, this._onMouseUp);
+      removeListener(doc, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
+      addListener(canvasElement, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
     }
+    this._resetTransformEventData();
   }
 
   /**
@@ -14988,12 +14999,14 @@ class Canvas extends SelectableCanvas {
    * @param {Event} e Event object fired on mousemove
    */
   _onMouseMove(e) {
+    this._cacheTransformEventData(e);
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling && (!activeObject ||
     // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
     // we must not prevent the event's default behavior in order for the window to start dragging
     !activeObject.shouldStartDragging(e)) && e.preventDefault && e.preventDefault();
     this.__onMouseMove(e);
+    this._resetTransformEventData();
   }
 
   /**
@@ -15026,11 +15039,12 @@ class Canvas extends SelectableCanvas {
    */
   __onMouseUp(e) {
     var _this$_activeObject;
-    this._cacheTransformEventData(e);
     this._handleEvent(e, 'up:before');
     const transform = this._currentTransform;
     const isClick = this._isClick;
-    const target = this._target;
+    const {
+      target
+    } = this.findTarget(e);
 
     // if right/middle click just fire events and return
     // target undefined will make the _handleEvent search the target
@@ -15039,7 +15053,6 @@ class Canvas extends SelectableCanvas {
     } = e;
     if (button) {
       (this.fireMiddleClick && button === 1 || this.fireRightClick && button === 2) && this._handleEvent(e, 'up');
-      this._resetTransformEventData();
       return;
     }
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
@@ -15121,25 +15134,26 @@ class Canvas extends SelectableCanvas {
    * @param {TPointerEventNames} eventType
    */
   _handleEvent(e, eventType, extraData) {
-    const target = this._target,
-      targets = this.targets || [],
-      options = _objectSpread2(_objectSpread2(_objectSpread2({
+    const {
+        target,
+        subTargets
+      } = this.findTarget(e),
+      options = {
         e,
         target,
-        subTargets: targets
-      }, getEventPoints(this, e)), {}, {
-        transform: this._currentTransform
-      }, eventType === 'up:before' || eventType === 'up' ? {
-        isClick: this._isClick,
-        currentTarget: this.findTarget(e),
-        // set by the preceding `findTarget` call
-        currentSubTargets: this.targets
-      } : {}), eventType === 'down:before' || eventType === 'down' ? extraData : {});
-    this.fire("mouse:".concat(eventType), options);
+        subTargets,
+        ...getEventPoints(this, e),
+        transform: this._currentTransform,
+        ...(eventType === 'down:before' || eventType === 'down' ? extraData : {})
+      };
+    if (eventType === 'up:before' || eventType === 'up') {
+      options.isClick = this._isClick;
+    }
+    this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
-    target && target.fire("mouse".concat(eventType), options);
-    for (let i = 0; i < targets.length; i++) {
-      targets[i] !== target && targets[i].fire("mouse".concat(eventType), options);
+    target && target.fire(`mouse${eventType}`, options);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i] !== target && subTargets[i].fire(`mouse${eventType}`, options);
     }
   }
 
@@ -15209,9 +15223,10 @@ class Canvas extends SelectableCanvas {
    */
   __onMouseDown(e) {
     this._isClick = true;
-    this._cacheTransformEventData(e);
     this._handleEvent(e, 'down:before');
-    let target = this._target;
+    let {
+      target
+    } = this.findTarget(e);
     let alreadySelected = !!target && target === this._activeObject;
     // if right/middle click just fire events
     const {
@@ -15221,7 +15236,6 @@ class Canvas extends SelectableCanvas {
       (this.fireMiddleClick && button === 1 || this.fireRightClick && button === 2) && this._handleEvent(e, 'down', {
         alreadySelected
       });
-      this._resetTransformEventData();
       return;
     }
     if (this.isDrawingMode) {
@@ -15292,7 +15306,7 @@ class Canvas extends SelectableCanvas {
    * @private
    */
   _resetTransformEventData() {
-    this._target = this._pointer = this._absolutePointer = undefined;
+    this._targetInfo = this._viewportPoint = this._scenePoint = undefined;
   }
 
   /**
@@ -15303,9 +15317,12 @@ class Canvas extends SelectableCanvas {
   _cacheTransformEventData(e) {
     // reset in order to avoid stale caching
     this._resetTransformEventData();
-    this._pointer = this.getViewportPoint(e);
-    this._absolutePointer = sendPointToPlane(this._pointer, undefined, this.viewportTransform);
-    this._target = this._currentTransform ? this._currentTransform.target : this.findTarget(e);
+    this._viewportPoint = this.getViewportPoint(e);
+    this._scenePoint = sendPointToPlane(this._viewportPoint, undefined, this.viewportTransform);
+    this._targetInfo = this.findTarget(e);
+    if (this._currentTransform) {
+      this._targetInfo.target = this._currentTransform.target;
+    }
   }
 
   /**
@@ -15319,7 +15336,6 @@ class Canvas extends SelectableCanvas {
    */
   __onMouseMove(e) {
     this._isClick = false;
-    this._cacheTransformEventData(e);
     this._handleEvent(e, 'move:before');
     if (this.isDrawingMode) {
       this._onMouseMoveInDrawingMode(e);
@@ -15337,7 +15353,9 @@ class Canvas extends SelectableCanvas {
       groupSelector.deltaY = pointer.y - groupSelector.y;
       this.renderTop();
     } else if (!this._currentTransform) {
-      const target = this.findTarget(e);
+      const {
+        target
+      } = this.findTarget(e);
       this._setCursorFromEvent(e, target);
       this._fireOverOutEvents(e, target);
     } else {
@@ -15345,7 +15363,6 @@ class Canvas extends SelectableCanvas {
     }
     this.textEditingManager.onMouseMove(e);
     this._handleEvent(e, 'move');
-    this._resetTransformEventData();
   }
 
   /**
@@ -15357,8 +15374,10 @@ class Canvas extends SelectableCanvas {
   _fireOverOutEvents(e, target) {
     const _hoveredTarget = this._hoveredTarget,
       _hoveredTargets = this._hoveredTargets,
-      targets = this.targets,
-      length = Math.max(_hoveredTargets.length, targets.length);
+      {
+        subTargets
+      } = this.findTarget(e),
+      length = Math.max(_hoveredTargets.length, subTargets.length);
     this.fireSyntheticInOutEvents('mouse', {
       e,
       target,
@@ -15368,12 +15387,12 @@ class Canvas extends SelectableCanvas {
     for (let i = 0; i < length; i++) {
       this.fireSyntheticInOutEvents('mouse', {
         e,
-        target: targets[i],
+        target: subTargets[i],
         oldTarget: _hoveredTargets[i]
       });
     }
     this._hoveredTarget = target;
-    this._hoveredTargets = this.targets.concat();
+    this._hoveredTargets = subTargets;
   }
 
   /**
@@ -15382,21 +15401,25 @@ class Canvas extends SelectableCanvas {
    * @param {Object} data Event object fired on dragover
    * @private
    */
-  _fireEnterLeaveEvents(target, data) {
+  _fireEnterLeaveEvents(e, target, data) {
     const draggedoverTarget = this._draggedoverTarget,
       _hoveredTargets = this._hoveredTargets,
-      targets = this.targets,
-      length = Math.max(_hoveredTargets.length, targets.length);
-    this.fireSyntheticInOutEvents('drag', _objectSpread2(_objectSpread2({}, data), {}, {
+      {
+        subTargets
+      } = this.findTarget(e),
+      length = Math.max(_hoveredTargets.length, subTargets.length);
+    this.fireSyntheticInOutEvents('drag', {
+      ...data,
       target,
       oldTarget: draggedoverTarget,
       fireCanvas: true
-    }));
+    });
     for (let i = 0; i < length; i++) {
-      this.fireSyntheticInOutEvents('drag', _objectSpread2(_objectSpread2({}, data), {}, {
-        target: targets[i],
+      this.fireSyntheticInOutEvents('drag', {
+        ...data,
+        target: subTargets[i],
         oldTarget: _hoveredTargets[i]
-      }));
+      });
     }
     this._draggedoverTarget = target;
   }
@@ -15415,12 +15438,12 @@ class Canvas extends SelectableCanvas {
    */
   fireSyntheticInOutEvents(type, _ref) {
     let {
-        target,
-        oldTarget,
-        fireCanvas,
-        e
-      } = _ref,
-      data = _objectWithoutProperties(_ref, _excluded$9);
+      target,
+      oldTarget,
+      fireCanvas,
+      e,
+      ...data
+    } = _ref;
     const {
       targetIn,
       targetOut,
@@ -15429,33 +15452,27 @@ class Canvas extends SelectableCanvas {
     } = syntheticEventConfig[type];
     const targetChanged = oldTarget !== target;
     if (oldTarget && targetChanged) {
-      const outOpt = _objectSpread2(_objectSpread2({}, data), {}, {
+      const outOpt = {
+        ...data,
         e,
         target: oldTarget,
-        nextTarget: target
-      }, getEventPoints(this, e));
+        nextTarget: target,
+        ...getEventPoints(this, e)
+      };
       fireCanvas && this.fire(canvasOut, outOpt);
       oldTarget.fire(targetOut, outOpt);
     }
     if (target && targetChanged) {
-      const inOpt = _objectSpread2(_objectSpread2({}, data), {}, {
+      const inOpt = {
+        ...data,
         e,
         target,
-        previousTarget: oldTarget
-      }, getEventPoints(this, e));
+        previousTarget: oldTarget,
+        ...getEventPoints(this, e)
+      };
       fireCanvas && this.fire(canvasIn, inOpt);
       target.fire(targetIn, inOpt);
     }
-  }
-
-  /**
-   * Method that defines actions when an Event Mouse Wheel
-   * @param {Event} e Event object fired on mouseup
-   */
-  __onMouseWheel(e) {
-    this._cacheTransformEventData(e);
-    this._handleEvent(e, 'wheel');
-    this._resetTransformEventData();
   }
 
   /**
@@ -15518,14 +15535,20 @@ class Canvas extends SelectableCanvas {
       if (target.subTargetCheck) {
         // hoverCursor should come from top-most subTarget,
         // so we walk the array backwards
-        this.targets.concat().reverse().map(_target => {
+        const {
+          subTargets
+        } = this.findTarget(e);
+        subTargets.concat().reverse().forEach(_target => {
           hoverCursor = _target.hoverCursor || hoverCursor;
         });
       }
       this.setCursor(hoverCursor);
     } else {
-      const control = corner.control;
-      this.setCursor(control.cursorStyleHandler(e, control, target));
+      const {
+        control,
+        coord
+      } = corner;
+      this.setCursor(control.cursorStyleHandler(e, control, target, coord));
     }
   }
 
@@ -15536,6 +15559,7 @@ class Canvas extends SelectableCanvas {
    * ---
    * - If the active object is the active selection we add/remove `target` from it
    * - If not, add the active object and `target` to the active selection and make it the active object.
+   * @TODO rewrite this after find target is refactored
    * @private
    * @param {TPointerEvent} e Event object
    * @param {FabricObject} target target of event to select/deselect
@@ -15563,14 +15587,20 @@ class Canvas extends SelectableCanvas {
     !activeObject.getActiveControl()) {
       if (isAS) {
         const prevActiveObjects = activeObject.getObjects();
+        let subTargets = [];
+        // const { subTargets: testSubTargets } = this.findTarget(e);
         if (target === activeObject) {
-          const pointer = this.getViewportPoint(e);
-          target =
-          // first search active objects for a target to remove
-          this.searchPossibleTargets(prevActiveObjects, pointer) ||
-          //  if not found, search under active selection for a target to add
-          // `prevActiveObjects` will be searched but we already know they will not be found
-          this.searchPossibleTargets(this._objects, pointer);
+          const pointer = this.getScenePoint(e);
+          let targetInfo = this.searchPossibleTargets(prevActiveObjects, pointer);
+          // console.log(testSubTargets.includes(targetInfo.target));
+          if (targetInfo.target) {
+            target = targetInfo.target;
+            subTargets = targetInfo.subTargets;
+          } else {
+            targetInfo = this.searchPossibleTargets(this._objects, pointer);
+            target = targetInfo.target;
+            subTargets = targetInfo.subTargets;
+          }
           // if nothing is found bail out
           if (!target || !target.selectable) {
             return false;
@@ -15580,7 +15610,7 @@ class Canvas extends SelectableCanvas {
           // `target` is part of active selection => remove it
           activeObject.remove(target);
           this._hoveredTarget = target;
-          this._hoveredTargets = [...this.targets];
+          this._hoveredTargets = subTargets;
           // if after removing an object we are left with one only...
           if (activeObject.size() === 1) {
             // activate last remaining object
@@ -15591,7 +15621,7 @@ class Canvas extends SelectableCanvas {
           // `target` isn't part of active selection => add it
           activeObject.multiSelectAdd(target);
           this._hoveredTarget = activeObject;
-          this._hoveredTargets = [...this.targets];
+          this._hoveredTargets = subTargets;
         }
         this._fireSelectionEvents(prevActiveObjects, e);
       } else {
@@ -15698,10 +15728,11 @@ const linearDefaultCoords = {
   x2: 0,
   y2: 0
 };
-const radialDefaultCoords = _objectSpread2(_objectSpread2({}, linearDefaultCoords), {}, {
+const radialDefaultCoords = {
+  ...linearDefaultCoords,
   r1: 0,
   r2: 0
-});
+};
 
 /**
  *
@@ -15731,8 +15762,8 @@ function parsePercent(value, valueIfNaN) {
 
 const RE_KEY_VALUE_PAIRS = /\s*;\s*/;
 const RE_KEY_VALUE = /\s*:\s*/;
-function parseColorStop(el, multiplier) {
-  let colorValue, opacity;
+function parseColorStop(el, opacityMultiplier) {
+  let colorValue, opacityValue;
   const style = el.getAttribute('style');
   if (style) {
     const keyValuePairs = style.split(RE_KEY_VALUE_PAIRS);
@@ -15744,15 +15775,17 @@ function parseColorStop(el, multiplier) {
       if (key === 'stop-color') {
         colorValue = value;
       } else if (key === 'stop-opacity') {
-        opacity = value;
+        opacityValue = value;
       }
     }
   }
-  const color = new Color(colorValue || el.getAttribute('stop-color') || 'rgb(0,0,0)');
+  colorValue = colorValue || el.getAttribute('stop-color') || 'rgb(0,0,0)';
+  opacityValue = ifNaN(parseFloat(opacityValue || el.getAttribute('stop-opacity') || ''), 1);
+  const color = new Color(colorValue);
+  color.setAlpha(color.getAlpha() * opacityValue * opacityMultiplier);
   return {
     offset: parsePercent(el.getAttribute('offset'), 0),
-    color: color.toRgb(),
-    opacity: ifNaN(parseFloat(opacity || el.getAttribute('stop-opacity') || ''), 1) * color.getAlpha() * multiplier
+    color: color.toRgba()
   };
 }
 function parseColorStops(el, opacityAttr) {
@@ -15826,9 +15859,10 @@ function parseRadialCoords(el) {
   };
 }
 function parseCoords(el, size) {
-  return convertPercentUnitsToValues(parseType(el) === 'linear' ? parseLinearCoords(el) : parseRadialCoords(el), _objectSpread2(_objectSpread2({}, size), {}, {
+  return convertPercentUnitsToValues(parseType(el) === 'linear' ? parseLinearCoords(el) : parseRadialCoords(el), {
+    ...size,
     gradientUnits: parseGradientUnits(el)
-  }));
+  });
 }
 
 /**
@@ -15851,12 +15885,15 @@ class Gradient {
     Object.assign(this, {
       type,
       gradientUnits,
-      coords: _objectSpread2(_objectSpread2({}, type === 'radial' ? radialDefaultCoords : linearDefaultCoords), coords),
+      coords: {
+        ...(type === 'radial' ? radialDefaultCoords : linearDefaultCoords),
+        ...coords
+      },
       colorStops,
       offsetX,
       offsetY,
       gradientTransform,
-      id: id ? "".concat(id, "_").concat(uid()) : uid()
+      id: id ? `${id}_${uid()}` : uid()
     });
   }
 
@@ -15867,11 +15904,9 @@ class Gradient {
    */
   addColorStop(colorStops) {
     for (const position in colorStops) {
-      const color = new Color(colorStops[position]);
       this.colorStops.push({
         offset: parseFloat(position),
-        color: color.toRgb(),
-        opacity: color.getAlpha()
+        color: colorStops[position]
       });
     }
     return this;
@@ -15883,15 +15918,20 @@ class Gradient {
    * @return {object}
    */
   toObject(propertiesToInclude) {
-    return _objectSpread2(_objectSpread2({}, pick(this, propertiesToInclude)), {}, {
+    return {
+      ...pick(this, propertiesToInclude),
       type: this.type,
-      coords: _objectSpread2({}, this.coords),
-      colorStops: this.colorStops.map(colorStop => _objectSpread2({}, colorStop)),
+      coords: {
+        ...this.coords
+      },
+      colorStops: this.colorStops.map(colorStop => ({
+        ...colorStop
+      })),
       offsetX: this.offsetX,
       offsetY: this.offsetY,
       gradientUnits: this.gradientUnits,
       gradientTransform: this.gradientTransform ? [...this.gradientTransform] : undefined
-    });
+    };
   }
 
   /* _TO_SVG_START_ */
@@ -15908,7 +15948,9 @@ class Gradient {
       transform = this.gradientTransform ? this.gradientTransform.concat() : iMatrix.concat(),
       gradientUnits = this.gradientUnits === 'pixels' ? 'userSpaceOnUse' : 'objectBoundingBox';
     // colorStops must be sorted ascending, and guarded against deep mutations
-    const colorStops = this.colorStops.map(colorStop => _objectSpread2({}, colorStop)).sort((a, b) => {
+    const colorStops = this.colorStops.map(colorStop => ({
+      ...colorStop
+    })).sort((a, b) => {
       return a.offset - b.offset;
     });
     let offsetX = -this.offsetX,
@@ -15927,7 +15969,7 @@ class Gradient {
     }
     transform[4] -= offsetX;
     transform[5] -= offsetY;
-    const commonAttributes = ["id=\"SVGID_".concat(this.id, "\""), "gradientUnits=\"".concat(gradientUnits, "\""), "gradientTransform=\"".concat(preTransform ? preTransform + ' ' : '').concat(matrixToSVG(transform), "\""), ''].join(' ');
+    const commonAttributes = [`id="SVGID_${this.id}"`, `gradientUnits="${gradientUnits}"`, `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`, ''].join(' ');
     if (this.type === 'linear') {
       const {
         x1,
@@ -15968,10 +16010,9 @@ class Gradient {
     colorStops.forEach(_ref => {
       let {
         color,
-        offset,
-        opacity
+        offset
       } = _ref;
-      markup.push('<stop ', 'offset="', offset * 100 + '%', '" style="stop-color:', color, typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';', '"/>\n');
+      markup.push(`<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`);
     });
     markup.push(this.type === 'linear' ? '</linearGradient>' : '</radialGradient>', '\n');
     return markup.join('');
@@ -15996,10 +16037,9 @@ class Gradient {
     this.colorStops.forEach(_ref2 => {
       let {
         color,
-        opacity,
         offset
       } = _ref2;
-      gradient.addColorStop(offset, typeof opacity !== 'undefined' ? new Color(color).setAlpha(opacity).toRgba() : color);
+      gradient.addColorStop(offset, color);
     });
     return gradient;
   }
@@ -16008,17 +16048,18 @@ class Gradient {
       colorStops,
       gradientTransform
     } = options;
-    return new this(_objectSpread2(_objectSpread2({}, options), {}, {
-      colorStops: colorStops ? colorStops.map(colorStop => _objectSpread2({}, colorStop)) : undefined,
+    return new this({
+      ...options,
+      colorStops: colorStops ? colorStops.map(colorStop => ({
+        ...colorStop
+      })) : undefined,
       gradientTransform: gradientTransform ? [...gradientTransform] : undefined
-    }));
+    });
   }
 
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
-   * @static
-   * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
    * @param {FabricObject} instance
    * @param {String} opacity A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.
@@ -16062,7 +16103,7 @@ class Gradient {
   static fromElement(el, instance, svgOptions) {
     const gradientUnits = parseGradientUnits(el);
     const center = instance._findCenterFromElement();
-    return new this(_objectSpread2({
+    return new this({
       id: el.getAttribute('id') || undefined,
       type: parseType(el),
       coords: parseCoords(el, {
@@ -16071,14 +16112,15 @@ class Gradient {
       }),
       colorStops: parseColorStops(el, svgOptions.opacity),
       gradientUnits,
-      gradientTransform: parseTransformAttribute(el.getAttribute('gradientTransform') || '')
-    }, gradientUnits === 'pixels' ? {
-      offsetX: instance.width / 2 - center.x,
-      offsetY: instance.height / 2 - center.y
-    } : {
-      offsetX: 0,
-      offsetY: 0
-    }));
+      gradientTransform: parseTransformAttribute(el.getAttribute('gradientTransform') || ''),
+      ...(gradientUnits === 'pixels' ? {
+        offsetX: instance.width / 2 - center.x,
+        offsetY: instance.height / 2 - center.y
+      } : {
+        offsetX: 0,
+        offsetY: 0
+      })
+    });
   }
   /* _FROM_SVG_END_ */
 }
@@ -16136,8 +16178,6 @@ classRegistry.setClass(Gradient, 'gradient');
 classRegistry.setClass(Gradient, 'linear');
 classRegistry.setClass(Gradient, 'radial');
 
-const _excluded$8 = ["type", "source", "patternTransform"];
-
 /**
  * @see {@link http://fabricjs.com/patterns demo}
  * @see {@link http://fabricjs.com/dynamic-patterns demo}
@@ -16167,7 +16207,6 @@ class Pattern {
    * transform matrix to change the pattern, imported from svgs.
    * @todo verify if using the identity matrix as default makes the rest of the code more easy
    * @type Array
-   * @default
    */
 
   /**
@@ -16194,18 +16233,15 @@ class Pattern {
     /**
      * Pattern horizontal offset from object's left/top corner
      * @type Number
-     * @default
      */
     _defineProperty(this, "offsetX", 0);
     /**
      * Pattern vertical offset from object's left/top corner
      * @type Number
-     * @default
      */
     _defineProperty(this, "offsetY", 0);
     /**
      * @type TCrossOrigin
-     * @default
      */
     _defineProperty(this, "crossOrigin", '');
     this.id = uid();
@@ -16256,7 +16292,8 @@ class Pattern {
       repeat,
       crossOrigin
     } = this;
-    return _objectSpread2(_objectSpread2({}, pick(this, propertiesToInclude)), {}, {
+    return {
+      ...pick(this, propertiesToInclude),
       type: 'pattern',
       source: this.sourceToString(),
       repeat,
@@ -16264,7 +16301,7 @@ class Pattern {
       offsetX: toFixed(this.offsetX, config.NUM_FRACTION_DIGITS),
       offsetY: toFixed(this.offsetY, config.NUM_FRACTION_DIGITS),
       patternTransform: this.patternTransform ? [...this.patternTransform] : null
-    });
+    };
   }
 
   /* _TO_SVG_START_ */
@@ -16285,24 +16322,26 @@ class Pattern {
       patternOffsetY = ifNaN(this.offsetY / height, 0),
       patternWidth = repeat === 'repeat-y' || repeat === 'no-repeat' ? 1 + Math.abs(patternOffsetX || 0) : ifNaN(patternSource.width / width, 0),
       patternHeight = repeat === 'repeat-x' || repeat === 'no-repeat' ? 1 + Math.abs(patternOffsetY || 0) : ifNaN(patternSource.height / height, 0);
-    return ["<pattern id=\"SVGID_".concat(id, "\" x=\"").concat(patternOffsetX, "\" y=\"").concat(patternOffsetY, "\" width=\"").concat(patternWidth, "\" height=\"").concat(patternHeight, "\">"), "<image x=\"0\" y=\"0\" width=\"".concat(patternSource.width, "\" height=\"").concat(patternSource.height, "\" xlink:href=\"").concat(this.sourceToString(), "\"></image>"), "</pattern>", ''].join('\n');
+    return [`<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`, `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${this.sourceToString()}"></image>`, `</pattern>`, ''].join('\n');
   }
   /* _TO_SVG_END_ */
 
   static async fromObject(_ref2, options) {
     let {
-        type,
-        source,
-        patternTransform
-      } = _ref2,
-      otherOptions = _objectWithoutProperties(_ref2, _excluded$8);
-    const img = await loadImage(source, _objectSpread2(_objectSpread2({}, options), {}, {
+      type,
+      source,
+      patternTransform,
+      ...otherOptions
+    } = _ref2;
+    const img = await loadImage(source, {
+      ...options,
       crossOrigin: otherOptions.crossOrigin
-    }));
-    return new this(_objectSpread2(_objectSpread2({}, otherOptions), {}, {
+    });
+    return new this({
+      ...otherOptions,
       patternTransform: patternTransform && patternTransform.slice(0),
       source: img
-    }));
+    });
   }
 }
 _defineProperty(Pattern, "type", 'Pattern');
@@ -16322,13 +16361,11 @@ class BaseBrush {
     /**
      * Color of a brush
      * @type String
-     * @default
      */
     _defineProperty(this, "color", 'rgb(0, 0, 0)');
     /**
      * Width of a brush, has to be a Number, no string literals
      * @type Number
-     * @default
      */
     _defineProperty(this, "width", 1);
     /**
@@ -16336,31 +16373,26 @@ class BaseBrush {
      * <b>Backwards incompatibility note:</b> This property replaces "shadowColor" (String), "shadowOffsetX" (Number),
      * "shadowOffsetY" (Number) and "shadowBlur" (Number) since v1.2.12
      * @type Shadow
-     * @default
      */
     _defineProperty(this, "shadow", null);
     /**
      * Line endings style of a brush (one of "butt", "round", "square")
      * @type String
-     * @default
      */
     _defineProperty(this, "strokeLineCap", 'round');
     /**
      * Corner style of a brush (one of "bevel", "round", "miter")
      * @type String
-     * @default
      */
     _defineProperty(this, "strokeLineJoin", 'round');
     /**
      * Maximum miter length (used for strokeLineJoin = "miter") of a brush's
      * @type Number
-     * @default
      */
     _defineProperty(this, "strokeMiterLimit", 10);
     /**
      * Stroke Dash Array.
      * @type Array
-     * @default
      */
     _defineProperty(this, "strokeDashArray", null);
     /**
@@ -16443,8 +16475,6 @@ class BaseBrush {
   }
 }
 
-const _excluded$7 = ["path", "left", "top"],
-  _excluded2$2 = ["d"];
 class Path extends FabricObject {
   /**
    * Constructor
@@ -16453,13 +16483,12 @@ class Path extends FabricObject {
    * @return {Path} thisArg
    */
   constructor(path) {
-    let _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-      {
-        path: _,
-        left,
-        top
-      } = _ref,
-      options = _objectWithoutProperties(_ref, _excluded$7);
+    let {
+      path: _,
+      left,
+      top,
+      ...options
+    } = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     super();
     Object.assign(this, Path.ownDefaults);
     this.setOptions(options);
@@ -16538,7 +16567,7 @@ class Path extends FabricObject {
    * @return {string} string representation of an instance
    */
   toString() {
-    return "#<Path (".concat(this.complexity(), "): { \"top\": ").concat(this.top, ", \"left\": ").concat(this.left, " }>");
+    return `#<Path (${this.complexity()}): { "top": ${this.top}, "left": ${this.left} }>`;
   }
 
   /**
@@ -16548,9 +16577,10 @@ class Path extends FabricObject {
    */
   toObject() {
     let propertiesToInclude = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    return _objectSpread2(_objectSpread2({}, super.toObject(propertiesToInclude)), {}, {
+    return {
+      ...super.toObject(propertiesToInclude),
       path: this.path.map(pathCmd => pathCmd.slice())
-    });
+    };
   }
 
   /**
@@ -16575,7 +16605,7 @@ class Path extends FabricObject {
    */
   _toSVG() {
     const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
-    return ['<path ', 'COMMON_PARTS', "d=\"".concat(path, "\" stroke-linecap=\"round\" />\n")];
+    return ['<path ', 'COMMON_PARTS', `d="${path}" stroke-linecap="round" />\n`];
   }
 
   /**
@@ -16584,7 +16614,7 @@ class Path extends FabricObject {
    */
   _getOffsetTransform() {
     const digits = config.NUM_FRACTION_DIGITS;
-    return " translate(".concat(toFixed(-this.pathOffset.x, digits), ", ").concat(toFixed(-this.pathOffset.y, digits), ")");
+    return ` translate(${toFixed(-this.pathOffset.x, digits)}, ${toFixed(-this.pathOffset.y, digits)})`;
   }
 
   /**
@@ -16695,22 +16725,19 @@ class Path extends FabricObject {
    */
   _calcDimensions() {
     const bbox = this._calcBoundsFromPath();
-    return _objectSpread2(_objectSpread2({}, bbox), {}, {
+    return {
+      ...bbox,
       pathOffset: new Point(bbox.left + bbox.width / 2, bbox.top + bbox.height / 2)
-    });
+    };
   }
 
   /**
    * List of attribute names to account for when parsing SVG element (used by `Path.fromElement`)
-   * @static
-   * @memberOf Path
    * @see http://www.w3.org/TR/SVG/paths.html#PathElement
    */
 
   /**
    * Creates an instance of Path from an object
-   * @static
-   * @memberOf Path
    * @param {Object} object
    * @returns {Promise<Path>}
    */
@@ -16722,28 +16749,26 @@ class Path extends FabricObject {
 
   /**
    * Creates an instance of Path from an SVG <path> element
-   * @static
-   * @memberOf Path
    * @param {HTMLElement} element to parse
    * @param {Partial<PathProps>} [options] Options object
    */
   static async fromElement(element, options, cssRules) {
-    const _parseAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules),
-      {
-        d
-      } = _parseAttributes,
-      parsedAttributes = _objectWithoutProperties(_parseAttributes, _excluded2$2);
-    return new this(d, _objectSpread2(_objectSpread2(_objectSpread2({}, parsedAttributes), options), {}, {
+    const {
+      d,
+      ...parsedAttributes
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
+    return new this(d, {
+      ...parsedAttributes,
+      ...options,
       // we pass undefined to instruct the constructor to position the object using the bbox
       left: undefined,
       top: undefined
-    }));
+    });
   }
 }
 /**
  * Array of path points
  * @type Array
- * @default
  */
 _defineProperty(Path, "type", 'Path');
 _defineProperty(Path, "cacheProperties", [...cacheProperties, 'path', 'fillRule']);
@@ -16987,6 +17012,7 @@ class PencilBrush extends BaseBrush {
       adjustedDistance = Math.pow(distance / zoom, 2),
       l = points.length - 1,
       newPoints = [lastPoint];
+    // TODO investigate why this is not i < l
     for (let i = 1; i < l - 1; i++) {
       cDistance = Math.pow(lastPoint.x - points[i].x, 2) + Math.pow(lastPoint.y - points[i].y, 2);
       if (cDistance >= adjustedDistance) {
@@ -17037,7 +17063,6 @@ class PencilBrush extends BaseBrush {
   }
 }
 
-const _excluded$6 = ["left", "top", "radius"];
 const CIRCLE_PROPS = ['radius', 'startAngle', 'endAngle', 'counterClockwise'];
 const circleDefaultValues = {
   radius: 0,
@@ -17047,7 +17072,10 @@ const circleDefaultValues = {
 };
 class Circle extends FabricObject {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Circle.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Circle.ownDefaults
+    };
   }
 
   /**
@@ -17130,7 +17158,7 @@ class Circle extends FabricObject {
   _toSVG() {
     const angle = (this.endAngle - this.startAngle) % 360;
     if (angle === 0) {
-      return ['<circle ', 'COMMON_PARTS', 'cx="0" cy="0" ', 'r="', "".concat(this.radius), '" />\n'];
+      return ['<circle ', 'COMMON_PARTS', 'cx="0" cy="0" ', 'r="', `${this.radius}`, '" />\n'];
     } else {
       const {
         radius
@@ -17143,7 +17171,7 @@ class Circle extends FabricObject {
         endY = sin(end) * radius,
         largeFlag = angle > 180 ? 1 : 0,
         sweepFlag = this.counterClockwise ? 0 : 1;
-      return ["<path d=\"M ".concat(startX, " ").concat(startY, " A ").concat(radius, " ").concat(radius, " 0 ").concat(largeFlag, " ").concat(sweepFlag, " ").concat(endX, " ").concat(endY, "\" "), 'COMMON_PARTS', ' />\n'];
+      return [`<path d="M ${startX} ${startY} A ${radius} ${radius} 0 ${largeFlag} ${sweepFlag} ${endX} ${endY}" `, 'COMMON_PARTS', ' />\n'];
     }
   }
   /* _TO_SVG_END_ */
@@ -17151,35 +17179,31 @@ class Circle extends FabricObject {
   /* _FROM_SVG_START_ */
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Circle.fromElement})
-   * @static
-   * @memberOf Circle
    * @see: http://www.w3.org/TR/SVG/shapes.html#CircleElement
    */
 
   /**
    * Returns {@link Circle} instance from an SVG element
-   * @static
-   * @memberOf Circle
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
   static async fromElement(element, options, cssRules) {
-    const _ref = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules),
-      {
-        left = 0,
-        top = 0,
-        radius = 0
-      } = _ref,
-      otherParsedAttributes = _objectWithoutProperties(_ref, _excluded$6);
+    const {
+      left = 0,
+      top = 0,
+      radius = 0,
+      ...otherParsedAttributes
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
 
     // this probably requires to be fixed for default origins not being top/left.
 
-    return new this(_objectSpread2(_objectSpread2({}, otherParsedAttributes), {}, {
+    return new this({
+      ...otherParsedAttributes,
       radius,
       left: left - radius,
       top: top - radius
-    }));
+    });
   }
 
   /* _FROM_SVG_END_ */
@@ -17204,7 +17228,6 @@ class CircleBrush extends BaseBrush {
     /**
      * Width of a brush
      * @type Number
-     * @default
      */
     _defineProperty(this, "width", 10);
     this.points = [];
@@ -17335,7 +17358,7 @@ function getUniqueRects(rects) {
   const uniqueRects = {};
   const uniqueRectsArray = [];
   for (let i = 0, key; i < rects.length; i++) {
-    key = "".concat(rects[i].left).concat(rects[i].top);
+    key = `${rects[i].left}${rects[i].top}`;
     if (!uniqueRects[key]) {
       uniqueRects[key] = true;
       uniqueRectsArray.push(rects[i]);
@@ -17354,37 +17377,31 @@ class SprayBrush extends BaseBrush {
     /**
      * Width of a spray
      * @type Number
-     * @default
      */
     _defineProperty(this, "width", 10);
     /**
      * Density of a spray (number of dots per chunk)
      * @type Number
-     * @default
      */
     _defineProperty(this, "density", 20);
     /**
      * Width of spray dots
      * @type Number
-     * @default
      */
     _defineProperty(this, "dotWidth", 1);
     /**
      * Width variance of spray dots
      * @type Number
-     * @default
      */
     _defineProperty(this, "dotWidthVariance", 1);
     /**
      * Whether opacity of a dot should be random
      * @type Boolean
-     * @default
      */
     _defineProperty(this, "randomOpacity", false);
     /**
      * Whether overlapping dots (rectangles) should be removed (for performance reasons)
      * @type Boolean
-     * @default
      */
     _defineProperty(this, "optimizeOverlapping", true);
     this.sprayChunks = [];
@@ -17554,11 +17571,16 @@ class PatternBrush extends PencilBrush {
   }
 }
 
-const _excluded$5 = ["x1", "y1", "x2", "y2"],
-  _excluded2$1 = ["x1", "y1", "x2", "y2"];
 // @TODO this code is terrible and Line should be a special case of polyline.
 
 const coordProps = ['x1', 'x2', 'y1', 'y2'];
+/**
+ * A Class to draw a line
+ * A bunch of methods will be added to Polyline to handle the line case
+ * The line class is very strange to work with, is all special, it hardly aligns
+ * to what a developer want everytime there is an angle
+ * @deprecated
+ */
 class Line extends FabricObject {
   /**
    * Constructor
@@ -17676,7 +17698,10 @@ class Line extends FabricObject {
    */
   toObject() {
     let propertiesToInclude = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    return _objectSpread2(_objectSpread2({}, super.toObject(propertiesToInclude)), this.calcLinePoints());
+    return {
+      ...super.toObject(propertiesToInclude),
+      ...this.calcLinePoints()
+    };
   }
 
   /*
@@ -17740,33 +17765,28 @@ class Line extends FabricObject {
       y1,
       y2
     } = this.calcLinePoints();
-    return ['<line ', 'COMMON_PARTS', "x1=\"".concat(x1, "\" y1=\"").concat(y1, "\" x2=\"").concat(x2, "\" y2=\"").concat(y2, "\" />\n")];
+    return ['<line ', 'COMMON_PARTS', `x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />\n`];
   }
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Line.fromElement})
-   * @static
-   * @memberOf Line
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
 
   /**
    * Returns Line instance from an SVG element
-   * @static
-   * @memberOf Line
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
   static async fromElement(element, options, cssRules) {
-    const _parseAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules),
-      {
-        x1 = 0,
-        y1 = 0,
-        x2 = 0,
-        y2 = 0
-      } = _parseAttributes,
-      parsedAttributes = _objectWithoutProperties(_parseAttributes, _excluded$5);
+    const {
+      x1 = 0,
+      y1 = 0,
+      x2 = 0,
+      y2 = 0,
+      ...parsedAttributes
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
     return new this([x1, y1, x2, y2], parsedAttributes);
   }
 
@@ -17774,22 +17794,21 @@ class Line extends FabricObject {
 
   /**
    * Returns Line instance from an object representation
-   * @static
-   * @memberOf Line
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */
   static fromObject(_ref) {
     let {
-        x1,
-        y1,
-        x2,
-        y2
-      } = _ref,
-      object = _objectWithoutProperties(_ref, _excluded2$1);
-    return this._fromObject(_objectSpread2(_objectSpread2({}, object), {}, {
+      x1,
+      y1,
+      x2,
+      y2,
+      ...object
+    } = _ref;
+    return this._fromObject({
+      ...object,
       points: [x1, y1, x2, y2]
-    }), {
+    }, {
       extraParam: 'points'
     });
   }
@@ -17797,22 +17816,18 @@ class Line extends FabricObject {
 /**
  * x value or first line edge
  * @type number
- * @default
  */
 /**
  * y value or first line edge
  * @type number
- * @default
  */
 /**
  * x value or second line edge
  * @type number
- * @default
  */
 /**
  * y value or second line edge
  * @type number
- * @default
  */
 _defineProperty(Line, "type", 'Line');
 _defineProperty(Line, "cacheProperties", [...cacheProperties, ...coordProps]);
@@ -17826,7 +17841,10 @@ const triangleDefaultValues = {
 };
 class Triangle extends FabricObject {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Triangle.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Triangle.ownDefaults
+    };
   }
 
   /**
@@ -17862,7 +17880,7 @@ class Triangle extends FabricObject {
   _toSVG() {
     const widthBy2 = this.width / 2,
       heightBy2 = this.height / 2,
-      points = "".concat(-widthBy2, " ").concat(heightBy2, ",0 ").concat(-heightBy2, ",").concat(widthBy2, " ").concat(heightBy2);
+      points = `${-widthBy2} ${heightBy2},0 ${-heightBy2},${widthBy2} ${heightBy2}`;
     return ['<polygon ', 'COMMON_PARTS', 'points="', points, '" />'];
   }
 }
@@ -17878,7 +17896,10 @@ const ellipseDefaultValues = {
 const ELLIPSE_PROPS = ['rx', 'ry'];
 class Ellipse extends FabricObject {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Ellipse.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Ellipse.ownDefaults
+    };
   }
 
   /**
@@ -17944,7 +17965,7 @@ class Ellipse extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    return ['<ellipse ', 'COMMON_PARTS', "cx=\"0\" cy=\"0\" rx=\"".concat(this.rx, "\" ry=\"").concat(this.ry, "\" />\n")];
+    return ['<ellipse ', 'COMMON_PARTS', `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`];
   }
 
   /**
@@ -17964,15 +17985,11 @@ class Ellipse extends FabricObject {
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Ellipse.fromElement})
-   * @static
-   * @memberOf Ellipse
    * @see http://www.w3.org/TR/SVG/shapes.html#EllipseElement
    */
 
   /**
    * Returns {@link Ellipse} instance from an SVG element
-   * @static
-   * @memberOf Ellipse
    * @param {HTMLElement} element Element to parse
    * @return {Ellipse}
    */
@@ -17988,12 +18005,10 @@ class Ellipse extends FabricObject {
 /**
  * Horizontal radius
  * @type Number
- * @default
  */
 /**
  * Vertical radius
  * @type Number
- * @default
  */
 _defineProperty(Ellipse, "type", 'Ellipse');
 _defineProperty(Ellipse, "cacheProperties", [...cacheProperties, ...ELLIPSE_PROPS]);
@@ -18005,7 +18020,6 @@ classRegistry.setSVGClass(Ellipse);
 /**
  * Parses "points" attribute, returning an array of values
  * @static
- * @memberOf fabric
  * @param {String} points points attribute string
  * @return {Array} array of points
  */
@@ -18032,7 +18046,6 @@ function parsePointsAttribute(points) {
   return parsedPoints;
 }
 
-const _excluded$4 = ["left", "top"];
 const polylineDefaultValues = {
   /**
    * @deprecated transient option soon to be removed in favor of a different design
@@ -18041,7 +18054,10 @@ const polylineDefaultValues = {
 };
 class Polyline extends FabricObject {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Polyline.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Polyline.ownDefaults
+    };
   }
 
   /**
@@ -18097,7 +18113,7 @@ class Polyline extends FabricObject {
    * @private
    */
   _calcDimensions(options) {
-    options = _objectSpread2({
+    options = {
       scaleX: this.scaleX,
       scaleY: this.scaleY,
       skewX: this.skewX,
@@ -18106,8 +18122,9 @@ class Polyline extends FabricObject {
       strokeLineJoin: this.strokeLineJoin,
       strokeMiterLimit: this.strokeMiterLimit,
       strokeUniform: this.strokeUniform,
-      strokeWidth: this.strokeWidth
-    }, options || {});
+      strokeWidth: this.strokeWidth,
+      ...(options || {})
+    };
     const points = this.exactBoundingBox ? this._projectStrokeOnPoints(options).map(projection => projection.projectedPoint) : this.points;
     if (points.length === 0) {
       return {
@@ -18122,10 +18139,11 @@ class Polyline extends FabricObject {
     }
     const bbox = makeBoundingBoxFromPoints(points),
       // Remove scale effect, since it's applied after
-      matrix = calcDimensionsMatrix(_objectSpread2(_objectSpread2({}, options), {}, {
+      matrix = calcDimensionsMatrix({
+        ...options,
         scaleX: 1,
         scaleY: 1
-      })),
+      }),
       bboxNoStroke = makeBoundingBoxFromPoints(this.points.map(p => transformPoint(p, matrix, true))),
       scale = new Point(this.scaleX, this.scaleY);
     let offsetX = bbox.left + bbox.width / 2,
@@ -18136,11 +18154,12 @@ class Polyline extends FabricObject {
       // offsetY relies on offsetX being already changed by the line above
       offsetY = offsetY - offsetX * Math.tan(degreesToRadians(this.skewY));
     }
-    return _objectSpread2(_objectSpread2({}, bbox), {}, {
+    return {
+      ...bbox,
       pathOffset: new Point(offsetX, offsetY),
       strokeOffset: new Point(bboxNoStroke.left, bboxNoStroke.top).subtract(new Point(bbox.left, bbox.top)).multiply(scale),
       strokeDiff: new Point(bbox.width, bbox.height).subtract(new Point(bboxNoStroke.width, bboxNoStroke.height)).multiply(scale)
-    });
+    };
   }
 
   /**
@@ -18244,7 +18263,8 @@ class Polyline extends FabricObject {
    */
   toObject() {
     let propertiesToInclude = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    return _objectSpread2(_objectSpread2({}, super.toObject(propertiesToInclude)), {}, {
+    return {
+      ...super.toObject(propertiesToInclude),
       points: this.points.map(_ref => {
         let {
           x,
@@ -18255,7 +18275,7 @@ class Polyline extends FabricObject {
           y
         };
       })
-    });
+    };
   }
 
   /**
@@ -18271,7 +18291,7 @@ class Polyline extends FabricObject {
     for (let i = 0, len = this.points.length; i < len; i++) {
       points.push(toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',', toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' ');
     }
-    return ["<".concat(this.constructor.type.toLowerCase(), " "), 'COMMON_PARTS', "points=\"".concat(points.join(''), "\" />\n")];
+    return [`<${this.constructor.type.toLowerCase()} `, 'COMMON_PARTS', `points="${points.join('')}" />\n`];
   }
 
   /**
@@ -18309,31 +18329,33 @@ class Polyline extends FabricObject {
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Polyline.fromElement})
-   * @static
-   * @memberOf Polyline
    * @see: http://www.w3.org/TR/SVG/shapes.html#PolylineElement
    */
 
   /**
    * Returns Polyline instance from an SVG element
-   * @static
-   * @memberOf Polyline
    * @param {HTMLElement} element Element to parser
    * @param {Object} [options] Options object
    */
   static async fromElement(element, options, cssRules) {
     const points = parsePointsAttribute(element.getAttribute('points')),
-      _parseAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules),
-      parsedAttributes = _objectWithoutProperties(_parseAttributes, _excluded$4);
-    return new this(points, _objectSpread2(_objectSpread2({}, parsedAttributes), options));
+      // we omit left and top to instruct the constructor to position the object using the bbox
+
+      {
+        left,
+        top,
+        ...parsedAttributes
+      } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
+    return new this(points, {
+      ...parsedAttributes,
+      ...options
+    });
   }
 
   /* _FROM_SVG_END_ */
 
   /**
    * Returns Polyline instance from an object representation
-   * @static
-   * @memberOf Polyline
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Polyline>}
    */
@@ -18346,7 +18368,6 @@ class Polyline extends FabricObject {
 /**
  * Points array
  * @type Array
- * @default
  */
 /**
  * WARNING: Feature in progress
@@ -18374,64 +18395,6 @@ _defineProperty(Polygon, "ownDefaults", polylineDefaultValues);
 _defineProperty(Polygon, "type", 'Polygon');
 classRegistry.setClass(Polygon);
 classRegistry.setSVGClass(Polygon);
-
-const fontProperties = ['fontSize', 'fontWeight', 'fontFamily', 'fontStyle'];
-const textDecorationProperties = ['underline', 'overline', 'linethrough'];
-const textLayoutProperties = [...fontProperties, 'lineHeight', 'text', 'charSpacing', 'textAlign', 'styles', 'path', 'pathStartOffset', 'pathSide', 'pathAlign'];
-const additionalProps = [...textLayoutProperties, ...textDecorationProperties, 'textBackgroundColor', 'direction'];
-const styleProperties = [...fontProperties, ...textDecorationProperties, STROKE, 'strokeWidth', FILL, 'deltaY', 'textBackgroundColor'];
-
-// @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
-// regexes, list of properties that are not suppose to change by instances, magic consts.
-// this will be a separated effort
-const textDefaultValues = {
-  _reNewline: reNewline,
-  _reSpacesAndTabs: /[ \t\r]/g,
-  _reSpaceAndTab: /[ \t\r]/,
-  _reWords: /\S+/g,
-  fontSize: 40,
-  fontWeight: 'normal',
-  fontFamily: 'Times New Roman',
-  underline: false,
-  overline: false,
-  linethrough: false,
-  textAlign: LEFT,
-  fontStyle: 'normal',
-  lineHeight: 1.16,
-  superscript: {
-    size: 0.6,
-    // fontSize factor
-    baseline: -0.35 // baseline-shift factor (upwards)
-  },
-  subscript: {
-    size: 0.6,
-    // fontSize factor
-    baseline: 0.11 // baseline-shift factor (downwards)
-  },
-  textBackgroundColor: '',
-  stroke: null,
-  shadow: null,
-  path: undefined,
-  pathStartOffset: 0,
-  pathSide: LEFT,
-  pathAlign: 'baseline',
-  _fontSizeFraction: 0.222,
-  offsets: {
-    underline: 0.1,
-    linethrough: -0.315,
-    overline: -0.88
-  },
-  _fontSizeMult: 1.13,
-  charSpacing: 0,
-  deltaY: 0,
-  direction: 'ltr',
-  CACHE_FONT_SIZE: 400,
-  MIN_TEXT_WIDTH: 2
-};
-const JUSTIFY = 'justify';
-const JUSTIFY_LEFT = 'justify-left';
-const JUSTIFY_RIGHT = 'justify-right';
-const JUSTIFY_CENTER = 'justify-center';
 
 class StyledText extends FabricObject {
   /**
@@ -18580,7 +18543,12 @@ class StyledText extends FabricObject {
     if (!this._getLineStyle(lineIndex)) {
       this._setLineStyle(lineIndex);
     }
-    const newStyle = pickBy(_objectSpread2(_objectSpread2({}, this._getStyleDeclaration(lineIndex, charIndex)), style), value => value !== undefined);
+    const newStyle = pickBy({
+      // first create a new object that is a merge of existing and new
+      ...this._getStyleDeclaration(lineIndex, charIndex),
+      ...style
+      // use the predicate to discard undefined values
+    }, value => value !== undefined);
 
     // finally assign to the old position the new style
     this._setStyleDeclaration(lineIndex, charIndex, newStyle);
@@ -18655,7 +18623,10 @@ class StyledText extends FabricObject {
    * @return {Object} style object
    */
   getCompleteStyleDeclaration(lineIndex, charIndex) {
-    return _objectSpread2(_objectSpread2({}, pick(this, this.constructor._styleProperties)), this._getStyleDeclaration(lineIndex, charIndex));
+    return {
+      ...pick(this, this.constructor._styleProperties),
+      ...this._getStyleDeclaration(lineIndex, charIndex)
+    };
   }
 
   /**
@@ -18704,12 +18675,12 @@ _defineProperty(StyledText, "_styleProperties", styleProperties);
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
 function createSVGInlineRect(color, left, top, width, height) {
-  return "\t\t".concat(createSVGRect(color, {
+  return `\t\t${createSVGRect(color, {
     left,
     top,
     width,
     height
-  }), "\n");
+  })}\n`;
 }
 class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   _toSVG() {
@@ -18747,7 +18718,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     } = _ref;
     const noShadow = true,
       textDecoration = this.getSvgTextDecoration(this);
-    return [textBgRects.join(''), '\t\t<text xml:space="preserve" ', this.fontFamily ? "font-family=\"".concat(this.fontFamily.replace(dblQuoteRegex, "'"), "\" ") : '', this.fontSize ? "font-size=\"".concat(this.fontSize, "\" ") : '', this.fontStyle ? "font-style=\"".concat(this.fontStyle, "\" ") : '', this.fontWeight ? "font-weight=\"".concat(this.fontWeight, "\" ") : '', textDecoration ? "text-decoration=\"".concat(textDecoration, "\" ") : '', this.direction === 'rtl' ? "direction=\"".concat(this.direction, "\" ") : '', 'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >', textSpans.join(''), '</text>\n'];
+    return [textBgRects.join(''), '\t\t<text xml:space="preserve" ', `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `, `font-size="${this.fontSize}" `, this.fontStyle ? `font-style="${this.fontStyle}" ` : '', this.fontWeight ? `font-weight="${this.fontWeight}" ` : '', textDecoration ? `text-decoration="${textDecoration}" ` : '', this.direction === 'rtl' ? `direction="${this.direction}" ` : '', 'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >', textSpans.join(''), '</text>\n'];
   }
 
   /**
@@ -18785,9 +18756,9 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   _createTextCharSpan(char, styleDecl, left, top, charBox) {
     const numFractionDigit = config.NUM_FRACTION_DIGITS;
     const styleProps = this.getSvgSpanStyles(styleDecl, char !== char.trim() || !!char.match(multipleSpacesRegex)),
-      fillStyles = styleProps ? "style=\"".concat(styleProps, "\"") : '',
+      fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? " dy=\"".concat(toFixed(dy, numFractionDigit), "\" ") : '',
+      dySpan = dy ? ` dy="${toFixed(dy, numFractionDigit)}" ` : '',
       {
         angle,
         renderLeft,
@@ -18797,7 +18768,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     let angleAttr = '';
     if (renderLeft !== undefined) {
       const wBy2 = width / 2;
-      angle && (angleAttr = " rotate=\"".concat(toFixed(radiansToDegrees(angle), numFractionDigit), "\""));
+      angle && (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}"`);
       const m = createRotateMatrix({
         angle: radiansToDegrees(angle)
       });
@@ -18807,7 +18778,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       left = renderPoint.x;
       top = renderPoint.y;
     }
-    return "<tspan x=\"".concat(toFixed(left, numFractionDigit), "\" y=\"").concat(toFixed(top, numFractionDigit), "\" ").concat(dySpan).concat(angleAttr).concat(fillStyles, ">").concat(escapeXml(char), "</tspan>");
+    return `<tspan x="${toFixed(left, numFractionDigit)}" y="${toFixed(top, numFractionDigit)}" ${dySpan}${angleAttr}${fillStyles}>${escapeXml(char)}</tspan>`;
   }
   _setSVGTextLineText(textSpans, lineIndex, textLeftOffset, textTopOffset) {
     const lineHeight = this.getHeightOfLine(lineIndex),
@@ -18883,28 +18854,12 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   /**
-   * @deprecated unused
-   */
-  _getSVGLineTopOffset(lineIndex) {
-    let lineTopOffset = 0,
-      j;
-    for (j = 0; j < lineIndex; j++) {
-      lineTopOffset += this.getHeightOfLine(j);
-    }
-    const lastHeight = this.getHeightOfLine(j);
-    return {
-      lineTop: lineTopOffset,
-      offset: (this._fontSizeMult - this._fontSizeFraction) * lastHeight / (this.lineHeight * this._fontSizeMult)
-    };
-  }
-
-  /**
    * Returns styles-string for svg-export
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
   getSvgStyles(skipShadow) {
-    return "".concat(super.getSvgStyles(skipShadow), " white-space: pre;");
+    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed(this.textDecorationThickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; white-space: pre;`;
   }
 
   /**
@@ -18922,10 +18877,19 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontSize,
       fontStyle,
       fontWeight,
-      deltaY
+      deltaY,
+      textDecorationThickness,
+      linethrough,
+      overline,
+      underline
     } = style;
-    const textDecoration = this.getSvgTextDecoration(style);
-    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? "stroke-width: ".concat(strokeWidth, "; ") : '', fontFamily ? "font-family: ".concat(!fontFamily.includes("'") && !fontFamily.includes('"') ? "'".concat(fontFamily, "'") : fontFamily, "; ") : '', fontSize ? "font-size: ".concat(fontSize, "px; ") : '', fontStyle ? "font-style: ".concat(fontStyle, "; ") : '', fontWeight ? "font-weight: ".concat(fontWeight, "; ") : '', textDecoration ? "text-decoration: ".concat(textDecoration, "; ") : textDecoration, fill ? colorPropToSVG(FILL, fill) : '', deltaY ? "baseline-shift: ".concat(-deltaY, "; ") : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
+    const textDecoration = this.getSvgTextDecoration({
+      underline: underline !== null && underline !== void 0 ? underline : this.underline,
+      overline: overline !== null && overline !== void 0 ? overline : this.overline,
+      linethrough: linethrough !== null && linethrough !== void 0 ? linethrough : this.linethrough
+    });
+    const thickness = textDecorationThickness || this.textDecorationThickness;
+    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${strokeWidth}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${fontFamily}'` : fontFamily}; ` : '', fontSize ? `font-size: ${fontSize}px; ` : '', fontStyle ? `font-style: ${fontStyle}; ` : '', fontWeight ? `font-weight: ${fontWeight}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', deltaY ? `baseline-shift: ${-deltaY}; ` : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
   }
 
   /**
@@ -18938,7 +18902,6 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 }
 
-const _excluded$3 = ["textAnchor", "textDecoration", "dx", "dy", "top", "left", "fontSize", "strokeWidth"];
 let measuringContext;
 
 /**
@@ -18970,7 +18933,10 @@ function getMeasuringContext() {
  */
 class FabricText extends StyledText {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), FabricText.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...FabricText.ownDefaults
+    };
   }
   constructor(text, options) {
     super();
@@ -19119,7 +19085,7 @@ class FabricText extends StyledText {
    * @return {String} String representation of text object
    */
   toString() {
-    return "#<Text (".concat(this.complexity(), "): { \"text\": \"").concat(this.text, "\", \"fontFamily\": \"").concat(this.fontFamily, "\" }>");
+    return `#<Text (${this.complexity()}): { "text": "${this.text}", "fontFamily": "${this.fontFamily}" }>`;
   }
 
   /**
@@ -19942,6 +19908,7 @@ class FabricText extends StyledText {
     const leftOffset = this._getLeftOffset(),
       path = this.path,
       charSpacing = this._getWidthOfCharSpacing(),
+      offsetAligner = type === 'linethrough' ? 0.5 : type === 'overline' ? 1 : 0,
       offsetY = this.offsets[type];
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       const heightOfLine = this.getHeightOfLine(i);
@@ -19956,8 +19923,10 @@ class FabricText extends StyledText {
       let boxWidth = 0;
       let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
       let lastFill = this.getValueOfPropertyAt(i, 0, FILL);
-      let currentDecoration;
-      let currentFill;
+      let lastTickness = this.getValueOfPropertyAt(i, 0, TEXT_DECORATION_THICKNESS);
+      let currentDecoration = lastDecoration;
+      let currentFill = lastFill;
+      let currentTickness = lastTickness;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
       let size = this.getHeightOfChar(i, 0);
       let dy = this.getValueOfPropertyAt(i, 0, 'deltaY');
@@ -19965,29 +19934,33 @@ class FabricText extends StyledText {
         const charBox = this.__charBounds[i][j];
         currentDecoration = this.getValueOfPropertyAt(i, j, type);
         currentFill = this.getValueOfPropertyAt(i, j, FILL);
+        currentTickness = this.getValueOfPropertyAt(i, j, TEXT_DECORATION_THICKNESS);
         const currentSize = this.getHeightOfChar(i, j);
         const currentDy = this.getValueOfPropertyAt(i, j, 'deltaY');
         if (path && currentDecoration && currentFill) {
+          const finalTickness = this.fontSize * currentTickness / 1000;
           ctx.save();
           // bug? verify lastFill is a valid fill here.
           ctx.fillStyle = lastFill;
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
-          ctx.fillRect(-charBox.kernedWidth / 2, offsetY * currentSize + currentDy, charBox.kernedWidth, this.fontSize / 15);
+          ctx.fillRect(-charBox.kernedWidth / 2, offsetY * currentSize + currentDy - offsetAligner * finalTickness, charBox.kernedWidth, finalTickness);
           ctx.restore();
-        } else if ((currentDecoration !== lastDecoration || currentFill !== lastFill || currentSize !== size || currentDy !== dy) && boxWidth > 0) {
+        } else if ((currentDecoration !== lastDecoration || currentFill !== lastFill || currentSize !== size || currentTickness !== lastTickness || currentDy !== dy) && boxWidth > 0) {
+          const finalTickness = this.fontSize * lastTickness / 1000;
           let drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === 'rtl') {
             drawStart = this.width - drawStart - boxWidth;
           }
-          if (lastDecoration && lastFill) {
+          if (lastDecoration && lastFill && lastTickness) {
             // bug? verify lastFill is a valid fill here.
             ctx.fillStyle = lastFill;
-            ctx.fillRect(drawStart, top + offsetY * size + dy, boxWidth, this.fontSize / 15);
+            ctx.fillRect(drawStart, top + offsetY * size + dy - offsetAligner * finalTickness, boxWidth, finalTickness);
           }
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastDecoration = currentDecoration;
+          lastTickness = currentTickness;
           lastFill = currentFill;
           size = currentSize;
           dy = currentDy;
@@ -20000,7 +19973,8 @@ class FabricText extends StyledText {
         drawStart = this.width - drawStart - boxWidth;
       }
       ctx.fillStyle = currentFill;
-      currentDecoration && currentFill && ctx.fillRect(drawStart, top + offsetY * size + dy, boxWidth - charSpacing, this.fontSize / 15);
+      const finalTickness = this.fontSize * currentTickness / 1000;
+      currentDecoration && currentFill && currentTickness && ctx.fillRect(drawStart, top + offsetY * size + dy - offsetAligner * finalTickness, boxWidth - charSpacing, finalTickness);
       topOffset += heightOfLine;
     }
     // if there is text background color no
@@ -20021,8 +19995,8 @@ class FabricText extends StyledText {
       fontSize = this.fontSize
     } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     let forMeasuring = arguments.length > 1 ? arguments[1] : undefined;
-    const parsedFontFamily = fontFamily.includes("'") || fontFamily.includes('"') || fontFamily.includes(',') || FabricText.genericFonts.includes(fontFamily.toLowerCase()) ? fontFamily : "\"".concat(fontFamily, "\"");
-    return [fontStyle, fontWeight, "".concat(forMeasuring ? this.CACHE_FONT_SIZE : fontSize, "px"), parsedFontFamily].join(' ');
+    const parsedFontFamily = fontFamily.includes("'") || fontFamily.includes('"') || fontFamily.includes(',') || FabricText.genericFonts.includes(fontFamily.toLowerCase()) ? fontFamily : `"${fontFamily}"`;
+    return [fontStyle, fontWeight, `${forMeasuring ? this.CACHE_FONT_SIZE : fontSize}px`, parsedFontFamily].join(' ');
   }
 
   /**
@@ -20084,11 +20058,13 @@ class FabricText extends StyledText {
    */
   toObject() {
     let propertiesToInclude = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    return _objectSpread2(_objectSpread2({}, super.toObject([...additionalProps, ...propertiesToInclude])), {}, {
-      styles: stylesToArray(this.styles, this.text)
-    }, this.path ? {
-      path: this.path.toObject()
-    } : {});
+    return {
+      ...super.toObject([...additionalProps, ...propertiesToInclude]),
+      styles: stylesToArray(this.styles, this.text),
+      ...(this.path ? {
+        path: this.path.toObject()
+      } : {})
+    };
   }
   set(key, value) {
     const {
@@ -20134,31 +20110,31 @@ class FabricText extends StyledText {
 
   /**
    * Returns FabricText instance from an SVG element (<b>not yet implemented</b>)
-   * @static
-   * @memberOf Text
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    */
   static async fromElement(element, options, cssRules) {
     const parsedAttributes = parseAttributes(element, FabricText.ATTRIBUTE_NAMES, cssRules);
-    const _options$parsedAttrib = _objectSpread2(_objectSpread2({}, options), parsedAttributes),
-      {
-        textAnchor = LEFT,
-        textDecoration = '',
-        dx = 0,
-        dy = 0,
-        top = 0,
-        left = 0,
-        fontSize = DEFAULT_SVG_FONT_SIZE,
-        strokeWidth = 1
-      } = _options$parsedAttrib,
-      restOfOptions = _objectWithoutProperties(_options$parsedAttrib, _excluded$3);
+    const {
+      textAnchor = LEFT,
+      textDecoration = '',
+      dx = 0,
+      dy = 0,
+      top = 0,
+      left = 0,
+      fontSize = DEFAULT_SVG_FONT_SIZE,
+      strokeWidth = 1,
+      ...restOfOptions
+    } = {
+      ...options,
+      ...parsedAttributes
+    };
     const textContent = (element.textContent || '').replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     // this code here is probably the usual issue for SVG center find
     // this can later looked at again and probably removed.
 
-    const text = new this(textContent, _objectSpread2({
+    const text = new this(textContent, {
         left: left + dx,
         top: top + dy,
         underline: textDecoration.includes('underline'),
@@ -20166,8 +20142,9 @@ class FabricText extends StyledText {
         linethrough: textDecoration.includes('line-through'),
         // we initialize this as 0
         strokeWidth: 0,
-        fontSize
-      }, restOfOptions)),
+        fontSize,
+        ...restOfOptions
+      }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
       lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
@@ -20200,9 +20177,10 @@ class FabricText extends StyledText {
    * @returns {Promise<FabricText>}
    */
   static fromObject(object) {
-    return this._fromObject(_objectSpread2(_objectSpread2({}, object), {}, {
+    return this._fromObject({
+      ...object,
       styles: stylesFromArray(object.styles || {}, object.text)
-    }), {
+    }, {
       extraParam: 'text'
     });
   }
@@ -20220,8 +20198,6 @@ _defineProperty(FabricText, "genericFonts", ['serif', 'sans-serif', 'monospace',
 /* _FROM_SVG_START_ */
 /**
  * List of attribute names to account for when parsing SVG element (used by {@link FabricText.fromElement})
- * @static
- * @memberOf Text
  * @see: http://www.w3.org/TR/SVG/text.html#TextElement
  */
 _defineProperty(FabricText, "ATTRIBUTE_NAMES", SHARED_ATTRIBUTES.concat('x', 'y', 'dx', 'dy', 'font-family', 'font-style', 'font-weight', 'font-size', 'letter-spacing', 'text-decoration', 'text-anchor'));
@@ -20343,10 +20319,10 @@ class DraggableTextDelegate {
     //  position drag image offscreen
     setStyle(dragImage, {
       position: 'fixed',
-      left: "".concat(-dragImage.width, "px"),
+      left: `${-dragImage.width}px`,
       border: NONE,
-      width: "".concat(dragImage.width / retinaScaling, "px"),
-      height: "".concat(dragImage.height / retinaScaling, "px")
+      width: `${dragImage.width / retinaScaling}px`,
+      height: `${dragImage.height / retinaScaling}px`
     });
     this.__dragImageDisposer && this.__dragImageDisposer();
     this.__dragImageDisposer = () => {
@@ -20369,10 +20345,11 @@ class DraggableTextDelegate {
         selectionEnd: target.selectionEnd
       };
       const value = target._text.slice(selection.selectionStart, selection.selectionEnd).join('');
-      const data = _objectSpread2({
+      const data = {
         text: target.text,
-        value
-      }, selection);
+        value,
+        ...selection
+      };
       e.dataTransfer.setData('text/plain', value);
       e.dataTransfer.setData('application/fabric', JSON.stringify({
         value: value,
@@ -20825,8 +20802,7 @@ class ITextBehavior extends FabricText {
    * @param {Number} selectionStart Index of a character
    */
   selectWord(selectionStart) {
-    var _selectionStart;
-    selectionStart = (_selectionStart = selectionStart) !== null && _selectionStart !== void 0 ? _selectionStart : this.selectionStart;
+    selectionStart = selectionStart !== null && selectionStart !== void 0 ? selectionStart : this.selectionStart;
     // search backwards
     const newSelectionStart = this.searchWordBoundary(selectionStart, -1),
       // search forward
@@ -20844,8 +20820,7 @@ class ITextBehavior extends FabricText {
    * @param {Number} selectionStart Index of a character
    */
   selectLine(selectionStart) {
-    var _selectionStart2;
-    selectionStart = (_selectionStart2 = selectionStart) !== null && _selectionStart2 !== void 0 ? _selectionStart2 : this.selectionStart;
+    selectionStart = selectionStart !== null && selectionStart !== void 0 ? selectionStart : this.selectionStart;
     const newSelectionStart = this.findLineBoundaryLeft(selectionStart),
       newSelectionEnd = this.findLineBoundaryRight(selectionStart);
     this.selectionStart = newSelectionStart;
@@ -21067,9 +21042,9 @@ class ITextBehavior extends FabricText {
     p.x += this.canvas._offset.left;
     p.y += this.canvas._offset.top;
     return {
-      left: "".concat(p.x, "px"),
-      top: "".concat(p.y, "px"),
-      fontSize: "".concat(charHeight, "px"),
+      left: `${p.x}px`,
+      top: `${p.y}px`,
+      fontSize: `${charHeight}px`,
       charHeight: charHeight
     };
   }
@@ -21112,11 +21087,9 @@ class ITextBehavior extends FabricText {
 
   /**
    * runs the actual logic that exits from editing state, see {@link exitEditing}
-   * Please use exitEditingImpl, this function was kept to avoid breaking changes.
-   * Will be removed in fabric 7.0
-   * @deprecated use "exitEditingImpl"
+   * But it does not fire events
    */
-  _exitEditing() {
+  exitEditingImpl() {
     const hiddenTextarea = this.hiddenTextarea;
     this.selected = false;
     this.isEditing = false;
@@ -21127,14 +21100,6 @@ class ITextBehavior extends FabricText {
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
     this.selectionStart !== this.selectionEnd && this.clearContextTop();
-  }
-
-  /**
-   * runs the actual logic that exits from editing state, see {@link exitEditing}
-   * But it does not fire events
-   */
-  exitEditingImpl() {
-    this._exitEditing();
     this.selectionEnd = this.selectionStart;
     this._restoreEditingProps();
     if (this._forceClearCache) {
@@ -21298,11 +21263,15 @@ class ITextBehavior extends FabricText {
     while (qty > 0) {
       if (copiedStyle && copiedStyle[qty - 1]) {
         this.styles[lineIndex + qty] = {
-          0: _objectSpread2({}, copiedStyle[qty - 1])
+          0: {
+            ...copiedStyle[qty - 1]
+          }
         };
       } else if (currentCharStyle) {
         this.styles[lineIndex + qty] = {
-          0: _objectSpread2({}, currentCharStyle)
+          0: {
+            ...currentCharStyle
+          }
         };
       } else {
         delete this.styles[lineIndex + qty];
@@ -21324,7 +21293,9 @@ class ITextBehavior extends FabricText {
       this.styles = {};
     }
     const currentLineStyles = this.styles[lineIndex],
-      currentLineStylesCloned = currentLineStyles ? _objectSpread2({}, currentLineStyles) : {};
+      currentLineStylesCloned = currentLineStyles ? {
+        ...currentLineStyles
+      } : {};
     quantity || (quantity = 1);
     // shift all char styles by quantity forward
     // 0,1,2,3 -> (charIndex=2) -> 0,1,3,4 -> (insert 2) -> 0,1,2,3,4
@@ -21347,7 +21318,9 @@ class ITextBehavior extends FabricText {
         if (!this.styles[lineIndex]) {
           this.styles[lineIndex] = {};
         }
-        this.styles[lineIndex][charIndex + quantity] = _objectSpread2({}, copiedStyle[quantity]);
+        this.styles[lineIndex][charIndex + quantity] = {
+          ...copiedStyle[quantity]
+        };
       }
       return;
     }
@@ -21356,7 +21329,9 @@ class ITextBehavior extends FabricText {
     }
     const newStyle = currentLineStyles[charIndex ? charIndex - 1 : 1];
     while (newStyle && quantity--) {
-      this.styles[lineIndex][charIndex + quantity] = _objectSpread2({}, newStyle);
+      this.styles[lineIndex][charIndex + quantity] = {
+        ...newStyle
+      };
     }
   }
 
@@ -21509,7 +21484,6 @@ class ITextKeyBehavior extends ITextBehavior {
    * Useful to reduce laggish redraw of the full document.body tree and
    * also with modals event capturing that won't let the textarea take focus.
    * @type HTMLElement
-   * @default
    */
 
   /**
@@ -21536,7 +21510,7 @@ class ITextKeyBehavior extends ITextBehavior {
     } = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
-    textarea.style.cssText = "position: absolute; top: ".concat(top, "; left: ").concat(left, "; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ").concat(fontSize, ";");
+    textarea.style.cssText = `position: absolute; top: ${top}; left: ${left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${fontSize};`;
     (this.hiddenTextareaContainer || doc.body).appendChild(textarea);
     Object.entries({
       blur: 'blur',
@@ -21895,7 +21869,7 @@ class ITextKeyBehavior extends ITextBehavior {
    * @param {KeyboardEvent} e Event object
    */
   _moveCursorUpOrDown(direction, e) {
-    const offset = this["get".concat(direction, "CursorOffset")](e, this._selectionDirection === RIGHT);
+    const offset = this[`get${direction}CursorOffset`](e, this._selectionDirection === RIGHT);
     if (e.shiftKey) {
       this.moveCursorWithShift(offset);
     } else {
@@ -21959,9 +21933,9 @@ class ITextKeyBehavior extends ITextBehavior {
   _move(e, prop, direction) {
     let newValue;
     if (e.altKey) {
-      newValue = this["findWordBoundary".concat(direction)](this[prop]);
+      newValue = this[`findWordBoundary${direction}`](this[prop]);
     } else if (e.metaKey || e.keyCode === 35 || e.keyCode === 36) {
-      newValue = this["findLineBoundary".concat(direction)](this[prop]);
+      newValue = this[`findLineBoundary${direction}`](this[prop]);
     } else {
       this[prop] += direction === 'Left' ? -1 : 1;
       return true;
@@ -22034,7 +22008,7 @@ class ITextKeyBehavior extends ITextBehavior {
    * @param {KeyboardEvent} e Event object
    */
   _moveCursorLeftOrRight(direction, e) {
-    const actionName = "moveCursor".concat(direction).concat(e.shiftKey ? 'WithShift' : 'WithoutShift');
+    const actionName = `moveCursor${direction}${e.shiftKey ? 'WithShift' : 'WithoutShift'}`;
     this._currentCursorOpacity = 1;
     if (this[actionName](e)) {
       // TODO fix: abort and init should be an alternative depending
@@ -22349,7 +22323,7 @@ const protectedDefaultValues = {
   _reSpace: /\s|\r?\n/,
   inCompositionMode: false
 };
-const iTextDefaultValues = _objectSpread2({
+const iTextDefaultValues = {
   selectionStart: 0,
   selectionEnd: 0,
   selectionColor: 'rgba(17,119,255,0.3)',
@@ -22365,8 +22339,9 @@ const iTextDefaultValues = _objectSpread2({
   keysMap,
   keysMapRtl,
   ctrlKeysMapDown,
-  ctrlKeysMapUp
-}, protectedDefaultValues);
+  ctrlKeysMapUp,
+  ...protectedDefaultValues
+};
 
 // @TODO this is not complete
 
@@ -22415,7 +22390,10 @@ const iTextDefaultValues = _objectSpread2({
  */
 class IText extends ITextClickBehavior {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), IText.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...IText.ownDefaults
+    };
   }
   get type() {
     const type = super.type;
@@ -22429,7 +22407,10 @@ class IText extends ITextClickBehavior {
    * @param {Object} [options] Options object
    */
   constructor(text, options) {
-    super(text, _objectSpread2(_objectSpread2({}, IText.ownDefaults), options));
+    super(text, {
+      ...IText.ownDefaults,
+      ...options
+    });
     this.initBehavior();
   }
 
@@ -22920,37 +22901,30 @@ class IText extends ITextClickBehavior {
 /**
  * Index where text selection starts (or where cursor is when there is no selection)
  * @type Number
- * @default
  */
 /**
  * Index where text selection ends
  * @type Number
- * @default
  */
 /**
  * Color of text selection
  * @type String
- * @default
  */
 /**
  * Indicates whether text is in editing mode
  * @type Boolean
- * @default
  */
 /**
  * Indicates whether a text can be edited
  * @type Boolean
- * @default
  */
 /**
  * Border color of text object while it's in editing mode
  * @type String
- * @default
  */
 /**
  * Width of cursor (in px)
  * @type Number
- * @default
  */
 /**
  * Color of text cursor color in editing mode.
@@ -22958,22 +22932,18 @@ class IText extends ITextClickBehavior {
  * if set to a color value that fabric can understand, it will
  * be used instead of the color of the text at the current position.
  * @type String
- * @default
  */
 /**
  * Delay between cursor blink (in ms)
  * @type Number
- * @default
  */
 /**
  * Duration of cursor fade in (in ms)
  * @type Number
- * @default
  */
 /**
  * Indicates whether internal text char widths can be cached
  * @type Boolean
- * @default
  */
 _defineProperty(IText, "ownDefaults", iTextDefaultValues);
 _defineProperty(IText, "type", 'IText');
@@ -23003,7 +22973,10 @@ const textboxDefaultValues = {
  */
 class Textbox extends IText {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), Textbox.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...Textbox.ownDefaults
+    };
   }
 
   /**
@@ -23012,7 +22985,10 @@ class Textbox extends IText {
    * @param {Object} [options] Options object
    */
   constructor(text, options) {
-    super(text, _objectSpread2(_objectSpread2({}, Textbox.ownDefaults), options));
+    super(text, {
+      ...Textbox.ownDefaults,
+      ...options
+    });
   }
 
   /**
@@ -23132,7 +23108,6 @@ class Textbox extends IText {
       for (const p2 in obj[p1]) {
         const p2Number = parseInt(p2, 10);
         if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset)) {
-          // eslint-disable-next-line no-unused-vars
           for (const p3 in obj[p1][p2]) {
             return false;
           }
@@ -23425,7 +23400,7 @@ class Textbox extends IText {
       const propNumber = parseInt(prop, 10);
       if (this._textLines[propNumber]) {
         const lineIndex = this._styleMap[prop].line;
-        linesToKeep.set("".concat(lineIndex), true);
+        linesToKeep.set(`${lineIndex}`, true);
       }
     }
     for (const prop in this.styles) {
@@ -23449,14 +23424,12 @@ class Textbox extends IText {
 /**
  * Minimum width of textbox, in pixels.
  * @type Number
- * @default
  */
 /**
  * Minimum calculated width of a textbox, in pixels.
  * fixed to 2 so that an empty textbox cannot go to 0
  * and is still selectable without text.
  * @type Number
- * @default
  */
 /**
  * Use this boolean property in order to split strings that have no white space concept.
@@ -23613,7 +23586,10 @@ const activeSelectionDefaultValues = {
  */
 class ActiveSelection extends Group {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), ActiveSelection.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...ActiveSelection.ownDefaults
+    };
   }
 
   /**
@@ -23775,7 +23751,7 @@ class ActiveSelection extends Group {
    * @return {String}
    */
   toString() {
-    return "#<ActiveSelection: (".concat(this.complexity(), ")>");
+    return `#<ActiveSelection: (${this.complexity()})>`;
   }
 
   /**
@@ -23803,11 +23779,11 @@ class ActiveSelection extends Group {
   _renderControls(ctx, styleOverride, childrenOverride) {
     ctx.save();
     ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
-    const options = _objectSpread2(_objectSpread2({
-      hasControls: false
-    }, childrenOverride), {}, {
+    const options = {
+      hasControls: false,
+      ...childrenOverride,
       forActiveSelection: true
-    });
+    };
     for (let i = 0; i < this._objects.length; i++) {
       this._objects[i]._renderControls(ctx, options);
     }
@@ -23846,7 +23822,10 @@ class Canvas2dFilterBackend {
    * @param {HTMLCanvasElement} targetCanvas The destination for filtered output to be drawn.
    */
   applyFilters(filters, sourceElement, sourceWidth, sourceHeight, targetCanvas) {
-    const ctx = targetCanvas.getContext('2d');
+    const ctx = targetCanvas.getContext('2d', {
+      willReadFrequently: true,
+      desynchronized: true
+    });
     if (!ctx) {
       return;
     }
@@ -24217,8 +24196,6 @@ function setFilterBackend(backend) {
   filterBackend = backend;
 }
 
-const _excluded$2 = ["filters", "resizeFilter", "src", "crossOrigin", "type"];
-
 // @todo Would be nice to have filtering code not imported directly.
 
 const imageDefaultValues = {
@@ -24236,7 +24213,10 @@ const IMAGE_PROPS = ['cropX', 'cropY'];
  */
 class FabricImage extends FabricObject {
   static getDefaults() {
-    return _objectSpread2(_objectSpread2({}, super.getDefaults()), FabricImage.ownDefaults);
+    return {
+      ...super.getDefaults(),
+      ...FabricImage.ownDefaults
+    };
   }
   /**
    * Constructor
@@ -24286,7 +24266,7 @@ class FabricImage extends FabricObject {
     this.filters = [];
     Object.assign(this, FabricImage.ownDefaults);
     this.setOptions(options);
-    this.cacheKey = "texture".concat(uid());
+    this.cacheKey = `texture${uid()}`;
     this.setElement(typeof arg0 === 'string' ? (this.canvas && getDocumentFromElement(this.canvas.getElement()) || getFabricDocument()).getElementById(arg0) : arg0, options);
   }
 
@@ -24305,14 +24285,12 @@ class FabricImage extends FabricObject {
    * @param {Partial<TSize>} [size] Options object
    */
   setElement(element) {
-    var _element$classList;
     let size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     this.removeTexture(this.cacheKey);
-    this.removeTexture("".concat(this.cacheKey, "_filtered"));
+    this.removeTexture(`${this.cacheKey}_filtered`);
     this._element = element;
     this._originalElement = element;
     this._setWidthHeight(size);
-    (_element$classList = element.classList) === null || _element$classList === void 0 || _element$classList.add(FabricImage.CSS_CANVAS);
     if (this.filters.length !== 0) {
       this.applyFilters();
     }
@@ -24341,7 +24319,7 @@ class FabricImage extends FabricObject {
   dispose() {
     super.dispose();
     this.removeTexture(this.cacheKey);
-    this.removeTexture("".concat(this.cacheKey, "_filtered"));
+    this.removeTexture(`${this.cacheKey}_filtered`);
     this._cacheContext = null;
     ['_originalElement', '_element', '_filteredEl', '_cacheCanvas'].forEach(elementKey => {
       const el = this[elementKey];
@@ -24405,13 +24383,15 @@ class FabricImage extends FabricObject {
     this.filters.forEach(filterObj => {
       filterObj && filters.push(filterObj.toObject());
     });
-    return _objectSpread2(_objectSpread2({}, super.toObject([...IMAGE_PROPS, ...propertiesToInclude])), {}, {
+    return {
+      ...super.toObject([...IMAGE_PROPS, ...propertiesToInclude]),
       src: this.getSrc(),
       crossOrigin: this.getCrossOrigin(),
-      filters
-    }, this.resizeFilter ? {
-      resizeFilter: this.resizeFilter.toObject()
-    } : {});
+      filters,
+      ...(this.resizeFilter ? {
+        resizeFilter: this.resizeFilter.toObject()
+      } : {})
+    };
   }
 
   /**
@@ -24447,15 +24427,15 @@ class FabricImage extends FabricObject {
     if (!this.imageSmoothing) {
       imageRendering = ' image-rendering="optimizeSpeed"';
     }
-    imageMarkup.push('\t<image ', 'COMMON_PARTS', "xlink:href=\"".concat(this.getSvgSrc(true), "\" x=\"").concat(x - this.cropX, "\" y=\"").concat(y - this.cropY
+    imageMarkup.push('\t<image ', 'COMMON_PARTS', `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${y - this.cropY
     // we're essentially moving origin of transformation from top/left corner to the center of the shape
     // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
     // so that object's center aligns with container's left/top
-    , "\" width=\"").concat(element.width || element.naturalWidth, "\" height=\"").concat(element.height || element.naturalHeight, "\"").concat(imageRendering).concat(clipPath, "></image>\n"));
+    }" width="${element.width || element.naturalWidth}" height="${element.height || element.naturalHeight}"${imageRendering}${clipPath}></image>\n`);
     if (this.stroke || this.strokeDashArray) {
       const origFill = this.fill;
       this.fill = null;
-      strokeSvg = ["\t<rect x=\"".concat(x, "\" y=\"").concat(y, "\" width=\"").concat(this.width, "\" height=\"").concat(this.height, "\" style=\"").concat(this.getSvgStyles(), "\" />\n")];
+      strokeSvg = [`\t<rect x="${x}" y="${y}" width="${this.width}" height="${this.height}" style="${this.getSvgStyles()}" />\n`];
       this.fill = origFill;
     }
     if (this.paintFirst !== FILL) {
@@ -24523,7 +24503,7 @@ class FabricImage extends FabricObject {
    * @return {String} String representation of an instance
    */
   toString() {
-    return "#<Image: { src: \"".concat(this.getSrc(), "\" }>");
+    return `#<Image: { src: "${this.getSrc()}" }>`;
   }
   applyResizeFilters() {
     const filter = this.resizeFilter,
@@ -24568,7 +24548,7 @@ class FabricImage extends FabricObject {
     this.set('dirty', true);
 
     // needs to clear out or WEBGL will not resize correctly
-    this.removeTexture("".concat(this.cacheKey, "_filtered"));
+    this.removeTexture(`${this.cacheKey}_filtered`);
     if (filters.length === 0) {
       this._element = this._originalElement;
       // this is unsafe and needs to be rethinkend
@@ -24778,17 +24758,12 @@ class FabricImage extends FabricObject {
   }
 
   /**
-   * Default CSS class name for canvas
-   * Will be removed from fabric 7
-   * @static
-   * @deprecated
-   * @type String
-   * @default
+   * List of attribute names to account for when parsing SVG element (used by {@link FabricImage.fromElement})
+   * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
    */
 
   /**
    * Creates an instance of FabricImage from its object representation
-   * @static
    * @param {Object} object Object to create an instance from
    * @param {object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -24796,31 +24771,33 @@ class FabricImage extends FabricObject {
    */
   static fromObject(_ref, options) {
     let {
-        filters: f,
-        resizeFilter: rf,
-        src,
-        crossOrigin,
-        type
-      } = _ref,
-      object = _objectWithoutProperties(_ref, _excluded$2);
-    return Promise.all([loadImage(src, _objectSpread2(_objectSpread2({}, options), {}, {
+      filters: f,
+      resizeFilter: rf,
+      src,
+      crossOrigin,
+      type,
+      ...object
+    } = _ref;
+    return Promise.all([loadImage(src, {
+      ...options,
       crossOrigin
-    })), f && enlivenObjects(f, options),
-    // TODO: redundant - handled by enlivenObjectEnlivables
-    rf && enlivenObjects([rf], options), enlivenObjectEnlivables(object, options)]).then(_ref2 => {
-      let [el, filters = [], [resizeFilter] = [], hydratedProps = {}] = _ref2;
-      return new this(el, _objectSpread2(_objectSpread2({}, object), {}, {
-        // TODO: this creates a difference between image creation and restoring from JSON
+    }), f && enlivenObjects(f, options),
+    // redundant - handled by enlivenObjectEnlivables, but nicely explicit
+    rf ? enlivenObjects([rf], options) : [], enlivenObjectEnlivables(object, options)]).then(_ref2 => {
+      let [el, filters = [], [resizeFilter], hydratedProps = {}] = _ref2;
+      return new this(el, {
+        ...object,
+        // TODO: passing src creates a difference between image creation and restoring from JSON
         src,
         filters,
-        resizeFilter
-      }, hydratedProps));
+        resizeFilter,
+        ...hydratedProps
+      });
     });
   }
 
   /**
    * Creates an instance of Image from an URL string
-   * @static
    * @param {String} url URL to create an image from
    * @param {LoadImageOptions} [options] Options object
    * @returns {Promise<FabricImage>}
@@ -24839,7 +24816,6 @@ class FabricImage extends FabricObject {
 
   /**
    * Returns {@link FabricImage} instance from an SVG element
-   * @static
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -24858,12 +24834,6 @@ class FabricImage extends FabricObject {
 _defineProperty(FabricImage, "type", 'Image');
 _defineProperty(FabricImage, "cacheProperties", [...cacheProperties, ...IMAGE_PROPS]);
 _defineProperty(FabricImage, "ownDefaults", imageDefaultValues);
-_defineProperty(FabricImage, "CSS_CANVAS", 'canvas-img');
-/**
- * List of attribute names to account for when parsing SVG element (used by {@link FabricImage.fromElement})
- * @static
- * @see {@link http://www.w3.org/TR/SVG/struct.html#ImageElement}
- */
 _defineProperty(FabricImage, "ATTRIBUTE_NAMES", [...SHARED_ATTRIBUTES, 'x', 'y', 'width', 'height', 'preserveAspectRatio', 'xlink:href', 'href', 'crossOrigin', 'image-rendering']);
 classRegistry.setClass(FabricImage);
 classRegistry.setSVGClass(FabricImage);
@@ -25047,7 +25017,7 @@ function parseUseDirectives(doc) {
       y = 0,
       transform = ''
     } = useAttrMap;
-    const currentTrans = "".concat(transform, " ").concat(originalAttrMap.transform || '', " translate(").concat(x, ", ").concat(y, ")");
+    const currentTrans = `${transform} ${originalAttrMap.transform || ''} translate(${x}, ${y})`;
     applyViewboxTransform(clonedOriginal);
     if (/^svg$/i.test(clonedOriginal.nodeName)) {
       // if is an SVG, create a group and apply all the attributes on top of it
@@ -25154,12 +25124,10 @@ function getGradientDefs(doc) {
  */
 function getCSSRules(doc) {
   const styles = doc.getElementsByTagName('style');
-  let i;
-  let len;
   const allRules = {};
 
   // very crude parsing of style contents
-  for (i = 0, len = styles.length; i < len; i++) {
+  for (let i = 0; i < styles.length; i++) {
     const styleContents = (styles[i].textContent || '').replace(
     // remove comments
     /\/\*[\s\S]*?\*\//g, '');
@@ -25185,8 +25153,8 @@ function getCSSRules(doc) {
         propertyValuePairs = declaration.split(';').filter(function (pair) {
           return pair.trim();
         });
-      for (i = 0, len = propertyValuePairs.length; i < len; i++) {
-        const pair = propertyValuePairs[i].split(':'),
+      for (let j = 0; j < propertyValuePairs.length; j++) {
+        const pair = propertyValuePairs[j].split(':'),
           property = pair[0].trim(),
           value = pair[1].trim();
         ruleObj[property] = value;
@@ -25197,7 +25165,10 @@ function getCSSRules(doc) {
         if (_rule === '') {
           return;
         }
-        allRules[_rule] = _objectSpread2(_objectSpread2({}, allRules[_rule] || {}), ruleObj);
+        allRules[_rule] = {
+          ...(allRules[_rule] || {}),
+          ...ruleObj
+        };
       });
     });
   }
@@ -25254,9 +25225,10 @@ class ElementsParser {
     const gradientDef = this.extractPropertyDefinition(obj, property, this.gradientDefs);
     if (gradientDef) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = Gradient.fromElement(gradientDef, obj, _objectSpread2(_objectSpread2({}, this.options), {}, {
+      const gradient = Gradient.fromElement(gradientDef, obj, {
+        ...this.options,
         opacity: opacityAttr
-      }));
+      });
       obj.set(property, gradient);
     }
   }
@@ -25279,8 +25251,8 @@ class ElementsParser {
       // but i don't have an svg to test it
       // at the first SVG that has a transform on both places and is misplaced
       // try to invert this multiplication order
-      const finalTransform = parseTransformAttribute("".concat(clipPathOwner.getAttribute('transform') || '', " ").concat(clipPathTag.getAttribute('originalTransform') || ''));
-      clipPathTag.setAttribute('transform', "matrix(".concat(finalTransform.join(','), ")"));
+      const finalTransform = parseTransformAttribute(`${clipPathOwner.getAttribute('transform') || ''} ${clipPathTag.getAttribute('originalTransform') || ''}`);
+      clipPathTag.setAttribute('transform', `matrix(${finalTransform.join(',')})`);
       const container = await Promise.all(clipPathElements.map(clipPathElement => {
         return findTag(clipPathElement).fromElement(clipPathElement, this.options, this.cssRules).then(enlivedClippath => {
           removeTransformMatrixForSvgParsing(enlivedClippath);
@@ -25339,7 +25311,6 @@ const createEmptyResponse = () => ({
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
  * @static
  * @function
- * @memberOf fabric
  * @param {HTMLElement} doc SVG document to parse
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * @param {TSvgReviverCallback} [reviver] Extra callback for further parsing of SVG elements, called after each fabric object has been created.
@@ -25365,19 +25336,21 @@ async function parseSVGDocument(doc, reviver) {
   const documentElement = doc.documentElement;
   parseUseDirectives(doc);
   const descendants = Array.from(documentElement.getElementsByTagName('*')),
-    options = _objectSpread2(_objectSpread2({}, applyViewboxTransform(documentElement)), {}, {
+    options = {
+      ...applyViewboxTransform(documentElement),
       crossOrigin,
       signal
-    });
+    };
   const elements = descendants.filter(el => {
     applyViewboxTransform(el);
     return isValidSvgTag(el) && !hasInvalidAncestor(el); // http://www.w3.org/TR/SVG/struct.html#DefsElement
   });
   if (!elements || elements && !elements.length) {
-    return _objectSpread2(_objectSpread2({}, createEmptyResponse()), {}, {
+    return {
+      ...createEmptyResponse(),
       options,
       allElements: descendants
-    });
+    };
   }
   const localClipPaths = {};
   descendants.filter(el => getTagName(el) === 'clipPath').forEach(el => {
@@ -25399,7 +25372,6 @@ async function parseSVGDocument(doc, reviver) {
 
 /**
  * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
- * @memberOf fabric
  * @param {String} string representing the svg
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * {@link TSvgParsedCallback} also receives `allElements` array as the last argument. This is the full list of svg nodes available in the document.
@@ -25420,8 +25392,7 @@ function loadSVGFromString(string, reviver, options) {
 
 /**
  * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
- * Note that SVG is fetched via XMLHttpRequest, so it needs to conform to SOP (Same Origin Policy)
- * @memberOf fabric
+ * Note that SVG is fetched via fetch API, so it needs to conform to SOP (Same Origin Policy)
  * @param {string} url where the SVG is
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * {@link TSvgParsedCallback} also receives `allElements` array as the last argument. This is the full list of svg nodes available in the document.
@@ -25435,20 +25406,16 @@ function loadSVGFromString(string, reviver, options) {
  */
 function loadSVGFromURL(url, reviver) {
   let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  // need to handle error properly
-  return new Promise((resolve, reject) => {
-    const onComplete = r => {
-      const xml = r.responseXML;
-      if (xml) {
-        resolve(xml);
-      }
-      reject();
-    };
-    request(url.replace(/^\n\s*/, '').trim(), {
-      onComplete,
-      signal: options.signal
-    });
-  }).then(parsedDoc => parseSVGDocument(parsedDoc, reviver, options)).catch(() => {
+  return fetch(url.replace(/^\n\s*/, '').trim(), {
+    signal: options.signal
+  }).then(response => {
+    if (!response.ok) {
+      throw new FabricError(`HTTP error! status: ${response.status}`);
+    }
+    return response.text();
+  }).then(svgText => {
+    return loadSVGFromString(svgText, reviver, options);
+  }).catch(() => {
     // this is an unhappy path, we dont care about speed
     return createEmptyResponse();
   });
@@ -25485,6 +25452,7 @@ const polyActionHandler = (eventData, transform, x, y) => {
   const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, poly.calcOwnMatrix());
   poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
   poly.setDimensions();
+  poly.set('dirty', true);
   return true;
 };
 
@@ -25496,9 +25464,10 @@ const factoryPolyActionHandler = (pointIndex, fn) => {
     const poly = transform.target,
       anchorPoint = new Point(poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]),
       anchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix()),
-      actionPerformed = fn(eventData, _objectSpread2(_objectSpread2({}, transform), {}, {
+      actionPerformed = fn(eventData, {
+        ...transform,
         pointIndex
-      }), x, y);
+      }, x, y);
     const newAnchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix());
     const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
     poly.left -= diff.x;
@@ -25511,11 +25480,12 @@ function createPolyControls(arg0) {
   let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   const controls = {};
   for (let idx = 0; idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length); idx++) {
-    controls["p".concat(idx)] = new Control(_objectSpread2({
+    controls[`p${idx}`] = new Control({
       actionName: ACTION_NAME$1,
       positionHandler: createPolyPositionHandler(idx),
-      actionHandler: createPolyActionHandler(idx)
-    }, options));
+      actionHandler: createPolyActionHandler(idx),
+      ...options
+    });
   }
   return controls;
 }
@@ -25578,10 +25548,11 @@ function pathActionHandler(eventData, transform, x, y) {
   } = this;
   const actionPerformed = movePathPoint(target, x, y, commandIndex, pointIndex);
   {
-    fireEvent(this.actionName, _objectSpread2(_objectSpread2({}, commonEventInfo(eventData, transform, x, y)), {}, {
+    fireEvent(this.actionName, {
+      ...commonEventInfo(eventData, transform, x, y),
       commandIndex,
       pointIndex
-    }));
+    });
   }
   return actionPerformed;
 }
@@ -25591,11 +25562,12 @@ class PathPointControl extends Control {
     super(options);
   }
   render(ctx, left, top, styleOverride, fabricObject) {
-    const overrides = _objectSpread2(_objectSpread2({}, styleOverride), {}, {
+    const overrides = {
+      ...styleOverride,
       cornerColor: this.controlFill,
       cornerStrokeColor: this.controlStroke,
       transparentCorners: !this.controlFill
-    });
+    };
     super.render(ctx, left, top, overrides, fabricObject);
   }
 }
@@ -25634,15 +25606,17 @@ class PathControlPointControl extends PathPointControl {
     super.render(ctx, left, top, styleOverride, fabricObject);
   }
 }
-const createControl = (commandIndexPos, pointIndexPos, isControlPoint, options, connectToCommandIndex, connectToPointIndex) => new (isControlPoint ? PathControlPointControl : PathPointControl)(_objectSpread2(_objectSpread2({
+const createControl = (commandIndexPos, pointIndexPos, isControlPoint, options, connectToCommandIndex, connectToPointIndex) => new (isControlPoint ? PathControlPointControl : PathPointControl)({
   commandIndex: commandIndexPos,
   pointIndex: pointIndexPos,
   actionName: ACTION_NAME,
   positionHandler: pathPositionHandler,
   actionHandler: pathActionHandler,
   connectToCommandIndex,
-  connectToPointIndex
-}, options), isControlPoint ? options.controlPointStyle : options.pointStyle));
+  connectToPointIndex,
+  ...options,
+  ...(isControlPoint ? options.controlPointStyle : options.pointStyle)
+});
 function createPathControls(path) {
   let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   const controls = {};
@@ -25650,15 +25624,15 @@ function createPathControls(path) {
   path.path.forEach((command, commandIndex) => {
     const commandType = command[0];
     if (commandType !== 'Z') {
-      controls["c_".concat(commandIndex, "_").concat(commandType)] = createControl(commandIndex, command.length - 2, false, options);
+      controls[`c_${commandIndex}_${commandType}`] = createControl(commandIndex, command.length - 2, false, options);
     }
     switch (commandType) {
       case 'C':
-        controls["c_".concat(commandIndex, "_C_CP_1")] = createControl(commandIndex, 1, true, options, commandIndex - 1, indexFromPrevCommand(previousCommandType));
-        controls["c_".concat(commandIndex, "_C_CP_2")] = createControl(commandIndex, 3, true, options, commandIndex, 5);
+        controls[`c_${commandIndex}_C_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex - 1, indexFromPrevCommand(previousCommandType));
+        controls[`c_${commandIndex}_C_CP_2`] = createControl(commandIndex, 3, true, options, commandIndex, 5);
         break;
       case 'Q':
-        controls["c_".concat(commandIndex, "_Q_CP_1")] = createControl(commandIndex, 1, true, options, commandIndex, 3);
+        controls[`c_${commandIndex}_Q_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex, 3);
         break;
     }
     previousCommandType = commandType;
@@ -25736,18 +25710,26 @@ const isPutImageFaster = (width, height) => {
   return drawImageTime > putImageDataTime;
 };
 
-const highPsourceCode = "precision highp float";
-const identityFragmentShader = "\n    ".concat(highPsourceCode, ";\n    varying vec2 vTexCoord;\n    uniform sampler2D uTexture;\n    void main() {\n      gl_FragColor = texture2D(uTexture, vTexCoord);\n    }");
-const vertexSource$1 = "\n    attribute vec2 aPosition;\n    varying vec2 vTexCoord;\n    void main() {\n      vTexCoord = aPosition;\n      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n    }";
+const highPsourceCode = `precision highp float`;
+const identityFragmentShader = `
+    ${highPsourceCode};
+    varying vec2 vTexCoord;
+    uniform sampler2D uTexture;
+    void main() {
+      gl_FragColor = texture2D(uTexture, vTexCoord);
+    }`;
+const vertexSource$1 = `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    void main() {
+      vTexCoord = aPosition;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }`;
 
-const _excluded$1 = ["type"],
-  _excluded2 = ["type"];
 const regex = new RegExp(highPsourceCode, 'g');
 class BaseFilter {
   /**
    * Filter type
-   * @param {String} type
-   * @default
    */
   get type() {
     return this.constructor.type;
@@ -25766,8 +25748,10 @@ class BaseFilter {
    * @param {Object} [options] Options object
    */
   constructor() {
-    let _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      options = _objectWithoutProperties(_ref, _excluded$1);
+    let {
+      type,
+      ...options
+    } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     Object.assign(this, this.constructor.defaults, options);
   }
   getFragmentSource() {
@@ -25804,18 +25788,18 @@ class BaseFilter {
     gl.shaderSource(vertexShader, vertexSource);
     gl.compileShader(vertexShader);
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-      throw new FabricError("Vertex shader compile error for ".concat(this.type, ": ").concat(gl.getShaderInfoLog(vertexShader)));
+      throw new FabricError(`Vertex shader compile error for ${this.type}: ${gl.getShaderInfoLog(vertexShader)}`);
     }
     gl.shaderSource(fragmentShader, fragmentSource);
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-      throw new FabricError("Fragment shader compile error for ".concat(this.type, ": ").concat(gl.getShaderInfoLog(fragmentShader)));
+      throw new FabricError(`Fragment shader compile error for ${this.type}: ${gl.getShaderInfoLog(fragmentShader)}`);
     }
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      throw new FabricError("Shader link error for \"".concat(this.type, "\" ").concat(gl.getProgramInfoLog(program)));
+      throw new FabricError(`Shader link error for "${this.type}" ${gl.getProgramInfoLog(program)}`);
     }
     const uniformLocations = this.getUniformLocations(gl, program) || {};
     uniformLocations.uStepW = gl.getUniformLocation(program, 'uStepW');
@@ -26034,12 +26018,13 @@ class BaseFilter {
    */
   toObject() {
     const defaultKeys = Object.keys(this.constructor.defaults || {});
-    return _objectSpread2({
-      type: this.type
-    }, defaultKeys.reduce((acc, key) => {
-      acc[key] = this[key];
-      return acc;
-    }, {}));
+    return {
+      type: this.type,
+      ...defaultKeys.reduce((acc, key) => {
+        acc[key] = this[key];
+        return acc;
+      }, {})
+    };
   }
 
   /**
@@ -26050,8 +26035,11 @@ class BaseFilter {
     // delegate, not alias
     return this.toObject();
   }
-  static async fromObject(_ref2, _options) {
-    let filterOptions = _objectWithoutProperties(_ref2, _excluded2);
+  static async fromObject(_ref, _options) {
+    let {
+      type,
+      ...filterOptions
+    } = _ref;
     return new this(filterOptions);
   }
 }
@@ -26072,8 +26060,27 @@ const blendColorFragmentSource = {
   lighten: 'gl_FragColor.rgb = max(gl_FragColor.rgb, uColor.rgb);\n',
   darken: 'gl_FragColor.rgb = min(gl_FragColor.rgb, uColor.rgb);\n',
   exclusion: 'gl_FragColor.rgb += uColor.rgb - 2.0 * (uColor.rgb * gl_FragColor.rgb);\n',
-  overlay: "\n    if (uColor.r < 0.5) {\n      gl_FragColor.r *= 2.0 * uColor.r;\n    } else {\n      gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);\n    }\n    if (uColor.g < 0.5) {\n      gl_FragColor.g *= 2.0 * uColor.g;\n    } else {\n      gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);\n    }\n    if (uColor.b < 0.5) {\n      gl_FragColor.b *= 2.0 * uColor.b;\n    } else {\n      gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);\n    }\n    ",
-  tint: "\n    gl_FragColor.rgb *= (1.0 - uColor.a);\n    gl_FragColor.rgb += uColor.rgb;\n    "
+  overlay: `
+    if (uColor.r < 0.5) {
+      gl_FragColor.r *= 2.0 * uColor.r;
+    } else {
+      gl_FragColor.r = 1.0 - 2.0 * (1.0 - gl_FragColor.r) * (1.0 - uColor.r);
+    }
+    if (uColor.g < 0.5) {
+      gl_FragColor.g *= 2.0 * uColor.g;
+    } else {
+      gl_FragColor.g = 1.0 - 2.0 * (1.0 - gl_FragColor.g) * (1.0 - uColor.g);
+    }
+    if (uColor.b < 0.5) {
+      gl_FragColor.b *= 2.0 * uColor.b;
+    } else {
+      gl_FragColor.b = 1.0 - 2.0 * (1.0 - gl_FragColor.b) * (1.0 - uColor.b);
+    }
+    `,
+  tint: `
+    gl_FragColor.rgb *= (1.0 - uColor.a);
+    gl_FragColor.rgb += uColor.rgb;
+    `
 };
 
 const blendColorDefaultValues = {
@@ -26100,10 +26107,22 @@ const blendColorDefaultValues = {
  */
 class BlendColor extends BaseFilter {
   getCacheKey() {
-    return "".concat(this.type, "_").concat(this.mode);
+    return `${this.type}_${this.mode}`;
   }
   getFragmentSource() {
-    return "\n      precision highp float;\n      uniform sampler2D uTexture;\n      uniform vec4 uColor;\n      varying vec2 vTexCoord;\n      void main() {\n        vec4 color = texture2D(uTexture, vTexCoord);\n        gl_FragColor = color;\n        if (color.a > 0.0) {\n          ".concat(blendColorFragmentSource[this.mode], "\n        }\n      }\n      ");
+    return `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform vec4 uColor;
+      varying vec2 vTexCoord;
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        gl_FragColor = color;
+        if (color.a > 0.0) {
+          ${blendColorFragmentSource[this.mode]}
+        }
+      }
+      `;
   }
 
   /**
@@ -26205,18 +26224,15 @@ class BlendColor extends BaseFilter {
  * Color to make the blend operation with. default to a reddish color since black or white
  * gives always strong result.
  * @type String
- * @default
  **/
 /**
  * Blend mode for the filter: one of multiply, add, difference, screen, subtract,
  * darken, lighten, overlay, exclusion, tint.
  * @type String
- * @default
  **/
 /**
  * alpha value. represent the strength of the blend color operation.
  * @type Number
- * @default
  **/
 _defineProperty(BlendColor, "defaults", blendColorDefaultValues);
 _defineProperty(BlendColor, "type", 'BlendColor');
@@ -26224,12 +26240,47 @@ _defineProperty(BlendColor, "uniformLocations", ['uColor']);
 classRegistry.setClass(BlendColor);
 
 const fragmentSource$c = {
-  multiply: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform sampler2D uImage;\n    uniform vec4 uColor;\n    varying vec2 vTexCoord;\n    varying vec2 vTexCoord2;\n    void main() {\n      vec4 color = texture2D(uTexture, vTexCoord);\n      vec4 color2 = texture2D(uImage, vTexCoord2);\n      color.rgba *= color2.rgba;\n      gl_FragColor = color;\n    }\n    ",
-  mask: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform sampler2D uImage;\n    uniform vec4 uColor;\n    varying vec2 vTexCoord;\n    varying vec2 vTexCoord2;\n    void main() {\n      vec4 color = texture2D(uTexture, vTexCoord);\n      vec4 color2 = texture2D(uImage, vTexCoord2);\n      color.a = color2.a;\n      gl_FragColor = color;\n    }\n    "
+  multiply: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform sampler2D uImage;
+    uniform vec4 uColor;
+    varying vec2 vTexCoord;
+    varying vec2 vTexCoord2;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      vec4 color2 = texture2D(uImage, vTexCoord2);
+      color.rgba *= color2.rgba;
+      gl_FragColor = color;
+    }
+    `,
+  mask: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform sampler2D uImage;
+    uniform vec4 uColor;
+    varying vec2 vTexCoord;
+    varying vec2 vTexCoord2;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      vec4 color2 = texture2D(uImage, vTexCoord2);
+      color.a = color2.a;
+      gl_FragColor = color;
+    }
+    `
 };
-const vertexSource = "\n    attribute vec2 aPosition;\n    varying vec2 vTexCoord;\n    varying vec2 vTexCoord2;\n    uniform mat3 uTransformMatrix;\n    void main() {\n      vTexCoord = aPosition;\n      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;\n      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);\n    }\n    ";
+const vertexSource = `
+    attribute vec2 aPosition;
+    varying vec2 vTexCoord;
+    varying vec2 vTexCoord2;
+    uniform mat3 uTransformMatrix;
+    void main() {
+      vTexCoord = aPosition;
+      vTexCoord2 = (uTransformMatrix * vec3(aPosition, 1.0)).xy;
+      gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
+    }
+    `;
 
-const _excluded = ["type", "image"];
 const blendImageDefaultValues = {
   mode: 'multiply',
   alpha: 1
@@ -26253,7 +26304,7 @@ const blendImageDefaultValues = {
  */
 class BlendImage extends BaseFilter {
   getCacheKey() {
-    return "".concat(this.type, "_").concat(this.mode);
+    return `${this.type}_${this.mode}`;
   }
   getFragmentSource() {
     return fragmentSource$c[this.mode];
@@ -26361,14 +26412,14 @@ class BlendImage extends BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return _objectSpread2(_objectSpread2({}, super.toObject()), {}, {
+    return {
+      ...super.toObject(),
       image: this.image && this.image.toObject()
-    });
+    };
   }
 
   /**
    * Create filter instance from an object representation
-   * @static
    * @param {object} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting image loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -26376,13 +26427,14 @@ class BlendImage extends BaseFilter {
    */
   static async fromObject(_ref2, options) {
     let {
-        type,
-        image
-      } = _ref2,
-      filterOptions = _objectWithoutProperties(_ref2, _excluded);
-    return FabricImage.fromObject(image, options).then(enlivedImage => new this(_objectSpread2(_objectSpread2({}, filterOptions), {}, {
+      type,
+      image,
+      ...filterOptions
+    } = _ref2;
+    return FabricImage.fromObject(image, options).then(enlivedImage => new this({
+      ...filterOptions,
       image: enlivedImage
-    })));
+    }));
   }
 }
 /**
@@ -26395,7 +26447,6 @@ class BlendImage extends BaseFilter {
  * alpha channel of the filter image, and apply those values to the base
  * image's alpha channel.
  * @type String
- * @default
  **/
 /**
  * alpha value. represent the strength of the blend image operation.
@@ -26406,7 +26457,36 @@ _defineProperty(BlendImage, "defaults", blendImageDefaultValues);
 _defineProperty(BlendImage, "uniformLocations", ['uTransformMatrix', 'uImage']);
 classRegistry.setClass(BlendImage);
 
-const fragmentSource$b = "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform vec2 uDelta;\n    varying vec2 vTexCoord;\n    const float nSamples = 15.0;\n    vec3 v3offset = vec3(12.9898, 78.233, 151.7182);\n    float random(vec3 scale) {\n      /* use the fragment position for a different seed per-pixel */\n      return fract(sin(dot(gl_FragCoord.xyz, scale)) * 43758.5453);\n    }\n    void main() {\n      vec4 color = vec4(0.0);\n      float total = 0.0;\n      float offset = random(v3offset);\n      for (float t = -nSamples; t <= nSamples; t++) {\n        float percent = (t + offset - 0.5) / nSamples;\n        float weight = 1.0 - abs(percent);\n        color += texture2D(uTexture, vTexCoord + uDelta * percent) * weight;\n        total += weight;\n      }\n      gl_FragColor = color / total;\n    }\n  ";
+const fragmentSource$b = `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform vec2 uDelta;
+    varying vec2 vTexCoord;
+    const float nSamples = 15.0;
+    vec3 v3offset = vec3(12.9898, 78.233, 151.7182);
+    float random(vec3 scale) {
+      /* use the fragment position for a different seed per-pixel */
+      return fract(sin(dot(gl_FragCoord.xyz, scale)) * 43758.5453);
+    }
+    void main() {
+      vec4 color = vec4(0.0);
+      float totalC = 0.0;
+      float totalA = 0.0;
+      float offset = random(v3offset);
+      for (float t = -nSamples; t <= nSamples; t++) {
+        float percent = (t + offset - 0.5) / nSamples;
+        vec4 sample = texture2D(uTexture, vTexCoord + uDelta * percent);
+        float weight = 1.0 - abs(percent);
+        float alpha = weight * sample.a;
+        color.rgb += sample.rgb * alpha;
+        color.a += alpha;
+        totalA += weight;
+        totalC += alpha;
+      }
+      gl_FragColor.rgb = color.rgb / totalC;
+      gl_FragColor.a = color.a / totalA;
+    }
+  `;
 
 const blurDefaultValues = {
   blur: 0
@@ -26443,65 +26523,102 @@ class Blur extends BaseFilter {
       this.applyTo2d(options);
     }
   }
-  applyTo2d(options) {
-    options.imageData = this.simpleBlur(options);
-  }
-  simpleBlur(_ref) {
+  applyTo2d(_ref) {
     let {
-      ctx,
-      imageData,
-      filterBackend: {
-        resources
+      imageData: {
+        data,
+        width,
+        height
       }
     } = _ref;
-    const {
-      width,
-      height
-    } = imageData;
-    if (!resources.blurLayer1) {
-      resources.blurLayer1 = createCanvasElement();
-      resources.blurLayer2 = createCanvasElement();
+    // this code mimic the shader for output consistency
+    // it samples 31 pixels across the image over a distance that depends from the blur value.
+    this.aspectRatio = width / height;
+    this.horizontal = true;
+    let blurValue = this.getBlurValue() * width;
+    const imageData = new Uint8ClampedArray(data);
+    const samples = 15;
+    const bytesInRow = 4 * width;
+    for (let i = 0; i < data.length; i += 4) {
+      let r = 0.0,
+        g = 0.0,
+        b = 0.0,
+        a = 0.0,
+        totalA = 0;
+      const minIRow = i - i % bytesInRow;
+      const maxIRow = minIRow + bytesInRow;
+      // for now let's keep noise out of the way
+      // let pixelOffset = 0;
+      // const offset = Math.random() * 3;
+      // if (offset > 2) {
+      //   pixelOffset = 4;
+      // } else if (offset < 1) {
+      //   pixelOffset = -4;
+      // }
+      for (let j = -samples + 1; j < samples; j++) {
+        const percent = j / samples;
+        const distance = Math.floor(blurValue * percent) * 4;
+        const weight = 1 - Math.abs(percent);
+        let sampledPixel = i + distance; // + pixelOffset;
+        // try to implement edge mirroring
+        if (sampledPixel < minIRow) {
+          sampledPixel = minIRow;
+        } else if (sampledPixel > maxIRow) {
+          sampledPixel = maxIRow;
+        }
+        const localAlpha = data[sampledPixel + 3] * weight;
+        r += data[sampledPixel] * localAlpha;
+        g += data[sampledPixel + 1] * localAlpha;
+        b += data[sampledPixel + 2] * localAlpha;
+        a += localAlpha;
+        totalA += weight;
+      }
+      imageData[i] = r / a;
+      imageData[i + 1] = g / a;
+      imageData[i + 2] = b / a;
+      imageData[i + 3] = a / totalA;
     }
-    const canvas1 = resources.blurLayer1;
-    const canvas2 = resources.blurLayer2;
-    if (canvas1.width !== width || canvas1.height !== height) {
-      canvas2.width = canvas1.width = width;
-      canvas2.height = canvas1.height = height;
+    this.horizontal = false;
+    blurValue = this.getBlurValue() * height;
+    for (let i = 0; i < imageData.length; i += 4) {
+      let r = 0.0,
+        g = 0.0,
+        b = 0.0,
+        a = 0.0,
+        totalA = 0;
+      const minIRow = i % bytesInRow;
+      const maxIRow = imageData.length - bytesInRow + minIRow;
+      // for now let's keep noise out of the way
+      // let pixelOffset = 0;
+      // const offset = Math.random() * 3;
+      // if (offset > 2) {
+      //   pixelOffset = bytesInRow;
+      // } else if (offset < 1) {
+      //   pixelOffset = -bytesInRow;
+      // }
+      for (let j = -samples + 1; j < samples; j++) {
+        const percent = j / samples;
+        const distance = Math.floor(blurValue * percent) * bytesInRow;
+        const weight = 1 - Math.abs(percent);
+        let sampledPixel = i + distance; // + pixelOffset;
+        // try to implement edge mirroring
+        if (sampledPixel < minIRow) {
+          sampledPixel = minIRow;
+        } else if (sampledPixel > maxIRow) {
+          sampledPixel = maxIRow;
+        }
+        const localAlpha = imageData[sampledPixel + 3] * weight;
+        r += imageData[sampledPixel] * localAlpha;
+        g += imageData[sampledPixel + 1] * localAlpha;
+        b += imageData[sampledPixel + 2] * localAlpha;
+        a += localAlpha;
+        totalA += weight;
+      }
+      data[i] = r / a;
+      data[i + 1] = g / a;
+      data[i + 2] = b / a;
+      data[i + 3] = a / totalA;
     }
-    const ctx1 = canvas1.getContext('2d'),
-      ctx2 = canvas2.getContext('2d'),
-      nSamples = 15,
-      blur = this.blur * 0.06 * 0.5;
-    let random, percent, j, i;
-
-    // load first canvas
-    ctx1.putImageData(imageData, 0, 0);
-    ctx2.clearRect(0, 0, width, height);
-    for (i = -nSamples; i <= nSamples; i++) {
-      random = (Math.random() - 0.5) / 4;
-      percent = i / nSamples;
-      j = blur * percent * width + random;
-      ctx2.globalAlpha = 1 - Math.abs(percent);
-      ctx2.drawImage(canvas1, j, random);
-      ctx1.drawImage(canvas2, 0, 0);
-      ctx2.globalAlpha = 1;
-      ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-    }
-    for (i = -nSamples; i <= nSamples; i++) {
-      random = (Math.random() - 0.5) / 4;
-      percent = i / nSamples;
-      j = blur * percent * height + random;
-      ctx2.globalAlpha = 1 - Math.abs(percent);
-      ctx2.drawImage(canvas1, random, j);
-      ctx1.drawImage(canvas2, 0, 0);
-      ctx2.globalAlpha = 1;
-      ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
-    }
-    ctx.drawImage(canvas1, 0, 0);
-    const newImageData = ctx.getImageData(0, 0, canvas1.width, canvas1.height);
-    ctx1.globalAlpha = 1;
-    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
-    return newImageData;
   }
 
   /**
@@ -26517,32 +26634,33 @@ class Blur extends BaseFilter {
   isNeutralState() {
     return this.blur === 0;
   }
+  getBlurValue() {
+    let blurScale = 1;
+    const {
+      horizontal,
+      aspectRatio
+    } = this;
+    if (horizontal) {
+      if (aspectRatio > 1) {
+        // image is wide, i want to shrink radius horizontal
+        blurScale = 1 / aspectRatio;
+      }
+    } else {
+      if (aspectRatio < 1) {
+        // image is tall, i want to shrink radius vertical
+        blurScale = aspectRatio;
+      }
+    }
+    return blurScale * this.blur * 0.12;
+  }
 
   /**
    * choose right value of image percentage to blur with
    * @returns {Array} a numeric array with delta values
    */
   chooseRightDelta() {
-    let blurScale = 1;
-    const delta = [0, 0];
-    if (this.horizontal) {
-      if (this.aspectRatio > 1) {
-        // image is wide, i want to shrink radius horizontal
-        blurScale = 1 / this.aspectRatio;
-      }
-    } else {
-      if (this.aspectRatio < 1) {
-        // image is tall, i want to shrink radius vertical
-        blurScale = this.aspectRatio;
-      }
-    }
-    const blur = blurScale * this.blur * 0.12;
-    if (this.horizontal) {
-      delta[0] = blur;
-    } else {
-      delta[1] = blur;
-    }
-    return delta;
+    const blur = this.getBlurValue();
+    return this.horizontal ? [blur, 0] : [0, blur];
   }
 }
 /**
@@ -26550,14 +26668,23 @@ class Blur extends BaseFilter {
  * specific to keep the image blur constant at different resolutions
  * range between 0 and 1.
  * @type Number
- * @default
  */
 _defineProperty(Blur, "type", 'Blur');
 _defineProperty(Blur, "defaults", blurDefaultValues);
 _defineProperty(Blur, "uniformLocations", ['uDelta']);
 classRegistry.setClass(Blur);
 
-const fragmentSource$a = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform float uBrightness;\n  varying vec2 vTexCoord;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    color.rgb += uBrightness;\n    gl_FragColor = color;\n  }\n";
+const fragmentSource$a = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform float uBrightness;
+  varying vec2 vTexCoord;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    color.rgb += uBrightness;
+    gl_FragColor = color;
+  }
+`;
 
 const brightnessDefaultValues = {
   brightness: 0
@@ -26615,14 +26742,24 @@ class Brightness extends BaseFilter {
  * translated to -255 to 255 for 2d
  * 0.0039215686 is the part of 1 that get translated to 1 in 2d
  * @param {Number} brightness
- * @default
  */
 _defineProperty(Brightness, "type", 'Brightness');
 _defineProperty(Brightness, "defaults", brightnessDefaultValues);
 _defineProperty(Brightness, "uniformLocations", ['uBrightness']);
 classRegistry.setClass(Brightness);
 
-const fragmentSource$9 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  varying vec2 vTexCoord;\n  uniform mat4 uColorMatrix;\n  uniform vec4 uConstants;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    color *= uColorMatrix;\n    color += uConstants;\n    gl_FragColor = color;\n  }";
+const fragmentSource$9 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  varying vec2 vTexCoord;
+  uniform mat4 uColorMatrix;
+  uniform vec4 uConstants;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    color *= uColorMatrix;
+    color += uConstants;
+    gl_FragColor = color;
+  }`;
 
 const colorMatrixDefaultValues = {
   matrix: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
@@ -26692,9 +26829,10 @@ class ColorMatrix extends BaseFilter {
     gl.uniform4fv(uniformLocations.uConstants, constants);
   }
   toObject() {
-    return _objectSpread2(_objectSpread2({}, super.toObject()), {}, {
+    return {
+      ...super.toObject(),
       matrix: [...this.matrix]
-    });
+    };
   }
 }
 /**
@@ -26703,7 +26841,6 @@ class ColorMatrix extends BaseFilter {
  * outside the -1, 1 range.
  * 0.0039215686 is the part of 1 that get translated to 1 in 2d
  * @param {Array} matrix array of 20 numbers.
- * @default
  */
 /**
  * Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
@@ -26781,7 +26918,6 @@ class Composed extends BaseFilter {
 
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
-   * @static
    * @param {oject} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -26799,7 +26935,17 @@ class Composed extends BaseFilter {
 _defineProperty(Composed, "type", 'Composed');
 classRegistry.setClass(Composed);
 
-const fragmentSource$8 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform float uContrast;\n  varying vec2 vTexCoord;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    float contrastF = 1.015 * (uContrast + 1.0) / (1.0 * (1.015 - uContrast));\n    color.rgb = contrastF * (color.rgb - 0.5) + 0.5;\n    gl_FragColor = color;\n  }";
+const fragmentSource$8 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform float uContrast;
+  varying vec2 vTexCoord;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    float contrastF = 1.015 * (uContrast + 1.0) / (1.0 * (1.015 - uContrast));
+    color.rgb = contrastF * (color.rgb - 0.5) + 0.5;
+    gl_FragColor = color;
+  }`;
 
 const contrastDefaultValues = {
   contrast: 0
@@ -26864,14 +27010,158 @@ _defineProperty(Contrast, "uniformLocations", ['uContrast']);
 classRegistry.setClass(Contrast);
 
 const fragmentSource$7 = {
-  Convolute_3_1: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[9];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 0);\n      for (float h = 0.0; h < 3.0; h+=1.0) {\n        for (float w = 0.0; w < 3.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 1), uStepH * (h - 1));\n          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 3.0 + w)];\n        }\n      }\n      gl_FragColor = color;\n    }\n    ",
-  Convolute_3_0: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[9];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 1);\n      for (float h = 0.0; h < 3.0; h+=1.0) {\n        for (float w = 0.0; w < 3.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 1.0), uStepH * (h - 1.0));\n          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 3.0 + w)];\n        }\n      }\n      float alpha = texture2D(uTexture, vTexCoord).a;\n      gl_FragColor = color;\n      gl_FragColor.a = alpha;\n    }\n    ",
-  Convolute_5_1: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[25];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 0);\n      for (float h = 0.0; h < 5.0; h+=1.0) {\n        for (float w = 0.0; w < 5.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));\n          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 5.0 + w)];\n        }\n      }\n      gl_FragColor = color;\n    }\n    ",
-  Convolute_5_0: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[25];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 1);\n      for (float h = 0.0; h < 5.0; h+=1.0) {\n        for (float w = 0.0; w < 5.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));\n          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 5.0 + w)];\n        }\n      }\n      float alpha = texture2D(uTexture, vTexCoord).a;\n      gl_FragColor = color;\n      gl_FragColor.a = alpha;\n    }\n    ",
-  Convolute_7_1: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[49];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 0);\n      for (float h = 0.0; h < 7.0; h+=1.0) {\n        for (float w = 0.0; w < 7.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));\n          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 7.0 + w)];\n        }\n      }\n      gl_FragColor = color;\n    }\n    ",
-  Convolute_7_0: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[49];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 1);\n      for (float h = 0.0; h < 7.0; h+=1.0) {\n        for (float w = 0.0; w < 7.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));\n          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 7.0 + w)];\n        }\n      }\n      float alpha = texture2D(uTexture, vTexCoord).a;\n      gl_FragColor = color;\n      gl_FragColor.a = alpha;\n    }\n    ",
-  Convolute_9_1: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[81];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 0);\n      for (float h = 0.0; h < 9.0; h+=1.0) {\n        for (float w = 0.0; w < 9.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));\n          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 9.0 + w)];\n        }\n      }\n      gl_FragColor = color;\n    }\n    ",
-  Convolute_9_0: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform float uMatrix[81];\n    uniform float uStepW;\n    uniform float uStepH;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = vec4(0, 0, 0, 1);\n      for (float h = 0.0; h < 9.0; h+=1.0) {\n        for (float w = 0.0; w < 9.0; w+=1.0) {\n          vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));\n          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 9.0 + w)];\n        }\n      }\n      float alpha = texture2D(uTexture, vTexCoord).a;\n      gl_FragColor = color;\n      gl_FragColor.a = alpha;\n    }\n    "
+  Convolute_3_1: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[9];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 0);
+      for (float h = 0.0; h < 3.0; h+=1.0) {
+        for (float w = 0.0; w < 3.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 1), uStepH * (h - 1));
+          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 3.0 + w)];
+        }
+      }
+      gl_FragColor = color;
+    }
+    `,
+  Convolute_3_0: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[9];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 1);
+      for (float h = 0.0; h < 3.0; h+=1.0) {
+        for (float w = 0.0; w < 3.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 1.0), uStepH * (h - 1.0));
+          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 3.0 + w)];
+        }
+      }
+      float alpha = texture2D(uTexture, vTexCoord).a;
+      gl_FragColor = color;
+      gl_FragColor.a = alpha;
+    }
+    `,
+  Convolute_5_1: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[25];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 0);
+      for (float h = 0.0; h < 5.0; h+=1.0) {
+        for (float w = 0.0; w < 5.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));
+          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 5.0 + w)];
+        }
+      }
+      gl_FragColor = color;
+    }
+    `,
+  Convolute_5_0: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[25];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 1);
+      for (float h = 0.0; h < 5.0; h+=1.0) {
+        for (float w = 0.0; w < 5.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 2.0), uStepH * (h - 2.0));
+          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 5.0 + w)];
+        }
+      }
+      float alpha = texture2D(uTexture, vTexCoord).a;
+      gl_FragColor = color;
+      gl_FragColor.a = alpha;
+    }
+    `,
+  Convolute_7_1: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[49];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 0);
+      for (float h = 0.0; h < 7.0; h+=1.0) {
+        for (float w = 0.0; w < 7.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));
+          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 7.0 + w)];
+        }
+      }
+      gl_FragColor = color;
+    }
+    `,
+  Convolute_7_0: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[49];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 1);
+      for (float h = 0.0; h < 7.0; h+=1.0) {
+        for (float w = 0.0; w < 7.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 3.0), uStepH * (h - 3.0));
+          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 7.0 + w)];
+        }
+      }
+      float alpha = texture2D(uTexture, vTexCoord).a;
+      gl_FragColor = color;
+      gl_FragColor.a = alpha;
+    }
+    `,
+  Convolute_9_1: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[81];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 0);
+      for (float h = 0.0; h < 9.0; h+=1.0) {
+        for (float w = 0.0; w < 9.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));
+          color += texture2D(uTexture, vTexCoord + matrixPos) * uMatrix[int(h * 9.0 + w)];
+        }
+      }
+      gl_FragColor = color;
+    }
+    `,
+  Convolute_9_0: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform float uMatrix[81];
+    uniform float uStepW;
+    uniform float uStepH;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = vec4(0, 0, 0, 1);
+      for (float h = 0.0; h < 9.0; h+=1.0) {
+        for (float w = 0.0; w < 9.0; w+=1.0) {
+          vec2 matrixPos = vec2(uStepW * (w - 4.0), uStepH * (h - 4.0));
+          color.rgb += texture2D(uTexture, vTexCoord + matrixPos).rgb * uMatrix[int(h * 9.0 + w)];
+        }
+      }
+      float alpha = texture2D(uTexture, vTexCoord).a;
+      gl_FragColor = color;
+      gl_FragColor.a = alpha;
+    }
+    `
 };
 
 const convoluteDefaultValues = {
@@ -26921,7 +27211,7 @@ const convoluteDefaultValues = {
  */
 class Convolute extends BaseFilter {
   getCacheKey() {
-    return "".concat(this.type, "_").concat(Math.sqrt(this.matrix.length), "_").concat(this.opaque ? 1 : 0);
+    return `${this.type}_${Math.sqrt(this.matrix.length)}_${this.opaque ? 1 : 0}`;
   }
   getFragmentSource() {
     return fragmentSource$7[this.getCacheKey()];
@@ -27003,10 +27293,11 @@ class Convolute extends BaseFilter {
    * @return {Object} Object representation of an instance
    */
   toObject() {
-    return _objectSpread2(_objectSpread2({}, super.toObject()), {}, {
+    return {
+      ...super.toObject(),
       opaque: this.opaque,
       matrix: [...this.matrix]
-    });
+    };
   }
 }
 /*
@@ -27020,7 +27311,21 @@ _defineProperty(Convolute, "defaults", convoluteDefaultValues);
 _defineProperty(Convolute, "uniformLocations", ['uMatrix', 'uOpaque', 'uHalfSize', 'uSize']);
 classRegistry.setClass(Convolute);
 
-const fragmentSource$6 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform vec3 uGamma;\n  varying vec2 vTexCoord;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    vec3 correction = (1.0 / uGamma);\n    color.r = pow(color.r, correction.r);\n    color.g = pow(color.g, correction.g);\n    color.b = pow(color.b, correction.b);\n    gl_FragColor = color;\n    gl_FragColor.rgb *= color.a;\n  }\n";
+const fragmentSource$6 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform vec3 uGamma;
+  varying vec2 vTexCoord;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    vec3 correction = (1.0 / uGamma);
+    color.r = pow(color.r, correction.r);
+    color.g = pow(color.g, correction.g);
+    color.b = pow(color.b, correction.b);
+    gl_FragColor = color;
+    gl_FragColor.rgb *= color.a;
+  }
+`;
 
 const GAMMA = 'Gamma';
 const gammaDefaultValues = {
@@ -27110,7 +27415,6 @@ class Gamma extends BaseFilter {
 /**
  * Gamma array value, from 0.01 to 2.2.
  * @param {Array} gamma
- * @default
  */
 _defineProperty(Gamma, "type", GAMMA);
 _defineProperty(Gamma, "defaults", gammaDefaultValues);
@@ -27118,9 +27422,38 @@ _defineProperty(Gamma, "uniformLocations", ['uGamma']);
 classRegistry.setClass(Gamma);
 
 const fragmentSource$5 = {
-  average: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 color = texture2D(uTexture, vTexCoord);\n      float average = (color.r + color.b + color.g) / 3.0;\n      gl_FragColor = vec4(average, average, average, color.a);\n    }\n    ",
-  lightness: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform int uMode;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 col = texture2D(uTexture, vTexCoord);\n      float average = (max(max(col.r, col.g),col.b) + min(min(col.r, col.g),col.b)) / 2.0;\n      gl_FragColor = vec4(average, average, average, col.a);\n    }\n    ",
-  luminosity: "\n    precision highp float;\n    uniform sampler2D uTexture;\n    uniform int uMode;\n    varying vec2 vTexCoord;\n    void main() {\n      vec4 col = texture2D(uTexture, vTexCoord);\n      float average = 0.21 * col.r + 0.72 * col.g + 0.07 * col.b;\n      gl_FragColor = vec4(average, average, average, col.a);\n    }\n    "
+  average: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 color = texture2D(uTexture, vTexCoord);
+      float average = (color.r + color.b + color.g) / 3.0;
+      gl_FragColor = vec4(average, average, average, color.a);
+    }
+    `,
+  lightness: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform int uMode;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 col = texture2D(uTexture, vTexCoord);
+      float average = (max(max(col.r, col.g),col.b) + min(min(col.r, col.g),col.b)) / 2.0;
+      gl_FragColor = vec4(average, average, average, col.a);
+    }
+    `,
+  luminosity: `
+    precision highp float;
+    uniform sampler2D uTexture;
+    uniform int uMode;
+    varying vec2 vTexCoord;
+    void main() {
+      vec4 col = texture2D(uTexture, vTexCoord);
+      float average = 0.21 * col.r + 0.72 * col.g + 0.07 * col.b;
+      gl_FragColor = vec4(average, average, average, col.a);
+    }
+    `
 };
 
 const grayscaleDefaultValues = {
@@ -27166,7 +27499,7 @@ class Grayscale extends BaseFilter {
     }
   }
   getCacheKey() {
-    return "".concat(this.type, "_").concat(this.mode);
+    return `${this.type}_${this.mode}`;
   }
   getFragmentSource() {
     return fragmentSource$5[this.mode];
@@ -27197,9 +27530,10 @@ _defineProperty(Grayscale, "defaults", grayscaleDefaultValues);
 _defineProperty(Grayscale, "uniformLocations", ['uMode']);
 classRegistry.setClass(Grayscale);
 
-const hueRotationDefaultValues = _objectSpread2(_objectSpread2({}, colorMatrixDefaultValues), {}, {
+const hueRotationDefaultValues = {
+  ...colorMatrixDefaultValues,
   rotation: 0
-});
+};
 
 /**
  * HueRotation filter class
@@ -27241,7 +27575,25 @@ _defineProperty(HueRotation, "type", 'HueRotation');
 _defineProperty(HueRotation, "defaults", hueRotationDefaultValues);
 classRegistry.setClass(HueRotation);
 
-const fragmentSource$4 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform int uInvert;\n  uniform int uAlpha;\n  varying vec2 vTexCoord;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    if (uInvert == 1) {\n      if (uAlpha == 1) {\n        gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);\n      } else {\n        gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);\n      }\n    } else {\n      gl_FragColor = color;\n    }\n  }\n";
+const fragmentSource$4 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform int uInvert;
+  uniform int uAlpha;
+  varying vec2 vTexCoord;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    if (uInvert == 1) {
+      if (uAlpha == 1) {
+        gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,1.0 -color.a);
+      } else {
+        gl_FragColor = vec4(1.0 - color.r,1.0 -color.g,1.0 -color.b,color.a);
+      }
+    } else {
+      gl_FragColor = color;
+    }
+  }
+`;
 
 const invertDefaultValues = {
   alpha: false,
@@ -27304,19 +27656,32 @@ class Invert extends BaseFilter {
 /**
  * Invert also alpha.
  * @param {Boolean} alpha
- * @default
  **/
 /**
  * Filter invert. if false, does nothing
  * @param {Boolean} invert
- * @default
  */
 _defineProperty(Invert, "type", 'Invert');
 _defineProperty(Invert, "defaults", invertDefaultValues);
 _defineProperty(Invert, "uniformLocations", ['uInvert', 'uAlpha']);
 classRegistry.setClass(Invert);
 
-const fragmentSource$3 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform float uStepH;\n  uniform float uNoise;\n  uniform float uSeed;\n  varying vec2 vTexCoord;\n  float rand(vec2 co, float seed, float vScale) {\n    return fract(sin(dot(co.xy * vScale ,vec2(12.9898 , 78.233))) * 43758.5453 * (seed + 0.01) / 2.0);\n  }\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    color.rgb += (0.5 - rand(vTexCoord, uSeed, 0.1 / uStepH)) * uNoise;\n    gl_FragColor = color;\n  }\n";
+const fragmentSource$3 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform float uStepH;
+  uniform float uNoise;
+  uniform float uSeed;
+  varying vec2 vTexCoord;
+  float rand(vec2 co, float seed, float vScale) {
+    return fract(sin(dot(co.xy * vScale ,vec2(12.9898 , 78.233))) * 43758.5453 * (seed + 0.01) / 2.0);
+  }
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    color.rgb += (0.5 - rand(vTexCoord, uSeed, 0.1 / uStepH)) * uNoise;
+    gl_FragColor = color;
+  }
+`;
 
 const noiseDefaultValues = {
   noise: 0
@@ -27375,14 +27740,31 @@ class Noise extends BaseFilter {
 /**
  * Noise value, from
  * @param {Number} noise
- * @default
  */
 _defineProperty(Noise, "type", 'Noise');
 _defineProperty(Noise, "defaults", noiseDefaultValues);
 _defineProperty(Noise, "uniformLocations", ['uNoise', 'uSeed']);
 classRegistry.setClass(Noise);
 
-const fragmentSource$2 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform float uBlocksize;\n  uniform float uStepW;\n  uniform float uStepH;\n  varying vec2 vTexCoord;\n  void main() {\n    float blockW = uBlocksize * uStepW;\n    float blockH = uBlocksize * uStepH;\n    int posX = int(vTexCoord.x / blockW);\n    int posY = int(vTexCoord.y / blockH);\n    float fposX = float(posX);\n    float fposY = float(posY);\n    vec2 squareCoords = vec2(fposX * blockW, fposY * blockH);\n    vec4 color = texture2D(uTexture, squareCoords);\n    gl_FragColor = color;\n  }\n";
+const fragmentSource$2 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform float uBlocksize;
+  uniform float uStepW;
+  uniform float uStepH;
+  varying vec2 vTexCoord;
+  void main() {
+    float blockW = uBlocksize * uStepW;
+    float blockH = uBlocksize * uStepH;
+    int posX = int(vTexCoord.x / blockW);
+    int posY = int(vTexCoord.y / blockH);
+    float fposX = float(posX);
+    float fposY = float(posY);
+    vec2 squareCoords = vec2(fposX * blockW, fposY * blockH);
+    vec4 color = texture2D(uTexture, squareCoords);
+    gl_FragColor = color;
+  }
+`;
 
 const pixelateDefaultValues = {
   blocksize: 4
@@ -27457,7 +27839,19 @@ _defineProperty(Pixelate, "defaults", pixelateDefaultValues);
 _defineProperty(Pixelate, "uniformLocations", ['uBlocksize']);
 classRegistry.setClass(Pixelate);
 
-const fragmentShader = "\nprecision highp float;\nuniform sampler2D uTexture;\nuniform vec4 uLow;\nuniform vec4 uHigh;\nvarying vec2 vTexCoord;\nvoid main() {\n  gl_FragColor = texture2D(uTexture, vTexCoord);\n  if(all(greaterThan(gl_FragColor.rgb,uLow.rgb)) && all(greaterThan(uHigh.rgb,gl_FragColor.rgb))) {\n    gl_FragColor.a = 0.0;\n  }\n}\n";
+const fragmentShader = `
+precision highp float;
+uniform sampler2D uTexture;
+uniform vec4 uLow;
+uniform vec4 uHigh;
+varying vec2 vTexCoord;
+void main() {
+  gl_FragColor = texture2D(uTexture, vTexCoord);
+  if(all(greaterThan(gl_FragColor.rgb,uLow.rgb)) && all(greaterThan(uHigh.rgb,gl_FragColor.rgb))) {
+    gl_FragColor.a = 0.0;
+  }
+}
+`;
 
 const removeColorDefaultValues = {
   color: '#FFFFFF',
@@ -27521,8 +27915,6 @@ class RemoveColor extends BaseFilter {
 }
 /**
  * Color to remove, in any format understood by {@link Color}.
- * @param {String} type
- * @default
  */
 /**
  * distance to actual color, as value up or down from each r,g,b
@@ -27567,7 +27959,7 @@ class Resize extends BaseFilter {
   }
   getCacheKey() {
     const filterWindow = this.getFilterWindow();
-    return "".concat(this.type, "_").concat(filterWindow);
+    return `${this.type}_${filterWindow}`;
   }
   getFragmentSource() {
     const filterWindow = this.getFilterWindow();
@@ -27591,9 +27983,24 @@ class Resize extends BaseFilter {
   generateShader(filterWindow) {
     const offsets = new Array(filterWindow);
     for (let i = 1; i <= filterWindow; i++) {
-      offsets[i - 1] = "".concat(i, ".0 * uDelta");
+      offsets[i - 1] = `${i}.0 * uDelta`;
     }
-    return "\n      precision highp float;\n      uniform sampler2D uTexture;\n      uniform vec2 uDelta;\n      varying vec2 vTexCoord;\n      uniform float uTaps[".concat(filterWindow, "];\n      void main() {\n        vec4 color = texture2D(uTexture, vTexCoord);\n        float sum = 1.0;\n        ").concat(offsets.map((offset, i) => "\n              color += texture2D(uTexture, vTexCoord + ".concat(offset, ") * uTaps[").concat(i, "] + texture2D(uTexture, vTexCoord - ").concat(offset, ") * uTaps[").concat(i, "];\n              sum += 2.0 * uTaps[").concat(i, "];\n            ")).join('\n'), "\n        gl_FragColor = color / sum;\n      }\n    ");
+    return `
+      precision highp float;
+      uniform sampler2D uTexture;
+      uniform vec2 uDelta;
+      varying vec2 vTexCoord;
+      uniform float uTaps[${filterWindow}];
+      void main() {
+        vec4 color = texture2D(uTexture, vTexCoord);
+        float sum = 1.0;
+        ${offsets.map((offset, i) => `
+              color += texture2D(uTexture, vTexCoord + ${offset}) * uTaps[${i}] + texture2D(uTexture, vTexCoord - ${offset}) * uTaps[${i}];
+              sum += 2.0 * uTaps[${i}];
+            `).join('\n')}
+        gl_FragColor = color / sum;
+      }
+    `;
   }
   applyToForWebgl(options) {
     options.passes++;
@@ -27940,29 +28347,39 @@ class Resize extends BaseFilter {
  * Resize type
  * for webgl resizeType is just lanczos, for canvas2d can be:
  * bilinear, hermite, sliceHack, lanczos.
- * @default
  */
 /**
  * Scale factor for resizing, x axis
  * @param {Number} scaleX
- * @default
  */
 /**
  * Scale factor for resizing, y axis
  * @param {Number} scaleY
- * @default
  */
 /**
  * LanczosLobes parameter for lanczos filter, valid for resizeType lanczos
  * @param {Number} lanczosLobes
- * @default
  */
 _defineProperty(Resize, "type", 'Resize');
 _defineProperty(Resize, "defaults", resizeDefaultValues);
 _defineProperty(Resize, "uniformLocations", ['uDelta', 'uTaps']);
 classRegistry.setClass(Resize);
 
-const fragmentSource$1 = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform float uSaturation;\n  varying vec2 vTexCoord;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    float rgMax = max(color.r, color.g);\n    float rgbMax = max(rgMax, color.b);\n    color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;\n    color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;\n    color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;\n    gl_FragColor = color;\n  }\n";
+const fragmentSource$1 = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform float uSaturation;
+  varying vec2 vTexCoord;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    float rgMax = max(color.r, color.g);
+    float rgbMax = max(rgMax, color.b);
+    color.r += rgbMax != color.r ? (rgbMax - color.r) * uSaturation : 0.00;
+    color.g += rgbMax != color.g ? (rgbMax - color.g) * uSaturation : 0.00;
+    color.b += rgbMax != color.b ? (rgbMax - color.b) * uSaturation : 0.00;
+    gl_FragColor = color;
+  }
+`;
 
 const saturationDefaultValues = {
   saturation: 0
@@ -28025,14 +28442,28 @@ class Saturation extends BaseFilter {
  * A value of 0 has no effect.
  *
  * @param {Number} saturation
- * @default
  */
 _defineProperty(Saturation, "type", 'Saturation');
 _defineProperty(Saturation, "defaults", saturationDefaultValues);
 _defineProperty(Saturation, "uniformLocations", ['uSaturation']);
 classRegistry.setClass(Saturation);
 
-const fragmentSource = "\n  precision highp float;\n  uniform sampler2D uTexture;\n  uniform float uVibrance;\n  varying vec2 vTexCoord;\n  void main() {\n    vec4 color = texture2D(uTexture, vTexCoord);\n    float max = max(color.r, max(color.g, color.b));\n    float avg = (color.r + color.g + color.b) / 3.0;\n    float amt = (abs(max - avg) * 2.0) * uVibrance;\n    color.r += max != color.r ? (max - color.r) * amt : 0.00;\n    color.g += max != color.g ? (max - color.g) * amt : 0.00;\n    color.b += max != color.b ? (max - color.b) * amt : 0.00;\n    gl_FragColor = color;\n  }\n";
+const fragmentSource = `
+  precision highp float;
+  uniform sampler2D uTexture;
+  uniform float uVibrance;
+  varying vec2 vTexCoord;
+  void main() {
+    vec4 color = texture2D(uTexture, vTexCoord);
+    float max = max(color.r, max(color.g, color.b));
+    float avg = (color.r + color.g + color.b) / 3.0;
+    float amt = (abs(max - avg) * 2.0) * uVibrance;
+    color.r += max != color.r ? (max - color.r) * amt : 0.00;
+    color.g += max != color.g ? (max - color.g) * amt : 0.00;
+    color.b += max != color.b ? (max - color.b) * amt : 0.00;
+    gl_FragColor = color;
+  }
+`;
 
 const vibranceDefaultValues = {
   vibrance: 0
@@ -28097,7 +28528,6 @@ class Vibrance extends BaseFilter {
  * A value of 0 has no effect.
  *
  * @param {Number} vibrance
- * @default
  */
 _defineProperty(Vibrance, "type", 'Vibrance');
 _defineProperty(Vibrance, "defaults", vibranceDefaultValues);
@@ -28134,5 +28564,5 @@ var filters = /*#__PURE__*/Object.freeze({
   Vintage: Vintage
 });
 
-export { ActiveSelection, BaseBrush, FabricObject$1 as BaseFabricObject, Canvas, Canvas2dFilterBackend, CanvasDOMManager, Circle, CircleBrush, ClipPathLayout, Color, Control, Ellipse, FabricImage, FabricObject, FabricText, FitContentLayout, FixedLayout, Gradient, Group, IText, FabricImage as Image, InteractiveFabricObject, Intersection, LayoutManager, LayoutStrategy, Line, FabricObject as Object, Observable, Path, Pattern, PatternBrush, PencilBrush, Point, Polygon, Polyline, Rect, Shadow, SprayBrush, StaticCanvas, StaticCanvasDOMManager, FabricText as Text, Textbox, Triangle, WebGLFilterBackend, cache, classRegistry, config, index as controlsUtils, createCollectionMixin, filters, getCSSRules, getEnv, getFabricDocument, getFabricWindow, getFilterBackend, iMatrix, initFilterBackend, isPutImageFaster, isWebGLPipelineState, loadSVGFromString, loadSVGFromURL, parseAttributes, parseFontDeclaration, parsePointsAttribute, parseSVGDocument, parseStyleAttribute, parseTransformAttribute, runningAnimations, setEnv, setFilterBackend, index$1 as util, VERSION as version };
+export { ActiveSelection, BaseBrush, FabricObject$1 as BaseFabricObject, Canvas, Canvas2dFilterBackend, CanvasDOMManager, Circle, CircleBrush, ClipPathLayout, Color, Control, Ellipse, FabricImage, FabricObject, FabricText, FitContentLayout, FixedLayout, Gradient, Group, IText, FabricImage as Image, InteractiveFabricObject, Intersection, LayoutManager, LayoutStrategy, Line, FabricObject as Object, Observable, Path, Pattern, PatternBrush, PencilBrush, Point, Polygon, Polyline, Rect, Shadow, SprayBrush, StaticCanvas, StaticCanvasDOMManager, FabricText as Text, Textbox, Triangle, WebGLFilterBackend, cache, classRegistry, config, index as controlsUtils, createCollectionMixin, filters, getEnv, getFabricDocument, getFabricWindow, getFilterBackend, iMatrix, initFilterBackend, isPutImageFaster, isWebGLPipelineState, loadSVGFromString, loadSVGFromURL, parseSVGDocument, runningAnimations, setEnv, setFilterBackend, index$1 as util, VERSION as version };
 //# sourceMappingURL=index.mjs.map
