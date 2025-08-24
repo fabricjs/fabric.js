@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): BREAKING Refactor find target [#10587](https://github.com/fabricjs/fabric.js/pull/10587)
 - chore(): Reduce noise in inline docs [#10694](https://github.com/fabricjs/fabric.js/pull/10694)
 - chore(): Reduce noise in unit tests [#10693](https://github.com/fabricjs/fabric.js/pull/10693)
 - Fix Next.js compatibility by removing node export restriction [#10687](https://github.com/fabricjs/fabric.js/pull/10687)
@@ -43,7 +44,6 @@
 - refactor(tests): move text path tests from qunit to playwright [#10590](https://github.com/fabricjs/fabric.js/pull/10590)
 - chore(): Deprecate line [#10598](https://github.com/fabricjs/fabric.js/pull/10598)
 - feat(): Add support for Intl.segmenter [#10584](https://github.com/fabricjs/fabric.js/pull/10584)
-- refactor(): BREAKING Refactor find target [#10587](https://github.com/fabricjs/fabric.js/pull/10587)
 - ci(): Add firefox vitest to ci [#10586](https://github.com/fabricjs/fabric.js/pull/10586)
 - feat(tests): add firefox to vitest browser tests [#10571](https://github.com/fabricjs/fabric.js/pull/10571)
 - refactor(tests): move to data url tests from qunit to playwright [#10581](https://github.com/fabricjs/fabric.js/pull/10581)
