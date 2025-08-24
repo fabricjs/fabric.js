@@ -2,6 +2,8 @@
 
 ## [next]
 
+## [7.0.0-beta1]
+
 - refactor(): BREAKING Refactor find target [#10587](https://github.com/fabricjs/fabric.js/pull/10587)
 - chore(): Reduce noise in inline docs [#10694](https://github.com/fabricjs/fabric.js/pull/10694)
 - chore(): Reduce noise in unit tests [#10693](https://github.com/fabricjs/fabric.js/pull/10693)
