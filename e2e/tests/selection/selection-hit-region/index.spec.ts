@@ -22,7 +22,11 @@ test('Selection hit regions', async ({ canvasUtil }) => {
       for (let y = 0; y <= canvas.height; y += 2) {
         for (let x = 0; x < canvas.width; x += 2) {
           rects.some((rect) => {
-            if (canvas._checkTarget(rect, new window.fabric.Point(x, y))) {
+            const p = new window.fabric.Point(x, y);
+            const pt = p.transform(
+              window.fabric.util.invertTransform(canvas.viewportTransform),
+            );
+            if (canvas._checkTarget(rect, pt)) {
               render({ x, y }, rect.fill as string);
             }
           });

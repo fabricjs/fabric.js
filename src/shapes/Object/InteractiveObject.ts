@@ -204,7 +204,7 @@ export class InteractiveFabricObject<
 
   /**
    * Determines which corner is under the mouse cursor, represented by `pointer`.
-   * This function is return a corner only if the object is the active one.
+   * This function returns a corner only if the object is the active one.
    * This is done to avoid selecting corner of non active object and activating transformations
    * rather than drag action. The default behavior of fabricJS is that if you want to transform
    * an object, first you select it to show the control set
