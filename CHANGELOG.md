@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): Update typescript 5.9, eslint, babel and rollup to latest [#10708](https://github.com/fabricjs/fabric.js/pull/10708)
+
 ## [7.0.0-beta1]
 
 - refactor(): BREAKING Refactor find target [#10587](https://github.com/fabricjs/fabric.js/pull/10587)
