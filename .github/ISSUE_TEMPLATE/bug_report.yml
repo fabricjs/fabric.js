@@ -47,6 +47,12 @@ body:
         latest before filing a bug report, your issue might have been resolved
         already.
       options:
+        - 7.0.0-beta1
+        - 6.7.1
+        - 6.7.0
+        - 6.6.7
+        - 6.6.6
+        - 6.6.5
         - 6.6.4
         - 6.6.2
         - 6.6.1
@@ -66,29 +72,6 @@ body:
         - 6.0.2
         - 6.0.1
         - 6.0.0
-        - 6.0.0-rc4
-        - 6.0.0-rc3
-        - 6.0.0-rc2
-        - 6.0.0-rc1
-        - 6.0.0-beta9
-        - 6.0.0-beta8
-        - 6.0.0-beta7
-        - 6.0.0-beta6
-        - 6.0.0-beta5
-        - 6.0.0-beta4
-        - 6.0.0-beta3
-        - 6.0.0-beta20
-        - 6.0.0-beta19
-        - 6.0.0-beta18
-        - 6.0.0-beta17
-        - 6.0.0-beta16
-        - 6.0.0-beta15
-        - 6.0.0-beta14
-        - 6.0.0-beta13
-        - 6.0.0-beta12
-        - 6.0.0-beta11
-        - 6.0.0-beta10
-        - 6.0.0-beta1
         - 5.5.2
         - 5.5.1
         - 5.5.0
