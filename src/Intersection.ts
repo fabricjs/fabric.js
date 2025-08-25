@@ -28,7 +28,6 @@ export class Intersection {
    * Appends points of intersection
    * @param {...Point[]} points
    * @return {Intersection} thisArg
-   * @chainable
    */
   private append(...points: Point[]): Intersection {
     this.points = this.points.concat(
