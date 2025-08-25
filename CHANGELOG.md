@@ -2,6 +2,8 @@
 
 ## [next]
 
+- chore(): Fixes to TypeDoc for compilation [#10709](https://github.com/fabricjs/fabric.js/pull/10709)
+
 ## [7.0.0-beta1]
 
 - refactor(): BREAKING Refactor find target [#10587](https://github.com/fabricjs/fabric.js/pull/10587)
