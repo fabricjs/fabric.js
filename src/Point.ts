@@ -41,7 +41,6 @@ export class Point implements XY {
    * Adds another point to this one
    * @param {XY} that
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   addEquals(that: XY): Point {
@@ -63,7 +62,6 @@ export class Point implements XY {
    * Adds value to this point
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarAddEquals(scalar: number): Point {
@@ -85,7 +83,6 @@ export class Point implements XY {
    * Subtracts another point from this point
    * @param {XY} that
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   subtractEquals(that: XY): Point {
@@ -107,7 +104,6 @@ export class Point implements XY {
    * Subtracts value from this point
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarSubtractEquals(scalar: number): Point {
@@ -138,7 +134,6 @@ export class Point implements XY {
    * Multiplies this point by a value
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarMultiplyEquals(scalar: number): Point {
@@ -169,7 +164,6 @@ export class Point implements XY {
    * Divides this point by a value
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarDivideEquals(scalar: number): Point {
@@ -288,7 +282,6 @@ export class Point implements XY {
    * Sets x/y of this point
    * @param {Number} x
    * @param {Number} y
-   * @chainable
    */
   setXY(x: number, y: number) {
     this.x = x;
@@ -299,7 +292,6 @@ export class Point implements XY {
   /**
    * Sets x of this point
    * @param {Number} x
-   * @chainable
    */
   setX(x: number) {
     this.x = x;
@@ -309,7 +301,6 @@ export class Point implements XY {
   /**
    * Sets y of this point
    * @param {Number} y
-   * @chainable
    */
   setY(y: number) {
     this.y = y;
@@ -319,7 +310,6 @@ export class Point implements XY {
   /**
    * Sets x/y of this point from another point
    * @param {XY} that
-   * @chainable
    */
   setFromPoint(that: XY) {
     this.x = that.x;
