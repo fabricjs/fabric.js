@@ -216,7 +216,7 @@ export class WebGLFilterBackend {
     filter?:
       | WebGLRenderingContextBase['NEAREST']
       | WebGLRenderingContextBase['LINEAR'],
-  ) {
+  ): WebGLTexture {
     const {
       NEAREST,
       TEXTURE_2D,
