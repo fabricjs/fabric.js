@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(): Fixes to TypeDoc for compilation [#10709](https://github.com/fabricjs/fabric.js/pull/10709)
+- chore(): Update typescript 5.9, eslint, babel and rollup to latest [#10708](https://github.com/fabricjs/fabric.js/pull/10708)
 
 ## [7.0.0-beta1]
 
