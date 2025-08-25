@@ -3,6 +3,11 @@
 ## [next]
 
 - fix(): The mouse enter and leave events of child elements will be executed twice. [10698](https://github.com/fabricjs/fabric.js/issues/10698)
+- chore(): Update typescript 5.9, eslint, babel and rollup to latest [#10708](https://github.com/fabricjs/fabric.js/pull/10708)
+
+## [7.0.0-beta1]
+
+- refactor(): BREAKING Refactor find target [#10587](https://github.com/fabricjs/fabric.js/pull/10587)
 - chore(): Reduce noise in inline docs [#10694](https://github.com/fabricjs/fabric.js/pull/10694)
 - chore(): Reduce noise in unit tests [#10693](https://github.com/fabricjs/fabric.js/pull/10693)
 - Fix Next.js compatibility by removing node export restriction [#10687](https://github.com/fabricjs/fabric.js/pull/10687)

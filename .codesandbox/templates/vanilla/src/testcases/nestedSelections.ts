@@ -1,9 +1,10 @@
 import * as fabric from 'fabric';
 
 export function testCase(canvas: fabric.Canvas, objectCaching = true) {
+  canvas.setDimensions({ width: 1400, height: 900 });
   canvas.preserveObjectStacking = true;
   const circle = new fabric.Circle({ left: 100, top: 50, radius: 50 });
-  const text = new fabric.FabricText('empty', { evented: false });
+  const text = new fabric.FabricText('empty', { evented: true });
   const nastyTriangle = new fabric.Triangle({
     width: 10,
     height: 150,
