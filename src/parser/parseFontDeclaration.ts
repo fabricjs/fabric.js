@@ -3,8 +3,6 @@ import { reFontDeclaration } from './constants';
 
 /**
  * Parses a short font declaration, building adding its properties to a style object
- * @static
- * @function
  * @param {String} value font declaration
  * @param {Object} oStyle definition
  */

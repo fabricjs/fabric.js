@@ -510,7 +510,6 @@ export class FabricImage<
 
   /**
    * Applies filters assigned to this image (from "filters" array) or from filter param
-   * @method applyFilters
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */

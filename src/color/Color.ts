@@ -197,7 +197,6 @@ export class Color {
 
   /**
    * Returns new color object, when given a color in RGBA format
-   * @function
    * @param {String} color
    * @return {Color}
    */
@@ -234,7 +233,6 @@ export class Color {
 
   /**
    * Returns new color object, when given a color in HSLA format
-   * @function
    * @param {String} color
    * @return {Color}
    */

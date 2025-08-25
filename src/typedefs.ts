@@ -59,7 +59,7 @@ export type SupportedSVGUnit = 'mm' | 'cm' | 'in' | 'pt' | 'pc' | 'em';
  * [ a c e ]
  * [ b d f ]
  * [ 0 0 1 ]
- * For more details, see @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#matrix
+ * For more details, see {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#matrix}
  */
 export type TMat2D = [
   a: number,

@@ -901,7 +901,6 @@ export class StaticCanvas<
 
   /**
    * Returns SVG representation of canvas
-   * @function
    * @param {Object} [options] Options object for SVG output
    * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
    * @param {Object} [options.viewBox] SVG viewbox object
