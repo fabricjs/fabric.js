@@ -85,7 +85,7 @@ export const multiplyTransformMatrices = (
   ] as TMat2D;
 
 /**
- * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
+ * Multiplies the matrices array such that a matrix defines the plane for the rest of the matrices **after** it
  *
  * `multiplyTransformMatrixArray([A, B, C, D])` is equivalent to `A(B(C(D)))`
  *
