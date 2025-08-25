@@ -72,7 +72,7 @@ export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
 const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 
 /**
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
+ * @see {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
 export class FabricImage<
     Props extends TOptions<ImageProps> = Partial<ImageProps>,
@@ -510,7 +510,6 @@ export class FabricImage<
 
   /**
    * Applies filters assigned to this image (from "filters" array) or from filter param
-   * @method applyFilters
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */

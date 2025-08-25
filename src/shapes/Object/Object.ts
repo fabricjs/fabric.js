@@ -149,7 +149,7 @@ export type DrawContext =
 
 /**
  * Root object class from which all 2d shape classes inherit from
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
+ * @see {@link http://fabricjs.com/fabric-intro-part-1#objects}
  *
  * @fires added
  * @fires removed
@@ -1512,7 +1512,7 @@ export class FabricObject<
    * Animates object's properties
    * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
    * @param {Partial<AnimationOptions<T>>} options
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
+   * @see {@link http://fabricjs.com/fabric-intro-part-2#animation}
    * @return {Record<string, TAnimation<T>>} map of animation contexts
    *
    * As object — multiple properties

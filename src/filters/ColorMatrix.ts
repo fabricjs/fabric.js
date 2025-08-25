@@ -20,7 +20,7 @@ export const colorMatrixDefaultValues: ColorMatrixOwnProps = {
 /**
    * Color Matrix filter class
    * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
+   * @see {@link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
    * @example <caption>Kodachrome filter</caption>
    * const filter = new ColorMatrix({
    *  matrix: [

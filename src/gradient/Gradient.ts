@@ -24,7 +24,7 @@ import { isPath } from '../util/typeAssertions';
 /**
  * Gradient class
  * @class Gradient
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
+ * @see {@link http://fabricjs.com/fabric-intro-part-2#gradients}
  */
 export class Gradient<
   S,

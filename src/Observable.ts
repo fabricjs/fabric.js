@@ -5,7 +5,7 @@ type EventRegistryObject<E> = {
 };
 
 /**
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
+ * @see {@link http://fabricjs.com/fabric-intro-part-2#events}
  * @see {@link http://fabricjs.com/events|Events demo}
  */
 export class Observable<EventSpec> {

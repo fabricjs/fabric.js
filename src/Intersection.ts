@@ -28,7 +28,6 @@ export class Intersection {
    * Appends points of intersection
    * @param {...Point[]} points
    * @return {Intersection} thisArg
-   * @chainable
    */
   private append(...points: Point[]): Intersection {
     this.points = this.points.concat(
@@ -82,7 +81,7 @@ export class Intersection {
   }
 
   /**
-   * Use the ray casting algorithm to determine if {@link point} is in the polygon defined by {@link points}
+   * Use the ray casting algorithm to determine if point is in the polygon defined by points
    * @see https://en.wikipedia.org/wiki/Point_in_polygon
    * @param point
    * @param points polygon points
