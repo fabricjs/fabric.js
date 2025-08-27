@@ -179,7 +179,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     );
     functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
-    functor(canvasElement, 'wheel', this._onMouseWheel);
+    functor(canvasElement, 'wheel', this._onMouseWheel, { passive: false });
     functor(canvasElement, 'contextmenu', this._onContextMenu);
     functor(canvasElement, 'click', this._onClick);
     // decide if to remove in fabric 7.0
