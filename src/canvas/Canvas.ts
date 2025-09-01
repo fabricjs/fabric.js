@@ -1182,8 +1182,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @private
    */
   _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
-    const _hoveredTarget = this._hoveredTarget,
-      _hoveredTargets = this._hoveredTargets,
+    const { _hoveredTarget, _hoveredTargets } = this,
       { subTargets } = this.findTarget(e),
       length = Math.max(_hoveredTargets.length, subTargets.length);
 
@@ -1194,7 +1193,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       fireCanvas: true,
     });
     for (let i = 0; i < length; i++) {
-      if (target === subTargets[i]) {
+      if (
+        subTargets[i] === target ||
+        (_hoveredTargets[i] && _hoveredTargets[i] === _hoveredTarget)
+      ) {
         continue;
       }
       this.fireSyntheticInOutEvents('mouse', {

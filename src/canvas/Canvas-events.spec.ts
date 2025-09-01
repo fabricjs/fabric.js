@@ -1117,6 +1117,62 @@ describe('Canvas events mixin', () => {
     ).toBe(0);
   });
 
+  it('fires mouseover and mouseout events for subTargets when subTargetCheck is enabled but not twice', async () => {
+    let counterOver = 0,
+      counterOut = 0;
+    const testCanvas = new Canvas();
+
+    function setSubTargetCheckRecursive(obj: any) {
+      if (obj._objects) {
+        obj._objects.forEach(setSubTargetCheckRecursive);
+      }
+      obj.subTargetCheck = true;
+      obj.on('mouseover', function () {
+        counterOver++;
+      });
+      obj.on('mouseout', function () {
+        counterOut++;
+      });
+    }
+
+    await testCanvas.loadFromJSON(SUB_TARGETS_JSON);
+    const activeSelection = new ActiveSelection();
+    activeSelection.add(...testCanvas.getObjects());
+    testCanvas.setActiveObject(activeSelection);
+    setSubTargetCheckRecursive(activeSelection);
+
+    // perform MouseOver event on a deeply nested subTarget
+    const moveEvent = createPointerEvent();
+    const target = testCanvas.item(1) as any;
+    // @ts-expect-error protected
+    testCanvas._targetInfo = {
+      subTargets: [
+        target,
+        target.item(1),
+        target.item(1).item(1),
+        target.item(1).item(1).item(1),
+      ],
+    };
+
+    testCanvas._fireOverOutEvents(moveEvent, target);
+    expect(
+      counterOver,
+      'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets',
+    ).toBe(4);
+    expect(testCanvas._hoveredTarget, 'activeSelection is _hoveredTarget').toBe(
+      target,
+    );
+    // perform MouseOut even on all hoveredTargets
+    // @ts-expect-error protected
+    testCanvas._targetInfo.subTargets = [];
+    // @ts-expect-error private method
+    testCanvas._fireOverOutEvents(moveEvent, null);
+    expect(
+      counterOut,
+      'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets',
+    ).toBe(4);
+  });
+
   it('updates groupSelector during mouse move', () => {
     const e = createPointerEvent({
       clientX: 30,
