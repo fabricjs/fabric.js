@@ -1207,6 +1207,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       fireCanvas: true,
     });
     for (let i = 0; i < length; i++) {
+      if (
+        targets[i] === target ||
+        (_hoveredTargets[i] && _hoveredTargets[i] === _hoveredTarget)
+      ) {
+        continue;
+      }
       this.fireSyntheticInOutEvents('mouse', {
         e,
         target: targets[i],
