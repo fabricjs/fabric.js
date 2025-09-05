@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 24.x
           install-system-deps: false
       - name: Build fabric.js
         run: npm run build
