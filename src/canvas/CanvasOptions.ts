@@ -191,6 +191,9 @@ export interface TargetFindOptions {
 export interface CanvasEventsOptions {
   /**
    * Indicates if the right click on canvas can output the context menu or not
+   * The default value changed from false to true in Fabric 7.0
+   * @see https://fabricjs.com/docs/upgrading/upgrading-to-fabric-70/
+   * @deprecated since 7.0, Will be removed in Fabric 8.0
    * @type Boolean
    * @since 1.6.5
    */
@@ -198,6 +201,9 @@ export interface CanvasEventsOptions {
 
   /**
    * Indicates if the canvas can fire right click events
+   * The default value changed from false to true in Fabric 7.0
+   * @see https://fabricjs.com/docs/upgrading/upgrading-to-fabric-70/
+   * @deprecated since 7.0, Will be removed in Fabric 8.0
    * @type Boolean
    * @since 1.6.5
    */
@@ -205,6 +211,9 @@ export interface CanvasEventsOptions {
 
   /**
    * Indicates if the canvas can fire middle click events
+   * The default value changed from false to true in Fabric 7.0
+   * @see https://fabricjs.com/docs/upgrading/upgrading-to-fabric-70/
+   * @deprecated since 7.0, Will be removed in Fabric 8.0
    * @type Boolean
    * @since 1.7.8
    */
@@ -268,9 +277,9 @@ export const canvasDefaults: TOptions<CanvasOptions> = {
   targetFindTolerance: 0,
   skipTargetFind: false,
 
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
+  stopContextMenu: true,
+  fireRightClick: true,
+  fireMiddleClick: true,
   enablePointerEvents: false,
 
   containerClass: 'canvas-container',

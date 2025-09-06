@@ -2,8 +2,9 @@
 
 ## [next]
 
-- BREAKING: change default originX and originY to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)
-- BREAKING: chore(): Update min node version to 20, add 24 [#10716](https://github.com/fabricjs/fabric.js/pull/10716)
+- BREAKING chore(): Deprecate originX and originY and change their default to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)
+- BREAKING chore(): Deprecate fireRightClick, fireMiddleClick, stopContextMenu and change their default value. [#10720](https://github.com/fabricjs/fabric.js/pull/10720)
+- BREAKING chore(): Update min node version to 20, add 24 [#10716](https://github.com/fabricjs/fabric.js/pull/10716)
 - fix(): The mouse enter and leave events of child elements will be executed twice. [10698](https://github.com/fabricjs/fabric.js/issues/10698)
 - chore(): Remove mouse wheel console warning by setting default explicitly. [#10712](https://github.com/fabricjs/fabric.js/pull/10712)
 - chore(): Fixes to TypeDoc for compilation [#10709](https://github.com/fabricjs/fabric.js/pull/10709)
