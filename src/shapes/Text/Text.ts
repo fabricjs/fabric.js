@@ -47,6 +47,7 @@ import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
+import { Point } from '../../Point';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1882,8 +1883,6 @@ export class FabricText<
     // this can later looked at again and probably removed.
 
     const text = new this(textContent, {
-        left: left + dx,
-        top: top + dy,
         underline: textDecoration.includes('underline'),
         overline: textDecoration.includes('overline'),
         linethrough: textDecoration.includes('line-through'),
@@ -1893,31 +1892,24 @@ export class FabricText<
         ...restOfOptions,
       }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
-      lineHeightDiff =
-        (text.height + text.strokeWidth) * text.lineHeight - text.height,
+      lineHeightDiff = text.height * (text.lineHeight - 1),
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getScaledHeight() + scaledDiff;
-
-    let offX = 0;
+      textHeight = text.getScaledHeight() + scaledDiff,
+      pos = new Point(
+        left + dx,
+        top +
+          dy -
+          (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
+            text.lineHeight,
+      );
     /*
       Adjust positioning:
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        fabric output by default at top, left.
+        fabric output by default at center, center.
     */
-    if (textAnchor === CENTER) {
-      offX = text.getScaledWidth() / 2;
-    }
-    if (textAnchor === RIGHT) {
-      offX = text.getScaledWidth();
-    }
-    text.set({
-      left: text.left - offX,
-      top:
-        text.top -
-        (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) /
-          text.lineHeight,
-      strokeWidth,
-    });
+    // DOUBLE CHECK THIS CHANGE
+    text.setPositionByOrigin(pos, textAnchor, text.originY);
+    text.strokeWidth = strokeWidth;
     return text;
   }
 

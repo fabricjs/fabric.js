@@ -19,8 +19,8 @@ const CHAR_WIDTH = 20;
 const REFERENCE_TEXT_OBJECT = {
   version: version,
   type: 'Text',
-  originX: 'left',
-  originY: 'top',
+  originX: 'center',
+  originY: 'center',
   left: 0,
   top: 0,
   width: CHAR_WIDTH,
@@ -107,6 +107,8 @@ describe('FabricText', () => {
 
   it('toSVG with NUM_FRACTION_DIGITS', async () => {
     const text = await FabricText.fromObject({
+      left: 60.5,
+      top: 23.1,
       text: 'xxxxxx',
       styles: [
         { fill: 'red' },
@@ -126,7 +128,7 @@ describe('FabricText', () => {
     const path = new Path('M 10 10 H 50 V 60', { fill: '', stroke: 'red' });
     const text = new FabricText(
       'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      { scaleX: 2, scaleY: 2 },
+      { scaleX: 2, scaleY: 2, left: 1061, top: 46.2 },
     );
     const plainSvg = text.toSVG();
     text.path = path;
@@ -358,12 +360,12 @@ describe('FabricText', () => {
 
     const expectedObject = {
       ...REFERENCE_TEXT_OBJECT,
-      left: 0,
+      left: 4,
       top: -14.05,
       width: 8,
       height: 18.08,
       fontSize: 16,
-      originX: 'left',
+      originX: 'center',
     };
 
     expect(text.toObject(), 'parsed object is what expected').toEqual(
