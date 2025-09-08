@@ -75,7 +75,7 @@ export type TSVGExportOptions = {
 
 /**
  * Static canvas class
- * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
+ * @see {@link http://fabric5.fabricjs.com/static_canvas|StaticCanvas demo}
  * @fires before:render
  * @fires after:render
  * @fires canvas:cleared
@@ -781,7 +781,7 @@ export class StaticCanvas<
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
    * JSON does not support additional properties because toJSON has its own signature
    * @return {Object} JSON compatible object
-   * @see {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
    * @example <caption>JSON representation of canvas </caption>
    * const json = canvas.toJSON();
@@ -913,7 +913,7 @@ export class StaticCanvas<
    * @param {String} [options.height] desired height of svg with or without units
    * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
    * @return {String} SVG string
-   * @see {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
    * @example <caption>Normal SVG output</caption>
    * var svg = canvas.toSVG();
@@ -1204,7 +1204,7 @@ export class StaticCanvas<
    * @param {Object} [options] options
    * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<Canvas | StaticCanvas>} instance
-   * @see {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());

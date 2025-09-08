@@ -123,7 +123,7 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
 
 /**
  * Text class
- * @see {@link http://fabricjs.com/fabric-intro-part-2#text}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#text}
  */
 export class FabricText<
     Props extends TOptions<TextProps> = Partial<TextProps>,
