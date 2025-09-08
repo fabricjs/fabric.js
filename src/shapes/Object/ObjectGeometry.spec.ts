@@ -981,14 +981,26 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(coords[0].x, 'return top left absolute with skewX X').toBe(40);
-    expect(coords[1].x, 'return top right absolute with skewX X').toBe(69);
-    expect(coords[2].x, 'return bottom absolute right with skewX X').toBe(69);
-    expect(coords[3].x, 'return bottom absolute left with skewX X').toBe(40);
-    expect(coords[0].y, 'return top left absolute with skewX Y').toBe(30);
-    expect(coords[1].y, 'return top right absolute with skewX Y').toBe(30);
-    expect(coords[2].y, 'return bottom absolute right with skewX Y').toBe(47);
-    expect(coords[3].y, 'return bottom absolute left with skewX Y').toBe(47);
+    expect(coords).toMatchInlineSnapshot(`
+      [
+        Point {
+          "x": 34.5,
+          "y": 21.5,
+        },
+        Point {
+          "x": 63.5,
+          "y": 21.5,
+        },
+        Point {
+          "x": 63.5,
+          "y": 38.5,
+        },
+        Point {
+          "x": 34.5,
+          "y": 38.5,
+        },
+      ]
+    `);
   });
 
   it('getCoords with skewY', () => {
@@ -1006,14 +1018,26 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(coords[0].x, 'return top left absolute with skewY X').toBe(40);
-    expect(coords[1].x, 'return top right absolute with skewY X').toBe(52);
-    expect(coords[2].x, 'return bottom absolute right with skewY X').toBe(52);
-    expect(coords[3].x, 'return bottom absolute left with skewY X').toBe(40);
-    expect(coords[0].y, 'return top left absolute with skewY Y').toBe(30);
-    expect(coords[1].y, 'return top right absolute with skewY Y').toBe(30);
-    expect(coords[2].y, 'return bottom absolute right with skewY Y').toBe(59);
-    expect(coords[3].y, 'return bottom absolute left with skewY Y').toBe(59);
+    expect(coords).toMatchInlineSnapshot(`
+      [
+        Point {
+          "x": 34,
+          "y": 15.5,
+        },
+        Point {
+          "x": 46,
+          "y": 15.5,
+        },
+        Point {
+          "x": 46,
+          "y": 44.5,
+        },
+        Point {
+          "x": 34,
+          "y": 44.5,
+        },
+      ]
+    `);
   });
 
   it('getCoords with skewY skewX angle', () => {
@@ -1033,44 +1057,32 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(
-      coords[0].x,
-      'return top left absolute with skewY skewX angle X',
-    ).toBe(40);
-    expect(
-      coords[1].x,
-      'return top right absolute with skewY skewX angle X',
-    ).toBe(40);
-    expect(
-      coords[2].x,
-      'return bottom absolute right with skewY skewX angle X',
-    ).toBe(11);
-    expect(
-      coords[3].x,
-      'return bottom absolute left with skewY skewX angle X',
-    ).toBe(11);
-    expect(
-      coords[0].y,
-      'return top left absolute with skewY skewX angle Y',
-    ).toBe(30);
-    expect(
-      coords[1].y,
-      'return top right absolute with skewY skewX angle Y',
-    ).toBe(58.74315780649914);
-    expect(
-      coords[2].y,
-      'return bottom absolute right with skewY skewX angle Y',
-    ).toBe(58.74315780649914);
-    expect(
-      coords[3].y,
-      'return bottom absolute left with skewY skewX angle Y',
-    ).toBe(30);
+    expect(coords).toMatchInlineSnapshot(`
+      [
+        Point {
+          "x": 54.5,
+          "y": 15.628421096750428,
+        },
+        Point {
+          "x": 54.5,
+          "y": 44.37157890324957,
+        },
+        Point {
+          "x": 25.5,
+          "y": 44.37157890324957,
+        },
+        Point {
+          "x": 25.5,
+          "y": 15.628421096750428,
+        },
+      ]
+    `);
   });
 
   it('isPartiallyOnScreen', () => {
     const cObj = new FabricObject({
-      left: 50,
-      top: 50,
+      left: 100,
+      top: 100,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -1079,21 +1091,21 @@ describe('fabric.ObjectGeometry', () => {
     canvas.calcViewportBoundaries();
     // @ts-expect-error -- expects Canvas but we are setting StaticCanvas
     cObj.canvas = canvas;
-    cObj.left = -60;
-    cObj.top = -60;
+    cObj.left = -10;
+    cObj.top = -10;
     cObj.setCoords();
     expect(cObj.isPartiallyOnScreen(), 'object is partially onScreen').toBe(
       true,
     );
-    cObj.left = -110;
-    cObj.top = -110;
+    cObj.left = -60;
+    cObj.top = -60;
     cObj.setCoords();
     expect(
       cObj.isPartiallyOnScreen(),
       'object is completely offScreen and not partial',
     ).toBe(false);
-    cObj.left = 45;
-    cObj.top = 45;
+    cObj.left = 95;
+    cObj.top = 95;
     cObj.setCoords();
     expect(
       cObj.isPartiallyOnScreen(),
@@ -1108,8 +1120,8 @@ describe('fabric.ObjectGeometry', () => {
 
   it('isPartiallyOnScreen with object inside and outside of canvas', () => {
     const cObj = new FabricObject({
-      left: 5,
-      top: 5,
+      left: 55,
+      top: 55,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -1124,8 +1136,8 @@ describe('fabric.ObjectGeometry', () => {
     expect(cObj.isPartiallyOnScreen(), 'object is completely onScreen').toBe(
       false,
     );
-    cObj.left = -20;
-    cObj.top = -20;
+    cObj.left = 80;
+    cObj.top = 80;
     cObj.scaleX = 2;
     cObj.scaleY = 2;
     cObj.setCoords();
