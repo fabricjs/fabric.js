@@ -1136,8 +1136,8 @@ describe('fabric.ObjectGeometry', () => {
     expect(cObj.isPartiallyOnScreen(), 'object is completely onScreen').toBe(
       false,
     );
-    cObj.left = 80;
-    cObj.top = 80;
+    cObj.left = 60;
+    cObj.top = 60;
     cObj.scaleX = 2;
     cObj.scaleY = 2;
     cObj.setCoords();

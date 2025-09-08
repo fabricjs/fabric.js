@@ -20,24 +20,3 @@ exports[`fabric.ObjectGeometry > getCoords with angle 1`] = `
   },
 ]
 `;
-
-exports[`fabric.ObjectGeometry > getCoords with skewX 1`] = `
-[
-  Point {
-    "x": 25.5,
-    "y": 21.5,
-  },
-  Point {
-    "x": 54.5,
-    "y": 21.5,
-  },
-  Point {
-    "x": 54.5,
-    "y": 38.5,
-  },
-  Point {
-    "x": 25.5,
-    "y": 38.5,
-  },
-]
-`;
