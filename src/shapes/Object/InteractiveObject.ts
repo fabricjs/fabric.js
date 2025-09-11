@@ -337,7 +337,7 @@ export class InteractiveFabricObject<
 
   /**
    * @override set controls' coordinates as well
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link https://fabric5.fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords(): void {

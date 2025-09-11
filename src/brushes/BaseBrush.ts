@@ -5,7 +5,7 @@ import type { Canvas } from '../canvas/Canvas';
 import type { TBrushEventData } from './typedefs';
 
 /**
- * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
+ * @see {@link http://fabric5.fabricjs.com/freedrawing|Freedrawing demo}
  */
 export abstract class BaseBrush {
   /**

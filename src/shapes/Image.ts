@@ -72,7 +72,7 @@ export interface ImageProps extends FabricObjectProps, UniqueImageProps {}
 const IMAGE_PROPS = ['cropX', 'cropY'] as const;
 
 /**
- * @see {@link http://fabricjs.com/fabric-intro-part-1#images}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#images}
  */
 export class FabricImage<
     Props extends TOptions<ImageProps> = Partial<ImageProps>,

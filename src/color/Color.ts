@@ -12,7 +12,7 @@ import {
 
 /**
  * @class Color common color operations
- * @see {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#colors colors}
  */
 export class Color {
   declare private _source: TRGBAColorSource;
