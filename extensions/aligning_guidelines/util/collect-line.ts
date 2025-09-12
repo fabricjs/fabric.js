@@ -49,11 +49,11 @@ function collectVerticalLine(props: CollectItemLineProps) {
 
       const y1 = Math.min(line.y, line.y2, y, aLine.y2);
       const y2 = Math.max(line.y, line.y2, y, aLine.y2);
-      // 参考线可画多条
+      // Multiple reference lines can be drawn
       lines.push({ x, y1, y2 });
       if (b) continue;
       b = true;
-      // 对齐只进行一次
+      // Alignment is performed only once
       setPos({
         target,
         x,
@@ -91,11 +91,11 @@ function collectHorizontalLine(props: CollectItemLineProps) {
 
       const x1 = Math.min(line.x, line.x2, x, aLine.x2);
       const x2 = Math.max(line.x, line.x2, x, aLine.x2);
-      // 参考线可画多条
+      // Multiple reference lines can be drawn
       lines.push({ y, x1, x2 });
       if (b) continue;
       b = true;
-      // 对齐只进行一次
+      // Alignment is performed only once
       setPos({
         target,
         x,
@@ -126,7 +126,7 @@ function getDistanceLine(
 ) {
   let dis = Infinity;
   let index = -1;
-  /** 1正值 -1负值 */
+  /** 1 for positive value, -1 for negative value */
   let dir = 1;
   for (let i = 0; i < list.length; i++) {
     const v = getDistance(target[type], list[i][type]);
