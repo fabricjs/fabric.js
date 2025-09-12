@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
 - Clarify MIT License [#10725](https://github.com/fabricjs/fabric.js/pull/10725)
 - BREAKING(): Deprecate fireRightClick, fireMiddleClick, stopContextMenu and change their default value. [#10720](https://github.com/fabricjs/fabric.js/pull/10720)
