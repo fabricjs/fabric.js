@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump the npm_and_yarn group across 3 directories with 4 updates [#10728](https://github.com/fabricjs/fabric.js/pull/10728)
 - chore(): Format dependabot.yml with Prettier to ensure consistent code style [#10733](https://github.com/fabricjs/fabric.js/pull/10733)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
 - Clarify MIT License [#10725](https://github.com/fabricjs/fabric.js/pull/10725)
