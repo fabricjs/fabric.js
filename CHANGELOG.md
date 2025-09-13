@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump serve from 14.2.4 to 14.2.5 [#10730](https://github.com/fabricjs/fabric.js/pull/10730)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
 - Clarify MIT License [#10725](https://github.com/fabricjs/fabric.js/pull/10725)
 - BREAKING(): Deprecate fireRightClick, fireMiddleClick, stopContextMenu and change their default value. [#10720](https://github.com/fabricjs/fabric.js/pull/10720)
