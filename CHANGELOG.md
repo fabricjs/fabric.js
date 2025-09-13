@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump es-toolkit from 1.39.7 to 1.39.10 [#10731](https://github.com/fabricjs/fabric.js/pull/10731)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
 - Clarify MIT License [#10725](https://github.com/fabricjs/fabric.js/pull/10725)
 - BREAKING(): Deprecate fireRightClick, fireMiddleClick, stopContextMenu and change their default value. [#10720](https://github.com/fabricjs/fabric.js/pull/10720)
