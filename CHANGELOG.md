@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump jsdom from 26.1.0 to 27.0.0 [#10732](https://github.com/fabricjs/fabric.js/pull/10732)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
 - Clarify MIT License [#10725](https://github.com/fabricjs/fabric.js/pull/10725)
 - BREAKING(): Deprecate fireRightClick, fireMiddleClick, stopContextMenu and change their default value. [#10720](https://github.com/fabricjs/fabric.js/pull/10720)
