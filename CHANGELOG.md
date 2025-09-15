@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
 - chore(deps-dev): bump @eslint/js from 9.34.0 to 9.35.0 [#10729](https://github.com/fabricjs/fabric.js/pull/10729)
 - chore(): Format dependabot.yml with Prettier to ensure consistent code style [#10733](https://github.com/fabricjs/fabric.js/pull/10733)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
