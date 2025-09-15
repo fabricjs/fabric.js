@@ -91,9 +91,6 @@ Fabric is an open source project 🦄 and as such depends on the **genuine effor
 
 ### Getting Started
 
-- **Setup Git Configuration** \
-  Run `npm run setup:git` to configure git for fabric.js development.\
-  This prevents merge conflicts in `CHANGELOG.md` by setting up the union merge driver.
 - Read this section through.
 - Take a look at [**GOTCHAS**][gotchas]
 - Follow [Developing](#-developing-) and [Testing](#-testing).
