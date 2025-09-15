@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump serve from 14.2.4 to 14.2.5 [#10730](https://github.com/fabricjs/fabric.js/pull/10730)
 - Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
 - chore(deps-dev): bump @eslint/js from 9.34.0 to 9.35.0 [#10729](https://github.com/fabricjs/fabric.js/pull/10729)
 - chore(): Format dependabot.yml with Prettier to ensure consistent code style [#10733](https://github.com/fabricjs/fabric.js/pull/10733)
