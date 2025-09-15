@@ -61,6 +61,7 @@
     "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
     "sandbox": "npm run sandboxscript -- sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
+    "setup:git": "node scripts/setup-git.mjs",
     "lint": "eslint src extensions",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write ."
