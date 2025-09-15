@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump the npm_and_yarn group across 2 directories with 2 updates [#10734](https://github.com/fabricjs/fabric.js/pull/10734)
 - chore(deps-dev): bump @eslint/js from 9.34.0 to 9.35.0 [#10729](https://github.com/fabricjs/fabric.js/pull/10729)
 - chore(): Format dependabot.yml with Prettier to ensure consistent code style [#10733](https://github.com/fabricjs/fabric.js/pull/10733)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)
