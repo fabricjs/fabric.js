@@ -32,8 +32,8 @@ const IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 const REFERENCE_IMG_OBJECT = {
   version: version,
   type: 'Image',
-  originX: 'left' as const,
-  originY: 'top' as const,
+  originX: 'center' as const,
+  originY: 'center' as const,
   left: 0,
   top: 0,
   width: IMG_WIDTH,
@@ -73,8 +73,8 @@ describe('FabricImage', () => {
     test('It exports an svg with styles for an image with stroke', () => {
       const imgElement = new Image(200, 200);
       const img = new FabricImage(imgElement, {
-        left: 3,
-        top: 3,
+        left: 83.5,
+        top: 83.5,
         cropX: 10,
         cropY: 10,
         width: 150,
@@ -404,6 +404,9 @@ describe('FabricImage', () => {
     image.width -= 2;
     image.height -= 2;
 
+    image.left = image.width / 2;
+    image.top = image.height / 2;
+
     const expectedSVG = `<g transform="matrix(1 0 0 1 137 54)"  >
 <clipPath id="imageCrop_1">
 \t<rect x="-137" y="-54" width="274" height="108" />
@@ -451,7 +454,7 @@ describe('FabricImage', () => {
 
     expect(image.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
-    const expectedSVG = `<g transform="matrix(1 0 0 1 138 55)"  >
+    const expectedSVG = `<g transform="matrix(1 0 0 1 0 0)"  >
 \t<image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  xlink:href="${imgSrcUrl}" x="-138" y="-55" width="276" height="110"></image>
 </g>
 `;
@@ -465,10 +468,12 @@ describe('FabricImage', () => {
     const image = await createImage();
 
     image.imageSmoothing = false;
+    image.left = 200;
+    image.top = 55;
 
     expect(image.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
-    const expectedSVG = `<g transform="matrix(1 0 0 1 138 55)"  >
+    const expectedSVG = `<g transform="matrix(1 0 0 1 200 55)"  >
 \t<image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  xlink:href="${imgSrcUrl}" x="-138" y="-55" width="276" height="110" image-rendering="optimizeSpeed"></image>
 </g>
 `;
@@ -486,7 +491,7 @@ describe('FabricImage', () => {
 
     expect(image.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
-    const expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n</g>\n';
+    const expectedSVG = '<g transform="matrix(1 0 0 1 0 0)"  >\n</g>\n';
 
     expect(image.toSVG(), 'SVG should match expected output').toEqualSVG(
       expectedSVG,
@@ -1025,6 +1030,8 @@ export async function createImage(
   });
 
   return new FabricImage(el, {
+    top: 0,
+    left: 0,
     width: w ?? IMG_WIDTH,
     height: h ?? IMG_HEIGHT,
     ...extra,
