@@ -1,8 +1,0 @@
-paths:
-  - src
-  - lib
-  - extensions
-  - scripts
-  - test
-  - e2e
-  - .github
