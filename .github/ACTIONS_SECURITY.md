@@ -5,6 +5,7 @@ This repository has been configured to require all GitHub Actions to be pinned t
 ## Current Pinned Actions
 
 ### Core GitHub Actions
+
 ```yaml
 # Checkout repository
 uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -18,7 +19,7 @@ uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
 # Upload artifacts
 uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
 
-# Download artifacts  
+# Download artifacts
 uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
 
 # Run GitHub scripts
@@ -26,6 +27,7 @@ uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
 ```
 
 ### CodeQL Security Scanning
+
 ```yaml
 # Initialize CodeQL
 uses: github/codeql-action/init@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
@@ -35,6 +37,7 @@ uses: github/codeql-action/analyze@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3
 ```
 
 ### Third-Party Actions
+
 ```yaml
 # Find/create/update comments
 uses: edumserrano/find-create-or-update-comment@67bd99aa9c2f587aa595d5a8e4d95b62cbe49a83 # v3.0.0
@@ -58,6 +61,7 @@ When updating actions to newer versions:
 ## Tools for Managing Pinned Actions
 
 Consider using tools like:
+
 - [Dependabot](https://docs.github.com/en/code-security/dependabot/working-with-dependabot) for automated updates
 - [pin-github-action](https://github.com/mheap/pin-github-action) for CLI pinning
 - [action-validator](https://github.com/mpalmer/action-validator) for validation
@@ -65,6 +69,7 @@ Consider using tools like:
 ## Verification
 
 Run the verification script to check all actions are properly pinned:
+
 ```bash
 python3 /tmp/verify_pinned_actions.py
 ```
