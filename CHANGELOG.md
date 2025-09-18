@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Fix(Textarea): A form field element has neither an id nor a name attribute. [#10172](https://github.com/fabricjs/fabric.js/pull/10172)
 - chore(deps-dev): bump es-toolkit from 1.39.7 to 1.39.10 [#10731](https://github.com/fabricjs/fabric.js/pull/10731)
 - chore(deps-dev): bump serve from 14.2.4 to 14.2.5 [#10730](https://github.com/fabricjs/fabric.js/pull/10730)
 - Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
@@ -215,7 +216,6 @@
 
 ## [6.4.2]
 
-- Fix(Textarea): A form field element has neither an id nor a name attribute.
 - Fix(): path parsing performance [#10123](https://github.com/fabricjs/fabric.js/pull/10123)
 
 ## [6.4.1]
