@@ -30,10 +30,10 @@ uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
 
 ```yaml
 # Initialize CodeQL
-uses: github/codeql-action/init@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+uses: github/codeql-action/init@192325c86100d080feab897ff886c34abd4c83a3 # v3.30.3
 
 # Analyze with CodeQL
-uses: github/codeql-action/analyze@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+uses: github/codeql-action/analyze@192325c86100d080feab897ff886c34abd4c83a3 # v3.30.3
 ```
 
 ### Third-Party Actions
