@@ -4,11 +4,9 @@
  */
 
 import { Rect } from 'fabric';
-import {
-  initAligningGuidelines,
-  type AligningLineConfig,
-} from 'fabric/extensions';
+import { initAligningGuidelines } from 'fabric/extensions';
 import { beforeAll } from '../../test';
+import type { AligningLineConfig } from 'fabric/extensions';
 
 beforeAll(async (canvas) => {
   canvas.setDimensions({ width: 400, height: 150 });

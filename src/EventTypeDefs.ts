@@ -21,6 +21,7 @@ import type {
   SCALING,
   SKEWING,
 } from './constants';
+import type { TOCoord } from './shapes/Object/InteractiveObject';
 
 export type ModifierKey = keyof Pick<
   MouseEvent | PointerEvent | TouchEvent,
@@ -57,7 +58,12 @@ export type ControlCallback<R = void> = (
   fabricObject: FabricObject,
 ) => R;
 
-export type ControlCursorCallback = ControlCallback<string>;
+export type ControlCursorCallback<R = string> = (
+  eventData: TPointerEvent,
+  control: Control,
+  fabricObject: FabricObject,
+  coord: TOCoord,
+) => R;
 
 /**
  * relative to target's containing coordinate plane
@@ -103,6 +109,9 @@ interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
 export interface BasicTransformEvent<E extends Event = TPointerEvent>
   extends TEvent<E> {
   transform: Transform;
+  /* This pointer is usually a scenePoint. It isn't in the case of actions inside groups,
+   * where it becomes a point relative to the group center
+   */
   pointer: Point;
 }
 
@@ -157,18 +166,6 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   target?: FabricObject;
   subTargets?: FabricObject[];
   transform?: Transform | null;
-  /**
-   * @deprecated
-   * use viewportPoint instead.
-   * Kept for compatibility
-   */
-  pointer: Point;
-  /**
-   * @deprecated
-   * use scenePoint instead.
-   * Kept for compatibility
-   */
-  absolutePointer: Point;
   scenePoint: Point;
   viewportPoint: Point;
 }
@@ -197,18 +194,6 @@ export interface DragEventData extends TEvent<DragEvent> {
 }
 
 export interface DropEventData extends DragEventData {
-  /**
-   * @deprecated
-   * use viewportPoint instead.
-   * Kept for compatibility
-   */
-  pointer: Point;
-  /**
-   * @deprecated
-   * use scenePoint instead.
-   * Kept for compatibility
-   */
-  absolutePointer: Point;
   scenePoint: Point;
   viewportPoint: Point;
 }
@@ -258,15 +243,24 @@ type TPointerEvents<Prefix extends string> = Record<
   `${Prefix}${
     | WithBeforeSuffix<'down'>
     | WithBeforeSuffix<'move'>
-    | 'dblclick'}`,
+    | 'dblclick'
+    | 'tripleclick'}`,
   TPointerEventInfo
 > &
+  Record<
+    `${Prefix}down`,
+    TPointerEventInfo & {
+      /**
+       * Indicates if the target or current target where already selected
+       * before the cycle of mouse down -> mouse up started
+       */
+      alreadySelected: boolean;
+    }
+  > &
   Record<
     `${Prefix}${WithBeforeSuffix<'up'>}`,
     TPointerEventInfo & {
       isClick: boolean;
-      currentTarget?: FabricObject;
-      currentSubTargets: FabricObject[];
     }
   > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
@@ -278,6 +272,7 @@ export type TPointerEventNames =
   | WithBeforeSuffix<'move'>
   | WithBeforeSuffix<'up'>
   | 'dblclick'
+  | 'tripleclick'
   | 'wheel';
 
 export type ObjectPointerEvents = TPointerEvents<'mouse'>;
@@ -351,3 +346,6 @@ export interface CanvasEvents
   'text:editing:entered': { target: IText } & Partial<TEvent>;
   'text:editing:exited': { target: IText };
 }
+
+export type TEventsExtraData = Record<PropertyKey, Record<PropertyKey, never>> &
+  Record<'down', { alreadySelected: boolean }>;

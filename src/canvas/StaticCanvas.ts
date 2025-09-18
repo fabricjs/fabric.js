@@ -26,7 +26,7 @@ import {
 } from '../util/animation/AnimationFrameProvider';
 import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
-import { createCanvasElement, toDataURL } from '../util/misc/dom';
+import { createCanvasElementFor, toBlob, toDataURL } from '../util/misc/dom';
 import { invertTransform, transformPoint } from '../util/misc/matrix';
 import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
@@ -34,7 +34,7 @@ import {
   enlivenObjects,
 } from '../util/misc/objectEnlive';
 import { pick } from '../util/misc/pick';
-import { matrixToSVG } from '../util/misc/svgParsing';
+import { matrixToSVG } from '../util/misc/svgExport';
 import { toFixed } from '../util/misc/toFixed';
 import { isFiller, isPattern, isTextObject } from '../util/typeAssertions';
 import { StaticCanvasDOMManager } from './DOMManagers/StaticCanvasDOMManager';
@@ -75,7 +75,7 @@ export type TSVGExportOptions = {
 
 /**
  * Static canvas class
- * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
+ * @see {@link http://fabric5.fabricjs.com/static_canvas|StaticCanvas demo}
  * @fires before:render
  * @fires after:render
  * @fires canvas:cleared
@@ -157,8 +157,8 @@ export class StaticCanvas<
   declare disposed?: boolean;
 
   declare _offset: { left: number; top: number };
-  protected declare hasLostContext: boolean;
-  protected declare nextRenderHandle: number;
+  declare protected hasLostContext: boolean;
+  declare protected nextRenderHandle: number;
 
   declare elements: StaticCanvasDOMManager;
 
@@ -169,12 +169,12 @@ export class StaticCanvas<
    * @type Boolean
    * @default false
    */
-  protected declare skipControlsDrawing: boolean;
+  declare protected skipControlsDrawing: boolean;
 
   static ownDefaults = staticCanvasDefaults;
 
   // reference to
-  protected declare __cleanupTask?: {
+  declare protected __cleanupTask?: {
     (): void;
     kill: (reason?: any) => void;
   };
@@ -281,46 +281,6 @@ export class StaticCanvas<
    */
   getHeight(): number {
     return this.height;
-  }
-
-  /**
-   * Sets width of this canvas instance
-   * @param {Number|String} value                         Value to set width to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-  setWidth(
-    value: TSize['width'],
-    options?: { backstoreOnly?: true; cssOnly?: false },
-  ): void;
-  setWidth(
-    value: CSSDimensions['width'],
-    options?: { cssOnly?: true; backstoreOnly?: false },
-  ): void;
-  setWidth(value: number, options?: never) {
-    return this.setDimensions({ width: value }, options);
-  }
-
-  /**s
-   * Sets height of this canvas instance
-   * @param {Number|String} value                         Value to set height to
-   * @param {Object}        [options]                     Options object
-   * @param {Boolean}       [options.backstoreOnly=false] Set the given dimensions only as canvas backstore dimensions
-   * @param {Boolean}       [options.cssOnly=false]       Set the given dimensions only as css dimensions
-   * @deprecated will be removed in 7.0
-   */
-  setHeight(
-    value: TSize['height'],
-    options?: { backstoreOnly?: true; cssOnly?: false },
-  ): void;
-  setHeight(
-    value: CSSDimensions['height'],
-    options?: { cssOnly?: true; backstoreOnly?: false },
-  ): void;
-  setHeight(value: CSSDimensions['height'], options?: never) {
-    return this.setDimensions({ height: value }, options);
   }
 
   /**
@@ -585,9 +545,10 @@ export class StaticCanvas<
     if (path) {
       path._set('canvas', this);
       // needed to setup a couple of variables
+      // todo migrate to the newer one
       path.shouldCache();
       path._transformDone = true;
-      path.renderCache({ forClipping: true });
+      (path as TCachedFabricObject).renderCache({ forClipping: true });
       this.drawClipPathOnCanvas(ctx, path as TCachedFabricObject);
     }
     this._renderOverlay(ctx);
@@ -708,19 +669,6 @@ export class StaticCanvas<
 
   /**
    * Returns coordinates of a center of canvas.
-   * Returned value is an object with top and left properties
-   * @return {Object} object with "top" and "left" number values
-   * @deprecated migrate to `getCenterPoint`
-   */
-  getCenter() {
-    return {
-      top: this.height / 2,
-      left: this.width / 2,
-    };
-  }
-
-  /**
-   * Returns coordinates of a center of canvas.
    * @return {Point}
    */
   getCenterPoint() {
@@ -831,15 +779,14 @@ export class StaticCanvas<
    * this alias is provided because if you call JSON.stringify on an instance,
    * the toJSON object will be invoked if it exists.
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
+   * JSON does not support additional properties because toJSON has its own signature
    * @return {Object} JSON compatible object
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
-   * @example <caption>JSON without additional properties</caption>
-   * var json = canvas.toJSON();
-   * @example <caption>JSON with additional properties included</caption>
-   * var json = canvas.toJSON(['lockMovementX', 'lockMovementY', 'lockRotation', 'lockScalingX', 'lockScalingY']);
-   * @example <caption>JSON without default values</caption>
-   * var json = canvas.toJSON();
+   * @example <caption>JSON representation of canvas </caption>
+   * const json = canvas.toJSON();
+   * @example <caption>JSON representation of canvas </caption>
+   * const json = JSON.stringify(canvas);
    */
   toJSON() {
     return this.toObject();
@@ -954,7 +901,6 @@ export class StaticCanvas<
 
   /**
    * Returns SVG representation of canvas
-   * @function
    * @param {Object} [options] Options object for SVG output
    * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
    * @param {Object} [options.viewBox] SVG viewbox object
@@ -967,7 +913,7 @@ export class StaticCanvas<
    * @param {String} [options.height] desired height of svg with or without units
    * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
    * @return {String} SVG string
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
    * @example <caption>Normal SVG output</caption>
    * var svg = canvas.toSVG();
@@ -1258,7 +1204,7 @@ export class StaticCanvas<
    * @param {Object} [options] options
    * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<Canvas | StaticCanvas>} instance
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());
@@ -1334,9 +1280,7 @@ export class StaticCanvas<
    * This essentially copies canvas dimensions since loadFromJSON does not affect canvas size.
    */
   cloneWithoutData() {
-    const el = createCanvasElement();
-    el.width = this.width;
-    el.height = this.height;
+    const el = createCanvasElementFor(this);
     return new (this.constructor as Constructor<this>)(el);
   }
 
@@ -1394,6 +1338,22 @@ export class StaticCanvas<
       quality,
     );
   }
+  toBlob(options = {} as TDataUrlOptions): Promise<Blob | null> {
+    const {
+      format = 'png',
+      quality = 1,
+      multiplier = 1,
+      enableRetinaScaling = false,
+    } = options;
+    const finalMultiplier =
+      multiplier * (enableRetinaScaling ? this.getRetinaScaling() : 1);
+
+    return toBlob(
+      this.toCanvasElement(finalMultiplier, options),
+      format,
+      quality,
+    );
+  }
 
   /**
    * Create a new HTMLCanvas element painted with the current canvas content.
@@ -1425,12 +1385,13 @@ export class StaticCanvas<
       translateY = (vp[5] - (top || 0)) * multiplier,
       newVp = [newZoom, 0, 0, newZoom, translateX, translateY] as TMat2D,
       originalRetina = this.enableRetinaScaling,
-      canvasEl = createCanvasElement(),
+      canvasEl = createCanvasElementFor({
+        width: scaledWidth,
+        height: scaledHeight,
+      }),
       objectsToRender = filter
         ? this._objects.filter((obj) => filter(obj))
         : this._objects;
-    canvasEl.width = scaledWidth;
-    canvasEl.height = scaledHeight;
     this.enableRetinaScaling = false;
     this.viewportTransform = newVp;
     this.width = scaledWidth;

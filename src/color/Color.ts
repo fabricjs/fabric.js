@@ -12,10 +12,10 @@ import {
 
 /**
  * @class Color common color operations
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#colors colors}
  */
 export class Color {
-  private declare _source: TRGBAColorSource;
+  declare private _source: TRGBAColorSource;
   isUnrecognised = false;
 
   /**
@@ -42,6 +42,7 @@ export class Color {
    * @returns {TRGBAColorSource}
    */
   protected _tryParsingColor(color: string) {
+    color = color.toLowerCase();
     if (color in ColorNameMap) {
       color = ColorNameMap[color as keyof typeof ColorNameMap];
     }
@@ -187,7 +188,6 @@ export class Color {
 
   /**
    * Returns new color object, when given a color in RGB format
-   * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255)
    * @return {Color}
    */
@@ -197,9 +197,6 @@ export class Color {
 
   /**
    * Returns new color object, when given a color in RGBA format
-   * @static
-   * @function
-   * @memberOf Color
    * @param {String} color
    * @return {Color}
    */
@@ -209,7 +206,6 @@ export class Color {
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in RGB or RGBA format
-   * @memberOf Color
    * @param {String} color Color value ex: rgb(0-255,0-255,0-255), rgb(0%-100%,0%-100%,0%-100%)
    * @return {TRGBAColorSource | undefined} source
    */
@@ -229,7 +225,6 @@ export class Color {
   /**
    * Returns new color object, when given a color in HSL format
    * @param {String} color Color value ex: hsl(0-260,0%-100%,0%-100%)
-   * @memberOf Color
    * @return {Color}
    */
   static fromHsl(color: string): Color {
@@ -238,9 +233,6 @@ export class Color {
 
   /**
    * Returns new color object, when given a color in HSLA format
-   * @static
-   * @function
-   * @memberOf Color
    * @param {String} color
    * @return {Color}
    */
@@ -251,7 +243,6 @@ export class Color {
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HSL or HSLA format.
    * Adapted from <a href="https://rawgithub.com/mjijackson/mjijackson.github.com/master/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript.html">https://github.com/mjijackson</a>
-   * @memberOf Color
    * @param {String} color Color value ex: hsl(0-360,0%-100%,0%-100%) or hsla(0-360,0%-100%,0%-100%, 0-1)
    * @return {TRGBAColorSource | undefined} source
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
@@ -289,8 +280,6 @@ export class Color {
 
   /**
    * Returns new color object, when given a color in HEX format
-   * @static
-   * @memberOf Color
    * @param {String} color Color value ex: FF5555
    * @return {Color}
    */
@@ -300,8 +289,6 @@ export class Color {
 
   /**
    * Returns array representation (ex: [100, 100, 200, 1]) of a color that's in HEX format
-   * @static
-   * @memberOf Color
    * @param {String} color ex: FF5555 or FF5544CC (RGBa)
    * @return {TRGBAColorSource | undefined} source
    */
@@ -325,8 +312,6 @@ export class Color {
   /**
    * Converts a string that could be any angle notation (50deg, 0.5turn, 2rad)
    * into degrees without the 'deg' suffix
-   * @static
-   * @memberOf Color
    * @param {String} value ex: 0deg, 0.5turn, 2rad
    * @return {Number} number in degrees or NaN if inputs are invalid
    */

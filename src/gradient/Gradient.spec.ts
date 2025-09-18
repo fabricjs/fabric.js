@@ -1,9 +1,101 @@
-import { expect } from '@jest/globals';
 import { getFabricDocument } from '../env';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Gradient } from './Gradient';
-import type { SVGOptions } from './typedefs';
+import type { GradientUnits, SVGOptions } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+
+import { describe, expect, it, test, vi } from 'vitest';
+import { StaticCanvas } from '../canvas/StaticCanvas';
+
+vi.mock('../util/internals/uid', () => ({
+  uid: () => 0,
+}));
+
+function createLinearGradient(units: GradientUnits = 'pixels', id?: string) {
+  return new Gradient({
+    type: 'linear',
+    id,
+    gradientUnits: units,
+    coords: {
+      x1: 0,
+      y1: 10,
+      x2: 100,
+      y2: 200,
+    },
+    colorStops: [
+      { offset: 0, color: 'rgba(255,0,0,0)' },
+      { offset: 1, color: 'green' },
+    ],
+  });
+}
+
+function createRadialGradient(units: GradientUnits = 'pixels') {
+  return new Gradient({
+    type: 'radial',
+    gradientUnits: units,
+    coords: {
+      x1: 0,
+      y1: 10,
+      x2: 100,
+      y2: 200,
+      r1: 0,
+      r2: 50,
+    },
+    colorStops: [
+      { offset: 0, color: 'red' },
+      { offset: 1, color: 'rgba(0,255,0,0)' },
+    ],
+  });
+}
+
+function createRadialGradientWithInternalRadius() {
+  return new Gradient({
+    type: 'radial',
+    coords: {
+      x1: 0,
+      y1: 10,
+      x2: 100,
+      y2: 200,
+      r1: 10,
+      r2: 50,
+    },
+    colorStops: [
+      { offset: 0, color: 'red' },
+      { offset: 1, color: 'rgba(0,255,0,0)' },
+    ],
+  });
+}
+
+function createRadialGradientSwapped() {
+  return new Gradient({
+    type: 'radial',
+    coords: {
+      x1: 0,
+      y1: 10,
+      x2: 100,
+      y2: 200,
+      r1: 50,
+      r2: 10,
+    },
+    colorStops: [
+      { offset: 0, color: 'red' },
+      { offset: 1, color: 'rgba(0,255,0,0)' },
+    ],
+  });
+}
+
+const SVG_LINEAR =
+  '<linearGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  x1="0" y1="10" x2="100" y2="200">\n<stop offset="0%" style="stop-color:rgba(255,0,0,0);"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
+const SVG_RADIAL =
+  '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
+const SVG_INTERNALRADIUS =
+  '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="20%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
+const SVG_SWAPPED =
+  '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="0" cy="10" r="50" fx="100" fy="200">\n<stop offset="20%" style="stop-color:rgba(0,255,0,0);"/>\n<stop offset="100%" style="stop-color:red;"/>\n</radialGradient>\n';
+const SVG_LINEAR_PERCENTAGE =
+  '<linearGradient id="SVGID_0" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  x1="0" y1="10" x2="100" y2="200">\n<stop offset="0%" style="stop-color:rgba(255,0,0,0);"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
+const SVG_RADIAL_PERCENTAGE =
+  '<radialGradient id="SVGID_0" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
 
 describe('Gradient', () => {
   function fromElement(
@@ -21,7 +113,180 @@ describe('Gradient', () => {
     } as SVGOptions);
   }
 
-  it('registered in class registry', () => {
+  test('constructor linearGradient', () => {
+    const gradient = createLinearGradient();
+    expect(gradient instanceof Gradient).toBe(true);
+  });
+
+  test('constructor radialGradient', () => {
+    const gradient = createRadialGradient();
+    expect(gradient instanceof Gradient).toBe(true);
+  });
+
+  test('properties linearGradient', () => {
+    const gradient = createLinearGradient();
+
+    expect(gradient.coords.x1).toBe(0);
+    expect(gradient.coords.y1).toBe(10);
+    expect(gradient.coords.x2).toBe(100);
+    expect(gradient.coords.y2).toBe(200);
+
+    expect(gradient.type).toBe('linear');
+
+    expect(gradient.colorStops[0].offset).toBe(0);
+    expect(gradient.colorStops[0].color).toBe('rgba(255,0,0,0)');
+
+    expect(gradient.colorStops[1].offset).toBe(1);
+    expect(gradient.colorStops[1].color).toBe('green');
+  });
+
+  test('toSVG', () => {
+    const gradient = createLinearGradient();
+    expect(gradient.toSVG, 'toSVG function exists').toBeTruthy();
+  });
+
+  describe('SVG exports', () => {
+    test('toSVG linear', () => {
+      const gradient = createLinearGradient();
+      const baseObj = new FabricObject({ width: 100, height: 100 });
+      expect(gradient.toSVG(baseObj)).toEqual(SVG_LINEAR);
+    });
+
+    test('toSVG radial', () => {
+      const gradient = createRadialGradient();
+      const baseObj = new FabricObject({ width: 100, height: 100 });
+      expect(gradient.toSVG(baseObj)).toEqual(SVG_RADIAL);
+    });
+
+    test('toSVG radial with r1 > 0', () => {
+      const gradient = createRadialGradientWithInternalRadius();
+      const obj = new FabricObject({ width: 100, height: 100 });
+      expect(gradient.toSVG(obj)).toEqual(SVG_INTERNALRADIUS);
+    });
+
+    test('toSVG radial with r1 > 0 swapped', () => {
+      const gradient = createRadialGradientSwapped();
+      const obj = new FabricObject({ width: 100, height: 100 });
+      const gradientColorStops = JSON.stringify(gradient.colorStops);
+      expect(gradient.toSVG(obj), 'it exports as expected').toBe(SVG_SWAPPED);
+      const gradientColorStopsAfterExport = JSON.stringify(gradient.colorStops);
+      expect(gradient.toSVG(obj), 'it exports as expected a second time').toBe(
+        SVG_SWAPPED,
+      );
+      expect(gradientColorStops, 'colorstops do not change').toBe(
+        gradientColorStopsAfterExport,
+      );
+    });
+
+    test('toSVG linear objectBoundingBox', () => {
+      const gradient = createLinearGradient('percentage');
+      const obj = new FabricObject({ width: 100, height: 100 });
+      expect(gradient.toSVG(obj)).toBe(SVG_LINEAR_PERCENTAGE);
+    });
+
+    test('toSVG radial objectBoundingBox', () => {
+      const gradient = createRadialGradient('percentage');
+      const obj = new FabricObject({ width: 100, height: 100 });
+      expect(gradient.toSVG(obj)).toBe(SVG_RADIAL_PERCENTAGE);
+    });
+  });
+
+  test('properties radialGradient', () => {
+    const gradient = createRadialGradient();
+
+    expect(gradient.coords.x1).toBe(0);
+    expect(gradient.coords.y1).toBe(10);
+    expect(gradient.coords.x2).toBe(100);
+    expect(gradient.coords.y2).toBe(200);
+    expect(gradient.coords.r1).toBe(0);
+    expect(gradient.coords.r2).toBe(50);
+
+    expect(gradient.type, 'radial');
+
+    expect(gradient.colorStops[0].offset).toBe(0);
+    expect(gradient.colorStops[0].color).toBe('red');
+
+    expect(gradient.colorStops[1].offset).toBe(1);
+    expect(gradient.colorStops[1].color).toBe('rgba(0,255,0,0)');
+  });
+
+  test('toObject linearGradient', () => {
+    const gradient = createLinearGradient();
+    gradient.gradientTransform = [1, 0, 0, 1, 50, 50];
+    expect(typeof gradient.toObject === 'function');
+
+    const object = gradient.toObject();
+
+    expect(object.coords).toEqual(gradient.coords);
+    expect(object.coords, 'coords are not referenced').not.toBe(
+      gradient.coords,
+    );
+    expect(object.gradientUnits).toBe(gradient.gradientUnits);
+    expect(object.type).toBe(gradient.type);
+    expect(object.gradientTransform).toEqual(gradient.gradientTransform);
+    expect(object.gradientTransform, 'matrix is not referenced').not.toBe(
+      gradient.gradientTransform,
+    );
+    expect(object.colorStops).toEqual(gradient.colorStops);
+    expect(object.colorStops, 'colorStops are not referenced').not.toBe(
+      gradient.colorStops,
+    );
+  });
+
+  test('toObject with custom props', () => {
+    const gradient = createLinearGradient('pixels', 'myId');
+    const object = gradient.toObject(['id']);
+    expect(object.id).toBe('myId_0');
+  });
+
+  test('toObject radialGradient', () => {
+    const gradient = createRadialGradient();
+    const object = gradient.toObject();
+    expect(object.coords).toEqual(gradient.coords);
+    expect(object.coords).not.toBe(gradient.coords);
+    expect(object.type).toBe(gradient.type);
+    expect(object.colorStops).not.toBe(gradient.colorStops);
+    expect(object.colorStops).toEqual(gradient.colorStops);
+  });
+
+  test('toLive linearGradient', () => {
+    const canvas = new StaticCanvas(undefined, {
+      enableRetinaScaling: false,
+    });
+    const gradient = createLinearGradient();
+    const gradientHTML = canvas.contextContainer.createLinearGradient(
+      0,
+      0,
+      1,
+      1,
+    );
+    expect(gradient.toLive).toBeTruthy();
+    const gradientCtx = gradient.toLive(canvas.contextContainer);
+    expect(gradientCtx.toString(), 'The type match').toEqual(
+      gradientHTML.toString(),
+    );
+  });
+
+  test('toLive radialGradient', () => {
+    const canvas = new StaticCanvas(undefined, {
+      enableRetinaScaling: false,
+    });
+    const gradient = createRadialGradient();
+    const gradientHTML = canvas.contextContainer.createRadialGradient(
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+    );
+    const gradientCtx = gradient.toLive(canvas.contextContainer);
+    expect(gradientCtx.toString(), 'is a gradient for canvas radial').toEqual(
+      gradientHTML.toString(),
+    );
+  });
+
+  test('registered in class registry', () => {
     expect(classRegistry.getClass('gradient')).toEqual(Gradient);
     expect(classRegistry.getClass('linear')).toEqual(Gradient);
     expect(classRegistry.getClass('radial')).toEqual(Gradient);
@@ -62,10 +327,8 @@ describe('Gradient', () => {
     expect(gradient.colorStops[0].offset).toEqual(1);
     expect(gradient.colorStops[1].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(255,255,255)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0);
+    expect(gradient.colorStops[0].color).toEqual('rgba(0,0,0,0)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(255,255,255,1)');
   });
 
   test('fromElement linearGradient with floats percentage - objectBoundingBox', () => {
@@ -191,10 +454,8 @@ describe('Gradient', () => {
     expect(gradient.colorStops[0].offset).toEqual(1);
     expect(gradient.colorStops[1].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(255,255,255)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0);
+    expect(gradient.colorStops[0].color).toEqual('rgba(0,0,0,0)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(255,255,255,1)');
   });
 
   test('fromElement without stop', () => {
@@ -392,7 +653,7 @@ describe('Gradient', () => {
     element.appendChild(stop2);
 
     const object = new FabricObject({ width: 100, height: 100 });
-    const gradient = fromElement(element, object, {});
+    const gradient = fromElement(element, object, {}) as Gradient<'radial'>;
 
     expect(gradient instanceof Gradient).toBeTruthy();
 
@@ -406,8 +667,8 @@ describe('Gradient', () => {
     expect(gradient.colorStops[0].offset).toEqual(1);
     expect(gradient.colorStops[1].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(255,255,255)');
+    expect(gradient.colorStops[0].color).toEqual('rgba(0,0,0,1)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(255,255,255,1)');
   });
 
   test('fromElement radialGradient with transform', () => {
@@ -495,15 +756,10 @@ describe('Gradient', () => {
     expect(gradient.colorStops[2].offset).toEqual(0.5);
     expect(gradient.colorStops[3].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(255,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(0,0,255)');
-    expect(gradient.colorStops[2].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[3].color).toEqual('rgb(0,0,0)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0.5);
-    expect(gradient.colorStops[1].opacity).toEqual(0.9);
-    expect(gradient.colorStops[2].opacity).toEqual(1);
-    expect(gradient.colorStops[3].opacity).toEqual(1);
+    expect(gradient.colorStops[0].color).toEqual('rgba(255,0,0,0.5)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(0,0,255,0.9)');
+    expect(gradient.colorStops[2].color).toEqual('rgba(0,0,0,1)');
+    expect(gradient.colorStops[3].color).toEqual('rgba(0,0,0,1)');
   });
 
   test('fromElement radialGradient colorStop attributes/styles', () => {
@@ -557,14 +813,9 @@ describe('Gradient', () => {
     expect(gradient.colorStops[2].offset).toEqual(0.5);
     expect(gradient.colorStops[3].offset).toEqual(0);
 
-    expect(gradient.colorStops[0].color).toEqual('rgb(255,0,0)');
-    expect(gradient.colorStops[1].color).toEqual('rgb(0,0,255)');
-    expect(gradient.colorStops[2].color).toEqual('rgb(0,0,0)');
-    expect(gradient.colorStops[3].color).toEqual('rgb(0,0,0)');
-
-    expect(gradient.colorStops[0].opacity).toEqual(0.5);
-    expect(gradient.colorStops[1].opacity).toEqual(0.9);
-    expect(gradient.colorStops[2].opacity).toEqual(1);
-    expect(gradient.colorStops[3].opacity).toEqual(1);
+    expect(gradient.colorStops[0].color).toEqual('rgba(255,0,0,0.5)');
+    expect(gradient.colorStops[1].color).toEqual('rgba(0,0,255,0.9)');
+    expect(gradient.colorStops[2].color).toEqual('rgba(0,0,0,1)');
+    expect(gradient.colorStops[3].color).toEqual('rgba(0,0,0,1)');
   });
 });

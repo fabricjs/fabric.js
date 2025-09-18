@@ -62,7 +62,6 @@ export class Textbox<
   /**
    * Minimum width of textbox, in pixels.
    * @type Number
-   * @default
    */
   declare minWidth: number;
 
@@ -71,7 +70,6 @@ export class Textbox<
    * fixed to 2 so that an empty textbox cannot go to 0
    * and is still selectable without text.
    * @type Number
-   * @default
    */
   declare dynamicMinWidth: number;
 
@@ -232,7 +230,6 @@ export class Textbox<
       for (const p2 in obj[p1]) {
         const p2Number = parseInt(p2, 10);
         if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
-          // eslint-disable-next-line no-unused-vars
           for (const p3 in obj[p1][p2]) {
             return false;
           }
@@ -564,7 +561,6 @@ export class Textbox<
 
   /**
    * Returns object representation of an instance
-   * @method toObject
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
@@ -576,7 +572,7 @@ export class Textbox<
       'minWidth',
       'splitByGrapheme',
       ...propertiesToInclude,
-    ] as K[]) as Pick<T, K> & SProps;
+    ] as K[]);
   }
 }
 

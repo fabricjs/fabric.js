@@ -1,3 +1,5 @@
+import { getFabricWindow } from '../env';
+
 /**
  * Capitalizes a string
  * @param {String} string String to capitalize
@@ -24,24 +26,49 @@ export const escapeXml = (string: string): string =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
+let segmenter: Intl.Segmenter | false;
+
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter =
+      'Intl' in getFabricWindow() &&
+      'Segmenter' in Intl &&
+      new Intl.Segmenter(undefined, {
+        granularity: 'grapheme',
+      });
+  }
+  return segmenter;
+};
+
 /**
  * Divide a string in the user perceived single units
  * @param {String} textstring String to escape
  * @return {Array} array containing the graphemes
  */
 export const graphemeSplit = (textstring: string): string[] => {
-  const graphemes = [];
+  segmenter || getSegmenter();
+  if (segmenter) {
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(({ segment }) => segment);
+  }
+
+  //Fallback
+  return graphemeSplitImpl(textstring);
+};
+
+const graphemeSplitImpl = (textstring: string): string[] => {
+  const graphemes: string[] = [];
   for (let i = 0, chr; i < textstring.length; i++) {
     if ((chr = getWholeChar(textstring, i)) === false) {
       continue;
     }
-    graphemes.push(chr as string);
+    graphemes.push(chr);
   }
   return graphemes;
 };
 
 // taken from mdn in the charAt doc page.
-const getWholeChar = (str: string, i: number): string | boolean => {
+const getWholeChar = (str: string, i: number): string | false => {
   const code = str.charCodeAt(i);
   if (isNaN(code)) {
     return ''; // Position not found

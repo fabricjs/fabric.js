@@ -24,7 +24,6 @@ export class MyFilter extends BaseFilter<'MyFilter', MyFilterOwnProps> {
    * translated to -255 to 255 for 2d
    * 0.0039215686 is the part of 1 that get translated to 1 in 2d
    * @param {Number} myParameter
-   * @default
    */
   declare myParameter: MyFilterOwnProps['myParameter'];
 

@@ -47,14 +47,6 @@
       "scenePoint": {
         "x": 435,
         "y": 55
-      },
-      "pointer": {
-        "x": 435,
-        "y": 55
-      },
-      "absolutePointer": {
-        "x": 435,
-        "y": 55
       }
     },
     "b"
@@ -85,14 +77,6 @@
         "y": 55
       },
       "scenePoint": {
-        "x": 435,
-        "y": 55
-      },
-      "pointer": {
-        "x": 435,
-        "y": 55
-      },
-      "absolutePointer": {
         "x": 435,
         "y": 55
       }

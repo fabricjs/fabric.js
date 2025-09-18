@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { Path, FabricObject, util } from '../../dist/index.mjs';
-import lodash from 'lodash';
 import { normalPath, insanelyLongButRealPath } from './pathData.mjs';
+import { cloneDeep } from 'es-toolkit';
 
 class OldPath extends Path {
   /**
@@ -58,7 +58,7 @@ const cloningSimple = await benchmark(async () => {
 
 const cloningLodash = await benchmark(async () => {
   for (let i = 0; i < size2; i++) {
-    lodash.cloneDeep(parsedPath);
+    cloneDeep(parsedPath);
   }
 });
 
@@ -84,7 +84,7 @@ const cloningSimpleNormal = await benchmark(async () => {
 
 const cloningLodashNormal = await benchmark(async () => {
   for (let i = 0; i < size3; i++) {
-    lodash.cloneDeep(parsedNormalPath);
+    cloneDeep(parsedNormalPath);
   }
 });
 

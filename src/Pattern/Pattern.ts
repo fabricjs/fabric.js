@@ -14,8 +14,8 @@ import type {
 import { log } from '../util/internals/console';
 
 /**
- * @see {@link http://fabricjs.com/patterns demo}
- * @see {@link http://fabricjs.com/dynamic-patterns demo}
+ * @see {@link http://fabric5.fabricjs.com/patterns demo}
+ * @see {@link http://fabric5.fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
   static type = 'Pattern';
@@ -45,20 +45,17 @@ export class Pattern {
   /**
    * Pattern horizontal offset from object's left/top corner
    * @type Number
-   * @default
    */
   offsetX = 0;
 
   /**
    * Pattern vertical offset from object's left/top corner
    * @type Number
-   * @default
    */
   offsetY = 0;
 
   /**
    * @type TCrossOrigin
-   * @default
    */
   crossOrigin: TCrossOrigin = '';
 
@@ -66,7 +63,6 @@ export class Pattern {
    * transform matrix to change the pattern, imported from svgs.
    * @todo verify if using the identity matrix as default makes the rest of the code more easy
    * @type Array
-   * @default
    */
   declare patternTransform?: TMat2D;
 
@@ -174,17 +170,11 @@ export class Pattern {
       patternWidth =
         repeat === 'repeat-y' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetX || 0)
-          : ifNaN(
-              ((patternSource as HTMLImageElement).width as number) / width,
-              0,
-            ),
+          : ifNaN((patternSource as HTMLImageElement).width / width, 0),
       patternHeight =
         repeat === 'repeat-x' || repeat === 'no-repeat'
           ? 1 + Math.abs(patternOffsetY || 0)
-          : ifNaN(
-              ((patternSource as HTMLImageElement).height as number) / height,
-              0,
-            );
+          : ifNaN((patternSource as HTMLImageElement).height / height, 0);
 
     return [
       `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,

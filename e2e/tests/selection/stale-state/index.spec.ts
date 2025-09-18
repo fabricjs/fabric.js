@@ -1,9 +1,6 @@
 import type { Page } from '@playwright/test';
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
-
-setup();
+import { expect, test } from '../../../fixtures/base';
+import type { CanvasUtil } from '../../../utils/CanvasUtil';
 
 const tests = [
   {
@@ -17,18 +14,18 @@ const tests = [
   },
   {
     name: 'replacing selection',
-    step: (page: Page) =>
+    step: (page: Page, canvasUtil: CanvasUtil) =>
       test.step('replace selection', () =>
-        new CanvasUtil(page).executeInBrowser((canvas) => {
+        canvasUtil.executeInBrowser((canvas) => {
           canvas.setActiveObject(
-            new fabric.ActiveSelection(canvas.getActiveObjects()),
+            new window.fabric.ActiveSelection(canvas.getActiveObjects()),
           );
-        })),
+        }, null)),
   },
 ];
 
 for (const { name, step } of tests) {
-  test(name, async ({ page }) => {
+  test(name, async ({ page, canvasUtil }) => {
     await test.step('select', async () => {
       await page.mouse.move(20, 20);
       await page.mouse.down();
@@ -41,14 +38,14 @@ for (const { name, step } of tests) {
       await page.mouse.move(570, 150, { steps: 20 });
       await page.mouse.up();
     });
-    await step(page);
+    await step(page, canvasUtil);
     await test.step('select', async () => {
       await page.mouse.move(20, 20);
       await page.mouse.down();
       await page.mouse.move(600, 600, { steps: 20 });
       await page.mouse.up();
     });
-    expect(await new CanvasUtil(page).screenshot()).toMatchSnapshot({
+    expect(await canvasUtil.screenshot()).toMatchSnapshot({
       name: 'selection-stale-state.png',
     });
   });

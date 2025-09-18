@@ -58,7 +58,7 @@ export const polyActionHandler = (
 
   poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
   poly.setDimensions();
-
+  poly.set('dirty', true);
   return true;
 };
 

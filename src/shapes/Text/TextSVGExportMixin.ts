@@ -7,8 +7,12 @@ import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import { type TextStyleDeclaration } from './StyledText';
 import { JUSTIFY } from '../Text/constants';
-import type { FabricText } from './Text';
+import type { FabricText, GraphemeBBox } from './Text';
 import { STROKE, FILL } from '../../constants';
+import { createRotateMatrix } from '../../util/misc/matrix';
+import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
+import { Point } from '../../Point';
+import { matrixToSVG } from '../../util/misc/svgExport';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
@@ -31,11 +35,23 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   toSVG(this: TextSVGExportMixin & FabricText, reviver?: TSVGReviver): string {
-    return this._createBaseSVGMarkup(this._toSVG(), {
-      reviver,
-      noStyle: true,
-      withShadow: true,
-    });
+    const textSvg = this._createBaseSVGMarkup(this._toSVG(), {
+        reviver,
+        noStyle: true,
+        withShadow: true,
+      }),
+      path = this.path;
+    if (path) {
+      return (
+        textSvg +
+        path._createBaseSVGMarkup(path._toSVG(), {
+          reviver,
+          withShadow: true,
+          additionalTransform: matrixToSVG(this.calcOwnMatrix()),
+        })
+      );
+    }
+    return textSvg;
   }
 
   private _getSVGLeftTopOffsets(this: TextSVGExportMixin & FabricText) {
@@ -61,10 +77,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return [
       textBgRects.join(''),
       '\t\t<text xml:space="preserve" ',
-      this.fontFamily
-        ? `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `
-        : '',
-      this.fontSize ? `font-size="${this.fontSize}" ` : '',
+      `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `,
+      `font-size="${this.fontSize}" `,
       this.fontStyle ? `font-style="${this.fontStyle}" ` : '',
       this.fontWeight ? `font-weight="${this.fontWeight}" ` : '',
       textDecoration ? `text-decoration="${textDecoration}" ` : '',
@@ -142,22 +156,34 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     styleDecl: TextStyleDeclaration,
     left: number,
     top: number,
+    charBox: GraphemeBBox,
   ) {
+    const numFractionDigit = config.NUM_FRACTION_DIGITS;
     const styleProps = this.getSvgSpanStyles(
         styleDecl,
         char !== char.trim() || !!char.match(multipleSpacesRegex),
       ),
       fillStyles = styleProps ? `style="${styleProps}"` : '',
       dy = styleDecl.deltaY,
-      dySpan = dy ? ` dy="${toFixed(dy, config.NUM_FRACTION_DIGITS)}" ` : '';
+      dySpan = dy ? ` dy="${toFixed(dy, numFractionDigit)}" ` : '',
+      { angle, renderLeft, renderTop, width } = charBox;
+    let angleAttr = '';
+    if (renderLeft !== undefined) {
+      const wBy2 = width / 2;
+      angle &&
+        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}"`);
+      const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
+      m[4] = renderLeft!;
+      m[5] = renderTop!;
+      const renderPoint = new Point(-wBy2, 0).transform(m);
+      left = renderPoint.x;
+      top = renderPoint.y;
+    }
 
-    return `<tspan x="${toFixed(
-      left,
-      config.NUM_FRACTION_DIGITS,
-    )}" y="${toFixed(
+    return `<tspan x="${toFixed(left, numFractionDigit)}" y="${toFixed(
       top,
-      config.NUM_FRACTION_DIGITS,
-    )}" ${dySpan}${fillStyles}>${escapeXml(char)}</tspan>`;
+      numFractionDigit,
+    )}" ${dySpan}${angleAttr}${fillStyles}>${escapeXml(char)}</tspan>`;
   }
 
   private _setSVGTextLineText(
@@ -181,7 +207,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     textTopOffset +=
       (lineHeight * (1 - this._fontSizeFraction)) / this.lineHeight;
     for (let i = 0, len = line.length - 1; i <= len; i++) {
-      timeToRender = i === len || this.charSpacing;
+      timeToRender = i === len || this.charSpacing || this.path;
       charsToRender += line[i];
       charBox = this.__charBounds[lineIndex][i];
       if (boxWidth === 0) {
@@ -196,7 +222,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         }
       }
       if (!timeToRender) {
-        // if we have charSpacing, we render char by char
+        // if we have charSpacing or a path, we render char by char
         actualStyle =
           actualStyle || this.getCompleteStyleDeclaration(lineIndex, i);
         nextStyle = this.getCompleteStyleDeclaration(lineIndex, i + 1);
@@ -210,6 +236,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
             style,
             textLeftOffset,
             textTopOffset,
+            charBox,
           ),
         );
         charsToRender = '';
@@ -271,33 +298,12 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
   }
 
   /**
-   * @deprecated unused
-   */
-  _getSVGLineTopOffset(
-    this: TextSVGExportMixin & FabricText,
-    lineIndex: number,
-  ) {
-    let lineTopOffset = 0,
-      j;
-    for (j = 0; j < lineIndex; j++) {
-      lineTopOffset += this.getHeightOfLine(j);
-    }
-    const lastHeight = this.getHeightOfLine(j);
-    return {
-      lineTop: lineTopOffset,
-      offset:
-        ((this._fontSizeMult - this._fontSizeFraction) * lastHeight) /
-        (this.lineHeight * this._fontSizeMult),
-    };
-  }
-
-  /**
    * Returns styles-string for svg-export
    * @param {Boolean} skipShadow a boolean to skip shadow filter output
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    return `${super.getSvgStyles(skipShadow)} white-space: pre;`;
+    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed((this.textDecorationThickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; white-space: pre;`;
   }
 
   /**
@@ -320,10 +326,18 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontStyle,
       fontWeight,
       deltaY,
+      textDecorationThickness,
+      linethrough,
+      overline,
+      underline,
     } = style;
 
-    const textDecoration = this.getSvgTextDecoration(style);
-
+    const textDecoration = this.getSvgTextDecoration({
+      underline: underline ?? this.underline,
+      overline: overline ?? this.overline,
+      linethrough: linethrough ?? this.linethrough,
+    });
+    const thickness = textDecorationThickness || this.textDecorationThickness;
     return [
       stroke ? colorPropToSVG(STROKE, stroke) : '',
       strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
@@ -337,7 +351,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontSize ? `font-size: ${fontSize}px; ` : '',
       fontStyle ? `font-style: ${fontStyle}; ` : '',
       fontWeight ? `font-weight: ${fontWeight}; ` : '',
-      textDecoration ? `text-decoration: ${textDecoration}; ` : textDecoration,
+      textDecoration
+        ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; `
+        : '',
       fill ? colorPropToSVG(FILL, fill) : '',
       deltaY ? `baseline-shift: ${-deltaY}; ` : '',
       useWhiteSpace ? 'white-space: pre; ' : '',

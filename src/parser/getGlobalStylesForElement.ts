@@ -6,7 +6,7 @@ import type { CSSRules } from './typedefs';
  */
 
 export function getGlobalStylesForElement(
-  element: HTMLElement,
+  element: HTMLElement | SVGElement,
   cssRules: CSSRules = {},
 ) {
   let styles: Record<string, string> = {};

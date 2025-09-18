@@ -84,7 +84,7 @@ const roundPoint = (point: fabric.Point) => ({
 
 const parseEvent = (
   type: string,
-  { pointer, absolutePointer, ...ev } = {},
+  { pointer, absolutePointer, ...ev }: Record<string, any> = {},
   caller: fabric.Textbox | fabric.Canvas,
 ) =>
   JSON.parse(
@@ -101,8 +101,8 @@ const parseEvent = (
     ]),
   );
 
-class TestCanvas extends fabric.Canvas {
-  eventStream = [];
+export class DragDropTestCanvas extends fabric.Canvas {
+  eventStream: any[] = [];
   readEventStream() {
     const data = this.eventStream;
     this.eventStream = [];
@@ -124,7 +124,7 @@ const commonEvents = [
 ] as const;
 
 before('#canvas', (el) => {
-  const canvas = new TestCanvas(el, { width: 800, height: 500 });
+  const canvas = new DragDropTestCanvas(el, { width: 800, height: 500 });
   const textValue = 'fabric.js sandbox';
   const a = new fabric.Textbox(textValue, {
     originX: 'center',
@@ -151,6 +151,7 @@ before('#canvas', (el) => {
     top: 20,
     objectCaching: false,
     fontFamily: 'Arial',
+    // @ts-expect-error -- styles mock
     styles,
   });
 

@@ -1,5 +1,5 @@
 import { config } from '../config';
-import { createCanvasElement } from '../util/misc/dom';
+import { createCanvasElementFor } from '../util/misc/dom';
 import type {
   TWebGLPipelineState,
   TProgramCache,
@@ -72,9 +72,7 @@ export class WebGLFilterBackend {
    * class properties to the GLFilterBackend class.
    */
   createWebGLCanvas(width: number, height: number): void {
-    const canvas = createCanvasElement();
-    canvas.width = width;
-    canvas.height = height;
+    const canvas = createCanvasElementFor({ width, height });
     const glOptions = {
         alpha: true,
         premultipliedAlpha: false,
@@ -125,13 +123,11 @@ export class WebGLFilterBackend {
     const pipelineState: TWebGLPipelineState = {
       originalWidth:
         (source as HTMLImageElement).width ||
-        // @ts-expect-error is this a bug? should this be naturalWidth? or is this the pipeline state?
-        (source as HTMLImageElement).originalWidth ||
+        (source as HTMLImageElement).naturalWidth ||
         0,
       originalHeight:
         (source as HTMLImageElement).height ||
-        // @ts-expect-error is this a bug? should this be naturalHeight? or is this the pipeline state?
-        (source as HTMLImageElement).originalHeight ||
+        (source as HTMLImageElement).naturalHeight ||
         0,
       sourceWidth: width,
       sourceHeight: height,
@@ -152,7 +148,7 @@ export class WebGLFilterBackend {
           width,
           height,
           !cachedTexture ? source : undefined,
-        )!,
+        ),
       passes: filters.length,
       webgl: true,
       aPosition: this.aPosition,
@@ -220,7 +216,7 @@ export class WebGLFilterBackend {
     filter?:
       | WebGLRenderingContextBase['NEAREST']
       | WebGLRenderingContextBase['LINEAR'],
-  ) {
+  ): WebGLTexture {
     const {
       NEAREST,
       TEXTURE_2D,
@@ -260,7 +256,9 @@ export class WebGLFilterBackend {
         null,
       );
     }
-    return texture;
+    // disabled because website and issues with different typescript version
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    return texture!;
   }
 
   /**

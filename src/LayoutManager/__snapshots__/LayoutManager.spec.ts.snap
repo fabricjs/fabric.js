@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Layout Manager getLayoutResult imperative trigger 1`] = `
+exports[`Layout Manager > getLayoutResult > 'imperative' trigger 1`] = `
 {
   "nextCenter": Point {
     "x": 50,
@@ -35,7 +35,7 @@ exports[`Layout Manager getLayoutResult imperative trigger 1`] = `
 }
 `;
 
-exports[`Layout Manager getLayoutResult initialization trigger 1`] = `
+exports[`Layout Manager > getLayoutResult > 'initialization' trigger 1`] = `
 {
   "nextCenter": Point {
     "x": 50,

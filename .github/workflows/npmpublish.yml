@@ -5,25 +5,27 @@ on:
     branches:
       - master
       - 5.x
+      - 6.x
     types: [published]
 
 jobs:
   publish-npm:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
           registry-url: https://registry.npmjs.org/
       - run: npm install
       - run: npm run build
       - run: node publish.js
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-          PRE_RELEASE: ${{github.event.release.prerelease}}
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+          PRE_RELEASE: ${{ github.event.release.prerelease }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
   update-bug-report:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # wait for publishing to complete
     needs: publish-npm
     if: always()
@@ -33,7 +35,7 @@ jobs:
           ref: master
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
       - run: npm ci
       - name: Latest major version for bug report update
         id: major

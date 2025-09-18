@@ -3,6 +3,8 @@ import { FabricObject } from '../shapes/Object/FabricObject';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 import { Point } from '../Point';
 
+import { describe, expect, it } from 'vitest';
+
 const createTransformData = (): Transform => {
   return {
     target: new FabricObject({
@@ -47,7 +49,7 @@ describe('wrapWithFixedAnchor', () => {
     expect(targetTopLeftCorner.y).toBe(-203);
     expect(targetTopLeftCorner.x).toBe(-152.5);
     const event = new MouseEvent('move');
-    wrappedAction(event, transformData as Transform, 0, 0);
+    wrappedAction(event, transformData, 0, 0);
     const newTargetTopLeftCorner = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,
@@ -91,7 +93,7 @@ describe('wrapWithFixedAnchor', () => {
     expect(targetTopLeftCorner.y).toBe(-203);
     expect(targetTopLeftCorner.x).toBe(-152.5);
     const event = new MouseEvent('move');
-    wrappedAction(event, transformData as Transform, 0, 0);
+    wrappedAction(event, transformData, 0, 0);
     const newTargetAnchorPosition = target.translateToGivenOrigin(
       new Point(target.left, target.top),
       target.originX,

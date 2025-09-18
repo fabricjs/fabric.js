@@ -25,8 +25,8 @@ export abstract class StyledText<
   EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObject<Props, SProps, EventSpec> {
   declare abstract styles: TextStyle;
-  protected declare abstract _textLines: string[][];
-  protected declare _forceClearCache: boolean;
+  declare protected abstract _textLines: string[][];
+  declare protected _forceClearCache: boolean;
   static _styleProperties: Readonly<StylePropertiesType[]> = styleProperties;
   abstract get2DCursorLocation(
     selectionStart: number,
@@ -97,8 +97,6 @@ export abstract class StyledText<
    * has no other properties, then it is also deleted.  Finally,
    * if the line containing that character has no other characters
    * then it also is deleted.
-   *
-   * @param {string} property The property to compare between characters and text.
    */
   cleanStyle(property: keyof TextStyleDeclaration) {
     if (!this.styles) {
@@ -149,8 +147,7 @@ export abstract class StyledText<
       graphemeCount += this._textLines[i].length;
     }
     if (allStyleObjectPropertiesMatch && stylesCount === graphemeCount) {
-      // @ts-expect-error conspiracy theory of TS
-      this[property as keyof this] = stylePropertyValue;
+      this[property as keyof this] = stylePropertyValue as any;
       this.removeStyle(property);
     }
   }
@@ -266,7 +263,7 @@ export abstract class StyledText<
     charIndex: number,
   ): TextStyleDeclaration {
     const lineStyle = this.styles && this.styles[lineIndex];
-    return lineStyle ? lineStyle[charIndex] ?? {} : {};
+    return lineStyle ? (lineStyle[charIndex] ?? {}) : {};
   }
 
   /**
@@ -281,8 +278,11 @@ export abstract class StyledText<
     charIndex: number,
   ): CompleteTextStyleDeclaration {
     return {
-      // @ts-expect-error readonly
-      ...pick(this, (this.constructor as typeof StyledText)._styleProperties),
+      ...pick(
+        this,
+        (this.constructor as typeof StyledText)
+          ._styleProperties as (keyof this)[],
+      ),
       ...this._getStyleDeclaration(lineIndex, charIndex),
     } as CompleteTextStyleDeclaration;
   }

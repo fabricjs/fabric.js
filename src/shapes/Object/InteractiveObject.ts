@@ -204,7 +204,7 @@ export class InteractiveFabricObject<
 
   /**
    * Determines which corner is under the mouse cursor, represented by `pointer`.
-   * This function is return a corner only if the object is the active one.
+   * This function returns a corner only if the object is the active one.
    * This is done to avoid selecting corner of non active object and activating transformations
    * rather than drag action. The default behavior of fabricJS is that if you want to transform
    * an object, first you select it to show the control set
@@ -337,7 +337,7 @@ export class InteractiveFabricObject<
 
   /**
    * @override set controls' coordinates as well
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link https://fabric5.fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords(): void {
@@ -449,7 +449,7 @@ export class InteractiveFabricObject<
     const options = qrDecompose(matrix);
     ctx.save();
     ctx.translate(options.translateX, options.translateY);
-    ctx.lineWidth = 1 * this.borderScaleFactor;
+    ctx.lineWidth = this.borderScaleFactor; // 1 * this.borderScaleFactor;
     // since interactive groups have been introduced, an object could be inside a group and needing controls
     // the following equality check `this.group === this.parent` covers:
     // object without a group ( undefined === undefined )

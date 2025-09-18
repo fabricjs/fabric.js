@@ -135,7 +135,11 @@ export class ElementsParser {
 
   // TODO: resolveClipPath could be run once per clippath with minor work per object.
   // is a refactor that i m not sure is worth on this code
-  async resolveClipPath(obj: NotParsedFabricObject, usingElement: Element) {
+  async resolveClipPath(
+    obj: NotParsedFabricObject,
+    usingElement: Element,
+    exactOwner?: Element,
+  ) {
     const clipPathElements = this.extractPropertyDefinition(
       obj,
       'clipPath',
@@ -146,13 +150,14 @@ export class ElementsParser {
       const clipPathTag = clipPathElements[0].parentElement!;
       let clipPathOwner = usingElement;
       while (
+        !exactOwner &&
         clipPathOwner.parentElement &&
         clipPathOwner.getAttribute('clip-path') !== obj.clipPath
       ) {
         clipPathOwner = clipPathOwner.parentElement;
       }
       // move the clipPath tag as sibling to the real element that is using it
-      clipPathOwner.parentElement!.appendChild(clipPathTag!);
+      clipPathOwner.parentElement!.appendChild(clipPathTag);
 
       // this multiplication order could be opposite.
       // but i don't have an svg to test it
@@ -188,7 +193,14 @@ export class ElementsParser {
         clipPath.calcTransformMatrix(),
       );
       if (clipPath.clipPath) {
-        await this.resolveClipPath(clipPath, clipPathOwner);
+        await this.resolveClipPath(
+          clipPath,
+          clipPathOwner,
+          // this is tricky.
+          // it tries to differentiate from when clipPaths are inherited by outside groups
+          // or when are really clipPaths referencing other clipPaths
+          clipPathTag.getAttribute('clip-path') ? clipPathOwner : undefined,
+        );
       }
       const { scaleX, scaleY, angle, skewX, translateX, translateY } =
         qrDecompose(gTransform);

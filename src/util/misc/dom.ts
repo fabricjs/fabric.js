@@ -1,5 +1,5 @@
 import { getFabricDocument } from '../../env';
-import type { ImageFormat } from '../../typedefs';
+import type { ImageFormat, TSize } from '../../typedefs';
 import { FabricError } from '../internals/console';
 /**
  * Creates canvas element
@@ -28,10 +28,22 @@ export const createImage = (): HTMLImageElement =>
 export const copyCanvasElement = (
   canvas: HTMLCanvasElement,
 ): HTMLCanvasElement => {
+  const newCanvas = createCanvasElementFor(canvas);
+  newCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
+  return newCanvas;
+};
+
+/**
+ * Creates a canvas element as big as another
+ * @param {CanvasElement} canvas to copy size and content of
+ * @return {CanvasElement} initialized canvas element
+ */
+export const createCanvasElementFor = (
+  canvas: HTMLCanvasElement | ImageData | HTMLImageElement | TSize,
+): HTMLCanvasElement => {
   const newCanvas = createCanvasElement();
   newCanvas.width = canvas.width;
   newCanvas.height = canvas.height;
-  newCanvas.getContext('2d')?.drawImage(canvas, 0, 0);
   return newCanvas;
 };
 
@@ -40,7 +52,7 @@ export const copyCanvasElement = (
  * possibly useless
  * @param {CanvasElement} canvasEl to copy size and content of
  * @param {String} format 'jpeg' or 'png', in some browsers 'webp' is ok too
- * @param {Number} quality <= 1 and > 0
+ * @param {number} quality <= 1 and > 0
  * @return {String} data url
  */
 export const toDataURL = (
@@ -54,3 +66,12 @@ export const isHTMLCanvas = (
 ): canvas is HTMLCanvasElement => {
   return !!canvas && (canvas as HTMLCanvasElement).getContext !== undefined;
 };
+
+export const toBlob = (
+  canvasEl: HTMLCanvasElement,
+  format?: ImageFormat,
+  quality?: number,
+): Promise<Blob | null> =>
+  new Promise((resolve, _) => {
+    canvasEl.toBlob(resolve, `image/${format}`, quality);
+  });

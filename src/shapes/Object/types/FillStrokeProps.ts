@@ -4,7 +4,6 @@ export interface FillStrokeProps {
   /**
    * Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
    * @type String
-   * @default
    */
   paintFirst: 'fill' | 'stroke';
 
@@ -64,7 +63,6 @@ export interface FillStrokeProps {
   /**
    * Corner style of an object's stroke (one of "bevel", "round", "miter")
    * @type String
-   * @default
    */
   strokeLineJoin: CanvasLineJoin;
 

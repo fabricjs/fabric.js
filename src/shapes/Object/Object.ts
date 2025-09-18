@@ -27,7 +27,12 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { runningAnimations } from '../../util/animation/AnimationRegistry';
 import { capValue } from '../../util/misc/capValue';
-import { createCanvasElement, toDataURL } from '../../util/misc/dom';
+import {
+  createCanvasElement,
+  createCanvasElementFor,
+  toDataURL,
+  toBlob,
+} from '../../util/misc/dom';
 import { invertTransform, qrDecompose } from '../../util/misc/matrix';
 import { enlivenObjectEnlivables } from '../../util/misc/objectEnlive';
 import {
@@ -39,11 +44,7 @@ import { pick, pickBy } from '../../util/misc/pick';
 import { toFixed } from '../../util/misc/toFixed';
 import type { Group } from '../Group';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import {
-  isFiller,
-  isSerializableFiller,
-  isTextObject,
-} from '../../util/typeAssertions';
+import { isFiller, isSerializableFiller } from '../../util/typeAssertions';
 import type { FabricImage } from '../Image';
 import {
   cacheProperties,
@@ -134,9 +135,21 @@ type toDataURLOptions = ObjectToCanvasElementOptions & {
   quality?: number;
 };
 
+export type DrawContext =
+  | {
+      parentClipPaths: FabricObject[];
+      width: number;
+      height: number;
+      cacheTranslationX: number;
+      cacheTranslationY: number;
+      zoomX: number;
+      zoomY: number;
+    }
+  | Record<string, never>;
+
 /**
  * Root object class from which all 2d shape classes inherit from
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#objects}
  *
  * @fires added
  * @fires removed
@@ -333,6 +346,7 @@ export class FabricObject<
    * Legacy identifier of the class. Prefer using utils like isType or instanceOf
    * Will be removed in fabric 7 or 8.
    * The setter exists to avoid type errors in old code and possibly current deserialization code.
+   * DO NOT build new code around this type value
    * @TODO add sustainable warning message
    * @type string
    * @deprecated
@@ -376,19 +390,13 @@ export class FabricObject<
    * and each side do not cross fabric.cacheSideLimit
    * those numbers are configurable so that you can get as much detail as you want
    * making bargain with performances.
-   * @param {Object} dims
-   * @param {Object} dims.width width of canvas
-   * @param {Object} dims.height height of canvas
-   * @param {Object} dims.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @param {Object} dims.zoomY zoomY zoom value to unscale the canvas before drawing cache
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * It mutates the input object dims.
+   * @param {TCacheCanvasDimensions} dims
+   * @return {TCacheCanvasDimensions} dims
    */
   _limitCacheSize(
-    dims: TSize & { zoomX: number; zoomY: number; capped: boolean } & any,
-  ) {
+    dims: TCacheCanvasDimensions & { capped?: boolean },
+  ): TCacheCanvasDimensions & { capped?: boolean } {
     const width = dims.width,
       height = dims.height,
       max = config.maxCacheSideLimit,
@@ -427,12 +435,7 @@ export class FabricObject<
    * Return the dimension and the zoom level needed to create a cache canvas
    * big enough to host the object to be cached.
    * @private
-   * @return {Object}.x width of object to be cached
-   * @return {Object}.y height of object to be cached
-   * @return {Object}.width width of canvas
-   * @return {Object}.height height of canvas
-   * @return {Object}.zoomX zoomX zoom value to unscale the canvas before drawing cache
-   * @return {Object}.zoomY zoomY zoom value to unscale the canvas before drawing cache
+   * @return {TCacheCanvasDimensions} Informations about the object to be cached
    */
   _getCacheCanvasDimensions(): TCacheCanvasDimensions {
     const objectScale = this.getTotalObjectScaling(),
@@ -444,8 +447,8 @@ export class FabricObject<
       // for sure this ALIASING_LIMIT is slightly creating problem
       // in situation in which the cache canvas gets an upper limit
       // also objectScale contains already scaleX and scaleY
-      width: neededX + ALIASING_LIMIT,
-      height: neededY + ALIASING_LIMIT,
+      width: Math.ceil(neededX + ALIASING_LIMIT),
+      height: Math.ceil(neededY + ALIASING_LIMIT),
       zoomX: objectScale.x,
       zoomY: objectScale.y,
       x: neededX,
@@ -462,12 +465,9 @@ export class FabricObject<
   _updateCacheCanvas() {
     const canvas = this._cacheCanvas!,
       context = this._cacheContext,
-      dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      minCacheSize = config.minCacheSideLimit,
-      width = dims.width,
-      height = dims.height,
-      zoomX = dims.zoomX,
-      zoomY = dims.zoomY,
+      { width, height, zoomX, zoomY, x, y } = this._limitCacheSize(
+        this._getCacheCanvasDimensions(),
+      ),
       dimensionsChanged = width !== canvas.width || height !== canvas.height,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
 
@@ -475,48 +475,18 @@ export class FabricObject<
       return false;
     }
 
-    let drawingWidth,
-      drawingHeight,
-      shouldRedraw = dimensionsChanged || zoomChanged,
-      additionalWidth = 0,
-      additionalHeight = 0,
-      shouldResizeCanvas = false;
+    const shouldRedraw = dimensionsChanged || zoomChanged;
 
-    if (dimensionsChanged) {
-      const canvasWidth = (this._cacheCanvas as HTMLCanvasElement).width,
-        canvasHeight = (this._cacheCanvas as HTMLCanvasElement).height,
-        sizeGrowing = width > canvasWidth || height > canvasHeight,
-        sizeShrinking =
-          (width < canvasWidth * 0.9 || height < canvasHeight * 0.9) &&
-          canvasWidth > minCacheSize &&
-          canvasHeight > minCacheSize;
-      shouldResizeCanvas = sizeGrowing || sizeShrinking;
-      if (
-        sizeGrowing &&
-        !dims.capped &&
-        (width > minCacheSize || height > minCacheSize)
-      ) {
-        additionalWidth = width * 0.1;
-        additionalHeight = height * 0.1;
-      }
-    }
-    if (isTextObject(this) && this.path) {
-      shouldRedraw = true;
-      shouldResizeCanvas = true;
-      // IMHO in those lines we are using zoomX and zoomY not the this version.
-      additionalWidth += this.getHeightOfLine(0) * this.zoomX!;
-      additionalHeight += this.getHeightOfLine(0) * this.zoomY!;
-    }
     if (shouldRedraw) {
-      if (shouldResizeCanvas) {
-        canvas.width = Math.ceil(width + additionalWidth);
-        canvas.height = Math.ceil(height + additionalHeight);
+      if (width !== canvas.width || height !== canvas.height) {
+        canvas.width = width;
+        canvas.height = height;
       } else {
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
       }
-      drawingWidth = dims.x / 2;
-      drawingHeight = dims.y / 2;
+      const drawingWidth = x / 2;
+      const drawingHeight = y / 2;
       this.cacheTranslationX =
         Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY =
@@ -660,10 +630,8 @@ export class FabricObject<
     return this;
   }
 
-  /*
-   * @private
+  /**
    * return if the object would be visible in rendering
-   * @memberOf FabricObject.prototype
    * @return {Boolean}
    */
   isNotVisible() {
@@ -698,11 +666,11 @@ export class FabricObject<
     this._setOpacity(ctx);
     this._setShadow(ctx);
     if (this.shouldCache()) {
-      this.renderCache();
+      (this as TCachedFabricObject).renderCache();
       (this as TCachedFabricObject).drawCacheOnCanvas(ctx);
     } else {
       this._removeCacheCanvas();
-      this.drawObject(ctx);
+      this.drawObject(ctx, false, {});
       this.dirty = false;
     }
     ctx.restore();
@@ -712,13 +680,23 @@ export class FabricObject<
     /* no op */
   }
 
-  renderCache(options?: any) {
+  renderCache(this: TCachedFabricObject, options?: any) {
     options = options || {};
     if (!this._cacheCanvas || !this._cacheContext) {
       this._createCacheCanvas();
     }
     if (this.isCacheDirty() && this._cacheContext) {
-      this.drawObject(this._cacheContext, options.forClipping);
+      const { zoomX, zoomY, cacheTranslationX, cacheTranslationY } = this;
+      const { width, height } = this._cacheCanvas;
+      this.drawObject(this._cacheContext, options.forClipping, {
+        zoomX,
+        zoomY,
+        cacheTranslationX,
+        cacheTranslationY,
+        width,
+        height,
+        parentClipPaths: [],
+      });
       this.dirty = false;
     }
   }
@@ -741,9 +719,9 @@ export class FabricObject<
    * @since 3.0.0
    * @returns Boolean
    */
-  hasStroke() {
+  hasStroke(): boolean {
     return (
-      this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0
+      !!this.stroke && this.stroke !== 'transparent' && this.strokeWidth !== 0
     );
   }
 
@@ -757,12 +735,12 @@ export class FabricObject<
    * @since 3.0.0
    * @returns Boolean
    */
-  hasFill() {
-    return this.fill && this.fill !== 'transparent';
+  hasFill(): boolean {
+    return !!this.fill && this.fill !== 'transparent';
   }
 
   /**
-   * When set to `true`, force the object to have its own cache, even if it is inside a group
+   * When returns `true`, force the object to have its own cache, even if it is inside a group
    * it may be needed when your object behave in a particular way on the cache and always needs
    * its own isolated canvas to render correctly.
    * Created to be overridden
@@ -770,6 +748,7 @@ export class FabricObject<
    * @returns Boolean
    */
   needsItsOwnCache() {
+    // TODO re-evaluate this shadow condition
     if (
       this.paintFirst === STROKE &&
       this.hasFill() &&
@@ -788,15 +767,15 @@ export class FabricObject<
    * Decide if the object should cache or not. Create its own cache level
    * objectCaching is a global flag, wins over everything
    * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step. None of the fabric classes requires it.
+   * a cache step.
    * Generally you do not cache objects in groups because the group outside is cached.
    * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
    * @return {Boolean}
    */
   shouldCache() {
     this.ownCaching =
-      this.needsItsOwnCache() ||
-      (this.objectCaching && (!this.parent || !this.parent.isOnACache()));
+      (this.objectCaching && (!this.parent || !this.parent.isOnACache())) ||
+      this.needsItsOwnCache();
     return this.ownCaching;
   }
 
@@ -819,7 +798,8 @@ export class FabricObject<
    */
   drawClipPathOnCache(
     ctx: CanvasRenderingContext2D,
-    clipPath: TCachedFabricObject,
+    clipPath: FabricObject,
+    canvasWithClipPath: HTMLCanvasElement,
   ) {
     ctx.save();
     // DEBUG: uncomment this line, comment the following
@@ -829,18 +809,8 @@ export class FabricObject<
     } else {
       ctx.globalCompositeOperation = 'destination-in';
     }
-    //ctx.scale(1 / 2, 1 / 2);
-    if (clipPath.absolutePositioned) {
-      const m = invertTransform(this.calcTransformMatrix());
-      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
-    }
-    clipPath.transform(ctx);
-    ctx.scale(1 / clipPath.zoomX, 1 / clipPath.zoomY);
-    ctx.drawImage(
-      clipPath._cacheCanvas,
-      -clipPath.cacheTranslationX,
-      -clipPath.cacheTranslationY,
-    );
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(canvasWithClipPath, 0, 0);
     ctx.restore();
   }
 
@@ -848,8 +818,13 @@ export class FabricObject<
    * Execute the drawing operation for an object on a specified context
    * @param {CanvasRenderingContext2D} ctx Context to render on
    * @param {boolean} forClipping apply clipping styles
+   * @param {DrawContext} context additional context for rendering
    */
-  drawObject(ctx: CanvasRenderingContext2D, forClipping?: boolean) {
+  drawObject(
+    ctx: CanvasRenderingContext2D,
+    forClipping: boolean | undefined,
+    context: DrawContext,
+  ) {
     const originalFill = this.fill,
       originalStroke = this.stroke;
     if (forClipping) {
@@ -860,9 +835,32 @@ export class FabricObject<
       this._renderBackground(ctx);
     }
     this._render(ctx);
-    this._drawClipPath(ctx, this.clipPath);
+    this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
     this.stroke = originalStroke;
+  }
+
+  private createClipPathLayer(
+    this: TCachedFabricObject,
+    clipPath: FabricObject,
+    context: DrawContext,
+  ) {
+    const canvas = createCanvasElementFor(context as TSize);
+    const ctx = canvas.getContext('2d')!;
+    ctx.translate(context.cacheTranslationX, context.cacheTranslationY);
+    ctx.scale(context.zoomX, context.zoomY);
+    clipPath._cacheCanvas = canvas;
+    context.parentClipPaths.forEach((prevClipPath) => {
+      prevClipPath.transform(ctx);
+    });
+    context.parentClipPaths.push(clipPath);
+    if (clipPath.absolutePositioned) {
+      const m = invertTransform(this.calcTransformMatrix());
+      ctx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    }
+    clipPath.transform(ctx);
+    clipPath.drawObject(ctx, true, context);
+    return canvas;
   }
 
   /**
@@ -870,18 +868,22 @@ export class FabricObject<
    * @param {CanvasRenderingContext2D} ctx
    * @param {FabricObject} clipPath
    */
-  _drawClipPath(ctx: CanvasRenderingContext2D, clipPath?: FabricObject) {
+  _drawClipPath(
+    ctx: CanvasRenderingContext2D,
+    clipPath: FabricObject | undefined,
+    context: DrawContext,
+  ) {
     if (!clipPath) {
       return;
     }
-    // needed to setup a couple of variables
-    // path canvas gets overridden with this one.
+    // needed to setup _transformDone
     // TODO find a better solution?
-    clipPath._set('canvas', this.canvas);
-    clipPath.shouldCache();
     clipPath._transformDone = true;
-    clipPath.renderCache({ forClipping: true });
-    this.drawClipPathOnCache(ctx, clipPath as TCachedFabricObject);
+    const canvas = (this as TCachedFabricObject).createClipPathLayer(
+      clipPath,
+      context,
+    );
+    this.drawClipPathOnCache(ctx, clipPath, canvas);
   }
 
   /**
@@ -898,7 +900,10 @@ export class FabricObject<
   }
 
   /**
-   * Check if cache is dirty
+   * Check if cache is dirty and if is dirty clear the context.
+   * This check has a big side effect, it changes the underlying cache canvas if necessary.
+   * Do not call this method on your own to check if the cache is dirty, because if it is,
+   * it is also going to wipe the cache. This is badly designed and needs to be fixed.
    * @param {Boolean} skipCanvas skip canvas checks because this object is painted
    * on parent canvas.
    */
@@ -1023,10 +1028,6 @@ export class FabricObject<
   _setLineDash(ctx: CanvasRenderingContext2D, dashArray?: number[] | null) {
     if (!dashArray || dashArray.length === 0) {
       return;
-    }
-    // Spec requires the concatenation of two copies of the dash array when the number of elements is odd
-    if (1 & dashArray.length) {
-      dashArray.push(...dashArray);
     }
     ctx.setLineDash(dashArray);
   }
@@ -1184,14 +1185,16 @@ export class FabricObject<
     filler: TFiller,
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
-      pCanvas = createCanvasElement(),
       retinaScaling = this.getCanvasRetinaScaling(),
       width = dims.x / this.scaleX / retinaScaling,
-      height = dims.y / this.scaleY / retinaScaling;
-    // in case width and height are less than 1px, we have to round up.
-    // since the pattern is no-repeat, this is fine
-    pCanvas.width = Math.ceil(width);
-    pCanvas.height = Math.ceil(height);
+      height = dims.y / this.scaleY / retinaScaling,
+      pCanvas = createCanvasElementFor({
+        // in case width and height are less than 1px, we have to round up.
+        // since the pattern is no-repeat, this is fine
+        width: Math.ceil(width),
+        height: Math.ceil(height),
+      });
+
     const pCtx = pCanvas.getContext('2d');
     if (!pCtx) {
       return;
@@ -1387,11 +1390,27 @@ export class FabricObject<
       options.quality || 1,
     );
   }
+  toBlob(options: toDataURLOptions = {}) {
+    return toBlob(
+      this.toCanvasElement(options),
+      options.format || 'png',
+      options.quality || 1,
+    );
+  }
 
   /**
-   * Returns true if any of the specified types is identical to the type of an instance
-   * @param {String} type Type to check against
-   * @return {Boolean}
+   * Checks if the instance is of any of the specified types.
+   * We use this to filter a list of objects for the `getObjects` function.
+   *
+   * For detecting an instance type `instanceOf` is a better check,
+   * but to avoid to make specific classes a dependency of generic code
+   * internally we use this.
+   *
+   * This compares both the static class `type` and the instance's own `type` property
+   * against the provided list of types.
+   *
+   * @param types - A list of type strings to check against.
+   * @returns `true` if the object's type or class type matches any in the list, otherwise `false`.
    */
   isType(...types: string[]) {
     return (
@@ -1493,7 +1512,7 @@ export class FabricObject<
    * Animates object's properties
    * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
    * @param {Partial<AnimationOptions<T>>} options
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#animation}
    * @return {Record<string, TAnimation<T>>} map of animation contexts
    *
    * As object — multiple properties

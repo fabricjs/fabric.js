@@ -15,7 +15,6 @@ import { Group } from '../../shapes/Group';
  * **(2)** one is inverted and the other isn't - the wrapper shouldn't become inverted and the inverted clip path must clip the non inverted one to produce an identical visual effect.\
  * **(3)** both clip paths are not inverted - wrapper and clip paths remain unchanged.
  *
- * @memberOf fabric.util
  * @param {fabric.Object} c1
  * @param {fabric.Object} c2
  * @returns {fabric.Object} merged clip path

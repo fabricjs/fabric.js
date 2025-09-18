@@ -4,13 +4,21 @@ import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
 
 type ComposedOwnProps = {
-  subFilters: BaseFilter<string, object>[];
+  subFilters: BaseFilter<string, object, object>[];
+};
+
+type ComposedSerializedProps = {
+  subFilters: Record<string, unknown>[];
 };
 
 /**
  * A container class that knows how to apply a sequence of filters to an input image.
  */
-export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
+export class Composed extends BaseFilter<
+  'Composed',
+  ComposedOwnProps,
+  ComposedSerializedProps
+> {
   /**
    * A non sparse array of filters to apply
    */
@@ -19,10 +27,7 @@ export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
   static type = 'Composed';
 
   constructor(
-    options: { subFilters?: BaseFilter<string, object>[] } & Record<
-      string,
-      any
-    > = {},
+    options: { subFilters?: BaseFilter<string>[] } & Record<string, any> = {},
   ) {
     super(options);
     this.subFilters = options.subFilters || [];
@@ -47,11 +52,7 @@ export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
    * Serialize this filter into JSON.
    * @returns {Object} A JSON representation of this filter.
    */
-  //@ts-expect-error TS doesn't like this toObject
-  toObject(): {
-    type: 'Composed';
-    subFilters: ReturnType<BaseFilter<string, object>['toObject']>[];
-  } {
+  toObject() {
     return {
       type: this.type,
       subFilters: this.subFilters.map((filter) => filter.toObject()),
@@ -64,7 +65,6 @@ export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
 
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
-   * @static
    * @param {oject} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -72,18 +72,15 @@ export class Composed extends BaseFilter<'Composed', ComposedOwnProps> {
    */
   static fromObject(
     object: Record<string, any>,
-    options: { signal: AbortSignal },
+    options?: { signal: AbortSignal },
   ): Promise<Composed> {
     return Promise.all(
-      ((object.subFilters || []) as BaseFilter<string, object>[]).map(
-        (filter) =>
-          classRegistry
-            .getClass<typeof BaseFilter>(filter.type)
-            .fromObject(filter, options),
+      ((object.subFilters || []) as BaseFilter<string>[]).map((filter) =>
+        classRegistry
+          .getClass<typeof BaseFilter>(filter.type)
+          .fromObject(filter, options),
       ),
-    ).then(
-      (enlivedFilters) => new this({ subFilters: enlivedFilters }) as Composed,
-    );
+    ).then((enlivedFilters) => new this({ subFilters: enlivedFilters }));
   }
 }
 

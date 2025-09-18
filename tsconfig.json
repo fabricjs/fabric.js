@@ -65,7 +65,7 @@
     // "newLine": "crlf",                                /* Set the newline character for emitting files. */
     // "stripInternal": true,                            /* Disable emitting declarations that have `@internal` in their JSDoc comments. */
     // "noEmitHelpers": true,                            /* Disable generating custom helper functions like `__extends` in compiled output. */
-    "noEmitOnError": false /* Disable emitting files if any type checking errors are reported. */,
+    // "noEmitOnError": false                            /* Disable emitting files if any type checking errors are reported. */,
     // "preserveConstEnums": true,                       /* Disable erasing `const enum` declarations in generated code. */
     // "declarationDir": "./",                           /* Specify the output directory for generated declaration files. */
     // "preserveValueImports": true,                     /* Preserve unused imported values in the JavaScript output that would otherwise be removed. */
@@ -83,7 +83,7 @@
     // "strictNullChecks": true,                         /* When type checking, take into account `null` and `undefined`. */
     // "strictFunctionTypes": true,                      /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
     // "strictBindCallApply": true,                      /* Check that the arguments for `bind`, `call`, and `apply` methods match the original function. */
-    "strictPropertyInitialization": false /* Check for class properties that are declared but not set in the constructor. */,
+    "strictPropertyInitialization": false /* Check for class properties that are declared but not set in the constructor. */
     // "noImplicitThis": true,                           /* Enable error reporting when `this` is given the type `any`. */
     // "useUnknownInCatchVariables": true,               /* Type catch clause variables as 'unknown' instead of 'any'. */
     // "alwaysStrict": true,                             /* Ensure 'use strict' is always emitted. */
@@ -100,8 +100,19 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+    // "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["dist", "dist-extensions", "test", "e2e"],
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "test",
+    "e2e",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "vitest.extend.ts",
+    "vitest.config.ts",
+    "vitest.d.ts",
+    "playwright.setup.ts"
+  ],
   "include": ["src", "fabric.ts", "index.ts", "index.node.ts", "extensions"]
 }

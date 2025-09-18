@@ -1,4 +1,8 @@
+import { config } from '../../config';
 import { FabricText } from './Text';
+
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { Rect } from '../Rect';
 
 describe('TextSvgExport', () => {
   it('exports text background color correctly', () => {
@@ -25,5 +29,76 @@ describe('TextSvgExport', () => {
       true,
     );
     expect(svgStyles.includes('stroke="none"')).toBe(false);
+  });
+
+  describe('toSVG', () => {
+    beforeEach(() => {
+      config.configure({ NUM_FRACTION_DIGITS: 2 });
+    });
+
+    afterEach(() => {
+      config.restoreDefaults();
+    });
+
+    it('toSVG', () => {
+      const text = new FabricText('x');
+      expect(text.toSVG()).toMatchSVGSnapshot();
+      text.set('fontFamily', 'Arial');
+      expect(text.toSVG()).toMatchSVGSnapshot();
+    });
+
+    it('toSVG justified', () => {
+      const text = new FabricText('xxxxxx\nx y', {
+        textAlign: 'justify',
+      });
+
+      expect(text.toSVG()).toMatchSVGSnapshot();
+    });
+
+    it('toSVG with multiple spaces', () => {
+      const text = new FabricText('x                 y');
+      expect(text.toSVG()).toMatchSVGSnapshot();
+    });
+
+    it('toSVG with deltaY', () => {
+      config.configure({ NUM_FRACTION_DIGITS: 0 });
+      const text = new FabricText('xx', {
+        styles: {
+          0: {
+            1: {
+              deltaY: -14,
+              fontSize: 24,
+            },
+          },
+        },
+      });
+      expect(text.toSVG()).toMatchSVGSnapshot();
+      config.configure({ NUM_FRACTION_DIGITS: 2 });
+    });
+
+    it('toSVG with font', () => {
+      const text = new FabricText('xxxxxx\nx y', {
+        textAlign: 'justify',
+        styles: {
+          0: {
+            0: { fontFamily: 'Times New Roman' },
+            1: { fontFamily: 'Times New Roman' },
+            2: { fontFamily: 'Times New Roman' },
+            3: { fontFamily: 'Times New Roman' },
+            4: { fontFamily: 'Times New Roman' },
+            5: { fontFamily: 'Times New Roman' },
+          },
+        },
+      });
+      expect(text.toSVG()).toMatchSVGSnapshot();
+    });
+
+    it('toSVG with text as a clipPath', () => {
+      config.configure({ NUM_FRACTION_DIGITS: 0 });
+      const clipPath = new FabricText('text as clipPath');
+      const rect = new Rect({ width: 200, height: 100 });
+      rect.clipPath = clipPath;
+      expect(rect.toSVG()).toMatchSVGSnapshot();
+    });
   });
 });

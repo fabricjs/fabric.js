@@ -1,5 +1,4 @@
 import { getEnv } from '../env';
-import { createCanvasElement } from '../util/misc/dom';
 import type {
   T2DPipelineState,
   TWebGLAttributeLocationMap,
@@ -15,17 +14,17 @@ import {
 } from './shaders/baseFilter';
 import type { Abortable } from '../typedefs';
 import { FabricError } from '../util/internals/console';
+import { createCanvasElementFor } from '../util/misc/dom';
 
 const regex = new RegExp(highPsourceCode, 'g');
 
 export class BaseFilter<
   Name extends string,
   OwnProps extends Record<string, any> = object,
+  SerializedProps extends Record<string, any> = OwnProps,
 > {
   /**
    * Filter type
-   * @param {String} type
-   * @default
    */
   get type(): Name {
     return (this.constructor as typeof BaseFilter).type as Name;
@@ -368,9 +367,11 @@ export class BaseFilter<
    */
   createHelpLayer(options: T2DPipelineState) {
     if (!options.helpLayer) {
-      const helpLayer = createCanvasElement();
-      helpLayer.width = options.sourceWidth;
-      helpLayer.height = options.sourceHeight;
+      const { sourceWidth, sourceHeight } = options;
+      const helpLayer = createCanvasElementFor({
+        width: sourceWidth,
+        height: sourceHeight,
+      });
       options.helpLayer = helpLayer;
     }
   }
@@ -381,19 +382,19 @@ export class BaseFilter<
    * stored in the static defaults property.
    * @return {Object} Object representation of an instance
    */
-  toObject(): { type: Name } & OwnProps {
+  toObject(): { type: Name } & SerializedProps {
     const defaultKeys = Object.keys(
       (this.constructor as typeof BaseFilter).defaults || {},
-    ) as (keyof OwnProps)[];
+    ) as (keyof SerializedProps)[];
 
     return {
       type: this.type,
-      ...defaultKeys.reduce<OwnProps>((acc, key) => {
+      ...defaultKeys.reduce<SerializedProps>((acc, key) => {
         acc[key] = this[
           key as keyof this
         ] as unknown as (typeof acc)[typeof key];
         return acc;
-      }, {} as OwnProps),
+      }, {} as SerializedProps),
     };
   }
 
@@ -408,8 +409,8 @@ export class BaseFilter<
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    _options: Abortable,
-  ): Promise<BaseFilter<string, object>> {
+    _options?: Abortable,
+  ): Promise<BaseFilter<string>> {
     return new this(filterOptions);
   }
 }

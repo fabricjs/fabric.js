@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Path Utils fabric.util.getRegularPolygonPath 1`] = `
+exports[`Path Utils > fabric.util.getRegularPolygonPath 1`] = `
 [
   [
     "M",
@@ -33,7 +33,7 @@ exports[`Path Utils fabric.util.getRegularPolygonPath 1`] = `
 ]
 `;
 
-exports[`Path Utils fabric.util.getRegularPolygonPath 2`] = `
+exports[`Path Utils > fabric.util.getRegularPolygonPath 2`] = `
 [
   [
     "M",
@@ -71,7 +71,7 @@ exports[`Path Utils fabric.util.getRegularPolygonPath 2`] = `
 ]
 `;
 
-exports[`Path Utils getPathSegmentsInfo operates as expected 1`] = `
+exports[`Path Utils > getPathSegmentsInfo > operates as expected 1`] = `
 [
   {
     "command": "M",
@@ -125,7 +125,7 @@ exports[`Path Utils getPathSegmentsInfo operates as expected 1`] = `
 ]
 `;
 
-exports[`Path Utils makePathSimpler can parse paths that return NaN segments 1`] = `
+exports[`Path Utils > makePathSimpler > can parse paths that return NaN segments 1`] = `
 [
   [
     "M",
@@ -452,7 +452,7 @@ exports[`Path Utils makePathSimpler can parse paths that return NaN segments 1`]
 ]
 `;
 
-exports[`Path Utils parsePath Path written with uncommon scenario 1`] = `
+exports[`Path Utils > parsePath > Path written with uncommon scenario 1`] = `
 [
   [
     "a",
@@ -497,7 +497,7 @@ exports[`Path Utils parsePath Path written with uncommon scenario 1`] = `
 ]
 `;
 
-exports[`Path Utils parsePath can parse path string 1`] = `
+exports[`Path Utils > parsePath > can parse path string 1`] = `
 [
   [
     "M",
@@ -654,7 +654,7 @@ exports[`Path Utils parsePath can parse path string 1`] = `
 ]
 `;
 
-exports[`Path Utils parsePath can parse path string 2`] = `
+exports[`Path Utils > parsePath > can parse path string 2`] = `
 [
   [
     "M",

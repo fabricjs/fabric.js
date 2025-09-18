@@ -1,11 +1,11 @@
 import chalk from 'chalk';
 import fs from 'fs-extra';
-import _ from 'lodash';
 import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
 import psList from 'ps-list';
 import { dumpsPath } from './dirname.mjs';
+import { debounce } from 'es-toolkit/compat';
 
 export const lockFile = path.resolve(dumpsPath, 'build-lock.json');
 
@@ -60,13 +60,13 @@ export function awaitBuild() {
  * @param {number} [debounce]
  * @returns
  */
-export function subscribe(cb, debounce) {
+export function subscribe(cb, debounceVal) {
   return fs.watch(
     path.dirname(lockFile),
-    _.debounce((type, file) => {
+    debounce((type, file) => {
       if (file !== path.basename(lockFile)) return;
       cb(isLocked(), !!(readLockFile() ?? {}).error);
-    }, debounce),
+    }, debounceVal),
   );
 }
 
