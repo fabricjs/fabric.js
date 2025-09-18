@@ -14,8 +14,8 @@ import type {
 import { log } from '../util/internals/console';
 
 /**
- * @see {@link http://fabricjs.com/patterns demo}
- * @see {@link http://fabricjs.com/dynamic-patterns demo}
+ * @see {@link http://fabric5.fabricjs.com/patterns demo}
+ * @see {@link http://fabric5.fabricjs.com/dynamic-patterns demo}
  */
 export class Pattern {
   static type = 'Pattern';

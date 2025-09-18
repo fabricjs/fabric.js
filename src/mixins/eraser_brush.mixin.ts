@@ -28,14 +28,14 @@ import { uid } from '../util/internals/uid';
      * When set to `deep` the eraser will erase nested objects if they are erasable, leaving the group and the other objects untouched.
      * When set to `true` the eraser will erase the entire group. Once the group changes the eraser is propagated to its children for proper functionality.
      * When set to `false` the eraser will leave all objects including the group untouched.
-     * @see {@link http://fabricjs.com/erasing#erasable_property}
+     * @see {@link http://fabric5.fabricjs.com/erasing#erasable_property}
      * @type boolean | 'deep'
      * @default true
      */
     erasable: true,
 
     /**
-     * @see {@link http://fabricjs.com/erasing#eraser}
+     * @see {@link http://fabric5.fabricjs.com/erasing#eraser}
      * @type fabric.Eraser
      */
     eraser: undefined,
@@ -162,7 +162,7 @@ import { uid } from '../util/internals/uid';
 
     /**
      * Applies the group's eraser to its objects
-     * @see {@link http://fabricjs.com/erasing#erasable_property}
+     * @see {@link http://fabric5.fabricjs.com/erasing#erasable_property}
      * @returns {Promise<fabric.Path[]|fabric.Path[][]|void>}
      */
     applyEraserToObjects: function () {
@@ -343,7 +343,7 @@ import { uid } from '../util/internals/uid';
    * In order to update the EraserBrush call `preparePattern`.
    * It may come in handy when canvas changes during erasing (i.e animations) and you want the eraser to reflect the changes.
    *
-   * @see {@link http://fabricjs.com/erasing}
+   * @see {@link http://fabric5.fabricjs.com/erasing}
    * @class fabric.EraserBrush
    * @extends fabric.PencilBrush
    * @memberof fabric

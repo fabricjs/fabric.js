@@ -80,7 +80,7 @@ export type FullTargetsInfoWithContainer = TargetsInfoWithContainer & {
  * Canvas class
  * @class Canvas
  * @extends StaticCanvas
- * @see {@link http://fabricjs.com/fabric-intro-part-1#canvas}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#canvas}
  *
  * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
@@ -212,7 +212,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
    * After mousedown, mousemove creates a shape,
    * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-   * @see {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-4#free_drawing}
    * @type Boolean
    */
   declare isDrawingMode: boolean;

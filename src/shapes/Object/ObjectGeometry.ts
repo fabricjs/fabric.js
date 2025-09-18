@@ -444,7 +444,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
    * aCoords are used to quickly find an object on the canvas.
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabric5.fabricjs.com/fabric-gotchas}
    */
   setCoords(): void {
     this.aCoords = this.calcACoords();
