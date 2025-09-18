@@ -40,7 +40,8 @@ uses: github/codeql-action/analyze@192325c86100d080feab897ff886c34abd4c83a3 # v3
 
 ```yaml
 # Find/create/update comments
-uses: edumserrano/find-create-or-update-comment@67bd99aa9c2f587aa595d5a8e4d95b62cbe49a83 # v3.0.0
+
+uses: edumserrano/find-create-or-update-comment@82880b65c8a3a6e4c70aa05a204995b6c9696f53 # v3.0.0
 
 # Populate form versions
 uses: ShaMan123/gha-populate-form-version@421e9fce0e1fcfa18a3d5e00d6b1b2fe0d23bb31 # v2.0.1

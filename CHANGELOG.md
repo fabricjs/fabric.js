@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Incorrect sha for commenting action
 - fix(IText): A form field element has neither an id nor a name attribute. [#10172](https://github.com/fabricjs/fabric.js/pull/10172)
 - docs(): change CN comment to EN [#10727](https://github.com/fabricjs/fabric.js/pull/10727)
 - chore(): Remove paths for codeQL let it scan all the repo [#10738](https://github.com/fabricjs/fabric.js/pull/10738)
