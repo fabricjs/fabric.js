@@ -13,10 +13,10 @@ name: 'CodeQL'
 
 on:
   push:
-    branches: [master]
+    branches: ['master', '5.x', '6.x']
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: ['master', '5.x', '6.x']
   schedule:
     - cron: '28 13 * * 4'
 
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript', 'actions']
+        language: ['typescript', 'actions']
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
 
@@ -44,7 +44,6 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@192325c86100d080feab897ff886c34abd4c83a3 # v3.30.3
         with:
-          config-file: ./.github/codeql/codeql-config.yml
           languages: ${{ matrix.language }}
 
           # If you wish to specify custom queries, you can do so here or in a config file.
