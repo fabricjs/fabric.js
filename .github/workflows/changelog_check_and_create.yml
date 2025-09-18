@@ -12,7 +12,7 @@ jobs:
       link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
       - name: Check ${{ env.file }}
@@ -33,7 +33,7 @@ jobs:
       - name: Create and upload the changelog line
         id: changelog_string
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        uses: actions/github-script@v6
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
           result-encoding: string
           script: |
@@ -48,7 +48,7 @@ jobs:
         run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
       - name: Upload changelog artifact
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: changelog_artifact
           path: ./changelog_artifact.txt

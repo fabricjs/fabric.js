@@ -3,6 +3,7 @@
 ## [next]
 
 - Add additional paths to CodeQL config [#10738](https://github.com/fabricjs/fabric.js/pull/10738)
+- chore(): Pin all GitHub Actions to commit SHAs for security compliance [#10739](https://github.com/fabricjs/fabric.js/pull/10739)
 - chore(deps-dev): bump es-toolkit from 1.39.7 to 1.39.10 [#10731](https://github.com/fabricjs/fabric.js/pull/10731)
 - chore(deps-dev): bump serve from 14.2.4 to 14.2.5 [#10730](https://github.com/fabricjs/fabric.js/pull/10730)
 - Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
