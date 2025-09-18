@@ -16,7 +16,7 @@ jobs:
   prime-build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Install dependencies
         uses: ./.github/actions/cached-install
         with:
@@ -28,7 +28,7 @@ jobs:
     name: Vitest tests Node 24
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
@@ -36,7 +36,7 @@ jobs:
       - name: Run Vitest unit test
         run: npm run test:vitest:coverage
       - name: Upload test coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: coverage-vitest
           path: ./.nyc_output/*.json
@@ -49,7 +49,7 @@ jobs:
         browser: [chromium, firefox]
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
@@ -64,7 +64,7 @@ jobs:
     name: Vitest tests node 20
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
@@ -75,7 +75,7 @@ jobs:
     name: Vitest tests node 22
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 22.x
@@ -87,7 +87,7 @@ jobs:
     name: Playwright tests
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
@@ -99,14 +99,14 @@ jobs:
       - name: Run Playwright tests
         run: xvfb-run npm run test:e2e
       - name: Upload Test Output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         if: failure()
         with:
           name: e2e-report
           path: ./e2e/test-report/
           include-hidden-files: true
       - name: Upload Test Coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
@@ -114,7 +114,7 @@ jobs:
       - name: Create prnumber artifact
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: prnumber
           path: ./prnumber.txt

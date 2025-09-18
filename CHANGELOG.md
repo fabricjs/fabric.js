@@ -2,7 +2,10 @@
 
 ## [next]
 
-- Fix(Textarea): A form field element has neither an id nor a name attribute. [#10172](https://github.com/fabricjs/fabric.js/pull/10172)
+- fix(IText): A form field element has neither an id nor a name attribute. [#10172](https://github.com/fabricjs/fabric.js/pull/10172)
+- docs(): change CN comment to EN [#10727](https://github.com/fabricjs/fabric.js/pull/10727)
+- chore(): Remove paths for codeQL let it scan all the repo [#10738](https://github.com/fabricjs/fabric.js/pull/10738)
+- chore(): Pin all GitHub Actions to commit SHAs for security compliance [#10739](https://github.com/fabricjs/fabric.js/pull/10739)
 - chore(deps-dev): bump es-toolkit from 1.39.7 to 1.39.10 [#10731](https://github.com/fabricjs/fabric.js/pull/10731)
 - chore(deps-dev): bump serve from 14.2.4 to 14.2.5 [#10730](https://github.com/fabricjs/fabric.js/pull/10730)
 - Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
