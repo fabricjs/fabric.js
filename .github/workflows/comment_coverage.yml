@@ -11,30 +11,30 @@ jobs:
     name: Coverage reporting
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
           install-system-deps: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: coverage-e2e
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: coverage-vitest
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: coverage-visual
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./.nyc_output
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: prnumber
           run-id: ${{ github.event.workflow_run.id }}
@@ -60,7 +60,7 @@ jobs:
           echo "\`\`\`" >> ./cov.txt
           echo "${{ env.unique_id }}" >> ./cov.txt
       - name: Comment on PR for coverage
-        uses: edumserrano/find-create-or-update-comment@v3.0.0
+        uses: edumserrano/find-create-or-update-comment@67bd99aa9c2f587aa595d5a8e4d95b62cbe49a83 # v3.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ steps.prnumber.outputs.pr_number }}
