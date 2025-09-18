@@ -13,7 +13,7 @@ uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
 
 # Cache dependencies
-uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
 
 # Upload artifacts
 uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
