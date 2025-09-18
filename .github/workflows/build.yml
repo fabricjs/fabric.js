@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Uglified build
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
@@ -22,7 +22,7 @@ jobs:
       minified: dist/index.min.js
       bundled: dist/index.mjs
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
@@ -31,13 +31,13 @@ jobs:
       - name: Create prnumber artifact
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: prnumber
           path: ./prnumber.txt
       - name: Prepare pr stats
         id: stats
-        uses: actions/github-script@v6
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
           result-encoding: string
           script: |
@@ -48,7 +48,7 @@ jobs:
       - name: Create the artifact for stats
         run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
       - name: Upload Pr stats
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: prstats
           path: ./prstats.txt
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Linting
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Prettier check
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
