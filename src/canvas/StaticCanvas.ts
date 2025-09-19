@@ -1283,15 +1283,10 @@ export class StaticCanvas<
     }
 
     // parse json if it wasn't already
-    const serialized = typeof json === 'string' ? JSON.parse(json) : json;
-    const {
-      objects = [],
-      backgroundImage,
-      background,
-      overlayImage,
-      overlay,
-      clipPath,
-    } = serialized;
+    const { objects = [], ...serialized } =
+      typeof json === 'string' ? JSON.parse(json) : json;
+    const { backgroundImage, background, overlayImage, overlay, clipPath } =
+      serialized;
     const renderOnAddRemove = this.renderOnAddRemove;
     this.renderOnAddRemove = false;
 
