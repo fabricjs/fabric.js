@@ -1392,6 +1392,7 @@ describe('StaticCanvas', () => {
     expect(canvas.loadFromJSON).toBeTypeOf('function');
 
     await canvas.loadFromJSON(PATH_JSON);
+    expect('objects' in canvas).toBe(false);
     const obj = canvas.item(0);
 
     expect(canvas.isEmpty()).toBeFalsy();
