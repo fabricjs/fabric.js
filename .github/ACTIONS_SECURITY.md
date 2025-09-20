@@ -41,8 +41,10 @@ uses: github/codeql-action/analyze@192325c86100d080feab897ff886c34abd4c83a3 # v3
 ```yaml
 # Find/create/update comments
 
-uses: edumserrano/find-create-or-update-comment@82880b65c8a3a6e4c70aa05a204995b6c9696f53 # v3.0.0
-
+uses internal fork of edumserrano/find-create-or-update-comment@82880b65c8a3a6e4c70aa05a204995b6c9696f53 # v3.0.0
+locked to:
+peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
 # Populate form versions
 uses: ShaMan123/gha-populate-form-version@421e9fce0e1fcfa18a3d5e00d6b1b2fe0d23bb31 # v2.0.1
 
