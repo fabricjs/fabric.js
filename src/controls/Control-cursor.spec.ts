@@ -24,8 +24,8 @@ describe('fabric.controls.cursor', () => {
   let group: Group;
   beforeAll(() => {
     canvas = new Canvas(undefined);
-    rect = new Rect({ width: 100, height: 100 });
-    groupRect = new Rect({ width: 100, height: 100 });
+    rect = new Rect({ width: 100, height: 100, left: 50, top: 50 });
+    groupRect = new Rect({ width: 100, height: 100, left: 50, top: 50 });
     group = new Group([groupRect], {
       interactive: true,
       subTargetCheck: true,

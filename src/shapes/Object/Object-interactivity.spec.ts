@@ -205,8 +205,8 @@ describe('ObjectInteractivity', () => {
 
   it('corner coords', () => {
     const cObj = new FabricObject({
-      top: 10,
-      left: 10,
+      top: 15,
+      left: 15,
       width: 10,
       height: 10,
       strokeWidth: 0,
@@ -345,8 +345,8 @@ describe('ObjectInteractivity', () => {
     sharedControls.bl.sizeY = 10;
 
     const cObj = new FabricObject({
-      top: 10,
-      left: 10,
+      top: 15,
+      left: 15,
       width: 10,
       height: 10,
       strokeWidth: 0,
@@ -484,8 +484,8 @@ describe('ObjectInteractivity', () => {
 
   it('findControl', () => {
     const cObj = new FabricObject({
-      top: 10,
-      left: 10,
+      top: 25,
+      left: 25,
       width: 30,
       height: 30,
       strokeWidth: 0,

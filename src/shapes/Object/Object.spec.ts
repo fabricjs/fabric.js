@@ -50,6 +50,7 @@ describe('Object', () => {
   });
   it('rotate with centered rotation', () => {
     const fObj = new FabricObject({
+      originX: 'left',
       centeredRotation: true,
       width: 10,
       height: 10,
@@ -63,7 +64,7 @@ describe('Object', () => {
     // test that angle has been changed
     expect(fObj.angle).toBe(180);
     // test that top changed because of centered rotation
-    expect(fObj.top).toBe(10);
+    expect(fObj.top).toBe(0);
     // test that left changed because of centered rotation
     expect(fObj.left).toBe(10);
   });
@@ -285,7 +286,7 @@ describe('Object', () => {
     const emptyObjectJSON =
       '{"type":"FabricObject","version":"' +
       version +
-      '","originX":"left","originY":"top","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
+      '","originX":"center","originY":"center","left":0,"top":0,"width":0,"height":0,"fill":"rgb(0,0,0)",' +
       '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
       '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
       '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
@@ -294,7 +295,7 @@ describe('Object', () => {
     const augmentedJSON =
       '{"type":"FabricObject","version":"' +
       version +
-      '","originX":"left","originY":"top","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
+      '","originX":"center","originY":"center","left":0,"top":0,"width":122,"height":0,"fill":"rgb(0,0,0)",' +
       '"stroke":null,"strokeWidth":1,"strokeDashArray":[5,2],"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"bevel","strokeUniform":false,"strokeMiterLimit":5,' +
       '"scaleX":1.3,"scaleY":1,"angle":0,"flipX":false,"flipY":true,"opacity":0.88,' +
       '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over",' +
@@ -332,8 +333,8 @@ describe('Object', () => {
     const emptyObjectRepr = {
       version: version,
       type: 'FabricObject',
-      originX: 'left',
-      originY: 'top',
+      originX: 'center',
+      originY: 'center',
       left: 0,
       top: 0,
       width: 0,
@@ -366,8 +367,8 @@ describe('Object', () => {
     const augmentedObjectRepr = {
       version: version,
       type: 'FabricObject',
-      originX: 'left',
-      originY: 'top',
+      originX: 'center',
+      originY: 'center',
       left: 10,
       top: 20,
       width: 30,

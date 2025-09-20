@@ -1,0 +1,22 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`fabric.ObjectGeometry > getCoords with angle 1`] = `
+[
+  Point {
+    "x": 37.269015493552736,
+    "y": 19.960491863365768,
+  },
+  Point {
+    "x": 48.545326942983635,
+    "y": 24.064733583273792,
+  },
+  Point {
+    "x": 42.730984506447264,
+    "y": 40.03950813663423,
+  },
+  Point {
+    "x": 31.454673057016365,
+    "y": 35.93526641672621,
+  },
+]
+`;
