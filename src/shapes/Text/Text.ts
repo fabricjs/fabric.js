@@ -1875,7 +1875,8 @@ export class FabricText<
     } = { ...options, ...parsedAttributes };
 
     const textContent = (element.textContent || '')
-      .replace(/^\s+|\s+$|\n+/g, '')
+      .replace(/\n+/g, ' ')
+      .trim()
       .replace(/\s+/g, ' ');
 
     // this code here is probably the usual issue for SVG center find
