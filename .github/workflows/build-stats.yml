@@ -64,7 +64,7 @@ jobs:
               original: JSON.parse('${{ steps.upstream_stats.outputs.result }}'),
             });
       - name: Comment on PR for build stats
-        uses: edumserrano/find-create-or-update-comment@82880b65c8a3a6e4c70aa05a204995b6c9696f53 # v3.0.0
+        uses: ./.github/actions/find-create-or-update-comment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ steps.prnumber.outputs.pr_number }}
