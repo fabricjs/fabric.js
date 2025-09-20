@@ -3,6 +3,7 @@
 ## [next]
 
 - ci(): Foked the action find-create-update-comment in order to pin sha(s) [#10742](https://github.com/fabricjs/fabric.js/pull/10742)
+- fix(): After executing loadFromJSON, it unexpectedly adds an objects property to the canvas.
 - fix(): Incorrect sha for commenting action
 - fix(IText): A form field element has neither an id nor a name attribute. [#10172](https://github.com/fabricjs/fabric.js/pull/10172)
 - docs(): change CN comment to EN [#10727](https://github.com/fabricjs/fabric.js/pull/10727)
