@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): fix artifact poisoning in action build-stats [#10744](https://github.com/fabricjs/fabric.js/pull/10744)
 - ci(): Fix CWE-829 in the coverage report action [#10743](https://github.com/fabricjs/fabric.js/pull/10743)
 - ci(): Foked the action find-create-update-comment in order to pin sha(s) [#10742](https://github.com/fabricjs/fabric.js/pull/10742)
 - fix(): After executing loadFromJSON, it unexpectedly adds an objects property to the canvas.
