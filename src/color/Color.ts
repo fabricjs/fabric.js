@@ -210,7 +210,8 @@ export class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromRgb(color: string): TRGBAColorSource | undefined {
-    const match = color.match(reRGBa());
+    const cleanedColor = color.replace(/\s+/g, ' ');
+    const match = cleanedColor.match(reRGBa());
     if (match) {
       const [r, g, b] = match.slice(1, 4).map((value) => {
         const parsedValue = parseFloat(value);
@@ -248,7 +249,8 @@ export class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color: string): TRGBAColorSource | undefined {
-    const match = color.match(reHSLa());
+    const cleanedColor = color.replace(/\s+/g, ' ');
+    const match = cleanedColor.match(reHSLa());
     if (!match) {
       return;
     }
