@@ -4,6 +4,8 @@ on:
   pull_request:
     branches: [master, 6.x]
     types: [opened, synchronize, reopened, edited]
+permissions:
+  contents: read
 jobs:
   changelog-creation:
     runs-on: ubuntu-24.04
