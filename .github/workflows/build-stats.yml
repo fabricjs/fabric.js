@@ -55,7 +55,7 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync(process.ENV.minified).size, bundled: fs.statSync(process.ENV.bundled).size } }
+              size: { fabric: { minified: fs.statSync(process.env.minified).size, bundled: fs.statSync(process.env.bundled).size } }
             });
       - name: process
         id: stats-message
@@ -68,8 +68,8 @@ jobs:
           script: |
             const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
             return await run_simple({
-              modified: JSON.parse(process.ENV.pr_stats),
-              original: JSON.parse(process.ENV.upstream_stats),
+              modified: JSON.parse(process.env.pr_stats),
+              original: JSON.parse(process.env.upstream_stats),
             });
       - name: Comment on PR for build stats
         uses: ./.github/actions/find-create-or-update-comment
