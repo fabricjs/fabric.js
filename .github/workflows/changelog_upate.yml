@@ -33,6 +33,10 @@ jobs:
         with:
           ref: ${{ steps.changelog_data.outputs.pr_ref }}
           repository: ${{ steps.changelog_data.outputs.full_name }}
+          sparse-checkout: |
+            ${{ env.file }}
+            .prettierrc
+            .prettierignore
       - name: Update ${{ env.file }} from PR title
         id: update
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
@@ -78,7 +82,6 @@ jobs:
       - name: Commit & Push
         if: fromJson(steps.update.outputs.result)
         run: |
-          npm ci
           npx prettier --write ${{ env.file }}
           git diff
           git config user.name github-actions[bot]
