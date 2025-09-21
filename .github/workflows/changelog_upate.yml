@@ -50,9 +50,9 @@ jobs:
             const fs = require('fs');
             const file = 'CHANGELOG.md';
             let content = fs.readFileSync(file).toString();
-            const title = `[${process.ENV.next_version}]`;
-            const log = process.ENV.log;
-            const prev_log = process.ENV.prev_log;
+            const title = `[${process.env.next_version}]`;
+            const log = process.env.log;
+            const prev_log = process.env.prev_log;
             const prev_log_exists = prev_log && content.includes(prev_log);
             const log_exists = log && content.includes(log);
             let modified = false;

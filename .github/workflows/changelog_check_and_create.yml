@@ -41,8 +41,8 @@ jobs:
           result-encoding: string
           script: |
             return JSON.stringify({
-              log: `- ${process.ENV.title} ${process.ENV.link}`,
-              prev_log: !!'${process.ENV.prev_title}' ? `- ${process.ENV.prev_title} ${process.ENV.link}` : '',
+              log: `- ${process.env.title} ${process.env.link}`,
+              prev_log: !!'${process.env.prev_title}' ? `- ${process.env.prev_title} ${process.env.link}` : '',
               pr_ref: `${{ github.event.pull_request.head.ref }}`,
               full_name: `${{ github.event.pull_request.head.repo.full_name }}`
             });
