@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(): Simplify some regexes in order to avoid slowness with craft bad string [#10746](https://github.com/fabricjs/fabric.js/pull/10746)
+- fix(): CWE-1333 CWE-400 CWE-730 Simplify some regexes in order to avoid slowness with craft bad string [#10746](https://github.com/fabricjs/fabric.js/pull/10746)
 - fix(): CWE-1333 CWE-400 CWE-730 in Text.ts regex [#10745](https://github.com/fabricjs/fabric.js/pull/10745)
 - ci(): fix CWE-829 in action build-stats [#10744](https://github.com/fabricjs/fabric.js/pull/10744)
 - ci(): Fix CWE-829 in the coverage report action [#10743](https://github.com/fabricjs/fabric.js/pull/10743)
