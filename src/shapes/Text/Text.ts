@@ -48,6 +48,8 @@ import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
 import { Point } from '../../Point';
+import { normalizeWs } from '../../util/internals/normalizeWhiteSpace';
+
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -1875,9 +1877,7 @@ export class FabricText<
       ...restOfOptions
     } = { ...options, ...parsedAttributes };
 
-    const textContent = (element.textContent || '')
-      .replace(/^\s+|\s+$|\n+/g, '')
-      .replace(/\s+/g, ' ');
+    const textContent = normalizeWs(element.textContent || '').trim();
 
     // this code here is probably the usual issue for SVG center find
     // this can later looked at again and probably removed.

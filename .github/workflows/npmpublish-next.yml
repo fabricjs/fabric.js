@@ -4,7 +4,8 @@ on:
     branches:
       - master
     types: [closed]
-
+permissions:
+  contents: read
 jobs:
   publish-npm:
     if: github.event.pull_request.merged == true

@@ -7,7 +7,8 @@ on:
       - 5.x
       - 6.x
     types: [published]
-
+permissions:
+  contents: read
 jobs:
   publish-npm:
     runs-on: ubuntu-24.04
