@@ -4,6 +4,9 @@ on:
     workflows: ['🩺']
     types:
       - completed
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   build-stats:
     env:
@@ -52,18 +55,21 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync('${{ env.minified }}').size, bundled: fs.statSync('${{ env.bundled }}').size } }
+              size: { fabric: { minified: fs.statSync(process.ENV.minified).size, bundled: fs.statSync('${{ env.bundled }}').size } }
             });
       - name: process
         id: stats-message
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        env:
+          pr_stats: ${{ steps.pr_stats.outputs.pr_stats }}
+          upstream_stats: ${{ steps.upstream_stats.outputs.result }}
         with:
           result-encoding: string
           script: |
             const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
             return await run_simple({
-              modified: JSON.parse('${{ steps.pr_stats.outputs.pr_stats }}'),
-              original: JSON.parse('${{ steps.upstream_stats.outputs.result }}'),
+              modified: JSON.parse(process.ENV.pr_stats),
+              original: JSON.parse(process.ENV.upstream_stats),
             });
       - name: Comment on PR for build stats
         uses: ./.github/actions/find-create-or-update-comment
