@@ -1,16 +1,14 @@
 import { ifNaN } from '../util/internals/ifNaN';
 import { capValue } from '../util/misc/capValue';
 
-// Matches strings that end with a percent sign (%)
-const RE_PERCENT = /%$/;
-
 /**
  * Will loosely accept as percent numbers that are not like
  * 3.4a%. This function does not check for the correctness of a percentage
  * but it checks that values that are in theory correct are or arent percentages
  */
 export function isPercent(value: string | null) {
-  return value && RE_PERCENT.test(value) && Number.isFinite(parseFloat(value));
+  // /%$/ Matches strings that end with a percent sign (%)
+  return value && /%$/.test(value) && Number.isFinite(parseFloat(value));
 }
 
 /**

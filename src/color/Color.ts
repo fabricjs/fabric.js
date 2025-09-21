@@ -1,3 +1,4 @@
+import { normalizeWs } from '../util/internals/normalizeWhiteSpace';
 import { radiansToDegrees } from '../util/misc/radiansDegreesConversion';
 import { ColorNameMap } from './color_map';
 import { reHSLa, reHex, reRGBa } from './constants';
@@ -210,8 +211,7 @@ export class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromRgb(color: string): TRGBAColorSource | undefined {
-    const cleanedColor = color.replace(/\s+/g, ' ');
-    const match = cleanedColor.match(reRGBa());
+    const match = normalizeWs(color).match(reRGBa());
     if (match) {
       const [r, g, b] = match.slice(1, 4).map((value) => {
         const parsedValue = parseFloat(value);
@@ -249,8 +249,7 @@ export class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color: string): TRGBAColorSource | undefined {
-    const cleanedColor = color.replace(/\s+/g, ' ');
-    const match = cleanedColor.match(reHSLa());
+    const match = normalizeWs(color).match(reHSLa());
     if (!match) {
       return;
     }
