@@ -55,7 +55,7 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync(process.ENV.minified).size, bundled: fs.statSync('${{ env.bundled }}').size } }
+              size: { fabric: { minified: fs.statSync(process.ENV.minified).size, bundled: fs.statSync(process.ENV.bundled).size } }
             });
       - name: process
         id: stats-message
