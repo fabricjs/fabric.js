@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [master]
     paths-ignore: [CHANGELOG.md]
-
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-24.04

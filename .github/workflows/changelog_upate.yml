@@ -4,6 +4,8 @@ on:
     workflows: ['Check and create Changelog 📋']
     types:
       - completed
+permissions:
+  contents: write
 jobs:
   update_changelog:
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}

@@ -4,6 +4,9 @@ on:
     workflows: ['🧪']
     types:
       - completed
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   coverage:
     env:
