@@ -44,7 +44,7 @@ jobs:
           script: |
             const fs = require('fs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync(process.ENV.minified).size, bundled: fs.statSync(process.ENV.bundled).size } }
+              size: { fabric: { minified: fs.statSync(process.env.minified).size, bundled: fs.statSync(process.env.bundled).size } }
             });
       - name: Create the artifact for stats
         run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
