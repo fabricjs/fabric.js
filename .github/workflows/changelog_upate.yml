@@ -8,8 +8,6 @@ jobs:
   update_changelog:
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-24.04
-    env:
-      file: CHANGELOG.md
     steps:
       - name: 'Create an empty tmp directory'
         run: |
@@ -34,10 +32,10 @@ jobs:
           ref: ${{ steps.changelog_data.outputs.pr_ref }}
           repository: ${{ steps.changelog_data.outputs.full_name }}
           sparse-checkout: |
-            ${{ env.file }}
+            CHANGELOG.md
             .prettierrc
             .prettierignore
-      - name: Update ${{ env.file }} from PR title
+      - name: Update CHANGELOG.md from PR title
         id: update
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         env:
@@ -48,7 +46,7 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
-            const file = process.ENV.file;
+            const file = 'CHANGELOG.md';
             let content = fs.readFileSync(file).toString();
             const title = `[${process.ENV.next_version}]`;
             const log = process.ENV.log;
@@ -82,10 +80,10 @@ jobs:
       - name: Commit & Push
         if: fromJson(steps.update.outputs.result)
         run: |
-          npx prettier --write $file
+          npx prettier --write CHANGELOG.md
           git diff
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
-          git add $file
-          git commit -m "update $file"
+          git add CHANGELOG.md
+          git commit -m "update CHANGELOG.md"
           git push

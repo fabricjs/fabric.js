@@ -8,7 +8,6 @@ jobs:
   changelog-creation:
     runs-on: ubuntu-24.04
     env:
-      file: CHANGELOG.md
       link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
       title: ${{ github.event.pull_request.title }}
       prev_title: ${{ github.event.changes.title.from }}
@@ -17,7 +16,7 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
-      - name: Check ${{ env.file }}
+      - name: Check CHANGELOG.md
         id: check
 
         run: |
@@ -25,11 +24,11 @@ jobs:
             https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
             | jq -r '.[].filename')
           echo "Changed files: $files"
-          if echo "$files" | grep -q "^$file$"; then
-            echo "OK '$file' was modified"
+          if echo "$files" | grep -q "^CHANGELOG.md$"; then
+            echo "OK 'CHANGELOG.md' was modified"
             echo "changelog_updated=true" >> $GITHUB_OUTPUT
           else
-            echo "KO '$file' was NOT modified"
+            echo "KO 'CHANGELOG.md' was NOT modified"
             echo "changelog_updated=false" >> $GITHUB_OUTPUT
           fi
       - name: Create and upload the changelog line
