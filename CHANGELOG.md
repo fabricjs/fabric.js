@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @babel/core from 7.28.3 to 7.28.4 [#10753](https://github.com/fabricjs/fabric.js/pull/10753)
 - fix(): Fix some weaknesses in the changelog-update action ( various CWE ) [#10747](https://github.com/fabricjs/fabric.js/pull/10747)
 - fix(): CWE-1333 CWE-400 CWE-730 Simplify some regexes in order to avoid slowness with craft bad string [#10746](https://github.com/fabricjs/fabric.js/pull/10746)
 - fix(): CWE-1333 CWE-400 CWE-730 in Text.ts regex [#10745](https://github.com/fabricjs/fabric.js/pull/10745)
