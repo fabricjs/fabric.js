@@ -1,73 +1,82 @@
-# 🎉 Contributing to Fabric 🥳
+# Contributing to Fabric
+
+First of all thank you for your interest in contributing. 🙏
 
 This guide covers all you need to know from the start, for a first time contributor, advancing to the more advanced topics as you continue reading.
 
-## 🧐 Questions?!?
+## What is a contribution, who is a conributor
 
-Questions are legit but that doesn't make them bug reports...\
+A Contributor is anyone who simply adds to the project, without any formal membership. Contributions do not need to be code. Contributions can be code, docs, issue triaging, discussions, ideas.
+
+## Questions?
+
+Questions are legit but that doesn't make them bug reports.\
 Please refer to available resources (read below) and refrain from opening an issue in such a case.
 
 To find an answer, first [search the repository][search_issues]. It contains a lot of useful threads.
 
-Questions might inspire you to [improve the docs](#-improving-docs) 🌈 Please do 🌟.
+If you find an answer in the issue tracker or in the discussions, but not in the docs, you may consider [improving the docs](#improving-docs). Docs contributions are really appreciated above anything else
 
-Demos and examples 🤓 can be found on [fabricjs.com][website], [`jsfiddle`][jsfiddles], [`codepen.io`][codepens] and more.
+Demos and examples can be found on [fabricjs.com][website], [`jsfiddle`][jsfiddles], [`codepen.io`][codepens] and more.
 
-## 🏷️ Issue Tracker
+## Issue Tracker
 
 - **Before You Begin** 🎬
-  - 📌 Make sure you didn't fall into a known [**GOTCHA**][gotchas].
-  - 🔎 [**Searching**][search_issues] for existing issues and discussions is
-    🔋 **VITAL** in order to keep the community in a good state, prevent spamming 👎 and become a skilled fabric dev 🦉.
-- **Fill out the [🐛 report][bug_report] with care**, it is there for a reason.
+  - Make sure you didn't fall into a known [**GOTCHA**][gotchas].
+  - [**Searching**][search_issues] for existing issues and discussions is
+    **VITAL** in order to keep the community in a good state, prevent spamming and avoid consuming comunity time.
+    If you need to open a new issue then:
+- **Fill out the [bug report][bug_report] with care**, it is there for a reason.
 - The **Title** must be informative, short and 🧿 to the point.
 - **Description**
   - Describe the issue making sure you are very clear.
-  - Add (📎) logs, screenshots or videos if that makes sense.
-  - Make an effort explaining yourself!
-  - A good description has been read at least **3** times **before submitting**.
+  - Add logs, screenshots or videos if that makes sense.
+  - Make an effort explaining yourself. Maintainers are busy, don't waste on action on your issue for just having them ask for more details. Put them in condition to answer immediately.
+  - Re read your description multiple times **before submitting**.
 - **Test Case**
   - Create a minimal and immediate test case, reproducing the bug.
   - Add relevant explanations.
   - It should be extremely **easy** for someone to understand your bug and **fast** to reproduce it. **Don't leave it to us to do your part**.
   - Bug templates can be found within a bug report.
 - Specify which **version** of Fabric.js you are using.
-- **Upgrade** to the latest version before proceeding, your 🐛 may have turned into a 🦋.
+- Verify your bug also on the latest version before submitting it.
 
-**These are minimal requirements. Without them issues shall be ⛔.**
+**These are minimal requirements. Without them issues will be closed.**
 
-If it's not a bug **OR** if you're unsure, start a 🤠 [discussion][discussions].
+If it's not a bug **OR** if you're unsure, start a [discussion][discussions].
 
-Check out [**Helping Out**](#%EF%B8%8F-helping-out).
+Check out [**Helping Out**](#helping-out).
 
 ---
 
-## 🔦 Fixing typos
+## Fixing typos is appreciated
 
-Typos are a nasty thing.\
-Though it may seem insignificant, typo fixes are appreciated!\
+Typos happens.\
+Though it may seem insignificant, typo fixes are appreciated!
 It's a good and simple way to start contributing.
 
-## 🔎 Improving Docs
+## Improving Docs
 
 Improving **DOCS** is **SUPER** important for everyone.\
-Even if it's a small fix it is valuable 💎... **don't hesitate**!
+Even if it's a small fix it is valuable **don't hesitate**!
 
-We plan on building a brand new website, stay tuned.
+We have a website that is easy to contribute to.
 
-## ❤️ Helping Out
+Adding demos is also a great contribution.
+
+## Helping Out
 
 Answering questions and addressing issues, as well as fixing and adding types (see [Pull Requests](#-pull-requests)), are great ways to start contributing to fabric.
 
 - [Issues][issues]
 - [Discussions][discussions]
 
-### 🎮 Adding a DEMO (currently not possible)
+## Fixing Bugs
 
-**New website is under construction. Contributions are welcome.**
-
-Take a look at an existing [demo file][demo_file].\
-Create a new file in the same directory (`posts/demos/_posts`) and follow [**developing the website**](#fabricjscom-deprecated).
+- Open an [issue](#-issue-tracker), if there isn't any, addressing the bug.
+- Fix the bug, see [Developing](#-developing-).
+- Add [tests](#-testing).
+- [PR](#pull-requests)
 
 ### ~~`fabricjs.com`~~ (currently not possible)
 
@@ -77,17 +86,10 @@ To start the dev server run `npm start:dev` inside the `fabricjs.com` directory 
 
 If you are working on windows, check out [`jekyll` docs][jekyll] for further instructions or use [WSL][wsl].
 
-## 🐛 Fixing Bugs
+## Pull Requests
 
-- Open an [issue](#-issue-tracker), if there isn't any, addressing the bug.
-- Fix the bug, see [Developing](#-developing-).
-- Add [tests](#-testing).
-- [PR](#-pull-requests)
-
-## 🚀 Pull Requests
-
-Fabric is an open source project 🦄 and as such depends on the **genuine effort** of individuals and the community as a whole.
-**Join Us** to make Fabric better 🌺 .
+Fabric is an open source project and as such depends on the **genuine effort** of individuals and the community as a whole.
+**Join Us** to make Fabric better.
 
 ### Getting Started
 
@@ -201,7 +203,7 @@ If you need to change test config ask for guidance.
 
 ---
 
-## 🚧🎢 Developing 💡✨
+## Developing
 
 ### Getting Started
 
