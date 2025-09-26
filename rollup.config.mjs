@@ -52,7 +52,7 @@ function onwarn(warning, warn) {
       !warning.message.includes('sourcemap')) ||
     warning.code === 'CIRCULAR_DEPENDENCY'
   ) {
-    console.error(redBright(String(warning)));
+    console.error(redBright(warning));
     if (process.env.CI) {
       throw Object.assign(new Error(), warning);
     }
