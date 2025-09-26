@@ -3,6 +3,25 @@
 ## [next]
 
 - chore(deps): bump the npm_and_yarn group across 2 directories with 2 updates [#10734](https://github.com/fabricjs/fabric.js/pull/10734)
+- chore(deps-dev): bump @babel/core from 7.28.3 to 7.28.4 [#10753](https://github.com/fabricjs/fabric.js/pull/10753)
+- chore(): remove chalk [#10758](https://github.com/fabricjs/fabric.js/pull/10758)
+- chore(deps-dev): bump commander from 14.0.0 to 14.0.1 [#10754](https://github.com/fabricjs/fabric.js/pull/10754)
+- chore(deps-dev): bump chalk from 5.6.0 to 5.6.2 [#10752](https://github.com/fabricjs/fabric.js/pull/10752)
+- fix(): Fix some weaknesses in the changelog-update action ( various CWE ) [#10747](https://github.com/fabricjs/fabric.js/pull/10747)
+- fix(): CWE-1333 CWE-400 CWE-730 Simplify some regexes in order to avoid slowness with craft bad string [#10746](https://github.com/fabricjs/fabric.js/pull/10746)
+- fix(): CWE-1333 CWE-400 CWE-730 in Text.ts regex [#10745](https://github.com/fabricjs/fabric.js/pull/10745)
+- ci(): fix CWE-829 in action build-stats [#10744](https://github.com/fabricjs/fabric.js/pull/10744)
+- ci(): Fix CWE-829 in the coverage report action [#10743](https://github.com/fabricjs/fabric.js/pull/10743)
+- ci(): Foked the action find-create-update-comment in order to pin sha(s) [#10742](https://github.com/fabricjs/fabric.js/pull/10742)
+- fix(): After executing loadFromJSON, it unexpectedly adds an objects property to the canvas.
+- fix(): Incorrect sha for commenting action
+- fix(IText): A form field element has neither an id nor a name attribute. [#10172](https://github.com/fabricjs/fabric.js/pull/10172)
+- docs(): change CN comment to EN [#10727](https://github.com/fabricjs/fabric.js/pull/10727)
+- chore(): Remove paths for codeQL let it scan all the repo [#10738](https://github.com/fabricjs/fabric.js/pull/10738)
+- chore(): Pin all GitHub Actions to commit SHAs for security compliance [#10739](https://github.com/fabricjs/fabric.js/pull/10739)
+- chore(deps-dev): bump es-toolkit from 1.39.7 to 1.39.10 [#10731](https://github.com/fabricjs/fabric.js/pull/10731)
+- chore(deps-dev): bump serve from 14.2.4 to 14.2.5 [#10730](https://github.com/fabricjs/fabric.js/pull/10730)
+- Update license to include 2016–2025 Fabric.js contributors [#10726](https://github.com/fabricjs/fabric.js/pull/10726)
 - chore(deps-dev): bump @eslint/js from 9.34.0 to 9.35.0 [#10729](https://github.com/fabricjs/fabric.js/pull/10729)
 - chore(): Format dependabot.yml with Prettier to ensure consistent code style [#10733](https://github.com/fabricjs/fabric.js/pull/10733)
 - doc: Repair broken link in docs by targeting all demo and samples pages in old fabric docs. [#10723](https://github.com/fabricjs/fabric.js/pull/10723)

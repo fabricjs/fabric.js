@@ -4,18 +4,21 @@ on:
   pull_request:
     branches: [master, 6.x]
     types: [opened, synchronize, reopened, edited]
+permissions:
+  contents: read
 jobs:
   changelog-creation:
     runs-on: ubuntu-24.04
     env:
-      file: CHANGELOG.md
       link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
+      title: ${{ github.event.pull_request.title }}
+      prev_title: ${{ github.event.changes.title.from }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: 0
-      - name: Check ${{ env.file }}
+      - name: Check CHANGELOG.md
         id: check
 
         run: |
@@ -23,23 +26,23 @@ jobs:
             https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
             | jq -r '.[].filename')
           echo "Changed files: $files"
-          if echo "$files" | grep -q "^${{ env.file }}$"; then
-            echo "OK '${{ env.file }}' was modified"
+          if echo "$files" | grep -q "^CHANGELOG.md$"; then
+            echo "OK 'CHANGELOG.md' was modified"
             echo "changelog_updated=true" >> $GITHUB_OUTPUT
           else
-            echo "KO '${{ env.file }}' was NOT modified"
+            echo "KO 'CHANGELOG.md' was NOT modified"
             echo "changelog_updated=false" >> $GITHUB_OUTPUT
           fi
       - name: Create and upload the changelog line
         id: changelog_string
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        uses: actions/github-script@v6
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
           result-encoding: string
           script: |
             return JSON.stringify({
-              log: `- ${{ github.event.pull_request.title }} ${{ env.link }}`,
-              prev_log: !!'${{ github.event.changes.title.from }}' ? `- ${{ github.event.changes.title.from }} ${{ env.link }}` : '',
+              log: `- ${process.env.title} ${process.env.link}`,
+              prev_log: !!'${process.env.prev_title}' ? `- ${process.env.prev_title} ${process.env.link}` : '',
               pr_ref: `${{ github.event.pull_request.head.ref }}`,
               full_name: `${{ github.event.pull_request.head.repo.full_name }}`
             });
@@ -48,7 +51,7 @@ jobs:
         run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
       - name: Upload changelog artifact
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: changelog_artifact
           path: ./changelog_artifact.txt

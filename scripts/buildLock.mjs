@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { cyanBright } from './colors.mjs';
 import fs from 'fs-extra';
 import moment from 'moment';
 import path from 'node:path';
@@ -40,7 +40,7 @@ export function isLocked() {
 export function awaitBuild() {
   return new Promise((resolve) => {
     if (isLocked()) {
-      console.log(chalk.cyanBright('> waiting for build to finish...'));
+      console.log(cyanBright('> waiting for build to finish...'));
       const watcher = subscribe((locked) => {
         if (!locked) {
           watcher.close();

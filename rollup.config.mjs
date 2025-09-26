@@ -3,7 +3,7 @@ import terser from '@rollup/plugin-terser';
 import ts from '@rollup/plugin-typescript';
 import { babel } from '@rollup/plugin-babel';
 import path from 'path';
-import chalk from 'chalk';
+import { redBright } from './scripts/colors.mjs';
 // import dts from "rollup-plugin-dts";
 
 const splitter = /\n|\s|,/g;
@@ -52,7 +52,7 @@ function onwarn(warning, warn) {
       !warning.message.includes('sourcemap')) ||
     warning.code === 'CIRCULAR_DEPENDENCY'
   ) {
-    console.error(chalk.redBright(warning));
+    console.error(redBright(warning));
     if (process.env.CI) {
       throw Object.assign(new Error(), warning);
     }

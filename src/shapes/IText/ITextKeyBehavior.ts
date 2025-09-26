@@ -71,6 +71,7 @@ export abstract class ITextKeyBehavior<
       spellcheck: 'false',
       'data-fabric': 'textarea',
       wrap: 'off',
+      name: 'fabricTextarea',
     }).map(([attribute, value]) => textarea.setAttribute(attribute, value));
     const { top, left, fontSize } = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
