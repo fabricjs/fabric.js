@@ -106,6 +106,11 @@ Respond to pull requests by reviewing code, testing manually, and providing appr
 Expected to be responsive to review requests (inactivity for more than 1 month may result in falling back to triager until active again)
 Mentor contributors and reviewers
 
+### The process of becoming an Approver
+
+If you are a Triager, self nominate yourself.
+As of today ( sept 2025 ) clear project goals and guidelines are not written nor correctly nor in stone, so in practice we are not ready to give anyone the Approver role. There will be an effort to put these down in writing sooner than later.
+
 ## Maintainer
 
 For now there is one maintainer. Andrea Bogazzi.
