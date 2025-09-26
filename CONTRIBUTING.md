@@ -112,10 +112,6 @@ It is more than likely you will be requested to change stuff and refine your wor
 
 We use Vitest and Playwright.
 
-[![🩺](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
-[![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
-[![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
-
 | Suite                                                                                                         | unit (node)                                      | e2e (browser)                                                                        |
 | ------------------------------------------------------------------------------------------------------------- | :----------------------------------------------- | :----------------------------------------------------------------------------------- |
 | Framework                                                                                                     | [`vitest`][vitest]                               | [`playwright`][playwright]                                                           |
@@ -126,74 +122,13 @@ We use Vitest and Playwright.
 | Test Spec                                                                                                     |                                                  | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br> |
 | Outputs                                                                                                       | Snapshots next to the test file                  | - Snapshots next to the test file <br>- `e2e/test-report`<br>- `e2e/test-results`    |
 
-### Legacy Test Suite
-
-We **discourage** writing new tests in the legacy suite and **encourage** migrating failing tests to the new suite.
-However, it is not carved in stone.
-
-The test suites use [`QUnit`][qunit] for assertions and [`testem`][testem] for serving the browser tests.
-
-- `unit` tests: test logic and state
-- `visual` tests: test visual outcome against image refs located at `test/visual/golden`
-
-#### Getting Started
-
-- Build and watch for changes
-  ```bash
-  npm run build -- -f -w
-  ```
-- Run the _legacy_ test suite on `chrome` (many tests are skipped on `node`)
-  ```bash
-  npm test -- -a -c chrome
-  ```
-- Handle failing tests
-  - Fix logic
-  - If needed, alter tests with **caution**
-  - Rerun failing tests
-    - Save time by rerunning failing tests only
-      - Select failing test files
-        ```bash
-        npm test -- -c chrome
-        ```
-      - **OR** launch the browser test suite in _dev mode_ to watch for test changes
-        ```bash
-        npm test -- -c chrome --dev -l
-        ```
-    - In case of failing visual tests, there are 2 options to view visual diffs (in order to understand what is wrong)
-      - Testing in _visual debug mode_ is comfortable when using with `Github Desktop` to view the diffs since refs will be overwritten (rerunning tests will use the overwritten refs so be cautious)
-        ```bash
-        npm test -- -d -c chrome
-        ```
-      - Launching the browser test suite
-        ```bash
-        npm test -- -c chrome --dev -l
-        ```
-      - Take into account that different environments produce different outputs so it is advised to run both in `chrome` and `node`.
-      - Committing refs is done **ONLY** with `chrome` output.
-    - When you are done, rerun the entire test suit to verify all tests pass.
-    - If you are submitting a PR, visit the PR page on github to see all checks have passed (different platforms and config are covered by the checks).
-- Refer to the command docs
-  ```bash
-  npm test -- -h
-  ```
-
-#### Adding Tests
-
-Add tests to relevant files or add new files when necessary under `test/unit` or `test/visual`.
-
-- [`unit` test example][unit_test]
-- [`visual` test example][visual_test]
-
-If you need to change test config ask for guidance.
-
----
-
 ## Developing
 
 ### Getting Started
 
-1. 🍴 Fork and clone 💾 the repository
-1. Install dependencies 🕹️ `npm i --include=dev`
+0. You need to be comfortable with git
+1. Fork and clone the repository
+2. Install dependencies `npm i --include=dev`
 
 ### Starting an App
 
@@ -201,6 +136,8 @@ If you need to change test config ask for guidance.
 npm start <template>
 npm start -- --help
 ```
+
+I use `npm start vanilla` for a simple html page with a fabric canvas where i can test some changes.
 
 You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
 
@@ -221,7 +158,7 @@ You can actively develop fabric online using [Github Codespaces][github_codespac
   `A service is available on port ...` popups will show up.
 - Codesandbox: _available soon_.
 
-### 🔮 Symlinking
+### Symlinking
 
 Establish symlinking to work with a local version on separate projects.
 
@@ -256,8 +193,6 @@ Don't forget to unlink the package once you're done.
 [vitest]: https://vitest.dev/
 [qunit]: https://qunitjs.com/
 [testem]: https://github.com/testem/testem
-[unit_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/unit/point.js#L227-L237
-[visual_test]: https://github.com/fabricjs/fabric.js/blob/93dd2dcca705a4b481fbc9982da4952ef5b4ed1d/test/visual/generic_rendering.js#L44-L67
 [github_codespaces]: https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530
 [gitpod]: https://gitpod.io/from-referrer/
 [npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
