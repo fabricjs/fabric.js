@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore() Revisit and reduce conribution guidelines, try to streamline things [#10759](https://github.com/fabricjs/fabric.js/pull/10759)
 - chore(deps-dev): bump commander from 14.0.0 to 14.0.1 [#10754](https://github.com/fabricjs/fabric.js/pull/10754)
 - chore(deps-dev): bump chalk from 5.6.0 to 5.6.2 [#10752](https://github.com/fabricjs/fabric.js/pull/10752)
 - fix(): Fix some weaknesses in the changelog-update action ( various CWE ) [#10747](https://github.com/fabricjs/fabric.js/pull/10747)
