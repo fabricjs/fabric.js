@@ -3,6 +3,9 @@
 ## [next]
 
 - chore(deps-dev): bump @babel/core from 7.28.3 to 7.28.4 [#10753](https://github.com/fabricjs/fabric.js/pull/10753)
+- chore(): remove chalk [#10758](https://github.com/fabricjs/fabric.js/pull/10758)
+- chore(deps-dev): bump commander from 14.0.0 to 14.0.1 [#10754](https://github.com/fabricjs/fabric.js/pull/10754)
+- chore(deps-dev): bump chalk from 5.6.0 to 5.6.2 [#10752](https://github.com/fabricjs/fabric.js/pull/10752)
 - fix(): Fix some weaknesses in the changelog-update action ( various CWE ) [#10747](https://github.com/fabricjs/fabric.js/pull/10747)
 - fix(): CWE-1333 CWE-400 CWE-730 Simplify some regexes in order to avoid slowness with craft bad string [#10746](https://github.com/fabricjs/fabric.js/pull/10746)
 - fix(): CWE-1333 CWE-400 CWE-730 in Text.ts regex [#10745](https://github.com/fabricjs/fabric.js/pull/10745)
