@@ -10,6 +10,8 @@ A Contributor is anyone who simply adds to the project, without any formal membe
 
 If you are starting your coding journey, contributions are a good way to learn skills, learn development workflows, meet other developers.
 
+If you find yourself contribuing often you may be interested in the [Contributor ladder](CONTRIBUOR_LADDER.md)
+
 ## Asking Questions
 
 The place for questions is NOT the [Issue Tracker](#Issue-Tracker)
