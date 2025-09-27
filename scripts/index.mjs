@@ -11,7 +11,7 @@
  * Failing to do so will make CI report a false positive 📉.
  */
 
-import chalk from 'chalk';
+import { red, green, yellow, gray, bold } from './colors.mjs';
 import cp from 'child_process';
 import * as commander from 'commander';
 import fs from 'fs-extra';
@@ -35,7 +35,7 @@ function startWebsite() {
     JSON.parse(fs.readFileSync(path.resolve(websiteDir, 'package.json')))
       .name !== 'fabricjs.com'
   ) {
-    console.log(chalk.red('Could not locate fabricjs.com directory'));
+    console.log(red('Could not locate fabricjs.com directory'));
   }
   const args = ['run', 'start:dev'];
 
@@ -44,12 +44,12 @@ function startWebsite() {
   // os.platform() === 'win32' && args.push('--', '--force_polling', '--livereload');
   if (os.platform() === 'win32') {
     console.log(
-      chalk.green(
+      green(
         'Consider using ubuntu on WSL to run jekyll with the following options:',
       ),
     );
-    console.log(chalk.yellow('-- force_polling --livereload'));
-    console.log(chalk.gray('https://github.com/microsoft/WSL/issues/216'));
+    console.log(yellow('-- force_polling --livereload'));
+    console.log(gray('https://github.com/microsoft/WSL/issues/216'));
   }
 
   cp.spawn('npm', args, {
@@ -120,16 +120,14 @@ function exportAssetsToWebsite(options) {
     copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)),
   );
   console.log(
-    chalk.bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`),
+    bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`),
   );
   options.watch &&
     BUILD_SOURCE.forEach((p) => {
       watch(path.resolve(wd, p), () => {
         copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p));
         console.log(
-          chalk.bold(
-            `[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`,
-          ),
+          bold(`[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`),
         );
       });
     });
