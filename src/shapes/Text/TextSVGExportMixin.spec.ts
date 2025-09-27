@@ -41,7 +41,7 @@ describe('TextSvgExport', () => {
     });
 
     it('toSVG', () => {
-      const text = new FabricText('x');
+      const text = new FabricText('x', { left: 10.5, top: 23.1 });
       expect(text.toSVG()).toMatchSVGSnapshot();
       text.set('fontFamily', 'Arial');
       expect(text.toSVG()).toMatchSVGSnapshot();
@@ -50,19 +50,26 @@ describe('TextSvgExport', () => {
     it('toSVG justified', () => {
       const text = new FabricText('xxxxxx\nx y', {
         textAlign: 'justify',
+        left: 60.5,
+        top: 49.32,
       });
 
       expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with multiple spaces', () => {
-      const text = new FabricText('x                 y');
+      const text = new FabricText('x                 y', {
+        left: 105.5,
+        top: 23.1,
+      });
       expect(text.toSVG()).toMatchSVGSnapshot();
     });
 
     it('toSVG with deltaY', () => {
       config.configure({ NUM_FRACTION_DIGITS: 0 });
       const text = new FabricText('xx', {
+        left: 17,
+        top: 23,
         styles: {
           0: {
             1: {
@@ -79,6 +86,29 @@ describe('TextSvgExport', () => {
     it('toSVG with font', () => {
       const text = new FabricText('xxxxxx\nx y', {
         textAlign: 'justify',
+        left: 60.5,
+        top: 49.32,
+        styles: {
+          0: {
+            0: { fontFamily: 'Times New Roman' },
+            1: { fontFamily: 'Times New Roman' },
+            2: { fontFamily: 'Times New Roman' },
+            3: { fontFamily: 'Times New Roman' },
+            4: { fontFamily: 'Times New Roman' },
+            5: { fontFamily: 'Times New Roman' },
+          },
+        },
+      });
+      expect(text.toSVG()).toMatchSVGSnapshot();
+    });
+
+    it('toSVG with font and origins', () => {
+      const text = new FabricText('xxxxxx\nx y', {
+        textAlign: 'justify',
+        originX: 'left',
+        originY: 'top',
+        left: 60.5,
+        top: 49.32,
         styles: {
           0: {
             0: { fontFamily: 'Times New Roman' },
@@ -96,7 +126,7 @@ describe('TextSvgExport', () => {
     it('toSVG with text as a clipPath', () => {
       config.configure({ NUM_FRACTION_DIGITS: 0 });
       const clipPath = new FabricText('text as clipPath');
-      const rect = new Rect({ width: 200, height: 100 });
+      const rect = new Rect({ width: 200, height: 100, left: 100, top: 50 });
       rect.clipPath = clipPath;
       expect(rect.toSVG()).toMatchSVGSnapshot();
     });

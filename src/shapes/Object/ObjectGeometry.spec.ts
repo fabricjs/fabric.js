@@ -1,16 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { StaticCanvas } from '../../canvas/StaticCanvas';
-import { Object } from '../../../fabric';
+import { FabricObject } from './FabricObject';
 import { Point } from '../../Point';
 import { Rect } from '../Rect';
+import { LEFT, TOP } from '../../constants';
 
 describe('fabric.ObjectGeometry', () => {
   const canvas = new StaticCanvas(undefined, { enableRetinaScaling: false });
 
   it('intersectsWithRectangle without zoom', () => {
-    const cObj = new Object({
-      left: 50,
-      top: 50,
+    const cObj = new FabricObject({
+      left: 100,
+      top: 100,
       width: 100,
       height: 100,
     });
@@ -27,7 +28,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('intersectsWithRectangle with zoom', () => {
-    const cObj = new Rect({ left: 10, top: 10, width: 20, height: 20 });
+    const cObj = new Rect({ left: 20, top: 20, width: 20, height: 20 });
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     cObj.setCoords();
@@ -49,18 +50,18 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('intersectsWithObject', () => {
-    const cObj = new Object({
-      left: 50,
-      top: 50,
+    const cObj = new FabricObject({
+      left: 100,
+      top: 100,
       width: 100,
       height: 100,
     });
     cObj.setCoords();
     expect(cObj.intersectsWithObject).toBeTypeOf('function');
 
-    const cObj2 = new Object({
-      left: -150,
-      top: -150,
+    const cObj2 = new FabricObject({
+      left: -50,
+      top: -50,
       width: 200,
       height: 200,
     });
@@ -74,9 +75,9 @@ describe('fabric.ObjectGeometry', () => {
       'cobj2 does intersect with cobj',
     ).toBeTruthy();
 
-    const cObj3 = new Object({
-      left: 392.5,
-      top: 339.5,
+    const cObj3 = new FabricObject({
+      left: 399,
+      top: 356,
       width: 13,
       height: 33,
     });
@@ -90,9 +91,9 @@ describe('fabric.ObjectGeometry', () => {
       'cobj3 does not intersect with cobj (external)',
     ).toBeFalsy();
 
-    const cObj4 = new Object({
-      left: 0,
-      top: 0,
+    const cObj4 = new FabricObject({
+      left: 100,
+      top: 100,
       width: 200,
       height: 200,
     });
@@ -108,7 +109,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isContainedWithinRect', () => {
-    const cObj = new Object({ left: 20, top: 20, width: 10, height: 10 });
+    const cObj = new FabricObject({ left: 25, top: 25, width: 10, height: 10 });
     cObj.setCoords();
     expect(cObj.isContainedWithinRect).toBeTypeOf('function');
 
@@ -127,7 +128,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isContainedWithinRect with zoom', () => {
-    const cObj = new Rect({ left: 20, top: 20, width: 10, height: 10 });
+    const cObj = new Rect({ left: 25, top: 25, width: 10, height: 10 });
     canvas.add(cObj);
     canvas.viewportTransform = [2, 0, 0, 2, 0, 0];
     cObj.setCoords();
@@ -149,9 +150,9 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('intersectsWithRect', () => {
-    const object = new Object({
-      left: 0,
-      top: 0,
+    const object = new FabricObject({
+      left: 20,
+      top: 25,
       width: 40,
       height: 50,
       angle: 160,
@@ -174,7 +175,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('intersectsWithObject', () => {
-    const object = new Object({
+    const object = new FabricObject({
       left: 20,
       top: 30,
       width: 40,
@@ -182,7 +183,7 @@ describe('fabric.ObjectGeometry', () => {
       angle: 230,
       strokeWidth: 0,
     });
-    const object1 = new Object({
+    const object1 = new FabricObject({
       left: 20,
       top: 30,
       width: 60,
@@ -190,7 +191,7 @@ describe('fabric.ObjectGeometry', () => {
       angle: 10,
       strokeWidth: 0,
     });
-    const object2 = new Object({
+    const object2 = new FabricObject({
       left: 25,
       top: 35,
       width: 20,
@@ -198,7 +199,7 @@ describe('fabric.ObjectGeometry', () => {
       angle: 50,
       strokeWidth: 0,
     });
-    const object3 = new Object({
+    const object3 = new FabricObject({
       left: 50,
       top: 50,
       width: 20,
@@ -227,28 +228,28 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isContainedWithinObject', () => {
-    const object = new Object({
+    const object = new FabricObject({
       left: 0,
       top: 0,
       width: 40,
       height: 40,
       angle: 0,
     });
-    const object1 = new Object({
+    const object1 = new FabricObject({
       left: 1,
       top: 1,
       width: 38,
       height: 38,
       angle: 0,
     });
-    const object2 = new Object({
+    const object2 = new FabricObject({
       left: 20,
       top: 20,
       width: 40,
       height: 40,
       angle: 0,
     });
-    const object3 = new Object({
+    const object3 = new FabricObject({
       left: 50,
       top: 50,
       width: 40,
@@ -303,7 +304,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isContainedWithinRect', () => {
-    const object = new Object({
+    const object = new FabricObject({
       left: 40,
       top: 40,
       width: 40,
@@ -328,7 +329,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('containsPoint', () => {
-    const object = new Object({
+    const object = new FabricObject({
       left: 40,
       top: 40,
       width: 40,
@@ -357,9 +358,9 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('setCoords', () => {
-    const cObj = new Object({
-      left: 150,
-      top: 150,
+    const cObj = new FabricObject({
+      left: 200,
+      top: 200,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -379,7 +380,7 @@ describe('fabric.ObjectGeometry', () => {
     expect(cObj.oCoords.mtr.x).toBe(200);
     expect(cObj.oCoords.mtr.y).toBe(110);
 
-    cObj.set('left', 250).set('top', 250);
+    cObj.set('left', 300).set('top', 300);
 
     // coords should still correspond to initial one, even after invoking `set`
     expect(cObj.oCoords.tl.x).toBe(150);
@@ -424,9 +425,9 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('setCoords and aCoords', () => {
-    const cObj = new Object({
-      left: 150,
-      top: 150,
+    const cObj = new FabricObject({
+      left: 200,
+      top: 200,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -513,9 +514,9 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isOnScreen', () => {
-    const cObj = new Object({
-      left: 50,
-      top: 50,
+    const cObj = new FabricObject({
+      left: 100,
+      top: 100,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -536,9 +537,9 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isOnScreen flipped vpt', () => {
-    const cObj = new Object({
-      left: -50,
-      top: -50,
+    const cObj = new FabricObject({
+      left: 0,
+      top: 0,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -559,7 +560,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('transformMatrixKey depends from properties', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       left: -10,
       top: -10,
       width: 30,
@@ -581,7 +582,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('transformMatrixKey depends from originX/originY', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       left: -10,
       top: -10,
       width: 30,
@@ -601,7 +602,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isOnScreen with object that include canvas', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       left: -10,
       top: -10,
       width: canvas.getWidth() + 100,
@@ -622,8 +623,8 @@ describe('fabric.ObjectGeometry', () => {
 
   it('isOnScreen with object that is in top left corner of canvas', () => {
     const cObj = new Rect({
-      left: -46.56,
-      top: -9.23,
+      left: -21.56,
+      top: 14.23,
       width: 50,
       height: 50,
       angle: 314.57,
@@ -641,7 +642,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('calcTransformMatrix with no group', () => {
-    const cObj = new Object({ width: 10, height: 15, strokeWidth: 0 });
+    const cObj = new FabricObject({ width: 10, height: 15, strokeWidth: 0 });
     expect(cObj.calcTransformMatrix).toBeTypeOf('function');
     cObj.top = 0;
     cObj.left = 0;
@@ -651,7 +652,13 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('calcOwnMatrix', () => {
-    const cObj = new Object({ width: 10, height: 15, strokeWidth: 0 });
+    const cObj = new FabricObject({
+      width: 10,
+      height: 15,
+      strokeWidth: 0,
+      originX: LEFT,
+      originY: TOP,
+    });
     expect(cObj.calcOwnMatrix).toBeTypeOf('function');
     cObj.top = 0;
     cObj.left = 0;
@@ -686,7 +693,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('scaleToWidth', () => {
-    const cObj = new Object({ width: 560, strokeWidth: 0 });
+    const cObj = new FabricObject({ width: 560, strokeWidth: 0 });
     expect(cObj.scaleToWidth).toBeTypeOf('function');
     cObj.scaleToWidth(100);
     expect(cObj.getScaledWidth()).toBe(100);
@@ -694,7 +701,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('scaleToWidth with zoom', () => {
-    const cObj = new Object({ width: 560, strokeWidth: 0 });
+    const cObj = new FabricObject({ width: 560, strokeWidth: 0 });
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0],
@@ -707,7 +714,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('scaleToHeight', () => {
-    const cObj = new Object({ height: 560, strokeWidth: 0 });
+    const cObj = new FabricObject({ height: 560, strokeWidth: 0 });
     expect(cObj.scaleToHeight).toBeTypeOf('function');
     cObj.scaleToHeight(100);
     expect(cObj.getScaledHeight()).toBe(100);
@@ -715,7 +722,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('scaleToHeight with zoom', () => {
-    const cObj = new Object({ height: 560, strokeWidth: 0 });
+    const cObj = new FabricObject({ height: 560, strokeWidth: 0 });
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0],
@@ -728,26 +735,26 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('scaleToWidth on rotated object', () => {
-    const obj = new Object({ height: 100, width: 100, strokeWidth: 0 });
+    const obj = new FabricObject({ height: 100, width: 100, strokeWidth: 0 });
     obj.rotate(45);
     obj.scaleToWidth(200);
     expect(Math.round(obj.getBoundingRect().width)).toBe(200);
   });
 
   it('scaleToHeight on rotated object', () => {
-    const obj = new Object({ height: 100, width: 100, strokeWidth: 0 });
+    const obj = new FabricObject({ height: 100, width: 100, strokeWidth: 0 });
     obj.rotate(45);
     obj.scaleToHeight(300);
     expect(Math.round(obj.getBoundingRect().height)).toBe(300);
   });
 
   it('getBoundingRect with absolute coords', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       strokeWidth: 0,
       width: 10,
       height: 10,
-      top: 6,
-      left: 5,
+      top: 11,
+      left: 10,
     });
     let boundingRect;
 
@@ -786,7 +793,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('getBoundingRect', () => {
-    const cObj = new Object({ strokeWidth: 0 });
+    const cObj = new FabricObject({ strokeWidth: 0 });
     let boundingRect;
     expect(cObj.getBoundingRect).toBeTypeOf('function');
 
@@ -798,7 +805,7 @@ describe('fabric.ObjectGeometry', () => {
     expect(boundingRect.height).toBe(0);
     cObj.set('width', 123).setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(boundingRect.left).toBe(0);
+    expect(boundingRect.left).toBe(-61.5);
     expect(boundingRect.top).toBe(0);
     expect(boundingRect.width).toBe(123);
     expect(boundingRect.height).toBe(0);
@@ -806,59 +813,59 @@ describe('fabric.ObjectGeometry', () => {
     cObj.set('height', 167);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(boundingRect.left).toBe(0);
-    expect(Number(Math.abs(boundingRect.top).toFixed(13))).toBe(0);
+    expect(boundingRect.left).toBe(-61.5);
+    expect(boundingRect.top).toBe(-83.5);
     expect(boundingRect.width).toBe(123);
     expect(boundingRect.height).toBe(167);
 
     cObj.scale(2);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(boundingRect.left).toBe(0);
-    expect(Number(Math.abs(boundingRect.top).toFixed(13))).toBe(0);
+    expect(boundingRect.left).toBe(-123);
+    expect(boundingRect.top).toBe(-167);
     expect(boundingRect.width).toBe(246);
     expect(boundingRect.height).toBe(334);
   });
 
-  it('getBoundingRectWithStroke', () => {
-    const cObj = new Object();
+  it('getBoundingRect with stroke', () => {
+    const cObj = new FabricObject();
     let boundingRect;
     expect(cObj.getBoundingRect).toBeTypeOf('function');
 
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(Number(boundingRect.left.toFixed(2))).toBe(0);
-    expect(Number(boundingRect.top.toFixed(2))).toBe(0);
+    expect(Number(boundingRect.left.toFixed(2))).toBe(-0.5);
+    expect(Number(boundingRect.top.toFixed(2))).toBe(-0.5);
     expect(Number(boundingRect.width.toFixed(2))).toBe(1);
     expect(Number(boundingRect.height.toFixed(2))).toBe(1);
 
     cObj.set('width', 123);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(Number(boundingRect.left.toFixed(2))).toBe(0);
-    expect(Number(boundingRect.top.toFixed(2))).toBe(0);
+    expect(Number(boundingRect.left.toFixed(2))).toBe(-62);
+    expect(Number(boundingRect.top.toFixed(2))).toBe(-0.5);
     expect(Number(boundingRect.width.toFixed(2))).toBe(124);
     expect(Number(boundingRect.height.toFixed(2))).toBe(1);
 
     cObj.set('height', 167);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(Number(boundingRect.left.toFixed(2))).toBe(0);
-    expect(Number(boundingRect.top.toFixed(2))).toBe(0);
+    expect(Number(boundingRect.left.toFixed(2))).toBe(-62);
+    expect(Number(boundingRect.top.toFixed(2))).toBe(-84);
     expect(Number(boundingRect.width.toFixed(2))).toBe(124);
     expect(Number(boundingRect.height.toFixed(2))).toBe(168);
 
     cObj.scale(2);
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
-    expect(Number(boundingRect.left.toFixed(2))).toBe(0);
-    expect(Number(boundingRect.top.toFixed(2))).toBe(0);
+    expect(Number(boundingRect.left.toFixed(2))).toBe(-124);
+    expect(Number(boundingRect.top.toFixed(2))).toBe(-168);
     expect(Number(boundingRect.width.toFixed(2))).toBe(248);
     expect(Number(boundingRect.height.toFixed(2))).toBe(336);
   });
 
   it('getScaledWidth', () => {
-    const cObj = new Object();
+    const cObj = new FabricObject();
     expect(cObj.getScaledWidth).toBeTypeOf('function');
     expect(cObj.getScaledWidth()).toBe(0 + cObj.strokeWidth);
     cObj.set('width', 123);
@@ -868,7 +875,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('getScaledHeight', () => {
-    const cObj = new Object({ strokeWidth: 0 });
+    const cObj = new FabricObject({ strokeWidth: 0 });
     expect(cObj.getScaledHeight()).toBe(0);
     cObj.set('height', 123);
     expect(cObj.getScaledHeight()).toBe(123);
@@ -877,12 +884,12 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('scale', () => {
-    const cObj = new Object({ width: 10, height: 15, strokeWidth: 0 });
+    const cObj = new FabricObject({ width: 10, height: 15, strokeWidth: 0 });
     expect(cObj.scale).toBeTypeOf('function');
   });
 
   it('_constrainScale', () => {
-    const cObj = new Object({ width: 10, height: 15, strokeWidth: 0 });
+    const cObj = new FabricObject({ width: 10, height: 15, strokeWidth: 0 });
     expect(cObj._constrainScale).toBeTypeOf('function');
     cObj.set('scaleX', 0);
     expect(cObj.scaleX).toBe(0.0001);
@@ -893,13 +900,13 @@ describe('fabric.ObjectGeometry', () => {
     expect(cObj.scaleY).toBe(3);
   });
 
-  it('getCoords return coordinate of object in canvas coordinate.', () => {
-    const cObj = new Object({
+  it('getCoords return coordinate of object in scene coordinate.', () => {
+    const cObj = new FabricObject({
       width: 10,
       height: 15,
       strokeWidth: 2,
-      top: 30,
-      left: 40,
+      top: 38.5,
+      left: 46,
     });
     const coords = cObj.getCoords();
     expect(coords[0]).toEqual(new Point(40, 30));
@@ -922,13 +929,13 @@ describe('fabric.ObjectGeometry', () => {
     expect(updatedCoords[3]).toEqual(new Point(45, 47));
   });
 
-  it('getCoords return coordinate of object in absolute coordinates and ignore canvas zoom', () => {
-    const cObj = new Object({
+  it('getCoords return coordinate of object in scene coordinates and is not affected by viewport', () => {
+    const cObj = new FabricObject({
       width: 10,
       height: 15,
       strokeWidth: 2,
-      top: 30,
-      left: 40,
+      top: 38.5,
+      left: 46,
     });
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
@@ -942,7 +949,7 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('getCoords with angle', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       width: 10,
       height: 15,
       strokeWidth: 2,
@@ -956,35 +963,16 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(coords[0].x, 'return top left absolute with angle X').toBe(40);
-    expect(coords[1].x, 'return top right absolute with angle X').toBe(
-      51.2763114494309,
-    );
-    expect(coords[2].x, 'return bottom right absolute with angle X').toBe(
-      45.46196901289453,
-    );
-    expect(coords[3].x, 'return bottom left absolute with angle X').toBe(
-      34.18565756346363,
-    );
-    expect(coords[0].y, 'return top left absolute with angle Y').toBe(30);
-    expect(coords[1].y, 'return top right absolute with angle Y').toBe(
-      34.104241719908025,
-    );
-    expect(coords[2].y, 'return bottom right absolute with angle Y').toBe(
-      50.079016273268465,
-    );
-    expect(coords[3].y, 'return bottom left absolute with angle Y').toBe(
-      45.97477455336044,
-    );
+    expect(coords).toMatchSnapshot();
   });
 
   it('getCoords with skewX', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       width: 10,
       height: 15,
       strokeWidth: 2,
       top: 30,
-      left: 40,
+      left: 49,
       skewX: 45,
     });
     // the viewport is non influent.
@@ -993,18 +981,30 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(coords[0].x, 'return top left absolute with skewX X').toBe(40);
-    expect(coords[1].x, 'return top right absolute with skewX X').toBe(69);
-    expect(coords[2].x, 'return bottom absolute right with skewX X').toBe(69);
-    expect(coords[3].x, 'return bottom absolute left with skewX X').toBe(40);
-    expect(coords[0].y, 'return top left absolute with skewX Y').toBe(30);
-    expect(coords[1].y, 'return top right absolute with skewX Y').toBe(30);
-    expect(coords[2].y, 'return bottom absolute right with skewX Y').toBe(47);
-    expect(coords[3].y, 'return bottom absolute left with skewX Y').toBe(47);
+    expect(coords).toMatchInlineSnapshot(`
+      [
+        Point {
+          "x": 34.5,
+          "y": 21.5,
+        },
+        Point {
+          "x": 63.5,
+          "y": 21.5,
+        },
+        Point {
+          "x": 63.5,
+          "y": 38.5,
+        },
+        Point {
+          "x": 34.5,
+          "y": 38.5,
+        },
+      ]
+    `);
   });
 
   it('getCoords with skewY', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       width: 10,
       height: 15,
       strokeWidth: 2,
@@ -1018,18 +1018,30 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(coords[0].x, 'return top left absolute with skewY X').toBe(40);
-    expect(coords[1].x, 'return top right absolute with skewY X').toBe(52);
-    expect(coords[2].x, 'return bottom absolute right with skewY X').toBe(52);
-    expect(coords[3].x, 'return bottom absolute left with skewY X').toBe(40);
-    expect(coords[0].y, 'return top left absolute with skewY Y').toBe(30);
-    expect(coords[1].y, 'return top right absolute with skewY Y').toBe(30);
-    expect(coords[2].y, 'return bottom absolute right with skewY Y').toBe(59);
-    expect(coords[3].y, 'return bottom absolute left with skewY Y').toBe(59);
+    expect(coords).toMatchInlineSnapshot(`
+      [
+        Point {
+          "x": 34,
+          "y": 15.5,
+        },
+        Point {
+          "x": 46,
+          "y": 15.5,
+        },
+        Point {
+          "x": 46,
+          "y": 44.5,
+        },
+        Point {
+          "x": 34,
+          "y": 44.5,
+        },
+      ]
+    `);
   });
 
   it('getCoords with skewY skewX angle', () => {
-    const cObj = new Object({
+    const cObj = new FabricObject({
       width: 10,
       height: 15,
       strokeWidth: 2,
@@ -1045,44 +1057,32 @@ describe('fabric.ObjectGeometry', () => {
       viewportTransform: [2, 0, 0, 2, 35, 25],
     };
     const coords = cObj.getCoords();
-    expect(
-      coords[0].x,
-      'return top left absolute with skewY skewX angle X',
-    ).toBe(40);
-    expect(
-      coords[1].x,
-      'return top right absolute with skewY skewX angle X',
-    ).toBe(40);
-    expect(
-      coords[2].x,
-      'return bottom absolute right with skewY skewX angle X',
-    ).toBe(11);
-    expect(
-      coords[3].x,
-      'return bottom absolute left with skewY skewX angle X',
-    ).toBe(11);
-    expect(
-      coords[0].y,
-      'return top left absolute with skewY skewX angle Y',
-    ).toBe(30);
-    expect(
-      coords[1].y,
-      'return top right absolute with skewY skewX angle Y',
-    ).toBe(58.74315780649914);
-    expect(
-      coords[2].y,
-      'return bottom absolute right with skewY skewX angle Y',
-    ).toBe(58.74315780649914);
-    expect(
-      coords[3].y,
-      'return bottom absolute left with skewY skewX angle Y',
-    ).toBe(30);
+    expect(coords).toMatchInlineSnapshot(`
+      [
+        Point {
+          "x": 54.5,
+          "y": 15.628421096750428,
+        },
+        Point {
+          "x": 54.5,
+          "y": 44.37157890324957,
+        },
+        Point {
+          "x": 25.5,
+          "y": 44.37157890324957,
+        },
+        Point {
+          "x": 25.5,
+          "y": 15.628421096750428,
+        },
+      ]
+    `);
   });
 
   it('isPartiallyOnScreen', () => {
-    const cObj = new Object({
-      left: 50,
-      top: 50,
+    const cObj = new FabricObject({
+      left: 100,
+      top: 100,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -1091,21 +1091,21 @@ describe('fabric.ObjectGeometry', () => {
     canvas.calcViewportBoundaries();
     // @ts-expect-error -- expects Canvas but we are setting StaticCanvas
     cObj.canvas = canvas;
-    cObj.left = -60;
-    cObj.top = -60;
+    cObj.left = -10;
+    cObj.top = -10;
     cObj.setCoords();
     expect(cObj.isPartiallyOnScreen(), 'object is partially onScreen').toBe(
       true,
     );
-    cObj.left = -110;
-    cObj.top = -110;
+    cObj.left = -60;
+    cObj.top = -60;
     cObj.setCoords();
     expect(
       cObj.isPartiallyOnScreen(),
       'object is completely offScreen and not partial',
     ).toBe(false);
-    cObj.left = 45;
-    cObj.top = 45;
+    cObj.left = 95;
+    cObj.top = 95;
     cObj.setCoords();
     expect(
       cObj.isPartiallyOnScreen(),
@@ -1119,9 +1119,9 @@ describe('fabric.ObjectGeometry', () => {
   });
 
   it('isPartiallyOnScreen with object inside and outside of canvas', () => {
-    const cObj = new Object({
-      left: 5,
-      top: 5,
+    const cObj = new FabricObject({
+      left: 55,
+      top: 55,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -1136,8 +1136,8 @@ describe('fabric.ObjectGeometry', () => {
     expect(cObj.isPartiallyOnScreen(), 'object is completely onScreen').toBe(
       false,
     );
-    cObj.left = -20;
-    cObj.top = -20;
+    cObj.left = 60;
+    cObj.top = 60;
     cObj.scaleX = 2;
     cObj.scaleY = 2;
     cObj.setCoords();

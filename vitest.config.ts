@@ -22,7 +22,7 @@ export default defineConfig({
       'test/snapshot-serializers/canvas-rendering-context.ts',
     ],
     setupFiles: ['./vitest.setup.ts'],
-    workspace: [
+    projects: [
       {
         extends: true,
         test: {
