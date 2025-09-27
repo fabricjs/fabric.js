@@ -247,6 +247,15 @@ export interface CanvasOptions
    * @default true
    */
   preserveObjectStacking: boolean;
+
+  /**
+   * Enable double-click to lock the group node. After locking,
+   * you can select the child nodes in the group node,
+   * regardless of whether interative and subTargetCheck are enabled in the group.
+   * @type Boolean
+   * @default
+   */
+  dblClickIsolateObject: boolean;
 }
 
 export type TCanvasOptions = TOptions<CanvasOptions>;
