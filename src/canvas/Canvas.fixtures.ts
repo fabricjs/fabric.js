@@ -1,4 +1,4 @@
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 
 export const EMPTY_JSON = { version: version, objects: [] };
 

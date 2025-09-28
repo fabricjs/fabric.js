@@ -3,7 +3,7 @@ import { Point } from '../Point';
 
 import { describe, expect, it } from 'vitest';
 import { getFabricDocument } from '../env';
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 import { Polygon } from './Polygon';
 import { FabricObject } from './Object/FabricObject';
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
 import { Gradient } from '../gradient';

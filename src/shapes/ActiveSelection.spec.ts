@@ -6,7 +6,7 @@ import { FabricObject } from './Object/FabricObject';
 
 import { afterEach, describe, expect, it, test, vi } from 'vitest';
 import { Rect } from './Rect';
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 
 describe('ActiveSelection', () => {
   const canvas = new Canvas(undefined, {
