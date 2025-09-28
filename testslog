@@ -1,0 +1,1186 @@
+yarn run v1.22.22
+$ vitest --run --project unit-node
+
+ RUN  v3.2.4 /Users/abogazzi/fabric.js
+
+ ❯ |unit-node| src/LayoutManager/LayoutManager.spec.ts (29 tests | 3 failed) 203ms
+   ✓ Layout Manager > should set fit content strategy by default 1ms
+   ✓ Layout Manager > Lifecycle > performLayout with result of true 7ms
+   ✓ Layout Manager > Lifecycle > performLayout with result of false 3ms
+   ✓ Layout Manager > onBeforeLayout > triggers > should subscribe object 1ms
+   ✓ Layout Manager > onBeforeLayout > triggers > a subscribed object should trigger layout 7ms
+   ✓ Layout Manager > onBeforeLayout > triggers and event subscriptions > initialization trigger should subscribe targets and call target hooks 2ms
+   ✓ Layout Manager > onBeforeLayout > triggers and event subscriptions > object removed trigger should unsubscribe targets and call target hooks 1ms
+   ✓ Layout Manager > onBeforeLayout > triggers and event subscriptions > object added trigger should subscribe targets and call target hooks 1ms
+   ✓ Layout Manager > onBeforeLayout > passing deep should layout the entire tree 8ms
+   ✓ Layout Manager > getLayoutResult > 'initialization' trigger 2ms
+   ✓ Layout Manager > getLayoutResult > 'imperative' trigger 1ms
+   × Layout Manager > commitLayout > initialization trigger with {} should set size and position 8ms
+     → expected 2nd "set" call to have been called with [ { left: +0, top: +0 } ]
+   × Layout Manager > commitLayout > initialization trigger with { x: 10 } should set size and position 2ms
+     → expected 2nd "set" call to have been called with [ { left: 10, top: +0 } ]
+   × Layout Manager > commitLayout > initialization trigger with { y: 10 } should set size and position 1ms
+     → expected 2nd "set" call to have been called with [ { left: +0, top: 10 } ]
+   ✓ Layout Manager > commitLayout > initialization trigger with { x: 10, y: 10 } should set size and position 1ms
+   ✓ Layout Manager > commitLayout > non initialization trigger should set size, position and invalidate target 1ms
+   ✓ Layout Manager > onAfterLayout > should call target hooks with bubbling true 3ms
+   ✓ Layout Manager > onAfterLayout > should call target hooks with bubbling false 1ms
+   ✓ Layout Manager > onAfterLayout > bubbling 7ms
+   ✓ Layout Manager > onAfterLayout > fires canvas events for a perform layout 114ms
+   ✓ Layout Manager > onAfterLayout > fires canvas events for a perform layout deep: true 11ms
+   ✓ Layout Manager > Group initial layout > fit content layout should ignore size passed in options 0ms
+   ✓ Layout Manager > Group initial layout > should subscribe objects on initialization 2ms
+   ✓ Layout Manager > Group initial layout > fromObject restore > Fitcontent layout > should subscribe objects 5ms
+   ✓ Layout Manager > Group initial layout > fromObject restore > FixedLayout layout > should subscribe objects 6ms
+   ✓ Layout Manager > Group initial layout > fromObject restore > ClipPathLayout layout > should subscribe objects 5ms
+   ✓ Layout Manager > Group initial layout > initialization edge case, with specified layoutManager true 0ms
+   ✓ Layout Manager > Group initial layout > initialization edge case, with specified layoutManager false 0ms
+   ✓ Layout Manager > Group initial layout > fixed layout should respect size passed in options 0ms
+ ❯ |unit-node| src/canvas/SelectableCanvas.spec.ts (31 tests | 2 failed) 209ms
+   × Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area 125ms
+     → expected true to be false // Object.is equality
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with rotation 3ms
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with rotation and scaling 3ms
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with rotation and scaling and the strokeWidth 2ms
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with rotation and scaling and the strokeWidth and strokeUniform 2ms
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with rotation and scaling and the strokeWidth and strokeUniform and padding 2ms
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with rotation and scaling and the strokeWidth and padding 2ms
+   ✓ Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, with the strokeWidth and padding 2ms
+   × Selectable Canvas > _pointIsInObjectSelectionArea > points and selection area, group transformation and padding 6ms
+     → expected true to be false // Object.is equality
+   ✓ Selectable Canvas > searchPossibleTargets > the target returned will stop at the first non interactive container 4ms
+   ✓ Selectable Canvas > searchPossibleTargets > a interactive group covered by a non interactive group wont be selected 3ms
+   ✓ Selectable Canvas > searchPossibleTargets > nested non interactive groups with subTargetCheck 3ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'tl', zoom: false } 5ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'tl', zoom: true } 3ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mt', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mt', zoom: true } 3ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'tr', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'tr', zoom: true } 3ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mr', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mr', zoom: true } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'br', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'br', zoom: true } 3ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mb', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mb', zoom: true } 5ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'bl', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'bl', zoom: true } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'ml', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'ml', zoom: true } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mtr', zoom: false } 2ms
+   ✓ Selectable Canvas > setupCurrentTransform > should fire before:transform event %p { controlKey: 'mtr', zoom: true } 2ms
+   ✓ Selectable Canvas > _discardActiveObject > will clear hovered target if the target is the active selection 2ms
+ ❯ |unit-node| src/shapes/Group.spec.ts (62 tests | 8 failed) 106ms
+   ✓ Group > avoid mutations to passed objects array 4ms
+   ✓ Group > fromObject restores values as they are, ignoring specific width/height/top/left that could come from layout 1ms
+   ✓ Group > fromObject with images 2ms
+   ✓ Group > With fit-content layout manager > will serialize correctly without default values 1ms
+   ✓ Group > With fit-content layout manager > Group initialization will calculate correct width/height ignoring passed width and height 1ms
+   ✓ Group > With fit-content layout manager > Group initialization will calculate width/height ignoring the passed one 1ms
+   ✓ Group > With fit-content layout manager > Group initialization will calculate size and position if nothing is passed 1ms
+   ✓ Group > With fit-content layout manager > fit-content layout will change position or size 1ms
+   ✓ Group > With fixed layout > will serialize and deserialize correctly 1ms
+   ✓ Group > With fixed layout > will serialize correctly without default values 1ms
+   ✓ Group > With fixed layout > Fixed layout will not change position or size 1ms
+   ✓ Group > With clip-path layout > will serialize and deserialize correctly 1ms
+   ✓ Group > With clip-path layout > will serialize correctly without default values 4ms
+   ✓ Group > With clip-path layout > clip-path layout will not change position or size 2ms
+   ✓ Group > triggerLayout should preform layout, layoutManager is defined 1ms
+   ✓ Group > adding and removing an object 8ms
+   ✓ Group > constructor 1ms
+   ✓ Group > toString 0ms
+   ✓ Group > getObjects 0ms
+   ✓ Group > add 1ms
+   ✓ Group > remove 1ms
+   ✓ Group > size 1ms
+   ✓ Group > set 0ms
+   ✓ Group > contains 0ms
+   × Group > toObject 19ms
+     → expected { subTargetCheck: false, …(34) } to deeply equal { version: '7.0.0-beta1', …(34) }
+   × Group > toObject without default values 2ms
+     → expected { type: 'Group', …(6) } to deeply equal { version: '7.0.0-beta1', …(6) }
+   ✓ Group > toObject with excludeFromExport set on an object 1ms
+   ✓ Group > render 0ms
+   ✓ Group > item 0ms
+   ✓ Group > moveObjectTo 1ms
+   ✓ Group > complexity 0ms
+   ✓ Group > removeAll 1ms
+   ✓ Group > containsPoint 1ms
+   ✓ Group > forEachObject 0ms
+   ✓ Group > fromObject 2ms
+   ✓ Group > fromObject with clipPath 4ms
+   ✓ Group > fromObject restores aCoords 1ms
+   ✓ Group > fromObject does not delete objects from source 1ms
+   × Group > toSVG 4ms
+     → expected '<g transform="matrix(1 0 0 1 80 117.5…' to be '<g transform="matrix(1 0 0 1 90 130)"…' // Object.is equality
+   × Group > toSVG with a clipPath 3ms
+     → Expected SVG to equal the normalized reference
+Received: <g transform="matrix(1 0 0 1 80 117.5)" clip-path="url(#SVGID)"  >
+<clipPath id="SVGID" >
+	<rect transform="matrix(1 0 0 1 0 0)" x="-50" y="-50" rx="0" ry="0" width="100" height="100" />
+</clipPath>
+<g style=""   >
+		<g transform="matrix(1 0 0 1 20 -17.5)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+</g>
+		<g transform="matrix(1 0 0 1 -30 2.5)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</g>
+</g>
+</g>
+
+Expected: <g transform="matrix(1 0 0 1 90 130)" clip-path="url(#SVGID)"  >
+<clipPath id="SVGID" >
+	<rect transform="matrix(1 0 0 1 50.5 50.5)" x="-50" y="-50" rx="0" ry="0" width="100" height="100" />
+</clipPath>
+<g style=""   >
+		<g transform="matrix(1 0 0 1 25 -25)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+</g>
+		<g transform="matrix(1 0 0 1 -35 10)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</g>
+</g>
+</g>
+
+   × Group > toSVG with a clipPath absolutePositioned 1ms
+     → Expected SVG to equal the normalized reference
+Received: <g clip-path="url(#SVGID)"  >
+<g transform="matrix(1 0 0 1 80 117.5)"  >
+<clipPath id="SVGID" >
+	<rect transform="matrix(1 0 0 1 0 0)" x="-50" y="-50" rx="0" ry="0" width="100" height="100" />
+</clipPath>
+<g style=""   >
+		<g transform="matrix(1 0 0 1 20 -17.5)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+</g>
+		<g transform="matrix(1 0 0 1 -30 2.5)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</g>
+</g>
+</g>
+</g>
+
+Expected: <g clip-path="url(#SVGID)"  >
+<g transform="matrix(1 0 0 1 90 130)"  >
+<clipPath id="SVGID" >
+	<rect transform="matrix(1 0 0 1 50.5 50.5)" x="-50" y="-50" rx="0" ry="0" width="100" height="100" />
+</clipPath>
+<g style=""   >
+		<g transform="matrix(1 0 0 1 25 -25)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+</g>
+		<g transform="matrix(1 0 0 1 -35 10)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</g>
+</g>
+</g>
+</g>
+
+   × Group > toSVG with a group as a clipPath 1ms
+     → Expected SVG to equal the normalized reference
+Received: <g transform="matrix(1 0 0 1 80 117.5)" clip-path="url(#SVGID)"  >
+<clipPath id="SVGID" >
+		<rect transform="matrix(1 0 0 1 100 100)" x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+		<rect transform="matrix(1 0 0 1 50 120)" x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</clipPath>
+<g style=""   >
+		<g transform="matrix(1 0 0 1 20 -17.5)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+</g>
+		<g transform="matrix(1 0 0 1 -30 2.5)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</g>
+</g>
+</g>
+
+Expected: <g transform="matrix(1 0 0 1 90 130)" clip-path="url(#SVGID)"  >
+<clipPath id="SVGID" >
+		<rect transform="matrix(1 0 0 1 115 105)" x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+		<rect transform="matrix(1 0 0 1 55 140)" x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</clipPath>
+<g style=""   >
+		<g transform="matrix(1 0 0 1 25 -25)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />
+</g>
+		<g transform="matrix(1 0 0 1 -35 10)"  >
+<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />
+</g>
+</g>
+</g>
+
+   ✓ Group > cloning group with 2 objects 1ms
+   ✓ Group > get with locked objects 0ms
+   ✓ Group > object stacking methods with group objects 4ms
+   ✓ Group > group reference on an object 1ms
+   ✓ Group > insertAt 2ms
+   ✓ Group > dirty flag propagation from children up 0ms
+   ✓ Group > dirty flag propagation from children up does not happen if value does not change really 5ms
+   ✓ Group > dirty flag propagation from children up with 1ms
+   ✓ Group > _getCacheCanvasDimensions returns dimensions and zoom for cache canvas are influenced by group 1ms
+   × Group > test group - pixels. 2ms
+     → 0,0 is transparent: expected false to be true // Object.is equality
+   ✓ Group > group add 0ms
+   ✓ Group > group add edge cases 2ms
+   ✓ Group > group remove 0ms
+   ✓ Group > willDrawShadow 1ms
+   ✓ Group > willDrawShadow with no offsets 1ms
+   ✓ Group > shouldCache 1ms
+   ✓ Group > canvas prop propagation with set 0ms
+   ✓ Group > canvas prop propagation with add 1ms
+   ✓ Group > canvas prop propagation with add to group 1ms
+   × Group > add and coordinates 1ms
+     → top has been moved: expected 1 to be 5 // Object.is equality
+ ❯ |unit-node| src/shapes/Textbox.spec.ts (38 tests | 4 failed) 83ms
+   × Textbox > fromObject 16ms
+     → Snapshot `Textbox > fromObject 1` mismatched
+   × Textbox > toObject with styles 2ms
+     → Snapshot `Textbox > toObject with styles 1` mismatched
+   ✓ Textbox > stylesToArray edge case 1ms
+   ✓ Textbox > fromObject with styles 3ms
+   ✓ Textbox > constructor 1ms
+   ✓ Textbox > constructor with width 0ms
+   ✓ Textbox > constructor with width too small 0ms
+   ✓ Textbox > initial properties 1ms
+   ✓ Textbox > isEndOfWrapping 1ms
+   ✓ Textbox > _removeExtraneousStyles 1ms
+   ✓ Textbox > isEmptyStyles 0ms
+   ✓ Textbox > isEmptyStyles does not crash on null styles 0ms
+   ✓ Textbox > isEmptyStyles alternate lines 1ms
+   ✓ Textbox > wrapping with charspacing 2ms
+   ✓ Textbox > wrapping with splitByGrapheme and styles 2ms
+   ✓ Textbox > wrapping with largestWordWidth and styles 3ms
+   ✓ Textbox > wrapping with charspacing and splitByGrapheme positive 1ms
+   ✓ Textbox > wrapping with charspacing and splitByGrapheme negative 0ms
+   ✓ Textbox > Measure words 1ms
+   ✓ Textbox > Measure words with styles 1ms
+   ✓ Textbox > wrapping with different things 1ms
+   ✓ Textbox > wrapping with splitByGrapheme 0ms
+   ✓ Textbox > wrapping with custom space 1ms
+   ✓ Textbox > wrapping an empty line 0ms
+   ✓ Textbox > wrapping respects max line width 5ms
+   × Textbox > texbox will change width from the mr corner 6ms
+     → width increased: expected 40 to be 60 // Object.is equality
+   × Textbox > texbox will change width from the ml corner 4ms
+     → width increased: expected 40 to be 60 // Object.is equality
+   ✓ Textbox > _removeExtraneousStyles for textbox 1ms
+   ✓ Textbox > get2DCursorLocation with splitByGrapheme 1ms
+   ✓ Textbox > missingNewlineOffset with splitByGrapheme 1ms
+   ✓ Textbox > missingNewlineOffset with normal split 1 1ms
+   ✓ Textbox > missingNewlineOffset with normal split and short word 1ms
+   ✓ Textbox > _getLineStyle 1ms
+   ✓ Textbox > _setLineStyle 1ms
+   ✓ Textbox > _deleteStyleDeclaration 0ms
+   ✓ Textbox > _setStyleDeclaration 1ms
+   ✓ Textbox > styleHas 5ms
+   ✓ Textbox > The same text does not need to be wrapped. 1ms
+ ❯ |unit-node| src/shapes/IText/IText.test.ts (45 tests | 2 failed) 301ms
+   ✓ IText > cursor drawing width > group scaled by 1 and rotated by +0 , text scaled by 1 and rotated by +0, and canvas zoomed by 1 151ms
+   ✓ IText > cursor drawing width > group scaled by 1 and rotated by +0 , text scaled by 2 and rotated by +0, and canvas zoomed by 50 4ms
+   ✓ IText > cursor drawing width > group scaled by 200 and rotated by 45 , text scaled by 2 and rotated by +0, and canvas zoomed by 1 3ms
+   ✓ IText > cursor drawing width > group scaled by 200 and rotated by +0 , text scaled by 1 and rotated by +0, and canvas zoomed by 1 3ms
+   ✓ IText > cursor drawing width > group scaled by 200 and rotated by 30 , text scaled by 1 and rotated by 30, and canvas zoomed by 50 3ms
+   ✓ IText > cursor drawing width > group scaled by 200 and rotated by +0 , text scaled by 1 and rotated by +0, and canvas zoomed by 0.005 2ms
+   ✓ IText > cursor drawing width > group scaled by 200 and rotated by +0 , text scaled by 2 and rotated by 90, and canvas zoomed by 0.005 2ms
+   ✓ IText > Interaction with mouse and editing > _mouseDownHandlerBefore set up selected property 9ms
+   ✓ IText > constructor 3ms
+   ✓ IText > initial properties 3ms
+   ✓ IText > fromObject 3ms
+   ✓ IText > lineHeight with single line 2ms
+   ✓ IText > lineHeight with multi line 2ms
+   ✓ IText > toObject 2ms
+   ✓ IText > setSelectionStart 1ms
+   ✓ IText > empty itext 1ms
+   ✓ IText > setSelectionEnd 1ms
+   ✓ IText > get2DCursorLocation 2ms
+   ✓ IText > isEmptyStyles 2ms
+   ✓ IText > selectAll 2ms
+   ✓ IText > getSelectedText 2ms
+   ✓ IText > enterEditing, exitEditing 5ms
+   ✓ IText > enterEditing, exitEditing and saved props 3ms
+   ✓ IText > event firing 3ms
+   ✓ IText > insertNewlineStyleObject 2ms
+   ✓ IText > insertNewlineStyleObject with existing style 1ms
+   ✓ IText > shiftLineStyles 1ms
+   ✓ IText > selectWord 2ms
+   ✓ IText > selectLine 2ms
+   ✓ IText > findWordBoundaryLeft 1ms
+   ✓ IText > findWordBoundaryRight 1ms
+   ✓ IText > findLineBoundaryLeft 1ms
+   ✓ IText > findLineBoundaryRight 1ms
+   ✓ IText > getSelectionStyles with no arguments 1ms
+   ✓ IText > getSelectionStyles with 2 args 1ms
+   ✓ IText > setSelectionStyles 2ms
+   ✓ IText > getCurrentCharFontSize 2ms
+   ✓ IText > getCurrentCharColor 2ms
+   ✓ IText > toSVGWithFonts 22ms
+   ✓ IText > toSVGWithFontsInGroups 10ms
+   ✓ IText > space wrap attribute 2ms
+   ✓ IText > _removeExtraneousStyles 1ms
+   ✓ IText > dispose 2ms
+   × IText > IText and retina scaling > hiddenTextarea does not move DOM, enableRetinaScaling true 19ms
+     → top is scaled with CSS: expected 53 to be 57 // Object.is equality
+   × IText > IText and retina scaling > hiddenTextarea does not move DOM, enableRetinaScaling false 6ms
+     → top is scaled with CSS: expected 53 to be 57 // Object.is equality
+ ❯ |unit-node| src/canvas/Canvas-dispose.spec.ts (22 tests | 2 failed) 358ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose 142ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose: clear references sync 6ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose: clear references async 2ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose edge case: multiple calls 1ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose edge case: multiple calls after `requestRenderAll` 14ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose edge case: rendering after dispose 1ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose edge case: `toCanvasElement` interrupting `requestRenderAll` 1ms
+   × Canvas dispose > disposing 'StaticCanvas' > dispose edge case: `toCanvasElement` after dispose 10ms
+     → control: expected false to be truthy
+   ✓ Canvas dispose > disposing 'StaticCanvas' > dispose edge case: during animation 37ms
+   ✓ Canvas dispose > disposing 'StaticCanvas' > disposing during animation should cancel it by target 35ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose 4ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose: clear references sync 4ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose: clear references async 3ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose edge case: multiple calls 3ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose edge case: multiple calls after `requestRenderAll` 3ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose edge case: rendering after dispose 2ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose edge case: `toCanvasElement` interrupting `requestRenderAll` 2ms
+   × Canvas dispose > disposing 'Canvas' > dispose edge case: `toCanvasElement` after dispose 3ms
+     → control: expected false to be truthy
+   ✓ Canvas dispose > disposing 'Canvas' > dispose edge case: during animation 36ms
+   ✓ Canvas dispose > disposing 'Canvas' > disposing during animation should cancel it by target 35ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose: clear refs sync for Canvas 5ms
+   ✓ Canvas dispose > disposing 'Canvas' > dispose: clear refs async for Canvas 5ms
+ ❯ |unit-node| src/shapes/Polygon.spec.ts (19 tests | 7 failed | 1 skipped) 45ms
+   ✓ Polygon > constructor 2ms
+   ✓ Polygon > constructor, with strokeWidth top-left and origins top-left 0ms
+   ✓ Polygon > constructor, with strokeWidth top-left and origins center-center 1ms
+   ✓ Polygon > constructor, with strokeWidth top-left and origins bottom-right 0ms
+   ✓ Polygon > polygon with exactBoundingBox false 1ms
+   ✓ Polygon > polygon with exactBoundingBox true 2ms
+   ↓ Polygon > polygon with exactBoundingBox true and skew
+   ✓ Polygon > complexity 0ms
+   × Polygon > toObject 14ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   ✓ Polygon > toSVG 2ms
+   ✓ Polygon > fromObject 1ms
+   × Polygon > fromElement without points 3ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   × Polygon > fromElement without points but strokeWidth 2ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   × Polygon > fromElement with empty points 2ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   × Polygon > fromElement with points 2ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   × Polygon > fromElement with points no strokewidth 2ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   × Polygon > fromElement with points and custom attributes 8ms
+     → polygon object should match reference: expected { type: 'Polygon', …(31) } to deeply equal { version: '7.0.0-beta1', …(31) }
+   ✓ Polygon > _calcDimensions with object options 1ms
+   ✓ Polygon > _calcDimensions with custom options 1ms
+ ❯ |unit-node| src/canvas/Canvas-events.spec.ts (38 tests | 13 failed | 2 skipped) 534ms
+   ✓ Canvas events mixin > handles mouse:down with different buttons 139ms
+   ✓ Canvas events mixin > handles mouse:down:before with different buttons 6ms
+   × Canvas events mixin > handles mouse:down and group selector 17ms
+     → with object on target no groupSelector is started: expected Canvas{ __eventListeners: {}, …(79) } to have property "_groupSelector" with value null
+   ✓ Canvas events mixin > handles activeOn object selection 11ms
+   × Canvas events mixin > handles specific bug #5317 for multiselection 29ms
+     → green rectangle was the target: expected undefined to be Rect{ __eventListeners: {}, …(76) } // Object.is equality
+   ✓ Canvas events mixin > handles specific bug #6314 for partial intersection with drag 10ms
+   ✓ Canvas events mixin > reports isClick = true for mouse:up without movement 3ms
+   ✓ Canvas events mixin > reports isClick = false for mouse:up after movement 3ms
+   ✓ Canvas events mixin > reports isClick = false for mouse:up after dragging 3ms
+   ✓ Canvas events mixin > handles setDimensions and active brush 6ms
+   × Canvas events mixin > returns target in mouse:up event 27ms
+     → options match model - target: expected Rect{ __eventListeners: {}, …(78) } to be Rect{ __eventListeners: {}, …(76) } // Object.is equality
+   × Canvas events mixin > fires object:modified event 3ms
+     → object:modified fired: expected +0 to be 1 // Object.is equality
+   × Canvas events mixin > drags small object when mousemove + drag, not active 3ms
+     → rect moved by 4 pixels top: expected +0 to be 4 // Object.is equality
+   × Canvas events mixin > scales small object when mousemove + drag, active 4ms
+     → rect scaled X: expected 3.5 to be 3 // Object.is equality
+   × Canvas events mixin > scales a nested target 6ms
+     → mouse up handler for control has been called: expected false to be true // Object.is equality
+   × Canvas events mixin > drags a nested target 6ms
+     → expected [ 1, +0, +0, 1, -42.625, 8 ] to deeply equal [ 1, +0, +0, 1, 9.5, 9.5 ]
+   ✓ Canvas events mixin > calls mouseup and mousedown on the control during transform 3ms
+   ✓ Canvas events mixin > calls mouseup handler even when transform ends outside the object 5ms
+   ✓ Canvas events mixin > calls both mouseup handlers when transform ends on a new control 6ms
+   ✓ Canvas events mixin > fires drop:before and drop events 4ms
+   ✓ Canvas events mixin > handles drag event cycle 76ms
+   × Canvas events mixin > fires fabric event - mousedown 17ms
+     → mouse:down on canvas has rect as a target: expected undefined to be Rect{ __eventListeners: {}, …(76) } // Object.is equality
+   × Canvas events mixin > fires fabric event - mousemove 12ms
+     → mouse:move on canvas has rect as a target: expected undefined to be Rect{ __eventListeners: {}, …(76) } // Object.is equality
+   × Canvas events mixin > fires fabric event - wheel 6ms
+     → mouse:wheel on canvas has rect as a target: expected undefined to be Rect{ __eventListeners: {}, …(76) } // Object.is equality
+   × Canvas events mixin > fires fabric event - dblclick 7ms
+     → mouse:dblclick on canvas has rect as a target: expected undefined to be Rect{ __eventListeners: {}, …(76) } // Object.is equality
+   ✓ Canvas events mixin > fires mouse:over event for mouseenter 5ms
+   ✓ Canvas events mixin > handles mouseout events 5ms
+   ✓ Canvas events mixin > fires mouseover and mouseout events for subTargets when subTargetCheck is enabled 12ms
+   ✓ Canvas events mixin > fires mouseover and mouseout events for subTargets when subTargetCheck is enabled but not twice 7ms
+   ✓ Canvas events mixin > updates groupSelector during mouse move 3ms
+   ✓ Canvas events mixin > removes _hoveredTarget on mouseEnter 9ms
+   ✓ Canvas events mixin > does not remove _hoveredTarget on mouseEnter if a transform is happening 12ms
+   ✓ Canvas events mixin > removes __corner on mouseEnter 19ms
+   ✓ Canvas events mixin > does not remove __corner on mouseEnter if there is a transform 5ms
+   ✓ Canvas events mixin > sets cursor correctly for different controls 18ms
+   × Canvas events mixin > manages text editing targets correctly 23ms
+     → should unregister b: expected IText{ …(147) } to be falsy
+   ↓ Canvas events mixin > mousemove: subTargetCheck: setCursorFromEvent considers subTargets
+   ↓ Canvas events mixin > mousemove: subTargetCheck: setCursorFromEvent considers subTargets in reverse order, so the top-most subTarget's .hoverCursor takes precedence
+ ❯ |unit-node| src/controls/changeWidth.test.ts (10 tests | 7 failed) 53ms
+   × changeWidth > changeWidth changes the width 22ms
+     → expected 249.5 to be 199 // Object.is equality
+   × changeWidth > changeWidth changes the width with decimals 4ms
+     → expected 249.7 to be 199.2 // Object.is equality
+   ✓ changeWidth > changeWidth does not change the width 4ms
+   ✓ changeWidth > changeWidth does not change the width of target's other side 4ms
+   × changeWidth > changeWidth changes the width with centered transform 5ms
+     → expected 399 to be 298 // Object.is equality
+   × changeWidth > changeWidth changes the width with big strokeWidth 3ms
+     → expected 242.5 to be 185 // Object.is equality
+   × changeWidth > changeWidth changes the width with big strokeWidth and strokeUniform 3ms
+     → expected 242.5 to be 185 // Object.is equality
+   × changeWidth > changeWidth changes the width with big strokeWidth and strokeUniform + scaling 2ms
+     → expected 115 to be 62 // Object.is equality
+   × changeWidth > changeWidth changes the width with big strokeWidth + scaling 2ms
+     → expected 110 to be 52 // Object.is equality
+   ✓ changeWidth > changeWidth will fire events on canvas and target resizing 2ms
+ ❯ |unit-node| src/shapes/ActiveSelection.spec.ts (16 tests | 2 failed) 42ms
+   ✓ ActiveSelection > constructor 4ms
+   ✓ ActiveSelection > toString 1ms
+   × ActiveSelection > toObject 12ms
+     → expected { subTargetCheck: false, …(34) } to deeply equal { version: '7.0.0-beta1', …(34) }
+   × ActiveSelection > toObject without default values 3ms
+     → expected { type: 'ActiveSelection', …(6) } to deeply equal { version: '7.0.0-beta1', …(6) }
+   ✓ ActiveSelection > _renderControls 1ms
+   ✓ ActiveSelection > fromObject 3ms
+   ✓ ActiveSelection > ActiveSelection shouldCache 1ms
+   ✓ ActiveSelection > canvas property propagation 2ms
+   ✓ ActiveSelection > should set the layoutManager in the constructor 0ms
+   ✓ ActiveSelection > deselect removes all objects 3ms
+   ✓ ActiveSelection > should not set coords in the constructor 1ms
+   ✓ ActiveSelection > `setActiveObject` should update the active selection ref on canvas if it changed 4ms
+   ✓ ActiveSelection > adding and removing an object belonging to a group 2ms
+   ✓ ActiveSelection > transferring an object between active selections 3ms
+   ✓ ActiveSelection > should block descendants from entering selection 1ms
+   ✓ ActiveSelection > should block ancestors from entering selection 1ms
+ ❯ |unit-node| src/shapes/Line.spec.ts (171 tests | 1 failed) 42ms
+   ✓ Line > initializes constructor correctly 2ms
+   ✓ Line > has complexity function 0ms
+   ✓ Line > generates SVG correctly 1ms
+   × Line > converts to object correctly 10ms
+     → expected { type: 'Line', …(34) } to deeply equal { version: '7.0.0-beta1', …(34) }
+   ✓ Line > creates from object correctly 1ms
+   ✓ Line > creates from SVG element correctly 2ms
+   ✓ Line > allows straight lines to have 0 width or height 0ms
+   ✓ Line > updates width/height when changing x/y coordinates 0ms
+   ✓ Line > parses stroke width from style attribute 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/top stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:33 cap:butt) 1ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/center stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (left/bottom stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/top stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/center stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (center/bottom stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/top stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/center stroke:7 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:0 angle:90 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:0 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:0 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:0 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:33 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:33 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:33 cap:square) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:90 cap:butt) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:90 cap:round) 0ms
+   ✓ Line > line positioning > positions on center regardless of strokeWidth or origin (right/bottom stroke:7 angle:90 cap:square) 0ms
+ ❯ |unit-node| src/canvas/StaticCanvas.spec.ts (106 tests | 6 failed | 1 skipped) 605ms
+   ✓ StaticCanvas > toBlob 36ms
+   ✓ StaticCanvas > attempts webp format but may fallback to png in node environment 6ms
+   ✓ StaticCanvas > prevents multiple canvas initialization 3ms
+   ✓ StaticCanvas > has correct initial properties 2ms
+   ✓ StaticCanvas > provides getObjects method 1ms
+   ✓ StaticCanvas > provides getElement method 0ms
+   ✓ StaticCanvas > provides item method to access objects by index 2ms
+   ✓ StaticCanvas > calculates offset correctly 1ms
+   ✓ StaticCanvas > adds objects to the canvas 2ms
+   ✓ StaticCanvas > handles objects that belong to a different canvas 2ms
+   ✓ StaticCanvas > respects renderOnAddRemove setting 3ms
+   ✓ StaticCanvas > fires object:added events 3ms
+   ✓ StaticCanvas > inserts objects at specified positions 6ms
+   ✓ StaticCanvas > respects renderOnAddRemove when inserting objects 1ms
+   ✓ StaticCanvas > removes objects correctly 1ms
+   ✓ StaticCanvas > respects renderOnAddRemove when removing objects 1ms
+   ✓ StaticCanvas > fires object:removed events 1ms
+   ✓ StaticCanvas > provides clearContext method 0ms
+   ✓ StaticCanvas > clears the canvas completely 1ms
+   ✓ StaticCanvas > provides renderAll method 1ms
+   ✓ StaticCanvas > exports to canvas element of correct size 1ms
+   ✓ StaticCanvas > exports to canvas element with multiplier 1ms
+   ✓ StaticCanvas > generates data URL correctly 4ms
+   ✓ StaticCanvas > supports retina scaling in data URL generation 8ms
+   ✓ StaticCanvas > handles enableRetinaScaling: true with multiplier = 1 5ms
+   ✓ StaticCanvas > handles enableRetinaScaling: true with multiplier = 3 5ms
+   ✓ StaticCanvas > handles enableRetinaScaling: false with no multiplier 4ms
+   ✓ StaticCanvas > handles enableRetinaScaling: false with multiplier = 1 4ms
+   ✓ StaticCanvas > handles enableRetinaScaling: false with multiplier = 3 4ms
+   ✓ StaticCanvas > generates JPEG data URL correctly 1ms
+   ✓ StaticCanvas > supports cropping in data URL generation 4ms
+   ✓ StaticCanvas > centers objects horizontally 1ms
+   ✓ StaticCanvas > centers objects vertically 1ms
+   ✓ StaticCanvas > centers objects both horizontally and vertically 1ms
+   ✓ StaticCanvas > centers objects horizontally in viewport 1ms
+   ✓ StaticCanvas > centers objects vertically in viewport 1ms
+   ✓ StaticCanvas > centers objects in viewport both horizontally and vertically 1ms
+   ✓ StaticCanvas > generates SVG correctly 1ms
+   ✓ StaticCanvas > supports different encodings in SVG (ISO-8859-1) 1ms
+   ✓ StaticCanvas > can generate SVG without preamble 0ms
+   ✓ StaticCanvas > generates SVG with viewBox 0ms
+   ✓ StaticCanvas > handles reviver function for all objects 12ms
+   ✓ StaticCanvas > handles reviver function with background and overlay images 3ms
+   ✓ StaticCanvas > excludes objects marked with excludeFromExport from SVG 3ms
+   × StaticCanvas > correctly includes clipPath in SVG output 25ms
+     → Expected SVG to equal the normalized reference
+Received: <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="400" height="400" viewBox="0 0 400 400" xml:space="preserve">
+<desc>Created with Fabric.js 7.0.0-beta1</desc>
+<defs>
+<clipPath id="SVGID" >
+	<rect transform="matrix(1 0 0 1 0 0)" x="-100" y="-100" rx="0" ry="0" width="200" height="200" />
+</clipPath>
+</defs>
+<g clip-path="url(#SVGID)" >
+<g transform="matrix(1 0 0 1 0 0)"  >
+<circle style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" r="200" />
+</g>
+</g>
+</svg>
+Expected: <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="400" height="400" viewBox="0 0 400 400" xml:space="preserve">
+<desc>Created with Fabric.js 7.0.0-beta1</desc>
+<defs>
+<clipPath id="SVGID" >
+	<rect transform="matrix(1 0 0 1 100.5 100.5)" x="-100" y="-100" rx="0" ry="0" width="200" height="200" />
+</clipPath>
+</defs>
+<g clip-path="url(#SVGID)" >
+<g transform="matrix(1 0 0 1 200.5 200.5)"  >
+<circle style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" r="200" />
+</g>
+</g>
+</svg>
+   ✓ StaticCanvas > handles excludeFromExport for background and overlay images 1ms
+   × StaticCanvas > converts canvas to JSON correctly 6ms
+     → expected { version: '7.0.0-beta1', …(3) } to deeply equal { version: '7.0.0-beta1', …(3) }
+   ✓ StaticCanvas > handles custom properties in toObject correctly 1ms
+   × StaticCanvas > serializes backgroundImage to JSON correctly 4ms
+     → Expected image object to equal the reference
+Received: {"cropX":0,"cropY":0,"type":"Image","version":"7.0.0-beta1","originX":"center","originY":"center","left":0,"top":0,"width":276,"height":110,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"src":"test_image.gif","crossOrigin":null,"filters":[]}
+Expected: {"version":"7.0.0-beta1","type":"Image","originX":"left","originY":"top","left":0,"top":0,"width":276,"height":110,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeDashOffset":0,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"src":"test_image.gif","shadow":null,"visible":true,"backgroundColor":"","filters":[],"fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","crossOrigin":null,"skewX":0,"skewY":0,"cropX":0,"cropY":0,"strokeUniform":false}
+   ✓ StaticCanvas > includes custom props for backgroundImage when specified 3ms
+   × StaticCanvas > serializes overlayImage to JSON correctly 2ms
+     → Expected image object to equal the reference
+Received: {"cropX":0,"cropY":0,"type":"Image","version":"7.0.0-beta1","originX":"center","originY":"center","left":0,"top":0,"width":276,"height":110,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"src":"test_image.gif","crossOrigin":null,"filters":[]}
+Expected: {"version":"7.0.0-beta1","type":"Image","originX":"left","originY":"top","left":0,"top":0,"width":276,"height":110,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":0,"strokeDashArray":null,"strokeDashOffset":0,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"src":"test_image.gif","shadow":null,"visible":true,"backgroundColor":"","filters":[],"fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","crossOrigin":null,"skewX":0,"skewY":0,"cropX":0,"cropY":0,"strokeUniform":false}
+   ✓ StaticCanvas > includes custom props for overlayImage when specified 2ms
+   × StaticCanvas > generates dataless JSON correctly 5ms
+     → expected { version: '7.0.0-beta1', …(1) } to deeply equal { version: '7.0.0-beta1', …(1) }
+   ✓ StaticCanvas > serializes to object correctly 1ms
+   ✓ StaticCanvas > respects includeDefaultValues setting 1ms
+   ✓ StaticCanvas > respects excludeFromExport setting 1ms
+   ✓ StaticCanvas > respects excludeFromExport for background and overlay elements 2ms
+   ✓ StaticCanvas > generates dataless object representation 1ms
+   ✓ StaticCanvas > includes additional properties in object representation when specified 1ms
+   ✓ StaticCanvas > correctly reports if canvas is empty 1ms
+   ✓ StaticCanvas > loads from JSON string correctly 2ms
+   ✓ StaticCanvas > loads from JSON object correctly 1ms
+   ✓ StaticCanvas > loads from JSON object without defaults correctly 1ms
+   ✓ StaticCanvas > loads JSON with image background correctly 10ms
+   ✓ StaticCanvas > handles AbortController signal when loading JSON 2ms
+   × StaticCanvas > preserves custom properties when loading from JSON 3ms
+     → expected { version: '7.0.0-beta1', …(1) } to deeply equal { version: '7.0.0-beta1', …(1) }
+   ✓ StaticCanvas > loads text objects correctly from JSON 4ms
+   ✓ StaticCanvas > loads clipPath correctly from JSON 2ms
+   ✓ StaticCanvas > sends objects to the back of the stack 1ms
+   ✓ StaticCanvas > brings objects to the front of the stack 1ms
+   ✓ StaticCanvas > sends objects backwards in the stack 1ms
+   ✓ StaticCanvas > brings objects forward in the stack 2ms
+   ✓ StaticCanvas > moves objects to specific positions in the stack 2ms
+   ✓ StaticCanvas > accesses items by index 6ms
+   ✓ StaticCanvas > calculates complexity correctly 12ms
+   ✓ StaticCanvas > provides string representation 1ms
+   ✓ StaticCanvas > clones canvas with all objects 5ms
+   ✓ StaticCanvas > clones canvas without data 2ms
+   ✓ StaticCanvas > gets and sets width 1ms
+   ✓ StaticCanvas > gets and sets height 1ms
+   ✓ StaticCanvas > supports css-only width setting 1ms
+   ✓ StaticCanvas > supports css-only height setting 1ms
+   ✓ StaticCanvas > supports css-only dimension setting 1ms
+   ✓ StaticCanvas > supports backstore-only width setting 1ms
+   ✓ StaticCanvas > supports backstore-only height setting 1ms
+   ✓ StaticCanvas > supports backstore-only dimension setting 1ms
+   ↓ StaticCanvas > removes objects with animation
+   ✓ StaticCanvas > sets viewport transform correctly 0ms
+   ✓ StaticCanvas > gets zoom level correctly 0ms
+   ✓ StaticCanvas > sets zoom level correctly 0ms
+   ✓ StaticCanvas > zooms to specific point correctly 0ms
+   ✓ StaticCanvas > applies absolute panning correctly 2ms
+   ✓ StaticCanvas > applies relative panning correctly 1ms
+   ✓ StaticCanvas > gets canvas context correctly 1ms
+   ✓ StaticCanvas > calculates viewport boundaries correctly 1ms
+   ✓ StaticCanvas > calculates viewport boundaries correctly with zoom 0ms
+   ✓ StaticCanvas > calculates viewport boundaries correctly with zoom and translation 0ms
+   ✓ StaticCanvas > calculates viewport boundaries correctly with flipped zoom and translation 0ms
+   ✓ StaticCanvas > handles retina scaling correctly 0ms
+   ✓ StaticCanvas > provides Node.js stream methods when in Node environment  328ms
+   ✓ StaticCanvas > exports SVG with background color 2ms
+   ✓ StaticCanvas > exports SVG with background, zoom and svgViewportTransformation 2ms
+   ✓ StaticCanvas > exports SVG with background gradient 2ms
+   ✓ StaticCanvas > exports SVG with background gradient and transforms 2ms
+   ✓ StaticCanvas > exports SVG with background pattern 3ms
+   ✓ StaticCanvas > handles requestRenderAll and cancelRequestedRender correctly 1ms
+ ❯ |unit-node| src/shapes/Object/InteractiveObject.spec.ts (4 tests | 1 failed) 21ms
+   ✓ InteractiveObject > tests constructor & properties 2ms
+   × InteractiveObject > Interactive + BaseObject default values 8ms
+     → Snapshot `InteractiveObject > Interactive + BaseObject default values 1` mismatched
+   ✓ InteractiveObject > setCoords for objects inside group with rotation > all corners are rotated as much as the object total angle 8ms
+   ✓ InteractiveObject > getActiveControl 2ms
+ ❯ |unit-node| src/shapes/Circle.spec.ts (14 tests | 4 failed) 23ms
+   ✓ Circle > constructor 1ms
+   ✓ Circle > constructor with radius 0ms
+   ✓ Circle > getRadiusX, getRadiusY 1ms
+   ✓ Circle > setRadius 0ms
+   ✓ Circle > set radius 0ms
+   ✓ Circle > complexity 0ms
+   × Circle > toObject 9ms
+     → expected { radius: +0, startAngle: +0, …(33) } to strictly equal { version: '7.0.0-beta1', …(34) }
+   ✓ Circle > toObject without defaults 1ms
+   × Circle > toSVG with full circle 3ms
+     → expected '<g transform="matrix(1 0 0 1 0 0)"  >…' to be '<g transform="matrix(1 0 0 1 10.5 10.…' // Object.is equality
+   × Circle > toSVG with half circle 2ms
+     → expected '<g transform="matrix(1 0 0 1 0 0)"  >…' to be '<g transform="matrix(1 0 0 1 10.5 10.…' // Object.is equality
+   × Circle > toSVG with counterclockwise half circle 1ms
+     → expected '<g transform="matrix(1 0 0 1 0 0)"  >…' to be '<g transform="matrix(1 0 0 1 10.5 10.…' // Object.is equality
+   ✓ Circle > fromElement 3ms
+   ✓ Circle > fromObject 1ms
+   ✓ Circle > cloning and radius, width, height 0ms
+ ❯ |unit-node| src/controls/Control-handlers.spec.ts (16 tests | 5 failed) 24ms
+   × fabric.controlsUtils > scalingXOrSkewingY changes scaleX 9ms
+     → expected 3 to be 2 // Object.is equality
+   × fabric.controlsUtils > scalingXOrSkewingY changes scaleX to flip 1ms
+     → expected 0.0001 to be 0.5 // Object.is equality
+   × fabric.controlsUtils > scalingXOrSkewingY blocks scaleX to flip 1ms
+     → expected 0.0001 to be 1 // Object.is equality
+   ✓ fabric.controlsUtils > scalingYOrSkewingX changes scaleY 1ms
+   ✓ fabric.controlsUtils > scalingYOrSkewingX changes scaleY to flip 0ms
+   ✓ fabric.controlsUtils > scalingYOrSkewingX blocks scaleX to flip 0ms
+   ✓ fabric.controlsUtils > scalingXOrSkewingY changes skewY if shift pressed 1ms
+   × fabric.controlsUtils > scalingYOrSkewingX changes skewX if shift pressed 1ms
+     → expected +0 to be 76 // Object.is equality
+   ✓ fabric.controlsUtils > skewing Y with existing skewing 1ms
+   × fabric.controlsUtils > skewing X with existing skewing 1ms
+     → expected 45 to be 72 // Object.is equality
+   ✓ fabric.controlsUtils > scalingXOrSkewingY will fire events on canvas and target 1ms
+   ✓ fabric.controlsUtils > wrapWithFireEvent dont trigger event when actionHandler doesnt change anything 0ms
+   ✓ fabric.controlsUtils > scaling X from ml keeps the same sign when scale = 0 1ms
+   ✓ fabric.controlsUtils > scaling Y from mt keeps the same sign when scale = 0 1ms
+   ✓ fabric.controlsUtils > scaling X from mr keeps the same sign when scale = 0 2ms
+   ✓ fabric.controlsUtils > scaling Y from mb keeps the same sign when scale = 0 1ms
+ ❯ |unit-node| src/shapes/Ellipse.spec.ts (10 tests | 4 failed) 18ms
+   ✓ Ellipse > initializes constructor correctly 1ms
+   ✓ Ellipse > calculates complexity correctly 0ms
+   × Ellipse > converts to object with correct properties 7ms
+     → expected { rx: +0, ry: +0, …(31) } to deeply equal { version: '7.0.0-beta1', …(32) }
+   ✓ Ellipse > generates object without defaults 1ms
+   ✓ Ellipse > determines visibility correctly 0ms
+   × Ellipse > generates SVG correctly 3ms
+     → Expected SVG to equal the normalized reference
+Received: <g transform="matrix(1 0 0 1 0 0)"  >
+<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+</g>
+
+Expected: <g transform="matrix(1 0 0 1 100.5 12.5)"  >
+<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+</g>
+
+   × Ellipse > generates SVG with clipPath correctly 1ms
+     → Expected SVG to equal the normalized reference
+Received: <g transform="matrix(1 0 0 1 0 0)" clip-path="url(#SVGID)"  >
+<clipPath id="SVGID" >
+	<ellipse transform="matrix(1 0 0 1 60 -50)" cx="0" cy="0" rx="12" ry="100" />
+</clipPath>
+<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+</g>
+
+Expected: <g transform="matrix(1 0 0 1 100.5 12.5)" clip-path="url(#SVGID)"  >
+<clipPath id="SVGID" >
+	<ellipse transform="matrix(1 0 0 1 72.5 50.5)" cx="0" cy="0" rx="12" ry="100" />
+</clipPath>
+<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+</g>
+
+   × Ellipse > generates SVG with absolute positioned clipPath correctly 0ms
+     → Expected SVG to equal the normalized reference
+Received: <g clip-path="url(#SVGID)"  >
+<g transform="matrix(1 0 0 1 0 0)"  >
+<clipPath id="SVGID" >
+	<ellipse transform="matrix(1 0 0 1 60 -50)" cx="0" cy="0" rx="12" ry="100" />
+</clipPath>
+<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+</g>
+</g>
+
+Expected: <g clip-path="url(#SVGID)"  >
+<g transform="matrix(1 0 0 1 100.5 12.5)"  >
+<clipPath id="SVGID" >
+	<ellipse transform="matrix(1 0 0 1 72.5 50.5)" cx="0" cy="0" rx="12" ry="100" />
+</clipPath>
+<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+</g>
+</g>
+
+   ✓ Ellipse > creates from SVG element correctly 2ms
+   ✓ Ellipse > creates from object correctly 1ms
+ ✓ |unit-node| src/brushes/PencilBrush.spec.ts (14 tests) 43ms
+ ✓ |unit-node| src/parser/parser.spec.ts (40 tests) 66ms
+ ✓ |unit-node| src/shapes/IText/ITextBehavior.test.ts (17 tests) 52ms
+ ❯ |unit-node| src/shapes/IText/IText-click-behavior.spec.ts (13 tests | 5 failed) 1265ms
+   × iText click interaction > doubleClickHandler 50ms
+     → dblClick selection start is: expected 31 to be +0 // Object.is equality
+   ✓ iText click interaction > doubleClickHandler no editing 1ms
+   × iText click interaction > tripleClickHandler 5ms
+     → tripleClick selection start is: expected 20 to be +0 // Object.is equality
+   ✓ iText click interaction > tripleClickHandler without editing 1ms
+   × iText click interaction > getSelectionStartFromPointer with scale 2ms
+     → index: expected 31 to be 2 // Object.is equality
+   ✓ iText click interaction > mouse down aborts cursor animation 6ms
+   ✓ iText click interaction > _mouseUpHandler on a selected object enter edit 3ms
+   ✓ iText click interaction > _mouseUpHandler on a selected object does enter edit if there is an activeObject 1ms
+   ✓ iText click interaction > _mouseUpHandler on a selected text in a group does NOT enter editing 4ms
+   ✓ iText click interaction > _mouseUpHandler on a text in a group 4ms
+   ✓ iText click interaction > _mouseUpHandler on a corner of selected text DOES NOT enter edit 1ms
+   × iText click interaction > enableRetinaScaling = true > click on editing itext make selection:changed fire 534ms
+     → Itext set the selectionStart: expected 7 to be 2 // Object.is equality
+   × iText click interaction > enableRetinaScaling = false > click on editing itext make selection:changed fire 525ms
+     → Itext set the selectionStart: expected 7 to be 2 // Object.is equality
+ ✓ |unit-node| src/shapes/Object/ObjectGeometry.spec.ts (41 tests) 32ms
+ ❯ |unit-node| src/shapes/Image.spec.ts (49 tests | 6 failed | 1 skipped) 1223ms
+   ✓ FabricImage > Svg export > It exports an svg with styles for an image with stroke 5ms
+   ✓ FabricImage > ApplyFilter use cacheKey 3ms
+   ✓ FabricImage > SVG import > can import images when xlink:href attribute is set  602ms
+   ✓ FabricImage > SVG import > can import images when href attribute has no xlink 147ms
+   ✓ FabricImage > constructor 3ms
+   ✓ FabricImage > toObject 2ms
+   ✓ FabricImage > setSrc 3ms
+   ✓ FabricImage > setSrc with crossOrigin 6ms
+   ✓ FabricImage > toObject with no element 3ms
+   ✓ FabricImage > toObject with resize filter 4ms
+   ✓ FabricImage > toObject with normal filter and resize filter 146ms
+   ✓ FabricImage > toObject with applied resize filter 5ms
+   ✓ FabricImage > toString 3ms
+   ✓ FabricImage > toSVG with crop 3ms
+   ✓ FabricImage > hasCrop 1ms
+   ✓ FabricImage > toSVG 3ms
+   ✓ FabricImage > toSVG with imageSmoothing false 2ms
+   ✓ FabricImage > toSVG with missing element 2ms
+   ✓ FabricImage > getSrc 2ms
+   ✓ FabricImage > getSrc with srcFromAttribute 2ms
+   ✓ FabricImage > getElement 0ms
+   ✓ FabricImage > setElement 9ms
+   ✓ FabricImage > setElement calls `removeTexture` 1ms
+   ↓ FabricImage > setElement resets the webgl cache [Skip test if WebGL backend is not available]
+   ✓ FabricImage > fromObject 2ms
+   ✓ FabricImage > fromObject with clipPath and filters 4ms
+   ✓ FabricImage > fromURL 2ms
+   ✓ FabricImage > fromURL error 129ms
+   ✓ FabricImage > apply filters run isNeutralState implementation of filters 2ms
+   ✓ FabricImage > apply filters set the image dirty 2ms
+   ✓ FabricImage > apply filters reset _element and _filteredEl 8ms
+   ✓ FabricImage > apply filters and resize filter 18ms
+   ✓ FabricImage > apply filters set the image dirty and also the group 2ms
+   ✓ FabricImage > _renderFill respects source boundaries crop < 0 and width > elWidth 0ms
+   ✓ FabricImage > _renderFill respects source boundaries with crop and scaling 0ms
+   ✓ FabricImage > crossOrigin propagation 0ms
+   ✓ FabricImage > clone keeps equality 2ms
+   ✓ FabricImage > clone keeps width / height of the element 3ms
+   ✓ FabricImage > fromObject does not mutate input 2ms
+   ✓ FabricImage > fromURL with non‑default options 1ms
+   ✓ FabricImage > consecutive toDataURL calls give identical result 48ms
+   ✓ FabricImage > fromElement → imageSmoothing = false 4ms
+   ✓ FabricImage > fromElement with preserveAspectRatio (larger box) 4ms
+   × FabricImage > fromElement preserveAspectRatio xMidYMid meet 12ms
+     → expected 35 to be +0 // Object.is equality
+   × FabricImage > fromElement preserveAspectRatio xMidYMax meet 4ms
+     → expected 35 to be +0 // Object.is equality
+   × FabricImage > fromElement preserveAspectRatio xMidYMin meet 4ms
+     → expected 35 to be +0 // Object.is equality
+   × FabricImage > fromElement preserveAspectRatio xMinYMin meet 3ms
+     → expected 35 to be +0 // Object.is equality
+   × FabricImage > fromElement preserveAspectRatio xMidYMin meet 2ms
+     → expected 70 to be 35 // Object.is equality
+   × FabricImage > fromElement preserveAspectRatio xMaxYMin meet 6ms
+     → expected 105 to be 70 // Object.is equality
+ ✓ |unit-node| src/util/animation/animations.spec.ts (55 tests) 43ms
+ ✓ |unit-node| src/shapes/Object/Object.spec.ts (72 tests | 2 skipped) 57ms
+ ✓ |unit-node| src/shapes/Text/Text.spec.ts (68 tests) 71ms
+ ✓ |unit-node| src/LayoutManager/ActiveSelectionLayoutManager.spec.ts (2 tests) 57ms
+ ✓ |unit-node| src/ClassRegistry.spec.ts (8 tests) 46ms
+ ✓ |unit-node| src/shapes/IText/ITextKeyBehavior.test.ts (21 tests) 31ms
+ ✓ |unit-node| src/canvas/__tests__/SelectableCanvas.spec.ts (4 tests) 23ms
+ ✓ |unit-node| src/shapes/Image-filters.spec.ts (128 tests) 20ms
+ ✓ |unit-node| src/gradient/Gradient.spec.ts (33 tests) 29ms
+ ✓ |unit-node| src/Pattern/Pattern.spec.ts (14 tests) 32ms
+ ✓ |unit-node| src/canvas/__tests__/eventData.test.ts (41 tests | 2 skipped) 669ms
+ ✓ |unit-node| src/shapes/Path.spec.ts (29 tests) 18ms
+ ✓ |unit-node| src/parser/loadSVGFromString.test.ts (5 tests) 22ms
+ ✓ |unit-node| src/parser/getCSSRules.spec.ts (3 tests) 15ms
+ ✓ |unit-node| src/shapes/Object/StackedObject.spec.ts (7 tests) 13ms
+ ✓ |unit-node| src/controls/scale.test.ts (4 tests) 23ms
+ ✓ |unit-node| src/shapes/Text/TextSVGExportMixin.spec.ts (10 tests) 16ms
+ ✓ |unit-node| src/controls/pathControl.spec.ts (1 test) 17ms
+ ✓ |unit-node| src/controls/polyControl.spec.ts (1 test) 12ms
+ ❯ |unit-node| src/canvas/Canvas.spec.ts (118 tests | 13 failed) 1647ms
+   ✓ Canvas > touchStart > will prevent default to not allow dom scrolling on canvas touch drag 9ms
+   ✓ Canvas > touchStart > will not prevent default when allowTouchScrolling is true and there is no action 5ms
+   ✓ Canvas > touchStart > will prevent default when allowTouchScrolling is true but we are drawing 5ms
+   ✓ Canvas > touchStart > will prevent default when allowTouchScrolling is true and we are dragging an object 7ms
+   ✓ Canvas > touchStart > will NOT prevent default when allowTouchScrolling is true and we just lost selection 10ms
+   ✓ Canvas > touchStart > dispose after _onTouchStart 5ms
+   ✓ Canvas > handleMultiSelection > Selecting shapes containing text does not trigger the exit event 8ms
+   ✓ Canvas > prevents multiple canvas initialization 4ms
+   ✓ Canvas > initializes with element existing in the dom 9ms
+   ✓ Canvas > has expected initial properties 2ms
+   ✓ Canvas > implements getObjects method 9ms
+   ✓ Canvas > implements getElement method 2ms
+   ✓ Canvas > implements item method 12ms
+   ✓ Canvas > preserveObjectStacking property 2ms
+   ✓ Canvas > uniformScaling property 2ms
+   ✓ Canvas > uniScaleKey property 2ms
+   ✓ Canvas > centeredScaling property 2ms
+   ✓ Canvas > centeredRotation property 2ms
+   ✓ Canvas > centeredKey property 2ms
+   ✓ Canvas > altActionKey property 2ms
+   ✓ Canvas > selection property 2ms
+   ✓ Canvas > initializes DOM elements correctly 2ms
+   ✓ Canvas > implements renderTop method 2ms
+   ✓ Canvas > implements _chooseObjectsToRender method 21ms
+   ✓ Canvas > implements calcOffset method 2ms
+   ✓ Canvas > implements add method 23ms
+   ✓ Canvas > implements insertAt method 22ms
+   ✓ Canvas > implements remove method 19ms
+   ✓ Canvas > clears hovered target when removed 19ms
+   ✓ Canvas > fires before:selection:cleared only when removing active objects 38ms
+   ✓ Canvas > provides deselected objects in before:selection:cleared event 22ms
+   ✓ Canvas > fires selection:cleared only when removing active objects 19ms
+   ✓ Canvas > creating active selection fires selection:created event 22ms
+   ✓ Canvas > creating active selection fires selected event on new objects 25ms
+   ✓ Canvas > starts multiselection with correct order (default) 24ms
+   ✓ Canvas > starts multiselection with canvas stacking order 19ms
+   ✓ Canvas > fires selection:updated when updating active selection 27ms
+   ✓ Canvas > fires deselected event when removing object from active selection 21ms
+   ✓ Canvas > fires selected event when adding object to active selection 22ms
+   ✓ Canvas > respects order of objects in continuing multiselection 47ms
+   ✓ Canvas > toggles selected objects in multiselection 19ms
+   ✓ Canvas > toggles nested target when clicking inside active selection 23ms
+   ✓ Canvas > does nothing when clicking active selection area 22ms
+   × Canvas > selects target behind active selection when using selection key 33ms
+     → added from behind active selection: expected [ Rect{ …(80) }, Rect{ …(80) } ] to deeply equal [ Rect{ …(80) }, Rect{ …(77) }, …(1) ]
+   ✓ Canvas > fires deselected event when changing active object 2ms
+   ✓ Canvas > fires selected event for each object when group selecting 22ms
+   ✓ Canvas > fires selection:created when multiple objects are selected 23ms
+   ✓ Canvas > fires selection:created when a single object is selected 20ms
+   ✓ Canvas > collects topmost object when no dragging occurs 22ms
+   ✓ Canvas > does not collect objects with onSelect returning true 21ms
+   × Canvas > does not call onSelect on objects that are not intersected 20ms
+     → rect1 was selected: expected ActiveSelection{ …(84) } to be Rect{ …(81) } // Object.is equality
+   ✓ Canvas > returns false from handleMultiSelection when onSelect returns true 2ms
+   ✓ Canvas > returns true from handleMultiSelection when onSelect returns false and selectionKey is true 2ms
+   ✓ Canvas > returns false from handleMultiSelection when selectionKey is false 2ms
+   ✓ Canvas > fires multiple events from _fireSelectionEvents 3ms
+   ✓ Canvas > implements getContext method 1ms
+   ✓ Canvas > implements clearContext method 1ms
+   ✓ Canvas > implements clear method and empties the canvas 18ms
+   ✓ Canvas > implements renderAll method 2ms
+   ✓ Canvas > implements _drawSelection method 1ms
+   ✓ Canvas > finds target objects correctly with findTarget 19ms
+   ✓ Canvas > implements toDataURL method that returns valid data URL 17ms
+   ✓ Canvas > implements getCenterPoint method that returns canvas center as Point 2ms
+   ✓ Canvas > centers objects horizontally with centerObjectH 21ms
+   ✓ Canvas > centers objects vertically with centerObjectV 21ms
+   ✓ Canvas > centers objects with centerObject 21ms
+   × Canvas > serializes to JSON with toJSON 19ms
+     → expected { version: '7.0.0-beta1', …(3) } to deeply equal { version: '7.0.0-beta1', …(3) }
+   ✓ Canvas > serializes to JSON with active selection 22ms
+   × Canvas > serializes to dataless JSON with toDatalessJSON 21ms
+     → expected { version: '7.0.0-beta1', …(1) } to deeply equal { version: '7.0.0-beta1', …(1) }
+   ✓ Canvas > converts to object with toObject 20ms
+   × Canvas > includes clipPath in toObject when present 5ms
+     → expected { version: '7.0.0-beta1', …(2) } to deeply equal { version: '7.0.0-beta1', …(2) }
+   ✓ Canvas > converts to dataless object with toDatalessObject 19ms
+   ✓ Canvas > checks if canvas is empty with isEmpty 19ms
+   ✓ Canvas > loads from JSON string with loadFromJSON 3ms
+   ✓ Canvas > loads from JSON object with loadFromJSON 2ms
+   × Canvas > loads from JSON object without default values 2ms
+     → expected 'center' to be 'left' // Object.is equality
+   ✓ Canvas > loads from JSON with reviver function 2ms
+   ✓ Canvas > loads from JSON with no objects 3ms
+   ✓ Canvas > loads from JSON without "objects" property 2ms
+   ✓ Canvas > loads from JSON with empty Group 3ms
+   ✓ Canvas > loads from JSON with async content 19ms
+   ✓ Canvas > loads custom properties on Canvas with no async objects 2ms
+   ✓ Canvas > loads custom properties on Canvas with image 8ms
+   ✓ Canvas > sends objects to the back of the stack 21ms
+   ✓ Canvas > brings objects to the front of the stack 20ms
+   ✓ Canvas > sends objects backwards in the stack 21ms
+   ✓ Canvas > brings objects forward in the stack 20ms
+   ✓ Canvas > sets active object and tracks it 20ms
+   ✓ Canvas > gets active object 23ms
+   ✓ Canvas > sets and gets active object with groups 2ms
+   ✓ Canvas > retrieves objects by index with item method 18ms
+   ✓ Canvas > discards active object on ActiveSelection 2ms
+   ✓ Canvas > discards active object with internal method 18ms
+   ✓ Canvas > cleans up transform when discarding active object 20ms
+   ✓ Canvas > discards active object and fires events 20ms
+   ✓ Canvas > refuses to discard active object when onDeselect returns true 19ms
+   ✓ Canvas > calculates complexity based on number of objects 20ms
+   ✓ Canvas > converts to string representation 18ms
+   ✓ Canvas > produces same SVG with or without active selection 21ms
+   ✓ Canvas > set dimensions with enableRetinaScaling=true > sets and restores dimensions correctly 21ms
+   ✓ Canvas > set dimensions with enableRetinaScaling=false > sets and restores dimensions correctly 21ms
+   ✓ Canvas > clones the canvas and its contents 20ms
+   ✓ Canvas > clones the canvas without data 21ms
+   ✓ Canvas > gets and sets width 17ms
+   ✓ Canvas > gets and sets height 19ms
+   ✓ Canvas > sets width with cssOnly option 18ms
+   ✓ Canvas > sets height with cssOnly option 18ms
+   ✓ Canvas > sets width with backstoreOnly option 19ms
+   ✓ Canvas > sets height with backstoreOnly option 20ms
+   × Canvas > sets up current transform based on interaction point 22ms
+     → no corner selected: expected 'br' to be '' // Object.is equality
+   × Canvas > isTargetTransparent with objectCaching = true > detects transparent regions correctly 18ms
+     → checking transparency of (-5, -5), expected to be true, outside, : expected false to be true // Object.is equality
+   × Canvas > isTargetTransparent with objectCaching = true > detects transparent regions correctly with viewport transform 18ms
+     → checking transparency of (0, 0), expected to be false, stroke, : expected true to be false // Object.is equality
+   × Canvas > isTargetTransparent with objectCaching = true > detects transparent regions correctly with viewport transform and tolerance 20ms
+     → checking transparency of (-10, -10), expected to be true, outside, : expected false to be true // Object.is equality
+   × Canvas > isTargetTransparent with objectCaching = false > detects transparent regions correctly 19ms
+     → checking transparency of (-5, -5), expected to be true, outside, : expected false to be true // Object.is equality
+   × Canvas > isTargetTransparent with objectCaching = false > detects transparent regions correctly with viewport transform 19ms
+     → checking transparency of (0, 0), expected to be false, stroke, : expected true to be false // Object.is equality
+   × Canvas > isTargetTransparent with objectCaching = false > detects transparent regions correctly with viewport transform and tolerance 18ms
+     → checking transparency of (-10, -10), expected to be true, outside, : expected false to be true // Object.is equality
+   ✓ Canvas > provides access to top context with getTopContext 2ms
+   ✓ Canvas > determines when transformations should be centered 1ms
+ ✓ |unit-node| src/controls/Control-cursor.spec.ts (32 tests) 15ms
+ ✓ |unit-node| src/util/path/index.spec.ts (12 tests) 13ms
+ ✓ |unit-node| src/shapes/Polyline.spec.ts (21 tests) 14ms
+ ✓ |unit-node| src/shapes/Object/Object-clip-path.spec.ts (7 tests) 15ms
+ ✓ |unit-node| src/util/typeAssertions.spec.ts (19 tests) 18ms
+ ✓ |unit-node| src/parser/applyViewboxTransform.spec.ts (22 tests) 12ms
+ ✓ |unit-node| src/parser/parseUseDirectives.test.ts (5 tests) 9ms
+ ✓ |unit-node| src/color/color.test.ts (40 tests) 13ms
+ ✓ |unit-node| src/Intersection.spec.ts (44 tests) 13ms
+ ✓ |unit-node| src/Point.spec.ts (34 tests) 10ms
+ ✓ |unit-node| src/shapes/Object/Object-interactivity.spec.ts (13 tests) 13ms
+ ✓ |unit-node| src/controls/Control.spec.ts (2 tests) 20ms
+ ✓ |unit-node| src/shapes/Rect.spec.ts (15 tests) 18ms
+ ✓ |unit-node| src/Collection.spec.ts (18 tests) 14ms
+ ✓ |unit-node| src/shapes/Text/StyledText.spec.ts (2 tests) 10ms
+ ✓ |unit-node| src/Shadow.spec.ts (15 tests) 9ms
+ ✓ |unit-node| src/util/misc/dom.spec.ts (6 tests) 9ms
+ ✓ |unit-node| src/util/internals/getRandomInt.test.ts (5 tests) 7ms
+ ✓ |unit-node| src/shapes/Object/ObjectOrigin.spec.ts (13 tests) 10ms
+ ✓ |unit-node| src/util/misc/groupSVGElements.spec.ts (2 tests) 9ms
+ ✓ |unit-node| extensions/data_updaters/gradient/index.spec.ts (8 tests) 10ms
+ ✓ |unit-node| src/Observable.spec.ts (16 tests) 6ms
+ ✓ |unit-node| src/util/misc/planeChange.spec.ts (4 tests) 7ms
+ ✓ |unit-node| src/util/misc/mergeClipPaths.spec.ts (3 tests) 9ms
+ ✓ |unit-node| extensions/data_updaters/origins/index.spec.ts (2 tests) 8ms
+ ✓ |unit-node| src/brushes/CircleBrush.test.ts (1 test) 6ms
+ ✓ |unit-node| src/filters/ColorMatrix.spec.ts (2 tests) 2ms
+ ✓ |unit-node| src/util/internals/cloneStyles.spec.ts (1 test) 4ms
+ ✓ |unit-node| src/util/misc/matrix.spec.ts (12 tests) 7ms
+ ✓ |unit-node| src/canvas/DOMManagers/util.spec.ts (2 tests) 3ms
+ ✓ |unit-node| extensions/aligning_guidelines/util/basic.spec.ts (2 tests) 3ms
+ ✓ |unit-node| src/shapes/Object/ObjectSerialization.spec.ts (6 tests) 4ms
+ ✓ |unit-node| src/shapes/Object/FabricObject.spec.ts (1 test) 3ms
+ ✓ |unit-node| src/util/misc/svgParsing.spec.ts (3 tests) 3ms
+ ✓ |unit-node| src/util/misc/vectors.spec.ts (5 tests) 3ms
+ ✓ |unit-node| src/parser/constants.spec.ts (5 tests) 3ms
+ ✓ |unit-node| src/util/index.spec.ts (1 test) 4ms
+ ✓ |unit-node| src/controls/wrapWithFixedAnchor.spec.ts (2 tests) 4ms
+ ✓ |unit-node| src/cache.spec.ts (5 tests) 6ms
+ ✓ |unit-node| src/util/lang_string.spec.ts (5 tests) 3ms
+ ✓ |unit-node| src/filters/WebGLFilterBackend.spec.ts (3 tests | 1 skipped) 2ms
+ ✓ |unit-node| src/util/misc/radiansDegreesConversion.spec.ts (2 tests) 2ms
+ ✓ |unit-node| src/util/internals/removeFromArray.spec.ts (1 test) 3ms
+ ✓ |unit-node| src/util/misc/findScaleTo.spec.ts (2 tests) 2ms
+ ✓ |unit-node| src/util/misc/capValue.spec.ts (3 tests) 2ms
+ ✓ |unit-node| src/util/misc/boundingBoxFromPoints.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/util/misc/objectTransforms.spec.ts (2 tests) 4ms
+ ✓ |unit-node| src/util/internals/cleanupSvgAttribute.test.ts (3 tests) 3ms
+ ✓ |unit-node| src/util/internals/dom_style.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/util/misc/pick.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/filters/BaseFilter.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/util/misc/toFixed.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/util/misc/cos.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/brushes/BaseBrush.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/util/dom_event.spec.ts (1 test) 2ms
+ ✓ |unit-node| src/env/env.spec.ts (1 test) 1ms
+ ↓ |unit-node| src/util/misc/objectEnlive.spec.ts (7 tests | 7 skipped)
+
+  Snapshots  3 failed
+             1 obsolete
+             ↳ src/shapes/Textbox.spec.ts
+               · Textbox > fromObject 2
+
+ Test Files  19 failed | 79 passed | 1 skipped (99)
+      Tests  95 failed | 1762 passed | 14 skipped | 3 todo (1874)
+   Start at  17:00:16
+   Duration  4.17s (transform 2.39s, setup 5.50s, collect 13.00s, tests 8.59s, environment 3.61s, prepare 7.59s)
+
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
