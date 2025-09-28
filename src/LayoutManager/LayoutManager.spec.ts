@@ -350,7 +350,9 @@ describe('Layout Manager', () => {
       const lifecycle: vi.SpyInstance[] = [];
 
       const targets = [new Group([new FabricObject()]), new FabricObject()];
-      const target = new Group(targets, { strokeWidth: 0 });
+      const target = new Group(targets, {
+        strokeWidth: 0,
+      });
       const targetSet = vi.spyOn(target, 'set').mockImplementation(() => {
         lifecycle.push(targetSet);
       });
@@ -387,6 +389,7 @@ describe('Layout Manager', () => {
       return {
         manager,
         context,
+        target,
         layoutResult: {
           result: { center: new Point(5, 5), size: new Point(10, 10) },
           prevCenter: new Point(),
@@ -433,8 +436,8 @@ describe('Layout Manager', () => {
         expect(layoutObjects).toBeCalledWith(context, layoutResult);
         expect(targetMocks.set).nthCalledWith(2, {
           // this needs to be investigated.
-          left: pos.x ?? 0,
-          top: pos.y ?? 0,
+          left: pos.x ?? 5,
+          top: pos.y ?? 5,
         });
       },
     );

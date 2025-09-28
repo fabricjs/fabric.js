@@ -30,6 +30,7 @@ import { getDocumentFromElement } from '../util/dom_misc';
 import type { CSSRules } from '../parser/typedefs';
 import type { Resize, ResizeSerializedProps } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
+import { Point } from '../Point';
 import { log } from '../util/internals/console';
 
 // @todo Would be nice to have filtering code not imported directly.
@@ -826,19 +827,27 @@ export class FabricImage<
     options: Abortable = {},
     cssRules?: CSSRules,
   ) {
-    const parsedAttributes = parseAttributes(
-      element,
-      this.ATTRIBUTE_NAMES,
-      cssRules,
-    );
-    return this.fromURL(
-      parsedAttributes['xlink:href'] || parsedAttributes['href'],
-      options,
-      parsedAttributes,
-    ).catch((err) => {
-      log('log', 'Unable to parse Image', err);
+    const {
+      x,
+      y,
+      strokeWidth,
+      href,
+      'xlink:href': xlinkHref,
+      ...restOfParsedAttributes
+    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
+    try {
+      const image = await this.fromURL(
+        xlinkHref || href,
+        options,
+        restOfParsedAttributes,
+      );
+      image.setPositionByOrigin(new Point(x, y), 'left', 'top');
+      image.strokeWidth = strokeWidth;
+      return image;
+    } catch (e) {
+      log('log', 'Unable to parse Image', e);
       return null;
-    });
+    }
   }
 }
 

@@ -994,8 +994,8 @@ describe('FabricImage', () => {
         img,
         img.parsePreserveAspectRatioAttribute(),
       );
-      expect(img.left).toBe(expLeft);
-      expect(img.top).toBe(expTop);
+      expect(img.left).toBe(expLeft + w / 2);
+      expect(img.top).toBe(expTop + h / 2);
       expect(img.scaleX).toBe(5);
       expect(img.scaleY).toBe(5);
     });
