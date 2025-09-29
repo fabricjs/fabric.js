@@ -21,7 +21,7 @@ describe('fabric.controlsUtils', () => {
   const canvas = new Canvas(undefined);
 
   beforeEach(() => {
-    const target = new Rect({ width: 100, height: 100 });
+    const target = new Rect({ left: 50.5, top: 50.5, width: 100, height: 100 });
     canvas.add(target);
     eventData = {} as TPointerEvent;
     transform = prepareTransform(target, 'mr');
