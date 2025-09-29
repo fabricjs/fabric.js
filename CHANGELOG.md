@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @playwright/test from 1.55.0 to 1.55.1 [#10761](https://github.com/fabricjs/fabric.js/pull/10761)
 - chore(deps): bump the npm_and_yarn group across 2 directories with 2 updates [#10734](https://github.com/fabricjs/fabric.js/pull/10734)
 - chore(deps-dev): bump @babel/core from 7.28.3 to 7.28.4 [#10753](https://github.com/fabricjs/fabric.js/pull/10753)
 - chore(): remove chalk [#10758](https://github.com/fabricjs/fabric.js/pull/10758)
