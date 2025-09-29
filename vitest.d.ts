@@ -17,7 +17,7 @@ interface CustomMatchers<R = unknown, T = unknown> {
 
   toMatchObjectSnapshot(propertiesOrHint?: ObjectOptions<T>, hint?: string): R;
 
-  toMatchSVGSnapshot(propertiesOrHint?: ObjectOptions<T>, hint?: string): R;
+  toMatchSVGSnapshot(hint?: string): R;
 
   toEqualRoundedMatrix(expected: TMat2D, precision?: number): R;
 

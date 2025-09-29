@@ -6,10 +6,10 @@ import { FabricObject, getFabricDocument, version } from '../../fabric';
 const REFERENCE_PATH_OBJECT = {
   version: version,
   type: 'Path',
-  originX: 'left' as const,
-  originY: 'top' as const,
-  left: 100,
-  top: 100,
+  originX: 'center' as const,
+  originY: 'center' as const,
+  left: 200,
+  top: 200,
   width: 200,
   height: 200,
   fill: 'red',
@@ -113,7 +113,7 @@ describe('Path', () => {
       strokeWidth: 0,
     });
 
-    expect(path.left, 'left should be 100').toBe(100);
+    expect(path.left, 'left should be 150').toBe(150);
     expect(path.top, 'top should be 0').toBe(0);
   });
 
@@ -122,8 +122,8 @@ describe('Path', () => {
       strokeWidth: 50,
     });
 
-    expect(path.left, 'left should be 75').toBe(75);
-    expect(path.top, 'top should be 75').toBe(75);
+    expect(path.left, 'left should be 150').toBe(150);
+    expect(path.top, 'top should be 150').toBe(150);
   });
 
   it('initialize with strokeWidth with originX and originY center/center', () => {
@@ -233,7 +233,7 @@ describe('Path', () => {
       'function',
     );
     expect(path.toString(), 'toString should return expected string').toBe(
-      '#<Path (4): { "top": 100, "left": 100 }>',
+      '#<Path (4): { "top": 200, "left": 200 }>',
     );
   });
 
@@ -280,7 +280,7 @@ describe('Path', () => {
     path.strokeWidth = 2;
 
     expect(path.toSVG(), 'SVG output should match expected').toEqualSVG(
-      '<g transform="matrix(1 0 0 1 201 201)"  >\n<path style="stroke: rgb(0,0,255); stroke-width: 2; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  transform=" translate(-200, -200)" d="M 100 100 L 300 100 L 200 300 Z" stroke-linecap="round" />\n</g>\n',
+      '<g transform="matrix(1 0 0 1 200 200)"  >\n<path style="stroke: rgb(0,0,255); stroke-width: 2; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  transform=" translate(-200, -200)" d="M 100 100 L 300 100 L 200 300 Z" stroke-linecap="round" />\n</g>\n',
     );
   });
 

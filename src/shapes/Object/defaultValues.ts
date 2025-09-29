@@ -7,6 +7,7 @@ import {
   SKEW_Y,
   FILL,
   STROKE,
+  CENTER,
 } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { InteractiveFabricObject } from './InteractiveObject';
@@ -63,8 +64,8 @@ export const fabricObjectDefaultValues: Partial<
   minScaleLimit: 0,
   skewX: 0,
   skewY: 0,
-  originX: LEFT,
-  originY: TOP,
+  originX: CENTER,
+  originY: CENTER,
   strokeWidth: 1,
   strokeUniform: false,
   padding: 0,

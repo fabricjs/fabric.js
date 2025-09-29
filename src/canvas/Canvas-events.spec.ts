@@ -126,7 +126,7 @@ describe('Canvas events mixin', () => {
       clientX: 30,
       clientY: 40,
     });
-    const rect = new Rect({ width: 150, height: 150 });
+    const rect = new Rect({ top: 75, left: 75, width: 150, height: 150 });
     const expectedGroupSelector = { x: 80, y: 120, deltaX: 0, deltaY: 0 };
 
     canvas.absolutePan(new Point(50, 80));
@@ -208,8 +208,8 @@ describe('Canvas events mixin', () => {
     const greenRect = new Rect({
       width: 300,
       height: 300,
-      left: 0,
-      top: 0,
+      left: 150,
+      top: 150,
       fill: 'green',
       selectable: false,
     });
@@ -218,8 +218,8 @@ describe('Canvas events mixin', () => {
     // add red, half-transparent circle
     const redCircle = new Circle({
       radius: 40,
-      left: 200,
-      top: 100,
+      left: 240,
+      top: 140,
       fill: 'red',
       opacity: 0.5,
     });
@@ -228,8 +228,8 @@ describe('Canvas events mixin', () => {
     // add blue, half-transparent circle
     const blueCircle = new Circle({
       radius: 40,
-      left: 0,
-      top: 0,
+      left: 40,
+      top: 40,
       fill: 'blue',
       opacity: 0.5,
     });
@@ -459,14 +459,14 @@ describe('Canvas events mixin', () => {
       clientY: 100,
     });
     const rect1 = new Rect({
-      left: 0,
-      top: 0,
+      left: 25,
+      top: 25,
       width: 50,
       height: 50,
       lockMovementX: true,
       lockMovementY: true,
     });
-    const rect2 = new Rect({ left: 75, top: 75, width: 50, height: 50 });
+    const rect2 = new Rect({ left: 100, top: 100, width: 50, height: 50 });
 
     canvas.add(rect1);
     canvas.add(rect2);
@@ -492,7 +492,7 @@ describe('Canvas events mixin', () => {
       clientX: 31,
       clientY: 31,
     });
-    const rect = new Rect({ left: 0, top: 0, width: 50, height: 50 });
+    const rect = new Rect({ left: 25, top: 25, width: 50, height: 50 });
 
     canvas.add(rect);
 
@@ -527,8 +527,8 @@ describe('Canvas events mixin', () => {
       clientY: 6,
     });
     const rect = new Rect({
-      left: 0,
-      top: 0,
+      left: 1.5,
+      top: 1.5,
       width: 3,
       height: 3,
       strokeWidth: 0,
@@ -540,8 +540,8 @@ describe('Canvas events mixin', () => {
     canvas._onMouseMove(e2);
     canvas._onMouseUp(e2);
 
-    expect(rect.top, 'rect moved by 4 pixels top').toBe(4);
-    expect(rect.left, 'rect moved by 4 pixels left').toBe(4);
+    expect(rect.top, 'rect moved by 4 pixels top').toBe(5.5);
+    expect(rect.left, 'rect moved by 4 pixels left').toBe(5.5);
     expect(rect.scaleX, 'rect did not scale Y').toBe(1);
     expect(rect.scaleY, 'rect did not scale X').toBe(1);
   });
@@ -560,8 +560,8 @@ describe('Canvas events mixin', () => {
       clientY: 9,
     });
     const rect = new Rect({
-      left: 0,
-      top: 0,
+      left: 1.5,
+      top: 1.5,
       width: 3,
       height: 3,
       strokeWidth: 0,
@@ -595,6 +595,10 @@ describe('Canvas events mixin', () => {
       clientX: 9,
       clientY: 9,
     });
+
+    let mouseUpCalled = false;
+    let mouseDownCalled = false;
+
     const rect = new Rect({
       left: 0,
       top: 0,
@@ -603,9 +607,10 @@ describe('Canvas events mixin', () => {
       strokeWidth: 0,
       scaleX: 0.5,
     });
-    let mouseUpCalled = false;
-    let mouseDownCalled = false;
+    rect.setPositionByOrigin(new Point(0, 0), 'left', 'top');
 
+    const otherRect = new Rect({ left: 100, top: 100, width: 3, height: 3 });
+    otherRect.setPositionByOrigin(new Point(100, 100), 'left', 'top');
     rect.controls = {
       br: rect.controls.br,
     };
@@ -616,14 +621,12 @@ describe('Canvas events mixin', () => {
       mouseDownCalled = true;
     };
 
-    const group = new Group(
-      [rect, new Rect({ left: 100, top: 100, width: 3, height: 3 })],
-      {
-        interactive: true,
-        subTargetCheck: true,
-        scaleX: 2,
-      },
-    );
+    const group = new Group([rect, otherRect], {
+      interactive: true,
+      subTargetCheck: true,
+      scaleX: 2,
+    });
+    group.setPositionByOrigin(new Point(0, 0), 'left', 'top');
     canvas.add(group);
     canvas.setActiveObject(rect);
 
@@ -640,7 +643,7 @@ describe('Canvas events mixin', () => {
       'mouse down handler for control has been called',
     ).toBe(true);
     expect(rect.calcTransformMatrix()).toEqual([3, 0, 0, 3, 4.5, 4.5]);
-    expect(rect.getXY()).toEqual(new Point());
+    expect(rect.getXY()).toEqual(new Point(4.5, 4.5));
   });
 
   it('drags a nested target', () => {
@@ -665,15 +668,18 @@ describe('Canvas events mixin', () => {
       scaleX: 0.5,
     });
     rect.controls = {};
+    rect.setPositionByOrigin(new Point(0, 0), 'left', 'top');
 
-    const group = new Group(
-      [rect, new Rect({ left: 100, top: 100, width: 3, height: 3 })],
-      {
-        interactive: true,
-        subTargetCheck: true,
-        scaleX: 2,
-      },
-    );
+    const otherRect = new Rect({ left: 100, top: 100, width: 3, height: 3 });
+    otherRect.setPositionByOrigin(new Point(100, 100), 'left', 'top');
+
+    const group = new Group([rect, otherRect], {
+      interactive: true,
+      subTargetCheck: true,
+      scaleX: 2,
+    });
+    group.setPositionByOrigin(new Point(0, 0), 'left', 'top');
+
     canvas.add(group);
     canvas.setActiveObject(rect);
 
@@ -683,7 +689,7 @@ describe('Canvas events mixin', () => {
     canvas._onMouseUp(e2);
 
     expect(rect.calcTransformMatrix()).toEqual([1, 0, 0, 1, 9.5, 9.5]);
-    expect(rect.getXY()).toEqual(new Point(8, 8));
+    expect(rect.getXY()).toEqual(new Point(9.5, 9.5));
   });
 
   it('calls mouseup and mousedown on the control during transform', () => {
@@ -958,7 +964,7 @@ describe('Canvas events mixin', () => {
       let counter = 0;
       let target;
       const c = new Canvas();
-      const rect = new Rect({ top: -4, left: -4, width: 12, height: 12 });
+      const rect = new Rect({ top: 2, left: 2, width: 12, height: 12 });
 
       c.add(rect);
       c.on(eventname as any, function (opt) {
@@ -1563,6 +1569,8 @@ describe('Canvas events mixin', () => {
 
     const a = new IText('test');
     const b = new IText('test');
+    a.setPositionByOrigin(new Point(0, 0), 'left', 'top');
+    b.setPositionByOrigin(new Point(0, 0), 'left', 'top');
     const e = createPointerEvent({
       clientX: 30,
       clientY: 40,
