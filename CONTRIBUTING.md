@@ -4,13 +4,13 @@ First of all thank you for your interest in contributing. 🙏
 
 This guide covers all you need to know from the start, for a first time contributor, advancing to the more advanced topics as you continue reading.
 
-## What is a contribution, who is a conributor
+## What is a contribution, who is a contributor
 
 A Contributor is anyone who simply adds to the project, without any formal membership. Contributions do not need to be code. Contributions can be code, docs, issue triaging, discussions, ideas.
 
 If you are starting your coding journey, contributions are a good way to learn skills, learn development workflows, meet other developers.
 
-If you find yourself contribuing often you may be interested in the [Contributor ladder](CONTRIBUOR_LADDER.md)
+If you find yourself contributing often you may be interested in the [Contributor ladder](CONTRIBUTOR_LADDER.md)
 
 ## Asking Questions
 
@@ -28,7 +28,7 @@ Demos and examples can be found on [fabricjs.com][website], [`jsfiddle`][jsfiddl
 - **Before You Begin** 🎬
   - Make sure you didn't fall into a known [**GOTCHA**][gotchas].
   - [**Searching**][search_issues] for existing issues and discussions is
-    **VITAL** in order to keep the community in a good state, prevent spamming and avoid consuming comunity time.
+    **VITAL** in order to keep the community in a good state, prevent spamming and avoid consuming community time.
     If you need to open a new issue then:
 - **Fill out the [bug report][bug_report] with care**, it is there for a reason.
 - The **Title** must be informative, short and 🧿 to the point.
@@ -76,7 +76,7 @@ Answering questions and addressing issues, as well as fixing and adding types (s
 ## Fixing Bugs
 
 - Open an [issue](#issue-tracker), if there isn't any, addressing the bug.
-- If the isse is labeled as 'bug' then it needs a fix. Do not open a PR before that moment.
+- If the issue is labeled as 'bug' then it needs a fix. Do not open a PR before that moment.
 - Once the issue is confirmed as a bug you can fix it, mention in the issue you are working to fix it and check [Developing](#developing).
 - Add [tests](#testing).
 - Open [PR](#pull-requests)

@@ -4,7 +4,7 @@ Hello! We are excited that you want to learn more about our project contributor 
 
 Each of the roles is organized into lists of three types of things. "Responsibilities" are things that a contributor is expected to do. "Requirements" are qualifications a person needs to meet to be in that role, and "Privileges" are things contributors on that level are entitled to.
 
-This document has been started September 2025 and will be subjected to changes depending from people feedback.
+This document has been started September 2025 and will be subjected to changes depending on people feedback.
 
 ## Community Participant
 
@@ -24,7 +24,7 @@ Reviewing pull requests
 
 ## Contributor
 
-A Contributor is anyone who simply adds to the project, without any formal membership. Contributions do no have to be code. People at the contributor level may be new contributors, or they may only contribute occasionally.
+A Contributor is anyone who simply adds to the project, without any formal membership. Contributions do not have to be code. People at the contributor level may be new contributors, or they may only contribute occasionally.
 
 ### Requirements
 
@@ -38,11 +38,11 @@ Respond to questions and feedback from organization members
 
 ## Organization Member
 
-An Organization Member is an established contributor who regularly participates in the project. Organization Members have privileges in project repositories and discussions around the direcion of the project, and as such are expected to act in the interests of the whole project.
+An Organization Member is an established contributor who regularly participates in the project. Organization Members have privileges in project repositories and discussions around the direction of the project, and as such are expected to act in the interests of the whole project.
 
 ### Requirements
 
-All the contributor requiremens
+All the contributor requirements
 Contributes regularly
 Upholds community and code of conduct values
 Enabled secure two-factor authentication on their GitHub account
@@ -50,11 +50,11 @@ Enabled secure two-factor authentication on their GitHub account
 ### Responsibilities and privileges
 
 All the contributor responsibilities and privileges
-Organization members can meet reguraly in a chat to discuss the project and priorities.
+Organization members can meet regularly in a chat to discuss the project and priorities.
 
 Organization member still contribute from forks.
 
-FabricJS is a small project, if you want to be an organization member, ask the mainainer via email or in an issue, mention the work you have done, and self nominate you to become a member.
+FabricJS is a small project, if you want to be an organization member, ask the maintainer via email or in an issue, mention the work you have done, and self nominate you to become a member.
 
 ## Triager
 
@@ -115,7 +115,7 @@ As of today ( sept 2025 ) clear project goals and guidelines are not written nor
 
 For now there is one maintainer. Andrea Bogazzi.
 There is also another maintainer that is a dear friend and likely one between the first people to know if something happens to me and we lost the maintainer, but is not actively contributing to the project.
-In the short term i don't plan to add more maintainers, unless my interest in the project diminish and is clear that i m trascuring it.
+In the short term I don't plan to add more maintainers, unless my interest in the project diminishes and it is clear that I'm neglecting it.
 
 Open source projects that are an hobby may have wave of contributions depending on the particular moment in the life of the project and the life of people contributing to it, if someone feels like to take a break for a period it should be free to do so without too many problems.
 
