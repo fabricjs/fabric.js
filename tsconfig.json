@@ -109,6 +109,7 @@
     "e2e",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
+    "src/**/*.fixture.ts",
     "vitest.extend.ts",
     "vitest.config.ts",
     "vitest.d.ts",

@@ -28,7 +28,7 @@ import {
   PATH_WITHOUT_DEFAULTS_JSON,
   PATH_JSON,
   RECT_JSON,
-} from './Canvas.fixtures.ts';
+} from './Canvas.fixture.ts';
 
 describe('Canvas', () => {
   let canvas: Canvas;

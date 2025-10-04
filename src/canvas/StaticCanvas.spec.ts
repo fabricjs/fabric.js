@@ -31,7 +31,7 @@ import {
   IMG_SRC,
   IMG_WIDTH,
   IMG_HEIGHT,
-} from './StaticCanvas.fixtures';
+} from './StaticCanvas.fixture';
 import { isJSDOM, sanitizeSVG } from '../../vitest.extend';
 
 describe('StaticCanvas', () => {
