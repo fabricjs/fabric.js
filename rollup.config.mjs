@@ -22,7 +22,7 @@ const plugins = [
       'dist-extensions',
       '**/**.spec.ts',
       '**/**.test.ts',
-      '**/**.fixture.ts',
+      '**/**.fixtures.ts',
     ],
   }),
   babel({

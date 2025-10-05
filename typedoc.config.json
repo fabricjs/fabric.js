@@ -8,6 +8,6 @@
     "e2e",
     "**/*.test.ts",
     "**/*.spec.ts",
-    "**/*.fixture.ts"
+    "**/*.fixtures.ts"
   ]
 }
