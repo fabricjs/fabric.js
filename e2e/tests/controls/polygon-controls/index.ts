@@ -1,4 +1,4 @@
-import { Polygon, controlsUtils } from 'fabric';
+import { Polygon, controlsUtils, Point } from 'fabric';
 import { beforeAll } from '../../test';
 
 beforeAll((canvas) => {
@@ -23,6 +23,8 @@ beforeAll((canvas) => {
   star.controls = controlsUtils.createPolyControls(5);
 
   canvas.add(star);
+  star.setPositionByOrigin(new Point(100, 100), 'left', 'top');
+
   canvas.setActiveObject(star);
 
   return { star };

@@ -3,7 +3,7 @@
  * Imports are defined in 'e2e/imports.ts'
  */
 
-import { Rect, ActiveSelection } from 'fabric';
+import { Rect, ActiveSelection, Point } from 'fabric';
 import { beforeAll } from '../../test';
 
 beforeAll(async (canvas) => {
@@ -21,6 +21,8 @@ beforeAll(async (canvas) => {
     originY: 'bottom',
     fill: 'green',
   });
+  rect1.setPositionByOrigin(new Point(250, 250), 'left', 'top');
+
   const rect2 = new Rect({
     strokeWidth: 0,
     left: 255,
@@ -31,6 +33,7 @@ beforeAll(async (canvas) => {
     originY: 'top',
     fill: 'yellow',
   });
+  rect2.setPositionByOrigin(new Point(255, 255), 'left', 'top');
 
   canvas.add(rect1, rect2);
 
