@@ -3,6 +3,7 @@
 ## [next]
 
 - BREAKING chore(): Deprecate originX and originY and change their default to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)
+- chore(deps-dev): bump @playwright/test from 1.55.0 to 1.55.1 [#10761](https://github.com/fabricjs/fabric.js/pull/10761)
 - test(): Add new e2e import test for svg preserve aspect ratio [#10766](https://github.com/fabricjs/fabric.js/pull/10766)
 - chore() Revisit and reduce contribution guidelines, try to streamline things [#10759](https://github.com/fabricjs/fabric.js/pull/10759)
 - chore(deps): bump the npm_and_yarn group across 2 directories with 2 updates [#10734](https://github.com/fabricjs/fabric.js/pull/10734)
