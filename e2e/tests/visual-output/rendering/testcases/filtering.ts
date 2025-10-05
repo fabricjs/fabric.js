@@ -12,9 +12,10 @@ const imageAlphaBlurFilterTest = (): renderTestType[] => {
         enableGLFiltering: configValue === 'enabled',
       });
       const img = await globalThis.getImage(fabric, 'shirt-with-alpha.png');
-      const image = new fabric.Image(img);
+      const image = new fabric.FabricImage(img);
       image.filters = [new fabric.filters.Blur({ blur: 0.6 })];
       image.applyFilters();
+      image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
       canvas.backgroundColor = 'cyan';
       canvas.add(image);
       canvas.renderAll();
@@ -34,9 +35,10 @@ const imageBlurFilterTest = (): renderTestType[] => {
         enableGLFiltering: configValue === 'enabled',
       });
       const img = await globalThis.getImage(fabric, 'dog_image.jpg');
-      const image = new fabric.Image(img);
+      const image = new fabric.FabricImage(img);
       image.filters = [new fabric.filters.Blur({ blur: 0.6 })];
       image.applyFilters();
+      image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
       canvas.backgroundColor = 'cyan';
       canvas.add(image);
       canvas.renderAll();

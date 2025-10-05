@@ -2,15 +2,12 @@ import type { renderTestType } from '../../../types';
 
 const createGroupForLayoutTests = (fabric: any, text: string, options: any) => {
   const circle = new fabric.Circle({
-    left: 100,
-    top: 50,
     radius: 50,
   });
+  circle.setPositionByOrigin(new fabric.Point(100, 50), 'left', 'top');
 
-  const itext = new fabric.FabricText(text, {
-    left: 100,
-    top: 150,
-  });
+  const itext = new fabric.FabricText(text);
+  itext.setPositionByOrigin(new fabric.Point(100, 150), 'left', 'top');
 
   const rect = new fabric.Rect({
     top: 200,
@@ -19,8 +16,19 @@ const createGroupForLayoutTests = (fabric: any, text: string, options: any) => {
     fill: 'red',
     opacity: 0.3,
   });
+  rect.setPositionByOrigin(new fabric.Point(0, 200), 'left', 'top');
 
-  return new fabric.Group([rect, circle, itext], options);
+  const g = new fabric.Group([rect, circle, itext]);
+  const pos = g.translateToGivenOrigin(
+    new fabric.Point(g.left, g.top),
+    g.originX,
+    g.originY,
+    'left',
+    'top',
+  );
+  g.set(options);
+  g.setPositionByOrigin(pos, 'left', 'top');
+  return g;
 };
 
 const createObjectsForOriginTests = (
@@ -30,12 +38,11 @@ const createObjectsForOriginTests = (
   options: any,
 ) => {
   const rect1 = new fabric.Rect({
-    left: 150,
-    top: 100,
     width: 30,
     height: 10,
     strokeWidth: 0,
   });
+  rect1.setPositionByOrigin(new fabric.Point(150, 100), 'left', 'top');
 
   const rect2 = new fabric.Rect({
     left: 200,
@@ -44,6 +51,7 @@ const createObjectsForOriginTests = (
     height: 40,
     strokeWidth: 0,
   });
+  rect2.setPositionByOrigin(new fabric.Point(200, 120), 'left', 'top');
 
   const controlPoint = new fabric.Circle({
     radius: 5,
@@ -57,10 +65,9 @@ const createObjectsForOriginTests = (
   const tlControlPoint = new fabric.Circle({
     radius: 5,
     fill: 'red',
-    left: 150,
-    top: 100,
     strokeWidth: 0,
   });
+  tlControlPoint.setPositionByOrigin(new fabric.Point(150, 100), 'left', 'top');
 
   const g = new fabric.Group(
     [rect1, rect2, tlControlPoint],
@@ -163,22 +170,22 @@ const nestedLayout: renderTestType = {
       height: 100,
       fill: 'yellow',
     });
+    rect3.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
 
     const rect4 = new fabric.Rect({
       width: 100,
       height: 100,
-      left: 100,
-      top: 100,
       fill: 'purple',
     });
+    rect4.setPositionByOrigin(new fabric.Point(100, 100), 'left', 'top');
 
     const group3 = new fabric.Group([rect3, rect4], {
       scaleX: 0.5,
       scaleY: 0.5,
-      top: 100,
-      left: 0,
     });
     group3.subTargetCheck = true;
+    group3.setPositionByOrigin(new fabric.Point(0, 100), 'left', 'top');
+
     group3.setCoords();
 
     const rect1 = new fabric.Rect({
@@ -186,20 +193,22 @@ const nestedLayout: renderTestType = {
       height: 100,
       fill: 'red',
     });
+    rect1.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
 
     const rect2 = new fabric.Rect({
       width: 100,
       height: 100,
-      left: 100,
-      top: 100,
       fill: 'blue',
     });
+    rect2.setPositionByOrigin(new fabric.Point(100, 100), 'left', 'top');
 
     const g = new fabric.Group([rect1, rect2, group3], {
       top: -150,
       left: -50,
     });
     g.subTargetCheck = true;
+    g.setPositionByOrigin(new fabric.Point(-50, -150), 'left', 'top');
+
     canvas.viewportTransform = [0.1, 0, 0, 0.1, 100, 200];
     canvas.add(g);
     canvas.renderAll();
@@ -221,8 +230,22 @@ const fitContentLayoutChange: renderTestType = {
       fabric.util.invertTransform(g.calcTransformMatrix()),
     );
 
-    g.item(0).set({ left: point.x });
+    g.item(0).setPositionByOrigin(
+      new fabric.Point(point.x, g.item(0).y),
+      'left',
+      g.item(0).originY,
+    );
+    const pos = g
+      .item(1)
+      .translateToGivenOrigin(
+        new fabric.Point(g.item(1).left, g.item(1).top),
+        g.item(1).originX,
+        g.item(1).originY,
+        'left',
+        'top',
+      );
     g.item(1).set({ skewX: -45 });
+    g.setPositionByOrigin(pos, 'left', 'top');
     g.item(2).rotate(45);
     g.triggerLayout({ strategy: new fabric.FitContentLayout() });
     canvas.add(g);
@@ -242,15 +265,13 @@ const fitContentLayoutAdd: renderTestType = {
     });
 
     const rect = new fabric.Rect({
-      top: 200,
-      left: 50,
       width: 50,
       height: 50,
       fill: 'red',
       angle: 15,
       skewY: 30,
     });
-
+    rect.setPositionByOrigin(new fabric.Point(50, 200), 'left', 'top');
     g.add(rect);
     canvas.add(g);
     canvas.renderAll();
@@ -306,14 +327,14 @@ const clipPathLayout2: renderTestType = {
   percentage: 0.06,
   size: [330, 330],
   async renderFunction(canvas, fabric) {
+    const clipPath = new fabric.Circle({
+      radius: 110,
+      scaleX: 1.5,
+    });
+    clipPath.setPositionByOrigin(new fabric.Point(-150, -100), 'left', 'top');
     const g = createGroupForLayoutTests(fabric, 'clip path layout', {
       backgroundColor: 'magenta',
-      clipPath: new fabric.Circle({
-        radius: 110,
-        left: -150,
-        top: -100,
-        scaleX: 1.5,
-      }),
+      clipPath,
       layoutManager: new fabric.LayoutManager(new fabric.ClipPathLayout()),
     });
 

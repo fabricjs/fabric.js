@@ -19,136 +19,20 @@ import { Polyline } from '../shapes/Polyline';
 import { Triangle } from '../shapes/Triangle';
 import { Polygon } from '../shapes/Polygon';
 
-import TEST_IMAGE_GIF from '../../test/fixtures/test_image.gif';
-import { isJSDOM } from '../../vitest.extend';
-
-const CANVAS_SVG =
-  '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
-  '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="200" height="200" viewBox="0 0 200 200" xml:space="preserve">\n<desc>Created with Fabric.js ' +
-  version +
-  '</desc>\n<defs>\n</defs>\n</svg>';
-
-const CANVAS_SVG_VIEWBOX =
-  '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n' +
-  '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="200" height="200" viewBox="100 100 300 300" xml:space="preserve">\n<desc>Created with Fabric.js ' +
-  version +
-  '</desc>\n<defs>\n</defs>\n</svg>';
-
-const RECT_JSON =
-  '{"version":"' +
-  version +
-  '","objects":[{"type":"Rect","version":"' +
-  version +
-  '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
-  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-  '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
-
-const PATH_DATALESS_JSON =
-  '{"version":"' +
-  version +
-  '","objects":[{"type":"Path","version":"' +
-  version +
-  '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
-  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-  '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
-
-const PATH_JSON =
-  '{"version":"' +
-  version +
-  '","objects": [{"type": "path", "version":"' +
-  version +
-  '", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
-  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
-  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
-  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
-  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
-  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
-  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
-  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
-  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
-  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
-  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
-  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
-  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
-  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
-  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-  '13.99], ["z"]]}], "background": "#ff5555", "overlay":"rgba(0,0,0,0.2)"}';
-
-const PATH_WITHOUT_DEFAULTS_JSON =
-  '{"version":"' +
-  version +
-  '","objects": [{"type": "path", "version":"' +
-  version +
-  '", "left": 268, "top": 266, "width": 51, "height": 49, "path": [["M", 18.511, 13.99],' +
-  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
-  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
-  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
-  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
-  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
-  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
-  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
-  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
-  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
-  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
-  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
-  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-  '13.99], ["z"]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
-
-const RECT_JSON_WITH_PADDING =
-  '{"version":"' +
-  version +
-  '","objects":[{"type":"Rect","version":"' +
-  version +
-  '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":20,"fill":"rgb(0,0,0)",' +
-  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
-  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-  '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0,"padding":123,"foo":"bar"}]}';
-
-const IMG_SRC = isJSDOM() ? 'test_image.gif' : TEST_IMAGE_GIF;
-const IMG_WIDTH = 276;
-const IMG_HEIGHT = 110;
-const REFERENCE_IMG_OBJECT: Partial<
-  FabricImage & { version: string; src: string; crossOrigin: null }
-> = {
-  version: version,
-  type: 'Image',
-  originX: 'left',
-  originY: 'top',
-  left: 0,
-  top: 0,
-  width: IMG_WIDTH, // node-canvas doesn't seem to allow setting width/height on image objects
-  height: IMG_HEIGHT, // or does it now?
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 0,
-  strokeDashArray: null,
-  strokeDashOffset: 0,
-  strokeLineCap: 'butt',
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
-  src: IMG_SRC,
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  filters: [],
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
-  crossOrigin: null,
-  skewX: 0,
-  skewY: 0,
-  cropX: 0,
-  cropY: 0,
-  strokeUniform: false,
-};
+import {
+  CANVAS_SVG,
+  CANVAS_SVG_VIEWBOX,
+  PATH_DATALESS_JSON,
+  PATH_JSON,
+  PATH_WITHOUT_DEFAULTS_JSON,
+  RECT_JSON,
+  RECT_JSON_WITH_PADDING,
+  REFERENCE_IMG_OBJECT,
+  IMG_SRC,
+  IMG_WIDTH,
+  IMG_HEIGHT,
+} from './StaticCanvas.fixtures';
+import { isJSDOM, sanitizeSVG } from '../../vitest.extend';
 
 describe('StaticCanvas', () => {
   const canvas = new StaticCanvas(undefined, {
@@ -1091,16 +975,33 @@ describe('StaticCanvas', () => {
       height: 400,
       renderOnAddRemove: false,
     });
-    canvasClip.clipPath = new Rect({ width: 200, height: 200 });
-    canvasClip.add(new Circle({ radius: 200 }));
+    canvasClip.clipPath = new Rect({
+      left: 100.5,
+      top: 100.5,
+      width: 200,
+      height: 200,
+    });
+    canvasClip.add(new Circle({ left: 200.5, top: 200.5, radius: 200 }));
 
     const svg = canvasClip.toSVG();
-    const expectedSVG =
-      '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="400" height="400" viewBox="0 0 400 400" xml:space="preserve">\n<desc>Created with Fabric.js ' +
-      version +
-      '</desc>\n<defs>\n<clipPath id="CLIPPATH_0" >\n\t<rect transform="matrix(1 0 0 1 100.5 100.5)" x="-100" y="-100" rx="0" ry="0" width="200" height="200" />\n</clipPath>\n</defs>\n<g clip-path="url(#CLIPPATH_0)" >\n<g transform="matrix(1 0 0 1 200.5 200.5)"  >\n<circle style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" r="200" />\n</g>\n</g>\n</svg>';
 
-    expect(svg).toEqualSVG(expectedSVG);
+    expect(sanitizeSVG(svg)).toMatchInlineSnapshot(`
+      "<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="400" height="400" viewBox="0 0 400 400" xml:space="preserve">
+      <desc>Created with Fabric.js ${version}</desc>
+      <defs>
+      <clipPath id="SVGID" >
+      	<rect transform="matrix(1 0 0 1 100.5 100.5)" x="-100" y="-100" rx="0" ry="0" width="200" height="200" />
+      </clipPath>
+      </defs>
+      <g clip-path="url(#SVGID)" >
+      <g transform="matrix(1 0 0 1 200.5 200.5)"  >
+      <circle style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" r="200" />
+      </g>
+      </g>
+      </svg>"
+    `);
   });
 
   it('handles excludeFromExport for background and overlay images', () => {
@@ -1151,7 +1052,7 @@ describe('StaticCanvas', () => {
     });
 
     canvas.add(makeRect());
-    expect(canvas.toJSON()).toEqual(JSON.parse(RECT_JSON));
+    expect(canvas.toJSON()).toEqual(RECT_JSON);
   });
 
   it('handles custom properties in toObject correctly', () => {
@@ -1228,7 +1129,7 @@ describe('StaticCanvas', () => {
     });
     canvas.add(path);
 
-    expect(canvas.toDatalessJSON()).toEqual(JSON.parse(PATH_DATALESS_JSON));
+    expect(canvas.toDatalessJSON()).toEqual(PATH_DATALESS_JSON);
   });
 
   it('serializes to object correctly', () => {
@@ -1419,7 +1320,7 @@ describe('StaticCanvas', () => {
   it('loads from JSON object correctly', async () => {
     expect(canvas.loadFromJSON).toBeTypeOf('function');
 
-    await canvas.loadFromJSON(JSON.parse(PATH_JSON));
+    await canvas.loadFromJSON(PATH_JSON);
     const obj = canvas.item(0);
 
     expect(canvas.isEmpty()).toBeFalsy();
@@ -1447,7 +1348,7 @@ describe('StaticCanvas', () => {
   it('loads from JSON object without defaults correctly', async () => {
     expect(canvas.loadFromJSON).toBeTypeOf('function');
 
-    await canvas.loadFromJSON(JSON.parse(PATH_WITHOUT_DEFAULTS_JSON));
+    await canvas.loadFromJSON(PATH_WITHOUT_DEFAULTS_JSON);
     const obj = canvas.item(0);
 
     expect(canvas.isEmpty()).toBeFalsy();
@@ -1473,7 +1374,7 @@ describe('StaticCanvas', () => {
   });
 
   it('loads JSON with image background correctly', async () => {
-    const serialized = JSON.parse(PATH_JSON);
+    const serialized = JSON.parse(JSON.stringify(PATH_JSON));
     serialized.background = 'green';
     serialized.backgroundImage = {
       type: 'image',
@@ -1517,7 +1418,7 @@ describe('StaticCanvas', () => {
   });
 
   it('handles AbortController signal when loading JSON', async () => {
-    const serialized = JSON.parse(PATH_JSON);
+    const serialized = JSON.parse(JSON.stringify(PATH_JSON));
     serialized.background = 'green';
     serialized.backgroundImage = {
       type: 'image',
@@ -1579,8 +1480,12 @@ describe('StaticCanvas', () => {
     const jsonWithoutFoo = canvas.toObject(['padding']);
     const jsonWithFoo = canvas.toObject(['padding', 'foo']);
 
-    expect(jsonWithFoo).toEqual(JSON.parse(RECT_JSON_WITH_PADDING));
-    expect(jsonWithoutFoo).not.toEqual(JSON.parse(RECT_JSON_WITH_PADDING));
+    expect(jsonWithFoo).toEqual(
+      JSON.parse(JSON.stringify(RECT_JSON_WITH_PADDING)),
+    );
+    expect(jsonWithoutFoo).not.toEqual(
+      JSON.parse(JSON.stringify(RECT_JSON_WITH_PADDING)),
+    );
 
     canvas.clear();
     await canvas.loadFromJSON(jsonWithFoo);
@@ -2358,7 +2263,7 @@ function _createImageObject(
   elImage.width = width;
   elImage.height = height;
   setSrc(elImage, IMG_SRC, function () {
-    callback(new FabricImage(elImage));
+    callback(new FabricImage(elImage, { left: width / 2, top: height / 2 }));
   });
 }
 

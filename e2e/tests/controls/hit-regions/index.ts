@@ -25,6 +25,7 @@ beforeAll((canvas) => {
     fill: 'blue',
     padding: 10,
   });
+  rect.setPositionByOrigin(new fabric.Point(25, 60), 'left', 'top');
   const group = new fabric.Group([rect], {
     angle: 30,
     scaleX: 2,

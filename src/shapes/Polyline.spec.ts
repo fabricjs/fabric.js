@@ -3,7 +3,7 @@ import { Point } from '../Point';
 
 import { describe, expect, it } from 'vitest';
 import { getFabricDocument } from '../env';
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 import { Polygon } from './Polygon';
 import { FabricObject } from './Object/FabricObject';
 
@@ -16,10 +16,10 @@ const points = [
 const REFERENCE_OBJECT = {
   version: version,
   type: 'Polyline',
-  originX: 'left',
-  originY: 'top',
-  left: 9.5,
-  top: 11.5,
+  originX: 'center',
+  originY: 'center',
+  left: 15,
+  top: 17,
   width: 10,
   height: 10,
   fill: 'rgb(0,0,0)',
@@ -222,7 +222,6 @@ describe('Polyline', () => {
 
     expect({
       ...polyline.toObject(),
-      points: getPoints(),
     }).toEqual(REFERENCE_OBJECT);
   });
 
@@ -264,14 +263,15 @@ describe('Polyline', () => {
       'http://www.w3.org/2000/svg',
       'polyline',
     ) as unknown as HTMLElement;
-    elPolylineWithoutPoints.setAttributeNS(namespace, 'stroke-width', '1');
+    elPolylineWithoutPoints.setAttributeNS(namespace, 'stroke-width', '8');
 
     const polyline = await Polyline.fromElement(elPolylineWithoutPoints);
     expect(polyline.toObject()).toEqual({
       ...REFERENCE_OBJECT,
       ...REFERENCE_EMPTY_OBJECT,
-      left: -0.5,
-      top: -0.5,
+      left: 0,
+      top: 0,
+      strokeWidth: 8,
     });
   });
 
@@ -287,8 +287,8 @@ describe('Polyline', () => {
     expect(polyline.toObject()).toEqual({
       ...REFERENCE_OBJECT,
       ...REFERENCE_EMPTY_OBJECT,
-      left: -0.5,
-      top: -0.5,
+      left: 0,
+      top: 0,
     });
   });
 
@@ -299,13 +299,13 @@ describe('Polyline', () => {
       'polyline',
     ) as unknown as HTMLElement;
     elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
-    elPolyline.setAttributeNS(namespace, 'stroke-width', String(1));
+    elPolyline.setAttributeNS(namespace, 'stroke-width', '1');
 
     const polyline = await Polyline.fromElement(elPolyline);
     expect(polyline.toObject()).toEqual({
       ...REFERENCE_OBJECT,
-      left: 9.5,
-      top: 11.5,
+      left: 15,
+      top: 17,
     });
   });
 
@@ -323,8 +323,8 @@ describe('Polyline', () => {
     expect(polyline.toObject()).toEqual({
       ...REFERENCE_OBJECT,
       strokeWidth: 0,
-      left: 10,
-      top: 12,
+      left: 15,
+      top: 17,
     });
   });
 
@@ -340,8 +340,8 @@ describe('Polyline', () => {
     expect(polyline).toBeInstanceOf(Polyline);
     expect(polyline.toObject()).toEqual({
       ...REFERENCE_OBJECT,
-      left: 9.5,
-      top: 11.5,
+      left: 15,
+      top: 17,
     });
   });
 
@@ -390,8 +390,8 @@ describe('Polyline', () => {
       strokeMiterLimit: 5,
       opacity: 0.34,
       points: expectedPoints,
-      left: 8.5,
-      top: 8.5,
+      left: 20,
+      top: 20,
     });
   });
 });

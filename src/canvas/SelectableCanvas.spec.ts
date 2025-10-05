@@ -10,8 +10,8 @@ describe('Selectable Canvas', () => {
   describe('_pointIsInObjectSelectionArea', () => {
     it('points and selection area', () => {
       const object = new FabricObject({
-        left: 40,
-        top: 40,
+        left: 60,
+        top: 65,
         width: 40,
         height: 50,
         angle: 0,
@@ -275,8 +275,8 @@ describe('Selectable Canvas', () => {
     });
     it('points and selection area, group transformation and padding', () => {
       const object = new FabricObject({
-        left: 5,
-        top: 5,
+        left: 10,
+        top: 10,
         width: 10,
         height: 10,
         padding: 5,
@@ -284,8 +284,8 @@ describe('Selectable Canvas', () => {
       });
 
       const object2 = new FabricObject({
-        left: 35,
-        top: 35,
+        left: 40,
+        top: 40,
         width: 10,
         height: 10,
         padding: 5,
@@ -294,6 +294,7 @@ describe('Selectable Canvas', () => {
 
       const canvas = new Canvas(undefined, { renderOnAddRemove: false });
       const group = new Group([object, object2], { scaleX: 2, scaleY: 2 });
+      group.setPositionByOrigin(new Point(5, 5), 'left', 'top');
       canvas.add(group);
 
       for (let y = -1; y <= 31; y++) {

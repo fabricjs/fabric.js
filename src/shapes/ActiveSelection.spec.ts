@@ -6,7 +6,7 @@ import { FabricObject } from './Object/FabricObject';
 
 import { afterEach, describe, expect, it, test, vi } from 'vitest';
 import { Rect } from './Rect';
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 
 describe('ActiveSelection', () => {
   const canvas = new Canvas(undefined, {
@@ -47,10 +47,10 @@ describe('ActiveSelection', () => {
     const expectedObject = {
       version: version,
       type: 'ActiveSelection',
-      originX: 'left',
-      originY: 'top',
-      left: 50,
-      top: 100,
+      originX: 'center',
+      originY: 'center',
+      left: 90,
+      top: 130,
       width: 80,
       height: 60,
       fill: 'rgb(0,0,0)',
@@ -108,8 +108,8 @@ describe('ActiveSelection', () => {
       {
         version: version,
         type: 'Rect',
-        left: 10,
-        top: -30,
+        left: 25,
+        top: -25,
         width: 30,
         height: 10,
         strokeWidth: 0,
@@ -117,8 +117,8 @@ describe('ActiveSelection', () => {
       {
         version: version,
         type: 'Rect',
-        left: -40,
-        top: -10,
+        left: -35,
+        top: 10,
         width: 10,
         height: 40,
         strokeWidth: 0,
@@ -127,8 +127,8 @@ describe('ActiveSelection', () => {
     const expectedObject = {
       version: version,
       type: 'ActiveSelection',
-      left: 50,
-      top: 100,
+      left: 90,
+      top: 130,
       width: 80,
       height: 60,
       objects: objects,
@@ -357,15 +357,15 @@ describe('ActiveSelection', () => {
 
 function makeAsWith2Objects() {
   const rect1 = new Rect({
-    top: 100,
-    left: 100,
+    top: 105,
+    left: 115,
     width: 30,
     height: 10,
     strokeWidth: 0,
   });
   const rect2 = new Rect({
-    top: 120,
-    left: 50,
+    top: 140,
+    left: 55,
     width: 10,
     height: 40,
     strokeWidth: 0,
@@ -375,26 +375,26 @@ function makeAsWith2Objects() {
 }
 
 function makeAsWith4Objects() {
-  const rect1 = new Rect({ top: 100, left: 100, width: 30, height: 10 });
-  const rect2 = new Rect({ top: 120, left: 50, width: 10, height: 40 });
-  const rect3 = new Rect({ top: 40, left: 0, width: 20, height: 40 });
-  const rect4 = new Rect({ top: 75, left: 75, width: 40, height: 40 });
+  const rect1 = new Rect({ top: 105, left: 115, width: 30, height: 10 });
+  const rect2 = new Rect({ top: 140, left: 55, width: 10, height: 40 });
+  const rect3 = new Rect({ top: 60, left: 10, width: 20, height: 40 });
+  const rect4 = new Rect({ top: 95, left: 95, width: 40, height: 40 });
 
   return new ActiveSelection([rect1, rect2, rect3, rect4]);
 }
 
 function makeAsWith2ObjectsWithOpacity() {
   const rect1 = new Rect({
-    top: 100,
-    left: 100,
+    top: 105,
+    left: 115,
     width: 30,
     height: 10,
     strokeWidth: 0,
     opacity: 0.5,
   });
   const rect2 = new Rect({
-    top: 120,
-    left: 50,
+    top: 140,
+    left: 55,
     width: 10,
     height: 40,
     strokeWidth: 0,

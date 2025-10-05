@@ -16,10 +16,10 @@ function getPoints() {
 const REFERENCE_OBJECT = {
   version: version,
   type: 'Polygon',
-  originX: 'left',
-  originY: 'top',
-  left: 9.5,
-  top: 11.5,
+  originX: 'center',
+  originY: 'center',
+  left: 15,
+  top: 17,
   width: 10,
   height: 10,
   fill: 'rgb(0,0,0)',
@@ -331,8 +331,8 @@ describe('Polygon', () => {
       {
         ...REFERENCE_OBJECT,
         ...REFERENCE_EMPTY_OBJECT,
-        left: -0.5,
-        top: -0.5,
+        left: 0,
+        top: 0,
       },
     );
   });
@@ -352,8 +352,8 @@ describe('Polygon', () => {
       {
         ...REFERENCE_OBJECT,
         ...REFERENCE_EMPTY_OBJECT,
-        left: -0.5,
-        top: -0.5,
+        left: 0,
+        top: 0,
       },
     );
   });
@@ -374,8 +374,8 @@ describe('Polygon', () => {
           { x: 10, y: 12 },
           { x: 20, y: 22 },
         ],
-        left: 9.5,
-        top: 11.5,
+        left: 15,
+        top: 17,
       },
     );
   });
@@ -398,8 +398,8 @@ describe('Polygon', () => {
           { x: 10, y: 12 },
           { x: 20, y: 22 },
         ],
-        left: 10,
-        top: 12,
+        left: 15,
+        top: 17,
       },
     );
   });
@@ -455,8 +455,8 @@ describe('Polygon', () => {
       strokeMiterLimit: 5,
       opacity: 0.34,
       points: expectedPoints,
-      top: 8.5,
-      left: 8.5,
+      top: 20,
+      left: 20,
     });
   });
 

@@ -13,11 +13,10 @@ export const controlsRenderingTests: renderTestType[] = [
         strokeWidth: 2,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -35,11 +34,10 @@ export const controlsRenderingTests: renderTestType[] = [
         padding: 8,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -57,14 +55,12 @@ export const controlsRenderingTests: renderTestType[] = [
         padding: 8,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       const group = new fabric.Group([rect]);
+      group.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       group.set({ scaleX: 2 });
       rect.set({ scaleX: 0.5 });
-
       canvas.add(group);
       canvas.setActiveObject(rect);
     },
@@ -84,11 +80,10 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -108,11 +103,10 @@ export const controlsRenderingTests: renderTestType[] = [
         cornerColor: 'green',
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -133,11 +127,10 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -158,11 +151,10 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -184,11 +176,10 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -209,14 +200,13 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       rect.setControlVisible('tl', false);
       rect.setControlVisible('br', false);
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -239,11 +229,10 @@ export const controlsRenderingTests: renderTestType[] = [
         cornerDashArray: [3, 3],
         fill: 'orange',
         stroke: 'green',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -267,11 +256,10 @@ export const controlsRenderingTests: renderTestType[] = [
         borderScaleFactor: 3,
         fill: 'red',
         stroke: 'blue',
-        top: 55,
-        left: 55,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(55, 55), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -294,11 +282,10 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: true,
         borderScaleFactor: 3,
         fill: 'red',
-        top: 35,
-        left: 35,
       });
 
       canvas.add(rect);
+      rect.setPositionByOrigin(new fabric.Point(35, 35), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -321,8 +308,6 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         borderScaleFactor: 3,
         fill: 'red',
-        top: 50,
-        left: 35,
       });
 
       const group = new fabric.Group([rect], {
@@ -331,6 +316,7 @@ export const controlsRenderingTests: renderTestType[] = [
       });
 
       canvas.add(group);
+      group.setPositionByOrigin(new fabric.Point(35, 50), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -353,17 +339,20 @@ export const controlsRenderingTests: renderTestType[] = [
         transparentCorners: false,
         borderScaleFactor: 3,
         fill: 'red',
-        top: 50,
-        left: 35,
       });
+      rect.setPositionByOrigin(new fabric.Point(35, 50), 'left', 'top');
 
       const group = new fabric.Group([rect], {
-        angle: 90,
-        left: 110,
         flipY: true,
         interactive: true,
         subTargetCheck: true,
       });
+      group.setPositionByOrigin(
+        new fabric.Point(110, group.top),
+        'right',
+        group.originY,
+      );
+      group.angle = 90;
 
       canvas.add(group);
       canvas.setActiveObject(rect);
@@ -387,11 +376,10 @@ export const controlsRenderingTests: renderTestType[] = [
         borderColor: 'black',
         borderScaleFactor: 4,
         fill: 'cyan',
-        top: 10,
-        left: 10,
         isMoving: true,
         borderOpacityWhenMoving: 0.4,
       });
+      rect.setPositionByOrigin(new fabric.Point(10, 10), 'left', 'top');
 
       canvas.add(rect);
       canvas.setActiveObject(rect);
@@ -422,12 +410,11 @@ export const controlsRenderingTests: renderTestType[] = [
       const group = new fabric.Group([rect], {
         interactive: true,
         subTargetCheck: true,
-        top: 10,
-        left: 10,
       });
 
       canvas.preserveObjectStacking = false;
       canvas.add(group);
+      group.setPositionByOrigin(new fabric.Point(10, 10), 'left', 'top');
       canvas.setActiveObject(rect);
     },
   },
@@ -458,8 +445,6 @@ export const controlsRenderingTests: renderTestType[] = [
         height: 90,
         padding: 3,
         opacity: 0.4,
-        top: 10,
-        left: 120,
         cornerSize: 12,
         cornerColor: 'black',
         cornerStrokeColor: 'black',
@@ -476,6 +461,9 @@ export const controlsRenderingTests: renderTestType[] = [
         top: 10,
         left: 10,
       });
+
+      group.setPositionByOrigin(new fabric.Point(10, 10), 'left', 'top');
+      rect2.setPositionByOrigin(new fabric.Point(120, 10), 'left', 'top');
 
       canvas.add(group, rect2);
 

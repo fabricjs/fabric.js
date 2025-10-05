@@ -29,7 +29,8 @@ const generic1: renderTestType = {
       fill: '',
       stroke: 'blue',
     });
-
+    rect.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
+    rect2.setPositionByOrigin(new fabric.Point(4, 4), 'left', 'top');
     canvas.add(rect);
     canvas.add(rect2);
     canvas.renderAll();
@@ -51,13 +52,12 @@ const renderStrokeWithNegativeScale: renderTestType = {
       strokeWidth: 15,
       strokeUniform: true,
       strokeDashArray: [2, 2],
-      top: 65,
-      left: 30,
     });
 
     // do not do this at init time or they will be positive
     rect.scaleX = -2;
     rect.scaleY = -4;
+    rect.setPositionByOrigin(new fabric.Point(30, 65), 'left', 'top');
 
     const rect2 = new fabric.Rect({
       width: 10,
@@ -69,9 +69,8 @@ const renderStrokeWithNegativeScale: renderTestType = {
       scaleY: -4,
       strokeDashArray: [2, 2],
       strokeUniform: true,
-      top: 10,
-      left: 55,
     });
+    rect2.setPositionByOrigin(new fabric.Point(55, 10), 'left', 'top');
 
     canvas.add(rect, rect2);
     canvas.renderAll();
@@ -90,8 +89,6 @@ const shadownonscaling: renderTestType = {
       height: 10,
       scaleX: 12,
       scaleY: 3,
-      top: 10,
-      left: 5,
       fill: '#f55',
     });
     obj.set(
@@ -104,7 +101,7 @@ const shadownonscaling: renderTestType = {
         nonScaling: true,
       }),
     );
-
+    obj.setPositionByOrigin(new fabric.Point(5, 10), 'left', 'top');
     canvas.add(obj);
     canvas.renderAll();
   },
@@ -377,8 +374,8 @@ const toCanvasElementAndControls: renderTestType = {
     const rect = new fabric.Rect({
       width: 200,
       height: 200,
-      left: 50,
-      top: 50,
+      left: 150.5,
+      top: 150.5,
       fill: 'yellow',
     });
 
@@ -407,11 +404,9 @@ const pathWithGradient: renderTestType = {
         }),
         height: 100,
         width: 100,
-        top: 0,
-        left: 0,
       },
     );
-
+    pathWithGradient.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
     canvas.add(pathWithGradient);
     canvas.renderAll();
   },

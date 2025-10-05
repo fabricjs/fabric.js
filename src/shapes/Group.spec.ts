@@ -28,15 +28,15 @@ const makeGenericGroup = (options?: Partial<GroupProps>) => {
 
 function makeGroupWith2Objects() {
   const rect1 = new Rect({
-      top: 100,
-      left: 100,
+      top: 105,
+      left: 115,
       width: 30,
       height: 10,
       strokeWidth: 0,
     }),
     rect2 = new Rect({
-      top: 120,
-      left: 50,
+      top: 140,
+      left: 55,
       width: 10,
       height: 40,
       strokeWidth: 0,
@@ -46,51 +46,25 @@ function makeGroupWith2Objects() {
 }
 
 function makeGroupWith2ObjectsWithOpacity() {
-  const rect1 = new Rect({
-      top: 100,
-      left: 100,
-      width: 30,
-      height: 10,
-      strokeWidth: 0,
-      opacity: 0.5,
-    }),
-    rect2 = new Rect({
-      top: 120,
-      left: 50,
-      width: 10,
-      height: 40,
-      strokeWidth: 0,
-      opacity: 0.8,
-    });
-
-  return new Group([rect1, rect2], { strokeWidth: 0 });
+  const g = makeGroupWith2Objects();
+  const objs = g.getObjects();
+  objs[0].opacity = 0.5;
+  objs[1].opacity = 0.8;
+  return g;
 }
 
 function makeGroupWith2ObjectsAndNoExport() {
-  const rect1 = new Rect({
-      top: 100,
-      left: 100,
-      width: 30,
-      height: 10,
-      strokeWidth: 0,
-    }),
-    rect2 = new Rect({
-      top: 120,
-      left: 50,
-      width: 10,
-      height: 40,
-      strokeWidth: 0,
-      excludeFromExport: true,
-    });
-
-  return new Group([rect1, rect2], { strokeWidth: 0 });
+  const g = makeGroupWith2Objects();
+  const objs = g.getObjects();
+  objs[1].excludeFromExport = true;
+  return g;
 }
 
 function makeGroupWith4Objects() {
-  const rect1 = new Rect({ top: 100, left: 100, width: 30, height: 10 }),
-    rect2 = new Rect({ top: 120, left: 50, width: 10, height: 40 }),
-    rect3 = new Rect({ top: 40, left: 0, width: 20, height: 40 }),
-    rect4 = new Rect({ top: 75, left: 75, width: 40, height: 40 });
+  const rect1 = new Rect({ top: 105, left: 115, width: 30, height: 10 }),
+    rect2 = new Rect({ top: 140, left: 55, width: 10, height: 40 }),
+    rect3 = new Rect({ top: 60, left: 10, width: 20, height: 40 }),
+    rect4 = new Rect({ top: 95, left: 95, width: 40, height: 40 });
 
   return new Group([rect1, rect2, rect3, rect4]);
 }
@@ -110,15 +84,15 @@ describe('Group', () => {
     const objectData = {
       width: 2,
       height: 3,
-      left: 6,
-      top: 4,
+      left: 7,
+      top: 5.5,
       strokeWidth: 0,
       objects: [
         new Rect({
           width: 100,
           height: 100,
-          top: 0,
-          left: 0,
+          top: 50,
+          left: 50,
           strokeWidth: 0,
         }).toObject(),
       ],
@@ -595,10 +569,10 @@ describe('Group', () => {
     const expectedObject = {
       version: version,
       type: 'Group',
-      originX: 'left',
-      originY: 'top',
-      left: 50,
-      top: 100,
+      originX: 'center',
+      originY: 'center',
+      left: 90,
+      top: 130,
       width: 80,
       height: 60,
       fill: 'rgb(0,0,0)',
@@ -655,8 +629,8 @@ describe('Group', () => {
       {
         version: version,
         type: 'Rect',
-        left: 10,
-        top: -30,
+        left: 25,
+        top: -25,
         width: 30,
         height: 10,
         strokeWidth: 0,
@@ -664,8 +638,8 @@ describe('Group', () => {
       {
         version: version,
         type: 'Rect',
-        left: -40,
-        top: -10,
+        left: -35,
+        top: 10,
         width: 10,
         height: 40,
         strokeWidth: 0,
@@ -674,8 +648,8 @@ describe('Group', () => {
     const expectedObject = {
       version: version,
       type: 'Group',
-      left: 50,
-      top: 100,
+      left: 90,
+      top: 130,
       width: 80,
       height: 60,
       objects: objects,
@@ -757,10 +731,8 @@ describe('Group', () => {
   it('removeAll', () => {
     const group = makeGroupWith2Objects(),
       firstObject = group.item(0),
-      initialLeftValue = 100,
-      initialTopValue = 100;
-
-    expect(group.removeAll).toBeTypeOf('function');
+      initialLeftValue = 115,
+      initialTopValue = 105;
 
     expect(initialLeftValue !== firstObject.get('left')).toBeTruthy();
     expect(initialTopValue !== firstObject.get('top')).toBeTruthy();
@@ -918,18 +890,14 @@ describe('Group', () => {
   it('toSVG with a clipPath', () => {
     const group = makeGroupWith2Objects();
     group.clipPath = new Rect({ width: 100, height: 100 });
-    const expectedSVG =
-      '<g transform="matrix(1 0 0 1 90 130)" clip-path="url(#CLIPPATH_0)"  >\n<clipPath id="CLIPPATH_0" >\n\t<rect transform="matrix(1 0 0 1 50.5 50.5)" x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</clipPath>\n<g style=""   >\n\t\t<g transform="matrix(1 0 0 1 25 -25)"  >\n<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />\n</g>\n\t\t<g transform="matrix(1 0 0 1 -35 10)"  >\n<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />\n</g>\n</g>\n</g>\n';
-    expect(group.toSVG()).toEqualSVG(expectedSVG);
+    expect(group.toSVG()).toMatchSVGSnapshot();
   });
 
   it('toSVG with a clipPath absolutePositioned', () => {
     const group = makeGroupWith2Objects();
     group.clipPath = new Rect({ width: 100, height: 100 });
     group.clipPath.absolutePositioned = true;
-    const expectedSVG =
-      '<g clip-path="url(#CLIPPATH_0)"  >\n<g transform="matrix(1 0 0 1 90 130)"  >\n<clipPath id="CLIPPATH_0" >\n\t<rect transform="matrix(1 0 0 1 50.5 50.5)" x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</clipPath>\n<g style=""   >\n\t\t<g transform="matrix(1 0 0 1 25 -25)"  >\n<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-15" y="-5" rx="0" ry="0" width="30" height="10" />\n</g>\n\t\t<g transform="matrix(1 0 0 1 -35 10)"  >\n<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  x="-5" y="-20" rx="0" ry="0" width="10" height="40" />\n</g>\n</g>\n</g>\n</g>\n';
-    expect(group.toSVG()).toEqualSVG(expectedSVG);
+    expect(group.toSVG()).toMatchSVGSnapshot();
   });
 
   it('toSVG with a group as a clipPath', () => {
@@ -1204,8 +1172,8 @@ describe('Group', () => {
 
   it('test group - pixels.', () => {
     const rect1 = new Rect({
-        top: 1,
-        left: 1,
+        top: 2,
+        left: 2,
         width: 2,
         height: 2,
         strokeWidth: 0,
@@ -1214,8 +1182,8 @@ describe('Group', () => {
         objectCaching: false,
       }),
       rect2 = new Rect({
-        top: 5,
-        left: 5,
+        top: 6,
+        left: 6,
         width: 2,
         height: 2,
         strokeWidth: 0,
@@ -1720,38 +1688,37 @@ describe('Group', () => {
 
   it('add and coordinates', () => {
     const rect1 = new Rect({
-        top: 1,
-        left: 1,
+        top: 2,
+        left: 2.5,
         width: 3,
         height: 2,
         strokeWidth: 0,
         fill: 'red',
       }),
       rect2 = new Rect({
-        top: 5,
-        left: 5,
+        top: 6,
+        left: 8,
         width: 2,
         height: 6,
         angle: 90,
         strokeWidth: 0,
         fill: 'red',
-      }),
-      group = new Group([], { layoutManager: new LayoutManager() });
+      });
+    const group = new Group([], { layoutManager: new LayoutManager() });
 
     group.add(rect1);
     group.add(rect2);
-    group.left = 5;
-    group.top = 5;
     group.scaleX = 3;
     group.scaleY = 2;
+    group.setPositionByOrigin(new Point(5, 5), 'left', 'top');
     group.removeAll();
 
-    expect(rect1.top, 'top has been moved').toBe(5);
-    expect(rect1.left, 'left has been moved').toBe(11);
+    expect(rect1.top, 'top has been moved').toBe(7);
+    expect(rect1.left, 'left has been moved').toBe(9.5);
     expect(rect1.scaleX, 'scaleX has been scaled').toBe(3);
     expect(rect1.scaleY, 'scaleY has been scaled').toBe(2);
-    expect(rect2.top, 'top has been moved').toBe(13);
-    expect(rect2.left, 'left has been moved').toBe(23);
+    expect(rect2.top, 'top has been moved').toBe(15);
+    expect(rect2.left, 'left has been moved').toBe(26);
     expect(
       rect2.scaleX,
       'scaleX has been scaled inverted because of angle 90',

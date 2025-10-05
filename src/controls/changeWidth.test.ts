@@ -25,7 +25,7 @@ describe('changeWidth', () => {
 
   beforeEach(() => {
     canvas = new Canvas();
-    target = new Rect({ width: 100, height: 100 });
+    target = new Rect({ left: 50, top: 50, width: 100, height: 100 });
     canvas.add(target);
     eventData = {};
     transform = prepareTransform(target, 'mr');
@@ -40,18 +40,18 @@ describe('changeWidth', () => {
     expect(target.width).toBe(100);
     const changed = changeWidth(eventData, transform, 200, 300);
     expect(changed).toBe(true);
-    expect(target.width).toBe(199);
-    expect(target.left).toBe(0);
-    expect(target.top).toBe(0);
+    expect(target.width).toBe(199.5);
+    expect(target.left).toBe(99.75);
+    expect(target.top).toBe(50);
   });
 
   test('changeWidth changes the width with decimals', () => {
     expect(target.width).toBe(100);
     const changed = changeWidth(eventData, transform, 200.2, 300);
     expect(changed).toBe(true);
-    expect(target.width).toBe(199.2);
-    expect(target.left).toBe(0);
-    expect(target.top).toBe(0);
+    expect(target.width).toBe(199.7);
+    expect(target.left).toBe(99.85);
+    expect(target.top).toBe(50);
   });
 
   test('changeWidth does not change the width', () => {
@@ -85,8 +85,8 @@ describe('changeWidth', () => {
     );
     expect(changed2).toBe(false);
     expect(target.width).toBe(100);
-    expect(target.left).toBe(0);
-    expect(target.top).toBe(0);
+    expect(target.left).toBe(50);
+    expect(target.top).toBe(50);
   });
 
   test('changeWidth changes the width with centered transform', () => {
@@ -94,22 +94,22 @@ describe('changeWidth', () => {
     transform.originY = 'center';
     expect(target.width).toBe(100);
     changeWidth(eventData, transform, 200, 300);
-    expect(target.width).toBe(298);
-    expect(target.left).toBe(-99);
-    expect(target.top).toBe(0);
+    expect(target.width).toBe(299);
+    expect(target.left).toBe(50);
+    expect(target.top).toBe(50);
   });
 
   test('changeWidth changes the width with big strokeWidth', () => {
     transform.target.strokeWidth = 15;
     changeWidth(eventData, transform, 200, 300);
-    expect(target.width).toBe(185);
+    expect(target.width).toBe(192.5);
   });
 
   test('changeWidth changes the width with big strokeWidth and strokeUniform', () => {
     transform.target.strokeWidth = 15;
     transform.target.strokeUniform = true;
     changeWidth(eventData, transform, 200, 300);
-    expect(target.width).toBe(185);
+    expect(target.width).toBe(192.5);
   });
 
   test('changeWidth changes the width with big strokeWidth and strokeUniform + scaling', () => {
@@ -117,14 +117,14 @@ describe('changeWidth', () => {
     transform.target.strokeUniform = true;
     transform.target.scaleX = 3;
     changeWidth(eventData, transform, 200, 300);
-    expect(Math.ceil(target.width)).toBe(62);
+    expect(Math.ceil(target.width)).toBe(98);
   });
 
   test('changeWidth changes the width with big strokeWidth + scaling', () => {
     transform.target.strokeWidth = 15;
     transform.target.scaleX = 3;
     changeWidth(eventData, transform, 200, 300);
-    expect(Math.ceil(target.width)).toBe(52);
+    expect(Math.ceil(target.width)).toBe(93);
   });
 
   test('changeWidth will fire events on canvas and target resizing', () => {

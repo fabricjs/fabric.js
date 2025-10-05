@@ -18,19 +18,9 @@ describe('fabric.controlsUtils', () => {
     signY: number;
     [key: string]: any;
   };
+  let target: Rect;
+
   const canvas = new Canvas(undefined);
-
-  beforeEach(() => {
-    const target = new Rect({ width: 100, height: 100 });
-    canvas.add(target);
-    eventData = {} as TPointerEvent;
-    transform = prepareTransform(target, 'mr');
-  });
-
-  afterEach(() => {
-    canvas.off();
-    canvas.clear();
-  });
 
   function prepareTransform(
     target: FabricObject,
@@ -45,19 +35,38 @@ describe('fabric.controlsUtils', () => {
       originY: origin.y,
       signX: 1,
       signY: 1,
+      skewX: 0,
+      skewY: 0,
+      scaleX: 1,
+      scaleY: 1,
     } as Transform & { signX: number; signY: number };
   }
 
+  beforeEach(() => {
+    target = new Rect({
+      left: 50,
+      top: 50,
+      width: 100,
+      height: 100,
+      strokeWidth: 0,
+    });
+    canvas.add(target);
+    eventData = {} as TPointerEvent;
+  });
+
+  afterEach(() => {
+    canvas.off();
+    canvas.clear();
+  });
+
   it('scalingXOrSkewingY changes scaleX', () => {
-    transform.target.scaleX = 1;
-    transform.target.strokeWidth = 0;
+    transform = prepareTransform(target, 'mr');
     scalingXOrSkewingY(eventData, transform, 200, 300);
     expect(Math.round(transform.target.scaleX)).toBe(2);
   });
 
   it('scalingXOrSkewingY changes scaleX to flip', () => {
-    transform.target.scaleX = 1;
-    transform.target.strokeWidth = 0;
+    transform = prepareTransform(target, 'mr');
     const returned = scalingXOrSkewingY(eventData, transform, -50, 300);
     expect(transform.target.scaleX).toBe(0.5);
     expect(transform.target.flipX, 'the object flipped X').toBe(true);
@@ -65,8 +74,7 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('scalingXOrSkewingY blocks scaleX to flip', () => {
-    transform.target.scaleX = 1;
-    transform.target.strokeWidth = 0;
+    transform = prepareTransform(target, 'mr');
     transform.target.lockScalingFlip = true;
     const returned = scalingXOrSkewingY(eventData, transform, -50, 300);
     expect(transform.target.scaleX).toBe(1);
@@ -75,24 +83,21 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('scalingYOrSkewingX changes scaleY', () => {
-    transform.target.scaleY = 1;
-    transform.target.strokeWidth = 0;
+    transform = prepareTransform(target, 'mb');
     scalingYOrSkewingX(eventData, transform, 200, 300);
     expect(Math.round(transform.target.scaleY)).toBe(3);
   });
 
   it('scalingYOrSkewingX changes scaleY to flip', () => {
-    transform.target.scaleY = 1;
-    transform.target.strokeWidth = 0;
+    transform = prepareTransform(target, 'mb');
     const returned = scalingYOrSkewingX(eventData, transform, 200, -80);
     expect(transform.target.scaleY).toBe(0.8);
     expect(transform.target.flipY, 'the object flipped Y').toBe(true);
     expect(returned, 'action was permitted Y').toBe(true);
   });
 
-  it('scalingYOrSkewingX blocks scaleX to flip', () => {
-    transform.target.scaleY = 1;
-    transform.target.strokeWidth = 0;
+  it('scalingYOrSkewingX blocks scaleY to flip', () => {
+    transform = prepareTransform(target, 'mb');
     transform.target.lockScalingFlip = true;
     const returned = scalingYOrSkewingX(eventData, transform, 200, -80);
     expect(transform.target.scaleY).toBe(1);
@@ -101,11 +106,7 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('scalingXOrSkewingY changes skewY if shift pressed', () => {
-    transform.target.scaleX = 1;
-    transform.target.skewY = 0;
-    transform.target.strokeWidth = 0;
-    transform.skewX = 0;
-    transform.skewY = 0;
+    transform = prepareTransform(target, 'mr');
     // @ts-expect-error -- readonly
     eventData.shiftKey = true;
     scalingXOrSkewingY(eventData, transform, 200, 300);
@@ -114,11 +115,7 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('scalingYOrSkewingX changes skewX if shift pressed', () => {
-    transform.target.scaleY = 1;
-    transform.target.skewX = 0;
-    transform.target.strokeWidth = 0;
-    transform.skewX = 0;
-    transform.skewY = 0;
+    transform = prepareTransform(target, 'mb');
     // @ts-expect-error -- readonly
     eventData.shiftKey = true;
     scalingYOrSkewingX(eventData, transform, 200, 300);
@@ -127,10 +124,9 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('skewing Y with existing skewing', () => {
-    transform.target.scaleX = 1;
+    transform = prepareTransform(target, 'mr');
     transform.target.skewY = 30;
     transform.target.skewY = 45;
-    transform.target.strokeWidth = 0;
     transform.skewX = 45;
     transform.skewY = 15;
     // @ts-expect-error -- readonly
@@ -141,10 +137,10 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('skewing X with existing skewing', () => {
-    transform.target.scaleY = 1;
+    transform = prepareTransform(target, 'mb');
     transform.target.skewX = 30;
     transform.target.skewY = 45;
-    transform.target.strokeWidth = 0;
+
     transform.skewX = 45;
     transform.skewY = 15;
     // @ts-expect-error -- readonly
@@ -155,6 +151,7 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('scalingXOrSkewingY will fire events on canvas and target', () => {
+    transform = prepareTransform(target, 'mr');
     return new Promise<void>((done) => {
       transform.target.scaleX = 1;
       transform.target.canvas!.on('object:scaling', (options) => {
@@ -173,6 +170,7 @@ describe('fabric.controlsUtils', () => {
   });
 
   it('wrapWithFireEvent dont trigger event when actionHandler doesnt change anything', () => {
+    transform = prepareTransform(target, 'mr');
     transform.target.canvas!.on('object:scaling', () => {
       expect.fail('Should not trigger event');
     });
@@ -215,7 +213,7 @@ describe('fabric.controlsUtils', () => {
     const isX = axis === 'x';
 
     it(`scaling ${AXIS} from ${controlKey} keeps the same sign when scale = 0`, () => {
-      transform = prepareTransform(transform.target, controlKey);
+      transform = prepareTransform(target, controlKey);
       const size = transform.target._getTransformedDimensions()[
         axis as keyof Point
       ] as number;

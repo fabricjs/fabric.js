@@ -3,7 +3,7 @@
  * Imports are defined in 'e2e/imports.ts'
  */
 
-import { Rect, Group } from 'fabric';
+import { Rect, Group, Point } from 'fabric';
 import { beforeAll } from '../../test';
 
 beforeAll((canvas) => {
@@ -18,6 +18,8 @@ beforeAll((canvas) => {
     fill: 'green',
     opacity: 0.5,
   });
+  rect.setPositionByOrigin(new Point(40, 50), 'left', 'top');
+
   const rect2 = new Rect({
     width: 200,
     angle: 10,
@@ -28,6 +30,8 @@ beforeAll((canvas) => {
     fill: 'blue',
     opacity: 0.5,
   });
+  rect2.setPositionByOrigin(new Point(250, 60), 'left', 'top');
+
   const rect3 = new Rect({
     width: 200,
     angle: 45,
@@ -38,6 +42,7 @@ beforeAll((canvas) => {
     fill: 'purple',
     opacity: 0.5,
   });
+  rect3.setPositionByOrigin(new Point(60, 260), 'left', 'top');
 
   const group = new Group([rect, rect2, rect3], {
     subTargetCheck: true,
