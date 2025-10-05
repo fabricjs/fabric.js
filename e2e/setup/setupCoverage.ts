@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { ensureDirSync, writeFileSync } from 'fs-extra';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'path';
 import { URL } from 'url';
 import v8toIstanbul from 'v8-to-istanbul';
@@ -36,7 +36,7 @@ export async function stopCoverage(page: Page, outputDir: string) {
         ),
     ),
   );
-  ensureDirSync(outputDir);
+  mkdirSync(outputDir, { recursive: true });
   writeFileSync(
     path.resolve(outputDir, 'coverage-v8.json'),
     JSON.stringify(coverage, null, 2),

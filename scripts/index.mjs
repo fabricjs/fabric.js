@@ -14,7 +14,7 @@
 import { red, green, yellow, gray, bold } from './colors.mjs';
 import cp from 'child_process';
 import * as commander from 'commander';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
@@ -79,7 +79,7 @@ function watch(path, callback, debounceVal = 500) {
 
 function copy(from, to) {
   try {
-    fs.copySync(from, to);
+    fs.cpSync(from, to, { recursive: true });
     const containingFolder = path.resolve(wd, '..');
     console.log(
       `copied ${path.relative(containingFolder, from)} to ${path.relative(
