@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(deps-dev): bump fs-extra from 11.3.1 to 11.3.2 [#10762](https://github.com/fabricjs/fabric.js/pull/10762)
+- test(): Add new e2e import test for svg preserve aspect ratio [#10766](https://github.com/fabricjs/fabric.js/pull/10766)
+- chore() Revisit and reduce contribution guidelines, try to streamline things [#10759](https://github.com/fabricjs/fabric.js/pull/10759)
 - chore(deps): bump the npm_and_yarn group across 2 directories with 2 updates [#10734](https://github.com/fabricjs/fabric.js/pull/10734)
 - chore(deps-dev): bump @babel/core from 7.28.3 to 7.28.4 [#10753](https://github.com/fabricjs/fabric.js/pull/10753)
 - chore(): remove chalk [#10758](https://github.com/fabricjs/fabric.js/pull/10758)
