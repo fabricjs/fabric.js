@@ -3,8 +3,11 @@
  */
 
 import { renderTestType } from '../../types';
+import { genericRenderingTests } from './testcases/generic-rendering';
+// import { freedrawTests } from './testcases/free-draw';
+// import { colorFilteringTests } from './testcases/filtering';
 // import { clipPathRenderingTests } from './testcases/clip-path';
-import { controlsRenderingTests } from './testcases/controls-rendering';
+// import { controlsRenderingTests } from './testcases/controls-rendering';
 
 export const renderTests: renderTestType[] = [
   // {
@@ -70,10 +73,10 @@ export const renderTests: renderTestType[] = [
   // ...zSvgExport,
   // ...dataURLExports,
   // ...textPathTests,
-  ...controlsRenderingTests,
+  // ...controlsRenderingTests,
   // ...clipPathRenderingTests,
   // ...groupLayoutTests,
-  // ...genericRenderingTests,
+  ...genericRenderingTests,
   // ...globalCompositeOperationTests,
   // ...resizeFilterTests,
   // ...textRenderingTests,
