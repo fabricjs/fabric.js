@@ -3,7 +3,8 @@
  */
 
 import { renderTestType } from '../../types';
-import { clipPathRenderingTests } from './testcases/clip-path';
+// import { clipPathRenderingTests } from './testcases/clip-path';
+import { controlsRenderingTests } from './testcases/controls-rendering';
 
 export const renderTests: renderTestType[] = [
   // {
@@ -69,8 +70,8 @@ export const renderTests: renderTestType[] = [
   // ...zSvgExport,
   // ...dataURLExports,
   // ...textPathTests,
-  // ...controlsRenderingTests,
-  ...clipPathRenderingTests,
+  ...controlsRenderingTests,
+  // ...clipPathRenderingTests,
   // ...groupLayoutTests,
   // ...genericRenderingTests,
   // ...globalCompositeOperationTests,
