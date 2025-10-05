@@ -12,18 +12,16 @@ beforeAll((canvas) => {
 
   // Create the star polygon
   const star = new Polygon(starPoints, {
-    left: 100,
-    top: 100,
     fill: 'yellow',
     stroke: 'black',
     strokeLineJoin: 'round',
     strokeWidth: 10,
   });
+  star.setPositionByOrigin(new Point(100, 100), 'left', 'top');
 
   star.controls = controlsUtils.createPolyControls(5);
 
   canvas.add(star);
-  star.setPositionByOrigin(new Point(100, 100), 'left', 'top');
 
   canvas.setActiveObject(star);
 

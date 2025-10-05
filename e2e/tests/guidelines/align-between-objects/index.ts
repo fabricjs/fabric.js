@@ -3,7 +3,7 @@
  * Imports are defined in 'e2e/imports.ts'
  */
 
-import { Rect, Point } from 'fabric';
+import { Rect } from 'fabric';
 import { initAligningGuidelines } from 'fabric/extensions';
 import { beforeAll } from '../../test';
 import type { AligningLineConfig } from 'fabric/extensions';
@@ -16,11 +16,8 @@ beforeAll(async (canvas) => {
     top: 30,
     width: 50,
     height: 50,
-    originX: 'center',
-    originY: 'center',
     fill: 'green',
   });
-  rect1.setPositionByOrigin(new Point(30, 30), 'left', 'top');
 
   const rect2 = new Rect({
     strokeWidth: 0,
@@ -28,11 +25,8 @@ beforeAll(async (canvas) => {
     top: 30,
     width: 60,
     height: 60,
-    originX: 'center',
-    originY: 'center',
     fill: 'yellow',
   });
-  rect2.setPositionByOrigin(new Point(200, 300), 'left', 'top');
 
   initAligningGuidelines(canvas, {
     width: 2,
