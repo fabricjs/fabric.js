@@ -13,20 +13,14 @@ beforeAll(async (canvas) => {
   canvas.preserveObjectStacking = true;
   const rect1 = new Rect({
     strokeWidth: 0,
-    left: 250,
-    top: 250,
     width: 150,
     height: 150,
-    originX: 'right',
-    originY: 'bottom',
     fill: 'green',
   });
-  rect1.setPositionByOrigin(new Point(250, 250), 'left', 'top');
+  rect1.setPositionByOrigin(new Point(250, 250), 'right', 'bottom');
 
   const rect2 = new Rect({
     strokeWidth: 0,
-    left: 255,
-    top: 255,
     width: 150,
     height: 150,
     originX: 'left',
