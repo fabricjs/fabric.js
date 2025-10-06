@@ -22,7 +22,7 @@ export default defineConfig({
       'test/snapshot-serializers/canvas-rendering-context.ts',
     ],
     setupFiles: ['./vitest.setup.ts'],
-    workspace: [
+    projects: [
       {
         extends: true,
         test: {
@@ -54,7 +54,7 @@ export default defineConfig({
           browser: {
             provider: 'playwright',
             enabled: true,
-            headless: true,
+            headless: false,
             instances: [
               {
                 browser: 'firefox',
