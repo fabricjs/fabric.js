@@ -1,5 +1,5 @@
 import { cyanBright } from './colors.mjs';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import moment from 'moment';
 import path from 'node:path';
 import process from 'node:process';
