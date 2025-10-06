@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @eslint/js from 9.35.0 to 9.37.0 [#10768](https://github.com/fabricjs/fabric.js/pull/10768)
 - chore(deps-dev): bump @playwright/test from 1.55.0 to 1.55.1 [#10761](https://github.com/fabricjs/fabric.js/pull/10761)
 - test(): Add new e2e import test for svg preserve aspect ratio [#10766](https://github.com/fabricjs/fabric.js/pull/10766)
 - chore() Revisit and reduce contribution guidelines, try to streamline things [#10759](https://github.com/fabricjs/fabric.js/pull/10759)
