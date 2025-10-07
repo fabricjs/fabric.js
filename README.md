@@ -10,6 +10,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - [**Contributing, Developing and More**](CONTRIBUTING.md)
 
 ## Special Thanks
+
 Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
 
    <a href="https://www.warp.dev/fabric.js">
@@ -17,6 +18,7 @@ Here is a section for recognition of companies or individuals that support fabri
    </a>
 
 ### [Warp, built for coding with multiple AI agents](https://www.warp.dev/fabric.js)
+
 [Available for MacOS, Linux, & Windows](https://www.warp.dev/fabric.js)<br>
 
 </div>
