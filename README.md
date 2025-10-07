@@ -16,7 +16,7 @@ Here is a section for recognition of companies or individuals that support fabri
       <img alt="Warp sponsorship" width="300" src="https://github.com/warpdotdev/brand-assets/blob/main/Github/Sponsor/Warp-Github-LG-01.png">
    </a>
 
-### [Warp, the intelligent terminal for developers](https://www.warp.dev/fabric.js)
+### [Warp, built for coding with multiple AI agents](https://www.warp.dev/fabric.js)
 [Available for MacOS, Linux, & Windows](https://www.warp.dev/fabric.js)<br>
 
 </div>
