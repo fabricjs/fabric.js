@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
 - ci(): Move firefox to headless: false to see if improves passing rate. Renamed config because of deprecation warning [#10769](https://github.com/fabricjs/fabric.js/pull/10769)
 - chore(): remove fs-extra dev dependency [#10767](https://github.com/fabricjs/fabric.js/pull/10767)
 - chore(deps-dev): bump @playwright/test from 1.55.0 to 1.55.1 [#10761](https://github.com/fabricjs/fabric.js/pull/10761)

@@ -1,6 +1,6 @@
 import { cyanBright } from './colors.mjs';
 import fs from 'node:fs';
-import moment from 'moment';
+import { formatFullTimestamp } from './date-time.mjs';
 import path from 'node:path';
 import process from 'node:process';
 import psList from 'ps-list';
@@ -83,7 +83,7 @@ export function report(type, data) {
         JSON.stringify(
           {
             start: {
-              timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+              timestamp: formatFullTimestamp(),
               pid: process.pid,
             },
           },
@@ -99,7 +99,7 @@ export function report(type, data) {
           {
             ...readLockFile(),
             error: {
-              timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+              timestamp: formatFullTimestamp(),
               pid: process.pid,
               data,
             },

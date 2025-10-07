@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import cp from 'child_process';
 import fs from 'node:fs';
-import moment from 'moment';
+import { formatFullTimestamp } from '../scripts/date-time.mjs';
 import path from 'node:path';
 import { build } from '../scripts/build.mjs';
 import { subscribe } from '../scripts/buildLock.mjs';
@@ -43,7 +43,7 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
         JSON.stringify(
           {
             ...packageJSON,
-            trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
+            trigger: formatFullTimestamp(),
           },
           null,
           2,
