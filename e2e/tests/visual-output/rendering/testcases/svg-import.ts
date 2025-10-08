@@ -101,6 +101,11 @@ const svgFiles = [
   'use-svg-style-2',
   'svg_text_underline_thick',
   'coords-viewattr-02-b',
+  // Nested clipPath tests for infinite recursion fix (https://github.com/fabricjs/fabric.js/issues/10659)
+  'nested-clippath-simple',
+  'nested-clippath-triple',
+  'nested-clippath-different',
+  'nested-clippath-complex',
 ];
 
 export const svgImportTests: renderTestType[] = svgFiles.map(createTestFromSVG);
