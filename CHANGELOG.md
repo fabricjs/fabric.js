@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
 - chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
 - ci(): Move firefox to headless: false to see if improves passing rate. Renamed config because of deprecation warning [#10769](https://github.com/fabricjs/fabric.js/pull/10769)
