@@ -51,6 +51,7 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import { Group } from '../shapes/Group';
 
 export type TargetsInfo = {
   target?: FabricObject;
@@ -219,6 +220,29 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   declare preserveObjectStacking: boolean;
 
+  /**
+   * Enable double-click to lock the group node. After locking,
+   * you can select the child nodes in the group node,
+   * regardless of whether interative and subTargetCheck are enabled in the group.
+   * @type Boolean
+   * @default
+   */
+  declare dblClickIsolateObject: boolean;
+
+  /**
+   * Double-click the locked node. Currently only group nodes are supported.
+   * @type Group | null
+   * @default
+   */
+  isolatedObject: Group | null;
+
+  /**
+   * Specified search objects
+   * @type Boolean
+   * @default null
+   */
+  _searchTargets: FabricObject[] | null;
+
   // event config
   declare stopContextMenu: boolean;
   declare fireRightClick: boolean;
@@ -283,7 +307,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  declare protected _scenePoint?: Point;
+  protected declare _scenePoint?: Point;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
@@ -292,14 +316,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  declare protected _viewportPoint?: Point;
+  protected declare _viewportPoint?: Point;
 
   /**
    * Holds the informations we cache during an event lifespan
    * This data is needed many times during an event and we want to avoid to recalculate it
    * multuple times.
    */
-  declare protected _targetInfo: FullTargetsInfoWithContainer | undefined;
+  protected declare _targetInfo: FullTargetsInfoWithContainer | undefined;
 
   static ownDefaults = canvasDefaults;
 
@@ -317,10 +341,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   get wrapperEl() {
     return this.elements.container;
   }
-  declare private pixelFindCanvasEl: HTMLCanvasElement;
-  declare private pixelFindContext: CanvasRenderingContext2D;
+  private declare pixelFindCanvasEl: HTMLCanvasElement;
+  private declare pixelFindContext: CanvasRenderingContext2D;
 
-  declare protected _isCurrentlyDrawing: boolean;
+  protected declare _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
 
@@ -719,9 +743,60 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * This function is in charge of deciding which is the object that is the current target of an interaction event.
-   * For interaction event we mean a pointer related action on the canvas.
-   * Which is the
+   * Double-click to lock the group
+   * @param e
+   * @returns
+   */
+  dblClickLock(e: TPointerEvent): boolean {
+    if (this.dblClickIsolateObject) {
+      const pointer = this.getScenePoint(e);
+      const objects = this.isolatedObject
+        ? this.isolatedObject.getObjects()
+        : this.getObjects();
+      const obj = this.searchPossibleTargets(objects, pointer);
+      if (obj.target) {
+        if (obj.target instanceof Group) {
+          this.isolatedObject = obj.target;
+          this.discardActiveObject();
+          // The newly created group object has its child node coords initialized, otherwise it cannot be selected.
+          obj.target._objects.forEach((o) => {
+            o.setCoords();
+          });
+        } else {
+          // Non-group objects do not handle locking, return false to continue the object's own double-click event
+          return false;
+        }
+      } else {
+        // cancel isolation
+        this.isolatedObject = null;
+        this.discardActiveObject();
+      }
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Manually set the search object
+   * @param objects
+   */
+  setSearchTargets(objects: FabricObject[] | null) {
+    this._searchTargets = objects;
+  }
+
+  /**
+   * Returns the search object
+   * @returns
+   */
+  getSearchTargets() {
+    return (
+      this._searchTargets ||
+      (this.isolatedObject ? this.isolatedObject._objects : this._objects)
+    );
+  }
+
+  /**
+   * Method that determines what object we are clicking on
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
@@ -744,7 +819,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects(),
-      targetInfo = this.searchPossibleTargets(this._objects, pointer);
+      targetInfo = this.searchPossibleTargets(this.getSearchTargets(), pointer);
 
     const {
       subTargets: currentSubTargets,
@@ -907,7 +982,12 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     while (i--) {
       const target = objects[i];
       if (this._checkTarget(target, pointer)) {
-        if (isCollection(target) && target.subTargetCheck) {
+        // Double-clicking to lock a node before searching for its child nodes is not enabled
+        if (
+          !this.dblClickIsolateObject &&
+          isCollection(target) &&
+          target.subTargetCheck
+        ) {
           const { target: subTarget } = this._searchPossibleTargets(
             target._objects,
             pointer,
