@@ -54,7 +54,7 @@ export default defineConfig({
           browser: {
             provider: 'playwright',
             enabled: true,
-            headless: true,
+            headless: false,
             instances: [
               {
                 browser: 'firefox',

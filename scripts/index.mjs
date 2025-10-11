@@ -14,8 +14,8 @@
 import { red, green, yellow, gray, bold } from './colors.mjs';
 import cp from 'child_process';
 import * as commander from 'commander';
-import fs from 'fs-extra';
-import moment from 'moment';
+import fs from 'node:fs';
+import { formatTime } from './date-time.mjs';
 import path from 'node:path';
 import process from 'node:process';
 import os from 'os';
@@ -79,7 +79,7 @@ function watch(path, callback, debounceVal = 500) {
 
 function copy(from, to) {
   try {
-    fs.copySync(from, to);
+    fs.cpSync(from, to, { recursive: true });
     const containingFolder = path.resolve(wd, '..');
     console.log(
       `copied ${path.relative(containingFolder, from)} to ${path.relative(
@@ -119,16 +119,12 @@ function exportAssetsToWebsite(options) {
   BUILD_SOURCE.forEach((p) =>
     copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)),
   );
-  console.log(
-    bold(`[${moment().format('HH:mm')}] exported assets to fabricjs.com`),
-  );
+  console.log(bold(`[${formatTime()}] exported assets to fabricjs.com`));
   options.watch &&
     BUILD_SOURCE.forEach((p) => {
       watch(path.resolve(wd, p), () => {
         copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p));
-        console.log(
-          bold(`[${moment().format('HH:mm')}] exported ${p} to fabricjs.com`),
-        );
+        console.log(bold(`[${formatTime()}] exported ${p} to fabricjs.com`));
       });
     });
 }

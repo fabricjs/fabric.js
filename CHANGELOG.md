@@ -3,6 +3,11 @@
 ## [next]
 
 - BREAKING chore(): Deprecate originX and originY and change their default to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)
+- chore(): up dev deps [#10773](https://github.com/fabricjs/fabric.js/pull/10773)
+- chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
+- chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
+- ci(): Move firefox to headless: false to see if improves passing rate. Renamed config because of deprecation warning [#10769](https://github.com/fabricjs/fabric.js/pull/10769)
+- chore(): remove fs-extra dev dependency [#10767](https://github.com/fabricjs/fabric.js/pull/10767)
 - chore(deps-dev): bump @playwright/test from 1.55.0 to 1.55.1 [#10761](https://github.com/fabricjs/fabric.js/pull/10761)
 - test(): Add new e2e import test for svg preserve aspect ratio [#10766](https://github.com/fabricjs/fabric.js/pull/10766)
 - chore() Revisit and reduce contribution guidelines, try to streamline things [#10759](https://github.com/fabricjs/fabric.js/pull/10759)

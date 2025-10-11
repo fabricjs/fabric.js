@@ -1,6 +1,6 @@
 import { red, blue, yellow, cyanBright, bold } from './colors.mjs';
 import * as commander from 'commander';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import inquirer from 'inquirer';
 import path from 'node:path';
 import process from 'node:process';
@@ -92,7 +92,8 @@ sandbox
   )
   .action((template, destination, { watch }) => {
     const templateDir = path.resolve(codesandboxTemplatesDir, template);
-    fs.copySync(templateDir, destination, {
+    fs.cpSync(templateDir, destination, {
+      recursive: true,
       filter: (src) => !ignore(templateDir, path.relative(templateDir, src)),
     });
     console.log(

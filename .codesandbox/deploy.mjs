@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import match from 'micromatch';
 import path from 'path';
 import { getGitInfo } from '../scripts/git.mjs';

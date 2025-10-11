@@ -59,7 +59,7 @@ jobs:
       - name: Run Vitest unit test
         run: xvfb-run npm run test:vitest:${{matrix.browser}}
         env:
-          LIBGL_ALWAYS_SOFTWARE: 1
+          LIBGL_ALWAYS_SOFTWARE: true
   vitest-node-20:
     name: Vitest tests node 20
     runs-on: ubuntu-24.04

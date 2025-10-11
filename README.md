@@ -1,6 +1,6 @@
 # Fabric.js
 
-<a href="http://fabricjs.com/kitchensink" target="_blank"><img align="right" src="/lib/screenshot.png" style="width:400px"></a>
+<a href="http://fabricjs.com/kitchensink" target="_blank"><img align="right" src="/lib/screenshot.png" width="400"></a>
 
 A **simple and powerful Javascript HTML5 canvas library**.
 
@@ -9,34 +9,19 @@ A **simple and powerful Javascript HTML5 canvas library**.
 - [**GOTCHAS**][gotchas]
 - [**Contributing, Developing and More**](CONTRIBUTING.md)
 
----
+## Special Thanks
 
-<!-- build/coverage status, climate -->
+Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
 
-[![🩺](../../actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
-[![🧪](../../actions/workflows/tests.yml/badge.svg)](../../actions/workflows/tests.yml)
-[![CodeQL](../../actions/workflows/codeql-analysis.yml/badge.svg)](../../actions/workflows/codeql-analysis.yml)
+   <a href="https://go.warp.dev/fabric">
+      <img alt="Warp sponsorship" width="300" src="https://github.com/warpdotdev/brand-assets/blob/main/Github/Sponsor/Warp-Github-LG-01.png">
+   </a>
 
----
+### [Warp, built for coding with multiple AI agents](https://go.warp.dev/fabric)
 
-<!-- npm, bower, CDNJS versions, downloads -->
+[Available for MacOS, Linux, & Windows](https://go.warp.dev/fabric)<br>
 
-[![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
-[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/fabric/badge)][jsdelivr]
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js)
-
-[![NPM](https://badge.fury.io/js/fabric.svg)](http://badge.fury.io/js/fabric)
-[![Downloads per month](https://img.shields.io/npm/dm/fabric.svg)](https://www.npmjs.org/package/fabric)
-[![Bower](https://badge.fury.io/bo/fabric.svg)](http://badge.fury.io/bo/fabric)
-
----
-
-[![Sponsor asturur](https://img.shields.io/static/v1?label=Sponsor%20asturur&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/asturur)
-[![Sponsor melchiar](https://img.shields.io/static/v1?label=Sponsor%20melchiar&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/melchiar)
-[![Sponsor ShaMan123](https://img.shields.io/static/v1?label=Sponsor%20ShaMan123&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/ShaMan123)
-[![Patreon](https://img.shields.io/static/v1?label=Patreon&message=%F0%9F%91%8D&logo=Patreon&color=blueviolet)](https://www.patreon.com/fabricJS)
-
----
+</div>
 
 ## Features
 

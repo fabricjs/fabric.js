@@ -1,7 +1,13 @@
 import { transformFileAsync } from '@babel/core';
 import type { PlaywrightTestConfig } from '@playwright/test';
-import { readdirSync, rmSync, statSync, watch, writeFileSync } from 'node:fs';
-import { ensureFileSync } from 'fs-extra';
+import {
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  watch,
+  writeFileSync,
+} from 'node:fs';
 import { makeRe } from 'micromatch';
 import * as path from 'node:path';
 
@@ -49,7 +55,7 @@ const buildFile = async (file: string) => {
   });
   if (result?.code) {
     const distFile = getDistFileName(file);
-    ensureFileSync(distFile);
+    mkdirSync(path.dirname(distFile), { recursive: true });
     writeFileSync(distFile, result.code);
   }
 };
