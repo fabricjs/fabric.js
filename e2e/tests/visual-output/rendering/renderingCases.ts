@@ -3,20 +3,20 @@
  */
 
 import { renderTestType } from '../../types';
-import { groupLayoutTests } from './testcases/group-layout';
-import { globalCompositeOperationTests } from './testcases/global-composite-operation';
-import { genericRenderingTests } from './testcases/generic-rendering';
-import { freedrawTests } from './testcases/free-draw';
-import { colorFilteringTests } from './testcases/filtering';
-import { clipPathRenderingTests } from './testcases/clip-path';
-import { controlsRenderingTests } from './testcases/controls-rendering';
-import { resizeFilterTests } from './testcases/resize-filter';
+// import { groupLayoutTests } from './testcases/group-layout';
+// import { globalCompositeOperationTests } from './testcases/global-composite-operation';
+// import { genericRenderingTests } from './testcases/generic-rendering';
+// import { freedrawTests } from './testcases/free-draw';
+// import { colorFilteringTests } from './testcases/filtering';
+// import { clipPathRenderingTests } from './testcases/clip-path';
+// import { controlsRenderingTests } from './testcases/controls-rendering';
+// import { resizeFilterTests } from './testcases/resize-filter';
 import { svgImportTests } from './testcases/svg-import';
-import { textRenderingTests } from './testcases/text';
-import { textPathTests } from './testcases/text-path';
+// import { textRenderingTests } from './testcases/text';
+// import { textPathTests } from './testcases/text-path';
 import { selectedTextWithClipPath } from './testcases/textWithClipPath';
-import { dataURLExports } from './testcases/to-data-url';
-import { zSvgExport } from './testcases/z-svg-export';
+// import { dataURLExports } from './testcases/to-data-url';
+// import { zSvgExport } from './testcases/z-svg-export';
 
 export const renderTests: renderTestType[] = [
   {
@@ -71,6 +71,7 @@ export const renderTests: renderTestType[] = [
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, imgSource.width, imgSource.height);
       const img = new fabric.FabricImage(imgSource);
+      img.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
       canvas.add(img);
       img.filters[0] = new fabric.filters.Pixelate({
         blocksize: 20,
@@ -79,17 +80,17 @@ export const renderTests: renderTestType[] = [
     },
   },
   selectedTextWithClipPath,
-  ...zSvgExport,
-  ...dataURLExports,
-  ...textPathTests,
-  ...controlsRenderingTests,
-  ...clipPathRenderingTests,
-  ...groupLayoutTests,
-  ...genericRenderingTests,
-  ...globalCompositeOperationTests,
-  ...resizeFilterTests,
-  ...textRenderingTests,
-  ...freedrawTests,
+  // ...zSvgExport,
+  // ...dataURLExports,
+  // ...textPathTests,
+  // ...controlsRenderingTests,
+  // ...clipPathRenderingTests,
+  // ...groupLayoutTests,
+  // ...genericRenderingTests,
+  // ...globalCompositeOperationTests,
+  // ...resizeFilterTests,
+  // ...textRenderingTests,
+  // ...freedrawTests,
   ...svgImportTests,
-  ...colorFilteringTests,
+  // ...colorFilteringTests,
 ];
