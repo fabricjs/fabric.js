@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @types/node from 24.7.0 to 24.7.2 [#10778](https://github.com/fabricjs/fabric.js/pull/10778)
 - chore(): up dev deps [#10773](https://github.com/fabricjs/fabric.js/pull/10773)
 - chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
 - chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
