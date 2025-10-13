@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump es-toolkit from 1.39.10 to 1.40.0 [#10777](https://github.com/fabricjs/fabric.js/pull/10777)
 - chore(): up dev deps [#10773](https://github.com/fabricjs/fabric.js/pull/10773)
 - chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
 - chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
