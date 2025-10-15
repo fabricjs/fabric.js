@@ -32,8 +32,6 @@ export class RemoveColor extends BaseFilter<
 > {
   /**
    * Color to remove, in any format understood by {@link Color}.
-   * @param {String} type
-   * @default
    */
   declare color: RemoveColorOwnProps['color'];
 

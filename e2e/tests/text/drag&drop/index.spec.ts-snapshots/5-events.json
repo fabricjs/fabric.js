@@ -48,14 +48,6 @@
       "scenePoint": {
         "x": 120,
         "y": 55
-      },
-      "pointer": {
-        "x": 120,
-        "y": 55
-      },
-      "absolutePointer": {
-        "x": 120,
-        "y": 55
       }
     },
     "b"
@@ -75,14 +67,6 @@
         "y": 55
       },
       "scenePoint": {
-        "x": 120,
-        "y": 55
-      },
-      "pointer": {
-        "x": 120,
-        "y": 55
-      },
-      "absolutePointer": {
         "x": 120,
         "y": 55
       }
@@ -106,15 +90,7 @@
         "x": 120,
         "y": 55
       },
-      "didDrop": false,
-      "pointer": {
-        "x": 120,
-        "y": 55
-      },
-      "absolutePointer": {
-        "x": 120,
-        "y": 55
-      }
+      "didDrop": false
     },
     "canvas"
   ],
@@ -163,15 +139,7 @@
         "y": 55
       },
       "didDrop": true,
-      "dropTarget": "a",
-      "pointer": {
-        "x": 120,
-        "y": 55
-      },
-      "absolutePointer": {
-        "x": 120,
-        "y": 55
-      }
+      "dropTarget": "a"
     },
     "a"
   ],

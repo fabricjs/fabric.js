@@ -4,16 +4,17 @@ on:
     branches:
       - master
     types: [closed]
-
+permissions:
+  contents: read
 jobs:
   publish-npm:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
         with:
-          node-version: 20.x
+          node-version: 24.x
           registry-url: https://registry.npmjs.org/
       - run: npm ci
       - run: node publish-next.js

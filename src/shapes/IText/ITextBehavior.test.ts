@@ -1,5 +1,6 @@
-import { roundSnapshotOptions } from '../../../jest.extend';
+import { roundSnapshotOptions } from '../../../vitest.extend';
 import { IText } from './IText';
+import { describe, expect, it, beforeEach, afterEach, test, vi } from 'vitest';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
 
@@ -41,34 +42,59 @@ describe('text imperative changes', () => {
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars', async () => {
+  it('insertChars', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab', undefined, 1);
     expect(iText.text).toBe('tabest');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars and removes chars', async () => {
+  it('insertChars and removes chars', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab', undefined, 1, 2);
     expect(iText.text).toBe('tabst');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars and removes chars', async () => {
+  it('insertChars and removes chars', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab', undefined, 1, 4);
     expect(iText.text).toBe('tab');
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars handles new lines correctly', async () => {
+  it('insertChars handles new lines correctly', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars('ab\n\n', undefined, 1);
     matchTextStateSnapshot(iText);
   });
 
-  it('insertChars can accept some style for the new text', async () => {
+  it('insertChars can accept some style for the new text', async (context) => {
+    context.skip(
+      !!context.task.file.projectName?.includes('firefox'),
+      'Firefox delivers different snapshot',
+    );
+
     const iText = await create();
     iText.insertChars(
       'ab\n\na',
@@ -96,57 +122,55 @@ describe('text imperative changes', () => {
 describe('IText cursor animation snapshot', () => {
   let currentAnimation: string[] = [];
   const origCalculate = ValueAnimation.prototype.calculate;
-  beforeAll(() => {
-    jest
-      .spyOn(ValueAnimation.prototype, 'calculate')
-      .mockImplementation(function (timeElapsed: number) {
+
+  beforeEach(() => {
+    vi.spyOn(ValueAnimation.prototype, 'calculate').mockImplementation(
+      function (timeElapsed: number) {
         const value = origCalculate.call(this, timeElapsed);
         currentAnimation.push(value.value.toFixed(3));
         return value;
-      });
-    jest.useFakeTimers();
-  });
-  afterAll(() => {
-    ValueAnimation.prototype.calculate = origCalculate;
-  });
-  beforeEach(() => {
-    jest.runAllTimers();
+      },
+    );
+    vi.useFakeTimers();
+    vi.runAllTimers();
     currentAnimation = [];
   });
-  afterAll(() => {
-    jest.resetAllMocks();
-    jest.useRealTimers();
+
+  afterEach(() => {
+    ValueAnimation.prototype.calculate = origCalculate;
+    vi.resetAllMocks();
+    vi.useRealTimers();
   });
   test('initDelayedCursor false - with delay', () => {
     const iText = new IText('', { canvas: {} });
     iText.initDelayedCursor();
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('initDelayedCursor true - with NO delay', () => {
     const iText = new IText('', { canvas: {} });
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('selectionStart/selection end will abort animation', () => {
     const iText = new IText('asd', { canvas: {} });
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(160);
+    vi.advanceTimersByTime(160);
     iText.selectionStart = 0;
     iText.selectionEnd = 3;
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('exiting from a canvas will abort animation', () => {
     const iText = new IText('asd', { canvas: {} });
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(160);
+    vi.advanceTimersByTime(160);
     iText.canvas = undefined;
-    jest.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
@@ -155,7 +179,7 @@ describe('IText cursor animation snapshot', () => {
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor();
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
@@ -164,30 +188,30 @@ describe('IText cursor animation snapshot', () => {
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor(true);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
 });
 
 describe('IText _tick', () => {
-  const _tickMock = jest.fn();
+  const _tickMock = vi.fn();
   beforeEach(() => {
     _tickMock.mockClear();
   });
   test('enter Editing will call _tick', () => {
     const iText = new IText('hello\nhello');
-    jest.spyOn(iText, '_tick').mockImplementation(_tickMock);
+    vi.spyOn(iText, '_tick').mockImplementation(_tickMock);
     iText.enterEditing();
     expect(_tickMock).toHaveBeenCalledWith();
   });
   test('mouse up will fire an animation restart with 0 delay if is a click', () => {
     const iText = new IText('hello\nhello');
-    jest.spyOn(iText, '_tick').mockImplementation(_tickMock);
+    vi.spyOn(iText, '_tick').mockImplementation(_tickMock);
     iText.enterEditing();
     expect(_tickMock).toHaveBeenCalledWith();
     _tickMock.mockClear();
-    iText.__lastSelected = true;
+    iText.selected = true;
     iText.mouseUpHandler({
       e: {
         button: 0,
@@ -198,8 +222,8 @@ describe('IText _tick', () => {
 });
 
 describe('Itext enterEditing and exitEditing', () => {
-  const enterMock = jest.fn();
-  const exitMock = jest.fn();
+  const enterMock = vi.fn();
+  const exitMock = vi.fn();
 
   afterEach(() => {
     enterMock.mockClear();

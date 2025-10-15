@@ -1,9 +1,15 @@
 import { transformFileAsync } from '@babel/core';
 import type { PlaywrightTestConfig } from '@playwright/test';
-import { readdirSync, rmSync, statSync, watch, writeFileSync } from 'node:fs';
-import { ensureFileSync } from 'fs-extra';
-import match from 'micromatch';
-import path from 'path';
+import {
+  mkdirSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  watch,
+  writeFileSync,
+} from 'node:fs';
+import { makeRe } from 'micromatch';
+import * as path from 'node:path';
 
 const include = ['**/*.ts'];
 const exclude = ['**/*.spec.ts'];
@@ -11,13 +17,13 @@ const exclude = ['**/*.spec.ts'];
 const src = path.resolve(process.cwd(), 'e2e', 'tests');
 const dist = path.resolve(process.cwd(), 'e2e', 'dist');
 
-const includeRe = include.map((glob) => match.makeRe(glob));
-const excludeRe = exclude.map((glob) => match.makeRe(glob));
+const includeRe = include.map((glob) => makeRe(glob));
+const excludeRe = exclude.map((glob) => makeRe(glob));
 
 const walkSync = (dir: string, callback: (file: string) => any) => {
   const files = readdirSync(dir);
   files.forEach((file) => {
-    var filepath = path.resolve(dir, file);
+    const filepath = path.resolve(dir, file);
     const stats = statSync(filepath);
     if (stats.isDirectory()) {
       walkSync(filepath, callback);
@@ -49,12 +55,12 @@ const buildFile = async (file: string) => {
   });
   if (result?.code) {
     const distFile = getDistFileName(file);
-    ensureFileSync(distFile);
+    mkdirSync(path.dirname(distFile), { recursive: true });
     writeFileSync(distFile, result.code);
   }
 };
 
-export default async (config: PlaywrightTestConfig) => {
+export default async (_config: PlaywrightTestConfig) => {
   const files: string[] = [];
   walkSync(src, (file) => files.push(file));
 
@@ -75,6 +81,9 @@ export default async (config: PlaywrightTestConfig) => {
       src,
       { recursive: true, persistent: true },
       (type, filename) => {
+        if (!filename) {
+          return;
+        }
         const file = path.join(src, filename);
         shouldBuild(file) && buildFile(file);
       },

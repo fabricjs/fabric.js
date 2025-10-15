@@ -5,3 +5,8 @@ export {
   originUpdaterWrapper,
   installOriginWrapperUpdater,
 } from './data_updaters/origins';
+
+export {
+  gradientUpdaterWrapper,
+  installGradientUpdater,
+} from './data_updaters/gradient';

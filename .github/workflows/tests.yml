@@ -7,121 +7,90 @@ on:
     branches: [master]
     paths-ignore: [CHANGELOG.md]
 
+permissions:
+  actions: write
+  issues: write
+  pull-requests: write
+
 jobs:
   prime-build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Install dependencies
         uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 24.x
           install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
-  node-coverage:
-    needs: [prime-build]
+  vitest-coverage:
+    name: Vitest tests Node 24
     runs-on: ubuntu-24.04
-    name: Node 20.x ${{ matrix.suite }} tests
-    strategy:
-      fail-fast: false
-      matrix:
-        # For more information see:
-        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        suite: [unit, visual]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 24.x
           install-system-deps: false
-      - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
-      - name: Run ${{ matrix.suite }} tests with coverage
-        if: matrix.suite == 'unit'
-        run: npm run test:coverage && sleep 5
-      - name: Run ${{ matrix.suite }} tests with coverage
-        if: matrix.suite == 'visual'
-        run: npm run test:visual:coverage
-      - name: Verify coverage files
-        run: ls -l ./.nyc_output/*.json
-      - name: Upload test coverage ${{ matrix.suite }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-${{ matrix.suite }}
-          path: ./.nyc_output/*.json
-          include-hidden-files: true
-
-  browser:
-    needs: [prime-build]
-    name: ${{ matrix.target }} ${{ matrix.suite }} tests
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        node-version: [20]
-        target: [chrome, firefox]
-        suite: [unit, visual]
-      fail-fast: false
-    steps:
-      - name: Unit tests on browser ${{ matrix.target }}
-        uses: actions/checkout@v4
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
-      - name: Run ${{ matrix.target }} ${{ matrix.suite }} headless test
-        run: xvfb-run npm run test -- -c ${{ matrix.target }} -s ${{ matrix.suite }}
-  node:
-    needs: [prime-build]
-    runs-on: ubuntu-24.04
-    name: Node ${{ matrix.node-version }} ${{ matrix.suite }} tests
-    strategy:
-      fail-fast: false
-      matrix:
-        # For more information see:
-        # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-        # supported Node.js release schedule: https://nodejs.org/en/about/releases/
-        node-version: [18, 22]
-        suite: [unit, visual]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: ${{ matrix.node-version }}
-          install-system-deps: ${{ matrix.node-version >= 22 }}
-      - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
-      - name: Run ${{ matrix.suite }} tests
-        run: npm run test -- -c node -s ${{ matrix.suite }}
-  jest:
-    name: Jest tests
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 20.x
-          install-system-deps: false
-      - name: Run Jest unit test
-        run: npm run test:jest:coverage
+      - name: Run Vitest unit test
+        run: npm run test:vitest:coverage
       - name: Upload test coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
-          name: coverage-jest
+          name: coverage-vitest
           path: ./.nyc_output/*.json
           include-hidden-files: true
-
+  vitest-browser:
+    name: Vitest tests ${{matrix.browser}}
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        browser: [chromium, firefox]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 24.x
+          install-system-deps: false
+      - name: Install Playwright Browsers ${{matrix.browser}}
+        run: npx playwright install --with-deps ${{matrix.browser}}
+      - name: Run Vitest unit test
+        run: xvfb-run npm run test:vitest:${{matrix.browser}}
+        env:
+          LIBGL_ALWAYS_SOFTWARE: true
+  vitest-node-20:
+    name: Vitest tests node 20
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 20.x
+          install-system-deps: false
+      - name: Run Vitest unit test
+        run: npm run test:vitest
+  vitest-node-22:
+    name: Vitest tests node 22
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 22.x
+          install-system-deps: false
+      - name: Run Vitest unit test
+        run: npm run test:vitest
   e2e:
     needs: [prime-build]
     name: Playwright tests
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 24.x
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install
@@ -130,48 +99,22 @@ jobs:
       - name: Run Playwright tests
         run: xvfb-run npm run test:e2e
       - name: Upload Test Output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         if: failure()
         with:
           name: e2e-report
           path: ./e2e/test-report/
           include-hidden-files: true
       - name: Upload Test Coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: coverage-e2e
           path: ./e2e/test-results/**/coverage.json
           include-hidden-files: true
-  coverage:
-    needs: [node-coverage, e2e]
-    name: Coverage reporting
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/cached-install
+      - name: Create prnumber artifact
+        run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
+      - name: Upload Pr Number
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
-          node-version: 18.x
-          install-system-deps: false
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-e2e
-          path: ./.nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-jest
-          path: ./.nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-unit
-          path: ./.nyc_output
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-visual
-          path: ./.nyc_output
-      - run: ls -l ./.nyc_output
-      - run: npm run coverage:report
-      - uses: romeovs/lcov-reporter-action@v0.4.0
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          delete-old-comments: true
+          name: prnumber
+          path: ./prnumber.txt

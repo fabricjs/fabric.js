@@ -1,33 +1,30 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../../fixtures/base';
 import type { Textbox } from 'fabric';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
 import { TextUtil } from '../../../utils/TextUtil';
-
-setup();
 
 test.describe.configure({ mode: 'serial' });
 
 for (const splitByGrapheme of [true, false]) {
   test(`adding new lines and copy paste - splitByGrapheme: ${splitByGrapheme}`, async ({
     page,
+    canvasUtil,
     context,
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    const canvasUtil = new CanvasUtil(page);
-    const textBoxutil = new TextUtil<Textbox>(page, 'text');
+    const textBoxutil = new TextUtil(page, 'text');
     await test.step('initial render', async () => {
       await textBoxutil.executeInBrowser(
-        (textbox: Textbox, context) => {
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
           textbox.splitByGrapheme = context.splitByGrapheme;
           textbox.set('dirty', true);
           textbox.initDimensions();
-          textbox.canvas.renderAll();
+          textbox.canvas!.renderAll();
         },
         { splitByGrapheme },
       );
 
-      await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `1-initial-splitByGrapheme-${splitByGrapheme}.png`,
       });
     });
@@ -55,7 +52,7 @@ for (const splitByGrapheme of [true, false]) {
       await canvasUtil.press('Enter');
       await canvasUtil.press('Enter');
       await canvasUtil.press('Enter');
-      await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `2-before-deleting-${splitByGrapheme}.png`,
       });
     });
@@ -64,7 +61,7 @@ for (const splitByGrapheme of [true, false]) {
       // an old bug was shifting style and then deleting it all at once
       await canvasUtil.press('Backspace');
       await canvasUtil.press('Backspace');
-      await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `3-after-deleting-${splitByGrapheme}.png`,
       });
     });
@@ -73,7 +70,7 @@ for (const splitByGrapheme of [true, false]) {
       await canvasUtil.press('b');
       await canvasUtil.press('c');
       await canvasUtil.press('Enter');
-      await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `4-after-typing-${splitByGrapheme}.png`,
       });
     });
@@ -84,7 +81,7 @@ for (const splitByGrapheme of [true, false]) {
         delay: 200,
       });
       await canvasUtil.ctrlV();
-      await expect(await canvasUtil.screenshot()).toMatchSnapshot({
+      expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `5-after-pasting-splitByGrapheme-${splitByGrapheme}.png`,
         maxDiffPixelRatio: 0.03,
       });

@@ -25,7 +25,6 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
   /**
    * Noise value, from
    * @param {Number} noise
-   * @default
    */
   declare noise: NoiseOwnProps['noise'];
 

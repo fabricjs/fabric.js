@@ -25,8 +25,6 @@ export class BaseFilter<
 > {
   /**
    * Filter type
-   * @param {String} type
-   * @default
    */
   get type(): Name {
     return (this.constructor as typeof BaseFilter).type as Name;
@@ -411,8 +409,8 @@ export class BaseFilter<
 
   static async fromObject(
     { type, ...filterOptions }: Record<string, any>,
-    _options: Abortable,
-  ): Promise<BaseFilter<string, object>> {
+    _options?: Abortable,
+  ): Promise<BaseFilter<string>> {
     return new this(filterOptions);
   }
 }

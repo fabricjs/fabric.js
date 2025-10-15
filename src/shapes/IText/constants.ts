@@ -11,7 +11,7 @@ export type CursorHandlingMethods =
   | 'exitEditing'
   | 'copy'
   | 'cut'
-  | 'selectAll';
+  | 'cmdAll';
 
 const MOVE_CURSOR_UP: CursorHandlingMethods = 'moveCursorUp';
 const MOVE_CURSOR_DOWN: CursorHandlingMethods = 'moveCursorDown';
@@ -61,5 +61,5 @@ export const ctrlKeysMapUp: TKeyMapIText = {
  * For functionalities on keyDown + ctrl || cmd
  */
 export const ctrlKeysMapDown: TKeyMapIText = {
-  65: 'selectAll',
+  65: 'cmdAll',
 };

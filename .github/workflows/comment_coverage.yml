@@ -1,0 +1,67 @@
+name: 'Comment coverage on PR'
+on:
+  workflow_run:
+    workflows: ['🧪']
+    types:
+      - completed
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  coverage:
+    env:
+      unique_id: <!-- coverage-report -->
+    name: Coverage reporting
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 'Create an empty tmp directory'
+        run: |
+          mkdir ${{ runner.temp }}/artifacts
+          mkdir ${{ runner.temp }}/artifacts/nyc_output
+          mkdir ./.nyc_output
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: coverage-e2e
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/artifacts/nyc_output
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: coverage-vitest
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/artifacts/nyc_output
+      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: prnumber
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/artifacts
+      - name: 'copy all coverage files at the same root level'
+        run: |
+          find ${{ runner.temp }}/artifacts/nyc_output -type f -name 'coverage.json' | while read file; do       
+            dir=$(dirname "$file");
+            base=$(basename "$dir");
+            cp "$file" "./.nyc_output/${base}.json";
+            rm -rf "$dir"
+          done;
+      - run: ls -l ./.nyc_output
+      - name: Add pr number to output
+        id: prnumber
+        run: echo "pr_number=$(cat ${{ runner.temp }}/prnumber.txt)" >> $GITHUB_OUTPUT
+      - name: Build the report
+        id: report
+        run: |
+          echo "\`\`\`" > ./cov.txt
+          npx nyc report --reporter=text-summary >> ./cov.txt
+          echo "\`\`\`" >> ./cov.txt
+          echo "${{ env.unique_id }}" >> ./cov.txt
+      - name: Comment on PR for coverage
+        uses: ./.github/actions/find-create-or-update-comment
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.prnumber.outputs.pr_number }}
+          body-includes: '${{ env.unique_id }}'
+          comment-author: 'github-actions[bot]'
+          body-path: ./cov.txt
+          edit-mode: replace

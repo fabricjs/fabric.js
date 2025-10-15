@@ -157,7 +157,7 @@ export class ElementsParser {
         clipPathOwner = clipPathOwner.parentElement;
       }
       // move the clipPath tag as sibling to the real element that is using it
-      clipPathOwner.parentElement!.appendChild(clipPathTag!);
+      clipPathOwner.parentElement!.appendChild(clipPathTag);
 
       // this multiplication order could be opposite.
       // but i don't have an svg to test it

@@ -1,11 +1,10 @@
-import { Color } from '../color/Color';
 import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
 import { pick } from '../util/misc/pick';
-import { matrixToSVG } from '../util/misc/svgParsing';
+import { matrixToSVG } from '../util/misc/svgExport';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
 import { parseColorStops } from './parser/parseColorStops';
 import { parseCoords } from './parser/parseCoords';
@@ -17,6 +16,7 @@ import type {
   GradientType,
   GradientUnits,
   SVGOptions,
+  SerializedGradientProps,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 import { isPath } from '../util/typeAssertions';
@@ -24,7 +24,7 @@ import { isPath } from '../util/typeAssertions';
 /**
  * Gradient class
  * @class Gradient
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#gradients}
  */
 export class Gradient<
   S,
@@ -132,11 +132,9 @@ export class Gradient<
    */
   addColorStop(colorStops: Record<string, string>) {
     for (const position in colorStops) {
-      const color = new Color(colorStops[position]);
       this.colorStops.push({
         offset: parseFloat(position),
-        color: color.toRgb(),
-        opacity: color.getAlpha(),
+        color: colorStops[position],
       });
     }
     return this;
@@ -147,7 +145,9 @@ export class Gradient<
    * @param {string[]} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {object}
    */
-  toObject(propertiesToInclude?: (keyof this | string)[]) {
+  toObject(
+    propertiesToInclude?: (keyof this | string)[],
+  ): SerializedGradientProps<T> {
     return {
       ...pick(this, propertiesToInclude as (keyof this)[]),
       type: this.type,
@@ -270,15 +270,9 @@ export class Gradient<
       }
     }
 
-    colorStops.forEach(({ color, offset, opacity }) => {
+    colorStops.forEach(({ color, offset }) => {
       markup.push(
-        '<stop ',
-        'offset="',
-        offset * 100 + '%',
-        '" style="stop-color:',
-        color,
-        typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';',
-        '"/>\n',
+        `<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`,
       );
     });
 
@@ -303,13 +297,8 @@ export class Gradient<
         ? ctx.createLinearGradient(x1, y1, x2, y2)
         : ctx.createRadialGradient(x1, y1, r1, x2, y2, r2);
 
-    this.colorStops.forEach(({ color, opacity, offset }) => {
-      gradient.addColorStop(
-        offset,
-        typeof opacity !== 'undefined'
-          ? new Color(color).setAlpha(opacity).toRgba()
-          : color,
-      );
+    this.colorStops.forEach(({ color, offset }) => {
+      gradient.addColorStop(offset, color);
     });
 
     return gradient;
@@ -317,7 +306,7 @@ export class Gradient<
 
   static async fromObject(
     options: GradientOptions<'linear'>,
-  ): Promise<Gradient<'radial'>>;
+  ): Promise<Gradient<'linear'>>;
   static async fromObject(
     options: GradientOptions<'radial'>,
   ): Promise<Gradient<'radial'>>;
@@ -337,8 +326,6 @@ export class Gradient<
   /* _FROM_SVG_START_ */
   /**
    * Returns {@link Gradient} instance from an SVG element
-   * @static
-   * @memberOf Gradient
    * @param {SVGGradientElement} el SVG gradient element
    * @param {FabricObject} instance
    * @param {String} opacity A fill-opacity or stroke-opacity attribute to multiply to each stop's opacity.

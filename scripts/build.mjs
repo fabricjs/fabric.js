@@ -1,5 +1,4 @@
 import cp from 'child_process';
-import path from 'node:path';
 import process from 'node:process';
 import { wd } from './dirname.mjs';
 

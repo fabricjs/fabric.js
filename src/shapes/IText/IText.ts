@@ -18,6 +18,9 @@ import {
 } from '../Text/constants';
 import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
+import type { FabricObject } from '../Object/FabricObject';
+import { createCanvasElementFor } from '../../util/misc/dom';
+import { applyCanvasTransform } from '../../util/internals/applyCanvasTransform';
 
 export type CursorBoundaries = {
   left: number;
@@ -128,14 +131,12 @@ export class IText<
   /**
    * Index where text selection starts (or where cursor is when there is no selection)
    * @type Number
-   * @default
    */
   declare selectionStart: number;
 
   /**
    * Index where text selection ends
    * @type Number
-   * @default
    */
   declare selectionEnd: number;
 
@@ -146,35 +147,30 @@ export class IText<
   /**
    * Color of text selection
    * @type String
-   * @default
    */
   declare selectionColor: string;
 
   /**
    * Indicates whether text is in editing mode
    * @type Boolean
-   * @default
    */
   declare isEditing: boolean;
 
   /**
    * Indicates whether a text can be edited
    * @type Boolean
-   * @default
    */
   declare editable: boolean;
 
   /**
    * Border color of text object while it's in editing mode
    * @type String
-   * @default
    */
   declare editingBorderColor: string;
 
   /**
    * Width of cursor (in px)
    * @type Number
-   * @default
    */
   declare cursorWidth: number;
 
@@ -184,21 +180,18 @@ export class IText<
    * if set to a color value that fabric can understand, it will
    * be used instead of the color of the text at the current position.
    * @type String
-   * @default
    */
   declare cursorColor: string;
 
   /**
    * Delay between cursor blink (in ms)
    * @type Number
-   * @default
    */
   declare cursorDelay: number;
 
   /**
    * Duration of cursor fade in (in ms)
    * @type Number
-   * @default
    */
   declare cursorDuration: number;
 
@@ -207,7 +200,6 @@ export class IText<
   /**
    * Indicates whether internal text char widths can be cached
    * @type Boolean
-   * @default
    */
   declare caching: boolean;
 
@@ -381,7 +373,7 @@ export class IText<
    * it does on the contextTop. If contextTop is not available, do nothing.
    */
   renderCursorOrSelection() {
-    if (!this.isEditing) {
+    if (!this.isEditing || !this.canvas) {
       return;
     }
     const ctx = this.clearContextTop(true);
@@ -389,13 +381,75 @@ export class IText<
       return;
     }
     const boundaries = this._getCursorBoundaries();
-    if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
-      this.renderCursor(ctx, boundaries);
-    } else {
-      this.renderSelection(ctx, boundaries);
+
+    const ancestors = this.findAncestorsWithClipPath();
+    const hasAncestorsWithClipping = ancestors.length > 0;
+    let drawingCtx: CanvasRenderingContext2D = ctx;
+    let drawingCanvas: HTMLCanvasElement | undefined = undefined;
+    if (hasAncestorsWithClipping) {
+      // we have some clipPath, we need to draw the selection on an intermediate layer.
+      drawingCanvas = createCanvasElementFor(ctx.canvas);
+      drawingCtx = drawingCanvas.getContext('2d')!;
+      applyCanvasTransform(drawingCtx, this.canvas);
+      const m = this.calcTransformMatrix();
+      drawingCtx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
     }
-    this.canvas!.contextTopDirty = true;
+
+    if (this.selectionStart === this.selectionEnd && !this.inCompositionMode) {
+      this.renderCursor(drawingCtx, boundaries);
+    } else {
+      this.renderSelection(drawingCtx, boundaries);
+    }
+
+    if (hasAncestorsWithClipping) {
+      // we need a neutral context.
+      // this won't work for nested clippaths in which a clippath
+      // has its own clippath
+      for (const ancestor of ancestors) {
+        const clipPath = ancestor.clipPath!;
+        const clippingCanvas = createCanvasElementFor(ctx.canvas);
+        const clippingCtx = clippingCanvas.getContext('2d')!;
+        applyCanvasTransform(clippingCtx, this.canvas);
+        // position the ctx in the center of the outer ancestor
+        if (!clipPath.absolutePositioned) {
+          const m = ancestor.calcTransformMatrix();
+          clippingCtx.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+        }
+        clipPath.transform(clippingCtx);
+        // we assign an empty drawing context, we don't plan to have this working for nested clippaths for now
+        clipPath.drawObject(clippingCtx, true, {});
+        this.drawClipPathOnCache(drawingCtx, clipPath, clippingCanvas);
+      }
+    }
+
+    if (hasAncestorsWithClipping) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(drawingCanvas!, 0, 0);
+    }
+
+    this.canvas.contextTopDirty = true;
     ctx.restore();
+  }
+
+  /**
+   * Finds and returns an array of clip paths that are applied to the parent
+   * group(s) of the current FabricObject instance. The object's hierarchy is
+   * traversed upwards (from the current object towards the root of the canvas),
+   * checking each parent object for the presence of a `clipPath` that is not
+   * absolutely positioned.
+   */
+  findAncestorsWithClipPath(): FabricObject[] {
+    const clipPathAncestors: FabricObject[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    let obj: FabricObject | undefined = this;
+    while (obj) {
+      if (obj.clipPath) {
+        clipPathAncestors.push(obj);
+      }
+      obj = obj.parent;
+    }
+
+    return clipPathAncestors;
   }
 
   /**
@@ -545,7 +599,7 @@ export class IText<
 
   /**
    * Render the cursor at the given selectionStart.
-   *
+   * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
   _renderCursor(
     ctx: CanvasRenderingContext2D,

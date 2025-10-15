@@ -4,16 +4,19 @@ import { Canvas } from '../canvas/Canvas';
 import { Polygon } from '../shapes/Polygon';
 import { createPolyControls } from './polyControl';
 
+import { describe, expect, it, vi } from 'vitest';
+
 describe('polyControl', () => {
   it('should fire events', () => {
     const poly = new Polygon(
       [new Point(), new Point(50, 0), new Point(50, 50), new Point(0, 50)],
       { controls: createPolyControls(4) },
     );
+    vi.spyOn(poly, 'set');
     const canvas = new Canvas();
     canvas.add(poly);
     canvas.setActiveObject(poly);
-    const spy = jest.fn();
+    const spy = vi.fn();
     poly.on('modifyPoly', spy);
     poly.on('modified', spy);
     canvas
@@ -40,5 +43,9 @@ describe('polyControl', () => {
         ]) => action,
       ),
     ).toMatchObject(['modifyPoly', 'modifyPoly']);
+    expect(
+      poly.set,
+      'call set method with dirty for cache invalidation of point changes that do not change polygon size',
+    ).toHaveBeenCalledWith('dirty', true);
   });
 });

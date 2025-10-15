@@ -4,8 +4,12 @@ import {
   makePathSimpler,
   getRegularPolygonPath,
   joinPath,
+  transformPath,
 } from '.';
 import type { TSimplePathData } from './typedefs';
+
+import { describe, expect, it, test } from 'vitest';
+import { Path } from '../../shapes/Path';
 
 describe('Path Utils', () => {
   describe('parsePath', () => {
@@ -129,6 +133,33 @@ describe('Path Utils', () => {
         ['L', 500, 500],
       ]);
       expect(data).toMatchSnapshot();
+    });
+  });
+
+  describe('transformPath', () => {
+    it('can scale a path by 2', () => {
+      expect(typeof transformPath === 'function').toBeTruthy();
+
+      const path = new Path('M 100 100 L 200 100 L 170 200 z');
+      const oldPath = path.path;
+      // @ts-expect-error -- transformPath requires 3 arguments
+      const newPath = transformPath(path.path, [2, 0, 0, 2, 0, 0]);
+
+      expect(joinPath(oldPath)).toBe('M 100 100 L 200 100 L 170 200 Z');
+      expect(joinPath(newPath)).toBe('M 200 200 L 400 200 L 340 400 Z');
+    });
+
+    it('can apply a generic transform', () => {
+      const path = new Path('M 100 100 L 200 100 L 170 200 z');
+      const oldPath = path.path;
+      const newPath = transformPath(
+        path.path,
+        [1, 2, 3, 4, 5, 6],
+        path.pathOffset,
+      );
+
+      expect(joinPath(oldPath)).toBe('M 100 100 L 200 100 L 170 200 Z');
+      expect(joinPath(newPath)).toBe('M -195 -294 L -95 -94 L 175 246 Z');
     });
   });
 });

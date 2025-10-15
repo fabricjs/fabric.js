@@ -6,12 +6,13 @@ import type { FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
 import * as fabric from 'fabric';
 import * as fabricExtensions from 'fabric/extensions';
+import type { CanvasOptions } from 'fabric';
 
 const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
 const renderingTestMap = (window.renderingTestMap = new Map<
   string,
-  () => void
+  () => void | string
 >());
 type AsyncReturnValue<T> = T | Promise<T>;
 
@@ -42,7 +43,7 @@ export function before(
   }>,
 ) {
   const task = Promise.resolve().then(async () => {
-    const el = document.querySelector<HTMLCanvasElement>(selector);
+    const el = document.querySelector<HTMLCanvasElement>(selector)!;
     const { canvas, objects = {} } = await cb(el);
     canvasMap.set(el, canvas);
     Object.entries(objects).forEach(([key, value]) => {
@@ -61,10 +62,11 @@ export async function beforeRenderTest(
   cb: (
     canvas: Canvas,
   ) => AsyncReturnValue<{ title: string; boundFunction: () => void }[]>,
-  options,
+  options: Partial<CanvasOptions> | undefined,
 ) {
-  const el = document.querySelector<HTMLCanvasElement>('#canvas');
+  const el = document.querySelector<HTMLCanvasElement>('#canvas')!;
   const canvas = new Canvas(el, options);
+  canvasMap.set(el, canvas);
   // cb has to bind the rendering test to the specific canvas and add a clear before the test
   const renderingTests = await cb(canvas);
   renderingTests.forEach((renderTest) => {
@@ -85,7 +87,7 @@ export async function beforeRenderTest(
  */
 export function beforeAll(
   cb: (canvas: Canvas) => AsyncReturnValue<Record<string, FabricObject> | void>,
-  options?,
+  options: Partial<CanvasOptions> = {},
 ) {
   before('#canvas', async (el) => {
     const canvas = new Canvas(el, options);
@@ -99,8 +101,8 @@ export function after(
   cb: (canvas: Canvas) => AsyncReturnValue<void>,
 ) {
   teardownTasks.push(() => {
-    const el = document.querySelector<HTMLCanvasElement>(selector);
-    const canvas = canvasMap.get(el);
+    const el = document.querySelector<HTMLCanvasElement>(selector)!;
+    const canvas = canvasMap.get(el)!;
     return cb(canvas);
   });
 }

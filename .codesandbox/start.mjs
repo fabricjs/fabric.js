@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import cp from 'child_process';
-import fs from 'fs-extra';
-import moment from 'moment';
+import fs from 'node:fs';
+import { formatFullTimestamp } from '../scripts/date-time.mjs';
 import path from 'node:path';
 import { build } from '../scripts/build.mjs';
 import { subscribe } from '../scripts/buildLock.mjs';
@@ -37,16 +37,19 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
   const pathToTrigger = path.resolve(destination, 'package.json');
   subscribe((locked) => {
     if (!locked) {
-      const packageJSON = fs.readJsonSync(pathToTrigger);
-      fs.writeJSONSync(
+      const packageJSON = JSON.parse(fs.readFileSync(pathToTrigger, 'utf8'));
+      fs.writeFileSync(
         pathToTrigger,
-        {
-          ...packageJSON,
-          trigger: moment().format('YYYY-MM-DD HH:mm:ss'),
-        },
-        { spaces: 2 },
+        JSON.stringify(
+          {
+            ...packageJSON,
+            trigger: formatFullTimestamp(),
+          },
+          null,
+          2,
+        ),
       );
-      fs.writeJSONSync(pathToTrigger, packageJSON, { spaces: 2 });
+      fs.writeFileSync(pathToTrigger, JSON.stringify(packageJSON, null, 2));
     }
   }, 500);
 

@@ -52,11 +52,35 @@ import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
 
+export type TargetsInfo = {
+  target?: FabricObject;
+  subTargets: FabricObject[];
+};
+
+export type TargetsInfoWithContainer = {
+  // the target we think is the most continuing the selection action.
+  // could be hoveredTarget or the currently selected object
+  target?: FabricObject;
+  // the nested targets under the pointer for container
+  subTargets: FabricObject[];
+  // the container for target, or target itself if there are no selectable nested targets
+  container?: FabricObject;
+};
+
+export type FullTargetsInfoWithContainer = TargetsInfoWithContainer & {
+  // hoveredTarget
+  currentTarget?: FabricObject;
+  // the container for hoveredTarget, or container itself
+  currentContainer?: FabricObject;
+  // nested targets of current container
+  currentSubTargets: FabricObject[];
+};
+
 /**
  * Canvas class
  * @class Canvas
  * @extends StaticCanvas
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#canvas}
  *
  * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
@@ -188,9 +212,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
    * After mousedown, mousemove creates a shape,
    * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-4#free_drawing}
    * @type Boolean
-   * @default
    */
   declare isDrawingMode: boolean;
 
@@ -202,20 +225,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare fireMiddleClick: boolean;
 
   /**
-   * Keep track of the subTargets for Mouse Events, ordered bottom up from innermost nested subTarget
-   * @type FabricObject[]
-   */
-  targets: FabricObject[] = [];
-
-  /**
-   * Keep track of the hovered target
+   * Keep track of the hovered target in the previous event
    * @type FabricObject | null
    * @private
    */
   declare _hoveredTarget?: FabricObject;
 
   /**
-   * hold the list of nested targets hovered
+   * hold the list of nested targets hovered in the previous events
    * @type FabricObject[]
    * @private
    */
@@ -226,7 +243,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @type FabricObject[]
    * @private
    */
-  _objectsToRender?: FabricObject[];
+  declare _objectsToRender?: FabricObject[];
 
   /**
    * hold a reference to a data structure that contains information
@@ -261,29 +278,28 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _absolutePointer holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
+   * _scenePoint holds a reference to the pointer in fabricCanvas/design coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  protected declare _absolutePointer?: Point;
+  declare protected _scenePoint?: Point;
 
   /**
    * During a mouse event we may need the pointer multiple times in multiple functions.
-   * _pointer holds a reference to the pointer in html coordinates that is valid for the event
+   * _viewportPoint holds a reference to the pointer in html coordinates that is valid for the event
    * lifespan. Every fabricJS mouse event create and delete the cache every time
    * We do this because there are some HTML DOM inspection functions to get the actual pointer coordinates
    * @type {Point}
    */
-  protected declare _pointer?: Point;
+  declare protected _viewportPoint?: Point;
 
   /**
-   * During a mouse event we may need the target multiple times in multiple functions.
-   * _target holds a reference to the target that is valid for the event
-   * lifespan. Every fabricJS mouse event create and delete the cache every time
-   * @type {FabricObject}
+   * Holds the informations we cache during an event lifespan
+   * This data is needed many times during an event and we want to avoid to recalculate it
+   * multuple times.
    */
-  protected declare _target?: FabricObject;
+  declare protected _targetInfo: FullTargetsInfoWithContainer | undefined;
 
   static ownDefaults = canvasDefaults;
 
@@ -301,10 +317,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   get wrapperEl() {
     return this.elements.container;
   }
-  private declare pixelFindCanvasEl: HTMLCanvasElement;
-  private declare pixelFindContext: CanvasRenderingContext2D;
+  declare private pixelFindCanvasEl: HTMLCanvasElement;
+  declare private pixelFindContext: CanvasRenderingContext2D;
 
-  protected declare _isCurrentlyDrawing: boolean;
+  declare protected _isCurrentlyDrawing: boolean;
   declare freeDrawingBrush?: BaseBrush;
   declare _activeObject?: FabricObject;
 
@@ -703,60 +719,101 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Method that determines what object we are clicking on
+   * This function is in charge of deciding which is the object that is the current target of an interaction event.
+   * For interaction event we mean a pointer related action on the canvas.
+   * Which is the
    * 11/09/2018 TODO: would be cool if findTarget could discern between being a full target
    * or the outside part of the corner.
    * @param {Event} e mouse event
-   * @return {FabricObject | null} the target found
+   * @return {TargetsInfoWithContainer} the target found
    */
-  findTarget(e: TPointerEvent): FabricObject | undefined {
-    if (this.skipTargetFind) {
-      return undefined;
+  findTarget(e: TPointerEvent): FullTargetsInfoWithContainer {
+    // this._targetInfo is cached by _cacheTransformEventData
+    // and destroyed by _resetTransformEventData
+    if (this._targetInfo) {
+      return this._targetInfo;
     }
 
-    const pointer = this.getViewportPoint(e),
+    if (this.skipTargetFind) {
+      return {
+        subTargets: [],
+        currentSubTargets: [],
+      };
+    }
+
+    const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
-      aObjects = this.getActiveObjects();
+      aObjects = this.getActiveObjects(),
+      targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
-    this.targets = [];
+    const {
+      subTargets: currentSubTargets,
+      container: currentContainer,
+      target: currentTarget,
+    } = targetInfo;
 
-    if (activeObject && aObjects.length >= 1) {
-      if (activeObject.findControl(pointer, isTouchEvent(e))) {
-        // if we hit the corner of the active object, let's return that.
-        return activeObject;
-      } else if (
-        aObjects.length > 1 &&
-        // check pointer is over active selection and possibly perform `subTargetCheck`
-        this.searchPossibleTargets([activeObject], pointer)
+    const fullTargetInfo: FullTargetsInfoWithContainer = {
+      ...targetInfo,
+      currentSubTargets,
+      currentContainer,
+      currentTarget,
+    };
+
+    // simplest case no active object, return a new target
+    if (!activeObject) {
+      return fullTargetInfo;
+    }
+
+    // check pointer is over active selection and possibly perform `subTargetCheck`
+    const activeObjectTargetInfo: FullTargetsInfoWithContainer = {
+      ...this.searchPossibleTargets([activeObject], pointer),
+      currentSubTargets,
+      currentContainer,
+      currentTarget,
+    };
+
+    const activeObjectControl = activeObject.findControl(
+      this.getViewportPoint(e),
+      isTouchEvent(e),
+    );
+
+    // we are clicking exactly the control of an active object, shortcut to that object.
+    if (activeObjectControl) {
+      return {
+        ...activeObjectTargetInfo,
+        target: activeObject, // we override target in case we are in the outside part of the corner.
+      };
+    }
+
+    // in case we are over the active object
+    if (activeObjectTargetInfo.target) {
+      if (aObjects.length > 1) {
+        // in case of active selection and target hit over the activeSelection, just exit
+        // TODO Verify if we need to override target with container
+        return activeObjectTargetInfo;
+      }
+      // from here onward not an active selection, just an activeOject that maybe is a group
+
+      // preserveObjectStacking is false, so activeObject is drawn on top, just return activeObject
+      if (!this.preserveObjectStacking) {
+        // TODO Verify if we need to override target with container
+        return activeObjectTargetInfo;
+      }
+
+      // In case we are in preserveObjectStacking ( selection in stack )
+      // there is the possibility to force with `altSelectionKey` to return the activeObject
+      // from any point in the stack, even if we have another object completely on top of it.
+      if (
+        this.preserveObjectStacking &&
+        e[this.altSelectionKey as ModifierKey]
       ) {
-        // active selection does not select sub targets like normal groups
-        return activeObject;
-      } else if (
-        activeObject === this.searchPossibleTargets([activeObject], pointer)
-      ) {
-        // active object is not an active selection
-        if (!this.preserveObjectStacking) {
-          return activeObject;
-        } else {
-          const subTargets = this.targets;
-          this.targets = [];
-          const target = this.searchPossibleTargets(this._objects, pointer);
-          if (
-            e[this.altSelectionKey as ModifierKey] &&
-            target &&
-            target !== activeObject
-          ) {
-            // alt selection: select active object even though it is not the top most target
-            // restore targets
-            this.targets = subTargets;
-            return activeObject;
-          }
-          return target;
-        }
+        // TODO Verify if we need to override target with container
+        return activeObjectTargetInfo;
       }
     }
 
-    return this.searchPossibleTargets(this._objects, pointer);
+    // we have an active object, but we ruled out it being our target in any way.
+    return fullTargetInfo;
   }
 
   /**
@@ -804,7 +861,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Checks point is inside the object selection condition. Either area with padding
    * or over pixels if perPixelTargetFind is enabled
    * @param {FabricObject} obj Object to test against
-   * @param {Object} [pointer] point from viewport.
+   * @param {Point} pointer point from scene.
    * @return {Boolean} true if point is contained within an area of given object
    * @private
    */
@@ -813,16 +870,14 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       obj &&
       obj.visible &&
       obj.evented &&
-      this._pointIsInObjectSelectionArea(
-        obj,
-        sendPointToPlane(pointer, undefined, this.viewportTransform),
-      )
+      this._pointIsInObjectSelectionArea(obj, pointer)
     ) {
       if (
         (this.perPixelTargetFind || obj.perPixelTargetFind) &&
         !(obj as unknown as IText).isEditing
       ) {
-        if (!this.isTargetTransparent(obj, pointer.x, pointer.y)) {
+        const viewportPoint = pointer.transform(this.viewportTransform);
+        if (!this.isTargetTransparent(obj, viewportPoint.x, viewportPoint.y)) {
           return true;
         }
       } else {
@@ -833,17 +888,19 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   }
 
   /**
-   * Internal Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @param {Array} [objects] objects array to look into
-   * @param {Object} [pointer] x,y object of point coordinates we want to check.
-   * @return {FabricObject} **top most object from given `objects`** that contains pointer
+   * Given an array of objects search possible targets under the pointer position
+   * Returns an
+   * @param {Array} objects objects array to look into
+   * @param {Object} pointer x,y object of point of scene coordinates we want to check.
+   * @param {Object} subTargets If passed, subtargets will be collected inside the array
+   * @return {TargetsInfo} **top most object from given `objects`** that contains pointer
    * @private
    */
   _searchPossibleTargets(
     objects: FabricObject[],
     pointer: Point,
-  ): FabricObject | undefined {
-    // Cache all targets where their bounding box contains point.
+    subTargets: FabricObject[],
+  ): TargetsInfo {
     let i = objects.length;
     // Do not check for currently grouped objects, since we check the parent group itself.
     // until we call this function specifically to search inside the activeGroup
@@ -851,54 +908,69 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       const target = objects[i];
       if (this._checkTarget(target, pointer)) {
         if (isCollection(target) && target.subTargetCheck) {
-          const subTarget = this._searchPossibleTargets(
-            target._objects as FabricObject[],
+          const { target: subTarget } = this._searchPossibleTargets(
+            target._objects,
             pointer,
+            subTargets,
           );
-          subTarget && this.targets.push(subTarget);
+          subTarget && subTargets.push(subTarget);
         }
-        return target;
+        return {
+          target,
+          subTargets,
+        };
       }
     }
+    return {
+      subTargets: [],
+    };
   }
 
   /**
-   * Function used to search inside objects an object that contains pointer in bounding box or that contains pointerOnCanvas when painted
-   * @see {@link _searchPossibleTargets}
-   * @param {FabricObject[]} [objects] objects array to look into
-   * @param {Point} [pointer] coordinates from viewport to check.
+   * Search inside an objects array the fiurst object that contains pointer
+   * Collect subTargets of that object inside the subTargets array passed as parameter
+   * @param {FabricObject[]} objects objects array to look into
+   * @param {Point} pointer coordinates from viewport to check.
    * @return {FabricObject} **top most object on screen** that contains pointer
    */
   searchPossibleTargets(
     objects: FabricObject[],
     pointer: Point,
-  ): FabricObject | undefined {
-    const target = this._searchPossibleTargets(objects, pointer);
+  ): TargetsInfoWithContainer {
+    const targetInfo: TargetsInfoWithContainer = this._searchPossibleTargets(
+      objects,
+      pointer,
+      [],
+    );
 
-    // if we found something in this.targets, and the group is interactive, return the innermost subTarget
-    // that is still interactive
-    // TODO: reverify why interactive. the target should be returned always, but selected only
-    // if interactive.
+    // outermost target is the container.
+    targetInfo.container = targetInfo.target;
+    const { container, subTargets } = targetInfo;
+
     if (
-      target &&
-      isCollection(target) &&
-      target.interactive &&
-      this.targets[0]
+      container &&
+      isCollection(container) &&
+      container.interactive &&
+      subTargets[0]
     ) {
-      /** targets[0] is the innermost nested target, but it could be inside non interactive groups and so not a selection target */
-      const targets = this.targets;
-      for (let i = targets.length - 1; i > 0; i--) {
-        const t = targets[i];
+      /** subTargets[0] is the innermost nested target, but it could be inside non interactive groups
+       * and so not a possible selection target.
+       * We loop the array from the end that is outermost innertarget.
+       */
+      for (let i = subTargets.length - 1; i > 0; i--) {
+        const t = subTargets[i];
         if (!(isCollection(t) && t.interactive)) {
           // one of the subtargets was not interactive. that is the last subtarget we can return.
           // we can't dig more deep;
-          return t;
+          targetInfo.target = t;
+          return targetInfo;
         }
       }
-      return targets[0];
+      targetInfo.target = subTargets[0];
+      return targetInfo;
     }
 
-    return target;
+    return targetInfo;
   }
 
   /**
@@ -916,10 +988,10 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    *
    */
   getViewportPoint(e: TPointerEvent) {
-    if (this._pointer) {
-      return this._pointer;
+    if (this._viewportPoint) {
+      return this._viewportPoint;
     }
-    return this.getPointer(e, true);
+    return this._getPointerImpl(e, true);
   }
 
   /**
@@ -935,23 +1007,22 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    *
    */
   getScenePoint(e: TPointerEvent) {
-    if (this._absolutePointer) {
-      return this._absolutePointer;
+    if (this._scenePoint) {
+      return this._scenePoint;
     }
-    return this.getPointer(e);
+    return this._getPointerImpl(e);
   }
 
   /**
    * Returns pointer relative to canvas.
    *
-   * @deprecated This method is deprecated since v6 to protect you from misuse.
    * Use {@link getViewportPoint} or {@link getScenePoint} instead.
    *
    * @param {Event} e
    * @param {Boolean} [fromViewport] whether to return the point from the viewport or in the scene
    * @return {Point}
    */
-  getPointer(e: TPointerEvent, fromViewport = false): Point {
+  protected _getPointerImpl(e: TPointerEvent, fromViewport = false): Point {
     const upperCanvasEl = this.upperCanvasEl,
       bounds = upperCanvasEl.getBoundingClientRect();
     let pointer = getPointer(e),

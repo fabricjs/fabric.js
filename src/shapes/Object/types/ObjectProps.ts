@@ -39,7 +39,6 @@ export interface ObjectProps
   /**
    * When `false`, default object's values are not included in its serialization
    * @type Boolean
-   * @default
    */
   includeDefaultValues: boolean;
 
@@ -47,7 +46,6 @@ export interface ObjectProps
    * When `true`, object is not exported in OBJECT/JSON
    * @since 1.6.3
    * @type Boolean
-   * @default
    */
   excludeFromExport: boolean;
 }

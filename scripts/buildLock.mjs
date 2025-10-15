@@ -1,11 +1,11 @@
-import chalk from 'chalk';
-import fs from 'fs-extra';
-import _ from 'lodash';
-import moment from 'moment';
+import { cyanBright } from './colors.mjs';
+import fs from 'node:fs';
+import { formatFullTimestamp } from './date-time.mjs';
 import path from 'node:path';
 import process from 'node:process';
 import psList from 'ps-list';
 import { dumpsPath } from './dirname.mjs';
+import { debounce } from 'es-toolkit/compat';
 
 export const lockFile = path.resolve(dumpsPath, 'build-lock.json');
 
@@ -40,7 +40,7 @@ export function isLocked() {
 export function awaitBuild() {
   return new Promise((resolve) => {
     if (isLocked()) {
-      console.log(chalk.cyanBright('> waiting for build to finish...'));
+      console.log(cyanBright('> waiting for build to finish...'));
       const watcher = subscribe((locked) => {
         if (!locked) {
           watcher.close();
@@ -60,13 +60,13 @@ export function awaitBuild() {
  * @param {number} [debounce]
  * @returns
  */
-export function subscribe(cb, debounce) {
+export function subscribe(cb, debounceVal) {
   return fs.watch(
     path.dirname(lockFile),
-    _.debounce((type, file) => {
+    debounce((type, file) => {
       if (file !== path.basename(lockFile)) return;
       cb(isLocked(), !!(readLockFile() ?? {}).error);
-    }, debounce),
+    }, debounceVal),
   );
 }
 
@@ -83,7 +83,7 @@ export function report(type, data) {
         JSON.stringify(
           {
             start: {
-              timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+              timestamp: formatFullTimestamp(),
               pid: process.pid,
             },
           },
@@ -99,7 +99,7 @@ export function report(type, data) {
           {
             ...readLockFile(),
             error: {
-              timestamp: moment().format('YYYY-MM-DD HH:mm:ss'),
+              timestamp: formatFullTimestamp(),
               pid: process.pid,
               data,
             },

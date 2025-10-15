@@ -27,10 +27,7 @@ export class Composed extends BaseFilter<
   static type = 'Composed';
 
   constructor(
-    options: { subFilters?: BaseFilter<string, object>[] } & Record<
-      string,
-      any
-    > = {},
+    options: { subFilters?: BaseFilter<string>[] } & Record<string, any> = {},
   ) {
     super(options);
     this.subFilters = options.subFilters || [];
@@ -68,7 +65,6 @@ export class Composed extends BaseFilter<
 
   /**
    * Deserialize a JSON definition of a ComposedFilter into a concrete instance.
-   * @static
    * @param {oject} object Object to create an instance from
    * @param {object} [options]
    * @param {AbortSignal} [options.signal] handle aborting `BlendImage` filter loading, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
@@ -76,18 +72,15 @@ export class Composed extends BaseFilter<
    */
   static fromObject(
     object: Record<string, any>,
-    options: { signal: AbortSignal },
+    options?: { signal: AbortSignal },
   ): Promise<Composed> {
     return Promise.all(
-      ((object.subFilters || []) as BaseFilter<string, object>[]).map(
-        (filter) =>
-          classRegistry
-            .getClass<typeof BaseFilter>(filter.type)
-            .fromObject(filter, options),
+      ((object.subFilters || []) as BaseFilter<string>[]).map((filter) =>
+        classRegistry
+          .getClass<typeof BaseFilter>(filter.type)
+          .fromObject(filter, options),
       ),
-    ).then(
-      (enlivedFilters) => new this({ subFilters: enlivedFilters }) as Composed,
-    );
+    ).then((enlivedFilters) => new this({ subFilters: enlivedFilters }));
   }
 }
 

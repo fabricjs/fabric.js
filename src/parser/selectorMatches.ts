@@ -1,4 +1,7 @@
-export function selectorMatches(element: HTMLElement, selector: string) {
+export function selectorMatches(
+  element: HTMLElement | SVGElement,
+  selector: string,
+) {
   const nodeName = element.nodeName;
   const classNames = element.getAttribute('class');
   const id = element.getAttribute('id');

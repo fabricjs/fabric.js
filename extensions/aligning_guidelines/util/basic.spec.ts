@@ -1,11 +1,12 @@
+import { describe, expect, it } from 'vitest';
+import { Point } from '../../../src/Point';
+import { Rect } from '../../../src/shapes/Rect';
 import {
   getContraryMap,
   getDistance,
   getDistanceList,
   getPointMap,
 } from './basic';
-import { Point } from '../../../src/Point';
-import { Rect } from '../../../src/shapes/Rect';
 
 describe('getDistance', () => {
   it('returns the distance between the 2 numbers', () => {

@@ -1,13 +1,11 @@
-import { expect, test } from '@playwright/test';
-import setup from '../../../setup';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
-import { ObjectUtil } from '../../../utils/ObjectUtil';
+import { expect, test } from '../../../fixtures/base';
 import type { Circle } from 'fabric';
+import { ObjectUtil } from '../../../utils/ObjectUtil';
 
-setup();
-
-test('Activeselection across interactive groups', async ({ page }) => {
-  const canvasUtil = new CanvasUtil(page);
+test('Activeselection across interactive groups', async ({
+  page,
+  canvasUtil,
+}) => {
   const circle1Util = new ObjectUtil<Circle>(page, 'circle1');
   const circle2Util = new ObjectUtil<Circle>(page, 'circle2');
   const circle3Util = new ObjectUtil<Circle>(page, 'circle3');

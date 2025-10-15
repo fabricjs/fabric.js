@@ -1,6 +1,8 @@
-import type { TSimplePathData } from 'fabric';
+import type { TSimplePathData } from '../../../fabric';
 import { installOriginWrapperUpdater } from './index';
-import { BaseFabricObject, Path, Rect, Group } from 'fabric';
+import { BaseFabricObject, Path, Rect, Group } from '../../../fabric';
+
+import { describe, expect, it } from 'vitest';
 
 installOriginWrapperUpdater();
 

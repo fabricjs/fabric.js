@@ -72,6 +72,7 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
   eventData,
   control,
   fabricObject,
+  coord,
 ) => {
   if (control.x !== 0 && isLocked(fabricObject, 'lockSkewingY')) {
     return NOT_ALLOWED_CURSOR;
@@ -79,7 +80,7 @@ export const skewCursorStyleHandler: ControlCursorCallback = (
   if (control.y !== 0 && isLocked(fabricObject, 'lockSkewingX')) {
     return NOT_ALLOWED_CURSOR;
   }
-  const n = findCornerQuadrant(fabricObject, control) % 4;
+  const n = findCornerQuadrant(fabricObject, control, coord) % 4;
   return `${skewMap[n]}-resize`;
 };
 

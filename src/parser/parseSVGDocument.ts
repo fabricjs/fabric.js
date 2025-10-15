@@ -20,9 +20,6 @@ export const createEmptyResponse = (): SVGParsingOutput => ({
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
- * @static
- * @function
- * @memberOf fabric
  * @param {HTMLElement} doc SVG document to parse
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * @param {TSvgReviverCallback} [reviver] Extra callback for further parsing of SVG elements, called after each fabric object has been created.

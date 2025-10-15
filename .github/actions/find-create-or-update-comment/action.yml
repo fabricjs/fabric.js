@@ -1,0 +1,97 @@
+name: 'Find, create or update comment'
+description: 'Tries to find a comment and updates it if found, if not creates it.'
+branding:
+  icon: 'message-square'
+  color: 'gray-dark'
+
+inputs:
+  token:
+    description: 'GITHUB_TOKEN or a repo scoped PAT.'
+    required: true
+    default: ${{ github.token }}
+  repository:
+    description: 'The full name of the repository containing the issue or pull request where to find, create or update the comment.'
+    required: true
+    default: ${{ github.repository }}
+  issue-number:
+    description: 'The number of the issue or pull request in which to find, create or update the comment.'
+    required: true
+  comment-author:
+    description: 'The GitHub user name of the comment author.'
+    required: false
+    default: ''
+  body-includes:
+    description: 'A string to search for in the body of comments. Cannot be used in conjunction with body-regex.'
+    required: false
+    default: ''
+  body-regex:
+    description: 'A regular expression to search for in the body of comments. Cannot be used in conjunction with body-includes.'
+    required: false
+    default: ''
+  direction:
+    description: 'Search direction, specified as first or last.'
+    required: false
+    default: 'first'
+  nth:
+    description: '0-indexed number, specifying which comment to return if multiple are found.'
+    required: false
+    default: '0'
+  body:
+    description: 'The comment body. Cannot be used in conjunction with body-path.'
+    required: false
+    default: ''
+  body-path:
+    description: 'The path to a file containing the comment body. Cannot be used in conjunction with body.'
+    required: false
+    default: ''
+  edit-mode:
+    description: 'The mode when updating a comment: replace or append.'
+    required: false
+    default: 'append'
+  reactions:
+    description: 'A comma separated list of reactions to add to the comment (+1, -1, laugh, confused, heart, hooray, rocket, eyes).'
+    required: false
+    default: ''
+  reactions-edit-mode:
+    description: 'The mode when updating comment reactions, replace or append.'
+    required: false
+    default: 'append'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Find Comment
+      uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+      id: find-comment
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.repository }}
+        issue-number: ${{ inputs.issue-number }}
+        comment-author: ${{ inputs.comment-author }}
+        body-includes: ${{ inputs.body-includes }}
+        body-regex: ${{ inputs.body-regex }}
+        direction: ${{ inputs.direction }}
+        nth: ${{ inputs.nth }}
+    - name: Create comment
+      uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+      if: steps.find-comment.outputs.comment-id == 0
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.repository }}
+        issue-number: ${{ inputs.issue-number }}
+        body: ${{ inputs.body }}
+        body-path: ${{ inputs.body-path }}
+        reactions: ${{ inputs.reactions }}
+        reactions-edit-mode: ${{ inputs.reactions-edit-mode }}
+    - name: Update comment
+      uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+      if: steps.find-comment.outputs.comment-id != 0
+      with:
+        token: ${{ inputs.token }}
+        repository: ${{ inputs.repository }}
+        comment-id: ${{ steps.find-comment.outputs.comment-id }}
+        edit-mode: ${{ inputs.edit-mode }}
+        body: ${{ inputs.body }}
+        body-path: ${{ inputs.body-path }}
+        reactions: ${{ inputs.reactions }}
+        reactions-edit-mode: ${{ inputs.reactions-edit-mode }}

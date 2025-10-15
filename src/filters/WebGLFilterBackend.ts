@@ -148,7 +148,7 @@ export class WebGLFilterBackend {
           width,
           height,
           !cachedTexture ? source : undefined,
-        )!,
+        ),
       passes: filters.length,
       webgl: true,
       aPosition: this.aPosition,
@@ -216,7 +216,7 @@ export class WebGLFilterBackend {
     filter?:
       | WebGLRenderingContextBase['NEAREST']
       | WebGLRenderingContextBase['LINEAR'],
-  ) {
+  ): WebGLTexture {
     const {
       NEAREST,
       TEXTURE_2D,
@@ -256,7 +256,9 @@ export class WebGLFilterBackend {
         null,
       );
     }
-    return texture;
+    // disabled because website and issues with different typescript version
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    return texture!;
   }
 
   /**

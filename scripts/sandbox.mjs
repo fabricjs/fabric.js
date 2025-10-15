@@ -1,6 +1,6 @@
-import chalk from 'chalk';
+import { red, blue, yellow, cyanBright, bold } from './colors.mjs';
 import * as commander from 'commander';
-import fs from 'fs-extra';
+import fs from 'node:fs';
 import inquirer from 'inquirer';
 import path from 'node:path';
 import process from 'node:process';
@@ -47,7 +47,7 @@ sandbox
   )
   .action(async (deploy, { template }, context) => {
     if (!deploy && !template) {
-      console.log(chalk.red(`Provide "path" or "--template"`));
+      console.log(red(`Provide "path" or "--template"`));
       context.help({ error: true });
       return;
     } else if (
@@ -61,7 +61,7 @@ sandbox
         {
           type: 'confirm',
           name: 'confirm',
-          message: `Did you mean to run ${chalk.blue(
+          message: `Did you mean to run ${blue(
             `npm run sandbox deploy -- -t ${template}\n`,
           )}?`,
           default: true,
@@ -75,7 +75,7 @@ sandbox
     const uri = await createCodeSandbox(
       deploy || path.resolve(codesandboxTemplatesDir, template),
     );
-    console.log(chalk.yellow(`> created codesandbox ${uri}`));
+    console.log(yellow(`> created codesandbox ${uri}`));
   });
 
 sandbox
@@ -92,13 +92,12 @@ sandbox
   )
   .action((template, destination, { watch }) => {
     const templateDir = path.resolve(codesandboxTemplatesDir, template);
-    fs.copySync(templateDir, destination, {
+    fs.cpSync(templateDir, destination, {
+      recursive: true,
       filter: (src) => !ignore(templateDir, path.relative(templateDir, src)),
     });
     console.log(
-      `${chalk.blue(
-        `> building ${chalk.bold(template)} sandbox`,
-      )} at ${chalk.cyanBright(destination)}`,
+      `${blue(`> building ${bold(template)} sandbox`)} at ${cyanBright(destination)}`,
     );
     startSandbox(destination, watch, true);
   });
@@ -123,7 +122,7 @@ sandbox
         {
           type: 'confirm',
           name: 'confirm',
-          message: `Did you mean to run ${chalk.blue(
+          message: `Did you mean to run ${blue(
             `npm run sandbox start -- -t ${pathToSandbox}\n`,
           )}?`,
           default: true,
@@ -136,7 +135,7 @@ sandbox
       template = pathToSandbox;
       pathToSandbox = undefined;
     } else if (!fs.existsSync(pathToSandbox)) {
-      console.log(chalk.blue('Did you mean to use the build command?'));
+      console.log(blue('Did you mean to use the build command?'));
       context.help({ error: true });
       return;
     }

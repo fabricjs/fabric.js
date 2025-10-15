@@ -5,8 +5,8 @@ type EventRegistryObject<E> = {
 };
 
 /**
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
- * @see {@link http://fabricjs.com/events|Events demo}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#events}
+ * @see {@link http://fabric5.fabricjs.com/events|Events demo}
  */
 export class Observable<EventSpec> {
   private __eventListeners: Record<keyof EventSpec, TEventCallback[]> =

@@ -102,6 +102,17 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     // "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "exclude": ["dist", "dist-extensions", "test", "e2e"],
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "test",
+    "e2e",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "vitest.extend.ts",
+    "vitest.config.ts",
+    "vitest.d.ts",
+    "playwright.setup.ts"
+  ],
   "include": ["src", "fabric.ts", "index.ts", "index.node.ts", "extensions"]
 }

@@ -27,7 +27,6 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
    * A value of 0 has no effect.
    *
    * @param {Number} vibrance
-   * @default
    */
   declare vibrance: VibranceOwnProps['vibrance'];
 

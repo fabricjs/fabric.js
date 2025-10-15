@@ -1,13 +1,10 @@
-import { expect, test } from '@playwright/test';
-import { CanvasUtil } from '../../../utils/CanvasUtil';
+import { expect, test } from '../../../fixtures/base';
 import { promiseSequence } from '../../../utils/promiseSequence';
 import data from './data.json';
 import data2 from './data2.json';
-import setup from '../../../setup';
+import type { FabricObject } from 'fabric';
 
-setup();
-
-test('control box rendering', async ({ page }) => {
+test('control box rendering', async ({ canvasUtil }) => {
   const cases = [
     { data, title: 'skewY, flipX' },
     { data: data2, title: 'skewY' },
@@ -36,7 +33,6 @@ test('control box rendering', async ({ page }) => {
       ({ data, padding, objectPadding, name }) =>
         async () =>
           test.step(name, async () => {
-            const canvasUtil = new CanvasUtil(page);
             await canvasUtil.executeInBrowser(
               async (canvas, [data, padding, objectPadding]) => {
                 await canvas.loadFromJSON(data);
@@ -47,20 +43,25 @@ test('control box rendering', async ({ page }) => {
                   object.transparentCorners = false;
                   const color = object.fill;
                   object._renderControls(canvas.contextContainer, {
-                    borderColor: color,
-                    cornerColor: color,
+                    borderColor: color as string,
+                    cornerColor: color as string,
                   });
-                  object.getObjects?.().forEach((subTarget) => {
-                    subTarget.padding = objectPadding;
-                    subTarget.borderScaleFactor = 3;
-                    subTarget.transparentCorners = false;
-                    const color = subTarget.fill;
-                    subTarget.setCoords();
-                    subTarget._renderControls(canvas.contextContainer, {
-                      borderColor: color,
-                      cornerColor: color,
+
+                  // TODO: verify why getObjects is needing so much acrobatics to be called
+                  // seems like object is type of FabricObject and doesn't have getObjects typed?
+                  'getObjects' in object &&
+                    typeof object.getObjects === 'function' &&
+                    object.getObjects().forEach((subTarget: FabricObject) => {
+                      subTarget.padding = objectPadding;
+                      subTarget.borderScaleFactor = 3;
+                      subTarget.transparentCorners = false;
+                      const color = subTarget.fill as string;
+                      subTarget.setCoords();
+                      subTarget._renderControls(canvas.contextContainer, {
+                        borderColor: color,
+                        cornerColor: color,
+                      });
                     });
-                  });
                 });
               },
               [data, padding, objectPadding] as const,

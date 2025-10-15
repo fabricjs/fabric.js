@@ -26,6 +26,13 @@ export interface SerializedLineProps
   extends SerializedObjectProps,
     UniqueLineProps {}
 
+/**
+ * A Class to draw a line
+ * A bunch of methods will be added to Polyline to handle the line case
+ * The line class is very strange to work with, is all special, it hardly aligns
+ * to what a developer want everytime there is an angle
+ * @deprecated
+ */
 export class Line<
     Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
     SProps extends SerializedLineProps = SerializedLineProps,
@@ -37,28 +44,24 @@ export class Line<
   /**
    * x value or first line edge
    * @type number
-   * @default
    */
   declare x1: number;
 
   /**
    * y value or first line edge
    * @type number
-   * @default
    */
   declare y1: number;
 
   /**
    * x value or second line edge
    * @type number
-   * @default
    */
   declare x2: number;
 
   /**
    * y value or second line edge
    * @type number
-   * @default
    */
   declare y2: number;
 
@@ -158,7 +161,6 @@ export class Line<
 
   /**
    * Returns object representation of an instance
-   * @method toObject
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
@@ -231,23 +233,19 @@ export class Line<
 
   /**
    * List of attribute names to account for when parsing SVG element (used by {@link Line.fromElement})
-   * @static
-   * @memberOf Line
    * @see http://www.w3.org/TR/SVG/shapes.html#LineElement
    */
   static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat(coordProps);
 
   /**
    * Returns Line instance from an SVG element
-   * @static
-   * @memberOf Line
    * @param {HTMLElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
   static async fromElement(
     element: HTMLElement,
-    options: Abortable,
+    options?: Abortable,
     cssRules?: CSSRules,
   ) {
     const {
@@ -264,8 +262,6 @@ export class Line<
 
   /**
    * Returns Line instance from an object representation
-   * @static
-   * @memberOf Line
    * @param {Object} object Object to create an instance from
    * @returns {Promise<Line>}
    */

@@ -1,0 +1,84 @@
+name: 'Comment build stats on PR'
+on:
+  workflow_run:
+    workflows: ['🩺']
+    types:
+      - completed
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  build-stats:
+    env:
+      unique_id: <!-- build-stats -->
+      minified: dist/index.min.js
+      bundled: dist/index.mjs
+    name: Build stats
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 'Create an empty tmp directory'
+        run: mkdir ${{ runner.temp }}/artifacts
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Install dependencies
+        uses: ./.github/actions/cached-install
+        with:
+          node-version: 24.x
+          install-system-deps: false
+      - name: Build fabric.js
+        run: npm run build
+      - name: Recover build stats
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: prstats
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/artifacts
+      - name: Put stats in GITHUB_OUTPUT
+        id: pr_stats
+        run: echo "pr_stats=$(cat ${{ runner.temp }}/artifacts/prstats.txt)" >> $GITHUB_OUTPUT
+      - name: Recover pr number
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: prnumber
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/artifacts
+      - name: Add pr number to output
+        id: prnumber
+        run: echo "pr_number=$(cat ${{ runner.temp }}/artifacts/prnumber.txt)" >> $GITHUB_OUTPUT
+      - name: Create upstream stats
+        id: upstream_stats
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs');
+            return JSON.stringify({
+              size: { fabric: { minified: fs.statSync(process.env.minified).size, bundled: fs.statSync(process.env.bundled).size } }
+            });
+      - name: process
+        id: stats-message
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        env:
+          pr_stats: ${{ steps.pr_stats.outputs.pr_stats }}
+          upstream_stats: ${{ steps.upstream_stats.outputs.result }}
+        with:
+          result-encoding: string
+          script: |
+            const { run_simple } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            return await run_simple({
+              modified: JSON.parse(process.env.pr_stats),
+              original: JSON.parse(process.env.upstream_stats),
+            });
+      - name: Comment on PR for build stats
+        uses: ./.github/actions/find-create-or-update-comment
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.prnumber.outputs.pr_number }}
+          body-includes: '${{ env.unique_id }}'
+          comment-author: 'github-actions[bot]'
+          body: |
+            ${{ env.unique_id }}
+            ${{ steps.stats-message.outputs.result }}
+          edit-mode: replace

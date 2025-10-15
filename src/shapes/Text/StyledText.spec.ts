@@ -1,6 +1,8 @@
 import { FabricText } from './Text';
 import { graphemeSplit } from '../../util/lang_string';
 
+import { describe, expect, it, test } from 'vitest';
+
 describe('setSelectionStyles', () => {
   test('will set properties at the correct position', () => {
     const text = new FabricText('Hello', {

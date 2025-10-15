@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import '../../../jest.extend';
+import type { TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import { ActiveSelection } from '../../shapes/ActiveSelection';
 import { Circle } from '../../shapes/Circle';
@@ -11,17 +11,20 @@ import { Triangle } from '../../shapes/Triangle';
 import type { TMat2D } from '../../typedefs';
 import { Canvas } from '../Canvas';
 
+import { describe, expect, test, vi, beforeEach, afterEach, it } from 'vitest';
+import type { MockInstance } from 'vitest';
+
 const genericVpt = [2.3, 0, 0, 2.3, 120, 80] as TMat2D;
 
 const registerTestObjects = (objects: Record<string, FabricObject>) => {
   Object.entries(objects).forEach(([key, object]) => {
-    jest.spyOn(object, 'toJSON').mockReturnValue(key);
+    object.toJSON = vi.fn(() => key);
   });
 };
 
 describe('Canvas event data', () => {
   let canvas: Canvas;
-  let spy: jest.SpyInstance;
+  let spyFire: MockInstance;
 
   const snapshotOptions = {
     cloneDeepWith: (value: any) => {
@@ -33,7 +36,7 @@ describe('Canvas event data', () => {
 
   beforeEach(() => {
     canvas = new Canvas();
-    spy = jest.spyOn(canvas, 'fire');
+    spyFire = vi.spyOn(canvas, 'fire');
   });
 
   afterEach(() => {
@@ -54,10 +57,14 @@ describe('Canvas event data', () => {
     'HTML event "%s" should fire a corresponding canvas event',
     (type) => {
       canvas.setViewportTransform(genericVpt);
-      canvas
-        .getSelectionElement()
-        .dispatchEvent(new MouseEvent(type, { clientX: 50, clientY: 50 }));
-      expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
+      canvas.getSelectionElement().dispatchEvent(
+        new MouseEvent(type, {
+          clientX: 50,
+          clientY: 50,
+          detail: type === 'dblclick' ? 2 : undefined,
+        }),
+      );
+      expect(spyFire.mock.calls).toMatchSnapshot(snapshotOptions);
     },
   );
 
@@ -67,11 +74,11 @@ describe('Canvas event data', () => {
     canvas
       .getSelectionElement()
       .dispatchEvent(new MouseEvent('mousedown', { clientX: 50, clientY: 50 }));
-    spy.mockReset();
+    spyFire.mockReset();
     document.dispatchEvent(
       new MouseEvent('mouseup', { clientX: 50, clientY: 50 }),
     );
-    expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
+    expect(spyFire.mock.calls).toMatchSnapshot(snapshotOptions);
   });
 
   test.each([
@@ -90,25 +97,27 @@ describe('Canvas event data', () => {
         originX: 'center',
         originY: 'center',
       });
-      jest.spyOn(dragTarget, 'onDragStart').mockReturnValue(true);
-      jest.spyOn(dragTarget, 'renderDragSourceEffect').mockImplementation();
-      jest.spyOn(dragTarget, 'toJSON').mockReturnValue('Drag Target');
+      vi.spyOn(dragTarget, 'onDragStart').mockReturnValue(true);
+      vi.spyOn(dragTarget, 'renderDragSourceEffect').mockImplementation(
+        vi.fn(),
+      );
+      dragTarget.toJSON = vi.fn(() => 'Drag Target');
       canvas.add(dragTarget);
       canvas.setActiveObject(dragTarget);
-      spy.mockReset();
-      canvas.getSelectionElement().dispatchEvent(
-        new MouseEvent('dragstart', {
-          clientX: 50,
-          clientY: 50,
-        }),
-      );
+      spyFire.mockReset();
+      const evt = new MouseEvent('dragstart', {
+        clientX: 50,
+        clientY: 50,
+      });
+      canvas._cacheTransformEventData(evt);
+      canvas.getSelectionElement().dispatchEvent(evt);
       canvas.getSelectionElement().dispatchEvent(
         new MouseEvent(type, {
           clientX: 50,
           clientY: 50,
         }),
       );
-      expect(spy.mock.calls).toMatchSnapshot(snapshotOptions);
+      expect(spyFire.mock.calls).toMatchSnapshot(snapshotOptions);
     },
   );
 
@@ -118,14 +127,14 @@ describe('Canvas event data', () => {
       width: 200,
       height: 200,
     });
-    jest.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
-    const spy = jest.spyOn(canvas, 'getPointer');
-    jest.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
+    const spy = vi.spyOn(canvas, '_getPointerImpl');
+    vi.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
       width: 500,
       height: 500,
     });
-    jest.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
-    jest.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
+    vi.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
+    vi.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
     const ev = new MouseEvent('mousemove', {
       clientX: 50,
       clientY: 50,
@@ -134,7 +143,7 @@ describe('Canvas event data', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenNthCalledWith(1, ev);
     canvas._cacheTransformEventData(ev);
-    expect(point).toEqual(canvas['_absolutePointer']);
+    expect(point).toEqual(canvas['_scenePoint']);
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenNthCalledWith(2, ev, true);
   });
@@ -149,9 +158,9 @@ describe('Event targets', () => {
     });
     const canvas = new Canvas();
     canvas.add(group);
-    const targetSpy = jest.fn();
+    const targetSpy = vi.fn();
     target.on('mousedown', targetSpy);
-    jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+    vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
     canvas.getSelectionElement().dispatchEvent(
       new MouseEvent('mousedown', {
         clientX: 50,
@@ -209,10 +218,10 @@ describe('Event targets', () => {
       subTargetCheck: true,
     });
 
-    const enter = jest.fn();
-    const exit = jest.fn();
+    const enter = vi.fn();
+    const exit = vi.fn();
 
-    const getTargetsFromEventStream = (mock: jest.Mock) =>
+    const getTargetsFromEventStream = (mock: MockInstance) =>
       mock.mock.calls.map((args) => args[0].target);
 
     registerTestObjects({
@@ -269,28 +278,6 @@ describe('Event targets', () => {
   });
 
   describe('findTarget', () => {
-    const mockEvent = ({
-      canvas,
-      ...init
-    }: MouseEventInit & { canvas: Canvas }) => {
-      const e = new MouseEvent('mousedown', {
-        ...init,
-      });
-      jest
-        .spyOn(e, 'target', 'get')
-        .mockReturnValue(canvas.getSelectionElement());
-      return e;
-    };
-
-    const findTarget = (canvas: Canvas, ev?: MouseEventInit) => {
-      const target = canvas.findTarget(
-        mockEvent({ canvas, clientX: 0, clientY: 0, ...ev }),
-      );
-      const targets = canvas.targets;
-      canvas.targets = [];
-      return { target, targets };
-    };
-
     test.skip.each([true, false])(
       'findTargetsTraversal: search all is %s',
       (searchAll) => {
@@ -318,7 +305,7 @@ describe('Event targets', () => {
         const canvas = new Canvas();
         canvas.add(parent);
 
-        jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+        vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
         const found = canvas['findTargetsTraversal']([parent], new Point(), {
           searchStrategy: searchAll ? 'search-all' : 'first-hit',
         });
@@ -330,7 +317,7 @@ describe('Event targets', () => {
       },
     );
 
-    test.failing('searchPossibleTargets', () => {
+    test.fails('searchPossibleTargets', () => {
       const subTarget = new FabricObject();
       const target = new Group([subTarget], {
         subTargetCheck: true,
@@ -344,7 +331,7 @@ describe('Event targets', () => {
       const canvas = new Canvas();
       canvas.add(parent);
 
-      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+      vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets([parent], new Point());
       expect(found).toBe(target);
       expect(canvas.targets).toEqual([subTarget, target, parent]);
@@ -364,22 +351,13 @@ describe('Event targets', () => {
       activeSelection.add(target, other);
       canvas.setActiveObject(activeSelection);
 
-      jest.spyOn(canvas, '_checkTarget').mockReturnValue(true);
+      vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets(
         [activeSelection],
-        new Point(),
+        new Point(0, 0),
       );
-      expect(found).toBe(activeSelection);
-      expect(canvas.targets).toEqual([]);
-    });
-
-    test('findTarget clears prev targets', () => {
-      const canvas = new Canvas();
-      canvas.targets = [new FabricObject()];
-      expect(findTarget(canvas, { clientX: 0, clientY: 0 })).toEqual({
-        target: undefined,
-        targets: [],
-      });
+      expect(found.target).toBe(activeSelection);
+      expect(found.subTargets).toEqual([]);
     });
 
     test('findTarget preserveObjectStacking false', () => {
@@ -403,9 +381,11 @@ describe('Event targets', () => {
       canvas.add(rect, rectOver);
       canvas.setActiveObject(rect);
 
-      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
+      ).toMatchObject({
         target: rect,
-        targets: [],
+        subTargets: [],
       });
     });
 
@@ -426,28 +406,28 @@ describe('Event targets', () => {
         clientX: 15,
         clientY: 15,
         shiftKey: true,
-      };
+      } as TPointerEvent;
       const e2 = { clientX: 4, clientY: 4 };
 
-      expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] },
+      expect(canvas.findTarget(e)).toMatchObject(
+        { target: rectOver, subTargets: [] },
         // 'Should return the rectOver, rect is not considered'
       );
 
       canvas.setActiveObject(rect);
-      expect(findTarget(canvas, e)).toEqual(
-        { target: rectOver, targets: [] },
+      expect(canvas.findTarget(e)).toMatchObject(
+        { target: rectOver, subTargets: [] },
         // 'Should still return rectOver because is above active object'
       );
 
-      expect(findTarget(canvas, e2)).toEqual(
-        { target: rect, targets: [] },
+      expect(canvas.findTarget(e2 as TPointerEvent)).toMatchObject(
+        { target: rect, subTargets: [] },
         // 'Should rect because a corner of the activeObject has been hit'
       );
 
       canvas.altSelectionKey = 'shiftKey';
-      expect(findTarget(canvas, e)).toEqual(
-        { target: rect, targets: [] },
+      expect(canvas.findTarget(e)).toMatchObject(
+        { target: rect, subTargets: [] },
         // 'Should rect because active and altSelectionKey is pressed'
       );
     });
@@ -465,32 +445,42 @@ describe('Event targets', () => {
       registerTestObjects({ rect, rect2, group });
       canvas.add(group);
 
-      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [],
+        subTargets: [],
       });
 
-      expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 35, clientY: 35 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [],
+        subTargets: [],
       });
 
       group.subTargetCheck = true;
       group.setCoords();
 
-      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect],
+        subTargets: [rect],
       });
 
-      expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 15, clientY: 15 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [],
+        subTargets: [],
       });
 
-      expect(findTarget(canvas, { clientX: 35, clientY: 35 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 35, clientY: 35 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect2],
+        subTargets: [rect2],
       });
     });
 
@@ -545,34 +535,46 @@ describe('Event targets', () => {
       });
       canvas.add(group);
 
-      expect(findTarget(canvas, { clientX: 96, clientY: 186 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 96, clientY: 186 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
-      expect(findTarget(canvas, { clientX: 98, clientY: 188 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 98, clientY: 188 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
-      expect(findTarget(canvas, { clientX: 100, clientY: 190 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 100, clientY: 190 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
-      expect(findTarget(canvas, { clientX: 102, clientY: 192 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 102, clientY: 192 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
-      expect(findTarget(canvas, { clientX: 104, clientY: 194 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 104, clientY: 194 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
-      expect(findTarget(canvas, { clientX: 106, clientY: 196 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 106, clientY: 196 } as TPointerEvent),
+      ).toMatchObject({
         target: group,
-        targets: [rect2],
+        subTargets: [rect2],
       });
     });
 
@@ -598,9 +600,11 @@ describe('Event targets', () => {
         canvas.add(group);
         canvas.setActiveObject(group);
 
-        expect(findTarget(canvas, { clientX: 9, clientY: 9 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 9, clientY: 9 } as TPointerEvent),
+        ).toMatchObject({
           target: group,
-          targets: [rect],
+          subTargets: [rect],
         });
       },
     );
@@ -612,20 +616,25 @@ describe('Event targets', () => {
       const canvas = new Canvas();
       canvas.add(triangle);
 
-      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
+      ).toMatchObject({
         target: triangle,
-        targets: [],
+        subTargets: [],
       });
 
       canvas.perPixelTargetFind = true;
 
-      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
-        target: undefined,
-        targets: [],
+      expect(
+        canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
+      ).toMatchObject({
+        subTargets: [],
       });
-      expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 15, clientY: 15 } as TPointerEvent),
+      ).toMatchObject({
         target: triangle,
-        targets: [],
+        subTargets: [],
       });
     });
 
@@ -723,9 +732,10 @@ describe('Event targets', () => {
         { x: 87, y: 139 },
       ])('transparent hit on %s', ({ x: clientX, y: clientY }) => {
         const { canvas } = prepareTest();
-        expect(findTarget(canvas, { clientX, clientY })).toEqual({
-          target: undefined,
-          targets: [],
+        expect(
+          canvas.findTarget({ clientX, clientY } as TPointerEvent),
+        ).toMatchObject({
+          subTargets: [],
         });
       });
 
@@ -743,42 +753,54 @@ describe('Event targets', () => {
           group3,
         } = prepareTest();
 
-        expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 15, clientY: 15 } as TPointerEvent),
+        ).toMatchObject({
           target: group3,
-          targets: [deepTriangle, deepGroup, group2],
+          subTargets: [deepTriangle, deepGroup, group2],
         });
 
-        expect(findTarget(canvas, { clientX: 50, clientY: 20 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 50, clientY: 20 } as TPointerEvent),
+        ).toMatchObject({
           target: group3,
-          targets: [deepCircle, deepGroup, group2],
+          subTargets: [deepCircle, deepGroup, group2],
         });
 
-        expect(findTarget(canvas, { clientX: 117, clientY: 16 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 117, clientY: 16 } as TPointerEvent),
+        ).toMatchObject({
           target: group3,
-          targets: [deepRect, deepGroup, group2],
+          subTargets: [deepRect, deepGroup, group2],
         });
 
-        expect(findTarget(canvas, { clientX: 100, clientY: 90 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 100, clientY: 90 } as TPointerEvent),
+        ).toMatchObject({
           target: group3,
-          targets: [rect2, group2],
+          subTargets: [rect2, group2],
         });
 
-        expect(findTarget(canvas, { clientX: 9, clientY: 145 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 9, clientY: 145 } as TPointerEvent),
+        ).toMatchObject({
           target: group3,
-          targets: [circle2, group2],
+          subTargets: [circle2, group2],
         });
 
-        expect(findTarget(canvas, { clientX: 66, clientY: 143 })).toEqual({
+        expect(
+          canvas.findTarget({ clientX: 66, clientY: 143 } as TPointerEvent),
+        ).toMatchObject({
           target: group3,
-          targets: [triangle2, group2],
+          subTargets: [triangle2, group2],
         });
       });
     });
 
     test('findTarget on active selection', () => {
       const rect1 = new FabricObject({
-        left: 0,
-        top: 0,
+        left: 1,
+        top: 1,
         width: 10,
         height: 10,
       });
@@ -804,36 +826,53 @@ describe('Event targets', () => {
       canvas.add(rect1, rect2, rect3);
       canvas.setActiveObject(activeSelection);
 
-      expect(findTarget(canvas, { clientX: 5, clientY: 5 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 5, clientY: 5 } as TPointerEvent),
+      ).toMatchObject({
         target: activeSelection,
-        targets: [rect1],
+        subTargets: [rect1],
       });
 
-      expect(findTarget(canvas, { clientX: 40, clientY: 15 })).toEqual({
-        target: undefined,
-        targets: [],
+      expect(
+        canvas.findTarget({ clientX: 40, clientY: 15 } as TPointerEvent),
+      ).toMatchObject({
+        subTargets: [],
       });
       expect(activeSelection.__corner).toBeUndefined();
 
-      expect(findTarget(canvas, { clientX: 0, clientY: 0 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 1, clientY: 1 } as TPointerEvent),
+      ).toMatchObject({
         target: activeSelection,
-        targets: [],
+        subTargets: [rect1],
       });
       expect(activeSelection.__corner).toBe('tl');
 
-      expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
+      expect(
+        canvas.findTarget({ clientX: 0, clientY: 0 } as TPointerEvent),
+      ).toMatchObject({
+        target: activeSelection,
+        subTargets: [],
+      });
+      expect(activeSelection.__corner).toBe('tl');
+
+      expect(
+        canvas.findTarget({ clientX: 25, clientY: 5 } as TPointerEvent),
+      ).toMatchObject(
         {
           target: activeSelection,
-          targets: [],
+          subTargets: [],
         },
         // 'Should not return the rect behind active selection'
       );
 
       canvas.discardActiveObject();
-      expect(findTarget(canvas, { clientX: 25, clientY: 5 })).toEqual(
+      expect(
+        canvas.findTarget({ clientX: 25, clientY: 5 } as TPointerEvent),
+      ).toMatchObject(
         {
           target: rect3,
-          targets: [],
+          subTargets: [],
         },
         // 'Should return the rect after clearing selection'
       );
@@ -863,14 +902,18 @@ describe('Event targets', () => {
       canvas.add(rect1, rect2);
       canvas.setActiveObject(activeSelection);
 
-      expect(findTarget(canvas, { clientX: 8, clientY: 8 })).toEqual({
+      expect(
+        canvas.findTarget({ clientX: 8, clientY: 8 } as TPointerEvent),
+      ).toMatchObject({
         target: activeSelection,
-        targets: [],
+        subTargets: [],
       });
 
-      expect(findTarget(canvas, { clientX: 15, clientY: 15 })).toEqual({
-        target: undefined,
-        targets: [],
+      expect(
+        canvas.findTarget({ clientX: 15, clientY: 15 } as TPointerEvent),
+      ).toMatchObject({
+        currentSubTargets: [],
+        subTargets: [],
       });
     });
   });
@@ -879,11 +922,9 @@ describe('Event targets', () => {
     const target = new FabricObject({ width: 10, height: 10 });
     const canvas = new Canvas();
     canvas.add(target);
-
-    jest.spyOn(target, 'toJSON').mockReturnValue('target');
-
-    const targetSpy = jest.spyOn(target, 'fire');
-    const canvasSpy = jest.spyOn(canvas, 'fire');
+    target.toJSON = vi.fn(() => 'target');
+    const targetSpy = vi.spyOn(target, 'fire');
+    const canvasSpy = vi.spyOn(canvas, 'fire');
     const enter = new MouseEvent('mousemove', { clientX: 5, clientY: 5 });
     const exit = new MouseEvent('mousemove', { clientX: 20, clientY: 20 });
     canvas._onMouseMove(enter);

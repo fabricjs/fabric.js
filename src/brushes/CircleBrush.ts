@@ -13,7 +13,6 @@ export class CircleBrush extends BaseBrush {
   /**
    * Width of a brush
    * @type Number
-   * @default
    */
   width = 10;
 
