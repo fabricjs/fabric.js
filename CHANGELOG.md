@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update playwright [#10780](https://github.com/fabricjs/fabric.js/pull/10780)
 - chore(): up dev deps [#10773](https://github.com/fabricjs/fabric.js/pull/10773)
 - chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
 - chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
