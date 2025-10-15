@@ -1,83 +1,116 @@
-import type { FabricObject, Point, TOriginX, TOriginY } from 'fabric';
-import { aligningLineConfig } from '../constant';
-import { getDistance } from './basic';
+import type { FabricObject, Point } from 'fabric';
+import type { AligningGuidelines } from '..';
+import type { LineProps } from '../typedefs';
+import { getDistanceList } from './basic';
 
 type CollectPointProps = {
-  activeObject: FabricObject;
+  target: FabricObject;
+  /** Operation points of the target element: top-left, bottom-left, top-right, bottom-right */
   point: Point;
+  /** Position using diagonal points when resizing/scaling. */
+  diagonalPoint: Point;
+  /** Set of points to consider for alignment: [tl, tr, br, bl, center] */
   list: Point[];
+  /** Change the zoom or change the size, determine by whether e.transform.action starts with the string "scale" */
   isScale: boolean;
-  index: number;
+  /** Whether to change uniformly is determined by canvas.uniformScaling and canvas.uniScaleKey. */
+  isUniform: boolean;
+  /** When holding the centerKey (default is altKey), the shape will scale based on the center point, with the reference point being the center. */
+  isCenter: boolean;
+  /** tl、tr、br、bl、mt、mr、mb、ml */
+  corner: string;
 };
-const originXArr: TOriginX[] = ['left', 'center', 'right'];
-const originYArr: TOriginY[] = ['top', 'center', 'bottom'];
 
-export function collectVerticalPoint(props: CollectPointProps) {
-  const aligningLineMargin = aligningLineConfig.margin;
-  const { activeObject, isScale, index, point, list } = props;
+export function collectVerticalPoint(
+  this: AligningGuidelines,
+  props: CollectPointProps,
+): LineProps[] {
+  const {
+    target,
+    isScale,
+    isUniform,
+    corner,
+    point,
+    diagonalPoint,
+    list,
+    isCenter,
+  } = props;
   const { dis, arr } = getDistanceList(point, list, 'x');
-  const margin = aligningLineMargin / (activeObject.canvas?.getZoom() ?? 1);
+  const margin = this.margin / this.canvas.getZoom();
   if (dis > margin) return [];
   let v = arr[arr.length - 1].x - point.x;
-  const dir = index == 0 || index == 3 ? -1 : 1;
-  v *= dir;
+  // tl bl ml
+  // If modifying on the left side, the size decreases; conversely, it increases.
+  const dirX = corner.includes('l') ? -1 : 1;
+  v *= dirX;
 
-  const { width, scaleX, left } = activeObject;
-  const dim = activeObject._getTransformedDimensions();
-  const sx = (v + dim.x) / dim.x;
-  if (isScale) activeObject.set('scaleX', scaleX * sx);
-  else activeObject.set('width', width * sx);
-  const dArr = [0, (v / 2) * dir, v * dir];
-  if (dir < 0) dArr.reverse();
-  const d = dArr[originXArr.indexOf(activeObject.originX)];
-  activeObject.set('left', left + d);
-  activeObject.setCoords();
-  return arr.map((item) => ({
-    x: item.x,
-    y1: item.y,
-    y2: point.y,
-  }));
+  const { width, height, scaleX, scaleY } = target;
+  // Because when modifying through the center point, isUniform is always false, so skew does not need to be considered.
+  const dStrokeWidth = target.strokeUniform ? 0 : target.strokeWidth;
+  const scaleWidth = scaleX * width + dStrokeWidth;
+  const sx = (v + scaleWidth) / scaleWidth;
+  // When v equals -scaleWidth, sx equals 0.
+  if (sx == 0) return [];
+  if (isScale) {
+    target.set('scaleX', scaleX * sx);
+    if (isUniform) target.set('scaleY', scaleY * sx);
+  } else {
+    target.set('width', width * sx);
+    if (isUniform) target.set('height', height * sx);
+  }
+  if (isCenter) {
+    target.setRelativeXY(diagonalPoint, 'center', 'center');
+  } else {
+    const originArr = this.contraryOriginMap;
+    target.setRelativeXY(diagonalPoint, ...originArr[corner]);
+  }
+  target.setCoords();
+  return arr.map((target) => ({ origin: point, target }));
 }
 
-export function collectHorizontalPoint(props: CollectPointProps) {
-  const aligningLineMargin = aligningLineConfig.margin;
-  const { activeObject, isScale, index, point, list } = props;
+export function collectHorizontalPoint(
+  this: AligningGuidelines,
+  props: CollectPointProps,
+): LineProps[] {
+  const {
+    target,
+    isScale,
+    isUniform,
+    corner,
+    point,
+    diagonalPoint,
+    list,
+    isCenter,
+  } = props;
   const { dis, arr } = getDistanceList(point, list, 'y');
-  const margin = aligningLineMargin / (activeObject.canvas?.getZoom() ?? 1);
+  const margin = this.margin / this.canvas.getZoom();
   if (dis > margin) return [];
   let v = arr[arr.length - 1].y - point.y;
-  const dir = index < 2 ? -1 : 1;
-  v *= dir;
+  // tl mt tr
+  // If modifying on the top side, the size decreases; conversely, it increases.
+  const dirY = corner.includes('t') ? -1 : 1;
+  v *= dirY;
 
-  const { height, scaleY, top } = activeObject;
-  const dim = activeObject._getTransformedDimensions();
-  const sy = (v + dim.y) / dim.y;
-  if (isScale) activeObject.set('scaleY', scaleY * sy);
-  else activeObject.set('height', height * sy);
-  const dArr = [0, (v / 2) * dir, v * dir];
-  if (dir < 0) dArr.reverse();
-  const d = dArr[originYArr.indexOf(activeObject.originY)];
-  activeObject.set('top', top + d);
-  activeObject.setCoords();
-  return arr.map((item) => ({
-    y: item.y,
-    x1: item.x,
-    x2: point.x,
-  }));
-}
-
-function getDistanceList(point: Point, list: Point[], type: 'x' | 'y') {
-  let dis = Infinity;
-  let arr: Point[] = [];
-  for (const item of list) {
-    const v = getDistance(point[type], item[type]);
-    if (dis > v) {
-      arr = [];
-      dis = v;
-    }
-    if (dis == v) {
-      arr.push(item);
-    }
+  const { width, height, scaleX, scaleY } = target;
+  // Because when modifying through the center point, isUniform is always false, so skew does not need to be considered.
+  const dStrokeWidth = target.strokeUniform ? 0 : target.strokeWidth;
+  const scaleHeight = scaleY * height + dStrokeWidth;
+  const sy = (v + scaleHeight) / scaleHeight;
+  // When v equals -scaleHeight, sy equals 0.
+  if (sy == 0) return [];
+  if (isScale) {
+    target.set('scaleY', scaleY * sy);
+    if (isUniform) target.set('scaleX', scaleX * sy);
+  } else {
+    target.set('height', height * sy);
+    if (isUniform) target.set('width', width * sy);
   }
-  return { dis, arr };
+  if (isCenter) {
+    target.setRelativeXY(diagonalPoint, 'center', 'center');
+  } else {
+    const originArr = this.contraryOriginMap;
+    target.setRelativeXY(diagonalPoint, ...originArr[corner]);
+  }
+  target.setCoords();
+  return arr.map((target) => ({ origin: point, target }));
 }
