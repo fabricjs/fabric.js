@@ -17,8 +17,7 @@ const raw: renderTestType[] = [
         fontSize: 60,
         objectCaching: false,
       });
-      canvas.add(text);
-      canvas.renderAll();
+      return text.toDataURL();
     },
   },
   {
@@ -32,17 +31,13 @@ const raw: renderTestType[] = [
         fontSize: 60,
         objectCaching: false,
       });
-      text.setPositionByOrigin(new Point(0, 0), 'left', 'top');
       text.shadow = new fabric.Shadow({
         color: 'purple',
         offsetX: 0,
         offsetY: 0,
         blur: 6,
       });
-      canvas.add(text);
-      canvas.renderAll();
-      // to trigger the wrapper of the test code
-      text.toDataURL();
+      return text.toDataURL();
     },
   },
   {
@@ -63,10 +58,7 @@ const raw: renderTestType[] = [
         offsetY: +40,
         blur: 10,
       });
-      canvas.add(text);
-      canvas.renderAll();
-      // to trigger the wrapper of the test code
-      text.toDataURL();
+      return text.toDataURL();
     },
   },
   {
@@ -81,9 +73,7 @@ const raw: renderTestType[] = [
         objectCaching: false,
         flipX: true,
       });
-      text.setPositionByOrigin(new Point(0, 0), 'left', 'top');
-      canvas.add(text);
-      canvas.renderAll();
+      return text.toDataURL();
     },
   },
   {
@@ -368,41 +358,7 @@ function wrapWithExportedBitmap<
   F extends (canvas: Canvas, fabric: FabricNamespace) => any,
 >(fn: F): F {
   return (async (canvas: Canvas, fabric) => {
-    let lastDataUrl: string | undefined;
-
-    const origCanvasToDataURL = canvas.toDataURL.bind(canvas);
-    canvas.toDataURL = (...args) =>
-      (lastDataUrl = origCanvasToDataURL(...args));
-
-    const FabricObject = fabric.FabricObject;
-    const origObjToDataURL = fabric.FabricObject.prototype.toDataURL;
-    FabricObject.prototype.toDataURL = function (...args) {
-      lastDataUrl = origObjToDataURL.apply(this, args);
-      return lastDataUrl;
-    };
-
-    try {
-      await fn(canvas, fabric);
-    } finally {
-      canvas.toDataURL = origCanvasToDataURL;
-      FabricObject.prototype.toDataURL = origObjToDataURL;
-    }
-
-    if (!lastDataUrl) return;
-
-    const img = await new Promise<HTMLImageElement>((res) => {
-      const i = fabric.util.createImage();
-      i.onload = () => res(i);
-      i.src = lastDataUrl!;
-    });
-
-    canvas.enableRetinaScaling = false;
-    fabric.config.configure({ devicePixelRatio: 1 });
-
-    canvas.clear();
-    canvas.setDimensions({ width: img.width, height: img.height });
-    canvas.setZoom(1);
-    canvas.add(new fabric.FabricImage(img));
-    canvas.renderAll();
+    const lastDataUrl = await fn(canvas, fabric);
+    return lastDataUrl;
   }) as F;
 }
