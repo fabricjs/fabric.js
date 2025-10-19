@@ -6635,6 +6635,15 @@ class ObjectGeometry extends CommonMethods {
   _getLeftTopCoords() {
     return this.translateToOriginPoint(this.getRelativeCenterPoint(), LEFT, TOP);
   }
+
+  /**
+   * An utility method to position the object by its left top corner.
+   * Useful to reposition objects since now the default origin is center/center
+   * Places the left/top corner of the object bounding box in p.
+   */
+  positionByLeftTop(p) {
+    return this.setPositionByOrigin(p, LEFT, TOP);
+  }
 }
 
 /**
