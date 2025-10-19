@@ -20140,6 +20140,8 @@ class FabricText extends StyledText {
     // this can later looked at again and probably removed.
 
     const text = new this(textContent, {
+        left: left + dx,
+        top: top + dy,
         underline: textDecoration.includes('underline'),
         overline: textDecoration.includes('overline'),
         linethrough: textDecoration.includes('line-through'),
@@ -20149,18 +20151,26 @@ class FabricText extends StyledText {
         ...restOfOptions
       }),
       textHeightScaleFactor = text.getScaledHeight() / text.height,
-      lineHeightDiff = text.height * (text.lineHeight - 1),
+      lineHeightDiff = (text.height + text.strokeWidth) * text.lineHeight - text.height,
       scaledDiff = lineHeightDiff * textHeightScaleFactor,
-      textHeight = text.getScaledHeight() + scaledDiff,
-      pos = new Point(left + dx, top + dy - (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) / text.lineHeight);
+      textHeight = text.getScaledHeight() + scaledDiff;
+    let offX = 0;
     /*
       Adjust positioning:
         x/y attributes in SVG correspond to the bottom-left corner of text bounding box
-        fabric output by default at center, center.
+        fabric output by default at top, left.
     */
-    // DOUBLE CHECK THIS CHANGE
-    text.setPositionByOrigin(pos, textAnchor, text.originY);
-    text.strokeWidth = strokeWidth;
+    if (textAnchor === CENTER) {
+      offX = text.getScaledWidth() / 2;
+    }
+    if (textAnchor === RIGHT) {
+      offX = text.getScaledWidth();
+    }
+    text.set({
+      left: text.left - offX,
+      top: text.top - (textHeight - text.fontSize * (0.07 + text._fontSizeFraction)) / text.lineHeight,
+      strokeWidth
+    });
     return text;
   }
 
@@ -24820,23 +24830,11 @@ class FabricImage extends FabricObject {
   static async fromElement(element) {
     let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     let cssRules = arguments.length > 2 ? arguments[2] : undefined;
-    const {
-      x,
-      y,
-      strokeWidth,
-      href,
-      'xlink:href': xlinkHref,
-      ...restOfParsedAttributes
-    } = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
-    try {
-      const image = await this.fromURL(xlinkHref || href, options, restOfParsedAttributes);
-      image.setPositionByOrigin(new Point(x, y), 'left', 'top');
-      image.strokeWidth = strokeWidth;
-      return image;
-    } catch (e) {
-      log('log', 'Unable to parse Image', e);
+    const parsedAttributes = parseAttributes(element, this.ATTRIBUTE_NAMES, cssRules);
+    return this.fromURL(parsedAttributes['xlink:href'] || parsedAttributes['href'], options, parsedAttributes).catch(err => {
+      log('log', 'Unable to parse Image', err);
       return null;
-    }
+    });
   }
 }
 _defineProperty(FabricImage, "type", 'Image');
