@@ -10,7 +10,6 @@ const createGroupForLayoutTests = (fabric: any, text: string, options: any) => {
   itext.setPositionByOrigin(new fabric.Point(100, 150), 'left', 'top');
 
   const rect = new fabric.Rect({
-    top: 200,
     width: 50,
     height: 50,
     fill: 'red',
@@ -18,16 +17,7 @@ const createGroupForLayoutTests = (fabric: any, text: string, options: any) => {
   });
   rect.setPositionByOrigin(new fabric.Point(0, 200), 'left', 'top');
 
-  const g = new fabric.Group([rect, circle, itext]);
-  const pos = g.translateToGivenOrigin(
-    new fabric.Point(g.left, g.top),
-    g.originX,
-    g.originY,
-    'left',
-    'top',
-  );
-  g.set(options);
-  g.setPositionByOrigin(pos, 'left', 'top');
+  const g = new fabric.Group([rect, circle, itext], options);
   return g;
 };
 
@@ -137,8 +127,16 @@ const fitContentLayoutWithSkewX: renderTestType = {
   async renderFunction(canvas, fabric) {
     const g = createGroupForLayoutTests(fabric, 'fit-content layout', {
       backgroundColor: 'blue',
-      skewX: 45,
     });
+    const pos = g.translateToGivenOrigin(
+      new fabric.Point(g.left, g.top),
+      g.originX,
+      g.originY,
+      'left',
+      'top',
+    );
+    g.skewX = 45;
+    g.positionByLeftTop(pos);
     canvas.add(g);
     canvas.renderAll();
   },
@@ -152,8 +150,16 @@ const fitContentLayoutWithSkewY: renderTestType = {
   async renderFunction(canvas, fabric) {
     const g = createGroupForLayoutTests(fabric, 'fit-content layout', {
       backgroundColor: 'blue',
-      skewY: 45,
     });
+    const pos = g.translateToGivenOrigin(
+      new fabric.Point(g.left, g.top),
+      g.originX,
+      g.originY,
+      'left',
+      'top',
+    );
+    g.skewY = 45;
+    g.positionByLeftTop(pos);
     canvas.add(g);
     canvas.renderAll();
   },
@@ -245,7 +251,7 @@ const fitContentLayoutChange: renderTestType = {
         'top',
       );
     g.item(1).set({ skewX: -45 });
-    g.setPositionByOrigin(pos, 'left', 'top');
+    g.item(1).positionByLeftTop(pos);
     g.item(2).rotate(45);
     g.triggerLayout({ strategy: new fabric.FitContentLayout() });
     canvas.add(g);
