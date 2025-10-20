@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @rollup/plugin-babel from 6.0.4 to 6.1.0 [#10776](https://github.com/fabricjs/fabric.js/pull/10776)
 - chore(): up dev deps [#10773](https://github.com/fabricjs/fabric.js/pull/10773)
 - chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
 - chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
