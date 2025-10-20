@@ -1,6 +1,6 @@
 import type { JSHandle, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
-import type { FabricObject } from 'fabric';
+import type { FabricObject, XY } from 'fabric';
 import type { PageFunctionOn } from 'playwright-core/types/structs';
 
 export class ObjectUtil<T extends FabricObject = FabricObject> {
@@ -45,6 +45,14 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     return this.executeInBrowser(
       (object, { controlName }) => object.oCoords[controlName],
       { controlName },
+    );
+  }
+
+  positionByLeftTop(point: XY) {
+    return this.executeInBrowser(
+      (object, { point }) =>
+        object.positionByLeftTop(new window.fabric.Point(point)),
+      { point },
     );
   }
 
