@@ -553,8 +553,8 @@ class AnimationRegistry extends Array {
 const runningAnimations = new AnimationRegistry();
 
 /**
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#events}
- * @see {@link http://fabric5.fabricjs.com/events|Events demo}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
+ * @see {@link http://fabricjs.com/events|Events demo}
  */
 class Observable {
   constructor() {
@@ -797,6 +797,7 @@ class Point {
    * Adds another point to this one
    * @param {XY} that
    * @return {Point} thisArg
+   * @chainable
    * @deprecated
    */
   addEquals(that) {
@@ -818,6 +819,7 @@ class Point {
    * Adds value to this point
    * @param {Number} scalar
    * @return {Point} thisArg
+   * @chainable
    * @deprecated
    */
   scalarAddEquals(scalar) {
@@ -839,6 +841,7 @@ class Point {
    * Subtracts another point from this point
    * @param {XY} that
    * @return {Point} thisArg
+   * @chainable
    * @deprecated
    */
   subtractEquals(that) {
@@ -860,6 +863,7 @@ class Point {
    * Subtracts value from this point
    * @param {Number} scalar
    * @return {Point} thisArg
+   * @chainable
    * @deprecated
    */
   scalarSubtractEquals(scalar) {
@@ -890,6 +894,7 @@ class Point {
    * Multiplies this point by a value
    * @param {Number} scalar
    * @return {Point} thisArg
+   * @chainable
    * @deprecated
    */
   scalarMultiplyEquals(scalar) {
@@ -920,6 +925,7 @@ class Point {
    * Divides this point by a value
    * @param {Number} scalar
    * @return {Point} thisArg
+   * @chainable
    * @deprecated
    */
   scalarDivideEquals(scalar) {
@@ -1035,6 +1041,7 @@ class Point {
    * Sets x/y of this point
    * @param {Number} x
    * @param {Number} y
+   * @chainable
    */
   setXY(x, y) {
     this.x = x;
@@ -1045,6 +1052,7 @@ class Point {
   /**
    * Sets x of this point
    * @param {Number} x
+   * @chainable
    */
   setX(x) {
     this.x = x;
@@ -1054,6 +1062,7 @@ class Point {
   /**
    * Sets y of this point
    * @param {Number} y
+   * @chainable
    */
   setY(y) {
     this.y = y;
@@ -1063,6 +1072,7 @@ class Point {
   /**
    * Sets x/y of this point from another point
    * @param {XY} that
+   * @chainable
    */
   setFromPoint(that) {
     this.x = that.x;
@@ -1634,7 +1644,7 @@ const invertTransform = t => {
 const multiplyTransformMatrices = (a, b, is2x2) => [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], is2x2 ? 0 : a[0] * b[4] + a[2] * b[5] + a[4], is2x2 ? 0 : a[1] * b[4] + a[3] * b[5] + a[5]];
 
 /**
- * Multiplies the matrices array such that a matrix defines the plane for the rest of the matrices **after** it
+ * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
  *
  * `multiplyTransformMatrixArray([A, B, C, D])` is equivalent to `A(B(C(D)))`
  *
@@ -1678,7 +1688,7 @@ const qrDecompose = a => {
  * [ 0 1 y ]
  * [ 0 0 1 ]
  *
- * See {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate} for more details
+ * See @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate for more details
  *
  * @param {number} x translation on X axis
  * @param {number} [y] translation on Y axis
@@ -1724,7 +1734,7 @@ function createRotateMatrix() {
  * [0 y 0]
  * [0 0 1]
  *
- * {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#scale}
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#scale
  *
  * @param {number} x scale on X axis
  * @param {number} [y] scale on Y axis
@@ -1744,7 +1754,7 @@ const angleToSkew = angle => Math.tan(degreesToRadians(angle));
  * [0 1 0]
  * [0 0 1]
  *
- * {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx}
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx
  *
  * @param {TDegree} skewValue translation on X axis
  * @returns {TMat2D} matrix
@@ -1759,7 +1769,7 @@ const createSkewXMatrix = skewValue => [1, 0, angleToSkew(skewValue), 1, 0, 0];
  * [y 1 0]
  * [0 0 1]
  *
- * {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewy}
+ * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewy
  *
  * @param {TDegree} skewValue translation on Y axis
  * @returns {TMat2D} matrix
@@ -2248,7 +2258,7 @@ const staticCanvasDefaults = {
 
 /**
  * Static canvas class
- * @see {@link http://fabric5.fabricjs.com/static_canvas|StaticCanvas demo}
+ * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
  * @fires before:render
  * @fires after:render
  * @fires canvas:cleared
@@ -2874,7 +2884,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
    * JSON does not support additional properties because toJSON has its own signature
    * @return {Object} JSON compatible object
-   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
    * @example <caption>JSON representation of canvas </caption>
    * const json = canvas.toJSON();
@@ -2963,6 +2973,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
 
   /**
    * Returns SVG representation of canvas
+   * @function
    * @param {Object} [options] Options object for SVG output
    * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
    * @param {Object} [options.viewBox] SVG viewbox object
@@ -2975,7 +2986,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
    * @param {String} [options.height] desired height of svg with or without units
    * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
    * @return {String} SVG string
-   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
    * @example <caption>Normal SVG output</caption>
    * var svg = canvas.toSVG();
@@ -3193,7 +3204,7 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
    * @param {Object} [options] options
    * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<Canvas | StaticCanvas>} instance
-   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#deserialization}
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());
@@ -3216,11 +3227,9 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
     }
 
     // parse json if it wasn't already
+    const serialized = typeof json === 'string' ? JSON.parse(json) : json;
     const {
       objects = [],
-      ...serialized
-    } = typeof json === 'string' ? JSON.parse(json) : json;
-    const {
       backgroundImage,
       background,
       overlayImage,
@@ -3927,8 +3936,6 @@ const dragHandler = (eventData, transform, x, y) => {
   return moveX || moveY;
 };
 
-const normalizeWs = value => value.replace(/\s+/g, ' ');
-
 /**
  * Map of the 148 color names with HEX code
  * @see: https://www.w3.org/TR/css3-color/#svg-color
@@ -4088,10 +4095,6 @@ const ColorNameMap = {
  * Regex matching color in RGB or RGBA formats (ex: `rgb(0, 0, 0)`, `rgba(255, 100, 10, 0.5)`, `rgba( 255 , 100 , 10 , 0.5 )`, `rgb(1,1,1)`, `rgba(100%, 60%, 10%, 0.5)`)
  * Also matching rgba(r g b / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
- *
- * In order to avoid performance issues, you have to clean the input string for this regex from multiple spaces before.
- * ex: colorString.replace(/\s+/g, ' ');
- *
  * Formal syntax at the time of writing:
  * <rgb()> =
  *  rgb( [ <percentage> | none ]{3} [ / [ <alpha-value> | none ] ]? )  |
@@ -4103,35 +4106,35 @@ const ColorNameMap = {
  *
  * /^          # Beginning of the string
  * rgba?       # "rgb" or "rgba"
- * \(\s?       # Opening parenthesis and zero or one whitespace character
+ * \(\s*       # Opening parenthesis and optional whitespace
  * (\d{0,3}    # 0 to three digits R channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the first color component
  * %?          # Optional percent sign after the first color component
- * \s?         # Zero or one whitespace character
+ * \s*         # Optional whitespace
  * [\s|,]      # Separator between color components can be a space or comma
- * \s?         # Zero or one whitespace character
+ * \s*         # Optional whitespace
  * (\d{0,3}    # 0 to three digits G channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the second color component
  * %?          # Optional percent sign after the second color component
- * \s?         # Zero or one whitespace character
+ * \s*         # Optional whitespace
  * [\s|,]      # Separator between color components can be a space or comma
- * \s?         # Zero or one whitespace character
+ * \s*         # Optional whitespace
  * (\d{0,3}    # 0 to three digits B channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the third color component
  * %?          # Optional percent sign after the third color component
- * \s?         # Zero or one whitespace character
+ * \s*         # Optional whitespace
  * (?:         # Beginning of non-capturing group for alpha value
- *  \s?        # Zero or one whitespace character
+ *  \s*        # Optional whitespace
  *  [,/]       # Comma or slash separator for alpha value
- *  \s?        # Zero or one whitespace character
+ *  \s*        # Optional whitespace
  *  (\d{0,3}   # Zero to three digits
  *    (?:\.\d+)? # Optional decimal with one or more digits
  *  )          # End of capturing group for alpha value
  *  %?         # Optional percent sign after alpha value
- *  \s?        # Zero or one whitespace character
+ *  \s*        # Optional whitespace
  * )?          # End of non-capturing group for alpha value (optional)
  * \)          # Closing parenthesis
  * $           # End of the string
@@ -4141,14 +4144,12 @@ const ColorNameMap = {
  * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
  * So the spec does not allow for `rgba(30 , 45%  35, 49%)` but this will work anyways for us
  */
-const reRGBa = () => /^rgba?\(\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?(?:\s?[,/]\s?(\d{0,3}(?:\.\d+)?%?)\s?)?\)$/i;
+const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
 
 /**
- * Regex matching color in HSL or HSLA formats (ex: hsl(0deg 0%, 0%), hsla(160, 100, 10, 0.5), hsla( 180 , 100 , 10 , 0.5 ), hsl(1,1,1))
- * Also matching hsla(h s l / a) as per new specs
+ * Regex matching color in HSL or HSLA formats (ex: hsl(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
+ * Also matching rgba(r g b / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
- * In order to avoid performance issues, you have to clean the input string for this regex from multiple spaces before.
- * ex: colorString.replace(/\s+/g, ' ');
  * Formal syntax at the time of writing:
  * <hsl()> =
  *   hsl( [ <hue> | none ] [ <percentage> | none ] [ <percentage> | none ] [ / [ <alpha-value> | none ] ]? )
@@ -4165,30 +4166,30 @@ const reRGBa = () => /^rgba?\(\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\
  * Regular expression for matching an hsla or hsl CSS color value
  *
  * /^hsla?\(         // Matches the beginning of the string and the opening parenthesis of "hsl" or "hsla"
- * \s?               // Matches any whitespace character (space, tab, etc.) zero or one time
+ * \s*               // Matches any whitespace characters (space, tab, etc.) zero or more times
  * (\d{0,3}          // Hue: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Hue: Optional (non capture group) decimal with one or more digits.
  * (?:deg|turn|rad)? // Hue: Optionally include suffix deg or turn or rad
  * )                 // Hue: End capture group
- * \s?               // Matches any whitespace character zero or one time
+ * \s*               // Matches any whitespace characters zero or more times
  * [\s|,]            // Matches a space, tab or comma
- * \s?               // Matches any whitespace character zero or one time
+ * \s*               // Matches any whitespace characters zero or more times
  * (\d{0,3}          // Saturation: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Saturation: Optional decimal with one or more digits in a non-capturing group
  * %?)               // Saturation: match optional % character and end capture group
- * \s?               // Matches any whitespace character zero or one time
+ * \s*               // Matches any whitespace characters zero or more times
  * [\s|,]            // Matches a space, tab or comma
- * \s?               // Matches any whitespace character zero or one time
+ * \s*               // Matches any whitespace characters zero or more times
  * (\d{0,3}          // Lightness: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Lightness: Optional decimal with one or more digits in a non-capturing group
  * %?)                // Lightness: match % character and end capture group
- * \s?               // Matches any whitespace character zero or one time
+ * \s*               // Matches any whitespace characters zero or more times
  * (?:               // Alpha: Begins a non-capturing group for the alpha value
- *   \s?             // Matches any whitespace character zero or one time
+ *   \s*             // Matches any whitespace characters zero or more times
  *   [,/]            // Matches a comma or forward slash
- *   \s?             // Matches any whitespace character zero or one time
+ *   \s*             // Matches any whitespace characters zero or more times
  *   (\d*(?:\.\d+)?%?) // Matches zero or more digits, optionally followed by a decimal point and one or more digits, followed by an optional percentage sign and captures it in a group
- *   \s?             // Matches any whitespace character zero or one time
+ *   \s*             // Matches any whitespace characters zero or more times
  * )?                // Makes the alpha value group optional
  * \)                // Matches the closing parenthesis
  * $/i               // Matches the end of the string and sets the regular expression to case-insensitive mode
@@ -4196,7 +4197,7 @@ const reRGBa = () => /^rgba?\(\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\
  * WARNING this regex doesn't fail on off spec colors. It matches everything that could be a color.
  * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
-const reHSLa = () => /^hsla?\(\s?([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?(?:\s?[,/]\s?(\d*(?:\.\d+)?%?)\s?)?\)$/i;
+const reHSLa = () => /^hsla?\(\s*([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
@@ -4285,7 +4286,7 @@ const greyAverage = _ref => {
 
 /**
  * @class Color common color operations
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#colors colors}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
  */
 class Color {
   /**
@@ -4460,6 +4461,7 @@ class Color {
 
   /**
    * Returns new color object, when given a color in RGBA format
+   * @function
    * @param {String} color
    * @return {Color}
    */
@@ -4473,7 +4475,7 @@ class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromRgb(color) {
-    const match = normalizeWs(color).match(reRGBa());
+    const match = color.match(reRGBa());
     if (match) {
       const [r, g, b] = match.slice(1, 4).map(value => {
         const parsedValue = parseFloat(value);
@@ -4494,6 +4496,7 @@ class Color {
 
   /**
    * Returns new color object, when given a color in HSLA format
+   * @function
    * @param {String} color
    * @return {Color}
    */
@@ -4509,7 +4512,7 @@ class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color) {
-    const match = normalizeWs(color).match(reHSLa());
+    const match = color.match(reHSLa());
     if (!match) {
       return;
     }
@@ -5008,7 +5011,7 @@ const shadowDefaultValues = {
 };
 class Shadow {
   /**
-   * @see {@link http://fabric5.fabricjs.com/shadows|Shadow demo}
+   * @see {@link http://fabricjs.com/shadows|Shadow demo}
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
    */
 
@@ -5143,8 +5146,8 @@ const fabricObjectDefaultValues = {
   minScaleLimit: 0,
   skewX: 0,
   skewY: 0,
-  originX: CENTER,
-  originY: CENTER,
+  originX: LEFT,
+  originY: TOP,
   strokeWidth: 1,
   strokeUniform: false,
   padding: 0,
@@ -5817,6 +5820,7 @@ class Intersection {
    * Appends points of intersection
    * @param {...Point[]} points
    * @return {Intersection} thisArg
+   * @chainable
    */
   append() {
     for (var _len = arguments.length, points = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -5864,7 +5868,7 @@ class Intersection {
   }
 
   /**
-   * Use the ray casting algorithm to determine if point is in the polygon defined by points
+   * Use the ray casting algorithm to determine if {@link point} is in the polygon defined by {@link points}
    * @see https://en.wikipedia.org/wiki/Point_in_polygon
    * @param point
    * @param points polygon points
@@ -6076,35 +6080,35 @@ class ObjectGeometry extends CommonMethods {
    */
 
   /**
-   * @returns {number} x position according to object's originX property in canvas coordinate plane
+   * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
    */
   getX() {
     return this.getXY().x;
   }
 
   /**
-   * @param {number} value x position according to object's originX property in canvas coordinate plane
+   * @param {number} value x position according to object's {@link originX} property in canvas coordinate plane
    */
   setX(value) {
     this.setXY(this.getXY().setX(value));
   }
 
   /**
-   * @returns {number} y position according to object's originY property in canvas coordinate plane
+   * @returns {number} y position according to object's {@link originY} property in canvas coordinate plane
    */
   getY() {
     return this.getXY().y;
   }
 
   /**
-   * @param {number} value y position according to object's originY property in canvas coordinate plane
+   * @param {number} value y position according to object's {@link originY} property in canvas coordinate plane
    */
   setY(value) {
     this.setXY(this.getXY().setY(value));
   }
 
   /**
-   * @returns {number} x position according to object's originX property in parent's coordinate plane\
+   * @returns {number} x position according to object's {@link originX} property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link getX}
    */
   getRelativeX() {
@@ -6112,7 +6116,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @param {number} value x position according to object's originX property in parent's coordinate plane\
+   * @param {number} value x position according to object's {@link originX} property in parent's coordinate plane\
    * if parent is canvas then this method is identical to {@link setX}
    */
   setRelativeX(value) {
@@ -6120,7 +6124,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {number} y position according to object's originY property in parent's coordinate plane\
+   * @returns {number} y position according to object's {@link originY} property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link getY}
    */
   getRelativeY() {
@@ -6128,7 +6132,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @param {number} value y position according to object's originY property in parent's coordinate plane\
+   * @param {number} value y position according to object's {@link originY} property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link setY}
    */
   setRelativeY(value) {
@@ -6136,7 +6140,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {Point} x position according to object's originX originY properties in canvas coordinate plane
+   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
    */
   getXY() {
     const relativePosition = this.getRelativeXY();
@@ -6145,7 +6149,7 @@ class ObjectGeometry extends CommonMethods {
 
   /**
    * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-   * You can specify originX and originY values,
+   * You can specify {@link originX} and {@link originY} values,
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
    * object.setXY(new Point(5, 5), 'left', 'bottom').
@@ -6161,7 +6165,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {Point} x,y position according to object's originX originY properties in parent's coordinate plane
+   * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    */
   getRelativeXY() {
     return new Point(this.left, this.top);
@@ -6169,7 +6173,7 @@ class ObjectGeometry extends CommonMethods {
 
   /**
    * As {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
-   * @param {Point} point position according to object's originX originY properties in parent's coordinate plane
+   * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
@@ -6205,7 +6209,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * Checks if object intersects with the scene rect formed by tl and br
+   * Checks if object intersects with the scene rect formed by {@link tl} and {@link br}
    */
   intersectsWithRect(tl, br) {
     const intersection = Intersection.intersectPolygonRectangle(this.getCoords(), tl, br);
@@ -6233,7 +6237,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * Checks if object is fully contained within the scene rect formed by tl and br
+   * Checks if object is fully contained within the scene rect formed by {@link tl} and {@link br}
    */
   isContainedWithinRect(tl, br) {
     const {
@@ -6426,7 +6430,7 @@ class ObjectGeometry extends CommonMethods {
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
    * aCoords are used to quickly find an object on the canvas.
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabric5.fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    */
   setCoords() {
     this.aCoords = this.calcACoords();
@@ -6691,20 +6695,11 @@ class ObjectGeometry extends CommonMethods {
   _getLeftTopCoords() {
     return this.translateToOriginPoint(this.getRelativeCenterPoint(), LEFT, TOP);
   }
-
-  /**
-   * An utility method to position the object by its left top corner.
-   * Useful to reposition objects since now the default origin is center/center
-   * Places the left/top corner of the object bounding box in p.
-   */
-  positionByLeftTop(p) {
-    return this.setPositionByOrigin(p, LEFT, TOP);
-  }
 }
 
 /**
  * Root object class from which all 2d shape classes inherit from
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#objects}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
  *
  * @fires added
  * @fires removed
@@ -7816,7 +7811,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Animates object's properties
    * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
    * @param {Partial<AnimationOptions<T>>} options
-   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#animation}
+   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
    * @return {Record<string, TAnimation<T>>} map of animation contexts
    *
    * As object — multiple properties
@@ -9380,7 +9375,7 @@ class InteractiveFabricObject extends FabricObject$1 {
 
   /**
    * @override set controls' coordinates as well
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link https://fabric5.fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords() {
@@ -10538,9 +10533,9 @@ const normalizeAttr = attr => {
 };
 
 const regex$1 = new RegExp(`(${reNum})`, 'gi');
-const cleanupSvgAttribute = attributeValue => normalizeWs(attributeValue.replace(regex$1, ' $1 ')
+const cleanupSvgAttribute = attributeValue => attributeValue.replace(regex$1, ' $1 ')
 // replace annoying commas and arbitrary whitespace with single spaces
-.replace(/,/gi, ' '));
+.replace(/,/gi, ' ').replace(/\s+/gi, ' ');
 
 // == begin transform regexp
 const p$1 = `(${reNum})`;
@@ -10561,6 +10556,8 @@ const reTransformAll = new RegExp(transform, 'g');
 
 /**
  * Parses "transform" attribute, returning an array of values
+ * @static
+ * @function
  * @param {String} attributeValue String containing attribute value
  * @return {TTransformMatrix} Array of 6 elements representing transformation matrix
  */
@@ -10676,6 +10673,8 @@ function normalizeValue(attr, value, parentAttributes, fontSize) {
 
 /**
  * Parses a short font declaration, building adding its properties to a style object
+ * @static
+ * @function
  * @param {String} value font declaration
  * @param {Object} oStyle definition
  */
@@ -10740,6 +10739,7 @@ function parseStyleString(style, oStyle) {
 
 /**
  * Parses "style" attribute, retuning an object with values
+ * @static
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */
@@ -11970,6 +11970,7 @@ classRegistry.setClass(Group);
 /**
  * TODO experiment with different layout manager and svg results ( fixed fit content )
  * Groups SVG elements (usually those retrieved from SVG document)
+ * @static
  * @param {FabricObject[]} elements FabricObject(s) parsed from svg, to group
  * @return {FabricObject | Group}
  */
@@ -13198,9 +13199,9 @@ const canvasDefaults = {
   perPixelTargetFind: false,
   targetFindTolerance: 0,
   skipTargetFind: false,
-  stopContextMenu: true,
-  fireRightClick: true,
-  fireMiddleClick: true,
+  stopContextMenu: false,
+  fireRightClick: false,
+  fireMiddleClick: false,
   enablePointerEvents: false,
   containerClass: 'canvas-container',
   preserveObjectStacking: true
@@ -13210,7 +13211,7 @@ const canvasDefaults = {
  * Canvas class
  * @class Canvas
  * @extends StaticCanvas
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#canvas}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
  *
  * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
@@ -13311,21 +13312,27 @@ class SelectableCanvas extends StaticCanvas$1 {
      * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
      * After mousedown, mousemove creates a shape,
      * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-     * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-4#free_drawing}
+     * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
      * @type Boolean
      */
     // event config
     /**
-     * Keep track of the hovered target in the previous event
+     * Keep track of the hovered target
      * @type FabricObject | null
      * @private
      */
     /**
-     * hold the list of nested targets hovered in the previous events
+     * hold the list of nested targets hovered
      * @type FabricObject[]
      * @private
      */
     _defineProperty(this, "_hoveredTargets", []);
+    /**
+     * hold the list of objects to render
+     * @type FabricObject[]
+     * @private
+     */
+    _defineProperty(this, "_objectsToRender", void 0);
     /**
      * hold a reference to a data structure that contains information
      * on the current on going transform
@@ -14535,9 +14542,7 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
     functor(canvasElement, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
     functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
-    functor(canvasElement, 'wheel', this._onMouseWheel, {
-      passive: false
-    });
+    functor(canvasElement, 'wheel', this._onMouseWheel);
     functor(canvasElement, 'contextmenu', this._onContextMenu);
     functor(canvasElement, 'click', this._onClick);
     // decide if to remove in fabric 7.0
@@ -15424,10 +15429,8 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
    * @private
    */
   _fireOverOutEvents(e, target) {
-    const {
-        _hoveredTarget,
-        _hoveredTargets
-      } = this,
+    const _hoveredTarget = this._hoveredTarget,
+      _hoveredTargets = this._hoveredTargets,
       {
         subTargets
       } = this.findTarget(e),
@@ -15439,9 +15442,6 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
       fireCanvas: true
     });
     for (let i = 0; i < length; i++) {
-      if (subTargets[i] === target || _hoveredTargets[i] && _hoveredTargets[i] === _hoveredTarget) {
-        continue;
-      }
       this.fireSyntheticInOutEvents('mouse', {
         e,
         target: subTargets[i],
@@ -15801,20 +15801,15 @@ const ifNaN = (value, valueIfNaN) => {
   return isNaN(value) && typeof valueIfNaN === 'number' ? valueIfNaN : value;
 };
 
-/**
- * Will loosely accept as percent numbers that are not like
- * 3.4a%. This function does not check for the correctness of a percentage
- * but it checks that values that are in theory correct are or arent percentages
- */
+const RE_PERCENT = /^(\d+\.\d+)%|(\d+)%$/;
 function isPercent(value) {
-  // /%$/ Matches strings that end with a percent sign (%)
-  return value && /%$/.test(value) && Number.isFinite(parseFloat(value));
+  return value && RE_PERCENT.test(value);
 }
 
 /**
- * Parse a percentage value in an svg.
+ *
  * @param value
- * @param fallback in case of not possible to parse the number
+ * @param valueIfNaN
  * @returns ∈ [0, 1]
  */
 function parsePercent(value, valueIfNaN) {
@@ -15874,16 +15869,15 @@ function convertPercentUnitsToValues(valuesToConvert, _ref) {
     gradientUnits
   } = _ref;
   let finalValue;
-  return Object.entries(valuesToConvert).reduce((acc, _ref2) => {
-    let [prop, propValue] = _ref2;
+  return Object.keys(valuesToConvert).reduce((acc, prop) => {
+    const propValue = valuesToConvert[prop];
     if (propValue === 'Infinity') {
       finalValue = 1;
     } else if (propValue === '-Infinity') {
       finalValue = 0;
     } else {
-      const isString = typeof propValue === 'string';
-      finalValue = isString ? parseFloat(propValue) : propValue;
-      if (isString && isPercent(propValue)) {
+      finalValue = typeof propValue === 'string' ? parseFloat(propValue) : propValue;
+      if (typeof propValue === 'string' && isPercent(propValue)) {
         finalValue *= 0.01;
         if (gradientUnits === 'pixels') {
           // then we need to fix those percentages here in svg parsing
@@ -15931,7 +15925,7 @@ function parseCoords(el, size) {
 /**
  * Gradient class
  * @class Gradient
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#gradients}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
  */
 class Gradient {
   constructor(options) {
@@ -16242,8 +16236,8 @@ classRegistry.setClass(Gradient, 'linear');
 classRegistry.setClass(Gradient, 'radial');
 
 /**
- * @see {@link http://fabric5.fabricjs.com/patterns demo}
- * @see {@link http://fabric5.fabricjs.com/dynamic-patterns demo}
+ * @see {@link http://fabricjs.com/patterns demo}
+ * @see {@link http://fabricjs.com/dynamic-patterns demo}
  */
 class Pattern {
   /**
@@ -16413,7 +16407,7 @@ classRegistry.setClass(Pattern);
 classRegistry.setClass(Pattern, 'pattern');
 
 /**
- * @see {@link http://fabric5.fabricjs.com/freedrawing|Freedrawing demo}
+ * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
  */
 class BaseBrush {
   /**
@@ -17755,6 +17749,7 @@ class Line extends FabricObject {
 
   /**
    * Returns object representation of an instance
+   * @method toObject
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
@@ -18081,6 +18076,7 @@ classRegistry.setSVGClass(Ellipse);
 
 /**
  * Parses "points" attribute, returning an array of values
+ * @static
  * @param {String} points points attribute string
  * @return {Array} array of points
  */
@@ -18990,7 +18986,7 @@ function getMeasuringContext() {
 
 /**
  * Text class
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#text}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
  */
 class FabricText extends StyledText {
   static getDefaults() {
@@ -20190,7 +20186,7 @@ class FabricText extends StyledText {
       ...options,
       ...parsedAttributes
     };
-    const textContent = normalizeWs(element.textContent || '').trim();
+    const textContent = (element.textContent || '').replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
 
     // this code here is probably the usual issue for SVG center find
     // this can later looked at again and probably removed.
@@ -21559,8 +21555,7 @@ class ITextKeyBehavior extends ITextBehavior {
       autocomplete: 'off',
       spellcheck: 'false',
       'data-fabric': 'textarea',
-      wrap: 'off',
-      name: 'fabricTextarea'
+      wrap: 'off'
     }).map(_ref => {
       let [attribute, value] = _ref;
       return textarea.setAttribute(attribute, value);
@@ -23474,6 +23469,7 @@ class Textbox extends IText {
 
   /**
    * Returns object representation of an instance
+   * @method toObject
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
@@ -24089,8 +24085,6 @@ class WebGLFilterBackend {
     } else {
       gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
     }
-    // disabled because website and issues with different typescript version
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return texture;
   }
 
@@ -24272,7 +24266,7 @@ const imageDefaultValues = {
 const IMAGE_PROPS = ['cropX', 'cropY'];
 
 /**
- * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#images}
+ * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
  */
 class FabricImage extends FabricObject {
   static getDefaults() {
@@ -24601,6 +24595,7 @@ class FabricImage extends FabricObject {
 
   /**
    * Applies filters assigned to this image (from "filters" array) or from filter param
+   * @method applyFilters
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
@@ -25371,6 +25366,8 @@ const createEmptyResponse = () => ({
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
+ * @static
+ * @function
  * @param {HTMLElement} doc SVG document to parse
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * @param {TSvgReviverCallback} [reviver] Extra callback for further parsing of SVG elements, called after each fabric object has been created.
@@ -26828,8 +26825,8 @@ const colorMatrixDefaultValues = {
 
 /**
    * Color Matrix filter class
-   * @see {@link http://fabric5.fabricjs.com/image-filters|ImageFilters demo}
-   * @see {@link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
+   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
+   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
    * @example <caption>Kodachrome filter</caption>
    * const filter = new ColorMatrix({
    *  matrix: [
