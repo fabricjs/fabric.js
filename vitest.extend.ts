@@ -19,7 +19,7 @@ function replaceLinks(value: string) {
   }, value);
 }
 
-function sanitizeSVG(value: string) {
+export function sanitizeSVG(value: string) {
   return replaceLinks(value).replace(SVG_RE, 'SVGID');
 }
 

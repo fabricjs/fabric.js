@@ -35,6 +35,13 @@ exports[`TextSvgExport > toSVG > toSVG with font 1`] = `
 "
 `;
 
+exports[`TextSvgExport > toSVG > toSVG with font and origins 1`] = `
+"<g transform="matrix(1 0 0 1 121 98.64)" style=""  >
+		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; text-decoration-thickness: 6.67%; white-space: pre;" ><tspan x="-60" y="-13.65" style="font-family: 'Times New Roman'; ">xxxxxx</tspan><tspan x="-60" y="38.78" style="white-space: pre; ">x </tspan><tspan x="40" y="38.78" >y</tspan></text>
+</g>
+"
+`;
+
 exports[`TextSvgExport > toSVG > toSVG with multiple spaces 1`] = `
 "<g transform="matrix(1 0 0 1 105.5 23.1)" style=""  >
 		<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; text-decoration-thickness: 6.67%; white-space: pre;" ><tspan x="-105" y="12.57" style="white-space: pre; ">x                 y</tspan></text>
@@ -43,7 +50,7 @@ exports[`TextSvgExport > toSVG > toSVG with multiple spaces 1`] = `
 `;
 
 exports[`TextSvgExport > toSVG > toSVG with text as a clipPath 1`] = `
-"<g transform="matrix(1 0 0 1 101 51)" clip-path="url(#SVGID)"  >
+"<g transform="matrix(1 0 0 1 100 50)" clip-path="url(#SVGID)"  >
 <clipPath id="SVGID" >
 			<text xml:space="preserve" font-family="Times New Roman" font-size="40" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; text-decoration-thickness: 7%; white-space: pre;" ><tspan x="-122" y="13" >text as clipPath</tspan></text>
 </clipPath>

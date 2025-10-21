@@ -1227,6 +1227,8 @@ export class FabricObject<
   /**
    * This function is an helper for svg import. it returns the center of the object in the svg
    * untransformed coordinates
+   * It doesn't matter where the objects origin are, svg has left and top in the top left corner,
+   * And this method is only run once on the object after the fromElement parser.
    * @private
    * @return {Point} center point from element coordinates
    */

@@ -32,8 +32,8 @@ const IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 const REFERENCE_IMG_OBJECT = {
   version: version,
   type: 'Image',
-  originX: 'left' as const,
-  originY: 'top' as const,
+  originX: 'center' as const,
+  originY: 'center' as const,
   left: 0,
   top: 0,
   width: IMG_WIDTH,
@@ -73,8 +73,8 @@ describe('FabricImage', () => {
     test('It exports an svg with styles for an image with stroke', () => {
       const imgElement = new Image(200, 200);
       const img = new FabricImage(imgElement, {
-        left: 3,
-        top: 3,
+        left: 83.5,
+        top: 83.5,
         cropX: 10,
         cropY: 10,
         width: 150,
@@ -162,10 +162,8 @@ describe('FabricImage', () => {
 
   it('toObject', async () => {
     const image = await createImage();
-
-    expect(image.toObject, 'toObject should be a function').toBeTypeOf(
-      'function',
-    );
+    image.left = 0;
+    image.top = 0;
 
     const toObject = image.toObject();
 
@@ -189,6 +187,9 @@ describe('FabricImage', () => {
 
     image.width = 100;
     image.height = 100;
+
+    image.left = 0;
+    image.top = 0;
 
     expect(image.setSrc, 'setSrc should be a function').toBeTypeOf('function');
     expect(image.width, 'width should be 100').toBe(100);
@@ -225,6 +226,8 @@ describe('FabricImage', () => {
 
   it('toObject with no element', async () => {
     const image = await createImage();
+    image.left = 0;
+    image.top = 0;
 
     expect(image.toObject, 'toObject should be a function').toBeTypeOf(
       'function',
@@ -249,6 +252,8 @@ describe('FabricImage', () => {
 
   it('toObject with resize filter', async () => {
     const image = await createImage();
+    image.left = 0;
+    image.top = 0;
 
     expect(image.toObject, 'toObject should be a function').toBeTypeOf(
       'function',
@@ -404,7 +409,7 @@ describe('FabricImage', () => {
     image.width -= 2;
     image.height -= 2;
 
-    const expectedSVG = `<g transform="matrix(1 0 0 1 137 54)"  >
+    const expectedSVG = `<g transform="matrix(1 0 0 1 138 55)"  >
 <clipPath id="imageCrop_1">
 \t<rect x="-137" y="-54" width="274" height="108" />
 </clipPath>
@@ -966,15 +971,15 @@ describe('FabricImage', () => {
   });
 
   const paCases = [
-    ['xMidYMid meet', 0, 42.5],
-    ['xMidYMax meet', 0, 85],
-    ['xMidYMin meet', 0, 0],
-    ['xMinYMin meet', 0, 0, 140, 85], // vertical bbox
-    ['xMidYMin meet', 35, 0, 140, 85],
-    ['xMaxYMin meet', 70, 0, 140, 85],
+    ['xMidYMid meet', 35, 85, 70, 170],
+    ['xMidYMax meet', 35, 127.5, 70, 170],
+    ['xMidYMin meet', 35, 42.5, 70, 170],
+    ['xMinYMin meet', 35, 42.5, 140, 85], // vertical bbox
+    ['xMidYMin meet', 70, 42.5, 140, 85],
+    ['xMaxYMin meet', 105, 42.5, 140, 85],
   ] as const;
 
-  paCases.forEach(([pr, expLeft, expTop, w = 70, h = 170]) => {
+  paCases.forEach(([pr, expLeft, expTop, w, h]) => {
     it(`fromElement preserveAspectRatio ${pr}`, async () => {
       const el = makeImageElement({
         x: '0',
@@ -1025,6 +1030,8 @@ export async function createImage(
   });
 
   return new FabricImage(el, {
+    top: h ? h / 2 : IMG_HEIGHT / 2,
+    left: w ? w / 2 : IMG_WIDTH / 2,
     width: w ?? IMG_WIDTH,
     height: h ?? IMG_HEIGHT,
     ...extra,

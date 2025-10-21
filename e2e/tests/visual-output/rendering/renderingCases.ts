@@ -2,21 +2,21 @@
  * Runs from both the browser and node
  */
 
-import { selectedTextWithClipPath } from './testcases/textWithClipPath';
 import { renderTestType } from '../../types';
-import { zSvgExport } from './testcases/z-svg-export';
-import { dataURLExports } from './testcases/to-data-url';
-import { textPathTests } from './testcases/text-path';
-import { controlsRenderingTests } from './testcases/controls-rendering';
-import { clipPathRenderingTests } from './testcases/clip-path';
 import { groupLayoutTests } from './testcases/group-layout';
-import { genericRenderingTests } from './testcases/generic-rendering';
 import { globalCompositeOperationTests } from './testcases/global-composite-operation';
-import { resizeFilterTests } from './testcases/resize-filter';
-import { textRenderingTests } from './testcases/text';
+import { genericRenderingTests } from './testcases/generic-rendering';
 import { freedrawTests } from './testcases/free-draw';
-import { svgImportTests } from './testcases/svg-import';
 import { colorFilteringTests } from './testcases/filtering';
+import { clipPathRenderingTests } from './testcases/clip-path';
+import { controlsRenderingTests } from './testcases/controls-rendering';
+import { resizeFilterTests } from './testcases/resize-filter';
+import { svgImportTests } from './testcases/svg-import';
+import { textRenderingTests } from './testcases/text';
+import { textPathTests } from './testcases/text-path';
+import { selectedTextWithClipPath } from './testcases/textWithClipPath';
+import { dataURLExports } from './testcases/to-data-url';
+import { zSvgExport } from './testcases/z-svg-export';
 
 export const renderTests: renderTestType[] = [
   {
@@ -71,6 +71,7 @@ export const renderTests: renderTestType[] = [
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, imgSource.width, imgSource.height);
       const img = new fabric.FabricImage(imgSource);
+      img.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
       canvas.add(img);
       img.filters[0] = new fabric.filters.Pixelate({
         blocksize: 20,

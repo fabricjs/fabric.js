@@ -23,6 +23,7 @@ const imageResizeTest: renderTestType = {
     canvas.setZoom(zoom);
     image.scaleToWidth(canvas.width / zoom);
     canvas.add(image);
+    image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
     canvas.renderAll();
   },
 };
@@ -41,6 +42,8 @@ const imageResizeTestNoZoom: renderTestType = {
     image.resizeFilter = new fabric.filters.Resize({ resizeType: 'lanczos' });
     image.scaleToWidth(canvas.width);
     canvas.add(image);
+    image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
+
     canvas.renderAll();
   },
 };
@@ -60,6 +63,7 @@ const imageResizeTestAnamorphic: renderTestType = {
     image.scaleY = 0.3;
     image.scaleX = 1;
     canvas.add(image);
+    image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
     canvas.renderAll();
   },
 };
@@ -80,6 +84,7 @@ const imageResizeTestGroup: renderTestType = {
     group.strokeWidth = 0;
     group.scaleToWidth(canvas.width);
     canvas.add(group);
+    group.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
     canvas.renderAll();
   },
 };
@@ -102,6 +107,7 @@ const blendImageTest2: renderTestType = {
     image.applyFilters();
     image.scaleToWidth(400);
     canvas.add(image);
+    image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
     canvas.renderAll();
   },
 };
@@ -126,6 +132,7 @@ const blendImageTest: renderTestType = {
     image.scaleToWidth(400);
     image.applyFilters();
     canvas.add(image);
+    image.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
     canvas.renderAll();
   },
 };

@@ -1,3 +1,4 @@
+import { Point } from 'fabric';
 import { renderTestType } from '../../../types';
 
 export const clipPathRenderingTests: renderTestType[] = [
@@ -10,13 +11,13 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 100,
         strokeWidth: 0,
-        top: -10,
-        left: -10,
+        top: 90,
+        left: 90,
       });
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 100,
+        left: 100,
         strokeWidth: 0,
         width: 200,
         height: 200,
@@ -37,14 +38,14 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 50,
         strokeWidth: 40,
-        top: -50,
-        left: -50,
+        top: 20,
+        left: 20,
         fill: 'transparent',
       });
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 100,
+        left: 100,
         strokeWidth: 0,
         width: 200,
         height: 200,
@@ -65,14 +66,14 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 50,
         strokeWidth: 40,
-        top: -50,
-        left: -50,
+        top: 20,
+        left: 20,
         fill: '',
       });
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 100,
+        left: 100,
         strokeWidth: 0,
         width: 200,
         height: 200,
@@ -96,13 +97,13 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 5,
         strokeWidth: 0,
-        top: -2,
-        left: -2,
+        top: 3,
+        left: 3,
       });
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 5,
+        left: 5,
         strokeWidth: 0,
         width: 10,
         height: 10,
@@ -122,8 +123,8 @@ export const clipPathRenderingTests: renderTestType[] = [
     async renderFunction(canvas, fabric) {
       const clipPath = new fabric.Circle({
         radius: 100,
-        top: -100,
-        left: -100,
+        top: 0,
+        left: 0,
       });
 
       const group = new fabric.Group(
@@ -132,6 +133,8 @@ export const clipPathRenderingTests: renderTestType[] = [
             strokeWidth: 0,
             width: 100,
             height: 100,
+            top: 50,
+            left: 50,
             fill: 'red',
           }),
           new fabric.Rect({
@@ -139,22 +142,24 @@ export const clipPathRenderingTests: renderTestType[] = [
             width: 100,
             height: 100,
             fill: 'yellow',
-            left: 100,
+            top: 50,
+            left: 150,
           }),
           new fabric.Rect({
             strokeWidth: 0,
             width: 100,
             height: 100,
             fill: 'blue',
-            top: 100,
+            left: 50,
+            top: 150,
           }),
           new fabric.Rect({
             strokeWidth: 0,
             width: 100,
             height: 100,
             fill: 'green',
-            left: 100,
-            top: 100,
+            left: 150,
+            top: 150,
           }),
         ],
         { strokeWidth: 0, clipPath },
@@ -172,15 +177,13 @@ export const clipPathRenderingTests: renderTestType[] = [
     async renderFunction(canvas, fabric) {
       const clipPath = new fabric.Circle({
         radius: 100,
-        top: -100,
-        left: -100,
+        top: 0,
+        left: 0,
       });
-      const small = new fabric.Circle({ radius: 50, top: -50, left: -50 });
+      const small = new fabric.Circle({ radius: 50 });
       const small2 = new fabric.Rect({
         width: 30,
         height: 30,
-        top: -50,
-        left: -50,
       });
 
       const group = new fabric.Group(
@@ -189,6 +192,8 @@ export const clipPathRenderingTests: renderTestType[] = [
             strokeWidth: 0,
             width: 100,
             height: 100,
+            left: 50,
+            top: 50,
             fill: 'red',
             clipPath: small,
           }),
@@ -197,14 +202,16 @@ export const clipPathRenderingTests: renderTestType[] = [
             width: 100,
             height: 100,
             fill: 'yellow',
-            left: 100,
+            left: 150,
+            top: 50,
           }),
           new fabric.Rect({
             strokeWidth: 0,
             width: 100,
             height: 100,
             fill: 'blue',
-            top: 100,
+            top: 150,
+            left: 50,
             clipPath: small2,
           }),
           new fabric.Rect({
@@ -212,8 +219,8 @@ export const clipPathRenderingTests: renderTestType[] = [
             width: 100,
             height: 100,
             fill: 'green',
-            left: 100,
-            top: 100,
+            left: 150,
+            top: 150,
           }),
         ],
         { strokeWidth: 0, clipPath },
@@ -232,15 +239,13 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 20,
         strokeWidth: 0,
-        top: -10,
-        left: -10,
         scaleX: 2,
         skewY: 45,
       });
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 150,
+        left: 150,
         strokeWidth: 0,
         width: 200,
         height: 200,
@@ -286,6 +291,7 @@ export const clipPathRenderingTests: renderTestType[] = [
         scaleX: 2,
         skewY: 45,
       });
+      clipPath.setPositionByOrigin(new Point(-10, -10), 'left', 'top');
 
       const clipPath1 = new fabric.Circle({
         radius: 15,
@@ -296,6 +302,7 @@ export const clipPathRenderingTests: renderTestType[] = [
         scaleX: 2,
         skewY: 45,
       });
+      clipPath1.setPositionByOrigin(new Point(-50, -100), 'left', 'top');
 
       const clipPath2 = new fabric.Circle({
         radius: 10,
@@ -305,12 +312,13 @@ export const clipPathRenderingTests: renderTestType[] = [
         scaleY: 2,
         skewX: 45,
       });
+      clipPath2.setPositionByOrigin(new Point(-20, -20), 'left', 'top');
 
       const group = new fabric.Group([clipPath, clipPath1, clipPath2]);
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 100,
+        left: 100,
         strokeWidth: 0,
         width: 200,
         height: 200,
@@ -357,6 +365,7 @@ export const clipPathRenderingTests: renderTestType[] = [
         scaleX: 2,
         skewY: 45,
       });
+      clipPath.setPositionByOrigin(new Point(-10, -10), 'left', 'top');
 
       const clipPath1 = new fabric.Circle({
         radius: 15,
@@ -367,6 +376,7 @@ export const clipPathRenderingTests: renderTestType[] = [
         scaleX: 2,
         skewY: 45,
       });
+      clipPath1.setPositionByOrigin(new Point(-50, -100), 'left', 'top');
 
       const clipPath2 = new fabric.Circle({
         radius: 10,
@@ -376,12 +386,13 @@ export const clipPathRenderingTests: renderTestType[] = [
         scaleY: 2,
         skewX: 45,
       });
+      clipPath2.setPositionByOrigin(new Point(-20, -20), 'left', 'top');
 
       const group = new fabric.Group([clipPath, clipPath1, clipPath2]);
 
       const obj = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 100,
+        left: 100,
         strokeWidth: 0,
         width: 200,
         height: 200,
@@ -424,14 +435,15 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 30,
         strokeWidth: 0,
-        top: -30,
-        left: -30,
+        top: 0,
+        left: 0,
         skewY: 45,
       });
+      clipPath.setPositionByOrigin(new Point(-30, -30), 'left', 'top');
 
       const obj1 = new fabric.Rect({
-        top: 0,
-        left: 100,
+        top: 50,
+        left: 150,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -439,8 +451,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj2 = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 50,
+        left: 50,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -448,8 +460,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj3 = new fabric.Rect({
-        top: 100,
-        left: 0,
+        top: 150,
+        left: 50,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -457,8 +469,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj4 = new fabric.Rect({
-        top: 100,
-        left: 100,
+        top: 150,
+        left: 150,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -486,14 +498,14 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 60,
         strokeWidth: 0,
-        top: 40,
-        left: 40,
+        top: 100,
+        left: 100,
         absolutePositioned: true,
       });
 
       const obj1 = new fabric.Rect({
-        top: 0,
-        left: 100,
+        top: 50,
+        left: 150,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -501,8 +513,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj2 = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 50,
+        left: 50,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -510,8 +522,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj3 = new fabric.Rect({
-        top: 100,
-        left: 0,
+        top: 150,
+        left: 50,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -519,8 +531,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj4 = new fabric.Rect({
-        top: 100,
-        left: 100,
+        top: 150,
+        left: 150,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -547,13 +559,13 @@ export const clipPathRenderingTests: renderTestType[] = [
       const clipPath = new fabric.Circle({
         radius: 60,
         strokeWidth: 0,
-        top: 10,
-        left: 10,
+        top: 70,
+        left: 70,
       });
 
       const obj1 = new fabric.Rect({
-        top: 0,
-        left: 100,
+        top: 50,
+        left: 150,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -561,8 +573,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj2 = new fabric.Rect({
-        top: 0,
-        left: 0,
+        top: 50,
+        left: 50,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -570,8 +582,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj3 = new fabric.Rect({
-        top: 100,
-        left: 0,
+        top: 150,
+        left: 50,
         strokeWidth: 0,
         width: 100,
         height: 100,
@@ -579,8 +591,8 @@ export const clipPathRenderingTests: renderTestType[] = [
       });
 
       const obj4 = new fabric.Rect({
-        top: 100,
-        left: 100,
+        top: 150,
+        left: 150,
         strokeWidth: 0,
         width: 100,
         height: 100,

@@ -1,5 +1,5 @@
 import { CENTER, SCALE_X, SCALE_Y } from '../constants';
-import type { FabricImage } from '../shapes/Image';
+import type { FabricImage, ParsedPAROffsets } from '../shapes/Image';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
 import { qrDecompose } from './misc/matrix';
@@ -39,7 +39,7 @@ const _assignTransformMatrixProps = (
  */
 export const removeTransformMatrixForSvgParsing = (
   object: FabricObjectWithTransformMatrix,
-  preserveAspectRatioOptions?: any,
+  preserveAspectRatioOptions?: ParsedPAROffsets,
 ) => {
   let center = object._findCenterFromElement();
   if (object.transformMatrix) {
