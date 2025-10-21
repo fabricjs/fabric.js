@@ -39,6 +39,17 @@ export type ImageSource =
   | HTMLVideoElement
   | HTMLCanvasElement;
 
+export type ParsedPAROffsets = {
+  width: number;
+  height: number;
+  scaleX: number;
+  scaleY: number;
+  offsetLeft: number;
+  offsetTop: number;
+  cropX: number;
+  cropY: number;
+};
+
 interface UniqueImageProps {
   srcFromAttribute: boolean;
   minimumScaleTrigger: number;
@@ -682,7 +693,7 @@ export class FabricImage<
    * the preserveAspectRatio attribute
    * @private
    */
-  parsePreserveAspectRatioAttribute() {
+  parsePreserveAspectRatioAttribute(): ParsedPAROffsets {
     const pAR = parsePreserveAspectRatioAttribute(
         this.preserveAspectRatio || '',
       ),

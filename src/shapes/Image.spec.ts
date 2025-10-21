@@ -162,10 +162,8 @@ describe('FabricImage', () => {
 
   it('toObject', async () => {
     const image = await createImage();
-
-    expect(image.toObject, 'toObject should be a function').toBeTypeOf(
-      'function',
-    );
+    image.left = 0;
+    image.top = 0;
 
     const toObject = image.toObject();
 
@@ -189,6 +187,9 @@ describe('FabricImage', () => {
 
     image.width = 100;
     image.height = 100;
+
+    image.left = 0;
+    image.top = 0;
 
     expect(image.setSrc, 'setSrc should be a function').toBeTypeOf('function');
     expect(image.width, 'width should be 100').toBe(100);
@@ -225,6 +226,8 @@ describe('FabricImage', () => {
 
   it('toObject with no element', async () => {
     const image = await createImage();
+    image.left = 0;
+    image.top = 0;
 
     expect(image.toObject, 'toObject should be a function').toBeTypeOf(
       'function',
@@ -249,6 +252,8 @@ describe('FabricImage', () => {
 
   it('toObject with resize filter', async () => {
     const image = await createImage();
+    image.left = 0;
+    image.top = 0;
 
     expect(image.toObject, 'toObject should be a function').toBeTypeOf(
       'function',
@@ -404,10 +409,7 @@ describe('FabricImage', () => {
     image.width -= 2;
     image.height -= 2;
 
-    image.left = image.width / 2;
-    image.top = image.height / 2;
-
-    const expectedSVG = `<g transform="matrix(1 0 0 1 137 54)"  >
+    const expectedSVG = `<g transform="matrix(1 0 0 1 138 55)"  >
 <clipPath id="imageCrop_1">
 \t<rect x="-137" y="-54" width="274" height="108" />
 </clipPath>
@@ -454,7 +456,7 @@ describe('FabricImage', () => {
 
     expect(image.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
-    const expectedSVG = `<g transform="matrix(1 0 0 1 0 0)"  >
+    const expectedSVG = `<g transform="matrix(1 0 0 1 138 55)"  >
 \t<image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  xlink:href="${imgSrcUrl}" x="-138" y="-55" width="276" height="110"></image>
 </g>
 `;
@@ -468,12 +470,10 @@ describe('FabricImage', () => {
     const image = await createImage();
 
     image.imageSmoothing = false;
-    image.left = 200;
-    image.top = 55;
 
     expect(image.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
-    const expectedSVG = `<g transform="matrix(1 0 0 1 200 55)"  >
+    const expectedSVG = `<g transform="matrix(1 0 0 1 138 55)"  >
 \t<image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  xlink:href="${imgSrcUrl}" x="-138" y="-55" width="276" height="110" image-rendering="optimizeSpeed"></image>
 </g>
 `;
@@ -491,7 +491,7 @@ describe('FabricImage', () => {
 
     expect(image.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
-    const expectedSVG = '<g transform="matrix(1 0 0 1 0 0)"  >\n</g>\n';
+    const expectedSVG = '<g transform="matrix(1 0 0 1 138 55)"  >\n</g>\n';
 
     expect(image.toSVG(), 'SVG should match expected output').toEqualSVG(
       expectedSVG,
@@ -971,15 +971,15 @@ describe('FabricImage', () => {
   });
 
   const paCases = [
-    ['xMidYMid meet', 0, 42.5],
-    ['xMidYMax meet', 0, 85],
-    ['xMidYMin meet', 0, 0],
-    ['xMinYMin meet', 0, 0, 140, 85], // vertical bbox
-    ['xMidYMin meet', 35, 0, 140, 85],
-    ['xMaxYMin meet', 70, 0, 140, 85],
+    ['xMidYMid meet', 35, 85, 70, 170],
+    ['xMidYMax meet', 35, 127.5, 70, 170],
+    ['xMidYMin meet', 35, 42.5, 70, 170],
+    ['xMinYMin meet', 35, 42.5, 140, 85], // vertical bbox
+    ['xMidYMin meet', 70, 42.5, 140, 85],
+    ['xMaxYMin meet', 105, 42.5, 140, 85],
   ] as const;
 
-  paCases.forEach(([pr, expLeft, expTop, w = 70, h = 170]) => {
+  paCases.forEach(([pr, expLeft, expTop, w, h]) => {
     it(`fromElement preserveAspectRatio ${pr}`, async () => {
       const el = makeImageElement({
         x: '0',
@@ -994,8 +994,8 @@ describe('FabricImage', () => {
         img,
         img.parsePreserveAspectRatioAttribute(),
       );
-      expect(img.left).toBe(expLeft + w / 2);
-      expect(img.top).toBe(expTop + h / 2);
+      expect(img.left).toBe(expLeft);
+      expect(img.top).toBe(expTop);
       expect(img.scaleX).toBe(5);
       expect(img.scaleY).toBe(5);
     });
@@ -1030,8 +1030,8 @@ export async function createImage(
   });
 
   return new FabricImage(el, {
-    top: 0,
-    left: 0,
+    top: h ? h / 2 : IMG_HEIGHT / 2,
+    left: w ? w / 2 : IMG_WIDTH / 2,
     width: w ?? IMG_WIDTH,
     height: h ?? IMG_HEIGHT,
     ...extra,
