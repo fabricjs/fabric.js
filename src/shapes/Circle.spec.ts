@@ -89,8 +89,8 @@ describe('Circle', () => {
     const defaultProperties = {
       version: version,
       type: 'Circle',
-      originX: 'left',
-      originY: 'top',
+      originX: 'center',
+      originY: 'center',
       left: 0,
       top: 0,
       width: 0,
@@ -153,7 +153,13 @@ describe('Circle', () => {
   });
 
   it('toSVG with full circle', () => {
-    const circle = new Circle({ width: 100, height: 100, radius: 10 });
+    const circle = new Circle({
+      width: 100,
+      height: 100,
+      radius: 10,
+      left: 10.5,
+      top: 10.5,
+    });
     const svg = circle.toSVG();
     const svgClipPath = circle.toClipPathSVG();
     expect(svg).toBe(
@@ -169,6 +175,8 @@ describe('Circle', () => {
       width: 100,
       height: 100,
       radius: 10,
+      left: 10.5,
+      top: 10.5,
       endAngle: 180,
     });
     const svg = circle.toSVG();
@@ -186,6 +194,8 @@ describe('Circle', () => {
       width: 100,
       height: 100,
       radius: 10,
+      left: 10.5,
+      top: 10.5,
       endAngle: 180,
       counterClockwise: true,
     });

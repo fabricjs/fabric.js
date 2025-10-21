@@ -19,8 +19,8 @@ describe('Object - clipPath', () => {
     const emptyObjectRepr = {
       version: version,
       type: 'FabricObject',
-      originX: 'left',
-      originY: 'top',
+      originX: 'center',
+      originY: 'center',
       left: 0,
       top: 0,
       width: 0,

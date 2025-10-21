@@ -23,7 +23,18 @@ for (const splitByGrapheme of [true, false]) {
         },
         { splitByGrapheme },
       );
-
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
       expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `1-initial-splitByGrapheme-${splitByGrapheme}.png`,
       });
@@ -52,6 +63,19 @@ for (const splitByGrapheme of [true, false]) {
       await canvasUtil.press('Enter');
       await canvasUtil.press('Enter');
       await canvasUtil.press('Enter');
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
+
       expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `2-before-deleting-${splitByGrapheme}.png`,
       });
@@ -61,6 +85,18 @@ for (const splitByGrapheme of [true, false]) {
       // an old bug was shifting style and then deleting it all at once
       await canvasUtil.press('Backspace');
       await canvasUtil.press('Backspace');
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
       expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `3-after-deleting-${splitByGrapheme}.png`,
       });
@@ -70,6 +106,18 @@ for (const splitByGrapheme of [true, false]) {
       await canvasUtil.press('b');
       await canvasUtil.press('c');
       await canvasUtil.press('Enter');
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
       expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `4-after-typing-${splitByGrapheme}.png`,
       });
@@ -81,6 +129,18 @@ for (const splitByGrapheme of [true, false]) {
         delay: 200,
       });
       await canvasUtil.ctrlV();
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
       expect(await canvasUtil.screenshot()).toMatchSnapshot({
         name: `5-after-pasting-splitByGrapheme-${splitByGrapheme}.png`,
         maxDiffPixelRatio: 0.03,
@@ -98,6 +158,18 @@ for (const splitByGrapheme of [true, false]) {
       await page.mouse.up();
       // we remove them because space is finishing
       await canvasUtil.press('Backspace');
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
       // lets click where style end to show that we can add new line without carrying over
       const clickPointYellow = await textBoxutil.getCanvasCursorPositionAt(45);
       await canvasUtil.click({
@@ -107,6 +179,18 @@ for (const splitByGrapheme of [true, false]) {
       await canvasUtil.press('Enter');
       // this part of test is valid if the new line is after a styled char,
       // and there is no style on the part of text that follows, but there is visible text.
+      await textBoxutil.executeInBrowser(
+        (iTextObject, context) => {
+          const textbox = iTextObject as Textbox;
+          textbox.setPositionByOrigin(
+            new window.fabric.Point(0, 0),
+            'left',
+            'top',
+          );
+          textbox.canvas!.renderAll();
+        },
+        { splitByGrapheme },
+      );
       await expect(page).toHaveScreenshot(
         `6-after-adding-a-newline-splitByGrapheme-${splitByGrapheme}.png`,
         {

@@ -1,9 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect, test } from '../../../fixtures/base';
-import type { IText } from 'fabric';
+import { type IText } from 'fabric';
 import { TextUtil } from '../../../utils/TextUtil';
 import { binaryToBuffer } from '../../../utils/binaryToBuffer';
-import type { CanvasUtil } from '../../../utils/CanvasUtil';
+import { CanvasUtil } from '../../../utils/CanvasUtil';
 import type { DragDropTestCanvas } from './index';
 
 const dragA = 'fabric';
@@ -41,6 +41,7 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
   const textarea = page.locator('#textarea');
   const a = new TextUtil(page, 'a');
   const b = new TextUtil(page, 'b');
+  const fCanvas = new CanvasUtil(page, 'canvas');
 
   await selectFabricInA(page);
 
@@ -92,6 +93,7 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
     await page.mouse.move(400, 70, { steps: 10 });
     await page.mouse.move(250, 130, { steps: 10 });
     await page.mouse.move(240, 140, { steps: 10 });
+
     expect(
       await canvas.screenshot(),
       `2. before dropping "${dragA}" => "sandbox|" (A => A)`,
@@ -99,6 +101,9 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
       name: '2.before-drop-fabric-after-sandbox.png',
     });
     await page.mouse.up();
+    a.setPositionByOrigin({ x: 150, y: 20 }, 'center', 'top');
+    b.setPositionByOrigin({ x: 400, y: 20 }, 'left', 'top');
+    fCanvas.renderAll();
     expect(
       await canvas.screenshot(),
       `3. drop "${dragA}" => "sandbox|${dragA}" (A => A)`,
@@ -124,6 +129,9 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
     // expect(await page.evaluate(() => document.activeElement)).toBe(
     //   await b.executeInBrowser((text) => text.hiddenTextarea),
     // );
+    a.setPositionByOrigin({ x: 150, y: 20 }, 'center', 'top');
+    b.setPositionByOrigin({ x: 400, y: 20 }, 'left', 'top');
+    fCanvas.renderAll();
     expect(
       await canvas.screenshot(),
       `4. drag & drop "${dragA}" => "lor|${dragA}|em" (A => B(3))`,
@@ -149,6 +157,9 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
   });
 
   await test.step(`drag & drop to A(4) = ".js |${dragB}|sandbox"`, async () => {
+    a.setPositionByOrigin({ x: 150, y: 20 }, 'center', 'top');
+    b.setPositionByOrigin({ x: 400, y: 20 }, 'left', 'top');
+    fCanvas.renderAll();
     await canvas.dragTo(canvas, {
       sourcePosition: {
         x: 580,
@@ -162,6 +173,9 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
     // expect(await page.evaluate(() => document.activeElement)).toBe(
     //   await a.executeInBrowser((text) => text.hiddenTextarea),
     // );
+    a.setPositionByOrigin({ x: 150, y: 20 }, 'center', 'top');
+    b.setPositionByOrigin({ x: 400, y: 20 }, 'left', 'top');
+    fCanvas.renderAll();
     expect(
       await canvas.screenshot(),
       `5. drag & drop "${dragB}" => ".js |${dragB}|sandbox" (B => A(4))`,
@@ -195,6 +209,9 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
   });
 
   await test.step(`drag & drop "dolor" from textarea to B = "lor|dolor|fabrictur"`, async () => {
+    a.setPositionByOrigin({ x: 150, y: 20 }, 'center', 'top');
+    b.setPositionByOrigin({ x: 400, y: 20 }, 'left', 'top');
+    fCanvas.renderAll();
     await page.mouse.move(25, 527);
     await page.mouse.dblclick(25, 527);
     await page.mouse.down();

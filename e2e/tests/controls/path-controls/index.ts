@@ -1,4 +1,4 @@
-import { Path, controlsUtils } from 'fabric';
+import { Path, controlsUtils, Point } from 'fabric';
 import { beforeAll } from '../../test';
 
 beforeAll((canvas) => {
@@ -27,6 +27,7 @@ beforeAll((canvas) => {
   });
 
   canvas.add(testPath);
+  testPath.setPositionByOrigin(new Point(100, 100), 'left', 'top');
   canvas.setActiveObject(testPath);
 
   return { testPath };

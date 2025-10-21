@@ -795,4 +795,13 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
       TOP,
     );
   }
+
+  /**
+   * An utility method to position the object by its left top corner.
+   * Useful to reposition objects since now the default origin is center/center
+   * Places the left/top corner of the object bounding box in p.
+   */
+  positionByLeftTop(p: Point) {
+    return this.setPositionByOrigin(p, LEFT, TOP);
+  }
 }

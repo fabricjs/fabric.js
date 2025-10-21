@@ -10,11 +10,12 @@ beforeAll(async (canvas) => {
   canvas.setDimensions({ width: 450, height: 450 });
 
   canvas.preserveObjectStacking = true;
-  const circle1 = new Circle({ left: 100, top: 50, radius: 50 });
+  const circle1 = new Circle({ left: 150, top: 100, radius: 50 });
   const g = new Group(
     [
       new Rect({
-        top: 200,
+        left: 25,
+        top: 225,
         width: 50,
         height: 50,
         fill: 'red',

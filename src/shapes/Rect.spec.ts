@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { version } from '../../fabric';
+import { version } from '../../package.json';
 import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
 import { Gradient } from '../gradient';
@@ -11,8 +11,8 @@ import { loadSVGFromString } from '../parser/loadSVGFromString';
 const REFERENCE_RECT = {
   version,
   type: 'Rect',
-  originX: 'left',
-  originY: 'top',
+  originX: 'center',
+  originY: 'center',
   left: 0,
   top: 0,
   width: 0,
@@ -176,6 +176,8 @@ describe('Rect', () => {
 
   it('toSVG with rounded corners', async () => {
     const rect = new Rect({
+      left: 50,
+      top: 50,
       width: 100,
       height: 100,
       rx: 20,
@@ -191,6 +193,8 @@ describe('Rect', () => {
 
   it('toSVG with alpha colors fill', async () => {
     const rect = new Rect({
+      left: 50,
+      top: 50,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -212,12 +216,13 @@ describe('Rect', () => {
     });
     const svg = rect.toSVG();
     expect(svg).toBe(
-      '<g transform="matrix(1 0 0 1 50 50)" id="myRect"  >\n<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-opacity: 0.5; fill-rule: nonzero; opacity: 1;"  x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</g>\n',
+      '<g transform="matrix(1 0 0 1 0 0)" id="myRect"  >\n<rect style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-opacity: 0.5; fill-rule: nonzero; opacity: 1;"  x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</g>\n',
     );
   });
 
   it('toSVG with alpha colors stroke', async () => {
     const rect = new Rect({
+      top: 50,
       width: 100,
       height: 100,
       strokeWidth: 0,
@@ -226,19 +231,20 @@ describe('Rect', () => {
     });
     const svg = rect.toSVG();
     expect(svg).toBe(
-      '<g transform="matrix(1 0 0 1 50 50)"  >\n<rect style="stroke: rgb(255,0,0); stroke-opacity: 0.5; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"  x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</g>\n',
+      '<g transform="matrix(1 0 0 1 0 50)"  >\n<rect style="stroke: rgb(255,0,0); stroke-opacity: 0.5; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"  x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</g>\n',
     );
   });
 
   it('toSVG with paintFirst set to stroke', async () => {
     const rect = new Rect({
+      left: 50,
       width: 100,
       height: 100,
       paintFirst: 'stroke',
     });
     const svg = rect.toSVG();
     expect(svg).toBe(
-      '<g transform="matrix(1 0 0 1 50.5 50.5)"  >\n<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  paint-order="stroke"  x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</g>\n',
+      '<g transform="matrix(1 0 0 1 50 0)"  >\n<rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"  paint-order="stroke"  x="-50" y="-50" rx="0" ry="0" width="100" height="100" />\n</g>\n',
     );
   });
 
