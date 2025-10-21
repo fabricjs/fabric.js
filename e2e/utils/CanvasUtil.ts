@@ -77,6 +77,12 @@ export class CanvasUtil {
       .screenshot({ omitBackground: true, ...options });
   }
 
+  renderAll() {
+    return this.executeInBrowser((canvas) => {
+      canvas.renderAll();
+    }, {});
+  }
+
   evaluateSelf() {
     return this.page.evaluateHandle(
       (selector) => canvasMap.get(document.querySelector(selector)!),
