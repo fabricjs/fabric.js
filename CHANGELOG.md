@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump es-toolkit from 1.39.10 to 1.40.0 [#10777](https://github.com/fabricjs/fabric.js/pull/10777)
 - BREAKING chore(): Deprecate originX and originY and change their default to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)
 - chore(deps-dev): bump @types/node from 24.7.0 to 24.7.2 [#10778](https://github.com/fabricjs/fabric.js/pull/10778)
 - chore(deps-dev): bump @rollup/plugin-babel from 6.0.4 to 6.1.0 [#10776](https://github.com/fabricjs/fabric.js/pull/10776)
