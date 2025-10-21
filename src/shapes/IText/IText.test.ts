@@ -1,7 +1,7 @@
 import { Canvas } from '../../canvas/Canvas';
 import { Group } from '../Group';
 import { IText } from './IText';
-
+import { Point } from '../../Point';
 import {
   describe,
   expect,
@@ -13,7 +13,9 @@ import {
   it,
 } from 'vitest';
 import { FabricText } from '../Text/Text';
-import { config, getFabricWindow, version } from '../../../fabric';
+import { version } from '../../../package.json';
+import { getFabricWindow } from '../../env';
+import { config } from '../../config';
 
 const ITEXT_OBJECT = {
   version: version,
@@ -1156,10 +1158,7 @@ describe('IText', () => {
         canvas2.setDimensions({ width: 100, height: 100 }, { cssOnly: true });
         canvas2.cancelRequestedRender();
 
-        iText.set({
-          top: 400,
-          left: 400,
-        });
+        iText.setPositionByOrigin(new Point(400, 400), 'left', 'top');
 
         canvas2.add(iText);
 

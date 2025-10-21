@@ -419,8 +419,8 @@ describe('fabric.Collection', () => {
       collection.add(rect1, rect2, rect3, rect4);
       const collected = collection.collectObjects(
         {
-          left: -1,
-          top: -1,
+          left: -6,
+          top: -6,
           width: 30,
           height: 30,
         },
@@ -444,8 +444,8 @@ describe('fabric.Collection', () => {
       collection.add(rect1, rect2, rect3, rect4);
       const collected = collection.collectObjects(
         {
-          left: 5,
-          top: 5,
+          left: 0,
+          top: 0,
           width: 20,
           height: 20,
         },

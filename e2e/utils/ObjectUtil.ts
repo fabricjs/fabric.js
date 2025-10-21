@@ -1,6 +1,6 @@
 import type { JSHandle, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
-import type { FabricObject } from 'fabric';
+import type { FabricObject, TOriginX, TOriginY, XY } from 'fabric';
 
 export class ObjectUtil<T extends FabricObject = FabricObject> {
   executeInBrowser: JSHandle<T>['evaluate'];
@@ -50,6 +50,32 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
     return this.executeInBrowser(
       (object, { controlName }) => object.oCoords[controlName],
       { controlName },
+    );
+  }
+
+  positionByLeftTop(point: XY) {
+    return this.executeInBrowser(
+      (object, { point }) => {
+        object.positionByLeftTop(new window.fabric.Point(point));
+        object.setCoords();
+        object.canvas?.renderAll();
+      },
+      { point },
+    );
+  }
+
+  setPositionByOrigin(point: XY, originX: TOriginX, originY: TOriginY) {
+    return this.executeInBrowser(
+      (object, { point, originX, originY }) => {
+        object.setPositionByOrigin(
+          new window.fabric.Point(point),
+          originX,
+          originY,
+        );
+        object.setCoords();
+        object.canvas?.renderAll();
+      },
+      { point, originX, originY },
     );
   }
 

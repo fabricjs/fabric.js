@@ -1,4 +1,4 @@
-import { Textbox, util } from 'fabric';
+import { Textbox, util, Point } from 'fabric';
 import { beforeAll } from '../../test';
 
 beforeAll(
@@ -52,6 +52,7 @@ beforeAll(
         textValue,
       ),
     });
+    text.setPositionByOrigin(new Point(0, 0), 'left', 'top');
     canvas.add(text);
     return { text };
   },

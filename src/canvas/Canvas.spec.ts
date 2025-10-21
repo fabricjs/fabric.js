@@ -21,90 +21,14 @@ import {
 } from '../../fabric';
 import TEST_IMAGE from '../../test/fixtures/test_image.gif';
 import { isJSDOM } from '../../vitest.extend';
-
-const EMPTY_JSON = '{"version":"' + version + '","objects":[]}';
-
-const PATH_JSON =
-  '{"version":"' +
-  version +
-  '","objects": [{"version":"' +
-  version +
-  '","type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
-  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
-  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
-  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
-  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
-  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
-  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
-  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
-  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
-  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
-  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
-  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
-  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
-  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
-  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-  '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
-
-const PATH_WITHOUT_DEFAULTS_JSON =
-  '{"version":"' +
-  version +
-  '","objects": [{"version":"' +
-  version +
-  '","type": "path", "left": 268, "top": 266, "width": 51, "height": 49, "path": [["M", 18.511, 13.99],' +
-  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
-  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
-  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
-  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
-  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
-  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
-  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
-  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
-  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
-  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
-  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
-  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-  '13.99], ["z", null]]}], "background": "#ff5555","overlay": "rgba(0,0,0,0.2)"}';
-
-const PATH_OBJ_JSON =
-  '{"version":"' +
-  version +
-  '","type": "path", "originX": "left", "originY": "top", "left": 268, "top": 266, "width": 51, "height": 49,' +
-  ' "fill": "rgb(0,0,0)", "stroke": null, "strokeWidth": 1, "scaleX": 1, "scaleY": 1, ' +
-  '"angle": 0, "flipX": false, "flipY": false, "opacity": 1, "path": [["M", 18.511, 13.99],' +
-  ' ["c", 0, 0, -2.269, -4.487, -12.643, 4.411], ["c", 0, 0, 4.824, -14.161, 19.222, -9.059],' +
-  ' ["l", 0.379, -2.1], ["c", -0.759, -0.405, -1.375, -1.139, -1.645, -2.117], ["c", -0.531, ' +
-  '-1.864, 0.371, -3.854, 1.999, -4.453], ["c", 0.312, -0.118, 0.633, -0.169, 0.953, -0.169], ' +
-  '["c", 1.299, 0, 2.514, 0.953, 2.936, 2.455], ["c", 0.522, 1.864, -0.372, 3.854, -1.999, ' +
-  '4.453], ["c", -0.229, 0.084, -0.464, 0.127, -0.692, 0.152], ["l", -0.379, 2.37], ["c", ' +
-  '1.146, 0.625, 2.024, 1.569, 2.674, 2.758], ["c", 3.213, 2.514, 8.561, 4.184, 11.774, -8.232],' +
-  ' ["c", 0, 0, 0.86, 16.059, -12.424, 14.533], ["c", 0.008, 2.859, 0.615, 5.364, -0.076, 8.224],' +
-  ' ["c", 8.679, 3.146, 15.376, 14.389, 17.897, 18.168], ["l", 2.497, -2.151], ["l", 1.206, 1.839],' +
-  ' ["l", -3.889, 3.458], ["C", 46.286, 48.503, 31.036, 32.225, 22.72, 35.81], ["c", -1.307, 2.851,' +
-  ' -3.56, 6.891, -7.481, 8.848], ["c", -4.689, 2.336, -9.084, -0.802, -11.277, -2.868], ["l",' +
-  ' -1.948, 3.104], ["l", -1.628, -1.333], ["l", 3.138, -4.689], ["c", 0.025, 0, 9, 1.932, 9, 1.932], ' +
-  '["c", 0.877, -9.979, 2.893, -12.905, 4.942, -15.621], ["C", 17.878, 21.775, 18.713, 17.397, 18.511, ' +
-  '13.99], ["z", null]]}';
-
-const PATH_DATALESS_JSON =
-  '{"version":"' +
-  version +
-  '","objects":[{"type":"Path","version":"' +
-  version +
-  '","originX":"left","originY":"top","left":99.5,"top":99.5,"width":200,"height":200,"fill":"rgb(0,0,0)",' +
-  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,' +
-  '"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-  '"shadow":null,"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"sourcePath":"http://example.com/"}]}';
-
-const RECT_JSON =
-  '{"version":"' +
-  version +
-  '","objects":[{"type":"Rect","version":"' +
-  version +
-  '","originX":"left","originY":"top","left":0,"top":0,"width":10,"height":10,"fill":"rgb(0,0,0)",' +
-  '"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeDashOffset":0,"strokeLineJoin":"miter","strokeUniform":false,"strokeMiterLimit":4,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,' +
-  '"shadow":null,' +
-  '"visible":true,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","skewX":0,"skewY":0,"rx":0,"ry":0}],"background":"#ff5555","overlay":"rgba(0,0,0,0.2)"}';
+import {
+  EMPTY_JSON,
+  PATH_DATALESS_JSON,
+  PATH_OBJ_JSON,
+  PATH_WITHOUT_DEFAULTS_JSON,
+  PATH_JSON,
+  RECT_JSON,
+} from './Canvas.fixtures.ts';
 
 describe('Canvas', () => {
   let canvas: Canvas;
@@ -873,9 +797,9 @@ describe('Canvas', () => {
   });
 
   it('selects target behind active selection when using selection key', () => {
-    const rect1 = new Rect({ left: 10, width: 10, height: 10 });
-    const rect2 = new Rect({ width: 10, height: 10 });
-    const rect3 = new Rect({ top: 10, width: 10, height: 10 });
+    const rect1 = new Rect({ left: 15, top: 5, width: 10, height: 10 });
+    const rect2 = new Rect({ width: 10, height: 10, left: 5, top: 5 });
+    const rect3 = new Rect({ top: 15, left: 5, width: 10, height: 10 });
     canvas.add(rect1, rect2, rect3);
 
     initActiveSelection(canvas, rect1, rect3);
@@ -1042,8 +966,8 @@ describe('Canvas', () => {
   });
 
   it('does not call onSelect on objects that are not intersected', () => {
-    const rect1 = new Rect({ width: 10, height: 10, top: 0, left: 0 });
-    const rect2 = new Rect({ width: 10, height: 10, top: 0, left: 10 });
+    const rect1 = new Rect({ width: 10, height: 10, top: 5, left: 5 });
+    const rect2 = new Rect({ width: 10, height: 10, top: 5, left: 15 });
     let onSelectRect1CallCount = 0;
     let onSelectRect2CallCount = 0;
 
@@ -1265,7 +1189,7 @@ describe('Canvas', () => {
 
   it('serializes to JSON with toJSON', () => {
     expect(canvas.toJSON).toBeTypeOf('function');
-    expect(JSON.stringify(canvas.toJSON())).toBe(EMPTY_JSON);
+    expect(JSON.stringify(canvas.toJSON())).toBe(JSON.stringify(EMPTY_JSON));
 
     canvas.backgroundColor = '#ff5555';
     canvas.overlayColor = 'rgba(0,0,0,0.2)';
@@ -1280,7 +1204,7 @@ describe('Canvas', () => {
     });
 
     canvas.add(makeRect());
-    expect(canvas.toJSON()).toEqual(JSON.parse(RECT_JSON));
+    expect(canvas.toJSON()).toEqual(RECT_JSON);
   });
 
   it('serializes to JSON with active selection', () => {
@@ -1302,7 +1226,7 @@ describe('Canvas', () => {
       sourcePath: 'http://example.com/',
     });
     canvas.add(path);
-    expect(canvas.toDatalessJSON()).toEqual(JSON.parse(PATH_DATALESS_JSON));
+    expect(canvas.toDatalessJSON()).toEqual(PATH_DATALESS_JSON);
   });
 
   it('converts to object with toObject', () => {
@@ -1329,8 +1253,8 @@ describe('Canvas', () => {
       clipPath: {
         type: 'Rect',
         version: version,
-        originX: 'left',
-        originY: 'top',
+        originX: 'center',
+        originY: 'center',
         left: 0,
         top: 0,
         width: 10,
@@ -1433,7 +1357,7 @@ describe('Canvas', () => {
   });
 
   it('loads from JSON object with loadFromJSON', async () => {
-    await canvas.loadFromJSON(JSON.parse(PATH_JSON));
+    await canvas.loadFromJSON(PATH_JSON);
 
     const obj = canvas.item(0);
 
@@ -1465,7 +1389,7 @@ describe('Canvas', () => {
   });
 
   it('loads from JSON object without default values', async () => {
-    await canvas.loadFromJSON(JSON.parse(PATH_WITHOUT_DEFAULTS_JSON));
+    await canvas.loadFromJSON(PATH_WITHOUT_DEFAULTS_JSON);
     const obj = canvas.item(0);
 
     expect(canvas.isEmpty(), 'canvas is not empty').toBeFalsy();
@@ -1479,8 +1403,8 @@ describe('Canvas', () => {
       'rgba(0,0,0,0.2)',
     );
 
-    expect(obj.get('originX')).toBe('left');
-    expect(obj.get('originY')).toBe('top');
+    expect(obj.get('originX')).toBe('center');
+    expect(obj.get('originY')).toBe('center');
     expect(obj.get('left')).toBe(268);
     expect(obj.get('top')).toBe(266);
     expect(obj.get('width')).toBe(49.803999999999995);
@@ -1498,8 +1422,8 @@ describe('Canvas', () => {
   });
 
   it('loads from JSON with reviver function', async () => {
-    await canvas.loadFromJSON(JSON.parse(PATH_JSON), function (obj, instance) {
-      expect(obj).toEqual(JSON.parse(PATH_OBJ_JSON));
+    await canvas.loadFromJSON(PATH_JSON, function (obj, instance) {
+      expect(obj).toEqual(PATH_OBJ_JSON);
       // @ts-expect-error -- constructor function has type
       if (instance.constructor.type === 'Path') {
         // @ts-expect-error -- custom prop
@@ -1631,7 +1555,7 @@ describe('Canvas', () => {
   });
 
   it('loads custom properties on Canvas with no async objects', async () => {
-    const serialized = JSON.parse(PATH_JSON);
+    const serialized = JSON.parse(JSON.stringify(PATH_JSON));
     serialized.controlsAboveOverlay = true;
     serialized.preserveObjectStacking = true;
 
@@ -2158,7 +2082,7 @@ describe('Canvas', () => {
     const clone = canvas.cloneWithoutData();
 
     expect(clone).toBeInstanceOf(Canvas);
-    expect(JSON.stringify(clone), 'data on cloned canvas should be empty').toBe(
+    expect(clone.toJSON(), 'data on cloned canvas should be empty').toEqual(
       EMPTY_JSON,
     );
 
@@ -2270,7 +2194,7 @@ describe('Canvas', () => {
   it('sets up current transform based on interaction point', () => {
     expect(canvas._setupCurrentTransform).toBeTypeOf('function');
 
-    const rect = new Rect({ left: 75, top: 75, width: 50, height: 50 });
+    const rect = new Rect({ left: 100, top: 100, width: 50, height: 50 });
     canvas.add(rect);
     const canvasOffset = canvas.calcOffset();
     let eventStub = {
@@ -2317,8 +2241,8 @@ describe('Canvas', () => {
     expect(t.shiftKey, 'shift was not pressed').toBe(undefined);
 
     eventStub = {
-      clientX: canvasOffset.left + rect.left - 2,
-      clientY: canvasOffset.top + rect.top + rect.height / 2,
+      clientX: canvasOffset.left + rect.left - 2 - rect.width / 2,
+      clientY: canvasOffset.top + rect.top,
       target: canvas.upperCanvasEl,
       shiftKey: true,
     } as unknown as TPointerEvent;
@@ -2470,8 +2394,8 @@ describe('Canvas', () => {
           strokeWidth: 4,
           stroke: 'red',
           fill: '',
-          top: 0,
-          left: 0,
+          top: 7,
+          left: 7,
           objectCaching,
         });
         canvas.add(rect);
@@ -2491,8 +2415,8 @@ describe('Canvas', () => {
           strokeWidth: 4,
           stroke: 'red',
           fill: '',
-          top: 0,
-          left: 0,
+          top: 7,
+          left: 7,
           objectCaching,
         });
         canvas.add(rect);
@@ -2513,8 +2437,8 @@ describe('Canvas', () => {
           strokeWidth: 4,
           stroke: 'red',
           fill: '',
-          top: 0,
-          left: 0,
+          top: 7,
+          left: 7,
           objectCaching,
         });
         canvas.add(rect);
