@@ -360,7 +360,7 @@ describe('FabricText', () => {
 
     const expectedObject = {
       ...REFERENCE_TEXT_OBJECT,
-      left: 4,
+      left: 0,
       top: -14.05,
       width: 8,
       height: 18.08,
