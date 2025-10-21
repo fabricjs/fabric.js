@@ -50,8 +50,11 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
 
   positionByLeftTop(point: XY) {
     return this.executeInBrowser(
-      (object, { point }) =>
-        object.positionByLeftTop(new window.fabric.Point(point)),
+      (object, { point }) => {
+        object.positionByLeftTop(new window.fabric.Point(point));
+        object.setCoords();
+        object.canvas?.renderAll();
+      },
       { point },
     );
   }
@@ -65,6 +68,7 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
           originY,
         );
         object.setCoords();
+        object.canvas?.renderAll();
       },
       { point, originX, originY },
     );
