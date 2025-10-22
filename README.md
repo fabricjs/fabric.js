@@ -13,13 +13,13 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
 
-   <a href="https://www.warp.dev/fabric.js">
+   <a href="https://go.warp.dev/fabric">
       <img alt="Warp sponsorship" width="300" src="https://github.com/warpdotdev/brand-assets/blob/main/Github/Sponsor/Warp-Github-LG-01.png">
    </a>
 
-### [Warp, built for coding with multiple AI agents](https://www.warp.dev/fabric.js)
+### [Warp, built for coding with multiple AI agents](https://go.warp.dev/fabric)
 
-[Available for MacOS, Linux, & Windows](https://www.warp.dev/fabric.js)<br>
+[Available for MacOS, Linux, & Windows](https://go.warp.dev/fabric)<br>
 
 </div>
 

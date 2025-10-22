@@ -25,6 +25,7 @@ test('textbox typing and resizing', async ({ page, canvasUtil }) => {
         // delay: 160,
       },
     );
+  await textboxUtil.positionByLeftTop({ x: 50, y: 0 });
 
   expect(await canvasUtil.screenshot()).toMatchSnapshot({ name: 'typed.png' });
 
@@ -54,6 +55,7 @@ test('textbox typing and resizing', async ({ page, canvasUtil }) => {
   await page.mouse.move(mrControlPoint.x + 300, mrControlPoint.y, {
     steps: 40,
   });
+  await textboxUtil.positionByLeftTop({ x: 50, y: 0 });
   expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'increase_width_mr.png',
   });
@@ -62,6 +64,8 @@ test('textbox typing and resizing', async ({ page, canvasUtil }) => {
     steps: 60,
   });
   await page.mouse.up();
+  await textboxUtil.positionByLeftTop({ x: 50, y: 0 });
+
   expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'decrease_width_mr.png',
   });
@@ -73,6 +77,8 @@ test('textbox typing and resizing', async ({ page, canvasUtil }) => {
   await page.mouse.move(mlControlPoint.x - 300, mlControlPoint.y, {
     steps: 40,
   });
+  await textboxUtil.positionByLeftTop({ x: 50, y: 0 });
+
   expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'increase_width_ml.png',
   });
@@ -81,6 +87,8 @@ test('textbox typing and resizing', async ({ page, canvasUtil }) => {
     steps: 60,
   });
   await page.mouse.up();
+  await textboxUtil.positionByLeftTop({ x: 50, y: 0 });
+
   expect(await canvasUtil.screenshot()).toMatchSnapshot({
     name: 'decrease_width_ml.png',
   });

@@ -11,6 +11,7 @@ export function render(canvas: StaticCanvas, fabric: typeof import('fabric')) {
     width: 200,
     top: 20,
   });
+  textbox.setPositionByOrigin(new fabric.Point(0, 20), 'left', 'top');
   canvas.add(textbox);
   canvas.centerObjectH(textbox);
   canvas.renderAll();

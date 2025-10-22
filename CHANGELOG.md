@@ -3,6 +3,13 @@
 ## [next]
 
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
+- fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
+- chore(): update playwright [#10780](https://github.com/fabricjs/fabric.js/pull/10780)
+- chore(deps-dev): bump es-toolkit from 1.39.10 to 1.40.0 [#10777](https://github.com/fabricjs/fabric.js/pull/10777)
+- BREAKING chore(): Deprecate originX and originY and change their default to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)
+- chore(deps-dev): bump @types/node from 24.7.0 to 24.7.2 [#10778](https://github.com/fabricjs/fabric.js/pull/10778)
+- chore(deps-dev): bump @rollup/plugin-babel from 6.0.4 to 6.1.0 [#10776](https://github.com/fabricjs/fabric.js/pull/10776)
+- chore(): up dev deps [#10773](https://github.com/fabricjs/fabric.js/pull/10773)
 - chore(): up deps [#10771](https://github.com/fabricjs/fabric.js/pull/10771)
 - chore(): remove moment dev dependency [#10770](https://github.com/fabricjs/fabric.js/pull/10770)
 - ci(): Move firefox to headless: false to see if improves passing rate. Renamed config because of deprecation warning [#10769](https://github.com/fabricjs/fabric.js/pull/10769)

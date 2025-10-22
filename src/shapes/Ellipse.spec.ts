@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Ellipse } from './Ellipse';
 import { FabricObject } from './Object/Object';
 import { getFabricDocument, version } from '../../fabric';
+import { sanitizeSVG } from '../../vitest.extend';
 
 describe('Ellipse', () => {
   it('initializes constructor correctly', () => {
@@ -26,8 +27,8 @@ describe('Ellipse', () => {
     const defaultProperties = {
       version: version,
       type: 'Ellipse',
-      originX: 'left',
-      originY: 'top',
+      originX: 'center',
+      originY: 'center',
       left: 0,
       top: 0,
       width: 0,
@@ -109,47 +110,79 @@ describe('Ellipse', () => {
 
   it('generates SVG correctly', () => {
     const ellipse = new Ellipse({
+      left: 100.5,
+      top: 12.5,
       rx: 100,
       ry: 12,
       fill: 'red',
       stroke: 'blue',
     });
 
-    expect(ellipse.toSVG()).toEqualSVG(
-      '<g transform="matrix(1 0 0 1 100.5 12.5)"  >\n<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />\n</g>\n',
+    expect(sanitizeSVG(ellipse.toSVG())).toMatchInlineSnapshot(
+      `
+      "<g transform="matrix(1 0 0 1 100.5 12.5)"  >
+      <ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+      </g>
+      "
+    `,
     );
 
-    expect(ellipse.toClipPathSVG()).toEqualSVG(
-      '\t<ellipse transform="matrix(1 0 0 1 100.5 12.5)" cx="0" cy="0" rx="100" ry="12" />\n',
+    expect(sanitizeSVG(ellipse.toClipPathSVG())).toMatchInlineSnapshot(
+      `
+      "	<ellipse transform="matrix(1 0 0 1 100.5 12.5)" cx="0" cy="0" rx="100" ry="12" />
+      "
+    `,
     );
   });
 
   it('generates SVG with clipPath correctly', () => {
     const ellipse = new Ellipse({
+      left: 100.5,
+      top: 12.5,
       rx: 100,
       ry: 12,
       fill: 'red',
       stroke: 'blue',
     });
-    ellipse.clipPath = new Ellipse({ rx: 12, ry: 100, left: 60, top: -50 });
+    ellipse.clipPath = new Ellipse({ rx: 12, ry: 100, left: 72.5, top: 50.5 });
 
-    expect(ellipse.toSVG()).toEqualSVG(
-      '<g transform="matrix(1 0 0 1 100.5 12.5)" clip-path="url(#CLIPPATH_0)"  >\n<clipPath id="CLIPPATH_0" >\n\t<ellipse transform="matrix(1 0 0 1 72.5 50.5)" cx="0" cy="0" rx="12" ry="100" />\n</clipPath>\n<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />\n</g>\n',
+    expect(sanitizeSVG(ellipse.toSVG())).toMatchInlineSnapshot(
+      `
+      "<g transform="matrix(1 0 0 1 100.5 12.5)" clip-path="url(#SVGID)"  >
+      <clipPath id="SVGID" >
+      	<ellipse transform="matrix(1 0 0 1 72.5 50.5)" cx="0" cy="0" rx="12" ry="100" />
+      </clipPath>
+      <ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+      </g>
+      "
+    `,
     );
   });
 
   it('generates SVG with absolute positioned clipPath correctly', () => {
     const ellipse = new Ellipse({
+      left: 100.5,
+      top: 12.5,
       rx: 100,
       ry: 12,
       fill: 'red',
       stroke: 'blue',
     });
-    ellipse.clipPath = new Ellipse({ rx: 12, ry: 100, left: 60, top: -50 });
+    ellipse.clipPath = new Ellipse({ rx: 12, ry: 100, left: 72.5, top: 50.5 });
     ellipse.clipPath.absolutePositioned = true;
 
-    expect(ellipse.toSVG()).toEqualSVG(
-      '<g clip-path="url(#CLIPPATH_0)"  >\n<g transform="matrix(1 0 0 1 100.5 12.5)"  >\n<clipPath id="CLIPPATH_0" >\n\t<ellipse transform="matrix(1 0 0 1 72.5 50.5)" cx="0" cy="0" rx="12" ry="100" />\n</clipPath>\n<ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />\n</g>\n</g>\n',
+    expect(sanitizeSVG(ellipse.toSVG())).toMatchInlineSnapshot(
+      `
+      "<g clip-path="url(#SVGID)"  >
+      <g transform="matrix(1 0 0 1 100.5 12.5)"  >
+      <clipPath id="SVGID" >
+      	<ellipse transform="matrix(1 0 0 1 72.5 50.5)" cx="0" cy="0" rx="12" ry="100" />
+      </clipPath>
+      <ellipse style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  cx="0" cy="0" rx="100" ry="12" />
+      </g>
+      </g>
+      "
+    `,
     );
   });
 
