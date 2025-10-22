@@ -811,13 +811,13 @@ export class FabricText<
       previousWidth: number | undefined,
       kernedWidth: number | undefined;
 
-    if (previousChar && fontCache.get(previousChar) !== undefined) {
+    if (previousChar && fontCache.has(previousChar)) {
       previousWidth = fontCache.get(previousChar);
     }
-    if (fontCache.get(_char) !== undefined) {
+    if (fontCache.has(_char)) {
       kernedWidth = width = fontCache.get(_char);
     }
-    if (stylesAreEqual && fontCache.get(couple) !== undefined) {
+    if (stylesAreEqual && fontCache.has(couple)) {
       coupleWidth = fontCache.get(couple)!;
       kernedWidth = coupleWidth - previousWidth!;
     }
