@@ -1,17 +1,19 @@
 import { config } from './config';
 import type { TRectBounds } from './typedefs';
 
+type TextCouplesCache = Map</** char */ string, /** width */ number>;
+
+type FamilyCache = Map</** fontStyleCacheKey */ string, TextCouplesCache>;
+
 export class Cache {
   /**
    * Cache of widths of chars in text rendering.
    */
-  charWidthsCache: Record<
-    /** fontFamily */ string,
-    Record<
-      /** fontStyleCacheKey */ string,
-      Record</** char */ string, /** width */ number>
-    >
-  > = {};
+  declare charWidthsCache: Map</** fontFamily */ string, FamilyCache>;
+
+  constructor() {
+    this.charWidthsCache = new Map();
+  }
 
   /**
    * @return {Object} reference to cache
@@ -24,19 +26,20 @@ export class Cache {
     fontFamily: string;
     fontStyle: string;
     fontWeight: string | number;
-  }) {
+  }): TextCouplesCache {
     fontFamily = fontFamily.toLowerCase();
-    if (!this.charWidthsCache[fontFamily]) {
-      this.charWidthsCache[fontFamily] = {};
+    const cache = this.charWidthsCache;
+    if (!cache.has(fontFamily)) {
+      cache.set(fontFamily, new Map<string, TextCouplesCache>());
     }
-    const fontCache = this.charWidthsCache[fontFamily];
+    const fontCache = cache.get(fontFamily)!;
     const cacheKey = `${fontStyle.toLowerCase()}_${(
       fontWeight + ''
     ).toLowerCase()}`;
-    if (!fontCache[cacheKey]) {
-      fontCache[cacheKey] = {};
+    if (!fontCache.has(cacheKey)) {
+      fontCache.set(cacheKey, new Map<string, number>());
     }
-    return fontCache[cacheKey];
+    return fontCache.get(cacheKey)!;
   }
 
   /**
@@ -51,11 +54,10 @@ export class Cache {
    * @param {String} [fontFamily] font family to clear
    */
   clearFontCache(fontFamily?: string) {
-    fontFamily = (fontFamily || '').toLowerCase();
     if (!fontFamily) {
-      this.charWidthsCache = {};
-    } else if (this.charWidthsCache[fontFamily]) {
-      delete this.charWidthsCache[fontFamily];
+      this.charWidthsCache = new Map();
+    } else {
+      this.charWidthsCache.delete((fontFamily || '').toLowerCase());
     }
   }
 

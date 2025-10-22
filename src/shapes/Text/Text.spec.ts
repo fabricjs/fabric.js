@@ -699,10 +699,13 @@ describe('FabricText', () => {
 
     text.initDimensions();
 
-    const charCache = cache.charWidthsCache[text.fontFamily.toLowerCase()];
+    const charCache = cache.charWidthsCache.get(text.fontFamily.toLowerCase());
     const cacheProp = text.fontStyle + '_400';
 
-    expect(cacheProp in charCache, '400 is converted to string').toBe(true);
+    expect(
+      charCache && charCache.has(cacheProp),
+      '400 is converted to string',
+    ).toBe(true);
   });
 
   it('getFontCache is case insensitive', () => {
@@ -1045,7 +1048,10 @@ describe('FabricText', () => {
     const box2 = text._measureChar('a', style, zwc, style);
 
     expect(
-      cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc],
+      cache.charWidthsCache
+        .get(text.fontFamily.toLowerCase())
+        ?.get('normal_normal')
+        ?.get(zwc),
       'zwc is a 0 width char',
     ).toBe(0);
     expect(box.kernedWidth, 'measurements should be consistent').toBe(
