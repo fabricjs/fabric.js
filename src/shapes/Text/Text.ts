@@ -725,6 +725,8 @@ export class FabricText<
       let drawStart;
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      const bgHeightDivided = heightOfLine / this.lineHeight;
+      const bgHeight = Number.isFinite(bgHeightDivided) ? bgHeightDivided : 0;
       for (let j = 0; j < jlen; j++) {
         // at this point charbox are either standard or full with pathInfo if there is a path.
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
@@ -737,9 +739,9 @@ export class FabricText<
           currentColor &&
             ctx.fillRect(
               -charBox.width / 2,
-              (-heightOfLine / this.lineHeight) * (1 - this._fontSizeFraction),
+              -bgHeight * (1 - this._fontSizeFraction),
               charBox.width,
-              heightOfLine / this.lineHeight,
+              bgHeight,
             );
           ctx.restore();
         } else if (currentColor !== lastColor) {
@@ -749,12 +751,7 @@ export class FabricText<
           }
           ctx.fillStyle = lastColor;
           lastColor &&
-            ctx.fillRect(
-              drawStart,
-              lineTopOffset,
-              boxWidth,
-              heightOfLine / this.lineHeight,
-            );
+            ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastColor = currentColor;
@@ -768,12 +765,7 @@ export class FabricText<
           drawStart = this.width - drawStart - boxWidth;
         }
         ctx.fillStyle = currentColor;
-        ctx.fillRect(
-          drawStart,
-          lineTopOffset,
-          boxWidth,
-          heightOfLine / this.lineHeight,
-        );
+        ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
       }
       lineTopOffset += heightOfLine;
     }
@@ -1040,7 +1032,14 @@ export class FabricText<
       height = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
       lineHeight = this.getHeightOfLine(i);
-      height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
+      if (i === len - 1) {
+        const divided = lineHeight / this.lineHeight;
+        height += Number.isFinite(divided)
+          ? divided
+          : this.fontSize * this._fontSizeMult;
+      } else {
+        height += lineHeight;
+      }
     }
     return height;
   }
@@ -1075,9 +1074,12 @@ export class FabricText<
     const left = this._getLeftOffset(),
       top = this._getTopOffset();
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      const heightOfLine = this.getHeightOfLine(i),
-        maxHeight = heightOfLine / this.lineHeight,
-        leftOffset = this._getLineLeftOffset(i);
+      const heightOfLine = this.getHeightOfLine(i);
+      const divided = heightOfLine / this.lineHeight;
+      const maxHeight = Number.isFinite(divided)
+        ? divided
+        : this.fontSize * this._fontSizeMult;
+      const leftOffset = this._getLineLeftOffset(i);
       this._renderTextLine(
         method,
         ctx,
@@ -1169,7 +1171,11 @@ export class FabricText<
       ctx.direction = isLtr ? 'ltr' : 'rtl';
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
-    top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
+    const divided = (lineHeight * this._fontSizeFraction) / this.lineHeight;
+    const topAdjustment = Number.isFinite(divided)
+      ? divided
+      : this.fontSize * this._fontSizeMult * this._fontSizeFraction;
+    top -= topAdjustment;
     if (shortCut) {
       // render all the line in one pass without checking
       // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);

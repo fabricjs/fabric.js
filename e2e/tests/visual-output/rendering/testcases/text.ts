@@ -1035,6 +1035,46 @@ const cases: renderTestType[] = [
       canvas.add(text2);
     },
   },
+  {
+    title: 'Text with edge case lineHeight values (0 and 0.01)',
+    golden: 'textLineHeightEdgeCases.png',
+    percentage: 0.03,
+    size: [400, 300],
+    async renderFunction(canvas, fabric) {
+      // overlaps letters because of small line height
+      const text1 = new fabric.Textbox('a\nb\nc\nd', {
+        lineHeight: 0.01,
+        left: 0,
+        top: 5,
+        fill: 'blue',
+        fontSize: 60,
+      });
+      text1.positionByLeftTop(new fabric.Point(0, 5));
+
+      // Reproducer of the bug: text with lineHeight 0 disappears
+      // letters should also overlap
+      const text2 = new fabric.Textbox('a\nb\nc\nd', {
+        lineHeight: 0,
+        left: 100,
+        top: 5,
+        fill: 'red',
+        fontSize: 60,
+      });
+      text2.positionByLeftTop(new fabric.Point(100, 5));
+
+      // reference text with normal lineHeight for comparison
+      const text3 = new fabric.Textbox('a\nb\nc\nd', {
+        lineHeight: 1.16,
+        left: 250,
+        top: 5,
+        fill: 'green',
+        fontSize: 60,
+      });
+      text3.positionByLeftTop(new fabric.Point(250, 5));
+
+      canvas.add(text1, text2, text3);
+    },
+  },
 ];
 
 export const textRenderingTests: renderTestType[] = cases.map((testCase) => ({
