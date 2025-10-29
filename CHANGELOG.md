@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat: Add Intl.Segmenter support for Textbox word splitting [#10791](https://github.com/fabricjs/fabric.js/pull/10791)
 - chore(): update major version of vitest [#10786](https://github.com/fabricjs/fabric.js/pull/10786)
 - fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
 - chore(): update playwright [#10780](https://github.com/fabricjs/fabric.js/pull/10780)
