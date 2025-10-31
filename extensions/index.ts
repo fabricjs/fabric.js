@@ -1,7 +1,5 @@
-export {
-  initAligningGuidelines,
-  type AligningLineConfig,
-} from './aligning_guidelines';
+export { AligningGuidelines } from './aligning_guidelines';
+export type * from './aligning_guidelines/typedefs';
 
 export {
   originUpdaterWrapper,
