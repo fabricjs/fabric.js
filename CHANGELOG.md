@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
+- chore(): update major version of vitest [#10786](https://github.com/fabricjs/fabric.js/pull/10786)
 - fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
 - chore(): update playwright [#10780](https://github.com/fabricjs/fabric.js/pull/10780)
 - chore(deps-dev): bump es-toolkit from 1.39.10 to 1.40.0 [#10777](https://github.com/fabricjs/fabric.js/pull/10777)
