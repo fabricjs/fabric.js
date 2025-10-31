@@ -726,7 +726,9 @@ export class FabricText<
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
       const bgHeightDivided = heightOfLine / this.lineHeight;
-      const bgHeight = Number.isFinite(bgHeightDivided) ? bgHeightDivided : 0;
+      const bgHeight = Number.isFinite(bgHeightDivided)
+        ? bgHeightDivided
+        : this.fontSize * this._fontSizeMult;
       for (let j = 0; j < jlen; j++) {
         // at this point charbox are either standard or full with pathInfo if there is a path.
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
