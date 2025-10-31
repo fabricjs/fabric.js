@@ -197,6 +197,7 @@ const cases: renderTestType[] = [
           strokeWidth: 0,
         },
       );
+      text4.positionByLeftTop(new fabric.Point(0, 200));
 
       const rect = new fabric.Rect({
         width: text4.width,
@@ -207,6 +208,7 @@ const cases: renderTestType[] = [
         top: text4.top,
         left: text4.left,
       });
+      rect.positionByLeftTop(new fabric.Point(text4.left, text4.top));
 
       const text5 = new fabric.FabricText(
         '  2 spaces both sides  \nno trailing spance\n     5 spaces both sides     ',
@@ -219,6 +221,7 @@ const cases: renderTestType[] = [
           strokeWidth: 0,
         },
       );
+      text5.positionByLeftTop(new fabric.Point(200, 250));
 
       const rect2 = new fabric.Rect({
         width: text5.width,
@@ -230,6 +233,7 @@ const cases: renderTestType[] = [
         left: text5.left,
         angle: text5.angle,
       });
+      rect2.positionByLeftTop(new fabric.Point(text5.left, text5.top));
 
       const text = new fabric.FabricText(
         'text with all decorations\nmultiline',
@@ -241,6 +245,7 @@ const cases: renderTestType[] = [
           strokeWidth: 0,
         },
       );
+      rect.positionByLeftTop(new fabric.Point(0, 0));
 
       canvas.add(rect, text4, rect2, text5, text);
     },
@@ -256,6 +261,7 @@ const cases: renderTestType[] = [
         'lorem ipsum\ndolor\nsit Amet2\nconsectgetur',
         LOREM_IPSUM_TEXT_OPTS,
       );
+      text.positionByLeftTop(new fabric.Point(0, 0));
 
       canvas.add(text);
     },
@@ -278,6 +284,7 @@ const cases: renderTestType[] = [
           angle: 25,
         },
       );
+      text.positionByLeftTop(new fabric.Point(0, 0));
 
       const matrix = text.calcTransformMatrix();
       canvas.viewportTransform = fabric.util.invertTransform(matrix);
@@ -302,6 +309,7 @@ const cases: renderTestType[] = [
         fill: 'rgba(0,0,255,0.4)',
         strokeWidth: 0,
       });
+      text.positionByLeftTop(new fabric.Point(0, 0));
 
       const text2 = new fabric.FabricText('Scaling', {
         fontSize: 10,
@@ -311,6 +319,7 @@ const cases: renderTestType[] = [
         top: 10,
         strokeWidth: 0,
       });
+      text2.positionByLeftTop(new fabric.Point(0, 10));
 
       const text3 = new fabric.FabricText('Scaling', {
         fontSize: 10,
@@ -320,6 +329,7 @@ const cases: renderTestType[] = [
         top: 20,
         strokeWidth: 0,
       });
+      text3.positionByLeftTop(new fabric.Point(0, 20));
 
       const text4 = new fabric.FabricText('Scaling', {
         fontSize: 10,
@@ -329,6 +339,7 @@ const cases: renderTestType[] = [
         top: 30,
         strokeWidth: 0,
       });
+      text4.positionByLeftTop(new fabric.Point(0, 30));
 
       const text5 = new fabric.FabricText('Scaling', {
         fontSize: 10,
@@ -338,6 +349,7 @@ const cases: renderTestType[] = [
         top: 40,
         strokeWidth: 0,
       });
+      text5.positionByLeftTop(new fabric.Point(0, 40));
 
       const text6 = new fabric.FabricText('Scaling', {
         fontSize: 10,
@@ -347,6 +359,7 @@ const cases: renderTestType[] = [
         top: 50,
         strokeWidth: 0,
       });
+      text6.positionByLeftTop(new fabric.Point(0, 50));
 
       const text7 = new fabric.FabricText('A', {
         fontSize: 80,
@@ -357,6 +370,7 @@ const cases: renderTestType[] = [
         strokeWidth: 12,
         stroke: 'rgba(255,0,0,0.2)',
       });
+      text7.positionByLeftTop(new fabric.Point(190, 0));
 
       const text8 = new fabric.FabricText('A', {
         fontSize: 65,
@@ -368,6 +382,7 @@ const cases: renderTestType[] = [
         strokeWidth: 12,
         stroke: 'rgba(255,0,0,0.2)',
       });
+      text8.positionByLeftTop(new fabric.Point(-100, -100));
 
       canvas.add(text8, text, text2, text3, text4, text5, text6, text7);
     },
@@ -385,6 +400,7 @@ const cases: renderTestType[] = [
         top: 0,
         fontFamily: 'Ubuntu',
       });
+      text.positionByLeftTop(new fabric.Point(0, 0));
       canvas.add(text);
 
       const text2 = new fabric.FabricText('bold', {
@@ -393,6 +409,8 @@ const cases: renderTestType[] = [
         fontFamily: 'Ubuntu',
         fontWeight: 'bold',
       });
+      text2.positionByLeftTop(new fabric.Point(0, 50));
+
       canvas.add(text2);
 
       const text3 = new fabric.FabricText('italic', {
@@ -401,6 +419,8 @@ const cases: renderTestType[] = [
         fontFamily: 'Ubuntu',
         fontStyle: 'italic',
       });
+      text3.positionByLeftTop(new fabric.Point(0, 100));
+
       canvas.add(text3);
 
       const text4 = new fabric.FabricText('bold italic', {
@@ -410,6 +430,8 @@ const cases: renderTestType[] = [
         fontWeight: 'bold',
         fontStyle: 'italic',
       });
+      text4.positionByLeftTop(new fabric.Point(0, 150));
+
       canvas.add(text4);
     },
   },
@@ -449,7 +471,7 @@ const cases: renderTestType[] = [
           fill: gradient,
         },
       );
-
+      text.positionByLeftTop(new fabric.Point(0, 0));
       canvas.add(text);
     },
   },
@@ -469,7 +491,7 @@ const cases: renderTestType[] = [
         scaleX: 0.2,
         scaleY: 0.2,
       });
-
+      text.positionByLeftTop(new fabric.Point(10, 10));
       canvas.add(text);
     },
   },
@@ -530,7 +552,7 @@ const cases: renderTestType[] = [
         stroke: relGradient,
         fill: pattern,
       });
-
+      text.positionByLeftTop(new fabric.Point(5, 5));
       canvas.add(text);
     },
   },
@@ -564,7 +586,7 @@ const cases: renderTestType[] = [
           path: path,
         },
       );
-
+      test.positionByLeftTop(new fabric.Point(10, 10));
       canvas.add(test);
     },
   },
@@ -606,7 +628,7 @@ const cases: renderTestType[] = [
           },
         },
       });
-
+      itext.positionByLeftTop(new fabric.Point(4, 4));
       const itext2 = new fabric.FabricText('Version 4.2.0', {
         left: 105,
         top: 4,
@@ -652,7 +674,7 @@ const cases: renderTestType[] = [
           },
         },
       });
-
+      itext2.positionByLeftTop(new fabric.Point(105, 4));
       canvas.add(itext);
       canvas.add(itext2);
     },
@@ -671,7 +693,7 @@ const cases: renderTestType[] = [
           '{"type":"IText","version":"4.4.0","left":1.28,"top":0.19,"width":740.57,"height":150.06,"fill":"#e38644","scaleX":0.48,"scaleY":0.48,"angle":0.2,"text":"השועל החום והזריז קופץ מעל הכלב העצלן\\nהשועל החום והזר33יז  קופץ מעל הכל העצלן\\nשלום עולם","fontWeight":"normal","fontFamily":"Arial","textAlign":"right","textBackgroundColor":"#d72323","direction":"rtl","styles":{"0":{"6":{"fill":"red"},"7":{"fill":"red"},"8":{"fill":"red","linethrough":true},"9":{"fill":"red","linethrough":true},"10":{"linethrough":true,"textBackgroundColor":"red"},"11":{"linethrough":true,"textBackgroundColor":"green"},"12":{"linethrough":true},"13":{"linethrough":true}},"1":{"8":{"underline":true},"9":{"underline":true},"10":{"underline":true},"11":{"underline":true},"12":{"underline":true},"13":{"underline":true,"fontSize":22},"14":{"underline":true,"fontSize":22},"15":{"underline":true,"fontSize":22},"16":{"underline":true,"fontSize":22},"17":{"fontSize":22},"18":{"fontSize":22},"19":{"fontSize":22},"20":{"fontSize":22},"21":{"fontSize":22},"22":{"fontSize":22,"textBackgroundColor":"blue"}}},"path":null}',
         ),
       );
-
+      text.positionByLeftTop(new fabric.Point(1.28, 0.19));
       canvas.add(text);
     },
   },
@@ -691,6 +713,7 @@ const cases: renderTestType[] = [
           '{"type":"Textbox","version":"4.5.0","left":0.94,"top":0.46,"width":231.02,"height":254.93,"scaleX":0.9,"scaleY":0.9,"angle":0.19,"text":"اگر شما یک طراح هستین و یا با طراحی های گرافیکی سروکار دارید.","fontFamily":"Arial","underline":true,"linethrough":true,"textAlign":"right","direction":"rtl","minWidth":20,"splitByGrapheme":false,"styles":{},"path":null}',
         ),
       );
+      text.positionByLeftTop(new fabric.Point(0.94, 0.46));
       canvas.add(text);
       canvas.renderAll();
       return canvas.lowerCanvasEl.toDataURL();
@@ -817,11 +840,10 @@ const cases: renderTestType[] = [
       const source = new fabric.IText('A draggable text\nSecond line');
       const target = new fabric.Textbox('A draggable textbox, Second line', {
         width: 200,
-        left: 20,
-        top: 20,
         fill: 'red',
       });
-
+      source.positionByLeftTop(new fabric.Point(0, 0));
+      target.positionByLeftTop(new fabric.Point(20, 20));
       canvas.add(source, target);
       canvas.setActiveObject(source);
       source.enterEditing();
@@ -875,6 +897,7 @@ const cases: renderTestType[] = [
           centeredRotation: true,
         },
       );
+      text.positionByLeftTop(new fabric.Point(0, 0));
       canvas.add(text);
       canvas.setActiveObject(text);
       text.enterEditing();
@@ -904,7 +927,6 @@ const cases: renderTestType[] = [
       const text = new TestTextboxClass('lorem ipsum dolor sit Amet sit Amet', {
         width: 200,
       });
-
       canvas.add(text);
       canvas.renderAll();
       canvas.setActiveObject(text);
@@ -921,6 +943,8 @@ const cases: renderTestType[] = [
       text.width = 150;
       // @ts-expect-error -- _forceClearCache is a protected member
       text._forceClearCache = true;
+      canvas.renderAll();
+      text.setPositionByOrigin(new fabric.Point(0, 0), 'left', 'top');
       canvas.renderAll();
 
       if (text.__calledInitDimensions !== 1) {
@@ -948,7 +972,7 @@ const cases: renderTestType[] = [
           width: 200,
         },
       );
-
+      text.positionByLeftTop(new fabric.Point(0, 0));
       canvas.add(text);
       canvas.setActiveObject(text);
       text.enterEditing();
@@ -1007,8 +1031,62 @@ const cases: renderTestType[] = [
           },
         },
       });
-
+      text2.positionByLeftTop(new fabric.Point(0, 0));
       canvas.add(text2);
+    },
+  },
+  {
+    title: 'Text with edge case lineHeight values (0 and 0.01)',
+    golden: 'textLineHeightEdgeCases.png',
+    only: true,
+    percentage: 0.03,
+    size: [400, 300],
+    async renderFunction(canvas, fabric) {
+      // overlaps letters because of small line height
+      const text1 = new fabric.Textbox('x\nd\ng\no', {
+        lineHeight: 0.01,
+        fill: 'blue',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(255,0,0,0.1)',
+      });
+      text1.positionByLeftTop(new fabric.Point(0, 5));
+
+      // Reproducer of the bug: text with lineHeight 0 disappears
+      // letters should also overlap
+      const text2 = new fabric.Textbox('x\nd\ng\no', {
+        lineHeight: 0,
+        fill: 'red',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,0,0.1)',
+      });
+      text2.positionByLeftTop(new fabric.Point(100, 5));
+
+      // reference text with normal lineHeight for comparison
+      const text3 = new fabric.Textbox('x\nd\ng\no', {
+        lineHeight: 1.16,
+        fill: 'green',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,255,0.1)',
+      });
+      text3.positionByLeftTop(new fabric.Point(250, 5));
+
+      const text4 = new fabric.Textbox('x\nd\ng', {
+        lineHeight: 2.5,
+        fill: 'red',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,0,0.1)',
+      });
+      text4.positionByLeftTop(new fabric.Point(175, 5));
+
+      const text5 = new fabric.Textbox('o\no\no\no\no\no', {
+        lineHeight: 0,
+        fill: 'rgba(255,0,0,0.1)',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,0,0.1)',
+      });
+      text5.positionByLeftTop(new fabric.Point(0, 95));
+
+      canvas.add(text1, text2, text3, text4, text5);
     },
   },
 ];

@@ -129,8 +129,6 @@ before('#canvas', (el) => {
   const a = new fabric.Textbox(textValue, {
     originX: 'center',
     width: 210,
-    left: 150,
-    top: 20,
     splitByGrapheme: true,
     styles: fabric.util.stylesFromArray(
       [
@@ -146,15 +144,16 @@ before('#canvas', (el) => {
       textValue,
     ),
   });
+  a.setPositionByOrigin(new fabric.Point(150, 20), 'center', 'top');
+  a.setCoords();
   const b = new fabric.Textbox('lorem ipsum\ndolor\nsit Amet2\nconsectgetur', {
-    left: 400,
-    top: 20,
     objectCaching: false,
     fontFamily: 'Arial',
     // @ts-expect-error -- styles mock
     styles,
   });
-
+  b.positionByLeftTop(new fabric.Point(400, 20));
+  b.setCoords();
   (
     [...commonEvents, 'text:selection:changed', 'text:changed'] as const
   ).forEach((type) => {

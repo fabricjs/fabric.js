@@ -7,30 +7,38 @@ describe('cache', () => {
     it('removes specified font cache or all caches', () => {
       expect(cache.clearFontCache).toBeTypeOf('function');
 
-      cache.charWidthsCache = {
-        // @ts-expect-error -- test values
-        arial: { some: 'cache' },
-        // @ts-expect-error -- test values
-        helvetica: { some: 'cache' },
-      };
+      cache.charWidthsCache.set(
+        'arial',
+        new Map([['some', new Map([['aa', 10]])]]),
+      );
+      cache.charWidthsCache.set(
+        'helvetica',
+        new Map([['some', new Map([['aa', 11]])]]),
+      );
       cache.clearFontCache('arial');
-      expect(cache.charWidthsCache.arial).toBe(undefined);
-      expect(cache.charWidthsCache.helvetica.some).toBe('cache');
+      expect(cache.charWidthsCache.get('arial')).toBe(undefined);
+      expect(
+        cache.charWidthsCache.get('helvetica')?.get('some'),
+      ).toBeInstanceOf(Map);
 
       cache.clearFontCache();
-      expect(cache.charWidthsCache).toEqual({});
+      expect(cache.charWidthsCache.size).toEqual(0);
     });
 
     it('handles case-insensitive font names', () => {
-      cache.charWidthsCache = {
-        // @ts-expect-error -- test values
-        arial: { some: 'cache' },
-        // @ts-expect-error -- test values
-        helvetica: { some: 'cache' },
-      };
+      cache.charWidthsCache.set(
+        'arial',
+        new Map([['some', new Map([['aa', 10]])]]),
+      );
+      cache.charWidthsCache.set(
+        'helvetica',
+        new Map([['some', new Map([['aa', 11]])]]),
+      );
       cache.clearFontCache('ARIAL');
-      expect(cache.charWidthsCache.arial).toBe(undefined);
-      expect(cache.charWidthsCache.helvetica.some).toBe('cache');
+      expect(cache.charWidthsCache.get('arial')).toBe(undefined);
+      expect(
+        cache.charWidthsCache.get('helvetica')?.get('some'),
+      ).toBeInstanceOf(Map);
     });
   });
 

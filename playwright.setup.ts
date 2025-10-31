@@ -12,7 +12,7 @@ import { makeRe } from 'micromatch';
 import * as path from 'node:path';
 
 const include = ['**/*.ts'];
-const exclude = ['**/*.spec.ts'];
+const exclude = ['**/*.spec.ts', '**/*.fixtures.ts'];
 
 const src = path.resolve(process.cwd(), 'e2e', 'tests');
 const dist = path.resolve(process.cwd(), 'e2e', 'dist');

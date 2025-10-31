@@ -19,8 +19,8 @@ const CHAR_WIDTH = 20;
 const REFERENCE_TEXT_OBJECT = {
   version: version,
   type: 'Text',
-  originX: 'left',
-  originY: 'top',
+  originX: 'center',
+  originY: 'center',
   left: 0,
   top: 0,
   width: CHAR_WIDTH,
@@ -107,6 +107,8 @@ describe('FabricText', () => {
 
   it('toSVG with NUM_FRACTION_DIGITS', async () => {
     const text = await FabricText.fromObject({
+      left: 60.5,
+      top: 23.1,
       text: 'xxxxxx',
       styles: [
         { fill: 'red' },
@@ -126,7 +128,7 @@ describe('FabricText', () => {
     const path = new Path('M 10 10 H 50 V 60', { fill: '', stroke: 'red' });
     const text = new FabricText(
       'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      { scaleX: 2, scaleY: 2 },
+      { scaleX: 2, scaleY: 2, left: 1061, top: 46.2 },
     );
     const plainSvg = text.toSVG();
     text.path = path;
@@ -363,7 +365,7 @@ describe('FabricText', () => {
       width: 8,
       height: 18.08,
       fontSize: 16,
-      originX: 'left',
+      originX: 'center',
     };
 
     expect(text.toObject(), 'parsed object is what expected').toEqual(
@@ -697,10 +699,13 @@ describe('FabricText', () => {
 
     text.initDimensions();
 
-    const charCache = cache.charWidthsCache[text.fontFamily.toLowerCase()];
+    const charCache = cache.charWidthsCache.get(text.fontFamily.toLowerCase());
     const cacheProp = text.fontStyle + '_400';
 
-    expect(cacheProp in charCache, '400 is converted to string').toBe(true);
+    expect(
+      charCache && charCache.has(cacheProp),
+      '400 is converted to string',
+    ).toBe(true);
   });
 
   it('getFontCache is case insensitive', () => {
@@ -1043,7 +1048,10 @@ describe('FabricText', () => {
     const box2 = text._measureChar('a', style, zwc, style);
 
     expect(
-      cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc],
+      cache.charWidthsCache
+        .get(text.fontFamily.toLowerCase())
+        ?.get('normal_normal')
+        ?.get(zwc),
       'zwc is a 0 width char',
     ).toBe(0);
     expect(box.kernedWidth, 'measurements should be consistent').toBe(

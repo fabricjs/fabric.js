@@ -16,18 +16,15 @@ beforeAll(async (canvas) => {
     top: 30,
     width: 50,
     height: 50,
-    originX: 'center',
-    originY: 'center',
     fill: 'green',
   });
+
   const rect2 = new Rect({
     strokeWidth: 0,
     left: 200,
     top: 30,
     width: 60,
     height: 60,
-    originX: 'center',
-    originY: 'center',
     fill: 'yellow',
   });
 

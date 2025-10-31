@@ -11,7 +11,7 @@ import {
 } from '../../fabric';
 
 function makeRect(options = {}) {
-  return new Rect({ width: 10, height: 10, ...options });
+  return new Rect({ top: 5, left: 5, width: 10, height: 10, ...options });
 }
 
 describe('Canvas dispose', () => {
@@ -203,7 +203,9 @@ describe('Canvas dispose', () => {
           .data.filter((_, i) => i % 4 === 0)
           .every((x) => x === colorByteVal);
       };
-      canvas.add(makeRect({ fill: 'red', width: 20, height: 20 }));
+      canvas.add(
+        makeRect({ fill: 'red', width: 20, height: 20, top: 10, left: 10 }),
+      );
       expect(testImageData(255), 'control').toBeTruthy();
       canvas.disposed = true;
       expect(testImageData(255), 'should render canvas').toBeTruthy();
