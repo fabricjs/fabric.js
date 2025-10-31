@@ -13,6 +13,7 @@ const createTestFromSVG = (svgName: string): renderTestType => {
   return {
     title: `Svg import test ${svgName}`,
     golden: `${svgName}.png`,
+    only: true,
     percentage: 0.055,
     snapshotSuffix: 'svg-import',
     size: [100, 100],

@@ -157,10 +157,12 @@ export class ElementsParser {
       'clipPath',
       this.clipPaths,
     );
-    if (clipPathDefinition && !processedClipPaths.has(clipPathDefinition.id)) {
+    if (clipPathDefinition) {
       const clipPathElements = clipPathDefinition.def;
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
-      const clipPathTag = clipPathElements[0].parentElement!;
+      const clipPathTag = clipPathElements[0].parentElement!.cloneNode(
+        true,
+      ) as HTMLElement;
       let clipPathOwner = usingElement;
       while (
         !exactOwner &&
@@ -176,6 +178,7 @@ export class ElementsParser {
       // but i don't have an svg to test it
       // at the first SVG that has a transform on both places and is misplaced
       // try to invert this multiplication order
+      console.log(clipPathOwner.getAttribute('transform'));
       const finalTransform = parseTransformAttribute(
         `${clipPathOwner.getAttribute('transform') || ''} ${
           clipPathTag.getAttribute('originalTransform') || ''
@@ -218,7 +221,7 @@ export class ElementsParser {
         clipPath.calcTransformMatrix(),
       );
       // Only resolve if clipPath property is still a string (not already resolved)
-      if (clipPath.clipPath && typeof clipPath.clipPath === 'string') {
+      if (clipPath.clipPath) {
         await this.resolveClipPath(
           clipPath,
           clipPathOwner,
