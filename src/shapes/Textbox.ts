@@ -8,6 +8,7 @@ import type { SerializedITextProps, ITextProps } from './IText/IText';
 import type { ITextEvents } from './IText/ITextBehavior';
 import type { TextLinesInfo } from './Text/Text';
 import type { Control } from '../controls/Control';
+import { wordSplit } from '../util/lang_string';
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
 // regexes, list of properties that are not suppose to change by instances, magic consts.
@@ -408,7 +409,7 @@ export class Textbox<
    * @returns {string[]} array of words
    */
   wordSplit(value: string): string[] {
-    return value.split(this._wordJoiners);
+    return wordSplit(value, this._wordJoiners);
   }
 
   /**

@@ -26,18 +26,31 @@ export const escapeXml = (string: string): string =>
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-let segmenter: Intl.Segmenter | false;
+let graphemeSegmenter: Intl.Segmenter | false;
+let wordSegmenter: Intl.Segmenter | false;
 
-const getSegmenter = () => {
-  if (!segmenter) {
-    segmenter =
+const getGraphemeSegmenter = () => {
+  if (!graphemeSegmenter) {
+    graphemeSegmenter =
       'Intl' in getFabricWindow() &&
       'Segmenter' in Intl &&
       new Intl.Segmenter(undefined, {
         granularity: 'grapheme',
       });
   }
-  return segmenter;
+  return graphemeSegmenter;
+};
+
+const getWordSegmenter = () => {
+  if (!wordSegmenter) {
+    wordSegmenter =
+      'Intl' in getFabricWindow() &&
+      'Segmenter' in Intl &&
+      new Intl.Segmenter(undefined, {
+        granularity: 'word',
+      });
+  }
+  return wordSegmenter;
 };
 
 /**
@@ -46,14 +59,34 @@ const getSegmenter = () => {
  * @return {Array} array containing the graphemes
  */
 export const graphemeSplit = (textstring: string): string[] => {
-  segmenter || getSegmenter();
-  if (segmenter) {
-    const segments = segmenter.segment(textstring);
+  graphemeSegmenter || getGraphemeSegmenter();
+  if (graphemeSegmenter) {
+    const segments = graphemeSegmenter.segment(textstring);
     return Array.from(segments).map(({ segment }) => segment);
   }
 
   //Fallback
   return graphemeSplitImpl(textstring);
+};
+
+/**
+ * Divide a string into words
+ * @param {String} textstring String to split into words
+ * @param {RegExp} splitRegex Optional regex pattern for fallback splitting (default: /[ \t\r]/)
+ * @return {Array} array containing the words
+ */
+export const wordSplit = (
+  textstring: string,
+  splitRegex: RegExp
+): string[] => {
+  wordSegmenter || getWordSegmenter();
+  if (wordSegmenter) {
+    const segments = wordSegmenter.segment(textstring);
+    return Array.from(segments).map(({ segment }) => segment);
+  }
+
+  // Fallback to regex-based split
+  return textstring.split(splitRegex);
 };
 
 const graphemeSplitImpl = (textstring: string): string[] => {
