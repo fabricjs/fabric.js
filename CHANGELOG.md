@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): update major version of vitest [#10786](https://github.com/fabricjs/fabric.js/pull/10786)
 - fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
 - fix(): fix rendering of text when line height is set to 0 [#10785](https://github.com/fabricjs/fabric.js/pull/10785)

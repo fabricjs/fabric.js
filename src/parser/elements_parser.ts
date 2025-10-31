@@ -30,9 +30,7 @@ type StorageType = {
 };
 
 type NotParsedFabricObject = FabricObject & {
-  fill: string;
-  stroke: string;
-  clipPath?: string;
+  clipPath?: string | FabricObject['clipPath'];
   clipRule?: CanvasFillRule;
 };
 
@@ -96,11 +94,24 @@ export class ElementsParser {
 
   extractPropertyDefinition(
     obj: NotParsedFabricObject,
+    property: 'fill' | 'stroke',
+    storage: Record<string, SVGGradientElement>,
+  ): { def: SVGGradientElement; id: string } | undefined;
+  extractPropertyDefinition(
+    obj: NotParsedFabricObject,
+    property: 'clipPath',
+    storage: Record<string, Element[]>,
+  ): { def: Element[]; id: string } | undefined;
+  extractPropertyDefinition(
+    obj: NotParsedFabricObject,
     property: 'fill' | 'stroke' | 'clipPath',
     storage: Record<string, StorageType[typeof property]>,
-  ): StorageType[typeof property] | undefined {
-    const value = obj[property]!,
-      regex = this.regexUrl;
+  ): { def: StorageType[typeof property]; id: string } | undefined {
+    const value = obj[property];
+    if (typeof value !== 'string') {
+      return undefined;
+    }
+    const regex = this.regexUrl;
     if (!regex.test(value)) {
       return undefined;
     }
@@ -110,7 +121,7 @@ export class ElementsParser {
     const id = regex.exec(value)![1];
     regex.lastIndex = 0;
     // @todo fix this
-    return storage[id];
+    return storage[id] ? { def: storage[id], id } : undefined;
   }
 
   resolveGradient(
@@ -118,14 +129,14 @@ export class ElementsParser {
     el: Element,
     property: 'fill' | 'stroke',
   ) {
-    const gradientDef = this.extractPropertyDefinition(
+    const gradientDefinition = this.extractPropertyDefinition(
       obj,
       property,
       this.gradientDefs,
-    ) as SVGGradientElement;
-    if (gradientDef) {
+    );
+    if (gradientDefinition) {
       const opacityAttr = el.getAttribute(property + '-opacity');
-      const gradient = Gradient.fromElement(gradientDef, obj, {
+      const gradient = Gradient.fromElement(gradientDefinition.def, obj, {
         ...this.options,
         opacity: opacityAttr,
       } as SVGOptions);
@@ -139,15 +150,19 @@ export class ElementsParser {
     obj: NotParsedFabricObject,
     usingElement: Element,
     exactOwner?: Element,
+    processedClipPaths: Set<string> = new Set(),
   ) {
-    const clipPathElements = this.extractPropertyDefinition(
+    const clipPathDefinition = this.extractPropertyDefinition(
       obj,
       'clipPath',
       this.clipPaths,
-    ) as Element[];
-    if (clipPathElements) {
+    );
+    if (clipPathDefinition) {
+      const clipPathElements = clipPathDefinition.def;
       const objTransformInv = invertTransform(obj.calcTransformMatrix());
-      const clipPathTag = clipPathElements[0].parentElement!;
+      const clipPathTag = clipPathElements[0].parentElement!.cloneNode(
+        true,
+      ) as HTMLElement;
       let clipPathOwner = usingElement;
       while (
         !exactOwner &&
@@ -163,6 +178,7 @@ export class ElementsParser {
       // but i don't have an svg to test it
       // at the first SVG that has a transform on both places and is misplaced
       // try to invert this multiplication order
+      console.log(clipPathOwner.getAttribute('transform'));
       const finalTransform = parseTransformAttribute(
         `${clipPathOwner.getAttribute('transform') || ''} ${
           clipPathTag.getAttribute('originalTransform') || ''
@@ -174,16 +190,28 @@ export class ElementsParser {
         `matrix(${finalTransform.join(',')})`,
       );
 
+      const updatedProcessedClipPaths = new Set(processedClipPaths);
+      updatedProcessedClipPaths.add(clipPathDefinition.id);
+
       const container = await Promise.all(
-        clipPathElements.map((clipPathElement) => {
-          return findTag(clipPathElement)
-            .fromElement(clipPathElement, this.options, this.cssRules)
-            .then((enlivedClippath: NotParsedFabricObject) => {
-              removeTransformMatrixForSvgParsing(enlivedClippath);
-              enlivedClippath.fillRule = enlivedClippath.clipRule!;
-              delete enlivedClippath.clipRule;
-              return enlivedClippath;
-            });
+        clipPathElements.map(async (clipPathElement) => {
+          const enlivedClippath: NotParsedFabricObject = await findTag(
+            clipPathElement,
+          ).fromElement(clipPathElement, this.options, this.cssRules);
+          removeTransformMatrixForSvgParsing(enlivedClippath);
+          enlivedClippath.fillRule = enlivedClippath.clipRule!;
+          delete enlivedClippath.clipRule;
+
+          // Resolve clipPath on elements inside the clipPath definition
+          // This prevents nested elements from having unresolved clipPath strings
+          await this.resolveClipPath(
+            enlivedClippath,
+            clipPathElement,
+            undefined,
+            updatedProcessedClipPaths,
+          );
+
+          return enlivedClippath;
         }),
       );
       const clipPath =
@@ -192,6 +220,7 @@ export class ElementsParser {
         objTransformInv,
         clipPath.calcTransformMatrix(),
       );
+      // Only resolve if clipPath property is still a string (not already resolved)
       if (clipPath.clipPath) {
         await this.resolveClipPath(
           clipPath,
@@ -200,6 +229,7 @@ export class ElementsParser {
           // it tries to differentiate from when clipPaths are inherited by outside groups
           // or when are really clipPaths referencing other clipPaths
           clipPathTag.getAttribute('clip-path') ? clipPathOwner : undefined,
+          updatedProcessedClipPaths,
         );
       }
       const { scaleX, scaleY, angle, skewX, translateX, translateY } =
