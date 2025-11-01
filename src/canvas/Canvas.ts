@@ -84,21 +84,21 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type number
    * @private
    */
-  declare private _willAddMouseDown: number;
+  private declare _willAddMouseDown: number;
 
   /**
    * Holds a reference to an object on the canvas that is receiving the drag over event.
    * @type FabricObject
    * @private
    */
-  declare private _draggedoverTarget?: FabricObject;
+  private declare _draggedoverTarget?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas from where the drag operation started
    * @type FabricObject
    * @private
    */
-  declare private _dragSource?: FabricObject;
+  private declare _dragSource?: FabricObject;
 
   /**
    * Holds a reference to an object on the canvas that is the current drop target
@@ -107,7 +107,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @type FabricObject
    * @private
    */
-  declare private _dropTarget: FabricObject<ObjectEvents> | undefined;
+  private declare _dropTarget: FabricObject<ObjectEvents> | undefined;
 
   /**
    * a boolean that keeps track of the click state during a cycle of mouse down/up.
@@ -544,9 +544,24 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const clicks = e.detail;
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
-    clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
+    clicks == 2 && e.type === 'dblclick' && this._onDblClick(e);
     clicks == 3 && this._handleEvent(e, 'tripleclick');
     this._resetTransformEventData();
+  }
+
+  /**
+   * Double-click to select the child nodes of the locked group
+   * @param e
+   */
+  private _onDblClick(e: TPointerEvent) {
+    if (this.dblClickLock(e)) {
+      // Immediately select the clicked child object after locking
+      this._resetTransformEventData();
+      this.__onMouseDown(e);
+      this.__onMouseUp(e);
+      return;
+    }
+    this._handleEvent(e, 'dblclick');
   }
 
   /**
@@ -1046,6 +1061,20 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       shouldRender = true;
     } else if (this._shouldClearSelection(e, target)) {
       this.discardActiveObject(e);
+
+      if (this.isolatedObject && !this._searchTargets) {
+        this.setSearchTargets([this.isolatedObject]);
+        const { target } = this.findTarget(e);
+        // When an object is locked and no selection is specified, if you click on a blank space or object outside the group, the lock is canceled.
+        if (target !== this.isolatedObject) {
+          this.isolatedObject = null;
+        }
+        this.setSearchTargets(null);
+        // use __onMouseDown select other object immediately after unlocking
+        this._resetTransformEventData();
+        this.__onMouseDown(e);
+        return;
+      }
     }
     // we start a group selector rectangle if
     // selection is enabled
