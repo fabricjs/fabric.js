@@ -84,7 +84,7 @@
     "@vitest/ui": "^4.0.2",
     "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
     "commander": "^14.0.1",
-    "es-toolkit": "1.40.0",
+    "es-toolkit": "1.41.0",
     "eslint-config-prettier": "^10.1.8",
     "inquirer": "^12.9.6",
     "micromatch": "^4.0.8",
