@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @vitest/ui from 4.0.2 to 4.0.6 [#10793](https://github.com/fabricjs/fabric.js/pull/10793)
 - chore(deps-dev): bump inquirer from 12.9.6 to 12.10.0 [#10789](https://github.com/fabricjs/fabric.js/pull/10789)
 - chore(deps-dev): bump @types/micromatch from 4.0.9 to 4.0.10 [#10788](https://github.com/fabricjs/fabric.js/pull/10788)
 - chore(): update major version of vitest [#10786](https://github.com/fabricjs/fabric.js/pull/10786)
