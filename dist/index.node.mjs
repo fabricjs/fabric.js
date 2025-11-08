@@ -461,7 +461,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.7.1";
+var version = "6.8.0";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -2305,6 +2305,8 @@ const staticCanvasDefaults = {
   viewportTransform: [...iMatrix]
 };
 
+const _excluded$j = ["objects"];
+
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
  * Better try to restrict with types to avoid confusion.
@@ -3322,9 +3324,12 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
     }
 
     // parse json if it wasn't already
-    const serialized = typeof json === 'string' ? JSON.parse(json) : json;
+    const _ref2 = typeof json === 'string' ? JSON.parse(json) : json,
+      {
+        objects = []
+      } = _ref2,
+      serialized = _objectWithoutProperties(_ref2, _excluded$j);
     const {
-      objects = [],
       backgroundImage,
       background,
       overlayImage,
@@ -3344,8 +3349,8 @@ let StaticCanvas$1 = class StaticCanvas extends createCollectionMixin(CommonMeth
       clipPath
     }, {
       signal
-    })]).then(_ref2 => {
-      let [enlived, enlivedMap] = _ref2;
+    })]).then(_ref3 => {
+      let [enlived, enlivedMap] = _ref3;
       this.clear();
       this.add(...enlived);
       this.set(serialized);
@@ -3943,6 +3948,8 @@ const dragHandler = (eventData, transform, x, y) => {
   return moveX || moveY;
 };
 
+const normalizeWs = value => value.replace(/\s+/g, ' ');
+
 /**
  * Map of the 148 color names with HEX code
  * @see: https://www.w3.org/TR/css3-color/#svg-color
@@ -4102,6 +4109,10 @@ const ColorNameMap = {
  * Regex matching color in RGB or RGBA formats (ex: `rgb(0, 0, 0)`, `rgba(255, 100, 10, 0.5)`, `rgba( 255 , 100 , 10 , 0.5 )`, `rgb(1,1,1)`, `rgba(100%, 60%, 10%, 0.5)`)
  * Also matching rgba(r g b / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
+ *
+ * In order to avoid performance issues, you have to clean the input string for this regex from multiple spaces before.
+ * ex: colorString.replace(/\s+/g, ' ');
+ *
  * Formal syntax at the time of writing:
  * <rgb()> =
  *  rgb( [ <percentage> | none ]{3} [ / [ <alpha-value> | none ] ]? )  |
@@ -4113,35 +4124,35 @@ const ColorNameMap = {
  *
  * /^          # Beginning of the string
  * rgba?       # "rgb" or "rgba"
- * \(\s*       # Opening parenthesis and optional whitespace
+ * \(\s?       # Opening parenthesis and zero or one whitespace character
  * (\d{0,3}    # 0 to three digits R channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the first color component
  * %?          # Optional percent sign after the first color component
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * [\s|,]      # Separator between color components can be a space or comma
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * (\d{0,3}    # 0 to three digits G channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the second color component
  * %?          # Optional percent sign after the second color component
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * [\s|,]      # Separator between color components can be a space or comma
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * (\d{0,3}    # 0 to three digits B channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the third color component
  * %?          # Optional percent sign after the third color component
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * (?:         # Beginning of non-capturing group for alpha value
- *  \s*        # Optional whitespace
+ *  \s?        # Zero or one whitespace character
  *  [,/]       # Comma or slash separator for alpha value
- *  \s*        # Optional whitespace
+ *  \s?        # Zero or one whitespace character
  *  (\d{0,3}   # Zero to three digits
  *    (?:\.\d+)? # Optional decimal with one or more digits
  *  )          # End of capturing group for alpha value
  *  %?         # Optional percent sign after alpha value
- *  \s*        # Optional whitespace
+ *  \s?        # Zero or one whitespace character
  * )?          # End of non-capturing group for alpha value (optional)
  * \)          # Closing parenthesis
  * $           # End of the string
@@ -4151,12 +4162,14 @@ const ColorNameMap = {
  * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
  * So the spec does not allow for `rgba(30 , 45%  35, 49%)` but this will work anyways for us
  */
-const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
+const reRGBa = () => /^rgba?\(\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?(?:\s?[,/]\s?(\d{0,3}(?:\.\d+)?%?)\s?)?\)$/i;
 
 /**
- * Regex matching color in HSL or HSLA formats (ex: hsl(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
- * Also matching rgba(r g b / a) as per new specs
+ * Regex matching color in HSL or HSLA formats (ex: hsl(0deg 0%, 0%), hsla(160, 100, 10, 0.5), hsla( 180 , 100 , 10 , 0.5 ), hsl(1,1,1))
+ * Also matching hsla(h s l / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
+ * In order to avoid performance issues, you have to clean the input string for this regex from multiple spaces before.
+ * ex: colorString.replace(/\s+/g, ' ');
  * Formal syntax at the time of writing:
  * <hsl()> =
  *   hsl( [ <hue> | none ] [ <percentage> | none ] [ <percentage> | none ] [ / [ <alpha-value> | none ] ]? )
@@ -4173,30 +4186,30 @@ const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\
  * Regular expression for matching an hsla or hsl CSS color value
  *
  * /^hsla?\(         // Matches the beginning of the string and the opening parenthesis of "hsl" or "hsla"
- * \s*               // Matches any whitespace characters (space, tab, etc.) zero or more times
+ * \s?               // Matches any whitespace character (space, tab, etc.) zero or one time
  * (\d{0,3}          // Hue: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Hue: Optional (non capture group) decimal with one or more digits.
  * (?:deg|turn|rad)? // Hue: Optionally include suffix deg or turn or rad
  * )                 // Hue: End capture group
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * [\s|,]            // Matches a space, tab or comma
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * (\d{0,3}          // Saturation: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Saturation: Optional decimal with one or more digits in a non-capturing group
  * %?)               // Saturation: match optional % character and end capture group
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * [\s|,]            // Matches a space, tab or comma
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * (\d{0,3}          // Lightness: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Lightness: Optional decimal with one or more digits in a non-capturing group
  * %?)                // Lightness: match % character and end capture group
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * (?:               // Alpha: Begins a non-capturing group for the alpha value
- *   \s*             // Matches any whitespace characters zero or more times
+ *   \s?             // Matches any whitespace character zero or one time
  *   [,/]            // Matches a comma or forward slash
- *   \s*             // Matches any whitespace characters zero or more times
+ *   \s?             // Matches any whitespace character zero or one time
  *   (\d*(?:\.\d+)?%?) // Matches zero or more digits, optionally followed by a decimal point and one or more digits, followed by an optional percentage sign and captures it in a group
- *   \s*             // Matches any whitespace characters zero or more times
+ *   \s?             // Matches any whitespace character zero or one time
  * )?                // Makes the alpha value group optional
  * \)                // Matches the closing parenthesis
  * $/i               // Matches the end of the string and sets the regular expression to case-insensitive mode
@@ -4204,7 +4217,7 @@ const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\
  * WARNING this regex doesn't fail on off spec colors. It matches everything that could be a color.
  * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
-const reHSLa = () => /^hsla?\(\s*([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
+const reHSLa = () => /^hsla?\(\s?([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?(?:\s?[,/]\s?(\d*(?:\.\d+)?%?)\s?)?\)$/i;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
@@ -4486,7 +4499,7 @@ class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromRgb(color) {
-    const match = color.match(reRGBa());
+    const match = normalizeWs(color).match(reRGBa());
     if (match) {
       const [r, g, b] = match.slice(1, 4).map(value => {
         const parsedValue = parseFloat(value);
@@ -4527,7 +4540,7 @@ class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color) {
-    const match = color.match(reHSLa());
+    const match = normalizeWs(color).match(reHSLa());
     if (!match) {
       return;
     }
@@ -10650,9 +10663,9 @@ const normalizeAttr = attr => {
 };
 
 const regex$1 = new RegExp("(".concat(reNum, ")"), 'gi');
-const cleanupSvgAttribute = attributeValue => attributeValue.replace(regex$1, ' $1 ')
+const cleanupSvgAttribute = attributeValue => normalizeWs(attributeValue.replace(regex$1, ' $1 ')
 // replace annoying commas and arbitrary whitespace with single spaces
-.replace(/,/gi, ' ').replace(/\s+/gi, ' ');
+.replace(/,/gi, ' '));
 
 var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7;
 
@@ -13479,17 +13492,11 @@ class SelectableCanvas extends StaticCanvas$1 {
      */
     _defineProperty(this, "targets", []);
     /**
-     * hold the list of nested targets hovered
+     * hold the list of nested targets hovered in the previous events
      * @type FabricObject[]
      * @private
      */
     _defineProperty(this, "_hoveredTargets", []);
-    /**
-     * hold the list of objects to render
-     * @type FabricObject[]
-     * @private
-     */
-    _defineProperty(this, "_objectsToRender", void 0);
     /**
      * hold a reference to a data structure that contains information
      * on the current on going transform
@@ -14641,7 +14648,9 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
     functor(canvasElement, "".concat(eventTypePrefix, "move"), this._onMouseMove, addEventOptions);
     functor(canvasElement, "".concat(eventTypePrefix, "out"), this._onMouseOut);
     functor(canvasElement, "".concat(eventTypePrefix, "enter"), this._onMouseEnter);
-    functor(canvasElement, 'wheel', this._onMouseWheel);
+    functor(canvasElement, 'wheel', this._onMouseWheel, {
+      passive: false
+    });
     functor(canvasElement, 'contextmenu', this._onContextMenu);
     functor(canvasElement, 'click', this._onClick);
     // decide if to remove in fabric 7.0
@@ -15514,6 +15523,9 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
       fireCanvas: true
     });
     for (let i = 0; i < length; i++) {
+      if (targets[i] === target || _hoveredTargets[i] && _hoveredTargets[i] === _hoveredTarget) {
+        continue;
+      }
       this.fireSyntheticInOutEvents('mouse', {
         e,
         target: targets[i],
@@ -15861,15 +15873,20 @@ const ifNaN = (value, valueIfNaN) => {
   return isNaN(value) && typeof valueIfNaN === 'number' ? valueIfNaN : value;
 };
 
-const RE_PERCENT = /^(\d+\.\d+)%|(\d+)%$/;
+/**
+ * Will loosely accept as percent numbers that are not like
+ * 3.4a%. This function does not check for the correctness of a percentage
+ * but it checks that values that are in theory correct are or arent percentages
+ */
 function isPercent(value) {
-  return value && RE_PERCENT.test(value);
+  // /%$/ Matches strings that end with a percent sign (%)
+  return value && /%$/.test(value) && Number.isFinite(parseFloat(value));
 }
 
 /**
- *
+ * Parse a percentage value in an svg.
  * @param value
- * @param valueIfNaN
+ * @param fallback in case of not possible to parse the number
  * @returns ∈ [0, 1]
  */
 function parsePercent(value, valueIfNaN) {
@@ -15927,15 +15944,16 @@ function convertPercentUnitsToValues(valuesToConvert, _ref) {
     gradientUnits
   } = _ref;
   let finalValue;
-  return Object.keys(valuesToConvert).reduce((acc, prop) => {
-    const propValue = valuesToConvert[prop];
+  return Object.entries(valuesToConvert).reduce((acc, _ref2) => {
+    let [prop, propValue] = _ref2;
     if (propValue === 'Infinity') {
       finalValue = 1;
     } else if (propValue === '-Infinity') {
       finalValue = 0;
     } else {
-      finalValue = typeof propValue === 'string' ? parseFloat(propValue) : propValue;
-      if (typeof propValue === 'string' && isPercent(propValue)) {
+      const isString = typeof propValue === 'string';
+      finalValue = isString ? parseFloat(propValue) : propValue;
+      if (isString && isPercent(propValue)) {
         finalValue *= 0.01;
         if (gradientUnits === 'pixels') {
           // then we need to fix those percentages here in svg parsing
@@ -19352,6 +19370,7 @@ class FabricText extends StyledText {
       let drawStart;
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      const bgHeight = this.getHeightOfLineImpl(i);
       for (let j = 0; j < jlen; j++) {
         // at this point charbox are either standard or full with pathInfo if there is a path.
         const charBox = this.__charBounds[i][j];
@@ -19361,7 +19380,7 @@ class FabricText extends StyledText {
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
           ctx.fillStyle = currentColor;
-          currentColor && ctx.fillRect(-charBox.width / 2, -heightOfLine / this.lineHeight * (1 - this._fontSizeFraction), charBox.width, heightOfLine / this.lineHeight);
+          currentColor && ctx.fillRect(-charBox.width / 2, -bgHeight * (1 - this._fontSizeFraction), charBox.width, bgHeight);
           ctx.restore();
         } else if (currentColor !== lastColor) {
           drawStart = leftOffset + lineLeftOffset + boxStart;
@@ -19369,7 +19388,7 @@ class FabricText extends StyledText {
             drawStart = this.width - drawStart - boxWidth;
           }
           ctx.fillStyle = lastColor;
-          lastColor && ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
+          lastColor && ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastColor = currentColor;
@@ -19383,7 +19402,7 @@ class FabricText extends StyledText {
           drawStart = this.width - drawStart - boxWidth;
         }
         ctx.fillStyle = currentColor;
-        ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
+        ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
       }
       lineTopOffset += heightOfLine;
     }
@@ -19592,13 +19611,16 @@ class FabricText extends StyledText {
   }
 
   /**
-   * Calculate height of line at 'lineIndex'
+   * Calculate height of line at 'lineIndex',
+   * without the lineHeigth multiplication factor
+   * @private
    * @param {Number} lineIndex index of line to calculate
    * @return {Number}
    */
-  getHeightOfLine(lineIndex) {
-    if (this.__lineHeights[lineIndex]) {
-      return this.__lineHeights[lineIndex];
+  getHeightOfLineImpl(lineIndex) {
+    const lh = this.__lineHeights;
+    if (lh[lineIndex]) {
+      return lh[lineIndex];
     }
 
     // char 0 is measured before the line cycle because it needs to char
@@ -19607,18 +19629,25 @@ class FabricText extends StyledText {
     for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
       maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
     }
-    return this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
+    return lh[lineIndex] = maxHeight * this._fontSizeMult;
+  }
+
+  /**
+   * Calculate height of line at 'lineIndex'
+   * @param {Number} lineIndex index of line to calculate
+   * @return {Number}
+   */
+  getHeightOfLine(lineIndex) {
+    return this.getHeightOfLineImpl(lineIndex) * this.lineHeight;
   }
 
   /**
    * Calculate text box height
    */
   calcTextHeight() {
-    let lineHeight,
-      height = 0;
+    let height = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      lineHeight = this.getHeightOfLine(i);
-      height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
+      height += i === len - 1 ? this.getHeightOfLineImpl(i) : this.getHeightOfLine(i);
     }
     return height;
   }
@@ -19650,11 +19679,8 @@ class FabricText extends StyledText {
     const left = this._getLeftOffset(),
       top = this._getTopOffset();
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      const heightOfLine = this.getHeightOfLine(i),
-        maxHeight = heightOfLine / this.lineHeight,
-        leftOffset = this._getLineLeftOffset(i);
-      this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i);
-      lineHeights += heightOfLine;
+      this._renderTextLine(method, ctx, this._textLines[i], left + this._getLineLeftOffset(i), top + lineHeights + this.getHeightOfLineImpl(i), i);
+      lineHeights += this.getHeightOfLine(i);
     }
     ctx.restore();
   }
@@ -19699,8 +19725,7 @@ class FabricText extends StyledText {
    * @param {Number} lineIndex
    */
   _renderChars(method, ctx, line, left, top, lineIndex) {
-    const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.includes(JUSTIFY),
+    const isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
       shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
       isLtr = this.direction === 'ltr',
@@ -19721,7 +19746,7 @@ class FabricText extends StyledText {
       ctx.direction = isLtr ? 'ltr' : 'rtl';
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
-    top -= lineHeight * this._fontSizeFraction / this.lineHeight;
+    top -= this.getHeightOfLineImpl(lineIndex) * this._fontSizeFraction;
     if (shortCut) {
       // render all the line in one pass without checking
       // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
@@ -20260,7 +20285,7 @@ class FabricText extends StyledText {
         strokeWidth = 1
       } = _options$parsedAttrib,
       restOfOptions = _objectWithoutProperties(_options$parsedAttrib, _excluded$3);
-    const textContent = (element.textContent || '').replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
+    const textContent = normalizeWs(element.textContent || '').trim();
 
     // this code here is probably the usual issue for SVG center find
     // this can later looked at again and probably removed.
@@ -21631,7 +21656,8 @@ class ITextKeyBehavior extends ITextBehavior {
       autocomplete: 'off',
       spellcheck: 'false',
       'data-fabric': 'textarea',
-      wrap: 'off'
+      wrap: 'off',
+      name: 'fabricTextarea'
     }).map(_ref => {
       let [attribute, value] = _ref;
       return textarea.setAttribute(attribute, value);
