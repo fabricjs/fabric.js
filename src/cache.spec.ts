@@ -4,7 +4,7 @@ import { config } from './config';
 describe('cache', () => {
   describe('clearFontCache', () => {
     it('removes specified font cache or all caches', () => {
-      expect(cache.clearFontCache).toBeTypeOf('function');
+      expect(cache.clearFontCache).toBeDefined();
 
       cache.charWidthsCache.set(
         'arial',
@@ -53,7 +53,7 @@ describe('cache', () => {
     });
 
     it('limitDimsByArea provides correct dimensions for aspect ratio 1', () => {
-      expect(cache.limitDimsByArea).toBeTypeOf('function');
+      expect(cache.limitDimsByArea).toBeDefined();
       const [x, y] = cache.limitDimsByArea(1);
       expect(x).toBe(100);
       expect(y).toBe(100);
