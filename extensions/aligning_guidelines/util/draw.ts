@@ -1,29 +1,34 @@
-import type { Canvas } from 'fabric';
 import { Point } from 'fabric';
-import type { HorizontalLine, VerticalLine } from '../typedefs';
-import { aligningLineConfig } from '../constant';
+import type { AligningGuidelines } from '..';
 
-function drawLine(canvas: Canvas, origin: Point, target: Point) {
-  const { width, color } = aligningLineConfig;
-  const ctx = canvas.getSelectionContext();
-  const viewportTransform = canvas.viewportTransform;
-  const zoom = canvas.getZoom();
+export function drawLine(
+  this: AligningGuidelines,
+  origin: Point,
+  target: Point,
+) {
+  const ctx = this.canvas.getTopContext();
+  const viewportTransform = this.canvas.viewportTransform;
+  const zoom = this.canvas.getZoom();
   ctx.save();
   ctx.transform(...viewportTransform);
-  ctx.lineWidth = width / zoom;
-  ctx.strokeStyle = color;
+  ctx.lineWidth = this.width / zoom;
+  if (this.lineDash) ctx.setLineDash(this.lineDash);
+  ctx.strokeStyle = this.color;
   ctx.beginPath();
   ctx.moveTo(origin.x, origin.y);
   ctx.lineTo(target.x, target.y);
   ctx.stroke();
-  drawX(ctx, zoom, origin);
-  drawX(ctx, zoom, target);
+  if (this.lineDash) ctx.setLineDash([]);
+
+  this.drawX(origin, -1);
+  this.drawX(target, 1);
   ctx.restore();
 }
 
-const xSize = 2.4;
-function drawX(ctx: CanvasRenderingContext2D, zoom: number, point: Point) {
-  const size = xSize / zoom;
+export function drawX(this: AligningGuidelines, point: Point, _: number) {
+  const ctx = this.canvas.getTopContext();
+  const zoom = this.canvas.getZoom();
+  const size = this.xSize / zoom;
   ctx.save();
   ctx.translate(point.x, point.y);
   ctx.beginPath();
@@ -34,41 +39,46 @@ function drawX(ctx: CanvasRenderingContext2D, zoom: number, point: Point) {
   ctx.stroke();
   ctx.restore();
 }
-function drawPoint(canvas: Canvas, arr: Point[]) {
-  const { width, color } = aligningLineConfig;
-  const ctx = canvas.getSelectionContext();
-  const viewportTransform = canvas.viewportTransform;
-  const zoom = canvas.getZoom();
+function drawPoint(this: AligningGuidelines, arr: Point[]) {
+  const ctx = this.canvas.getTopContext();
+  const viewportTransform = this.canvas.viewportTransform;
+  const zoom = this.canvas.getZoom();
   ctx.save();
   ctx.transform(...viewportTransform);
-  ctx.lineWidth = width / zoom;
-  ctx.strokeStyle = color;
-  for (const item of arr) drawX(ctx, zoom, item);
+  ctx.lineWidth = this.width / zoom;
+  ctx.strokeStyle = this.color;
+  for (const item of arr) this.drawX(item, 0);
   ctx.restore();
 }
-export function drawPointList(
-  canvas: Canvas,
-  list: Array<VerticalLine | HorizontalLine>,
-) {
-  const arr = list.map((item) => {
-    const isVertical = 'y2' in item;
-    const x = isVertical ? item.x : item.x1;
-    const y = isVertical ? item.y1 : item.y;
-    return new Point(x, y);
-  });
-  drawPoint(canvas, arr);
+
+export function drawPointList(this: AligningGuidelines) {
+  const list = [];
+  if (!this.closeVLine) {
+    for (const v of this.verticalLines) list.push(JSON.parse(v));
+  }
+  if (!this.closeHLine) {
+    for (const h of this.horizontalLines) list.push(JSON.parse(h));
+  }
+  const arr = list.map((item) => item.target);
+  drawPoint.call(this, arr);
 }
 
-export function drawVerticalLine(canvas: Canvas, coords: VerticalLine) {
-  const x = coords.x;
-  const origin = new Point(x, coords.y1);
-  const target = new Point(x, coords.y2);
-  drawLine(canvas, origin, target);
+export function drawVerticalLine(this: AligningGuidelines) {
+  if (this.closeVLine) return;
+
+  for (const v of this.verticalLines) {
+    const { origin, target } = JSON.parse(v);
+    const o = new Point(target.x, origin.y);
+    this.drawLine(o, target);
+  }
 }
 
-export function drawHorizontalLine(canvas: Canvas, coords: HorizontalLine) {
-  const y = coords.y;
-  const origin = new Point(coords.x1, y);
-  const target = new Point(coords.x2, y);
-  drawLine(canvas, origin, target);
+export function drawHorizontalLine(this: AligningGuidelines) {
+  if (this.closeHLine) return;
+
+  for (const v of this.horizontalLines) {
+    const { origin, target } = JSON.parse(v);
+    const o = new Point(origin.x, target.y);
+    this.drawLine(o, target);
+  }
 }
