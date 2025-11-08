@@ -2,8 +2,9 @@
 
 ## [next]
 
-- fix(AligningGuidelines): Too many shapes will result in too many reference lines [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
-- fix(AligningGuidelines): Align guidless changes aspect ratio on snapping when scaling [#10114](https://github.com/fabricjs/fabric.js/issues/10114)
+- fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
+- chore(deps-dev): bump inquirer from 12.9.6 to 12.10.0 [#10789](https://github.com/fabricjs/fabric.js/pull/10789)
+- chore(deps-dev): bump @types/micromatch from 4.0.9 to 4.0.10 [#10788](https://github.com/fabricjs/fabric.js/pull/10788)
 - chore(): update major version of vitest [#10786](https://github.com/fabricjs/fabric.js/pull/10786)
 - fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
 - fix(): fix rendering of text when line height is set to 0 [#10785](https://github.com/fabricjs/fabric.js/pull/10785)
