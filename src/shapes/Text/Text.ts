@@ -47,6 +47,7 @@ import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
 import type { CSSRules } from '../../parser/typedefs';
+import { normalizeWs } from '../../util/internals/normalizeWhiteSpace';
 
 let measuringContext: CanvasRenderingContext2D | null;
 
@@ -746,6 +747,7 @@ export class FabricText<
       let drawStart;
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      const bgHeight = this.getHeightOfLineImpl(i);
       for (let j = 0; j < jlen; j++) {
         // at this point charbox are either standard or full with pathInfo if there is a path.
         const charBox = this.__charBounds[i][j] as Required<GraphemeBBox>;
@@ -758,9 +760,9 @@ export class FabricText<
           currentColor &&
             ctx.fillRect(
               -charBox.width / 2,
-              (-heightOfLine / this.lineHeight) * (1 - this._fontSizeFraction),
+              -bgHeight * (1 - this._fontSizeFraction),
               charBox.width,
-              heightOfLine / this.lineHeight,
+              bgHeight,
             );
           ctx.restore();
         } else if (currentColor !== lastColor) {
@@ -770,12 +772,7 @@ export class FabricText<
           }
           ctx.fillStyle = lastColor;
           lastColor &&
-            ctx.fillRect(
-              drawStart,
-              lineTopOffset,
-              boxWidth,
-              heightOfLine / this.lineHeight,
-            );
+            ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastColor = currentColor;
@@ -789,12 +786,7 @@ export class FabricText<
           drawStart = this.width - drawStart - boxWidth;
         }
         ctx.fillStyle = currentColor;
-        ctx.fillRect(
-          drawStart,
-          lineTopOffset,
-          boxWidth,
-          heightOfLine / this.lineHeight,
-        );
+        ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
       }
       lineTopOffset += heightOfLine;
     }
@@ -1033,13 +1025,16 @@ export class FabricText<
   }
 
   /**
-   * Calculate height of line at 'lineIndex'
+   * Calculate height of line at 'lineIndex',
+   * without the lineHeigth multiplication factor
+   * @private
    * @param {Number} lineIndex index of line to calculate
    * @return {Number}
    */
-  getHeightOfLine(lineIndex: number): number {
-    if (this.__lineHeights[lineIndex]) {
-      return this.__lineHeights[lineIndex];
+  private getHeightOfLineImpl(lineIndex: number): number {
+    const lh = this.__lineHeights;
+    if (lh[lineIndex]) {
+      return lh[lineIndex];
     }
 
     // char 0 is measured before the line cycle because it needs to char
@@ -1049,19 +1044,26 @@ export class FabricText<
       maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
     }
 
-    return (this.__lineHeights[lineIndex] =
-      maxHeight * this.lineHeight * this._fontSizeMult);
+    return (lh[lineIndex] = maxHeight * this._fontSizeMult);
+  }
+
+  /**
+   * Calculate height of line at 'lineIndex'
+   * @param {Number} lineIndex index of line to calculate
+   * @return {Number}
+   */
+  getHeightOfLine(lineIndex: number): number {
+    return this.getHeightOfLineImpl(lineIndex) * this.lineHeight;
   }
 
   /**
    * Calculate text box height
    */
   calcTextHeight() {
-    let lineHeight,
-      height = 0;
+    let height = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      lineHeight = this.getHeightOfLine(i);
-      height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
+      height +=
+        i === len - 1 ? this.getHeightOfLineImpl(i) : this.getHeightOfLine(i);
     }
     return height;
   }
@@ -1096,18 +1098,15 @@ export class FabricText<
     const left = this._getLeftOffset(),
       top = this._getTopOffset();
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      const heightOfLine = this.getHeightOfLine(i),
-        maxHeight = heightOfLine / this.lineHeight,
-        leftOffset = this._getLineLeftOffset(i);
       this._renderTextLine(
         method,
         ctx,
         this._textLines[i],
-        left + leftOffset,
-        top + lineHeights + maxHeight,
+        left + this._getLineLeftOffset(i),
+        top + lineHeights + this.getHeightOfLineImpl(i),
         i,
       );
-      lineHeights += heightOfLine;
+      lineHeights += this.getHeightOfLine(i);
     }
     ctx.restore();
   }
@@ -1162,8 +1161,7 @@ export class FabricText<
     top: number,
     lineIndex: number,
   ) {
-    const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.includes(JUSTIFY),
+    const isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
       shortCut =
         !isJustify &&
@@ -1190,7 +1188,7 @@ export class FabricText<
       ctx.direction = isLtr ? 'ltr' : 'rtl';
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
-    top -= (lineHeight * this._fontSizeFraction) / this.lineHeight;
+    top -= this.getHeightOfLineImpl(lineIndex) * this._fontSizeFraction;
     if (shortCut) {
       // render all the line in one pass without checking
       // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
@@ -1900,9 +1898,7 @@ export class FabricText<
       ...restOfOptions
     } = { ...options, ...parsedAttributes };
 
-    const textContent = (element.textContent || '')
-      .replace(/^\s+|\s+$|\n+/g, '')
-      .replace(/\s+/g, ' ');
+    const textContent = normalizeWs(element.textContent || '').trim();
 
     // this code here is probably the usual issue for SVG center find
     // this can later looked at again and probably removed.

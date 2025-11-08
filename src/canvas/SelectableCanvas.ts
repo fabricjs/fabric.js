@@ -215,7 +215,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare _hoveredTarget?: FabricObject;
 
   /**
-   * hold the list of nested targets hovered
+   * hold the list of nested targets hovered in the previous events
    * @type FabricObject[]
    * @private
    */
@@ -226,7 +226,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @type FabricObject[]
    * @private
    */
-  _objectsToRender?: FabricObject[];
+  declare _objectsToRender?: FabricObject[];
 
   /**
    * hold a reference to a data structure that contains information

@@ -1,5 +1,17 @@
 # Changelog
 
+## [next]
+
+## [6.8.0]
+
+- fix(): CWE-1333 CWE-400 CWE-730 Simplify some regexes in order to avoid slowness with craft bad string #10746
+- fix(): CWE-1333 CWE-400 CWE-730 in Text.ts regex #10745
+- fix(StaticCanvas): After executing loadFromJSON, it unexpectedly adds an objects property to the canvas. #10741
+- fix(textarea): A form field element has neither an id nor a name attribute. #10172
+- fix(Canvas): The mouse enter and leave events of child elements will be executed twice. #10699
+- chore(): Remove mouse wheel console warning by setting default explicitly. #10712
+- fix(): fix rendering of text when line height is set to 0 #10785
+
 ## [6.7.1]
 
 - fix(SVGParser): Corrected CSS rule parsing for multiple style tags. [#10688](https://github.com/fabricjs/fabric.js/issues/10683)
