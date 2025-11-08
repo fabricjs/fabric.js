@@ -1,19 +1,17 @@
 import { config } from './config';
 import type { TRectBounds } from './typedefs';
 
-type TextCouplesCache = Map</** char */ string, /** width */ number>;
-
-type FamilyCache = Map</** fontStyleCacheKey */ string, TextCouplesCache>;
-
 export class Cache {
   /**
    * Cache of widths of chars in text rendering.
    */
-  declare charWidthsCache: Map</** fontFamily */ string, FamilyCache>;
-
-  constructor() {
-    this.charWidthsCache = new Map();
-  }
+  charWidthsCache: Record<
+    /** fontFamily */ string,
+    Record<
+      /** fontStyleCacheKey */ string,
+      Record</** char */ string, /** width */ number>
+    >
+  > = {};
 
   /**
    * @return {Object} reference to cache
@@ -26,20 +24,19 @@ export class Cache {
     fontFamily: string;
     fontStyle: string;
     fontWeight: string | number;
-  }): TextCouplesCache {
+  }) {
     fontFamily = fontFamily.toLowerCase();
-    const cache = this.charWidthsCache;
-    if (!cache.has(fontFamily)) {
-      cache.set(fontFamily, new Map<string, TextCouplesCache>());
+    if (!this.charWidthsCache[fontFamily]) {
+      this.charWidthsCache[fontFamily] = {};
     }
-    const fontCache = cache.get(fontFamily)!;
+    const fontCache = this.charWidthsCache[fontFamily];
     const cacheKey = `${fontStyle.toLowerCase()}_${(
       fontWeight + ''
     ).toLowerCase()}`;
-    if (!fontCache.has(cacheKey)) {
-      fontCache.set(cacheKey, new Map<string, number>());
+    if (!fontCache[cacheKey]) {
+      fontCache[cacheKey] = {};
     }
-    return fontCache.get(cacheKey)!;
+    return fontCache[cacheKey];
   }
 
   /**
@@ -54,10 +51,11 @@ export class Cache {
    * @param {String} [fontFamily] font family to clear
    */
   clearFontCache(fontFamily?: string) {
+    fontFamily = (fontFamily || '').toLowerCase();
     if (!fontFamily) {
-      this.charWidthsCache = new Map();
-    } else {
-      this.charWidthsCache.delete((fontFamily || '').toLowerCase());
+      this.charWidthsCache = {};
+    } else if (this.charWidthsCache[fontFamily]) {
+      delete this.charWidthsCache[fontFamily];
     }
   }
 
