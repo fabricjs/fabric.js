@@ -387,11 +387,11 @@ const getEnv = () => {
 };
 
 class Cache {
+  /**
+   * Cache of widths of chars in text rendering.
+   */
+
   constructor() {
-    /**
-     * Cache of widths of chars in text rendering.
-     */
-    _defineProperty(this, "charWidthsCache", {});
     /**
      * This object keeps the results of the boundsOfCurve calculation mapped by the joined arguments necessary to calculate it.
      * It does speed up calculation, if you parse and add always the same paths, but in case of heavy usage of freedrawing
@@ -401,7 +401,9 @@ class Cache {
      * It was an internal variable, is accessible since version 2.3.4
      */
     _defineProperty(this, "boundsOfCurveCache", {});
+    this.charWidthsCache = new Map();
   }
+
   /**
    * @return {Object} reference to cache
    */
@@ -412,15 +414,16 @@ class Cache {
       fontWeight
     } = _ref;
     fontFamily = fontFamily.toLowerCase();
-    if (!this.charWidthsCache[fontFamily]) {
-      this.charWidthsCache[fontFamily] = {};
+    const cache = this.charWidthsCache;
+    if (!cache.has(fontFamily)) {
+      cache.set(fontFamily, new Map());
     }
-    const fontCache = this.charWidthsCache[fontFamily];
+    const fontCache = cache.get(fontFamily);
     const cacheKey = "".concat(fontStyle.toLowerCase(), "_").concat((fontWeight + '').toLowerCase());
-    if (!fontCache[cacheKey]) {
-      fontCache[cacheKey] = {};
+    if (!fontCache.has(cacheKey)) {
+      fontCache.set(cacheKey, new Map());
     }
-    return fontCache[cacheKey];
+    return fontCache.get(cacheKey);
   }
 
   /**
@@ -435,11 +438,10 @@ class Cache {
    * @param {String} [fontFamily] font family to clear
    */
   clearFontCache(fontFamily) {
-    fontFamily = (fontFamily || '').toLowerCase();
     if (!fontFamily) {
-      this.charWidthsCache = {};
-    } else if (this.charWidthsCache[fontFamily]) {
-      delete this.charWidthsCache[fontFamily];
+      this.charWidthsCache = new Map();
+    } else {
+      this.charWidthsCache.delete((fontFamily || '').toLowerCase());
     }
   }
 
@@ -461,7 +463,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.8.0";
+var version = "6.9.0";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -19429,14 +19431,14 @@ class FabricText extends StyledText {
       stylesAreEqual = previousChar && fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width, coupleWidth, previousWidth, kernedWidth;
-    if (previousChar && fontCache[previousChar] !== undefined) {
-      previousWidth = fontCache[previousChar];
+    if (previousChar && fontCache.has(previousChar)) {
+      previousWidth = fontCache.get(previousChar);
     }
-    if (fontCache[_char] !== undefined) {
-      kernedWidth = width = fontCache[_char];
+    if (fontCache.has(_char)) {
+      kernedWidth = width = fontCache.get(_char);
     }
-    if (stylesAreEqual && fontCache[couple] !== undefined) {
-      coupleWidth = fontCache[couple];
+    if (stylesAreEqual && fontCache.has(couple)) {
+      coupleWidth = fontCache.get(couple);
       kernedWidth = coupleWidth - previousWidth;
     }
     if (width === undefined || previousWidth === undefined || coupleWidth === undefined) {
@@ -19445,16 +19447,16 @@ class FabricText extends StyledText {
       this._setTextStyles(ctx, charStyle, true);
       if (width === undefined) {
         kernedWidth = width = ctx.measureText(_char).width;
-        fontCache[_char] = width;
+        fontCache.set(_char, width);
       }
       if (previousWidth === undefined && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
-        fontCache[previousChar] = previousWidth;
+        fontCache.set(previousChar, previousWidth);
       }
       if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
-        fontCache[couple] = coupleWidth;
+        fontCache.set(couple, coupleWidth);
         // safe to use the non-null since if undefined we defined it before.
         kernedWidth = coupleWidth - previousWidth;
       }
