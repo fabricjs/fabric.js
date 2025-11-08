@@ -2,6 +2,10 @@
 
 ## [next]
 
+## [6.9.0]
+
+- fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
+
 ## [6.8.0]
 
 - fix(): CWE-1333 CWE-400 CWE-730 Simplify some regexes in order to avoid slowness with craft bad string #10746

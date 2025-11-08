@@ -824,14 +824,14 @@ export class FabricText<
       previousWidth: number | undefined,
       kernedWidth: number | undefined;
 
-    if (previousChar && fontCache[previousChar] !== undefined) {
-      previousWidth = fontCache[previousChar];
+    if (previousChar && fontCache.has(previousChar)) {
+      previousWidth = fontCache.get(previousChar);
     }
-    if (fontCache[_char] !== undefined) {
-      kernedWidth = width = fontCache[_char];
+    if (fontCache.has(_char)) {
+      kernedWidth = width = fontCache.get(_char);
     }
-    if (stylesAreEqual && fontCache[couple] !== undefined) {
-      coupleWidth = fontCache[couple];
+    if (stylesAreEqual && fontCache.has(couple)) {
+      coupleWidth = fontCache.get(couple)!;
       kernedWidth = coupleWidth - previousWidth!;
     }
     if (
@@ -844,16 +844,16 @@ export class FabricText<
       this._setTextStyles(ctx, charStyle, true);
       if (width === undefined) {
         kernedWidth = width = ctx.measureText(_char).width;
-        fontCache[_char] = width;
+        fontCache.set(_char, width);
       }
       if (previousWidth === undefined && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
-        fontCache[previousChar] = previousWidth;
+        fontCache.set(previousChar, previousWidth);
       }
       if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
-        fontCache[couple] = coupleWidth;
+        fontCache.set(couple, coupleWidth);
         // safe to use the non-null since if undefined we defined it before.
         kernedWidth = coupleWidth - previousWidth!;
       }

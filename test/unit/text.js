@@ -402,9 +402,9 @@
   QUnit.test('getFontCache works with fontWeight numbers', function(assert) {
     var text = new fabric.Text('xxx', { fontWeight: 400 });
     text.initDimensions();
-    var cache = fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()];
+    var cache = fabric.cache.charWidthsCache.get(text.fontFamily.toLowerCase());
     var cacheProp = text.fontStyle + '_400';
-    assert.equal(cacheProp in cache, true, '400 is converted to string');
+    assert.equal(cache.has(cacheProp), true, '400 is converted to string');
   });
 
   QUnit.test('getFontCache is case insensitive', function(assert) {
@@ -672,7 +672,7 @@
     var style = text.getCompleteStyleDeclaration(0, 0);
     var box = text._measureChar('a', style, zwc, style);
     var box2 = text._measureChar('a', style, zwc, style);
-    assert.equal(fabric.cache.charWidthsCache[text.fontFamily.toLowerCase()].normal_normal[zwc], 0, 'zwc is a 0 width char');
+    assert.equal(fabric.cache.charWidthsCache.get(text.fontFamily.toLowerCase()).get('normal_normal').get(zwc), 0, 'zwc is a 0 width char');
     assert.equal(box.kernedWidth, box2.kernedWidth, '2 measurements of the same string return the same number');
   });
 
