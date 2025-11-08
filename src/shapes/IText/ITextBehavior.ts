@@ -7,7 +7,7 @@ import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import type { TOptions } from '../../typedefs';
+import type { TOptions, TOriginX } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
 import { LEFT, MODIFIED, RIGHT, reNewline } from '../../constants';
 import type { IText } from './IText';
@@ -539,17 +539,32 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * This function updates the text value from the hidden textarea and recalculates the tex bounding box
+   * size and position.
+   * It is called by fabricJS internals, do not use it directly.
    * @private
    */
   updateFromTextArea() {
     if (!this.hiddenTextarea) {
       return;
     }
+    // we want to anchor the textarea position depending on text alignment
+    // or in case of text justify depending on ltr/rtl direction.
+    // this.textAlign.replace('justify-', '') leverage the fact that our textAlign values all contain the word left/right/center,
+    // that match the originX values.
+    const anchorX: TOriginX =
+      this.textAlign !== 'justify'
+        ? (this.textAlign.replace('justify-', '') as TOriginX)
+        : this.direction === 'ltr'
+          ? LEFT
+          : RIGHT;
+    const originalPosition = this.getPositionByOrigin(anchorX, 'top');
     this.cursorOffsetCache = {};
     const textarea = this.hiddenTextarea;
     this.text = textarea.value;
     this.set('dirty', true);
     this.initDimensions();
+    this.setPositionByOrigin(originalPosition, anchorX, 'top');
     this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
       textarea.selectionStart,
