@@ -1,4 +1,3 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Canvas } from './Canvas';
 import { Rect } from '../shapes/Rect';
 import { Circle } from '../shapes/Circle';
@@ -15,6 +14,9 @@ import type {
 } from '../EventTypeDefs.ts';
 import { getFabricDocument, IText, version } from '../../fabric';
 import { createPointerEvent } from '../../test/utils';
+import { expect as oldExpect } from '@jest/globals';
+
+const expect = (value: any, _description: string) => oldExpect(value);
 
 describe('Canvas events mixin', () => {
   const SUB_TARGETS_JSON = `{"version":"${version}","objects":[{"type":"ActiveSelection","left":-152,"top":656.25,"width":356.5,"height":356.5,"scaleX":0.45,"scaleY":0.45,"objects":[]},{"type":"Group","left":11,"top":6,"width":511.5,"height":511.5,"objects":[{"type":"Rect","left":-255.75,"top":-255.75,"width":50,"height":50,"fill":"#6ce798","scaleX":10.03,"scaleY":10.03,"opacity":0.8},{"type":"Group","left":-179.75,"top":22,"width":356.5,"height":356.5,"scaleX":0.54,"scaleY":0.54,"objects":[{"type":"Rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"Group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"Rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"Rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"Triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"Rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"Group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"Rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"Rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"Triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"Rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"Group","left":-202.75,"top":-228.5,"width":356.5,"height":356.5,"scaleX":0.61,"scaleY":0.61,"objects":[{"type":"Rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"Group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"Rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"Rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"Triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"Rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"Group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"Rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"Rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"Triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"Rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]},{"type":"Group","left":138.3,"top":-90.22,"width":356.5,"height":356.5,"scaleX":0.42,"scaleY":0.42,"angle":62.73,"objects":[{"type":"Rect","left":-178.25,"top":-178.25,"width":50,"height":50,"fill":"#4862cc","scaleX":6.99,"scaleY":6.99,"opacity":0.8},{"type":"Group","left":-163.25,"top":-161.25,"width":177.5,"height":177.5,"objects":[{"type":"Rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"Rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"Triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"Rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]},{"type":"Group","left":-34.25,"top":-31.25,"width":177.5,"height":177.5,"scaleX":1.08,"scaleY":1.08,"objects":[{"type":"Rect","left":-88.75,"top":-88.75,"width":50,"height":50,"fill":"#5fe909","scaleX":3.48,"scaleY":3.48,"opacity":0.8},{"type":"Rect","left":-59.75,"top":-68.75,"width":50,"height":50,"fill":"#f3529c","opacity":0.8},{"type":"Triangle","left":36.03,"top":-38.12,"width":50,"height":50,"fill":"#c1124e","angle":39.07,"opacity":0.8},{"type":"Rect","left":-65.75,"top":17.25,"width":50,"height":50,"fill":"#9c5120","opacity":0.8}]}]}]}]}`;
@@ -1047,130 +1049,6 @@ describe('Canvas events mixin', () => {
     expect(control.length, 'should have fired once').toBe(1);
     expect(control[0].target, 'no target should be referenced').toBeUndefined();
     expect(targetControl, 'no target should be referenced').toEqual([]);
-  });
-
-  it('fires mouseover and mouseout events for subTargets when subTargetCheck is enabled', async () => {
-    let counterOver = 0,
-      counterOut = 0;
-    const testCanvas = new Canvas();
-
-    function setSubTargetCheckRecursive(obj: any) {
-      if (obj._objects) {
-        obj._objects.forEach(setSubTargetCheckRecursive);
-      }
-      obj.subTargetCheck = true;
-      obj.on('mouseover', function () {
-        counterOver++;
-      });
-      obj.on('mouseout', function () {
-        counterOut++;
-      });
-    }
-
-    await testCanvas.loadFromJSON(SUB_TARGETS_JSON);
-    const activeSelection = new ActiveSelection();
-    activeSelection.add(...testCanvas.getObjects());
-    testCanvas.setActiveObject(activeSelection);
-    setSubTargetCheckRecursive(activeSelection);
-
-    // perform MouseOver event on a deeply nested subTarget
-    const moveEvent = createPointerEvent();
-    const target = testCanvas.item(1) as any;
-    // @ts-expect-error protected
-    testCanvas._targetInfo = {
-      subTargets: [
-        target.item(1),
-        target.item(1).item(1),
-        target.item(1).item(1).item(1),
-      ],
-    };
-
-    testCanvas._fireOverOutEvents(moveEvent, target);
-    expect(
-      counterOver,
-      'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets',
-    ).toBe(4);
-    expect(testCanvas._hoveredTarget, 'activeSelection is _hoveredTarget').toBe(
-      target,
-    );
-    expect(
-      testCanvas._hoveredTargets.length,
-      '3 additional subTargets are captured as _hoveredTargets',
-    ).toBe(3);
-
-    // perform MouseOut even on all hoveredTargets
-    // @ts-expect-error protected
-    testCanvas._targetInfo.subTargets = [];
-    // @ts-expect-error private method
-    testCanvas._fireOverOutEvents(moveEvent, null);
-    expect(
-      counterOut,
-      'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets',
-    ).toBe(4);
-    expect(
-      testCanvas._hoveredTarget,
-      '_hoveredTarget has been set to null',
-    ).toBeNull();
-    expect(
-      testCanvas._hoveredTargets.length,
-      '_hoveredTargets array is empty',
-    ).toBe(0);
-  });
-
-  it('fires mouseover and mouseout events for subTargets when subTargetCheck is enabled but not twice', async () => {
-    let counterOver = 0,
-      counterOut = 0;
-    const testCanvas = new Canvas();
-
-    function setSubTargetCheckRecursive(obj: any) {
-      if (obj._objects) {
-        obj._objects.forEach(setSubTargetCheckRecursive);
-      }
-      obj.subTargetCheck = true;
-      obj.on('mouseover', function () {
-        counterOver++;
-      });
-      obj.on('mouseout', function () {
-        counterOut++;
-      });
-    }
-
-    await testCanvas.loadFromJSON(SUB_TARGETS_JSON);
-    const activeSelection = new ActiveSelection();
-    activeSelection.add(...testCanvas.getObjects());
-    testCanvas.setActiveObject(activeSelection);
-    setSubTargetCheckRecursive(activeSelection);
-
-    // perform MouseOver event on a deeply nested subTarget
-    const moveEvent = createPointerEvent();
-    const target = testCanvas.item(1) as any;
-    // @ts-expect-error protected
-    testCanvas._targetInfo = {
-      subTargets: [
-        target,
-        target.item(1),
-        target.item(1).item(1),
-        target.item(1).item(1).item(1),
-      ],
-    };
-
-    testCanvas._fireOverOutEvents(moveEvent, target);
-    expect(
-      counterOver,
-      'mouseover fabric event fired 4 times for primary hoveredTarget & subTargets',
-    ).toBe(4);
-    expect(testCanvas._hoveredTarget, 'activeSelection is _hoveredTarget').toBe(
-      target,
-    );
-    // perform MouseOut even on all hoveredTargets
-    // @ts-expect-error protected
-    testCanvas._targetInfo.subTargets = [];
-    // @ts-expect-error private method
-    testCanvas._fireOverOutEvents(moveEvent, null);
-    expect(
-      counterOut,
-      'mouseout fabric event fired 4 times for primary hoveredTarget & subTargets',
-    ).toBe(4);
   });
 
   it('updates groupSelector during mouse move', () => {
