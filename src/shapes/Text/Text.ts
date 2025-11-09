@@ -1,4 +1,5 @@
 import { cache } from '../../cache';
+import type { NORMAL } from '../../constants';
 import { DEFAULT_SVG_FONT_SIZE, FILL, LTR, RTL, STROKE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
@@ -77,6 +78,17 @@ export type TextLinesInfo = {
   _unwrappedLines: string[][];
 };
 
+export type TextAlign =
+  | typeof LEFT
+  | typeof CENTER
+  | typeof RIGHT
+  | typeof JUSTIFY
+  | typeof JUSTIFY_LEFT
+  | typeof JUSTIFY_CENTER
+  | typeof JUSTIFY_RIGHT;
+
+export type FontStyle = '' | typeof NORMAL | 'italic' | 'oblique';
+
 /**
  * Measure and return the info of a single grapheme.
  * needs the the info of previous graphemes already filled
@@ -100,13 +112,13 @@ interface UniqueTextProps {
   fontSize: number;
   fontWeight: string | number;
   fontFamily: string;
-  fontStyle: string;
+  fontStyle: FontStyle;
   pathSide: TPathSide;
   pathAlign: TPathAlign;
   underline: boolean;
   overline: boolean;
   linethrough: boolean;
-  textAlign: string;
+  textAlign: TextAlign;
   direction: CanvasDirection;
   path?: Path;
   textDecorationThickness: number;
@@ -208,15 +220,15 @@ export class FabricText<
   /**
    * Text alignment. Possible values: "left", "center", "right", "justify",
    * "justify-left", "justify-center" or "justify-right".
-   * @type String
+   * @type TextAlign
    */
-  declare textAlign: string;
+  declare textAlign: TextAlign;
 
   /**
    * Font style . Possible values: "", "normal", "italic" or "oblique".
-   * @type String
+   * @type FontStyle
    */
-  declare fontStyle: string;
+  declare fontStyle: FontStyle;
 
   /**
    * Line height
@@ -1352,6 +1364,7 @@ export class FabricText<
     _char: string,
     left: number,
     top: number,
+    lineHeight?: number,
   ) {
     const decl = this._getStyleDeclaration(lineIndex, charIndex),
       fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
@@ -1474,11 +1487,7 @@ export class FabricText<
       leftOffset = lineDiff;
     }
     if (direction === RTL) {
-      if (
-        textAlign === RIGHT ||
-        textAlign === JUSTIFY ||
-        textAlign === JUSTIFY_RIGHT
-      ) {
+      if (textAlign === RIGHT || textAlign === JUSTIFY_RIGHT) {
         leftOffset = 0;
       } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
         leftOffset = -lineDiff;

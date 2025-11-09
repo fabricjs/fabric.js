@@ -1,4 +1,4 @@
-import { FILL, LEFT, LTR, STROKE, reNewline } from '../../constants';
+import { FILL, LEFT, LTR, NORMAL, STROKE, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { FabricText } from './Text';
 
@@ -73,13 +73,13 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,
   fontSize: 40,
-  fontWeight: 'normal',
+  fontWeight: NORMAL,
   fontFamily: 'Times New Roman',
   underline: false,
   overline: false,
   linethrough: false,
   textAlign: LEFT,
-  fontStyle: 'normal',
+  fontStyle: NORMAL,
   lineHeight: 1.16,
   textBackgroundColor: '',
   stroke: null,

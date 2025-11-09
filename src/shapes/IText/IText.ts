@@ -16,7 +16,7 @@ import {
   JUSTIFY_LEFT,
   JUSTIFY_RIGHT,
 } from '../Text/constants';
-import { CENTER, FILL, LEFT, RIGHT } from '../../constants';
+import { CENTER, FILL, LEFT, RIGHT, RTL } from '../../constants';
 import type { ObjectToCanvasElementOptions } from '../Object/Object';
 import type { FabricObject } from '../Object/FabricObject';
 import { createCanvasElementFor } from '../../util/misc/dom';
@@ -503,7 +503,7 @@ export class IText<
     let topOffset = 0,
       leftOffset = 0;
     const { charIndex, lineIndex } = this.get2DCursorLocation(index);
-
+    const { textAlign, direction } = this;
     for (let i = 0; i < lineIndex; i++) {
       topOffset += this.getHeightOfLine(i);
     }
@@ -516,27 +516,25 @@ export class IText<
     ) {
       leftOffset -= this._getWidthOfCharSpacing();
     }
-    const boundaries = {
-      top: topOffset,
-      left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0),
-    };
-    if (this.direction === 'rtl') {
+    let left = lineLeftOffset + (leftOffset > 0 ? leftOffset : 0);
+
+    if (direction === RTL) {
       if (
-        this.textAlign === RIGHT ||
-        this.textAlign === JUSTIFY ||
-        this.textAlign === JUSTIFY_RIGHT
+        textAlign === RIGHT ||
+        textAlign === JUSTIFY ||
+        textAlign === JUSTIFY_RIGHT
       ) {
-        boundaries.left *= -1;
-      } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
-        boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-      } else if (
-        this.textAlign === CENTER ||
-        this.textAlign === JUSTIFY_CENTER
-      ) {
-        boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+        left *= -1;
+      } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
+        left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+      } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
+        left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       }
     }
-    return boundaries;
+    return {
+      top: topOffset,
+      left,
+    };
   }
 
   /**

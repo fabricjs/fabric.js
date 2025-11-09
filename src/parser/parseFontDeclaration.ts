@@ -1,3 +1,4 @@
+import { NORMAL } from '../constants';
 import { parseUnit } from '../util/misc/svgParsing';
 import { reFontDeclaration } from './constants';
 
@@ -38,6 +39,6 @@ export function parseFontDeclaration(
     oStyle.fontFamily = fontFamily;
   }
   if (lineHeight) {
-    oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
+    oStyle.lineHeight = lineHeight === NORMAL ? 1 : lineHeight;
   }
 }

@@ -47,3 +47,5 @@ export const MODIFIED = 'modified';
 
 export const LTR = 'ltr';
 export const RTL = 'rtl';
+
+export const NORMAL = 'normal';
