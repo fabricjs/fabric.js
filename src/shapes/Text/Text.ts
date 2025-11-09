@@ -1,5 +1,5 @@
 import { cache } from '../../cache';
-import { DEFAULT_SVG_FONT_SIZE, FILL, STROKE } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, FILL, LTR, RTL, STROKE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
   CompleteTextStyleDeclaration,
@@ -745,7 +745,7 @@ export class FabricText<
           ctx.restore();
         } else if (currentColor !== lastColor) {
           drawStart = leftOffset + lineLeftOffset + boxStart;
-          if (this.direction === 'rtl') {
+          if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
           }
           ctx.fillStyle = lastColor;
@@ -760,7 +760,7 @@ export class FabricText<
       }
       if (currentColor && !this.path) {
         drawStart = leftOffset + lineLeftOffset + boxStart;
-        if (this.direction === 'rtl') {
+        if (this.direction === RTL) {
           drawStart = this.width - drawStart - boxWidth;
         }
         ctx.fillStyle = currentColor;
@@ -1051,7 +1051,7 @@ export class FabricText<
    * @return {Number} Left offset
    */
   _getLeftOffset(): number {
-    return this.direction === 'ltr' ? -this.width / 2 : this.width / 2;
+    return this.direction === LTR ? -this.width / 2 : this.width / 2;
   }
 
   /**
@@ -1146,8 +1146,8 @@ export class FabricText<
         this.charSpacing === 0 &&
         this.isEmptyStyles(lineIndex) &&
         !path,
-      isLtr = this.direction === 'ltr',
-      sign = this.direction === 'ltr' ? 1 : -1,
+      isLtr = this.direction === LTR,
+      sign = this.direction === LTR ? 1 : -1,
       // this was changed in the PR #7674
       // currentDirection = ctx.canvas.getAttribute('dir');
       currentDirection = ctx.direction;
@@ -1162,8 +1162,8 @@ export class FabricText<
 
     ctx.save();
     if (currentDirection !== this.direction) {
-      ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-      ctx.direction = isLtr ? 'ltr' : 'rtl';
+      ctx.canvas.setAttribute('dir', isLtr ? LTR : RTL);
+      ctx.direction = isLtr ? LTR : RTL;
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
     top -= this.getHeightOfLineImpl(lineIndex) * this._fontSizeFraction;
@@ -1473,7 +1473,7 @@ export class FabricText<
     if (textAlign === JUSTIFY_RIGHT) {
       leftOffset = lineDiff;
     }
-    if (direction === 'rtl') {
+    if (direction === RTL) {
       if (
         textAlign === RIGHT ||
         textAlign === JUSTIFY ||
@@ -1616,7 +1616,7 @@ export class FabricText<
         ) {
           const finalTickness = (this.fontSize * lastTickness) / 1000;
           let drawStart = leftOffset + lineLeftOffset + boxStart;
-          if (this.direction === 'rtl') {
+          if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
           }
           if (lastDecoration && lastFill && lastTickness) {
@@ -1641,7 +1641,7 @@ export class FabricText<
         }
       }
       let drawStart = leftOffset + lineLeftOffset + boxStart;
-      if (this.direction === 'rtl') {
+      if (this.direction === RTL) {
         drawStart = this.width - drawStart - boxWidth;
       }
       ctx.fillStyle = currentFill as string;

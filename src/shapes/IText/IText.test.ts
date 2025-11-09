@@ -16,6 +16,7 @@ import { FabricText } from '../Text/Text';
 import { version } from '../../../package.json';
 import { getFabricWindow } from '../../env';
 import { config } from '../../config';
+import { LEFT, LTR } from '../../constants';
 
 const ITEXT_OBJECT = {
   version: version,
@@ -51,7 +52,7 @@ const ITEXT_OBJECT = {
   underline: false,
   overline: false,
   linethrough: false,
-  textAlign: 'left',
+  textAlign: LEFT,
   backgroundColor: '',
   textBackgroundColor: '',
   fillRule: 'nonzero' as const,
@@ -63,9 +64,9 @@ const ITEXT_OBJECT = {
   styles: [],
   strokeUniform: false,
   path: undefined,
-  direction: 'ltr' as const,
+  direction: LTR,
   pathStartOffset: 0,
-  pathSide: 'left' as const,
+  pathSide: LEFT,
   pathAlign: 'baseline' as const,
   textDecorationThickness: 66.67,
 };

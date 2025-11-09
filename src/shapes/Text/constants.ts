@@ -1,4 +1,4 @@
-import { FILL, LEFT, STROKE, reNewline } from '../../constants';
+import { FILL, LEFT, LTR, STROKE, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { FabricText } from './Text';
 
@@ -90,7 +90,7 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   pathAlign: 'baseline',
   charSpacing: 0,
   deltaY: 0,
-  direction: 'ltr',
+  direction: LTR,
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
   // Text magic numbers

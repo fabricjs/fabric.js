@@ -9,7 +9,7 @@ import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
 import type { TOptions, TOriginX } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, MODIFIED, RIGHT, reNewline } from '../../constants';
+import { LEFT, LTR, MODIFIED, RIGHT, reNewline } from '../../constants';
 import type { IText } from './IText';
 import { JUSTIFY } from '../Text/constants';
 
@@ -557,7 +557,7 @@ export abstract class ITextBehavior<
     const anchorX: TOriginX =
       textAlign !== JUSTIFY
         ? (textAlign.replace('justify-', '') as TOriginX)
-        : direction === 'ltr'
+        : direction === LTR
           ? LEFT
           : RIGHT;
     const originalPosition = this.getPositionByOrigin(anchorX, 'top');
