@@ -658,9 +658,10 @@ export class IText<
     selection: { selectionStart: number; selectionEnd: number },
     boundaries: CursorBoundaries,
   ) {
+    const { textAlign, direction } = this;
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
-      isJustify = this.textAlign.includes(JUSTIFY),
+      isJustify = textAlign.includes(JUSTIFY),
       start = this.get2DCursorLocation(selectionStart),
       end = this.get2DCursorLocation(selectionEnd),
       startLine = start.lineIndex,
@@ -709,19 +710,16 @@ export class IText<
       } else {
         ctx.fillStyle = this.selectionColor;
       }
-      if (this.direction === 'rtl') {
+      if (direction === RTL) {
         if (
-          this.textAlign === RIGHT ||
-          this.textAlign === JUSTIFY ||
-          this.textAlign === JUSTIFY_RIGHT
+          textAlign === RIGHT ||
+          textAlign === JUSTIFY ||
+          textAlign === JUSTIFY_RIGHT
         ) {
           drawStart = this.width - drawStart - drawWidth;
-        } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
+        } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
           drawStart = boundaries.left + lineOffset - boxEnd;
-        } else if (
-          this.textAlign === CENTER ||
-          this.textAlign === JUSTIFY_CENTER
-        ) {
+        } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
           drawStart = boundaries.left + lineOffset - boxEnd;
         }
       }
