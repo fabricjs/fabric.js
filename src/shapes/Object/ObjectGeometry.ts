@@ -798,11 +798,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @private
    */
   _getLeftTopCoords() {
-    return this.translateToOriginPoint(
-      this.getRelativeCenterPoint(),
-      LEFT,
-      TOP,
-    );
+    return this.getPositionByOrigin(LEFT, TOP);
   }
 
   /**
