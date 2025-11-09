@@ -2,6 +2,7 @@
 
 ## [next]
 
+- tests are failing [#10804](https://github.com/fabricjs/fabric.js/pull/10804)
 - fix(): BREAKING Fix text positioning [#10803](https://github.com/fabricjs/fabric.js/pull/10803)
 - fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
 - chore(deps-dev): bump inquirer from 12.9.6 to 12.10.0 [#10789](https://github.com/fabricjs/fabric.js/pull/10789)
