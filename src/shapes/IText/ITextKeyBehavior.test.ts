@@ -46,6 +46,39 @@ describe('IText move cursor', () => {
       iText.hiddenTextarea!.dispatchEvent(event);
       expect(iText.text.includes('__UNIQUE_TEXT_')).toBe(true);
     });
+    test.each([
+      // [anchorX, textAlign, direction]
+      ['left', 'left', 'ltr'],
+      ['right', 'right', 'ltr'],
+      ['left', 'justify', 'ltr'],
+      ['right', 'justify', 'rtl'],
+    ] as const)(
+      'getPositionByOrigin (%s, top) unchanged after input for textAlign=%s dir=%s',
+      (anchorX, textAlign, direction) => {
+        const iText = new IText('', { fontSize: 20 });
+        iText.textAlign = textAlign;
+        iText.direction = direction;
+        iText.enterEditing();
+
+        const before = iText.getPositionByOrigin(anchorX, 'top');
+        const beforeWidth = iText.width;
+        const event = new (getFabricWindow().InputEvent)('input', {
+          inputType: 'insertText',
+          data: '__UNIQUE_TEXT_',
+          composed: true,
+        });
+        // manually crafted events have `isTrusted` as false so they won't interact with the html element
+        iText.hiddenTextarea!.value = `__UNIQUE_TEXT_${iText.hiddenTextarea!.value}`;
+        iText.hiddenTextarea!.dispatchEvent(event);
+
+        const after = iText.getPositionByOrigin(anchorX, 'top');
+
+        expect(after).toEqual(before);
+        expect(iText.width).not.toEqual(beforeWidth);
+        iText.exitEditing();
+        iText.dispose();
+      },
+    );
     test('updateFromTextArea calls setDimensions', () => {
       iText.enterEditing();
       expect(iText.width).toBeLessThan(400); // 'iText is less than 400px'

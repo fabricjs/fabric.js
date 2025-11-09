@@ -1,5 +1,6 @@
 import { cache } from '../../cache';
-import { DEFAULT_SVG_FONT_SIZE, FILL, STROKE } from '../../constants';
+import type { NORMAL } from '../../constants';
+import { DEFAULT_SVG_FONT_SIZE, FILL, LTR, RTL, STROKE } from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
   CompleteTextStyleDeclaration,
@@ -77,6 +78,17 @@ export type TextLinesInfo = {
   _unwrappedLines: string[][];
 };
 
+export type TextAlign =
+  | typeof LEFT
+  | typeof CENTER
+  | typeof RIGHT
+  | typeof JUSTIFY
+  | typeof JUSTIFY_LEFT
+  | typeof JUSTIFY_CENTER
+  | typeof JUSTIFY_RIGHT;
+
+export type FontStyle = '' | typeof NORMAL | 'italic' | 'oblique';
+
 /**
  * Measure and return the info of a single grapheme.
  * needs the the info of previous graphemes already filled
@@ -100,13 +112,13 @@ interface UniqueTextProps {
   fontSize: number;
   fontWeight: string | number;
   fontFamily: string;
-  fontStyle: string;
+  fontStyle: FontStyle;
   pathSide: TPathSide;
   pathAlign: TPathAlign;
   underline: boolean;
   overline: boolean;
   linethrough: boolean;
-  textAlign: string;
+  textAlign: TextAlign;
   direction: CanvasDirection;
   path?: Path;
   textDecorationThickness: number;
@@ -208,15 +220,15 @@ export class FabricText<
   /**
    * Text alignment. Possible values: "left", "center", "right", "justify",
    * "justify-left", "justify-center" or "justify-right".
-   * @type String
+   * @type TextAlign
    */
-  declare textAlign: string;
+  declare textAlign: TextAlign;
 
   /**
    * Font style . Possible values: "", "normal", "italic" or "oblique".
-   * @type String
+   * @type FontStyle
    */
-  declare fontStyle: string;
+  declare fontStyle: FontStyle;
 
   /**
    * Line height
@@ -745,7 +757,7 @@ export class FabricText<
           ctx.restore();
         } else if (currentColor !== lastColor) {
           drawStart = leftOffset + lineLeftOffset + boxStart;
-          if (this.direction === 'rtl') {
+          if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
           }
           ctx.fillStyle = lastColor;
@@ -760,7 +772,7 @@ export class FabricText<
       }
       if (currentColor && !this.path) {
         drawStart = leftOffset + lineLeftOffset + boxStart;
-        if (this.direction === 'rtl') {
+        if (this.direction === RTL) {
           drawStart = this.width - drawStart - boxWidth;
         }
         ctx.fillStyle = currentColor;
@@ -1051,7 +1063,7 @@ export class FabricText<
    * @return {Number} Left offset
    */
   _getLeftOffset(): number {
-    return this.direction === 'ltr' ? -this.width / 2 : this.width / 2;
+    return this.direction === LTR ? -this.width / 2 : this.width / 2;
   }
 
   /**
@@ -1146,8 +1158,8 @@ export class FabricText<
         this.charSpacing === 0 &&
         this.isEmptyStyles(lineIndex) &&
         !path,
-      isLtr = this.direction === 'ltr',
-      sign = this.direction === 'ltr' ? 1 : -1,
+      isLtr = this.direction === LTR,
+      sign = this.direction === LTR ? 1 : -1,
       // this was changed in the PR #7674
       // currentDirection = ctx.canvas.getAttribute('dir');
       currentDirection = ctx.direction;
@@ -1162,8 +1174,8 @@ export class FabricText<
 
     ctx.save();
     if (currentDirection !== this.direction) {
-      ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-      ctx.direction = isLtr ? 'ltr' : 'rtl';
+      ctx.canvas.setAttribute('dir', isLtr ? LTR : RTL);
+      ctx.direction = isLtr ? LTR : RTL;
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
     top -= this.getHeightOfLineImpl(lineIndex) * this._fontSizeFraction;
@@ -1473,12 +1485,8 @@ export class FabricText<
     if (textAlign === JUSTIFY_RIGHT) {
       leftOffset = lineDiff;
     }
-    if (direction === 'rtl') {
-      if (
-        textAlign === RIGHT ||
-        textAlign === JUSTIFY ||
-        textAlign === JUSTIFY_RIGHT
-      ) {
+    if (direction === RTL) {
+      if (textAlign === RIGHT || textAlign === JUSTIFY_RIGHT) {
         leftOffset = 0;
       } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
         leftOffset = -lineDiff;
@@ -1616,7 +1624,7 @@ export class FabricText<
         ) {
           const finalTickness = (this.fontSize * lastTickness) / 1000;
           let drawStart = leftOffset + lineLeftOffset + boxStart;
-          if (this.direction === 'rtl') {
+          if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
           }
           if (lastDecoration && lastFill && lastTickness) {
@@ -1641,7 +1649,7 @@ export class FabricText<
         }
       }
       let drawStart = leftOffset + lineLeftOffset + boxStart;
-      if (this.direction === 'rtl') {
+      if (this.direction === RTL) {
         drawStart = this.width - drawStart - boxWidth;
       }
       ctx.fillStyle = currentFill as string;

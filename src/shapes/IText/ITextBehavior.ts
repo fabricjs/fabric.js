@@ -7,10 +7,11 @@ import type { TOnAnimationChangeCallback } from '../../util/animation/types';
 import type { ValueAnimation } from '../../util/animation/ValueAnimation';
 import type { TextStyleDeclaration } from '../Text/StyledText';
 import type { SerializedTextProps, TextProps } from '../Text/Text';
-import type { TOptions } from '../../typedefs';
+import type { TOptions, TOriginX } from '../../typedefs';
 import { getDocumentFromElement } from '../../util/dom_misc';
-import { LEFT, MODIFIED, RIGHT, reNewline } from '../../constants';
+import { LEFT, LTR, MODIFIED, RIGHT, reNewline } from '../../constants';
 import type { IText } from './IText';
+import { JUSTIFY } from '../Text/constants';
 
 /**
  *  extend this regex to support non english languages
@@ -539,25 +540,40 @@ export abstract class ITextBehavior<
   }
 
   /**
+   * This function updates the text value from the hidden textarea and recalculates the text bounding box
+   * size and position.
+   * It is called by fabricJS internals, do not use it directly.
    * @private
    */
   updateFromTextArea() {
-    if (!this.hiddenTextarea) {
+    const { hiddenTextarea, direction, textAlign, inCompositionMode } = this;
+    if (!hiddenTextarea) {
       return;
     }
+    // we want to anchor the textarea position depending on text alignment
+    // or in case of text justify depending on ltr/rtl direction.
+    // this.textAlign.replace('justify-', '') leverages the fact that our textAlign values all contain the word left/right/center,
+    // that match the originX values.
+    const anchorX: TOriginX =
+      textAlign !== JUSTIFY
+        ? (textAlign.replace('justify-', '') as TOriginX)
+        : direction === LTR
+          ? LEFT
+          : RIGHT;
+    const originalPosition = this.getPositionByOrigin(anchorX, 'top');
     this.cursorOffsetCache = {};
-    const textarea = this.hiddenTextarea;
-    this.text = textarea.value;
+    this.text = hiddenTextarea.value;
     this.set('dirty', true);
     this.initDimensions();
+    this.setPositionByOrigin(originalPosition, anchorX, 'top');
     this.setCoords();
     const newSelection = this.fromStringToGraphemeSelection(
-      textarea.selectionStart,
-      textarea.selectionEnd,
-      textarea.value,
+      hiddenTextarea.selectionStart,
+      hiddenTextarea.selectionEnd,
+      hiddenTextarea.value,
     );
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
-    if (!this.inCompositionMode) {
+    if (!inCompositionMode) {
       this.selectionStart = newSelection.selectionStart;
     }
     this.updateTextareaPosition();
