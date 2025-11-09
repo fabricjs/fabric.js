@@ -1456,11 +1456,7 @@ export class FabricObject<
     this.set('angle', angle);
 
     if (centeredRotation) {
-      const { x, y } = this.translateToOriginPoint(
-        this.getRelativeCenterPoint(),
-        originX,
-        originY,
-      );
+      const { x, y } = this.getPositionByOrigin(originX, originY);
       this.left = x;
       this.top = y;
       this.originX = originX;
