@@ -1364,7 +1364,6 @@ export class FabricText<
     _char: string,
     left: number,
     top: number,
-    lineHeight?: number,
   ) {
     const decl = this._getStyleDeclaration(lineIndex, charIndex),
       fullDecl = this.getCompleteStyleDeclaration(lineIndex, charIndex),
