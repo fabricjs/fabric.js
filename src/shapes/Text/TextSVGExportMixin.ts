@@ -355,7 +355,6 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; `
         : '',
       fill ? colorPropToSVG(FILL, fill) : '',
-      deltaY ? `baseline-shift: ${-deltaY}; ` : '',
       useWhiteSpace ? 'white-space: pre; ' : '',
     ].join('');
   }
