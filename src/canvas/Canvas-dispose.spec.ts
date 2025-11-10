@@ -205,7 +205,7 @@ describe('Canvas dispose', () => {
       task,
     }) => {
       const ChosenClass =
-        task.suite?.name === 'unit-node' ? NodeClass : CanvasClass;
+        task.suite?.file.projectName === 'unit-node' ? NodeClass : CanvasClass;
       const canvas = new ChosenClass(undefined, { renderOnAddRemove: false });
       const testImageData = (colorByteVal: number) => {
         return canvas
