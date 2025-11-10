@@ -53,7 +53,7 @@ export class StaticCanvas extends StaticCanvasBase {
     if (this.destroyed) {
       return;
     }
-    console.log(this.patternQuality);
+
     ctx.patternQuality = this.patternQuality;
     return super.renderCanvas(
       ctx as unknown as globalThis.CanvasRenderingContext2D,

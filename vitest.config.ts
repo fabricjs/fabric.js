@@ -10,11 +10,6 @@ if (!fixturesUrl.endsWith('/')) {
 }
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      fabric: resolve(__dirname, './fabric.ts'),
-    },
-  },
   test: {
     pool: 'vmThreads',
     clearMocks: true,
@@ -25,6 +20,11 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     projects: [
       {
+        resolve: {
+          alias: {
+            fabric: resolve(__dirname, './index.node.ts'),
+          },
+        },
         extends: true,
         test: {
           environment: 'jsdom',
