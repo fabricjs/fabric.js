@@ -73,6 +73,8 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
+type PatternQuality = 'fast' | 'good' | 'best' | 'nearest' | 'bilinear';
+
 /**
  * Static canvas class
  * @see {@link http://fabric5.fabricjs.com/static_canvas|StaticCanvas demo}
@@ -170,6 +172,12 @@ export class StaticCanvas<
    * @default false
    */
   declare protected skipControlsDrawing: boolean;
+
+  /**
+   * Controls the rendering of images under node-canvas.
+   * Has no effects on the browser context.
+   */
+  declare patternQuality: PatternQuality;
 
   static ownDefaults = staticCanvasDefaults;
 
@@ -530,7 +538,7 @@ export class StaticCanvas<
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
     // @ts-expect-error node-canvas stuff
-    ctx.patternQuality = 'best';
+    ctx.patternQuality = this.patternQuality;
     this.fire('before:render', { ctx });
     this._renderBackground(ctx);
 
