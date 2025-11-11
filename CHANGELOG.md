@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Add scrollbars to extensions [#10371](https://github.com/fabricjs/fabric.js/discussions/10371)
 - fix(): BREAKING Fix text positioning [#10803](https://github.com/fabricjs/fabric.js/pull/10803)
 - fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
 - chore(deps-dev): bump inquirer from 12.9.6 to 12.10.0 [#10789](https://github.com/fabricjs/fabric.js/pull/10789)
