@@ -3,13 +3,9 @@
  */
 
 import type { StaticCanvas } from 'fabric';
-import type { StaticCanvas as NodeStaticCanvas } from 'fabric/node';
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-export function render(
-  canvas: StaticCanvas | NodeStaticCanvas,
-  fabric: typeof import('fabric') | typeof import('fabric/node'),
-) {
+export function render(canvas: StaticCanvas, fabric: typeof import('fabric')) {
   canvas.setDimensions({ width: 200, height: 70 });
   const textbox = new fabric.Textbox('fabric.js test', {
     width: 200,

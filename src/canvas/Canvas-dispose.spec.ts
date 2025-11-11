@@ -3,10 +3,6 @@ import { Rect } from '../shapes/Rect';
 import { config } from '../config';
 import { Canvas } from './Canvas';
 import {
-  Canvas as CanvasNode,
-  StaticCanvas as StaticCanvasNode,
-} from '../../index.node';
-import {
   ActiveSelection,
   getFabricDocument,
   runningAnimations,
@@ -20,13 +16,9 @@ function makeRect(options = {}) {
 
 describe('Canvas dispose', () => {
   describe.for([
-    {
-      name: 'StaticCanvas',
-      CanvasClass: StaticCanvas,
-      NodeClass: StaticCanvasNode,
-    },
-    { name: 'Canvas', CanvasClass: Canvas, NodeClass: CanvasNode },
-  ])('disposing $name', ({ CanvasClass, NodeClass }) => {
+    { name: 'StaticCanvas', CanvasClass: StaticCanvas },
+    { name: 'Canvas', CanvasClass: Canvas },
+  ])('disposing $name', ({ CanvasClass }) => {
     afterEach(() => {
       config.restoreDefaults();
     });
@@ -201,12 +193,8 @@ describe('Canvas dispose', () => {
       expect(canvas.nextRenderHandle, 'should request rendering').toBe(1);
     });
 
-    it('dispose edge case: `toCanvasElement` after dispose', async ({
-      task,
-    }) => {
-      const ChosenClass =
-        task.suite?.file.projectName === 'unit-node' ? NodeClass : CanvasClass;
-      const canvas = new ChosenClass(undefined, { renderOnAddRemove: false });
+    it('dispose edge case: `toCanvasElement` after dispose', async () => {
+      const canvas = new CanvasClass(undefined, { renderOnAddRemove: false });
       const testImageData = (colorByteVal: number) => {
         return canvas
           .toCanvasElement()

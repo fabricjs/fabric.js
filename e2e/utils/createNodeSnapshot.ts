@@ -1,6 +1,5 @@
 import * as fabric from 'fabric/node';
-import type { Canvas as NodeCanvas } from 'fabric/node';
-import type { Canvas } from 'fabric';
+
 export class TestingCanvas extends fabric.Canvas {
   requestRenderAll(): void {
     this.renderAll();
@@ -9,9 +8,9 @@ export class TestingCanvas extends fabric.Canvas {
 
 export async function createNodeSnapshot(
   cb: (
-    canvas: Canvas | NodeCanvas,
+    canvas: TestingCanvas,
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    fabric: typeof import('fabric') | typeof import('fabric/node'),
+    fabric: typeof import('fabric/node'),
   ) => any | Promise<any>,
   options: Partial<fabric.StaticCanvasOptions> = {},
 ) {

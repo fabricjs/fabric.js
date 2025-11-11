@@ -529,6 +529,8 @@ export class StaticCanvas<
     this.calcViewportBoundaries();
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
+    // @ts-expect-error node-canvas stuff
+    ctx.patternQuality = 'best';
     this.fire('before:render', { ctx });
     this._renderBackground(ctx);
 
