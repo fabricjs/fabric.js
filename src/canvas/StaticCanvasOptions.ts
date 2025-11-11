@@ -184,4 +184,5 @@ export const staticCanvasDefaults: TOptions<StaticCanvasOptions> = {
   allowTouchScrolling: false,
 
   viewportTransform: [...iMatrix],
+  patternQuality: 'best',
 };

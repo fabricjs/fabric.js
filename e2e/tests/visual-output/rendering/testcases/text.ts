@@ -1038,7 +1038,6 @@ const cases: renderTestType[] = [
   {
     title: 'Text with edge case lineHeight values (0 and 0.01)',
     golden: 'textLineHeightEdgeCases.png',
-    only: true,
     percentage: 0.03,
     size: [400, 300],
     async renderFunction(canvas, fabric) {
