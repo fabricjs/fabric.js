@@ -321,9 +321,8 @@ const canvasPattern: renderTestType = {
 };
 
 const canvasPatternNearest: renderTestType = {
-  only: true,
   title: 'canvas with background pattern and export quality low',
-  golden: 'canvasPattern.png',
+  golden: 'canvasPatternLow.png',
   percentage: 0.09,
   size: [500, 500],
   async renderFunction(canvas, fabric) {
@@ -649,6 +648,7 @@ export const genericRenderingTests = [
   objectsInActiveSelections,
   canvasPattern,
   canvasPatternMultiplier,
+  canvasPatternNearest,
   imageSmoothing,
   toCanvasElementAndControls,
   pathWithGradient,
