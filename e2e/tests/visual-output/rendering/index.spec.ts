@@ -2,6 +2,7 @@ import { expect, test } from '../../../fixtures/base';
 import { TestingCanvas } from '../../../utils/createNodeSnapshot';
 import { renderTests } from './renderingCases';
 import * as fabric from 'fabric/node';
+import type { Canvas as BrowserCanvas } from 'fabric';
 
 function dataURLOutputToBuffer(dataURL: string) {
   const base64Data = dataURL.replace(/^data:image\/png;base64,/, '');
@@ -60,7 +61,10 @@ test.describe('VISUAL RENDERING TESTS', () => {
             width: testCase.size[0],
             height: testCase.size[1],
           });
-          const output = await testCase.renderFunction(canvas, fabric);
+          const output = await testCase.renderFunction(
+            canvas as unknown as BrowserCanvas,
+            fabric as any,
+          );
           if (output) {
             expect(
               dataURLOutputToBuffer(output),
