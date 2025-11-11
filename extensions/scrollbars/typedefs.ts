@@ -28,3 +28,16 @@ export type ScrollbarProps = {
 export type ScrollbarXProps = Pick<ScrollbarProps, 'left' | 'right'>;
 
 export type ScrollbarYProps = Pick<ScrollbarProps, 'top' | 'bottom'>;
+
+export type MakeMouseWheelProps = {
+  /** Minimum zoom size */
+  min: number;
+  /** Maximum zoom size */
+  max: number;
+  /** Touchpad Zoom Speed default to 0.99 */
+  tSpeed: number;
+  /** Mouse Wheel Zoom Speed default to 0.998 */
+  mSpeed: number;
+  /** Canvas panning speed defaults to 1 */
+  pSpeed: number;
+};

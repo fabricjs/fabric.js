@@ -2,6 +2,7 @@ export { AligningGuidelines } from './aligning_guidelines';
 export type * from './aligning_guidelines/typedefs';
 
 export { Scrollbars } from './scrollbars';
+export { makeMouseWheel } from './scrollbars/util';
 export type * from './scrollbars/typedefs';
 
 export {

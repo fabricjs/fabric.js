@@ -5,7 +5,7 @@ Add scrollbars to the infinite canvas. The scrollbars will be hidden when all gr
 ## How to use it
 
 ```ts
-import { Scrollbars } from 'fabric/extensions';
+import { Scrollbars, makeMouseWheel } from 'fabric/extensions';
 
 const config = {
   /** Scrollbar fill color */
@@ -28,9 +28,15 @@ const config = {
   padding = 4;
 };
 
+// You have the option to implement custom canvas zooming or use the plugin's built-in solution.
+const mousewheel = makeMouseWheel(canvas);
+canvas.on("mouse:wheel", mousewheel);
+// canvas.off("mouse:wheel", mousewheel);
+
 const scrollbars = new Scrollbars(myCanvas, options);
 
 // in order to disable scrollbars later:
 
 scrollbars.dispose();
+
 ```
