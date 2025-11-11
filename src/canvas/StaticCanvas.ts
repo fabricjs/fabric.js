@@ -73,7 +73,7 @@ export type TSVGExportOptions = {
   reviver?: TSVGReviver;
 };
 
-type PatternQuality = 'fast' | 'good' | 'best' | 'nearest' | 'bilinear';
+export type PatternQuality = 'fast' | 'good' | 'best' | 'nearest' | 'bilinear';
 
 /**
  * Static canvas class

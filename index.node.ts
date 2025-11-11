@@ -8,7 +8,6 @@ setEnv(getEnv());
 // After the env is set we can export everything and expose specific node functionality
 
 import type { JpegConfig, PngConfig } from 'canvas';
-import type { StaticCanvasOptions, TOptions } from './fabric';
 import {
   Canvas as CanvasBase,
   StaticCanvas as StaticCanvasBase,
@@ -18,24 +17,7 @@ import { FabricObject as FabricObjectBase } from './src/shapes/Object/Object';
 FabricObjectBase.ownDefaults.objectCaching = false;
 
 export * from './fabric';
-
-type NodeStaticCanvasOptions = {
-  patternQuality: PatternQuality;
-};
-
-const staticCanvasDefaults: TOptions<
-  StaticCanvasOptions & NodeStaticCanvasOptions
-> = {
-  ...StaticCanvasBase.ownDefaults,
-  patternQuality: 'best',
-};
-
 export class StaticCanvas extends StaticCanvasBase {
-  declare patternQuality: PatternQuality;
-
-  static ownDefaults: TOptions<StaticCanvasOptions & NodeStaticCanvasOptions> =
-    staticCanvasDefaults;
-
   getNodeCanvas() {
     return getNodeCanvas(this.getElement());
   }
@@ -54,11 +36,6 @@ export class StaticCanvas extends StaticCanvasBase {
  * Use {@link StaticCanvas} instead.
  */
 export class Canvas extends CanvasBase {
-  declare patternQuality: PatternQuality;
-
-  static ownDefaults: TOptions<StaticCanvasOptions & NodeStaticCanvasOptions> =
-    staticCanvasDefaults;
-
   getNodeCanvas() {
     return getNodeCanvas(this.getElement());
   }
