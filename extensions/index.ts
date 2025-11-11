@@ -10,3 +10,6 @@ export {
   gradientUpdaterWrapper,
   installGradientUpdater,
 } from './data_updaters/gradient';
+
+export { DistanceGuide } from './distance-guide';
+export type * from './distance-guide/typedefs';
