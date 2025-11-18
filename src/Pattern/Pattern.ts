@@ -22,7 +22,7 @@ export class Pattern {
 
   /**
    * Legacy identifier of the class. Prefer using this.constructor.type 'Pattern'
-   * or utils like isPattern, or instance of to indentify a pattern in your code.
+   * or utils like isPattern, or instance of to identify a pattern in your code.
    * Will be removed in future versiones
    * @TODO add sustainable warning message
    * @type string
