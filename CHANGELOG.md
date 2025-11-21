@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump js-yaml from 3.14.1 to 3.14.2 in the npm_and_yarn group across 1 directory [#10812](https://github.com/fabricjs/fabric.js/pull/10812)
 - feat(): Add configuration parameter for patternQuality in node [#10804](https://github.com/fabricjs/fabric.js/pull/10804)
 - fix(): BREAKING Fix text positioning [#10803](https://github.com/fabricjs/fabric.js/pull/10803)
 - fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
