@@ -158,7 +158,7 @@ export default [
 
   {
     input: ['./extensions/index.ts'],
-    external: ['fabric'],
+    external: ['fabric', 'westures'],
     output: [
       // es modules in files
       {

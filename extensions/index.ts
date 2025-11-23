@@ -10,3 +10,5 @@ export {
   gradientUpdaterWrapper,
   installGradientUpdater,
 } from './data_updaters/gradient';
+
+export { addGestures } from './westures_integration';
