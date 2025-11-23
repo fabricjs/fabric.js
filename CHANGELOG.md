@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Multi touch gesture support with module westures [#10813](https://github.com/fabricjs/fabric.js/pull/10813)
 - feat(): Add configuration parameter for patternQuality in node [#10804](https://github.com/fabricjs/fabric.js/pull/10804)
 - fix(): BREAKING Fix text positioning [#10803](https://github.com/fabricjs/fabric.js/pull/10803)
 - fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
