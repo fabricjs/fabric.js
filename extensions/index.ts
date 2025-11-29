@@ -11,4 +11,8 @@ export {
   installGradientUpdater,
 } from './data_updaters/gradient';
 
-export { addGestures } from './westures_integration';
+export {
+  addGestures,
+  pinchEventHandler,
+  rotateEventHandler,
+} from './westures_integration';

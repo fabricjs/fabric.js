@@ -542,10 +542,42 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   private _onClick(e: TPointerEvent) {
     const clicks = e.detail;
+    console.log(clicks, e);
+
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
     clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
     clicks == 3 && this._handleEvent(e, 'tripleclick');
+    this._resetTransformEventData();
+  }
+
+  /**
+   * This supports gesture event firing
+   * It is a method to keep some code organized, it exposes private methods
+   * in a way that works and still keep them private
+   * @param {PointerEvent} e Event object fired on mousedown
+   */
+  fireEventFromPointerEvent<T>(
+    e: TPointerEvent,
+    eventName: string,
+    extraData: T,
+  ) {
+    this._cacheTransformEventData(e);
+    const { target, subTargets } = this.findTarget(e),
+      options = {
+        e,
+        target,
+        subTargets,
+        ...getEventPoints(this, e),
+        transform: this._currentTransform,
+        ...extraData,
+      };
+    this.fire(eventName, options);
+    // this may be a little be more complicated of what we want to handle
+    target && target.fire(eventName, options);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i] !== target && subTargets[i].fire(eventName, options);
+    }
     this._resetTransformEventData();
   }
 
@@ -936,6 +968,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (eventType === 'up:before' || eventType === 'up') {
       (options as CanvasEvents[`mouse:up`]).isClick = this._isClick;
     }
+
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
