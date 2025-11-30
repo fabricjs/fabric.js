@@ -1,5 +1,5 @@
 import wes from 'westures';
-import { type Canvas, type XY, util } from 'fabric';
+import { type Canvas, type CanvasEvents, type XY, util } from 'fabric';
 
 type PinchEventData = {
   centroid: XY;
@@ -14,7 +14,7 @@ type RotateEventData = {
   centroid: XY;
   event: PointerEvent;
   phase: string;
-  type: 'pinch';
+  type: 'rotate';
   rotation: number;
   target: HTMLElement;
 };
@@ -23,7 +23,10 @@ type RotateEventData = {
  * Register this handler on canvas.on('pinch', pinchEventHandler);
  * To get an out of the box functionality for the pinch to zoom
  */
-export function pinchEventHandler(this: Canvas, { scale, target, scenePoint }) {
+export function pinchEventHandler(
+  this: Canvas,
+  { scale, target, scenePoint }: CanvasEvents['pinch'],
+) {
   if (target && this.getActiveObject() === target) {
     // if we are pinching on the active object, let's scale it
     target.scaleX *= scale;
@@ -33,7 +36,10 @@ export function pinchEventHandler(this: Canvas, { scale, target, scenePoint }) {
   }
 }
 
-export function rotateEventHandler(this: Canvas, { rotation, target }) {
+export function rotateEventHandler(
+  this: Canvas,
+  { rotation, target }: CanvasEvents['rotate'],
+) {
   if (target && this.getActiveObject() === target) {
     target.rotate(target.angle + util.radiansToDegrees(rotation));
   }

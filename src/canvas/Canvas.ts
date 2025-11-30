@@ -561,10 +561,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * It is a method to keep some code organized, it exposes private methods
    * in a way that works and still keep them private
    */
-  fireEventFromPointerEvent<T>(
+  fireEventFromPointerEvent(
     e: TPointerEvent,
-    eventName: string,
-    extraData: T,
+    eventName: string | 'rotate' | 'pinch',
+    extraData:
+      | Record<string, unknown>
+      | { rotation: number }
+      | { ping: number },
   ) {
     this._cacheTransformEventData(e);
     const { target, subTargets } = this.findTarget(e),

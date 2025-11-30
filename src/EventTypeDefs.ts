@@ -265,7 +265,10 @@ type TPointerEvents<Prefix extends string> = Record<
   > &
   Record<`${Prefix}wheel`, TPointerEventInfo<WheelEvent>> &
   Record<`${Prefix}over`, TPointerEventInfo & InEvent> &
-  Record<`${Prefix}out`, TPointerEventInfo & OutEvent>;
+  Record<`${Prefix}out`, TPointerEventInfo & OutEvent> &
+  Record<'pinch', TPointerEventInfo & { scale: number }> &
+  Record<'rotate', TPointerEventInfo & { rotation: number }> &
+  Record<string, TPointerEventInfo & Record<string, unknown>>;
 
 export type TPointerEventNames =
   | WithBeforeSuffix<'down'>
