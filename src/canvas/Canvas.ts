@@ -544,8 +544,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onClick(e: TPointerEvent) {
-    this._clickCount += 1;
-    const clicks = this._clickCount;
+    const clicks = (this._clickCount += 1);
     clearTimeout(this._clickInterval);
     this._clickInterval = setTimeout(() => {
       this._clickCount = 0;
@@ -561,7 +560,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * This supports gesture event firing
    * It is a method to keep some code organized, it exposes private methods
    * in a way that works and still keep them private
-   * @param {PointerEvent} e Event object fired on mousedown
    */
   fireEventFromPointerEvent<T>(
     e: TPointerEvent,
