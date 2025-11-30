@@ -117,10 +117,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   private _isClick: boolean;
 
+  declare _clickCount: number;
+  declare _clickInterval: ReturnType<typeof setTimeout>;
+  declare multipleClickDelay: number;
+
   textEditingManager = new TextEditingManager(this);
 
   constructor(el?: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
+    this._clickCount = 0;
     // bind event handlers
     (
       [
@@ -180,8 +185,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     functor(canvasElement, 'wheel', this._onMouseWheel, { passive: false });
     functor(canvasElement, 'contextmenu', this._onContextMenu);
     functor(canvasElement, 'click', this._onClick);
-    // decide if to remove in fabric 7.0
-    functor(canvasElement, 'dblclick', this._onClick);
     functor(canvasElement, 'dragstart', this._onDragStart);
     functor(canvasElement, 'dragend', this._onDragEnd);
     functor(canvasElement, 'dragover', this._onDragOver);
@@ -541,9 +544,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onClick(e: TPointerEvent) {
-    const clicks = e.detail;
-    console.log(clicks, e);
-
+    this._clickCount += 1;
+    const clicks = this._clickCount;
+    clearTimeout(this._clickInterval);
+    this._clickInterval = setTimeout(() => {
+      this._clickCount = 0;
+    }, this.multipleClickDelay);
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
     clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');

@@ -23,7 +23,7 @@ type RotateEventData = {
  * Register this handler on canvas.on('pinch', pinchEventHandler);
  * To get an out of the box functionality for the pinch to zoom
  */
-function pinchEventHandler(this: Canvas, { scale, target, scenePoint }) {
+export function pinchEventHandler(this: Canvas, { scale, target, scenePoint }) {
   if (target && this.getActiveObject() === target) {
     // if we are pinching on the active object, let's scale it
     target.scaleX *= scale;
@@ -33,11 +33,11 @@ function pinchEventHandler(this: Canvas, { scale, target, scenePoint }) {
   }
 }
 
-export const rotateEventHandler = ({ rotation, target }) => {
-  if (target && target.canvas.getActiveObject() === target) {
+export function rotateEventHandler(this: Canvas, { rotation, target }) {
+  if (target && this.getActiveObject() === target) {
     target.rotate(target.angle + util.radiansToDegrees(rotation));
   }
-};
+}
 
 export const pinchGesture = (canvas: Canvas) => {
   return new wes.Pinch(

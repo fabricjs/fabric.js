@@ -224,6 +224,14 @@ export interface CanvasEventsOptions {
    * @type Boolean
    */
   enablePointerEvents: boolean;
+
+  /**
+   * The number of milliseconds to consider clicks chained together.
+   * Used to track double and triple click since touch and pointer events on touch device
+   * can fire clicks but not dblclicks, and do not carry the detail property on the click event
+   * @type Boolean
+   */
+  multipleClickDelay: number;
 }
 
 export interface CanvasOptions
@@ -281,6 +289,7 @@ export const canvasDefaults: TOptions<CanvasOptions> = {
   fireRightClick: true,
   fireMiddleClick: true,
   enablePointerEvents: false,
+  multipleClickDelay: 300,
 
   containerClass: 'canvas-container',
   preserveObjectStacking: true,
