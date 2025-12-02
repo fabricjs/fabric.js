@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(): Fix the situation where undefined + char exists when calculating coupleWidth [#10816](https://github.com/fabricjs/fabric.js/pull/10816)
 - feat(): Add configuration parameter for patternQuality in node [#10804](https://github.com/fabricjs/fabric.js/pull/10804)
 - fix(): BREAKING Fix text positioning [#10803](https://github.com/fabricjs/fabric.js/pull/10803)
 - fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
