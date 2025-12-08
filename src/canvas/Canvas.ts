@@ -117,15 +117,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   private _isClick: boolean;
 
-  declare _clickCount: number;
-  declare _clickInterval: ReturnType<typeof setTimeout>;
-  declare multipleClickDelay: number;
-
   textEditingManager = new TextEditingManager(this);
 
   constructor(el?: string | HTMLCanvasElement, options: TCanvasOptions = {}) {
     super(el, options);
-    this._clickCount = 0;
     // bind event handlers
     (
       [
@@ -544,11 +539,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onClick(e: TPointerEvent) {
-    const clicks = (this._clickCount += 1);
-    clearTimeout(this._clickInterval);
-    this._clickInterval = setTimeout(() => {
-      this._clickCount = 0;
-    }, this.multipleClickDelay);
+    const clicks = e.detail;
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
     clicks === 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');

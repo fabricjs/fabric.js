@@ -57,11 +57,11 @@ export const tripleTapGesture = (canvas: Canvas) => {
   return new wes.Tap(
     canvas.upperCanvasEl,
     ({ event }: TapEventData) => {
-      canvas.fireEventFromPointerEvent(event, 'tripleclick');
+      canvas.fireEventFromPointerEvent(event, 'mousetripleclick');
     },
     {
       numTaps: 3,
-      maxRetain: 300,
+      maxRetain: 400,
     },
   );
 };
@@ -70,7 +70,7 @@ export const doubleTapGesture = (canvas: Canvas) => {
   return new wes.Tap(
     canvas.upperCanvasEl,
     ({ event }: TapEventData) => {
-      canvas.fireEventFromPointerEvent(event, 'dblclick');
+      canvas.fireEventFromPointerEvent(event, 'mousedblclick');
     },
     {
       numTaps: 2,
