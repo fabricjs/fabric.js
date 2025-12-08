@@ -19,6 +19,14 @@ type RotateEventData = {
   target: HTMLElement;
 };
 
+type TapEventData = {
+  centroid: XY;
+  event: PointerEvent;
+  phase: string;
+  type: 'tap';
+  target: HTMLElement;
+};
+
 /**
  * Register this handler on canvas.on('pinch', pinchEventHandler);
  * To get an out of the box functionality for the pinch to zoom
@@ -45,6 +53,32 @@ export function rotateEventHandler(
   }
 }
 
+export const tripleTapGesture = (canvas: Canvas) => {
+  return new wes.Tap(
+    canvas.upperCanvasEl,
+    ({ event }: TapEventData) => {
+      canvas.fireEventFromPointerEvent(event, 'tripleclick');
+    },
+    {
+      numTaps: 3,
+      maxRetain: 300,
+    },
+  );
+};
+
+export const doubleTapGesture = (canvas: Canvas) => {
+  return new wes.Tap(
+    canvas.upperCanvasEl,
+    ({ event }: TapEventData) => {
+      canvas.fireEventFromPointerEvent(event, 'dblclick');
+    },
+    {
+      numTaps: 2,
+      maxRetain: 300,
+    },
+  );
+};
+
 export const pinchGesture = (canvas: Canvas) => {
   return new wes.Pinch(
     canvas.upperCanvasEl,
@@ -70,4 +104,6 @@ export const addGestures = (canvas: Canvas) => {
   const canvasRegion = new wes.Region(canvas.upperCanvasEl);
   canvasRegion.addGesture(rotateGesture(canvas));
   canvasRegion.addGesture(pinchGesture(canvas));
+  canvasRegion.addGesture(tripleTapGesture(canvas));
+  canvasRegion.addGesture(doubleTapGesture(canvas));
 };

@@ -551,8 +551,8 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }, this.multipleClickDelay);
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
-    clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
-    clicks == 3 && this._handleEvent(e, 'tripleclick');
+    clicks === 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
+    clicks === 3 && this._handleEvent(e, 'tripleclick');
     this._resetTransformEventData();
   }
 
@@ -560,6 +560,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * This supports gesture event firing
    * It is a method to keep some code organized, it exposes private methods
    * in a way that works and still keep them private
+   * This is supposed to mirror _handleEvent
    */
   fireEventFromPointerEvent(
     e: TPointerEvent,
@@ -567,7 +568,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     extraData:
       | Record<string, unknown>
       | { rotation: number }
-      | { ping: number },
+      | { ping: number } = {},
   ) {
     this._cacheTransformEventData(e);
     const { target, subTargets } = this.findTarget(e),
