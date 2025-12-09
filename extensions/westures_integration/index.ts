@@ -57,7 +57,13 @@ export const tripleTapGesture = (canvas: Canvas) => {
   return new wes.Tap(
     canvas.upperCanvasEl,
     ({ event }: TapEventData) => {
-      canvas.fireEventFromPointerEvent(event, 'mousetripleclick');
+      canvas.fireEventFromPointerEvent(
+        event,
+        'mouse:tripleclick',
+        undefined,
+        'mousetripleclick',
+      );
+      event.preventDefault();
     },
     {
       numTaps: 3,
@@ -70,7 +76,13 @@ export const doubleTapGesture = (canvas: Canvas) => {
   return new wes.Tap(
     canvas.upperCanvasEl,
     ({ event }: TapEventData) => {
-      canvas.fireEventFromPointerEvent(event, 'mousedblclick');
+      canvas.fireEventFromPointerEvent(
+        event,
+        'mouse:dblclick',
+        undefined,
+        'mousedblclick',
+      );
+      event.preventDefault();
     },
     {
       numTaps: 2,
@@ -102,8 +114,20 @@ export const rotateGesture = (canvas: Canvas) => {
  */
 export const addGestures = (canvas: Canvas) => {
   const canvasRegion = new wes.Region(canvas.upperCanvasEl);
+  canvas.addOrRemove(
+    (
+      el: HTMLElement,
+      ...args: Parameters<HTMLElement['removeEventListener']>
+    ) => el.removeEventListener(...args),
+  );
   canvasRegion.addGesture(rotateGesture(canvas));
   canvasRegion.addGesture(pinchGesture(canvas));
   canvasRegion.addGesture(tripleTapGesture(canvas));
   canvasRegion.addGesture(doubleTapGesture(canvas));
+  // add back events, excluding the click one
+  canvas.addOrRemove(
+    (el: HTMLElement, ...args: Parameters<HTMLElement['addEventListener']>) =>
+      el.addEventListener(...args),
+    true,
+  );
 };

@@ -153,7 +153,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this[eventHandler] = (this[eventHandler] as Function).bind(this);
     });
     // register event handlers
-    this.addOrRemove(addListener, 'add');
+    this.addOrRemove(addListener);
   }
 
   /**
@@ -164,7 +164,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     return this.enablePointerEvents ? 'pointer' : 'mouse';
   }
 
-  addOrRemove(functor: any, _eventjsFunctor: 'add' | 'remove') {
+  addOrRemove(functor: any, forTouch = false) {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
@@ -179,7 +179,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
     functor(canvasElement, 'wheel', this._onMouseWheel, { passive: false });
     functor(canvasElement, 'contextmenu', this._onContextMenu);
-    functor(canvasElement, 'click', this._onClick);
+    if (!forTouch) {
+      functor(canvasElement, 'click', this._onClick);
+      functor(canvasElement, 'dblclick', this._onClick);
+    }
     functor(canvasElement, 'dragstart', this._onDragStart);
     functor(canvasElement, 'dragend', this._onDragEnd);
     functor(canvasElement, 'dragover', this._onDragOver);
@@ -189,24 +192,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (!this.enablePointerEvents) {
       functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
     }
-    // if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
-    //   eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
-    //   eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
-    //   eventjs[eventjsFunctor](
-    //     canvasElement,
-    //     'orientation',
-    //     this._onOrientationChange
-    //   );
-    //   eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
-    //   eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
-    // }
   }
 
   /**
    * Removes all event listeners, used when disposing the instance
    */
   removeListeners() {
-    this.addOrRemove(removeListener, 'remove');
+    this.addOrRemove(removeListener);
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(this.upperCanvasEl);
@@ -539,11 +531,17 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onClick(e: TPointerEvent) {
+    if (e.defaultPrevented) {
+      return;
+    }
     const clicks = e.detail;
+    console.log(performance.now(), clicks);
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
-    clicks === 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
-    clicks === 3 && this._handleEvent(e, 'tripleclick');
+    clicks === 2 && this._handleEvent(e, 'dblclick');
+    clicks === 3 &&
+      e.type === 'dblclick' &&
+      this._handleEvent(e, 'tripleclick');
     this._resetTransformEventData();
   }
 
@@ -560,6 +558,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       | Record<string, unknown>
       | { rotation: number }
       | { ping: number } = {},
+    secondaryName: string = eventName,
   ) {
     this._cacheTransformEventData(e);
     const { target, subTargets } = this.findTarget(e),
@@ -573,9 +572,9 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       };
     this.fire(eventName, options);
     // this may be a little be more complicated of what we want to handle
-    target && target.fire(eventName, options);
+    target && target.fire(secondaryName, options);
     for (let i = 0; i < subTargets.length; i++) {
-      subTargets[i] !== target && subTargets[i].fire(eventName, options);
+      subTargets[i] !== target && subTargets[i].fire(secondaryName, options);
     }
     this._resetTransformEventData();
   }
