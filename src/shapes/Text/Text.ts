@@ -814,7 +814,7 @@ export class FabricText<
   ) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      couple = previousChar + _char,
+      couple = previousChar ? previousChar + _char : _char,
       stylesAreEqual =
         previousChar &&
         fontDeclaration === this._getFontDeclaration(prevCharStyle),
