@@ -535,7 +535,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       return;
     }
     const clicks = e.detail;
-    console.log(performance.now(), clicks);
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
     clicks === 2 && this._handleEvent(e, 'dblclick');
