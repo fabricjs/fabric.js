@@ -60,8 +60,8 @@ export const tripleTapGesture = (canvas: Canvas) => {
       canvas.fireEventFromPointerEvent(
         event,
         'mouse:tripleclick',
-        undefined,
         'mousetripleclick',
+        undefined,
       );
       event.preventDefault();
     },
@@ -79,8 +79,8 @@ export const doubleTapGesture = (canvas: Canvas) => {
       canvas.fireEventFromPointerEvent(
         event,
         'mouse:dblclick',
-        undefined,
         'mousedblclick',
+        undefined,
       );
       event.preventDefault();
     },
@@ -95,7 +95,7 @@ export const pinchGesture = (canvas: Canvas) => {
   return new wes.Pinch(
     canvas.upperCanvasEl,
     ({ scale, event }: PinchEventData) => {
-      canvas.fireEventFromPointerEvent(event, 'pinch', { scale });
+      canvas.fireEventFromPointerEvent(event, 'pinch', 'pinch', { scale });
     },
   );
 };
@@ -104,7 +104,7 @@ export const rotateGesture = (canvas: Canvas) => {
   return new wes.Rotate(
     canvas.upperCanvasEl,
     ({ rotation, event }: RotateEventData) => {
-      canvas.fireEventFromPointerEvent(event, 'rotate', { rotation });
+      canvas.fireEventFromPointerEvent(event, 'rotate', 'rotate', { rotation });
     },
   );
 };

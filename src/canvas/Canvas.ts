@@ -553,12 +553,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   fireEventFromPointerEvent(
     e: TPointerEvent,
-    eventName: string | 'rotate' | 'pinch',
+    eventName: keyof CanvasEvents,
+    secondaryName: keyof ObjectEvents,
     extraData:
       | Record<string, unknown>
       | { rotation: number }
       | { ping: number } = {},
-    secondaryName: string = eventName,
   ) {
     this._cacheTransformEventData(e);
     const { target, subTargets } = this.findTarget(e),

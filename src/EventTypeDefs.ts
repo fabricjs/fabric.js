@@ -267,8 +267,7 @@ type TPointerEvents<Prefix extends string> = Record<
   Record<`${Prefix}over`, TPointerEventInfo & InEvent> &
   Record<`${Prefix}out`, TPointerEventInfo & OutEvent> &
   Record<'pinch', TPointerEventInfo & { scale: number }> &
-  Record<'rotate', TPointerEventInfo & { rotation: number }> &
-  Record<string, TPointerEventInfo & Record<string, unknown>>;
+  Record<'rotate', TPointerEventInfo & { rotation: number }>;
 
 export type TPointerEventNames =
   | WithBeforeSuffix<'down'>
@@ -298,7 +297,6 @@ export interface ObjectEvents
   deselected: Partial<TEvent> & {
     target: FabricObject;
   };
-
   // tree
   added: { target: Group | Canvas | StaticCanvas };
   removed: { target: Group | Canvas | StaticCanvas };
