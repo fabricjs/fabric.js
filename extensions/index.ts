@@ -10,3 +10,9 @@ export {
   gradientUpdaterWrapper,
   installGradientUpdater,
 } from './data_updaters/gradient';
+
+export {
+  addGestures,
+  pinchEventHandler,
+  rotateEventHandler,
+} from './westures_integration';
