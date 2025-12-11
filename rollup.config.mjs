@@ -176,6 +176,7 @@ export default [
         sourcemap: true,
         globals: {
           fabric: 'fabric',
+          westures: 'westures',
         },
         plugins: [terser()],
       },

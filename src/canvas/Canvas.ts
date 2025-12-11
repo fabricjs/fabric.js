@@ -531,16 +531,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    * @param {Event} e Event object fired on mousedown
    */
   private _onClick(e: TPointerEvent) {
-    if (e.defaultPrevented) {
-      return;
-    }
     const clicks = e.detail;
     if (clicks > 3 || clicks < 2) return;
     this._cacheTransformEventData(e);
-    clicks === 2 && this._handleEvent(e, 'dblclick');
-    clicks === 3 &&
-      e.type === 'dblclick' &&
-      this._handleEvent(e, 'tripleclick');
+    clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
+    clicks == 3 && this._handleEvent(e, 'tripleclick');
     this._resetTransformEventData();
   }
 

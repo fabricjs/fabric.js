@@ -71,7 +71,7 @@
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
     "@eslint/js": "^9.37.0",
-    "@playwright/test": "^1.56.0",
+    "@playwright/test": "^1.57.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-terser": "^0.4.4",
