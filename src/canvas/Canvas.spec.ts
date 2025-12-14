@@ -1155,7 +1155,7 @@ describe('Canvas', () => {
     // don't compare actual data url, as it is often browser-dependent
 
     expect(mockSetCtx).toHaveBeenCalledWith(undefined);
-  });
+    expect(mockSetCtx).toHaveBeenCalledTimes(2);
 
   it('implements toDataURL method that returns valid data URL', () => {
     expect(canvas.toDataURL).toBeTypeOf('function');
