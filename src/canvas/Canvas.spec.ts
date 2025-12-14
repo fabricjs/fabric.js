@@ -4,6 +4,29 @@ import { IText } from '../shapes/IText/IText';
 import '../shapes/ActiveSelection';
 
 describe('Canvas', () => {
+    it('implements toCanvasElement method that clears the contextTop', () => {
+    const canvas = new Canvas();
+    const mockSetCtx = jest.fn();
+    class UpperMock {
+      declare el: any;
+      set ctx(value: any) {
+        mockSetCtx(value);
+      }
+      get ctx() {
+        return undefined;
+      }
+      constructor() {
+        this.el = {
+          getContext: jest.fn(),
+        };
+      }
+    }
+    canvas.elements.upper = new UpperMock();
+
+    canvas.toCanvasElement();
+    expect(mockSetCtx).toHaveBeenCalledWith(undefined);
+    expect(mockSetCtx).toHaveBeenCalledTimes(2);
+  });
   describe('touchStart', () => {
     test('will prevent default to not allow dom scrolling on canvas touch drag', () => {
       const canvas = new Canvas(undefined, {
