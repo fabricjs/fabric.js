@@ -3,7 +3,16 @@ import { Rect } from '../shapes/Rect';
 import { IText } from '../shapes/IText/IText';
 import '../shapes/ActiveSelection';
 
-import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  test,
+  vi,
+  vitest,
+} from 'vitest';
 import { config } from '../config';
 import type {
   FabricObject,
@@ -1130,6 +1139,31 @@ describe('Canvas', () => {
     expect(target2, 'Should not find target').toBeUndefined();
 
     canvas.remove(rect);
+  });
+
+  it('implements toCanvasElement method that clears the contextTop', () => {
+    const canvas = new Canvas();
+    const mockSetCtx = vitest.fn();
+    class UpperMock {
+      declare el: any;
+      set ctx(value: any) {
+        mockSetCtx(value);
+      }
+      get ctx() {
+        return undefined;
+      }
+      constructor() {
+        this.el = {
+          getContext: vitest.fn(),
+        };
+      }
+    }
+    canvas.elements.upper = new UpperMock();
+
+    canvas.toCanvasElement();
+    // don't compare actual data url, as it is often browser-dependent
+
+    expect(mockSetCtx).toHaveBeenCalledWith(undefined);
   });
 
   it('implements toDataURL method that returns valid data URL', () => {
