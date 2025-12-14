@@ -23,7 +23,4 @@ export function testCase(canvas: fabric.Canvas) {
   canvas.setDimensions({ width: 900, height: 700 });
   canvas.add(text2);
   canvas.centerObject(text2);
-  setInterval(() => {
-    canvas.toDataURL({ multiplier: 2 });
-  }, 1000);
 }
