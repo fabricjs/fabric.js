@@ -3,16 +3,7 @@ import { Rect } from '../shapes/Rect';
 import { IText } from '../shapes/IText/IText';
 import '../shapes/ActiveSelection';
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  test,
-  vi,
-  vitest,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 import { config } from '../config';
 import type {
   FabricObject,
@@ -1143,7 +1134,7 @@ describe('Canvas', () => {
 
   it('implements toCanvasElement method that clears the contextTop', () => {
     const canvas = new Canvas();
-    const mockSetCtx = vitest.fn();
+    const mockSetCtx = vi.fn();
     class UpperMock {
       declare el: any;
       set ctx(value: any) {
@@ -1154,7 +1145,7 @@ describe('Canvas', () => {
       }
       constructor() {
         this.el = {
-          getContext: vitest.fn(),
+          getContext: vi.fn(),
         };
       }
     }
