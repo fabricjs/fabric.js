@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [7.0.0]
 
 - fix(): Fix toDataUrl writing on contextTop [#10820](https://github.com/fabricjs/fabric.js/pull/10820)
 - feat(): Multi touch gesture support with module westures [#10813](https://github.com/fabricjs/fabric.js/pull/10813)

@@ -356,7 +356,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.0.0-beta1";
+var version = "7.0.0-rc1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -15748,6 +15748,23 @@ class Canvas extends SelectableCanvas {
   }
 
   /**
+   * Wraps the original toCanvasElement with a function that removes
+   * the context top for the time the function is run.
+   * So we avoid painting side effects on the upper canvas when exporting
+   */
+  toCanvasElement() {
+    let multiplier = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    let options = arguments.length > 1 ? arguments[1] : undefined;
+    const {
+      upper
+    } = this.elements;
+    upper.ctx = undefined;
+    const htmlElement = super.toCanvasElement(multiplier, options);
+    upper.ctx = upper.el.getContext('2d');
+    return htmlElement;
+  }
+
+  /**
    * @override clear {@link textEditingManager}
    */
   clear() {
@@ -19321,7 +19338,7 @@ class FabricText extends StyledText {
   _measureChar(_char, charStyle, previousChar, prevCharStyle) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      couple = previousChar + _char,
+      couple = previousChar ? previousChar + _char : _char,
       stylesAreEqual = previousChar && fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width, coupleWidth, previousWidth, kernedWidth;
