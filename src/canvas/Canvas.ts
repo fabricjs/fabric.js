@@ -14,6 +14,7 @@ import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { type TToCanvasElementOptions } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -1569,6 +1570,22 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // cleanup
     this._groupSelector = null;
     return true;
+  }
+
+  /**
+   * Wraps the original toCanvasElement with a function that removes
+   * the context top for the time the function is run.
+   * So we avoid painting side effects on the upper canvas when exporting
+   */
+  toCanvasElement(
+    multiplier = 1,
+    options?: TToCanvasElementOptions,
+  ): HTMLCanvasElement {
+    const { upper } = this.elements;
+    upper.ctx = undefined as unknown as CanvasRenderingContext2D;
+    const htmlElement = super.toCanvasElement(multiplier, options);
+    upper.ctx = upper.el.getContext('2d')!;
+    return htmlElement;
   }
 
   /**
