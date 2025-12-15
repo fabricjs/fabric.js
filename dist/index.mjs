@@ -407,7 +407,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "6.9.0";
+var version = "6.9.1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -15778,6 +15778,23 @@ class Canvas extends SelectableCanvas {
     // cleanup
     this._groupSelector = null;
     return true;
+  }
+
+  /**
+   * Wraps the original toCanvasElement with a function that removes
+   * the context top for the time the function is run.
+   * So we avoid painting side effects on the upper canvas when exporting
+   */
+  toCanvasElement() {
+    let multiplier = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    let options = arguments.length > 1 ? arguments[1] : undefined;
+    const {
+      upper
+    } = this.elements;
+    upper.ctx = undefined;
+    const htmlElement = super.toCanvasElement(multiplier, options);
+    upper.ctx = upper.el.getContext('2d');
+    return htmlElement;
   }
 
   /**
