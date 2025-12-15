@@ -19388,7 +19388,7 @@ class FabricText extends StyledText {
   _measureChar(_char, charStyle, previousChar, prevCharStyle) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      couple = previousChar + _char,
+      couple = previousChar ? previousChar + _char : _char,
       stylesAreEqual = previousChar && fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width, coupleWidth, previousWidth, kernedWidth;
