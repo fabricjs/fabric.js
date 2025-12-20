@@ -7,7 +7,7 @@ title: "scalingYOrSkewingX"
 
 > `const` **scalingYOrSkewingX**: [`TransformActionHandler`](/api/type-aliases/transformactionhandler/)
 
-Defined in: [src/controls/scaleSkew.ts:85](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/controls/scaleSkew.ts#L85)
+Defined in: [src/controls/scaleSkew.ts:85](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/controls/scaleSkew.ts#L85)
 
 Composed action handler to either scale Y or skew X
 Needs to be wrapped with `wrapWithFixedAnchor` to be effective

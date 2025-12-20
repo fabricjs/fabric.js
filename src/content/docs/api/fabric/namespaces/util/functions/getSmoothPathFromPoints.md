@@ -7,7 +7,7 @@ title: "getSmoothPathFromPoints"
 
 > **getSmoothPathFromPoints**(`points`, `correction?`): [`TSimplePathData`](/api/type-aliases/tsimplepathdata/)
 
-Defined in: [src/util/path/index.ts:910](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/path/index.ts#L910)
+Defined in: [src/util/path/index.ts:910](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/path/index.ts#L910)
 
 Converts points to a smooth SVG path
 

@@ -5,7 +5,7 @@ export interface Props {
   subtitle?: string;
 }
 const {
-  version = '6.9.0',
+  version = '7.0.0',
   url = 'https://github.com/fabricjs/fabric.js/releases',
   subtitle = 'Download latest release from GitHub',
 } = Astro.props as Props;
@@ -44,14 +44,15 @@ const {
   .release-card {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     padding: 0.75rem;
     border-radius: 8px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     color: var(--color-text, #111);
     text-decoration: none;
     max-width: fit-content;
-    margin: 20px auto;
+    margin: 0px 16px;
+    font-size: 0.75rem;
     transition:
       transform 0.12s ease,
       box-shadow 0.12s ease;
@@ -60,13 +61,13 @@ const {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
   }
   .release-card .subtitle {
     display: block;
-    font-size: 0.75rem
+    font-size: 0.66rem;
     color: rgba(0, 0, 0, 0.6);
   }
 </style>

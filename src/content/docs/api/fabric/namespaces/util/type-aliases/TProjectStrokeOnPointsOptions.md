@@ -7,7 +7,7 @@ title: "TProjectStrokeOnPointsOptions"
 
 > **TProjectStrokeOnPointsOptions** = `object`
 
-Defined in: [src/util/misc/projectStroke/types.ts:4](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L4)
+Defined in: [src/util/misc/projectStroke/types.ts:4](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L4)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:4](https://github.com/fabricjs
 
 > **scaleX**: `number`
 
-Defined in: [src/util/misc/projectStroke/types.ts:13](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L13)
+Defined in: [src/util/misc/projectStroke/types.ts:13](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L13)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:13](https://github.com/fabricj
 
 > **scaleY**: `number`
 
-Defined in: [src/util/misc/projectStroke/types.ts:14](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L14)
+Defined in: [src/util/misc/projectStroke/types.ts:14](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L14)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:14](https://github.com/fabricj
 
 > **skewX**: [`TDegree`](/api/type-aliases/tdegree/)
 
-Defined in: [src/util/misc/projectStroke/types.ts:15](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L15)
+Defined in: [src/util/misc/projectStroke/types.ts:15](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L15)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:15](https://github.com/fabricj
 
 > **skewY**: [`TDegree`](/api/type-aliases/tdegree/)
 
-Defined in: [src/util/misc/projectStroke/types.ts:16](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L16)
+Defined in: [src/util/misc/projectStroke/types.ts:16](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L16)
 
 ***
 
@@ -47,7 +47,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:16](https://github.com/fabricj
 
 > **strokeLineCap**: `CanvasLineCap`
 
-Defined in: [src/util/misc/projectStroke/types.ts:6](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L6)
+Defined in: [src/util/misc/projectStroke/types.ts:6](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L6)
 
 ***
 
@@ -55,7 +55,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:6](https://github.com/fabricjs
 
 > **strokeLineJoin**: `CanvasLineJoin`
 
-Defined in: [src/util/misc/projectStroke/types.ts:7](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L7)
+Defined in: [src/util/misc/projectStroke/types.ts:7](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L7)
 
 ***
 
@@ -63,7 +63,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:7](https://github.com/fabricjs
 
 > **strokeMiterLimit**: `number`
 
-Defined in: [src/util/misc/projectStroke/types.ts:11](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L11)
+Defined in: [src/util/misc/projectStroke/types.ts:11](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L11)
 
 https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
 
@@ -73,7 +73,7 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
 
 > **strokeUniform**: `boolean`
 
-Defined in: [src/util/misc/projectStroke/types.ts:12](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L12)
+Defined in: [src/util/misc/projectStroke/types.ts:12](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L12)
 
 ***
 
@@ -81,4 +81,4 @@ Defined in: [src/util/misc/projectStroke/types.ts:12](https://github.com/fabricj
 
 > **strokeWidth**: `number`
 
-Defined in: [src/util/misc/projectStroke/types.ts:5](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/util/misc/projectStroke/types.ts#L5)
+Defined in: [src/util/misc/projectStroke/types.ts:5](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/projectStroke/types.ts#L5)

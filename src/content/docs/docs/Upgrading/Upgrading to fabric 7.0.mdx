@@ -2,18 +2,21 @@
 date: '2025-08-24'
 title: 'Upgrading to Fabric.js 7.0'
 description: 'Updating your app for Fabric.js 7.0'
+sidebar:
+  order: 990
 ---
 
 FabricJS 7.0 will be released shortly, this is a **preview** of the breaking changes and an upgrade guide.
 
 ## Breaking changes
 
-Fabric 7.0 is basically Fabric 6.0 there is no large major change that should stop you from updating.
+Fabric 7.0 is basically Fabric 6.0 there is no large major change that should stop you from upgrading.
 
 The reason for the major version change was the will to move to canvas version 3 and higher,
-that itself required jsdom 26 and that required at least node 18, it was bumped to 20 anyway.
+that itself required jsdom 26 and that required at least node 18, it was bumped to 20.
+We really suggest that if you start a new project with fabricJS you start with the latest LTS version of node available.
 
-Node 18 was removed too since its support halted in April 2025 and while FabricJS can
+Node 18 was removed since its support halted in April 2025 and while FabricJS can
 still run ok on node 18, vitest 4 does not nor do the latest versions of jsdom.
 
 Since a major version bump was happening also the list of supported browsers was refreshed to allow
@@ -35,12 +38,39 @@ On top of supported platform changes, there are some notable api changes:
 
 ## Changed default values
 
+### WARNING: Object.originX and object.originY now default to 'center'
+
+**This is the only real annonying breaking change.**
+
+In fabric 8.0 or later we would like to remove those entirely.
+Unless you set them back to 'left' and 'top', it means that the object is positioned by its center.
+When you position an object at `0,0` it will be a quarter on screen and three quarter off screen.
+
+In order to make things easy, since many developers are more comfortable with the left top corner, utility methods have been added:
+
+getPositionByOrigin is the mirror of setPositionByOrigin:
+```ts
+  getPositionByOrigin(originX, originY) {
+    return this.translateToOriginPoint(this.getRelativeCenterPoint(), originX, originY);
+  }
+```
+It is used to determine where is for example the left,top corner of an object by calling
+```ts
+const point = rect.getPositionByOrigin('left', 'top');
+```
+
+`positionByLeftTop(point)` is a shortcut for `setPositionByOrigin(point, 'left', 'top');
+We understand that may be a very common use case and we provided a shortcut.
+
+In the extension folders updaters for data and loadFromJSON have been added.
+They currently work well under browser only and a node version will also be made available.
+
 ### fireMiddleClick, fireRightClick and stopContextMenu on Canvas
 
 These 3 booleans have been flipped to default `TRUE`.
 This mean that mouse up and down even will fire also for these buttons.
 If you have mouse events that have to be triggered only for the left button, you have to safeguard
-your event with an early return inspecting the event `button` property OR changing back the default values to fault.
+your event with an early return inspecting the event `button` property OR changing back the default values to false.
 
 FabricJS 8.0 will delete these property so changing the default value will not be an option in the future.
 
@@ -94,22 +124,29 @@ Now you find only viewportPoint and scenePoint in the events
 - `getCenter` method has been removed, use only `getCenterPoint`
 - The internal cache variables `_pointer` and `_absolutePointer` have been renamed to `_viewportPoint` and `_scenePoint` for clarity
 - `preserveObjectStacking` is now default to `true`, if you want objects to break the stack when selected, set it to `false`
-- `getPointer` deprecated method has been removed, is now a protected `_getPointerImpl` method.
+- `getPointer` deprecated method has been removed, is now a protected `_getPointerImpl` method. Use `getScenePoint` or `getViewportPoint`.
 - `setWidth` and `setHeight` are gone, use only `setDimensions({ width, height })`
 
+## Filters
+
+### Blur Filter
+Blur filter drawImage implementation has been dropped.
+It had inconsistencies with the webgl one, and didn't work well with transparent pictures.
+WEBGL is really available everywhere and if you need to blur an image with the CPU at leat now the output is consistent.
 
 ### Objects
 #### Text
 - unused method `_getSVGLineTopOffset` has been deleted
 #### Itext
 - protected `_exitEditing` is merged with `exitEditingImpl` public
+- Before Text anchor during edit mode was determined by originX and originY. Since those are deprecated and the defaults are not editing friendly we now determine text anchor in edit mode using the textAlign property.
 #### Image
 - `CSS_CANVAS` static property from image is gone also with the `classList.Add` requirement
 
 ### Utils
 - `rotatePoint` is gone, use `point.rotate` instead
 - `request` is gone. We use fetch, node 18 supports fetch. There is no reason to use the old request object and status
-- `setStyle` is gone
+- `setStyle` is gone, it was taking care of old browser stlye handling differences.
 - `parseAttributes`, `parseStyleAttribute`, `parseFontDeclaration`, `parsePointsAttribute`, `parseTransformAttribute` and `getCSSRules`
 have been removed from the package. Those utils were meant for internal usage and never for exposing this part of the api.
 

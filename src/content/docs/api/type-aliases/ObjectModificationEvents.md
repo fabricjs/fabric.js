@@ -7,7 +7,7 @@ title: "ObjectModificationEvents"
 
 > **ObjectModificationEvents** = `object`
 
-Defined in: [src/EventTypeDefs.ts:139](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L139)
+Defined in: [src/EventTypeDefs.ts:139](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L139)
 
 ## Extended by
 
@@ -19,7 +19,7 @@ Defined in: [src/EventTypeDefs.ts:139](https://github.com/fabricjs/fabric.js/blo
 
 > **modified**: [`ModifiedEvent`](/api/interfaces/modifiedevent/)
 
-Defined in: [src/EventTypeDefs.ts:147](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L147)
+Defined in: [src/EventTypeDefs.ts:147](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L147)
 
 ***
 
@@ -27,7 +27,7 @@ Defined in: [src/EventTypeDefs.ts:147](https://github.com/fabricjs/fabric.js/blo
 
 > **modifyPath**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/) & [`ModifyPathEvent`](/api/interfaces/modifypathevent/)
 
-Defined in: [src/EventTypeDefs.ts:146](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L146)
+Defined in: [src/EventTypeDefs.ts:146](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L146)
 
 ***
 
@@ -35,7 +35,7 @@ Defined in: [src/EventTypeDefs.ts:146](https://github.com/fabricjs/fabric.js/blo
 
 > **modifyPoly**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/)
 
-Defined in: [src/EventTypeDefs.ts:145](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L145)
+Defined in: [src/EventTypeDefs.ts:145](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L145)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [src/EventTypeDefs.ts:145](https://github.com/fabricjs/fabric.js/blo
 
 > **moving**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/)
 
-Defined in: [src/EventTypeDefs.ts:140](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L140)
+Defined in: [src/EventTypeDefs.ts:140](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L140)
 
 ***
 
@@ -51,7 +51,7 @@ Defined in: [src/EventTypeDefs.ts:140](https://github.com/fabricjs/fabric.js/blo
 
 > **resizing**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/)
 
-Defined in: [src/EventTypeDefs.ts:144](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L144)
+Defined in: [src/EventTypeDefs.ts:144](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L144)
 
 ***
 
@@ -59,7 +59,7 @@ Defined in: [src/EventTypeDefs.ts:144](https://github.com/fabricjs/fabric.js/blo
 
 > **rotating**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/)
 
-Defined in: [src/EventTypeDefs.ts:142](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L142)
+Defined in: [src/EventTypeDefs.ts:142](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L142)
 
 ***
 
@@ -67,7 +67,7 @@ Defined in: [src/EventTypeDefs.ts:142](https://github.com/fabricjs/fabric.js/blo
 
 > **scaling**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/)
 
-Defined in: [src/EventTypeDefs.ts:141](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L141)
+Defined in: [src/EventTypeDefs.ts:141](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L141)
 
 ***
 
@@ -75,4 +75,4 @@ Defined in: [src/EventTypeDefs.ts:141](https://github.com/fabricjs/fabric.js/blo
 
 > **skewing**: [`BasicTransformEvent`](/api/interfaces/basictransformevent/)
 
-Defined in: [src/EventTypeDefs.ts:143](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/EventTypeDefs.ts#L143)
+Defined in: [src/EventTypeDefs.ts:143](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L143)

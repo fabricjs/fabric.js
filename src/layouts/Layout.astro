@@ -1,5 +1,6 @@
 ---
 import Header from '../components/Header/Header.astro';
+import LatestRelease from '../components/LatestRelease/LatestRelease.astro';
 import './style.css';
 import './colorvars.css';
 import CarbonAd from '../components/CarbonAd/InlineCarbonAd.astro';
@@ -24,7 +25,7 @@ const { title, description } = Astro.props;
 		<title>{title}</title>
 	</head>
 	<body>
-		<Header />
+		<Header ><LatestRelease /></Header>
 		<CarbonAd />
 		<slot />
 	</body>

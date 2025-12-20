@@ -7,7 +7,7 @@ title: "GraphemeBBox"
 
 > **GraphemeBBox** = `object`
 
-Defined in: [src/shapes/Text/Text.ts:85](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L85)
+Defined in: [src/shapes/Text/Text.ts:97](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L97)
 
 Measure and return the info of a single grapheme.
 needs the the info of previous graphemes already filled
@@ -19,7 +19,7 @@ Override to customize measuring
 
 > `optional` **angle**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:93](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L93)
+Defined in: [src/shapes/Text/Text.ts:105](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L105)
 
 ***
 
@@ -27,7 +27,7 @@ Defined in: [src/shapes/Text/Text.ts:93](https://github.com/fabricjs/fabric.js/b
 
 > **deltaY**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:90](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L90)
+Defined in: [src/shapes/Text/Text.ts:102](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L102)
 
 ***
 
@@ -35,7 +35,7 @@ Defined in: [src/shapes/Text/Text.ts:90](https://github.com/fabricjs/fabric.js/b
 
 > **height**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:87](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L87)
+Defined in: [src/shapes/Text/Text.ts:99](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L99)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [src/shapes/Text/Text.ts:87](https://github.com/fabricjs/fabric.js/b
 
 > **kernedWidth**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:88](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L88)
+Defined in: [src/shapes/Text/Text.ts:100](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L100)
 
 ***
 
@@ -51,7 +51,7 @@ Defined in: [src/shapes/Text/Text.ts:88](https://github.com/fabricjs/fabric.js/b
 
 > **left**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:89](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L89)
+Defined in: [src/shapes/Text/Text.ts:101](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L101)
 
 ***
 
@@ -59,7 +59,7 @@ Defined in: [src/shapes/Text/Text.ts:89](https://github.com/fabricjs/fabric.js/b
 
 > `optional` **renderLeft**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:91](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L91)
+Defined in: [src/shapes/Text/Text.ts:103](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L103)
 
 ***
 
@@ -67,7 +67,7 @@ Defined in: [src/shapes/Text/Text.ts:91](https://github.com/fabricjs/fabric.js/b
 
 > `optional` **renderTop**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:92](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L92)
+Defined in: [src/shapes/Text/Text.ts:104](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L104)
 
 ***
 
@@ -75,4 +75,4 @@ Defined in: [src/shapes/Text/Text.ts:92](https://github.com/fabricjs/fabric.js/b
 
 > **width**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:86](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L86)
+Defined in: [src/shapes/Text/Text.ts:98](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L98)

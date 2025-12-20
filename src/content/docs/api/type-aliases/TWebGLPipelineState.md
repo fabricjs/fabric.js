@@ -7,7 +7,7 @@ title: "TWebGLPipelineState"
 
 > **TWebGLPipelineState** = `object`
 
-Defined in: [src/filters/typedefs.ts:15](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L15)
+Defined in: [src/filters/typedefs.ts:15](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L15)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/filters/typedefs.ts:15](https://github.com/fabricjs/fabric.js/b
 
 > **aPosition**: `Float32Array`
 
-Defined in: [src/filters/typedefs.ts:29](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L29)
+Defined in: [src/filters/typedefs.ts:29](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L29)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/filters/typedefs.ts:29](https://github.com/fabricjs/fabric.js/b
 
 > **context**: `WebGLRenderingContext`
 
-Defined in: [src/filters/typedefs.ts:23](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L23)
+Defined in: [src/filters/typedefs.ts:23](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L23)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [src/filters/typedefs.ts:23](https://github.com/fabricjs/fabric.js/b
 
 > **destinationHeight**: `number`
 
-Defined in: [src/filters/typedefs.ts:22](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L22)
+Defined in: [src/filters/typedefs.ts:22](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L22)
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: [src/filters/typedefs.ts:22](https://github.com/fabricjs/fabric.js/b
 
 > **destinationWidth**: `number`
 
-Defined in: [src/filters/typedefs.ts:21](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L21)
+Defined in: [src/filters/typedefs.ts:21](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L21)
 
 ***
 
@@ -47,7 +47,7 @@ Defined in: [src/filters/typedefs.ts:21](https://github.com/fabricjs/fabric.js/b
 
 > **filterBackend**: [`WebGLFilterBackend`](/api/classes/webglfilterbackend/)
 
-Defined in: [src/filters/typedefs.ts:16](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L16)
+Defined in: [src/filters/typedefs.ts:16](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L16)
 
 ***
 
@@ -55,7 +55,7 @@ Defined in: [src/filters/typedefs.ts:16](https://github.com/fabricjs/fabric.js/b
 
 > **originalHeight**: `number`
 
-Defined in: [src/filters/typedefs.ts:18](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L18)
+Defined in: [src/filters/typedefs.ts:18](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L18)
 
 ***
 
@@ -63,7 +63,7 @@ Defined in: [src/filters/typedefs.ts:18](https://github.com/fabricjs/fabric.js/b
 
 > **originalTexture**: `WebGLTexture`
 
-Defined in: [src/filters/typedefs.ts:26](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L26)
+Defined in: [src/filters/typedefs.ts:26](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L26)
 
 ***
 
@@ -71,7 +71,7 @@ Defined in: [src/filters/typedefs.ts:26](https://github.com/fabricjs/fabric.js/b
 
 > **originalWidth**: `number`
 
-Defined in: [src/filters/typedefs.ts:17](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L17)
+Defined in: [src/filters/typedefs.ts:17](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L17)
 
 ***
 
@@ -79,7 +79,7 @@ Defined in: [src/filters/typedefs.ts:17](https://github.com/fabricjs/fabric.js/b
 
 > **pass**: `number`
 
-Defined in: [src/filters/typedefs.ts:31](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L31)
+Defined in: [src/filters/typedefs.ts:31](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L31)
 
 ***
 
@@ -87,7 +87,7 @@ Defined in: [src/filters/typedefs.ts:31](https://github.com/fabricjs/fabric.js/b
 
 > **passes**: `number`
 
-Defined in: [src/filters/typedefs.ts:27](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L27)
+Defined in: [src/filters/typedefs.ts:27](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L27)
 
 ***
 
@@ -95,7 +95,7 @@ Defined in: [src/filters/typedefs.ts:27](https://github.com/fabricjs/fabric.js/b
 
 > **programCache**: [`TProgramCache`](/api/type-aliases/tprogramcache/)
 
-Defined in: [src/filters/typedefs.ts:30](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L30)
+Defined in: [src/filters/typedefs.ts:30](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L30)
 
 ***
 
@@ -103,7 +103,7 @@ Defined in: [src/filters/typedefs.ts:30](https://github.com/fabricjs/fabric.js/b
 
 > **sourceHeight**: `number`
 
-Defined in: [src/filters/typedefs.ts:20](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L20)
+Defined in: [src/filters/typedefs.ts:20](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L20)
 
 ***
 
@@ -111,7 +111,7 @@ Defined in: [src/filters/typedefs.ts:20](https://github.com/fabricjs/fabric.js/b
 
 > **sourceTexture**: `WebGLTexture` \| `null`
 
-Defined in: [src/filters/typedefs.ts:24](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L24)
+Defined in: [src/filters/typedefs.ts:24](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L24)
 
 ***
 
@@ -119,7 +119,7 @@ Defined in: [src/filters/typedefs.ts:24](https://github.com/fabricjs/fabric.js/b
 
 > **sourceWidth**: `number`
 
-Defined in: [src/filters/typedefs.ts:19](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L19)
+Defined in: [src/filters/typedefs.ts:19](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L19)
 
 ***
 
@@ -127,7 +127,7 @@ Defined in: [src/filters/typedefs.ts:19](https://github.com/fabricjs/fabric.js/b
 
 > **targetCanvas**: `HTMLCanvasElement`
 
-Defined in: [src/filters/typedefs.ts:32](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L32)
+Defined in: [src/filters/typedefs.ts:32](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L32)
 
 ***
 
@@ -135,7 +135,7 @@ Defined in: [src/filters/typedefs.ts:32](https://github.com/fabricjs/fabric.js/b
 
 > **targetTexture**: `WebGLTexture` \| `null`
 
-Defined in: [src/filters/typedefs.ts:25](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L25)
+Defined in: [src/filters/typedefs.ts:25](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L25)
 
 ***
 
@@ -143,4 +143,4 @@ Defined in: [src/filters/typedefs.ts:25](https://github.com/fabricjs/fabric.js/b
 
 > **webgl**: `boolean`
 
-Defined in: [src/filters/typedefs.ts:28](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/typedefs.ts#L28)
+Defined in: [src/filters/typedefs.ts:28](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/typedefs.ts#L28)

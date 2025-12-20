@@ -5,7 +5,7 @@ prev: false
 title: "Canvas2dFilterBackend"
 ---
 
-Defined in: [src/filters/Canvas2dFilterBackend.ts:7](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/Canvas2dFilterBackend.ts#L7)
+Defined in: [src/filters/Canvas2dFilterBackend.ts:7](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/Canvas2dFilterBackend.ts#L7)
 
 ## Constructors
 
@@ -23,7 +23,7 @@ Defined in: [src/filters/Canvas2dFilterBackend.ts:7](https://github.com/fabricjs
 
 > **resources**: [`TPipelineResources`](/api/type-aliases/tpipelineresources/) = `{}`
 
-Defined in: [src/filters/Canvas2dFilterBackend.ts:15](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/Canvas2dFilterBackend.ts#L15)
+Defined in: [src/filters/Canvas2dFilterBackend.ts:15](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/Canvas2dFilterBackend.ts#L15)
 
 Experimental. This object is a sort of repository of help layers used to avoid
 of recreating them during frequent filtering. If you are previewing a filter with
@@ -37,7 +37,7 @@ cleared never. Clearing is left to the developer.
 
 > **applyFilters**(`filters`, `sourceElement`, `sourceWidth`, `sourceHeight`, `targetCanvas`): `void` \| [`T2DPipelineState`](/api/type-aliases/t2dpipelinestate/)
 
-Defined in: [src/filters/Canvas2dFilterBackend.ts:27](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/filters/Canvas2dFilterBackend.ts#L27)
+Defined in: [src/filters/Canvas2dFilterBackend.ts:27](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/filters/Canvas2dFilterBackend.ts#L27)
 
 Apply a set of filters against a source image and draw the filtered output
 to the provided destination canvas.

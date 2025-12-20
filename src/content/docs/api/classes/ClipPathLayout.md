@@ -5,7 +5,7 @@ prev: false
 title: "ClipPathLayout"
 ---
 
-Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:13](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L13)
+Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:13](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L13)
 
 Layout will adjust the bounding box to match the clip path bounding box.
 
@@ -33,7 +33,7 @@ Layout will adjust the bounding box to match the clip path bounding box.
 
 > `readonly` `static` **type**: `"clip-path"` = `'clip-path'`
 
-Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:14](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L14)
+Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:14](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L14)
 
 override by subclass for persistence (TS does not support `static abstract`)
 
@@ -47,7 +47,7 @@ override by subclass for persistence (TS does not support `static abstract`)
 
 > **calcBoundingBox**(`objects`, `context`): `undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:68](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L68)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:68](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L68)
 
 Override this method to customize layout.
 
@@ -75,7 +75,7 @@ Override this method to customize layout.
 
 > **calcLayoutResult**(`context`, `objects`): `undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:24](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L24)
+Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:24](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L24)
 
 Used by the `LayoutManager` to perform layout
 @TODO/fix: if this method is calcResult, should calc unconditionally.
@@ -107,7 +107,7 @@ layout result **OR** `undefined` to skip layout
 
 > **getInitialSize**(`context`, `result`): [`Point`](/api/classes/point/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L58)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L58)
 
 #### Parameters
 
@@ -133,7 +133,7 @@ Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://gi
 
 > **shouldLayoutClipPath**(): `boolean`
 
-Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:20](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L20)
+Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:20](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L20)
 
 #### Returns
 
@@ -149,7 +149,7 @@ Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:20](https://gi
 
 > **shouldPerformLayout**(`context`): `boolean`
 
-Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:16](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L16)
+Defined in: [src/LayoutManager/LayoutStrategies/ClipPathLayout.ts:16](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts#L16)
 
 #### Parameters
 

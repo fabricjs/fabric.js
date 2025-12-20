@@ -5,7 +5,7 @@ prev: false
 title: "SerializedITextProps"
 ---
 
-Defined in: [src/shapes/IText/IText.ts:74](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/IText/IText.ts#L74)
+Defined in: [src/shapes/IText/IText.ts:74](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/IText/IText.ts#L74)
 
 ## Extends
 
@@ -21,7 +21,7 @@ Defined in: [src/shapes/IText/IText.ts:74](https://github.com/fabricjs/fabric.js
 
 > **angle**: [`TDegree`](/api/type-aliases/tdegree/)
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:61](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L61)
+Defined in: [src/shapes/Object/types/BaseProps.ts:61](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L61)
 
 Angle of rotation of an object (in degrees)
 
@@ -41,7 +41,7 @@ Angle of rotation of an object (in degrees)
 
 > **backgroundColor**: `string`
 
-Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:24](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/SerializedObjectProps.ts#L24)
+Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:24](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/SerializedObjectProps.ts#L24)
 
 Background color of an object.
 takes css colors https://www.w3.org/TR/css-color-3/
@@ -52,11 +52,23 @@ takes css colors https://www.w3.org/TR/css-color-3/
 
 ***
 
+### charSpacing
+
+> **charSpacing**: `number`
+
+Defined in: [src/shapes/Text/Text.ts:110](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L110)
+
+#### Inherited from
+
+[`SerializedTextProps`](/api/interfaces/serializedtextprops/).[`charSpacing`](/api/interfaces/serializedtextprops/#charspacing)
+
+***
+
 ### clipPath?
 
 > `optional` **clipPath**: `Partial`\<[`SerializedObjectProps`](/api/interfaces/serializedobjectprops/) & `ClipPathProps`\>
 
-Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:46](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/SerializedObjectProps.ts#L46)
+Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:46](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/SerializedObjectProps.ts#L46)
 
 a fabricObject that, without stroke define a clipping area with their shape. filled in black
 the clipPath object gets used when the object has rendered, and the context is placed in the center
@@ -73,7 +85,7 @@ If you want 0,0 of a clipPath to align with an object center, use clipPath.origi
 
 > **direction**: `CanvasDirection`
 
-Defined in: [src/shapes/Text/Text.ts:110](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L110)
+Defined in: [src/shapes/Text/Text.ts:122](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L122)
 
 #### Inherited from
 
@@ -85,7 +97,7 @@ Defined in: [src/shapes/Text/Text.ts:110](https://github.com/fabricjs/fabric.js/
 
 > **fill**: `null` \| `string` \| `Record`\<`string`, `any`\> \| [`SerializedGradientProps`](/api/type-aliases/serializedgradientprops/)\<`"linear"`\> \| [`SerializedGradientProps`](/api/type-aliases/serializedgradientprops/)\<`"radial"`\>
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:16](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L16)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:16](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L16)
 
 Color of object's fill
 takes css colors https://www.w3.org/TR/css-color-3/
@@ -106,7 +118,7 @@ rgb(0,0,0)
 
 > **fillRule**: `CanvasFillRule`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:25](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L25)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:25](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L25)
 
 Fill rule used to fill an object
 accepted values are nonzero, evenodd
@@ -128,7 +140,7 @@ nonzero
 
 > **flipX**: `boolean`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:68](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L68)
+Defined in: [src/shapes/Object/types/BaseProps.ts:68](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L68)
 
 When true, an object is rendered as flipped horizontally
 
@@ -148,7 +160,7 @@ false
 
 > **flipY**: `boolean`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:75](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L75)
+Defined in: [src/shapes/Object/types/BaseProps.ts:75](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L75)
 
 When true, an object is rendered as flipped vertically
 
@@ -168,7 +180,7 @@ false
 
 > **fontFamily**: `string`
 
-Defined in: [src/shapes/Text/Text.ts:102](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L102)
+Defined in: [src/shapes/Text/Text.ts:114](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L114)
 
 #### Inherited from
 
@@ -180,7 +192,7 @@ Defined in: [src/shapes/Text/Text.ts:102](https://github.com/fabricjs/fabric.js/
 
 > **fontSize**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:100](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L100)
+Defined in: [src/shapes/Text/Text.ts:112](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L112)
 
 #### Inherited from
 
@@ -190,9 +202,9 @@ Defined in: [src/shapes/Text/Text.ts:100](https://github.com/fabricjs/fabric.js/
 
 ### fontStyle
 
-> **fontStyle**: `string`
+> **fontStyle**: `FontStyle`
 
-Defined in: [src/shapes/Text/Text.ts:103](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L103)
+Defined in: [src/shapes/Text/Text.ts:115](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L115)
 
 #### Inherited from
 
@@ -204,7 +216,7 @@ Defined in: [src/shapes/Text/Text.ts:103](https://github.com/fabricjs/fabric.js/
 
 > **fontWeight**: `string` \| `number`
 
-Defined in: [src/shapes/Text/Text.ts:101](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L101)
+Defined in: [src/shapes/Text/Text.ts:113](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L113)
 
 #### Inherited from
 
@@ -216,7 +228,7 @@ Defined in: [src/shapes/Text/Text.ts:101](https://github.com/fabricjs/fabric.js/
 
 > **globalCompositeOperation**: `GlobalCompositeOperation`
 
-Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:17](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/SerializedObjectProps.ts#L17)
+Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:17](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/SerializedObjectProps.ts#L17)
 
 Composite rule used for canvas globalCompositeOperation
 
@@ -230,7 +242,7 @@ Composite rule used for canvas globalCompositeOperation
 
 > **height**: `number`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:32](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L32)
+Defined in: [src/shapes/Object/types/BaseProps.ts:32](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L32)
 
 Object height
 
@@ -240,23 +252,11 @@ Object height
 
 ***
 
-### charSpacing
-
-> **charSpacing**: `number`
-
-Defined in: [src/shapes/Text/Text.ts:98](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L98)
-
-#### Inherited from
-
-[`SerializedTextProps`](/api/interfaces/serializedtextprops/).[`charSpacing`](/api/interfaces/serializedtextprops/#charspacing)
-
-***
-
 ### left
 
 > **left**: `number`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:11](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L11)
+Defined in: [src/shapes/Object/types/BaseProps.ts:11](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L11)
 
 Left position of an object.
 Note that by default it's relative to object left.
@@ -278,7 +278,7 @@ You can change this by setting originX
 
 > **lineHeight**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:99](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L99)
+Defined in: [src/shapes/Text/Text.ts:111](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L111)
 
 #### Inherited from
 
@@ -290,7 +290,7 @@ Defined in: [src/shapes/Text/Text.ts:99](https://github.com/fabricjs/fabric.js/b
 
 > **linethrough**: `boolean`
 
-Defined in: [src/shapes/Text/Text.ts:108](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L108)
+Defined in: [src/shapes/Text/Text.ts:120](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L120)
 
 #### Inherited from
 
@@ -302,7 +302,7 @@ Defined in: [src/shapes/Text/Text.ts:108](https://github.com/fabricjs/fabric.js/
 
 > **opacity**: `number`
 
-Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:11](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/SerializedObjectProps.ts#L11)
+Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:11](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/SerializedObjectProps.ts#L11)
 
 Opacity of an object
 
@@ -322,7 +322,7 @@ Opacity of an object
 
 > **originX**: [`TOriginX`](/api/type-aliases/toriginx/)
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:43](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L43)
+Defined in: [src/shapes/Object/types/BaseProps.ts:43](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L43)
 
 Horizontal origin of transformation of an object (`left`, `center`, `right`  or `[0, 1]`)
 See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
@@ -349,7 +349,7 @@ To set the default value to 'center' import BaseFabricObject and set the static 
 
 > **originY**: [`TOriginY`](/api/type-aliases/toriginy/)
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:54](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L54)
+Defined in: [src/shapes/Object/types/BaseProps.ts:54](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L54)
 
 Vertical origin of transformation of an object (`top`, `center`, `bottom` or `[0, 1]`)
 See http://jsfiddle.net/1ow02gea/244/ on how originX/originY affect objects in groups
@@ -376,7 +376,7 @@ To set the default value to 'center' import BaseFabricObject and set the static 
 
 > **overline**: `boolean`
 
-Defined in: [src/shapes/Text/Text.ts:107](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L107)
+Defined in: [src/shapes/Text/Text.ts:119](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L119)
 
 #### Inherited from
 
@@ -388,7 +388,7 @@ Defined in: [src/shapes/Text/Text.ts:107](https://github.com/fabricjs/fabric.js/
 
 > **paintFirst**: `"fill"` \| `"stroke"`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:8](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L8)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:8](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L8)
 
 Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
 
@@ -402,7 +402,7 @@ Determines if the fill or the stroke is drawn first (one of "fill" or "stroke")
 
 > `optional` **path**: [`Path`](/api/classes/path/)\<`Partial`\<[`PathProps`](/api/interfaces/pathprops/)\>, [`SerializedPathProps`](/api/interfaces/serializedpathprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/shapes/Text/Text.ts:111](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L111)
+Defined in: [src/shapes/Text/Text.ts:123](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L123)
 
 #### Inherited from
 
@@ -414,7 +414,7 @@ Defined in: [src/shapes/Text/Text.ts:111](https://github.com/fabricjs/fabric.js/
 
 > **pathAlign**: [`TPathAlign`](/api/type-aliases/tpathalign/)
 
-Defined in: [src/shapes/Text/Text.ts:105](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L105)
+Defined in: [src/shapes/Text/Text.ts:117](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L117)
 
 #### Inherited from
 
@@ -426,7 +426,7 @@ Defined in: [src/shapes/Text/Text.ts:105](https://github.com/fabricjs/fabric.js/
 
 > **pathSide**: [`TPathSide`](/api/type-aliases/tpathside/)
 
-Defined in: [src/shapes/Text/Text.ts:104](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L104)
+Defined in: [src/shapes/Text/Text.ts:116](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L116)
 
 #### Inherited from
 
@@ -438,7 +438,7 @@ Defined in: [src/shapes/Text/Text.ts:104](https://github.com/fabricjs/fabric.js/
 
 > **scaleX**: `number`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:82](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L82)
+Defined in: [src/shapes/Object/types/BaseProps.ts:82](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L82)
 
 Object scale factor (horizontal)
 
@@ -458,7 +458,7 @@ Object scale factor (horizontal)
 
 > **scaleY**: `number`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:89](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L89)
+Defined in: [src/shapes/Object/types/BaseProps.ts:89](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L89)
 
 Object scale factor (vertical)
 
@@ -478,7 +478,7 @@ Object scale factor (vertical)
 
 > **selectionEnd**: `number`
 
-Defined in: [src/shapes/IText/IText.ts:71](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/IText/IText.ts#L71)
+Defined in: [src/shapes/IText/IText.ts:71](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/IText/IText.ts#L71)
 
 #### Inherited from
 
@@ -490,7 +490,7 @@ Defined in: [src/shapes/IText/IText.ts:71](https://github.com/fabricjs/fabric.js
 
 > **selectionStart**: `number`
 
-Defined in: [src/shapes/IText/IText.ts:70](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/IText/IText.ts#L70)
+Defined in: [src/shapes/IText/IText.ts:70](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/IText/IText.ts#L70)
 
 #### Inherited from
 
@@ -502,7 +502,7 @@ Defined in: [src/shapes/IText/IText.ts:70](https://github.com/fabricjs/fabric.js
 
 > **shadow**: `null` \| `Partial`\<[`SerializedShadowOptions`](/api/type-aliases/serializedshadowoptions/)\>
 
-Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:31](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/SerializedObjectProps.ts#L31)
+Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:31](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/SerializedObjectProps.ts#L31)
 
 Shadow object representing shadow of this shape
 
@@ -522,7 +522,7 @@ null
 
 > **skewX**: [`TDegree`](/api/type-aliases/tdegree/)
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:96](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L96)
+Defined in: [src/shapes/Object/types/BaseProps.ts:96](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L96)
 
 Angle of skew on x axes of an object (in degrees)
 
@@ -542,7 +542,7 @@ Angle of skew on x axes of an object (in degrees)
 
 > **skewY**: [`TDegree`](/api/type-aliases/tdegree/)
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:103](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L103)
+Defined in: [src/shapes/Object/types/BaseProps.ts:103](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L103)
 
 Angle of skew on y axes of an object (in degrees)
 
@@ -562,7 +562,7 @@ Angle of skew on y axes of an object (in degrees)
 
 > **stroke**: `null` \| `string` \| `Record`\<`string`, `any`\> \| [`SerializedGradientProps`](/api/type-aliases/serializedgradientprops/)\<`"linear"`\> \| [`SerializedGradientProps`](/api/type-aliases/serializedgradientprops/)\<`"radial"`\>
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:33](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L33)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:33](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L33)
 
 When defined, an object is rendered via stroke and this property specifies its color
 takes css colors https://www.w3.org/TR/css-color-3/
@@ -583,7 +583,7 @@ null
 
 > **strokeDashArray**: `null` \| `number`[]
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:47](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L47)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:47](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L47)
 
 Array specifying dash pattern of an object's stroke (stroke must be defined)
 
@@ -603,7 +603,7 @@ null;
 
 > **strokeDashOffset**: `number`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:54](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L54)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:54](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L54)
 
 Line offset of an object's stroke
 
@@ -623,7 +623,7 @@ Line offset of an object's stroke
 
 > **strokeLineCap**: `CanvasLineCap`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:61](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L61)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:61](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L61)
 
 Line endings style of an object's stroke (one of "butt", "round", "square")
 
@@ -643,7 +643,7 @@ butt
 
 > **strokeLineJoin**: `CanvasLineJoin`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:67](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L67)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:67](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L67)
 
 Corner style of an object's stroke (one of "bevel", "round", "miter")
 
@@ -657,7 +657,7 @@ Corner style of an object's stroke (one of "bevel", "round", "miter")
 
 > **strokeMiterLimit**: `number`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:74](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L74)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:74](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L74)
 
 Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
 
@@ -677,7 +677,7 @@ Maximum miter length (used for strokeLineJoin = "miter") of an object's stroke
 
 > **strokeUniform**: `boolean`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:87](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L87)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:87](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L87)
 
 When `false`, the stoke width will scale with the object.
 When `true`, the stroke will always match the exact pixel size entered for stroke width.
@@ -710,7 +710,7 @@ false
 
 > **strokeWidth**: `number`
 
-Defined in: [src/shapes/Object/types/FillStrokeProps.ts:40](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/FillStrokeProps.ts#L40)
+Defined in: [src/shapes/Object/types/FillStrokeProps.ts:40](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/FillStrokeProps.ts#L40)
 
 Width of a stroke used to render this object
 
@@ -730,7 +730,7 @@ Width of a stroke used to render this object
 
 > **styles**: [`TextStyle`](/api/type-aliases/textstyle/) \| [`TextStyleArray`](/api/fabric/namespaces/util/type-aliases/textstylearray/)
 
-Defined in: [src/shapes/Text/Text.ts:118](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L118)
+Defined in: [src/shapes/Text/Text.ts:130](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L130)
 
 #### Inherited from
 
@@ -740,9 +740,9 @@ Defined in: [src/shapes/Text/Text.ts:118](https://github.com/fabricjs/fabric.js/
 
 ### textAlign
 
-> **textAlign**: `string`
+> **textAlign**: `TextAlign`
 
-Defined in: [src/shapes/Text/Text.ts:109](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L109)
+Defined in: [src/shapes/Text/Text.ts:121](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L121)
 
 #### Inherited from
 
@@ -754,7 +754,7 @@ Defined in: [src/shapes/Text/Text.ts:109](https://github.com/fabricjs/fabric.js/
 
 > **textDecorationThickness**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:112](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L112)
+Defined in: [src/shapes/Text/Text.ts:124](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L124)
 
 #### Inherited from
 
@@ -766,7 +766,7 @@ Defined in: [src/shapes/Text/Text.ts:112](https://github.com/fabricjs/fabric.js/
 
 > **top**: `number`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:20](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L20)
+Defined in: [src/shapes/Object/types/BaseProps.ts:20](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L20)
 
 Top position of an object.
 Note that by default it's relative to object top.
@@ -788,7 +788,7 @@ You can change this by setting originY
 
 > **underline**: `boolean`
 
-Defined in: [src/shapes/Text/Text.ts:106](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Text/Text.ts#L106)
+Defined in: [src/shapes/Text/Text.ts:118](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Text/Text.ts#L118)
 
 #### Inherited from
 
@@ -800,7 +800,7 @@ Defined in: [src/shapes/Text/Text.ts:106](https://github.com/fabricjs/fabric.js/
 
 > **visible**: `boolean`
 
-Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:37](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/SerializedObjectProps.ts#L37)
+Defined in: [src/shapes/Object/types/SerializedObjectProps.ts:37](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/SerializedObjectProps.ts#L37)
 
 When set to `false`, an object is not rendered on canvas
 
@@ -814,7 +814,7 @@ When set to `false`, an object is not rendered on canvas
 
 > **width**: `number`
 
-Defined in: [src/shapes/Object/types/BaseProps.ts:26](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/Object/types/BaseProps.ts#L26)
+Defined in: [src/shapes/Object/types/BaseProps.ts:26](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/Object/types/BaseProps.ts#L26)
 
 Object width
 

@@ -7,9 +7,13 @@ title: "ITextEvents"
 
 > **ITextEvents** = [`ObjectEvents`](/api/interfaces/objectevents/) & `object`
 
-Defined in: [src/shapes/IText/ITextBehavior.ts:30](https://github.com/fabricjs/fabric.js/blob/9a792f4b7b8031f02ec7ea4ce8c99f810e45cfec/src/shapes/IText/ITextBehavior.ts#L30)
+Defined in: [src/shapes/IText/ITextBehavior.ts:31](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/shapes/IText/ITextBehavior.ts#L31)
 
 ## Type Declaration
+
+### changed
+
+> **changed**: `never` \| \{ `action`: `string`; `index`: `number`; \}
 
 ### editing:entered
 
@@ -18,10 +22,6 @@ Defined in: [src/shapes/IText/ITextBehavior.ts:30](https://github.com/fabricjs/f
 ### editing:exited
 
 > **editing:exited**: `never`
-
-### changed
-
-> **changed**: `never` \| \{ `action`: `string`; `index`: `number`; \}
 
 ### selection:changed
 
