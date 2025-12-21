@@ -1,6 +1,7 @@
 <header id="site-header">
   <a id="logo" href="/">
-    <img alt="Fabric.js logo" src="/logo.svg" width="200" height="63" />
+    <img alt="Fabric.js logo" class="logo-dark" src="/logo.svg" width="178" height="55" />
+    <img alt="Fabric.js logo" class="logo-light" src="/logo-light.svg" width="178" height="55" />
   </a>
   <slot />
   <nav>
@@ -42,6 +43,22 @@
     display: block;
     text-align: center;
     align-self: flex-start;
+  }
+
+  /* Logo theme switching - only in mobile mode */
+  .logo-light {
+    display: none;
+  }
+  .logo-dark {
+    display: block;
+  }
+  @media not all and (min-width: 800px) and (orientation: landscape) {
+    :global([data-theme='dark']) .logo-light {
+      display: block;
+    }
+    :global([data-theme='dark']) .logo-dark {
+      display: none;
+    }
   }
 
   #site-header > nav {
