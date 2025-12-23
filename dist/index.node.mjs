@@ -412,7 +412,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.0.0-rc1";
+var version = "7.0.0";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -434,6 +434,7 @@ const TOP = 'top';
 const BOTTOM = 'bottom';
 const RIGHT = 'right';
 const NONE = 'none';
+const HEIGHT = 'height';
 const reNewline = /\r?\n/;
 const MOVING = 'moving';
 const SCALING = 'scaling';
@@ -25570,6 +25571,24 @@ function loadSVGFromURL(url, reviver) {
   });
 }
 
+const changeObjectHeight = (eventData, transform, x, y) => {
+  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+  const originY = resolveOrigin(transform.originY);
+  if (originY === 0 || originY > 0 && localPoint.y < 0 || originY < 0 && localPoint.y > 0) {
+    const {
+      target
+    } = transform;
+    const strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleY : 1);
+    const multiplier = isTransformCentered(transform) ? 2 : 1;
+    const oldHeight = target.height;
+    const newHeight = Math.abs(localPoint.y * multiplier / target.scaleY) - strokePadding;
+    target.set(HEIGHT, Math.max(newHeight, 1));
+    return oldHeight !== target.height;
+  }
+  return false;
+};
+const changeHeight = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectHeight));
+
 const ACTION_NAME$1 = MODIFY_POLY;
 /**
  * This function locates the controls.
@@ -25791,6 +25810,9 @@ function createPathControls(path) {
 
 var index = /*#__PURE__*/Object.freeze({
   __proto__: null,
+  changeHeight: changeHeight,
+  changeObjectHeight: changeObjectHeight,
+  changeObjectWidth: changeObjectWidth,
   changeWidth: changeWidth,
   createObjectDefaultControls: createObjectDefaultControls,
   createPathControls: createPathControls,
