@@ -49,3 +49,5 @@ export const LTR = 'ltr';
 export const RTL = 'rtl';
 
 export const NORMAL = 'normal';
+
+export const HEIGHT = 'height';

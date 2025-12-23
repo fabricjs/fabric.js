@@ -1,4 +1,5 @@
-export { changeWidth } from './changeWidth';
+export { changeWidth, changeObjectWidth } from './changeWidth';
+export { changeHeight, changeObjectHeight } from './changeHeight';
 export { renderCircleControl, renderSquareControl } from './controlRendering';
 export * from './commonControls';
 export { dragHandler } from './drag';

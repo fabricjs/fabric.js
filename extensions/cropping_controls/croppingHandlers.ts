@@ -1,0 +1,112 @@
+import type { TModificationEvents } from 'fabric';
+import { controlsUtils, type TransformActionHandler, type FabricImage } from 'fabric';
+
+/**
+ * Wrap controlsUtils.changeObjectWidth with image constrains
+ */
+export const changeImageWidth: TransformActionHandler = (
+  eventData,
+  transform,
+  x,
+  y,
+) => {
+  const { target } = transform;
+  const { width } = target;
+  const image = target as FabricImage;
+  const modified = controlsUtils.changeObjectWidth(eventData, transform, x, y);
+  const availableWidth = image._element.width - image.cropX
+  if (modified) {
+    if (image.width > availableWidth) {
+      image.width =  availableWidth;
+    }
+    if (image.width < 0) {
+      image.width =  1;
+    }
+  }
+  return width != image.width;
+}
+
+export const changeCroppingWidth = controlsUtils.wrapWithFireEvent(
+  'CROPPING' as TModificationEvents,
+  controlsUtils.wrapWithFixedAnchor(changeImageWidth),
+);
+
+/**
+ * Wrap controlsUtils.changeObjectHeight with image constrains
+ */
+export const changeImageHeight: TransformActionHandler = (
+  eventData,
+  transform,
+  x,
+  y,
+) => {
+  const { target } = transform;
+  const { height } = target;
+  const image = target as FabricImage;
+  const modified = controlsUtils.changeObjectHeight(eventData, transform, x, y);
+  const availableHeight = image._element.height - image.cropY
+  if (modified) {
+    if (image.width > availableHeight) {
+      image.width = availableHeight;
+    }
+    if (image.height < 0) {
+      image.height = 1;
+    }
+  }
+  return height != image.height;
+}
+
+export const changeCroppingHeight = controlsUtils.wrapWithFireEvent(
+  'CROPPING' as TModificationEvents,
+  controlsUtils.wrapWithFixedAnchor(changeImageHeight),
+);
+
+export const changeImageCropX: TransformActionHandler = (
+  eventData,
+  transform,
+  x,
+  y,
+) => {
+  const { target } = transform;
+  const image = target as FabricImage;
+  const { width, cropX } = image;
+  const modified = controlsUtils.changeObjectWidth(eventData, transform, x, y);
+  let newCropX = cropX + width - image.width;
+  if (modified) {
+    // restore original width
+    image.width = width;
+    if (newCropX < 0) {
+      newCropX = 0;
+    }
+    if (newCropX + image.width > image._element.width) {
+      newCropX = image._element.width - image.width;
+    }
+    image.cropX = newCropX;
+  }
+  return newCropX != cropX;
+}
+
+export const changeImageCropY: TransformActionHandler = (
+  eventData,
+  transform,
+  x,
+  y,
+) => {
+  const { target } = transform;
+  const image = target as FabricImage;
+  const { height, cropY } = image;
+  const modified = controlsUtils.changeObjectHeight(eventData, transform, x, y);
+  let newCropY = cropY + height - image.height;
+  if (modified) {
+    // restore original height
+    image.height = height;
+    if (newCropY < 0) {
+      newCropY = 0;
+    }
+    if (newCropY + image.height > image._element.height) {
+      newCropY = image._element.height - image.height;
+    }
+    image.cropY = newCropY;
+  }
+  return newCropY != cropY;
+}

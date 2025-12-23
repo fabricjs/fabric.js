@@ -69,7 +69,7 @@ export type ControlCursorCallback<R = string> = (
  * relative to target's containing coordinate plane
  * both agree on every point
  */
-export type Transform = {
+export type Transform<T extends FabricObject = FabricObject> = {
   target: FabricObject;
   action?: string;
   actionHandler?: TransformActionHandler;
