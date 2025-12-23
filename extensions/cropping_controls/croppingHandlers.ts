@@ -1,6 +1,8 @@
 import type { TModificationEvents } from 'fabric';
 import { controlsUtils, type TransformActionHandler, type FabricImage } from 'fabric';
 
+const { wrapWithFixedAnchor, wrapWithFireEvent } = controlsUtils;
+
 /**
  * Wrap controlsUtils.changeObjectWidth with image constrains
  */
@@ -26,9 +28,9 @@ export const changeImageWidth: TransformActionHandler = (
   return width != image.width;
 }
 
-export const changeCroppingWidth = controlsUtils.wrapWithFireEvent(
+export const changeCropWidth = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
-  controlsUtils.wrapWithFixedAnchor(changeImageWidth),
+  wrapWithFixedAnchor(changeImageWidth),
 );
 
 /**
@@ -56,9 +58,9 @@ export const changeImageHeight: TransformActionHandler = (
   return height != image.height;
 }
 
-export const changeCroppingHeight = controlsUtils.wrapWithFireEvent(
+export const changeCropHeight = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
-  controlsUtils.wrapWithFixedAnchor(changeImageHeight),
+  wrapWithFixedAnchor(changeImageHeight),
 );
 
 export const changeImageCropX: TransformActionHandler = (
@@ -110,3 +112,13 @@ export const changeImageCropY: TransformActionHandler = (
   }
   return newCropY != cropY;
 }
+
+export const changeCropX = wrapWithFireEvent(
+  'CROPPING' as TModificationEvents,
+  wrapWithFixedAnchor(changeImageCropX),
+);
+
+export const changeCropY = controlsUtils.wrapWithFireEvent(
+  'CROPPING' as TModificationEvents,
+  wrapWithFixedAnchor(changeImageCropY),
+);
