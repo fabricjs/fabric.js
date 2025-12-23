@@ -16,3 +16,6 @@ export {
   pinchEventHandler,
   rotateEventHandler,
 } from './westures_integration';
+
+export { createImageCroppingControls } from './cropping_controls/croppingControls';
+export { changeCropY, changeCropX, changeCropWidth, changeCropHeight } from './cropping_controls/croppingHandlers';

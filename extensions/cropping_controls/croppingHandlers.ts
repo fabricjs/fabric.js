@@ -118,7 +118,7 @@ export const changeCropX = wrapWithFireEvent(
   wrapWithFixedAnchor(changeImageCropX),
 );
 
-export const changeCropY = controlsUtils.wrapWithFireEvent(
+export const changeCropY = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
   wrapWithFixedAnchor(changeImageCropY),
 );
