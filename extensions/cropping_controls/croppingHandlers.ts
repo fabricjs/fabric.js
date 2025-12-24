@@ -48,8 +48,8 @@ export const changeImageHeight: TransformActionHandler = (
   const modified = controlsUtils.changeObjectHeight(eventData, transform, x, y);
   const availableHeight = image._element.height - image.cropY
   if (modified) {
-    if (image.width > availableHeight) {
-      image.width = availableHeight;
+    if (image.height > availableHeight) {
+      image.height = availableHeight;
     }
     if (image.height < 0) {
       image.height = 1;

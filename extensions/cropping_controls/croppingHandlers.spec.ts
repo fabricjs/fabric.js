@@ -74,9 +74,9 @@ describe('croppingHandlers', () => {
   describe('changeImageWidth', () => {
     test('changes width normally when within bounds', () => {
       expect(image.width).toBe(100);
-      const changed = changeImageWidth(eventData, transform, 200, 50);
+      const changed = changeImageWidth(eventData, transform, 180, 50);
       expect(changed).toBe(true);
-      expect(image.width).toBeLessThanOrEqual(200);
+      expect(image.width).toBe(180);
     });
 
     test('constrains width to available width (upper limit)', () => {
@@ -87,19 +87,16 @@ describe('croppingHandlers', () => {
 
       // Try to set width beyond available (200 - 50 = 150 available)
       changeImageWidth(eventData, transform, 500, 50);
-      expect(image.width).toBeLessThanOrEqual(150);
+      expect(image.width).toBe(150);
     });
 
     test('constrains width to minimum of 1 (lower limit)', () => {
-      transform = prepareTransform(image, 'mr');
-
-      // Mock to simulate setting negative width
       vi.spyOn(controlsUtils, 'changeObjectWidth').mockImplementation(() => {
         image.width = -10;
         return true;
       });
-
-      changeImageWidth(eventData, transform, -100, 50);
+      transform = prepareTransform(image, 'mr');
+      changeImageWidth(eventData, transform, 0, 50);
       expect(image.width).toBe(1);
 
       vi.restoreAllMocks();
@@ -117,9 +114,6 @@ describe('croppingHandlers', () => {
 
   describe('changeCropWidth', () => {
     test('is wrapped with wrapWithFireEvent and wrapWithFixedAnchor', () => {
-      const wrapWithFireEventSpy = vi.spyOn(controlsUtils, 'wrapWithFireEvent');
-      const wrapWithFixedAnchorSpy = vi.spyOn(controlsUtils, 'wrapWithFixedAnchor');
-
       // Re-import to trigger the wrapping
       // Since the module is already loaded, we verify the export is a function
       expect(typeof changeCropWidth).toBe('function');
@@ -138,9 +132,9 @@ describe('croppingHandlers', () => {
 
     test('changes height normally when within bounds', () => {
       expect(image.height).toBe(100);
-      const changed = changeImageHeight(eventData, transform, 50, 200);
+      const changed = changeImageHeight(eventData, transform, 50, 130);
       expect(changed).toBe(true);
-      expect(image.height).toBeLessThanOrEqual(200);
+      expect(image.height).toBe(130);
     });
 
     test('constrains height to available height (upper limit)', () => {
