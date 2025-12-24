@@ -123,3 +123,18 @@ export const changeCropY = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
   wrapWithFixedAnchor(changeImageCropY),
 );
+
+export const dragTransformHandler: TransformActionHandler = (
+  eventData,
+  transform,
+  x,
+  y,
+) => {
+  const { target, offsetX, offsetY } = transform;
+  let cropX = x - offsetX,
+      cropY = y - offsetY;
+    
+    const moved = target.cropX !== cropX || target.cropY !== cropY;
+    target.set({ cropX, cropY });
+    return moved;
+}

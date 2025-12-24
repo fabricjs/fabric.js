@@ -1,4 +1,3 @@
-import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
@@ -620,7 +619,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)?.bind(control)
-          : dragHandler,
+          : target.getDragHandler(),
       action = getActionFromCorner(alreadySelected, corner, e, target),
       altKey = e[this.centeredKey as ModifierKey],
       origin = this._shouldCenterTransform(target, action, altKey)
