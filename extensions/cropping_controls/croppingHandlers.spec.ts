@@ -191,7 +191,7 @@ describe('croppingHandlers', () => {
       transform = prepareTransform(image, 'ml');
     });
 
-    test('changes cropX while maintaining width', () => {
+    test('changes cropX and width together', () => {
       image = createMockImage({ width: 100, cropX: 50, elementWidth: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'ml');
@@ -207,15 +207,16 @@ describe('croppingHandlers', () => {
 
       const changed = changeImageCropX(eventData, transform, 70, 50);
 
-      // Width should be restored
-      expect(image.width).toBe(originalWidth);
-      // CropX should have changed
-      expect(changed).toBe(image.cropX !== originalCropX);
+      // newCropX = 50 + 100 - 80 = 70
+      // width = 100 + 50 - 70 = 80
+      expect(image.cropX).toBe(70);
+      expect(image.width).toBe(80);
+      expect(changed).toBe(true);
 
       vi.restoreAllMocks();
     });
 
-    test('constrains cropX to minimum of 0 (lower limit)', () => {
+    test('constrains cropX to minimum of 0 and adjusts width accordingly', () => {
       image = createMockImage({ width: 100, cropX: 10, elementWidth: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'ml');
@@ -228,12 +229,15 @@ describe('croppingHandlers', () => {
 
       changeImageCropX(eventData, transform, 30, 50);
 
-      expect(image.cropX).toBeGreaterThanOrEqual(0);
+      // newCropX is clamped to 0 (was -10)
+      expect(image.cropX).toBe(0);
+      // width = 100 + 10 - 0 = 110
+      expect(image.width).toBe(110);
 
       vi.restoreAllMocks();
     });
 
-    test('constrains cropX so image stays within element bounds (upper limit)', () => {
+    test('constrains cropX so image stays within element bounds and adjusts width accordingly', () => {
       image = createMockImage({ width: 100, cropX: 50, elementWidth: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'ml');
@@ -246,6 +250,10 @@ describe('croppingHandlers', () => {
 
       changeImageCropX(eventData, transform, 100, 50);
 
+      // newCropX = 100, but clamped to elementWidth - width = 200 - 100 = 100 (stays 100)
+      expect(image.cropX).toBe(100);
+      // width = 100 + 50 - 100 = 50
+      expect(image.width).toBe(50);
       // cropX + width should not exceed element width (200)
       expect(image.cropX + image.width).toBeLessThanOrEqual(200);
 
@@ -275,7 +283,7 @@ describe('croppingHandlers', () => {
       transform = prepareTransform(image, 'mt');
     });
 
-    test('changes cropY while maintaining height', () => {
+    test('changes cropY and height together', () => {
       image = createMockImage({ height: 100, cropY: 50, elementHeight: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'mt');
@@ -291,15 +299,16 @@ describe('croppingHandlers', () => {
 
       const changed = changeImageCropY(eventData, transform, 50, 70);
 
-      // Height should be restored
-      expect(image.height).toBe(originalHeight);
-      // CropY should have changed
-      expect(changed).toBe(image.cropY !== originalCropY);
+      // newCropY = 50 + 100 - 80 = 70
+      // height = 100 + 50 - 70 = 80
+      expect(image.cropY).toBe(70);
+      expect(image.height).toBe(80);
+      expect(changed).toBe(true);
 
       vi.restoreAllMocks();
     });
 
-    test('constrains cropY to minimum of 0 (lower limit)', () => {
+    test('constrains cropY to minimum of 0 and adjusts height accordingly', () => {
       image = createMockImage({ height: 100, cropY: 10, elementHeight: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'mt');
@@ -312,12 +321,15 @@ describe('croppingHandlers', () => {
 
       changeImageCropY(eventData, transform, 50, 30);
 
-      expect(image.cropY).toBeGreaterThanOrEqual(0);
+      // newCropY is clamped to 0 (was -10)
+      expect(image.cropY).toBe(0);
+      // height = 100 + 10 - 0 = 110
+      expect(image.height).toBe(110);
 
       vi.restoreAllMocks();
     });
 
-    test('constrains cropY so image stays within element bounds (upper limit)', () => {
+    test('constrains cropY so image stays within element bounds and adjusts height accordingly', () => {
       image = createMockImage({ height: 100, cropY: 50, elementHeight: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'mt');
@@ -330,6 +342,10 @@ describe('croppingHandlers', () => {
 
       changeImageCropY(eventData, transform, 50, 100);
 
+      // newCropY = 100, but clamped to elementHeight - height = 200 - 100 = 100 (stays 100)
+      expect(image.cropY).toBe(100);
+      // height = 100 + 50 - 100 = 50
+      expect(image.height).toBe(50);
       // cropY + height should not exceed element height (200)
       expect(image.cropY + image.height).toBeLessThanOrEqual(200);
 

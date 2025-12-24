@@ -68,8 +68,8 @@ export const createImageCroppingControls = () => ({
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const height = changeCropHeight(...args);
-      const cropY = changeCropY(...args);
-      return height || cropY;
+      const cropX = changeCropX(...args);
+      return height || cropX;
     },
     getActionName: cropActionName,
   }),

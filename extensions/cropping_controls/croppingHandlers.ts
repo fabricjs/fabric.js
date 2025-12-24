@@ -74,9 +74,8 @@ export const changeImageCropX: TransformActionHandler = (
   const { width, cropX } = image;
   const modified = controlsUtils.changeObjectWidth(eventData, transform, x, y);
   let newCropX = cropX + width - image.width;
+  image.width = width;
   if (modified) {
-    // restore original width
-    image.width = width;
     if (newCropX < 0) {
       newCropX = 0;
     }
@@ -84,6 +83,8 @@ export const changeImageCropX: TransformActionHandler = (
       newCropX = image._element.width - image.width;
     }
     image.cropX = newCropX;
+    // calculate new width on the base of how much crop we have now
+    image.width += cropX - newCropX;
   }
   return newCropX != cropX;
 }
@@ -99,9 +100,8 @@ export const changeImageCropY: TransformActionHandler = (
   const { height, cropY } = image;
   const modified = controlsUtils.changeObjectHeight(eventData, transform, x, y);
   let newCropY = cropY + height - image.height;
+  image.height = height;
   if (modified) {
-    // restore original height
-    image.height = height;
     if (newCropY < 0) {
       newCropY = 0;
     }
@@ -109,6 +109,7 @@ export const changeImageCropY: TransformActionHandler = (
       newCropY = image._element.height - image.height;
     }
     image.cropY = newCropY;
+    image.height += cropY - newCropY;
   }
   return newCropY != cropY;
 }
