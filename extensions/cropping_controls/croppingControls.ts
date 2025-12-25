@@ -85,6 +85,4 @@ export const createImageCroppingControls = () => ({
     },
     getActionName: cropActionName,
   }),
-
-  // dragHandler: dragTransformHandler,
 });

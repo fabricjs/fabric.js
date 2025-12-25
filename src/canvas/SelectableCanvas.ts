@@ -50,6 +50,7 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import { dragHandler } from '../controls';
 
 export type TargetsInfo = {
   target?: FabricObject;
@@ -619,7 +620,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       actionHandler =
         alreadySelected && control
           ? control.getActionHandler(e, target, control)?.bind(control)
-          : target.getDragHandler(),
+          : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
       altKey = e[this.centeredKey as ModifierKey],
       origin = this._shouldCenterTransform(target, action, altKey)

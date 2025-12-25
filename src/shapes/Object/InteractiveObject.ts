@@ -12,7 +12,7 @@ import {
 } from '../../util/misc/matrix';
 import type { Control } from '../../controls/Control';
 import { sizeAfterTransform } from '../../util/misc/objectTransforms';
-import type { ObjectEvents, TPointerEvent, TransformActionHandler } from '../../EventTypeDefs';
+import type { ObjectEvents, TPointerEvent } from '../../EventTypeDefs';
 import type { Canvas } from '../../canvas/Canvas';
 import type { ControlRenderingStyleOverride } from '../../controls/controlRendering';
 import type { FabricObjectProps } from './types/FabricObjectProps';
@@ -20,16 +20,13 @@ import type { TFabricObjectProps, SerializedObjectProps } from './types';
 import { createObjectDefaultControls } from '../../controls/commonControls';
 import { interactiveObjectDefaultValues } from './defaultValues';
 import { SCALE } from '../../constants';
-import { dragHandler } from '../../controls/drag';
 
 export type TOCoord = Point & {
   corner: TCornerPoint;
   touchCorner: TCornerPoint;
 };
 
-export type TControlSet = Record<string, Control> & {
-  dragHandler?: TransformActionHandler;
-};
+export type TControlSet = Record<string, Control>;
 
 export type TBorderRenderingStyleOverride = Partial<
   Pick<InteractiveFabricObject, 'borderColor' | 'borderDashArray'>
@@ -203,10 +200,6 @@ export class InteractiveFabricObject<
           coord: this.oCoords[key],
         }
       : undefined;
-  }
-
-  getDragHandler() {
-    return this.controls.dragHandler ?? dragHandler;
   }
 
   /**
