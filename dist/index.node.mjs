@@ -412,7 +412,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.0.0";
+var version = "7.0.0-rc1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -434,7 +434,6 @@ const TOP = 'top';
 const BOTTOM = 'bottom';
 const RIGHT = 'right';
 const NONE = 'none';
-const HEIGHT = 'height';
 const reNewline = /\r?\n/;
 const MOVING = 'moving';
 const SCALING = 'scaling';
@@ -3696,6 +3695,20 @@ const sendObjectToPlane = (object, from, to) => {
   return t;
 };
 
+const fireEvent = (eventName, options) => {
+  var _target$canvas;
+  const {
+    transform: {
+      target
+    }
+  } = options;
+  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
+    ...options,
+    target
+  });
+  target.fire(eventName, options);
+};
+
 const originOffset = {
   left: -0.5,
   top: -0.5,
@@ -3897,6 +3910,33 @@ function getLocalPoint(_ref, originX, originY, x, y) {
   localPoint.y -= control.offsetY;
   return localPoint;
 }
+
+/**
+ * Action handler
+ * @private
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if the translation occurred
+ */
+const dragHandler = (eventData, transform, x, y) => {
+  const {
+      target,
+      offsetX,
+      offsetY
+    } = transform,
+    newLeft = x - offsetX,
+    newTop = y - offsetY,
+    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
+    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
+  moveX && target.set(LEFT, newLeft);
+  moveY && target.set(TOP, newTop);
+  if (moveX || moveY) {
+    fireEvent(MOVING, commonEventInfo(eventData, transform, x, y));
+  }
+  return moveX || moveY;
+};
 
 const normalizeWs = value => value.replace(/\s+/g, ' ');
 
@@ -8189,20 +8229,6 @@ _defineProperty(FabricObject$1, "customProperties", []);
 classRegistry.setClass(FabricObject$1);
 classRegistry.setClass(FabricObject$1, 'object');
 
-const fireEvent = (eventName, options) => {
-  var _target$canvas;
-  const {
-    transform: {
-      target
-    }
-  } = options;
-  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
-    ...options,
-    target
-  });
-  target.fire(eventName, options);
-};
-
 /**
  * Wrap an action handler with firing an event if the action is performed
  * @param {TModificationEvents} eventName the event we want to fire
@@ -9216,33 +9242,6 @@ const createTextboxDefaultControls = () => ({
   ...createResizeControls()
 });
 
-/**
- * Action handler
- * @private
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if the translation occurred
- */
-const dragHandler = (eventData, transform, x, y) => {
-  const {
-      target,
-      offsetX,
-      offsetY
-    } = transform,
-    newLeft = x - offsetX,
-    newTop = y - offsetY,
-    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
-    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
-  moveX && target.set(LEFT, newLeft);
-  moveY && target.set(TOP, newTop);
-  if (moveX || moveY) {
-    fireEvent(MOVING, commonEventInfo(eventData, transform, x, y));
-  }
-  return moveX || moveY;
-};
-
 class InteractiveFabricObject extends FabricObject$1 {
   static getDefaults() {
     return {
@@ -9298,10 +9297,6 @@ class InteractiveFabricObject extends FabricObject$1 {
       control: this.controls[key],
       coord: this.oCoords[key]
     } : undefined;
-  }
-  getDragHandler() {
-    var _this$controls$dragHa;
-    return (_this$controls$dragHa = this.controls.dragHandler) !== null && _this$controls$dragHa !== void 0 ? _this$controls$dragHa : dragHandler;
   }
 
   /**
@@ -13646,7 +13641,7 @@ class SelectableCanvas extends StaticCanvas$1 {
         key: corner = '',
         control
       } = target.getActiveControl() || {},
-      actionHandler = alreadySelected && control ? (_control$getActionHan = control.getActionHandler(e, target, control)) === null || _control$getActionHan === void 0 ? void 0 : _control$getActionHan.bind(control) : target.getDragHandler(),
+      actionHandler = alreadySelected && control ? (_control$getActionHan = control.getActionHandler(e, target, control)) === null || _control$getActionHan === void 0 ? void 0 : _control$getActionHan.bind(control) : dragHandler,
       action = getActionFromCorner(alreadySelected, corner, e, target),
       altKey = e[this.centeredKey],
       origin = this._shouldCenterTransform(target, action, altKey) ? {
@@ -25575,24 +25570,6 @@ function loadSVGFromURL(url, reviver) {
   });
 }
 
-const changeObjectHeight = (eventData, transform, x, y) => {
-  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-  const originY = resolveOrigin(transform.originY);
-  if (originY === 0 || originY > 0 && localPoint.y < 0 || originY < 0 && localPoint.y > 0) {
-    const {
-      target
-    } = transform;
-    const strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleY : 1);
-    const multiplier = isTransformCentered(transform) ? 2 : 1;
-    const oldHeight = target.height;
-    const newHeight = Math.abs(localPoint.y * multiplier / target.scaleY) - strokePadding;
-    target.set(HEIGHT, Math.max(newHeight, 1));
-    return oldHeight !== target.height;
-  }
-  return false;
-};
-const changeHeight = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectHeight));
-
 const ACTION_NAME$1 = MODIFY_POLY;
 /**
  * This function locates the controls.
@@ -25814,9 +25791,6 @@ function createPathControls(path) {
 
 var index = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  changeHeight: changeHeight,
-  changeObjectHeight: changeObjectHeight,
-  changeObjectWidth: changeObjectWidth,
   changeWidth: changeWidth,
   createObjectDefaultControls: createObjectDefaultControls,
   createPathControls: createPathControls,

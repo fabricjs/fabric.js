@@ -3,7 +3,7 @@ import type { Transform } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { Canvas } from '../canvas/Canvas';
 import { Rect } from '../shapes/Rect';
-import { changeHeight } from './changeHeight';
+import { changeHeight } from './changeWidth';
 
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
 

@@ -5,6 +5,39 @@ import { getLocalPoint, isTransformCentered } from './util';
 import { wrapWithFireEvent } from './wrapWithFireEvent';
 import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
 
+export const changeObjectDimensionGen = (dimension: 'width' | 'height', origin: 'originX' | 'originY', xorY: 'x' | 'y', scale: 'scaleX' | 'scaleY'):TransformActionHandler => (
+  eventData,
+  transform,
+  x,
+  y,
+) => {
+  const localPoint = getLocalPoint(
+    transform,
+    transform.originX,
+    transform.originY,
+    x,
+    y,
+  );
+  const localPointValue = localPoint[xorY];
+  //  make sure the control changes width ONLY from it's side of target
+  const originValue = resolveOrigin(transform[origin]);
+  if (
+    originValue === 0 || (originValue > 0 && localPointValue < 0) || (originValue < 0 && localPointValue > 0)
+  ) {
+    const { target } = transform,
+      strokePadding =
+        target.strokeWidth / (target.strokeUniform ? target[scale] : 1),
+      multiplier = isTransformCentered(transform) ? 2 : 1,
+      oldWidth = target[dimension],
+      newWidth =
+        Math.abs((localPointValue * multiplier) / target[scale]) - strokePadding;
+    target.set(dimension, Math.max(newWidth, 1));
+    //  check against actual target width in case `newWidth` was rejected
+    return oldWidth !== target[dimension];
+  }
+  return false;
+};
+
 /**
  * Action handler to change object's width
  * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
@@ -14,79 +47,25 @@ import { wrapWithFixedAnchor } from './wrapWithFixedAnchor';
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-export const changeObjectWidth: TransformActionHandler = (
-  eventData,
-  transform,
-  x,
-  y,
-) => {
-  const localPoint = getLocalPoint(
-    transform,
-    transform.originX,
-    transform.originY,
-    x,
-    y,
-  );
-  //  make sure the control changes width ONLY from it's side of target
-  const originX = resolveOrigin(transform.originX);
-  if (
-    originX === 0 ||
-    (originX > 0 &&
-      localPoint.x < 0) ||
-    (originX < 0 &&
-      localPoint.x > 0)
-  ) {
-    const { target } = transform,
-      strokePadding =
-        target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target.width,
-      newWidth =
-        Math.abs((localPoint.x * multiplier) / target.scaleX) - strokePadding;
-    target.set('width', Math.max(newWidth, 1));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
-  }
-  return false;
-};
+export const changeObjectWidth: TransformActionHandler = changeObjectDimensionGen('width', 'originX', 'x', 'scaleX');
 
-export const changeObjectDimensionGen = (origin: 'originX' | 'originY', xorY: 'x' | 'y', scale: 'scaleX' | 'scaleY'):TransformActionHandler => (
-  eventData,
-  transform,
-  x,
-  y,
-) => {
-  const localPoint = getLocalPoint(
-    transform,
-    transform.originX,
-    transform.originY,
-    x,
-    y,
-  );
-  //  make sure the control changes width ONLY from it's side of target
-  const originValue = resolveOrigin(transform[origin]);
-  if (
-    originValue === 0 ||
-    (originValue > 0 &&
-      localPoint[xorY] < 0) ||
-    (originValue < 0 &&
-      localPoint[xorY] > 0)
-  ) {
-    const { target } = transform,
-      strokePadding =
-        target.strokeWidth / (target.strokeUniform ? target[scale] : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target.width,
-      newWidth =
-        Math.abs((localPoint.x * multiplier) / target[scale]) - strokePadding;
-    target.set('width', Math.max(newWidth, 1));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
-  }
-  return false;
-};
+/**
+ * Action handler to change object's height
+ * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if some change happened
+ */
+export const changeObjectHeight: TransformActionHandler = changeObjectDimensionGen('height', 'originY', 'y', 'scaleY');
 
 export const changeWidth = wrapWithFireEvent(
   RESIZING,
   wrapWithFixedAnchor(changeObjectWidth),
+);
+
+export const changeHeight = wrapWithFireEvent(
+  RESIZING,
+  wrapWithFixedAnchor(changeObjectHeight),
 );
