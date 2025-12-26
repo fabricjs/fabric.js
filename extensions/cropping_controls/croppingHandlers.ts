@@ -1,5 +1,9 @@
 import type { TModificationEvents } from 'fabric';
-import { controlsUtils, type TransformActionHandler, type FabricImage } from 'fabric';
+import {
+  controlsUtils,
+  type TransformActionHandler,
+  type FabricImage,
+} from 'fabric';
 
 const { wrapWithFixedAnchor, wrapWithFireEvent } = controlsUtils;
 
@@ -16,17 +20,17 @@ export const changeImageWidth: TransformActionHandler = (
   const { width } = target;
   const image = target as FabricImage;
   const modified = controlsUtils.changeObjectWidth(eventData, transform, x, y);
-  const availableWidth = image._element.width - image.cropX
+  const availableWidth = image._element.width - image.cropX;
   if (modified) {
     if (image.width > availableWidth) {
-      image.width =  availableWidth;
+      image.width = availableWidth;
     }
     if (image.width < 0) {
-      image.width =  1;
+      image.width = 1;
     }
   }
   return width != image.width;
-}
+};
 
 export const changeCropWidth = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
@@ -46,7 +50,7 @@ export const changeImageHeight: TransformActionHandler = (
   const { height } = target;
   const image = target as FabricImage;
   const modified = controlsUtils.changeObjectHeight(eventData, transform, x, y);
-  const availableHeight = image._element.height - image.cropY
+  const availableHeight = image._element.height - image.cropY;
   if (modified) {
     if (image.height > availableHeight) {
       image.height = availableHeight;
@@ -56,7 +60,7 @@ export const changeImageHeight: TransformActionHandler = (
     }
   }
   return height != image.height;
-}
+};
 
 export const changeCropHeight = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
@@ -87,7 +91,7 @@ export const changeImageCropX: TransformActionHandler = (
     image.width += cropX - newCropX;
   }
   return newCropX != cropX;
-}
+};
 
 export const changeImageCropY: TransformActionHandler = (
   eventData,
@@ -112,7 +116,7 @@ export const changeImageCropY: TransformActionHandler = (
     image.height += cropY - newCropY;
   }
   return newCropY != cropY;
-}
+};
 
 export const changeCropX = wrapWithFireEvent(
   'CROPPING' as TModificationEvents,
@@ -132,9 +136,11 @@ export const dragTransformHandler: TransformActionHandler = (
 ) => {
   const { target, offsetX, offsetY } = transform;
   const cropX = x - offsetX,
-      cropY = y - offsetY;
-    
-    const moved = (target as FabricImage).cropX !== cropX || (target as FabricImage).cropY !== cropY;
-    target.set({ cropX, cropY });
-    return moved;
-}
+    cropY = y - offsetY;
+
+  const moved =
+    (target as FabricImage).cropX !== cropX ||
+    (target as FabricImage).cropY !== cropY;
+  target.set({ cropX, cropY });
+  return moved;
+};

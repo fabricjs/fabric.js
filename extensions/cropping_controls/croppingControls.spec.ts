@@ -13,7 +13,7 @@ describe('createImageCroppingControls', () => {
     const controls = createImageCroppingControls();
     expect(typeof controls).toBe('object');
     expect(Object.keys(controls)).toEqual(
-      expect.arrayContaining(['ml', 'mr', 'mb', 'mt', 'tl', 'tr', 'bl', 'br'])
+      expect.arrayContaining(['ml', 'mr', 'mb', 'mt', 'tl', 'tr', 'bl', 'br']),
     );
   });
 

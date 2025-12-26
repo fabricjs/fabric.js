@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "prettier.prettier-vscode",
   "markdown.validate.enabled": true,
   "markdown.validate.fileLinks.enabled": "warning",
   "markdown.validate.fragmentLinks.enabled": "warning",

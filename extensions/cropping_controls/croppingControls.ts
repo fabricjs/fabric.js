@@ -1,5 +1,10 @@
-import { Control, controlsUtils } from "fabric";
-import { changeCropHeight, changeCropWidth, changeCropX, changeCropY } from "./croppingHandlers";
+import { Control, controlsUtils } from 'fabric';
+import {
+  changeCropHeight,
+  changeCropWidth,
+  changeCropX,
+  changeCropY,
+} from './croppingHandlers';
 
 const { scaleCursorStyleHandler } = controlsUtils;
 

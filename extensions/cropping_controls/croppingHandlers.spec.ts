@@ -29,14 +29,16 @@ describe('croppingHandlers', () => {
     } as Transform;
   }
 
-  function createMockImage(options: Partial<{
-    width: number;
-    height: number;
-    cropX: number;
-    cropY: number;
-    elementWidth: number;
-    elementHeight: number;
-  }> = {}): FabricImage {
+  function createMockImage(
+    options: Partial<{
+      width: number;
+      height: number;
+      cropX: number;
+      cropY: number;
+      elementWidth: number;
+      elementHeight: number;
+    }> = {},
+  ): FabricImage {
     const {
       width = 100,
       height = 100,
