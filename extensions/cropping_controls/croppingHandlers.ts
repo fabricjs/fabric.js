@@ -131,10 +131,10 @@ export const dragTransformHandler: TransformActionHandler = (
   y,
 ) => {
   const { target, offsetX, offsetY } = transform;
-  let cropX = x - offsetX,
+  const cropX = x - offsetX,
       cropY = y - offsetY;
     
-    const moved = target.cropX !== cropX || target.cropY !== cropY;
+    const moved = (target as FabricImage).cropX !== cropX || (target as FabricImage).cropY !== cropY;
     target.set({ cropX, cropY });
     return moved;
 }
