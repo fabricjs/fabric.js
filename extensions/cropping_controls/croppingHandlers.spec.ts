@@ -192,9 +192,6 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareTransform(image, 'ml');
 
-      const originalWidth = image.width;
-      const originalCropX = image.cropX;
-
       // Simulate a width change that would affect cropX
       vi.spyOn(controlsUtils, 'changeObjectWidth').mockImplementation(() => {
         image.width = 80; // Simulate width reduction
@@ -283,9 +280,6 @@ describe('croppingHandlers', () => {
       image = createMockImage({ height: 100, cropY: 50, elementHeight: 200 });
       canvas.add(image);
       transform = prepareTransform(image, 'mt');
-
-      const originalHeight = image.height;
-      const originalCropY = image.cropY;
 
       // Simulate a height change that would affect cropY
       vi.spyOn(controlsUtils, 'changeObjectHeight').mockImplementation(() => {
