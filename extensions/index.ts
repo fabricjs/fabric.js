@@ -24,3 +24,4 @@ export {
   changeCropWidth,
   changeCropHeight,
 } from './cropping_controls/croppingHandlers';
+export { enterCropMode } from './cropping_controls/enterCropMode';

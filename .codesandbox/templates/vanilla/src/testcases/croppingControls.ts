@@ -9,17 +9,20 @@ export async function testCase(canvas: fabric.Canvas) {
   );
 
   // Remove original controls and apply cropping controls
-  image.controls = extensions.createImageCroppingControls();
+  image.on('mousedblclick', () => {
+    extensions.enterCropMode(image);
+    canvas.requestRenderAll();
+  });
 
   // Set some initial crop to demonstrate the controls
   image.set({
-    scaleX: 0.5,
-    scaleY: 0.5,
-    angle: 30,
-    cropX: 50,
-    cropY: 50,
-    width: 300,
-    height: 200,
+    scaleX: 0.4,
+    scaleY: 0.4,
+    angle: 10,
+    cropX: 80,
+    cropY: 80,
+    width: 500,
+    height: 400,
   });
 
   canvas.add(image);

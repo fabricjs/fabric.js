@@ -51,6 +51,7 @@ import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
 import { dragHandler } from '../controls';
+import { type FabricImage } from '../shapes/Image';
 
 export type TargetsInfo = {
   target?: FabricObject;
@@ -657,6 +658,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
           ...saveObjectTransform(target),
           originX: origin.x,
           originY: origin.y,
+          cropX: (target as FabricImage).cropX,
+          cropY: (target as FabricImage).cropY,
         },
       };
 

@@ -13893,7 +13893,9 @@ class SelectableCanvas extends StaticCanvas {
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
-          originY: origin.y
+          originY: origin.y,
+          cropX: target.cropX,
+          cropY: target.cropY
         }
       };
     this._currentTransform = transform;
