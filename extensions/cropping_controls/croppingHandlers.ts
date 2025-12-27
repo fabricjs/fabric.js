@@ -128,14 +128,16 @@ export const cropPanMoveHandler = ({ transform }: TPointerEventInfo) => {
   // this makes the image pan too fast.
   const { target, original } = transform as Transform;
   const fabricImage = target as FabricImage;
-  const p = new Point(target.left - original.left, target.top - original.top);
-  p.transform(
+  const p = new Point(
+    target.left - original.left,
+    target.top - original.top,
+  ).transform(
     util.invertTransform(
       util.createRotateMatrix({ angle: fabricImage.getTotalAngle() }),
     ),
   );
-  let cropX = original.cropX! - p.x;
-  let cropY = original.cropY! - p.y;
+  let cropX = original.cropX! - p.x / fabricImage.scaleX;
+  let cropY = original.cropY! - p.y / fabricImage.scaleY;
   const { width, height, _element } = fabricImage;
   if (cropX < 0) {
     cropX = 0;

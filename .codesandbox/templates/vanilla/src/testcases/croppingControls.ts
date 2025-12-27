@@ -13,13 +13,13 @@ export async function testCase(canvas: fabric.Canvas) {
 
   // Set some initial crop to demonstrate the controls
   image.set({
-    scaleX: 0.4,
-    scaleY: 0.4,
+    scaleX: 4,
+    scaleY: 4,
     angle: 10,
     cropX: 80,
     cropY: 80,
-    width: 500,
-    height: 400,
+    width: 40,
+    height: 40,
     cornerStrokeColor: 'blue',
     cornerColor: 'white',
     borderScaleFactor: 2,
