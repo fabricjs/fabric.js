@@ -1,27 +1,26 @@
-import { type FabricImage, Point, util } from 'fabric';
+import { type FabricImage, type TPointerEventInfo } from 'fabric';
 import { createImageCroppingControls } from './croppingControls';
+import { cropPanMoveHandler } from './croppingHandlers';
 /**
  * Coordinates the change to image to enter crop mode and returns
  * a function to exit crop mode
  */
-export const enterCropMode = (fabricImage: FabricImage) => {
-  const { lockMovementX, lockMovementY, controls } = fabricImage;
+export const enterCropMode = function enterCropMode(
+  this: (args: TPointerEventInfo) => void,
+  { target }: TPointerEventInfo,
+) {
+  const fabricImage = target as FabricImage;
+  const { controls } = fabricImage;
   fabricImage.controls = createImageCroppingControls();
-  // fabricImage.lockMovementX = true;
-  // fabricImage.lockMovementY = true;
-  fabricImage.on('moving', ({ transform }) => {
-    const { target, original } = transform;
-    const p = new Point(target.left - original.left, target.top - original.top);
-    p.transform(util.invertTransform(target.calcTransformMatrix()));
-    fabricImage.cropX = original.cropX! - p.x;
-    fabricImage.cropY = original.cropY! - p.y;
-    fabricImage.left = original.left;
-    fabricImage.top = original.top;
-  });
+  fabricImage.on('moving', cropPanMoveHandler);
   fabricImage.setCoords();
-  return () => {
+  const exitCropMode = () => {
+    fabricImage.off('moving', cropPanMoveHandler);
     fabricImage.controls = controls;
-    fabricImage.lockMovementX = lockMovementX;
-    fabricImage.lockMovementY = lockMovementY;
+    fabricImage.setCoords();
+    fabricImage.once('mousedblclick', enterCropMode);
+    fabricImage.canvas?.requestRenderAll();
   };
+  fabricImage.once('mousedblclick', exitCropMode);
+  fabricImage.canvas?.requestRenderAll();
 };

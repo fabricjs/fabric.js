@@ -5,6 +5,7 @@ import {
   changeCropX,
   changeCropY,
 } from './croppingHandlers';
+import { renderCornerControl } from './renderCornerControl';
 
 const { scaleCursorStyleHandler } = controlsUtils;
 
@@ -14,6 +15,8 @@ export const createImageCroppingControls = () => ({
   ml: new Control({
     x: -0.5,
     y: 0,
+    sizeX: 4,
+    sizeY: 20,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeCropX,
     getActionName: cropActionName,
@@ -22,6 +25,8 @@ export const createImageCroppingControls = () => ({
   mr: new Control({
     x: 0.5,
     y: 0,
+    sizeX: 4,
+    sizeY: 20,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeCropWidth,
     getActionName: cropActionName,
@@ -30,6 +35,8 @@ export const createImageCroppingControls = () => ({
   mb: new Control({
     x: 0,
     y: 0.5,
+    sizeX: 20,
+    sizeY: 4,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeCropHeight,
     getActionName: cropActionName,
@@ -38,14 +45,20 @@ export const createImageCroppingControls = () => ({
   mt: new Control({
     x: 0,
     y: -0.5,
+    sizeX: 20,
+    sizeY: 4,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeCropY,
     getActionName: cropActionName,
   }),
 
   tl: new Control({
+    angle: 0,
     x: -0.5,
     y: -0.5,
+    sizeX: 20,
+    sizeY: 4,
+    render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const cropX = changeCropX(...args);
@@ -56,8 +69,12 @@ export const createImageCroppingControls = () => ({
   }),
 
   tr: new Control({
+    angle: 90,
     x: 0.5,
     y: -0.5,
+    sizeX: 20,
+    sizeY: 4,
+    render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const width = changeCropWidth(...args);
@@ -68,8 +85,12 @@ export const createImageCroppingControls = () => ({
   }),
 
   bl: new Control({
+    angle: 270,
     x: -0.5,
     y: 0.5,
+    sizeX: 20,
+    sizeY: 4,
+    render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const height = changeCropHeight(...args);
@@ -80,8 +101,12 @@ export const createImageCroppingControls = () => ({
   }),
 
   br: new Control({
+    angle: 180,
     x: 0.5,
     y: 0.5,
+    sizeX: 20,
+    sizeY: 4,
+    render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const height = changeCropHeight(...args);

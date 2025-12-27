@@ -3,6 +3,8 @@ import {
   controlsUtils,
   type TransformActionHandler,
   type FabricImage,
+  Point,
+  util,
 } from 'fabric';
 
 const { wrapWithFixedAnchor, wrapWithFireEvent } = controlsUtils;
@@ -122,19 +124,18 @@ export const changeCropY = wrapWithFireEvent(
   wrapWithFixedAnchor(changeImageCropY),
 );
 
-export const dragTransformHandler: TransformActionHandler = (
-  eventData,
-  transform,
-  x,
-  y,
-) => {
-  const { target, offsetX, offsetY } = transform;
-  const cropX = x - offsetX,
-    cropY = y - offsetY;
-
-  const moved =
-    (target as FabricImage).cropX !== cropX ||
-    (target as FabricImage).cropY !== cropY;
-  target.set({ cropX, cropY });
-  return moved;
+export const cropPanMoveHandler = ({ transform }) => {
+  // this makes the image pan too fast.
+  const { target, original } = transform;
+  const fabricImage = target as FabricImage;
+  const p = new Point(target.left - original.left, target.top - original.top);
+  p.transform(
+    util.invertTransform(
+      util.createRotateMatrix({ angle: fabricImage.getTotalAngle() }),
+    ),
+  );
+  fabricImage.cropX = original.cropX! - p.x;
+  fabricImage.cropY = original.cropY! - p.y;
+  fabricImage.left = original.left;
+  fabricImage.top = original.top;
 };
