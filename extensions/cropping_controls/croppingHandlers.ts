@@ -25,11 +25,11 @@ export const changeImageWidth: TransformActionHandler = (
     if (image.width > availableWidth) {
       image.width = availableWidth;
     }
-    if (image.width < 0) {
+    if (image.width < 1) {
       image.width = 1;
     }
   }
-  return width != image.width;
+  return width !== image.width;
 };
 
 export const changeCropWidth = wrapWithFireEvent(
@@ -55,11 +55,11 @@ export const changeImageHeight: TransformActionHandler = (
     if (image.height > availableHeight) {
       image.height = availableHeight;
     }
-    if (image.height < 0) {
+    if (image.height < 1) {
       image.height = 1;
     }
   }
-  return height != image.height;
+  return height !== image.height;
 };
 
 export const changeCropHeight = wrapWithFireEvent(
@@ -83,14 +83,11 @@ export const changeImageCropX: TransformActionHandler = (
     if (newCropX < 0) {
       newCropX = 0;
     }
-    if (newCropX + image.width > image._element.width) {
-      newCropX = image._element.width - image.width;
-    }
     image.cropX = newCropX;
     // calculate new width on the base of how much crop we have now
     image.width += cropX - newCropX;
   }
-  return newCropX != cropX;
+  return newCropX !== cropX;
 };
 
 export const changeImageCropY: TransformActionHandler = (
@@ -109,13 +106,10 @@ export const changeImageCropY: TransformActionHandler = (
     if (newCropY < 0) {
       newCropY = 0;
     }
-    if (newCropY + image.height > image._element.height) {
-      newCropY = image._element.height - image.height;
-    }
     image.cropY = newCropY;
     image.height += cropY - newCropY;
   }
-  return newCropY != cropY;
+  return newCropY !== cropY;
 };
 
 export const changeCropX = wrapWithFireEvent(

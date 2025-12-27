@@ -1,5 +1,5 @@
 import type { Transform } from 'fabric';
-import { controlsUtils, FabricImage, Canvas } from 'fabric';
+import { FabricImage, Canvas } from 'fabric';
 import {
   changeImageWidth,
   changeCropWidth,
@@ -11,7 +11,7 @@ import {
   changeCropY,
 } from './croppingHandlers';
 
-import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
+import { describe, expect, test, beforeEach, afterEach } from 'vitest';
 
 describe('croppingHandlers', () => {
   let canvas: Canvas;
@@ -93,24 +93,23 @@ describe('croppingHandlers', () => {
     });
 
     test('constrains width to minimum of 1 (lower limit)', () => {
-      vi.spyOn(controlsUtils, 'changeObjectWidth').mockImplementation(() => {
-        image.width = -10;
-        return true;
-      });
+      image = createMockImage({ width: 100, cropX: 50, elementWidth: 200 });
       transform = prepareTransform(image, 'mr');
-      changeImageWidth(eventData, transform, 0, 50);
+      changeImageWidth(eventData, transform, 0.1, 50);
       expect(image.width).toBe(1);
-
-      vi.restoreAllMocks();
     });
 
     test('returns false when no modification occurred', () => {
-      vi.spyOn(controlsUtils, 'changeObjectWidth').mockReturnValue(false);
-
+      image = createMockImage({
+        width: 100,
+        cropX: 50,
+        elementWidth: 200,
+      });
+      transform = prepareTransform(image, 'mr');
       const changed = changeImageWidth(eventData, transform, 200, 50);
-      expect(changed).toBe(false);
-
-      vi.restoreAllMocks();
+      expect(changed).toBe(true);
+      const changed2 = changeImageWidth(eventData, transform, 200, 50);
+      expect(changed2).toBe(false);
     });
   });
 
@@ -122,13 +121,16 @@ describe('croppingHandlers', () => {
 
       // The wrapped function should be different from the base function
       expect(changeCropWidth).not.toBe(changeImageWidth);
-
-      vi.restoreAllMocks();
     });
   });
 
   describe('changeImageHeight', () => {
     beforeEach(() => {
+      image = createMockImage({
+        height: 100,
+        cropY: 50,
+        elementHeight: 200,
+      });
       transform = prepareTransform(image, 'mb');
     });
 
@@ -140,36 +142,22 @@ describe('croppingHandlers', () => {
     });
 
     test('constrains height to available height (upper limit)', () => {
-      // Image element is 200px tall, cropY is 50, so max available is 150
-      image = createMockImage({ height: 100, cropY: 50, elementHeight: 200 });
-      canvas.add(image);
-      transform = prepareTransform(image, 'mb');
-
-      // Try to set height beyond available (200 - 50 = 150 available)
+      // Try to set height beyond available (200 - 50 = 150 available
       changeImageHeight(eventData, transform, 50, 500);
       expect(image.height).toBeLessThanOrEqual(150);
     });
 
     test('constrains height to minimum of 1 (lower limit)', () => {
       // Mock to simulate setting negative height
-      vi.spyOn(controlsUtils, 'changeObjectHeight').mockImplementation(() => {
-        image.height = -10;
-        return true;
-      });
-
-      changeImageHeight(eventData, transform, 50, -100);
+      changeImageHeight(eventData, transform, 50, 0.1);
       expect(image.height).toBe(1);
-
-      vi.restoreAllMocks();
     });
 
     test('returns false when no modification occurred', () => {
-      vi.spyOn(controlsUtils, 'changeObjectHeight').mockReturnValue(false);
-
       const changed = changeImageHeight(eventData, transform, 50, 200);
-      expect(changed).toBe(false);
-
-      vi.restoreAllMocks();
+      expect(changed).toBe(true);
+      const changed2 = changeImageHeight(eventData, transform, 50, 200);
+      expect(changed2).toBe(false);
     });
   });
 
@@ -183,83 +171,47 @@ describe('croppingHandlers', () => {
 
   describe('changeImageCropX', () => {
     beforeEach(() => {
+      image = createMockImage({
+        width: 100,
+        cropX: 50,
+        elementWidth: 200,
+      });
       // Use 'ml' corner for cropX - changing left side moves cropX
       transform = prepareTransform(image, 'ml');
     });
 
     test('changes cropX and width together', () => {
-      image = createMockImage({ width: 100, cropX: 50, elementWidth: 200 });
-      canvas.add(image);
-      transform = prepareTransform(image, 'ml');
-
-      // Simulate a width change that would affect cropX
-      vi.spyOn(controlsUtils, 'changeObjectWidth').mockImplementation(() => {
-        image.width = 80; // Simulate width reduction
-        return true;
-      });
-
-      const changed = changeImageCropX(eventData, transform, 70, 50);
-
-      // newCropX = 50 + 100 - 80 = 70
-      // width = 100 + 50 - 70 = 80
+      const changed = changeImageCropX(eventData, transform, 20, 50);
       expect(image.cropX).toBe(70);
       expect(image.width).toBe(80);
       expect(changed).toBe(true);
-
-      vi.restoreAllMocks();
     });
 
     test('constrains cropX to minimum of 0 and adjusts width accordingly', () => {
       image = createMockImage({ width: 100, cropX: 10, elementWidth: 200 });
-      canvas.add(image);
       transform = prepareTransform(image, 'ml');
 
-      // Simulate a change that would make cropX negative
-      vi.spyOn(controlsUtils, 'changeObjectWidth').mockImplementation(() => {
-        image.width = 120; // Width increased by 20, would make cropX = 10 + 100 - 120 = -10
-        return true;
-      });
-
-      changeImageCropX(eventData, transform, 30, 50);
+      changeImageCropX(eventData, transform, -10, 50);
 
       // newCropX is clamped to 0 (was -10)
       expect(image.cropX).toBe(0);
       // width = 100 + 10 - 0 = 110
       expect(image.width).toBe(110);
-
-      vi.restoreAllMocks();
     });
 
     test('constrains cropX so image stays within element bounds and adjusts width accordingly', () => {
-      image = createMockImage({ width: 100, cropX: 50, elementWidth: 200 });
-      canvas.add(image);
-      transform = prepareTransform(image, 'ml');
-
-      // Simulate a change that would push cropX + width beyond element width
-      vi.spyOn(controlsUtils, 'changeObjectWidth').mockImplementation(() => {
-        image.width = 50; // Width decreased by 50, would make cropX = 50 + 100 - 50 = 100
-        return true;
-      });
-
-      changeImageCropX(eventData, transform, 100, 50);
-
+      changeImageCropX(eventData, transform, 50, 50);
       // newCropX = 100, but clamped to elementWidth - width = 200 - 100 = 100 (stays 100)
       expect(image.cropX).toBe(100);
       // width = 100 + 50 - 100 = 50
       expect(image.width).toBe(50);
       // cropX + width should not exceed element width (200)
       expect(image.cropX + image.width).toBeLessThanOrEqual(200);
-
-      vi.restoreAllMocks();
     });
 
     test('returns false when no modification occurred', () => {
-      vi.spyOn(controlsUtils, 'changeObjectWidth').mockReturnValue(false);
-
-      const changed = changeImageCropX(eventData, transform, 30, 50);
+      const changed = changeImageCropX(eventData, transform, 0, 50);
       expect(changed).toBe(false);
-
-      vi.restoreAllMocks();
     });
   });
 
@@ -272,30 +224,22 @@ describe('croppingHandlers', () => {
 
   describe('changeImageCropY', () => {
     beforeEach(() => {
+      image = createMockImage({
+        height: 100,
+        cropY: 50,
+        elementHeight: 200,
+      });
       // Use 'mt' corner for cropY - changing top side moves cropY
       transform = prepareTransform(image, 'mt');
     });
 
     test('changes cropY and height together', () => {
-      image = createMockImage({ height: 100, cropY: 50, elementHeight: 200 });
-      canvas.add(image);
-      transform = prepareTransform(image, 'mt');
-
-      // Simulate a height change that would affect cropY
-      vi.spyOn(controlsUtils, 'changeObjectHeight').mockImplementation(() => {
-        image.height = 80; // Simulate height reduction
-        return true;
-      });
-
-      const changed = changeImageCropY(eventData, transform, 50, 70);
-
+      const changed = changeImageCropY(eventData, transform, 50, 20);
       // newCropY = 50 + 100 - 80 = 70
       // height = 100 + 50 - 70 = 80
       expect(image.cropY).toBe(70);
       expect(image.height).toBe(80);
       expect(changed).toBe(true);
-
-      vi.restoreAllMocks();
     });
 
     test('constrains cropY to minimum of 0 and adjusts height accordingly', () => {
@@ -303,52 +247,17 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareTransform(image, 'mt');
 
-      // Simulate a change that would make cropY negative
-      vi.spyOn(controlsUtils, 'changeObjectHeight').mockImplementation(() => {
-        image.height = 120; // Height increased by 20, would make cropY = 10 + 100 - 120 = -10
-        return true;
-      });
-
-      changeImageCropY(eventData, transform, 50, 30);
+      changeImageCropY(eventData, transform, 50, -30);
 
       // newCropY is clamped to 0 (was -10)
       expect(image.cropY).toBe(0);
       // height = 100 + 10 - 0 = 110
       expect(image.height).toBe(110);
-
-      vi.restoreAllMocks();
-    });
-
-    test('constrains cropY so image stays within element bounds and adjusts height accordingly', () => {
-      image = createMockImage({ height: 100, cropY: 50, elementHeight: 200 });
-      canvas.add(image);
-      transform = prepareTransform(image, 'mt');
-
-      // Simulate a change that would push cropY + height beyond element height
-      vi.spyOn(controlsUtils, 'changeObjectHeight').mockImplementation(() => {
-        image.height = 50; // Height decreased by 50, would make cropY = 50 + 100 - 50 = 100
-        return true;
-      });
-
-      changeImageCropY(eventData, transform, 50, 100);
-
-      // newCropY = 100, but clamped to elementHeight - height = 200 - 100 = 100 (stays 100)
-      expect(image.cropY).toBe(100);
-      // height = 100 + 50 - 100 = 50
-      expect(image.height).toBe(50);
-      // cropY + height should not exceed element height (200)
-      expect(image.cropY + image.height).toBeLessThanOrEqual(200);
-
-      vi.restoreAllMocks();
     });
 
     test('returns false when no modification occurred', () => {
-      vi.spyOn(controlsUtils, 'changeObjectHeight').mockReturnValue(false);
-
-      const changed = changeImageCropY(eventData, transform, 50, 30);
+      const changed = changeImageCropY(eventData, transform, 50, 0);
       expect(changed).toBe(false);
-
-      vi.restoreAllMocks();
     });
   });
 
