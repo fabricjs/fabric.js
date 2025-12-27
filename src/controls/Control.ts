@@ -6,7 +6,7 @@ import type {
 } from '../EventTypeDefs';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
-import { SCALE } from '../constants';
+import { FILL, SCALE, STROKE } from '../constants';
 import type {
   InteractiveFabricObject,
   TOCoord,
@@ -334,6 +334,36 @@ export class Control {
       tr: new Point(0.5, -0.5).transform(t),
       br: new Point(0.5, 0.5).transform(t),
       bl: new Point(-0.5, 0.5).transform(t),
+    };
+  }
+
+  commonRenderProps(
+    fabricObject: InteractiveFabricObject,
+    styleOverride: ControlRenderingStyleOverride = {},
+  ): {
+    stroke: boolean;
+    xSize: number;
+    ySize: number;
+    transparentCorners: boolean;
+    methodName: 'stroke' | 'fill';
+  } {
+    const xSize =
+        this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+      ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+      transparentCorners =
+        typeof styleOverride.transparentCorners !== 'undefined'
+          ? styleOverride.transparentCorners
+          : fabricObject.transparentCorners,
+      methodName = transparentCorners ? STROKE : FILL,
+      stroke =
+        !transparentCorners &&
+        !!(styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
+    return {
+      stroke,
+      xSize,
+      ySize,
+      transparentCorners,
+      methodName,
     };
   }
 

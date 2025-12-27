@@ -94,6 +94,8 @@ export type Transform = {
   original: ReturnType<typeof saveObjectTransform> & {
     originX: TOriginX;
     originY: TOriginY;
+    cropX?: number;
+    cropY?: number;
   };
   actionPerformed: boolean;
 };

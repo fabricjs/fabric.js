@@ -51,7 +51,6 @@ export abstract class StyledText<
         : { line: this.styles[lineIndex] };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
-        // eslint-disable-next-line no-unused-vars
         for (const p3 in obj[p1][p2]) {
           return false;
         }
@@ -78,9 +77,7 @@ export abstract class StyledText<
       typeof lineIndex === 'undefined'
         ? this.styles
         : { 0: this.styles[lineIndex] };
-    // eslint-disable-next-line
     for (const p1 in obj) {
-      // eslint-disable-next-line
       for (const p2 in obj[p1]) {
         if (typeof obj[p1][p2][property] !== 'undefined') {
           return true;

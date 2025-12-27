@@ -24,6 +24,7 @@ export const TOP = 'top';
 export const BOTTOM = 'bottom';
 export const RIGHT = 'right';
 export const NONE = 'none';
+export const HEIGHT = 'height';
 
 export const reNewline = /\r?\n/;
 

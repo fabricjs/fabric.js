@@ -1,4 +1,3 @@
-import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
@@ -51,6 +50,8 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import { dragHandler } from '../controls';
+import { type FabricImage } from '../shapes/Image';
 
 export type TargetsInfo = {
   target?: FabricObject;
@@ -626,37 +627,52 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       origin = this._shouldCenterTransform(target, action, altKey)
         ? ({ x: CENTER, y: CENTER } as const)
         : this._getOriginFromCorner(target, corner),
+      {
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+        left,
+        top,
+        angle,
+        width,
+        height,
+        cropX,
+        cropY,
+      } = target as FabricImage,
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform: Transform = {
-        target: target,
+        target,
         action,
         actionHandler,
         actionPerformed: false,
         corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+        offsetX: pointer.x - left,
+        offsetY: pointer.y - top,
         originX: origin.x,
         originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
+        theta: degreesToRadians(angle),
+        width,
+        height,
         shiftKey: e.shiftKey,
         altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
           originY: origin.y,
+          cropX,
+          cropY,
         },
       };
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- feat(): Cropping controls extension [#10825](https://github.com/fabricjs/fabric.js/pull/10825)
+
 ## [7.0.0]
 
 - fix(): Fix toDataUrl writing on contextTop [#10820](https://github.com/fabricjs/fabric.js/pull/10820)
