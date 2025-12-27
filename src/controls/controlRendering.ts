@@ -1,4 +1,4 @@
-import { FILL, STROKE, twoMathPi } from '../constants';
+import { twoMathPi } from '../constants';
 import type { InteractiveFabricObject } from '../shapes/Object/InteractiveObject';
 import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { Control } from './Control';
@@ -44,18 +44,10 @@ export function renderCircleControl(
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: InteractiveFabricObject,
 ) {
-  styleOverride = styleOverride || {};
-  const xSize =
-      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-    transparentCorners =
-      typeof styleOverride.transparentCorners !== 'undefined'
-        ? styleOverride.transparentCorners
-        : fabricObject.transparentCorners,
-    methodName = transparentCorners ? STROKE : FILL,
-    stroke =
-      !transparentCorners &&
-      (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
+  const { stroke, xSize, ySize, methodName } = this.commonRenderProps(
+    fabricObject,
+    styleOverride,
+  );
   let myLeft = left,
     myTop = top,
     size;
@@ -103,18 +95,10 @@ export function renderSquareControl(
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: InteractiveFabricObject,
 ) {
-  styleOverride = styleOverride || {};
-  const xSize =
-      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-    transparentCorners =
-      typeof styleOverride.transparentCorners !== 'undefined'
-        ? styleOverride.transparentCorners
-        : fabricObject.transparentCorners,
-    methodName = transparentCorners ? STROKE : FILL,
-    stroke =
-      !transparentCorners &&
-      (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+  const { stroke, xSize, ySize, methodName } = this.commonRenderProps(
+      fabricObject,
+      styleOverride,
+    ),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
   ctx.save();

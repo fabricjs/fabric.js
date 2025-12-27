@@ -26,17 +26,10 @@ export function renderCornerControl(
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: InteractiveFabricObject,
 ) {
-  styleOverride = styleOverride || {};
-  const xSize =
-      this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-    transparentCorners =
-      typeof styleOverride.transparentCorners !== 'undefined'
-        ? styleOverride.transparentCorners
-        : fabricObject.transparentCorners,
-    stroke =
-      !transparentCorners &&
-      (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+  const { stroke, xSize, ySize, transparentCorners } = this.commonRenderProps(
+      fabricObject,
+      styleOverride,
+    ),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
   ctx.save();
