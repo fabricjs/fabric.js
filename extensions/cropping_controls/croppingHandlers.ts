@@ -1,11 +1,11 @@
-import type { TModificationEvents } from 'fabric';
-import {
-  controlsUtils,
-  type TransformActionHandler,
-  type FabricImage,
-  Point,
-  util,
+import type {
+  TModificationEvents,
+  TPointerEventInfo,
+  Transform,
+  TransformActionHandler,
+  FabricImage,
 } from 'fabric';
+import { controlsUtils, Point, util } from 'fabric';
 
 const { wrapWithFixedAnchor, wrapWithFireEvent } = controlsUtils;
 
@@ -124,9 +124,9 @@ export const changeCropY = wrapWithFireEvent(
   wrapWithFixedAnchor(changeImageCropY),
 );
 
-export const cropPanMoveHandler = ({ transform }) => {
+export const cropPanMoveHandler = ({ transform }: TPointerEventInfo) => {
   // this makes the image pan too fast.
-  const { target, original } = transform;
+  const { target, original } = transform as Transform;
   const fabricImage = target as FabricImage;
   const p = new Point(target.left - original.left, target.top - original.top);
   p.transform(
@@ -134,8 +134,23 @@ export const cropPanMoveHandler = ({ transform }) => {
       util.createRotateMatrix({ angle: fabricImage.getTotalAngle() }),
     ),
   );
-  fabricImage.cropX = original.cropX! - p.x;
-  fabricImage.cropY = original.cropY! - p.y;
+  let cropX = original.cropX! - p.x;
+  let cropY = original.cropY! - p.y;
+  const { width, height, _element } = fabricImage;
+  if (cropX < 0) {
+    cropX = 0;
+  }
+  if (cropY < 0) {
+    cropY = 0;
+  }
+  if (cropX + width > _element.width) {
+    cropX = _element.width - width;
+  }
+  if (cropY + height > _element.height) {
+    cropY = _element.height - height;
+  }
+  fabricImage.cropX = cropX;
+  fabricImage.cropY = cropY;
   fabricImage.left = original.left;
   fabricImage.top = original.top;
 };
