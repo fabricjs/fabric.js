@@ -345,25 +345,29 @@ export class Control {
     xSize: number;
     ySize: number;
     transparentCorners: boolean;
+    fillStyle: string;
+    strokeStyle: string;
     methodName: 'stroke' | 'fill';
   } {
-    const xSize =
-        this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-      ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-      transparentCorners =
-        typeof styleOverride.transparentCorners !== 'undefined'
-          ? styleOverride.transparentCorners
+    const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } =
+      styleOverride;
+    const xSize = this.sizeX || cornerSize || fabricObject.cornerSize,
+      ySize = this.sizeY || cornerSize || fabricObject.cornerSize,
+      transparent =
+        typeof transparentCorners !== 'undefined'
+          ? transparentCorners
           : fabricObject.transparentCorners,
       methodName = transparentCorners ? STROKE : FILL,
-      stroke =
-        !transparentCorners &&
-        !!(styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
+      strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
+      stroke = !transparentCorners && !!strokeColor;
     return {
       stroke,
       xSize,
       ySize,
-      transparentCorners,
+      transparentCorners: transparent,
       methodName,
+      fillStyle: cornerColor || fabricObject.cornerColor || '',
+      strokeStyle: strokeColor || '',
     };
   }
 
