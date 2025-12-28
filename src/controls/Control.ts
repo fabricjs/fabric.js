@@ -360,7 +360,7 @@ export class Control {
           : fabricObject.transparentCorners,
       methodName = transparent ? STROKE : FILL,
       strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
-      stroke = !transparentCorners && !!strokeColor;
+      stroke = !transparent && !!strokeColor;
     return {
       stroke,
       xSize,
