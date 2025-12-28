@@ -46,6 +46,8 @@ export const changeObjectDimensionGen =
 /**
  * Action handler to change object's width
  * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * You want to use this only if you are building a new control handler and you want
+ * to reuse some logic. use "changeWidth" if you are looking to just use a control for width
  * @param {Event} eventData javascript event that is doing the transform
  * @param {Object} transform javascript object containing a series of information around the current transform
  * @param {number} x current mouse x position, canvas normalized
@@ -58,6 +60,8 @@ export const changeObjectWidth: TransformActionHandler =
 /**
  * Action handler to change object's height
  * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * You want to use this only if you are building a new control handler and you want
+ * to reuse some logic. use "changeHeight" if you are looking to just use a control for height
  * @param {Event} eventData javascript event that is doing the transform
  * @param {Object} transform javascript object containing a series of information around the current transform
  * @param {number} x current mouse x position, canvas normalized
@@ -67,11 +71,17 @@ export const changeObjectWidth: TransformActionHandler =
 export const changeObjectHeight: TransformActionHandler =
   changeObjectDimensionGen('height', 'originY', 'y', 'scaleY');
 
+/**
+ * Control handler for changing width
+ */
 export const changeWidth = wrapWithFireEvent(
   RESIZING,
   wrapWithFixedAnchor(changeObjectWidth),
 );
 
+/**
+ * Control handler for changing height
+ */
 export const changeHeight = wrapWithFireEvent(
   RESIZING,
   wrapWithFixedAnchor(changeObjectHeight),
