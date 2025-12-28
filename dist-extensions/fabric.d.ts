@@ -111,6 +111,5 @@ export { loadSVGFromURL } from './src/parser/loadSVGFromURL';
 export { parseSVGDocument } from './src/parser/parseSVGDocument';
 export { Control } from './src/controls/Control';
 export * as controlsUtils from './src/controls';
-export type { ControlRenderingStyleOverride } from './src/controls';
 export * from './src/filters';
 //# sourceMappingURL=fabric.d.ts.map
