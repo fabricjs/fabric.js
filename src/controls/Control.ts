@@ -338,6 +338,7 @@ export class Control {
   }
 
   commonRenderProps(
+    ctx: CanvasRenderingContext2D,
     fabricObject: InteractiveFabricObject,
     styleOverride: ControlRenderingStyleOverride = {},
   ): {
@@ -345,8 +346,6 @@ export class Control {
     xSize: number;
     ySize: number;
     transparentCorners: boolean;
-    fillStyle: string;
-    strokeStyle: string;
     methodName: 'stroke' | 'fill';
   } {
     const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } =
@@ -361,14 +360,14 @@ export class Control {
       methodName = transparent ? STROKE : FILL,
       strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
       stroke = !transparent && !!strokeColor;
+    ctx.fillStyle = cornerColor || fabricObject.cornerColor || '';
+    ctx.strokeStyle = strokeColor || '';
     return {
       stroke,
       xSize,
       ySize,
       transparentCorners: transparent,
       methodName,
-      fillStyle: cornerColor || fabricObject.cornerColor || '',
-      strokeStyle: strokeColor || '',
     };
   }
 

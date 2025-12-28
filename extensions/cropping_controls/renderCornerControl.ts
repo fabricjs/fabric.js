@@ -26,16 +26,14 @@ export function renderCornerControl(
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: InteractiveFabricObject,
 ) {
+  ctx.save();
   const { stroke, xSize, ySize, transparentCorners } = this.commonRenderProps(
+      ctx,
       fabricObject,
       styleOverride,
     ),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
-  ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
-  ctx.strokeStyle =
-    styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   ctx.translate(left, top);
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle();

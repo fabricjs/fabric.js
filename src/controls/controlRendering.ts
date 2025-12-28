@@ -44,14 +44,15 @@ export function renderCircleControl(
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: InteractiveFabricObject,
 ) {
-  const { stroke, xSize, ySize, methodName, fillStyle, strokeStyle } =
-    this.commonRenderProps(fabricObject, styleOverride);
+  ctx.save();
+  const { stroke, xSize, ySize, methodName } = this.commonRenderProps(
+    ctx,
+    fabricObject,
+    styleOverride,
+  );
   let myLeft = left,
     myTop = top,
     size;
-  ctx.save();
-  ctx.fillStyle = fillStyle;
-  ctx.strokeStyle = strokeStyle;
   // TODO: use proper ellipse code.
   if (xSize > ySize) {
     size = xSize;
@@ -92,13 +93,14 @@ export function renderSquareControl(
   styleOverride: ControlRenderingStyleOverride,
   fabricObject: InteractiveFabricObject,
 ) {
-  const { stroke, xSize, ySize, methodName, fillStyle, strokeStyle } =
-      this.commonRenderProps(fabricObject, styleOverride),
+  ctx.save();
+  const { stroke, xSize, ySize, methodName } = this.commonRenderProps(
+      ctx,
+      fabricObject,
+      styleOverride,
+    ),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
-  ctx.save();
-  ctx.fillStyle = fillStyle;
-  ctx.strokeStyle = strokeStyle;
   ctx.translate(left, top);
   //  angle is relative to canvas plane
   const angle = fabricObject.getTotalAngle();
