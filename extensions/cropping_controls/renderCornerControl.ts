@@ -27,7 +27,7 @@ export function renderCornerControl(
   fabricObject: InteractiveFabricObject,
 ) {
   ctx.save();
-  const { stroke, xSize, ySize, transparentCorners } = this.commonRenderProps(
+  const { stroke, xSize, ySize, opName } = this.commonRenderProps(
       ctx,
       fabricObject,
       styleOverride,
@@ -47,7 +47,7 @@ export function renderCornerControl(
   ctx.lineTo(xSizeBy2, -ySizeBy2);
   ctx.lineTo(-ySizeBy2, -ySizeBy2);
   ctx.closePath();
-  transparentCorners || ctx.fill();
+  ctx[opName]();
   stroke && ctx.stroke();
   ctx.restore();
 }

@@ -45,7 +45,7 @@ export function renderCircleControl(
   fabricObject: InteractiveFabricObject,
 ) {
   ctx.save();
-  const { stroke, xSize, ySize, methodName } = this.commonRenderProps(
+  const { stroke, xSize, ySize, opName } = this.commonRenderProps(
     ctx,
     fabricObject,
     styleOverride,
@@ -67,7 +67,7 @@ export function renderCircleControl(
   }
   ctx.beginPath();
   ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
-  ctx[methodName]();
+  ctx[opName]();
   if (stroke) {
     ctx.stroke();
   }
@@ -94,7 +94,7 @@ export function renderSquareControl(
   fabricObject: InteractiveFabricObject,
 ) {
   ctx.save();
-  const { stroke, xSize, ySize, methodName } = this.commonRenderProps(
+  const { stroke, xSize, ySize, opName } = this.commonRenderProps(
       ctx,
       fabricObject,
       styleOverride,
@@ -108,7 +108,7 @@ export function renderSquareControl(
   // this does not work, and fixed with ( && ) does not make sense.
   // to have real transparent corners we need the controls on upperCanvas
   // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-  ctx[`${methodName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
+  ctx[`${opName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
   if (stroke) {
     ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
   }

@@ -352,7 +352,7 @@ export class Control {
     xSize: number;
     ySize: number;
     transparentCorners: boolean;
-    methodName: 'stroke' | 'fill';
+    opName: 'stroke' | 'fill';
   } {
     const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } =
         styleOverride,
@@ -363,7 +363,7 @@ export class Control {
         typeof transparentCorners !== 'undefined'
           ? transparentCorners
           : fabricObject.transparentCorners,
-      methodName = transparent ? STROKE : FILL,
+      opName = transparent ? STROKE : FILL,
       strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
       stroke = !transparent && !!strokeColor;
     ctx.fillStyle = cornerColor || fabricObject.cornerColor || '';
@@ -373,7 +373,7 @@ export class Control {
       xSize,
       ySize,
       transparentCorners: transparent,
-      methodName,
+      opName,
     };
   }
 
