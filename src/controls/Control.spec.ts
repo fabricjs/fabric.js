@@ -73,6 +73,8 @@ describe('Controls', () => {
       ({
         fillStyle: '',
         strokeStyle: '',
+        translate: vi.fn(),
+        rotate: vi.fn(),
       }) as unknown as CanvasRenderingContext2D;
 
     test('returns default values from fabricObject', () => {
@@ -85,7 +87,7 @@ describe('Controls', () => {
         cornerStrokeColor: 'red',
       });
 
-      const result = control.commonRenderProps(ctx, fabricObject);
+      const result = control.commonRenderProps(ctx, 10, 20, fabricObject);
 
       expect(result).toEqual({
         stroke: true,
@@ -96,6 +98,8 @@ describe('Controls', () => {
       });
       expect(ctx.fillStyle).toBe('blue');
       expect(ctx.strokeStyle).toBe('red');
+      expect(ctx.translate).toHaveBeenCalledWith(10, 20);
+      expect(ctx.rotate).toHaveBeenCalled();
     });
 
     test('uses control sizeX and sizeY when set', () => {
@@ -103,7 +107,7 @@ describe('Controls', () => {
       const ctx = createMockContext();
       const fabricObject = new FabricObject({ cornerSize: 13 });
 
-      const result = control.commonRenderProps(ctx, fabricObject);
+      const result = control.commonRenderProps(ctx, 0, 0, fabricObject);
 
       expect(result.xSize).toBe(20);
       expect(result.ySize).toBe(30);
@@ -119,7 +123,7 @@ describe('Controls', () => {
         cornerStrokeColor: 'red',
       });
 
-      const result = control.commonRenderProps(ctx, fabricObject, {
+      const result = control.commonRenderProps(ctx, 0, 0, fabricObject, {
         cornerSize: 25,
         cornerColor: 'green',
         transparentCorners: true,
@@ -145,7 +149,7 @@ describe('Controls', () => {
         cornerStrokeColor: 'red',
       });
 
-      const result = control.commonRenderProps(ctx, fabricObject);
+      const result = control.commonRenderProps(ctx, 0, 0, fabricObject);
 
       expect(result.stroke).toBe(false);
       expect(result.opName).toBe('stroke');
@@ -159,7 +163,7 @@ describe('Controls', () => {
         cornerStrokeColor: '',
       });
 
-      const result = control.commonRenderProps(ctx, fabricObject);
+      const result = control.commonRenderProps(ctx, 0, 0, fabricObject);
 
       expect(result.stroke).toBe(false);
       expect(result.opName).toBe('fill');

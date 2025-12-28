@@ -18,6 +18,7 @@ import {
   createTranslateMatrix,
   multiplyTransformMatrixArray,
 } from '../util/misc/matrix';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { ControlRenderingStyleOverride } from './controlRendering';
 import { renderCircleControl, renderSquareControl } from './controlRendering';
 
@@ -345,6 +346,8 @@ export class Control {
    */
   commonRenderProps(
     ctx: CanvasRenderingContext2D,
+    left: number,
+    top: number,
     fabricObject: InteractiveFabricObject,
     styleOverride: ControlRenderingStyleOverride = {},
   ): {
@@ -368,6 +371,9 @@ export class Control {
       stroke = !transparent && !!strokeColor;
     ctx.fillStyle = cornerColor || fabricObject.cornerColor || '';
     ctx.strokeStyle = strokeColor || '';
+    ctx.translate(left, top);
+    //  angle is relative to canvas plane
+    ctx.rotate(degreesToRadians(fabricObject.getTotalAngle()));
     return {
       stroke,
       xSize,
