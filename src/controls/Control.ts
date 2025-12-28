@@ -337,6 +337,12 @@ export class Control {
     };
   }
 
+  /**
+   * This is an helper method to prepare the canvas to render a control
+   * It detectes common control properties and sets the correct fill and
+   * stroke styles on the context. It does not execute translations or
+   * rotations since different controls need differnt combination of these.
+   */
   commonRenderProps(
     ctx: CanvasRenderingContext2D,
     fabricObject: InteractiveFabricObject,
