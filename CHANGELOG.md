@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): Render circle control tweak for code reusability and style [#10829](https://github.com/fabricjs/fabric.js/pull/10829)
 - feat(): Cropping controls extension [#10825](https://github.com/fabricjs/fabric.js/pull/10825)
 
 ## [7.0.0]
