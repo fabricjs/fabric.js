@@ -124,6 +124,10 @@ export const changeCropY = wrapWithFireEvent(
   wrapWithFixedAnchor(changeImageCropY),
 );
 
+/**
+ * A function to counter the move action and change cropX/cropY of an image
+ * Keep the image steady, but moves it inside its own cropping rectangle
+ */
 export const cropPanMoveHandler = ({ transform }: ObjectEvents['moving']) => {
   // this makes the image pan too fast.
   const { target, original } = transform as Transform;
