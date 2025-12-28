@@ -350,9 +350,10 @@ export class Control {
     methodName: 'stroke' | 'fill';
   } {
     const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } =
-      styleOverride;
-    const xSize = this.sizeX || cornerSize || fabricObject.cornerSize,
-      ySize = this.sizeY || cornerSize || fabricObject.cornerSize,
+        styleOverride,
+      sizeFromProps = cornerSize || fabricObject.cornerSize,
+      xSize = this.sizeX || sizeFromProps,
+      ySize = this.sizeY || sizeFromProps,
       transparent =
         typeof transparentCorners !== 'undefined'
           ? transparentCorners
