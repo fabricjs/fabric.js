@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { config } from '../../config';
 import { noop } from '../../constants';
 import { getEnv, getFabricWindow } from '../../env';
