@@ -358,7 +358,7 @@ export class Control {
         typeof transparentCorners !== 'undefined'
           ? transparentCorners
           : fabricObject.transparentCorners,
-      methodName = transparentCorners ? STROKE : FILL,
+      methodName = transparent ? STROKE : FILL,
       strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
       stroke = !transparentCorners && !!strokeColor;
     return {
