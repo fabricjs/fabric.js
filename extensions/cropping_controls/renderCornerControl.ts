@@ -29,15 +29,15 @@ export function renderCornerControl(
   ctx.save();
   const { stroke, xSize, ySize, opName } = this.commonRenderProps(
       ctx,
+      left,
+      top,
       fabricObject,
       styleOverride,
     ),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
-  ctx.translate(left, top);
   //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle();
-  ctx.rotate(degreesToRadians(angle + this.angle));
+  ctx.rotate(degreesToRadians(this.angle));
   ctx.beginPath();
   ctx.moveTo(-ySizeBy2, 0);
   ctx.lineTo(-ySizeBy2, xSizeBy2);
