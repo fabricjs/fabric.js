@@ -24,6 +24,7 @@ export const TOP = 'top';
 export const BOTTOM = 'bottom';
 export const RIGHT = 'right';
 export const NONE = 'none';
+export const HEIGHT = 'height';
 
 export const reNewline = /\r?\n/;
 
@@ -44,3 +45,8 @@ export const SKEW_Y = 'skewY';
 export const FILL = 'fill';
 export const STROKE = 'stroke';
 export const MODIFIED = 'modified';
+
+export const LTR = 'ltr';
+export const RTL = 'rtl';
+
+export const NORMAL = 'normal';

@@ -3,8 +3,22 @@
 ## [next]
 
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
+- chore(): Render circle control tweak for code reusability and style [#10829](https://github.com/fabricjs/fabric.js/pull/10829)
+- feat(): Cropping controls extension [#10825](https://github.com/fabricjs/fabric.js/pull/10825)
+
+## [7.0.0]
+
+- fix(): Fix toDataUrl writing on contextTop [#10820](https://github.com/fabricjs/fabric.js/pull/10820)
+- feat(): Multi touch gesture support with module westures [#10813](https://github.com/fabricjs/fabric.js/pull/10813)
+- fix(): Fix the situation where undefined + char exists when calculating couple [#10816](https://github.com/fabricjs/fabric.js/pull/10816)
+- feat(): Add configuration parameter for patternQuality in node [#10804](https://github.com/fabricjs/fabric.js/pull/10804)
+- fix(): BREAKING Fix text positioning [#10803](https://github.com/fabricjs/fabric.js/pull/10803)
+- fix(AligningGuidelines): Guidelines features updates [#10120] (https://github.com/fabricjs/fabric.js/pull/10120)
+- chore(deps-dev): bump inquirer from 12.9.6 to 12.10.0 [#10789](https://github.com/fabricjs/fabric.js/pull/10789)
+- chore(deps-dev): bump @types/micromatch from 4.0.9 to 4.0.10 [#10788](https://github.com/fabricjs/fabric.js/pull/10788)
 - chore(): update major version of vitest [#10786](https://github.com/fabricjs/fabric.js/pull/10786)
 - fix(): Prototype pollution risk on text char cache [#10782](https://github.com/fabricjs/fabric.js/pull/10782)
+- fix(): fix rendering of text when line height is set to 0 [#10785](https://github.com/fabricjs/fabric.js/pull/10785)
 - chore(): update playwright [#10780](https://github.com/fabricjs/fabric.js/pull/10780)
 - chore(deps-dev): bump es-toolkit from 1.39.10 to 1.40.0 [#10777](https://github.com/fabricjs/fabric.js/pull/10777)
 - BREAKING chore(): Deprecate originX and originY and change their default to center/center [#10715](https://github.com/fabricjs/fabric.js/pull/10715)

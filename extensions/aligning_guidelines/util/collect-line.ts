@@ -1,172 +1,65 @@
-import type { FabricObject, TBBox } from 'fabric';
-import { Point } from 'fabric';
-import type { HorizontalLine, VerticalLine } from '../typedefs';
-import { aligningLineConfig } from '../constant';
-import { getDistance, setPositionDir } from './basic';
+import type { FabricObject, Point, TOriginX, TOriginY } from 'fabric';
+import type { AligningGuidelines } from '..';
+import type { LineProps } from '../typedefs';
+import { getDistanceList } from './basic';
 
-type CollectLineProps = {
-  activeObject: FabricObject;
-  activeObjectRect: TBBox;
-  objectRect: TBBox;
-};
-
-export function collectLine(props: CollectLineProps) {
-  const aligningLineMargin = aligningLineConfig.margin;
-  const { activeObject, activeObjectRect, objectRect } = props;
-  const list = makeLineByRect(objectRect);
-  const aList = makeLineByRect(activeObjectRect);
-  const margin = aligningLineMargin / (activeObject.canvas?.getZoom() ?? 1);
-  const opts = { target: activeObject, list, aList, margin };
-  const vLines = collectVerticalLine(opts);
-  const hLines = collectHorizontalLine(opts);
+export function collectLine(
+  this: AligningGuidelines,
+  target: FabricObject,
+  points: Point[],
+) {
+  const list = target.getCoords();
+  list.push(target.getCenterPoint());
+  const margin = this.margin / this.canvas.getZoom();
+  const opts = { target, list, points, margin };
+  const vLines = collectPoints({ ...opts, type: 'x' });
+  const hLines = collectPoints({ ...opts, type: 'y' });
 
   return { vLines, hLines };
 }
 
 type CollectItemLineProps = {
   target: FabricObject;
-  list: LineProps[];
-  aList: LineProps[];
+  list: Point[];
+  points: Point[];
   margin: number;
+  type: 'x' | 'y';
 };
-function collectVerticalLine(props: CollectItemLineProps) {
-  const { target, list, aList, margin } = props;
-
-  const arr = aList.map((x) => getDistanceLine(x, list, 'x'));
-  const min = Math.min(...arr.map((x) => x.dis));
-  if (min > margin) return [];
-  const lines: VerticalLine[] = [];
-  const width = aList[0].x2 - aList[0].x;
-  const height = aList[0].y2 - aList[0].y;
-  let b = false;
-  for (let i = 0; i < arr.length; i++) {
-    const item = arr[i];
-    if (min == item.dis) {
-      const line = list[item.index];
-      const aLine = aList[item.index];
-      const x = line.x;
-      const y = aLine.y;
-
-      const y1 = Math.min(line.y, line.y2, y, aLine.y2);
-      const y2 = Math.max(line.y, line.y2, y, aLine.y2);
-      // Multiple reference lines can be drawn
-      lines.push({ x, y1, y2 });
-      if (b) continue;
-      b = true;
-      // Alignment is performed only once
-      setPos({
-        target,
-        x,
-        y,
-        centerX: i - 1,
-        centerY: item.index - 1,
-        width,
-        height,
-        dir: 'x',
-      });
-      const dis = min * item.dir;
-      aList.forEach((x) => (x.x -= dis));
-    }
+const originArr: [TOriginX, TOriginY][] = [
+  ['left', 'top'],
+  ['right', 'top'],
+  ['right', 'bottom'],
+  ['left', 'bottom'],
+  ['center', 'center'],
+];
+function collectPoints(props: CollectItemLineProps) {
+  const { target, list, points, margin, type } = props;
+  const res: LineProps[] = [];
+  const arr: ReturnType<typeof getDistanceList>[] = [];
+  let min = Infinity;
+  for (const item of list) {
+    const o = getDistanceList(item, points, type);
+    arr.push(o);
+    if (min > o.dis) min = o.dis;
   }
-  return lines;
-}
-
-function collectHorizontalLine(props: CollectItemLineProps) {
-  const { target, list, aList, margin } = props;
-
-  const arr = aList.map((x) => getDistanceLine(x, list, 'y'));
-  const min = Math.min(...arr.map((x) => x.dis));
-  if (min > margin) return [];
-  const lines: HorizontalLine[] = [];
-  const width = aList[0].x2 - aList[0].x;
-  const height = aList[0].y2 - aList[0].y;
+  if (min > margin) return res;
   let b = false;
-  for (let i = 0; i < arr.length; i++) {
-    const item = arr[i];
-    if (min == item.dis) {
-      const line = list[item.index];
-      const aLine = aList[item.index];
-      const y = line.y;
-      const x = aLine.x;
-
-      const x1 = Math.min(line.x, line.x2, x, aLine.x2);
-      const x2 = Math.max(line.x, line.x2, x, aLine.x2);
-      // Multiple reference lines can be drawn
-      lines.push({ y, x1, x2 });
-      if (b) continue;
-      b = true;
-      // Alignment is performed only once
-      setPos({
-        target,
-        x,
-        y,
-        centerX: item.index - 1,
-        centerY: i - 1,
-        width,
-        height,
-        dir: 'y',
-      });
-      const dis = min * item.dir;
-      aList.forEach((x) => (x.y -= dis));
-    }
-  }
-  return lines;
-}
-
-type LineProps = {
-  x: number;
-  y: number;
-  x2: number;
-  y2: number;
-};
-function getDistanceLine(
-  target: LineProps,
-  list: LineProps[],
-  type: 'x' | 'y',
-) {
-  let dis = Infinity;
-  let index = -1;
-  /** 1 for positive value, -1 for negative value */
-  let dir = 1;
   for (let i = 0; i < list.length; i++) {
-    const v = getDistance(target[type], list[i][type]);
-    if (dis > v) {
-      index = i;
-      dis = v;
-      dir = target[type] > list[i][type] ? 1 : -1;
+    if (arr[i].dis != min) continue;
+    for (const item of arr[i].arr) {
+      res.push({ origin: list[i], target: item });
     }
+
+    if (b) continue;
+    b = true;
+    const d = arr[i].arr[0][type] - list[i][type];
+    // It will change the original data, and the next time we collect y, use the modified data.
+    list.forEach((item) => {
+      item[type] += d;
+    });
+    target.setXY(list[i], ...originArr[i]);
+    target.setCoords();
   }
-  return { dis, index, dir };
-}
 
-function makeLineByRect(rect: TBBox) {
-  const { left, top, width, height } = rect;
-  const a = { x: left, y: top, x2: left + width, y2: top + height };
-  const x = left + width / 2;
-  const y = top + height / 2;
-  const b = { x, y, x2: x, y2: y };
-  const c = { x: left + width, x2: left, y: top + height, y2: top };
-
-  return [a, b, c];
-}
-
-type SnapToPixelProps = {
-  target: FabricObject;
-  x: number;
-  y: number;
-  /** -1 0 1 */
-  centerX: number;
-  /** -1 0 1 */
-  centerY: number;
-  width: number;
-  height: number;
-  dir: 'x' | 'y';
-};
-function setPos(props: SnapToPixelProps) {
-  const { target, centerX, centerY, width, height, dir } = props;
-  let { x, y } = props;
-  x -= (centerX * width) / 2;
-  y -= (centerY * height) / 2;
-  setPositionDir(target, new Point(x, y), dir);
-  target.setCoords();
+  return res;
 }

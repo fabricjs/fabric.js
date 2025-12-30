@@ -14,6 +14,7 @@ import type { ActiveSelection } from '../shapes/ActiveSelection';
 import type { Group } from '../shapes/Group';
 import type { IText } from '../shapes/IText/IText';
 import type { FabricObject } from '../shapes/Object/FabricObject';
+import { type TToCanvasElementOptions } from '../typedefs';
 import { isTouchEvent, stopEvent } from '../util/dom_event';
 import { getDocumentFromElement, getWindowFromElement } from '../util/dom_misc';
 import { sendPointToPlane } from '../util/misc/planeChange';
@@ -153,7 +154,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this[eventHandler] = (this[eventHandler] as Function).bind(this);
     });
     // register event handlers
-    this.addOrRemove(addListener, 'add');
+    this.addOrRemove(addListener);
   }
 
   /**
@@ -164,7 +165,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     return this.enablePointerEvents ? 'pointer' : 'mouse';
   }
 
-  addOrRemove(functor: any, _eventjsFunctor: 'add' | 'remove') {
+  addOrRemove(functor: any, forTouch = false) {
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
@@ -179,9 +180,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
     functor(canvasElement, 'wheel', this._onMouseWheel, { passive: false });
     functor(canvasElement, 'contextmenu', this._onContextMenu);
-    functor(canvasElement, 'click', this._onClick);
-    // decide if to remove in fabric 7.0
-    functor(canvasElement, 'dblclick', this._onClick);
+    if (!forTouch) {
+      functor(canvasElement, 'click', this._onClick);
+      functor(canvasElement, 'dblclick', this._onClick);
+    }
     functor(canvasElement, 'dragstart', this._onDragStart);
     functor(canvasElement, 'dragend', this._onDragEnd);
     functor(canvasElement, 'dragover', this._onDragOver);
@@ -191,24 +193,13 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (!this.enablePointerEvents) {
       functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
     }
-    // if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
-    //   eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
-    //   eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
-    //   eventjs[eventjsFunctor](
-    //     canvasElement,
-    //     'orientation',
-    //     this._onOrientationChange
-    //   );
-    //   eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
-    //   eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
-    // }
   }
 
   /**
    * Removes all event listeners, used when disposing the instance
    */
   removeListeners() {
-    this.addOrRemove(removeListener, 'remove');
+    this.addOrRemove(removeListener);
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(this.upperCanvasEl);
@@ -546,6 +537,40 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     this._cacheTransformEventData(e);
     clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
     clicks == 3 && this._handleEvent(e, 'tripleclick');
+    this._resetTransformEventData();
+  }
+
+  /**
+   * This supports gesture event firing
+   * It is a method to keep some code organized, it exposes private methods
+   * in a way that works and still keep them private
+   * This is supposed to mirror _handleEvent
+   */
+  fireEventFromPointerEvent(
+    e: TPointerEvent,
+    eventName: keyof CanvasEvents,
+    secondaryName: keyof ObjectEvents,
+    extraData:
+      | Record<string, unknown>
+      | { rotation: number }
+      | { ping: number } = {},
+  ) {
+    this._cacheTransformEventData(e);
+    const { target, subTargets } = this.findTarget(e),
+      options = {
+        e,
+        target,
+        subTargets,
+        ...getEventPoints(this, e),
+        transform: this._currentTransform,
+        ...extraData,
+      };
+    this.fire(eventName, options);
+    // this may be a little be more complicated of what we want to handle
+    target && target.fire(secondaryName, options);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i] !== target && subTargets[i].fire(secondaryName, options);
+    }
     this._resetTransformEventData();
   }
 
@@ -936,6 +961,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     if (eventType === 'up:before' || eventType === 'up') {
       (options as CanvasEvents[`mouse:up`]).isClick = this._isClick;
     }
+
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
     target && target.fire(`mouse${eventType}`, options);
@@ -1544,6 +1570,22 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     // cleanup
     this._groupSelector = null;
     return true;
+  }
+
+  /**
+   * Wraps the original toCanvasElement with a function that removes
+   * the context top for the time the function is run.
+   * So we avoid painting side effects on the upper canvas when exporting
+   */
+  toCanvasElement(
+    multiplier = 1,
+    options?: TToCanvasElementOptions,
+  ): HTMLCanvasElement {
+    const { upper } = this.elements;
+    upper.ctx = undefined as unknown as CanvasRenderingContext2D;
+    const htmlElement = super.toCanvasElement(multiplier, options);
+    upper.ctx = upper.el.getContext('2d')!;
+    return htmlElement;
   }
 
   /**

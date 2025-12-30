@@ -4,7 +4,7 @@
  */
 
 import { Rect } from 'fabric';
-import { initAligningGuidelines } from 'fabric/extensions';
+import { AligningGuidelines } from 'fabric/extensions';
 import { beforeAll } from '../../test';
 import type { AligningLineConfig } from 'fabric/extensions';
 
@@ -28,7 +28,7 @@ beforeAll(async (canvas) => {
     fill: 'yellow',
   });
 
-  initAligningGuidelines(canvas, {
+  new AligningGuidelines(canvas, {
     width: 2,
     margin: 60,
   } as AligningLineConfig);
