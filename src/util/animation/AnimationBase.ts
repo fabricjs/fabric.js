@@ -1,4 +1,5 @@
 import { noop } from '../../constants';
+import { getFabricWindow } from '../../env';
 import { requestAnimFrame } from './AnimationFrameProvider';
 import { runningAnimations } from './AnimationRegistry';
 import { defaultEasing } from './easing';
@@ -52,6 +53,8 @@ export abstract class AnimationBase<
    * Animation start time ms
    */
   declare private startTime: number;
+
+  private timeout: number | null;
 
   constructor({
     startValue,
@@ -114,7 +117,10 @@ export abstract class AnimationBase<
     // setTimeout(cb, 0) will run cb on the next frame, causing a delay
     // we don't want that
     if (this.delay > 0) {
-      setTimeout(() => requestAnimFrame(firstTick), this.delay);
+      this.timeout = getFabricWindow().setTimeout(
+        () => requestAnimFrame(firstTick),
+        this.delay,
+      );
     } else {
       requestAnimFrame(firstTick);
     }
@@ -145,6 +151,7 @@ export abstract class AnimationBase<
         this.durationProgress,
       );
       this.unregister();
+      this.timeout = null;
     } else {
       this._onChange(this.value, this.valueProgress, this.durationProgress);
       requestAnimFrame(this.tick);
@@ -162,5 +169,7 @@ export abstract class AnimationBase<
   abort() {
     this._state = 'aborted';
     this.unregister();
+
+    this.timeout && getFabricWindow().clearTimeout(this.timeout);
   }
 }
