@@ -31,6 +31,15 @@ describe('TextSvgExport', () => {
     expect(svgStyles.includes('stroke="none"')).toBe(false);
   });
 
+  it('deltay does not get exported in svgStyles', () => {
+    const myText = new FabricText('text', {
+      fill: 'rgba(100, 0, 100, 0.5)',
+      deltaY: -5,
+    });
+    const svgStyles = myText.getSvgStyles();
+    expect(svgStyles.includes('baseline-shift')).toBe(false);
+  });
+
   describe('toSVG', () => {
     beforeEach(() => {
       config.configure({ NUM_FRACTION_DIGITS: 2 });
