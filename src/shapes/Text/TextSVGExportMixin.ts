@@ -325,7 +325,6 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontSize,
       fontStyle,
       fontWeight,
-      deltaY,
       textDecorationThickness,
       linethrough,
       overline,
