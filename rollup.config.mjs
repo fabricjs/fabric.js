@@ -158,7 +158,7 @@ export default [
 
   {
     input: ['./extensions/index.ts'],
-    external: ['fabric'],
+    external: ['fabric', 'westures'],
     output: [
       // es modules in files
       {
@@ -176,6 +176,7 @@ export default [
         sourcemap: true,
         globals: {
           fabric: 'fabric',
+          westures: 'westures',
         },
         plugins: [terser()],
       },

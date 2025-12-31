@@ -9,7 +9,15 @@ import { readFileSync } from 'node:fs';
  */
 const packageJSON = JSON.parse(readFileSync('./package.json', 'utf8'));
 
+// Create a data URL that exports the global westures object as an ES module
+const westuresWrapper = `data:text/javascript,${encodeURIComponent(`
+  const westures = window.westures || globalThis.westures;
+  export default westures;
+  export const { Pan, Pinch, Press, Pull, Rotate, Swipe, Swivel, Tap, Track, Region, Gesture, PointerData, State, Input, Point2D, CANCEL, END, MOVE, START } = westures;
+`)}`;
+
 export default {
   fabric: packageJSON.module.slice(1),
   ['fabric/extensions']: packageJSON.exports['./extensions'].import.slice(1),
+  westures: westuresWrapper,
 };

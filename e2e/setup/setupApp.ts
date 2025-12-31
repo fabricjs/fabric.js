@@ -16,6 +16,25 @@ export async function setupApp(page: Page, file: string) {
   });
 
   await page.goto('/e2e/site');
+
+  // Provide CommonJS shim for westures
+  await page.addScriptTag({
+    content: `
+      window.module = { exports: {} };
+      window.exports = window.module.exports;
+    `,
+  });
+
+  // Load westures as a global module
+  await page.addScriptTag({
+    path: path.resolve(process.cwd(), 'node_modules/westures/dist/index.js'),
+  });
+
+  // Expose westures from module.exports
+  await page.evaluate(() => {
+    (window as any).westures = window.module.exports;
+  });
+
   // expose imports for consumption
   await page.addScriptTag({
     type: 'importmap',
