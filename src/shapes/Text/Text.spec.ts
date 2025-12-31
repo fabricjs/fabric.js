@@ -1320,4 +1320,21 @@ describe('FabricText', () => {
     ).toBe(0);
     expect(text._getLineLeftOffset(1), 'like align right with rtl').toBe(0);
   });
+
+  describe('measuring, splitting', () => {
+    it('measuring a single char', () => {
+      cache.clearFontCache();
+      const text = new FabricText('');
+      const style = text.getCompleteStyleDeclaration(0, 0);
+      const measurement1 = text._measureChar('a', style, '', style);
+      const measurement2 = text._measureChar('a', style, '', style);
+      expect(measurement1).toEqual(measurement2);
+      const cacheKeys = cache.charWidthsCache
+        .get(text.fontFamily.toLowerCase())
+        ?.get('normal_normal')
+        ?.keys();
+      expect(cacheKeys?.next().value).not.toBe('undefineda');
+      expect(cacheKeys?.next().done).toBe(true);
+    });
+  });
 });

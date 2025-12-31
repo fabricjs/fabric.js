@@ -1132,6 +1132,30 @@ describe('Canvas', () => {
     canvas.remove(rect);
   });
 
+  it('implements toCanvasElement method that clears the contextTop', () => {
+    const canvas = new Canvas();
+    const mockSetCtx = vi.fn();
+    class UpperMock {
+      declare el: any;
+      set ctx(value: any) {
+        mockSetCtx(value);
+      }
+      get ctx() {
+        return undefined;
+      }
+      constructor() {
+        this.el = {
+          getContext: vi.fn(),
+        };
+      }
+    }
+    canvas.elements.upper = new UpperMock();
+
+    canvas.toCanvasElement();
+    expect(mockSetCtx).toHaveBeenCalledWith(undefined);
+    expect(mockSetCtx).toHaveBeenCalledTimes(2);
+  });
+
   it('implements toDataURL method that returns valid data URL', () => {
     expect(canvas.toDataURL).toBeTypeOf('function');
     const dataURL = canvas.toDataURL();
