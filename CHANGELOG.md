@@ -1,6 +1,6 @@
 # Changelog
 
-## [next]
+## [7.1.0]
 
 - fix(Text):Double offset when exporting SVG after setting deltaY in Text [#10805](https://github.com/fabricjs/fabric.js/pull/10805)
 - chore(deps-dev): bump js-yaml from 3.14.1 to 3.14.2 in the npm_and_yarn group across 1 directory [#10812](https://github.com/fabricjs/fabric.js/pull/10812)
