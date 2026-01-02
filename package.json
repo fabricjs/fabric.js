@@ -159,6 +159,7 @@
     "jsdom": "^26.1.0"
   },
   "lint-staged": {
+    "*.{js,md,css,ts,tsx,jsx}": "eslint --fix",
     "*.{js,css,md,ts,tsx,jsx}": "prettier --write",
     "**/*.ts": "tsc-files --noEmit"
   }
