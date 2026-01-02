@@ -7,5 +7,5 @@
     "/.codesandbox/templates/vanilla",
     "/.codesandbox/templates/vue"
   ],
-  "node": "16"
+  "node": "20"
 }
