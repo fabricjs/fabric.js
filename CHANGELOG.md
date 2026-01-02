@@ -1,5 +1,9 @@
 # Changelog
 
+## [next]
+
+- chore(): Add pre-commit hook to run lint, prettier, tsc on staged files. [#10834](https://github.com/fabricjs/fabric.js/pull/10834)
+
 ## [7.1.0]
 
 - fix(Text):Double offset when exporting SVG after setting deltaY in Text [#10805](https://github.com/fabricjs/fabric.js/pull/10805)
