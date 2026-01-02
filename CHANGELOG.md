@@ -1,5 +1,7 @@
 # Changelog
 
+## [next]
+
 ## [7.1.0]
 
 - fix(Text):Double offset when exporting SVG after setting deltaY in Text [#10805](https://github.com/fabricjs/fabric.js/pull/10805)
