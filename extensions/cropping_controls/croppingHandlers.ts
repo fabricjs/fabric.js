@@ -4,6 +4,8 @@ import type {
   TransformActionHandler,
   FabricImage,
   ObjectEvents,
+  Control,
+  TMat2D,
 } from 'fabric';
 import { controlsUtils, Point, util } from 'fabric';
 
@@ -160,3 +162,38 @@ export const cropPanMoveHandler = ({ transform }: ObjectEvents['moving']) => {
   fabricImage.left = original.left;
   fabricImage.top = original.top;
 };
+
+export function ghostScalePositionHandler(
+  this: Control,
+  dim: Point, // currentDimension
+  finalMatrix: TMat2D,
+  fabricObject: FabricImage,
+  // currentControl: Control,
+) {
+  let x = 0;
+  let y = 0;
+  if (this.x < 0) {
+    x = (this.x - fabricObject.cropX / (fabricObject.width / 2)) * dim.x;
+  } else {
+    x =
+      this.x +
+      ((fabricObject._element.width - fabricObject.cropX - fabricObject.width) /
+        (fabricObject.width / 2)) *
+        dim.x;
+  }
+
+  if (this.y < 0) {
+    y = (this.y - fabricObject.cropY / (fabricObject.height / 2)) * dim.y;
+  } else {
+    y =
+      this.y +
+      ((fabricObject._element.height -
+        fabricObject.cropY -
+        fabricObject.height) /
+        (fabricObject.width / 2)) *
+        dim.x;
+  }
+  return new Point(x + this.offsetX, y * dim.y + this.offsetY).transform(
+    finalMatrix,
+  );
+}
