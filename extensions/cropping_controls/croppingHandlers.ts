@@ -163,6 +163,12 @@ export const cropPanMoveHandler = ({ transform }: ObjectEvents['moving']) => {
   fabricImage.top = original.top;
 };
 
+/**
+ * This position handler works only for this specific use case.
+ * It does not support padding nor offset, and it reduces all possible positions
+ * to the main 4 corners only.
+ * Any position that is < 0 is the extreme left/top, the rest are right/bottom
+ */
 export function ghostScalePositionHandler(
   this: Control,
   dim: Point, // currentDimension
@@ -170,30 +176,28 @@ export function ghostScalePositionHandler(
   fabricObject: FabricImage,
   // currentControl: Control,
 ) {
+  const matrix = fabricObject.calcTransformMatrix();
+  const vpt = fabricObject.getViewportTransform();
+  const _finalMatrix = util.multiplyTransformMatrices(vpt, matrix);
+
   let x = 0;
   let y = 0;
   if (this.x < 0) {
-    x = (this.x - fabricObject.cropX / (fabricObject.width / 2)) * dim.x;
+    x = -fabricObject.width / 2 - fabricObject.cropX;
   } else {
     x =
-      this.x +
-      ((fabricObject._element.width - fabricObject.cropX - fabricObject.width) /
-        (fabricObject.width / 2)) *
-        dim.x;
+      fabricObject.getElement().width -
+      fabricObject.width / 2 -
+      fabricObject.cropX;
   }
 
   if (this.y < 0) {
-    y = (this.y - fabricObject.cropY / (fabricObject.height / 2)) * dim.y;
+    y = -fabricObject.height / 2 - fabricObject.cropY;
   } else {
     y =
-      this.y +
-      ((fabricObject._element.height -
-        fabricObject.cropY -
-        fabricObject.height) /
-        (fabricObject.width / 2)) *
-        dim.x;
+      fabricObject.getElement().height -
+      fabricObject.height / 2 -
+      fabricObject.cropY;
   }
-  return new Point(x + this.offsetX, y * dim.y + this.offsetY).transform(
-    finalMatrix,
-  );
+  return new Point(x, y).transform(_finalMatrix);
 }

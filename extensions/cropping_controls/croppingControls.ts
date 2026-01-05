@@ -25,6 +25,18 @@ export const createImageCroppingControls = () => ({
     cursorStyleHandler: scaleCursorStyleHandler,
     positionHandler: ghostScalePositionHandler,
   }),
+  trs: new Control({
+    x: 0.5,
+    y: -0.5,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    positionHandler: ghostScalePositionHandler,
+  }),
+  bl: new Control({
+    x: -0.5,
+    y: 0.5,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    positionHandler: ghostScalePositionHandler,
+  }),
   mlc: new Control({
     x: -0.5,
     y: 0,

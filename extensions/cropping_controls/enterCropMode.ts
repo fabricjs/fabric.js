@@ -10,11 +10,13 @@ export const enterCropMode = function enterCropMode(
   { target }: TPointerEventInfo,
 ) {
   const fabricImage = target as FabricImage;
-  const { controls } = fabricImage;
+  const { controls, padding } = fabricImage;
+  fabricImage.padding = 0;
   fabricImage.controls = createImageCroppingControls();
   fabricImage.on('moving', cropPanMoveHandler);
   fabricImage.setCoords();
   const exitCropMode = () => {
+    fabricImage.padding = padding;
     fabricImage.off('moving', cropPanMoveHandler);
     fabricImage.controls = controls;
     fabricImage.setCoords();
