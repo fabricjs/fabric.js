@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Cropping controls follow ups [#10839](https://github.com/fabricjs/fabric.js/pull/10839)
 - chore(): Add pre-commit hook to run lint, prettier, tsc on staged files. [#10834](https://github.com/fabricjs/fabric.js/pull/10834)
 
 ## [7.1.0]
