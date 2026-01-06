@@ -201,3 +201,71 @@ export function ghostScalePositionHandler(
   }
   return new Point(x, y).transform(_finalMatrix);
 }
+
+const calcScale = (currentPoint: Point, height: number, width: number) =>
+  Math.min(Math.abs(currentPoint.x / width), Math.abs(currentPoint.y / height));
+
+/**
+ * Action handler generator that handles scaling of an image in crop mode.
+ * The goal is to keep the current bounding box steady.
+ * So this action handler has its own calculations for a dynamic anchor point
+ */
+export const scaleEquallyCropGenerator =
+  (cx: number, cy: number): TransformActionHandler =>
+  (eventData, transform, x, y) => {
+    const { target } = transform as unknown as { target: FabricImage };
+    const { width: fullWidth, height: fullHeight } = target.getElement();
+    const remainderX = fullWidth - target.width - target.cropX;
+    const remainderY = fullHeight - target.height - target.cropY;
+    const anchorOriginX =
+      cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width;
+    const anchorOriginY =
+      cy < 0 ? 1 + remainderY / target.height : -target.cropY / target.height;
+    const constraint = target.translateToOriginPoint(
+      target.getCenterPoint(),
+      anchorOriginX,
+      anchorOriginY,
+    );
+    const newPoint = controlsUtils.getLocalPoint(
+      transform,
+      anchorOriginX,
+      anchorOriginY,
+      x,
+      y,
+    );
+    const scale = calcScale(newPoint, fullHeight, fullWidth);
+    const scaleChangeX = scale / target.scaleX;
+    const scaleChangeY = scale / target.scaleY;
+    const scaledRemainderX = remainderX / scaleChangeX;
+    const scaledRemainderY = remainderY / scaleChangeY;
+    const newWidth = target.width / scaleChangeX;
+    const newHeight = target.height / scaleChangeY;
+    const newCropX =
+      cx < 0
+        ? fullWidth - newWidth - scaledRemainderX
+        : target.cropX / scaleChangeX;
+    const newCropY =
+      cy < 0
+        ? fullHeight - newHeight - scaledRemainderY
+        : target.cropY / scaleChangeY;
+
+    if (
+      (cx < 0 ? scaledRemainderX : newCropX) + newWidth > fullWidth ||
+      (cy < 0 ? scaledRemainderY : newCropY) + newHeight > fullHeight
+    ) {
+      return false;
+    }
+
+    target.scaleX = scale;
+    target.scaleY = scale;
+    target.width = newWidth;
+    target.height = newHeight;
+    target.cropX = newCropX;
+    target.cropY = newCropY;
+    const newAnchorOriginX =
+      cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth;
+    const newAnchorOriginY =
+      cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight;
+    target.setPositionByOrigin(constraint, newAnchorOriginX, newAnchorOriginY);
+    return true;
+  };

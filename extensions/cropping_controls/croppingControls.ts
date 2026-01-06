@@ -5,6 +5,7 @@ import {
   changeCropX,
   changeCropY,
   ghostScalePositionHandler,
+  scaleEquallyCropGenerator,
 } from './croppingHandlers';
 import { renderCornerControl } from './renderCornerControl';
 
@@ -13,30 +14,36 @@ const { scaleCursorStyleHandler } = controlsUtils;
 const cropActionName = () => 'crop';
 // use this function if you want to generate new controls for every instance
 export const createImageCroppingControls = () => ({
+  // scaling image
   tls: new Control({
     x: -0.5,
     y: -0.5,
     cursorStyleHandler: scaleCursorStyleHandler,
     positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(-0.5, -0.5),
   }),
   brs: new Control({
     x: 0.5,
     y: 0.5,
     cursorStyleHandler: scaleCursorStyleHandler,
     positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(0.5, 0.5),
   }),
   trs: new Control({
     x: 0.5,
     y: -0.5,
     cursorStyleHandler: scaleCursorStyleHandler,
     positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(0.5, -0.5),
   }),
-  bl: new Control({
+  bls: new Control({
     x: -0.5,
     y: 0.5,
     cursorStyleHandler: scaleCursorStyleHandler,
     positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(-0.5, 0.5),
   }),
+  // cropping image
   mlc: new Control({
     x: -0.5,
     y: 0,
