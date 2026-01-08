@@ -8478,14 +8478,6 @@ class Control {
     _defineProperty(this, "withConnection", false);
     Object.assign(this, options);
   }
-  getTransformAnchorPoint() {
-    var _this$transformAnchor;
-    return (// return the control transformAnchorPoint
-      (_this$transformAnchor = this.transformAnchorPoint) !== null && _this$transformAnchor !== void 0 ? _this$transformAnchor :
-      // otherwise will return the opposite origin of where the control is located.
-      new Point(-this.x + 0.5, -this.y + 0.5)
-    );
-  }
 
   /**
    * The control actionHandler, provide one to handle action ( control being moved )
@@ -13908,13 +13900,11 @@ class SelectableCanvas extends StaticCanvas$1 {
    * Given the control clicked, determine the origin of the transform.
    * This is bad because controls can totally have custom names
    * should disappear before release 4.0
-   * Fabric 7.1, jan 2026 we are still using this.
-   * Needs to go.
    * @private
    * @deprecated
    */
   _getOriginFromCorner(target, controlName) {
-    const origin = controlName ? target.controls[controlName].getTransformAnchorPoint() : {
+    const origin = {
       x: target.originX,
       y: target.originY
     };
@@ -13922,9 +13912,6 @@ class SelectableCanvas extends StaticCanvas$1 {
       return origin;
     }
 
-    // this part down here is deprecated.
-    // It is left to do not change the standard behavior in the middle of a major version
-    // but when possible `getTransformAnchorPoint` will be the only source of truth
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;

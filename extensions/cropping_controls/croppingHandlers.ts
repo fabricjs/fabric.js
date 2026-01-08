@@ -269,3 +269,17 @@ export const scaleEquallyCropGenerator =
     target.setPositionByOrigin(constraint, newAnchorOriginX, newAnchorOriginY);
     return true;
   };
+
+export function renderGhostImage(
+  this: FabricImage,
+  { ctx }: { ctx: CanvasRenderingContext2D },
+) {
+  const alpha = ctx.globalAlpha;
+  ctx.globalAlpha *= 0.5;
+  ctx.drawImage(
+    this._element,
+    -this.width / 2 - this.cropX,
+    -this.height / 2 - this.cropY,
+  );
+  ctx.globalAlpha = alpha;
+}
