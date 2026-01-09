@@ -456,8 +456,6 @@ describe('croppingHandlers', () => {
         elementWidth: 300,
         elementHeight: 300,
       });
-      image.scaleX = 1;
-      image.scaleY = 1;
       canvas.add(image);
     });
 
@@ -469,28 +467,23 @@ describe('croppingHandlers', () => {
     test('scales image uniformly from top-left corner', () => {
       const handler = scaleEquallyCropGenerator(-0.5, -0.5);
       transform = prepareTransform(image, 'tls');
-
+      expect(image.scaleX).toBe(1);
       // Simulate dragging to scale up
-      const result = handler(eventData, transform, 400, 400);
+      const result = handler(eventData, transform, -400, -400);
 
       // The handler should return a boolean
       expect(result).toBe(true);
+      expect(image.scaleX.toFixed(2)).toBe('2.17');
+      expect(image.scaleX).toBe(image.scaleY);
     });
 
     test('scales image uniformly from bottom-right corner', () => {
       const handler = scaleEquallyCropGenerator(0.5, 0.5);
       transform = prepareTransform(image, 'brs');
-
+      expect(image.scaleX).toBe(1);
       const result = handler(eventData, transform, 400, 400);
       expect(result).toBe(true);
-    });
-
-    test('maintains equal scaleX and scaleY', () => {
-      const handler = scaleEquallyCropGenerator(0.5, 0.5);
-      transform = prepareTransform(image, 'brs');
-
-      handler(eventData, transform, 200, 200);
-
+      expect(image.scaleX).toBe(1.5);
       expect(image.scaleX).toBe(image.scaleY);
     });
 
@@ -504,8 +497,6 @@ describe('croppingHandlers', () => {
         elementWidth: 300,
         elementHeight: 300,
       });
-      image.scaleX = 1;
-      image.scaleY = 1;
       canvas.add(image);
 
       const handler = scaleEquallyCropGenerator(-0.5, -0.5);
@@ -514,18 +505,28 @@ describe('croppingHandlers', () => {
       // Try to scale down significantly which might push bounds
       const result = handler(eventData, transform, 10, 10);
 
-      expect(typeof result).toBe('boolean');
+      expect(result).toBe(false);
     });
 
     test('adjusts cropX and cropY when scaling from negative corner', () => {
+      image = createMockImage({
+        width: 90,
+        height: 90,
+        cropX: 25,
+        cropY: 25,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
       const handler = scaleEquallyCropGenerator(-0.5, -0.5);
       transform = prepareTransform(image, 'tls');
-
-      handler(eventData, transform, 300, 300);
-
+      expect(image.cropX).toBe(25);
+      expect(image.cropY).toBe(25);
+      const result = handler(eventData, transform, 5, 5);
+      expect(result).toBe(true);
       // When scaling from top-left, cropX and cropY should be recalculated
-      expect(image.cropX).toBeDefined();
-      expect(image.cropY).toBeDefined();
+      expect(image.cropX).toBe(0);
+      expect(image.cropY).toBe(0);
     });
   });
 
