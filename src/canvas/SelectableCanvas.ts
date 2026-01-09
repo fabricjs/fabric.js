@@ -565,6 +565,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Given the control clicked, determine the origin of the transform.
    * This is bad because controls can totally have custom names
    * should disappear before release 4.0
+   * Fabric 7.1, jan 2026 we are still using this.
+   * Needs to go.
    * @private
    * @deprecated
    */
@@ -572,15 +574,20 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     target: FabricObject,
     controlName: string,
   ): { x: TOriginX; y: TOriginY } {
-    const origin = {
-      x: target.originX,
-      y: target.originY,
-    };
+    const origin = controlName
+      ? target.controls[controlName].getTransformAnchorPoint()
+      : {
+          x: target.originX,
+          y: target.originY,
+        };
 
     if (!controlName) {
       return origin;
     }
 
+    // this part down here is deprecated.
+    // It is left to do not change the standard behavior in the middle of a major version
+    // but when possible `getTransformAnchorPoint` will be the only source of truth
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;

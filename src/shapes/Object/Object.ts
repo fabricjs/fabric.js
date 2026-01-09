@@ -834,6 +834,7 @@ export class FabricObject<
     } else {
       this._renderBackground(ctx);
     }
+    this.fire('before:render', { ctx });
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;

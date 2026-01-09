@@ -9,6 +9,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default tseslint.config(
   {
     ignores: [
+      'dist/*',
+      'dist-extensions/*',
       'src/mixins/eraser_brush.mixin.ts',
       'src/util/lang_class.ts',
       'src/parkinglot',

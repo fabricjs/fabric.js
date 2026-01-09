@@ -11,7 +11,13 @@ import type {
   InteractiveFabricObject,
   TOCoord,
 } from '../shapes/Object/InteractiveObject';
-import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
+import type {
+  TCornerPoint,
+  TDegree,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+} from '../typedefs';
 import {
   createRotateMatrix,
   createScaleMatrix,
@@ -143,8 +149,25 @@ export class Control {
    */
   withConnection = false;
 
+  declare transformAnchorPoint?: {
+    x: TOriginX;
+    y: TOriginY;
+  };
+
   constructor(options?: Partial<Control>) {
     Object.assign(this, options);
+  }
+
+  getTransformAnchorPoint(): {
+    x: TOriginX;
+    y: TOriginY;
+  } {
+    return (
+      // return the control transformAnchorPoint
+      this.transformAnchorPoint ??
+      // otherwise will return the opposite origin of where the control is located.
+      new Point(-this.x + 0.5, -this.y + 0.5)
+    );
   }
 
   /**

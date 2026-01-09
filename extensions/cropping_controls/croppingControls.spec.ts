@@ -9,11 +9,26 @@ import {
 } from './croppingHandlers';
 
 describe('createImageCroppingControls', () => {
-  test('returns an object with 8 control properties', () => {
+  test('returns an object with 12 control properties', () => {
     const controls = createImageCroppingControls();
     expect(typeof controls).toBe('object');
     expect(Object.keys(controls)).toEqual(
-      expect.arrayContaining(['ml', 'mr', 'mb', 'mt', 'tl', 'tr', 'bl', 'br']),
+      expect.arrayContaining([
+        // scaling controls
+        'tls',
+        'brs',
+        'trs',
+        'bls',
+        // cropping controls
+        'mlc',
+        'mrc',
+        'mbc',
+        'mtc',
+        'tlc',
+        'trc',
+        'blc',
+        'brc',
+      ]),
     );
   });
 
@@ -25,53 +40,76 @@ describe('createImageCroppingControls', () => {
     });
   });
 
-  test('ml control uses changeCropX as actionHandler', () => {
+  // Scaling controls tests
+  test('tls control uses scaleEquallyCropGenerator actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.ml.actionHandler).toBe(changeCropX);
+    expect(typeof controls.tls.actionHandler).toBe('function');
   });
 
-  test('mr control uses changeCropWidth as actionHandler', () => {
+  test('brs control uses scaleEquallyCropGenerator actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mr.actionHandler).toBe(changeCropWidth);
+    expect(typeof controls.brs.actionHandler).toBe('function');
   });
 
-  test('mb control uses changeCropHeight as actionHandler', () => {
+  test('trs control uses scaleEquallyCropGenerator actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mb.actionHandler).toBe(changeCropHeight);
+    expect(typeof controls.trs.actionHandler).toBe('function');
   });
 
-  test('mt control uses changeCropY as actionHandler', () => {
+  test('bls control uses scaleEquallyCropGenerator actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mt.actionHandler).toBe(changeCropY);
+    expect(typeof controls.bls.actionHandler).toBe('function');
   });
 
-  test('tl control combines changeCropX and changeCropY', () => {
+  // Cropping middle controls tests
+  test('mlc control uses changeCropX as actionHandler', () => {
     const controls = createImageCroppingControls();
-    // tl uses a custom function, so we verify it's a function
-    expect(typeof controls.tl.actionHandler).toBe('function');
+    expect(controls.mlc.actionHandler).toBe(changeCropX);
+  });
+
+  test('mrc control uses changeCropWidth as actionHandler', () => {
+    const controls = createImageCroppingControls();
+    expect(controls.mrc.actionHandler).toBe(changeCropWidth);
+  });
+
+  test('mbc control uses changeCropHeight as actionHandler', () => {
+    const controls = createImageCroppingControls();
+    expect(controls.mbc.actionHandler).toBe(changeCropHeight);
+  });
+
+  test('mtc control uses changeCropY as actionHandler', () => {
+    const controls = createImageCroppingControls();
+    expect(controls.mtc.actionHandler).toBe(changeCropY);
+  });
+
+  // Cropping corner controls tests
+  test('tlc control combines changeCropX and changeCropY', () => {
+    const controls = createImageCroppingControls();
+    // tlc uses a custom function, so we verify it's a function
+    expect(typeof controls.tlc.actionHandler).toBe('function');
     // The handler is not directly equal to either function since it's a wrapper
-    expect(controls.tl.actionHandler).not.toBe(changeCropX);
-    expect(controls.tl.actionHandler).not.toBe(changeCropY);
+    expect(controls.tlc.actionHandler).not.toBe(changeCropX);
+    expect(controls.tlc.actionHandler).not.toBe(changeCropY);
   });
 
-  test('tr control combines changeCropWidth and changeCropY', () => {
+  test('trc control combines changeCropWidth and changeCropY', () => {
     const controls = createImageCroppingControls();
-    expect(typeof controls.tr.actionHandler).toBe('function');
-    expect(controls.tr.actionHandler).not.toBe(changeCropWidth);
-    expect(controls.tr.actionHandler).not.toBe(changeCropY);
+    expect(typeof controls.trc.actionHandler).toBe('function');
+    expect(controls.trc.actionHandler).not.toBe(changeCropWidth);
+    expect(controls.trc.actionHandler).not.toBe(changeCropY);
   });
 
-  test('bl control combines changeCropHeight and changeCropX', () => {
+  test('blc control combines changeCropHeight and changeCropX', () => {
     const controls = createImageCroppingControls();
-    expect(typeof controls.bl.actionHandler).toBe('function');
-    expect(controls.bl.actionHandler).not.toBe(changeCropHeight);
-    expect(controls.bl.actionHandler).not.toBe(changeCropX);
+    expect(typeof controls.blc.actionHandler).toBe('function');
+    expect(controls.blc.actionHandler).not.toBe(changeCropHeight);
+    expect(controls.blc.actionHandler).not.toBe(changeCropX);
   });
 
-  test('br control combines changeCropHeight and changeCropWidth', () => {
+  test('brc control combines changeCropHeight and changeCropWidth', () => {
     const controls = createImageCroppingControls();
-    expect(typeof controls.br.actionHandler).toBe('function');
-    expect(controls.br.actionHandler).not.toBe(changeCropHeight);
-    expect(controls.br.actionHandler).not.toBe(changeCropWidth);
+    expect(typeof controls.brc.actionHandler).toBe('function');
+    expect(controls.brc.actionHandler).not.toBe(changeCropHeight);
+    expect(controls.brc.actionHandler).not.toBe(changeCropWidth);
   });
 });
