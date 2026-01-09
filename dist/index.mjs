@@ -356,7 +356,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.1.0";
+var version = "7.0.0-rc1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -3639,6 +3639,20 @@ const sendObjectToPlane = (object, from, to) => {
   return t;
 };
 
+const fireEvent = (eventName, options) => {
+  var _target$canvas;
+  const {
+    transform: {
+      target
+    }
+  } = options;
+  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
+    ...options,
+    target
+  });
+  target.fire(eventName, options);
+};
+
 const originOffset = {
   left: -0.5,
   top: -0.5,
@@ -3840,6 +3854,33 @@ function getLocalPoint(_ref, originX, originY, x, y) {
   localPoint.y -= control.offsetY;
   return localPoint;
 }
+
+/**
+ * Action handler
+ * @private
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if the translation occurred
+ */
+const dragHandler = (eventData, transform, x, y) => {
+  const {
+      target,
+      offsetX,
+      offsetY
+    } = transform,
+    newLeft = x - offsetX,
+    newTop = y - offsetY,
+    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
+    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
+  moveX && target.set(LEFT, newLeft);
+  moveY && target.set(TOP, newTop);
+  if (moveX || moveY) {
+    fireEvent(MOVING, commonEventInfo(eventData, transform, x, y));
+  }
+  return moveX || moveY;
+};
 
 const normalizeWs = value => value.replace(/\s+/g, ' ');
 
@@ -6391,7 +6432,7 @@ class ObjectGeometry extends CommonMethods {
   calcOwnMatrix() {
     const key = this.transformMatrixKey(true),
       cache = this.ownMatrixCache;
-    if (cache && cache.key.every((x, i) => x === key[i])) {
+    if (cache && cache.key === key) {
       return cache.value;
     }
     const center = this.getRelativeCenterPoint(),
@@ -8132,20 +8173,6 @@ _defineProperty(FabricObject$1, "customProperties", []);
 classRegistry.setClass(FabricObject$1);
 classRegistry.setClass(FabricObject$1, 'object');
 
-const fireEvent = (eventName, options) => {
-  var _target$canvas;
-  const {
-    transform: {
-      target
-    }
-  } = options;
-  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
-    ...options,
-    target
-  });
-  target.fire(eventName, options);
-};
-
 /**
  * Wrap an action handler with firing an event if the action is performed
  * @param {TModificationEvents} eventName the event we want to fire
@@ -8188,61 +8215,33 @@ function wrapWithFixedAnchor(actionHandler) {
   };
 }
 
-const changeObjectDimensionGen = (dimension, origin, xorY, scale) => (eventData, transform, x, y) => {
-  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-  const localPointValue = localPoint[xorY];
-  //  make sure the control changes width ONLY from it's side of target
-  const originValue = resolveOrigin(transform[origin]);
-  if (originValue === 0 || originValue > 0 && localPointValue < 0 || originValue < 0 && localPointValue > 0) {
-    const {
-        target
-      } = transform,
-      strokePadding = target.strokeWidth / (target.strokeUniform ? target[scale] : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target[dimension],
-      newWidth = Math.abs(localPointValue * multiplier / target[scale]) - strokePadding;
-    target.set(dimension, Math.max(newWidth, 1));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target[dimension];
-  }
-  return false;
-};
-
 /**
  * Action handler to change object's width
  * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
- * You want to use this only if you are building a new control handler and you want
- * to reuse some logic. use "changeWidth" if you are looking to just use a control for width
  * @param {Event} eventData javascript event that is doing the transform
  * @param {Object} transform javascript object containing a series of information around the current transform
  * @param {number} x current mouse x position, canvas normalized
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-const changeObjectWidth = changeObjectDimensionGen('width', 'originX', 'x', 'scaleX');
-
-/**
- * Action handler to change object's height
- * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
- * You want to use this only if you are building a new control handler and you want
- * to reuse some logic. use "changeHeight" if you are looking to just use a control for height
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if some change happened
- */
-const changeObjectHeight = changeObjectDimensionGen('height', 'originY', 'y', 'scaleY');
-
-/**
- * Control handler for changing width
- */
+const changeObjectWidth = (eventData, transform, x, y) => {
+  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+  //  make sure the control changes width ONLY from it's side of target
+  if (resolveOrigin(transform.originX) === resolveOrigin(CENTER) || resolveOrigin(transform.originX) === resolveOrigin(RIGHT) && localPoint.x < 0 || resolveOrigin(transform.originX) === resolveOrigin(LEFT) && localPoint.x > 0) {
+    const {
+        target
+      } = transform,
+      strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
+      multiplier = isTransformCentered(transform) ? 2 : 1,
+      oldWidth = target.width,
+      newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
+    target.set('width', Math.max(newWidth, 1));
+    //  check against actual target width in case `newWidth` was rejected
+    return oldWidth !== target.width;
+  }
+  return false;
+};
 const changeWidth = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectWidth));
-
-/**
- * Control handler for changing height
- */
-const changeHeight = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectHeight));
 
 /**
  * Render a round control, as per fabric features.
@@ -8256,24 +8255,33 @@ const changeHeight = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjec
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 function renderCircleControl(ctx, left, top, styleOverride, fabricObject) {
+  styleOverride = styleOverride || {};
+  const xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ? styleOverride.transparentCorners : fabricObject.transparentCorners,
+    methodName = transparentCorners ? STROKE : FILL,
+    stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
+  let myLeft = left,
+    myTop = top,
+    size;
   ctx.save();
-  const {
-    stroke,
-    xSize,
-    ySize,
-    opName
-  } = this.commonRenderProps(ctx, left, top, fabricObject, styleOverride);
-  let size = xSize;
+  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
+  ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
   // TODO: use proper ellipse code.
   if (xSize > ySize) {
+    size = xSize;
     ctx.scale(1.0, ySize / xSize);
+    myTop = top * xSize / ySize;
   } else if (ySize > xSize) {
     size = ySize;
     ctx.scale(xSize / ySize, 1.0);
+    myLeft = left * ySize / xSize;
+  } else {
+    size = xSize;
   }
   ctx.beginPath();
-  ctx.arc(0, 0, size / 2, 0, twoMathPi, false);
-  ctx[opName]();
+  ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
+  ctx[methodName]();
   if (stroke) {
     ctx.stroke();
   }
@@ -8292,19 +8300,25 @@ function renderCircleControl(ctx, left, top, styleOverride, fabricObject) {
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
-  ctx.save();
-  const {
-      stroke,
-      xSize,
-      ySize,
-      opName
-    } = this.commonRenderProps(ctx, left, top, fabricObject, styleOverride),
+  styleOverride = styleOverride || {};
+  const xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
+    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
+    transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ? styleOverride.transparentCorners : fabricObject.transparentCorners,
+    methodName = transparentCorners ? STROKE : FILL,
+    stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
+  ctx.save();
+  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
+  ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
+  ctx.translate(left, top);
+  //  angle is relative to canvas plane
+  const angle = fabricObject.getTotalAngle();
+  ctx.rotate(degreesToRadians(angle));
   // this does not work, and fixed with ( && ) does not make sense.
   // to have real transparent corners we need the controls on upperCanvas
   // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-  ctx[`${opName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
+  ctx[`${methodName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
   if (stroke) {
     ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
   }
@@ -8561,41 +8575,6 @@ class Control {
       tr: new Point(0.5, -0.5).transform(t),
       br: new Point(0.5, 0.5).transform(t),
       bl: new Point(-0.5, 0.5).transform(t)
-    };
-  }
-
-  /**
-   * This is an helper method to prepare the canvas to render a control
-   * It detectes common control properties and sets the correct fill and
-   * stroke styles on the context. It does not execute translations or
-   * rotations since different controls need differnt combination of these.
-   */
-  commonRenderProps(ctx, left, top, fabricObject) {
-    let styleOverride = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
-    const {
-        cornerSize,
-        cornerColor,
-        transparentCorners,
-        cornerStrokeColor
-      } = styleOverride,
-      sizeFromProps = cornerSize || fabricObject.cornerSize,
-      xSize = this.sizeX || sizeFromProps,
-      ySize = this.sizeY || sizeFromProps,
-      transparent = typeof transparentCorners !== 'undefined' ? transparentCorners : fabricObject.transparentCorners,
-      opName = transparent ? STROKE : FILL,
-      strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
-      stroke = !transparent && !!strokeColor;
-    ctx.fillStyle = cornerColor || fabricObject.cornerColor || '';
-    ctx.strokeStyle = strokeColor || '';
-    ctx.translate(left, top);
-    //  angle is relative to canvas plane
-    ctx.rotate(degreesToRadians(fabricObject.getTotalAngle()));
-    return {
-      stroke,
-      xSize,
-      ySize,
-      transparentCorners: transparent,
-      opName
     };
   }
 
@@ -13193,288 +13172,6 @@ const canvasDefaults = {
 };
 
 /**
- * Action handler
- * @private
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if the translation occurred
- */
-const dragHandler = (eventData, transform, x, y) => {
-  const {
-      target,
-      offsetX,
-      offsetY
-    } = transform,
-    newLeft = x - offsetX,
-    newTop = y - offsetY,
-    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
-    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
-  moveX && target.set(LEFT, newLeft);
-  moveY && target.set(TOP, newTop);
-  if (moveX || moveY) {
-    fireEvent(MOVING, commonEventInfo(eventData, transform, x, y));
-  }
-  return moveX || moveY;
-};
-
-const ACTION_NAME$1 = MODIFY_POLY;
-/**
- * This function locates the controls.
- * It'll be used both for drawing and for interaction.
- */
-const createPolyPositionHandler = pointIndex => {
-  return function (dim, finalMatrix, polyObject) {
-    const {
-      points,
-      pathOffset
-    } = polyObject;
-    return new Point(points[pointIndex]).subtract(pathOffset).transform(multiplyTransformMatrices(polyObject.getViewportTransform(), polyObject.calcTransformMatrix()));
-  };
-};
-
-/**
- * This function defines what the control does.
- * It'll be called on every mouse move after a control has been clicked and is being dragged.
- * The function receives as argument the mouse event, the current transform object
- * and the current position in canvas coordinate `transform.target` is a reference to the
- * current object being transformed.
- */
-const polyActionHandler = (eventData, transform, x, y) => {
-  const {
-    target,
-    pointIndex
-  } = transform;
-  const poly = target;
-  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, poly.calcOwnMatrix());
-  poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
-  poly.setDimensions();
-  poly.set('dirty', true);
-  return true;
-};
-
-/**
- * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
- */
-const factoryPolyActionHandler = (pointIndex, fn) => {
-  return function (eventData, transform, x, y) {
-    const poly = transform.target,
-      anchorPoint = new Point(poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]),
-      anchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix()),
-      actionPerformed = fn(eventData, {
-        ...transform,
-        pointIndex
-      }, x, y);
-    const newAnchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix());
-    const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
-    poly.left -= diff.x;
-    poly.top -= diff.y;
-    return actionPerformed;
-  };
-};
-const createPolyActionHandler = pointIndex => wrapWithFireEvent(ACTION_NAME$1, factoryPolyActionHandler(pointIndex, polyActionHandler));
-function createPolyControls(arg0) {
-  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const controls = {};
-  for (let idx = 0; idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length); idx++) {
-    controls[`p${idx}`] = new Control({
-      actionName: ACTION_NAME$1,
-      positionHandler: createPolyPositionHandler(idx),
-      actionHandler: createPolyActionHandler(idx),
-      ...options
-    });
-  }
-  return controls;
-}
-
-const ACTION_NAME = 'modifyPath';
-const calcPathPointPosition = (pathObject, commandIndex, pointIndex) => {
-  const {
-    path,
-    pathOffset
-  } = pathObject;
-  const command = path[commandIndex];
-  return new Point(command[pointIndex] - pathOffset.x, command[pointIndex + 1] - pathOffset.y).transform(multiplyTransformMatrices(pathObject.getViewportTransform(), pathObject.calcTransformMatrix()));
-};
-const movePathPoint = (pathObject, x, y, commandIndex, pointIndex) => {
-  const {
-    path,
-    pathOffset
-  } = pathObject;
-  const anchorCommand = path[(commandIndex > 0 ? commandIndex : path.length) - 1];
-  const anchorPoint = new Point(anchorCommand[pointIndex], anchorCommand[pointIndex + 1]);
-  const anchorPointInParentPlane = anchorPoint.subtract(pathOffset).transform(pathObject.calcOwnMatrix());
-  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, pathObject.calcOwnMatrix());
-  path[commandIndex][pointIndex] = mouseLocalPosition.x + pathOffset.x;
-  path[commandIndex][pointIndex + 1] = mouseLocalPosition.y + pathOffset.y;
-  pathObject.setDimensions();
-  const newAnchorPointInParentPlane = anchorPoint.subtract(pathObject.pathOffset).transform(pathObject.calcOwnMatrix());
-  const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
-  pathObject.left -= diff.x;
-  pathObject.top -= diff.y;
-  pathObject.set('dirty', true);
-  return true;
-};
-
-/**
- * This function locates the controls.
- * It'll be used both for drawing and for interaction.
- */
-function pathPositionHandler(dim, finalMatrix, pathObject) {
-  const {
-    commandIndex,
-    pointIndex
-  } = this;
-  return calcPathPointPosition(pathObject, commandIndex, pointIndex);
-}
-
-/**
- * This function defines what the control does.
- * It'll be called on every mouse move after a control has been clicked and is being dragged.
- * The function receives as argument the mouse event, the current transform object
- * and the current position in canvas coordinate `transform.target` is a reference to the
- * current object being transformed.
- */
-function pathActionHandler(eventData, transform, x, y) {
-  const {
-    target
-  } = transform;
-  const {
-    commandIndex,
-    pointIndex
-  } = this;
-  const actionPerformed = movePathPoint(target, x, y, commandIndex, pointIndex);
-  {
-    fireEvent(this.actionName, {
-      ...commonEventInfo(eventData, transform, x, y),
-      commandIndex,
-      pointIndex
-    });
-  }
-  return actionPerformed;
-}
-const indexFromPrevCommand = previousCommandType => previousCommandType === 'C' ? 5 : previousCommandType === 'Q' ? 3 : 1;
-class PathPointControl extends Control {
-  constructor(options) {
-    super(options);
-  }
-  render(ctx, left, top, styleOverride, fabricObject) {
-    const overrides = {
-      ...styleOverride,
-      cornerColor: this.controlFill,
-      cornerStrokeColor: this.controlStroke,
-      transparentCorners: !this.controlFill
-    };
-    super.render(ctx, left, top, overrides, fabricObject);
-  }
-}
-class PathControlPointControl extends PathPointControl {
-  constructor(options) {
-    super(options);
-  }
-  render(ctx, left, top, styleOverride, fabricObject) {
-    const {
-      path
-    } = fabricObject;
-    const {
-      commandIndex,
-      pointIndex,
-      connectToCommandIndex,
-      connectToPointIndex
-    } = this;
-    ctx.save();
-    ctx.strokeStyle = this.controlStroke;
-    if (this.connectionDashArray) {
-      ctx.setLineDash(this.connectionDashArray);
-    }
-    const [commandType] = path[commandIndex];
-    const point = calcPathPointPosition(fabricObject, connectToCommandIndex, connectToPointIndex);
-    if (commandType === 'Q') {
-      // one control point connects to 2 points
-      const point2 = calcPathPointPosition(fabricObject, commandIndex, pointIndex + 2);
-      ctx.moveTo(point2.x, point2.y);
-      ctx.lineTo(left, top);
-    } else {
-      ctx.moveTo(left, top);
-    }
-    ctx.lineTo(point.x, point.y);
-    ctx.stroke();
-    ctx.restore();
-    super.render(ctx, left, top, styleOverride, fabricObject);
-  }
-}
-const createControl = (commandIndexPos, pointIndexPos, isControlPoint, options, connectToCommandIndex, connectToPointIndex) => new (isControlPoint ? PathControlPointControl : PathPointControl)({
-  commandIndex: commandIndexPos,
-  pointIndex: pointIndexPos,
-  actionName: ACTION_NAME,
-  positionHandler: pathPositionHandler,
-  actionHandler: pathActionHandler,
-  connectToCommandIndex,
-  connectToPointIndex,
-  ...options,
-  ...(isControlPoint ? options.controlPointStyle : options.pointStyle)
-});
-function createPathControls(path) {
-  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const controls = {};
-  let previousCommandType = 'M';
-  path.path.forEach((command, commandIndex) => {
-    const commandType = command[0];
-    if (commandType !== 'Z') {
-      controls[`c_${commandIndex}_${commandType}`] = createControl(commandIndex, command.length - 2, false, options);
-    }
-    switch (commandType) {
-      case 'C':
-        controls[`c_${commandIndex}_C_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex - 1, indexFromPrevCommand(previousCommandType));
-        controls[`c_${commandIndex}_C_CP_2`] = createControl(commandIndex, 3, true, options, commandIndex, 5);
-        break;
-      case 'Q':
-        controls[`c_${commandIndex}_Q_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex, 3);
-        break;
-    }
-    previousCommandType = commandType;
-  });
-  return controls;
-}
-
-var index = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  changeHeight: changeHeight,
-  changeObjectHeight: changeObjectHeight,
-  changeObjectWidth: changeObjectWidth,
-  changeWidth: changeWidth,
-  createObjectDefaultControls: createObjectDefaultControls,
-  createPathControls: createPathControls,
-  createPolyActionHandler: createPolyActionHandler,
-  createPolyControls: createPolyControls,
-  createPolyPositionHandler: createPolyPositionHandler,
-  createResizeControls: createResizeControls,
-  createTextboxDefaultControls: createTextboxDefaultControls,
-  dragHandler: dragHandler,
-  factoryPolyActionHandler: factoryPolyActionHandler,
-  getLocalPoint: getLocalPoint,
-  polyActionHandler: polyActionHandler,
-  renderCircleControl: renderCircleControl,
-  renderSquareControl: renderSquareControl,
-  rotationStyleHandler: rotationStyleHandler,
-  rotationWithSnapping: rotationWithSnapping,
-  scaleCursorStyleHandler: scaleCursorStyleHandler,
-  scaleOrSkewActionName: scaleOrSkewActionName,
-  scaleSkewCursorStyleHandler: scaleSkewCursorStyleHandler,
-  scalingEqually: scalingEqually,
-  scalingX: scalingX,
-  scalingXOrSkewingY: scalingXOrSkewingY,
-  scalingY: scalingY,
-  scalingYOrSkewingX: scalingYOrSkewingX,
-  skewCursorStyleHandler: skewCursorStyleHandler,
-  skewHandlerX: skewHandlerX,
-  skewHandlerY: skewHandlerY,
-  wrapWithFireEvent: wrapWithFireEvent,
-  wrapWithFixedAnchor: wrapWithFixedAnchor
-});
-
-/**
  * Canvas class
  * @class Canvas
  * @extends StaticCanvas
@@ -13895,52 +13592,37 @@ class SelectableCanvas extends StaticCanvas {
         x: CENTER,
         y: CENTER
       } : this._getOriginFromCorner(target, corner),
-      {
-        scaleX,
-        scaleY,
-        skewX,
-        skewY,
-        left,
-        top,
-        angle,
-        width,
-        height,
-        cropX,
-        cropY
-      } = target,
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform = {
-        target,
+        target: target,
         action,
         actionHandler,
         actionPerformed: false,
         corner,
-        scaleX,
-        scaleY,
-        skewX,
-        skewY,
-        offsetX: pointer.x - left,
-        offsetY: pointer.y - top,
+        scaleX: target.scaleX,
+        scaleY: target.scaleY,
+        skewX: target.skewX,
+        skewY: target.skewY,
+        offsetX: pointer.x - target.left,
+        offsetY: pointer.y - target.top,
         originX: origin.x,
         originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        theta: degreesToRadians(angle),
-        width,
-        height,
+        theta: degreesToRadians(target.angle),
+        width: target.width,
+        height: target.height,
         shiftKey: e.shiftKey,
         altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
-          originY: origin.y,
-          cropX,
-          cropY
+          originY: origin.y
         }
       };
     this._currentTransform = transform;
@@ -18796,6 +18478,7 @@ class StyledText extends FabricObject {
     };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
+        // eslint-disable-next-line no-unused-vars
         for (const p3 in obj[p1][p2]) {
           return false;
         }
@@ -18821,7 +18504,9 @@ class StyledText extends FabricObject {
     const obj = typeof lineIndex === 'undefined' ? this.styles : {
       0: this.styles[lineIndex]
     };
+    // eslint-disable-next-line
     for (const p1 in obj) {
+      // eslint-disable-next-line
       for (const p2 in obj[p1]) {
         if (typeof obj[p1][p2][property] !== 'undefined') {
           return true;
@@ -19256,6 +18941,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontSize,
       fontStyle,
       fontWeight,
+      deltaY,
       textDecorationThickness,
       linethrough,
       overline,
@@ -19267,7 +18953,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       linethrough: linethrough !== null && linethrough !== void 0 ? linethrough : this.linethrough
     });
     const thickness = textDecorationThickness || this.textDecorationThickness;
-    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${strokeWidth}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${fontFamily}'` : fontFamily}; ` : '', fontSize ? `font-size: ${fontSize}px; ` : '', fontStyle ? `font-style: ${fontStyle}; ` : '', fontWeight ? `font-weight: ${fontWeight}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
+    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${strokeWidth}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${fontFamily}'` : fontFamily}; ` : '', fontSize ? `font-size: ${fontSize}px; ` : '', fontStyle ? `font-style: ${fontStyle}; ` : '', fontWeight ? `font-weight: ${fontWeight}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', deltaY ? `baseline-shift: ${-deltaY}; ` : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
   }
 
   /**
@@ -25827,6 +25513,258 @@ function loadSVGFromURL(url, reviver) {
     return createEmptyResponse();
   });
 }
+
+const ACTION_NAME$1 = MODIFY_POLY;
+/**
+ * This function locates the controls.
+ * It'll be used both for drawing and for interaction.
+ */
+const createPolyPositionHandler = pointIndex => {
+  return function (dim, finalMatrix, polyObject) {
+    const {
+      points,
+      pathOffset
+    } = polyObject;
+    return new Point(points[pointIndex]).subtract(pathOffset).transform(multiplyTransformMatrices(polyObject.getViewportTransform(), polyObject.calcTransformMatrix()));
+  };
+};
+
+/**
+ * This function defines what the control does.
+ * It'll be called on every mouse move after a control has been clicked and is being dragged.
+ * The function receives as argument the mouse event, the current transform object
+ * and the current position in canvas coordinate `transform.target` is a reference to the
+ * current object being transformed.
+ */
+const polyActionHandler = (eventData, transform, x, y) => {
+  const {
+    target,
+    pointIndex
+  } = transform;
+  const poly = target;
+  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, poly.calcOwnMatrix());
+  poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
+  poly.setDimensions();
+  poly.set('dirty', true);
+  return true;
+};
+
+/**
+ * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
+ */
+const factoryPolyActionHandler = (pointIndex, fn) => {
+  return function (eventData, transform, x, y) {
+    const poly = transform.target,
+      anchorPoint = new Point(poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]),
+      anchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix()),
+      actionPerformed = fn(eventData, {
+        ...transform,
+        pointIndex
+      }, x, y);
+    const newAnchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix());
+    const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
+    poly.left -= diff.x;
+    poly.top -= diff.y;
+    return actionPerformed;
+  };
+};
+const createPolyActionHandler = pointIndex => wrapWithFireEvent(ACTION_NAME$1, factoryPolyActionHandler(pointIndex, polyActionHandler));
+function createPolyControls(arg0) {
+  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const controls = {};
+  for (let idx = 0; idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length); idx++) {
+    controls[`p${idx}`] = new Control({
+      actionName: ACTION_NAME$1,
+      positionHandler: createPolyPositionHandler(idx),
+      actionHandler: createPolyActionHandler(idx),
+      ...options
+    });
+  }
+  return controls;
+}
+
+const ACTION_NAME = 'modifyPath';
+const calcPathPointPosition = (pathObject, commandIndex, pointIndex) => {
+  const {
+    path,
+    pathOffset
+  } = pathObject;
+  const command = path[commandIndex];
+  return new Point(command[pointIndex] - pathOffset.x, command[pointIndex + 1] - pathOffset.y).transform(multiplyTransformMatrices(pathObject.getViewportTransform(), pathObject.calcTransformMatrix()));
+};
+const movePathPoint = (pathObject, x, y, commandIndex, pointIndex) => {
+  const {
+    path,
+    pathOffset
+  } = pathObject;
+  const anchorCommand = path[(commandIndex > 0 ? commandIndex : path.length) - 1];
+  const anchorPoint = new Point(anchorCommand[pointIndex], anchorCommand[pointIndex + 1]);
+  const anchorPointInParentPlane = anchorPoint.subtract(pathOffset).transform(pathObject.calcOwnMatrix());
+  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, pathObject.calcOwnMatrix());
+  path[commandIndex][pointIndex] = mouseLocalPosition.x + pathOffset.x;
+  path[commandIndex][pointIndex + 1] = mouseLocalPosition.y + pathOffset.y;
+  pathObject.setDimensions();
+  const newAnchorPointInParentPlane = anchorPoint.subtract(pathObject.pathOffset).transform(pathObject.calcOwnMatrix());
+  const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
+  pathObject.left -= diff.x;
+  pathObject.top -= diff.y;
+  pathObject.set('dirty', true);
+  return true;
+};
+
+/**
+ * This function locates the controls.
+ * It'll be used both for drawing and for interaction.
+ */
+function pathPositionHandler(dim, finalMatrix, pathObject) {
+  const {
+    commandIndex,
+    pointIndex
+  } = this;
+  return calcPathPointPosition(pathObject, commandIndex, pointIndex);
+}
+
+/**
+ * This function defines what the control does.
+ * It'll be called on every mouse move after a control has been clicked and is being dragged.
+ * The function receives as argument the mouse event, the current transform object
+ * and the current position in canvas coordinate `transform.target` is a reference to the
+ * current object being transformed.
+ */
+function pathActionHandler(eventData, transform, x, y) {
+  const {
+    target
+  } = transform;
+  const {
+    commandIndex,
+    pointIndex
+  } = this;
+  const actionPerformed = movePathPoint(target, x, y, commandIndex, pointIndex);
+  {
+    fireEvent(this.actionName, {
+      ...commonEventInfo(eventData, transform, x, y),
+      commandIndex,
+      pointIndex
+    });
+  }
+  return actionPerformed;
+}
+const indexFromPrevCommand = previousCommandType => previousCommandType === 'C' ? 5 : previousCommandType === 'Q' ? 3 : 1;
+class PathPointControl extends Control {
+  constructor(options) {
+    super(options);
+  }
+  render(ctx, left, top, styleOverride, fabricObject) {
+    const overrides = {
+      ...styleOverride,
+      cornerColor: this.controlFill,
+      cornerStrokeColor: this.controlStroke,
+      transparentCorners: !this.controlFill
+    };
+    super.render(ctx, left, top, overrides, fabricObject);
+  }
+}
+class PathControlPointControl extends PathPointControl {
+  constructor(options) {
+    super(options);
+  }
+  render(ctx, left, top, styleOverride, fabricObject) {
+    const {
+      path
+    } = fabricObject;
+    const {
+      commandIndex,
+      pointIndex,
+      connectToCommandIndex,
+      connectToPointIndex
+    } = this;
+    ctx.save();
+    ctx.strokeStyle = this.controlStroke;
+    if (this.connectionDashArray) {
+      ctx.setLineDash(this.connectionDashArray);
+    }
+    const [commandType] = path[commandIndex];
+    const point = calcPathPointPosition(fabricObject, connectToCommandIndex, connectToPointIndex);
+    if (commandType === 'Q') {
+      // one control point connects to 2 points
+      const point2 = calcPathPointPosition(fabricObject, commandIndex, pointIndex + 2);
+      ctx.moveTo(point2.x, point2.y);
+      ctx.lineTo(left, top);
+    } else {
+      ctx.moveTo(left, top);
+    }
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    ctx.restore();
+    super.render(ctx, left, top, styleOverride, fabricObject);
+  }
+}
+const createControl = (commandIndexPos, pointIndexPos, isControlPoint, options, connectToCommandIndex, connectToPointIndex) => new (isControlPoint ? PathControlPointControl : PathPointControl)({
+  commandIndex: commandIndexPos,
+  pointIndex: pointIndexPos,
+  actionName: ACTION_NAME,
+  positionHandler: pathPositionHandler,
+  actionHandler: pathActionHandler,
+  connectToCommandIndex,
+  connectToPointIndex,
+  ...options,
+  ...(isControlPoint ? options.controlPointStyle : options.pointStyle)
+});
+function createPathControls(path) {
+  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const controls = {};
+  let previousCommandType = 'M';
+  path.path.forEach((command, commandIndex) => {
+    const commandType = command[0];
+    if (commandType !== 'Z') {
+      controls[`c_${commandIndex}_${commandType}`] = createControl(commandIndex, command.length - 2, false, options);
+    }
+    switch (commandType) {
+      case 'C':
+        controls[`c_${commandIndex}_C_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex - 1, indexFromPrevCommand(previousCommandType));
+        controls[`c_${commandIndex}_C_CP_2`] = createControl(commandIndex, 3, true, options, commandIndex, 5);
+        break;
+      case 'Q':
+        controls[`c_${commandIndex}_Q_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex, 3);
+        break;
+    }
+    previousCommandType = commandType;
+  });
+  return controls;
+}
+
+var index = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  changeWidth: changeWidth,
+  createObjectDefaultControls: createObjectDefaultControls,
+  createPathControls: createPathControls,
+  createPolyActionHandler: createPolyActionHandler,
+  createPolyControls: createPolyControls,
+  createPolyPositionHandler: createPolyPositionHandler,
+  createResizeControls: createResizeControls,
+  createTextboxDefaultControls: createTextboxDefaultControls,
+  dragHandler: dragHandler,
+  factoryPolyActionHandler: factoryPolyActionHandler,
+  getLocalPoint: getLocalPoint,
+  polyActionHandler: polyActionHandler,
+  renderCircleControl: renderCircleControl,
+  renderSquareControl: renderSquareControl,
+  rotationStyleHandler: rotationStyleHandler,
+  rotationWithSnapping: rotationWithSnapping,
+  scaleCursorStyleHandler: scaleCursorStyleHandler,
+  scaleOrSkewActionName: scaleOrSkewActionName,
+  scaleSkewCursorStyleHandler: scaleSkewCursorStyleHandler,
+  scalingEqually: scalingEqually,
+  scalingX: scalingX,
+  scalingXOrSkewingY: scalingXOrSkewingY,
+  scalingY: scalingY,
+  scalingYOrSkewingX: scalingYOrSkewingX,
+  skewCursorStyleHandler: skewCursorStyleHandler,
+  skewHandlerX: skewHandlerX,
+  skewHandlerY: skewHandlerY,
+  wrapWithFireEvent: wrapWithFireEvent,
+  wrapWithFixedAnchor: wrapWithFixedAnchor
+});
 
 const isWebGLPipelineState = options => {
   return options.webgl !== undefined;
