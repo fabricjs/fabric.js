@@ -305,6 +305,7 @@ export interface ObjectEvents
 
   // erasing
   'erasing:end': { path: FabricObject };
+  'before:render': { ctx: CanvasRenderingContext2D };
 }
 
 export interface StaticCanvasEvents extends CollectionEvents {

@@ -1,25 +1,26 @@
-import * as fabric from 'fabric';
-import * as extensions from 'fabric/extensions';
+import { FabricImage } from 'fabric';
+import { enterCropMode } from 'fabric/extensions';
+import { beforeAll } from '../../test';
 
-export async function testCase(canvas: fabric.Canvas) {
+beforeAll(async (canvas) => {
   canvas.setDimensions({ width: 900, height: 700 });
 
-  const image = await fabric.FabricImage.fromURL(
+  const image = await FabricImage.fromURL(
     'https://fabricjs.com/assets/dragon.jpg',
   );
 
   // Remove original controls and apply cropping controls
-  image.once('mousedblclick', extensions.enterCropMode);
+  image.once('mousedblclick', enterCropMode);
 
   // Set some initial crop to demonstrate the controls
   image.set({
-    scaleX: 0.5,
-    scaleY: 0.5,
+    scaleX: 0.3,
+    scaleY: 0.3,
     angle: 10,
-    cropX: 80,
-    cropY: 80,
-    width: 400,
-    height: 400,
+    cropX: 90,
+    cropY: 150,
+    width: 600,
+    height: 600,
     cornerStrokeColor: 'blue',
     cornerColor: 'white',
     borderScaleFactor: 2,
@@ -27,9 +28,9 @@ export async function testCase(canvas: fabric.Canvas) {
     cornerStyle: 'circle',
   });
 
-  image.controls.tl.sizeX = 30;
-  image.controls.br.sizeY = 30;
   canvas.add(image);
   canvas.centerObject(image);
   canvas.setActiveObject(image);
-}
+
+  return { image };
+});
