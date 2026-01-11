@@ -12,6 +12,7 @@
   },
   "include": [
     "src/**/*",
+    "e2e/**/*",
     "extensions/**/*",
     "vitest.d.ts",
     "vitest.env.d.ts",
