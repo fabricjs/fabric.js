@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "paths": {
+      "fabric": [
+        "./index"
+      ],
+      "fabric/node": [
+        "./index.node"
+      ],
+      "fabric/extensions": [
+        "./extensions/index"
+      ]
+    },
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "test",
+    "e2e",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/*.fixtures.ts",
+    "vitest.extend.ts",
+    "vitest.config.ts",
+    "vitest.d.ts",
+    "playwright.setup.ts"
+  ],
+  "include": [],
+  "files": [
+    "/Users/andreabogazzi/develop/fabric.js/e2e/tests/controls/cropping/index.spec.ts"
+  ]
+}
