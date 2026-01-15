@@ -3,6 +3,8 @@
 Extensions and/or plugins are all those features that do no have a place in the library itself.
 FabricJS is a rendering library with an interactive layer and serialization support and has already a lot of features and needs to avoid more scope creep.
 
+## What are extensions?
+
 Extension are all those pieces of codes that are more features and less api, as examples:
 
 - filters with a niche use case
@@ -25,3 +27,10 @@ It may be a class or a function that wrap an existing class, or a series of func
 Refer to each README file for explanations
 
 Feature are not built in the main FabricJS bundle and are available both in form of ES module or an extension bundle.
+
+## Demos
+
+Download and open in your browser to try it:
+
+- `aligning_guidelines/demo.html` - Snap alignment when dragging objects
+- `cropping_controls/demo.html` - Image cropping with drag-to-reposition

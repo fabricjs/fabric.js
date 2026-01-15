@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aligning Guidelines</title>
+  <style>
+    body { font-family: system-ui; padding: 20px; background: #f5f5f5; }
+    p { color: #666; margin: 0 0 12px; }
+  </style>
+</head>
+<body>
+  <p>Drag objects to see alignment guides</p>
+  <canvas id="c" width="800" height="600"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/fabric@7/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fabric@7/dist-extensions/fabric-extensions.min.js"></script>
+  <script>
+  const canvas = new fabric.Canvas('c', { backgroundColor: '#ddd' });
+
+  new fabricExtensions.AligningGuidelines(canvas);
+
+  // Background "canvas" rect - locked in place
+  canvas.add(new fabric.Rect({
+    left: 400,
+    top: 300,
+    width: 600,
+    height: 400,
+    fill: '#fff',
+    selectable: false,
+    evented: false,
+    lockMovementX: true,
+    lockMovementY: true,
+  }));
+
+  canvas.add(new fabric.Rect({ left: 150, top: 150, width: 100, height: 100, fill: '#3b82f6' }));
+  canvas.add(new fabric.Rect({ left: 350, top: 200, width: 120, height: 80, fill: '#22c55e' }));
+  canvas.add(new fabric.Circle({ left: 550, top: 250, radius: 50, fill: '#f59e0b' }));
+  canvas.add(new fabric.Triangle({ left: 300, top: 380, width: 100, height: 100, fill: '#ef4444' }));
+  </script>
+</body>
+</html>
