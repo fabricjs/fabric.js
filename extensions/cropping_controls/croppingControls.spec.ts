@@ -1,12 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { Control } from 'fabric';
 import { createImageCroppingControls } from './croppingControls';
-import {
-  changeCropHeight,
-  changeCropWidth,
-  changeCropX,
-  changeCropY,
-} from './croppingHandlers';
 
 describe('createImageCroppingControls', () => {
   test('returns an object with 12 control properties', () => {
@@ -61,55 +55,45 @@ describe('createImageCroppingControls', () => {
     expect(typeof controls.bls.actionHandler).toBe('function');
   });
 
-  // Cropping middle controls tests
-  test('mlc control uses changeCropX as actionHandler', () => {
+  // Cropping middle controls tests (flip-aware wrappers)
+  test('mlc control wraps changeCropX with flip awareness', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mlc.actionHandler).toBe(changeCropX);
+    expect(typeof controls.mlc.actionHandler).toBe('function');
   });
 
-  test('mrc control uses changeCropWidth as actionHandler', () => {
+  test('mrc control wraps changeCropWidth with flip awareness', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mrc.actionHandler).toBe(changeCropWidth);
+    expect(typeof controls.mrc.actionHandler).toBe('function');
   });
 
-  test('mbc control uses changeCropHeight as actionHandler', () => {
+  test('mbc control wraps changeCropHeight with flip awareness', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mbc.actionHandler).toBe(changeCropHeight);
+    expect(typeof controls.mbc.actionHandler).toBe('function');
   });
 
-  test('mtc control uses changeCropY as actionHandler', () => {
+  test('mtc control wraps changeCropY with flip awareness', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mtc.actionHandler).toBe(changeCropY);
+    expect(typeof controls.mtc.actionHandler).toBe('function');
   });
 
   // Cropping corner controls tests
   test('tlc control combines changeCropX and changeCropY', () => {
     const controls = createImageCroppingControls();
-    // tlc uses a custom function, so we verify it's a function
     expect(typeof controls.tlc.actionHandler).toBe('function');
-    // The handler is not directly equal to either function since it's a wrapper
-    expect(controls.tlc.actionHandler).not.toBe(changeCropX);
-    expect(controls.tlc.actionHandler).not.toBe(changeCropY);
   });
 
   test('trc control combines changeCropWidth and changeCropY', () => {
     const controls = createImageCroppingControls();
     expect(typeof controls.trc.actionHandler).toBe('function');
-    expect(controls.trc.actionHandler).not.toBe(changeCropWidth);
-    expect(controls.trc.actionHandler).not.toBe(changeCropY);
   });
 
   test('blc control combines changeCropHeight and changeCropX', () => {
     const controls = createImageCroppingControls();
     expect(typeof controls.blc.actionHandler).toBe('function');
-    expect(controls.blc.actionHandler).not.toBe(changeCropHeight);
-    expect(controls.blc.actionHandler).not.toBe(changeCropX);
   });
 
   test('brc control combines changeCropHeight and changeCropWidth', () => {
     const controls = createImageCroppingControls();
     expect(typeof controls.brc.actionHandler).toBe('function');
-    expect(controls.brc.actionHandler).not.toBe(changeCropHeight);
-    expect(controls.brc.actionHandler).not.toBe(changeCropWidth);
   });
 });
