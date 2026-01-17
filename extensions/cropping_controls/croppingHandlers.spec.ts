@@ -38,6 +38,8 @@ describe('croppingHandlers', () => {
       cropY: number;
       elementWidth: number;
       elementHeight: number;
+      flipX: boolean;
+      flipY: boolean;
     }> = {},
   ): FabricImage {
     const {
@@ -47,6 +49,8 @@ describe('croppingHandlers', () => {
       cropY = 0,
       elementWidth = 200,
       elementHeight = 200,
+      flipX = false,
+      flipY = false,
     } = options;
 
     const imgElement = new Image(elementWidth, elementHeight);
@@ -57,6 +61,8 @@ describe('croppingHandlers', () => {
       height,
       cropX,
       cropY,
+      flipX,
+      flipY,
     });
     img.controls = createImageCroppingControls();
 
@@ -381,6 +387,172 @@ describe('croppingHandlers', () => {
 
       // cropY + height should not exceed element height
       expect(image.cropY + image.height).toBeLessThanOrEqual(300);
+    });
+
+    test('pans correctly when flipX is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 100,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+        flipX: true,
+      });
+      canvas.add(image);
+
+      const original = {
+        left: image.left,
+        top: image.top,
+        cropX: image.cropX,
+        cropY: image.cropY,
+      };
+
+      // Move the image 10px to the right
+      image.left = original.left + 10;
+      image.top = original.top;
+
+      const moveEvent = {
+        transform: {
+          target: image,
+          original,
+        } as unknown as Transform,
+      };
+
+      cropPanMoveHandler(moveEvent as any);
+
+      // With flipX, moving right should increase cropX (opposite of normal)
+      expect(image.cropX).toBeGreaterThan(original.cropX);
+    });
+
+    test('pans correctly when flipY is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 100,
+        elementWidth: 300,
+        elementHeight: 300,
+        flipY: true,
+      });
+      canvas.add(image);
+
+      const original = {
+        left: image.left,
+        top: image.top,
+        cropX: image.cropX,
+        cropY: image.cropY,
+      };
+
+      // Move the image 10px down
+      image.left = original.left;
+      image.top = original.top + 10;
+
+      const moveEvent = {
+        transform: {
+          target: image,
+          original,
+        } as unknown as Transform,
+      };
+
+      cropPanMoveHandler(moveEvent as any);
+
+      // With flipY, moving down should increase cropY (opposite of normal)
+      expect(image.cropY).toBeGreaterThan(original.cropY);
+    });
+  });
+
+  describe('flip-aware crop controls', () => {
+    test('mlc control changes width when flipX is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 0,
+        elementWidth: 200,
+        elementHeight: 200,
+        flipX: true,
+      });
+      canvas.add(image);
+      transform = prepareTransform(image, 'mlc');
+
+      const initialCropX = image.cropX;
+      const initialWidth = image.width;
+
+      // Call the mlc action handler
+      image.controls.mlc.actionHandler!(eventData, transform, 30, 50);
+
+      // When flipX is true, mlc should change width, not cropX
+      expect(image.cropX).toBe(initialCropX);
+      expect(image.width).not.toBe(initialWidth);
+    });
+
+    test('mrc control changes cropX when flipX is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 0,
+        elementWidth: 200,
+        elementHeight: 200,
+        flipX: true,
+      });
+      canvas.add(image);
+      transform = prepareTransform(image, 'mrc');
+
+      const initialCropX = image.cropX;
+
+      // Call the mrc action handler
+      image.controls.mrc.actionHandler!(eventData, transform, 180, 50);
+
+      // When flipX is true, mrc should behave like mlc (change cropX)
+      expect(image.cropX).not.toBe(initialCropX);
+    });
+
+    test('mtc control changes height when flipY is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 0,
+        cropY: 50,
+        elementWidth: 200,
+        elementHeight: 200,
+        flipY: true,
+      });
+      canvas.add(image);
+      transform = prepareTransform(image, 'mtc');
+
+      const initialCropY = image.cropY;
+      const initialHeight = image.height;
+
+      // Call the mtc action handler
+      image.controls.mtc.actionHandler!(eventData, transform, 50, 30);
+
+      // When flipY is true, mtc should change height, not cropY
+      expect(image.cropY).toBe(initialCropY);
+      expect(image.height).not.toBe(initialHeight);
+    });
+
+    test('mbc control changes cropY when flipY is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 0,
+        cropY: 50,
+        elementWidth: 200,
+        elementHeight: 200,
+        flipY: true,
+      });
+      canvas.add(image);
+      transform = prepareTransform(image, 'mbc');
+
+      const initialCropY = image.cropY;
+
+      // Call the mbc action handler
+      image.controls.mbc.actionHandler!(eventData, transform, 50, 180);
+
+      // When flipY is true, mbc should behave like mtc (change cropY)
+      expect(image.cropY).not.toBe(initialCropY);
     });
   });
 
