@@ -10,6 +10,8 @@ import {
   ghostScalePositionHandler,
   scaleEquallyCropGenerator,
   renderGhostImage,
+  changeImageEdgeWidth,
+  changeImageEdgeHeight,
 } from './croppingHandlers';
 
 import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest';
@@ -574,6 +576,227 @@ describe('croppingHandlers', () => {
       expect(alphaWhenDrawing).toBe(0.4);
       // After render, alpha should be restored
       expect(mockCtx.globalAlpha).toBe(0.8);
+    });
+  });
+
+  describe('changeImageEdgeWidth', () => {
+    function prepareEdgeTransform(
+      target: FabricImage,
+      originX: 'left' | 'center' | 'right',
+      originY: 'top' | 'center' | 'bottom',
+      corner = 'mr',
+    ): Transform {
+      target.controls[corner] = new Control({
+        x: originX === 'left' ? 0.5 : originX === 'right' ? -0.5 : 0,
+        y: originY === 'top' ? 0.5 : originY === 'bottom' ? -0.5 : 0,
+      });
+      return {
+        target,
+        corner,
+        originX,
+        originY,
+        width: target.width,
+        height: target.height,
+        original: {
+          cropX: target.cropX,
+          cropY: target.cropY,
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+        },
+      } as unknown as Transform;
+    }
+
+    test('increases width within available space (right edge)', () => {
+      // 100px wide, cropX=50, element=300 -> 150px available on right
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'left', 'center');
+
+      const changed = changeImageEdgeWidth(eventData, transform, 180, 50);
+      expect(changed).toBe(true);
+      expect(image.width).toBeGreaterThan(100);
+      expect(image.scaleX).toBe(1);
+    });
+
+    test('constrains width to element boundary (right edge)', () => {
+      image = createMockImage({
+        width: 100,
+        cropX: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'left', 'center');
+
+      changeImageEdgeWidth(eventData, transform, 500, 50);
+      expect(image.width).toBeLessThanOrEqual(250); // 300 - 50
+    });
+
+    test('triggers cover scale when beyond element bounds', () => {
+      // Already at max width, no crop space left
+      image = createMockImage({
+        width: 300,
+        height: 200,
+        cropX: 0,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'left', 'center');
+
+      changeImageEdgeWidth(eventData, transform, 500, 100);
+      expect(image.scaleX).toBeGreaterThan(1);
+      expect(image.scaleX).toBe(image.scaleY); // uniform
+      expect(image.width).toBe(300);
+    });
+
+    test('expands into cropX space (left edge)', () => {
+      image = createMockImage({
+        width: 100,
+        cropX: 100,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'right', 'center');
+
+      changeImageEdgeWidth(eventData, transform, -250, 50);
+      expect(image.cropX).toBe(0);
+      expect(image.width).toBe(200); // original 100 + cropX 100
+    });
+
+    test('triggers cover scale from left edge when cropX exhausted', () => {
+      image = createMockImage({
+        width: 200,
+        height: 200,
+        cropX: 0,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'right', 'center');
+
+      changeImageEdgeWidth(eventData, transform, -400, 100);
+      expect(image.scaleX).toBeGreaterThan(1);
+      expect(image.cropX).toBe(0);
+    });
+  });
+
+  describe('changeImageEdgeHeight', () => {
+    function prepareEdgeTransform(
+      target: FabricImage,
+      originX: 'left' | 'center' | 'right',
+      originY: 'top' | 'center' | 'bottom',
+      corner = 'mb',
+    ): Transform {
+      target.controls[corner] = new Control({
+        x: originX === 'left' ? 0.5 : originX === 'right' ? -0.5 : 0,
+        y: originY === 'top' ? 0.5 : originY === 'bottom' ? -0.5 : 0,
+      });
+      return {
+        target,
+        corner,
+        originX,
+        originY,
+        width: target.width,
+        height: target.height,
+        original: {
+          cropX: target.cropX,
+          cropY: target.cropY,
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+        },
+      } as unknown as Transform;
+    }
+
+    test('increases height within available space (bottom edge)', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'top');
+
+      changeImageEdgeHeight(eventData, transform, 50, 180);
+      expect(image.height).toBeGreaterThan(100);
+      expect(image.scaleY).toBe(1);
+    });
+
+    test('constrains height to element boundary (bottom edge)', () => {
+      image = createMockImage({
+        height: 100,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'top');
+
+      changeImageEdgeHeight(eventData, transform, 50, 500);
+      expect(image.height).toBeLessThanOrEqual(250); // 300 - 50
+    });
+
+    test('triggers cover scale when beyond element bounds', () => {
+      image = createMockImage({
+        width: 200,
+        height: 300,
+        cropX: 50,
+        cropY: 0,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'top');
+
+      changeImageEdgeHeight(eventData, transform, 100, 500);
+      expect(image.scaleY).toBeGreaterThan(1);
+      expect(image.scaleX).toBe(image.scaleY); // uniform
+      expect(image.height).toBe(300);
+    });
+
+    test('expands into cropY space (top edge)', () => {
+      image = createMockImage({
+        height: 100,
+        cropY: 100,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'bottom');
+
+      changeImageEdgeHeight(eventData, transform, 50, -250);
+      expect(image.cropY).toBe(0);
+      expect(image.height).toBe(200); // original 100 + cropY 100
+    });
+
+    test('triggers cover scale from top edge when cropY exhausted', () => {
+      image = createMockImage({
+        width: 200,
+        height: 200,
+        cropX: 50,
+        cropY: 0,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'bottom');
+
+      changeImageEdgeHeight(eventData, transform, 100, -400);
+      expect(image.scaleY).toBeGreaterThan(1);
+      expect(image.cropY).toBe(0);
     });
   });
 });

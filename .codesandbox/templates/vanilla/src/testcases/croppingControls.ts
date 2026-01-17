@@ -11,6 +11,16 @@ export async function testCase(canvas: fabric.Canvas) {
   // Remove original controls and apply cropping controls
   image.once('mousedblclick', extensions.enterCropMode);
 
+  // Apply edge resize controls to replace default ml, mr, mt, mb
+  // These resize within crop bounds, then switch to uniform scaling
+  const edgeControls = extensions.createImageEdgeResizeControls();
+  Object.assign(image.controls, {
+    ml: edgeControls.mle,
+    mr: edgeControls.mre,
+    mt: edgeControls.mte,
+    mb: edgeControls.mbe,
+  });
+
   // Set some initial crop to demonstrate the controls
   image.set({
     scaleX: 0.5,
@@ -22,6 +32,7 @@ export async function testCase(canvas: fabric.Canvas) {
     height: 400,
     cornerStrokeColor: 'blue',
     cornerColor: 'white',
+    borderColor: 'blue',
     borderScaleFactor: 2,
     transparentCorners: false,
     cornerStyle: 'circle',

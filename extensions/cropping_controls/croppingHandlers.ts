@@ -283,3 +283,129 @@ export function renderGhostImage(
   );
   ctx.globalAlpha = alpha;
 }
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, value));
+
+/**
+ * Generator for edge resize handlers that support cover scale with bounce-back.
+ * Similar pattern to scaleEquallyCropGenerator.
+ */
+const changeImageEdgeGenerator =
+  (axis: 'x' | 'y'): TransformActionHandler =>
+  (_eventData, transform, x, y) => {
+    const image = transform.target as FabricImage;
+    const original = transform.original as {
+      cropX?: number;
+      cropY?: number;
+      scaleX: number;
+      scaleY: number;
+    };
+
+    const isX = axis === 'x';
+    const elementSize = isX ? image._element.width : image._element.height;
+    const crossElementSize = isX ? image._element.height : image._element.width;
+    const isNegativeEdge = isX
+      ? transform.originX === 'right'
+      : transform.originY === 'bottom';
+
+    const initialSize = isX ? transform.width : transform.height;
+    const initialCrossSize = isX ? transform.height : transform.width;
+    const initialCrop = isX ? (original.cropX ?? 0) : (original.cropY ?? 0);
+    const initialCrossCrop = isX
+      ? (original.cropY ?? 0)
+      : (original.cropX ?? 0);
+    const initialScale = isX ? original.scaleX : original.scaleY;
+    const initialCrossScale = isX ? original.scaleY : original.scaleX;
+
+    const localPoint = controlsUtils.getLocalPoint(
+      transform,
+      transform.originX,
+      transform.originY,
+      x,
+      y,
+    );
+
+    const minSize = 10;
+    const rawSize = isNegativeEdge
+      ? -(isX ? localPoint.x : localPoint.y)
+      : isX
+        ? localPoint.x
+        : localPoint.y;
+    const requestedSize = Math.max(minSize, rawSize / initialScale);
+
+    const availableSize = isNegativeEdge
+      ? initialCrop + initialSize
+      : elementSize - initialCrop;
+
+    const setImageProps = (
+      size: number,
+      crossSize: number,
+      scale: number,
+      crop: number,
+      crossCrop: number,
+    ) => {
+      if (isX) {
+        image.width = size;
+        image.height = crossSize;
+        image.cropX = crop;
+        image.cropY = crossCrop;
+      } else {
+        image.height = size;
+        image.width = crossSize;
+        image.cropY = crop;
+        image.cropX = crossCrop;
+      }
+      image.scaleX = scale;
+      image.scaleY = scale;
+    };
+
+    if (requestedSize <= availableSize) {
+      const newCrop = isNegativeEdge
+        ? Math.max(0, initialCrop + initialSize - requestedSize)
+        : initialCrop;
+      setImageProps(
+        Math.max(1, requestedSize),
+        initialCrossSize,
+        initialScale,
+        newCrop,
+        initialCrossCrop,
+      );
+    } else {
+      const targetScaledSize = requestedSize * initialScale;
+      const newScale = targetScaledSize / availableSize;
+
+      const scaledCrossSize = initialCrossSize * initialCrossScale;
+      const crossNaturalInView = scaledCrossSize / newScale;
+      const newCrossSize = Math.min(crossNaturalInView, crossElementSize);
+      const crossCenter = initialCrossCrop + initialCrossSize / 2;
+      const newCrossCrop = clamp(
+        crossCenter - newCrossSize / 2,
+        0,
+        crossElementSize - newCrossSize,
+      );
+
+      setImageProps(
+        availableSize,
+        newCrossSize,
+        newScale,
+        isNegativeEdge ? 0 : initialCrop,
+        newCrossCrop,
+      );
+    }
+
+    return true;
+  };
+
+export const changeImageEdgeWidth = changeImageEdgeGenerator('x');
+export const changeImageEdgeHeight = changeImageEdgeGenerator('y');
+
+export const changeEdgeWidth = wrapWithFireEvent(
+  'RESIZING' as TModificationEvents,
+  wrapWithFixedAnchor(changeImageEdgeWidth),
+);
+
+export const changeEdgeHeight = wrapWithFireEvent(
+  'RESIZING' as TModificationEvents,
+  wrapWithFixedAnchor(changeImageEdgeHeight),
+);
