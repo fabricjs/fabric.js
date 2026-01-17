@@ -3,6 +3,12 @@
 ## [next]
 
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
+- feat(): Cropping controls follow ups [#10839](https://github.com/fabricjs/fabric.js/pull/10839)
+- chore(): Add pre-commit hook to run lint, prettier, tsc on staged files. [#10834](https://github.com/fabricjs/fabric.js/pull/10834)
+
+## [7.1.0]
+
+- fix(Text):Double offset when exporting SVG after setting deltaY in Text [#10805](https://github.com/fabricjs/fabric.js/pull/10805)
 - chore(deps-dev): bump js-yaml from 3.14.1 to 3.14.2 in the npm_and_yarn group across 1 directory [#10812](https://github.com/fabricjs/fabric.js/pull/10812)
 - Correctly check for cache key equality in calcOwnMatrix [#10831](https://github.com/fabricjs/fabric.js/pull/10831)
 - chore(): Render circle control tweak for code reusability and style [#10829](https://github.com/fabricjs/fabric.js/pull/10829)

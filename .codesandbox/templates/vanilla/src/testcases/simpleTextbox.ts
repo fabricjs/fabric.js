@@ -20,7 +20,39 @@ export function testCase(canvas: fabric.Canvas) {
       width: 600,
     },
   );
+  const text3 = new fabric.FabricText('TESTING SVG DELTAY', {
+    top: 20,
+    left: 180,
+    styles: {
+      0: {
+        12: {
+          deltaY: -10,
+          fontSize: 25,
+        },
+        13: {
+          deltaY: -10,
+          fontSize: 25,
+        },
+        14: {
+          deltaY: -10,
+          fontSize: 25,
+        },
+        15: {
+          deltaY: -10,
+          fontSize: 25,
+        },
+        16: {
+          deltaY: -10,
+          fontSize: 25,
+        },
+        17: {
+          deltaY: -10,
+          fontSize: 25,
+        },
+      },
+    },
+  });
   canvas.setDimensions({ width: 900, height: 700 });
-  canvas.add(text2);
+  canvas.add(text2, text3);
   canvas.centerObject(text2);
 }

@@ -4,6 +4,8 @@ import {
   changeCropWidth,
   changeCropX,
   changeCropY,
+  ghostScalePositionHandler,
+  scaleEquallyCropGenerator,
 } from './croppingHandlers';
 import { renderCornerControl } from './renderCornerControl';
 
@@ -12,7 +14,37 @@ const { scaleCursorStyleHandler } = controlsUtils;
 const cropActionName = () => 'crop';
 // use this function if you want to generate new controls for every instance
 export const createImageCroppingControls = () => ({
-  ml: new Control({
+  // scaling image
+  tls: new Control({
+    x: -0.5,
+    y: -0.5,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(-0.5, -0.5),
+  }),
+  brs: new Control({
+    x: 0.5,
+    y: 0.5,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(0.5, 0.5),
+  }),
+  trs: new Control({
+    x: 0.5,
+    y: -0.5,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(0.5, -0.5),
+  }),
+  bls: new Control({
+    x: -0.5,
+    y: 0.5,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    positionHandler: ghostScalePositionHandler,
+    actionHandler: scaleEquallyCropGenerator(-0.5, 0.5),
+  }),
+  // cropping image
+  mlc: new Control({
     x: -0.5,
     y: 0,
     sizeX: 4,
@@ -22,7 +54,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  mr: new Control({
+  mrc: new Control({
     x: 0.5,
     y: 0,
     sizeX: 4,
@@ -32,7 +64,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  mb: new Control({
+  mbc: new Control({
     x: 0,
     y: 0.5,
     sizeX: 20,
@@ -42,7 +74,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  mt: new Control({
+  mtc: new Control({
     x: 0,
     y: -0.5,
     sizeX: 20,
@@ -52,7 +84,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  tl: new Control({
+  tlc: new Control({
     angle: 0,
     x: -0.5,
     y: -0.5,
@@ -68,7 +100,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  tr: new Control({
+  trc: new Control({
     angle: 90,
     x: 0.5,
     y: -0.5,
@@ -84,7 +116,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  bl: new Control({
+  blc: new Control({
     angle: 270,
     x: -0.5,
     y: 0.5,
@@ -100,7 +132,7 @@ export const createImageCroppingControls = () => ({
     getActionName: cropActionName,
   }),
 
-  br: new Control({
+  brc: new Control({
     angle: 180,
     x: 0.5,
     y: 0.5,
