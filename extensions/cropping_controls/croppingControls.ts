@@ -12,6 +12,20 @@ import { renderCornerControl } from './renderCornerControl';
 const { scaleCursorStyleHandler } = controlsUtils;
 
 const cropActionName = () => 'crop';
+
+const withFlip = (
+  handler: typeof changeCropX,
+  flippedHandler: typeof changeCropX,
+  axis: 'flipX' | 'flipY',
+): typeof changeCropX => {
+  return (eventData, transform, x, y) => {
+    if (transform.target[axis]) {
+      return flippedHandler(eventData, transform, x, y);
+    }
+    return handler(eventData, transform, x, y);
+  };
+};
+
 // use this function if you want to generate new controls for every instance
 export const createImageCroppingControls = () => ({
   // scaling image
@@ -50,7 +64,7 @@ export const createImageCroppingControls = () => ({
     sizeX: 4,
     sizeY: 20,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropX,
+    actionHandler: withFlip(changeCropX, changeCropWidth, 'flipX'),
     getActionName: cropActionName,
   }),
 
@@ -60,7 +74,7 @@ export const createImageCroppingControls = () => ({
     sizeX: 4,
     sizeY: 20,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropWidth,
+    actionHandler: withFlip(changeCropWidth, changeCropX, 'flipX'),
     getActionName: cropActionName,
   }),
 
@@ -70,7 +84,7 @@ export const createImageCroppingControls = () => ({
     sizeX: 20,
     sizeY: 4,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropHeight,
+    actionHandler: withFlip(changeCropHeight, changeCropY, 'flipY'),
     getActionName: cropActionName,
   }),
 
@@ -80,7 +94,7 @@ export const createImageCroppingControls = () => ({
     sizeX: 20,
     sizeY: 4,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropY,
+    actionHandler: withFlip(changeCropY, changeCropHeight, 'flipY'),
     getActionName: cropActionName,
   }),
 
@@ -93,8 +107,8 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const cropX = changeCropX(...args);
-      const cropY = changeCropY(...args);
+      const cropX = withFlip(changeCropX, changeCropWidth, 'flipX')(...args);
+      const cropY = withFlip(changeCropY, changeCropHeight, 'flipY')(...args);
       return cropX || cropY;
     },
     getActionName: cropActionName,
@@ -109,8 +123,8 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const width = changeCropWidth(...args);
-      const cropY = changeCropY(...args);
+      const width = withFlip(changeCropWidth, changeCropX, 'flipX')(...args);
+      const cropY = withFlip(changeCropY, changeCropHeight, 'flipY')(...args);
       return width || cropY;
     },
     getActionName: cropActionName,
@@ -125,8 +139,8 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const height = changeCropHeight(...args);
-      const cropX = changeCropX(...args);
+      const height = withFlip(changeCropHeight, changeCropY, 'flipY')(...args);
+      const cropX = withFlip(changeCropX, changeCropWidth, 'flipX')(...args);
       return height || cropX;
     },
     getActionName: cropActionName,
@@ -141,8 +155,8 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const height = changeCropHeight(...args);
-      const width = changeCropWidth(...args);
+      const height = withFlip(changeCropHeight, changeCropY, 'flipY')(...args);
+      const width = withFlip(changeCropWidth, changeCropX, 'flipX')(...args);
       return height || width;
     },
     getActionName: cropActionName,
