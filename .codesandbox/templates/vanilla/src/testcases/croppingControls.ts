@@ -38,9 +38,6 @@ export async function testCase(canvas: fabric.Canvas) {
     cornerStyle: 'circle',
   });
 
-  // TODO: ???
-  // image.controls.tl.sizeX = 30;
-  // image.controls.br.sizeY = 30;
   canvas.add(image);
   canvas.centerObject(image);
   canvas.setActiveObject(image);
