@@ -142,8 +142,10 @@ export const cropPanMoveHandler = ({ transform }: ObjectEvents['moving']) => {
       util.createRotateMatrix({ angle: fabricImage.getTotalAngle() }),
     ),
   );
-  let cropX = original.cropX! - p.x / fabricImage.scaleX;
-  let cropY = original.cropY! - p.y / fabricImage.scaleY;
+  let cropX =
+    original.cropX! - (p.x / fabricImage.scaleX) * (fabricImage.flipX ? -1 : 1);
+  let cropY =
+    original.cropY! - (p.y / fabricImage.scaleY) * (fabricImage.flipY ? -1 : 1);
   const { width, height, _element } = fabricImage;
   if (cropX < 0) {
     cropX = 0;
