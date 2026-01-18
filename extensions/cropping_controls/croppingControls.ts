@@ -6,6 +6,8 @@ import {
   changeCropY,
   ghostScalePositionHandler,
   scaleEquallyCropGenerator,
+  changeEdgeWidth,
+  changeEdgeHeight,
 } from './croppingHandlers';
 import { renderCornerControl, renderEdgeControl } from './controlRendering';
 
@@ -169,5 +171,58 @@ export const createImageCroppingControls = () => ({
       return height || width;
     },
     getActionName: cropActionName,
+  }),
+});
+
+const edgeActionName = () => 'resizing';
+
+// edge resize controls - resize within crop bounds, then uniform scale when exhausted
+export const createImageEdgeResizeControls = () => ({
+  mle: new Control({
+    x: -0.5,
+    y: 0,
+    angle: 90,
+    sizeX: 8,
+    sizeY: 20,
+    render: renderEdgeControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeWidth,
+    getActionName: edgeActionName,
+  }),
+
+  mre: new Control({
+    x: 0.5,
+    y: 0,
+    angle: 90,
+    sizeX: 8,
+    sizeY: 20,
+    render: renderEdgeControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeWidth,
+    getActionName: edgeActionName,
+  }),
+
+  mte: new Control({
+    x: 0,
+    y: -0.5,
+    angle: 0,
+    sizeX: 20,
+    sizeY: 8,
+    render: renderEdgeControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeHeight,
+    getActionName: edgeActionName,
+  }),
+
+  mbe: new Control({
+    x: 0,
+    y: 0.5,
+    angle: 0,
+    sizeX: 20,
+    sizeY: 8,
+    render: renderEdgeControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeHeight,
+    getActionName: edgeActionName,
   }),
 });
