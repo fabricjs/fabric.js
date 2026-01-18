@@ -28,5 +28,6 @@ export {
   changeCropHeight,
   changeEdgeWidth,
   changeEdgeHeight,
+  withFlip,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';
