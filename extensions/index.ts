@@ -30,3 +30,5 @@ export {
   changeEdgeHeight,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';
+export { CropMode } from './cropping_controls/CropMode';
+export type { CropModeConfig } from './cropping_controls/CropMode';
