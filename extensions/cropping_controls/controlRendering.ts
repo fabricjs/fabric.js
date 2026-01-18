@@ -36,12 +36,6 @@ export function renderEdgeControl(
     thickness = Math.min(xSize, ySize),
     halfLength = length / 2;
 
-  const borderOffset = (fabricObject.borderScaleFactor || 1) / 2;
-  if (this.x === -0.5) ctx.translate(-borderOffset, 0);
-  else if (this.x === 0.5) ctx.translate(borderOffset, 0);
-  if (this.y === -0.5) ctx.translate(0, -borderOffset);
-  else if (this.y === 0.5) ctx.translate(0, borderOffset);
-
   ctx.rotate(degreesToRadians(this.angle));
   ctx.lineCap = 'round';
 
@@ -89,12 +83,6 @@ export function renderCornerControl(
     ),
     length = Math.max(xSize, ySize),
     thickness = Math.min(xSize, ySize);
-
-  const borderOffset = (fabricObject.borderScaleFactor || 1) / 2;
-  if (this.x === -0.5) ctx.translate(-borderOffset, 0);
-  else if (this.x === 0.5) ctx.translate(borderOffset, 0);
-  if (this.y === -0.5) ctx.translate(0, -borderOffset);
-  else if (this.y === 0.5) ctx.translate(0, borderOffset);
 
   ctx.rotate(degreesToRadians(this.angle));
   ctx.lineCap = 'round';
