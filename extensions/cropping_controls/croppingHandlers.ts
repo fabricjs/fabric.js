@@ -328,13 +328,9 @@ const changeImageEdgeGenerator =
       y,
     );
 
-    const minSize = 10;
-    const rawSize = isNegativeEdge
-      ? -(isX ? localPoint.x : localPoint.y)
-      : isX
-        ? localPoint.x
-        : localPoint.y;
-    const requestedSize = Math.max(minSize, rawSize / initialScale);
+    const coordinate = isX ? localPoint.x : localPoint.y;
+    const rawSize = isNegativeEdge ? -coordinate : coordinate;
+    const requestedSize = Math.max(10, rawSize / initialScale);
 
     const availableSize = isNegativeEdge
       ? initialCrop + initialSize
