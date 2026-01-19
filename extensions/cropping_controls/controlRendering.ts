@@ -55,13 +55,8 @@ export function renderRoundedSegmentControl(
 }
 
 /**
- * Render a control for the main corners of a cropping image.
- * Draws an L-shaped filled path.
- * @param {CanvasRenderingContext2D} ctx context to render on
- * @param {Number} left x coordinate where the control center should be
- * @param {Number} top y coordinate where the control center should be
- * @param {Object} styleOverride override for FabricObject controls style
- * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
+ * Render an L-shaped corner control using two rounded segments.
+ * Matches the style of renderRoundedSegmentControl.
  */
 export function renderCornerControl(
   this: Control,
@@ -72,27 +67,37 @@ export function renderCornerControl(
   fabricObject: InteractiveFabricObject,
 ) {
   ctx.save();
-  const { stroke, xSize, ySize, opName } = this.commonRenderProps(
+  const { stroke, xSize, ySize } = this.commonRenderProps(
       ctx,
       left,
       top,
       fabricObject,
       styleOverride,
     ),
-    xSizeBy2 = xSize / 2,
-    ySizeBy2 = ySize / 2;
+    length = Math.max(xSize, ySize),
+    thickness = Math.min(xSize, ySize),
+    strokeWidth = fabricObject.borderScaleFactor * 2;
 
   ctx.rotate(degreesToRadians(this.angle));
-  ctx.beginPath();
-  ctx.moveTo(-ySizeBy2, 0);
-  ctx.lineTo(-ySizeBy2, xSizeBy2);
-  ctx.lineTo(ySizeBy2, xSizeBy2);
-  ctx.lineTo(ySizeBy2, ySizeBy2);
-  ctx.lineTo(xSizeBy2, ySizeBy2);
-  ctx.lineTo(xSizeBy2, -ySizeBy2);
-  ctx.lineTo(-ySizeBy2, -ySizeBy2);
-  ctx.closePath();
-  ctx[opName]();
-  stroke && ctx.stroke();
+  ctx.lineCap = 'round';
+
+  const drawL = () => {
+    ctx.beginPath();
+    ctx.moveTo(length, 0);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(0, length);
+  };
+
+  if (stroke) {
+    ctx.lineWidth = thickness;
+    drawL();
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = ctx.fillStyle;
+  ctx.lineWidth = stroke ? thickness - strokeWidth : thickness;
+  drawL();
+  ctx.stroke();
+
   ctx.restore();
 }
