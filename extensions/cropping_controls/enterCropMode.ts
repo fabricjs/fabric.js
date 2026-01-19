@@ -18,14 +18,14 @@ export const enterCropMode = function enterCropMode(
   fabricImage.on('before:render', renderGhostImage);
   fabricImage.setCoords();
   const exitCropMode = () => {
-    fabricImage.padding = padding;
     fabricImage.off('moving', cropPanMoveHandler);
     fabricImage.off('before:render', renderGhostImage);
     fabricImage.controls = controls;
+    fabricImage.padding = padding;
     fabricImage.setCoords();
-    fabricImage.once('mousedblclick', enterCropMode);
     canvas?.off('selection:cleared', onDeselect);
     canvas?.off('selection:updated', onDeselect);
+    fabricImage.once('mousedblclick', enterCropMode);
     fabricImage.canvas?.requestRenderAll();
   };
   const onDeselect = () => {
