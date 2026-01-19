@@ -10,7 +10,7 @@ import {
   changeEdgeHeight,
   withFlip,
 } from './croppingHandlers';
-import { renderCornerControl, renderEdgeControl } from './controlRendering';
+import { renderCornerControl, renderRoundedSegmentControl } from './controlRendering';
 
 const { scaleCursorStyleHandler } = controlsUtils;
 
@@ -51,10 +51,8 @@ export const createImageCroppingControls = () => ({
   mlc: new Control({
     x: -0.5,
     y: 0,
-    angle: 90,
-    sizeX: 8,
+    sizeX: 4,
     sizeY: 20,
-    render: renderEdgeControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: withFlip(changeCropX, changeCropWidth, 'flipX'),
     getActionName: cropActionName,
@@ -63,10 +61,8 @@ export const createImageCroppingControls = () => ({
   mrc: new Control({
     x: 0.5,
     y: 0,
-    angle: 90,
-    sizeX: 8,
+    sizeX: 4,
     sizeY: 20,
-    render: renderEdgeControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: withFlip(changeCropWidth, changeCropX, 'flipX'),
     getActionName: cropActionName,
@@ -75,10 +71,8 @@ export const createImageCroppingControls = () => ({
   mbc: new Control({
     x: 0,
     y: 0.5,
-    angle: 0,
     sizeX: 20,
-    sizeY: 8,
-    render: renderEdgeControl,
+    sizeY: 4,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: withFlip(changeCropHeight, changeCropY, 'flipY'),
     getActionName: cropActionName,
@@ -87,10 +81,8 @@ export const createImageCroppingControls = () => ({
   mtc: new Control({
     x: 0,
     y: -0.5,
-    angle: 0,
     sizeX: 20,
-    sizeY: 8,
-    render: renderEdgeControl,
+    sizeY: 4,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: withFlip(changeCropY, changeCropHeight, 'flipY'),
     getActionName: cropActionName,
@@ -100,8 +92,8 @@ export const createImageCroppingControls = () => ({
     angle: 0,
     x: -0.5,
     y: -0.5,
-    sizeX: 12,
-    sizeY: 8,
+    sizeX: 20,
+    sizeY: 4,
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
@@ -116,8 +108,8 @@ export const createImageCroppingControls = () => ({
     angle: 90,
     x: 0.5,
     y: -0.5,
-    sizeX: 12,
-    sizeY: 8,
+    sizeX: 20,
+    sizeY: 4,
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
@@ -132,8 +124,8 @@ export const createImageCroppingControls = () => ({
     angle: 270,
     x: -0.5,
     y: 0.5,
-    sizeX: 12,
-    sizeY: 8,
+    sizeX: 20,
+    sizeY: 4,
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
@@ -148,8 +140,8 @@ export const createImageCroppingControls = () => ({
     angle: 180,
     x: 0.5,
     y: 0.5,
-    sizeX: 12,
-    sizeY: 8,
+    sizeX: 20,
+    sizeY: 4,
     render: renderCornerControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
@@ -171,7 +163,7 @@ export const createImageEdgeResizeControls = () => ({
     angle: 90,
     sizeX: 8,
     sizeY: 20,
-    render: renderEdgeControl,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeEdgeWidth,
     getActionName: edgeActionName,
@@ -183,7 +175,7 @@ export const createImageEdgeResizeControls = () => ({
     angle: 90,
     sizeX: 8,
     sizeY: 20,
-    render: renderEdgeControl,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeEdgeWidth,
     getActionName: edgeActionName,
@@ -195,7 +187,7 @@ export const createImageEdgeResizeControls = () => ({
     angle: 0,
     sizeX: 20,
     sizeY: 8,
-    render: renderEdgeControl,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeEdgeHeight,
     getActionName: edgeActionName,
@@ -207,7 +199,7 @@ export const createImageEdgeResizeControls = () => ({
     angle: 0,
     sizeX: 20,
     sizeY: 8,
-    render: renderEdgeControl,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: changeEdgeHeight,
     getActionName: edgeActionName,

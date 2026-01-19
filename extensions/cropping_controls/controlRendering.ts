@@ -8,15 +8,15 @@ import {
 const { degreesToRadians } = util;
 
 /**
- * Render a line control for middle edge handles.
- * Uses Control.angle for orientation, cornerStrokeColor outline and cornerColor fill.
+ * Render a rounded segment control (line with round caps).
+ * Useful for edge resize handles.
  * @param {CanvasRenderingContext2D} ctx context to render on
  * @param {Number} left x coordinate where the control center should be
  * @param {Number} top y coordinate where the control center should be
  * @param {Object} styleOverride override for FabricObject controls style
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
-export function renderEdgeControl(
+export function renderRoundedSegmentControl(
   this: Control,
   ctx: CanvasRenderingContext2D,
   left: number,
@@ -34,31 +34,29 @@ export function renderEdgeControl(
     ),
     length = Math.max(xSize, ySize),
     thickness = Math.min(xSize, ySize),
-    halfLength = length / 2;
+    halfLength = length / 2,
+    strokeWidth = fabricObject.borderScaleFactor * 2;
 
   ctx.rotate(degreesToRadians(this.angle));
   ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-halfLength, 0);
+  ctx.lineTo(halfLength, 0);
 
   if (stroke) {
     ctx.lineWidth = thickness;
-    ctx.beginPath();
-    ctx.moveTo(-halfLength, 0);
-    ctx.lineTo(halfLength, 0);
     ctx.stroke();
   }
 
   ctx.strokeStyle = ctx.fillStyle;
-  ctx.lineWidth = stroke ? thickness - 4 : thickness;
-  ctx.beginPath();
-  ctx.moveTo(-halfLength, 0);
-  ctx.lineTo(halfLength, 0);
+  ctx.lineWidth = stroke ? thickness - strokeWidth : thickness;
   ctx.stroke();
   ctx.restore();
 }
 
 /**
- * Render an L-shaped control for cropping corners.
- * Same style as renderEdgeControl but draws two perpendicular lines.
+ * Render a control for the main corners of a cropping image.
+ * Draws an L-shaped filled path.
  * @param {CanvasRenderingContext2D} ctx context to render on
  * @param {Number} left x coordinate where the control center should be
  * @param {Number} top y coordinate where the control center should be
@@ -74,41 +72,27 @@ export function renderCornerControl(
   fabricObject: InteractiveFabricObject,
 ) {
   ctx.save();
-  const { stroke, xSize, ySize } = this.commonRenderProps(
+  const { stroke, xSize, ySize, opName } = this.commonRenderProps(
       ctx,
       left,
       top,
       fabricObject,
       styleOverride,
     ),
-    length = Math.max(xSize, ySize),
-    thickness = Math.min(xSize, ySize);
+    xSizeBy2 = xSize / 2,
+    ySizeBy2 = ySize / 2;
 
   ctx.rotate(degreesToRadians(this.angle));
-  ctx.lineCap = 'round';
-
-  if (stroke) {
-    ctx.lineWidth = thickness;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(length, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, length);
-    ctx.stroke();
-  }
-
-  ctx.strokeStyle = ctx.fillStyle;
-  ctx.lineWidth = stroke ? thickness - 4 : thickness;
   ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(length, 0);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(0, length);
-  ctx.stroke();
-
+  ctx.moveTo(-ySizeBy2, 0);
+  ctx.lineTo(-ySizeBy2, xSizeBy2);
+  ctx.lineTo(ySizeBy2, xSizeBy2);
+  ctx.lineTo(ySizeBy2, ySizeBy2);
+  ctx.lineTo(xSizeBy2, ySizeBy2);
+  ctx.lineTo(xSizeBy2, -ySizeBy2);
+  ctx.lineTo(-ySizeBy2, -ySizeBy2);
+  ctx.closePath();
+  ctx[opName]();
+  stroke && ctx.stroke();
   ctx.restore();
 }

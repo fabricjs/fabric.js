@@ -334,8 +334,7 @@ export function renderGhostImage(
   ctx.globalAlpha = alpha;
 }
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.max(min, Math.min(max, value));
+const { capValue } = util;
 
 /**
  * Generator for edge resize handlers that support cover scale with bounce-back.
@@ -428,7 +427,7 @@ const changeImageEdgeGenerator =
       const crossNaturalInView = scaledCrossSize / newScale;
       const newCrossSize = Math.min(crossNaturalInView, crossElementSize);
       const crossCenter = initialCrossCrop + initialCrossSize / 2;
-      const newCrossCrop = clamp(
+      const newCrossCrop = capValue(
         crossCenter - newCrossSize / 2,
         0,
         crossElementSize - newCrossSize,
