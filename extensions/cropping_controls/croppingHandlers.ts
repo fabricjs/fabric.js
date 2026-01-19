@@ -324,13 +324,18 @@ export function renderGhostImage(
   this: FabricImage,
   { ctx }: { ctx: CanvasRenderingContext2D },
 ) {
+  const element = this._element;
+  const ghostX = -this.width / 2 - this.cropX;
+  const ghostY = -this.height / 2 - this.cropY;
+
   const alpha = ctx.globalAlpha;
   ctx.globalAlpha *= 0.5;
-  ctx.drawImage(
-    this._element,
-    -this.width / 2 - this.cropX,
-    -this.height / 2 - this.cropY,
-  );
+  ctx.drawImage(element, ghostX, ghostY);
+
+  ctx.strokeStyle = this.borderColor;
+  ctx.lineWidth = this.borderScaleFactor / this.scaleX;
+  ctx.strokeRect(ghostX, ghostY, element.width, element.height);
+
   ctx.globalAlpha = alpha;
 }
 
