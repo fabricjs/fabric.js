@@ -719,7 +719,10 @@ describe('croppingHandlers', () => {
     test('draws image at correct position based on crop values', () => {
       const mockCtx = {
         globalAlpha: 1,
+        strokeStyle: '',
+        lineWidth: 0,
         drawImage: vi.fn(),
+        strokeRect: vi.fn(),
       } as unknown as CanvasRenderingContext2D;
 
       renderGhostImage.call(image, { ctx: mockCtx });
@@ -737,9 +740,12 @@ describe('croppingHandlers', () => {
       let alphaWhenDrawing: number | undefined;
       const mockCtx = {
         globalAlpha: 0.8,
+        strokeStyle: '',
+        lineWidth: 0,
         drawImage: vi.fn(() => {
           alphaWhenDrawing = mockCtx.globalAlpha;
         }),
+        strokeRect: vi.fn(),
       } as unknown as CanvasRenderingContext2D;
 
       renderGhostImage.call(image, { ctx: mockCtx });
@@ -748,6 +754,22 @@ describe('croppingHandlers', () => {
       expect(alphaWhenDrawing).toBe(0.4);
       // After render, alpha should be restored
       expect(mockCtx.globalAlpha).toBe(0.8);
+    });
+
+    test('draws border using borderColor', () => {
+      image.borderColor = 'blue';
+      const mockCtx = {
+        globalAlpha: 1,
+        strokeStyle: '',
+        lineWidth: 0,
+        drawImage: vi.fn(),
+        strokeRect: vi.fn(),
+      } as unknown as CanvasRenderingContext2D;
+
+      renderGhostImage.call(image, { ctx: mockCtx });
+
+      expect(mockCtx.strokeStyle).toBe('blue');
+      expect(mockCtx.strokeRect).toHaveBeenCalledWith(-100, -100, 300, 300);
     });
   });
 
@@ -969,6 +991,114 @@ describe('croppingHandlers', () => {
       changeImageEdgeHeight(eventData, transform, 100, -400);
       expect(image.scaleY).toBeGreaterThan(1);
       expect(image.cropY).toBe(0);
+    });
+  });
+
+  describe('edge resize with flipped images', () => {
+    function prepareEdgeTransform(
+      target: FabricImage,
+      originX: 'left' | 'center' | 'right',
+      originY: 'top' | 'center' | 'bottom',
+      corner: string,
+    ): Transform {
+      target.controls[corner] = new Control({
+        x: originX === 'left' ? 0.5 : originX === 'right' ? -0.5 : 0,
+        y: originY === 'top' ? 0.5 : originY === 'bottom' ? -0.5 : 0,
+      });
+      return {
+        target,
+        corner,
+        originX,
+        originY,
+        width: target.width,
+        height: target.height,
+        original: {
+          cropX: target.cropX,
+          cropY: target.cropY,
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+        },
+      } as unknown as Transform;
+    }
+
+    test('right edge expands width when flipX is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+        flipX: true,
+      });
+      canvas.add(image);
+      // Right edge: originX='left' (anchor opposite side)
+      transform = prepareEdgeTransform(image, 'left', 'center', 'mr');
+
+      const initialWidth = image.width;
+      // Drag outward (positive x in local coords after flip transform)
+      changeImageEdgeWidth(eventData, transform, 180, 50);
+      expect(image.width).toBeGreaterThan(initialWidth);
+      expect(image.scaleX).toBe(1);
+    });
+
+    test('left edge expands into cropX when flipX is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 100,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+        flipX: true,
+      });
+      canvas.add(image);
+      // Left edge: originX='right' (anchor opposite side)
+      transform = prepareEdgeTransform(image, 'right', 'center', 'ml');
+
+      const initialCropX = image.cropX;
+      // Drag outward (negative x expands left edge)
+      changeImageEdgeWidth(eventData, transform, -180, 50);
+      expect(image.cropX).toBeLessThan(initialCropX);
+      expect(image.width).toBeGreaterThan(100);
+    });
+
+    test('bottom edge expands height when flipY is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 50,
+        elementWidth: 300,
+        elementHeight: 300,
+        flipY: true,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'top', 'mb');
+
+      const initialHeight = image.height;
+      changeImageEdgeHeight(eventData, transform, 50, 180);
+      expect(image.height).toBeGreaterThan(initialHeight);
+      expect(image.scaleY).toBe(1);
+    });
+
+    test('top edge expands into cropY when flipY is true', () => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 50,
+        cropY: 100,
+        elementWidth: 300,
+        elementHeight: 300,
+        flipY: true,
+      });
+      canvas.add(image);
+      transform = prepareEdgeTransform(image, 'center', 'bottom', 'mt');
+
+      const initialCropY = image.cropY;
+      changeImageEdgeHeight(eventData, transform, 50, -180);
+      expect(image.cropY).toBeLessThan(initialCropY);
+      expect(image.height).toBeGreaterThan(100);
     });
   });
 });

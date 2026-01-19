@@ -359,12 +359,9 @@ const changeImageEdgeGenerator =
     const isX = axis === 'x';
     const elementSize = isX ? image._element.width : image._element.height;
     const crossElementSize = isX ? image._element.height : image._element.width;
-    // Determine edge direction, accounting for flip
-    let isNegativeEdge = isX
+    const isNegativeEdge = isX
       ? transform.originX === 'right'
       : transform.originY === 'bottom';
-    if (isX && image.flipX) isNegativeEdge = !isNegativeEdge;
-    if (!isX && image.flipY) isNegativeEdge = !isNegativeEdge;
 
     const initialSize = isX ? transform.width : transform.height;
     const initialCrossSize = isX ? transform.height : transform.width;
