@@ -10,7 +10,11 @@ import {
   changeEdgeHeight,
   withFlip,
 } from './croppingHandlers';
-import { renderCornerControl, renderRoundedSegmentControl } from './controlRendering';
+import {
+  renderCornerControl,
+  renderRoundedSegmentControl,
+  shouldActivateCorner,
+} from './controlRendering';
 
 const { scaleCursorStyleHandler } = controlsUtils;
 
@@ -100,9 +104,10 @@ export const createImageCroppingControls = () => ({
     angle: 0,
     x: -0.5,
     y: -0.5,
-    sizeX: 16,
+    sizeX: 12,
     sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const cropX = changeCropX(...args);
@@ -116,9 +121,10 @@ export const createImageCroppingControls = () => ({
     angle: 90,
     x: 0.5,
     y: -0.5,
-    sizeX: 16,
+    sizeX: 12,
     sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const width = changeCropWidth(...args);
@@ -132,9 +138,10 @@ export const createImageCroppingControls = () => ({
     angle: 270,
     x: -0.5,
     y: 0.5,
-    sizeX: 16,
+    sizeX: 12,
     sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const height = changeCropHeight(...args);
@@ -148,9 +155,10 @@ export const createImageCroppingControls = () => ({
     angle: 180,
     x: 0.5,
     y: 0.5,
-    sizeX: 16,
+    sizeX: 12,
     sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
       const height = changeCropHeight(...args);
