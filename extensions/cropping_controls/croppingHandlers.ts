@@ -28,6 +28,23 @@ export const withFlip = (
 };
 
 /**
+ * Wraps corner handlers to swap both X and Y behavior based on flip state.
+ */
+export const withCornerFlip = (
+  xHandler: TransformActionHandler,
+  xFlippedHandler: TransformActionHandler,
+  yHandler: TransformActionHandler,
+  yFlippedHandler: TransformActionHandler,
+): TransformActionHandler => {
+  return (eventData, transform, x, y) => {
+    const target = transform.target as FabricImage;
+    const xResult = (target.flipX ? xFlippedHandler : xHandler)(eventData, transform, x, y);
+    const yResult = (target.flipY ? yFlippedHandler : yHandler)(eventData, transform, x, y);
+    return xResult || yResult;
+  };
+};
+
+/**
  * Wrap controlsUtils.changeObjectWidth with image constrains
  */
 export const changeImageWidth: TransformActionHandler = (
