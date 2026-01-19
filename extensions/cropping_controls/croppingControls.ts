@@ -110,9 +110,11 @@ export const createImageCroppingControls = () => ({
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const cropX = changeCropX(...args);
-      const cropY = changeCropY(...args);
-      return cropX || cropY;
+      const [, transform] = args;
+      const target = transform.target as FabricImage;
+      const xResult = (target.flipX ? changeCropWidth : changeCropX)(...args);
+      const yResult = (target.flipY ? changeCropHeight : changeCropY)(...args);
+      return xResult || yResult;
     },
     getActionName: cropActionName,
   }),
@@ -127,9 +129,11 @@ export const createImageCroppingControls = () => ({
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const width = changeCropWidth(...args);
-      const cropY = changeCropY(...args);
-      return width || cropY;
+      const [, transform] = args;
+      const target = transform.target as FabricImage;
+      const xResult = (target.flipX ? changeCropX : changeCropWidth)(...args);
+      const yResult = (target.flipY ? changeCropHeight : changeCropY)(...args);
+      return xResult || yResult;
     },
     getActionName: cropActionName,
   }),
@@ -144,9 +148,11 @@ export const createImageCroppingControls = () => ({
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const height = changeCropHeight(...args);
-      const cropX = changeCropX(...args);
-      return height || cropX;
+      const [, transform] = args;
+      const target = transform.target as FabricImage;
+      const xResult = (target.flipX ? changeCropWidth : changeCropX)(...args);
+      const yResult = (target.flipY ? changeCropY : changeCropHeight)(...args);
+      return xResult || yResult;
     },
     getActionName: cropActionName,
   }),
@@ -161,9 +167,11 @@ export const createImageCroppingControls = () => ({
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
     actionHandler: (...args) => {
-      const height = changeCropHeight(...args);
-      const width = changeCropWidth(...args);
-      return height || width;
+      const [, transform] = args;
+      const target = transform.target as FabricImage;
+      const xResult = (target.flipX ? changeCropX : changeCropWidth)(...args);
+      const yResult = (target.flipY ? changeCropY : changeCropHeight)(...args);
+      return xResult || yResult;
     },
     getActionName: cropActionName,
   }),
