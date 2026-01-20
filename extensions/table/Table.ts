@@ -21,6 +21,7 @@ import { createTableEdgeControls } from './tableControls';
 
 export interface TableDefaults {
   cellWidth: number;
+  minCellWidth: number;
   minCellHeight: number;
   cellPadding: number;
   cellSpacing: number;
@@ -32,6 +33,9 @@ export interface TableDefaults {
   fontWeight: string;
   fontStyle: string;
   textAlign: string;
+  selectionColor: string;
+  selectionWidth: number;
+  borderThreshold: number;
 }
 
 export interface CellData {
@@ -70,15 +74,34 @@ export interface SerializedTableProps extends SerializedGroupProps {
   cellData: CellData[];
 }
 
+export interface TableBorderInfo {
+  type: 'col' | 'row';
+  index: number;
+  position: number;
+}
+
+export interface CellPosition {
+  row: number;
+  col: number;
+}
+
 export class Table extends Group {
   static type = 'Table';
 
   declare cellFill: string;
   declare cellStroke: string;
   declare borderWidth: number;
+  declare selectionColor: string;
+  declare selectionWidth: number;
+  declare borderThreshold: number;
+
+  _selectedCells: CellPosition[] = [];
+  _selectionAnchor: CellPosition | null = null;
+  _hoveredBorder: TableBorderInfo | null = null;
 
   static defaults: TableDefaults = {
     cellWidth: 100,
+    minCellWidth: 40,
     minCellHeight: 40,
     cellPadding: 8,
     cellSpacing: 0,
@@ -90,6 +113,9 @@ export class Table extends Group {
     fontWeight: 'normal',
     fontStyle: 'normal',
     textAlign: 'center',
+    selectionColor: '#2563eb',
+    selectionWidth: 2,
+    borderThreshold: 5,
   };
 
   constructor(
@@ -129,6 +155,9 @@ export class Table extends Group {
     this.cellFill = config.cellFill;
     this.cellStroke = config.cellStroke;
     this.borderWidth = config.borderWidth;
+    this.selectionColor = config.selectionColor;
+    this.selectionWidth = config.selectionWidth;
+    this.borderThreshold = config.borderThreshold;
     this.controls = { ...this.controls, ...createTableEdgeControls() };
     this.lockScalingFlip = true;
   }
@@ -567,6 +596,240 @@ export class Table extends Group {
       cumulative += size + spacing;
     }
     return -1;
+  }
+
+  getContentDimensions(): { contentWidth: number; contentHeight: number } {
+    const contentWidth =
+      this.columnWidths.reduce((s, w) => s + w, 0) +
+      (this.cols - 1) * this.cellSpacing;
+    const contentHeight =
+      this.rowHeights.reduce((s, h) => s + h, 0) +
+      (this.rows - 1) * this.cellSpacing;
+    return { contentWidth, contentHeight };
+  }
+
+  toContentPoint(canvasPoint: Point): Point {
+    const { contentWidth, contentHeight } = this.getContentDimensions();
+    const local = this.toLocalPoint(canvasPoint);
+    return new Point(local.x + contentWidth / 2, local.y + contentHeight / 2);
+  }
+
+  getBorderPosition(type: 'col' | 'row', index: number): number {
+    const { contentWidth, contentHeight } = this.getContentDimensions();
+    const halfSpacing = this.cellSpacing / 2;
+    const sizes = type === 'col' ? this.columnWidths : this.rowHeights;
+    const contentSize = type === 'col' ? contentWidth : contentHeight;
+    let pos = 0;
+    for (let i = 0; i < index; i++) {
+      pos += sizes[i] + this.cellSpacing;
+    }
+    return pos - halfSpacing - contentSize / 2;
+  }
+
+  private findBorderAtPosition(
+    position: number,
+    count: number,
+    getSizeFn: (index: number) => number,
+    spacing: number,
+    threshold: number,
+    contentSize: number,
+    otherPos: number,
+    otherLimit: number,
+  ): { index: number; position: number } | null {
+    const halfSpacing = spacing / 2;
+    let cumulative = 0;
+    for (let i = 0; i <= count; i++) {
+      const isInternal = i > 0 && i < count;
+      const borderPos = cumulative - halfSpacing;
+      if (
+        isInternal &&
+        Math.abs(position - borderPos) < threshold &&
+        otherPos >= 0 &&
+        otherPos <= otherLimit
+      ) {
+        return { index: i, position: borderPos - contentSize / 2 };
+      }
+      if (i < count) cumulative += getSizeFn(i) + spacing;
+    }
+    return null;
+  }
+
+  private isBorderInsideMerge(
+    type: 'col' | 'row',
+    index: number,
+    otherIndex: number,
+  ): boolean {
+    if (type === 'col') {
+      const cell = this.getCell(otherIndex, index - 1);
+      if (cell?._isMerged && cell._mergeParent) {
+        const master = this.getCell(cell._mergeParent.row, cell._mergeParent.col);
+        if (master && master._col + (master._colspan ?? 1) > index) return true;
+      } else if (cell && (cell._colspan ?? 1) > 1) {
+        return true;
+      }
+    } else {
+      const cell = this.getCell(index - 1, otherIndex);
+      if (cell?._isMerged && cell._mergeParent) {
+        const master = this.getCell(cell._mergeParent.row, cell._mergeParent.col);
+        if (master && master._row + (master._rowspan ?? 1) > index) return true;
+      } else if (cell && (cell._rowspan ?? 1) > 1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getBorderAtPoint(
+    canvasPoint: Point,
+    threshold = this.borderThreshold,
+  ): TableBorderInfo | null {
+    const pt = this.toContentPoint(canvasPoint);
+    const { contentWidth, contentHeight } = this.getContentDimensions();
+    const tx = threshold / this.scaleX;
+    const ty = threshold / this.scaleY;
+
+    const row = this.findIndexAtPosition(
+      pt.y,
+      this.rows,
+      (r) => this.getRowHeight(r),
+      this.cellSpacing,
+    );
+    const col = this.findIndexAtPosition(
+      pt.x,
+      this.cols,
+      (c) => this.getColumnWidth(c),
+      this.cellSpacing,
+    );
+
+    const colBorder = this.findBorderAtPosition(
+      pt.x,
+      this.cols,
+      (c) => this.getColumnWidth(c),
+      this.cellSpacing,
+      tx,
+      contentWidth,
+      pt.y,
+      contentHeight,
+    );
+    if (colBorder && row >= 0 && !this.isBorderInsideMerge('col', colBorder.index, row)) {
+      return { type: 'col', ...colBorder };
+    }
+
+    const rowBorder = this.findBorderAtPosition(
+      pt.y,
+      this.rows,
+      (r) => this.getRowHeight(r),
+      this.cellSpacing,
+      ty,
+      contentHeight,
+      pt.x,
+      contentWidth,
+    );
+    if (rowBorder && col >= 0 && !this.isBorderInsideMerge('row', rowBorder.index, col)) {
+      return { type: 'row', ...rowBorder };
+    }
+
+    return null;
+  }
+
+  get selectedCells(): TableCell[] {
+    return this._selectedCells
+      .map((pos) => this.getCell(pos.row, pos.col))
+      .filter((c): c is TableCell => c !== undefined);
+  }
+
+  get hasSelection(): boolean {
+    return this._selectedCells.length > 0;
+  }
+
+  get selectionCount(): number {
+    return this._selectedCells.length;
+  }
+
+  selectCell(row: number, col: number, extendSelection = false) {
+    if (!extendSelection) {
+      this._selectedCells = [{ row, col }];
+      this._selectionAnchor = { row, col };
+    } else if (this._selectionAnchor) {
+      this._selectedCells = this.buildSelectionRange(this._selectionAnchor, { row, col });
+    }
+    this.dirty = true;
+  }
+
+  private buildSelectionRange(anchor: CellPosition, target: CellPosition): CellPosition[] {
+    const r1 = Math.min(anchor.row, target.row);
+    const r2 = Math.max(anchor.row, target.row);
+    const c1 = Math.min(anchor.col, target.col);
+    const c2 = Math.max(anchor.col, target.col);
+    const cells: CellPosition[] = [];
+    const seen = new Set<string>();
+    for (let r = r1; r <= r2; r++) {
+      for (let c = c1; c <= c2; c++) {
+        const cell = this.getCell(r, c);
+        const pos =
+          cell?._isMerged && cell._mergeParent ? cell._mergeParent : { row: r, col: c };
+        const key = `${pos.row},${pos.col}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          cells.push(pos);
+        }
+      }
+    }
+    return cells;
+  }
+
+  clearCellSelection() {
+    this._selectedCells = [];
+    this._selectionAnchor = null;
+    this.dirty = true;
+  }
+
+  drawSelectionOverlay(ctx: CanvasRenderingContext2D) {
+    if (!this._selectedCells.length && !this._hoveredBorder) return;
+
+    const matrix = this.calcTransformMatrix();
+    ctx.save();
+    ctx.transform(
+      matrix[0],
+      matrix[1],
+      matrix[2],
+      matrix[3],
+      matrix[4],
+      matrix[5],
+    );
+    ctx.strokeStyle = this.selectionColor;
+    ctx.lineWidth = this.selectionWidth / this.scaleX;
+
+    const drawn = new Set<string>();
+    for (const { row, col } of this._selectedCells) {
+      const cell = this.getCell(row, col);
+      if (!cell || cell._isMerged) continue;
+      const key = `${cell._row},${cell._col}`;
+      if (drawn.has(key)) continue;
+      drawn.add(key);
+      ctx.strokeRect(
+        cell.left - cell.width / 2,
+        cell.top - cell.height / 2,
+        cell.width,
+        cell.height,
+      );
+    }
+
+    if (this._hoveredBorder) {
+      const { contentWidth, contentHeight } = this.getContentDimensions();
+      const { type, position } = this._hoveredBorder;
+      ctx.beginPath();
+      if (type === 'col') {
+        ctx.moveTo(position, -contentHeight / 2);
+        ctx.lineTo(position, contentHeight / 2);
+      } else {
+        ctx.moveTo(-contentWidth / 2, position);
+        ctx.lineTo(contentWidth / 2, position);
+      }
+      ctx.stroke();
+    }
+
+    ctx.restore();
   }
 
   toObject(propertiesToInclude: string[] = []): SerializedTableProps {

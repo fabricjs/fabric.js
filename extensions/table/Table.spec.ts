@@ -277,6 +277,61 @@ describe('Table', () => {
       expect(result?.col).toBeGreaterThanOrEqual(0);
     });
   });
+
+  describe('getContentDimensions', () => {
+    test('returns correct content dimensions', () => {
+      const dims = table.getContentDimensions();
+      expect(dims.contentWidth).toBe(300);
+      expect(dims.contentHeight).toBeGreaterThan(0);
+    });
+  });
+
+  describe('getBorderAtPoint', () => {
+    test('returns null when not near a border', () => {
+      table.set({ left: 200, top: 200 });
+      table.setCoords();
+      const result = table.getBorderAtPoint({ x: 200, y: 200 } as any);
+      expect(result).toBeNull();
+    });
+
+    test('getBorderPosition returns position for internal border', () => {
+      const pos = table.getBorderPosition('col', 1);
+      expect(typeof pos).toBe('number');
+    });
+  });
+
+  describe('cell selection', () => {
+    test('selectCell sets selection state', () => {
+      table.selectCell(1, 1);
+      expect(table.hasSelection).toBe(true);
+      expect(table.selectionCount).toBe(1);
+    });
+
+    test('selectedCells returns selected cell objects', () => {
+      table.selectCell(0, 0);
+      const cells = table.selectedCells;
+      expect(cells.length).toBe(1);
+      expect(cells[0]._row).toBe(0);
+      expect(cells[0]._col).toBe(0);
+    });
+
+    test('selectCell with extend creates range', () => {
+      table.selectCell(0, 0);
+      table.selectCell(1, 1, true);
+      expect(table.selectionCount).toBe(4);
+    });
+
+    test('clearCellSelection clears selection', () => {
+      table.selectCell(0, 0);
+      table.clearCellSelection();
+      expect(table.hasSelection).toBe(false);
+      expect(table.selectionCount).toBe(0);
+    });
+
+    test('_hoveredBorder is initially null', () => {
+      expect(table._hoveredBorder).toBeNull();
+    });
+  });
 });
 
 describe('TableLayoutStrategy', () => {
