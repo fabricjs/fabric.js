@@ -162,6 +162,7 @@ export class Table extends Group {
     this.cornerColor = '#ffffff';
     this.cornerStrokeColor = config.selectionColor;
     this.borderColor = config.selectionColor;
+    this.borderScaleFactor = 1;
     this.transparentCorners = false;
 
     this.controls = createTableControls();

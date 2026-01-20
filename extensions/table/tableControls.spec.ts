@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { Control, controlsUtils } from 'fabric';
 import { createTableControls } from './tableControls';
+import { getBorderCursor } from './tableInteraction';
 
 describe('createTableControls', () => {
   test('returns object with 9 control properties', () => {
@@ -88,5 +89,47 @@ describe('createTableControls', () => {
     Object.values(controls).forEach((control) => {
       expect(typeof control.render).toBe('function');
     });
+  });
+});
+
+describe('getBorderCursor', () => {
+  test('column border at 0° returns ew-resize', () => {
+    expect(getBorderCursor(0, 'col')).toBe('ew-resize');
+  });
+
+  test('row border at 0° returns ns-resize', () => {
+    expect(getBorderCursor(0, 'row')).toBe('ns-resize');
+  });
+
+  test('column border at 45° returns nwse-resize', () => {
+    expect(getBorderCursor(45, 'col')).toBe('nwse-resize');
+  });
+
+  test('row border at 45° returns nesw-resize', () => {
+    expect(getBorderCursor(45, 'row')).toBe('nesw-resize');
+  });
+
+  test('column border at 90° returns ns-resize', () => {
+    expect(getBorderCursor(90, 'col')).toBe('ns-resize');
+  });
+
+  test('row border at 90° returns ew-resize', () => {
+    expect(getBorderCursor(90, 'row')).toBe('ew-resize');
+  });
+
+  test('column border at 135° returns nesw-resize', () => {
+    expect(getBorderCursor(135, 'col')).toBe('nesw-resize');
+  });
+
+  test('row border at 135° returns nwse-resize', () => {
+    expect(getBorderCursor(135, 'row')).toBe('nwse-resize');
+  });
+
+  test('handles negative angles', () => {
+    expect(getBorderCursor(-45, 'col')).toBe('nesw-resize');
+  });
+
+  test('handles angles > 180°', () => {
+    expect(getBorderCursor(225, 'col')).toBe('nwse-resize');
   });
 });

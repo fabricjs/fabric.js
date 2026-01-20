@@ -23,7 +23,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Table class extending Group
 - [x] TableLayoutStrategy for auto-sizing rows to text content
 - [x] Full serialization (toObject/fromObject)
-- [x] Unit tests (61 passing)
+- [x] Unit tests (71 passing)
 
 ### Controls
 - [x] Custom circle corners with 2px stroke
@@ -54,6 +54,7 @@ const cleanup = initTableInteraction(canvas);
 ### Resize
 - [x] Drag internal column/row borders to resize
 - [x] Edge handles resize outer row/column
+- [x] Angle-aware cursors for border drag
 
 ### Structure
 - [x] Add/remove rows and columns
@@ -63,5 +64,4 @@ const cleanup = initTableInteraction(canvas);
 ## TODO (for UI layer)
 - [ ] Multi-cell style edits (apply fill/stroke to all selected)
 - [ ] Copy/paste between cells
-- [ ] Custom cursor for border drag
 - [ ] Undo/redo integration

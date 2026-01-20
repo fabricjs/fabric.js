@@ -28,6 +28,16 @@ let editor: EditorState | null = null;
 let finishingEdit = false;
 const CLICK_THRESHOLD = 5;
 
+const CURSOR_MAP = ['ew', 'nwse', 'ns', 'nesw'];
+
+export function getBorderCursor(angle: number, borderType: 'col' | 'row'): string {
+  const baseIndex = borderType === 'col' ? 0 : 2;
+  const normalizedAngle = ((angle % 180) + 180) % 180;
+  const rotationIndex = Math.round(normalizedAngle / 45) % 4;
+  const index = (baseIndex + rotationIndex) % 4;
+  return `${CURSOR_MAP[index]}-resize`;
+}
+
 function getTableFromTarget(target: unknown): Table | null {
   if (target instanceof Table) return target;
   if (
@@ -69,11 +79,9 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   const point = canvas.getViewportPoint(e.e);
   const border = table.getBorderAtPoint(point);
   table._hoveredBorder = border;
-  canvas.defaultCursor = border
-    ? border.type === 'col'
-      ? 'col-resize'
-      : 'row-resize'
-    : 'default';
+  table.hoverCursor = border
+    ? getBorderCursor(table.getTotalAngle(), border.type)
+    : 'move';
   canvas.requestRenderAll();
 }
 
