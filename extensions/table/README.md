@@ -54,6 +54,7 @@ const cleanup = initTableInteraction(canvas);
 
 ### Resize
 - [x] Drag internal column/row borders to resize
+- [x] Row resize respects text content minimum
 - [x] Edge handles resize outer row/column
 - [x] Angle-aware cursors for border drag
 

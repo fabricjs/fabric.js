@@ -121,9 +121,11 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
   } else {
     const delta = currentLocal.y - startLocal.y;
     const totalHeight = startHeights[index - 1] + startHeights[index];
+    const topMin = table.getRowMinHeight(index - 1);
+    const bottomMin = table.getRowMinHeight(index);
     const topHeight = Math.max(
-      table.minCellHeight,
-      Math.min(startHeights[index - 1] + delta, totalHeight - table.minCellHeight),
+      topMin,
+      Math.min(startHeights[index - 1] + delta, totalHeight - bottomMin),
     );
     const bottomHeight = totalHeight - topHeight;
     if (table.strategy) {

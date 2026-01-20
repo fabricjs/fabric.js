@@ -305,6 +305,17 @@ export class Table extends Group {
     return this.strategy?.getRowHeight(row) ?? this.minCellHeight;
   }
 
+  getRowMinHeight(row: number): number {
+    let maxTextHeight = 0;
+    for (let c = 0; c < this.cols; c++) {
+      const text = this.getCellText(row, c);
+      if (text && typeof (text as any).calcTextHeight === 'function') {
+        maxTextHeight = Math.max(maxTextHeight, (text as any).calcTextHeight());
+      }
+    }
+    return Math.max(this.minCellHeight, maxTextHeight + this.cellPadding * 2);
+  }
+
   setColumnWidth(col: number, width: number) {
     if (!this.strategy || col < 0 || col >= this.cols) return;
     this.strategy.columnWidths[col] = Math.max(this.minCellWidth, width);
