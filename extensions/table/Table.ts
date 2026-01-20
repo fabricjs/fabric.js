@@ -182,6 +182,12 @@ export class Table extends Group {
     this.lockScalingFlip = true;
   }
 
+  override _onObjectAdded(object: FabricObject) {
+    this.enterGroup(object, false);
+    this.fire('object:added', { target: object });
+    object.fire('added', { target: this });
+  }
+
   private static createCellPair(
     row: number,
     col: number,
@@ -413,17 +419,15 @@ export class Table extends Group {
     if (!this.strategy) return;
     const sourceRow =
       position > 0 ? position - 1 : position < this.rows ? position : null;
+    const sourceData = Array.from({ length: this.cols }, (_, c) => ({
+      cell: sourceRow !== null ? this.getCell(sourceRow, c) : undefined,
+      text: sourceRow !== null ? this.getCellText(sourceRow, c) : undefined,
+      width: this.getColumnWidth(c),
+    }));
     this.shiftIndices('_row', position, 1);
     for (let c = 0; c < this.cols; c++) {
-      const sourceCell =
-        sourceRow !== null ? this.getCell(sourceRow, c) : undefined;
-      const sourceText =
-        sourceRow !== null ? this.getCellText(sourceRow, c) : undefined;
-      const config = this.cellConfigFrom(
-        sourceCell,
-        sourceText,
-        this.getColumnWidth(c),
-      );
+      const { cell: sourceCell, text: sourceText, width } = sourceData[c];
+      const config = this.cellConfigFrom(sourceCell, sourceText, width);
       const [cell, text] = Table.createCellPair(position, c, config);
       this.add(cell, text);
     }
@@ -451,12 +455,13 @@ export class Table extends Group {
       sourceCol !== null
         ? this.getColumnWidth(sourceCol)
         : Table.defaults.cellWidth;
+    const sourceData = Array.from({ length: this.rows }, (_, r) => ({
+      cell: sourceCol !== null ? this.getCell(r, sourceCol) : undefined,
+      text: sourceCol !== null ? this.getCellText(r, sourceCol) : undefined,
+    }));
     this.shiftIndices('_col', position, 1);
     for (let r = 0; r < this.rows; r++) {
-      const sourceCell =
-        sourceCol !== null ? this.getCell(r, sourceCol) : undefined;
-      const sourceText =
-        sourceCol !== null ? this.getCellText(r, sourceCol) : undefined;
+      const { cell: sourceCell, text: sourceText } = sourceData[r];
       const config = this.cellConfigFrom(sourceCell, sourceText, sourceWidth);
       const [cell, text] = Table.createCellPair(r, position, config);
       this.add(cell, text);
@@ -909,7 +914,7 @@ export class Table extends Group {
     const indicatorOffset = this.indicatorOffset / this.scaleX;
     const indicatorHitRadius = this.indicatorHitRadius / this.scaleX;
 
-    for (let i = 1; i < this.cols; i++) {
+    for (let i = 0; i <= this.cols; i++) {
       const x = this.getBorderPosition('col', i);
       const indicatorY = -halfH - indicatorOffset;
       const dx = local.x - x,
@@ -923,7 +928,7 @@ export class Table extends Group {
       }
     }
 
-    for (let i = 1; i < this.rows; i++) {
+    for (let i = 0; i <= this.rows; i++) {
       const y = this.getBorderPosition('row', i);
       const indicatorX = -halfW - indicatorOffset;
       const dx = local.x - indicatorX,

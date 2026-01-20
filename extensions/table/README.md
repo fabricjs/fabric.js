@@ -24,7 +24,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Table class extending Group
 - [x] TableLayoutStrategy for auto-sizing rows to text content
 - [x] Full serialization (toObject/fromObject)
-- [x] Unit tests (77 passing)
+- [x] Unit tests (89 passing)
 
 ### Controls
 
@@ -78,7 +78,7 @@ const cleanup = initTableInteraction(canvas);
 
 ## TODO (extension)
 
-- [ ] Edge indicators: Show + on first/last row/col edges too (currently only internal borders)
+- [ ] Indicator hitbox gap: indicators disappear when cursor moves between table edge and indicator position
 - [ ] Zoom-aware indicator sizing
 
 ## TODO (for UI layer)
