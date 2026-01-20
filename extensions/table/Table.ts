@@ -917,10 +917,14 @@ export class Table extends Group {
     for (let i = 0; i <= this.cols; i++) {
       const x = this.getBorderPosition('col', i);
       const indicatorY = -halfH - indicatorOffset;
-      const dx = local.x - x,
-        dy = local.y - indicatorY;
+      const dx = local.x - x;
+      const dy = local.y - indicatorY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < indicatorHitRadius) {
+      const inStem =
+        Math.abs(dx) < indicatorHitRadius &&
+        local.y >= indicatorY - indicatorHitRadius &&
+        local.y <= -halfH;
+      if (dist < indicatorHitRadius || inStem) {
         return {
           border: { type: 'col', index: i, position: x },
           indicatorSide: 'before',
@@ -931,10 +935,14 @@ export class Table extends Group {
     for (let i = 0; i <= this.rows; i++) {
       const y = this.getBorderPosition('row', i);
       const indicatorX = -halfW - indicatorOffset;
-      const dx = local.x - indicatorX,
-        dy = local.y - y;
+      const dx = local.x - indicatorX;
+      const dy = local.y - y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < indicatorHitRadius) {
+      const inStem =
+        Math.abs(dy) < indicatorHitRadius &&
+        local.x >= indicatorX - indicatorHitRadius &&
+        local.x <= -halfW;
+      if (dist < indicatorHitRadius || inStem) {
         return {
           border: { type: 'row', index: i, position: y },
           indicatorSide: 'before',

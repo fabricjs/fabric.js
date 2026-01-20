@@ -78,7 +78,6 @@ const cleanup = initTableInteraction(canvas);
 
 ## TODO (extension)
 
-- [ ] Indicator hitbox gap: indicators disappear when cursor moves between table edge and indicator position
 - [ ] Zoom-aware indicator sizing
 
 ## TODO (for UI layer)
