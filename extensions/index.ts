@@ -36,4 +36,4 @@ export type {
 } from './table';
 export { TableLayoutStrategy } from './table';
 export type { TableCell, TableCellText } from './table';
-export { createTableControls, initTableBorderInteraction } from './table';
+export { createTableControls, initTableInteraction } from './table';

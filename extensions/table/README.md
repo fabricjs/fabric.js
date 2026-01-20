@@ -2,19 +2,10 @@
 
 A Table class extending Group with spreadsheet-like layout and interaction.
 
-## Features
-
-- **Layout**: Auto-sizing rows to text content via TableLayoutStrategy
-- **Controls**: Custom circle corners, segment edges, rotation handle
-- **Resize**: Edge controls resize outer row/column, internal border drag resizes adjacent
-- **Selection**: Cell selection with range selection (shift+click), selection overlay
-- **Editing**: Add/remove rows/columns, cell merging/unmerging
-- **Serialization**: Full toObject/fromObject support
-
 ## Usage
 
 ```typescript
-import { Table, initTableBorderInteraction } from 'fabric/extensions';
+import { Table, initTableInteraction } from 'fabric/extensions';
 
 const table = new Table(3, 4, {
   cellWidth: 100,
@@ -22,24 +13,55 @@ const table = new Table(3, 4, {
 });
 canvas.add(table);
 
-// Enable internal border drag interaction
-const cleanup = initTableBorderInteraction(canvas);
+// Enable all table interactions
+const cleanup = initTableInteraction(canvas);
 ```
 
-## Done
+## Feature Checklist
+
+### Core
 - [x] Table class extending Group
 - [x] TableLayoutStrategy for auto-sizing rows to text content
-- [x] Custom controls (circle corners, segment edges, rotation)
-- [x] Edge resize controls (ml, mr, mt, mb)
-- [x] Internal column/row border drag
-- [x] Cell selection with range selection
-- [x] Selection overlay rendering
-- [x] Add/remove rows and columns
-- [x] Cell merging and unmerging
-- [x] Full serialization
-- [x] Unit tests (50 passing)
+- [x] Full serialization (toObject/fromObject)
+- [x] Unit tests (61 passing)
 
-## TODO
+### Controls
+- [x] Custom circle corners with 2px stroke
+- [x] Custom segment edge handles with 2px stroke
+- [x] Rotation handle matching corner style
+- [x] Edge resize controls (ml, mr, mt, mb)
+
+### Movement & Transform
+- [x] Drag table to move
+- [x] Works at any scale (zoom, transform)
+
+### Cell Selection
+- [x] Click cell to select
+- [x] Shift+click for range selection
+- [x] Selection overlay rendering
+
+### Cell Editing
+- [x] Double-click cell to edit text
+- [x] Enter to start editing selected cell
+- [x] Text changes reflow row heights automatically
+
+### Keyboard
+- [x] Arrow keys to navigate cells
+- [x] Tab/Shift+Tab to move between cells
+- [x] Delete/Backspace to clear cell content
+- [x] Escape to back out: Text → Cell → Table
+
+### Resize
+- [x] Drag internal column/row borders to resize
+- [x] Edge handles resize outer row/column
+
+### Structure
+- [x] Add/remove rows and columns
+- [x] Cell merging (colspan/rowspan)
+- [x] Cell unmerging
+
+## TODO (for UI layer)
+- [ ] Multi-cell style edits (apply fill/stroke to all selected)
+- [ ] Copy/paste between cells
 - [ ] Custom cursor for border drag
-- [ ] Cell text editing (double-click)
-- [ ] Keyboard navigation
+- [ ] Undo/redo integration

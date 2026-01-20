@@ -9,4 +9,4 @@ export type {
 export { TableLayoutStrategy } from './TableLayoutStrategy';
 export type { TableCell, TableCellText } from './TableLayoutStrategy';
 export { createTableControls } from './tableControls';
-export { initTableBorderInteraction } from './tableBorderInteraction';
+export { initTableInteraction } from './tableInteraction';

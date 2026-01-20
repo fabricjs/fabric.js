@@ -1,10 +1,10 @@
 import * as fabric from 'fabric';
-import { Table, initTableBorderInteraction } from 'fabric/extensions';
+import { Table, initTableInteraction } from 'fabric/extensions';
 
 export async function testCase(canvas: fabric.Canvas) {
   canvas.setDimensions({ width: 800, height: 600 });
 
-  initTableBorderInteraction(canvas);
+  initTableInteraction(canvas);
 
   const table = new Table(4, 4, {
     cellWidth: 120,
