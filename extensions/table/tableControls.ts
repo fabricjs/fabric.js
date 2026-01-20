@@ -93,6 +93,7 @@ export function createTableControls() {
       render: renderTableCircleControl,
       cursorStyleHandler: controlsUtils.rotationStyleHandler,
       actionHandler: rotationWithSnapping,
+      actionName: 'rotate',
       withConnection: true,
     }),
     ml: createEdgeControl(-0.5, 0, 'left'),
