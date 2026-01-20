@@ -1082,11 +1082,26 @@ export class Table extends Group {
         const indicatorX = type === 'col' ? position : -halfW - offset;
         const indicatorY = type === 'col' ? -halfH - offset : position;
 
+        // Draw stem line from indicator to table edge
+        ctx.strokeStyle = this.selectionColor;
+        ctx.lineWidth = this.borderScaleFactor / this.scaleX;
+        ctx.beginPath();
+        if (type === 'col') {
+          ctx.moveTo(indicatorX, indicatorY + r);
+          ctx.lineTo(indicatorX, -halfH);
+        } else {
+          ctx.moveTo(indicatorX + r, indicatorY);
+          ctx.lineTo(-halfW, indicatorY);
+        }
+        ctx.stroke();
+
+        // Draw indicator circle
         ctx.fillStyle = this.selectionColor;
         ctx.beginPath();
         ctx.arc(indicatorX, indicatorY, r, 0, Math.PI * 2);
         ctx.fill();
 
+        // Draw + sign
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = lineWidth;
         ctx.lineCap = 'round';
