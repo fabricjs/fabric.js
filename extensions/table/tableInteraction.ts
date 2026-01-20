@@ -4,6 +4,17 @@ import { Table, type TableBorderInfo } from './Table';
 
 const calcDistance = (dx: number, dy: number) => Math.sqrt(dx * dx + dy * dy);
 
+function getResizeLimitFeedback(
+  startPosition: number,
+  newPosition: number,
+  dragDelta: number,
+  scale: number,
+): number {
+  const positionMoved = Math.abs(newPosition - startPosition) >= 0.5;
+  if (positionMoved || Math.abs(dragDelta) <= 1) return 0;
+  return (Math.sign(dragDelta) * Math.min(1.5, Math.abs(dragDelta) * 0.1)) / scale;
+}
+
 interface BorderDragState {
   table: Table;
   border: TableBorderInfo;
@@ -203,11 +214,16 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
     }
   }
 
+  const startPosition = border.position;
   table.triggerLayout();
+  const newPosition = table.getBorderPosition(type, index);
+  const dragDelta =
+    type === 'col' ? currentLocal.x - startLocal.x : currentLocal.y - startLocal.y;
+
   table._hoveredBorder = {
     type,
     index,
-    position: table.getBorderPosition(type, index),
+    position: newPosition + getResizeLimitFeedback(startPosition, newPosition, dragDelta, table.scaleX),
   };
   canvas.requestRenderAll();
 }

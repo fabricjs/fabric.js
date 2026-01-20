@@ -67,6 +67,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Edge handles resize outer row/column
 - [x] Angle-aware cursors for border drag
 - [x] Proportional resize: drag border touching selected cells to resize all equally
+- [x] Visual feedback when dragging borders at minimum size limit
 
 ### Structure
 
