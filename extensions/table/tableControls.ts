@@ -55,9 +55,12 @@ function createEdgeControl(
   y: number,
   edge: 'left' | 'right' | 'top' | 'bottom',
 ): Control {
+  const isVertical = edge === 'left' || edge === 'right';
   return new Control({
     x,
     y,
+    sizeX: isVertical ? 4 : 20,
+    sizeY: isVertical ? 20 : 4,
     cursorStyleHandler: controlsUtils.scaleSkewCursorStyleHandler,
     actionHandler: wrapWithFixedAnchor(createEdgeResizeHandler(edge)),
     actionName: 'resizing',
