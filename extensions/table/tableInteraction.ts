@@ -7,6 +7,8 @@ interface BorderDragState {
   startPoint: { x: number; y: number };
   startWidths: number[];
   startHeights: number[];
+  selectedCols: number[];
+  selectedRows: number[];
 }
 
 interface ClickState {
@@ -98,10 +100,18 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   canvas.requestRenderAll();
 }
 
+function borderTouchesSelection(
+  borderIndex: number,
+  selectedIndices: number[],
+): boolean {
+  if (selectedIndices.length < 2) return false;
+  return selectedIndices.includes(borderIndex - 1) || selectedIndices.includes(borderIndex);
+}
+
 function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
   if (!borderDrag) return;
 
-  const { table, border, startPoint, startWidths, startHeights } = borderDrag;
+  const { table, border, startPoint, startWidths, startHeights, selectedCols, selectedRows } = borderDrag;
   const currentPoint = canvas.getViewportPoint(e.e);
   const startLocal = table.toLocalPoint(new Point(startPoint.x, startPoint.y));
   const currentLocal = table.toLocalPoint(currentPoint);
@@ -109,32 +119,54 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
 
   if (type === 'col') {
     const delta = currentLocal.x - startLocal.x;
-    const totalWidth = startWidths[index - 1] + startWidths[index];
-    const leftWidth = util.capValue(
-      table.minCellWidth,
-      startWidths[index - 1] + delta,
-      totalWidth - table.minCellWidth,
-    );
-    if (table.strategy) {
-      table.strategy.columnWidths[index - 1] = leftWidth;
-      table.strategy.columnWidths[index] = totalWidth - leftWidth;
+
+    if (borderTouchesSelection(index, selectedCols)) {
+      for (const col of selectedCols) {
+        const newWidth = Math.max(table.minCellWidth, startWidths[col] + delta);
+        if (table.strategy) {
+          table.strategy.columnWidths[col] = newWidth;
+        }
+      }
+    } else {
+      const totalWidth = startWidths[index - 1] + startWidths[index];
+      const leftWidth = util.capValue(
+        table.minCellWidth,
+        startWidths[index - 1] + delta,
+        totalWidth - table.minCellWidth,
+      );
+      if (table.strategy) {
+        table.strategy.columnWidths[index - 1] = leftWidth;
+        table.strategy.columnWidths[index] = totalWidth - leftWidth;
+      }
     }
   } else {
     const delta = currentLocal.y - startLocal.y;
-    const totalHeight = startHeights[index - 1] + startHeights[index];
-    const topMin = table.getRowMinHeight(index - 1);
-    const bottomMin = table.getRowMinHeight(index);
-    const topHeight = util.capValue(
-      topMin,
-      startHeights[index - 1] + delta,
-      totalHeight - bottomMin,
-    );
-    const bottomHeight = totalHeight - topHeight;
-    if (table.strategy) {
-      table.strategy.rowHeights[index - 1] = topHeight;
-      table.strategy.rowHeights[index] = bottomHeight;
-      table.strategy.manualRowHeights[index - 1] = topHeight;
-      table.strategy.manualRowHeights[index] = bottomHeight;
+
+    if (borderTouchesSelection(index, selectedRows)) {
+      for (const row of selectedRows) {
+        const minHeight = table.getRowMinHeight(row);
+        const newHeight = Math.max(minHeight, startHeights[row] + delta);
+        if (table.strategy) {
+          table.strategy.rowHeights[row] = newHeight;
+          table.strategy.manualRowHeights[row] = newHeight;
+        }
+      }
+    } else {
+      const totalHeight = startHeights[index - 1] + startHeights[index];
+      const topMin = table.getRowMinHeight(index - 1);
+      const bottomMin = table.getRowMinHeight(index);
+      const topHeight = util.capValue(
+        topMin,
+        startHeights[index - 1] + delta,
+        totalHeight - bottomMin,
+      );
+      const bottomHeight = totalHeight - topHeight;
+      if (table.strategy) {
+        table.strategy.rowHeights[index - 1] = topHeight;
+        table.strategy.rowHeights[index] = bottomHeight;
+        table.strategy.manualRowHeights[index - 1] = topHeight;
+        table.strategy.manualRowHeights[index] = bottomHeight;
+      }
     }
   }
 
@@ -176,6 +208,19 @@ function handleMouseDown(
   };
 }
 
+function getSelectedColsAndRows(table: Table): { cols: number[]; rows: number[] } {
+  const cols = new Set<number>();
+  const rows = new Set<number>();
+  for (const { row, col } of table._selectedCells) {
+    cols.add(col);
+    rows.add(row);
+  }
+  return {
+    cols: [...cols].sort((a, b) => a - b),
+    rows: [...rows].sort((a, b) => a - b),
+  };
+}
+
 function startBorderDrag(
   canvas: Canvas,
   table: Table,
@@ -184,7 +229,8 @@ function startBorderDrag(
 ) {
   table.lockMovementX = true;
   table.lockMovementY = true;
-  table.clearCellSelection();
+
+  const { cols, rows } = getSelectedColsAndRows(table);
 
   borderDrag = {
     table,
@@ -192,6 +238,8 @@ function startBorderDrag(
     startPoint: { x: point.x, y: point.y },
     startWidths: [...table.columnWidths],
     startHeights: [...table.rowHeights],
+    selectedCols: cols,
+    selectedRows: rows,
   };
 
   canvas.requestRenderAll();
@@ -439,6 +487,13 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
   if (!table.hasSelection) return;
 
   const isModifier = e.metaKey || e.ctrlKey;
+
+  if (isModifier && e.key === 'a') {
+    e.preventDefault();
+    table.selectAllCells();
+    canvas.requestRenderAll();
+    return;
+  }
 
   if (isModifier && e.key === 'c') {
     copySelectedCells(table);

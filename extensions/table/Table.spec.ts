@@ -441,6 +441,31 @@ describe('Table', () => {
     test('_hoveredBorder is initially null', () => {
       expect(table._hoveredBorder).toBeNull();
     });
+
+    test('selectAllCells selects every cell', () => {
+      table.selectAllCells();
+      expect(table.selectionCount).toBe(9);
+    });
+
+    test('selectAllCells sets anchor to top-left', () => {
+      table.selectAllCells();
+      expect(table._selectionAnchor).toEqual({ row: 0, col: 0 });
+    });
+
+    test('selectAllCells works on larger tables', () => {
+      const large = new Table(5, 4);
+      large.selectAllCells();
+      expect(large.selectionCount).toBe(20);
+    });
+
+    test('selectAllCells includes merged cell masters only', () => {
+      table.mergeCells(0, 0, 1, 1);
+      table.selectAllCells();
+      // 9 cells minus 3 slaves + master = 6 unique positions
+      // Actually: buildSelectionRange dedupes by mergeParent
+      // (0,0) master covers 4 cells, so we have 1 master + 5 other cells = 6
+      expect(table.selectionCount).toBe(6);
+    });
   });
 });
 

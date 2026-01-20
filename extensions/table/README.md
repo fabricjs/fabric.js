@@ -51,6 +51,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Delete/Backspace to clear cell content
 - [x] Escape to back out: Text → Cell → Table
 - [x] Ctrl/Cmd+C/X/V to copy/cut/paste cells
+- [x] Ctrl/Cmd+A to select all cells
 - [x] Ctrl/Cmd+M to merge, Ctrl/Cmd+Shift+M to unmerge
 
 ### Resize
@@ -58,6 +59,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Row resize respects text content minimum
 - [x] Edge handles resize outer row/column
 - [x] Angle-aware cursors for border drag
+- [x] Proportional resize: drag border touching selected cells to resize all equally
 
 ### Structure
 - [x] Add/remove rows and columns

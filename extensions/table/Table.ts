@@ -893,6 +893,15 @@ export class Table extends Group {
     this.dirty = true;
   }
 
+  selectAllCells() {
+    this._selectedCells = this.buildSelectionRange(
+      { row: 0, col: 0 },
+      { row: this.rows - 1, col: this.cols - 1 },
+    );
+    this._selectionAnchor = { row: 0, col: 0 };
+    this.dirty = true;
+  }
+
   drawSelectionOverlay(ctx: CanvasRenderingContext2D) {
     if (!this._selectedCells.length && !this._hoveredBorder) return;
 
