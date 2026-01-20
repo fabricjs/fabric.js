@@ -1,5 +1,5 @@
-import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { Canvas } from 'fabric';
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { Canvas, getFabricDocument } from 'fabric';
 import { Table } from './Table';
 import { initTableInteraction } from './tableInteraction';
 
@@ -16,6 +16,11 @@ describe('tableInteraction keyboard handlers', () => {
     cleanup = initTableInteraction(canvas);
   });
 
+  afterEach(() => {
+    cleanup();
+    canvas.dispose();
+  });
+
   function dispatchKeyDown(key: string, options: Partial<KeyboardEventInit> = {}) {
     const event = new KeyboardEvent('keydown', {
       key,
@@ -23,7 +28,7 @@ describe('tableInteraction keyboard handlers', () => {
       cancelable: true,
       ...options,
     });
-    document.dispatchEvent(event);
+    getFabricDocument().dispatchEvent(event);
     return event;
   }
 

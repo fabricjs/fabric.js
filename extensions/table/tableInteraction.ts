@@ -1,6 +1,14 @@
-import { Point, Textbox, util, type Canvas, type TPointerEvent } from 'fabric';
-import { getDocumentFromElement } from '../../src/util/dom_misc';
+import {
+  getFabricDocument,
+  Point,
+  Textbox,
+  util,
+  type Canvas,
+  type TPointerEvent,
+} from 'fabric';
 import { Table, type TableBorderInfo } from './Table';
+
+const getDocument = (el: HTMLElement) => el.ownerDocument || getFabricDocument();
 
 const calcDistance = (dx: number, dy: number) => Math.sqrt(dx * dx + dy * dy);
 
@@ -743,7 +751,7 @@ export function initTableInteraction(canvas: Canvas): () => void {
     handleDeselected(canvas, e);
   const onKeyDown = (e: KeyboardEvent) => handleKeyDown(canvas, e);
 
-  const doc = getDocumentFromElement(canvas.upperCanvasEl);
+  const doc = getDocument(canvas.upperCanvasEl);
 
   canvas.on('mouse:move', onMouseMove);
   canvas.on('mouse:down:before', onMouseDownBefore);

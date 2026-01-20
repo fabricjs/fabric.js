@@ -401,7 +401,7 @@ export class Table extends Group {
 
   private removeAtIndex(prop: '_row' | '_col', index: number) {
     const toRemove = this._objects.filter((o) => {
-      const item = o;
+      const item = o as unknown as { _isCell?: boolean; _isCellText?: boolean; _row: number; _col: number };
       return (item._isCell || item._isCellText) && item[prop] === index;
     });
     for (const obj of toRemove) {

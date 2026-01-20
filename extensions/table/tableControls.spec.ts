@@ -31,7 +31,7 @@ describe('createTableControls', () => {
 
   test('corner controls use scalingEqually actionHandler', () => {
     const controls = createTableControls();
-    ['tl', 'tr', 'bl', 'br'].forEach((key) => {
+    (['tl', 'tr', 'bl', 'br'] as const).forEach((key) => {
       expect(controls[key].actionHandler).toBe(controlsUtils.scalingEqually);
     });
   });
@@ -51,7 +51,7 @@ describe('createTableControls', () => {
 
   test('edge controls have custom actionHandler', () => {
     const controls = createTableControls();
-    ['ml', 'mr', 'mt', 'mb'].forEach((key) => {
+    (['ml', 'mr', 'mt', 'mb'] as const).forEach((key) => {
       expect(typeof controls[key].actionHandler).toBe('function');
     });
   });
