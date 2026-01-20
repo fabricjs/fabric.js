@@ -22,10 +22,23 @@ interface EditorState {
   col: number;
 }
 
+interface ClipboardCell {
+  row: number;
+  col: number;
+  fill: string;
+  text: string;
+  textFill: string;
+  fontSize: number;
+  fontWeight: string;
+  fontStyle: string;
+  textAlign: string;
+}
+
 let borderDrag: BorderDragState | null = null;
 let clickStart: ClickState | null = null;
 let editor: EditorState | null = null;
 let finishingEdit = false;
+let clipboard: ClipboardCell[] | null = null;
 const CLICK_THRESHOLD = 5;
 
 const CURSOR_MAP = ['ew', 'nwse', 'ns', 'nesw'];
@@ -327,6 +340,74 @@ function handleEditingExited(canvas: Canvas, e: { target: unknown }) {
   finishEditing(canvas, false);
 }
 
+function copySelectedCells(table: Table) {
+  if (!table.hasSelection) return;
+
+  const cells: ClipboardCell[] = [];
+  for (const { row, col } of table._selectedCells) {
+    const cell = table.getCell(row, col);
+    const text = table.getCellText(row, col);
+    if (!cell || cell._isMerged) continue;
+
+    cells.push({
+      row,
+      col,
+      fill: cell.fill as string,
+      text: text?.text || '',
+      textFill: (text?.fill as string) || '#333333',
+      fontSize: (text?.fontSize as number) || 14,
+      fontWeight: (text?.fontWeight as string) || 'normal',
+      fontStyle: (text?.fontStyle as string) || 'normal',
+      textAlign: (text?.textAlign as string) || 'center',
+    });
+  }
+
+  if (!cells.length) return;
+
+  const minRow = Math.min(...cells.map((c) => c.row));
+  const minCol = Math.min(...cells.map((c) => c.col));
+  for (const c of cells) {
+    c.row -= minRow;
+    c.col -= minCol;
+  }
+
+  clipboard = cells;
+}
+
+function pasteClipboard(canvas: Canvas, table: Table) {
+  if (!clipboard || !table.hasSelection) return;
+
+  const anchor = table._selectedCells[0];
+  if (!anchor) return;
+
+  for (const data of clipboard) {
+    const targetRow = anchor.row + data.row;
+    const targetCol = anchor.col + data.col;
+    if (targetRow >= table.rows || targetCol >= table.cols) continue;
+
+    const cell = table.getCell(targetRow, targetCol);
+    const text = table.getCellText(targetRow, targetCol);
+
+    if (cell && !cell._isMerged) {
+      cell.set('fill', data.fill);
+    }
+    if (text && !cell?._isMerged) {
+      text.set({
+        text: data.text,
+        fill: data.textFill,
+        fontSize: data.fontSize,
+        fontWeight: data.fontWeight,
+        fontStyle: data.fontStyle,
+        textAlign: data.textAlign,
+      });
+    }
+  }
+
+  table.triggerLayout();
+  table.dirty = true;
+  canvas.requestRenderAll();
+}
+
 function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
   if (editor?.textbox.isEditing) {
     if (e.key === 'Escape') {
@@ -352,6 +433,18 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
   }
 
   if (!table.hasSelection) return;
+
+  const isModifier = e.metaKey || e.ctrlKey;
+
+  if (isModifier && e.key === 'c') {
+    copySelectedCells(table);
+    return;
+  }
+
+  if (isModifier && e.key === 'v') {
+    pasteClipboard(canvas, table);
+    return;
+  }
 
   if (e.key === 'Enter') {
     e.preventDefault();
