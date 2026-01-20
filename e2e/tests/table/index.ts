@@ -4,7 +4,7 @@
  */
 
 import { Table } from 'fabric/extensions';
-import { beforeAll } from '../../test';
+import { beforeAll } from '../test';
 
 beforeAll(async (canvas) => {
   canvas.setDimensions({ width: 600, height: 400 });

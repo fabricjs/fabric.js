@@ -110,9 +110,10 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
   if (type === 'col') {
     const delta = currentLocal.x - startLocal.x;
     const totalWidth = startWidths[index - 1] + startWidths[index];
-    const leftWidth = Math.max(
+    const leftWidth = util.capValue(
       table.minCellWidth,
-      Math.min(startWidths[index - 1] + delta, totalWidth - table.minCellWidth),
+      startWidths[index - 1] + delta,
+      totalWidth - table.minCellWidth,
     );
     if (table.strategy) {
       table.strategy.columnWidths[index - 1] = leftWidth;
@@ -123,9 +124,10 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
     const totalHeight = startHeights[index - 1] + startHeights[index];
     const topMin = table.getRowMinHeight(index - 1);
     const bottomMin = table.getRowMinHeight(index);
-    const topHeight = Math.max(
+    const topHeight = util.capValue(
       topMin,
-      Math.min(startHeights[index - 1] + delta, totalHeight - bottomMin),
+      startHeights[index - 1] + delta,
+      totalHeight - bottomMin,
     );
     const bottomHeight = totalHeight - topHeight;
     if (table.strategy) {

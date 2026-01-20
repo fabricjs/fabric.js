@@ -65,4 +65,3 @@ const cleanup = initTableInteraction(canvas);
 
 ## TODO (for UI layer)
 - [ ] Multi-cell style edits (apply fill/stroke to all selected)
-- [ ] Undo/redo integration
