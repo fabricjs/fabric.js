@@ -1,7 +1,8 @@
 import { Control, controlsUtils, type TransformActionHandler } from 'fabric';
 import type { Table } from './Table';
+import { renderTableSegmentControl, renderTableCircleControl } from './controlRendering';
 
-const { wrapWithFixedAnchor } = controlsUtils;
+const { wrapWithFixedAnchor, scalingEqually, rotationWithSnapping } = controlsUtils;
 
 function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): TransformActionHandler {
   const isHorizontal = edge === 'left' || edge === 'right';
@@ -59,16 +60,41 @@ function createEdgeControl(
   return new Control({
     x,
     y,
-    sizeX: isVertical ? 4 : 20,
-    sizeY: isVertical ? 20 : 4,
+    angle: isVertical ? 90 : 0,
+    sizeX: isVertical ? 8 : 16,
+    sizeY: isVertical ? 16 : 8,
+    render: renderTableSegmentControl,
     cursorStyleHandler: controlsUtils.scaleSkewCursorStyleHandler,
     actionHandler: wrapWithFixedAnchor(createEdgeResizeHandler(edge)),
     actionName: 'resizing',
   });
 }
 
-export function createTableEdgeControls() {
+function createCornerControl(x: number, y: number): Control {
+  return new Control({
+    x,
+    y,
+    render: renderTableCircleControl,
+    cursorStyleHandler: controlsUtils.scaleCursorStyleHandler,
+    actionHandler: scalingEqually,
+  });
+}
+
+export function createTableControls() {
   return {
+    tl: createCornerControl(-0.5, -0.5),
+    tr: createCornerControl(0.5, -0.5),
+    bl: createCornerControl(-0.5, 0.5),
+    br: createCornerControl(0.5, 0.5),
+    mtr: new Control({
+      x: 0,
+      y: -0.5,
+      offsetY: -40,
+      render: renderTableCircleControl,
+      cursorStyleHandler: controlsUtils.rotationStyleHandler,
+      actionHandler: rotationWithSnapping,
+      withConnection: true,
+    }),
     ml: createEdgeControl(-0.5, 0, 'left'),
     mr: createEdgeControl(0.5, 0, 'right'),
     mt: createEdgeControl(0, -0.5, 'top'),

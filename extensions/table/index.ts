@@ -8,5 +8,5 @@ export type {
 } from './Table';
 export { TableLayoutStrategy } from './TableLayoutStrategy';
 export type { TableCell, TableCellText } from './TableLayoutStrategy';
-export { createTableEdgeControls } from './tableControls';
+export { createTableControls } from './tableControls';
 export { initTableBorderInteraction } from './tableBorderInteraction';

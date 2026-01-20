@@ -17,7 +17,7 @@ import {
   type TableCell,
   type TableCellText,
 } from './TableLayoutStrategy';
-import { createTableEdgeControls } from './tableControls';
+import { createTableControls } from './tableControls';
 
 export interface TableDefaults {
   cellWidth: number;
@@ -158,7 +158,13 @@ export class Table extends Group {
     this.selectionColor = config.selectionColor;
     this.selectionWidth = config.selectionWidth;
     this.borderThreshold = config.borderThreshold;
-    this.controls = { ...this.controls, ...createTableEdgeControls() };
+
+    this.cornerColor = '#ffffff';
+    this.cornerStrokeColor = config.selectionColor;
+    this.borderColor = config.selectionColor;
+    this.transparentCorners = false;
+
+    this.controls = createTableControls();
     this.lockScalingFlip = true;
   }
 
@@ -832,7 +838,7 @@ export class Table extends Group {
     ctx.restore();
   }
 
-  toObject(propertiesToInclude: string[] = []): SerializedTableProps {
+  override toObject(propertiesToInclude: any[] = []) {
     const cellData: CellData[] = [];
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {

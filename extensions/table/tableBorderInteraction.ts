@@ -1,4 +1,4 @@
-import type { Canvas, TPointerEvent } from 'fabric';
+import { Point, type Canvas, type TPointerEvent } from 'fabric';
 import { Table, type TableBorderInfo } from './Table';
 
 interface BorderDragState {
@@ -29,9 +29,17 @@ function getActiveTable(canvas: Canvas): Table | null {
   return getTableFromTarget(active);
 }
 
+function isControlActive(canvas: Canvas): boolean {
+  return !!(canvas as unknown as { _currentTransform?: unknown })._currentTransform;
+}
+
 function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   if (borderDrag) {
     handleBorderDrag(canvas, e);
+    return;
+  }
+
+  if (isControlActive(canvas)) {
     return;
   }
 
@@ -57,7 +65,7 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
 
   const { table, border, startPoint, startWidths, startHeights } = borderDrag;
   const currentPoint = canvas.getViewportPoint(e.e);
-  const startLocal = table.toLocalPoint({ x: startPoint.x, y: startPoint.y });
+  const startLocal = table.toLocalPoint(new Point(startPoint.x, startPoint.y));
   const currentLocal = table.toLocalPoint(currentPoint);
   const { index, type } = border;
 
@@ -99,8 +107,12 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
 
 function handleMouseDown(
   canvas: Canvas,
-  e: { target: unknown; e: TPointerEvent },
+  e: { target?: unknown; e: TPointerEvent; transform?: { corner?: string } },
 ) {
+  if (e.transform?.corner) {
+    return;
+  }
+
   const table = getTableFromTarget(e.target);
   if (!table) return;
 
@@ -155,7 +167,7 @@ function drawTableOverlays(canvas: Canvas) {
 
 export function initTableBorderInteraction(canvas: Canvas): () => void {
   const onMouseMove = (e: { e: TPointerEvent }) => handleMouseMove(canvas, e);
-  const onMouseDown = (e: { target: unknown; e: TPointerEvent }) =>
+  const onMouseDown = (e: { target?: unknown; e: TPointerEvent }) =>
     handleMouseDown(canvas, e);
   const onMouseUp = () => handleMouseUp(canvas);
   const onAfterRender = () => drawTableOverlays(canvas);

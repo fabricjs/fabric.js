@@ -1,25 +1,45 @@
 # Table Extension
 
+A Table class extending Group with spreadsheet-like layout and interaction.
+
+## Features
+
+- **Layout**: Auto-sizing rows to text content via TableLayoutStrategy
+- **Controls**: Custom circle corners, segment edges, rotation handle
+- **Resize**: Edge controls resize outer row/column, internal border drag resizes adjacent
+- **Selection**: Cell selection with range selection (shift+click), selection overlay
+- **Editing**: Add/remove rows/columns, cell merging/unmerging
+- **Serialization**: Full toObject/fromObject support
+
+## Usage
+
+```typescript
+import { Table, initTableBorderInteraction } from 'fabric/extensions';
+
+const table = new Table(3, 4, {
+  cellWidth: 100,
+  minCellHeight: 40,
+});
+canvas.add(table);
+
+// Enable internal border drag interaction
+const cleanup = initTableBorderInteraction(canvas);
+```
+
 ## Done
 - [x] Table class extending Group
 - [x] TableLayoutStrategy for auto-sizing rows to text content
+- [x] Custom controls (circle corners, segment edges, rotation)
 - [x] Edge resize controls (ml, mr, mt, mb)
-- [x] Internal column/row border detection
-- [x] Internal border drag to resize adjacent columns/rows
-- [x] Cell selection state with range selection (shift+click)
+- [x] Internal column/row border drag
+- [x] Cell selection with range selection
 - [x] Selection overlay rendering
-- [x] Add/remove rows and columns dynamically
+- [x] Add/remove rows and columns
 - [x] Cell merging and unmerging
-- [x] Full serialization (toObject/fromObject)
-- [x] Configurable defaults (selectionColor, borderThreshold, minCellWidth, etc.)
+- [x] Full serialization
 - [x] Unit tests (50 passing)
-- [x] E2E test structure
-- [x] Dev testcase for visual testing
 
 ## TODO
-- [ ] Disable border drag when edge controls active
-- [ ] Match edge control styling to crop handles (cornerColor)
-- [ ] Cell text selection
-- [ ] Double-click to edit text
-- [ ] Keyboard navigation between cells
-- [ ] Enter to edit, Escape to exit
+- [ ] Custom cursor for border drag
+- [ ] Cell text editing (double-click)
+- [ ] Keyboard navigation
