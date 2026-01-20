@@ -451,15 +451,18 @@ function finishEditing(canvas: Canvas, shouldExitEditing = true) {
   if (shouldExitEditing && textbox.isEditing) {
     textbox.exitEditing();
   }
+
+  editor = null;
+
+  // Set active object BEFORE removing textbox - this triggers onDeselect
+  // while textbox still has canvas reference
+  canvas.setActiveObject(table);
   canvas.remove(textbox);
 
   table.triggerLayout();
   table.setCoords();
   table.selectCell(row, col);
 
-  editor = null;
-
-  canvas.setActiveObject(table);
   canvas.requestRenderAll();
 
   requestAnimationFrame(() => {
@@ -489,7 +492,9 @@ function handleTextChanged(canvas: Canvas, e: { target: unknown }) {
 
 function handleEditingExited(canvas: Canvas, e: { target: unknown }) {
   if (!editor || e.target !== editor.textbox) return;
-  finishEditing(canvas, false);
+  // Defer cleanup until after fabric's exitEditing completes
+  // (we're called mid-exitEditing, and fabric still needs this.canvas)
+  queueMicrotask(() => finishEditing(canvas, false));
 }
 
 function copySelectedCells(table: Table) {
@@ -565,6 +570,7 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
     if (e.key === 'Escape') {
       finishEditing(canvas);
       e.preventDefault();
+      e.stopPropagation();
     }
     return;
   }

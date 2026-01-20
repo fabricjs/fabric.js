@@ -63,5 +63,41 @@ describe('tableInteraction keyboard handlers', () => {
       expect(table._selectedCells.length).toBe(4);
     });
   });
+
+  describe('cell editing cleanup', () => {
+    test('does not throw when clicking away while editing', () => {
+      // Start editing a cell
+      table.selectCell(0, 0);
+      const cellText = table.getCellText(0, 0);
+      expect(cellText).toBeDefined();
+
+      // Simulate double-click to edit by firing the event
+      canvas.fire('mouse:dblclick', {
+        target: table,
+        e: { clientX: 100, clientY: 100 } as PointerEvent,
+      });
+
+      // Now simulate clicking away - this should trigger setActiveObject
+      // which calls onDeselect on the textbox
+      expect(() => {
+        canvas.setActiveObject(table);
+      }).not.toThrow();
+    });
+
+    test('does not throw when pressing Escape while editing', () => {
+      table.selectCell(0, 0);
+
+      // Simulate double-click to edit
+      canvas.fire('mouse:dblclick', {
+        target: table,
+        e: { clientX: 100, clientY: 100 } as PointerEvent,
+      });
+
+      // Press Escape
+      expect(() => {
+        dispatchKeyDown('Escape');
+      }).not.toThrow();
+    });
+  });
 });
 
