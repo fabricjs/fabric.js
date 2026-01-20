@@ -36,6 +36,9 @@ export interface TableDefaults {
   selectionColor: string;
   selectionWidth: number;
   borderThreshold: number;
+  indicatorOffset: number;
+  indicatorRadius: number;
+  indicatorHitRadius: number;
 }
 
 export interface CellData {
@@ -94,10 +97,14 @@ export class Table extends Group {
   declare selectionColor: string;
   declare selectionWidth: number;
   declare borderThreshold: number;
+  declare indicatorOffset: number;
+  declare indicatorRadius: number;
+  declare indicatorHitRadius: number;
 
   _selectedCells: CellPosition[] = [];
   _selectionAnchor: CellPosition | null = null;
   _hoveredBorder: TableBorderInfo | null = null;
+  _isDraggingBorder = false;
 
   static defaults: TableDefaults = {
     cellWidth: 100,
@@ -116,6 +123,9 @@ export class Table extends Group {
     selectionColor: '#2563eb',
     selectionWidth: 2,
     borderThreshold: 5,
+    indicatorOffset: 15,
+    indicatorRadius: 8,
+    indicatorHitRadius: 10,
   };
 
   constructor(
@@ -158,6 +168,9 @@ export class Table extends Group {
     this.selectionColor = config.selectionColor;
     this.selectionWidth = config.selectionWidth;
     this.borderThreshold = config.borderThreshold;
+    this.indicatorOffset = config.indicatorOffset;
+    this.indicatorRadius = config.indicatorRadius;
+    this.indicatorHitRadius = config.indicatorHitRadius;
 
     this.cornerColor = '#ffffff';
     this.cornerStrokeColor = config.selectionColor;
@@ -373,7 +386,11 @@ export class Table extends Group {
     };
   }
 
-  private shiftIndices(prop: '_row' | '_col', threshold: number, delta: number) {
+  private shiftIndices(
+    prop: '_row' | '_col',
+    threshold: number,
+    delta: number,
+  ) {
     for (const obj of this._objects) {
       const item = obj as any;
       if ((item._isCell || item._isCellText) && item[prop] >= threshold) {
@@ -384,7 +401,7 @@ export class Table extends Group {
 
   private removeAtIndex(prop: '_row' | '_col', index: number) {
     const toRemove = this._objects.filter((o) => {
-      const item = o as any;
+      const item = o;
       return (item._isCell || item._isCellText) && item[prop] === index;
     });
     for (const obj of toRemove) {
@@ -394,12 +411,19 @@ export class Table extends Group {
 
   addRow(position = this.rows) {
     if (!this.strategy) return;
-    const sourceRow = position > 0 ? position - 1 : position < this.rows ? position : null;
+    const sourceRow =
+      position > 0 ? position - 1 : position < this.rows ? position : null;
     this.shiftIndices('_row', position, 1);
     for (let c = 0; c < this.cols; c++) {
-      const sourceCell = sourceRow !== null ? this.getCell(sourceRow, c) : undefined;
-      const sourceText = sourceRow !== null ? this.getCellText(sourceRow, c) : undefined;
-      const config = this.cellConfigFrom(sourceCell, sourceText, this.getColumnWidth(c));
+      const sourceCell =
+        sourceRow !== null ? this.getCell(sourceRow, c) : undefined;
+      const sourceText =
+        sourceRow !== null ? this.getCellText(sourceRow, c) : undefined;
+      const config = this.cellConfigFrom(
+        sourceCell,
+        sourceText,
+        this.getColumnWidth(c),
+      );
       const [cell, text] = Table.createCellPair(position, c, config);
       this.add(cell, text);
     }
@@ -421,12 +445,18 @@ export class Table extends Group {
 
   addColumn(position = this.cols) {
     if (!this.strategy) return;
-    const sourceCol = position > 0 ? position - 1 : position < this.cols ? position : null;
-    const sourceWidth = sourceCol !== null ? this.getColumnWidth(sourceCol) : Table.defaults.cellWidth;
+    const sourceCol =
+      position > 0 ? position - 1 : position < this.cols ? position : null;
+    const sourceWidth =
+      sourceCol !== null
+        ? this.getColumnWidth(sourceCol)
+        : Table.defaults.cellWidth;
     this.shiftIndices('_col', position, 1);
     for (let r = 0; r < this.rows; r++) {
-      const sourceCell = sourceCol !== null ? this.getCell(r, sourceCol) : undefined;
-      const sourceText = sourceCol !== null ? this.getCellText(r, sourceCol) : undefined;
+      const sourceCell =
+        sourceCol !== null ? this.getCell(r, sourceCol) : undefined;
+      const sourceText =
+        sourceCol !== null ? this.getCellText(r, sourceCol) : undefined;
       const config = this.cellConfigFrom(sourceCell, sourceText, sourceWidth);
       const [cell, text] = Table.createCellPair(r, position, config);
       this.add(cell, text);
@@ -604,13 +634,23 @@ export class Table extends Group {
       Math.max(startCol, endCol),
     );
 
-    this.resetCellsInRange(bounds.minRow, bounds.maxRow, bounds.minCol, bounds.maxCol);
+    this.resetCellsInRange(
+      bounds.minRow,
+      bounds.maxRow,
+      bounds.minCol,
+      bounds.maxCol,
+    );
 
     const masterCell = this.getCell(bounds.minRow, bounds.minCol);
     const masterText = this.getCellText(bounds.minRow, bounds.minCol);
     if (!masterCell) return;
 
-    const combinedText = this.collectTextInRange(bounds.minRow, bounds.maxRow, bounds.minCol, bounds.maxCol);
+    const combinedText = this.collectTextInRange(
+      bounds.minRow,
+      bounds.maxRow,
+      bounds.minCol,
+      bounds.maxCol,
+    );
     if (masterText) masterText.set('text', combinedText);
 
     const colspan = bounds.maxCol - bounds.minCol + 1;
@@ -771,7 +811,10 @@ export class Table extends Group {
     if (type === 'col') {
       const cell = this.getCell(otherIndex, index - 1);
       if (cell?._isMerged && cell._mergeParent) {
-        const master = this.getCell(cell._mergeParent.row, cell._mergeParent.col);
+        const master = this.getCell(
+          cell._mergeParent.row,
+          cell._mergeParent.col,
+        );
         if (master && master._col + (master._colspan ?? 1) > index) return true;
       } else if (cell && (cell._colspan ?? 1) > 1) {
         return true;
@@ -779,7 +822,10 @@ export class Table extends Group {
     } else {
       const cell = this.getCell(index - 1, otherIndex);
       if (cell?._isMerged && cell._mergeParent) {
-        const master = this.getCell(cell._mergeParent.row, cell._mergeParent.col);
+        const master = this.getCell(
+          cell._mergeParent.row,
+          cell._mergeParent.col,
+        );
         if (master && master._row + (master._rowspan ?? 1) > index) return true;
       } else if (cell && (cell._rowspan ?? 1) > 1) {
         return true;
@@ -820,7 +866,11 @@ export class Table extends Group {
       pt.y,
       contentHeight,
     );
-    if (colBorder && row >= 0 && !this.isBorderInsideMerge('col', colBorder.index, row)) {
+    if (
+      colBorder &&
+      row >= 0 &&
+      !this.isBorderInsideMerge('col', colBorder.index, row)
+    ) {
       return { type: 'col', ...colBorder };
     }
 
@@ -834,8 +884,62 @@ export class Table extends Group {
       pt.x,
       contentWidth,
     );
-    if (rowBorder && col >= 0 && !this.isBorderInsideMerge('row', rowBorder.index, col)) {
+    if (
+      rowBorder &&
+      col >= 0 &&
+      !this.isBorderInsideMerge('row', rowBorder.index, col)
+    ) {
       return { type: 'row', ...rowBorder };
+    }
+
+    return null;
+  }
+
+  getBorderOrIndicatorAtPoint(
+    canvasPoint: Point,
+    threshold = this.borderThreshold,
+  ): {
+    border: TableBorderInfo;
+    indicatorSide: 'before' | 'after' | null;
+  } | null {
+    const local = this.toLocalPoint(canvasPoint);
+    const { contentWidth, contentHeight } = this.getContentDimensions();
+    const halfW = contentWidth / 2;
+    const halfH = contentHeight / 2;
+    const indicatorOffset = this.indicatorOffset / this.scaleX;
+    const indicatorHitRadius = this.indicatorHitRadius / this.scaleX;
+
+    for (let i = 1; i < this.cols; i++) {
+      const x = this.getBorderPosition('col', i);
+      const indicatorY = -halfH - indicatorOffset;
+      const dx = local.x - x,
+        dy = local.y - indicatorY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < indicatorHitRadius) {
+        return {
+          border: { type: 'col', index: i, position: x },
+          indicatorSide: 'before',
+        };
+      }
+    }
+
+    for (let i = 1; i < this.rows; i++) {
+      const y = this.getBorderPosition('row', i);
+      const indicatorX = -halfW - indicatorOffset;
+      const dx = local.x - indicatorX,
+        dy = local.y - y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < indicatorHitRadius) {
+        return {
+          border: { type: 'row', index: i, position: y },
+          indicatorSide: 'before',
+        };
+      }
+    }
+
+    const border = this.getBorderAtPoint(canvasPoint, threshold);
+    if (border) {
+      return { border, indicatorSide: null };
     }
 
     return null;
@@ -860,12 +964,18 @@ export class Table extends Group {
       this._selectedCells = [{ row, col }];
       this._selectionAnchor = { row, col };
     } else if (this._selectionAnchor) {
-      this._selectedCells = this.buildSelectionRange(this._selectionAnchor, { row, col });
+      this._selectedCells = this.buildSelectionRange(this._selectionAnchor, {
+        row,
+        col,
+      });
     }
     this.dirty = true;
   }
 
-  private buildSelectionRange(anchor: CellPosition, target: CellPosition): CellPosition[] {
+  private buildSelectionRange(
+    anchor: CellPosition,
+    target: CellPosition,
+  ): CellPosition[] {
     const r1 = Math.min(anchor.row, target.row);
     const r2 = Math.max(anchor.row, target.row);
     const c1 = Math.min(anchor.col, target.col);
@@ -876,7 +986,9 @@ export class Table extends Group {
       for (let c = c1; c <= c2; c++) {
         const cell = this.getCell(r, c);
         const pos =
-          cell?._isMerged && cell._mergeParent ? cell._mergeParent : { row: r, col: c };
+          cell?._isMerged && cell._mergeParent
+            ? cell._mergeParent
+            : { row: r, col: c };
         const key = `${pos.row},${pos.col}`;
         if (!seen.has(key)) {
           seen.add(key);
@@ -936,15 +1048,42 @@ export class Table extends Group {
     if (this._hoveredBorder) {
       const { contentWidth, contentHeight } = this.getContentDimensions();
       const { type, position } = this._hoveredBorder;
+      const halfW = contentWidth / 2;
+      const halfH = contentHeight / 2;
+      const offset = this.indicatorOffset / this.scaleX;
+
       ctx.beginPath();
       if (type === 'col') {
-        ctx.moveTo(position, -contentHeight / 2);
-        ctx.lineTo(position, contentHeight / 2);
+        ctx.moveTo(position, -halfH);
+        ctx.lineTo(position, halfH);
       } else {
-        ctx.moveTo(-contentWidth / 2, position);
-        ctx.lineTo(contentWidth / 2, position);
+        ctx.moveTo(-halfW, position);
+        ctx.lineTo(halfW, position);
       }
       ctx.stroke();
+
+      if (!this._isDraggingBorder) {
+        const r = this.indicatorRadius / this.scaleX;
+        const lineLen = r / 2;
+        const lineWidth = 1.5 / this.scaleX;
+        const indicatorX = type === 'col' ? position : -halfW - offset;
+        const indicatorY = type === 'col' ? -halfH - offset : position;
+
+        ctx.fillStyle = this.selectionColor;
+        ctx.beginPath();
+        ctx.arc(indicatorX, indicatorY, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(indicatorX - lineLen, indicatorY);
+        ctx.lineTo(indicatorX + lineLen, indicatorY);
+        ctx.moveTo(indicatorX, indicatorY - lineLen);
+        ctx.lineTo(indicatorX, indicatorY + lineLen);
+        ctx.stroke();
+      }
     }
 
     ctx.restore();

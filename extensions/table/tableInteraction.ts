@@ -1,5 +1,8 @@
 import { Point, Textbox, util, type Canvas, type TPointerEvent } from 'fabric';
+import { getDocumentFromElement } from '../../src/util/dom_misc';
 import { Table, type TableBorderInfo } from './Table';
+
+const calcDistance = (dx: number, dy: number) => Math.sqrt(dx * dx + dy * dy);
 
 interface BorderDragState {
   table: Table;
@@ -41,11 +44,16 @@ let clickStart: ClickState | null = null;
 let editor: EditorState | null = null;
 let finishingEdit = false;
 let clipboard: ClipboardCell[] | null = null;
+let pendingIndicatorClick: { table: Table; border: TableBorderInfo } | null =
+  null;
 const CLICK_THRESHOLD = 5;
 
 const CURSOR_MAP = ['ew', 'nwse', 'ns', 'nesw'];
 
-export function getBorderCursor(angle: number, borderType: 'col' | 'row'): string {
+export function getBorderCursor(
+  angle: number,
+  borderType: 'col' | 'row',
+): string {
   const baseIndex = borderType === 'col' ? 0 : 2;
   const normalizedAngle = ((angle % 180) + 180) % 180;
   const rotationIndex = Math.round(normalizedAngle / 45) % 4;
@@ -72,7 +80,8 @@ function getActiveTable(canvas: Canvas): Table | null {
 }
 
 function isControlActive(canvas: Canvas): boolean {
-  return !!(canvas as unknown as { _currentTransform?: unknown })._currentTransform;
+  return !!(canvas as unknown as { _currentTransform?: unknown })
+    ._currentTransform;
 }
 
 function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
@@ -92,11 +101,24 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   }
 
   const point = canvas.getViewportPoint(e.e);
-  const border = table.getBorderAtPoint(point);
-  table._hoveredBorder = border;
-  table.hoverCursor = border
-    ? getBorderCursor(table.getTotalAngle(), border.type)
-    : 'move';
+  const result = table.getBorderOrIndicatorAtPoint(point);
+
+  if (result?.indicatorSide && table._hoveredBorder) {
+    canvas.defaultCursor = 'pointer';
+    table.hoverCursor = 'pointer';
+  } else if (result?.border) {
+    table._hoveredBorder = result.border;
+    canvas.defaultCursor = 'default';
+    table.hoverCursor = getBorderCursor(
+      table.getTotalAngle(),
+      result.border.type,
+    );
+  } else {
+    table._hoveredBorder = null;
+    canvas.defaultCursor = 'default';
+    table.hoverCursor = 'move';
+  }
+
   canvas.requestRenderAll();
 }
 
@@ -105,13 +127,24 @@ function borderTouchesSelection(
   selectedIndices: number[],
 ): boolean {
   if (selectedIndices.length < 2) return false;
-  return selectedIndices.includes(borderIndex - 1) || selectedIndices.includes(borderIndex);
+  return (
+    selectedIndices.includes(borderIndex - 1) ||
+    selectedIndices.includes(borderIndex)
+  );
 }
 
 function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
   if (!borderDrag) return;
 
-  const { table, border, startPoint, startWidths, startHeights, selectedCols, selectedRows } = borderDrag;
+  const {
+    table,
+    border,
+    startPoint,
+    startWidths,
+    startHeights,
+    selectedCols,
+    selectedRows,
+  } = borderDrag;
   const currentPoint = canvas.getViewportPoint(e.e);
   const startLocal = table.toLocalPoint(new Point(startPoint.x, startPoint.y));
   const currentLocal = table.toLocalPoint(currentPoint);
@@ -179,6 +212,23 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
   canvas.requestRenderAll();
 }
 
+function handleMouseDownBefore(
+  canvas: Canvas,
+  e: { target?: unknown; e: TPointerEvent },
+) {
+  pendingIndicatorClick = null;
+
+  const activeTable = getActiveTable(canvas);
+  if (!activeTable || !activeTable._hoveredBorder) return;
+
+  const point = canvas.getViewportPoint(e.e);
+  const result = activeTable.getBorderOrIndicatorAtPoint(point);
+
+  if (result?.indicatorSide) {
+    pendingIndicatorClick = { table: activeTable, border: result.border };
+  }
+}
+
 function handleMouseDown(
   canvas: Canvas,
   e: { target?: unknown; e: TPointerEvent; transform?: { corner?: string } },
@@ -208,7 +258,10 @@ function handleMouseDown(
   };
 }
 
-function getSelectedColsAndRows(table: Table): { cols: number[]; rows: number[] } {
+function getSelectedColsAndRows(table: Table): {
+  cols: number[];
+  rows: number[];
+} {
   const cols = new Set<number>();
   const rows = new Set<number>();
   for (const { row, col } of table._selectedCells) {
@@ -229,6 +282,7 @@ function startBorderDrag(
 ) {
   table.lockMovementX = true;
   table.lockMovementY = true;
+  table._isDraggingBorder = true;
 
   const { cols, rows } = getSelectedColsAndRows(table);
 
@@ -247,22 +301,44 @@ function startBorderDrag(
 
 function handleMouseUp(canvas: Canvas, e: { e: TPointerEvent }) {
   if (borderDrag) {
-    borderDrag.table.lockMovementX = false;
-    borderDrag.table.lockMovementY = false;
-    borderDrag.table._hoveredBorder = null;
+    const table = borderDrag.table;
+    table.lockMovementX = false;
+    table.lockMovementY = false;
+    table._isDraggingBorder = false;
     borderDrag = null;
+
+    const point = canvas.getViewportPoint(e.e);
+    const result = table.getBorderOrIndicatorAtPoint(point);
+    table._hoveredBorder = result?.border ?? null;
     canvas.requestRenderAll();
     return;
   }
 
-  if (!clickStart) return;
+  if (pendingIndicatorClick) {
+    const { table, border } = pendingIndicatorClick;
+    pendingIndicatorClick = null;
+
+    if (border.type === 'col') {
+      table.addColumn(border.index);
+    } else {
+      table.addRow(border.index);
+    }
+    table._hoveredBorder = null;
+    canvas.setActiveObject(table);
+    canvas.requestRenderAll();
+    return;
+  }
+
+  if (!clickStart) {
+    return;
+  }
 
   const { table, point, shiftKey } = clickStart;
   clickStart = null;
 
   const upPoint = canvas.getViewportPoint(e.e);
-  const distance = Math.hypot(upPoint.x - point.x, upPoint.y - point.y);
-  if (distance > CLICK_THRESHOLD) return;
+  const moved = calcDistance(upPoint.x - point.x, upPoint.y - point.y);
+  if (moved > CLICK_THRESHOLD) return;
 
   const cellPos = table.getCellAtPoint(upPoint);
   if (!cellPos) return;
@@ -620,8 +696,24 @@ function navigateCell(
   }
 }
 
+function handleDeselected(canvas: Canvas, e: { deselected?: unknown[] }) {
+  if (!e.deselected) return;
+
+  for (const obj of e.deselected) {
+    const table = getTableFromTarget(obj);
+    if (!table) continue;
+
+    table._hoveredBorder = null;
+    table._selectedCells = [];
+    table._selectionAnchor = null;
+  }
+  canvas.requestRenderAll();
+}
+
 export function initTableInteraction(canvas: Canvas): () => void {
   const onMouseMove = (e: { e: TPointerEvent }) => handleMouseMove(canvas, e);
+  const onMouseDownBefore = (e: { target?: unknown; e: TPointerEvent }) =>
+    handleMouseDownBefore(canvas, e);
   const onMouseDown = (e: { target?: unknown; e: TPointerEvent }) =>
     handleMouseDown(canvas, e);
   const onMouseUp = (e: { e: TPointerEvent }) => handleMouseUp(canvas, e);
@@ -631,23 +723,31 @@ export function initTableInteraction(canvas: Canvas): () => void {
     handleTextChanged(canvas, e);
   const onEditingExited = (e: { target: unknown }) =>
     handleEditingExited(canvas, e);
+  const onDeselected = (e: { deselected?: unknown[] }) =>
+    handleDeselected(canvas, e);
   const onKeyDown = (e: KeyboardEvent) => handleKeyDown(canvas, e);
 
+  const doc = getDocumentFromElement(canvas.upperCanvasEl);
+
   canvas.on('mouse:move', onMouseMove);
+  canvas.on('mouse:down:before', onMouseDownBefore);
   canvas.on('mouse:down', onMouseDown);
   canvas.on('mouse:up', onMouseUp);
   canvas.on('mouse:dblclick', onDoubleClick);
   canvas.on('text:changed', onTextChanged);
   canvas.on('text:editing:exited', onEditingExited);
-  document.addEventListener('keydown', onKeyDown);
+  canvas.on('selection:cleared', onDeselected);
+  doc.addEventListener('keydown', onKeyDown);
 
   return () => {
     canvas.off('mouse:move', onMouseMove);
+    canvas.off('mouse:down:before', onMouseDownBefore);
     canvas.off('mouse:down', onMouseDown);
     canvas.off('mouse:up', onMouseUp);
     canvas.off('mouse:dblclick', onDoubleClick);
     canvas.off('text:changed', onTextChanged);
     canvas.off('text:editing:exited', onEditingExited);
-    document.removeEventListener('keydown', onKeyDown);
+    canvas.off('selection:cleared', onDeselected);
+    doc.removeEventListener('keydown', onKeyDown);
   };
 }

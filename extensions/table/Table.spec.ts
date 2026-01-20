@@ -339,7 +339,7 @@ describe('Table', () => {
   describe('serialization', () => {
     test('toObject returns serializable object', () => {
       const obj = table.toObject();
-      expect((obj as any).type).toBe('Table');
+      expect((obj).type).toBe('Table');
       expect(obj.rows).toBe(3);
       expect(obj.cols).toBe(3);
       expect(obj.cellData).toHaveLength(9);
@@ -407,6 +407,61 @@ describe('Table', () => {
     test('getBorderPosition returns position for internal border', () => {
       const pos = table.getBorderPosition('col', 1);
       expect(typeof pos).toBe('number');
+    });
+  });
+
+  describe('getBorderOrIndicatorAtPoint', () => {
+    test('returns border with null indicatorSide when over internal border', () => {
+      table.set({ left: 200, top: 200 });
+      table.setCoords();
+      const borderPos = table.getBorderPosition('col', 1);
+      const tableCenter = table.getCenterPoint();
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: tableCenter.x + borderPos,
+        y: tableCenter.y,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.border.type).toBe('col');
+      expect(result?.indicatorSide).toBeNull();
+    });
+
+    test('returns null when point is outside indicator zones', () => {
+      table.set({ left: 200, top: 200 });
+      table.setCoords();
+      const result = table.getBorderOrIndicatorAtPoint({ x: 0, y: 0 } as any);
+      expect(result).toBeNull();
+    });
+
+    test('detects column indicator above table', () => {
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const borderLocalX = table.getBorderPosition('col', 1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + borderLocalX,
+        y: 100 - halfH - table.indicatorOffset,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.border.type).toBe('col');
+      expect(result?.border.index).toBe(1);
+      expect(result?.indicatorSide).toBe('before');
+    });
+
+    test('detects row indicator left of table', () => {
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const borderLocalY = table.getBorderPosition('row', 1);
+      const { contentWidth } = table.getContentDimensions();
+      const halfW = contentWidth / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 - halfW - table.indicatorOffset,
+        y: 100 + borderLocalY,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.border.type).toBe('row');
+      expect(result?.border.index).toBe(1);
+      expect(result?.indicatorSide).toBe('before');
     });
   });
 
