@@ -839,6 +839,11 @@ export class Table extends Group {
     ctx.restore();
   }
 
+  override render(ctx: CanvasRenderingContext2D) {
+    super.render(ctx);
+    this.drawSelectionOverlay(ctx);
+  }
+
   override toObject(propertiesToInclude: any[] = []) {
     const cellData: CellData[] = [];
     for (let r = 0; r < this.rows; r++) {

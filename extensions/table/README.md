@@ -38,7 +38,7 @@ const cleanup = initTableInteraction(canvas);
 ### Cell Selection
 - [x] Click cell to select
 - [x] Shift+click for range selection
-- [x] Selection overlay rendering
+- [x] Selection overlay renders behind controls
 
 ### Cell Editing
 - [x] Double-click cell to edit text

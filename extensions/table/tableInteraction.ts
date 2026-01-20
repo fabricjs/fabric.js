@@ -435,15 +435,6 @@ function navigateCell(
   }
 }
 
-function drawTableOverlays(canvas: Canvas) {
-  const ctx = canvas.getContext();
-  for (const obj of canvas.getObjects()) {
-    if (obj instanceof Table) {
-      obj.drawSelectionOverlay(ctx);
-    }
-  }
-}
-
 export function initTableInteraction(canvas: Canvas): () => void {
   const onMouseMove = (e: { e: TPointerEvent }) => handleMouseMove(canvas, e);
   const onMouseDown = (e: { target?: unknown; e: TPointerEvent }) =>
@@ -455,7 +446,6 @@ export function initTableInteraction(canvas: Canvas): () => void {
     handleTextChanged(canvas, e);
   const onEditingExited = (e: { target: unknown }) =>
     handleEditingExited(canvas, e);
-  const onAfterRender = () => drawTableOverlays(canvas);
   const onKeyDown = (e: KeyboardEvent) => handleKeyDown(canvas, e);
 
   canvas.on('mouse:move', onMouseMove);
@@ -464,7 +454,6 @@ export function initTableInteraction(canvas: Canvas): () => void {
   canvas.on('mouse:dblclick', onDoubleClick);
   canvas.on('text:changed', onTextChanged);
   canvas.on('text:editing:exited', onEditingExited);
-  canvas.on('after:render', onAfterRender);
   document.addEventListener('keydown', onKeyDown);
 
   return () => {
@@ -474,7 +463,6 @@ export function initTableInteraction(canvas: Canvas): () => void {
     canvas.off('mouse:dblclick', onDoubleClick);
     canvas.off('text:changed', onTextChanged);
     canvas.off('text:editing:exited', onEditingExited);
-    canvas.off('after:render', onAfterRender);
     document.removeEventListener('keydown', onKeyDown);
   };
 }
