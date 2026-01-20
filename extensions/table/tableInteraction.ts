@@ -461,6 +461,28 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
     return;
   }
 
+  if (isModifier && e.key === 'm') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      const selected = table._selectedCells[0];
+      if (selected) {
+        table.unmergeCells(selected.row, selected.col);
+        canvas.requestRenderAll();
+      }
+    } else if (table._selectedCells.length > 1) {
+      const rows = table._selectedCells.map((c) => c.row);
+      const cols = table._selectedCells.map((c) => c.col);
+      table.mergeCells(
+        Math.min(...rows),
+        Math.min(...cols),
+        Math.max(...rows),
+        Math.max(...cols),
+      );
+      canvas.requestRenderAll();
+    }
+    return;
+  }
+
   if (e.key === 'Enter') {
     e.preventDefault();
     const selected = table._selectedCells[0];

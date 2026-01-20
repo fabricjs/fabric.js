@@ -224,6 +224,116 @@ describe('Table', () => {
       const former = table.getCell(0, 1);
       expect(former?._isMerged).toBe(false);
     });
+
+    test('merging already-merged cells with additional cells works correctly', () => {
+      // First merge: 2x2 block at top-left
+      table.mergeCells(0, 0, 1, 1);
+      expect(table.getCell(0, 0)?._colspan).toBe(2);
+      expect(table.getCell(0, 0)?._rowspan).toBe(2);
+
+      // Second merge: extend the block to include row 2
+      table.mergeCells(0, 0, 2, 1);
+
+      // Master should now span 3 rows x 2 cols
+      const master = table.getCell(0, 0);
+      expect(master?._colspan).toBe(2);
+      expect(master?._rowspan).toBe(3);
+
+      // All slave cells should be properly marked
+      expect(table.getCell(0, 1)?._isMerged).toBe(true);
+      expect(table.getCell(1, 0)?._isMerged).toBe(true);
+      expect(table.getCell(1, 1)?._isMerged).toBe(true);
+      expect(table.getCell(2, 0)?._isMerged).toBe(true);
+      expect(table.getCell(2, 1)?._isMerged).toBe(true);
+
+      // All slaves should point to master
+      expect(table.getCell(2, 0)?._mergeParent).toEqual({ row: 0, col: 0 });
+      expect(table.getCell(2, 1)?._mergeParent).toEqual({ row: 0, col: 0 });
+
+      // No orphaned cells - all slaves should have opacity 0
+      expect(table.getCell(0, 1)?.opacity).toBe(0);
+      expect(table.getCell(1, 0)?.opacity).toBe(0);
+      expect(table.getCell(1, 1)?.opacity).toBe(0);
+      expect(table.getCell(2, 0)?.opacity).toBe(0);
+      expect(table.getCell(2, 1)?.opacity).toBe(0);
+    });
+
+    test('mergeCells expands range to include existing merged regions', () => {
+      // First merge: 2x2 block at top-left
+      table.mergeCells(0, 0, 1, 1);
+
+      // User selects merged block (0,0) and cell (2,0) only - doesn't include col 1
+      // mergeCells should expand to include the full merged region
+      table.mergeCells(0, 0, 2, 0);
+
+      // Should expand to include col 1 because (0,0) had colspan=2
+      const master = table.getCell(0, 0);
+      expect(master?._colspan).toBe(2);
+      expect(master?._rowspan).toBe(3);
+
+      // (1,1) was part of original merge - should still be merged
+      expect(table.getCell(1, 1)?._isMerged).toBe(true);
+      expect(table.getCell(1, 1)?._mergeParent).toEqual({ row: 0, col: 0 });
+    });
+
+    test('merge range that includes slave cells expands to include master', () => {
+      // Merge (0,0)-(1,1) - creates master at (0,0), slaves at (0,1), (1,0), (1,1)
+      table.mergeCells(0, 0, 1, 1);
+
+      // Now merge (1,0)-(2,0) - (1,0) is a slave cell
+      // Should expand to include the master's full region
+      table.mergeCells(1, 0, 2, 0);
+
+      // Result should include full original merge plus new row
+      const master = table.getCell(0, 0);
+      expect(master?._colspan).toBe(2);
+      expect(master?._rowspan).toBe(3);
+    });
+
+    test('merge two separate merged regions into one', () => {
+      // Create two separate 1x2 horizontal merges
+      table.mergeCells(0, 0, 0, 1); // top merge
+      table.mergeCells(2, 0, 2, 1); // bottom merge
+
+      // Now merge them together (selecting both)
+      table.mergeCells(0, 0, 2, 1);
+
+      const master = table.getCell(0, 0);
+      expect(master?._colspan).toBe(2);
+      expect(master?._rowspan).toBe(3);
+
+      // All non-master cells should be slaves
+      expect(table.getCell(2, 0)?._isMerged).toBe(true);
+      expect(table.getCell(2, 1)?._isMerged).toBe(true);
+    });
+
+    test('unmerge then merge different cells works correctly', () => {
+      table.mergeCells(0, 0, 1, 1);
+      table.unmergeCells(0, 0);
+
+      // All cells should be independent again
+      expect(table.getCell(0, 0)?._colspan).toBe(1);
+      expect(table.getCell(0, 1)?._isMerged).toBe(false);
+
+      // Now merge different cells
+      table.mergeCells(1, 1, 2, 2);
+      expect(table.getCell(1, 1)?._colspan).toBe(2);
+      expect(table.getCell(1, 1)?._rowspan).toBe(2);
+      expect(table.getCell(0, 0)?._colspan).toBe(1); // unchanged
+    });
+
+    test('merge preserves text from all cells', () => {
+      const text00 = table.getCellText(0, 0);
+      const text01 = table.getCellText(0, 1);
+      text00?.set('text', 'A');
+      text01?.set('text', 'B');
+
+      table.mergeCells(0, 0, 0, 1);
+
+      const masterText = table.getCellText(0, 0);
+      expect(masterText?.text).toContain('A');
+      expect(masterText?.text).toContain('B');
+    });
   });
 
   describe('serialization', () => {

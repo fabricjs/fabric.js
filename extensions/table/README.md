@@ -23,7 +23,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Table class extending Group
 - [x] TableLayoutStrategy for auto-sizing rows to text content
 - [x] Full serialization (toObject/fromObject)
-- [x] Unit tests (71 passing)
+- [x] Unit tests (77 passing)
 
 ### Controls
 - [x] Custom circle corners with 2px stroke
@@ -51,6 +51,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Delete/Backspace to clear cell content
 - [x] Escape to back out: Text → Cell → Table
 - [x] Ctrl/Cmd+C/X/V to copy/cut/paste cells
+- [x] Ctrl/Cmd+M to merge, Ctrl/Cmd+Shift+M to unmerge
 
 ### Resize
 - [x] Drag internal column/row borders to resize
@@ -64,4 +65,15 @@ const cleanup = initTableInteraction(canvas);
 - [x] Cell unmerging
 
 ## TODO (for UI layer)
-- [ ] Multi-cell style edits (apply fill/stroke to all selected)
+
+The extension is headless. A complete table editor UI would include:
+
+- [ ] Toolbar with row/column insert/delete buttons
+- [ ] Cell fill and stroke color pickers
+- [ ] Text color, font size, and alignment controls
+- [ ] Table-wide defaults (padding, spacing, border width)
+- [ ] Multi-cell style edits (apply styles to all selected cells)
+- [ ] Merge/unmerge buttons (keyboard shortcuts exist: Ctrl+M)
+- [ ] Context menu for right-click actions
+
+See `fabric-table.html` demo for a reference implementation.

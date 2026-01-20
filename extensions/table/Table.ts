@@ -470,17 +470,71 @@ export class Table extends Group {
     this.triggerLayout();
   }
 
-  mergeCells(
-    startRow: number,
-    startCol: number,
-    endRow: number,
-    endCol: number,
-  ) {
-    const minRow = Math.min(startRow, endRow);
-    const maxRow = Math.max(startRow, endRow);
-    const minCol = Math.min(startCol, endCol);
-    const maxCol = Math.max(startCol, endCol);
+  private expandBoundsToIncludeMergedRegions(
+    minRow: number,
+    maxRow: number,
+    minCol: number,
+    maxCol: number,
+  ): { minRow: number; maxRow: number; minCol: number; maxCol: number } {
+    let expanded = true;
+    while (expanded) {
+      expanded = false;
+      for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+          const cell = this.getCell(r, c);
+          if (!cell) continue;
 
+          if (cell._isMerged && cell._mergeParent) {
+            const { row: masterRow, col: masterCol } = cell._mergeParent;
+            const master = this.getCell(masterRow, masterCol);
+            if (master) {
+              if (masterRow < minRow) {
+                minRow = masterRow;
+                expanded = true;
+              }
+              if (masterCol < minCol) {
+                minCol = masterCol;
+                expanded = true;
+              }
+              const masterEndRow = masterRow + (master._rowspan ?? 1) - 1;
+              const masterEndCol = masterCol + (master._colspan ?? 1) - 1;
+              if (masterEndRow > maxRow) {
+                maxRow = masterEndRow;
+                expanded = true;
+              }
+              if (masterEndCol > maxCol) {
+                maxCol = masterEndCol;
+                expanded = true;
+              }
+            }
+          }
+
+          if (cell._colspan && cell._colspan > 1) {
+            const endCol = c + cell._colspan - 1;
+            if (endCol > maxCol) {
+              maxCol = endCol;
+              expanded = true;
+            }
+          }
+          if (cell._rowspan && cell._rowspan > 1) {
+            const endRow = r + cell._rowspan - 1;
+            if (endRow > maxRow) {
+              maxRow = endRow;
+              expanded = true;
+            }
+          }
+        }
+      }
+    }
+    return { minRow, maxRow, minCol, maxCol };
+  }
+
+  private resetCellsInRange(
+    minRow: number,
+    maxRow: number,
+    minCol: number,
+    maxCol: number,
+  ) {
     for (let r = minRow; r <= maxRow; r++) {
       for (let c = minCol; c <= maxCol; c++) {
         const cell = this.getCell(r, c);
@@ -495,31 +549,38 @@ export class Table extends Group {
         if (text) text.set('opacity', 1);
       }
     }
+  }
 
-    const masterCell = this.getCell(minRow, minCol);
-    const masterText = this.getCellText(minRow, minCol);
-    if (!masterCell) return;
-
-    const textParts: string[] = [];
+  private collectTextInRange(
+    minRow: number,
+    maxRow: number,
+    minCol: number,
+    maxCol: number,
+  ): string {
+    const parts: string[] = [];
     for (let r = minRow; r <= maxRow; r++) {
       for (let c = minCol; c <= maxCol; c++) {
         const text = this.getCellText(r, c);
-        if (text?.text?.trim()) textParts.push(text.text.trim());
+        if (text?.text?.trim()) parts.push(text.text.trim());
       }
     }
-    if (masterText) masterText.set('text', textParts.join('\n'));
+    return parts.join('\n');
+  }
 
-    masterCell._colspan = maxCol - minCol + 1;
-    masterCell._rowspan = maxRow - minRow + 1;
-
-    for (let r = minRow; r <= maxRow; r++) {
-      for (let c = minCol; c <= maxCol; c++) {
-        if (r === minRow && c === minCol) continue;
+  private markSlaveCells(
+    masterRow: number,
+    masterCol: number,
+    rowspan: number,
+    colspan: number,
+  ) {
+    for (let r = masterRow; r < masterRow + rowspan; r++) {
+      for (let c = masterCol; c < masterCol + colspan; c++) {
+        if (r === masterRow && c === masterCol) continue;
         const cell = this.getCell(r, c);
         const text = this.getCellText(r, c);
         if (cell) {
           cell._isMerged = true;
-          cell._mergeParent = { row: minRow, col: minCol };
+          cell._mergeParent = { row: masterRow, col: masterCol };
           cell.set('opacity', 0);
         }
         if (text) {
@@ -528,6 +589,36 @@ export class Table extends Group {
         }
       }
     }
+  }
+
+  mergeCells(
+    startRow: number,
+    startCol: number,
+    endRow: number,
+    endCol: number,
+  ) {
+    const bounds = this.expandBoundsToIncludeMergedRegions(
+      Math.min(startRow, endRow),
+      Math.max(startRow, endRow),
+      Math.min(startCol, endCol),
+      Math.max(startCol, endCol),
+    );
+
+    this.resetCellsInRange(bounds.minRow, bounds.maxRow, bounds.minCol, bounds.maxCol);
+
+    const masterCell = this.getCell(bounds.minRow, bounds.minCol);
+    const masterText = this.getCellText(bounds.minRow, bounds.minCol);
+    if (!masterCell) return;
+
+    const combinedText = this.collectTextInRange(bounds.minRow, bounds.maxRow, bounds.minCol, bounds.maxCol);
+    if (masterText) masterText.set('text', combinedText);
+
+    const colspan = bounds.maxCol - bounds.minCol + 1;
+    const rowspan = bounds.maxRow - bounds.minRow + 1;
+    masterCell._colspan = colspan;
+    masterCell._rowspan = rowspan;
+
+    this.markSlaveCells(bounds.minRow, bounds.minCol, rowspan, colspan);
 
     this.triggerLayout();
   }
