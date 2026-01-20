@@ -50,8 +50,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Tab/Shift+Tab to move between cells
 - [x] Delete/Backspace to clear cell content
 - [x] Escape to back out: Text → Cell → Table
-- [x] Ctrl/Cmd+C to copy selected cells
-- [x] Ctrl/Cmd+V to paste at selection
+- [x] Ctrl/Cmd+C/X/V to copy/cut/paste cells
 
 ### Resize
 - [x] Drag internal column/row borders to resize

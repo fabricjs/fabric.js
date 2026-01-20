@@ -441,6 +441,17 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
     return;
   }
 
+  if (isModifier && e.key === 'x') {
+    copySelectedCells(table);
+    for (const { row, col } of table._selectedCells) {
+      const text = table.getCellText(row, col);
+      if (text) text.set('text', '');
+    }
+    table.triggerLayout();
+    canvas.requestRenderAll();
+    return;
+  }
+
   if (isModifier && e.key === 'v') {
     pasteClipboard(canvas, table);
     return;
