@@ -18,19 +18,44 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
     );
 
     if (isHorizontal) {
+      const spacing = table.cellSpacing * (table.cols - 1);
+      const totalWidth = Math.abs(localPoint.x) / table.scaleX;
+      const contentWidth = totalWidth - spacing - table.cellStrokeWidth;
+
+      if (table.edgeResizeMode === 'proportional') {
+        const oldTotal = table.columnWidths.reduce((s, w) => s + w, 0);
+        const scale = contentWidth / oldTotal;
+        const newWidths = table.columnWidths.map((w) =>
+          Math.max(table.minCellWidth, w * scale),
+        );
+        const changed = newWidths.some((w, i) => w !== table.columnWidths[i]);
+        newWidths.forEach((w, i) => table.setColumnWidth(i, w));
+        return changed;
+      }
+
       const col = edge === 'left' ? 0 : table.cols - 1;
       const otherColsWidth = table.columnWidths.reduce(
         (s, w, i) => (i === col ? s : s + w),
         0,
       );
-      const spacing = table.cellSpacing * (table.cols - 1);
-      const totalWidth = Math.abs(localPoint.x) / table.scaleX;
-      const newWidth = Math.max(
-        table.minCellWidth,
-        totalWidth - otherColsWidth - spacing - table.cellStrokeWidth,
-      );
+      const newWidth = Math.max(table.minCellWidth, contentWidth - otherColsWidth);
       const changed = table.columnWidths[col] !== newWidth;
       table.setColumnWidth(col, newWidth);
+      return changed;
+    }
+
+    const spacing = table.cellSpacing * (table.rows - 1);
+    const totalHeight = Math.abs(localPoint.y) / table.scaleY;
+    const contentHeight = totalHeight - spacing - table.cellStrokeWidth;
+
+    if (table.edgeResizeMode === 'proportional') {
+      const oldTotal = table.rowHeights.reduce((s, h) => s + h, 0);
+      const scale = contentHeight / oldTotal;
+      const newHeights = table.rowHeights.map((h) =>
+        Math.max(table.minCellHeight, h * scale),
+      );
+      const changed = newHeights.some((h, i) => h !== table.rowHeights[i]);
+      newHeights.forEach((h, i) => table.setRowHeight(i, h));
       return changed;
     }
 
@@ -39,12 +64,7 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
       (s, h, i) => (i === row ? s : s + h),
       0,
     );
-    const spacing = table.cellSpacing * (table.rows - 1);
-    const totalHeight = Math.abs(localPoint.y) / table.scaleY;
-    const newHeight = Math.max(
-      table.minCellHeight,
-      totalHeight - otherRowsHeight - spacing - table.cellStrokeWidth,
-    );
+    const newHeight = Math.max(table.minCellHeight, contentHeight - otherRowsHeight);
     const changed = table.rowHeights[row] !== newHeight;
     table.setRowHeight(row, newHeight);
     return changed;

@@ -37,6 +37,7 @@ export interface TableDefaults {
   indicatorOffset: number;
   indicatorRadius: number;
   indicatorHitRadius: number;
+  edgeResizeMode: 'single' | 'proportional';
 }
 
 export interface CellData {
@@ -96,6 +97,7 @@ export class Table extends Group {
   declare indicatorOffset: number;
   declare indicatorRadius: number;
   declare indicatorHitRadius: number;
+  declare edgeResizeMode: 'single' | 'proportional';
 
   _selectedCells: CellPosition[] = [];
   _selectionAnchor: CellPosition | null = null;
@@ -120,6 +122,7 @@ export class Table extends Group {
     indicatorOffset: 15,
     indicatorRadius: 8,
     indicatorHitRadius: 10,
+    edgeResizeMode: 'single',
   };
 
   constructor(
@@ -163,6 +166,7 @@ export class Table extends Group {
     this.indicatorOffset = config.indicatorOffset;
     this.indicatorRadius = config.indicatorRadius;
     this.indicatorHitRadius = config.indicatorHitRadius;
+    this.edgeResizeMode = config.edgeResizeMode;
 
     this.cornerColor = '#ffffff';
     this.cornerStrokeColor = this.borderColor;
