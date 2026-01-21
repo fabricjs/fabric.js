@@ -433,6 +433,10 @@ function startCellEditing(
   const cell = table.getCell(row, col);
   if (!cellText || !cell) return;
 
+  table._hoveredBorder = null;
+  table._isDraggingBorder = false;
+  table.clearCellSelection();
+
   const center = getCellCanvasCenter(table, row, col);
 
   const textbox = new Textbox(cellText.text || '', {
