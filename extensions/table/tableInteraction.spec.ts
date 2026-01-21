@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { Canvas, getFabricDocument } from 'fabric';
+import { Canvas, getFabricDocument, Point } from 'fabric';
 import { Table } from './Table';
 import { initTableInteraction } from './tableInteraction';
 
@@ -78,6 +78,8 @@ describe('tableInteraction keyboard handlers', () => {
       canvas.fire('mouse:dblclick', {
         target: table,
         e: { clientX: 100, clientY: 100 } as PointerEvent,
+        scenePoint: new Point(100, 100),
+        viewportPoint: new Point(100, 100),
       });
 
       // Now simulate clicking away - this should trigger setActiveObject
@@ -94,6 +96,8 @@ describe('tableInteraction keyboard handlers', () => {
       canvas.fire('mouse:dblclick', {
         target: table,
         e: { clientX: 100, clientY: 100 } as PointerEvent,
+        scenePoint: new Point(100, 100),
+        viewportPoint: new Point(100, 100),
       });
 
       // Press Escape
