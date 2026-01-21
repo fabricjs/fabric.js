@@ -11,6 +11,8 @@ import {
   type FabricObject,
   type GroupProps,
   type SerializedGroupProps,
+  type TOriginX,
+  type TOriginY,
 } from 'fabric';
 import {
   TableLayoutStrategy,
@@ -39,6 +41,8 @@ export interface TableDefaults {
   indicatorOffset: number;
   indicatorRadius: number;
   indicatorHitRadius: number;
+  reflowOriginX: TOriginX;
+  reflowOriginY: TOriginY;
 }
 
 export interface CellData {
@@ -74,6 +78,8 @@ export interface SerializedTableProps extends SerializedGroupProps {
   cellFill: string;
   cellStroke: string;
   borderWidth: number;
+  reflowOriginX: TOriginX;
+  reflowOriginY: TOriginY;
   cellData: CellData[];
 }
 
@@ -100,6 +106,8 @@ export class Table extends Group {
   declare indicatorOffset: number;
   declare indicatorRadius: number;
   declare indicatorHitRadius: number;
+  declare reflowOriginX: TOriginX;
+  declare reflowOriginY: TOriginY;
 
   _selectedCells: CellPosition[] = [];
   _selectionAnchor: CellPosition | null = null;
@@ -126,6 +134,8 @@ export class Table extends Group {
     indicatorOffset: 15,
     indicatorRadius: 8,
     indicatorHitRadius: 10,
+    reflowOriginX: 'left',
+    reflowOriginY: 'top',
   };
 
   constructor(
@@ -156,8 +166,6 @@ export class Table extends Group {
       layoutManager: new LayoutManager(strategy),
       subTargetCheck: true,
       interactive: true,
-      originX: 'left',
-      originY: 'top',
       stroke: undefined,
       strokeWidth: 0,
     });
@@ -177,6 +185,8 @@ export class Table extends Group {
     this.borderColor = config.selectionColor;
     this.borderScaleFactor = 1;
     this.transparentCorners = false;
+    this.reflowOriginX = config.reflowOriginX;
+    this.reflowOriginY = config.reflowOriginY;
 
     this.controls = createTableControls();
     this.lockScalingFlip = true;
@@ -189,9 +199,20 @@ export class Table extends Group {
   }
 
   override triggerLayout(options?: { deep?: boolean }) {
-    const anchor = this.getPositionByOrigin(this.originX, this.originY);
+    const anchor = this.getPositionByOrigin(this.reflowOriginX, this.reflowOriginY);
     super.triggerLayout(options);
-    this.setPositionByOrigin(anchor, this.originX, this.originY);
+    this.setPositionByOrigin(anchor, this.reflowOriginX, this.reflowOriginY);
+    this.setCoords();
+  }
+
+  protected override _onAfterObjectsChange(
+    type: 'added' | 'removed',
+    targets: FabricObject[],
+  ) {
+    const anchor = this.getPositionByOrigin(this.reflowOriginX, this.reflowOriginY);
+    super._onAfterObjectsChange(type, targets);
+    this.setPositionByOrigin(anchor, this.reflowOriginX, this.reflowOriginY);
+    this.setCoords();
   }
 
   private static createCellPair(
@@ -1170,6 +1191,8 @@ export class Table extends Group {
       cellFill: this.cellFill,
       cellStroke: this.cellStroke,
       borderWidth: this.borderWidth,
+      reflowOriginX: this.reflowOriginX,
+      reflowOriginY: this.reflowOriginY,
       cellData,
     };
   }
@@ -1186,6 +1209,8 @@ export class Table extends Group {
       cellFill: object.cellFill,
       cellStroke: object.cellStroke,
       borderWidth: object.borderWidth ?? 1,
+      reflowOriginX: object.reflowOriginX,
+      reflowOriginY: object.reflowOriginY,
       left: object.left,
       top: object.top,
       scaleX: object.scaleX,

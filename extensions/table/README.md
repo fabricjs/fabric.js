@@ -17,6 +17,30 @@ canvas.add(table);
 const cleanup = initTableInteraction(canvas);
 ```
 
+## Reflow Origin
+
+When rows/columns are added, the table expands. The `reflowOriginX` and `reflowOriginY` properties control which point stays fixed during this expansion.
+
+```typescript
+// Default: top-left stays fixed, table grows down and right
+const table = new Table(3, 3);
+table.addRow();  // top-left corner doesn't move
+
+// Center stays fixed, table expands equally in all directions
+const centeredTable = new Table(3, 3, {
+  reflowOriginX: 'center',
+  reflowOriginY: 'center',
+});
+
+// Bottom-right stays fixed, table grows up and left
+const bottomRightTable = new Table(3, 3, {
+  reflowOriginX: 'right',
+  reflowOriginY: 'bottom',
+});
+```
+
+This is independent of the table's visual `originX`/`originY` (which defaults to center/center like all Fabric objects).
+
 ## Feature Checklist
 
 ### Core
@@ -24,7 +48,7 @@ const cleanup = initTableInteraction(canvas);
 - [x] Table class extending Group
 - [x] TableLayoutStrategy for auto-sizing rows to text content
 - [x] Full serialization (toObject/fromObject)
-- [x] Unit tests (89 passing)
+- [x] Unit tests (71 passing)
 
 ### Controls
 
@@ -37,6 +61,7 @@ const cleanup = initTableInteraction(canvas);
 
 - [x] Drag table to move
 - [x] Works at any scale (zoom, transform)
+- [x] Configurable reflow origin (reflowOriginX/reflowOriginY)
 
 ### Cell Selection
 

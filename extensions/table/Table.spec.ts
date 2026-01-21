@@ -136,8 +136,8 @@ describe('Table', () => {
       expect(originalFirstRow?._row).toBe(1);
     });
 
-    test('preserves anchor position based on originX/originY', () => {
-      table.set({ left: 100, top: 100, originX: 'left', originY: 'top' });
+    test('preserves reflow anchor position (default left/top)', () => {
+      table.set({ left: 100, top: 100 });
       table.setCoords();
       const topLeftBefore = table.getPositionByOrigin('left', 'top');
 
@@ -148,14 +148,19 @@ describe('Table', () => {
       expect(topLeftAfter.y).toBeCloseTo(topLeftBefore.y, 1);
     });
 
-    test('center origin expands equally in all directions', () => {
-      table.set({ left: 200, top: 200, originX: 'center', originY: 'center' });
-      table.setCoords();
-      const centerBefore = table.getCenterPoint();
+    test('respects custom reflowOriginX/reflowOriginY', () => {
+      const centeredReflow = new Table(3, 3, {
+        reflowOriginX: 'center',
+        reflowOriginY: 'center',
+      });
+      canvas.add(centeredReflow);
+      centeredReflow.set({ left: 200, top: 200 });
+      centeredReflow.setCoords();
+      const centerBefore = centeredReflow.getCenterPoint();
 
-      table.addRow();
+      centeredReflow.addRow();
 
-      const centerAfter = table.getCenterPoint();
+      const centerAfter = centeredReflow.getCenterPoint();
       expect(centerAfter.x).toBeCloseTo(centerBefore.x, 1);
       expect(centerAfter.y).toBeCloseTo(centerBefore.y, 1);
     });
@@ -178,6 +183,18 @@ describe('Table', () => {
       singleRow.removeRow();
       expect(singleRow.rows).toBe(1);
     });
+
+    test('preserves reflow anchor position', () => {
+      table.set({ left: 100, top: 100 });
+      table.setCoords();
+      const topLeftBefore = table.getPositionByOrigin('left', 'top');
+
+      table.removeRow();
+
+      const topLeftAfter = table.getPositionByOrigin('left', 'top');
+      expect(topLeftAfter.x).toBeCloseTo(topLeftBefore.x, 1);
+      expect(topLeftAfter.y).toBeCloseTo(topLeftBefore.y, 1);
+    });
   });
 
   describe('addColumn', () => {
@@ -192,8 +209,8 @@ describe('Table', () => {
       expect(table.cols).toBe(4);
     });
 
-    test('preserves anchor position based on originX/originY', () => {
-      table.set({ left: 100, top: 100, originX: 'left', originY: 'top' });
+    test('preserves reflow anchor position (default left/top)', () => {
+      table.set({ left: 100, top: 100 });
       table.setCoords();
       const topLeftBefore = table.getPositionByOrigin('left', 'top');
 
@@ -210,6 +227,18 @@ describe('Table', () => {
       table.removeColumn();
       expect(table.cols).toBe(2);
       expect(table.cells.length).toBe(6);
+    });
+
+    test('preserves reflow anchor position', () => {
+      table.set({ left: 100, top: 100 });
+      table.setCoords();
+      const topLeftBefore = table.getPositionByOrigin('left', 'top');
+
+      table.removeColumn();
+
+      const topLeftAfter = table.getPositionByOrigin('left', 'top');
+      expect(topLeftAfter.x).toBeCloseTo(topLeftBefore.x, 1);
+      expect(topLeftAfter.y).toBeCloseTo(topLeftBefore.y, 1);
     });
 
     test('does not remove if only one column', () => {
@@ -370,6 +399,18 @@ describe('Table', () => {
       expect(masterText?.text).toContain('A');
       expect(masterText?.text).toContain('B');
     });
+
+    test('merge preserves reflow anchor position', () => {
+      table.set({ left: 100, top: 100 });
+      table.setCoords();
+      const topLeftBefore = table.getPositionByOrigin('left', 'top');
+
+      table.mergeCells(0, 0, 1, 1);
+
+      const topLeftAfter = table.getPositionByOrigin('left', 'top');
+      expect(topLeftAfter.x).toBeCloseTo(topLeftBefore.x, 1);
+      expect(topLeftAfter.y).toBeCloseTo(topLeftBefore.y, 1);
+    });
   });
 
   describe('serialization', () => {
@@ -410,6 +451,18 @@ describe('Table', () => {
       const master = restored.getCell(0, 0);
       expect(master?._colspan).toBe(2);
       expect(master?._rowspan).toBe(2);
+    });
+
+    test('fromObject restores reflow origins', async () => {
+      const custom = new Table(3, 3, {
+        reflowOriginX: 'center',
+        reflowOriginY: 'bottom',
+      });
+      const obj = custom.toObject();
+      const restored = await Table.fromObject(obj);
+
+      expect(restored.reflowOriginX).toBe('center');
+      expect(restored.reflowOriginY).toBe('bottom');
     });
   });
 
