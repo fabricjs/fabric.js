@@ -941,9 +941,12 @@ export class Table extends Group {
     const { contentWidth, contentHeight } = this.getContentDimensions();
     const halfW = contentWidth / 2;
     const halfH = contentHeight / 2;
-    const indicatorOffset = this.indicatorOffset / this.scaleX;
-    const indicatorHitRadius = this.indicatorHitRadius / this.scaleX;
-    const indicatorRadius = this.indicatorRadius / this.scaleX;
+    const vpt = this.getViewportTransform();
+    const zoom = vpt[0];
+    const scale = this.scaleX * zoom;
+    const indicatorOffset = this.indicatorOffset / scale;
+    const indicatorHitRadius = this.indicatorHitRadius / scale;
+    const indicatorRadius = this.indicatorRadius / scale;
 
     for (let i = 0; i <= this.cols; i++) {
       const x = this.getBorderPosition('col', i);
@@ -1067,6 +1070,8 @@ export class Table extends Group {
   drawSelectionOverlay(ctx: CanvasRenderingContext2D) {
     if (!this._selectedCells.length && !this._hoveredBorder) return;
 
+    const vpt = this.getViewportTransform();
+    const zoom = vpt[0];
     const matrix = this.calcTransformMatrix();
     ctx.save();
     ctx.transform(
@@ -1078,7 +1083,7 @@ export class Table extends Group {
       matrix[5],
     );
     ctx.strokeStyle = this.borderColor;
-    ctx.lineWidth = (this.borderScaleFactor * 2) / this.scaleX;
+    ctx.lineWidth = (this.borderScaleFactor * 2) / (this.scaleX * zoom);
 
     const drawn = new Set<string>();
     for (const { row, col } of this._selectedCells) {
@@ -1100,7 +1105,6 @@ export class Table extends Group {
       const { type, position } = this._hoveredBorder;
       const halfW = contentWidth / 2;
       const halfH = contentHeight / 2;
-      const offset = this.indicatorOffset / this.scaleX;
 
       ctx.beginPath();
       if (type === 'col') {
@@ -1111,29 +1115,53 @@ export class Table extends Group {
         ctx.lineTo(halfW, position);
       }
       ctx.stroke();
-
-      if (!this._isDraggingBorder) {
-        const r = this.indicatorRadius / this.scaleX;
-        const lineLen = r / 2;
-        const indicatorX = type === 'col' ? position : -halfW - offset;
-        const indicatorY = type === 'col' ? -halfH - offset : position;
-
-        ctx.fillStyle = this.borderColor;
-        ctx.beginPath();
-        ctx.arc(indicatorX, indicatorY, r, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.strokeStyle = this.cornerColor;
-        ctx.lineWidth = (this.borderScaleFactor * 2) / this.scaleX;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(indicatorX - lineLen, indicatorY);
-        ctx.lineTo(indicatorX + lineLen, indicatorY);
-        ctx.moveTo(indicatorX, indicatorY - lineLen);
-        ctx.lineTo(indicatorX, indicatorY + lineLen);
-        ctx.stroke();
-      }
     }
+
+    ctx.restore();
+  }
+
+  drawInsertIndicator(ctx: CanvasRenderingContext2D) {
+    if (!this._hoveredBorder || this._isDraggingBorder) return;
+
+    const vpt = this.getViewportTransform();
+    const retinaScaling = this.getCanvasRetinaScaling();
+    const matrix = this.calcTransformMatrix();
+
+    const { contentWidth, contentHeight } = this.getContentDimensions();
+    const { type, position } = this._hoveredBorder;
+    const halfW = contentWidth / 2;
+    const halfH = contentHeight / 2;
+
+    const edgeX = type === 'col' ? position : -halfW;
+    const edgeY = type === 'col' ? -halfH : position;
+    const edgePoint = new Point(edgeX, edgeY).transform(matrix).transform(vpt);
+
+    const viewportPoint = new Point(
+      type === 'col' ? edgePoint.x : edgePoint.x - this.indicatorOffset,
+      type === 'col' ? edgePoint.y - this.indicatorOffset : edgePoint.y,
+    );
+
+    ctx.save();
+    ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
+
+    const r = this.indicatorRadius;
+    const lineLen = r / 2;
+    const strokeWidth = this.borderScaleFactor * 2;
+
+    ctx.fillStyle = this.borderColor;
+    ctx.beginPath();
+    ctx.arc(viewportPoint.x, viewportPoint.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = this.cornerColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(viewportPoint.x - lineLen, viewportPoint.y);
+    ctx.lineTo(viewportPoint.x + lineLen, viewportPoint.y);
+    ctx.moveTo(viewportPoint.x, viewportPoint.y - lineLen);
+    ctx.lineTo(viewportPoint.x, viewportPoint.y + lineLen);
+    ctx.stroke();
 
     ctx.restore();
   }
@@ -1141,6 +1169,7 @@ export class Table extends Group {
   override render(ctx: CanvasRenderingContext2D) {
     super.render(ctx);
     this.drawSelectionOverlay(ctx);
+    this.drawInsertIndicator(ctx);
   }
 
   override toObject(propertiesToInclude: any[] = []) {
@@ -1185,6 +1214,8 @@ export class Table extends Group {
       cellFill: this.cellFill,
       cellStroke: this.cellStroke,
       cellStrokeWidth: this.cellStrokeWidth,
+      reflowOriginX: this.reflowOriginX,
+      reflowOriginY: this.reflowOriginY,
       cellData,
     };
   }
@@ -1201,6 +1232,8 @@ export class Table extends Group {
       cellFill: object.cellFill,
       cellStroke: object.cellStroke,
       cellStrokeWidth: object.cellStrokeWidth ?? 1,
+      reflowOriginX: object.reflowOriginX,
+      reflowOriginY: object.reflowOriginY,
       originX: object.originX,
       originY: object.originY,
       left: object.left,

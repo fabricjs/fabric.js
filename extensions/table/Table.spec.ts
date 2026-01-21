@@ -264,7 +264,7 @@ describe('Table', () => {
 
     test('updateBorderWidth updates stroke width', () => {
       table.updateBorderWidth(2);
-      expect(table.borderWidth).toBe(2);
+      expect(table.cellStrokeWidth).toBe(2);
     });
   });
 
@@ -550,6 +550,46 @@ describe('Table', () => {
       expect(result).not.toBeNull();
       expect(result?.border.type).toBe('row');
       expect(result?.border.index).toBe(1);
+      expect(result?.indicatorSide).toBe('before');
+    });
+
+    test('indicator hit detection works at 200% zoom', () => {
+      canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+
+      const borderLocalX = table.getBorderPosition('col', 1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+
+      const sceneX = 150 + borderLocalX;
+      const sceneY = 100 - halfH - table.indicatorOffset / 2;
+
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: sceneX,
+        y: sceneY,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.indicatorSide).toBe('before');
+    });
+
+    test('indicator hit detection works at 50% zoom', () => {
+      canvas.setViewportTransform([0.5, 0, 0, 0.5, 0, 0]);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+
+      const borderLocalX = table.getBorderPosition('col', 1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+
+      const sceneX = 150 + borderLocalX;
+      const sceneY = 100 - halfH - table.indicatorOffset * 2;
+
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: sceneX,
+        y: sceneY,
+      } as any);
+      expect(result).not.toBeNull();
       expect(result?.indicatorSide).toBe('before');
     });
   });

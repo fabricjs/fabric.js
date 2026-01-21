@@ -122,9 +122,10 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
     return;
   }
 
-  const point = canvas.getViewportPoint(e.e);
+  const viewportPoint = canvas.getViewportPoint(e.e);
+  const scenePoint = canvas.getScenePoint(e.e);
 
-  if (table.findControl(point)) {
+  if (table.findControl(viewportPoint)) {
     if (table._hoveredBorder) {
       table._hoveredBorder = null;
       canvas.requestRenderAll();
@@ -132,7 +133,7 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
     return;
   }
 
-  const result = table.getBorderOrIndicatorAtPoint(point);
+  const result = table.getBorderOrIndicatorAtPoint(scenePoint);
 
   if (result?.indicatorSide && result.inCircle) {
     table._hoveredBorder = result.border;
@@ -181,7 +182,7 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
     selectedCols,
     selectedRows,
   } = borderDrag;
-  const currentPoint = canvas.getViewportPoint(e.e);
+  const currentPoint = canvas.getScenePoint(e.e);
   const startLocal = table.toLocalPoint(new Point(startPoint.x, startPoint.y));
   const currentLocal = table.toLocalPoint(currentPoint);
   const { index, type } = border;
@@ -271,7 +272,7 @@ function handleMouseDownBefore(
   const activeTable = getActiveTable(canvas);
   if (!activeTable || !activeTable._hoveredBorder) return;
 
-  const point = canvas.getViewportPoint(e.e);
+  const point = canvas.getScenePoint(e.e);
   const result = activeTable.getBorderOrIndicatorAtPoint(point);
 
   if (result?.indicatorSide && result.inCircle) {
@@ -294,7 +295,7 @@ function handleMouseDown(
   const table = getTableFromTarget(e.target);
   if (!table) return;
 
-  const point = canvas.getViewportPoint(e.e);
+  const point = canvas.getScenePoint(e.e);
   const border = table.getBorderAtPoint(point);
 
   if (border) {
@@ -359,7 +360,7 @@ function handleMouseUp(canvas: Canvas, e: { e: TPointerEvent }) {
     table._isDraggingBorder = false;
     borderDrag = null;
 
-    const point = canvas.getViewportPoint(e.e);
+    const point = canvas.getScenePoint(e.e);
     const result = table.getBorderOrIndicatorAtPoint(point);
     table._hoveredBorder = result?.border ?? null;
     canvas.requestRenderAll();
@@ -388,7 +389,7 @@ function handleMouseUp(canvas: Canvas, e: { e: TPointerEvent }) {
   const { table, point, shiftKey } = clickStart;
   clickStart = null;
 
-  const upPoint = canvas.getViewportPoint(e.e);
+  const upPoint = canvas.getScenePoint(e.e);
   const moved = calcDistance(upPoint.x - point.x, upPoint.y - point.y);
   if (moved > CLICK_THRESHOLD) return;
 
@@ -406,7 +407,7 @@ function handleDoubleClick(
   const table = getTableFromTarget(e.target);
   if (!table) return;
 
-  const point = canvas.getViewportPoint(e.e);
+  const point = canvas.getScenePoint(e.e);
   const cellPos = table.getCellAtPoint(point);
   if (!cellPos) return;
 
