@@ -1,7 +1,7 @@
 ---
 date: '2016-11-26'
-description: 'Caching of object, properties and beahvior'
-title: Caching of object, properties and beahvior
+description: 'Caching of object, properties and behavior'
+title: Caching of object, properties and behavior
 sidebar:
   order: 700
 ---
@@ -21,7 +21,7 @@ In general every top level object on the fabric.canvas ends up on its own image 
  and in case it refreshes the copy and then uses it for painting again.
 
 The caching strategy is very simple in Fabric.js and there are few properties on the objects or in the top level configuration to slightly tweak it.
-In practice then this process has a lot of costrains and perfomance pitfalls. Please be sure to read this entire page to
+In practice then this process has a lot of contrains and performance pitfalls. Please be sure to read this entire page to
  understand the basics.
 
 ## Tweaks and configuration
@@ -46,7 +46,7 @@ Also spot differences in scaling between `noScaleCache` true or false.
 In canvases below left canvas is `true`, that means that during the scaling transformation the object is not regenerated.
 The right canvas has scaling that invalidates the cache every scale change.
 You can also open your developer tools and record scaling performances in both cases and compare.
-Take care that the below yellow care is a large complex object made of 417 innner objects and gradients.
+Take care that the below yellow care is a large complex object made of 417 inner objects and gradients.
 if you scale an object more than 3 times the original size you will notice blurring that then gets fixed with a new cached
  copy as soon as you perform a mouse up. Try it by yourself by scaling the little yellow cars on both canvases:
 
@@ -116,7 +116,7 @@ When a cache property is set in an object that is inside a group, all the parent
 
 Caching has a list of compromises in order to be somehow convenient most of the time.
 A cached canvas can't be too big or it will be too slow to be refreshed for example.
-It can't be too small or it will not trigger certain GPU optmization paths in browsers
+It can't be too small or it will not trigger certain GPU optimization paths in browsers
  ( this information may be obsolete with browser changes )
 
 In the Fabric.js configuration object there are 3 values that relate to caching:
@@ -151,10 +151,10 @@ minCacheSideLimit will determine the mini size of a side of the cache. At any ob
 If you are caching a Rect that is 1 by 1, you will have a 256 by 156 canvas with a single pixel filled.
 
 maxCacheSizeLimit and perfLimitSizeTotal are determining the maximum side and the maximum surface of the cache canvas.
-So with a value of 4k pixels and a perfLimitSizeTotal of around 2 milion pixels, if your object is 5000 by 10000 it will cached to a size of
+So with a value of 4k pixels and a perfLimitSizeTotal of around 2 million pixels, if your object is 5000 by 10000 it will cached to a size of
  4096 by (2097152 / 4096). The biggest side will be reduce to 4096 and the other one will be fit in what 2Milion pixels allow.
 
-You can change those value to experiment with what quality and speed fit best for your application by doing the follwing:
+You can change those value to experiment with what quality and speed fit best for your application by doing the following:
 
 ```ts
 import { config } from 'fabric';
@@ -339,11 +339,11 @@ Once painted and optimally centered the cache canvas is built and then painted o
 
 ### Performance pitfalls and issues
 
-Performance gains are not always there and there are also issues with blurryness rarely.
+Performance gains are not always there and there are also issues with blurriness rarely.
 
 Caching is beneficial depending on what your project looks like.
 If Are you drawing just a bunch of circles, rects or simple polygons caching is not a big deal. Calling `ctx.fillRect` or `ctx.drawImage`
-is mostly the same and if itsn't exactly the same you save on cache canvas creation and size comparision and a lot of ram.
+is mostly the same and if isn't exactly the same you save on cache canvas creation and size comparison and a lot of ram.
 
 On the other side if you importing and displaying large and complex svgs or groups well in that case cache is helpful.
 
@@ -384,10 +384,10 @@ In general viewport zooming is a performance killer with many objects and cache.
 
 The canvas vector drawing is anti aliased. This means that if you draw a black single pixel line at at position X, you will get 
  the line across pixel X and X-1. This across line means that both pixels will be grey and none black, you get a blurry line.
-it is very important that things are drawn as crisp as possible in the cache canvas to avoid to add blurryness on top of blurryness.
+it is very important that things are drawn as crisp as possible in the cache canvas to avoid to add blurriness on top of blurriness.
 To produce the below screenshot i created 2 cached rects, one wide 51px, another wide 51.5px, both with a 1px stroke.
 
-![Cache blurryness](/article_assets/cache_compare.png)
+![Cache blurriness](/article_assets/cache_compare.png)
 
 Fabric.js is able to make both sides crisp in the case of the 51px rect, by pixel align the rect on a 256px surface, understanding that
  we need to draw on integer pixels as much as possible. For the 51.5 pixel rect this is not possible and a single side is blurry.

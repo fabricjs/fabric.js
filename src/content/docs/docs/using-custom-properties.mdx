@@ -10,7 +10,7 @@ sidebar:
 When building your application you may need to attach to objects some custom properties.
 One very common need is to have an `id` or a `name` on objects.
 
-If you are using Typescript or if you want your IDE to suggest you completition you will need to clearly state which those properties are.
+If you are using Typescript or if you want your IDE to suggest you completion you will need to clearly state which those properties are.
 
 On top of that there is the serialization issue that will require you to pass down those properties in the argument of the function `toObject`.
 
@@ -42,7 +42,7 @@ declare module "fabric" {
 FabricObject.customProperties = ['name', 'id'];
 ```
 
-This change will make the types work correcty:
+This change will make the types work correctly:
 
 ![](/article_assets/custom_props/constructor.png)
 ![](/article_assets/custom_props/property.png)
@@ -50,7 +50,7 @@ This change will make the types work correcty:
 
 ### Custom methods
 
-In general it makes things simplier if you can stick to external utility functions, but in the cases in which you want to attach a specific method to the prototype of different classes, you have to do modify the interface again:
+In general it makes things simpler if you can stick to external utility functions, but in the cases in which you want to attach a specific method to the prototype of different classes, you have to do modify the interface again:
 
 ```ts
 // declare the methods for typescript

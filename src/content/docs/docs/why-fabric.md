@@ -1,7 +1,7 @@
 ---
 date: '2024-11-17'
 title: 'Fabric.js'
-description: 'Introductio to Fabric.js'
+description: 'Introduction to Fabric.js'
 ---
 
 ## What is Fabric.js

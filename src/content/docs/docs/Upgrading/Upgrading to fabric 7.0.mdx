@@ -40,7 +40,7 @@ On top of supported platform changes, there are some notable api changes:
 
 ### WARNING: Object.originX and object.originY now default to 'center'
 
-**This is the only real annonying breaking change.**
+**This is the only real annoying breaking change.**
 
 In fabric 8.0 or later we would like to remove those entirely.
 Unless you set them back to 'left' and 'top', it means that the object is positioned by its center.
@@ -132,7 +132,7 @@ Now you find only viewportPoint and scenePoint in the events
 ### Blur Filter
 Blur filter drawImage implementation has been dropped.
 It had inconsistencies with the webgl one, and didn't work well with transparent pictures.
-WEBGL is really available everywhere and if you need to blur an image with the CPU at leat now the output is consistent.
+WEBGL is really available everywhere and if you need to blur an image with the CPU at least now the output is consistent.
 
 ### Objects
 #### Text
@@ -146,7 +146,7 @@ WEBGL is really available everywhere and if you need to blur an image with the C
 ### Utils
 - `rotatePoint` is gone, use `point.rotate` instead
 - `request` is gone. We use fetch, node 18 supports fetch. There is no reason to use the old request object and status
-- `setStyle` is gone, it was taking care of old browser stlye handling differences.
+- `setStyle` is gone, it was taking care of old browser style handling differences.
 - `parseAttributes`, `parseStyleAttribute`, `parseFontDeclaration`, `parsePointsAttribute`, `parseTransformAttribute` and `getCSSRules`
 have been removed from the package. Those utils were meant for internal usage and never for exposing this part of the api.
 

@@ -17,11 +17,11 @@ Simple examples are:
 - When a transformation is finished
 
 Events have been always part of fabric.js, way before the custom controls api and selection callbacks were introduced.
-As a result events have also been used to modify standard fabric.js behaviours creating complex code flows.
+As a result events have also been used to modify standard fabric.js behaviors creating complex code flows.
 
 ### When to use events
 
-Try to do *not* depend too much from events, is not a great pattern outisde mouse and selections.
+Try to do *not* depend too much from events, is not a great pattern outside mouse and selections.
 At the time i joined the project events were already there and with time there have been additions but never cleanups.
 Try to think in this way: In Fabric.sj events are meant to alert you of things happening that you 
 can't reach because are part of code you didn't write.
@@ -80,9 +80,9 @@ dispose();
 The disposer is a function that when called will remove the event listener, this may be easier
 to use than keeping a reference to the handler function used with `on` as an alternative.
 
-The handlers are called bound on the instance, so in the handler funcion the `this` is  either the fabric object or the fabric canvas.
-Fat arrow functions can't be bound to anyhting else than the context in which they were created, so if you don't want unexpected
- side effects **use functions for event handers**.
+The handlers are called bound on the instance, so in the handler function the `this` is  either the fabric object or the fabric canvas.
+Fat arrow functions can't be bound to anything else than the context in which they were created, so if you don't want unexpected
+ side effects **use functions for event handlers**.
 
 Fabric.js calls `fire` to trigger event listeners, the listeners that are hosted on the instance are then called bound in order
  of registration and with a data object as first and only argument.
@@ -96,7 +96,7 @@ As an example the `mouse:down` event will have:
 - `e` the original mouse event
 - `scenePoint` the point where the event happened in the canvas coordinate system
 - `viewportPoint` the point where the event happened in the viewport coordinate system
-- `target` the object that was hit by the event, possibly undefimed
+- `target` the object that was hit by the event, possibly undefine
 - `subTargets` an array of objects that were hit by the event, possibly empty, if the target has children
 - `transform` the current ongoing transform action (if any, like scaling for example)
 
@@ -104,7 +104,7 @@ As an example the `mouse:down` event will have:
 
 There isn't an hand curated even list with descriptions and data passed in the argument.
 One way to get to know the events is to look at the event demo here: [Events inspector](/demos/events-inspector/) or to use a type enabled ide and look at 
-auto completition for the on method.
+auto completion for the on method.
 
 ### Custom events
 
