@@ -913,6 +913,7 @@ export class Table extends Group {
   ): {
     border: TableBorderInfo;
     indicatorSide: 'before' | 'after' | null;
+    inCircle?: boolean;
   } | null {
     const local = this.toLocalPoint(canvasPoint);
     const { contentWidth, contentHeight } = this.getContentDimensions();
@@ -920,21 +921,25 @@ export class Table extends Group {
     const halfH = contentHeight / 2;
     const indicatorOffset = this.indicatorOffset / this.scaleX;
     const indicatorHitRadius = this.indicatorHitRadius / this.scaleX;
+    const indicatorRadius = this.indicatorRadius / this.scaleX;
 
     for (let i = 0; i <= this.cols; i++) {
       const x = this.getBorderPosition('col', i);
       const indicatorY = -halfH - indicatorOffset;
-      const dx = local.x - x;
-      const dy = local.y - indicatorY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const inStem =
-        Math.abs(dx) < indicatorHitRadius &&
-        local.y >= indicatorY - indicatorHitRadius &&
+      const top = indicatorY - indicatorHitRadius;
+      const inHitbox =
+        local.x >= x - indicatorHitRadius &&
+        local.x <= x + indicatorHitRadius &&
+        local.y >= top &&
         local.y <= -halfH;
-      if (dist < indicatorHitRadius || inStem) {
+      if (inHitbox) {
+        const dx = local.x - x;
+        const dy = local.y - indicatorY;
+        const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
         return {
           border: { type: 'col', index: i, position: x },
           indicatorSide: 'before',
+          inCircle,
         };
       }
     }
@@ -942,17 +947,20 @@ export class Table extends Group {
     for (let i = 0; i <= this.rows; i++) {
       const y = this.getBorderPosition('row', i);
       const indicatorX = -halfW - indicatorOffset;
-      const dx = local.x - indicatorX;
-      const dy = local.y - y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const inStem =
-        Math.abs(dy) < indicatorHitRadius &&
-        local.x >= indicatorX - indicatorHitRadius &&
-        local.x <= -halfW;
-      if (dist < indicatorHitRadius || inStem) {
+      const left = indicatorX - indicatorHitRadius;
+      const inHitbox =
+        local.x >= left &&
+        local.x <= -halfW &&
+        local.y >= y - indicatorHitRadius &&
+        local.y <= y + indicatorHitRadius;
+      if (inHitbox) {
+        const dx = local.x - indicatorX;
+        const dy = local.y - y;
+        const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
         return {
           border: { type: 'row', index: i, position: y },
           indicatorSide: 'before',
+          inCircle,
         };
       }
     }

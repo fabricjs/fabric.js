@@ -122,9 +122,14 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   const point = canvas.getViewportPoint(e.e);
   const result = table.getBorderOrIndicatorAtPoint(point);
 
-  if (result?.indicatorSide && table._hoveredBorder) {
+  if (result?.indicatorSide && result.inCircle) {
+    table._hoveredBorder = result.border;
     canvas.defaultCursor = 'pointer';
     table.hoverCursor = 'pointer';
+  } else if (result?.indicatorSide) {
+    table._hoveredBorder = result.border;
+    canvas.defaultCursor = 'default';
+    table.hoverCursor = 'default';
   } else if (result?.border) {
     table._hoveredBorder = result.border;
     canvas.defaultCursor = 'default';
@@ -248,7 +253,7 @@ function handleMouseDownBefore(
   const point = canvas.getViewportPoint(e.e);
   const result = activeTable.getBorderOrIndicatorAtPoint(point);
 
-  if (result?.indicatorSide) {
+  if (result?.indicatorSide && result.inCircle) {
     pendingIndicatorClick = { table: activeTable, border: result.border };
   }
 }
