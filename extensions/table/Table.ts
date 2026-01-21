@@ -11,8 +11,6 @@ import {
   type FabricObject,
   type GroupProps,
   type SerializedGroupProps,
-  type TOriginX,
-  type TOriginY,
 } from 'fabric';
 import {
   TableLayoutStrategy,
@@ -27,7 +25,7 @@ export interface TableDefaults {
   minCellHeight: number;
   cellPadding: number;
   cellSpacing: number;
-  borderWidth: number;
+  cellStrokeWidth: number;
   cellStroke: string;
   cellFill: string;
   textFill: string;
@@ -35,14 +33,10 @@ export interface TableDefaults {
   fontWeight: string;
   fontStyle: string;
   textAlign: string;
-  selectionColor: string;
-  selectionWidth: number;
   borderThreshold: number;
   indicatorOffset: number;
   indicatorRadius: number;
   indicatorHitRadius: number;
-  reflowOriginX: TOriginX;
-  reflowOriginY: TOriginY;
 }
 
 export interface CellData {
@@ -77,9 +71,7 @@ export interface SerializedTableProps extends SerializedGroupProps {
   cellSpacing: number;
   cellFill: string;
   cellStroke: string;
-  borderWidth: number;
-  reflowOriginX: TOriginX;
-  reflowOriginY: TOriginY;
+  cellStrokeWidth: number;
   cellData: CellData[];
 }
 
@@ -99,15 +91,11 @@ export class Table extends Group {
 
   declare cellFill: string;
   declare cellStroke: string;
-  declare borderWidth: number;
-  declare selectionColor: string;
-  declare selectionWidth: number;
+  declare cellStrokeWidth: number;
   declare borderThreshold: number;
   declare indicatorOffset: number;
   declare indicatorRadius: number;
   declare indicatorHitRadius: number;
-  declare reflowOriginX: TOriginX;
-  declare reflowOriginY: TOriginY;
 
   _selectedCells: CellPosition[] = [];
   _selectionAnchor: CellPosition | null = null;
@@ -120,7 +108,7 @@ export class Table extends Group {
     minCellHeight: 40,
     cellPadding: 8,
     cellSpacing: 0,
-    borderWidth: 1,
+    cellStrokeWidth: 1,
     cellStroke: '#e0e0e0',
     cellFill: '#ffffff',
     textFill: '#333333',
@@ -128,14 +116,10 @@ export class Table extends Group {
     fontWeight: 'normal',
     fontStyle: 'normal',
     textAlign: 'center',
-    selectionColor: '#2563eb',
-    selectionWidth: 2,
     borderThreshold: 5,
     indicatorOffset: 15,
     indicatorRadius: 8,
     indicatorHitRadius: 10,
-    reflowOriginX: 'left',
-    reflowOriginY: 'top',
   };
 
   constructor(
@@ -156,7 +140,7 @@ export class Table extends Group {
       minCellHeight: config.minCellHeight,
       cellPadding: config.cellPadding,
       cellSpacing: config.cellSpacing,
-      borderWidth: config.borderWidth,
+      cellStrokeWidth: config.cellStrokeWidth,
     });
 
     const objects = Table.createCells(rows, cols, config);
@@ -166,27 +150,23 @@ export class Table extends Group {
       layoutManager: new LayoutManager(strategy),
       subTargetCheck: true,
       interactive: true,
+      originX: options.originX ?? 'left',
+      originY: options.originY ?? 'top',
       stroke: undefined,
       strokeWidth: 0,
     });
 
     this.cellFill = config.cellFill;
     this.cellStroke = config.cellStroke;
-    this.borderWidth = config.borderWidth;
-    this.selectionColor = config.selectionColor;
-    this.selectionWidth = config.selectionWidth;
+    this.cellStrokeWidth = config.cellStrokeWidth;
     this.borderThreshold = config.borderThreshold;
     this.indicatorOffset = config.indicatorOffset;
     this.indicatorRadius = config.indicatorRadius;
     this.indicatorHitRadius = config.indicatorHitRadius;
 
     this.cornerColor = '#ffffff';
-    this.cornerStrokeColor = config.selectionColor;
-    this.borderColor = config.selectionColor;
-    this.borderScaleFactor = 1;
+    this.cornerStrokeColor = this.borderColor;
     this.transparentCorners = false;
-    this.reflowOriginX = config.reflowOriginX;
-    this.reflowOriginY = config.reflowOriginY;
 
     this.controls = createTableControls();
     this.lockScalingFlip = true;
@@ -199,19 +179,19 @@ export class Table extends Group {
   }
 
   override triggerLayout(options?: { deep?: boolean }) {
-    const anchor = this.getPositionByOrigin(this.reflowOriginX, this.reflowOriginY);
+    const anchor = this.getPositionByOrigin(this.originX, this.originY);
     super.triggerLayout(options);
-    this.setPositionByOrigin(anchor, this.reflowOriginX, this.reflowOriginY);
+    this.setPositionByOrigin(anchor, this.originX, this.originY);
     this.setCoords();
   }
 
-  protected override _onAfterObjectsChange(
+  override _onAfterObjectsChange(
     type: 'added' | 'removed',
     targets: FabricObject[],
   ) {
-    const anchor = this.getPositionByOrigin(this.reflowOriginX, this.reflowOriginY);
+    const anchor = this.getPositionByOrigin(this.originX, this.originY);
     super._onAfterObjectsChange(type, targets);
-    this.setPositionByOrigin(anchor, this.reflowOriginX, this.reflowOriginY);
+    this.setPositionByOrigin(anchor, this.originX, this.originY);
     this.setCoords();
   }
 
@@ -225,7 +205,7 @@ export class Table extends Group {
       height: config.minCellHeight,
       fill: config.cellFill,
       stroke: config.cellStroke,
-      strokeWidth: config.borderWidth,
+      strokeWidth: config.cellStrokeWidth,
       originX: 'center',
       originY: 'center',
       selectable: false,
@@ -408,7 +388,7 @@ export class Table extends Group {
       minCellHeight: this.minCellHeight,
       cellPadding: this.cellPadding,
       cellStroke: this.cellStroke,
-      borderWidth: this.borderWidth,
+      cellStrokeWidth: this.cellStrokeWidth,
       cellFill: (sourceCell?.fill as string) ?? Table.defaults.cellFill,
       fontSize: sourceText?.fontSize ?? Table.defaults.fontSize,
       fontWeight:
@@ -524,8 +504,8 @@ export class Table extends Group {
   }
 
   updateBorderWidth(width: number) {
-    this.borderWidth = width;
-    if (this.strategy) this.strategy.borderWidth = width;
+    this.cellStrokeWidth = width;
+    if (this.strategy) this.strategy.cellStrokeWidth = width;
     this.cells
       .filter((c) => !(c as any)._hasCustomStroke)
       .forEach((c) => c.set('strokeWidth', width));
@@ -1067,8 +1047,8 @@ export class Table extends Group {
       matrix[4],
       matrix[5],
     );
-    ctx.strokeStyle = this.selectionColor;
-    ctx.lineWidth = this.selectionWidth / this.scaleX;
+    ctx.strokeStyle = this.borderColor;
+    ctx.lineWidth = this.borderScaleFactor * 2 / this.scaleX;
 
     const drawn = new Set<string>();
     for (const { row, col } of this._selectedCells) {
@@ -1105,12 +1085,10 @@ export class Table extends Group {
       if (!this._isDraggingBorder) {
         const r = this.indicatorRadius / this.scaleX;
         const lineLen = r / 2;
-        const lineWidth = 1.5 / this.scaleX;
         const indicatorX = type === 'col' ? position : -halfW - offset;
         const indicatorY = type === 'col' ? -halfH - offset : position;
 
-        // Draw stem line from indicator to table edge
-        ctx.strokeStyle = this.selectionColor;
+        ctx.strokeStyle = this.borderColor;
         ctx.lineWidth = this.borderScaleFactor / this.scaleX;
         ctx.beginPath();
         if (type === 'col') {
@@ -1122,15 +1100,13 @@ export class Table extends Group {
         }
         ctx.stroke();
 
-        // Draw indicator circle
-        ctx.fillStyle = this.selectionColor;
+        ctx.fillStyle = this.borderColor;
         ctx.beginPath();
         ctx.arc(indicatorX, indicatorY, r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw + sign
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = this.cornerColor;
+        ctx.lineWidth = this.borderScaleFactor / this.scaleX;
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(indicatorX - lineLen, indicatorY);
@@ -1190,9 +1166,7 @@ export class Table extends Group {
       cellSpacing: this.cellSpacing,
       cellFill: this.cellFill,
       cellStroke: this.cellStroke,
-      borderWidth: this.borderWidth,
-      reflowOriginX: this.reflowOriginX,
-      reflowOriginY: this.reflowOriginY,
+      cellStrokeWidth: this.cellStrokeWidth,
       cellData,
     };
   }
@@ -1208,9 +1182,9 @@ export class Table extends Group {
       cellSpacing: object.cellSpacing ?? 0,
       cellFill: object.cellFill,
       cellStroke: object.cellStroke,
-      borderWidth: object.borderWidth ?? 1,
-      reflowOriginX: object.reflowOriginX,
-      reflowOriginY: object.reflowOriginY,
+      cellStrokeWidth: object.cellStrokeWidth ?? 1,
+      originX: object.originX,
+      originY: object.originY,
       left: object.left,
       top: object.top,
       scaleX: object.scaleX,

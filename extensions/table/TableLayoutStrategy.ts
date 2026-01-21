@@ -38,7 +38,7 @@ export class TableLayoutStrategy extends LayoutStrategy {
   declare minCellHeight: number;
   declare cellPadding: number;
   declare cellSpacing: number;
-  declare borderWidth: number;
+  declare cellStrokeWidth: number;
   declare columnWidths: number[];
   declare rowHeights: number[];
   declare manualRowHeights: (number | null)[];
@@ -52,7 +52,7 @@ export class TableLayoutStrategy extends LayoutStrategy {
       minCellHeight: number;
       cellPadding: number;
       cellSpacing: number;
-      borderWidth: number;
+      cellStrokeWidth: number;
     }> = {},
   ) {
     super();
@@ -63,7 +63,7 @@ export class TableLayoutStrategy extends LayoutStrategy {
     this.minCellHeight = options.minCellHeight ?? 40;
     this.cellPadding = options.cellPadding ?? 8;
     this.cellSpacing = options.cellSpacing ?? 0;
-    this.borderWidth = options.borderWidth ?? 1;
+    this.cellStrokeWidth = options.cellStrokeWidth ?? 1;
     this.columnWidths = new Array(this.cols).fill(defaultWidth);
     this.rowHeights = new Array(this.rows).fill(this.minCellHeight);
     this.manualRowHeights = new Array(this.rows).fill(null);
@@ -107,8 +107,8 @@ export class TableLayoutStrategy extends LayoutStrategy {
     );
 
     const size = new Point(
-      contentWidth + this.borderWidth,
-      contentHeight + this.borderWidth,
+      contentWidth + this.cellStrokeWidth,
+      contentHeight + this.cellStrokeWidth,
     );
 
     if (context.type === 'initialization' || !context.target) {

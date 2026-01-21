@@ -27,7 +27,7 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
       const totalWidth = Math.abs(localPoint.x) / table.scaleX;
       const newWidth = Math.max(
         table.minCellWidth,
-        totalWidth - otherColsWidth - spacing - table.borderWidth,
+        totalWidth - otherColsWidth - spacing - table.cellStrokeWidth,
       );
       const changed = table.columnWidths[col] !== newWidth;
       table.setColumnWidth(col, newWidth);
@@ -43,7 +43,7 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
     const totalHeight = Math.abs(localPoint.y) / table.scaleY;
     const newHeight = Math.max(
       table.minCellHeight,
-      totalHeight - otherRowsHeight - spacing - table.borderWidth,
+      totalHeight - otherRowsHeight - spacing - table.cellStrokeWidth,
     );
     const changed = table.rowHeights[row] !== newHeight;
     table.setRowHeight(row, newHeight);

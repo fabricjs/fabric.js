@@ -12,7 +12,7 @@ export async function testCase(canvas: fabric.Canvas) {
     cellPadding: 10,
     cellFill: '#ffffff',
     cellStroke: '#d0d0d0',
-    borderWidth: 1,
+    cellStrokeWidth: 1,
   });
 
   const labels = ['Name', 'Age', 'City', 'Country'];
