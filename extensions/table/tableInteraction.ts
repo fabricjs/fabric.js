@@ -255,6 +255,8 @@ function handleMouseDownBefore(
 
   if (result?.indicatorSide && result.inCircle) {
     pendingIndicatorClick = { table: activeTable, border: result.border };
+    e.e.stopPropagation?.();
+    e.e.preventDefault?.();
   }
 }
 

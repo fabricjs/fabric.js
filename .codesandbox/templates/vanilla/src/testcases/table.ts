@@ -13,6 +13,7 @@ export async function testCase(canvas: fabric.Canvas) {
     cellFill: '#ffffff',
     cellStroke: '#d0d0d0',
     cellStrokeWidth: 1,
+    borderColor: 'red',
   });
 
   const labels = ['Name', 'Age', 'City', 'Country'];

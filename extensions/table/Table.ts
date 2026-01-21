@@ -473,8 +473,10 @@ export class Table extends Group {
       const [cell, text] = Table.createCellPair(r, position, config);
       this.add(cell, text);
     }
+    const totalWidth = this.strategy.columnWidths.reduce((sum, w) => sum + w, 0);
     this.strategy.cols++;
-    this.strategy.columnWidths.splice(position, 0, sourceWidth);
+    const equalWidth = Math.max(this.minCellWidth, totalWidth / this.strategy.cols);
+    this.strategy.columnWidths = new Array(this.strategy.cols).fill(equalWidth);
     this.triggerLayout();
   }
 
@@ -1096,25 +1098,13 @@ export class Table extends Group {
         const indicatorX = type === 'col' ? position : -halfW - offset;
         const indicatorY = type === 'col' ? -halfH - offset : position;
 
-        ctx.strokeStyle = this.borderColor;
-        ctx.lineWidth = this.borderScaleFactor / this.scaleX;
-        ctx.beginPath();
-        if (type === 'col') {
-          ctx.moveTo(indicatorX, indicatorY + r);
-          ctx.lineTo(indicatorX, -halfH);
-        } else {
-          ctx.moveTo(indicatorX + r, indicatorY);
-          ctx.lineTo(-halfW, indicatorY);
-        }
-        ctx.stroke();
-
         ctx.fillStyle = this.borderColor;
         ctx.beginPath();
         ctx.arc(indicatorX, indicatorY, r, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.strokeStyle = this.cornerColor;
-        ctx.lineWidth = this.borderScaleFactor / this.scaleX;
+        ctx.lineWidth = this.borderScaleFactor * 2 / this.scaleX;
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(indicatorX - lineLen, indicatorY);
