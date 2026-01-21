@@ -106,19 +106,16 @@ export class TableLayoutStrategy extends LayoutStrategy {
       rowYPositions,
     );
 
-    const preserveCenter =
-      context.type !== 'initialization' && context.target?.left !== undefined;
-    const center = preserveCenter
-      ? context.target.getCenterPoint()
-      : new Point(0, 0);
+    const size = new Point(
+      contentWidth + this.borderWidth,
+      contentHeight + this.borderWidth,
+    );
 
-    return {
-      center,
-      size: new Point(
-        contentWidth + this.borderWidth,
-        contentHeight + this.borderWidth,
-      ),
-    };
+    if (context.type === 'initialization' || !context.target) {
+      return { center: new Point(0, 0), size };
+    }
+
+    return { center: context.target.getRelativeCenterPoint(), size };
   }
 
   private indexTextsByCell(objects: FabricObject[]): Map<string, TableCellText> {

@@ -156,8 +156,8 @@ export class Table extends Group {
       layoutManager: new LayoutManager(strategy),
       subTargetCheck: true,
       interactive: true,
-      originX: 'center',
-      originY: 'center',
+      originX: 'left',
+      originY: 'top',
       stroke: undefined,
       strokeWidth: 0,
     });
@@ -186,6 +186,12 @@ export class Table extends Group {
     this.enterGroup(object, false);
     this.fire('object:added', { target: object });
     object.fire('added', { target: this });
+  }
+
+  override triggerLayout(options?: { deep?: boolean }) {
+    const anchor = this.getPositionByOrigin(this.originX, this.originY);
+    super.triggerLayout(options);
+    this.setPositionByOrigin(anchor, this.originX, this.originY);
   }
 
   private static createCellPair(

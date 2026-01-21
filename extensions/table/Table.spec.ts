@@ -135,6 +135,30 @@ describe('Table', () => {
       const originalFirstRow = table.getCell(1, 0);
       expect(originalFirstRow?._row).toBe(1);
     });
+
+    test('preserves anchor position based on originX/originY', () => {
+      table.set({ left: 100, top: 100, originX: 'left', originY: 'top' });
+      table.setCoords();
+      const topLeftBefore = table.getPositionByOrigin('left', 'top');
+
+      table.addRow();
+
+      const topLeftAfter = table.getPositionByOrigin('left', 'top');
+      expect(topLeftAfter.x).toBeCloseTo(topLeftBefore.x, 1);
+      expect(topLeftAfter.y).toBeCloseTo(topLeftBefore.y, 1);
+    });
+
+    test('center origin expands equally in all directions', () => {
+      table.set({ left: 200, top: 200, originX: 'center', originY: 'center' });
+      table.setCoords();
+      const centerBefore = table.getCenterPoint();
+
+      table.addRow();
+
+      const centerAfter = table.getCenterPoint();
+      expect(centerAfter.x).toBeCloseTo(centerBefore.x, 1);
+      expect(centerAfter.y).toBeCloseTo(centerBefore.y, 1);
+    });
   });
 
   describe('removeRow', () => {
@@ -166,6 +190,18 @@ describe('Table', () => {
     test('adds column at specific position', () => {
       table.addColumn(1);
       expect(table.cols).toBe(4);
+    });
+
+    test('preserves anchor position based on originX/originY', () => {
+      table.set({ left: 100, top: 100, originX: 'left', originY: 'top' });
+      table.setCoords();
+      const topLeftBefore = table.getPositionByOrigin('left', 'top');
+
+      table.addColumn();
+
+      const topLeftAfter = table.getPositionByOrigin('left', 'top');
+      expect(topLeftAfter.x).toBeCloseTo(topLeftBefore.x, 1);
+      expect(topLeftAfter.y).toBeCloseTo(topLeftBefore.y, 1);
     });
   });
 
