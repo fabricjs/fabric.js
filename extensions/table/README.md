@@ -19,7 +19,7 @@ const cleanup = initTableInteraction(canvas);
 
 ## Reflow Origin
 
-When rows/columns are added, the table expands. The `reflowOriginX` and `reflowOriginY` properties control which point stays fixed during this expansion.
+When rows/columns are added, the table expands. The `reflowOriginX` and `reflowOriginY` properties control which point stays fixed during expansion.
 
 ```typescript
 // Default: top-left stays fixed, table grows down and right
@@ -39,7 +39,7 @@ const bottomRightTable = new Table(3, 3, {
 });
 ```
 
-This is independent of the table's visual `originX`/`originY` (which defaults to center/center like all Fabric objects).
+This is independent of the table's visual `originX`/`originY` (which defaults to center/center like all Fabric objects). This separation allows tables to be centered on canvas while still growing predictably from a corner when content is added.
 
 ## Feature Checklist
 
@@ -89,7 +89,8 @@ This is independent of the table's visual `originX`/`originY` (which defaults to
 
 - [x] Drag internal column/row borders to resize
 - [x] Row resize respects text content minimum
-- [x] Edge handles resize outer row/column
+- [x] Edge handles resize outer row/column (single mode)
+- [x] Edge resize mode: `'single'` (default) or `'proportional'` (scales all cells)
 - [x] Angle-aware cursors for border drag
 - [x] Proportional resize: drag border touching selected cells to resize all equally
 - [x] Visual feedback when dragging borders at minimum size limit

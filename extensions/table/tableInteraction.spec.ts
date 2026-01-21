@@ -21,7 +21,10 @@ describe('tableInteraction keyboard handlers', () => {
     canvas.dispose();
   });
 
-  function dispatchKeyDown(key: string, options: Partial<KeyboardEventInit> = {}) {
+  function dispatchKeyDown(
+    key: string,
+    options: Partial<KeyboardEventInit> = {},
+  ) {
     const event = new KeyboardEvent('keydown', {
       key,
       bubbles: true,
@@ -100,4 +103,3 @@ describe('tableInteraction keyboard handlers', () => {
     });
   });
 });
-

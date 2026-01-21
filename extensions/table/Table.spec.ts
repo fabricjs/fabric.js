@@ -416,7 +416,7 @@ describe('Table', () => {
   describe('serialization', () => {
     test('toObject returns serializable object', () => {
       const obj = table.toObject();
-      expect((obj).type).toBe('Table');
+      expect(obj.type).toBe('Table');
       expect(obj.rows).toBe(3);
       expect(obj.cols).toBe(3);
       expect(obj.cellData).toHaveLength(9);

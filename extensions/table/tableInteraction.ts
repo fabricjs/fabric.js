@@ -8,7 +8,8 @@ import {
 } from 'fabric';
 import { Table, type TableBorderInfo } from './Table';
 
-const getDocument = (el: HTMLElement) => el.ownerDocument || getFabricDocument();
+const getDocument = (el: HTMLElement) =>
+  el.ownerDocument || getFabricDocument();
 
 const calcDistance = (dx: number, dy: number) => Math.sqrt(dx * dx + dy * dy);
 
@@ -20,7 +21,9 @@ function getResizeLimitFeedback(
 ): number {
   const positionMoved = Math.abs(newPosition - startPosition) >= 0.5;
   if (positionMoved || Math.abs(dragDelta) <= 1) return 0;
-  return (Math.sign(dragDelta) * Math.min(1.5, Math.abs(dragDelta) * 0.1)) / scale;
+  return (
+    (Math.sign(dragDelta) * Math.min(1.5, Math.abs(dragDelta) * 0.1)) / scale
+  );
 }
 
 interface BorderDragState {
@@ -120,6 +123,15 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   }
 
   const point = canvas.getViewportPoint(e.e);
+
+  if (table.findControl(point)) {
+    if (table._hoveredBorder) {
+      table._hoveredBorder = null;
+      canvas.requestRenderAll();
+    }
+    return;
+  }
+
   const result = table.getBorderOrIndicatorAtPoint(point);
 
   if (result?.indicatorSide && result.inCircle) {
@@ -228,15 +240,24 @@ function handleBorderDrag(canvas: Canvas, e: { e: TPointerEvent }) {
   }
 
   const startPosition = border.position;
-  table.triggerLayout();
+  table.relayout();
   const newPosition = table.getBorderPosition(type, index);
   const dragDelta =
-    type === 'col' ? currentLocal.x - startLocal.x : currentLocal.y - startLocal.y;
+    type === 'col'
+      ? currentLocal.x - startLocal.x
+      : currentLocal.y - startLocal.y;
 
   table._hoveredBorder = {
     type,
     index,
-    position: newPosition + getResizeLimitFeedback(startPosition, newPosition, dragDelta, table.scaleX),
+    position:
+      newPosition +
+      getResizeLimitFeedback(
+        startPosition,
+        newPosition,
+        dragDelta,
+        table.scaleX,
+      ),
   };
   canvas.requestRenderAll();
 }
@@ -466,7 +487,7 @@ function finishEditing(canvas: Canvas, shouldExitEditing = true) {
   canvas.setActiveObject(table);
   canvas.remove(textbox);
 
-  table.triggerLayout();
+  table.relayout();
   table.setCoords();
   table.selectCell(row, col);
 
@@ -487,7 +508,7 @@ function handleTextChanged(canvas: Canvas, e: { target: unknown }) {
     cellText.set('text', editor.textbox.text);
   }
 
-  table.triggerLayout();
+  table.relayout();
   table.setCoords();
 
   const center = getCellCanvasCenter(table, row, col);
@@ -567,7 +588,7 @@ function pasteClipboard(canvas: Canvas, table: Table) {
     }
   }
 
-  table.triggerLayout();
+  table.relayout();
   table.dirty = true;
   canvas.requestRenderAll();
 }
@@ -619,7 +640,7 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
       const text = table.getCellText(row, col);
       if (text) text.set('text', '');
     }
-    table.triggerLayout();
+    table.relayout();
     canvas.requestRenderAll();
     return;
   }
@@ -666,7 +687,7 @@ function handleKeyDown(canvas: Canvas, e: KeyboardEvent) {
       const text = table.getCellText(row, col);
       if (text) text.set('text', '');
     }
-    table.triggerLayout();
+    table.relayout();
     canvas.requestRenderAll();
     return;
   }

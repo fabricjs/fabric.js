@@ -118,7 +118,9 @@ export class TableLayoutStrategy extends LayoutStrategy {
     return { center: context.target.getRelativeCenterPoint(), size };
   }
 
-  private indexTextsByCell(objects: FabricObject[]): Map<string, TableCellText> {
+  private indexTextsByCell(
+    objects: FabricObject[],
+  ): Map<string, TableCellText> {
     const textsByCell = new Map<string, TableCellText>();
     for (const obj of objects) {
       const text = obj as TableCellText;
@@ -198,8 +200,7 @@ export class TableLayoutStrategy extends LayoutStrategy {
         if (r > 0) cellHeight += this.cellSpacing;
       }
 
-      const x =
-        columnXPositions[cell._col] - contentWidth / 2 + cellWidth / 2;
+      const x = columnXPositions[cell._col] - contentWidth / 2 + cellWidth / 2;
       const y = rowYPositions[cell._row] - contentHeight / 2 + cellHeight / 2;
 
       cell.set({

@@ -38,9 +38,7 @@ describe('createTableControls', () => {
 
   test('rotation control uses rotationWithSnapping actionHandler', () => {
     const controls = createTableControls();
-    expect(controls.mtr.actionHandler).toBe(
-      controlsUtils.rotationWithSnapping,
-    );
+    expect(controls.mtr.actionHandler).toBe(controlsUtils.rotationWithSnapping);
   });
 
   test('rotation control has correct offset and connection', () => {

@@ -1,10 +1,16 @@
 import { Control, controlsUtils, type TransformActionHandler } from 'fabric';
 import type { Table } from './Table';
-import { renderTableSegmentControl, renderTableCircleControl } from './controlRendering';
+import {
+  renderTableSegmentControl,
+  renderTableCircleControl,
+} from './controlRendering';
 
-const { wrapWithFixedAnchor, scalingEqually, rotationWithSnapping } = controlsUtils;
+const { wrapWithFixedAnchor, scalingEqually, rotationWithSnapping } =
+  controlsUtils;
 
-function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): TransformActionHandler {
+function createEdgeResizeHandler(
+  edge: 'left' | 'right' | 'top' | 'bottom',
+): TransformActionHandler {
   const isHorizontal = edge === 'left' || edge === 'right';
 
   return (_eventData, transform, x, y) => {
@@ -41,7 +47,10 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
         (s, w, i) => (i === col ? s : s + w),
         0,
       );
-      const newWidth = Math.max(table.minCellWidth, contentWidth - otherColsWidth);
+      const newWidth = Math.max(
+        table.minCellWidth,
+        contentWidth - otherColsWidth,
+      );
       const changed = table.columnWidths[col] !== newWidth;
       table.setColumnWidth(col, newWidth);
       return changed;
@@ -71,7 +80,10 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
       (s, h, i) => (i === row ? s : s + h),
       0,
     );
-    const newHeight = Math.max(table.minCellHeight, contentHeight - otherRowsHeight);
+    const newHeight = Math.max(
+      table.minCellHeight,
+      contentHeight - otherRowsHeight,
+    );
     const changed = table.rowHeights[row] !== newHeight;
     table.setRowHeight(row, newHeight);
     return changed;

@@ -11,6 +11,8 @@ import {
   type FabricObject,
   type GroupProps,
   type SerializedGroupProps,
+  type TOriginX,
+  type TOriginY,
 } from 'fabric';
 import {
   TableLayoutStrategy,
@@ -38,6 +40,8 @@ export interface TableDefaults {
   indicatorRadius: number;
   indicatorHitRadius: number;
   edgeResizeMode: 'single' | 'proportional';
+  reflowOriginX: TOriginX;
+  reflowOriginY: TOriginY;
 }
 
 export interface CellData {
@@ -98,6 +102,8 @@ export class Table extends Group {
   declare indicatorRadius: number;
   declare indicatorHitRadius: number;
   declare edgeResizeMode: 'single' | 'proportional';
+  declare reflowOriginX: TOriginX;
+  declare reflowOriginY: TOriginY;
 
   _selectedCells: CellPosition[] = [];
   _selectionAnchor: CellPosition | null = null;
@@ -123,6 +129,8 @@ export class Table extends Group {
     indicatorRadius: 8,
     indicatorHitRadius: 10,
     edgeResizeMode: 'single',
+    reflowOriginX: 'left',
+    reflowOriginY: 'top',
   };
 
   constructor(
@@ -153,8 +161,6 @@ export class Table extends Group {
       layoutManager: new LayoutManager(strategy),
       subTargetCheck: true,
       interactive: true,
-      originX: options.originX ?? 'left',
-      originY: options.originY ?? 'top',
       stroke: undefined,
       strokeWidth: 0,
     });
@@ -167,6 +173,8 @@ export class Table extends Group {
     this.indicatorRadius = config.indicatorRadius;
     this.indicatorHitRadius = config.indicatorHitRadius;
     this.edgeResizeMode = config.edgeResizeMode;
+    this.reflowOriginX = config.reflowOriginX;
+    this.reflowOriginY = config.reflowOriginY;
 
     this.cornerColor = '#ffffff';
     this.cornerStrokeColor = this.borderColor;
@@ -183,10 +191,17 @@ export class Table extends Group {
   }
 
   private triggerLayoutWithAnchor() {
-    const anchor = this.getPositionByOrigin(this.originX, this.originY);
+    const anchor = this.getPositionByOrigin(
+      this.reflowOriginX,
+      this.reflowOriginY,
+    );
     this.triggerLayout();
-    this.setPositionByOrigin(anchor, this.originX, this.originY);
+    this.setPositionByOrigin(anchor, this.reflowOriginX, this.reflowOriginY);
     this.setCoords();
+  }
+
+  relayout() {
+    this.triggerLayoutWithAnchor();
   }
 
   private static createCellPair(
@@ -408,7 +423,12 @@ export class Table extends Group {
 
   private removeAtIndex(prop: '_row' | '_col', index: number) {
     const toRemove = this._objects.filter((o) => {
-      const item = o as unknown as { _isCell?: boolean; _isCellText?: boolean; _row: number; _col: number };
+      const item = o as unknown as {
+        _isCell?: boolean;
+        _isCellText?: boolean;
+        _row: number;
+        _col: number;
+      };
       return (item._isCell || item._isCellText) && item[prop] === index;
     });
     for (const obj of toRemove) {
@@ -467,9 +487,15 @@ export class Table extends Group {
       const [cell, text] = Table.createCellPair(r, position, config);
       this.add(cell, text);
     }
-    const totalWidth = this.strategy.columnWidths.reduce((sum, w) => sum + w, 0);
+    const totalWidth = this.strategy.columnWidths.reduce(
+      (sum, w) => sum + w,
+      0,
+    );
     this.strategy.cols++;
-    const equalWidth = Math.max(this.minCellWidth, totalWidth / this.strategy.cols);
+    const equalWidth = Math.max(
+      this.minCellWidth,
+      totalWidth / this.strategy.cols,
+    );
     this.strategy.columnWidths = new Array(this.strategy.cols).fill(equalWidth);
     this.triggerLayoutWithAnchor();
   }
@@ -1052,7 +1078,7 @@ export class Table extends Group {
       matrix[5],
     );
     ctx.strokeStyle = this.borderColor;
-    ctx.lineWidth = this.borderScaleFactor * 2 / this.scaleX;
+    ctx.lineWidth = (this.borderScaleFactor * 2) / this.scaleX;
 
     const drawn = new Set<string>();
     for (const { row, col } of this._selectedCells) {
@@ -1098,7 +1124,7 @@ export class Table extends Group {
         ctx.fill();
 
         ctx.strokeStyle = this.cornerColor;
-        ctx.lineWidth = this.borderScaleFactor * 2 / this.scaleX;
+        ctx.lineWidth = (this.borderScaleFactor * 2) / this.scaleX;
         ctx.lineCap = 'round';
         ctx.beginPath();
         ctx.moveTo(indicatorX - lineLen, indicatorY);
