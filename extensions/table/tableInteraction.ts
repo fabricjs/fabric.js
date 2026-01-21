@@ -34,6 +34,8 @@ interface BorderDragState {
   startHeights: number[];
   selectedCols: number[];
   selectedRows: number[];
+  savedSelection: { row: number; col: number }[];
+  savedAnchor: { row: number; col: number } | null;
 }
 
 interface ClickState {
@@ -352,17 +354,24 @@ function startBorderDrag(
     startHeights: [...table.rowHeights],
     selectedCols: cols,
     selectedRows: rows,
+    savedSelection: [...table._selectedCells],
+    savedAnchor: table._selectionAnchor,
   };
 
+  table.clearCellSelection();
   canvas.requestRenderAll();
 }
 
 function handleMouseUp(canvas: Canvas, e: { e: TPointerEvent }) {
   if (borderDrag) {
-    const table = borderDrag.table;
+    const { table, savedSelection, savedAnchor } = borderDrag;
     table.lockMovementX = false;
     table.lockMovementY = false;
     table._isDraggingBorder = false;
+
+    table._selectedCells = savedSelection;
+    table._selectionAnchor = savedAnchor;
+
     borderDrag = null;
 
     const point = canvas.getScenePoint(e.e);
