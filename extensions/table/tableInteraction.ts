@@ -284,7 +284,12 @@ function handleMouseDownBefore(
 
 function handleMouseDown(
   canvas: Canvas,
-  e: { target?: unknown; e: TPointerEvent; transform?: { corner?: string } },
+  e: {
+    target?: unknown;
+    e: TPointerEvent;
+    transform?: { corner?: string };
+    alreadySelected?: boolean;
+  },
 ) {
   clickStart = null;
 
@@ -298,7 +303,7 @@ function handleMouseDown(
   const point = canvas.getScenePoint(e.e);
   const border = table.getBorderAtPoint(point);
 
-  if (border) {
+  if (border && e.alreadySelected) {
     startBorderDrag(canvas, table, border, point);
     e.e.stopPropagation?.();
     return;
