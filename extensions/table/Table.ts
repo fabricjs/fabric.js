@@ -182,19 +182,9 @@ export class Table extends Group {
     object.fire('added', { target: this });
   }
 
-  override triggerLayout(options?: { deep?: boolean }) {
+  private triggerLayoutWithAnchor() {
     const anchor = this.getPositionByOrigin(this.originX, this.originY);
-    super.triggerLayout(options);
-    this.setPositionByOrigin(anchor, this.originX, this.originY);
-    this.setCoords();
-  }
-
-  override _onAfterObjectsChange(
-    type: 'added' | 'removed',
-    targets: FabricObject[],
-  ) {
-    const anchor = this.getPositionByOrigin(this.originX, this.originY);
-    super._onAfterObjectsChange(type, targets);
+    this.triggerLayout();
     this.setPositionByOrigin(anchor, this.originX, this.originY);
     this.setCoords();
   }
@@ -363,21 +353,21 @@ export class Table extends Group {
   set minCellHeight(v: number) {
     if (this.strategy) {
       this.strategy.minCellHeight = v;
-      this.triggerLayout();
+      this.triggerLayoutWithAnchor();
     }
   }
 
   set cellPadding(v: number) {
     if (this.strategy) {
       this.strategy.cellPadding = v;
-      this.triggerLayout();
+      this.triggerLayoutWithAnchor();
     }
   }
 
   set cellSpacing(v: number) {
     if (this.strategy) {
       this.strategy.cellSpacing = v;
-      this.triggerLayout();
+      this.triggerLayoutWithAnchor();
     }
   }
 
@@ -445,7 +435,7 @@ export class Table extends Group {
     this.strategy.rows++;
     this.strategy.rowHeights.splice(position, 0, this.minCellHeight);
     this.strategy.manualRowHeights.splice(position, 0, null);
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   removeRow(position = this.rows - 1) {
@@ -455,7 +445,7 @@ export class Table extends Group {
     this.strategy.rows--;
     this.strategy.rowHeights.splice(position, 1);
     this.strategy.manualRowHeights.splice(position, 1);
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   addColumn(position = this.cols) {
@@ -481,7 +471,7 @@ export class Table extends Group {
     this.strategy.cols++;
     const equalWidth = Math.max(this.minCellWidth, totalWidth / this.strategy.cols);
     this.strategy.columnWidths = new Array(this.strategy.cols).fill(equalWidth);
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   removeColumn(position = this.cols - 1) {
@@ -490,7 +480,7 @@ export class Table extends Group {
     this.shiftIndices('_col', position, -1);
     this.strategy.cols--;
     this.strategy.columnWidths.splice(position, 1);
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   updateCellFill(color: string) {
@@ -515,7 +505,7 @@ export class Table extends Group {
     this.cells
       .filter((c) => !(c as any)._hasCustomStroke)
       .forEach((c) => c.set('strokeWidth', width));
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   private expandBoundsToIncludeMergedRegions(
@@ -678,7 +668,7 @@ export class Table extends Group {
 
     this.markSlaveCells(bounds.minRow, bounds.minCol, rowspan, colspan);
 
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   unmergeCells(row: number, col: number) {
@@ -705,7 +695,7 @@ export class Table extends Group {
       }
     }
 
-    this.triggerLayout();
+    this.triggerLayoutWithAnchor();
   }
 
   toLocalPoint(canvasPoint: Point): Point {

@@ -29,7 +29,10 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
           Math.max(table.minCellWidth, w * scale),
         );
         const changed = newWidths.some((w, i) => w !== table.columnWidths[i]);
-        newWidths.forEach((w, i) => table.setColumnWidth(i, w));
+        if (table.strategy) {
+          table.strategy.columnWidths = [...newWidths];
+          table.triggerLayout();
+        }
         return changed;
       }
 
@@ -55,7 +58,11 @@ function createEdgeResizeHandler(edge: 'left' | 'right' | 'top' | 'bottom'): Tra
         Math.max(table.minCellHeight, h * scale),
       );
       const changed = newHeights.some((h, i) => h !== table.rowHeights[i]);
-      newHeights.forEach((h, i) => table.setRowHeight(i, h));
+      if (table.strategy) {
+        table.strategy.rowHeights = [...newHeights];
+        table.strategy.manualRowHeights = [...newHeights];
+        table.triggerLayout();
+      }
       return changed;
     }
 
