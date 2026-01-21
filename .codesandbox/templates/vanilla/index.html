@@ -1,12 +1,144 @@
 <!doctype html>
 <html>
   <head>
-    <title>Parcel Sandbox</title>
+    <title>FabricJS Table Extension Demo</title>
     <meta charset="UTF-8" />
   </head>
 
   <body>
-    <canvas id="canvas"></canvas>
+    <header>
+      <div class="header-left">
+        <button id="addTable">+ Add Table</button>
+        <span class="subtitle">Table Extension Demo</span>
+      </div>
+      <div class="header-right">
+        <button id="zoomOut">−</button>
+        <span id="zoomLevel">100%</span>
+        <button id="zoomIn">+</button>
+        <button id="zoomReset">1:1</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="canvas-area">
+        <canvas id="canvas"></canvas>
+      </div>
+
+      <aside id="sidebar">
+        <section id="tablePanel" class="panel hidden">
+          <div class="panel-header">
+            <span>Table</span>
+            <button id="deleteTable" class="danger-text">Delete</button>
+          </div>
+
+          <div class="section-label">Structure</div>
+          <div class="button-row">
+            <button id="removeRow" class="danger" title="Delete selected row">− Row</button>
+            <button id="removeCol" class="danger" title="Delete selected column">− Col</button>
+          </div>
+          <div class="hint">Hover edges to insert rows/columns</div>
+
+          <div class="section-label">Resize Mode</div>
+          <div class="button-row">
+            <button id="resizeSingle" class="toggle">Single</button>
+            <button id="resizeProportional" class="toggle active">Proportional</button>
+          </div>
+
+          <div class="section-label">Reflow Origin</div>
+          <div class="origin-grid">
+            <button data-ox="left" data-oy="top" class="origin-btn active">↖</button>
+            <button data-ox="center" data-oy="top" class="origin-btn">↑</button>
+            <button data-ox="right" data-oy="top" class="origin-btn">↗</button>
+            <button data-ox="left" data-oy="center" class="origin-btn">←</button>
+            <button data-ox="center" data-oy="center" class="origin-btn">•</button>
+            <button data-ox="right" data-oy="center" class="origin-btn">→</button>
+            <button data-ox="left" data-oy="bottom" class="origin-btn">↙</button>
+            <button data-ox="center" data-oy="bottom" class="origin-btn">↓</button>
+            <button data-ox="right" data-oy="bottom" class="origin-btn">↘</button>
+          </div>
+          <div class="hint">Anchor point when adding rows/columns</div>
+
+          <div class="section-label">Style</div>
+          <div class="control-group">
+            <label>
+              <span>Padding</span>
+              <input type="range" id="cellPadding" min="0" max="20" value="8">
+              <span id="cellPaddingVal">8</span>
+            </label>
+            <label>
+              <span>Spacing</span>
+              <input type="range" id="cellSpacing" min="0" max="10" value="0">
+              <span id="cellSpacingVal">0</span>
+            </label>
+            <label>
+              <span>Border</span>
+              <input type="range" id="borderWidth" min="0" max="4" value="1">
+              <span id="borderWidthVal">1</span>
+            </label>
+            <label>
+              <span>Fill</span>
+              <input type="color" id="tableCellFill" value="#ffffff">
+            </label>
+            <label>
+              <span>Stroke</span>
+              <input type="color" id="tableCellStroke" value="#e0e0e0">
+            </label>
+          </div>
+        </section>
+
+        <section id="cellPanel" class="panel hidden">
+          <div class="panel-header">
+            <span>Cell</span>
+            <span id="cellInfo" class="info">—</span>
+          </div>
+          <div id="mergeControls" class="button-row hidden">
+            <button id="mergeBtn">Merge</button>
+            <button id="unmergeBtn" class="hidden">Unmerge</button>
+          </div>
+          <div class="control-group">
+            <label>
+              <span>Fill</span>
+              <input type="color" id="cellFill" value="#ffffff">
+            </label>
+            <label>
+              <span>Text</span>
+              <input type="color" id="textColor" value="#333333">
+            </label>
+            <label>
+              <span>Size</span>
+              <input type="range" id="fontSize" min="10" max="24" value="14">
+              <span id="fontSizeVal">14</span>
+            </label>
+            <label>
+              <span>Align</span>
+              <div class="button-group">
+                <button id="alignLeft">L</button>
+                <button id="alignCenter">C</button>
+                <button id="alignRight">R</button>
+              </div>
+            </label>
+            <label>
+              <span>Style</span>
+              <div class="button-group">
+                <button id="toggleBold"><b>B</b></button>
+                <button id="toggleItalic"><i>I</i></button>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <div id="emptyState">Click "+ Add Table" to start</div>
+      </aside>
+    </main>
+
+    <footer>
+      <span><kbd>Enter</kbd> edit</span>
+      <span><kbd>↑↓←→</kbd> navigate</span>
+      <span><kbd>Shift</kbd>+click range</span>
+      <span><kbd>⌘M</kbd> merge</span>
+      <span><kbd>Esc</kbd> back out</span>
+    </footer>
+
     <div id="svgout"></div>
     <script src="./src/index.ts" type="module"></script>
   </body>
