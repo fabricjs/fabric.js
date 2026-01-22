@@ -17,11 +17,17 @@ export {
   rotateEventHandler,
 } from './westures_integration';
 
-export { createImageCroppingControls } from './cropping_controls/croppingControls';
+export {
+  createImageCroppingControls,
+  createImageEdgeResizeControls,
+} from './cropping_controls/croppingControls';
 export {
   changeCropY,
   changeCropX,
   changeCropWidth,
   changeCropHeight,
+  changeEdgeWidth,
+  changeEdgeHeight,
+  withFlip,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';

@@ -12,6 +12,39 @@ import { controlsUtils, Point, util } from 'fabric';
 const { wrapWithFixedAnchor, wrapWithFireEvent } = controlsUtils;
 
 /**
+ * Wraps a handler to swap behavior based on flip state.
+ */
+export const withFlip = (
+  handler: TransformActionHandler,
+  flippedHandler: TransformActionHandler,
+  axis: 'flipX' | 'flipY',
+): TransformActionHandler => {
+  return (eventData, transform, x, y) => {
+    if (transform.target[axis]) {
+      return flippedHandler(eventData, transform, x, y);
+    }
+    return handler(eventData, transform, x, y);
+  };
+};
+
+/**
+ * Wraps corner handlers to swap both X and Y behavior based on flip state.
+ */
+export const withCornerFlip = (
+  xHandler: TransformActionHandler,
+  xFlippedHandler: TransformActionHandler,
+  yHandler: TransformActionHandler,
+  yFlippedHandler: TransformActionHandler,
+): TransformActionHandler => {
+  return (eventData, transform, x, y) => {
+    const target = transform.target as FabricImage;
+    const xResult = (target.flipX ? xFlippedHandler : xHandler)(eventData, transform, x, y);
+    const yResult = (target.flipY ? yFlippedHandler : yHandler)(eventData, transform, x, y);
+    return xResult || yResult;
+  };
+};
+
+/**
  * Wrap controlsUtils.changeObjectWidth with image constrains
  */
 export const changeImageWidth: TransformActionHandler = (
@@ -142,8 +175,10 @@ export const cropPanMoveHandler = ({ transform }: ObjectEvents['moving']) => {
       util.createRotateMatrix({ angle: fabricImage.getTotalAngle() }),
     ),
   );
-  let cropX = original.cropX! - p.x / fabricImage.scaleX;
-  let cropY = original.cropY! - p.y / fabricImage.scaleY;
+  let cropX =
+    original.cropX! - (p.x / fabricImage.scaleX) * (fabricImage.flipX ? -1 : 1);
+  let cropY =
+    original.cropY! - (p.y / fabricImage.scaleY) * (fabricImage.flipY ? -1 : 1);
   const { width, height, _element } = fabricImage;
   if (cropX < 0) {
     cropX = 0;
@@ -206,6 +241,25 @@ const calcScale = (currentPoint: Point, height: number, width: number) =>
   Math.min(Math.abs(currentPoint.x / width), Math.abs(currentPoint.y / height));
 
 /**
+ * Reflects pointer position across object center when image is flipped.
+ * This compensates for the inverted local coordinate system.
+ */
+const reflectPointerForFlip = (
+  target: FabricImage,
+  x: number,
+  y: number,
+): { x: number; y: number } => {
+  if (!target.flipX && !target.flipY) {
+    return { x, y };
+  }
+  const center = target.getCenterPoint();
+  return {
+    x: target.flipX ? 2 * center.x - x : x,
+    y: target.flipY ? 2 * center.y - y : y,
+  };
+};
+
+/**
  * Action handler generator that handles scaling of an image in crop mode.
  * The goal is to keep the current bounding box steady.
  * So this action handler has its own calculations for a dynamic anchor point
@@ -218,21 +272,28 @@ export const scaleEquallyCropGenerator =
     const remainderX = fullWidth - target.width - target.cropX;
     const remainderY = fullHeight - target.height - target.cropY;
     const anchorOriginX =
-      cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width;
+      cx < 0
+        ? 1 + remainderX / target.width
+        : -target.cropX / target.width;
     const anchorOriginY =
-      cy < 0 ? 1 + remainderY / target.height : -target.cropY / target.height;
+      cy < 0
+        ? 1 + remainderY / target.height
+        : -target.cropY / target.height;
     const constraint = target.translateToOriginPoint(
       target.getCenterPoint(),
       anchorOriginX,
       anchorOriginY,
     );
+
+    const pointerForLocalCoords = reflectPointerForFlip(target, x, y);
     const newPoint = controlsUtils.getLocalPoint(
       transform,
       anchorOriginX,
       anchorOriginY,
-      x,
-      y,
+      pointerForLocalCoords.x,
+      pointerForLocalCoords.y,
     );
+
     const scale = calcScale(newPoint, fullHeight, fullWidth);
     const scaleChangeX = scale / target.scaleX;
     const scaleChangeY = scale / target.scaleY;
@@ -249,10 +310,12 @@ export const scaleEquallyCropGenerator =
         ? fullHeight - newHeight - scaledRemainderY
         : target.cropY / scaleChangeY;
 
-    if (
-      (cx < 0 ? scaledRemainderX : newCropX) + newWidth > fullWidth ||
-      (cy < 0 ? scaledRemainderY : newCropY) + newHeight > fullHeight
-    ) {
+    const boundsFailX =
+      (cx < 0 ? scaledRemainderX : newCropX) + newWidth > fullWidth;
+    const boundsFailY =
+      (cy < 0 ? scaledRemainderY : newCropY) + newHeight > fullHeight;
+
+    if (boundsFailX || boundsFailY) {
       return false;
     }
 
@@ -263,9 +326,13 @@ export const scaleEquallyCropGenerator =
     target.cropX = newCropX;
     target.cropY = newCropY;
     const newAnchorOriginX =
-      cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth;
+      cx < 0
+        ? 1 + scaledRemainderX / newWidth
+        : -newCropX / newWidth;
     const newAnchorOriginY =
-      cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight;
+      cy < 0
+        ? 1 + scaledRemainderY / newHeight
+        : -newCropY / newHeight;
     target.setPositionByOrigin(constraint, newAnchorOriginX, newAnchorOriginY);
     return true;
   };
@@ -274,12 +341,138 @@ export function renderGhostImage(
   this: FabricImage,
   { ctx }: { ctx: CanvasRenderingContext2D },
 ) {
+  const element = this._element;
+  const ghostX = -this.width / 2 - this.cropX;
+  const ghostY = -this.height / 2 - this.cropY;
+
   const alpha = ctx.globalAlpha;
   ctx.globalAlpha *= 0.5;
-  ctx.drawImage(
-    this._element,
-    -this.width / 2 - this.cropX,
-    -this.height / 2 - this.cropY,
-  );
+  ctx.drawImage(element, ghostX, ghostY);
+
+  ctx.strokeStyle = this.borderColor;
+  ctx.lineWidth = this.borderScaleFactor / this.scaleX;
+  ctx.strokeRect(ghostX, ghostY, element.width, element.height);
+
   ctx.globalAlpha = alpha;
 }
+
+const { capValue } = util;
+
+/**
+ * Generator for edge resize handlers that support cover scale with bounce-back.
+ * Similar pattern to scaleEquallyCropGenerator.
+ */
+const changeImageEdgeGenerator =
+  (axis: 'x' | 'y'): TransformActionHandler =>
+  (_eventData, transform, x, y) => {
+    const image = transform.target as FabricImage;
+    const original = transform.original as {
+      cropX?: number;
+      cropY?: number;
+      scaleX: number;
+      scaleY: number;
+    };
+
+    const isX = axis === 'x';
+    const elementSize = isX ? image._element.width : image._element.height;
+    const crossElementSize = isX ? image._element.height : image._element.width;
+    const isNegativeEdge = isX
+      ? transform.originX === 'right'
+      : transform.originY === 'bottom';
+
+    const initialSize = isX ? transform.width : transform.height;
+    const initialCrossSize = isX ? transform.height : transform.width;
+    const initialCrop = isX ? (original.cropX ?? 0) : (original.cropY ?? 0);
+    const initialCrossCrop = isX
+      ? (original.cropY ?? 0)
+      : (original.cropX ?? 0);
+    const initialScale = isX ? original.scaleX : original.scaleY;
+    const initialCrossScale = isX ? original.scaleY : original.scaleX;
+
+    const localPoint = controlsUtils.getLocalPoint(
+      transform,
+      transform.originX,
+      transform.originY,
+      x,
+      y,
+    );
+
+    const coordinate = isX ? localPoint.x : localPoint.y;
+    const rawSize = isNegativeEdge ? -coordinate : coordinate;
+    const requestedSize = Math.max(10, rawSize / initialScale);
+
+    const availableSize = isNegativeEdge
+      ? initialCrop + initialSize
+      : elementSize - initialCrop;
+
+    const setImageProps = (
+      size: number,
+      crossSize: number,
+      scale: number,
+      crop: number,
+      crossCrop: number,
+    ) => {
+      if (isX) {
+        image.width = size;
+        image.height = crossSize;
+        image.cropX = crop;
+        image.cropY = crossCrop;
+      } else {
+        image.height = size;
+        image.width = crossSize;
+        image.cropY = crop;
+        image.cropX = crossCrop;
+      }
+      image.scaleX = scale;
+      image.scaleY = scale;
+    };
+
+    if (requestedSize <= availableSize) {
+      const newCrop = isNegativeEdge
+        ? Math.max(0, initialCrop + initialSize - requestedSize)
+        : initialCrop;
+      setImageProps(
+        Math.max(1, requestedSize),
+        initialCrossSize,
+        initialScale,
+        newCrop,
+        initialCrossCrop,
+      );
+    } else {
+      const targetScaledSize = requestedSize * initialScale;
+      const newScale = targetScaledSize / availableSize;
+
+      const scaledCrossSize = initialCrossSize * initialCrossScale;
+      const crossNaturalInView = scaledCrossSize / newScale;
+      const newCrossSize = Math.min(crossNaturalInView, crossElementSize);
+      const crossCenter = initialCrossCrop + initialCrossSize / 2;
+      const newCrossCrop = capValue(
+        crossCenter - newCrossSize / 2,
+        0,
+        crossElementSize - newCrossSize,
+      );
+
+      setImageProps(
+        availableSize,
+        newCrossSize,
+        newScale,
+        isNegativeEdge ? 0 : initialCrop,
+        newCrossCrop,
+      );
+    }
+
+    return true;
+  };
+
+export const changeImageEdgeWidth = changeImageEdgeGenerator('x');
+export const changeImageEdgeHeight = changeImageEdgeGenerator('y');
+
+export const changeEdgeWidth = wrapWithFireEvent(
+  'RESIZING' as TModificationEvents,
+  wrapWithFixedAnchor(changeImageEdgeWidth),
+);
+
+export const changeEdgeHeight = wrapWithFireEvent(
+  'RESIZING' as TModificationEvents,
+  wrapWithFixedAnchor(changeImageEdgeHeight),
+);

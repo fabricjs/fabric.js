@@ -61,25 +61,25 @@ describe('createImageCroppingControls', () => {
     expect(typeof controls.bls.actionHandler).toBe('function');
   });
 
-  // Cropping middle controls tests
-  test('mlc control uses changeCropX as actionHandler', () => {
+  // Cropping middle controls tests (wrapped with withFlip for flip-aware behavior)
+  test('mlc control has flip-aware actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mlc.actionHandler).toBe(changeCropX);
+    expect(typeof controls.mlc.actionHandler).toBe('function');
   });
 
-  test('mrc control uses changeCropWidth as actionHandler', () => {
+  test('mrc control has flip-aware actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mrc.actionHandler).toBe(changeCropWidth);
+    expect(typeof controls.mrc.actionHandler).toBe('function');
   });
 
-  test('mbc control uses changeCropHeight as actionHandler', () => {
+  test('mbc control has flip-aware actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mbc.actionHandler).toBe(changeCropHeight);
+    expect(typeof controls.mbc.actionHandler).toBe('function');
   });
 
-  test('mtc control uses changeCropY as actionHandler', () => {
+  test('mtc control has flip-aware actionHandler', () => {
     const controls = createImageCroppingControls();
-    expect(controls.mtc.actionHandler).toBe(changeCropY);
+    expect(typeof controls.mtc.actionHandler).toBe('function');
   });
 
   // Cropping corner controls tests

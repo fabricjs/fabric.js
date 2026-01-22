@@ -6,12 +6,21 @@ import {
   changeCropY,
   ghostScalePositionHandler,
   scaleEquallyCropGenerator,
+  changeEdgeWidth,
+  changeEdgeHeight,
+  withFlip,
+  withCornerFlip,
 } from './croppingHandlers';
-import { renderCornerControl } from './renderCornerControl';
+import {
+  renderCornerControl,
+  renderRoundedSegmentControl,
+  shouldActivateCorner,
+} from './controlRendering';
 
 const { scaleCursorStyleHandler } = controlsUtils;
 
 const cropActionName = () => 'crop';
+
 // use this function if you want to generate new controls for every instance
 export const createImageCroppingControls = () => ({
   // scaling image
@@ -47,40 +56,48 @@ export const createImageCroppingControls = () => ({
   mlc: new Control({
     x: -0.5,
     y: 0,
-    sizeX: 4,
-    sizeY: 20,
+    angle: 90,
+    sizeX: 8,
+    sizeY: 16,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropX,
+    actionHandler: withFlip(changeCropX, changeCropWidth, 'flipX'),
     getActionName: cropActionName,
   }),
 
   mrc: new Control({
     x: 0.5,
     y: 0,
-    sizeX: 4,
-    sizeY: 20,
+    angle: 90,
+    sizeX: 8,
+    sizeY: 16,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropWidth,
+    actionHandler: withFlip(changeCropWidth, changeCropX, 'flipX'),
     getActionName: cropActionName,
   }),
 
   mbc: new Control({
     x: 0,
     y: 0.5,
-    sizeX: 20,
-    sizeY: 4,
+    angle: 0,
+    sizeX: 16,
+    sizeY: 8,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropHeight,
+    actionHandler: withFlip(changeCropHeight, changeCropY, 'flipY'),
     getActionName: cropActionName,
   }),
 
   mtc: new Control({
     x: 0,
     y: -0.5,
-    sizeX: 20,
-    sizeY: 4,
+    angle: 0,
+    sizeX: 16,
+    sizeY: 8,
+    render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeCropY,
+    actionHandler: withFlip(changeCropY, changeCropHeight, 'flipY'),
     getActionName: cropActionName,
   }),
 
@@ -88,15 +105,12 @@ export const createImageCroppingControls = () => ({
     angle: 0,
     x: -0.5,
     y: -0.5,
-    sizeX: 20,
-    sizeY: 4,
+    sizeX: 12,
+    sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: (...args) => {
-      const cropX = changeCropX(...args);
-      const cropY = changeCropY(...args);
-      return cropX || cropY;
-    },
+    actionHandler: withCornerFlip(changeCropX, changeCropWidth, changeCropY, changeCropHeight),
     getActionName: cropActionName,
   }),
 
@@ -104,15 +118,12 @@ export const createImageCroppingControls = () => ({
     angle: 90,
     x: 0.5,
     y: -0.5,
-    sizeX: 20,
-    sizeY: 4,
+    sizeX: 12,
+    sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: (...args) => {
-      const width = changeCropWidth(...args);
-      const cropY = changeCropY(...args);
-      return width || cropY;
-    },
+    actionHandler: withCornerFlip(changeCropWidth, changeCropX, changeCropY, changeCropHeight),
     getActionName: cropActionName,
   }),
 
@@ -120,15 +131,12 @@ export const createImageCroppingControls = () => ({
     angle: 270,
     x: -0.5,
     y: 0.5,
-    sizeX: 20,
-    sizeY: 4,
+    sizeX: 12,
+    sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: (...args) => {
-      const height = changeCropHeight(...args);
-      const cropX = changeCropX(...args);
-      return height || cropX;
-    },
+    actionHandler: withCornerFlip(changeCropX, changeCropWidth, changeCropHeight, changeCropY),
     getActionName: cropActionName,
   }),
 
@@ -136,15 +144,65 @@ export const createImageCroppingControls = () => ({
     angle: 180,
     x: 0.5,
     y: 0.5,
-    sizeX: 20,
-    sizeY: 4,
+    sizeX: 12,
+    sizeY: 8,
     render: renderCornerControl,
+    shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: (...args) => {
-      const height = changeCropHeight(...args);
-      const width = changeCropWidth(...args);
-      return height || width;
-    },
+    actionHandler: withCornerFlip(changeCropWidth, changeCropX, changeCropHeight, changeCropY),
     getActionName: cropActionName,
+  }),
+});
+
+const edgeActionName = () => 'resizing';
+
+// edge resize controls - resize within crop bounds, then uniform scale when exhausted
+export const createImageEdgeResizeControls = () => ({
+  mle: new Control({
+    x: -0.5,
+    y: 0,
+    angle: 90,
+    sizeX: 8,
+    sizeY: 16,
+    render: renderRoundedSegmentControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeWidth,
+    getActionName: edgeActionName,
+  }),
+
+  mre: new Control({
+    x: 0.5,
+    y: 0,
+    angle: 90,
+    sizeX: 8,
+    sizeY: 16,
+    render: renderRoundedSegmentControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeWidth,
+    getActionName: edgeActionName,
+  }),
+
+  mte: new Control({
+    x: 0,
+    y: -0.5,
+    angle: 0,
+    sizeX: 16,
+    sizeY: 8,
+    render: renderRoundedSegmentControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeHeight,
+    getActionName: edgeActionName,
+  }),
+
+  mbe: new Control({
+    x: 0,
+    y: 0.5,
+    angle: 0,
+    sizeX: 16,
+    sizeY: 8,
+    render: renderRoundedSegmentControl,
+    cursorStyleHandler: scaleCursorStyleHandler,
+    actionHandler: changeEdgeHeight,
+    getActionName: edgeActionName,
   }),
 });
