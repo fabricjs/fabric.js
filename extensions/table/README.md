@@ -101,6 +101,34 @@ This is independent of the table's visual `originX`/`originY` (which defaults to
 - [x] Cell merging (colspan/rowspan)
 - [x] Cell unmerging
 - [x] Insert indicators: hover outside table edges to show "+" buttons for adding rows/columns
+- [x] Delete indicators: hover outside table edges (opposite side from insert) to show "-" buttons for removing rows/columns
+- [x] Delete with merge handling: shows unmerge icon when row/column contains merged cells; click to unmerge first, then delete
+
+## Configuration
+
+Developer-level options (not serialized):
+
+```typescript
+const table = new Table(3, 3, {
+  // Indicators
+  showInsertIndicators: true,   // Show "+" buttons for adding rows/cols
+  showDeleteIndicators: true,   // Show "-" buttons for removing rows/cols
+
+  // Column insert behavior
+  columnInsertMode: 'redistribute', // 'redistribute' keeps total width, divides equally
+                                    // 'expand' adds column at adjacent width, table grows
+
+  // Edge resize behavior
+  edgeResizeMode: 'single',     // 'single' resizes only edge row/col
+                                // 'proportional' scales all rows/cols
+});
+```
+
+These can be changed at runtime:
+```typescript
+table.showDeleteIndicators = false;  // Hide delete indicators
+table.columnInsertMode = 'expand';   // Switch to expand mode
+```
 
 ## TODO (extension)
 

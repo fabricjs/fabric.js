@@ -36,12 +36,30 @@
             <button id="removeRow" class="danger" title="Delete selected row">− Row</button>
             <button id="removeCol" class="danger" title="Delete selected column">− Col</button>
           </div>
-          <div class="hint">Hover edges to insert rows/columns</div>
+          <div class="hint">Hover edges to insert/delete</div>
 
           <div class="section-label">Resize Mode</div>
           <div class="button-row">
             <button id="resizeSingle" class="toggle">Single</button>
             <button id="resizeProportional" class="toggle active">Proportional</button>
+          </div>
+
+          <div class="section-label">Column Insert</div>
+          <div class="button-row">
+            <button id="insertRedistribute" class="toggle active">Redistribute</button>
+            <button id="insertExpand" class="toggle">Expand</button>
+          </div>
+
+          <div class="section-label">Indicators</div>
+          <div class="control-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="showInsert" checked>
+              <span>Insert (+)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="showDelete" checked>
+              <span>Delete (−)</span>
+            </label>
           </div>
 
           <div class="section-label">Reflow Origin</div>

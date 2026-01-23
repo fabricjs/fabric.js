@@ -46,6 +46,12 @@ export async function testCase(canvas: fabric.Canvas) {
       $('resizeSingle').classList.toggle('active', table.edgeResizeMode === 'single');
       $('resizeProportional').classList.toggle('active', table.edgeResizeMode === 'proportional');
 
+      $('insertRedistribute').classList.toggle('active', table.columnInsertMode === 'redistribute');
+      $('insertExpand').classList.toggle('active', table.columnInsertMode === 'expand');
+
+      $<HTMLInputElement>('showInsert').checked = table.showInsertIndicators;
+      $<HTMLInputElement>('showDelete').checked = table.showDeleteIndicators;
+
       $$('.origin-btn').forEach((btn) => {
         const el = btn as HTMLElement;
         const isActive = el.dataset.ox === table.reflowOriginX && el.dataset.oy === table.reflowOriginY;
@@ -161,6 +167,30 @@ export async function testCase(canvas: fabric.Canvas) {
     if (!currentTable) return;
     currentTable.edgeResizeMode = 'proportional';
     updateUI();
+  };
+
+  $('insertRedistribute').onclick = () => {
+    if (!currentTable) return;
+    currentTable.columnInsertMode = 'redistribute';
+    updateUI();
+  };
+
+  $('insertExpand').onclick = () => {
+    if (!currentTable) return;
+    currentTable.columnInsertMode = 'expand';
+    updateUI();
+  };
+
+  $<HTMLInputElement>('showInsert').onchange = function () {
+    if (!currentTable) return;
+    currentTable.showInsertIndicators = (this as HTMLInputElement).checked;
+    canvas.requestRenderAll();
+  };
+
+  $<HTMLInputElement>('showDelete').onchange = function () {
+    if (!currentTable) return;
+    currentTable.showDeleteIndicators = (this as HTMLInputElement).checked;
+    canvas.requestRenderAll();
   };
 
   $$('.origin-btn').forEach((btn) => {

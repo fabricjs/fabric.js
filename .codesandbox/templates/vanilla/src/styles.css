@@ -230,6 +230,18 @@ button:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.checkbox-label {
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+}
+
+.checkbox-label span {
+  width: auto !important;
+}
+
 .danger {
   color: #dc2626;
   border-color: #fecaca;

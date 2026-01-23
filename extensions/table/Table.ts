@@ -39,6 +39,9 @@ export interface TableDefaults {
   indicatorOffset: number;
   indicatorRadius: number;
   indicatorHitRadius: number;
+  showInsertIndicators: boolean;
+  showDeleteIndicators: boolean;
+  columnInsertMode: 'redistribute' | 'expand';
   edgeResizeMode: 'single' | 'proportional';
   reflowOriginX: TOriginX;
   reflowOriginY: TOriginY;
@@ -101,6 +104,9 @@ export class Table extends Group {
   declare indicatorOffset: number;
   declare indicatorRadius: number;
   declare indicatorHitRadius: number;
+  declare showInsertIndicators: boolean;
+  declare showDeleteIndicators: boolean;
+  declare columnInsertMode: 'redistribute' | 'expand';
   declare edgeResizeMode: 'single' | 'proportional';
   declare reflowOriginX: TOriginX;
   declare reflowOriginY: TOriginY;
@@ -108,6 +114,11 @@ export class Table extends Group {
   _selectedCells: CellPosition[] = [];
   _selectionAnchor: CellPosition | null = null;
   _hoveredBorder: TableBorderInfo | null = null;
+  _hoveredDeleteIndicator: {
+    type: 'row' | 'col';
+    index: number;
+    hasMerge: boolean;
+  } | null = null;
   _isDraggingBorder = false;
 
   static defaults: TableDefaults = {
@@ -128,6 +139,9 @@ export class Table extends Group {
     indicatorOffset: 15,
     indicatorRadius: 8,
     indicatorHitRadius: 10,
+    showInsertIndicators: true,
+    showDeleteIndicators: true,
+    columnInsertMode: 'redistribute',
     edgeResizeMode: 'single',
     reflowOriginX: 'left',
     reflowOriginY: 'top',
@@ -172,6 +186,9 @@ export class Table extends Group {
     this.indicatorOffset = config.indicatorOffset;
     this.indicatorRadius = config.indicatorRadius;
     this.indicatorHitRadius = config.indicatorHitRadius;
+    this.showInsertIndicators = config.showInsertIndicators;
+    this.showDeleteIndicators = config.showDeleteIndicators;
+    this.columnInsertMode = config.columnInsertMode;
     this.edgeResizeMode = config.edgeResizeMode;
     this.reflowOriginX = config.reflowOriginX;
     this.reflowOriginY = config.reflowOriginY;
@@ -487,16 +504,22 @@ export class Table extends Group {
       const [cell, text] = Table.createCellPair(r, position, config);
       this.add(cell, text);
     }
-    const totalWidth = this.strategy.columnWidths.reduce(
-      (sum, w) => sum + w,
-      0,
-    );
     this.strategy.cols++;
-    const equalWidth = Math.max(
-      this.minCellWidth,
-      totalWidth / this.strategy.cols,
-    );
-    this.strategy.columnWidths = new Array(this.strategy.cols).fill(equalWidth);
+    if (this.columnInsertMode === 'expand') {
+      this.strategy.columnWidths.splice(position, 0, sourceWidth);
+    } else {
+      const totalWidth = this.strategy.columnWidths.reduce(
+        (sum, w) => sum + w,
+        0,
+      );
+      const equalWidth = Math.max(
+        this.minCellWidth,
+        totalWidth / this.strategy.cols,
+      );
+      this.strategy.columnWidths = new Array(this.strategy.cols).fill(
+        equalWidth,
+      );
+    }
     this.triggerLayoutWithAnchor();
   }
 
@@ -809,6 +832,24 @@ export class Table extends Group {
     return pos - halfSpacing - contentSize / 2;
   }
 
+  getColumnCenter(col: number): number {
+    const { contentWidth } = this.getContentDimensions();
+    let pos = 0;
+    for (let i = 0; i < col; i++) {
+      pos += this.columnWidths[i] + this.cellSpacing;
+    }
+    return pos + this.columnWidths[col] / 2 - contentWidth / 2;
+  }
+
+  getRowCenter(row: number): number {
+    const { contentHeight } = this.getContentDimensions();
+    let pos = 0;
+    for (let i = 0; i < row; i++) {
+      pos += this.rowHeights[i] + this.cellSpacing;
+    }
+    return pos + this.rowHeights[row] / 2 - contentHeight / 2;
+  }
+
   private findBorderAtPosition(
     position: number,
     count: number,
@@ -866,6 +907,61 @@ export class Table extends Group {
       }
     }
     return false;
+  }
+
+  private getMergeMaster(cell: TableCell): TableCell | null {
+    if (cell._isMerged && cell._mergeParent) {
+      return this.getCell(cell._mergeParent.row, cell._mergeParent.col) ?? null;
+    }
+    return cell._colspan !== 1 || cell._rowspan !== 1 ? cell : null;
+  }
+
+  colHasMergeCrossing(col: number): boolean {
+    for (let r = 0; r < this.rows; r++) {
+      const cell = this.getCell(r, col);
+      if (!cell) continue;
+      const master = this.getMergeMaster(cell);
+      if (master && (master._colspan ?? 1) > 1) return true;
+    }
+    return false;
+  }
+
+  rowHasMergeCrossing(row: number): boolean {
+    for (let c = 0; c < this.cols; c++) {
+      const cell = this.getCell(row, c);
+      if (!cell) continue;
+      const master = this.getMergeMaster(cell);
+      if (master && (master._rowspan ?? 1) > 1) return true;
+    }
+    return false;
+  }
+
+  unmergeColumn(col: number) {
+    const toUnmerge = new Set<string>();
+    for (let r = 0; r < this.rows; r++) {
+      const cell = this.getCell(r, col);
+      if (!cell) continue;
+      const master = this.getMergeMaster(cell);
+      if (master) toUnmerge.add(`${master._row},${master._col}`);
+    }
+    for (const key of toUnmerge) {
+      const [r, c] = key.split(',').map(Number);
+      this.unmergeCells(r, c);
+    }
+  }
+
+  unmergeRow(row: number) {
+    const toUnmerge = new Set<string>();
+    for (let c = 0; c < this.cols; c++) {
+      const cell = this.getCell(row, c);
+      if (!cell) continue;
+      const master = this.getMergeMaster(cell);
+      if (master) toUnmerge.add(`${master._row},${master._col}`);
+    }
+    for (const key of toUnmerge) {
+      const [r, c] = key.split(',').map(Number);
+      this.unmergeCells(r, c);
+    }
   }
 
   getBorderAtPoint(
@@ -936,6 +1032,9 @@ export class Table extends Group {
     border: TableBorderInfo;
     indicatorSide: 'before' | 'after' | null;
     inCircle?: boolean;
+    rowIndex?: number;
+    colIndex?: number;
+    hasMerge?: boolean;
   } | null {
     const local = this.toLocalPoint(canvasPoint);
     const { contentWidth, contentHeight } = this.getContentDimensions();
@@ -948,34 +1047,81 @@ export class Table extends Group {
     const indicatorHitRadius = this.indicatorHitRadius / scale;
     const indicatorRadius = this.indicatorRadius / scale;
 
-    for (let i = 0; i <= this.cols; i++) {
-      const x = this.getBorderPosition('col', i);
-      const indicatorY = -halfH - indicatorOffset;
-      const top = indicatorY - indicatorHitRadius;
+    if (this.showInsertIndicators) {
+      for (let i = 0; i <= this.cols; i++) {
+        const x = this.getBorderPosition('col', i);
+        const indicatorY = -halfH - indicatorOffset;
+        const top = indicatorY - indicatorHitRadius;
+        const inHitbox =
+          local.x >= x - indicatorHitRadius &&
+          local.x <= x + indicatorHitRadius &&
+          local.y >= top &&
+          local.y <= -halfH;
+        if (inHitbox) {
+          const dx = local.x - x;
+          const dy = local.y - indicatorY;
+          const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
+          return {
+            border: { type: 'col', index: i, position: x },
+            indicatorSide: 'before',
+            inCircle,
+          };
+        }
+      }
+
+      for (let i = 0; i <= this.rows; i++) {
+        const y = this.getBorderPosition('row', i);
+        const indicatorX = -halfW - indicatorOffset;
+        const left = indicatorX - indicatorHitRadius;
+        const inHitbox =
+          local.x >= left &&
+          local.x <= -halfW &&
+          local.y >= y - indicatorHitRadius &&
+          local.y <= y + indicatorHitRadius;
+        if (inHitbox) {
+          const dx = local.x - indicatorX;
+          const dy = local.y - y;
+          const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
+          return {
+            border: { type: 'row', index: i, position: y },
+            indicatorSide: 'before',
+            inCircle,
+          };
+        }
+      }
+    }
+
+    if (this.showDeleteIndicators) {
+      for (let i = 0; i < this.cols; i++) {
+      const x = this.getColumnCenter(i);
+      const indicatorY = halfH + indicatorOffset;
+      const bottom = indicatorY + indicatorHitRadius;
       const inHitbox =
         local.x >= x - indicatorHitRadius &&
         local.x <= x + indicatorHitRadius &&
-        local.y >= top &&
-        local.y <= -halfH;
+        local.y >= halfH &&
+        local.y <= bottom;
       if (inHitbox) {
         const dx = local.x - x;
         const dy = local.y - indicatorY;
         const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
         return {
           border: { type: 'col', index: i, position: x },
-          indicatorSide: 'before',
+          indicatorSide: 'after',
           inCircle,
+          colIndex: i,
+          hasMerge: this.colHasMergeCrossing(i),
         };
       }
     }
 
-    for (let i = 0; i <= this.rows; i++) {
-      const y = this.getBorderPosition('row', i);
-      const indicatorX = -halfW - indicatorOffset;
-      const left = indicatorX - indicatorHitRadius;
+    for (let i = 0; i < this.rows; i++) {
+      const y = this.getRowCenter(i);
+      const indicatorX = halfW + indicatorOffset;
+      const right = indicatorX + indicatorHitRadius;
       const inHitbox =
-        local.x >= left &&
-        local.x <= -halfW &&
+        local.x >= halfW &&
+        local.x <= right &&
         local.y >= y - indicatorHitRadius &&
         local.y <= y + indicatorHitRadius;
       if (inHitbox) {
@@ -984,10 +1130,13 @@ export class Table extends Group {
         const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
         return {
           border: { type: 'row', index: i, position: y },
-          indicatorSide: 'before',
+          indicatorSide: 'after',
           inCircle,
+          rowIndex: i,
+          hasMerge: this.rowHasMergeCrossing(i),
         };
       }
+    }
     }
 
     const border = this.getBorderAtPoint(canvasPoint, threshold);
@@ -1121,7 +1270,12 @@ export class Table extends Group {
   }
 
   drawInsertIndicator(ctx: CanvasRenderingContext2D) {
-    if (!this._hoveredBorder || this._isDraggingBorder) return;
+    if (
+      !this.showInsertIndicators ||
+      !this._hoveredBorder ||
+      this._isDraggingBorder
+    )
+      return;
 
     const vpt = this.getViewportTransform();
     const retinaScaling = this.getCanvasRetinaScaling();
@@ -1166,10 +1320,68 @@ export class Table extends Group {
     ctx.restore();
   }
 
+  drawDeleteIndicator(ctx: CanvasRenderingContext2D) {
+    if (
+      !this.showDeleteIndicators ||
+      !this._hoveredDeleteIndicator ||
+      this._isDraggingBorder
+    )
+      return;
+
+    const vpt = this.getViewportTransform();
+    const retinaScaling = this.getCanvasRetinaScaling();
+    const matrix = this.calcTransformMatrix();
+
+    const { contentWidth, contentHeight } = this.getContentDimensions();
+    const { type, index, hasMerge } = this._hoveredDeleteIndicator;
+    const halfW = contentWidth / 2;
+    const halfH = contentHeight / 2;
+
+    const edgeX = type === 'col' ? this.getColumnCenter(index) : halfW;
+    const edgeY = type === 'col' ? halfH : this.getRowCenter(index);
+    const edgePoint = new Point(edgeX, edgeY).transform(matrix).transform(vpt);
+
+    const viewportPoint = new Point(
+      type === 'col' ? edgePoint.x : edgePoint.x + this.indicatorOffset,
+      type === 'col' ? edgePoint.y + this.indicatorOffset : edgePoint.y,
+    );
+
+    ctx.save();
+    ctx.setTransform(retinaScaling, 0, 0, retinaScaling, 0, 0);
+
+    const r = this.indicatorRadius;
+    const lineLen = r / 2;
+    const strokeWidth = this.borderScaleFactor * 2;
+
+    ctx.fillStyle = this.borderColor;
+    ctx.beginPath();
+    ctx.arc(viewportPoint.x, viewportPoint.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = this.cornerColor;
+    ctx.lineWidth = strokeWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+
+    if (hasMerge) {
+      ctx.moveTo(viewportPoint.x - lineLen, viewportPoint.y - lineLen);
+      ctx.lineTo(viewportPoint.x + lineLen, viewportPoint.y + lineLen);
+      ctx.moveTo(viewportPoint.x + lineLen, viewportPoint.y - lineLen);
+      ctx.lineTo(viewportPoint.x - lineLen, viewportPoint.y + lineLen);
+    } else {
+      ctx.moveTo(viewportPoint.x - lineLen, viewportPoint.y);
+      ctx.lineTo(viewportPoint.x + lineLen, viewportPoint.y);
+    }
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
   override render(ctx: CanvasRenderingContext2D) {
     super.render(ctx);
     this.drawSelectionOverlay(ctx);
     this.drawInsertIndicator(ctx);
+    this.drawDeleteIndicator(ctx);
   }
 
   override toObject(propertiesToInclude: any[] = []) {

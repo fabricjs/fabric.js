@@ -592,6 +592,198 @@ describe('Table', () => {
       expect(result).not.toBeNull();
       expect(result?.indicatorSide).toBe('before');
     });
+
+    test('detects delete indicator below table for column', () => {
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const colCenter = table.getColumnCenter(1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + colCenter,
+        y: 100 + halfH + table.indicatorOffset,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.indicatorSide).toBe('after');
+      expect(result?.colIndex).toBe(1);
+    });
+
+    test('detects delete indicator right of table for row', () => {
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const rowCenter = table.getRowCenter(1);
+      const { contentWidth } = table.getContentDimensions();
+      const halfW = contentWidth / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + halfW + table.indicatorOffset,
+        y: 100 + rowCenter,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.indicatorSide).toBe('after');
+      expect(result?.rowIndex).toBe(1);
+    });
+
+    test('delete indicator hasMerge is false for rowspan-only merge', () => {
+      table.mergeCells(0, 0, 1, 0);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const colCenter = table.getColumnCenter(0);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + colCenter,
+        y: 100 + halfH + table.indicatorOffset,
+      } as any);
+      expect(result?.hasMerge).toBe(false);
+    });
+
+    test('delete indicator hasMerge is true for colspan merge', () => {
+      table.mergeCells(0, 0, 0, 1);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const colCenter = table.getColumnCenter(0);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + colCenter,
+        y: 100 + halfH + table.indicatorOffset,
+      } as any);
+      expect(result?.hasMerge).toBe(true);
+    });
+
+    test('delete indicator hasMerge is false for colspan-only merge', () => {
+      table.mergeCells(0, 0, 0, 1);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const rowCenter = table.getRowCenter(0);
+      const { contentWidth } = table.getContentDimensions();
+      const halfW = contentWidth / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + halfW + table.indicatorOffset,
+        y: 100 + rowCenter,
+      } as any);
+      expect(result?.hasMerge).toBe(false);
+    });
+
+    test('delete indicator hasMerge is true for rowspan merge', () => {
+      table.mergeCells(0, 0, 1, 0);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const rowCenter = table.getRowCenter(0);
+      const { contentWidth } = table.getContentDimensions();
+      const halfW = contentWidth / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + halfW + table.indicatorOffset,
+        y: 100 + rowCenter,
+      } as any);
+      expect(result?.hasMerge).toBe(true);
+    });
+
+    test('delete indicator detection works at 200% zoom', () => {
+      canvas.setViewportTransform([2, 0, 0, 2, 0, 0]);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const colCenter = table.getColumnCenter(1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + colCenter,
+        y: 100 + halfH + table.indicatorOffset / 2,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.indicatorSide).toBe('after');
+    });
+
+    test('delete indicator detection works at 50% zoom', () => {
+      canvas.setViewportTransform([0.5, 0, 0, 0.5, 0, 0]);
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const colCenter = table.getColumnCenter(1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const result = table.getBorderOrIndicatorAtPoint({
+        x: 150 + colCenter,
+        y: 100 + halfH + table.indicatorOffset * 2,
+      } as any);
+      expect(result).not.toBeNull();
+      expect(result?.indicatorSide).toBe('after');
+    });
+  });
+
+  describe('merge boundary detection', () => {
+    test('colHasMergeCrossing returns false for unmerged column', () => {
+      expect(table.colHasMergeCrossing(0)).toBe(false);
+      expect(table.colHasMergeCrossing(1)).toBe(false);
+    });
+
+    test('colHasMergeCrossing returns true when cell spans into column', () => {
+      table.mergeCells(0, 0, 0, 1);
+      expect(table.colHasMergeCrossing(0)).toBe(true);
+      expect(table.colHasMergeCrossing(1)).toBe(true);
+    });
+
+    test('rowHasMergeCrossing returns false for unmerged row', () => {
+      expect(table.rowHasMergeCrossing(0)).toBe(false);
+      expect(table.rowHasMergeCrossing(1)).toBe(false);
+    });
+
+    test('rowHasMergeCrossing returns true when cell spans into row', () => {
+      table.mergeCells(0, 0, 1, 0);
+      expect(table.rowHasMergeCrossing(0)).toBe(true);
+      expect(table.rowHasMergeCrossing(1)).toBe(true);
+    });
+
+    test('colHasMergeCrossing handles slave cells correctly', () => {
+      table.mergeCells(0, 0, 1, 1);
+      expect(table.colHasMergeCrossing(0)).toBe(true);
+      expect(table.colHasMergeCrossing(1)).toBe(true);
+      expect(table.colHasMergeCrossing(2)).toBe(false);
+    });
+
+    test('rowHasMergeCrossing handles slave cells correctly', () => {
+      table.mergeCells(0, 0, 1, 1);
+      expect(table.rowHasMergeCrossing(0)).toBe(true);
+      expect(table.rowHasMergeCrossing(1)).toBe(true);
+      expect(table.rowHasMergeCrossing(2)).toBe(false);
+    });
+  });
+
+  describe('unmerge row/column', () => {
+    test('unmergeColumn unmerges all cells in column', () => {
+      table.mergeCells(0, 0, 0, 1);
+      table.mergeCells(1, 0, 1, 1);
+      table.unmergeColumn(0);
+      expect(table.getCell(0, 0)?._colspan).toBe(1);
+      expect(table.getCell(1, 0)?._colspan).toBe(1);
+      expect(table.getCell(0, 1)?._isMerged).toBe(false);
+      expect(table.getCell(1, 1)?._isMerged).toBe(false);
+    });
+
+    test('unmergeRow unmerges all cells in row', () => {
+      table.mergeCells(0, 0, 1, 0);
+      table.mergeCells(0, 1, 1, 1);
+      table.unmergeRow(0);
+      expect(table.getCell(0, 0)?._rowspan).toBe(1);
+      expect(table.getCell(0, 1)?._rowspan).toBe(1);
+      expect(table.getCell(1, 0)?._isMerged).toBe(false);
+      expect(table.getCell(1, 1)?._isMerged).toBe(false);
+    });
+
+    test('unmergeColumn handles slave cells by finding master', () => {
+      table.mergeCells(0, 0, 0, 2);
+      table.unmergeColumn(1);
+      expect(table.getCell(0, 0)?._colspan).toBe(1);
+      expect(table.getCell(0, 1)?._isMerged).toBe(false);
+      expect(table.getCell(0, 2)?._isMerged).toBe(false);
+    });
+
+    test('unmergeRow handles slave cells by finding master', () => {
+      table.mergeCells(0, 0, 2, 0);
+      table.unmergeRow(1);
+      expect(table.getCell(0, 0)?._rowspan).toBe(1);
+      expect(table.getCell(1, 0)?._isMerged).toBe(false);
+      expect(table.getCell(2, 0)?._isMerged).toBe(false);
+    });
   });
 
   describe('cell selection', () => {

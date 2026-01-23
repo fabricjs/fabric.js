@@ -68,8 +68,12 @@ let clickStart: ClickState | null = null;
 let editor: EditorState | null = null;
 let finishingEdit = false;
 let clipboard: ClipboardCell[] | null = null;
-let pendingIndicatorClick: { table: Table; border: TableBorderInfo } | null =
-  null;
+let pendingIndicatorClick: {
+  table: Table;
+  border: TableBorderInfo;
+  side: 'before' | 'after';
+  hasMerge?: boolean;
+} | null = null;
 const CLICK_THRESHOLD = 5;
 
 const CURSOR_MAP = ['ew', 'nwse', 'ns', 'nesw'];
@@ -128,8 +132,9 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   const scenePoint = canvas.getScenePoint(e.e);
 
   if (table.findControl(viewportPoint)) {
-    if (table._hoveredBorder) {
+    if (table._hoveredBorder || table._hoveredDeleteIndicator) {
       table._hoveredBorder = null;
+      table._hoveredDeleteIndicator = null;
       canvas.requestRenderAll();
     }
     return;
@@ -137,16 +142,37 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
 
   const result = table.getBorderOrIndicatorAtPoint(scenePoint);
 
-  if (result?.indicatorSide && result.inCircle) {
+  if (result?.indicatorSide === 'before' && result.inCircle) {
     table._hoveredBorder = result.border;
+    table._hoveredDeleteIndicator = null;
     canvas.defaultCursor = 'pointer';
     table.hoverCursor = 'pointer';
-  } else if (result?.indicatorSide) {
+  } else if (result?.indicatorSide === 'before') {
     table._hoveredBorder = result.border;
+    table._hoveredDeleteIndicator = null;
+    canvas.defaultCursor = 'default';
+    table.hoverCursor = 'default';
+  } else if (result?.indicatorSide === 'after' && result.inCircle) {
+    table._hoveredBorder = null;
+    table._hoveredDeleteIndicator = {
+      type: result.border.type,
+      index: result.border.index,
+      hasMerge: result.hasMerge ?? false,
+    };
+    canvas.defaultCursor = 'pointer';
+    table.hoverCursor = 'pointer';
+  } else if (result?.indicatorSide === 'after') {
+    table._hoveredBorder = null;
+    table._hoveredDeleteIndicator = {
+      type: result.border.type,
+      index: result.border.index,
+      hasMerge: result.hasMerge ?? false,
+    };
     canvas.defaultCursor = 'default';
     table.hoverCursor = 'default';
   } else if (result?.border) {
     table._hoveredBorder = result.border;
+    table._hoveredDeleteIndicator = null;
     canvas.defaultCursor = 'default';
     table.hoverCursor = getBorderCursor(
       table.getTotalAngle(),
@@ -154,6 +180,7 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
     );
   } else {
     table._hoveredBorder = null;
+    table._hoveredDeleteIndicator = null;
     canvas.defaultCursor = 'default';
     table.hoverCursor = 'move';
   }
@@ -272,13 +299,22 @@ function handleMouseDownBefore(
   pendingIndicatorClick = null;
 
   const activeTable = getActiveTable(canvas);
-  if (!activeTable || !activeTable._hoveredBorder) return;
+  if (
+    !activeTable ||
+    (!activeTable._hoveredBorder && !activeTable._hoveredDeleteIndicator)
+  )
+    return;
 
   const point = canvas.getScenePoint(e.e);
   const result = activeTable.getBorderOrIndicatorAtPoint(point);
 
   if (result?.indicatorSide && result.inCircle) {
-    pendingIndicatorClick = { table: activeTable, border: result.border };
+    pendingIndicatorClick = {
+      table: activeTable,
+      border: result.border,
+      side: result.indicatorSide,
+      hasMerge: result.hasMerge,
+    };
     e.e.stopPropagation?.();
     e.e.preventDefault?.();
   }
@@ -382,15 +418,32 @@ function handleMouseUp(canvas: Canvas, e: { e: TPointerEvent }) {
   }
 
   if (pendingIndicatorClick) {
-    const { table, border } = pendingIndicatorClick;
+    const { table, border, side, hasMerge } = pendingIndicatorClick;
     pendingIndicatorClick = null;
 
-    if (border.type === 'col') {
-      table.addColumn(border.index);
+    if (side === 'before') {
+      if (border.type === 'col') {
+        table.addColumn(border.index);
+      } else {
+        table.addRow(border.index);
+      }
     } else {
-      table.addRow(border.index);
+      if (hasMerge) {
+        if (border.type === 'col') {
+          table.unmergeColumn(border.index);
+        } else {
+          table.unmergeRow(border.index);
+        }
+      } else {
+        if (border.type === 'col') {
+          table.removeColumn(border.index);
+        } else {
+          table.removeRow(border.index);
+        }
+      }
     }
     table._hoveredBorder = null;
+    table._hoveredDeleteIndicator = null;
     canvas.setActiveObject(table);
     canvas.requestRenderAll();
     return;
@@ -448,6 +501,7 @@ function startCellEditing(
   if (!cellText || !cell) return;
 
   table._hoveredBorder = null;
+  table._hoveredDeleteIndicator = null;
   table._isDraggingBorder = false;
   table.clearCellSelection();
 
@@ -781,6 +835,7 @@ function handleDeselected(canvas: Canvas, e: { deselected?: unknown[] }) {
     if (!table) continue;
 
     table._hoveredBorder = null;
+    table._hoveredDeleteIndicator = null;
     table._selectedCells = [];
     table._selectionAnchor = null;
   }
