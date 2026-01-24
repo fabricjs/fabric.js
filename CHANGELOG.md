@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): replace canvas with @napi-rs/canvas [#10854](https://github.com/fabricjs/fabric.js/pull/10854)
 - chore(deps-dev): bump lodash from 4.17.21 to 4.17.23 in the npm_and_yarn group across 1 directory [#10853](https://github.com/fabricjs/fabric.js/pull/10853)
 - feat(): Cropping controls follow ups [#10839](https://github.com/fabricjs/fabric.js/pull/10839)
 - chore(): Add pre-commit hook to run lint, prettier, tsc on staged files. [#10834](https://github.com/fabricjs/fabric.js/pull/10834)
