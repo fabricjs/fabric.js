@@ -3,29 +3,19 @@ import { FabricNamespace, renderTestType } from '../../../types';
 function registerUbuntuFonts() {
   if (typeof window === 'undefined') {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { registerFont } = require('canvas');
+    const { GlobalFonts } = require('@napi-rs/canvas');
     const path = require('node:path');
     const dir = path.resolve(__dirname + '/../../../../../test/fixtures/');
-    registerFont(path.join(dir, 'Ubuntu-Regular.ttf'), {
-      family: 'Ubuntu',
-      weight: 'regular',
-      style: 'normal',
-    });
-    registerFont(path.join(dir, 'Ubuntu-Bold.ttf'), {
-      family: 'Ubuntu',
-      weight: 'bold',
-      style: 'normal',
-    });
-    registerFont(path.join(dir, 'Ubuntu-Italic.ttf'), {
-      family: 'Ubuntu',
-      weight: 'regular',
-      style: 'italic',
-    });
-    registerFont(path.join(dir, 'Ubuntu-BoldItalic.ttf'), {
-      family: 'Ubuntu',
-      weight: 'bold',
-      style: 'italic',
-    });
+    GlobalFonts.registerFromPath(
+      path.join(dir, 'Ubuntu-Regular.ttf'),
+      'Ubuntu',
+    );
+    GlobalFonts.registerFromPath(path.join(dir, 'Ubuntu-Bold.ttf'), 'Ubuntu');
+    GlobalFonts.registerFromPath(path.join(dir, 'Ubuntu-Italic.ttf'), 'Ubuntu');
+    GlobalFonts.registerFromPath(
+      path.join(dir, 'Ubuntu-BoldItalic.ttf'),
+      'Ubuntu',
+    );
   }
 }
 

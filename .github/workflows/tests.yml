@@ -21,7 +21,6 @@ jobs:
         uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: false
       - name: Build fabric.js
         uses: ./.github/actions/build-fabric-cached
   vitest-coverage:
@@ -32,7 +31,6 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: false
       - name: Run Vitest unit test
         run: npm run test:vitest:coverage
       - name: Upload test coverage
@@ -53,7 +51,6 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: false
       - name: Install Playwright Browsers ${{matrix.browser}}
         run: npx playwright install --with-deps ${{matrix.browser}}
       - name: Run Vitest unit test
@@ -68,7 +65,6 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
-          install-system-deps: false
       - name: Run Vitest unit test
         run: npm run test:vitest
   vitest-node-22:
@@ -79,7 +75,6 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 22.x
-          install-system-deps: false
       - name: Run Vitest unit test
         run: npm run test:vitest
   e2e:

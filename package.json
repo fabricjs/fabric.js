@@ -108,11 +108,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "overrides": {
-    "canvas": {
-      "canvas": "3.2.0"
-    }
-  },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "typesVersions": {
@@ -155,7 +150,7 @@
     }
   },
   "optionalDependencies": {
-    "canvas": "^3.2.0",
+    "@napi-rs/canvas": "^0.1.88",
     "jsdom": "^26.1.0"
   },
   "lint-staged": {
