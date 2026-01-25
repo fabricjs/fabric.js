@@ -605,7 +605,7 @@ describe('Table', () => {
       } as any);
       expect(result).not.toBeNull();
       expect(result?.indicatorSide).toBe('after');
-      expect(result?.colIndex).toBe(1);
+      expect(result?.border.index).toBe(1);
     });
 
     test('detects delete indicator right of table for row', () => {
@@ -620,7 +620,7 @@ describe('Table', () => {
       } as any);
       expect(result).not.toBeNull();
       expect(result?.indicatorSide).toBe('after');
-      expect(result?.rowIndex).toBe(1);
+      expect(result?.border.index).toBe(1);
     });
 
     test('delete indicator hasMerge is false for rowspan-only merge', () => {
@@ -707,6 +707,36 @@ describe('Table', () => {
       } as any);
       expect(result).not.toBeNull();
       expect(result?.indicatorSide).toBe('after');
+    });
+
+    test('findControl returns control for insert indicator', () => {
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const borderLocalX = table.getBorderPosition('col', 1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const viewportPoint = {
+        x: 150 + borderLocalX,
+        y: 100 - halfH - table.indicatorOffset,
+      };
+      const result = table.findControl(viewportPoint as any);
+      expect(result).toBeDefined();
+      expect(result?.key).toBe('insert_col_1');
+    });
+
+    test('findControl returns control for delete indicator', () => {
+      table.set({ left: 150, top: 100 });
+      table.setCoords();
+      const colCenter = table.getColumnCenter(1);
+      const { contentHeight } = table.getContentDimensions();
+      const halfH = contentHeight / 2;
+      const viewportPoint = {
+        x: 150 + colCenter,
+        y: 100 + halfH + table.indicatorOffset,
+      };
+      const result = table.findControl(viewportPoint as any);
+      expect(result).toBeDefined();
+      expect(result?.key).toBe('delete_col_1');
     });
   });
 

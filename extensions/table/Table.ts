@@ -4,6 +4,7 @@ import {
   Textbox,
   LayoutManager,
   classRegistry,
+  Control,
   Point,
   util,
   type TOptions,
@@ -13,6 +14,7 @@ import {
   type SerializedGroupProps,
   type TOriginX,
   type TOriginY,
+  type TOCoord,
 } from 'fabric';
 import {
   TableLayoutStrategy,
@@ -136,7 +138,7 @@ export class Table extends Group {
     fontStyle: 'normal',
     textAlign: 'center',
     borderThreshold: 5,
-    indicatorOffset: 15,
+    indicatorOffset: 20,
     indicatorRadius: 8,
     indicatorHitRadius: 10,
     showInsertIndicators: true,
@@ -525,10 +527,20 @@ export class Table extends Group {
 
   removeColumn(position = this.cols - 1) {
     if (this.cols <= 1 || !this.strategy) return;
+    const totalWidth = this.strategy.columnWidths.reduce((sum, w) => sum + w, 0);
     this.removeAtIndex('_col', position);
     this.shiftIndices('_col', position, -1);
     this.strategy.cols--;
     this.strategy.columnWidths.splice(position, 1);
+    if (this.columnInsertMode === 'redistribute') {
+      const equalWidth = Math.max(
+        this.minCellWidth,
+        totalWidth / this.strategy.cols,
+      );
+      this.strategy.columnWidths = new Array(this.strategy.cols).fill(
+        equalWidth,
+      );
+    }
     this.triggerLayoutWithAnchor();
   }
 
@@ -1032,8 +1044,6 @@ export class Table extends Group {
     border: TableBorderInfo;
     indicatorSide: 'before' | 'after' | null;
     inCircle?: boolean;
-    rowIndex?: number;
-    colIndex?: number;
     hasMerge?: boolean;
   } | null {
     const local = this.toLocalPoint(canvasPoint);
@@ -1093,50 +1103,48 @@ export class Table extends Group {
 
     if (this.showDeleteIndicators) {
       for (let i = 0; i < this.cols; i++) {
-      const x = this.getColumnCenter(i);
-      const indicatorY = halfH + indicatorOffset;
-      const bottom = indicatorY + indicatorHitRadius;
-      const inHitbox =
-        local.x >= x - indicatorHitRadius &&
-        local.x <= x + indicatorHitRadius &&
-        local.y >= halfH &&
-        local.y <= bottom;
-      if (inHitbox) {
-        const dx = local.x - x;
-        const dy = local.y - indicatorY;
-        const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
-        return {
-          border: { type: 'col', index: i, position: x },
-          indicatorSide: 'after',
-          inCircle,
-          colIndex: i,
-          hasMerge: this.colHasMergeCrossing(i),
-        };
+        const x = this.getColumnCenter(i);
+        const indicatorY = halfH + indicatorOffset;
+        const bottom = indicatorY + indicatorHitRadius;
+        const inHitbox =
+          local.x >= x - indicatorHitRadius &&
+          local.x <= x + indicatorHitRadius &&
+          local.y >= halfH &&
+          local.y <= bottom;
+        if (inHitbox) {
+          const dx = local.x - x;
+          const dy = local.y - indicatorY;
+          const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
+          return {
+            border: { type: 'col', index: i, position: x },
+            indicatorSide: 'after',
+            inCircle,
+            hasMerge: this.colHasMergeCrossing(i),
+          };
+        }
       }
-    }
 
-    for (let i = 0; i < this.rows; i++) {
-      const y = this.getRowCenter(i);
-      const indicatorX = halfW + indicatorOffset;
-      const right = indicatorX + indicatorHitRadius;
-      const inHitbox =
-        local.x >= halfW &&
-        local.x <= right &&
-        local.y >= y - indicatorHitRadius &&
-        local.y <= y + indicatorHitRadius;
-      if (inHitbox) {
-        const dx = local.x - indicatorX;
-        const dy = local.y - y;
-        const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
-        return {
-          border: { type: 'row', index: i, position: y },
-          indicatorSide: 'after',
-          inCircle,
-          rowIndex: i,
-          hasMerge: this.rowHasMergeCrossing(i),
-        };
+      for (let i = 0; i < this.rows; i++) {
+        const y = this.getRowCenter(i);
+        const indicatorX = halfW + indicatorOffset;
+        const right = indicatorX + indicatorHitRadius;
+        const inHitbox =
+          local.x >= halfW &&
+          local.x <= right &&
+          local.y >= y - indicatorHitRadius &&
+          local.y <= y + indicatorHitRadius;
+        if (inHitbox) {
+          const dx = local.x - indicatorX;
+          const dy = local.y - y;
+          const inCircle = Math.sqrt(dx * dx + dy * dy) <= indicatorRadius;
+          return {
+            border: { type: 'row', index: i, position: y },
+            indicatorSide: 'after',
+            inCircle,
+            hasMerge: this.rowHasMergeCrossing(i),
+          };
+        }
       }
-    }
     }
 
     const border = this.getBorderAtPoint(canvasPoint, threshold);
@@ -1375,6 +1383,58 @@ export class Table extends Group {
     ctx.stroke();
 
     ctx.restore();
+  }
+
+  override findControl(
+    pointer: Point,
+    forTouch = false,
+  ): { key: string; control: Control; coord: TOCoord } | undefined {
+    const parent = super.findControl(pointer, forTouch);
+    if (parent) return parent;
+
+    if (!this.canvas) return undefined;
+
+    const vpt = this.canvas.viewportTransform;
+    const pt = pointer instanceof Point ? pointer : new Point(pointer.x, pointer.y);
+    const scenePoint = pt.transform(util.invertTransform(vpt));
+    const result = this.getBorderOrIndicatorAtPoint(scenePoint);
+
+    if (result?.indicatorSide && result.inCircle) {
+      const key =
+        result.indicatorSide === 'before'
+          ? `insert_${result.border.type}_${result.border.index}`
+          : `delete_${result.border.type}_${result.border.index}`;
+      if (!this.controls[key]) {
+        this.controls[key] = new Control({
+          cursorStyle: 'pointer',
+          visible: false,
+          actionHandler: () => false,
+          actionName: 'indicator',
+        });
+      }
+      this.__corner = key;
+      const r = this.indicatorRadius;
+      const tr = this.indicatorHitRadius;
+      const dummyCoord: TOCoord = {
+        x: pointer.x,
+        y: pointer.y,
+        corner: {
+          tl: new Point(pointer.x - r, pointer.y - r),
+          tr: new Point(pointer.x + r, pointer.y - r),
+          bl: new Point(pointer.x - r, pointer.y + r),
+          br: new Point(pointer.x + r, pointer.y + r),
+        },
+        touchCorner: {
+          tl: new Point(pointer.x - tr, pointer.y - tr),
+          tr: new Point(pointer.x + tr, pointer.y - tr),
+          bl: new Point(pointer.x - tr, pointer.y + tr),
+          br: new Point(pointer.x + tr, pointer.y + tr),
+        },
+      };
+      return { key, control: this.controls[key], coord: dummyCoord };
+    }
+
+    return undefined;
   }
 
   override render(ctx: CanvasRenderingContext2D) {

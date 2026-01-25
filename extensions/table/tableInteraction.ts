@@ -131,7 +131,8 @@ function handleMouseMove(canvas: Canvas, e: { e: TPointerEvent }) {
   const viewportPoint = canvas.getViewportPoint(e.e);
   const scenePoint = canvas.getScenePoint(e.e);
 
-  if (table.findControl(viewportPoint)) {
+  const foundControl = table.findControl(viewportPoint);
+  if (foundControl && !foundControl.key.startsWith('insert_') && !foundControl.key.startsWith('delete_')) {
     if (table._hoveredBorder || table._hoveredDeleteIndicator) {
       table._hoveredBorder = null;
       table._hoveredDeleteIndicator = null;
