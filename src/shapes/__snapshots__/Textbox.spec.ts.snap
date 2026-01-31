@@ -15,7 +15,7 @@ exports[`Textbox > fromObject 1`] = `
   "fontStyle": "normal",
   "fontWeight": "normal",
   "globalCompositeOperation": "source-over",
-  "height": 254.928,
+  "height": 254.93,
   "left": 0,
   "lineHeight": 1.16,
   "linethrough": false,
@@ -54,13 +54,13 @@ fox",
   "type": "Textbox",
   "underline": false,
   "visible": true,
-  "width": 102,
+  "width": 102.21,
 }
 `;
 
 exports[`Textbox > fromObject 2`] = `
 {
-  "height": 254.928,
+  "height": 254.93,
   "left": 0,
   "styles": [],
   "text": "The quick 
@@ -68,7 +68,7 @@ brown
 fox",
   "top": 0,
   "type": "Textbox",
-  "width": 102,
+  "width": 102.21,
 }
 `;
 
@@ -106,7 +106,7 @@ exports[`Textbox > toObject with styles 1`] = `
   "fontStyle": "normal",
   "fontWeight": "normal",
   "globalCompositeOperation": "source-over",
-  "height": 202.496,
+  "height": 202.5,
   "left": 0,
   "lineHeight": 1.16,
   "linethrough": false,

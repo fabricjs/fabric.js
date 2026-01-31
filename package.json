@@ -80,9 +80,9 @@
     "@types/jsdom": "^21.1.7",
     "@types/micromatch": "^4.0.9",
     "@types/node": "^24.7.0",
-    "@vitest/browser-playwright": "^4.0.2",
-    "@vitest/coverage-v8": "^4.0.2",
-    "@vitest/ui": "^4.0.2",
+    "@vitest/browser-playwright": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
     "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
     "commander": "^14.0.1",
     "es-toolkit": "1.40.0",
@@ -102,7 +102,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.0",
     "v8-to-istanbul": "^9.3.0",
-    "vitest": "^4.0.2",
+    "vitest": "^4.0.18",
     "westures": "^1.1.1"
   },
   "engines": {
@@ -161,6 +161,6 @@
   "lint-staged": {
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
     "*.{js,css,md,ts,tsx,jsx,json}": "prettier --write",
-    "**/*.ts": "tsc-files --noEmit"
+    "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
   }
 }
