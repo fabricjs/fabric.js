@@ -56,7 +56,6 @@ describe('ClassRegistry', () => {
     expect(resolved, 'resolved different classes').not.toBe(resolvedSvg);
   });
   it('legacy resolution preparation', async () => {
-    vi.resetModules();
     const { classRegistry: freshRegistry } = await import('./ClassRegistry');
 
     // Registry should be empty before any shape classes are imported
@@ -66,7 +65,6 @@ describe('ClassRegistry', () => {
     expect(freshRegistry.has('object')).toBe(false);
   });
   it('legacy resolution', async () => {
-    vi.resetModules();
     const { classRegistry: freshRegistry } = await import('./ClassRegistry');
     const { Rect } = await import('./shapes/Rect');
     const { IText } = await import('./shapes/IText/IText');
