@@ -59,7 +59,7 @@ describe('ClassRegistry', () => {
   it('legacy resolution preparation', async () => {
     genericClassRegistryInstance[JSON].delete('rect');
     genericClassRegistryInstance[JSON].delete('i-text');
-    genericClassRegistryInstance[JSON].delete('activeSelelection');
+    genericClassRegistryInstance[JSON].delete('activeSelection');
     genericClassRegistryInstance[JSON].delete('object');
     expect(genericClassRegistryInstance.has('rect')).toBe(false);
     expect(genericClassRegistryInstance.has('i-text')).toBe(false);
