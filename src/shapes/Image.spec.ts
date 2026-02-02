@@ -88,7 +88,7 @@ describe('FabricImage', () => {
           offsetY: 14,
         }),
       });
-      expect(img.toSVG()).toMatchSnapshot();
+      expect(img.toSVG()).toMatchSVGSnapshot();
     });
   });
 
@@ -108,7 +108,7 @@ describe('FabricImage', () => {
         200,
         200,
         img.getElement(),
-        'texture3',
+        expect.stringMatching(/^texture\d+$/),
       );
     } finally {
       mockApply.mockRestore();

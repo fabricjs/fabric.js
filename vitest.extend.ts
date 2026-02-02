@@ -73,9 +73,13 @@ chai.util.addMethod(
     delete snap.version;
 
     const value = cloneDeepWith(snap, (v, k, obj, stack) => {
-      const c = customiser?.(v, k, obj, stack);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const c = (customiser as any)?.(v, k, obj, stack);
       if (c !== undefined) return c;
-      if (k === 'width') return Math.round(v as number);
+      if ((k === 'width' || k === 'height') && typeof v === 'number')
+        return Math.round(v * 100) / 100;
+      // Normalize uid-based ids which vary by test execution order
+      if (k === 'id' && typeof v === 'number') return 0;
     });
 
     chai.util.flag(this, 'object', value);

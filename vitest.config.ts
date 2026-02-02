@@ -9,6 +9,10 @@ if (!fixturesUrl.endsWith('/')) {
   fixturesUrl += '/';
 }
 
+// Node 20 requires vmThreads, newer versions can use threads
+const nodeMajor = parseInt(process.version.slice(1).split('.')[0]);
+const pool = nodeMajor <= 20 ? 'vmThreads' : 'threads';
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -16,7 +20,7 @@ export default defineConfig({
     },
   },
   test: {
-    pool: 'vmThreads',
+    pool,
     clearMocks: true,
     mockReset: true,
     snapshotSerializers: [
@@ -44,7 +48,12 @@ export default defineConfig({
             provider: playwright(),
             enabled: true,
             headless: true,
-            instances: [{ browser: 'chromium' }],
+            instances: [
+              {
+                browser: 'chromium',
+                isolate: true,
+              },
+            ],
           },
           name: 'unit-chromium',
         },
@@ -63,6 +72,7 @@ export default defineConfig({
             instances: [
               {
                 browser: 'firefox',
+                isolate: true,
               },
             ],
           },
