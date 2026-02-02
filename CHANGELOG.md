@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): refactor tests [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
 - chore(): fix Canvas-dispose tests on firefox [#10859](https://github.com/fabricjs/fabric.js/pull/10859)
 - chore(): update vitest to 4.0.18 [#10858](https://github.com/fabricjs/fabric.js/pull/10858)
 - chore(deps-dev): bump lodash from 4.17.21 to 4.17.23 in the npm_and_yarn group across 1 directory [#10853](https://github.com/fabricjs/fabric.js/pull/10853)
