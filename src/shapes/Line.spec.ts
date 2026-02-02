@@ -1,46 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { Line } from './Line';
-import { getFabricDocument, version } from '../../fabric';
+import { getFabricDocument } from '../../fabric';
 import { FabricObject } from './Object/Object';
+import { createReferenceObject } from '../../test/utils';
 
 describe('Line', () => {
-  const LINE_OBJECT = {
-    version: version,
-    type: 'Line',
-    originX: 'center',
-    originY: 'center',
+  const LINE_OBJECT = createReferenceObject('Line', {
     left: 12,
     top: 13,
     width: 2,
     height: 2,
-    fill: 'rgb(0,0,0)',
-    stroke: null,
-    strokeWidth: 1,
-    strokeDashArray: null,
-    strokeLineCap: 'butt',
-    strokeDashOffset: 0,
-    strokeLineJoin: 'miter',
-    strokeMiterLimit: 4,
-    scaleX: 1,
-    scaleY: 1,
-    angle: 0,
-    flipX: false,
-    flipY: false,
-    opacity: 1,
     x1: -1,
     y1: -1,
     x2: 1,
     y2: 1,
-    shadow: null,
-    visible: true,
-    backgroundColor: '',
-    fillRule: 'nonzero',
-    paintFirst: 'fill',
-    globalCompositeOperation: 'source-over',
-    skewX: 0,
-    skewY: 0,
-    strokeUniform: false,
-  } as const;
+  });
 
   it('initializes constructor correctly', () => {
     expect(Line).toBeTruthy();
