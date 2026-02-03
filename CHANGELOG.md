@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
 - chore(): update playwright to latest [#10860](https://github.com/fabricjs/fabric.js/pull/10860)
 - chore(): fix Canvas-dispose tests on firefox [#10859](https://github.com/fabricjs/fabric.js/pull/10859)
 - chore(): update vitest to 4.0.18 [#10858](https://github.com/fabricjs/fabric.js/pull/10858)

@@ -10,38 +10,15 @@ import {
   getFabricDocument,
   IText,
   Textbox,
-  version,
 } from '../../../fabric';
 import { toFixed } from '../../util';
+import { createReferenceObject } from '../../../test/utils';
 
 const CHAR_WIDTH = 20;
 
-const REFERENCE_TEXT_OBJECT = {
-  version: version,
-  type: 'Text',
-  originX: 'center',
-  originY: 'center',
-  left: 0,
-  top: 0,
+const REFERENCE_TEXT_OBJECT = createReferenceObject('Text', {
   width: CHAR_WIDTH,
   height: 45.2,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeLineCap: 'butt',
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
   text: 'x',
   fontSize: 40,
   fontWeight: 'normal',
@@ -53,21 +30,15 @@ const REFERENCE_TEXT_OBJECT = {
   linethrough: false,
   textAlign: 'left',
   textBackgroundColor: '',
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
-  skewX: 0,
-  skewY: 0,
   charSpacing: 0,
   styles: [],
   path: undefined,
-  strokeUniform: false,
   direction: 'ltr',
   pathStartOffset: 0,
   pathSide: 'left',
   pathAlign: 'baseline',
   textDecorationThickness: 66.667,
-};
+});
 
 function createTextObject() {
   return new FabricText('x');

@@ -3,6 +3,12 @@ import { Ellipse } from './Ellipse';
 import { FabricObject } from './Object/Object';
 import { getFabricDocument, version } from '../../fabric';
 import { sanitizeSVG } from '../../vitest.extend';
+import { createReferenceObject } from '../../test/utils';
+
+const REFERENCE_ELLIPSE = createReferenceObject('Ellipse', {
+  rx: 0,
+  ry: 0,
+});
 
 describe('Ellipse', () => {
   it('initializes constructor correctly', () => {
@@ -24,43 +30,8 @@ describe('Ellipse', () => {
 
   it('converts to object with correct properties', () => {
     const ellipse = new Ellipse();
-    const defaultProperties = {
-      version: version,
-      type: 'Ellipse',
-      originX: 'center',
-      originY: 'center',
-      left: 0,
-      top: 0,
-      width: 0,
-      height: 0,
-      fill: 'rgb(0,0,0)',
-      stroke: null,
-      strokeWidth: 1,
-      strokeDashArray: null,
-      strokeLineCap: 'butt',
-      strokeDashOffset: 0,
-      strokeLineJoin: 'miter',
-      strokeMiterLimit: 4,
-      scaleX: 1,
-      scaleY: 1,
-      angle: 0,
-      flipX: false,
-      flipY: false,
-      opacity: 1,
-      skewX: 0,
-      skewY: 0,
-      rx: 0,
-      ry: 0,
-      shadow: null,
-      visible: true,
-      backgroundColor: '',
-      fillRule: 'nonzero',
-      paintFirst: 'fill',
-      globalCompositeOperation: 'source-over',
-      strokeUniform: false,
-    };
     expect(ellipse.toObject).toBeTypeOf('function');
-    expect(ellipse.toObject()).toEqual(defaultProperties);
+    expect(ellipse.toObject()).toEqual(REFERENCE_ELLIPSE);
 
     ellipse.set('left', 100);
     ellipse.set('top', 200);
@@ -68,7 +39,7 @@ describe('Ellipse', () => {
     ellipse.set('ry', 25);
 
     expect(ellipse.toObject()).toEqual({
-      ...defaultProperties,
+      ...REFERENCE_ELLIPSE,
       left: 100,
       top: 200,
       rx: 15,
