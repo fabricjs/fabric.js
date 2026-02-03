@@ -125,8 +125,7 @@ interface UniqueTextProps {
 }
 
 export interface SerializedTextProps
-  extends SerializedObjectProps,
-    UniqueTextProps {
+  extends SerializedObjectProps, UniqueTextProps {
   styles: TextStyleArray | TextStyle;
 }
 
@@ -139,10 +138,10 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
  * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#text}
  */
 export class FabricText<
-    Props extends TOptions<TextProps> = Partial<TextProps>,
-    SProps extends SerializedTextProps = SerializedTextProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<TextProps> = Partial<TextProps>,
+  SProps extends SerializedTextProps = SerializedTextProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends StyledText<Props, SProps, EventSpec>
   implements UniqueTextProps
 {

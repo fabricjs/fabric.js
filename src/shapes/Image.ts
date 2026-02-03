@@ -86,10 +86,10 @@ const IMAGE_PROPS = ['cropX', 'cropY'] as const;
  * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#images}
  */
 export class FabricImage<
-    Props extends TOptions<ImageProps> = Partial<ImageProps>,
-    SProps extends SerializedImageProps = SerializedImageProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<ImageProps> = Partial<ImageProps>,
+  SProps extends SerializedImageProps = SerializedImageProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements ImageProps
 {

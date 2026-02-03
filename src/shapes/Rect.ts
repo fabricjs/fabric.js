@@ -19,18 +19,17 @@ interface UniqueRectProps {
 }
 
 export interface SerializedRectProps
-  extends SerializedObjectProps,
-    UniqueRectProps {}
+  extends SerializedObjectProps, UniqueRectProps {}
 
 export interface RectProps extends FabricObjectProps, UniqueRectProps {}
 
 const RECT_PROPS = ['rx', 'ry'] as const;
 
 export class Rect<
-    Props extends TOptions<RectProps> = Partial<RectProps>,
-    SProps extends SerializedRectProps = SerializedRectProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<RectProps> = Partial<RectProps>,
+  SProps extends SerializedRectProps = SerializedRectProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements RectProps
 {
