@@ -13,10 +13,10 @@ import { Group } from '../Group';
 import { config } from '../../config';
 import type {
   ObjectPointerEvents,
-  TPointerEvent,
   TPointerEventInfo,
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';
+import { createPointerEvent } from '../../../test/utils';
 
 describe('iText click interaction', () => {
   let canvas: Canvas;
@@ -40,12 +40,11 @@ describe('iText click interaction', () => {
 
     iText.canvas = canvas;
 
-    let eventData = {
-      which: 1,
+    let eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 40,
       clientY: 10,
-    } as unknown as TPointerEvent;
+    });
 
     iText.enterEditing();
 
@@ -56,12 +55,11 @@ describe('iText click interaction', () => {
     expect(iText.selectionStart, 'dblClick selection start is').toBe(0);
     expect(iText.selectionEnd, 'dblClick selection end is').toBe(4);
 
-    eventData = {
-      which: 1,
+    eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 40,
       clientY: 60,
-    } as unknown as TPointerEvent;
+    });
 
     iText.doubleClickHandler({
       e: eventData,
@@ -76,12 +74,11 @@ describe('iText click interaction', () => {
 
     iText.canvas = canvas;
 
-    const eventData = {
-      which: 1,
+    const eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 40,
       clientY: 10,
-    } as unknown as TPointerEvent;
+    });
 
     iText.doubleClickHandler({
       e: eventData,
@@ -97,12 +94,11 @@ describe('iText click interaction', () => {
 
     iText.canvas = canvas;
 
-    let eventData = {
-      which: 1,
+    let eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 40,
       clientY: 10,
-    } as unknown as TPointerEvent;
+    });
 
     iText.enterEditing();
 
@@ -113,12 +109,11 @@ describe('iText click interaction', () => {
     expect(iText.selectionStart, 'tripleClick selection start is').toBe(0);
     expect(iText.selectionEnd, 'tripleClick selection end is').toBe(19);
 
-    eventData = {
-      which: 1,
+    eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 40,
       clientY: 60,
-    } as unknown as TPointerEvent;
+    });
 
     iText.tripleClickHandler({
       e: eventData,
@@ -137,12 +132,11 @@ describe('iText click interaction', () => {
 
     iText.canvas = canvas;
 
-    const eventData = {
-      which: 1,
+    const eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 40,
       clientY: 10,
-    } as unknown as TPointerEvent;
+    });
 
     iText.tripleClickHandler({
       e: eventData,
@@ -153,12 +147,11 @@ describe('iText click interaction', () => {
   });
 
   test('getSelectionStartFromPointer with scale', () => {
-    const eventData = {
-      which: 1,
+    const eventData = createPointerEvent({
       target: canvas.upperCanvasEl,
       clientX: 70,
       clientY: 10,
-    } as unknown as TPointerEvent;
+    });
 
     const iText = new IText('test need some word\nsecond line', {
       scaleX: 3,
@@ -186,10 +179,7 @@ describe('iText click interaction', () => {
 
     expect(iText.getSelectionStartFromPointer(eventData), 'index').toBe(5);
     expect(
-      iText.getSelectionStartFromPointer({
-        ...eventData,
-        clientY: 20,
-      } as unknown as TPointerEvent),
+      iText.getSelectionStartFromPointer({ ...eventData, clientY: 20 }),
       'index',
     ).toBe(5);
   });
@@ -275,11 +265,11 @@ describe('iText click interaction', () => {
     canvas.add(group);
     // @ts-expect-error -- protected member
     iText.selected = true;
-    const evt = {
+    const evt = createPointerEvent({
       clientX: 1,
       clientY: 1,
       target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent;
+    });
     canvas._cacheTransformEventData(evt);
     canvas.__onMouseUp(evt);
     // @ts-expect-error -- protected member
@@ -309,11 +299,13 @@ describe('iText click interaction', () => {
     // @ts-expect-error -- protected member
     iText.selected = true;
 
-    canvas._onMouseUp({
-      clientX: 1,
-      clientY: 1,
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    canvas._onMouseUp(
+      createPointerEvent({
+        clientX: 1,
+        clientY: 1,
+        target: canvas.upperCanvasEl,
+      }),
+    );
 
     expect(iText.isEditing, 'iText should enter editing').toBe(true);
 
@@ -322,11 +314,13 @@ describe('iText click interaction', () => {
     // @ts-expect-error -- protected member
     iText.selected = true;
 
-    canvas._onMouseUp({
-      clientX: 1,
-      clientY: 1,
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    canvas._onMouseUp(
+      createPointerEvent({
+        clientX: 1,
+        clientY: 1,
+        target: canvas.upperCanvasEl,
+      }),
+    );
 
     expect(iText.isEditing, 'iText should not enter editing').toBe(false);
   });
@@ -376,19 +370,12 @@ describe('iText click interaction', () => {
           enableRetinaScaling,
         });
 
-        eventData = {
-          which: 1,
+        eventData = createPointerEvent({
           target: testCanvas.upperCanvasEl,
           ...(enableRetinaScaling
-            ? {
-                clientX: 60,
-                clientY: 30,
-              }
-            : {
-                clientX: 30,
-                clientY: 15,
-              }),
-        } as unknown as TPointerEvent;
+            ? { clientX: 60, clientY: 30 }
+            : { clientX: 30, clientY: 15 }),
+        });
 
         count = 0;
         countCanvas = 0;
