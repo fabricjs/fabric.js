@@ -6,8 +6,8 @@ import { Canvas } from '../canvas/Canvas';
 import { stylesFromArray } from '../util';
 import { FabricText } from './Text/Text';
 import { IText } from './IText/IText';
-import type { TPointerEvent } from '../EventTypeDefs';
 import { Point } from '../Point';
+import { createPointerEvent } from '../../test/utils';
 
 describe('Textbox', () => {
   let canvas: Canvas;
@@ -564,12 +564,12 @@ describe('Textbox', () => {
     canvas.add(text);
     canvas.setActiveObject(text);
 
-    const eventStub = {
+    const eventStub = createPointerEvent({
       clientX: text.width,
       clientY: text.oCoords.mr.corner.tl.y + 1,
       type: 'mousedown',
       target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent & { clientX: number; clientY: number };
+    });
 
     const originalWidth = text.width;
 
@@ -599,12 +599,12 @@ describe('Textbox', () => {
     canvas.add(text);
     canvas.setActiveObject(text);
 
-    const eventStub = {
+    const eventStub = createPointerEvent({
       clientX: text.left - text.width / 2,
       clientY: text.oCoords.ml.corner.tl.y + 2,
       type: 'mousedown',
       target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent & { clientX: number; clientY: number };
+    });
 
     const originalWidth = text.width;
 

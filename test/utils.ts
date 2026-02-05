@@ -54,6 +54,7 @@ export function createPointerEvent(
     button: number;
     target: EventTarget;
     shiftKey: boolean;
+    type: string;
   }> = {},
 ): TPointerEvent {
   return {

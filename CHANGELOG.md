@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(): update prettier [#10863](https://github.com/fabricjs/fabric.js/pull/10863)
+- chore(): reuse more of the createPointerEvent in unit tests [#10864](https://github.com/fabricjs/fabric.js/pull/10864)
 - test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
 - chore(): update playwright to latest [#10860](https://github.com/fabricjs/fabric.js/pull/10860)
 - chore(): fix Canvas-dispose tests on firefox [#10859](https://github.com/fabricjs/fabric.js/pull/10859)
