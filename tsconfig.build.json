@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noEmitOnError": false,
+    "allowJs": false
+  },
+  "include": ["src", "fabric.ts", "index.ts", "index.node.ts", "extensions"],
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "node_modules",
+    "**/*.mjs",
+    "**/*.js",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.fixtures.ts"
+  ]
+}

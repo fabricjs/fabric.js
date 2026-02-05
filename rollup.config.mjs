@@ -1,7 +1,6 @@
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
-import ts from '@rollup/plugin-typescript';
-import { babel } from '@rollup/plugin-babel';
+import esbuild from 'rollup-plugin-esbuild';
 import path from 'path';
 import { redBright } from './scripts/colors.mjs';
 // import dts from "rollup-plugin-dts";
@@ -12,35 +11,22 @@ const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 
 const dirname = path.dirname(buildOutput);
 const basename = path.basename(buildOutput, '.js');
+// Browser targets from .browserslistrc (Jan 2021 browsers)
+const target = ['chrome88', 'safari13', 'firefox85', 'edge88'];
+
 const plugins = [
   json(),
-  ts({
-    noForceEmit: true,
-    tsconfig: './tsconfig.json',
-    exclude: [
-      'dist',
-      'dist-extensions',
-      '**/**.spec.ts',
-      '**/**.test.ts',
-      '**/**.fixtures.ts',
-    ],
-  }),
-  babel({
-    extensions: ['.ts', '.js'],
-    babelHelpers: 'bundled',
+  esbuild({
+    target,
+    sourceMap: true,
   }),
 ];
 
 const pluginsExtensions = [
   json(),
-  ts({
-    noForceEmit: true,
-    tsconfig: './tsconfig-extensions.json',
-    exclude: ['dist', 'dist-extensions', '**/**.spec.ts', '**/**.test.ts'],
-  }),
-  babel({
-    extensions: ['.ts', '.js'],
-    babelHelpers: 'bundled',
+  esbuild({
+    target,
+    sourceMap: true,
   }),
 ];
 
