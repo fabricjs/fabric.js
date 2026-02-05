@@ -23,8 +23,7 @@ interface UniqueLineProps {
 }
 
 export interface SerializedLineProps
-  extends SerializedObjectProps,
-    UniqueLineProps {}
+  extends SerializedObjectProps, UniqueLineProps {}
 
 /**
  * A Class to draw a line
@@ -34,10 +33,10 @@ export interface SerializedLineProps
  * @deprecated
  */
 export class Line<
-    Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
-    SProps extends SerializedLineProps = SerializedLineProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedLineProps = SerializedLineProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueLineProps
 {
