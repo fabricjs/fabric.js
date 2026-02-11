@@ -1,10 +1,6 @@
-import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
-import ts from '@rollup/plugin-typescript';
-import { babel } from '@rollup/plugin-babel';
 import path from 'path';
 import { redBright } from './scripts/colors.mjs';
-// import dts from "rollup-plugin-dts";
 
 const splitter = /\n|\s|,/g;
 
@@ -12,41 +8,15 @@ const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
 
 const dirname = path.dirname(buildOutput);
 const basename = path.basename(buildOutput, '.js');
-const plugins = [
-  json(),
-  ts({
-    noForceEmit: true,
-    tsconfig: './tsconfig.json',
-    exclude: [
-      'dist',
-      'dist-extensions',
-      '**/**.spec.ts',
-      '**/**.test.ts',
-      '**/**.fixtures.ts',
-    ],
-  }),
-  babel({
-    extensions: ['.ts', '.js'],
-    babelHelpers: 'bundled',
-  }),
-];
 
-const pluginsExtensions = [
-  json(),
-  ts({
-    noForceEmit: true,
-    tsconfig: './tsconfig-extensions.json',
-    exclude: ['dist', 'dist-extensions', '**/**.spec.ts', '**/**.test.ts'],
-  }),
-  babel({
-    extensions: ['.ts', '.js'],
-    babelHelpers: 'bundled',
-  }),
-];
+// match .browserslistrc targets for syntax lowering
+const transform = {
+  target: ['chrome88', 'safari13', 'firefox85', 'edge88'],
+};
 
 /**
  * disallow circular deps
- * @see https://rollupjs.org/configuration-options/#onwarn
+ * @see https://rolldown.rs/reference/interface.inputoptions
  * @param {*} warning
  * @param {*} warn
  */
@@ -66,10 +36,11 @@ function onwarn(warning, warn) {
   warn(warning);
 }
 
-// https://rollupjs.org/guide/en/#configuration-files
+// https://rolldown.rs/guide/getting-started
 export default [
   {
     input: ['./fabric.ts'],
+    transform,
     output: [
       // es modules in files
       {
@@ -90,11 +61,11 @@ export default [
           }
         : null,
     ],
-    plugins,
     onwarn,
   },
   {
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    transform,
     output: [
       // es module in bundle
       {
@@ -130,7 +101,6 @@ export default [
           }
         : null,
     ],
-    plugins,
     onwarn,
   },
   {
@@ -150,7 +120,6 @@ export default [
         sourcemap: true,
       },
     ],
-    plugins,
     onwarn,
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
@@ -159,6 +128,8 @@ export default [
   {
     input: ['./extensions/index.ts'],
     external: ['fabric', 'westures'],
+    tsconfig: './tsconfig-extensions.json',
+    transform,
     output: [
       // es modules in files
       {
@@ -181,7 +152,6 @@ export default [
         plugins: [terser()],
       },
     ],
-    plugins: pluginsExtensions,
     onwarn,
   },
 ];

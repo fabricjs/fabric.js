@@ -3,24 +3,41 @@ import process from 'node:process';
 import { wd } from './dirname.mjs';
 
 /**
- * Handles rollup build
+ * Runs tsc to generate declaration files (.d.ts)
+ */
+function buildTypes() {
+  console.log('\nGenerating type declarations...');
+  try {
+    // Generate declarations using the build-specific tsconfig
+    cp.execSync('tsc -p ./tsconfig.build.json', {
+      stdio: 'inherit',
+      shell: true,
+      cwd: wd,
+    });
+    // Also build extensions types
+    cp.execSync('tsc -p ./tsconfig-extensions.json', {
+      stdio: 'inherit',
+      shell: true,
+      cwd: wd,
+    });
+    console.log('Type declarations generated.\n');
+  } catch (error) {
+    console.error('Failed to generate type declarations:', error.message);
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles rolldown build
  *
  * Hooks to build events to create `cli_output/build-lock.json`
- * @see https://rollupjs.org/guide/en/#--watchonstart-cmd---watchonbundlestart-cmd---watchonbundleend-cmd---watchonend-cmd---watchonerror-cmd
  * @param {*} options
  */
 export function build({ watch, fast, input, output, stats = false } = {}) {
   const cmd = [
-    'rollup',
+    'rolldown',
     '-c',
     watch ? '--watch' : '',
-    '--no-watch.clearScreen',
-    ...['onStart', 'onError', 'onEnd'].map(
-      (type) =>
-        `--watch.${type} "node ./scripts/buildReporter.mjs ${type
-          .toLowerCase()
-          .slice(2)}"`,
-    ),
   ].join(' ');
   const processOptions = {
     stdio: 'inherit',
@@ -39,6 +56,8 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
   } else {
     try {
       cp.execSync(cmd, processOptions);
+      // Generate .d.ts files after successful rollup build
+      buildTypes();
     } catch (error) {
       // minimal logging, no need for stack trace
       console.error(error.message);
