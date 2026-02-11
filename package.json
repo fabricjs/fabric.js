@@ -43,7 +43,7 @@
     "docs": "typedoc",
     "cli": "node ./scripts/index.mjs",
     "sandboxscript": "node ./scripts/sandbox.mjs",
-    "typecheck": "tsc -p ./tsconfig.build.json --noEmit",
+    "typecheck": "tsc -p ./tsconfig.build.json --noEmit && tsc -p ./tsconfig-extensions.json --noEmit",
     "build": "npm run cli -- build",
     "build:fast": "npm run build -- -f",
     "dev": "npm run cli -- dev",
