@@ -34,11 +34,7 @@ function buildTypes() {
  * @param {*} options
  */
 export function build({ watch, fast, input, output, stats = false } = {}) {
-  const cmd = [
-    'rolldown',
-    '-c',
-    watch ? '--watch' : '',
-  ].join(' ');
+  const cmd = ['rolldown', '-c', watch ? '--watch' : ''].join(' ');
   const processOptions = {
     stdio: 'inherit',
     shell: true,
