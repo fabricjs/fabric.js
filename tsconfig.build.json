@@ -5,7 +5,7 @@
     "noEmitOnError": false,
     "allowJs": false
   },
-  "include": ["src", "fabric.ts", "index.ts", "index.node.ts", "extensions"],
+  "include": ["src", "fabric.ts", "index.ts", "index.node.ts"],
   "exclude": [
     "dist",
     "dist-extensions",
