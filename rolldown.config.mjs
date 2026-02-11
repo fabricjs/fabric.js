@@ -40,6 +40,7 @@ function onwarn(warning, warn) {
 export default [
   {
     input: ['./fabric.ts'],
+    tsconfig: './tsconfig.build.json',
     transform,
     output: [
       // es modules in files
@@ -65,6 +66,7 @@ export default [
   },
   {
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    tsconfig: './tsconfig.build.json',
     transform,
     output: [
       // es module in bundle
@@ -105,6 +107,7 @@ export default [
   },
   {
     input: ['./index.node.ts'],
+    tsconfig: './tsconfig.build.json',
     output: [
       {
         file: path.resolve(dirname, `${basename}.node.mjs`),
