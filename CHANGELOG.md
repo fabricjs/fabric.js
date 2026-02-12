@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
 - chore(): update prettier [#10863](https://github.com/fabricjs/fabric.js/pull/10863)
 - chore(): reuse more of the createPointerEvent in unit tests [#10864](https://github.com/fabricjs/fabric.js/pull/10864)
 - test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
