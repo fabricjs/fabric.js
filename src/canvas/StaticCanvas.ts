@@ -86,9 +86,9 @@ export type PatternQuality = 'fast' | 'good' | 'best' | 'nearest' | 'bilinear';
  */
 // TODO: fix `EventSpec` inheritance https://github.com/microsoft/TypeScript/issues/26154#issuecomment-1366616260
 export class StaticCanvas<
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    EventSpec extends StaticCanvasEvents = StaticCanvasEvents,
-  >
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  EventSpec extends StaticCanvasEvents = StaticCanvasEvents,
+>
   extends createCollectionMixin(CommonMethods<CanvasEvents>)
   implements StaticCanvasOptions
 {

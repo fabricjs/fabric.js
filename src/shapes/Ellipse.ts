@@ -19,18 +19,17 @@ interface UniqueEllipseProps {
 }
 
 export interface SerializedEllipseProps
-  extends SerializedObjectProps,
-    UniqueEllipseProps {}
+  extends SerializedObjectProps, UniqueEllipseProps {}
 
 export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 
 const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
 export class Ellipse<
-    Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
-    SProps extends SerializedEllipseProps = SerializedEllipseProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
+  SProps extends SerializedEllipseProps = SerializedEllipseProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements EllipseProps
 {

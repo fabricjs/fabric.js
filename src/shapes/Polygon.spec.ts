@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { Point } from '../Point';
 import { getFabricDocument } from '../env';
-import { VERSION as version } from '../constants';
 import { Polygon } from './Polygon';
 import { Polyline } from './Polyline';
 import { FabricObject } from './Object/FabricObject';
+import { createReferenceObject } from '../../test/utils';
 
 function getPoints() {
   return [
@@ -13,40 +13,13 @@ function getPoints() {
   ];
 }
 
-const REFERENCE_OBJECT = {
-  version: version,
-  type: 'Polygon',
-  originX: 'center',
-  originY: 'center',
+const REFERENCE_OBJECT = createReferenceObject('Polygon', {
   left: 15,
   top: 17,
   width: 10,
   height: 10,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeLineCap: 'butt',
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
   points: getPoints(),
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
-  skewX: 0,
-  skewY: 0,
-  strokeUniform: false,
-} as const;
+});
 
 const REFERENCE_EMPTY_OBJECT = {
   points: [],

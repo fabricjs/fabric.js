@@ -1,13 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { Path } from './Path';
 import type { TSimpleParsedCommand } from '../util';
-import { FabricObject, getFabricDocument, version } from '../../fabric';
+import { FabricObject, getFabricDocument } from '../../fabric';
+import { createReferenceObject } from '../../test/utils';
 
-const REFERENCE_PATH_OBJECT = {
-  version: version,
-  type: 'Path',
-  originX: 'center' as const,
-  originY: 'center' as const,
+const REFERENCE_PATH_OBJECT = createReferenceObject('Path', {
   left: 200,
   top: 200,
   width: 200,
@@ -15,33 +12,13 @@ const REFERENCE_PATH_OBJECT = {
   fill: 'red',
   stroke: 'blue',
   strokeWidth: 0,
-  strokeDashArray: null,
-  strokeLineCap: 'butt' as const,
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter' as const,
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
   path: [
     ['M', 100, 100],
     ['L', 300, 100],
     ['L', 200, 300],
     ['Z'],
   ] as TSimpleParsedCommand[],
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  fillRule: 'nonzero' as const,
-  paintFirst: 'fill' as const,
-  globalCompositeOperation: 'source-over' as const,
-  skewX: 0,
-  skewY: 0,
-  strokeUniform: false,
-};
+});
 
 function getPathElement(path: string) {
   const namespace = 'http://www.w3.org/2000/svg';

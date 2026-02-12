@@ -3,6 +3,13 @@
 ## [next]
 
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
+- chore(): update prettier [#10863](https://github.com/fabricjs/fabric.js/pull/10863)
+- chore(): reuse more of the createPointerEvent in unit tests [#10864](https://github.com/fabricjs/fabric.js/pull/10864)
+- test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
+- chore(): update playwright to latest [#10860](https://github.com/fabricjs/fabric.js/pull/10860)
+- chore(): fix Canvas-dispose tests on firefox [#10859](https://github.com/fabricjs/fabric.js/pull/10859)
+- chore(): update vitest to 4.0.18 [#10858](https://github.com/fabricjs/fabric.js/pull/10858)
+- chore(deps-dev): bump lodash from 4.17.21 to 4.17.23 in the npm_and_yarn group across 1 directory [#10853](https://github.com/fabricjs/fabric.js/pull/10853)
 - feat(): Cropping controls follow ups [#10839](https://github.com/fabricjs/fabric.js/pull/10839)
 - chore(): Add pre-commit hook to run lint, prettier, tsc on staged files. [#10834](https://github.com/fabricjs/fabric.js/pull/10834)
 

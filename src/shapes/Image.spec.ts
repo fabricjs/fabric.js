@@ -13,7 +13,6 @@ import {
   getFabricDocument,
   getFilterBackend,
   Rect,
-  version,
   WebGLFilterBackend,
 } from '../../fabric';
 import { removeTransformMatrixForSvgParsing } from '../util';
@@ -21,6 +20,7 @@ import * as FilterBackend from '../filters/FilterBackend';
 import { FabricError } from '../util/internals/console';
 import TestImageGif from '../../test/fixtures/test_image.gif';
 import { isJSDOM } from '../../vitest.extend';
+import { createReferenceObject } from '../../test/utils';
 
 const IMG_SRC = isJSDOM() ? 'test_image.gif' : TestImageGif;
 const imgSrcUrl = new URL(IMG_SRC, import.meta.url).pathname;
@@ -29,44 +29,16 @@ const IMG_WIDTH = 276;
 const IMG_HEIGHT = 110;
 const IMG_URL_NON_EXISTING = 'http://www.google.com/non-existing';
 
-const REFERENCE_IMG_OBJECT = {
-  version: version,
-  type: 'Image',
-  originX: 'center' as const,
-  originY: 'center' as const,
-  left: 0,
-  top: 0,
+const REFERENCE_IMG_OBJECT = createReferenceObject('Image', {
   width: IMG_WIDTH,
   height: IMG_HEIGHT,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
   strokeWidth: 0,
-  strokeDashArray: null,
-  strokeLineCap: 'butt' as const,
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter' as const,
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
   src: IMG_SRC,
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
   filters: [],
-  fillRule: 'nonzero' as const,
-  paintFirst: 'fill' as const,
-  globalCompositeOperation: 'source-over' as const,
-  skewX: 0,
-  skewY: 0,
   crossOrigin: null,
   cropX: 0,
   cropY: 0,
-  strokeUniform: false,
-};
+});
 
 describe('FabricImage', () => {
   describe('Svg export', () => {
@@ -88,7 +60,7 @@ describe('FabricImage', () => {
           offsetY: 14,
         }),
       });
-      expect(img.toSVG()).toMatchSnapshot();
+      expect(img.toSVG()).toMatchSVGSnapshot();
     });
   });
 
@@ -108,7 +80,7 @@ describe('FabricImage', () => {
         200,
         200,
         img.getElement(),
-        'texture3',
+        expect.stringMatching(/^texture\d+$/),
       );
     } finally {
       mockApply.mockRestore();

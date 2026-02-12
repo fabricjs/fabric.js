@@ -1,16 +1,15 @@
-import {
-  ClassRegistry,
-  classRegistry as genericClassRegistryInstance,
-  JSON,
-} from './ClassRegistry';
-import './shapes/Object/FabricObject';
+import type { ClassRegistry } from './ClassRegistry';
 
-import { describe, expect, beforeEach, it } from 'vitest';
+import { describe, expect, beforeEach, afterEach, it, vi } from 'vitest';
 
 describe('ClassRegistry', () => {
   let classRegistry: ClassRegistry;
-  beforeEach(() => {
+  beforeEach(async () => {
+    const { ClassRegistry } = await import('./ClassRegistry');
     classRegistry = new ClassRegistry();
+  });
+  afterEach(() => {
+    vi.resetModules();
   });
   it('will error if a class is request that is not registered', () => {
     expect(() => classRegistry.getClass('any')).toThrow(
@@ -57,30 +56,30 @@ describe('ClassRegistry', () => {
     expect(resolved, 'resolved different classes').not.toBe(resolvedSvg);
   });
   it('legacy resolution preparation', async () => {
-    genericClassRegistryInstance[JSON].delete('rect');
-    genericClassRegistryInstance[JSON].delete('i-text');
-    genericClassRegistryInstance[JSON].delete('activeSelelection');
-    genericClassRegistryInstance[JSON].delete('object');
-    expect(genericClassRegistryInstance.has('rect')).toBe(false);
-    expect(genericClassRegistryInstance.has('i-text')).toBe(false);
-    expect(genericClassRegistryInstance.has('activeSelection')).toBe(false);
-    expect(genericClassRegistryInstance.has('object')).toBe(false);
+    const { classRegistry: freshRegistry } = await import('./ClassRegistry');
+
+    // Registry should be empty before any shape classes are imported
+    expect(freshRegistry.has('rect')).toBe(false);
+    expect(freshRegistry.has('i-text')).toBe(false);
+    expect(freshRegistry.has('activeSelection')).toBe(false);
+    expect(freshRegistry.has('object')).toBe(false);
   });
   it('legacy resolution', async () => {
+    const { classRegistry: freshRegistry } = await import('./ClassRegistry');
     const { Rect } = await import('./shapes/Rect');
     const { IText } = await import('./shapes/IText/IText');
     const { ActiveSelection } = await import('./shapes/ActiveSelection');
     // const { FabricObject } = await import('./shapes/Object/FabricObject');
     expect(
-      genericClassRegistryInstance.getClass('rect'),
+      freshRegistry.getClass('rect'),
       'resolves Rect class correctly',
     ).toBe(Rect);
     expect(
-      genericClassRegistryInstance.getClass('i-text'),
+      freshRegistry.getClass('i-text'),
       'resolves IText class correctly',
     ).toBe(IText);
     expect(
-      genericClassRegistryInstance.getClass('activeSelection'),
+      freshRegistry.getClass('activeSelection'),
       'resolves ActiveSelection class correctly',
     ).toBe(ActiveSelection);
     // expect(

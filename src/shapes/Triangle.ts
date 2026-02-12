@@ -10,10 +10,10 @@ export const triangleDefaultValues: Partial<TClassProperties<Triangle>> = {
 };
 
 export class Triangle<
-    Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
-    SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements FabricObjectProps
 {
