@@ -1,7 +1,8 @@
 # Changelog
 
-## [next]
+## [7.2.0]
 
+- fix(): Fix for svg export stored xss CVE-2026-27013
 - chore(): update prettier [#10863](https://github.com/fabricjs/fabric.js/pull/10863)
 - chore(): reuse more of the createPointerEvent in unit tests [#10864](https://github.com/fabricjs/fabric.js/pull/10864)
 - test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
