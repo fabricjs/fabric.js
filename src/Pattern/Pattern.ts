@@ -12,6 +12,7 @@ import type {
   SerializedPatternOptions,
 } from './types';
 import { log } from '../util/internals/console';
+import { escapeXml } from '../util/lang_string';
 
 /**
  * @see {@link http://fabric5.fabricjs.com/patterns demo}
@@ -177,12 +178,12 @@ export class Pattern {
           : ifNaN((patternSource as HTMLImageElement).height / height, 0);
 
     return [
-      `<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
+      `<pattern id="SVGID_${escapeXml(id)}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`,
       `<image x="0" y="0" width="${
         (patternSource as HTMLImageElement).width
       }" height="${
         (patternSource as HTMLImageElement).height
-      }" xlink:href="${this.sourceToString()}"></image>`,
+      }" xlink:href="${escapeXml(this.sourceToString())}"></image>`,
       `</pattern>`,
       '',
     ].join('\n');

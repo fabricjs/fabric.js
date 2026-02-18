@@ -158,6 +158,46 @@ describe('Gradient', () => {
       expect(gradient.toSVG(baseObj)).toEqualSVG(SVG_RADIAL);
     });
 
+    test('toSVG linear sanitizes coord injection', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        coords: {
+          x1: '0" /><script>alert(1)</script>' as unknown as number,
+          y1: '0" /><script>alert(1)</script>' as unknown as number,
+          x2: '0" /><script>alert(1)</script>' as unknown as number,
+          y2: '0" /><script>alert(1)</script>' as unknown as number,
+        },
+        colorStops: [
+          { offset: 0, color: 'rgba(255,0,0,0)' },
+          { offset: 1, color: 'green' },
+        ],
+      });
+      const baseObj = new FabricObject({ width: 100, height: 100 });
+      const svg = gradient.toSVG(baseObj);
+      expect(svg).not.toContain('<script>');
+    });
+
+    test('toSVG radial sanitizes coord injection', () => {
+      const gradient = new Gradient({
+        type: 'radial',
+        coords: {
+          x1: '0" /><script>alert(1)</script>' as unknown as number,
+          y1: '0" /><script>alert(1)</script>' as unknown as number,
+          x2: '0" /><script>alert(1)</script>' as unknown as number,
+          y2: '0" /><script>alert(1)</script>' as unknown as number,
+          r1: '0" /><script>alert(1)</script>' as unknown as number,
+          r2: '50" /><script>alert(1)</script>' as unknown as number,
+        },
+        colorStops: [
+          { offset: 0, color: 'red' },
+          { offset: 1, color: 'rgba(0,255,0,0)' },
+        ],
+      });
+      const baseObj = new FabricObject({ width: 100, height: 100 });
+      const svg = gradient.toSVG(baseObj);
+      expect(svg).not.toContain('<script>');
+    });
+
     test('toSVG radial with r1 > 0', () => {
       const gradient = createRadialGradientWithInternalRadius();
       const obj = new FabricObject({ width: 100, height: 100 });
@@ -824,5 +864,13 @@ describe('Gradient', () => {
     expect(gradient.colorStops[1].color).toEqual('rgba(0,0,255,0.9)');
     expect(gradient.colorStops[2].color).toEqual('rgba(0,0,0,1)');
     expect(gradient.colorStops[3].color).toEqual('rgba(0,0,0,1)');
+  });
+
+  describe('Attrivbute injection', () => {
+    it('id injection', () => {
+      const gradient = new Gradient({ id: 'malicious"><script>' });
+      const svg = gradient.toSVG({} as any);
+      expect(svg).toContain('id="SVGID_malicious&quot;&gt;&lt;script&gt;');
+    });
   });
 });

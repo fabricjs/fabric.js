@@ -2241,6 +2241,26 @@ describe('StaticCanvas', () => {
   // });
 });
 
+describe('malicious tests', () => {
+  it('from JSON to svg', async () => {
+    const canvas = new StaticCanvas();
+    const maliciousJSON = {
+      objects: [
+        {
+          type: 'rect',
+          id: '"><set onbegin="alert(1)"/>',
+          width: 100,
+          height: 100,
+          fill: 'red',
+        },
+      ],
+    };
+    await canvas.loadFromJSON(maliciousJSON);
+    const svg = canvas.toSVG();
+    expect(svg).not.toContain('onbegin="alert(1)"');
+  });
+});
+
 function makeRect(options = {}) {
   const defaultOptions = { width: 10, height: 10 };
   return new Rect({ ...defaultOptions, ...options });

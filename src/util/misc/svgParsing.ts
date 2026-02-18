@@ -2,6 +2,7 @@ import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE, FILL, NONE } from '../../constants';
 import type { TBBox, SVGElementName, SupportedSVGUnit } from '../../typedefs';
+import { escapeXml } from '../lang_string';
 import { toFixed } from './toFixed';
 
 /**
@@ -133,7 +134,7 @@ export const colorPropToSVG = (
   if (!value) {
     colorValue = 'none';
   } else if (value.toLive) {
-    colorValue = `url(#SVGID_${value.id})`;
+    colorValue = `url(#SVGID_${escapeXml(value.id)})`;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();

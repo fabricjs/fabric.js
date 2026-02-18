@@ -243,4 +243,26 @@ describe('Rect', () => {
     expect(rectObject.paintFirst).toBe('stroke');
     expect(rectSvg).toContain('paint-order="stroke"');
   });
+
+  describe('svg attribute injection', () => {
+    it('properties are properly escaped', () => {
+      const rect = new Rect({
+        id: 'asd"><script>alert(1)</script>',
+        width: 100,
+        height: 100,
+      });
+      const svg = rect.toSVG();
+      expect(svg).toContain(
+        `id="asd&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"`,
+      );
+    });
+    it('polyglot test', () => {
+      const polyglotPayload =
+        'jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/* */oNcliCk=alert() )';
+      const rect = new Rect({ id: polyglotPayload, width: 100, height: 100 });
+      const svg = rect.toSVG();
+      // Should escape all special characters
+      expect(svg).not.toContain(polyglotPayload);
+    });
+  });
 });

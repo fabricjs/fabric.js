@@ -25,6 +25,7 @@ import {
   TOP,
 } from '../constants';
 import type { CSSRules } from '../parser/typedefs';
+import { escapeXml } from '../util/lang_string';
 
 export const polylineDefaultValues: Partial<TClassProperties<Polyline>> = {
   /**
@@ -323,27 +324,25 @@ export class Polyline<
    * of the instance
    */
   _toSVG() {
-    const points = [],
-      diffX = this.pathOffset.x,
+    const diffX = this.pathOffset.x,
       diffY = this.pathOffset.y,
       NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
 
-    for (let i = 0, len = this.points.length; i < len; i++) {
-      points.push(
-        toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS),
-        ',',
-        toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS),
-        ' ',
-      );
-    }
+    const points = this.points
+      .map(
+        ({ x, y }) =>
+          `${toFixed(x - diffX, NUM_FRACTION_DIGITS)},${toFixed(y - diffY, NUM_FRACTION_DIGITS)}`,
+      )
+      .join(' ');
+
     return [
       `<${
-        (this.constructor as typeof Polyline).type.toLowerCase() as
+        escapeXml((this.constructor as typeof Polyline).type).toLowerCase() as
           | 'polyline'
           | 'polygon'
       } `,
       'COMMON_PARTS',
-      `points="${points.join('')}" />\n`,
+      `points="${points}" />\n`,
     ];
   }
 

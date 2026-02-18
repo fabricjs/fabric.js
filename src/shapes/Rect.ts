@@ -7,6 +7,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
+import { escapeXml } from '../util/lang_string';
 
 export const rectDefaultValues: Partial<TClassProperties<Rect>> = {
   rx: 0,
@@ -163,7 +164,7 @@ export class Rect<
       'COMMON_PARTS',
       `x="${-width / 2}" y="${
         -height / 2
-      }" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`,
+      }" rx="${escapeXml(rx)}" ry="${escapeXml(ry)}" width="${escapeXml(width)}" height="${escapeXml(height)}" />\n`,
     ];
   }
 

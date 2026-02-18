@@ -5,6 +5,7 @@ import { FILL, NONE, STROKE } from '../../constants';
 import type { FabricObject } from './FabricObject';
 import { isFiller } from '../../util/typeAssertions';
 import { matrixToSVG } from '../../util/misc/svgExport';
+import { escapeXml } from '../../util/lang_string';
 
 export class FabricObjectSVGExportMixin {
   /**
@@ -67,7 +68,9 @@ export class FabricObjectSVGExportMixin {
       ';',
       filter,
       visibility,
-    ].join('');
+    ]
+      .map((v) => escapeXml(v))
+      .join('');
   }
 
   /**
@@ -75,7 +78,9 @@ export class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgFilter(this: FabricObjectSVGExportMixin & FabricObject) {
-    return this.shadow ? `filter: url(#SVGID_${this.shadow.id});` : '';
+    return this.shadow
+      ? `filter: url(#SVGID_${escapeXml(this.shadow.id)});`
+      : '';
   }
 
   /**
@@ -86,7 +91,7 @@ export class FabricObjectSVGExportMixin {
     this: FabricObjectSVGExportMixin & FabricObject & { id?: string },
   ) {
     return [
-      this.id ? `id="${this.id}" ` : '',
+      this.id ? `id="${escapeXml(String(this.id))}" ` : '',
       this.clipPath
         ? `clip-path="url(#${
             (this.clipPath as FabricObjectSVGExportMixin & FabricObject)
@@ -248,6 +253,8 @@ export class FabricObjectSVGExportMixin {
   }
 
   addPaintOrder(this: FabricObjectSVGExportMixin & FabricObject) {
-    return this.paintFirst !== FILL ? ` paint-order="${this.paintFirst}" ` : '';
+    return this.paintFirst !== FILL
+      ? ` paint-order="${escapeXml(this.paintFirst)}" `
+      : '';
   }
 }

@@ -44,6 +44,7 @@ import type { StaticCanvasOptions } from './StaticCanvasOptions';
 import { staticCanvasDefaults } from './StaticCanvasOptions';
 import { log, FabricError } from '../util/internals/console';
 import { getDevicePixelRatio } from '../env';
+import { escapeXml } from '../util/lang_string';
 
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
@@ -950,7 +951,9 @@ export class StaticCanvas<
     this._setSVGPreamble(markup, options);
     this._setSVGHeader(markup, options);
     if (this.clipPath) {
-      markup.push(`<g clip-path="url(#${this.clipPath.clipPathId})" >\n`);
+      markup.push(
+        `<g clip-path="url(#${escapeXml(this.clipPath.clipPathId ?? '')})" >\n`,
+      );
     }
     this._setSVGBgOverlayColor(markup, 'background');
     this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
