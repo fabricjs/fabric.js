@@ -53,6 +53,15 @@ jobs:
         with:
           name: prstats
           path: ./prstats.txt
+  typecheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Type check
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 24.x
+      - run: npm run typecheck
   lint:
     runs-on: ubuntu-24.04
     steps:
