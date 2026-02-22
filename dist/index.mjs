@@ -356,7 +356,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.1.1";
+var version = "7.2.0";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;

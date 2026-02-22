@@ -38,8 +38,18 @@ export const withCornerFlip = (
 ): TransformActionHandler => {
   return (eventData, transform, x, y) => {
     const target = transform.target as FabricImage;
-    const xResult = (target.flipX ? xFlippedHandler : xHandler)(eventData, transform, x, y);
-    const yResult = (target.flipY ? yFlippedHandler : yHandler)(eventData, transform, x, y);
+    const xResult = (target.flipX ? xFlippedHandler : xHandler)(
+      eventData,
+      transform,
+      x,
+      y,
+    );
+    const yResult = (target.flipY ? yFlippedHandler : yHandler)(
+      eventData,
+      transform,
+      x,
+      y,
+    );
     return xResult || yResult;
   };
 };
@@ -272,13 +282,9 @@ export const scaleEquallyCropGenerator =
     const remainderX = fullWidth - target.width - target.cropX;
     const remainderY = fullHeight - target.height - target.cropY;
     const anchorOriginX =
-      cx < 0
-        ? 1 + remainderX / target.width
-        : -target.cropX / target.width;
+      cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width;
     const anchorOriginY =
-      cy < 0
-        ? 1 + remainderY / target.height
-        : -target.cropY / target.height;
+      cy < 0 ? 1 + remainderY / target.height : -target.cropY / target.height;
     const constraint = target.translateToOriginPoint(
       target.getCenterPoint(),
       anchorOriginX,
@@ -326,13 +332,9 @@ export const scaleEquallyCropGenerator =
     target.cropX = newCropX;
     target.cropY = newCropY;
     const newAnchorOriginX =
-      cx < 0
-        ? 1 + scaledRemainderX / newWidth
-        : -newCropX / newWidth;
+      cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth;
     const newAnchorOriginY =
-      cy < 0
-        ? 1 + scaledRemainderY / newHeight
-        : -newCropY / newHeight;
+      cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight;
     target.setPositionByOrigin(constraint, newAnchorOriginX, newAnchorOriginY);
     return true;
   };
@@ -350,6 +352,9 @@ export function renderGhostImage(
   ctx.drawImage(element, ghostX, ghostY);
 
   ctx.strokeStyle = this.borderColor;
+  // we assume this.scaleX and this.scaleY are same in an image.
+  // it is not common use case to stretch images, and if it is, and is brought up,
+  // this border for the image needs to be drawn differently.
   ctx.lineWidth = this.borderScaleFactor / this.scaleX;
   ctx.strokeRect(ghostX, ghostY, element.width, element.height);
 
@@ -359,19 +364,17 @@ export function renderGhostImage(
 const { capValue } = util;
 
 /**
- * Generator for edge resize handlers that support cover scale with bounce-back.
- * Similar pattern to scaleEquallyCropGenerator.
+ * Those are controls used to resize an image, similar to cropX,cropY,width,height
+ * But they change the scale of an image to accomodate out of bounds resizing.
+ * When resize comes back they scale the image back to what was before.
+ * The memory effect for bounce back works for the same transform.
+ * Once you mouseup, the bounce back is lost.
  */
 const changeImageEdgeGenerator =
   (axis: 'x' | 'y'): TransformActionHandler =>
   (_eventData, transform, x, y) => {
     const image = transform.target as FabricImage;
-    const original = transform.original as {
-      cropX?: number;
-      cropY?: number;
-      scaleX: number;
-      scaleY: number;
-    };
+    const original = transform.original;
 
     const isX = axis === 'x';
     const elementSize = isX ? image._element.width : image._element.height;
