@@ -442,7 +442,7 @@ exports[`text imperative changes > insertChars 2`] = `
   "text": "tabest",
   "top": 0,
   "type": "IText",
-  "width": 58,
+  "width": 58.31,
 }
 `;
 
@@ -563,7 +563,7 @@ exports[`text imperative changes > insertChars and removes chars 2`] = `
   "text": "tabst",
   "top": 0,
   "type": "IText",
-  "width": 47,
+  "width": 47.22,
 }
 `;
 
@@ -646,7 +646,7 @@ exports[`text imperative changes > insertChars and removes chars 4`] = `
   "text": "tab",
   "top": 0,
   "type": "IText",
-  "width": 31,
+  "width": 30.54,
 }
 `;
 
@@ -853,7 +853,7 @@ exports[`text imperative changes > insertChars can accept some style for the new
 aest",
   "top": 0,
   "type": "IText",
-  "width": 39,
+  "width": 38.87,
 }
 `;
 
@@ -1027,7 +1027,7 @@ exports[`text imperative changes > insertChars handles new lines correctly 2`] =
 est",
   "top": 0,
   "type": "IText",
-  "width": 31,
+  "width": 30.54,
 }
 `;
 
@@ -1105,6 +1105,6 @@ exports[`text imperative changes > removeChars 2`] = `
   "text": "tt",
   "top": 0,
   "type": "IText",
-  "width": 14,
+  "width": 13.89,
 }
 `;

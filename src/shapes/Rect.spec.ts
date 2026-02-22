@@ -7,42 +7,12 @@ import { Pattern } from '../Pattern';
 // will require some kind of handling here
 import { getEnv } from '../env';
 import { loadSVGFromString } from '../parser/loadSVGFromString';
+import { createReferenceObject } from '../../test/utils';
 
-const REFERENCE_RECT = {
-  version,
-  type: 'Rect',
-  originX: 'center',
-  originY: 'center',
-  left: 0,
-  top: 0,
-  width: 0,
-  height: 0,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeLineCap: 'butt',
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
+const REFERENCE_RECT = createReferenceObject('Rect', {
   rx: 0,
   ry: 0,
-  skewX: 0,
-  skewY: 0,
-  strokeUniform: false,
-};
+});
 
 describe('Rect', () => {
   it('constructor', function () {
@@ -272,5 +242,27 @@ describe('Rect', () => {
     expect(rect?.paintFirst).toBe('stroke');
     expect(rectObject.paintFirst).toBe('stroke');
     expect(rectSvg).toContain('paint-order="stroke"');
+  });
+
+  describe('svg attribute injection', () => {
+    it('properties are properly escaped', () => {
+      const rect = new Rect({
+        id: 'asd"><script>alert(1)</script>',
+        width: 100,
+        height: 100,
+      });
+      const svg = rect.toSVG();
+      expect(svg).toContain(
+        `id="asd&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"`,
+      );
+    });
+    it('polyglot test', () => {
+      const polyglotPayload =
+        'jaVasCript:/*-/*`/*\\`/*\'/*"/**/(/* */oNcliCk=alert() )';
+      const rect = new Rect({ id: polyglotPayload, width: 100, height: 100 });
+      const svg = rect.toSVG();
+      // Should escape all special characters
+      expect(svg).not.toContain(polyglotPayload);
+    });
   });
 });

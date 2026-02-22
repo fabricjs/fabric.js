@@ -35,8 +35,7 @@ interface UniquePathProps {
 }
 
 export interface SerializedPathProps
-  extends SerializedObjectProps,
-    UniquePathProps {}
+  extends SerializedObjectProps, UniquePathProps {}
 
 export interface PathProps extends FabricObjectProps, UniquePathProps {}
 
@@ -214,11 +213,10 @@ export class Path<
    * of the instance
    */
   _toSVG() {
-    const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
     return [
       '<path ',
       'COMMON_PARTS',
-      `d="${path}" stroke-linecap="round" />\n`,
+      `d="${joinPath(this.path, config.NUM_FRACTION_DIGITS)}" stroke-linecap="round" />\n`,
     ];
   }
 

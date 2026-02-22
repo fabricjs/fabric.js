@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { Circle } from './Circle';
 import { FabricObject } from './Object/FabricObject';
 import { getFabricDocument, version } from '../../fabric';
+import { createReferenceObject } from '../../test/utils';
+
+const REFERENCE_CIRCLE = createReferenceObject('Circle', {
+  radius: 0,
+  startAngle: 0,
+  endAngle: 360,
+  counterClockwise: false,
+});
 
 describe('Circle', () => {
   it('constructor', () => {
@@ -86,52 +94,15 @@ describe('Circle', () => {
 
   it('toObject', () => {
     const circle = new Circle();
-    const defaultProperties = {
-      version: version,
-      type: 'Circle',
-      originX: 'center',
-      originY: 'center',
-      left: 0,
-      top: 0,
-      width: 0,
-      height: 0,
-      fill: 'rgb(0,0,0)',
-      stroke: null,
-      strokeWidth: 1,
-      strokeDashArray: null,
-      strokeLineCap: 'butt',
-      strokeDashOffset: 0,
-      strokeLineJoin: 'miter',
-      strokeMiterLimit: 4,
-      scaleX: 1,
-      scaleY: 1,
-      angle: 0,
-      flipX: false,
-      flipY: false,
-      opacity: 1,
-      shadow: null,
-      visible: true,
-      backgroundColor: '',
-      fillRule: 'nonzero',
-      paintFirst: 'fill',
-      globalCompositeOperation: 'source-over',
-      radius: 0,
-      startAngle: 0,
-      endAngle: 360,
-      counterClockwise: false,
-      skewX: 0,
-      skewY: 0,
-      strokeUniform: false,
-    };
     expect(circle.toObject).toBeTypeOf('function');
-    expect(circle.toObject()).toStrictEqual(defaultProperties);
+    expect(circle.toObject()).toStrictEqual(REFERENCE_CIRCLE);
 
     circle.set('left', 100);
     circle.set('top', 200);
     circle.set('radius', 15);
 
     expect(circle.toObject()).toStrictEqual({
-      ...defaultProperties,
+      ...REFERENCE_CIRCLE,
       left: 100,
       top: 200,
       width: 30,
