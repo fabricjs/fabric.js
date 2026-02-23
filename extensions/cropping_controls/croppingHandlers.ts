@@ -254,20 +254,20 @@ const calcScale = (currentPoint: Point, height: number, width: number) =>
  * Reflects pointer position across object center when image is flipped.
  * This compensates for the inverted local coordinate system.
  */
-const reflectPointerForFlip = (
-  target: FabricImage,
-  x: number,
-  y: number,
-): { x: number; y: number } => {
-  if (!target.flipX && !target.flipY) {
-    return { x, y };
-  }
-  const center = target.getCenterPoint();
-  return {
-    x: target.flipX ? 2 * center.x - x : x,
-    y: target.flipY ? 2 * center.y - y : y,
-  };
-};
+// const reflectPointerForFlip = (
+//   target: FabricImage,
+//   x: number,
+//   y: number,
+// ): Point => {
+//   if (!target.flipX && !target.flipY) {
+//     return new Point(x, y);
+//   }
+//   const center = target.getCenterPoint();
+//   return new Point(
+//     target.flipX ? center.x - x : x,
+//     target.flipY ? center.y - y : y,
+//   );
+// };
 
 /**
  * Action handler generator that handles scaling of an image in crop mode.
@@ -282,25 +282,28 @@ export const scaleEquallyCropGenerator =
     const remainderX = fullWidth - target.width - target.cropX;
     const remainderY = fullHeight - target.height - target.cropY;
     const anchorOriginX =
-      cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width;
+      (cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width) *
+      (target.flipX ? -1 : 1);
     const anchorOriginY =
-      cy < 0 ? 1 + remainderY / target.height : -target.cropY / target.height;
+      (cy < 0
+        ? 1 + remainderY / target.height
+        : -target.cropY / target.height) * (target.flipY ? -1 : 1);
     const constraint = target.translateToOriginPoint(
       target.getCenterPoint(),
       anchorOriginX,
       anchorOriginY,
     );
 
-    const pointerForLocalCoords = reflectPointerForFlip(target, x, y);
     const newPoint = controlsUtils.getLocalPoint(
       transform,
       anchorOriginX,
       anchorOriginY,
-      pointerForLocalCoords.x,
-      pointerForLocalCoords.y,
+      x,
+      y,
     );
 
     const scale = calcScale(newPoint, fullHeight, fullWidth);
+
     const scaleChangeX = scale / target.scaleX;
     const scaleChangeY = scale / target.scaleY;
     const scaledRemainderX = remainderX / scaleChangeX;
@@ -332,9 +335,12 @@ export const scaleEquallyCropGenerator =
     target.cropX = newCropX;
     target.cropY = newCropY;
     const newAnchorOriginX =
-      cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth;
+      (cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth) *
+      (target.flipX ? -1 : 1);
     const newAnchorOriginY =
-      cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight;
+      (cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight) *
+      (target.flipY ? -1 : 1);
+
     target.setPositionByOrigin(constraint, newAnchorOriginX, newAnchorOriginY);
     return true;
   };
