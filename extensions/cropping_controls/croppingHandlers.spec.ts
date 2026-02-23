@@ -10,8 +10,8 @@ import {
   ghostScalePositionHandler,
   scaleEquallyCropGenerator,
   renderGhostImage,
-  changeImageEdgeWidth,
-  changeImageEdgeHeight,
+  changeImageHeightWithAutoCover,
+  changeImageWidthWithAutoCover,
 } from './croppingHandlers';
 
 import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest';
@@ -813,7 +813,12 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'left', 'center');
 
-      const changed = changeImageEdgeWidth(eventData, transform, 180, 50);
+      const changed = changeImageWidthWithAutoCover(
+        eventData,
+        transform,
+        180,
+        50,
+      );
       expect(changed).toBe(true);
       expect(image.width).toBeGreaterThan(100);
       expect(image.scaleX).toBe(1);
@@ -829,7 +834,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'left', 'center');
 
-      changeImageEdgeWidth(eventData, transform, 500, 50);
+      changeImageWidthWithAutoCover(eventData, transform, 500, 50);
       expect(image.width).toBeLessThanOrEqual(250); // 300 - 50
     });
 
@@ -846,7 +851,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'left', 'center');
 
-      changeImageEdgeWidth(eventData, transform, 500, 100);
+      changeImageWidthWithAutoCover(eventData, transform, 500, 100);
       expect(image.scaleX).toBeGreaterThan(1);
       expect(image.scaleX).toBe(image.scaleY); // uniform
       expect(image.width).toBe(300);
@@ -862,7 +867,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'right', 'center');
 
-      changeImageEdgeWidth(eventData, transform, -250, 50);
+      changeImageWidthWithAutoCover(eventData, transform, -250, 50);
       expect(image.cropX).toBe(0);
       expect(image.width).toBe(200); // original 100 + cropX 100
     });
@@ -879,7 +884,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'right', 'center');
 
-      changeImageEdgeWidth(eventData, transform, -400, 100);
+      changeImageWidthWithAutoCover(eventData, transform, -400, 100);
       expect(image.scaleX).toBeGreaterThan(1);
       expect(image.cropX).toBe(0);
     });
@@ -924,7 +929,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'center', 'top');
 
-      changeImageEdgeHeight(eventData, transform, 50, 180);
+      changeImageHeightWithAutoCover(eventData, transform, 50, 180);
       expect(image.height).toBeGreaterThan(100);
       expect(image.scaleY).toBe(1);
     });
@@ -939,7 +944,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'center', 'top');
 
-      changeImageEdgeHeight(eventData, transform, 50, 500);
+      changeImageHeightWithAutoCover(eventData, transform, 50, 500);
       expect(image.height).toBeLessThanOrEqual(250); // 300 - 50
     });
 
@@ -955,7 +960,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'center', 'top');
 
-      changeImageEdgeHeight(eventData, transform, 100, 500);
+      changeImageHeightWithAutoCover(eventData, transform, 100, 500);
       expect(image.scaleY).toBeGreaterThan(1);
       expect(image.scaleX).toBe(image.scaleY); // uniform
       expect(image.height).toBe(300);
@@ -971,7 +976,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'center', 'bottom');
 
-      changeImageEdgeHeight(eventData, transform, 50, -250);
+      changeImageHeightWithAutoCover(eventData, transform, 50, -250);
       expect(image.cropY).toBe(0);
       expect(image.height).toBe(200); // original 100 + cropY 100
     });
@@ -988,7 +993,7 @@ describe('croppingHandlers', () => {
       canvas.add(image);
       transform = prepareEdgeTransform(image, 'center', 'bottom');
 
-      changeImageEdgeHeight(eventData, transform, 100, -400);
+      changeImageHeightWithAutoCover(eventData, transform, 100, -400);
       expect(image.scaleY).toBeGreaterThan(1);
       expect(image.cropY).toBe(0);
     });
@@ -1037,7 +1042,7 @@ describe('croppingHandlers', () => {
 
       const initialWidth = image.width;
       // Drag outward (positive x in local coords after flip transform)
-      changeImageEdgeWidth(eventData, transform, 180, 50);
+      changeImageWidthWithAutoCover(eventData, transform, 180, 50);
       expect(image.width).toBeGreaterThan(initialWidth);
       expect(image.scaleX).toBe(1);
     });
@@ -1058,7 +1063,7 @@ describe('croppingHandlers', () => {
 
       const initialCropX = image.cropX;
       // Drag outward (negative x expands left edge)
-      changeImageEdgeWidth(eventData, transform, -180, 50);
+      changeImageWidthWithAutoCover(eventData, transform, -180, 50);
       expect(image.cropX).toBeLessThan(initialCropX);
       expect(image.width).toBeGreaterThan(100);
     });
@@ -1077,7 +1082,7 @@ describe('croppingHandlers', () => {
       transform = prepareEdgeTransform(image, 'center', 'top', 'mb');
 
       const initialHeight = image.height;
-      changeImageEdgeHeight(eventData, transform, 50, 180);
+      changeImageHeightWithAutoCover(eventData, transform, 50, 180);
       expect(image.height).toBeGreaterThan(initialHeight);
       expect(image.scaleY).toBe(1);
     });
@@ -1096,7 +1101,7 @@ describe('croppingHandlers', () => {
       transform = prepareEdgeTransform(image, 'center', 'bottom', 'mt');
 
       const initialCropY = image.cropY;
-      changeImageEdgeHeight(eventData, transform, 50, -180);
+      changeImageHeightWithAutoCover(eventData, transform, 50, -180);
       expect(image.cropY).toBeLessThan(initialCropY);
       expect(image.height).toBeGreaterThan(100);
     });
