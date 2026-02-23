@@ -377,6 +377,7 @@ const changeImageEdgeGenerator =
     const original = transform.original;
 
     const isX = axis === 'x';
+    const isFlipped = isX ? image.flipX : image.flipY;
     const elementSize = isX ? image._element.width : image._element.height;
     const crossElementSize = isX ? image._element.height : image._element.width;
     const isNegativeEdge = isX
@@ -404,9 +405,10 @@ const changeImageEdgeGenerator =
     const rawSize = isNegativeEdge ? -coordinate : coordinate;
     const requestedSize = Math.max(10, rawSize / initialScale);
 
-    const availableSize = isNegativeEdge
-      ? initialCrop + initialSize
-      : elementSize - initialCrop;
+    const availableSize =
+      isNegativeEdge !== isFlipped
+        ? initialCrop + initialSize
+        : elementSize - initialCrop;
 
     const setImageProps = (
       size: number,
@@ -431,9 +433,10 @@ const changeImageEdgeGenerator =
     };
 
     if (requestedSize <= availableSize) {
-      const newCrop = isNegativeEdge
-        ? Math.max(0, initialCrop + initialSize - requestedSize)
-        : initialCrop;
+      const newCrop =
+        isNegativeEdge !== isFlipped
+          ? Math.max(0, initialCrop + initialSize - requestedSize)
+          : initialCrop;
       setImageProps(
         Math.max(1, requestedSize),
         initialCrossSize,
@@ -459,7 +462,7 @@ const changeImageEdgeGenerator =
         availableSize,
         newCrossSize,
         newScale,
-        isNegativeEdge ? 0 : initialCrop,
+        isNegativeEdge !== isFlipped ? 0 : initialCrop,
         newCrossCrop,
       );
     }
