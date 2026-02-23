@@ -6,8 +6,8 @@ import {
   changeCropY,
   ghostScalePositionHandler,
   scaleEquallyCropGenerator,
-  changeEdgeWidth,
-  changeEdgeHeight,
+  changeWidthAndScaleToCover,
+  changeHeightAndScaleToCover,
   withFlip,
   withCornerFlip,
 } from './croppingHandlers';
@@ -110,7 +110,12 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: withCornerFlip(changeCropX, changeCropWidth, changeCropY, changeCropHeight),
+    actionHandler: withCornerFlip(
+      changeCropX,
+      changeCropWidth,
+      changeCropY,
+      changeCropHeight,
+    ),
     getActionName: cropActionName,
   }),
 
@@ -123,7 +128,12 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: withCornerFlip(changeCropWidth, changeCropX, changeCropY, changeCropHeight),
+    actionHandler: withCornerFlip(
+      changeCropWidth,
+      changeCropX,
+      changeCropY,
+      changeCropHeight,
+    ),
     getActionName: cropActionName,
   }),
 
@@ -136,7 +146,12 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: withCornerFlip(changeCropX, changeCropWidth, changeCropHeight, changeCropY),
+    actionHandler: withCornerFlip(
+      changeCropX,
+      changeCropWidth,
+      changeCropHeight,
+      changeCropY,
+    ),
     getActionName: cropActionName,
   }),
 
@@ -149,15 +164,20 @@ export const createImageCroppingControls = () => ({
     render: renderCornerControl,
     shouldActivate: shouldActivateCorner,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: withCornerFlip(changeCropWidth, changeCropX, changeCropHeight, changeCropY),
+    actionHandler: withCornerFlip(
+      changeCropWidth,
+      changeCropX,
+      changeCropHeight,
+      changeCropY,
+    ),
     getActionName: cropActionName,
   }),
 });
 
 const edgeActionName = () => 'resizing';
 
-// edge resize controls - resize within crop bounds, then uniform scale when exhausted
-export const createImageEdgeResizeControls = () => ({
+// resize + fallback scale controls - resize within crop bounds, then uniform scale when bounds reached
+export const createImageResizeControlsWithScaleToCover = () => ({
   mle: new Control({
     x: -0.5,
     y: 0,
@@ -166,7 +186,7 @@ export const createImageEdgeResizeControls = () => ({
     sizeY: 16,
     render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeEdgeWidth,
+    actionHandler: changeWidthAndScaleToCover,
     getActionName: edgeActionName,
   }),
 
@@ -178,7 +198,7 @@ export const createImageEdgeResizeControls = () => ({
     sizeY: 16,
     render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeEdgeWidth,
+    actionHandler: changeWidthAndScaleToCover,
     getActionName: edgeActionName,
   }),
 
@@ -190,7 +210,7 @@ export const createImageEdgeResizeControls = () => ({
     sizeY: 8,
     render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeEdgeHeight,
+    actionHandler: changeHeightAndScaleToCover,
     getActionName: edgeActionName,
   }),
 
@@ -202,7 +222,7 @@ export const createImageEdgeResizeControls = () => ({
     sizeY: 8,
     render: renderRoundedSegmentControl,
     cursorStyleHandler: scaleCursorStyleHandler,
-    actionHandler: changeEdgeHeight,
+    actionHandler: changeHeightAndScaleToCover,
     getActionName: edgeActionName,
   }),
 });

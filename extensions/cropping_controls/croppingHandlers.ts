@@ -376,7 +376,7 @@ const { capValue } = util;
  * The memory effect for bounce back works for the same transform.
  * Once you mouseup, the bounce back is lost.
  */
-const changeImageEdgeGenerator =
+const changeImageSizeWithAutoCoverGenerator =
   (axis: 'x' | 'y'): TransformActionHandler =>
   (_eventData, transform, x, y) => {
     const image = transform.target as FabricImage;
@@ -476,15 +476,17 @@ const changeImageEdgeGenerator =
     return true;
   };
 
-export const changeImageEdgeWidth = changeImageEdgeGenerator('x');
-export const changeImageEdgeHeight = changeImageEdgeGenerator('y');
+export const changeImageWidthWithAutoCover =
+  changeImageSizeWithAutoCoverGenerator('x');
+export const changeImageHeightWithAutoCover =
+  changeImageSizeWithAutoCoverGenerator('y');
 
-export const changeEdgeWidth = wrapWithFireEvent(
+export const changeWidthAndScaleToCover = wrapWithFireEvent(
   'RESIZING' as TModificationEvents,
-  wrapWithFixedAnchor(changeImageEdgeWidth),
+  wrapWithFixedAnchor(changeImageWidthWithAutoCover),
 );
 
-export const changeEdgeHeight = wrapWithFireEvent(
+export const changeHeightAndScaleToCover = wrapWithFireEvent(
   'RESIZING' as TModificationEvents,
-  wrapWithFixedAnchor(changeImageEdgeHeight),
+  wrapWithFixedAnchor(changeImageHeightWithAutoCover),
 );

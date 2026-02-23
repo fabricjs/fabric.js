@@ -19,15 +19,15 @@ export {
 
 export {
   createImageCroppingControls,
-  createImageEdgeResizeControls,
+  createImageResizeControlsWithScaleToCover,
 } from './cropping_controls/croppingControls';
 export {
   changeCropY,
   changeCropX,
   changeCropWidth,
   changeCropHeight,
-  changeEdgeWidth,
-  changeEdgeHeight,
+  changeWidthAndScaleToCover,
+  changeHeightAndScaleToCover,
   withFlip,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';
