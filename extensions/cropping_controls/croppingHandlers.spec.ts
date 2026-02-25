@@ -1044,7 +1044,9 @@ describe('croppingHandlers', () => {
       // Drag outward (positive x in local coords after flip transform)
       changeImageWidthWithAutoCover(eventData, transform, 180, 50);
       expect(image.width).toBeGreaterThan(initialWidth);
-      expect(image.scaleX).toBe(1);
+      expect(image.width).toBe(150);
+      expect(image.cropX).toBe(0); // eaten all crop
+      expect(image.scaleX).toBe(1.2); // 20% of 150 to get to 180
     });
 
     test('left edge expands into cropX when flipX is true', () => {
@@ -1064,8 +1066,9 @@ describe('croppingHandlers', () => {
       const initialCropX = image.cropX;
       // Drag outward (negative x expands left edge)
       changeImageWidthWithAutoCover(eventData, transform, -180, 50);
-      expect(image.cropX).toBeLessThan(initialCropX);
-      expect(image.width).toBeGreaterThan(100);
+      expect(image.cropX).toBe(initialCropX);
+      expect(image.width).toBe(200);
+      expect(image.scaleX).toBe(1.4); // 40% of 200 to go from 100 to 280
     });
 
     test('bottom edge expands height when flipY is true', () => {
@@ -1084,7 +1087,9 @@ describe('croppingHandlers', () => {
       const initialHeight = image.height;
       changeImageHeightWithAutoCover(eventData, transform, 50, 180);
       expect(image.height).toBeGreaterThan(initialHeight);
-      expect(image.scaleY).toBe(1);
+      expect(image.height).toBe(150);
+      expect(image.cropY).toBe(0);
+      expect(image.scaleY).toBe(1.2);
     });
 
     test('top edge expands into cropY when flipY is true', () => {
@@ -1102,8 +1107,9 @@ describe('croppingHandlers', () => {
 
       const initialCropY = image.cropY;
       changeImageHeightWithAutoCover(eventData, transform, 50, -180);
-      expect(image.cropY).toBeLessThan(initialCropY);
-      expect(image.height).toBeGreaterThan(100);
+      expect(image.cropY).toBe(initialCropY);
+      expect(image.height).toBe(200);
+      expect(image.scaleY).toBe(1.4);
     });
   });
 });
