@@ -1,5 +1,10 @@
-import type { TMat2D, FabricImage } from 'fabric';
-import { type Control, Point, type Gradient, util } from 'fabric';
+import type {
+  TMat2D,
+  FabricImage,
+  TransformActionHandler,
+  Control,
+} from 'fabric';
+import { Point, type Gradient, util } from 'fabric';
 
 export const linearGradientColorPositionHandlerGenerator = (
   gradient: Gradient<'linear'>,
@@ -60,4 +65,53 @@ export const linearGradientCoordPositionHandler = (
       ).transform(_finalMatrix);
     }
     return new Point(0, 0);
+  };
+
+export const linearGradientColorActionHandler =
+  (gradient: Gradient<'linear'>, colorIndex: number): TransformActionHandler =>
+  (eventData, { target }, x, y) => {
+    // find point in the space inside the object.
+    const point = util
+      .sendPointToPlane(
+        new Point(x, y),
+        undefined,
+        target.calcTransformMatrix(),
+      )
+      .add(new Point(target.width / 2, target.height / 2));
+    // create the linear gradient vector
+    const {
+      coords: { x1, x2, y1, y2 },
+    } = gradient;
+    const p1 = new Point(x1, y1);
+    const v = util.createVector(p1, new Point(x2, y2));
+    const u = util.createVector(p1, point);
+    const t = util.dotProduct(u, v) / util.dotProduct(v, v);
+    gradient.colorStops[colorIndex].offset = util.capValue(0, t, 1);
+    target.set('dirty', true);
+    return true;
+  };
+
+export const linearGradientCoordsActionHandler =
+  (gradient: Gradient<'linear'>, pointIndex: 1 | 2): TransformActionHandler =>
+  (eventData, { target }, x, y) => {
+    // find point in the space inside the object.
+    const point = util
+      .sendPointToPlane(
+        new Point(x, y),
+        undefined,
+        target.calcTransformMatrix(),
+      )
+      .add(new Point(target.width / 2, target.height / 2));
+
+    if (pointIndex === 1) {
+      gradient.coords.x1 = point.x;
+      gradient.coords.y1 = point.y;
+    }
+
+    if (pointIndex === 2) {
+      gradient.coords.x2 = point.x;
+      gradient.coords.y2 = point.y;
+    }
+    target.set('dirty', true);
+    return true;
   };

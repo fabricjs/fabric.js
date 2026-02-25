@@ -1,8 +1,10 @@
 import type { Gradient } from 'fabric';
 import { Control } from 'fabric';
 import {
+  linearGradientColorActionHandler,
   linearGradientColorPositionHandlerGenerator,
   linearGradientCoordPositionHandler,
+  linearGradientCoordsActionHandler,
 } from './linearGradientHandlers';
 
 export function createGradientControls(
@@ -17,15 +19,18 @@ export function createGradientControls(
         gradient,
         index,
       ),
+      actionHandler: linearGradientColorActionHandler(gradient, index),
     });
   });
   controls[`lgp_1`] = new Control({
     ...options,
     positionHandler: linearGradientCoordPositionHandler(gradient, 1),
+    actionHandler: linearGradientCoordsActionHandler(gradient, 1),
   });
   controls[`lgp_2`] = new Control({
     ...options,
     positionHandler: linearGradientCoordPositionHandler(gradient, 2),
+    actionHandler: linearGradientCoordsActionHandler(gradient, 2),
   });
   return controls;
 }
