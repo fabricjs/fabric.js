@@ -23,8 +23,7 @@ interface UniqueLineProps {
 }
 
 export interface SerializedLineProps
-  extends SerializedObjectProps,
-    UniqueLineProps {}
+  extends SerializedObjectProps, UniqueLineProps {}
 
 /**
  * A Class to draw a line
@@ -34,10 +33,10 @@ export interface SerializedLineProps
  * @deprecated
  */
 export class Line<
-    Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
-    SProps extends SerializedLineProps = SerializedLineProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
+  SProps extends SerializedLineProps = SerializedLineProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueLineProps
 {
@@ -200,18 +199,14 @@ export class Line<
    */
   calcLinePoints(): UniqueLineProps {
     const { x1: _x1, x2: _x2, y1: _y1, y2: _y2, width, height } = this;
-    const xMult = _x1 <= _x2 ? -1 : 1,
-      yMult = _y1 <= _y2 ? -1 : 1,
-      x1 = (xMult * width) / 2,
-      y1 = (yMult * height) / 2,
-      x2 = (xMult * -width) / 2,
-      y2 = (yMult * -height) / 2;
+    const xMult = _x1 <= _x2 ? -0.5 : 0.5,
+      yMult = _y1 <= _y2 ? -0.5 : 0.5;
 
     return {
-      x1,
-      x2,
-      y1,
-      y2,
+      x1: xMult * width,
+      x2: xMult * -width,
+      y1: yMult * height,
+      y2: yMult * -height,
     };
   }
 

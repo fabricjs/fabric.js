@@ -10,6 +10,7 @@ import type { Abortable, TClassProperties, TOptions } from '../typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { CSSRules } from '../parser/typedefs';
 import { SCALE_X, SCALE_Y } from '../constants';
+import { escapeXml } from '../util/lang_string';
 
 interface UniqueCircleProps {
   /**
@@ -43,8 +44,7 @@ interface UniqueCircleProps {
 }
 
 export interface SerializedCircleProps
-  extends SerializedObjectProps,
-    UniqueCircleProps {}
+  extends SerializedObjectProps, UniqueCircleProps {}
 
 export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
 
@@ -63,10 +63,10 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 };
 
 export class Circle<
-    Props extends TOptions<CircleProps> = Partial<CircleProps>,
-    SProps extends SerializedCircleProps = SerializedCircleProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<CircleProps> = Partial<CircleProps>,
+  SProps extends SerializedCircleProps = SerializedCircleProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueCircleProps
 {
@@ -174,7 +174,8 @@ export class Circle<
    * of the instance
    */
   _toSVG(): string[] {
-    const angle = (this.endAngle - this.startAngle) % 360;
+    const { radius, startAngle, endAngle } = this;
+    const angle = (endAngle - startAngle) % 360;
 
     if (angle === 0) {
       return [
@@ -182,13 +183,12 @@ export class Circle<
         'COMMON_PARTS',
         'cx="0" cy="0" ',
         'r="',
-        `${this.radius}`,
+        `${escapeXml(radius)}`,
         '" />\n',
       ];
     } else {
-      const { radius } = this;
-      const start = degreesToRadians(this.startAngle),
-        end = degreesToRadians(this.endAngle),
+      const start = degreesToRadians(startAngle),
+        end = degreesToRadians(endAngle),
         startX = cos(start) * radius,
         startY = sin(start) * radius,
         endX = cos(end) * radius,
