@@ -35,7 +35,8 @@ interface UniquePathProps {
 }
 
 export interface SerializedPathProps
-  extends SerializedObjectProps, UniquePathProps {}
+  extends SerializedObjectProps,
+    UniquePathProps {}
 
 export interface PathProps extends FabricObjectProps, UniquePathProps {}
 

@@ -227,8 +227,7 @@ export interface CanvasEventsOptions {
 }
 
 export interface CanvasOptions
-  extends
-    StaticCanvasOptions,
+  extends StaticCanvasOptions,
     CanvasTransformOptions,
     CanvasSelectionOptions,
     CanvasCursorOptions,

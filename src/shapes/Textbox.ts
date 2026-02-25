@@ -40,8 +40,7 @@ interface UniqueTextboxProps {
 }
 
 export interface SerializedTextboxProps
-  extends
-    SerializedITextProps,
+  extends SerializedITextProps,
     Pick<UniqueTextboxProps, 'minWidth' | 'splitByGrapheme'> {}
 
 export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
@@ -53,10 +52,10 @@ export interface TextboxProps extends ITextProps, UniqueTextboxProps {}
  * wrapping of lines.
  */
 export class Textbox<
-  Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
-  SProps extends SerializedTextboxProps = SerializedTextboxProps,
-  EventSpec extends ITextEvents = ITextEvents,
->
+    Props extends TOptions<TextboxProps> = Partial<TextboxProps>,
+    SProps extends SerializedTextboxProps = SerializedTextboxProps,
+    EventSpec extends ITextEvents = ITextEvents,
+  >
   extends IText<Props, SProps, EventSpec>
   implements UniqueTextboxProps
 {

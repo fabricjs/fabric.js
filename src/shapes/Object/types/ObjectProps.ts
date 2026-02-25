@@ -10,7 +10,9 @@ import type {
 } from './SerializedObjectProps';
 
 export interface ObjectProps
-  extends SerializedObjectProps, ClipPathProps, ObjectTransformActionProps {
+  extends SerializedObjectProps,
+    ClipPathProps,
+    ObjectTransformActionProps {
   clipPath?: FabricObject;
   fill: TFiller | string | null;
   stroke: TFiller | string | null;

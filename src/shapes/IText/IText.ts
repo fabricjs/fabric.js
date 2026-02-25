@@ -72,7 +72,8 @@ interface UniqueITextProps {
 }
 
 export interface SerializedITextProps
-  extends SerializedTextProps, UniqueITextProps {}
+  extends SerializedTextProps,
+    UniqueITextProps {}
 
 export interface ITextProps extends TextProps, UniqueITextProps {}
 
@@ -120,10 +121,10 @@ export interface ITextProps extends TextProps, UniqueITextProps {}
  * ```
  */
 export class IText<
-  Props extends TOptions<ITextProps> = Partial<ITextProps>,
-  SProps extends SerializedITextProps = SerializedITextProps,
-  EventSpec extends ITextEvents = ITextEvents,
->
+    Props extends TOptions<ITextProps> = Partial<ITextProps>,
+    SProps extends SerializedITextProps = SerializedITextProps,
+    EventSpec extends ITextEvents = ITextEvents,
+  >
   extends ITextClickBehavior<Props, SProps, EventSpec>
   implements UniqueITextProps
 {

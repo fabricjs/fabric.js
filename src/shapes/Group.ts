@@ -58,7 +58,8 @@ export interface GroupOwnProps {
 }
 
 export interface SerializedGroupProps
-  extends SerializedObjectProps, GroupOwnProps {
+  extends SerializedObjectProps,
+    GroupOwnProps {
   objects: SerializedObjectProps[];
   layoutManager: SerializedLayoutManager;
 }
