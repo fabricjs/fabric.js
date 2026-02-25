@@ -44,8 +44,7 @@ interface UniqueCircleProps {
 }
 
 export interface SerializedCircleProps
-  extends SerializedObjectProps,
-    UniqueCircleProps {}
+  extends SerializedObjectProps, UniqueCircleProps {}
 
 export interface CircleProps extends FabricObjectProps, UniqueCircleProps {}
 
@@ -64,10 +63,10 @@ export const circleDefaultValues: Partial<TClassProperties<Circle>> = {
 };
 
 export class Circle<
-    Props extends TOptions<CircleProps> = Partial<CircleProps>,
-    SProps extends SerializedCircleProps = SerializedCircleProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<CircleProps> = Partial<CircleProps>,
+  SProps extends SerializedCircleProps = SerializedCircleProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements UniqueCircleProps
 {
