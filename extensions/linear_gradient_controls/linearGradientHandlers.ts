@@ -3,8 +3,11 @@ import type {
   FabricImage,
   TransformActionHandler,
   Control,
+  ControlRenderingStyleOverride,
+  InteractiveFabricObject,
+  Gradient,
 } from 'fabric';
-import { Point, type Gradient, util } from 'fabric';
+import { Point, util, controlsUtils, iMatrix } from 'fabric';
 
 export const linearGradientColorPositionHandlerGenerator = (
   gradient: Gradient<'linear'>,
@@ -114,4 +117,41 @@ export const linearGradientCoordsActionHandler =
     }
     target.set('dirty', true);
     return true;
+  };
+
+export const linearGradientControlLineRender = (gradient: Gradient<'linear'>) =>
+  function renderCircleControlWithLine(
+    this: Control,
+    ctx: CanvasRenderingContext2D,
+    left: number,
+    top: number,
+    styleOverride: ControlRenderingStyleOverride,
+    fabricObject: InteractiveFabricObject,
+  ) {
+    // we are position in center of coords.x1/y1
+    ctx.save();
+    // this.commonRenderProps(ctx, left, top, fabricObject, styleOverride);
+    const { width, height } = fabricObject;
+    const { coords } = gradient;
+    const finalP = util.sendPointToPlane(
+      new Point(coords.x2 - width / 2, coords.y2 - height / 2),
+      util.multiplyTransformMatrices(
+        fabricObject.canvas?.viewportTransform ?? iMatrix,
+        fabricObject.calcTransformMatrix(),
+      ),
+    );
+    ctx.lineWidth = fabricObject.borderScaleFactor;
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.lineTo(finalP.x, finalP.y);
+    ctx.stroke();
+    controlsUtils.renderCircleControl.call(
+      this,
+      ctx,
+      left,
+      top,
+      styleOverride,
+      fabricObject,
+    );
+    ctx.restore();
   };
