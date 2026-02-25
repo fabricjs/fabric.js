@@ -5,7 +5,7 @@ export async function testCase(canvas: fabric.Canvas) {
   canvas.setDimensions({ width: 900, height: 700 });
   canvas.backgroundColor = '#f5f5f5';
 
-  const edgeControls = extensions.createImageEdgeResizeControls();
+  const edgeControls = extensions.createImageResizeControlsWithScaleToCover();
 
   const image = await fabric.FabricImage.fromURL(
     'https://fabricjs.com/assets/dragon.jpg',

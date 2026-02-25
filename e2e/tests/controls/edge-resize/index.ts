@@ -1,5 +1,5 @@
 import { FabricImage } from 'fabric';
-import { createImageEdgeResizeControls } from 'fabric/extensions';
+import { createImageResizeControlsWithScaleToCover } from 'fabric/extensions';
 import { beforeAll } from '../../test';
 
 beforeAll(async (canvas) => {
@@ -10,7 +10,7 @@ beforeAll(async (canvas) => {
   );
 
   // Apply edge resize controls
-  const edgeControls = createImageEdgeResizeControls();
+  const edgeControls = createImageResizeControlsWithScaleToCover();
   Object.assign(image.controls, {
     ml: edgeControls.mle,
     mr: edgeControls.mre,
