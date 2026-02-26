@@ -31,3 +31,15 @@ export {
   withFlip,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';
+
+export { Table } from './table';
+export type {
+  TableDefaults,
+  CellData,
+  SerializedTableProps,
+  TableBorderInfo,
+  CellPosition,
+} from './table';
+export { TableLayoutStrategy } from './table';
+export type { TableCell, TableCellText } from './table';
+export { createTableControls, initTableInteraction } from './table';
