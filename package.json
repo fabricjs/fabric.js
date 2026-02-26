@@ -91,7 +91,7 @@
     "nyc": "^17.1.0",
     "prettier": "^3.8.1",
     "ps-list": "^9.0.0",
-    "rolldown": "^1.0.0-rc.4",
+    "rolldown": "^1.0.0-rc.6",
     "semver": "^7.7.3",
     "serve": "^14.2.5",
     "tsc-files": "^1.1.4",
