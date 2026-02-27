@@ -233,6 +233,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare _hoveredTarget?: FabricObject;
 
   /**
+   * Keep track of the hovered target in the previous event with the shift key
+   * @type FabricObject | null
+   * @private
+   */
+  declare _hoveredCurrentTarget?: FabricObject;
+
+  /**
    * hold the list of nested targets hovered in the previous events
    * @type FabricObject[]
    * @private
@@ -811,7 +818,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     // in case we are over the active object
     if (activeObjectTargetInfo.target) {
       if (aObjects.length > 1) {
-        // in case of active selection and target hit over the activeSelection, just exit
+        // in case of active selection and target hit over the activeSelection, check also for multiSelection case
+        // if (this._isSelectionKeyPressed(e)) {
+        //   const multiTargetInfo = this.searchPossibleTargets(
+        //     this._objects,
+        //     pointer,
+        //   );
+        // }
         // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }

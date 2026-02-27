@@ -14,6 +14,7 @@
     "src/**/*",
     "e2e/**/*",
     "extensions/**/*",
+    ".codesandbox/templates/vanilla/src/**/*",
     "vitest.d.ts",
     "vitest.env.d.ts",
     "vitest.setup.ts",

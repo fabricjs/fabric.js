@@ -1209,13 +1209,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
     const { _hoveredTarget, _hoveredTargets } = this,
-      { subTargets } = this.findTarget(e),
+      { subTargets, currentTarget } = this.findTarget(e),
       length = Math.max(_hoveredTargets.length, subTargets.length);
 
     this.fireSyntheticInOutEvents('mouse', {
       e,
       target,
       oldTarget: _hoveredTarget,
+      currentTarget: currentTarget,
+      oldCurrentTarget: this._hoveredCurrentTarget,
       fireCanvas: true,
     });
     for (let i = 0; i < length; i++) {
@@ -1231,6 +1233,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         oldTarget: _hoveredTargets[i],
       });
     }
+    this._hoveredCurrentTarget = currentTarget;
     this._hoveredTarget = target;
     this._hoveredTargets = subTargets;
   }
@@ -1284,40 +1287,56 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     {
       target,
       oldTarget,
+      currentTarget,
+      oldCurrentTarget,
       fireCanvas,
       e,
       ...data
     }: TSyntheticEventContext[T] & {
       target?: FabricObject;
       oldTarget?: FabricObject;
+      currentTarget?: FabricObject;
+      oldCurrentTarget?: FabricObject;
       fireCanvas?: boolean;
     },
   ) {
     const { targetIn, targetOut, canvasIn, canvasOut } =
       syntheticEventConfig[type];
     const targetChanged = oldTarget !== target;
+    const currentTargetChanged = oldCurrentTarget !== currentTarget;
 
-    if (oldTarget && targetChanged) {
+    const commonData = {
+      ...data,
+      e,
+      ...getEventPoints(this, e),
+    };
+
+    if (
+      (oldTarget && targetChanged) ||
+      (oldCurrentTarget && currentTargetChanged)
+    ) {
       const outOpt: CanvasEvents[typeof canvasOut] = {
-        ...data,
-        e,
+        ...commonData,
         target: oldTarget,
         nextTarget: target,
-        ...getEventPoints(this, e),
+        currentTarget: oldCurrentTarget,
+        nextCurrentTarget: currentTarget,
       };
       fireCanvas && this.fire(canvasOut, outOpt);
-      oldTarget.fire(targetOut, outOpt);
+      oldTarget && oldTarget.fire(targetOut, outOpt);
+      oldCurrentTarget && oldCurrentTarget.fire(targetOut, outOpt);
     }
-    if (target && targetChanged) {
+    if ((target && targetChanged) || (currentTarget && currentTargetChanged)) {
       const inOpt: CanvasEvents[typeof canvasIn] = {
-        ...data,
-        e,
+        ...commonData,
         target,
         previousTarget: oldTarget,
-        ...getEventPoints(this, e),
+        currentTarget,
+        previousCurrentTarget: oldCurrentTarget,
       };
       fireCanvas && this.fire(canvasIn, inOpt);
-      target.fire(targetIn, inOpt);
+      target && target.fire(targetIn, inOpt);
+      currentTarget && currentTarget.fire(targetIn, inOpt);
     }
   }
 
