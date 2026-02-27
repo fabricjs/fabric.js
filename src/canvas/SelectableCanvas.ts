@@ -774,6 +774,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects(),
+      // searching a target in all possible objects means also avoiding the Active selection and check if
+      // you are over a target that  is behind the active selection.
       targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
     const {
@@ -782,6 +784,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       target: currentTarget,
     } = targetInfo;
 
+    // fullTargetInfo is just a duplicated standard target that is good for the case of no active selection or no activeObject
+    // we prefer presenting the data twice rather than trying to understand in the code when the data will be available or not.
     const fullTargetInfo: FullTargetsInfoWithContainer = {
       ...targetInfo,
       currentSubTargets,
