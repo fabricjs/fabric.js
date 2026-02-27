@@ -240,3 +240,19 @@ export const RECT_JSON = {
   background: '#ff5555',
   overlay: 'rgba(0,0,0,0.2)',
 };
+
+export const ERROR_IMAGE_JSON = {
+  version,
+  objects: [
+    {
+      type: 'Image',
+      src: 'https://not-existing-image.png',
+      crossOrigin: 'anonymous',
+    },
+    {
+      text: 'Il tuo testo qui',
+      type: 'Text',
+      left: 300,
+    },
+  ],
+};

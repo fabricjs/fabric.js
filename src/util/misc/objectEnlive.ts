@@ -103,7 +103,7 @@ export const enlivenObjects = <
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
-    Promise.all(
+    Promise.allSettled(
       objects.map((obj) =>
         classRegistry
           .getClass<
@@ -119,7 +119,12 @@ export const enlivenObjects = <
           }),
       ),
     )
-      .then(resolve)
+      .then((elementsResult) => {
+        const addedInstances = elementsResult
+          .filter((e) => e.status === 'fulfilled')
+          .map((e) => e.value);
+        resolve(addedInstances);
+      })
       .catch((error) => {
         // cleanup
         instances.forEach((instance) => {

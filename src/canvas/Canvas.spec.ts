@@ -29,6 +29,7 @@ import {
   PATH_WITHOUT_DEFAULTS_JSON,
   PATH_JSON,
   RECT_JSON,
+  ERROR_IMAGE_JSON,
 } from './Canvas.fixtures.ts';
 
 describe('Canvas', () => {
@@ -1409,6 +1410,18 @@ describe('Canvas', () => {
     expect(obj.get('flipY')).toBe(false);
     expect(obj.get('opacity')).toBe(1);
     expect(obj.get('path').length > 0).toBeTruthy();
+  });
+
+  it('loads from JSON string with loadFromJSON with images not existing', async () => {
+    expect(canvas.loadFromJSON).toBeTypeOf('function');
+    await canvas.loadFromJSON(ERROR_IMAGE_JSON);
+
+    const obj = canvas.item(0);
+
+    expect(canvas.isEmpty(), 'canvas is not empty').toBeFalsy();
+    expect(canvas.getObjects().length).toBe(1);
+    // @ts-expect-error -- constructor function has type
+    expect(obj.constructor.type, 'first object is a Image object').toBe('Text');
   });
 
   it('loads from JSON object without default values', async () => {
