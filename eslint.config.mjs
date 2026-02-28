@@ -11,6 +11,7 @@ export default tseslint.config(
     ignores: [
       'dist/*',
       'dist-extensions/*',
+      '.codesandbox/**/*',
       'src/mixins/eraser_brush.mixin.ts',
       'src/util/lang_class.ts',
       'src/parkinglot',
