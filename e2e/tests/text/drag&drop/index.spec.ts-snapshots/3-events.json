@@ -39,7 +39,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a",
       "viewportPoint": {
         "x": 117,
         "y": 50
@@ -47,7 +46,8 @@
       "scenePoint": {
         "x": 117,
         "y": 50
-      }
+      },
+      "target": "a"
     },
     "a"
   ],
@@ -60,7 +60,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a",
       "viewportPoint": {
         "x": 39,
         "y": 110
@@ -68,7 +67,8 @@
       "scenePoint": {
         "x": 39,
         "y": 110
-      }
+      },
+      "target": "a"
     },
     "a"
   ],
@@ -81,7 +81,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a",
       "viewportPoint": {
         "x": 87,
         "y": 123
@@ -89,7 +88,8 @@
       "scenePoint": {
         "x": 87,
         "y": 123
-      }
+      },
+      "target": "a"
     },
     "a"
   ],
@@ -102,7 +102,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a",
       "viewportPoint": {
         "x": 261,
         "y": 89
@@ -110,7 +109,8 @@
       "scenePoint": {
         "x": 261,
         "y": 89
-      }
+      },
+      "target": "a"
     },
     "a"
   ],
@@ -123,7 +123,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "b",
       "viewportPoint": {
         "x": 435,
         "y": 55
@@ -131,7 +130,8 @@
       "scenePoint": {
         "x": 435,
         "y": 55
-      }
+      },
+      "target": "b"
     },
     "b"
   ],
@@ -144,7 +144,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "b",
       "viewportPoint": {
         "x": 385,
         "y": 76
@@ -152,7 +151,8 @@
       "scenePoint": {
         "x": 385,
         "y": 76
-      }
+      },
+      "target": "b"
     },
     "b"
   ],
@@ -165,7 +165,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a",
       "viewportPoint": {
         "x": 250,
         "y": 130
@@ -173,7 +172,8 @@
       "scenePoint": {
         "x": 250,
         "y": 130
-      }
+      },
+      "target": "a"
     },
     "a"
   ],
