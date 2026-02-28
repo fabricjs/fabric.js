@@ -2,7 +2,7 @@
 
 ## [next]
 
-- fix(): Add more event firing when holding shift key. [#10874](https://github.com/fabricjs/fabric.js/pull/10874)
+- fix(): Fire mouseover/mouseleave for objects that are multi selection targets [#10874](https://github.com/fabricjs/fabric.js/pull/10874)
 - feat(extensions): Cropping controls with edge resize and flip support [#10851](https://github.com/fabricjs/fabric.js/pull/10851)
 
 ## [7.2.0]
