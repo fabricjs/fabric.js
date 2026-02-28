@@ -1209,15 +1209,15 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
    */
   _fireOverOutEvents(e: TPointerEvent, target?: FabricObject) {
     const { _hoveredTarget, _hoveredTargets } = this,
-      { subTargets, currentTarget } = this.findTarget(e),
+      { subTargets, currentTarget: actualTarget } = this.findTarget(e),
       length = Math.max(_hoveredTargets.length, subTargets.length);
 
     this.fireSyntheticInOutEvents('mouse', {
       e,
       target,
       oldTarget: _hoveredTarget,
-      currentTarget: currentTarget,
-      oldCurrentTarget: this._hoveredCurrentTarget,
+      actualTarget,
+      oldActualTarget: this._hoveredActualTarget,
       fireCanvas: true,
     });
     for (let i = 0; i < length; i++) {
@@ -1233,7 +1233,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         oldTarget: _hoveredTargets[i],
       });
     }
-    this._hoveredCurrentTarget = currentTarget;
+    this._hoveredActualTarget = actualTarget;
     this._hoveredTarget = target;
     this._hoveredTargets = subTargets;
   }
@@ -1287,57 +1287,62 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     {
       target,
       oldTarget,
-      currentTarget,
-      oldCurrentTarget,
+      actualTarget,
+      oldActualTarget,
       fireCanvas,
       e,
       ...data
     }: TSyntheticEventContext[T] & {
       target?: FabricObject;
       oldTarget?: FabricObject;
-      currentTarget?: FabricObject;
-      oldCurrentTarget?: FabricObject;
+      actualTarget?: FabricObject;
+      oldActualTarget?: FabricObject;
       fireCanvas?: boolean;
     },
   ) {
     const { targetIn, targetOut, canvasIn, canvasOut } =
       syntheticEventConfig[type];
     const targetChanged = oldTarget !== target;
-    const currentTargetChanged = oldCurrentTarget !== currentTarget;
-
+    const actualTargetChanged = oldActualTarget !== actualTarget;
+    const targetFires = target && targetChanged;
+    const actualTargetFires = actualTarget && actualTargetChanged;
+    const oldTargetFires = oldTarget && targetChanged;
+    const oldActualTargetFires = oldActualTarget && actualTargetChanged;
     const commonData = {
       ...data,
       e,
       ...getEventPoints(this, e),
     };
 
-    if (
-      (oldTarget && targetChanged) ||
-      (oldCurrentTarget && currentTargetChanged)
-    ) {
-      const outOpt: CanvasEvents[typeof canvasOut] = {
-        ...commonData,
-        target: oldTarget,
-        nextTarget: target,
-        currentTarget: oldCurrentTarget,
-        nextCurrentTarget: currentTarget,
-      };
+    const outOpt: CanvasEvents[typeof canvasOut] = {
+      ...commonData,
+      target: oldTarget,
+      nextTarget: target,
+      actualTarget: oldActualTarget,
+      nextActualTarget: actualTarget,
+    };
+    if (oldTargetFires || oldActualTargetFires) {
       fireCanvas && this.fire(canvasOut, outOpt);
-      oldTarget && oldTarget.fire(targetOut, outOpt);
-      oldCurrentTarget && oldCurrentTarget.fire(targetOut, outOpt);
     }
-    if ((target && targetChanged) || (currentTarget && currentTargetChanged)) {
-      const inOpt: CanvasEvents[typeof canvasIn] = {
-        ...commonData,
-        target,
-        previousTarget: oldTarget,
-        currentTarget,
-        previousCurrentTarget: oldCurrentTarget,
-      };
+    oldTargetFires && oldTarget.fire(targetOut, outOpt);
+    oldActualTargetFires &&
+      oldTarget !== oldActualTarget &&
+      oldActualTarget.fire(targetOut, outOpt);
+
+    const inOpt: CanvasEvents[typeof canvasIn] = {
+      ...commonData,
+      target,
+      previousTarget: oldTarget,
+      actualTarget,
+      previousActualTarget: oldActualTarget,
+    };
+    if (targetFires || actualTargetFires) {
       fireCanvas && this.fire(canvasIn, inOpt);
-      target && target.fire(targetIn, inOpt);
-      currentTarget && currentTarget.fire(targetIn, inOpt);
     }
+    targetFires && target.fire(targetIn, inOpt);
+    actualTargetFires &&
+      actualTarget !== target &&
+      actualTarget.fire(targetIn, inOpt);
   }
 
   /**

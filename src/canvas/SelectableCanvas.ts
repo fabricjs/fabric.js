@@ -237,7 +237,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @type FabricObject | null
    * @private
    */
-  declare _hoveredCurrentTarget?: FabricObject;
+  declare _hoveredActualTarget?: FabricObject;
 
   /**
    * hold the list of nested targets hovered in the previous events
