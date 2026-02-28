@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix: avoid crash if loadFromJSON load config with not existing images [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
 - feat(extensions): Cropping controls with edge resize and flip support [#10851](https://github.com/fabricjs/fabric.js/pull/10851)
 
 ## [7.2.0]
