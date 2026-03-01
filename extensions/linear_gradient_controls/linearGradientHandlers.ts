@@ -1,6 +1,6 @@
 import type {
   TMat2D,
-  FabricImage,
+  FabricObject,
   TransformActionHandler,
   Control,
   ControlRenderingStyleOverride,
@@ -8,6 +8,27 @@ import type {
   Gradient,
 } from 'fabric';
 import { Point, util, controlsUtils, iMatrix } from 'fabric';
+
+/** A deduping code block */
+const commonGradientInfo = (
+  fabricObject: FabricObject,
+  gradient: Gradient<'linear'>,
+) => {
+  const { width, height } = fabricObject;
+  const { colorStops, coords, gradientUnits } = gradient;
+  const isPerc = gradientUnits === 'percentage';
+  const matrix = fabricObject.calcTransformMatrix();
+  const vpt = fabricObject.getViewportTransform();
+  const _finalMatrix = util.multiplyTransformMatrixArray([vpt, matrix]);
+  return {
+    width,
+    height,
+    colorStops,
+    coords,
+    isPerc,
+    _finalMatrix,
+  };
+};
 
 export const linearGradientColorPositionHandlerGenerator = (
   gradient: Gradient<'linear'>,
@@ -17,15 +38,11 @@ export const linearGradientColorPositionHandlerGenerator = (
     this: Control,
     dim: Point, // currentDimension
     finalMatrix: TMat2D,
-    fabricObject: FabricImage,
+    fabricObject: FabricObject,
     // currentControl: Control,) => {};
   ) {
-    const matrix = fabricObject.calcTransformMatrix();
-    const vpt = fabricObject.getViewportTransform();
-    const _finalMatrix = util.multiplyTransformMatrices(vpt, matrix);
-    const { width, height } = fabricObject;
-    const isPerc = gradient.gradientUnits === 'percentage';
-    const { colorStops, coords } = gradient;
+    const { width, height, isPerc, coords, colorStops, _finalMatrix } =
+      commonGradientInfo(fabricObject, gradient);
     const p1 = new Point(
       coords.x1 * (isPerc ? width : 1) - width / 2,
       coords.y1 * (isPerc ? height : 1) - height / 2,
@@ -46,15 +63,13 @@ export const linearGradientCoordPositionHandler = (
     this: Control,
     dim: Point, // currentDimension
     finalMatrix: TMat2D,
-    fabricObject: FabricImage,
+    fabricObject: FabricObject,
     // currentControl: Control,) => {};
   ) {
-    const matrix = fabricObject.calcTransformMatrix();
-    const vpt = fabricObject.getViewportTransform();
-    const _finalMatrix = util.multiplyTransformMatrices(vpt, matrix);
-    const { width, height } = fabricObject;
-    const isPerc = gradient.gradientUnits === 'percentage';
-    const { coords } = gradient;
+    const { width, height, isPerc, coords, _finalMatrix } = commonGradientInfo(
+      fabricObject,
+      gradient,
+    );
 
     return (
       pointNumber === 1
@@ -72,6 +87,13 @@ export const linearGradientCoordPositionHandler = (
 export const linearGradientColorActionHandler =
   (gradient: Gradient<'linear'>, colorIndex: number): TransformActionHandler =>
   (eventData, { target }, x, y) => {
+    const {
+      width,
+      height,
+      isPerc,
+      coords: { x1, x2, y1, y2 },
+      colorStops,
+    } = commonGradientInfo(target, gradient);
     // find point in the space inside the object.
     const point = util
       .sendPointToPlane(
@@ -79,27 +101,16 @@ export const linearGradientColorActionHandler =
         undefined,
         target.calcTransformMatrix(),
       )
-      .add(new Point(target.width / 2, target.height / 2));
-    // create the linear gradient vector
-    const isPerc = gradient.gradientUnits === 'percentage';
+      .add(new Point(width / 2, height / 2));
 
-    const {
-      coords: { x1, x2, y1, y2 },
-    } = gradient;
-    const p1 = new Point(
-      x1 * (isPerc ? target.width : 1),
-      y1 * (isPerc ? target.height : 1),
-    );
+    const p1 = new Point(x1 * (isPerc ? width : 1), y1 * (isPerc ? height : 1));
     const v = util.createVector(
       p1,
-      new Point(
-        x2 * (isPerc ? target.width : 1),
-        y2 * (isPerc ? target.height : 1),
-      ),
+      new Point(x2 * (isPerc ? width : 1), y2 * (isPerc ? height : 1)),
     );
     const u = util.createVector(p1, point);
     const t = util.dotProduct(u, v) / util.dotProduct(v, v);
-    gradient.colorStops[colorIndex].offset = util.capValue(0, t, 1);
+    colorStops[colorIndex].offset = util.capValue(0, t, 1);
     target.set('dirty', true);
     return true;
   };
@@ -107,6 +118,10 @@ export const linearGradientColorActionHandler =
 export const linearGradientCoordsActionHandler =
   (gradient: Gradient<'linear'>, pointIndex: 1 | 2): TransformActionHandler =>
   (eventData, { target }, x, y) => {
+    const { width, height, isPerc, coords } = commonGradientInfo(
+      target,
+      gradient,
+    );
     // find point in the space inside the object.
     const point = util
       .sendPointToPlane(
@@ -114,16 +129,15 @@ export const linearGradientCoordsActionHandler =
         undefined,
         target.calcTransformMatrix(),
       )
-      .add(new Point(target.width / 2, target.height / 2));
-    const isPerc = gradient.gradientUnits === 'percentage';
+      .add(new Point(width / 2, height / 2));
     if (pointIndex === 1) {
-      gradient.coords.x1 = point.x / (isPerc ? target.width : 1);
-      gradient.coords.y1 = point.y / (isPerc ? target.height : 1);
+      coords.x1 = point.x / (isPerc ? width : 1);
+      coords.y1 = point.y / (isPerc ? height : 1);
     }
 
     if (pointIndex === 2) {
-      gradient.coords.x2 = point.x / (isPerc ? target.width : 1);
-      gradient.coords.y2 = point.y / (isPerc ? target.height : 1);
+      coords.x2 = point.x / (isPerc ? width : 1);
+      coords.y2 = point.y / (isPerc ? height : 1);
     }
     target.set('dirty', true);
     return true;
@@ -140,10 +154,10 @@ export const linearGradientControlLineRender = (gradient: Gradient<'linear'>) =>
   ) {
     // we are position in center of coords.x1/y1
     ctx.save();
-    // this.commonRenderProps(ctx, left, top, fabricObject, styleOverride);
-    const { width, height } = fabricObject;
-    const { coords } = gradient;
-    const isPerc = gradient.gradientUnits === 'percentage';
+    const { width, height, isPerc, coords } = commonGradientInfo(
+      fabricObject as FabricObject,
+      gradient,
+    );
     const finalP = util.sendPointToPlane(
       new Point(
         coords.x2 * (isPerc ? width : 1) - width / 2,

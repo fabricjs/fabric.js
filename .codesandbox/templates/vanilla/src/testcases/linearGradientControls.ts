@@ -7,8 +7,10 @@ export async function testCase(canvas: fabric.Canvas) {
   const rect = new fabric.Rect({
     width: 400,
     height: 250,
+    flipY: true,
     fill: new fabric.Gradient({
       type: 'linear',
+      // gradientTransform: [1, 0, 0, 2, 50, 40], <-- unsupported yet
       coords: {
         x1: 20,
         x2: 380,
@@ -39,6 +41,7 @@ export async function testCase(canvas: fabric.Canvas) {
   const rect2 = new fabric.Rect({
     width: 400,
     height: 250,
+    flipX: true,
     fill: new fabric.Gradient({
       type: 'linear',
       gradientUnits: 'percentage',
