@@ -94,6 +94,7 @@ export const linearGradientColorActionHandlerGenerator =
       coords: { x1, x2, y1, y2 },
       colorStops,
     } = commonGradientInfo(target, gradient);
+
     // find point in the space inside the object.
     const point = util
       .sendPointToPlane(

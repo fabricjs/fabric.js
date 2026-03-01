@@ -2,8 +2,8 @@ import * as fabric from 'fabric';
 import * as extensions from 'fabric/extensions';
 
 export async function testCase(canvas: fabric.Canvas) {
-  canvas.viewportTransform = [0.5, 0, 0, 0.5, 50, 50];
   canvas.setDimensions({ width: 900, height: 700 });
+  canvas.viewportTransform = [0.5, 0, 0, 0.5, 100, 100];
 
   const rect = new fabric.Rect({
     width: 400,
