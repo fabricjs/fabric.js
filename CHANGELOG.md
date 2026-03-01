@@ -2,6 +2,7 @@
 
 ## [next]
 
+- Gradient controls [#10844](https://github.com/fabricjs/fabric.js/pull/10844)
 - fix(): Fire mouseover/mouseleave for objects that are multi selection targets [#10874](https://github.com/fabricjs/fabric.js/pull/10874)
 - feat(extensions): Cropping controls with edge resize and flip support [#10851](https://github.com/fabricjs/fabric.js/pull/10851)
 
