@@ -84,7 +84,7 @@ export const linearGradientCoordPositionHandlerGenerator = (
     ).transform(_finalMatrix);
   };
 
-export const linearGradientColorActionHandler =
+export const linearGradientColorActionHandlerGenerator =
   (gradient: Gradient<'linear'>, colorIndex: number): TransformActionHandler =>
   (eventData, { target }, x, y) => {
     const {

@@ -1,14 +1,14 @@
 import type { Gradient } from 'fabric';
 import { Control, controlsUtils } from 'fabric';
 import {
-  linearGradientColorActionHandler,
+  linearGradientColorActionHandlerGenerator,
   linearGradientColorPositionHandlerGenerator,
   linearGradientControlLineRender,
   linearGradientCoordPositionHandlerGenerator,
   linearGradientCoordsActionHandler,
 } from './linearGradientHandlers';
 
-export function createGradientControls(
+export function createLinearGradientControls(
   gradient: Gradient<'linear'>,
   options: Partial<Control> = {},
 ): Record<string, Control> {
@@ -26,7 +26,7 @@ export function createGradientControls(
         gradient,
         index,
       ),
-      actionHandler: linearGradientColorActionHandler(gradient, index),
+      actionHandler: linearGradientColorActionHandlerGenerator(gradient, index),
     });
   });
 

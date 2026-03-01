@@ -76,14 +76,14 @@ export async function testCase(canvas: fabric.Canvas) {
   });
   rect.controls = {
     ...rect.controls,
-    ...extensions.createGradientControls(
+    ...extensions.createLinearGradientControls(
       rect.fill as fabric.Gradient<'linear'>,
     ),
   };
 
   rect2.controls = {
     ...rect2.controls,
-    ...extensions.createGradientControls(
+    ...extensions.createLinearGradientControls(
       rect2.fill as fabric.Gradient<'linear'>,
     ),
   };

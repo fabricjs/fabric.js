@@ -31,4 +31,4 @@ export {
   withFlip,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';
-export { createGradientControls } from './linear_gradient_controls/linearGradientControls';
+export { createLinearGradientControls } from './linear_gradient_controls/linearGradientControls';

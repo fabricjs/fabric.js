@@ -1,18 +1,19 @@
-import { Rect, Gradient, Point, iMatrix, Canvas } from 'fabric';
+import { Rect, Gradient, Point, iMatrix, Canvas, type Transform } from 'fabric';
 import {
   linearGradientCoordPositionHandlerGenerator,
   linearGradientColorPositionHandlerGenerator,
+  linearGradientColorActionHandlerGenerator,
 } from './linearGradientHandlers';
 import { describe, test, expect } from 'vitest';
 
-// function prepareTransform(target: Rect): Transform {
-//   return {
-//     target,
-//     corner: 'xxx',
-//     originX: 'center',
-//     originY: 'center',
-//   } as unknown as Transform;
-// }
+function prepareTransform(target: Rect): Transform {
+  return {
+    target,
+    corner: 'xxx',
+    originX: 'center',
+    originY: 'center',
+  } as unknown as Transform;
+}
 
 const prepareRectWithGradient = () => {
   const canvas = new Canvas(undefined, { renderOnAddRemove: false });
@@ -87,5 +88,22 @@ describe('position generators', () => {
       // CHECK RESULTS OF BEFORE TESTS
       expect(p1.lerp(p2, 0.6)).toEqual(color);
     });
+  });
+});
+
+describe('action generator', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const eventData = {} as any;
+  describe('color handling', () => {
+    const { rect, gradient } = prepareRectWithGradient();
+    const transform = prepareTransform(rect);
+    const actionHandler = linearGradientColorActionHandlerGenerator(
+      gradient,
+      0,
+    );
+    expect(rect.dirty).toBe(false);
+    const returned = actionHandler(eventData, transform, 20, 170);
+    expect(rect.dirty).toBe(true);
+    expect(returned).toBe(true);
   });
 });
