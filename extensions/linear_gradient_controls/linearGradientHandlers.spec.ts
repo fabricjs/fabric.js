@@ -3,6 +3,7 @@ import {
   linearGradientCoordPositionHandlerGenerator,
   linearGradientColorPositionHandlerGenerator,
   linearGradientColorActionHandlerGenerator,
+  linearGradientCoordsActionHandlerGenerator,
 } from './linearGradientHandlers';
 import { describe, test, expect } from 'vitest';
 
@@ -144,6 +145,42 @@ describe('action generator', () => {
       expect(rect.dirty).toBe(true);
       expect(returned).toBe(true);
       expect(gradient.colorStops[0].offset).toBe(1);
+    });
+  });
+  describe('linearGradientCoordsActionHandlerGenerator', () => {
+    test('can reloacate x1 and y1', () => {
+      const { rect, gradient } = prepareRectWithGradient();
+      const transform = prepareTransform(rect);
+      const coordActionHandler = linearGradientCoordsActionHandlerGenerator(
+        gradient,
+        1,
+      );
+      rect.dirty = false;
+      expect(rect.dirty).toBe(false);
+      expect(gradient.coords.x1).toBe(20);
+      expect(gradient.coords.y1).toBe(20);
+      const returned = coordActionHandler(eventData, transform, 600, 400);
+      expect(rect.dirty).toBe(true);
+      expect(returned).toBe(true);
+      expect(gradient.coords.x1).toBe(350);
+      expect(gradient.coords.y1).toBe(75);
+    });
+    test('can reloacate x2 and y2', () => {
+      const { rect, gradient } = prepareRectWithGradient();
+      const transform = prepareTransform(rect);
+      const coordActionHandler = linearGradientCoordsActionHandlerGenerator(
+        gradient,
+        2,
+      );
+      rect.dirty = false;
+      expect(rect.dirty).toBe(false);
+      expect(gradient.coords.x2).toBe(380);
+      expect(gradient.coords.y2).toBe(230);
+      const returned = coordActionHandler(eventData, transform, 600, 400);
+      expect(rect.dirty).toBe(true);
+      expect(returned).toBe(true);
+      expect(gradient.coords.x2).toBe(350);
+      expect(gradient.coords.y2).toBe(75);
     });
   });
 });

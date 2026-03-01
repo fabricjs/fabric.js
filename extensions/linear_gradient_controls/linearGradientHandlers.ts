@@ -116,7 +116,7 @@ export const linearGradientColorActionHandlerGenerator =
     return true;
   };
 
-export const linearGradientCoordsActionHandler =
+export const linearGradientCoordsActionHandlerGenerator =
   (gradient: Gradient<'linear'>, pointIndex: 1 | 2): TransformActionHandler =>
   (eventData, { target }, x, y) => {
     const { width, height, isPerc, coords } = commonGradientInfo(
