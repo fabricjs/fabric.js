@@ -34,7 +34,7 @@ export const linearGradientColorPositionHandlerGenerator = (
   gradient: Gradient<'linear'>,
   stopIndex: number,
 ) =>
-  function gradientPositionHandler(
+  function linearGradientColorPositionHandler(
     this: Control,
     dim: Point, // currentDimension
     finalMatrix: TMat2D,
@@ -55,11 +55,11 @@ export const linearGradientColorPositionHandlerGenerator = (
     return p1.lerp(p2, offset).transform(_finalMatrix);
   };
 
-export const linearGradientCoordPositionHandler = (
+export const linearGradientCoordPositionHandlerGenerator = (
   gradient: Gradient<'linear'>,
   pointNumber: 1 | 2,
 ) =>
-  function gradientPositionHandler(
+  function linearGradientCoordPositionHandler(
     this: Control,
     dim: Point, // currentDimension
     finalMatrix: TMat2D,

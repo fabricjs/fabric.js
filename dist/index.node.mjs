@@ -412,7 +412,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.1.1";
+var version = "7.2.0";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -13657,6 +13657,11 @@ class SelectableCanvas extends StaticCanvas$1 {
      * @private
      */
     /**
+     * Keep track of the hovered target in the previous event with the shift key
+     * @type FabricObject | null
+     * @private
+     */
+    /**
      * hold the list of nested targets hovered in the previous events
      * @type FabricObject[]
      * @private
@@ -14093,12 +14098,17 @@ class SelectableCanvas extends StaticCanvas$1 {
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects(),
+      // searching a target in all possible objects means also avoiding the Active selection and check if
+      // you are over a target that  is behind the active selection.
       targetInfo = this.searchPossibleTargets(this._objects, pointer);
     const {
       subTargets: currentSubTargets,
       container: currentContainer,
       target: currentTarget
     } = targetInfo;
+
+    // fullTargetInfo is just a duplicated standard target that is good for the case of no active selection or no activeObject
+    // we prefer presenting the data twice rather than trying to understand in the code when the data will be available or not.
     const fullTargetInfo = {
       ...targetInfo,
       currentSubTargets,
@@ -14131,7 +14141,8 @@ class SelectableCanvas extends StaticCanvas$1 {
     // in case we are over the active object
     if (activeObjectTargetInfo.target) {
       if (aObjects.length > 1) {
-        // in case of active selection and target hit over the activeSelection, just exit
+        // in case of active selection and target hit over the activeSelection, currentTarget could contain
+        // the target below the active selection or in general the target that would be hit by the multi selection targeting.
         // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }
@@ -15806,13 +15817,16 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
         _hoveredTargets
       } = this,
       {
-        subTargets
+        subTargets,
+        currentTarget: actualTarget
       } = this.findTarget(e),
       length = Math.max(_hoveredTargets.length, subTargets.length);
     this.fireSyntheticInOutEvents('mouse', {
       e,
       target,
       oldTarget: _hoveredTarget,
+      actualTarget,
+      oldActualTarget: this._hoveredActualTarget,
       fireCanvas: true
     });
     for (let i = 0; i < length; i++) {
@@ -15825,6 +15839,7 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
         oldTarget: _hoveredTargets[i]
       });
     }
+    this._hoveredActualTarget = actualTarget;
     this._hoveredTarget = target;
     this._hoveredTargets = subTargets;
   }
@@ -15874,6 +15889,8 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
     let {
       target,
       oldTarget,
+      actualTarget,
+      oldActualTarget,
       fireCanvas,
       e,
       ...data
@@ -15885,28 +15902,40 @@ let Canvas$1 = class Canvas extends SelectableCanvas {
       canvasOut
     } = syntheticEventConfig[type];
     const targetChanged = oldTarget !== target;
-    if (oldTarget && targetChanged) {
-      const outOpt = {
-        ...data,
-        e,
-        target: oldTarget,
-        nextTarget: target,
-        ...getEventPoints(this, e)
-      };
+    const actualTargetChanged = oldActualTarget !== actualTarget;
+    const targetFires = target && targetChanged;
+    const actualTargetFires = actualTarget && actualTargetChanged;
+    const oldTargetFires = oldTarget && targetChanged;
+    const oldActualTargetFires = oldActualTarget && actualTargetChanged;
+    const commonData = {
+      ...data,
+      e,
+      ...getEventPoints(this, e)
+    };
+    const outOpt = {
+      ...commonData,
+      target: oldTarget,
+      nextTarget: target,
+      actualTarget: oldActualTarget,
+      nextActualTarget: actualTarget
+    };
+    if (oldTargetFires || oldActualTargetFires) {
       fireCanvas && this.fire(canvasOut, outOpt);
-      oldTarget.fire(targetOut, outOpt);
     }
-    if (target && targetChanged) {
-      const inOpt = {
-        ...data,
-        e,
-        target,
-        previousTarget: oldTarget,
-        ...getEventPoints(this, e)
-      };
+    oldTargetFires && oldTarget.fire(targetOut, outOpt);
+    oldActualTargetFires && oldTarget !== oldActualTarget && oldActualTarget.fire(targetOut, outOpt);
+    const inOpt = {
+      ...commonData,
+      target,
+      previousTarget: oldTarget,
+      actualTarget,
+      previousActualTarget: oldActualTarget
+    };
+    if (targetFires || actualTargetFires) {
       fireCanvas && this.fire(canvasIn, inOpt);
-      target.fire(targetIn, inOpt);
     }
+    targetFires && target.fire(targetIn, inOpt);
+    actualTargetFires && actualTarget !== target && actualTarget.fire(targetIn, inOpt);
   }
 
   /**

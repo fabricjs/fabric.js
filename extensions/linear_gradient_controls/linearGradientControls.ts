@@ -4,7 +4,7 @@ import {
   linearGradientColorActionHandler,
   linearGradientColorPositionHandlerGenerator,
   linearGradientControlLineRender,
-  linearGradientCoordPositionHandler,
+  linearGradientCoordPositionHandlerGenerator,
   linearGradientCoordsActionHandler,
 } from './linearGradientHandlers';
 
@@ -15,7 +15,7 @@ export function createGradientControls(
   const controls = {} as Record<string, Control>;
   controls[`lgp_1`] = new Control({
     ...options,
-    positionHandler: linearGradientCoordPositionHandler(gradient, 1),
+    positionHandler: linearGradientCoordPositionHandlerGenerator(gradient, 1),
     actionHandler: linearGradientCoordsActionHandler(gradient, 1),
     render: linearGradientControlLineRender(gradient),
   });
@@ -32,7 +32,7 @@ export function createGradientControls(
 
   controls[`lgp_2`] = new Control({
     ...options,
-    positionHandler: linearGradientCoordPositionHandler(gradient, 2),
+    positionHandler: linearGradientCoordPositionHandlerGenerator(gradient, 2),
     actionHandler: linearGradientCoordsActionHandler(gradient, 2),
     render: controlsUtils.renderCircleControl,
   });

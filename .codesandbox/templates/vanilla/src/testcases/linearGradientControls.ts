@@ -2,6 +2,7 @@ import * as fabric from 'fabric';
 import * as extensions from 'fabric/extensions';
 
 export async function testCase(canvas: fabric.Canvas) {
+  canvas.viewportTransform = [0.5, 0, 0, 0.5, 50, 50];
   canvas.setDimensions({ width: 900, height: 700 });
 
   const rect = new fabric.Rect({
@@ -41,6 +42,8 @@ export async function testCase(canvas: fabric.Canvas) {
   const rect2 = new fabric.Rect({
     width: 400,
     height: 250,
+    left: 30,
+    top: 30,
     flipX: true,
     fill: new fabric.Gradient({
       type: 'linear',
