@@ -35,11 +35,54 @@ export async function testCase(canvas: fabric.Canvas) {
       ],
     }),
   });
-  rect.controls = extensions.createGradientControls(
-    rect.fill as fabric.Gradient<'linear'>,
-  );
 
-  canvas.add(rect);
+  const rect2 = new fabric.Rect({
+    width: 400,
+    height: 250,
+    fill: new fabric.Gradient({
+      type: 'linear',
+      gradientUnits: 'percentage',
+      coords: {
+        x1: 0.1,
+        x2: 0.95,
+        y1: 0.95,
+        y2: 0.05,
+      },
+      colorStops: [
+        {
+          offset: 0.2,
+          color: 'black',
+        },
+        {
+          offset: 0.4,
+          color: 'green',
+        },
+        {
+          offset: 0.6,
+          color: 'pink',
+        },
+        {
+          offset: 0.8,
+          color: 'white',
+        },
+      ],
+    }),
+  });
+  rect.controls = {
+    ...rect.controls,
+    ...extensions.createGradientControls(
+      rect.fill as fabric.Gradient<'linear'>,
+    ),
+  };
+
+  rect2.controls = {
+    ...rect2.controls,
+    ...extensions.createGradientControls(
+      rect2.fill as fabric.Gradient<'linear'>,
+    ),
+  };
+
+  canvas.add(rect, rect2);
   canvas.centerObject(rect);
   canvas.setActiveObject(rect);
 }
