@@ -15,6 +15,7 @@ import {
   ActiveSelection,
   Circle,
   classRegistry,
+  FabricText,
   getFabricDocument,
   Group,
   Path,
@@ -1422,6 +1423,27 @@ describe('Canvas', () => {
     expect(canvas.getObjects().length).toBe(1);
     // @ts-expect-error -- constructor function has type
     expect(obj.constructor.type, 'first object is a Image object').toBe('Text');
+  });
+
+  it('loads from JSON string with loadFromJSON with images not existing passing reviver', async () => {
+    expect(canvas.loadFromJSON).toBeTypeOf('function');
+    await canvas.loadFromJSON(
+      ERROR_IMAGE_JSON,
+      async (serializedObject, instance, error) => {
+        if (error) {
+          return new FabricText('text-placeholder');
+        }
+      },
+    );
+
+    const obj = canvas.item(0);
+
+    expect(canvas.isEmpty(), 'canvas is not empty').toBeFalsy();
+    expect(canvas.getObjects().length).toBe(2);
+    // @ts-expect-error -- constructor function has type
+    expect(obj.constructor.type, 'first object is a Image object').toBe('Text');
+    expect(obj).toBeInstanceOf(FabricText);
+    expect((obj as FabricText).text).toBe('text-placeholder');
   });
 
   it('loads from JSON object without default values', async () => {

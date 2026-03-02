@@ -75,8 +75,9 @@ export type EnlivenObjectOptions = Abortable & {
       | TFiller,
   >(
     serializedObj: Record<string, any>,
-    instance: T,
-  ) => void;
+    instance: T | undefined,
+    error?: FabricError,
+  ) => void | Promise<T>;
 };
 
 /**
@@ -111,19 +112,27 @@ export const enlivenObjects = <
               fromObject(options: any, context: Abortable): Promise<T>;
             }
           >(obj.type)
-          .fromObject(obj, { signal })
-          .then((fabricInstance) => {
-            reviver(obj, fabricInstance);
-            instances.push(fabricInstance);
-            return fabricInstance;
-          }),
+          .fromObject(obj, { signal }),
       ),
     )
-      .then((elementsResult) => {
-        const addedInstances = elementsResult
-          .filter((e) => e.status === 'fulfilled')
-          .map((e) => e.value);
-        resolve(addedInstances);
+      .then(async (elementsResult) => {
+        for (const [index, result] of elementsResult.entries()) {
+          if (result.status === 'fulfilled') {
+            await reviver(objects[index], result.value);
+            instances.push(result.value);
+          }
+          if (result.status === 'rejected') {
+            const fallback = await reviver(
+              objects[index],
+              undefined,
+              result.reason,
+            );
+            if (fallback) {
+              instances.push(fallback as T);
+            }
+          }
+        }
+        resolve(instances);
       })
       .catch((error) => {
         // cleanup
