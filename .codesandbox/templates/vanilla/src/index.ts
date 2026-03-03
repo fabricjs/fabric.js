@@ -1,6 +1,6 @@
 import * as fabric from 'fabric';
 import './styles.css';
-import { testCase } from './testcases/croppingControls';
+import { testCase } from './testcases/linearGradientControls';
 
 const el = document.getElementById('canvas');
 const canvas = (window.canvas = new fabric.Canvas(el, {

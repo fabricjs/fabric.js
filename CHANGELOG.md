@@ -2,7 +2,11 @@
 
 ## [next]
 
-- fix: avoid crash if loadFromJSON load config with not existing images [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
+- feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
+- chore(): Update typescript-eslint to address a recent vulnerability [#10878](https://github.com/fabricjs/fabric.js/pull/10878)
+- chore(deps-dev): bump rollup from 4.52.4 to 4.59.0 in the npm_and_yarn group across 1 directory [#10877](https://github.com/fabricjs/fabric.js/pull/10877)
+- Gradient controls [#10844](https://github.com/fabricjs/fabric.js/pull/10844)
+- fix(): Fire mouseover/mouseleave for objects that are multi selection targets [#10874](https://github.com/fabricjs/fabric.js/pull/10874)
 - feat(extensions): Cropping controls with edge resize and flip support [#10851](https://github.com/fabricjs/fabric.js/pull/10851)
 
 ## [7.2.0]

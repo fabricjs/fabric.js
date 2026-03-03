@@ -1179,6 +1179,124 @@ describe('Canvas events mixin', () => {
     ).toBe(4);
   });
 
+  it('tracks _hoveredActualTarget and emits transitions when actual target changes', () => {
+    const testCanvas = new Canvas();
+    const moveEvent = createPointerEvent();
+    const target = new Rect();
+    const actualTargetA = new Rect();
+    const actualTargetB = new Rect();
+    const canvasOutEvents: CanvasEvents['mouse:out'][] = [];
+    const canvasOverEvents: CanvasEvents['mouse:over'][] = [];
+    const currentAOutEvents: ObjectEvents['mouseout'][] = [];
+    const currentBOverEvents: ObjectEvents['mouseover'][] = [];
+
+    testCanvas.on('mouse:out', (opt) => canvasOutEvents.push(opt));
+    testCanvas.on('mouse:over', (opt) => canvasOverEvents.push(opt));
+    actualTargetA.on('mouseout', (opt) => currentAOutEvents.push(opt));
+    actualTargetB.on('mouseover', (opt) => currentBOverEvents.push(opt));
+
+    // @ts-expect-error protected
+    testCanvas._targetInfo = {
+      subTargets: [],
+      currentSubTargets: [],
+      currentTarget: actualTargetA,
+    };
+    testCanvas._fireOverOutEvents(moveEvent, target);
+    expect(
+      testCanvas._hoveredActualTarget,
+      'first call stores actual target',
+    ).toBe(actualTargetA);
+    expect(canvasOutEvents.length, 'no out event on first hover').toBe(0);
+    expect(canvasOverEvents.length, 'first hover emits over').toBe(1);
+
+    // @ts-expect-error protected
+    testCanvas._targetInfo = {
+      subTargets: [],
+      currentSubTargets: [],
+      currentTarget: actualTargetB,
+    };
+    testCanvas._fireOverOutEvents(moveEvent, target);
+
+    expect(
+      testCanvas._hoveredActualTarget,
+      'second call updates actual target',
+    ).toBe(actualTargetB);
+    expect(canvasOutEvents.length, 'changing actual target emits out').toBe(1);
+    expect(canvasOverEvents.length, 'changing actual target emits over').toBe(
+      2,
+    );
+    expect(
+      canvasOutEvents[0].actualTarget,
+      'canvas out payload exposes previous actual target',
+    ).toBe(actualTargetA);
+    expect(
+      canvasOutEvents[0].nextActualTarget,
+      'canvas out payload exposes next actual target',
+    ).toBe(actualTargetB);
+    expect(
+      canvasOverEvents[1].actualTarget,
+      'canvas over payload exposes new actual target',
+    ).toBe(actualTargetB);
+    expect(
+      canvasOverEvents[1].previousActualTarget,
+      'canvas over payload exposes previous actual target',
+    ).toBe(actualTargetA);
+    expect(
+      currentAOutEvents.length,
+      'previous actual target receives mouseout',
+    ).toBe(1);
+    expect(
+      currentBOverEvents.length,
+      'next actual target receives mouseover',
+    ).toBe(1);
+  });
+
+  it('fireSyntheticInOutEvents reacts to actual target changes even without primary target changes', () => {
+    const testCanvas = new Canvas();
+    const moveEvent = createPointerEvent();
+    const actualTargetA = new Rect();
+    const actualTargetB = new Rect();
+    const canvasOutEvents: CanvasEvents['mouse:out'][] = [];
+    const canvasOverEvents: CanvasEvents['mouse:over'][] = [];
+
+    testCanvas.on('mouse:out', (opt) => canvasOutEvents.push(opt));
+    testCanvas.on('mouse:over', (opt) => canvasOverEvents.push(opt));
+
+    testCanvas.fireSyntheticInOutEvents('mouse', {
+      e: moveEvent,
+      target: undefined,
+      oldTarget: undefined,
+      actualTarget: actualTargetB,
+      oldActualTarget: actualTargetA,
+      fireCanvas: true,
+    });
+
+    expect(
+      canvasOutEvents.length,
+      'out event fired for actual target change',
+    ).toBe(1);
+    expect(
+      canvasOutEvents[0].actualTarget,
+      'out payload has old actual target',
+    ).toBe(actualTargetA);
+    expect(
+      canvasOutEvents[0].nextActualTarget,
+      'out payload has next actual target',
+    ).toBe(actualTargetB);
+    expect(
+      canvasOverEvents.length,
+      'over event fired for actual target change',
+    ).toBe(1);
+    expect(
+      canvasOverEvents[0].actualTarget,
+      'over payload has actual target',
+    ).toBe(actualTargetB);
+    expect(
+      canvasOverEvents[0].previousActualTarget,
+      'over payload has previous actual target',
+    ).toBe(actualTargetA);
+  });
+
   it('updates groupSelector during mouse move', () => {
     const e = createPointerEvent({
       clientX: 30,

@@ -233,6 +233,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   declare _hoveredTarget?: FabricObject;
 
   /**
+   * Keep track of the hovered target in the previous event with the shift key
+   * @type FabricObject | null
+   * @private
+   */
+  declare _hoveredActualTarget?: FabricObject;
+
+  /**
    * hold the list of nested targets hovered in the previous events
    * @type FabricObject[]
    * @private
@@ -767,6 +774,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects(),
+      // searching a target in all possible objects means also avoiding the Active selection and check if
+      // you are over a target that  is behind the active selection.
       targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
     const {
@@ -775,6 +784,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       target: currentTarget,
     } = targetInfo;
 
+    // fullTargetInfo is just a duplicated standard target that is good for the case of no active selection or no activeObject
+    // we prefer presenting the data twice rather than trying to understand in the code when the data will be available or not.
     const fullTargetInfo: FullTargetsInfoWithContainer = {
       ...targetInfo,
       currentSubTargets,
@@ -811,7 +822,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     // in case we are over the active object
     if (activeObjectTargetInfo.target) {
       if (aObjects.length > 1) {
-        // in case of active selection and target hit over the activeSelection, just exit
+        // in case of active selection and target hit over the activeSelection, currentTarget could contain
+        // the target below the active selection or in general the target that would be hit by the multi selection targeting.
         // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }
