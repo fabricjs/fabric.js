@@ -1211,7 +1211,8 @@ export class StaticCanvas<
    * **IMPORTANT**: It is recommended to abort loading tasks before calling this method to prevent race conditions and unnecessary networking
    *
    * @param {String|Object} json JSON string or object
-   * @param {Function} [reviver] Method for further parsing of JSON elements, called after each fabric object created.
+   * @param {Promise<FabricObject> | Promise<void> | void} [reviver] Method for further parsing of JSON elements, called after each fabric object created with the instance
+   * if creation was successfully or with defined error if not. If a FabricObject is returned in the reviver, and an error occurred, this instance will be used in place of that one witch generated error.
    * @param {Object} [options] options
    * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<Canvas | StaticCanvas>} instance
@@ -1220,10 +1221,14 @@ export class StaticCanvas<
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());
    * @example <caption>loadFromJSON with reviver</caption>
-   * canvas.loadFromJSON(json, function(o, object) {
+   * canvas.loadFromJSON(json, function(o, object, error) {
    *   // `o` = json object
-   *   // `object` = fabric.Object instance
+   *   // `object` = fabric.Object instance or undefined
+   *   // `error` = FabricError or undefined
    *   // ... do some stuff ...
+   *   if(error){
+   *      return new FabricText('placeholder-object');
+   *   }
    * }).then((canvas) => {
    *   ... canvas is restored, add your code.
    * });
