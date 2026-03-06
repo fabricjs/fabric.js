@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): replace canvas with @napi-rs/canvas [#10854](https://github.com/fabricjs/fabric.js/pull/10854)
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
 - chore(): Update typescript-eslint to address a recent vulnerability [#10878](https://github.com/fabricjs/fabric.js/pull/10878)
 - chore(deps-dev): bump rollup from 4.52.4 to 4.59.0 in the npm_and_yarn group across 1 directory [#10877](https://github.com/fabricjs/fabric.js/pull/10877)

@@ -27,5 +27,5 @@ export async function createNodeSnapshot(
   });
   await cb(canvas, fabric);
   render && canvas.renderAll();
-  return canvas.getNodeCanvas().toBuffer();
+  return canvas.getNodeCanvas().toBuffer('image/png');
 }

@@ -71,7 +71,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
             });
           } else {
             canvas.renderAll();
-            const buffer = canvas.getNodeCanvas().toBuffer();
+            const buffer = canvas.getNodeCanvas().toBuffer('image/png');
             expect(
               buffer,
               `node snapshot should match browser snapshot`,

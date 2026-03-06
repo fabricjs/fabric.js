@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-globals */
-import type { Canvas as NodeCanvas } from 'canvas';
+import type { Canvas as NodeCanvas } from '@napi-rs/canvas';
 import { JSDOM } from 'jsdom';
 // @ts-expect-error internal import
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';

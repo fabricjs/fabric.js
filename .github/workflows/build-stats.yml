@@ -24,7 +24,6 @@ jobs:
         uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: false
       - name: Build fabric.js
         run: npm run build
       - name: Recover build stats
