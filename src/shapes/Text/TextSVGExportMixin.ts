@@ -77,12 +77,12 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     return [
       textBgRects.join(''),
       '\t\t<text xml:space="preserve" ',
-      `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `,
-      `font-size="${this.fontSize}" `,
-      this.fontStyle ? `font-style="${this.fontStyle}" ` : '',
-      this.fontWeight ? `font-weight="${this.fontWeight}" ` : '',
+      `font-family="${escapeXml(this.fontFamily.replace(dblQuoteRegex, "'"))}" `,
+      `font-size="${escapeXml(this.fontSize)}" `,
+      this.fontStyle ? `font-style="${escapeXml(this.fontStyle)}" ` : '',
+      this.fontWeight ? `font-weight="${escapeXml(this.fontWeight)}" ` : '',
       textDecoration ? `text-decoration="${textDecoration}" ` : '',
-      this.direction === 'rtl' ? `direction="${this.direction}" ` : '',
+      this.direction === 'rtl' ? `direction="rtl" ` : '',
       'style="',
       this.getSvgStyles(noShadow),
       '"',
@@ -112,7 +112,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     // bounding-box background
     this.backgroundColor &&
       textBgRects.push(
-        ...createSVGInlineRect(
+        createSVGInlineRect(
           this.backgroundColor,
           -this.width / 2,
           -this.height / 2,
@@ -270,7 +270,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       if (currentColor !== lastColor) {
         lastColor &&
           textBgRects.push(
-            ...createSVGInlineRect(
+            createSVGInlineRect(
               lastColor,
               leftOffset + boxStart,
               textTopOffset,
@@ -287,7 +287,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     }
     currentColor &&
       textBgRects.push(
-        ...createSVGInlineRect(
+        createSVGInlineRect(
           lastColor,
           leftOffset + boxStart,
           textTopOffset,
@@ -339,17 +339,17 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     const thickness = textDecorationThickness || this.textDecorationThickness;
     return [
       stroke ? colorPropToSVG(STROKE, stroke) : '',
-      strokeWidth ? `stroke-width: ${strokeWidth}; ` : '',
+      strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : '',
       fontFamily
         ? `font-family: ${
             !fontFamily.includes("'") && !fontFamily.includes('"')
-              ? `'${fontFamily}'`
-              : fontFamily
+              ? `'${escapeXml(fontFamily)}'`
+              : escapeXml(fontFamily)
           }; `
         : '',
-      fontSize ? `font-size: ${fontSize}px; ` : '',
-      fontStyle ? `font-style: ${fontStyle}; ` : '',
-      fontWeight ? `font-weight: ${fontWeight}; ` : '',
+      fontSize ? `font-size: ${escapeXml(fontSize)}px; ` : '',
+      fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : '',
+      fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : '',
       textDecoration
         ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; `
         : '',

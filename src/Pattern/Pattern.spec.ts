@@ -187,4 +187,16 @@ describe('Pattern', () => {
     const obj = await Rect.fromObject(rectObj);
     expect(obj.fill instanceof Pattern).toBeTruthy();
   });
+
+  describe('attribute injection', () => {
+    it('escapes correctly the src', () => {
+      const pattern = new Pattern({
+        source: { src: '"><svg onload=alert(1)>', width: 10, height: 10 },
+      });
+      const svg = pattern.toSVG({ width: 100, height: 100 });
+      expect(svg).toContain(
+        'xlink:href="&quot;&gt;&lt;svg onload=alert(1)&gt;"',
+      );
+    });
+  });
 });

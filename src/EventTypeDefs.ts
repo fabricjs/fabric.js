@@ -108,8 +108,9 @@ interface TEventWithTarget<E extends Event = TPointerEvent> extends TEvent<E> {
   target: FabricObject;
 }
 
-export interface BasicTransformEvent<E extends Event = TPointerEvent>
-  extends TEvent<E> {
+export interface BasicTransformEvent<
+  E extends Event = TPointerEvent,
+> extends TEvent<E> {
   transform: Transform;
   /* This pointer is usually a scenePoint. It isn't in the case of actions inside groups,
    * where it becomes a point relative to the group center
@@ -163,8 +164,9 @@ type CanvasModificationEvents = {
   'object:modified': ModifiedEvent;
 };
 
-export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
-  extends TEvent<E> {
+export interface TPointerEventInfo<
+  E extends TPointerEvent = TPointerEvent,
+> extends TEvent<E> {
   target?: FabricObject;
   subTargets?: FabricObject[];
   transform?: Transform | null;
@@ -172,18 +174,23 @@ export interface TPointerEventInfo<E extends TPointerEvent = TPointerEvent>
   viewportPoint: Point;
 }
 
-interface SimpleEventHandler<T extends Event = TPointerEvent>
-  extends TEvent<T> {
+interface SimpleEventHandler<
+  T extends Event = TPointerEvent,
+> extends TEvent<T> {
   target?: FabricObject;
   subTargets: FabricObject[];
 }
 
 interface InEvent {
   previousTarget?: FabricObject;
+  actualTarget?: FabricObject;
+  previousActualTarget?: FabricObject;
 }
 
 interface OutEvent {
   nextTarget?: FabricObject;
+  actualTarget?: FabricObject;
+  nextActualTarget?: FabricObject;
 }
 
 export interface DragEventData extends TEvent<DragEvent> {
@@ -288,10 +295,7 @@ export interface MiscEvents {
 }
 
 export interface ObjectEvents
-  extends ObjectPointerEvents,
-    DnDEvents,
-    MiscEvents,
-    ObjectModificationEvents {
+  extends ObjectPointerEvents, DnDEvents, MiscEvents, ObjectModificationEvents {
   // selection
   selected: Partial<TEvent> & {
     target: FabricObject;
@@ -320,7 +324,8 @@ export interface StaticCanvasEvents extends CollectionEvents {
 }
 
 export interface CanvasEvents
-  extends StaticCanvasEvents,
+  extends
+    StaticCanvasEvents,
     CanvasPointerEvents,
     CanvasDnDEvents,
     MiscEvents,

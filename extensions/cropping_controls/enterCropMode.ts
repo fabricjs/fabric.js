@@ -4,6 +4,8 @@ import { cropPanMoveHandler, renderGhostImage } from './croppingHandlers';
 /**
  * Coordinates the change to image to enter crop mode and returns
  * a function to exit crop mode
+ * This is a basic example for demos and your project may need persistent crop state,
+ * in that case make your own function.
  */
 export const enterCropMode = function enterCropMode(
   this: (args: TPointerEventInfo) => void,

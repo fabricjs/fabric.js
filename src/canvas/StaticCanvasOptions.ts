@@ -113,9 +113,7 @@ export interface CanvasExportOptions {
 }
 
 export interface StaticCanvasOptions
-  extends CanvasDrawableOptions,
-    CanvasRenderingOptions,
-    CanvasExportOptions {
+  extends CanvasDrawableOptions, CanvasRenderingOptions, CanvasExportOptions {
   /**
    * Width in virtual/logical pixels of the canvas.
    * The canvas can be larger than width if retina scaling is active

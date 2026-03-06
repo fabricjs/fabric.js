@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Canvas } from '../canvas/Canvas';
 import { PencilBrush } from './PencilBrush';
 import { parsePath } from '../util';
-import type { TPointerEvent } from '../EventTypeDefs';
 import { Path } from '../shapes/Path';
 import { Point } from '../Point';
+import { createPointerEvent } from '../../test/utils';
 
 describe('PencilBrush', () => {
   let canvas: Canvas;
@@ -55,12 +55,12 @@ describe('PencilBrush', () => {
 
       it('draws a point correctly', () => {
         const brush = new PencilBrush(canvas);
-        const e = { target: canvas.upperCanvasEl } as unknown as TPointerEvent;
-        const pointer = canvas.getScenePoint({
-          ...e,
+        const e = createPointerEvent({
+          target: canvas.upperCanvasEl,
           clientX: 10,
           clientY: 10,
         });
+        const pointer = canvas.getScenePoint(e);
         brush.onMouseDown(pointer, { e });
         // @ts-expect-error -- protected
         const pathData = brush.convertPointsToSVGPath(brush._points);
@@ -72,12 +72,12 @@ describe('PencilBrush', () => {
 
       it('handles multiple coincident points', () => {
         const brush = new PencilBrush(canvas);
-        const e = { target: canvas.upperCanvasEl } as unknown as TPointerEvent;
-        const pointer = canvas.getScenePoint({
-          ...e,
+        const e = createPointerEvent({
+          target: canvas.upperCanvasEl,
           clientX: 10,
           clientY: 10,
         });
+        const pointer = canvas.getScenePoint(e);
         brush.onMouseDown(pointer, { e });
         brush.onMouseMove(pointer, { e });
         brush.onMouseMove(pointer, { e });
@@ -95,7 +95,7 @@ describe('PencilBrush', () => {
 
       it('handles multiple non-coincident points', () => {
         const brush = new PencilBrush(canvas);
-        const e = { target: canvas.upperCanvasEl } as unknown as TPointerEvent;
+        const e = createPointerEvent({ target: canvas.upperCanvasEl });
         const pointer = canvas.getScenePoint({
           ...e,
           clientX: 10,
@@ -129,7 +129,7 @@ describe('PencilBrush', () => {
 
       it('handles points outside canvas', () => {
         const brush = new PencilBrush(canvas);
-        const e = { target: canvas.upperCanvasEl } as unknown as TPointerEvent;
+        const e = createPointerEvent({ target: canvas.upperCanvasEl });
         const pointer = canvas.getScenePoint({
           ...e,
           clientX: 10,
@@ -177,7 +177,7 @@ describe('PencilBrush', () => {
       it('limits points to canvas size when limitedToCanvasSize is true', () => {
         const brush = new PencilBrush(canvas);
         brush.limitedToCanvasSize = true;
-        const e = { target: canvas.upperCanvasEl } as unknown as TPointerEvent;
+        const e = createPointerEvent({ target: canvas.upperCanvasEl });
         const pointer = canvas.getScenePoint({
           ...e,
           clientX: 10,
@@ -237,7 +237,7 @@ describe('PencilBrush', () => {
         });
 
         const brush = new PencilBrush(canvas);
-        const e = { target: canvas.upperCanvasEl } as unknown as TPointerEvent;
+        const e = createPointerEvent({ target: canvas.upperCanvasEl });
         const pointer = canvas.getScenePoint({
           ...e,
           clientX: 10,
