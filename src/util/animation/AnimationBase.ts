@@ -54,7 +54,7 @@ export abstract class AnimationBase<
    */
   declare private startTime: number;
 
-  private timeout: number | null;
+  declare private timeout: number | null;
 
   constructor({
     startValue,
