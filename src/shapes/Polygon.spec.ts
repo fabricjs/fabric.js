@@ -246,7 +246,7 @@ describe('Polygon', () => {
     expect(polygon.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
     const EXPECTED_SVG =
-      '<g transform="matrix(1 0 0 1 15 17)"  >\n<polygon style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  points="-5,-5 5,5 " />\n</g>\n';
+      '<g transform="matrix(1 0 0 1 15 17)"  >\n<polygon style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  points="-5,-5 5,5" />\n</g>\n';
 
     expect(polygon.toSVG(), 'SVG output should match expected').toBe(
       EXPECTED_SVG,

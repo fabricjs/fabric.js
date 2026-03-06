@@ -35,6 +35,7 @@ import {
 import type { SerializedLayoutManager } from '../LayoutManager/LayoutManager';
 import type { FitContentLayout } from '../LayoutManager';
 import type { DrawContext } from './Object/Object';
+import { escapeXml } from '../util/lang_string';
 
 /**
  * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
@@ -649,7 +650,7 @@ export class Group
   getSvgStyles(): string {
     const opacity =
         typeof this.opacity !== 'undefined' && this.opacity !== 1
-          ? `opacity: ${this.opacity};`
+          ? `opacity: ${escapeXml(this.opacity)};`
           : '',
       visibility = this.visible ? '' : ' visibility: hidden;';
     return [opacity, this.getSvgFilter(), visibility].join('');

@@ -356,7 +356,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.1.0";
+var version = "7.1.1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -2192,6 +2192,111 @@ const staticCanvasDefaults = {
 };
 
 /**
+ * Capitalizes a string
+ * @param {String} string String to capitalize
+ * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
+ * and other letters stay untouched, if false first letter is capitalized
+ * and other letters are converted to lowercase.
+ * @return {String} Capitalized version of a string
+ */
+const capitalize = function (string) {
+  let firstLetterOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  return `${string.charAt(0).toUpperCase()}${firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase()}`;
+};
+
+/**
+ * Escapes XML in a string
+ * @param {String} string String to escape
+ * @return {String} Escaped version of a string
+ */
+const escapeXml = stringOrNumber => stringOrNumber.toString().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+let segmenter;
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
+      granularity: 'grapheme'
+    });
+  }
+  return segmenter;
+};
+
+/**
+ * Divide a string in the user perceived single units
+ * @param {String} textstring String to escape
+ * @return {Array} array containing the graphemes
+ */
+const graphemeSplit = textstring => {
+  segmenter || getSegmenter();
+  if (segmenter) {
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(_ref => {
+      let {
+        segment
+      } = _ref;
+      return segment;
+    });
+  }
+
+  //Fallback
+  return graphemeSplitImpl(textstring);
+};
+const graphemeSplitImpl = textstring => {
+  const graphemes = [];
+  for (let i = 0, chr; i < textstring.length; i++) {
+    if ((chr = getWholeChar(textstring, i)) === false) {
+      continue;
+    }
+    graphemes.push(chr);
+  }
+  return graphemes;
+};
+
+// taken from mdn in the charAt doc page.
+const getWholeChar = (str, i) => {
+  const code = str.charCodeAt(i);
+  if (isNaN(code)) {
+    return ''; // Position not found
+  }
+  if (code < 0xd800 || code > 0xdfff) {
+    return str.charAt(i);
+  }
+
+  // High surrogate (could change last hex to 0xDB7F to treat high private
+  // surrogates as single characters)
+  if (0xd800 <= code && code <= 0xdbff) {
+    if (str.length <= i + 1) {
+      throw 'High surrogate without following low surrogate';
+    }
+    const next = str.charCodeAt(i + 1);
+    if (0xdc00 > next || next > 0xdfff) {
+      throw 'High surrogate without following low surrogate';
+    }
+    return str.charAt(i) + str.charAt(i + 1);
+  }
+  // Low surrogate (0xDC00 <= code && code <= 0xDFFF)
+  if (i === 0) {
+    throw 'Low surrogate without preceding high surrogate';
+  }
+  const prev = str.charCodeAt(i - 1);
+
+  // (could change last hex to 0xDB7F to treat high private
+  // surrogates as single characters)
+  if (0xd800 > prev || prev > 0xdbff) {
+    throw 'Low surrogate without preceding high surrogate';
+  }
+  // We can pass over low surrogates now as the second component
+  // in a pair which we have already processed
+  return false;
+};
+
+var lang_string = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  capitalize: capitalize,
+  escapeXml: escapeXml,
+  graphemeSplit: graphemeSplit
+});
+
+/**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
  * Better try to restrict with types to avoid confusion.
  */
@@ -2960,7 +3065,8 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
     this._setSVGPreamble(markup, options);
     this._setSVGHeader(markup, options);
     if (this.clipPath) {
-      markup.push(`<g clip-path="url(#${this.clipPath.clipPathId})" >\n`);
+      var _this$clipPath$clipPa;
+      markup.push(`<g clip-path="url(#${escapeXml((_this$clipPath$clipPa = this.clipPath.clipPathId) !== null && _this$clipPath$clipPa !== void 0 ? _this$clipPath$clipPa : '')})" >\n`);
     }
     this._setSVGBgOverlayColor(markup, 'background');
     this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
@@ -4587,7 +4693,7 @@ const colorPropToSVG = function (prop, value) {
   if (!value) {
     colorValue = 'none';
   } else if (value.toLive) {
-    colorValue = `url(#SVGID_${value.id})`;
+    colorValue = `url(#SVGID_${escapeXml(value.id)})`;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
@@ -4640,7 +4746,7 @@ class FabricObjectSVGExportMixin {
       filter = skipShadow ? '' : this.getSvgFilter(),
       fill = colorPropToSVG(FILL, this.fill),
       stroke = colorPropToSVG(STROKE, this.stroke);
-    return [stroke, 'stroke-width: ', strokeWidth, '; ', 'stroke-dasharray: ', strokeDashArray, '; ', 'stroke-linecap: ', strokeLineCap, '; ', 'stroke-dashoffset: ', strokeDashOffset, '; ', 'stroke-linejoin: ', strokeLineJoin, '; ', 'stroke-miterlimit: ', strokeMiterLimit, '; ', fill, 'fill-rule: ', fillRule, '; ', 'opacity: ', opacity, ';', filter, visibility].join('');
+    return [stroke, 'stroke-width: ', strokeWidth, '; ', 'stroke-dasharray: ', strokeDashArray, '; ', 'stroke-linecap: ', strokeLineCap, '; ', 'stroke-dashoffset: ', strokeDashOffset, '; ', 'stroke-linejoin: ', strokeLineJoin, '; ', 'stroke-miterlimit: ', strokeMiterLimit, '; ', fill, 'fill-rule: ', fillRule, '; ', 'opacity: ', opacity, ';', filter, visibility].map(v => escapeXml(v)).join('');
   }
 
   /**
@@ -4648,7 +4754,7 @@ class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgFilter() {
-    return this.shadow ? `filter: url(#SVGID_${this.shadow.id});` : '';
+    return this.shadow ? `filter: url(#SVGID_${escapeXml(this.shadow.id)});` : '';
   }
 
   /**
@@ -4656,7 +4762,7 @@ class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgCommons() {
-    return [this.id ? `id="${this.id}" ` : '', this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : ''].join('');
+    return [this.id ? `id="${escapeXml(String(this.id))}" ` : '', this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : ''].join('');
   }
 
   /**
@@ -4769,7 +4875,7 @@ class FabricObjectSVGExportMixin {
     return reviver ? reviver(markup.join('')) : markup.join('');
   }
   addPaintOrder() {
-    return this.paintFirst !== FILL ? ` paint-order="${this.paintFirst}" ` : '';
+    return this.paintFirst !== FILL ? ` paint-order="${escapeXml(this.paintFirst)}" ` : '';
   }
 }
 
@@ -4907,7 +5013,6 @@ const reViewBoxAttrValue = new RegExp(String.raw`^\s*(${reNum})${viewportSeparat
 
 (?:$|\s): This captures either the end of the line or a whitespace character. It ensures that the match ends either at the end of the string or with a whitespace character.
    */
-// eslint-disable-next-line max-len
 
 const shadowOffsetRegex = '(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?';
 const reOffsetsAndBlur = new RegExp('(?:\\s|^)' + shadowOffsetRegex + shadowOffsetRegex + '(' + reNum + '?(?:px)?)?(?:\\s?|$)(?:$|\\s)');
@@ -4966,14 +5071,15 @@ class Shadow {
   toSVG(object) {
     const offset = rotateVector(new Point(this.offsetX, this.offsetY), degreesToRadians(-object.angle)),
       BLUR_BOX = 20,
+      NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       color = new Color(this.color);
     let fBoxX = 40,
       fBoxY = 40;
     if (object.width && object.height) {
       //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
       // we add some extra space to filter box to contain the blur ( 20 )
-      fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, config.NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
-      fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, config.NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
+      fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
+      fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
     }
     if (object.flipX) {
       offset.x *= -1;
@@ -4981,7 +5087,7 @@ class Shadow {
     if (object.flipY) {
       offset.y *= -1;
     }
-    return `<filter id="SVGID_${this.id}" y="-${fBoxY}%" height="${100 + 2 * fBoxY}%" x="-${fBoxX}%" width="${100 + 2 * fBoxX}%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(this.blur ? this.blur / 2 : 0, config.NUM_FRACTION_DIGITS)}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(offset.x, config.NUM_FRACTION_DIGITS)}" dy="${toFixed(offset.y, config.NUM_FRACTION_DIGITS)}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
+    return `<filter id="SVGID_${escapeXml(this.id)}" y="-${fBoxY}%" height="${100 + 2 * fBoxY}%" x="-${fBoxX}%" width="${100 + 2 * fBoxX}%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(this.blur ? this.blur / 2 : 0, NUM_FRACTION_DIGITS)}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(offset.x, NUM_FRACTION_DIGITS)}" dy="${toFixed(offset.y, NUM_FRACTION_DIGITS)}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
   }
 
   /**
@@ -7132,6 +7238,9 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
     } else {
       this._renderBackground(ctx);
     }
+    this.fire('before:render', {
+      ctx
+    });
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
@@ -8421,6 +8530,14 @@ class Control {
      */
     _defineProperty(this, "withConnection", false);
     Object.assign(this, options);
+  }
+  getTransformAnchorPoint() {
+    var _this$transformAnchor;
+    return (// return the control transformAnchorPoint
+      (_this$transformAnchor = this.transformAnchorPoint) !== null && _this$transformAnchor !== void 0 ? _this$transformAnchor :
+      // otherwise will return the opposite origin of where the control is located.
+      new Point(-this.x + 0.5, -this.y + 0.5)
+    );
   }
 
   /**
@@ -10238,111 +10355,6 @@ const cloneStyles = style => {
 };
 
 /**
- * Capitalizes a string
- * @param {String} string String to capitalize
- * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
- * and other letters stay untouched, if false first letter is capitalized
- * and other letters are converted to lowercase.
- * @return {String} Capitalized version of a string
- */
-const capitalize = function (string) {
-  let firstLetterOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  return `${string.charAt(0).toUpperCase()}${firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase()}`;
-};
-
-/**
- * Escapes XML in a string
- * @param {String} string String to escape
- * @return {String} Escaped version of a string
- */
-const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-let segmenter;
-const getSegmenter = () => {
-  if (!segmenter) {
-    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
-      granularity: 'grapheme'
-    });
-  }
-  return segmenter;
-};
-
-/**
- * Divide a string in the user perceived single units
- * @param {String} textstring String to escape
- * @return {Array} array containing the graphemes
- */
-const graphemeSplit = textstring => {
-  segmenter || getSegmenter();
-  if (segmenter) {
-    const segments = segmenter.segment(textstring);
-    return Array.from(segments).map(_ref => {
-      let {
-        segment
-      } = _ref;
-      return segment;
-    });
-  }
-
-  //Fallback
-  return graphemeSplitImpl(textstring);
-};
-const graphemeSplitImpl = textstring => {
-  const graphemes = [];
-  for (let i = 0, chr; i < textstring.length; i++) {
-    if ((chr = getWholeChar(textstring, i)) === false) {
-      continue;
-    }
-    graphemes.push(chr);
-  }
-  return graphemes;
-};
-
-// taken from mdn in the charAt doc page.
-const getWholeChar = (str, i) => {
-  const code = str.charCodeAt(i);
-  if (isNaN(code)) {
-    return ''; // Position not found
-  }
-  if (code < 0xd800 || code > 0xdfff) {
-    return str.charAt(i);
-  }
-
-  // High surrogate (could change last hex to 0xDB7F to treat high private
-  // surrogates as single characters)
-  if (0xd800 <= code && code <= 0xdbff) {
-    if (str.length <= i + 1) {
-      throw 'High surrogate without following low surrogate';
-    }
-    const next = str.charCodeAt(i + 1);
-    if (0xdc00 > next || next > 0xdfff) {
-      throw 'High surrogate without following low surrogate';
-    }
-    return str.charAt(i) + str.charAt(i + 1);
-  }
-  // Low surrogate (0xDC00 <= code && code <= 0xDFFF)
-  if (i === 0) {
-    throw 'Low surrogate without preceding high surrogate';
-  }
-  const prev = str.charCodeAt(i - 1);
-
-  // (could change last hex to 0xDB7F to treat high private
-  // surrogates as single characters)
-  if (0xd800 > prev || prev > 0xdbff) {
-    throw 'Low surrogate without preceding high surrogate';
-  }
-  // We can pass over low surrogates now as the second component
-  // in a pair which we have already processed
-  return false;
-};
-
-var lang_string = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  capitalize: capitalize,
-  escapeXml: escapeXml,
-  graphemeSplit: graphemeSplit
-});
-
-/**
  * @param {Object} prevStyle first style to compare
  * @param {Object} thisStyle second style to compare
  * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
@@ -10925,7 +10937,7 @@ class Rect extends FabricObject {
       rx,
       ry
     } = this;
-    return ['<rect ', 'COMMON_PARTS', `x="${-width / 2}" y="${-height / 2}" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`];
+    return ['<rect ', 'COMMON_PARTS', `x="${-width / 2}" y="${-height / 2}" rx="${escapeXml(rx)}" ry="${escapeXml(ry)}" width="${escapeXml(width)}" height="${escapeXml(height)}" />\n`];
   }
 
   /**
@@ -11890,7 +11902,7 @@ class Group extends createCollectionMixin(FabricObject) {
    * @return {String}
    */
   getSvgStyles() {
-    const opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ? `opacity: ${this.opacity};` : '',
+    const opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ? `opacity: ${escapeXml(this.opacity)};` : '',
       visibility = this.visible ? '' : ' visibility: hidden;';
     return [opacity, this.getSvgFilter(), visibility].join('');
   }
@@ -13844,11 +13856,13 @@ class SelectableCanvas extends StaticCanvas {
    * Given the control clicked, determine the origin of the transform.
    * This is bad because controls can totally have custom names
    * should disappear before release 4.0
+   * Fabric 7.1, jan 2026 we are still using this.
+   * Needs to go.
    * @private
    * @deprecated
    */
   _getOriginFromCorner(target, controlName) {
-    const origin = {
+    const origin = controlName ? target.controls[controlName].getTransformAnchorPoint() : {
       x: target.originX,
       y: target.originY
     };
@@ -13856,6 +13870,9 @@ class SelectableCanvas extends StaticCanvas {
       return origin;
     }
 
+    // this part down here is deprecated.
+    // It is left to do not change the standard behavior in the middle of a major version
+    // but when possible `getTransformAnchorPoint` will be the only source of truth
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -16353,7 +16370,8 @@ class Gradient {
     }
     transform[4] -= offsetX;
     transform[5] -= offsetY;
-    const commonAttributes = [`id="SVGID_${this.id}"`, `gradientUnits="${gradientUnits}"`, `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`, ''].join(' ');
+    const commonAttributes = [`id="SVGID_${escapeXml(String(this.id))}"`, `gradientUnits="${gradientUnits}"`, `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`, ''].join(' ');
+    const sanitizeCoord = value => parseFloat(String(value));
     if (this.type === 'linear') {
       const {
         x1,
@@ -16361,7 +16379,11 @@ class Gradient {
         x2,
         y2
       } = this.coords;
-      markup.push('<linearGradient ', commonAttributes, ' x1="', x1, '" y1="', y1, '" x2="', x2, '" y2="', y2, '">\n');
+      const sx1 = sanitizeCoord(x1);
+      const sy1 = sanitizeCoord(y1);
+      const sx2 = sanitizeCoord(x2);
+      const sy2 = sanitizeCoord(y2);
+      markup.push('<linearGradient ', commonAttributes, ' x1="', sx1, '" y1="', sy1, '" x2="', sx2, '" y2="', sy2, '">\n');
     } else if (this.type === 'radial') {
       const {
         x1,
@@ -16371,9 +16393,15 @@ class Gradient {
         r1,
         r2
       } = this.coords;
-      const needsSwap = r1 > r2;
+      const sx1 = sanitizeCoord(x1);
+      const sy1 = sanitizeCoord(y1);
+      const sx2 = sanitizeCoord(x2);
+      const sy2 = sanitizeCoord(y2);
+      const sr1 = sanitizeCoord(r1);
+      const sr2 = sanitizeCoord(r2);
+      const needsSwap = sr1 > sr2;
       // svg radial gradient has just 1 radius. the biggest.
-      markup.push('<radialGradient ', commonAttributes, ' cx="', needsSwap ? x1 : x2, '" cy="', needsSwap ? y1 : y2, '" r="', needsSwap ? r1 : r2, '" fx="', needsSwap ? x2 : x1, '" fy="', needsSwap ? y2 : y1, '">\n');
+      markup.push('<radialGradient ', commonAttributes, ' cx="', needsSwap ? sx1 : sx2, '" cy="', needsSwap ? sy1 : sy2, '" r="', needsSwap ? sr1 : sr2, '" fx="', needsSwap ? sx2 : sx1, '" fy="', needsSwap ? sy2 : sy1, '">\n');
       if (needsSwap) {
         // svg goes from internal to external radius. if radius are inverted, swap color stops.
         colorStops.reverse(); //  mutates array
@@ -16381,16 +16409,17 @@ class Gradient {
           colorStop.offset = 1 - colorStop.offset;
         });
       }
-      const minRadius = Math.min(r1, r2);
+      const minRadius = Math.min(sr1, sr2);
       if (minRadius > 0) {
         // i have to shift all colorStops and add new one in 0.
-        const maxRadius = Math.max(r1, r2),
+        const maxRadius = Math.max(sr1, sr2),
           percentageShift = minRadius / maxRadius;
         colorStops.forEach(colorStop => {
           colorStop.offset += percentageShift * (1 - colorStop.offset);
         });
       }
     }
+    // todo make a malicious script tag injection test with color and also apply a fix with escapeXml
     colorStops.forEach(_ref => {
       let {
         color,
@@ -16706,7 +16735,7 @@ class Pattern {
       patternOffsetY = ifNaN(this.offsetY / height, 0),
       patternWidth = repeat === 'repeat-y' || repeat === 'no-repeat' ? 1 + Math.abs(patternOffsetX || 0) : ifNaN(patternSource.width / width, 0),
       patternHeight = repeat === 'repeat-x' || repeat === 'no-repeat' ? 1 + Math.abs(patternOffsetY || 0) : ifNaN(patternSource.height / height, 0);
-    return [`<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`, `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${this.sourceToString()}"></image>`, `</pattern>`, ''].join('\n');
+    return [`<pattern id="SVGID_${escapeXml(id)}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`, `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${escapeXml(this.sourceToString())}"></image>`, `</pattern>`, ''].join('\n');
   }
   /* _TO_SVG_END_ */
 
@@ -16988,8 +17017,7 @@ class Path extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
-    return ['<path ', 'COMMON_PARTS', `d="${path}" stroke-linecap="round" />\n`];
+    return ['<path ', 'COMMON_PARTS', `d="${joinPath(this.path, config.NUM_FRACTION_DIGITS)}" stroke-linecap="round" />\n`];
   }
 
   /**
@@ -17540,15 +17568,17 @@ class Circle extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const angle = (this.endAngle - this.startAngle) % 360;
+    const {
+      radius,
+      startAngle,
+      endAngle
+    } = this;
+    const angle = (endAngle - startAngle) % 360;
     if (angle === 0) {
-      return ['<circle ', 'COMMON_PARTS', 'cx="0" cy="0" ', 'r="', `${this.radius}`, '" />\n'];
+      return ['<circle ', 'COMMON_PARTS', 'cx="0" cy="0" ', 'r="', `${escapeXml(radius)}`, '" />\n'];
     } else {
-      const {
-        radius
-      } = this;
-      const start = degreesToRadians(this.startAngle),
-        end = degreesToRadians(this.endAngle),
+      const start = degreesToRadians(startAngle),
+        end = degreesToRadians(endAngle),
         startX = cos(start) * radius,
         startY = sin(start) * radius,
         endX = cos(end) * radius,
@@ -18120,17 +18150,13 @@ class Line extends FabricObject {
       width,
       height
     } = this;
-    const xMult = _x1 <= _x2 ? -1 : 1,
-      yMult = _y1 <= _y2 ? -1 : 1,
-      x1 = xMult * width / 2,
-      y1 = yMult * height / 2,
-      x2 = xMult * -width / 2,
-      y2 = yMult * -height / 2;
+    const xMult = _x1 <= _x2 ? -0.5 : 0.5,
+      yMult = _y1 <= _y2 ? -0.5 : 0.5;
     return {
-      x1,
-      x2,
-      y1,
-      y2
+      x1: xMult * width,
+      x2: xMult * -width,
+      y1: yMult * height,
+      y2: yMult * -height
     };
   }
 
@@ -18348,7 +18374,7 @@ class Ellipse extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    return ['<ellipse ', 'COMMON_PARTS', `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`];
+    return ['<ellipse ', 'COMMON_PARTS', `cx="0" cy="0" rx="${escapeXml(this.rx)}" ry="${escapeXml(this.ry)}" />\n`];
   }
 
   /**
@@ -18666,14 +18692,17 @@ class Polyline extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const points = [],
-      diffX = this.pathOffset.x,
+    const diffX = this.pathOffset.x,
       diffY = this.pathOffset.y,
       NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
-    for (let i = 0, len = this.points.length; i < len; i++) {
-      points.push(toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',', toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' ');
-    }
-    return [`<${this.constructor.type.toLowerCase()} `, 'COMMON_PARTS', `points="${points.join('')}" />\n`];
+    const points = this.points.map(_ref2 => {
+      let {
+        x,
+        y
+      } = _ref2;
+      return `${toFixed(x - diffX, NUM_FRACTION_DIGITS)},${toFixed(y - diffY, NUM_FRACTION_DIGITS)}`;
+    }).join(' ');
+    return [`<${escapeXml(this.constructor.type).toLowerCase()} `, 'COMMON_PARTS', `points="${points}" />\n`];
   }
 
   /**
@@ -19097,7 +19126,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     } = _ref;
     const noShadow = true,
       textDecoration = this.getSvgTextDecoration(this);
-    return [textBgRects.join(''), '\t\t<text xml:space="preserve" ', `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `, `font-size="${this.fontSize}" `, this.fontStyle ? `font-style="${this.fontStyle}" ` : '', this.fontWeight ? `font-weight="${this.fontWeight}" ` : '', textDecoration ? `text-decoration="${textDecoration}" ` : '', this.direction === 'rtl' ? `direction="${this.direction}" ` : '', 'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >', textSpans.join(''), '</text>\n'];
+    return [textBgRects.join(''), '\t\t<text xml:space="preserve" ', `font-family="${escapeXml(this.fontFamily.replace(dblQuoteRegex, "'"))}" `, `font-size="${escapeXml(this.fontSize)}" `, this.fontStyle ? `font-style="${escapeXml(this.fontStyle)}" ` : '', this.fontWeight ? `font-weight="${escapeXml(this.fontWeight)}" ` : '', textDecoration ? `text-decoration="${textDecoration}" ` : '', this.direction === 'rtl' ? `direction="rtl" ` : '', 'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >', textSpans.join(''), '</text>\n'];
   }
 
   /**
@@ -19113,7 +19142,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       lineOffset;
 
     // bounding-box background
-    this.backgroundColor && textBgRects.push(...createSVGInlineRect(this.backgroundColor, -this.width / 2, -this.height / 2, this.width, this.height));
+    this.backgroundColor && textBgRects.push(createSVGInlineRect(this.backgroundColor, -this.width / 2, -this.height / 2, this.width, this.height));
 
     // text and text-background
     for (let i = 0, len = this._textLines.length; i < len; i++) {
@@ -19221,7 +19250,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       } = this.__charBounds[i][j];
       currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
       if (currentColor !== lastColor) {
-        lastColor && textBgRects.push(...createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
+        lastColor && textBgRects.push(createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
         boxStart = left;
         boxWidth = width;
         lastColor = currentColor;
@@ -19229,7 +19258,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         boxWidth += kernedWidth;
       }
     }
-    currentColor && textBgRects.push(...createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
+    currentColor && textBgRects.push(createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
   }
 
   /**
@@ -19267,7 +19296,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       linethrough: linethrough !== null && linethrough !== void 0 ? linethrough : this.linethrough
     });
     const thickness = textDecorationThickness || this.textDecorationThickness;
-    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${strokeWidth}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${fontFamily}'` : fontFamily}; ` : '', fontSize ? `font-size: ${fontSize}px; ` : '', fontStyle ? `font-style: ${fontStyle}; ` : '', fontWeight ? `font-weight: ${fontWeight}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
+    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${escapeXml(fontFamily)}'` : escapeXml(fontFamily)}; ` : '', fontSize ? `font-size: ${escapeXml(fontSize)}px; ` : '', fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : '', fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
   }
 
   /**
@@ -24831,13 +24860,13 @@ class FabricImage extends FabricObject {
     }
     if (this.hasCrop()) {
       const clipPathId = uid();
-      svgString.push('<clipPath id="imageCrop_' + clipPathId + '">\n', '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />\n', '</clipPath>\n');
+      svgString.push('<clipPath id="imageCrop_' + clipPathId + '">\n', '\t<rect x="' + x + '" y="' + y + '" width="' + escapeXml(this.width) + '" height="' + escapeXml(this.height) + '" />\n', '</clipPath>\n');
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
     }
     if (!this.imageSmoothing) {
       imageRendering = ' image-rendering="optimizeSpeed"';
     }
-    imageMarkup.push('\t<image ', 'COMMON_PARTS', `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${y - this.cropY
+    imageMarkup.push('\t<image ', 'COMMON_PARTS', `xlink:href="${escapeXml(this.getSrc(true))}" x="${x - this.cropX}" y="${y - this.cropY
     // we're essentially moving origin of transformation from top/left corner to the center of the shape
     // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
     // so that object's center aligns with container's left/top
@@ -24845,7 +24874,7 @@ class FabricImage extends FabricObject {
     if (this.stroke || this.strokeDashArray) {
       const origFill = this.fill;
       this.fill = null;
-      strokeSvg = [`\t<rect x="${x}" y="${y}" width="${this.width}" height="${this.height}" style="${this.getSvgStyles()}" />\n`];
+      strokeSvg = [`\t<rect x="${x}" y="${y}" width="${escapeXml(this.width)}" height="${escapeXml(this.height)}" style="${this.getSvgStyles()}" />\n`];
       this.fill = origFill;
     }
     if (this.paintFirst !== FILL) {

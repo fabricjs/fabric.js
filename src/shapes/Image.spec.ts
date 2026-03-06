@@ -972,6 +972,18 @@ describe('FabricImage', () => {
       expect(img.scaleY).toBe(5);
     });
   });
+
+  describe('attribute injection', () => {
+    it('source injection', () => {
+      const element = newImg('javascript:alert(1)');
+      const img = new FabricImage(element, {
+        width: 100,
+        height: 100,
+      });
+      const svg = img.toSVG();
+      expect(svg).toContain('xlink:href="javascript:alert(1)"'); // Should be escaped
+    });
+  });
 });
 
 export function newImg(src = IMG_SRC): HTMLImageElement {

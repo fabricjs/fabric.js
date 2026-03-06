@@ -183,10 +183,14 @@ interface SimpleEventHandler<
 
 interface InEvent {
   previousTarget?: FabricObject;
+  actualTarget?: FabricObject;
+  previousActualTarget?: FabricObject;
 }
 
 interface OutEvent {
   nextTarget?: FabricObject;
+  actualTarget?: FabricObject;
+  nextActualTarget?: FabricObject;
 }
 
 export interface DragEventData extends TEvent<DragEvent> {

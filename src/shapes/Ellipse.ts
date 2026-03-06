@@ -7,6 +7,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
+import { escapeXml } from '../util/lang_string';
 
 export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   rx: 0,
@@ -127,7 +128,7 @@ export class Ellipse<
     return [
       '<ellipse ',
       'COMMON_PARTS',
-      `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`,
+      `cx="0" cy="0" rx="${escapeXml(this.rx)}" ry="${escapeXml(this.ry)}" />\n`,
     ];
   }
 

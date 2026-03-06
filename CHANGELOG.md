@@ -3,6 +3,15 @@
 ## [next]
 
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
+- chore(): Update typescript-eslint to address a recent vulnerability [#10878](https://github.com/fabricjs/fabric.js/pull/10878)
+- chore(deps-dev): bump rollup from 4.52.4 to 4.59.0 in the npm_and_yarn group across 1 directory [#10877](https://github.com/fabricjs/fabric.js/pull/10877)
+- Gradient controls [#10844](https://github.com/fabricjs/fabric.js/pull/10844)
+- fix(): Fire mouseover/mouseleave for objects that are multi selection targets [#10874](https://github.com/fabricjs/fabric.js/pull/10874)
+- feat(extensions): Cropping controls with edge resize and flip support [#10851](https://github.com/fabricjs/fabric.js/pull/10851)
+
+## [7.2.0]
+
+- fix(): Fix for svg export stored xss CVE-2026-27013
 - chore(): update prettier [#10863](https://github.com/fabricjs/fabric.js/pull/10863)
 - chore(): reuse more of the createPointerEvent in unit tests [#10864](https://github.com/fabricjs/fabric.js/pull/10864)
 - test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)

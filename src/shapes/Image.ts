@@ -31,6 +31,7 @@ import type { CSSRules } from '../parser/typedefs';
 import type { Resize, ResizeSerializedProps } from '../filters/Resize';
 import type { TCachedFabricObject } from './Object/Object';
 import { log } from '../util/internals/console';
+import { escapeXml } from '../util/lang_string';
 
 // @todo Would be nice to have filtering code not imported directly.
 
@@ -389,9 +390,9 @@ export class FabricImage<
           '" y="' +
           y +
           '" width="' +
-          this.width +
+          escapeXml(this.width) +
           '" height="' +
-          this.height +
+          escapeXml(this.height) +
           '" />\n',
         '</clipPath>\n',
       );
@@ -403,7 +404,7 @@ export class FabricImage<
     imageMarkup.push(
       '\t<image ',
       'COMMON_PARTS',
-      `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${
+      `xlink:href="${escapeXml(this.getSrc(true))}" x="${x - this.cropX}" y="${
         y - this.cropY
         // we're essentially moving origin of transformation from top/left corner to the center of the shape
         // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
@@ -419,9 +420,9 @@ export class FabricImage<
       const origFill = this.fill;
       this.fill = null;
       strokeSvg = [
-        `\t<rect x="${x}" y="${y}" width="${this.width}" height="${
-          this.height
-        }" style="${this.getSvgStyles()}" />\n`,
+        `\t<rect x="${x}" y="${y}" width="${escapeXml(this.width)}" height="${escapeXml(
+          this.height,
+        )}" style="${this.getSvgStyles()}" />\n`,
       ];
       this.fill = origFill;
     }
@@ -470,7 +471,10 @@ export class FabricImage<
    * @param {String} src Source string (URL)
    * @param {LoadImageOptions} [options] Options object
    */
-  setSrc(src: string, { crossOrigin, signal }: LoadImageOptions = {}) {
+  setSrc(
+    src: string,
+    { crossOrigin, signal }: LoadImageOptions = {},
+  ): Promise<void> {
     return loadImage(src, { crossOrigin, signal }).then((img) => {
       typeof crossOrigin !== 'undefined' && this.set({ crossOrigin });
       this.setElement(img);
