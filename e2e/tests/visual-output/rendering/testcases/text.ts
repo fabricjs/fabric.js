@@ -2,7 +2,7 @@ import { FabricNamespace, renderTestType } from '../../../types';
 
 function registerUbuntuFonts() {
   if (typeof window === 'undefined') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const { registerFont } = require('canvas');
     const path = require('node:path');
     const dir = path.resolve(__dirname + '/../../../../../test/fixtures/');
@@ -1011,23 +1011,72 @@ const cases: renderTestType[] = [
         scaleY: 3,
         styles: {
           0: {
-            0: { fill: 'red', textDecorationThickness: 90 },
-            1: { fill: 'red', textDecorationThickness: 90 },
-            2: { fill: 'blue', overline: true, textDecorationThickness: 90 },
-            3: { fill: 'blue', overline: true, textDecorationThickness: 140 },
-            4: { fill: 'green', overline: true, textDecorationThickness: 140 },
-            5: { fill: 'green', textDecorationThickness: 190 },
+            0: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            1: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            2: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 90,
+              textDecorationColor: 'purple',
+            },
+            3: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 140,
+              textDecorationColor: 'cyan',
+            },
+            4: {
+              fill: 'green',
+              overline: true,
+              textDecorationThickness: 140,
+            },
+            5: {
+              fill: 'green',
+              textDecorationThickness: 190,
+              textDecorationColor: 'black',
+            },
             6: { fill: 'black', textDecorationThickness: 20 },
             7: { fill: 'black', textDecorationThickness: 20 },
             8: { fill: 'yellow', textDecorationThickness: 20 },
           },
           1: {
-            0: { fill: 'red', textDecorationThickness: 90 },
-            1: { fill: 'red', textDecorationThickness: 90 },
-            2: { fill: 'blue', overline: true, textDecorationThickness: 90 },
-            3: { fill: 'blue', overline: true, textDecorationThickness: 140 },
+            0: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            1: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            2: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 90,
+              textDecorationColor: 'purple',
+            },
+            3: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 140,
+              textDecorationColor: 'cyan',
+            },
             4: { fill: 'green', overline: true, textDecorationThickness: 140 },
-            5: { fill: 'purple', overline: true, textDecorationThickness: 190 },
+            5: {
+              fill: 'purple',
+              overline: true,
+              textDecorationThickness: 190,
+              textDecorationColor: 'black',
+            },
           },
         },
       });
