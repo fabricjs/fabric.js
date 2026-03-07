@@ -58,7 +58,8 @@ export default [
             preserveModules: true,
             entryFileNames: '[name].min.mjs',
             sourcemap: true,
-            plugins: [terser()],
+            plugins: [terser({ maxWorkers: 4 })],
+            minify: true,
           }
         : null,
     ],
@@ -82,7 +83,8 @@ export default [
             name: 'fabric',
             format: 'es',
             sourcemap: true,
-            plugins: [terser()],
+            plugins: [terser({ maxWorkers: 4 })],
+            minify: true,
           }
         : null,
       // umd module in bundle, the cdn one for fiddles
@@ -99,7 +101,8 @@ export default [
             name: 'fabric',
             format: 'umd',
             sourcemap: true,
-            plugins: [terser()],
+            plugins: [terser({ maxWorkers: 4 })],
+            minify: true,
           }
         : null,
     ],
@@ -152,7 +155,8 @@ export default [
           fabric: 'fabric',
           westures: 'westures',
         },
-        plugins: [terser()],
+        plugins: [terser({ maxWorkers: 4 })],
+        minify: true,
       },
     ],
     onwarn,
