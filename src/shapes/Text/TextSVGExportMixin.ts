@@ -346,8 +346,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     });
     const thickness =
       textDecorationThickness || this[TEXT_DECORATION_THICKNESS];
-    const decorationColor =
-      textDecorationColor || this[TEXT_DECORATION_COLOR] || fill;
+    const decorationColor = textDecorationColor || this[TEXT_DECORATION_COLOR];
     return [
       stroke ? colorPropToSVG(STROKE, stroke) : '',
       strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : '',
