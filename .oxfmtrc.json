@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "tabWidth": 2,
+  "singleQuote": true,
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    ".codesandbox/",
+    ".DS_Store",
+    "*.iml",
+    "change-output.md",
+    "/.nyc_output/",
+    "/node_modules/",
+    "/npm-debug.log",
+    "before_commit",
+    "/coverage/",
+    ".idea/",
+    "/cli_output/",
+    "/scripts/cli_cache.json",
+    "**/dist/",
+    "**/dist-extensions/",
+    "/lib/",
+    "/test/",
+    "/website/",
+    ".next/",
+    ".parcel-cache/",
+    "/docs/",
+    "/e2e/test-results/",
+    "/e2e/test-report/",
+    "/e2e/tests/**/*-snapshots/*.json"
+  ]
+}
