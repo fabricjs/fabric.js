@@ -6,7 +6,11 @@ import { hasStyleChanged } from '../../util/misc/textStyles';
 import { toFixed } from '../../util/misc/toFixed';
 import { FabricObjectSVGExportMixin } from '../Object/FabricObjectSVGExportMixin';
 import { type TextStyleDeclaration } from './StyledText';
-import { JUSTIFY } from '../Text/constants';
+import {
+  JUSTIFY,
+  TEXT_DECORATION_COLOR,
+  TEXT_DECORATION_THICKNESS,
+} from '../Text/constants';
 import type { FabricText, GraphemeBBox } from './Text';
 import { STROKE, FILL } from '../../constants';
 import { createRotateMatrix } from '../../util/misc/matrix';
@@ -303,7 +307,10 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed((this.textDecorationThickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; white-space: pre;`;
+    const objectLevelTextDecorationColor = this[TEXT_DECORATION_COLOR]
+      ? ` text-decoration-color: ${escapeXml(this[TEXT_DECORATION_COLOR])};`
+      : '';
+    return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed((this.textDecorationThickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%;${objectLevelTextDecorationColor} white-space: pre;`;
   }
 
   /**
@@ -326,6 +333,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontStyle,
       fontWeight,
       textDecorationThickness,
+      textDecorationColor,
       linethrough,
       overline,
       underline,
@@ -336,7 +344,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       overline: overline ?? this.overline,
       linethrough: linethrough ?? this.linethrough,
     });
-    const thickness = textDecorationThickness || this.textDecorationThickness;
+    const thickness =
+      textDecorationThickness || this[TEXT_DECORATION_THICKNESS];
+    const decorationColor = textDecorationColor || this[TEXT_DECORATION_COLOR];
     return [
       stroke ? colorPropToSVG(STROKE, stroke) : '',
       strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : '',
@@ -351,7 +361,11 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : '',
       fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : '',
       textDecoration
-        ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%; `
+        ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%;${
+            decorationColor
+              ? ` text-decoration-color: ${escapeXml(decorationColor)};`
+              : ''
+          } `
         : '',
       fill ? colorPropToSVG(FILL, fill) : '',
       useWhiteSpace ? 'white-space: pre; ' : '',

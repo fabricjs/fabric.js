@@ -31,6 +31,15 @@ describe('TextSvgExport', () => {
     expect(svgStyles.includes('stroke="none"')).toBe(false);
   });
 
+  it('exports text decoration color in svg styles', () => {
+    const myText = new FabricText('text', {
+      underline: true,
+      textDecorationColor: 'green',
+    });
+    const svgStyles = myText.getSvgStyles();
+    expect(svgStyles.includes('text-decoration-color: green;')).toBe(true);
+  });
+
   it('deltay does not get exported in svgStyles', () => {
     const myText = new FabricText('text', {
       fill: 'rgba(100, 0, 100, 0.5)',
