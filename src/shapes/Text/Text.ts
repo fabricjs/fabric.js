@@ -317,6 +317,8 @@ export class FabricText<
   /**
    * Optional text decoration color for underline, overline and strikethrough.
    * When undefined, decoration color falls back to the text fill color.
+   * This feature is not really supported by anything else than svg 2 specs with css3 support.
+   * Chrome does not support this, nor firefox apparently.
    */
   declare textDecorationColor?: string;
 
