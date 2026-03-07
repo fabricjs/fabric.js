@@ -82,7 +82,8 @@
           "deltaY": 0,
           "textBackgroundColor": "yellow",
           "textDecorationThickness": 66.667,
-          "textDecoration": " line-through"
+          "textDecoration": " line-through",
+          "textDecorationColor": "orange"
         },
         {
           "fontSize": 40,
@@ -223,7 +224,8 @@
           "deltaY": 0,
           "textBackgroundColor": "",
           "textDecorationThickness": 66.667,
-          "textDecoration": "underline"
+          "textDecoration": "underline",
+          "textDecorationColor": "purple"
         },
         {
           "fontSize": 40,
@@ -378,7 +380,8 @@
           "deltaY": 0,
           "textBackgroundColor": "",
           "textDecorationThickness": 66.667,
-          "textDecoration": " overline"
+          "textDecoration": " overline",
+          "textDecorationColor": "red"
         },
         {
           "fontSize": 40,

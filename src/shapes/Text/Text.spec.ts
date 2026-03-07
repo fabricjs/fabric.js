@@ -369,6 +369,7 @@ describe('FabricText', () => {
     elTextWithAttrs.setAttributeNS(namespace, 'font-size', '123');
     elTextWithAttrs.setAttributeNS(namespace, 'letter-spacing', '1em');
     elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
+    elTextWithAttrs.setAttributeNS(namespace, 'text-decoration-color', 'green');
     elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
     const textWithAttrs = await FabricText.fromElement(elTextWithAttrs);
@@ -402,6 +403,7 @@ describe('FabricText', () => {
       fontWeight: 'bold',
       fontSize: 123,
       underline: true,
+      textDecorationColor: 'green',
     };
 
     expect(
@@ -892,6 +894,7 @@ describe('FabricText', () => {
       textBackgroundColor: '',
       deltaY: 0,
       textDecorationThickness: 66.667,
+      textDecorationColor: undefined,
     };
 
     const expectedStyle2 = {
@@ -908,6 +911,7 @@ describe('FabricText', () => {
       textBackgroundColor: '',
       deltaY: 0,
       textDecorationThickness: 66.667,
+      textDecorationColor: undefined,
     };
 
     expect(
@@ -936,6 +940,19 @@ describe('FabricText', () => {
       "stroke-width: 30; font-family: 'Verdana'; font-size: 25px; fill: rgb(255,0,0); ";
 
     expect(styleString, 'style is as expected').toBe(expected);
+  });
+
+  it('getSvgSpanStyles includes textDecorationColor', () => {
+    const iText = new IText('test foo bar-baz', {
+      underline: true,
+      textDecorationColor: 'blue',
+    });
+    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
+    const styleString = iText.getSvgSpanStyles({
+      fill: 'red',
+      underline: true,
+    });
+    expect(styleString).toContain('text-decoration-color: blue;');
   });
 
   it('getSvgSpanStyles produces correct output with useWhiteSpace', () => {
@@ -1181,7 +1198,7 @@ describe('FabricText', () => {
       FabricText.cacheProperties.join('-'),
       'cache properties include text-specific ones',
     ).toBe(
-      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness',
+      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness-textDecorationColor',
     );
   });
 

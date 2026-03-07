@@ -101,4 +101,19 @@ export default tseslint.config(
       'no-restricted-syntax': 'off',
     },
   },
+  {
+    files: ['e2e/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: 'e2e/tsconfig.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'no-restricted-globals': 'off',
+      'no-restricted-syntax': 'off',
+    },
+  },
 );
