@@ -2,7 +2,6 @@ import { FabricNamespace, renderTestType } from '../../../types';
 
 function registerUbuntuFonts() {
   if (typeof window === 'undefined') {
-     
     const { registerFont } = require('canvas');
     const path = require('node:path');
     const dir = path.resolve(__dirname + '/../../../../../test/fixtures/');
