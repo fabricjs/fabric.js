@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @babel/cli from 7.28.3 to 7.28.6 [#10884](https://github.com/fabricjs/fabric.js/pull/10884)
 - feat(): Support textDecoration color. [#10880](https://github.com/fabricjs/fabric.js/pull/10880)
 - feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
