@@ -4034,6 +4034,7 @@ function getSvgRegex(arr) {
 //#endregion
 //#region src/shapes/Text/constants.ts
 const TEXT_DECORATION_THICKNESS = "textDecorationThickness";
+const TEXT_DECORATION_COLOR = "textDecorationColor";
 const fontProperties = [
 	"fontSize",
 	"fontWeight",
@@ -4062,7 +4063,8 @@ const additionalProps = [
 	...textDecorationProperties,
 	"textBackgroundColor",
 	"direction",
-	TEXT_DECORATION_THICKNESS
+	TEXT_DECORATION_THICKNESS,
+	TEXT_DECORATION_COLOR
 ];
 const styleProperties = [
 	...fontProperties,
@@ -4072,7 +4074,8 @@ const styleProperties = [
 	FILL,
 	"deltaY",
 	"textBackgroundColor",
-	TEXT_DECORATION_THICKNESS
+	TEXT_DECORATION_THICKNESS,
+	TEXT_DECORATION_COLOR
 ];
 const textDefaultValues = {
 	_reNewline: reNewline,
@@ -4191,7 +4194,8 @@ const attributesMap = {
 	"clip-rule": "clipRule",
 	"vector-effect": "strokeUniform",
 	"image-rendering": "imageSmoothing",
-	"text-decoration-thickness": TEXT_DECORATION_THICKNESS
+	"text-decoration-thickness": TEXT_DECORATION_THICKNESS,
+	"text-decoration-color": TEXT_DECORATION_COLOR
 };
 const fSize = "font-size";
 const cPath = "clip-path";
@@ -8193,7 +8197,7 @@ const cloneStyles = (style) => {
 * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
 * @return {boolean} true if the style changed
 */
-const hasStyleChanged = (prevStyle, thisStyle, forTextSpans = false) => prevStyle.fill !== thisStyle.fill || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.textDecorationThickness !== thisStyle.textDecorationThickness || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.deltaY !== thisStyle.deltaY || forTextSpans && (prevStyle.overline !== thisStyle.overline || prevStyle.underline !== thisStyle.underline || prevStyle.linethrough !== thisStyle.linethrough);
+const hasStyleChanged = (prevStyle, thisStyle, forTextSpans = false) => prevStyle.fill !== thisStyle.fill || prevStyle.stroke !== thisStyle.stroke || prevStyle.strokeWidth !== thisStyle.strokeWidth || prevStyle.fontSize !== thisStyle.fontSize || prevStyle.fontFamily !== thisStyle.fontFamily || prevStyle.fontWeight !== thisStyle.fontWeight || prevStyle.fontStyle !== thisStyle.fontStyle || prevStyle.textDecorationThickness !== thisStyle.textDecorationThickness || prevStyle.textDecorationColor !== thisStyle.textDecorationColor || prevStyle.textBackgroundColor !== thisStyle.textBackgroundColor || prevStyle.deltaY !== thisStyle.deltaY || forTextSpans && (prevStyle.overline !== thisStyle.overline || prevStyle.underline !== thisStyle.underline || prevStyle.linethrough !== thisStyle.linethrough);
 /**
 * Returns the array form of a text object's inline styles property with styles grouped in ranges
 * rather than per character. This format is less verbose, and is better suited for storage
@@ -15079,7 +15083,8 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 	* @return {String}
 	*/
 	getSvgStyles(skipShadow) {
-		return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed(this.textDecorationThickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; white-space: pre;`;
+		const objectLevelTextDecorationColor = this["textDecorationColor"] ? ` text-decoration-color: ${escapeXml(this[TEXT_DECORATION_COLOR])};` : "";
+		return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed(this.textDecorationThickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%;${objectLevelTextDecorationColor} white-space: pre;`;
 	}
 	/**
 	* Returns styles-string for svg-export
@@ -15088,13 +15093,14 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 	* @return {String}
 	*/
 	getSvgSpanStyles(style, useWhiteSpace) {
-		const { fontFamily, strokeWidth, stroke, fill, fontSize, fontStyle, fontWeight, textDecorationThickness, linethrough, overline, underline } = style;
+		const { fontFamily, strokeWidth, stroke, fill, fontSize, fontStyle, fontWeight, textDecorationThickness, textDecorationColor, linethrough, overline, underline } = style;
 		const textDecoration = this.getSvgTextDecoration({
 			underline: underline ?? this.underline,
 			overline: overline ?? this.overline,
 			linethrough: linethrough ?? this.linethrough
 		});
-		const thickness = textDecorationThickness || this.textDecorationThickness;
+		const thickness = textDecorationThickness || this["textDecorationThickness"];
+		const decorationColor = textDecorationColor || this["textDecorationColor"];
 		return [
 			stroke ? colorPropToSVG(STROKE, stroke) : "",
 			strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : "",
@@ -15102,7 +15108,7 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 			fontSize ? `font-size: ${escapeXml(fontSize)}px; ` : "",
 			fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : "",
 			fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : "",
-			textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : "",
+			textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%;${decorationColor ? ` text-decoration-color: ${escapeXml(decorationColor)};` : ""} ` : "",
 			fill ? colorPropToSVG(FILL, fill) : "",
 			useWhiteSpace ? "white-space: pre; " : ""
 		].join("");
@@ -15930,9 +15936,11 @@ var FabricText = class FabricText extends StyledText {
 			let boxWidth = 0;
 			let lastDecoration = this.getValueOfPropertyAt(i, 0, type);
 			let lastFill = this.getValueOfPropertyAt(i, 0, FILL);
+			let lastDecorationColor = this.getValueOfPropertyAt(i, 0, "textDecorationColor") || lastFill;
 			let lastTickness = this.getValueOfPropertyAt(i, 0, TEXT_DECORATION_THICKNESS);
 			let currentDecoration = lastDecoration;
 			let currentFill = lastFill;
+			let currentDecorationColor = lastDecorationColor;
 			let currentTickness = lastTickness;
 			const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
 			let size = this.getHeightOfChar(i, 0);
@@ -15941,28 +15949,30 @@ var FabricText = class FabricText extends StyledText {
 				const charBox = this.__charBounds[i][j];
 				currentDecoration = this.getValueOfPropertyAt(i, j, type);
 				currentFill = this.getValueOfPropertyAt(i, j, FILL);
+				currentDecorationColor = this.getValueOfPropertyAt(i, j, "textDecorationColor") || currentFill;
 				currentTickness = this.getValueOfPropertyAt(i, j, TEXT_DECORATION_THICKNESS);
 				const currentSize = this.getHeightOfChar(i, j);
 				const currentDy = this.getValueOfPropertyAt(i, j, "deltaY");
 				if (path && currentDecoration && currentFill) {
 					const finalTickness = this.fontSize * currentTickness / 1e3;
 					ctx.save();
-					ctx.fillStyle = lastFill;
+					ctx.fillStyle = currentDecorationColor;
 					ctx.translate(charBox.renderLeft, charBox.renderTop);
 					ctx.rotate(charBox.angle);
 					ctx.fillRect(-charBox.kernedWidth / 2, offsetY * currentSize + currentDy - offsetAligner * finalTickness, charBox.kernedWidth, finalTickness);
 					ctx.restore();
-				} else if ((currentDecoration !== lastDecoration || currentFill !== lastFill || currentSize !== size || currentTickness !== lastTickness || currentDy !== dy) && boxWidth > 0) {
+				} else if ((currentDecoration !== lastDecoration || currentFill !== lastFill || currentDecorationColor !== lastDecorationColor || currentSize !== size || currentTickness !== lastTickness || currentDy !== dy) && boxWidth > 0) {
 					const finalTickness = this.fontSize * lastTickness / 1e3;
 					let drawStart = leftOffset + lineLeftOffset + boxStart;
 					if (this.direction === "rtl") drawStart = this.width - drawStart - boxWidth;
-					if (lastDecoration && lastFill && lastTickness) {
-						ctx.fillStyle = lastFill;
+					if (lastDecoration && lastDecorationColor && lastTickness) {
+						ctx.fillStyle = lastDecorationColor;
 						ctx.fillRect(drawStart, top + offsetY * size + dy - offsetAligner * finalTickness, boxWidth, finalTickness);
 					}
 					boxStart = charBox.left;
 					boxWidth = charBox.width;
 					lastDecoration = currentDecoration;
+					lastDecorationColor = currentDecorationColor;
 					lastTickness = currentTickness;
 					lastFill = currentFill;
 					size = currentSize;
@@ -15971,9 +15981,9 @@ var FabricText = class FabricText extends StyledText {
 			}
 			let drawStart = leftOffset + lineLeftOffset + boxStart;
 			if (this.direction === "rtl") drawStart = this.width - drawStart - boxWidth;
-			ctx.fillStyle = currentFill;
+			ctx.fillStyle = currentDecorationColor;
 			const finalTickness = this.fontSize * currentTickness / 1e3;
-			currentDecoration && currentFill && currentTickness && ctx.fillRect(drawStart, top + offsetY * size + dy - offsetAligner * finalTickness, boxWidth - charSpacing, finalTickness);
+			currentDecoration && currentDecorationColor && currentTickness && ctx.fillRect(drawStart, top + offsetY * size + dy - offsetAligner * finalTickness, boxWidth - charSpacing, finalTickness);
 			topOffset += heightOfLine;
 		}
 		this._removeShadow(ctx);
@@ -16096,7 +16106,7 @@ var FabricText = class FabricText extends StyledText {
 	* List of attribute names to account for when parsing SVG element (used by {@link FabricText.fromElement})
 	* @see: http://www.w3.org/TR/SVG/text.html#TextElement
 	*/
-	static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat("x", "y", "dx", "dy", "font-family", "font-style", "font-weight", "font-size", "letter-spacing", "text-decoration", "text-anchor");
+	static ATTRIBUTE_NAMES = SHARED_ATTRIBUTES.concat("x", "y", "dx", "dy", "font-family", "font-style", "font-weight", "font-size", "letter-spacing", "text-decoration", "text-decoration-thickness", "text-decoration-color", "text-anchor");
 	/**
 	* Returns FabricText instance from an SVG element (<b>not yet implemented</b>)
 	* @param {HTMLElement} element Element to parse
