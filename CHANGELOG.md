@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @rollup/plugin-terser from 0.4.4 to 1.0.0 [#10886](https://github.com/fabricjs/fabric.js/pull/10886)
 - feat(): Support textDecoration color. [#10880](https://github.com/fabricjs/fabric.js/pull/10880)
 - feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
