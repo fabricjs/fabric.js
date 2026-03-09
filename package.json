@@ -75,7 +75,7 @@
     "@playwright/test": "^1.58.1",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-terser": "^1.0.0",
     "@rollup/plugin-typescript": "^12.1.4",
     "@types/jsdom": "^21.1.7",
     "@types/micromatch": "^4.0.9",
