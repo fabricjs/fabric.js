@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump semver from 7.7.3 to 7.7.4 [#10882](https://github.com/fabricjs/fabric.js/pull/10882)
 - feat(): Support textDecoration color. [#10880](https://github.com/fabricjs/fabric.js/pull/10880)
 - feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
