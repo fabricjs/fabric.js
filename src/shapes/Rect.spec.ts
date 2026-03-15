@@ -4,10 +4,8 @@ import { Rect } from './Rect';
 import { FabricObject } from './Object/FabricObject';
 import { Gradient } from '../gradient';
 import { Pattern } from '../Pattern';
-// will require some kind of handling here
-import { getEnv } from '../env';
 import { loadSVGFromString } from '../parser/loadSVGFromString';
-import { createReferenceObject } from '../../test/utils';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
 
 const REFERENCE_RECT = createReferenceObject('Rect', {
   rx: 0,
@@ -20,7 +18,7 @@ describe('Rect', () => {
 
     expect(rect).toBeInstanceOf(Rect);
     expect(rect, 'Inherits from FabricObject').toBeInstanceOf(FabricObject);
-    expect(rect.constructor.type).toBe('Rect');
+    expect(rect.constructor).toHaveProperty('type', 'Rect');
   });
 
   it('cache properties', function () {
@@ -79,40 +77,30 @@ describe('Rect', () => {
   });
 
   it('Rect.fromElement', async () => {
-    const elRect = getEnv().document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'rect',
-    );
+    const elRect = createSVGElement('rect');
     const rect = await Rect.fromElement(elRect);
     expect(rect).toBeInstanceOf(Rect);
     expect(rect.toObject()).toEqual({ ...REFERENCE_RECT, visible: false });
   });
 
   it('fromElement with custom attributes', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elRectWithAttrs = getEnv().document.createElementNS(
-      namespace,
-      'rect',
-    );
-    elRectWithAttrs.setAttributeNS(namespace, 'x', '10');
-    elRectWithAttrs.setAttributeNS(namespace, 'y', '20');
-    elRectWithAttrs.setAttributeNS(namespace, 'width', '222');
-    elRectWithAttrs.setAttributeNS(namespace, 'height', '333');
-    elRectWithAttrs.setAttributeNS(namespace, 'rx', '11');
-    elRectWithAttrs.setAttributeNS(namespace, 'ry', '12');
-    elRectWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
-    elRectWithAttrs.setAttributeNS(namespace, 'opacity', '0.45');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-width', '3');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-    elRectWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
-    elRectWithAttrs.setAttributeNS(
-      namespace,
-      'vector-effect',
-      'non-scaling-stroke',
-    );
+    const elRectWithAttrs = createSVGElement('rect', {
+      x: 10,
+      y: 20,
+      width: 222,
+      height: 333,
+      rx: 11,
+      ry: 12,
+      fill: 'rgb(255,255,255)',
+      opacity: 0.45,
+      stroke: 'blue',
+      'stroke-width': 3,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+      'vector-effect': 'non-scaling-stroke',
+    });
     const rectWithAttrs = await Rect.fromElement(elRectWithAttrs);
     expect(rectWithAttrs).toBeInstanceOf(Rect);
     expect(rectWithAttrs.strokeUniform, 'strokeUniform is parsed').toBe(true);
