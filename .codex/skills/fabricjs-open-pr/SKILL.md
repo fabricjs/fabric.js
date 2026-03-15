@@ -85,11 +85,16 @@ git checkout <working-branch>
 git merge master
 ```
 
-If merge conflicts exist, resolve them before continuing. 5. Predict next PR number. 6. Update `CHANGELOG.md` `[next]` line with predicted number and title. 7. Commit and push changelog/title-related edits. 8. Create PR with `gh pr create --base <base> --head <branch> --title "<title>" --body-file <file>`. 9. Fetch actual PR number. 10. If actual number differs from prediction:
-
-- Update the changelog line to actual number/link.
-- Commit and push the correction.
-- Optionally update PR body with a short note if needed.
+5. If merge conflicts exist, resolve them before continuing.
+6. Predict next PR number.
+7. Update `CHANGELOG.md` `[next]` line with predicted number and title.
+8. Commit and push changelog/title-related edits.
+9. Create PR with `gh pr create --base <base> --head <branch> --title "<title>" --body-file <file>`.
+10. Fetch actual PR number.
+11. If actual number differs from prediction:
+    - Update the changelog line to actual number/link.
+    - Commit and push the correction.
+    - Optionally update PR body with a short note if needed.
 
 ## Verification Checklist
 
