@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(): simplify svg creation in unit tests via shared helper [#10895](https://github.com/fabricjs/fabric.js/pull/10895)
+- ci(): fix the coverage comment action [#10898](https://github.com/fabricjs/fabric.js/pull/10898)
+- chore(): try to improve playwright tests speed [#10896](https://github.com/fabricjs/fabric.js/pull/10896)
 - chore: simplify issue templates and remove semver devDependency [#10892](https://github.com/fabricjs/fabric.js/pull/10892)
 - chore(deps-dev): bump nyc from 17.1.0 to 18.0.0 [#10883](https://github.com/fabricjs/fabric.js/pull/10883)
 - chore(deps-dev): bump @playwright/test from 1.58.1 to 1.58.2 [#10885](https://github.com/fabricjs/fabric.js/pull/10885)

@@ -32,7 +32,7 @@ jobs:
       - name: Create prnumber artifact
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: prnumber
           path: ./prnumber.txt
@@ -49,7 +49,7 @@ jobs:
       - name: Create the artifact for stats
         run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
       - name: Upload Pr stats
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: prstats
           path: ./prstats.txt
