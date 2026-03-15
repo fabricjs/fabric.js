@@ -49,6 +49,13 @@ jobs:
           name: coverage-vitest
           path: ./.nyc_output/*.json
           include-hidden-files: true
+      - name: Upload Sonarqube coverage
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        if: always()
+        with:
+          name: coverage-vitest-sonarqube
+          path: ./.nyc_output/lcov.info
+          include-hidden-files: true
   vitest-browser:
     name: Vitest tests ${{matrix.browser}}
     runs-on: ubuntu-24.04
