@@ -12,7 +12,7 @@ import {
   Textbox,
 } from '../../../fabric';
 import { toFixed } from '../../util';
-import { createReferenceObject } from '../../../test/utils';
+import { createReferenceObject, createSVGElement } from '../../../test/utils';
 
 const CHAR_WIDTH = 20;
 
@@ -346,31 +346,27 @@ describe('FabricText', () => {
 
   it('fromElement with custom attributes', async () => {
     config.configure({ NUM_FRACTION_DIGITS: 2 });
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elTextWithAttrs = getFabricDocument().createElementNS(
-      namespace,
-      'text',
-    );
-
+    const elTextWithAttrs = createSVGElement('text', {
+      x: 10,
+      y: 20,
+      fill: 'rgb(255,255,255)',
+      opacity: 0.45,
+      stroke: 'blue',
+      'stroke-width': 3,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+      'font-family': 'Monaco',
+      'font-style': 'italic',
+      'font-weight': 'bold',
+      'font-size': 123,
+      'letter-spacing': '1em',
+      'text-decoration': 'underline',
+      'text-decoration-color': 'green',
+      'text-anchor': 'middle',
+    });
     elTextWithAttrs.textContent = 'x';
-    elTextWithAttrs.setAttributeNS(namespace, 'x', String(10));
-    elTextWithAttrs.setAttributeNS(namespace, 'y', String(20));
-    elTextWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
-    elTextWithAttrs.setAttributeNS(namespace, 'opacity', String(0.45));
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', String(3));
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', String(5));
-    elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
-    elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
-    elTextWithAttrs.setAttributeNS(namespace, 'font-weight', 'bold');
-    elTextWithAttrs.setAttributeNS(namespace, 'font-size', '123');
-    elTextWithAttrs.setAttributeNS(namespace, 'letter-spacing', '1em');
-    elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
-    elTextWithAttrs.setAttributeNS(namespace, 'text-decoration-color', 'green');
-    elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
     const textWithAttrs = await FabricText.fromElement(elTextWithAttrs);
 
@@ -694,10 +690,10 @@ describe('FabricText', () => {
     text.initDimensions();
     text2.initDimensions();
 
-    const fothCache = cache.getFontCache(text);
+    const fontCache = cache.getFontCache(text);
     const cache2 = cache.getFontCache(text2);
 
-    expect(fothCache, 'you get the same cache').toBe(cache2);
+    expect(fontCache, 'you get the same cache').toBe(cache2);
   });
 
   it('getSelectionStyles with no arguments', () => {

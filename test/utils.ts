@@ -1,5 +1,19 @@
 import type { TPointerEvent } from '../src/EventTypeDefs';
+import { getFabricDocument } from '../fabric';
 import { version } from '../package.json';
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+export function createSVGElement(
+  tag: string,
+  attrs: Record<string, string | number> = {},
+): SVGElement {
+  const el = getFabricDocument().createElementNS(SVG_NS, tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    el.setAttribute(key, String(value));
+  }
+  return el;
+}
 
 const BASE_OBJECT_PROPS = {
   version,

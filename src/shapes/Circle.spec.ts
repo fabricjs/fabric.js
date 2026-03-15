@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { Circle } from './Circle';
 import { FabricObject } from './Object/FabricObject';
-import { getFabricDocument, version } from '../../fabric';
-import { createReferenceObject } from '../../test/utils';
+import { version } from '../../fabric';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
 
 const REFERENCE_CIRCLE = createReferenceObject('Circle', {
   radius: 0,
@@ -183,65 +183,42 @@ describe('Circle', () => {
   it('fromElement', async () => {
     expect(Circle.fromElement).toBeTypeOf('function');
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elCircle = getFabricDocument().createElementNS(namespace, 'circle'),
-      radius = 10,
-      left = 12,
-      top = 15,
-      fill = 'ff5555',
-      opacity = 0.5,
-      strokeWidth = 2,
-      strokeDashArray = [5, 2],
-      strokeLineCap = 'round',
-      strokeLineJoin = 'bevel',
-      strokeMiterLimit = 5;
-
-    elCircle.setAttributeNS(namespace, 'r', String(radius));
-    elCircle.setAttributeNS(namespace, 'cx', String(left));
-    elCircle.setAttributeNS(namespace, 'cy', String(top));
-    elCircle.setAttributeNS(namespace, 'fill', fill);
-    elCircle.setAttributeNS(namespace, 'opacity', String(opacity));
-    elCircle.setAttributeNS(namespace, 'stroke-width', String(strokeWidth));
-    elCircle.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elCircle.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
-    elCircle.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
-    elCircle.setAttributeNS(
-      namespace,
-      'stroke-miterlimit',
-      String(strokeMiterLimit),
-    );
+    const elCircle = createSVGElement('circle', {
+      r: 10,
+      cx: 12,
+      cy: 15,
+      fill: 'ff5555',
+      opacity: 0.5,
+      'stroke-width': 2,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+    });
 
     // @ts-expect-error -- svg circle element is not an HTMLElement
     const oCircle = await Circle.fromElement(elCircle, {});
     expect(oCircle).toBeInstanceOf(Circle);
-    expect(oCircle.get('radius')).toBe(radius);
-    expect(oCircle.get('left')).toBe(left - radius);
-    expect(oCircle.get('top')).toBe(top - radius);
-    expect(oCircle.get('fill')).toBe(fill);
-    expect(oCircle.get('opacity')).toBe(opacity);
-    expect(oCircle.get('strokeWidth')).toBe(strokeWidth);
-    expect(oCircle.get('strokeDashArray')).toStrictEqual(strokeDashArray);
-    expect(oCircle.get('strokeLineCap')).toBe(strokeLineCap);
-    expect(oCircle.get('strokeLineJoin')).toBe(strokeLineJoin);
-    expect(oCircle.get('strokeMiterLimit')).toBe(strokeMiterLimit);
+    expect(oCircle.get('radius')).toBe(10);
+    expect(oCircle.get('left')).toBe(2);
+    expect(oCircle.get('top')).toBe(5);
+    expect(oCircle.get('fill')).toBe('ff5555');
+    expect(oCircle.get('opacity')).toBe(0.5);
+    expect(oCircle.get('strokeWidth')).toBe(2);
+    expect(oCircle.get('strokeDashArray')).toStrictEqual([5, 2]);
+    expect(oCircle.get('strokeLineCap')).toBe('round');
+    expect(oCircle.get('strokeLineJoin')).toBe('bevel');
+    expect(oCircle.get('strokeMiterLimit')).toBe(5);
 
     {
-      const elFaultyCircle = getFabricDocument().createElementNS(
-        namespace,
-        'circle',
-      );
-      elFaultyCircle.setAttributeNS(namespace, 'r', '-10');
+      const elFaultyCircle = createSVGElement('circle', { r: -10 });
       // @ts-expect-error -- svg circle element is not an HTMLElement
       const circle = await Circle.fromElement(elFaultyCircle, {});
       expect(circle.radius, 'radius will default to -10').toBe(-10);
     }
 
     {
-      const elFaultyCircle = getFabricDocument().createElementNS(
-        namespace,
-        'circle',
-      );
-      elFaultyCircle.removeAttribute('r');
+      const elFaultyCircle = createSVGElement('circle');
       // @ts-expect-error -- svg circle element is not an HTMLElement
       const circle = await Circle.fromElement(elFaultyCircle, {});
       expect(circle.radius, 'radius will default to 0').toBe(0);
