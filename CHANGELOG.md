@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
 - docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
 - refactor(tests): use createSVGElement helper across spec files [#10902](https://github.com/fabricjs/fabric.js/pull/10902)
 - chore(): simplify svg creation in unit tests via shared helper [#10895](https://github.com/fabricjs/fabric.js/pull/10895)

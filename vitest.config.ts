@@ -88,7 +88,7 @@ export default defineConfig({
     ],
     coverage: {
       reportsDirectory: '.nyc_output',
-      reporter: ['json', 'text'],
+      reporter: ['json', 'text', 'lcov'],
       exclude: [
         'test/**',
         'dist/**',
