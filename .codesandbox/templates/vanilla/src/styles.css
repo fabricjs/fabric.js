@@ -1,3 +1,281 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f5f5;
+  font-size: 13px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 12px;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.canvas-area {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+  background: #e8e8e8;
+}
+
+#canvas {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+aside {
+  width: 180px;
+  background: #fff;
+  border-left: 1px solid #e0e0e0;
+  padding: 12px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+
+footer {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  font-size: 11px;
+  color: #666;
+}
+
+kbd {
+  background: #f0f0f0;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 10px;
+}
+
+button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+button:hover {
+  background: #f5f5f5;
+}
+
+#addTable {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+#addTable:hover {
+  background: #1d4ed8;
+}
+
+.panel {
+  margin-bottom: 12px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.panel-header .info {
+  font-weight: normal;
+  color: #888;
+  font-size: 11px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 12px 0 6px;
+}
+
+.section-label:first-of-type {
+  margin-top: 0;
+}
+
+.button-row {
+  display: flex;
+  gap: 4px;
+}
+
+.button-row button {
+  flex: 1;
+}
+
+.button-group {
+  display: flex;
+  gap: 2px;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 4px 8px;
+}
+
+.hint {
+  font-size: 10px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.toggle.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.origin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.origin-btn {
+  aspect-ratio: 1;
+  padding: 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.origin-btn.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-group label > span:first-child {
+  width: 50px;
+  color: #666;
+  font-size: 11px;
+}
+
+.control-group input[type="range"] {
+  flex: 1;
+  height: 4px;
+}
+
+.control-group input[type="color"] {
+  flex: 1;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.control-group label > span:last-child:not(:first-child) {
+  width: 16px;
+  text-align: right;
+  color: #888;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.checkbox-label {
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin: 0;
+}
+
+.checkbox-label span {
+  width: auto !important;
+}
+
+.danger {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.danger:hover {
+  background: #fef2f2;
+}
+
+.danger-text {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
+.danger-text:hover {
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#emptyState {
+  color: #888;
+  text-align: center;
+  padding: 32px 0;
+}
+
+#zoomLevel {
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
 }
