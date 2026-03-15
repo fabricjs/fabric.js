@@ -549,4 +549,49 @@ export const zSvgExport: renderTestType[] = [
       canvas.add(path);
     },
   },
+  {
+    title: 'Text deltay export',
+    golden: 'text_deltay.png',
+    percentage: 0.06,
+    size: [360, 40], // <= pick an appropriate size for your canvas depending how large is the object you test, you can go over, but do not exagerate, too many white pixels not a good test
+    async renderFunction(canvas, fabric) {
+      // you have a canvas and the fabric import in this function, write your test code
+      // just create a text object with a DY in the style so obvious that can be seen easily
+      // add more than just one negative and one positive, nest it if possible
+      const text = new fabric.FabricText('TESTING SVG DELTAY', {
+        top: 20,
+        left: 180,
+        styles: {
+          0: {
+            12: {
+              deltaY: -10,
+              fontSize: 25,
+            },
+            13: {
+              deltaY: -10,
+              fontSize: 25,
+            },
+            14: {
+              deltaY: -10,
+              fontSize: 25,
+            },
+            15: {
+              deltaY: -10,
+              fontSize: 25,
+            },
+            16: {
+              deltaY: -10,
+              fontSize: 25,
+            },
+            17: {
+              deltaY: -10,
+              fontSize: 25,
+            },
+          },
+        },
+      });
+      canvas.add(text);
+      canvas.centerObject(text);
+    },
+  },
 ];

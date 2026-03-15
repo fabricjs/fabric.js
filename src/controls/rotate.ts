@@ -43,11 +43,7 @@ const rotateObjectWithSnapping: TransformActionHandler = (
   x,
   y,
 ) => {
-  const pivotPoint = target.translateToOriginPoint(
-    target.getRelativeCenterPoint(),
-    originX,
-    originY,
-  );
+  const pivotPoint = target.getPositionByOrigin(originX, originY);
 
   if (isLocked(target, 'lockRotation')) {
     return false;

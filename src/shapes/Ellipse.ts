@@ -7,6 +7,7 @@ import { FabricObject, cacheProperties } from './Object/FabricObject';
 import type { FabricObjectProps, SerializedObjectProps } from './Object/types';
 import type { ObjectEvents } from '../EventTypeDefs';
 import type { CSSRules } from '../parser/typedefs';
+import { escapeXml } from '../util/lang_string';
 
 export const ellipseDefaultValues: Partial<TClassProperties<Ellipse>> = {
   rx: 0,
@@ -19,18 +20,17 @@ interface UniqueEllipseProps {
 }
 
 export interface SerializedEllipseProps
-  extends SerializedObjectProps,
-    UniqueEllipseProps {}
+  extends SerializedObjectProps, UniqueEllipseProps {}
 
 export interface EllipseProps extends FabricObjectProps, UniqueEllipseProps {}
 
 const ELLIPSE_PROPS = ['rx', 'ry'] as const;
 
 export class Ellipse<
-    Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
-    SProps extends SerializedEllipseProps = SerializedEllipseProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<EllipseProps> = Partial<EllipseProps>,
+  SProps extends SerializedEllipseProps = SerializedEllipseProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends FabricObject<Props, SProps, EventSpec>
   implements EllipseProps
 {
@@ -128,7 +128,7 @@ export class Ellipse<
     return [
       '<ellipse ',
       'COMMON_PARTS',
-      `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`,
+      `cx="0" cy="0" rx="${escapeXml(this.rx)}" ry="${escapeXml(this.ry)}" />\n`,
     ];
   }
 

@@ -39,7 +39,11 @@ export class ObjectUtil<T extends FabricObject = FabricObject> {
   }
 
   getObjectCenter() {
-    return this.executeInBrowser((object) => object.getCenterPoint(), null);
+    return this.executeInBrowser(
+      (object) =>
+        object.getCenterPoint().transform(object.canvas!.viewportTransform),
+      null,
+    );
   }
 
   getObjectCoords() {

@@ -2,7 +2,6 @@ import { FabricNamespace, renderTestType } from '../../../types';
 
 function registerUbuntuFonts() {
   if (typeof window === 'undefined') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { registerFont } = require('canvas');
     const path = require('node:path');
     const dir = path.resolve(__dirname + '/../../../../../test/fixtures/');
@@ -1011,28 +1010,130 @@ const cases: renderTestType[] = [
         scaleY: 3,
         styles: {
           0: {
-            0: { fill: 'red', textDecorationThickness: 90 },
-            1: { fill: 'red', textDecorationThickness: 90 },
-            2: { fill: 'blue', overline: true, textDecorationThickness: 90 },
-            3: { fill: 'blue', overline: true, textDecorationThickness: 140 },
-            4: { fill: 'green', overline: true, textDecorationThickness: 140 },
-            5: { fill: 'green', textDecorationThickness: 190 },
+            0: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            1: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            2: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 90,
+              textDecorationColor: 'purple',
+            },
+            3: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 140,
+              textDecorationColor: 'cyan',
+            },
+            4: {
+              fill: 'green',
+              overline: true,
+              textDecorationThickness: 140,
+            },
+            5: {
+              fill: 'green',
+              textDecorationThickness: 190,
+              textDecorationColor: 'black',
+            },
             6: { fill: 'black', textDecorationThickness: 20 },
             7: { fill: 'black', textDecorationThickness: 20 },
             8: { fill: 'yellow', textDecorationThickness: 20 },
           },
           1: {
-            0: { fill: 'red', textDecorationThickness: 90 },
-            1: { fill: 'red', textDecorationThickness: 90 },
-            2: { fill: 'blue', overline: true, textDecorationThickness: 90 },
-            3: { fill: 'blue', overline: true, textDecorationThickness: 140 },
+            0: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            1: {
+              fill: 'red',
+              textDecorationThickness: 90,
+              textDecorationColor: 'orange',
+            },
+            2: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 90,
+              textDecorationColor: 'purple',
+            },
+            3: {
+              fill: 'blue',
+              overline: true,
+              textDecorationThickness: 140,
+              textDecorationColor: 'cyan',
+            },
             4: { fill: 'green', overline: true, textDecorationThickness: 140 },
-            5: { fill: 'purple', overline: true, textDecorationThickness: 190 },
+            5: {
+              fill: 'purple',
+              overline: true,
+              textDecorationThickness: 190,
+              textDecorationColor: 'black',
+            },
           },
         },
       });
       text2.positionByLeftTop(new fabric.Point(0, 0));
       canvas.add(text2);
+    },
+  },
+  {
+    title: 'Text with edge case lineHeight values (0 and 0.01)',
+    golden: 'textLineHeightEdgeCases.png',
+    percentage: 0.03,
+    size: [400, 300],
+    async renderFunction(canvas, fabric) {
+      // overlaps letters because of small line height
+      const text1 = new fabric.Textbox('x\nd\ng\no', {
+        lineHeight: 0.01,
+        fill: 'blue',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(255,0,0,0.1)',
+      });
+      text1.positionByLeftTop(new fabric.Point(0, 5));
+
+      // Reproducer of the bug: text with lineHeight 0 disappears
+      // letters should also overlap
+      const text2 = new fabric.Textbox('x\nd\ng\no', {
+        lineHeight: 0,
+        fill: 'red',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,0,0.1)',
+      });
+      text2.positionByLeftTop(new fabric.Point(100, 5));
+
+      // reference text with normal lineHeight for comparison
+      const text3 = new fabric.Textbox('x\nd\ng\no', {
+        lineHeight: 1.16,
+        fill: 'green',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,255,0.1)',
+      });
+      text3.positionByLeftTop(new fabric.Point(250, 5));
+
+      const text4 = new fabric.Textbox('x\nd\ng', {
+        lineHeight: 2.5,
+        fill: 'red',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,0,0.1)',
+      });
+      text4.positionByLeftTop(new fabric.Point(175, 5));
+
+      const text5 = new fabric.Textbox('o\no\no\no\no\no', {
+        lineHeight: 0,
+        fill: 'rgba(255,0,0,0.1)',
+        fontSize: 60,
+        textBackgroundColor: 'rgba(0,255,0,0.1)',
+      });
+      text5.positionByLeftTop(new fabric.Point(0, 95));
+
+      canvas.add(text1, text2, text3, text4, text5);
     },
   },
 ];

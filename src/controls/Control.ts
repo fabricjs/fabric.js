@@ -6,18 +6,25 @@ import type {
 } from '../EventTypeDefs';
 import { Intersection } from '../Intersection';
 import { Point } from '../Point';
-import { SCALE } from '../constants';
+import { FILL, SCALE, STROKE } from '../constants';
 import type {
   InteractiveFabricObject,
   TOCoord,
 } from '../shapes/Object/InteractiveObject';
-import type { TCornerPoint, TDegree, TMat2D } from '../typedefs';
+import type {
+  TCornerPoint,
+  TDegree,
+  TMat2D,
+  TOriginX,
+  TOriginY,
+} from '../typedefs';
 import {
   createRotateMatrix,
   createScaleMatrix,
   createTranslateMatrix,
   multiplyTransformMatrixArray,
 } from '../util/misc/matrix';
+import { degreesToRadians } from '../util/misc/radiansDegreesConversion';
 import type { ControlRenderingStyleOverride } from './controlRendering';
 import { renderCircleControl, renderSquareControl } from './controlRendering';
 
@@ -142,8 +149,25 @@ export class Control {
    */
   withConnection = false;
 
+  declare transformAnchorPoint?: {
+    x: TOriginX;
+    y: TOriginY;
+  };
+
   constructor(options?: Partial<Control>) {
     Object.assign(this, options);
+  }
+
+  getTransformAnchorPoint(): {
+    x: TOriginX;
+    y: TOriginY;
+  } {
+    return (
+      // return the control transformAnchorPoint
+      this.transformAnchorPoint ??
+      // otherwise will return the opposite origin of where the control is located.
+      new Point(-this.x + 0.5, -this.y + 0.5)
+    );
   }
 
   /**
@@ -334,6 +358,51 @@ export class Control {
       tr: new Point(0.5, -0.5).transform(t),
       br: new Point(0.5, 0.5).transform(t),
       bl: new Point(-0.5, 0.5).transform(t),
+    };
+  }
+
+  /**
+   * This is an helper method to prepare the canvas to render a control
+   * It detectes common control properties and sets the correct fill and
+   * stroke styles on the context. It does not execute translations or
+   * rotations since different controls need differnt combination of these.
+   */
+  commonRenderProps(
+    ctx: CanvasRenderingContext2D,
+    left: number,
+    top: number,
+    fabricObject: InteractiveFabricObject,
+    styleOverride: ControlRenderingStyleOverride = {},
+  ): {
+    stroke: boolean;
+    xSize: number;
+    ySize: number;
+    transparentCorners: boolean;
+    opName: 'stroke' | 'fill';
+  } {
+    const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } =
+        styleOverride,
+      sizeFromProps = cornerSize || fabricObject.cornerSize,
+      xSize = this.sizeX || sizeFromProps,
+      ySize = this.sizeY || sizeFromProps,
+      transparent =
+        typeof transparentCorners !== 'undefined'
+          ? transparentCorners
+          : fabricObject.transparentCorners,
+      opName = transparent ? STROKE : FILL,
+      strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
+      stroke = !transparent && !!strokeColor;
+    ctx.fillStyle = cornerColor || fabricObject.cornerColor || '';
+    ctx.strokeStyle = strokeColor || '';
+    ctx.translate(left, top);
+    //  angle is relative to canvas plane
+    ctx.rotate(degreesToRadians(fabricObject.getTotalAngle()));
+    return {
+      stroke,
+      xSize,
+      ySize,
+      transparentCorners: transparent,
+      opName,
     };
   }
 

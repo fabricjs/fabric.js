@@ -18,8 +18,9 @@ export const capitalize = (string: string, firstLetterOnly = false): string =>
  * @param {String} string String to escape
  * @return {String} Escaped version of a string
  */
-export const escapeXml = (string: string): string =>
-  string
+export const escapeXml = (stringOrNumber: string | number): string =>
+  stringOrNumber
+    .toString()
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')

@@ -176,11 +176,11 @@ export type DrawContext =
  * @fires drop
  */
 export class FabricObject<
-    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends ObjectGeometry<EventSpec>
   implements ObjectProps
 {
@@ -834,6 +834,7 @@ export class FabricObject<
     } else {
       this._renderBackground(ctx);
     }
+    this.fire('before:render', { ctx });
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
@@ -1456,11 +1457,7 @@ export class FabricObject<
     this.set('angle', angle);
 
     if (centeredRotation) {
-      const { x, y } = this.translateToOriginPoint(
-        this.getRelativeCenterPoint(),
-        originX,
-        originY,
-      );
+      const { x, y } = this.getPositionByOrigin(originX, originY);
       this.left = x;
       this.top = y;
       this.originX = originX;

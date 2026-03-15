@@ -692,6 +692,21 @@ describe('fabric.ObjectGeometry', () => {
     ]);
   });
 
+  it('calcOwnMatrix is cached', () => {
+    const cObj = new FabricObject({
+      width: 10,
+      height: 15,
+      strokeWidth: 0,
+      originX: LEFT,
+      originY: TOP,
+    });
+    cObj.scaleX = 2;
+    cObj.scaleY = 3;
+    const expectedMatrix = cObj.calcOwnMatrix();
+    expect(expectedMatrix).toEqual([2, 0, 0, 3, 10, 22.5]);
+    expect(cObj.calcOwnMatrix()).toBe(expectedMatrix);
+  });
+
   it('scaleToWidth', () => {
     const cObj = new FabricObject({ width: 560, strokeWidth: 0 });
     expect(cObj.scaleToWidth).toBeTypeOf('function');

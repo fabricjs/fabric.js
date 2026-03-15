@@ -172,10 +172,12 @@ exports[`Canvas event data > HTML event "dragenter" should fire a corresponding 
   [
     "drag:enter",
     {
+      "actualTarget": undefined,
       "dragSource": "Drag Target",
       "e": MouseEvent {
         "isTrusted": false,
       },
+      "previousActualTarget": undefined,
       "previousTarget": undefined,
       "scenePoint": Point {
         "x": -30,
@@ -244,12 +246,14 @@ exports[`Canvas event data > HTML event "dragover" should fire a corresponding c
   [
     "drag:enter",
     {
+      "actualTarget": undefined,
       "canDrop": false,
       "dragSource": "Drag Target",
       "dropTarget": undefined,
       "e": MouseEvent {
         "isTrusted": false,
       },
+      "previousActualTarget": undefined,
       "previousTarget": undefined,
       "scenePoint": Point {
         "x": -30,
@@ -570,9 +574,11 @@ exports[`Event targets > should fire mouse over/out events on target 1`] = `
   [
     "mouseover",
     {
+      "actualTarget": "target",
       "e": MouseEvent {
         "isTrusted": false,
       },
+      "previousActualTarget": undefined,
       "previousTarget": undefined,
       "scenePoint": Point {
         "x": 5,
@@ -607,9 +613,11 @@ exports[`Event targets > should fire mouse over/out events on target 1`] = `
   [
     "mouseout",
     {
+      "actualTarget": "target",
       "e": MouseEvent {
         "isTrusted": false,
       },
+      "nextActualTarget": undefined,
       "nextTarget": undefined,
       "scenePoint": Point {
         "x": 20,
@@ -649,9 +657,11 @@ exports[`Event targets > should fire mouse over/out events on target 2`] = `
   [
     "mouse:over",
     {
+      "actualTarget": "target",
       "e": MouseEvent {
         "isTrusted": false,
       },
+      "previousActualTarget": undefined,
       "previousTarget": undefined,
       "scenePoint": Point {
         "x": 5,
@@ -705,9 +715,11 @@ exports[`Event targets > should fire mouse over/out events on target 2`] = `
   [
     "mouse:out",
     {
+      "actualTarget": "target",
       "e": MouseEvent {
         "isTrusted": false,
       },
+      "nextActualTarget": undefined,
       "nextTarget": undefined,
       "scenePoint": Point {
         "x": 20,

@@ -9,6 +9,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default tseslint.config(
   {
     ignores: [
+      'dist/*',
+      'dist-extensions/*',
+      '.codesandbox/**/*',
+      'e2e/*',
       'src/mixins/eraser_brush.mixin.ts',
       'src/util/lang_class.ts',
       'src/parkinglot',
@@ -94,6 +98,21 @@ export default tseslint.config(
   {
     files: ['playwright.setup.ts'],
     rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    files: ['e2e/**/*.ts'],
+    languageOptions: {
+      parserOptions: {
+        project: 'e2e/tsconfig.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      'no-restricted-globals': 'off',
       'no-restricted-syntax': 'off',
     },
   },

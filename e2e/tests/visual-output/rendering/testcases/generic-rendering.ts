@@ -320,6 +320,24 @@ const canvasPattern: renderTestType = {
   },
 };
 
+const canvasPatternNearest: renderTestType = {
+  title: 'canvas with background pattern and export quality low',
+  golden: 'canvasPatternLow.png',
+  percentage: 0.09,
+  size: [500, 500],
+  async renderFunction(canvas, fabric) {
+    canvas.patternQuality = 'nearest';
+    const img = await globalThis.getImage(fabric, 'diet.jpeg');
+    canvas.backgroundColor = new fabric.Pattern({
+      source: img,
+      repeat: 'repeat',
+      offsetX: -120,
+      offsetY: 50,
+    });
+    canvas.renderAll();
+  },
+};
+
 const canvasPatternMultiplier: renderTestType = {
   title: 'canvas with background pattern and multiplier',
   golden: 'canvasPatternMultiplier.png',
@@ -630,6 +648,7 @@ export const genericRenderingTests = [
   objectsInActiveSelections,
   canvasPattern,
   canvasPatternMultiplier,
+  canvasPatternNearest,
   imageSmoothing,
   toCanvasElementAndControls,
   pathWithGradient,

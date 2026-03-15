@@ -25,10 +25,9 @@ const config: PlaywrightTestConfig = {
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 1 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 4 : undefined,
+  /* Retry once to get the video and trace for truly failing tests */
+  retries: 1,
+  workers: process.env.CI ? '100%' : undefined,
   /* Do not update snapshot on CI */
   updateSnapshots: process.env.CI ? 'none' : 'missing',
   /* Configure snapshot names to be the same across platforms for CI */
@@ -48,8 +47,8 @@ const config: PlaywrightTestConfig = {
     baseURL: 'http://localhost:8080',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'retain-on-failure',
-    video: process.env.CI ? 'retain-on-failure' : 'on',
+    trace: 'on-first-retry',
+    video: 'on-first-retry',
     screenshot: process.env.CI ? 'only-on-failure' : 'on',
     viewport: { width: 900, height: 700 },
   },

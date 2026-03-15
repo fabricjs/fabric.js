@@ -16,6 +16,25 @@ export async function setupApp(page: Page, file: string) {
   });
 
   await page.goto('/e2e/site');
+
+  // Provide CommonJS shim for westures
+  await page.addScriptTag({
+    content: `
+      window.module = { exports: {} };
+      window.exports = window.module.exports;
+    `,
+  });
+
+  // Load westures as a global module
+  await page.addScriptTag({
+    path: path.resolve(process.cwd(), 'node_modules/westures/dist/index.js'),
+  });
+
+  // Expose westures from module.exports
+  await page.evaluate(() => {
+    (window as any).westures = window.module.exports;
+  });
+
   // expose imports for consumption
   await page.addScriptTag({
     type: 'importmap',
@@ -62,22 +81,9 @@ export async function setupApp(page: Page, file: string) {
       `test script '${pathToBuiltApp}' not found: global setup script probably did not run`,
     );
   } else if (exists) {
-    // used to avoid a race condition that occurs because of script loading
-    const trigger = page.evaluate(
-      () =>
-        new Promise((resolve) => {
-          window.addEventListener('fabric:setup', resolve, { once: true });
-        }),
-    );
-    await page.addScriptTag({
-      type: 'module',
-      content: `${readFileSync(
-        path.relative(process.cwd(), pathToBuiltApp),
-      ).toString()}
-       window.dispatchEvent(new CustomEvent('fabric:setup'));
-       `,
-    });
-    await trigger;
+    const scriptUrl = `/${path.relative(process.cwd(), pathToBuiltApp).replaceAll('\\', '/')}`;
+    // addScriptTag with url resolves after the module is loaded and executed
+    await page.addScriptTag({ type: 'module', url: scriptUrl });
     await page.evaluate(() => window.__setupFabricHook());
   }
 }

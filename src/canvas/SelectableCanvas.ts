@@ -1,4 +1,3 @@
-import { dragHandler } from '../controls/drag';
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
 import { FabricObject } from '../shapes/Object/FabricObject';
@@ -51,6 +50,8 @@ import type { CanvasOptions } from './CanvasOptions';
 import { canvasDefaults } from './CanvasOptions';
 import { Intersection } from '../Intersection';
 import { isActiveSelection } from '../util/typeAssertions';
+import { dragHandler } from '../controls';
+import { type FabricImage } from '../shapes/Image';
 
 export type TargetsInfo = {
   target?: FabricObject;
@@ -230,6 +231,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * @private
    */
   declare _hoveredTarget?: FabricObject;
+
+  /**
+   * Keep track of the hovered target in the previous event with the shift key
+   * @type FabricObject | null
+   * @private
+   */
+  declare _hoveredActualTarget?: FabricObject;
 
   /**
    * hold the list of nested targets hovered in the previous events
@@ -564,6 +572,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    * Given the control clicked, determine the origin of the transform.
    * This is bad because controls can totally have custom names
    * should disappear before release 4.0
+   * Fabric 7.1, jan 2026 we are still using this.
+   * Needs to go.
    * @private
    * @deprecated
    */
@@ -571,15 +581,20 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     target: FabricObject,
     controlName: string,
   ): { x: TOriginX; y: TOriginY } {
-    const origin = {
-      x: target.originX,
-      y: target.originY,
-    };
+    const origin = controlName
+      ? target.controls[controlName].getTransformAnchorPoint()
+      : {
+          x: target.originX,
+          y: target.originY,
+        };
 
     if (!controlName) {
       return origin;
     }
 
+    // this part down here is deprecated.
+    // It is left to do not change the standard behavior in the middle of a major version
+    // but when possible `getTransformAnchorPoint` will be the only source of truth
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -626,37 +641,52 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       origin = this._shouldCenterTransform(target, action, altKey)
         ? ({ x: CENTER, y: CENTER } as const)
         : this._getOriginFromCorner(target, corner),
+      {
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+        left,
+        top,
+        angle,
+        width,
+        height,
+        cropX,
+        cropY,
+      } = target as FabricImage,
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform: Transform = {
-        target: target,
+        target,
         action,
         actionHandler,
         actionPerformed: false,
         corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+        offsetX: pointer.x - left,
+        offsetY: pointer.y - top,
         originX: origin.x,
         originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
+        theta: degreesToRadians(angle),
+        width,
+        height,
         shiftKey: e.shiftKey,
         altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
           originY: origin.y,
+          cropX,
+          cropY,
         },
       };
 
@@ -744,6 +774,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     const pointer = this.getScenePoint(e),
       activeObject = this._activeObject,
       aObjects = this.getActiveObjects(),
+      // searching a target in all possible objects means also avoiding the Active selection and check if
+      // you are over a target that  is behind the active selection.
       targetInfo = this.searchPossibleTargets(this._objects, pointer);
 
     const {
@@ -752,6 +784,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       target: currentTarget,
     } = targetInfo;
 
+    // fullTargetInfo is just a duplicated standard target that is good for the case of no active selection or no activeObject
+    // we prefer presenting the data twice rather than trying to understand in the code when the data will be available or not.
     const fullTargetInfo: FullTargetsInfoWithContainer = {
       ...targetInfo,
       currentSubTargets,
@@ -788,7 +822,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     // in case we are over the active object
     if (activeObjectTargetInfo.target) {
       if (aObjects.length > 1) {
-        // in case of active selection and target hit over the activeSelection, just exit
+        // in case of active selection and target hit over the activeSelection, currentTarget could contain
+        // the target below the active selection or in general the target that would be hit by the multi selection targeting.
         // TODO Verify if we need to override target with container
         return activeObjectTargetInfo;
       }

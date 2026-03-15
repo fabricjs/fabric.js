@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { Ellipse } from './Ellipse';
 import { FabricObject } from './Object/Object';
-import { getFabricDocument, version } from '../../fabric';
+import { version } from '../../fabric';
 import { sanitizeSVG } from '../../vitest.extend';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
+
+const REFERENCE_ELLIPSE = createReferenceObject('Ellipse', {
+  rx: 0,
+  ry: 0,
+});
 
 describe('Ellipse', () => {
   it('initializes constructor correctly', () => {
@@ -24,43 +30,8 @@ describe('Ellipse', () => {
 
   it('converts to object with correct properties', () => {
     const ellipse = new Ellipse();
-    const defaultProperties = {
-      version: version,
-      type: 'Ellipse',
-      originX: 'center',
-      originY: 'center',
-      left: 0,
-      top: 0,
-      width: 0,
-      height: 0,
-      fill: 'rgb(0,0,0)',
-      stroke: null,
-      strokeWidth: 1,
-      strokeDashArray: null,
-      strokeLineCap: 'butt',
-      strokeDashOffset: 0,
-      strokeLineJoin: 'miter',
-      strokeMiterLimit: 4,
-      scaleX: 1,
-      scaleY: 1,
-      angle: 0,
-      flipX: false,
-      flipY: false,
-      opacity: 1,
-      skewX: 0,
-      skewY: 0,
-      rx: 0,
-      ry: 0,
-      shadow: null,
-      visible: true,
-      backgroundColor: '',
-      fillRule: 'nonzero',
-      paintFirst: 'fill',
-      globalCompositeOperation: 'source-over',
-      strokeUniform: false,
-    };
     expect(ellipse.toObject).toBeTypeOf('function');
-    expect(ellipse.toObject()).toEqual(defaultProperties);
+    expect(ellipse.toObject()).toEqual(REFERENCE_ELLIPSE);
 
     ellipse.set('left', 100);
     ellipse.set('top', 200);
@@ -68,7 +39,7 @@ describe('Ellipse', () => {
     ellipse.set('ry', 25);
 
     expect(ellipse.toObject()).toEqual({
-      ...defaultProperties,
+      ...REFERENCE_ELLIPSE,
       left: 100,
       top: 200,
       rx: 15,
@@ -189,53 +160,37 @@ describe('Ellipse', () => {
   it('creates from SVG element correctly', async () => {
     expect(Ellipse.fromElement).toBeTypeOf('function');
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elEllipse = getFabricDocument().createElementNS(
-      namespace,
-      'ellipse',
-    ) as unknown as HTMLElement;
-    const rx = 5;
-    const ry = 7;
-    const left = 12;
-    const top = 15;
-    const fill = 'ff5555';
-    const opacity = 0.5;
-    const strokeWidth = 2;
-    const strokeDashArray = [5, 2];
-    const strokeLineCap = 'round';
-    const strokeLineJoin = 'bevel';
-    const strokeMiterLimit = 5;
+    const elEllipse = createSVGElement('ellipse', {
+      rx: 5,
+      ry: 7,
+      cx: 12,
+      cy: 15,
+      fill: 'ff5555',
+      opacity: 0.5,
+      'stroke-width': 2,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+    });
 
-    elEllipse.setAttributeNS(namespace, 'rx', String(rx));
-    elEllipse.setAttributeNS(namespace, 'ry', String(ry));
-    elEllipse.setAttributeNS(namespace, 'cx', String(left));
-    elEllipse.setAttributeNS(namespace, 'cy', String(top));
-    elEllipse.setAttributeNS(namespace, 'fill', fill);
-    elEllipse.setAttributeNS(namespace, 'opacity', String(opacity));
-    elEllipse.setAttributeNS(namespace, 'stroke-width', String(strokeWidth));
-    elEllipse.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elEllipse.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
-    elEllipse.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
-    elEllipse.setAttributeNS(
-      namespace,
-      'stroke-miterlimit',
-      String(strokeMiterLimit),
+    const oEllipse = await Ellipse.fromElement(
+      elEllipse as unknown as HTMLElement,
+      {},
     );
 
-    const oEllipse = await Ellipse.fromElement(elEllipse, {});
-
     expect(oEllipse).toBeInstanceOf(Ellipse);
-    expect(oEllipse.get('rx')).toBe(rx);
-    expect(oEllipse.get('ry')).toBe(ry);
-    expect(oEllipse.get('left')).toBe(left - rx);
-    expect(oEllipse.get('top')).toBe(top - ry);
-    expect(oEllipse.get('fill')).toBe(fill);
-    expect(oEllipse.get('opacity')).toBe(opacity);
-    expect(oEllipse.get('strokeWidth')).toBe(strokeWidth);
-    expect(oEllipse.get('strokeDashArray')).toEqual(strokeDashArray);
-    expect(oEllipse.get('strokeLineCap')).toBe(strokeLineCap);
-    expect(oEllipse.get('strokeLineJoin')).toBe(strokeLineJoin);
-    expect(oEllipse.get('strokeMiterLimit')).toBe(strokeMiterLimit);
+    expect(oEllipse.get('rx')).toBe(5);
+    expect(oEllipse.get('ry')).toBe(7);
+    expect(oEllipse.get('left')).toBe(7);
+    expect(oEllipse.get('top')).toBe(8);
+    expect(oEllipse.get('fill')).toBe('ff5555');
+    expect(oEllipse.get('opacity')).toBe(0.5);
+    expect(oEllipse.get('strokeWidth')).toBe(2);
+    expect(oEllipse.get('strokeDashArray')).toEqual([5, 2]);
+    expect(oEllipse.get('strokeLineCap')).toBe('round');
+    expect(oEllipse.get('strokeLineJoin')).toBe('bevel');
+    expect(oEllipse.get('strokeMiterLimit')).toBe(5);
   });
 
   it('creates from object correctly', async () => {

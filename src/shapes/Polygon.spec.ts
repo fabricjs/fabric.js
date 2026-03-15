@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { Point } from '../Point';
-import { getFabricDocument } from '../env';
-import { VERSION as version } from '../constants';
 import { Polygon } from './Polygon';
 import { Polyline } from './Polyline';
 import { FabricObject } from './Object/FabricObject';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
 
 function getPoints() {
   return [
@@ -13,40 +12,13 @@ function getPoints() {
   ];
 }
 
-const REFERENCE_OBJECT = {
-  version: version,
-  type: 'Polygon',
-  originX: 'center',
-  originY: 'center',
+const REFERENCE_OBJECT = createReferenceObject('Polygon', {
   left: 15,
   top: 17,
   width: 10,
   height: 10,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeLineCap: 'butt',
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
   points: getPoints(),
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
-  skewX: 0,
-  skewY: 0,
-  strokeUniform: false,
-} as const;
+});
 
 const REFERENCE_EMPTY_OBJECT = {
   points: [],
@@ -273,7 +245,7 @@ describe('Polygon', () => {
     expect(polygon.toSVG, 'toSVG should be a function').toBeTypeOf('function');
 
     const EXPECTED_SVG =
-      '<g transform="matrix(1 0 0 1 15 17)"  >\n<polygon style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  points="-5,-5 5,5 " />\n</g>\n';
+      '<g transform="matrix(1 0 0 1 15 17)"  >\n<polygon style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  points="-5,-5 5,5" />\n</g>\n';
 
     expect(polygon.toSVG(), 'SVG output should match expected').toBe(
       EXPECTED_SVG,
@@ -298,15 +270,9 @@ describe('Polygon', () => {
       'function',
     );
 
-    const elPolygonWithoutPoints = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'polygon',
-    );
-    elPolygonWithoutPoints.setAttributeNS(
-      'http://www.w3.org/2000/svg',
-      'stroke-width',
-      String(0),
-    );
+    const elPolygonWithoutPoints = createSVGElement('polygon', {
+      'stroke-width': 0,
+    });
 
     const polygon = await Polygon.fromElement(elPolygonWithoutPoints);
 
@@ -320,10 +286,7 @@ describe('Polygon', () => {
   });
 
   it('fromElement without points but strokeWidth', async () => {
-    const elPolygonWithoutPoints = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'polygon',
-    );
+    const elPolygonWithoutPoints = createSVGElement('polygon');
 
     const polygon = await Polygon.fromElement(elPolygonWithoutPoints);
 
@@ -338,13 +301,9 @@ describe('Polygon', () => {
   });
 
   it('fromElement with empty points', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolygonWithEmptyPoints = getFabricDocument().createElementNS(
-      namespace,
-      'polygon',
-    );
-
-    elPolygonWithEmptyPoints.setAttributeNS(namespace, 'points', '');
+    const elPolygonWithEmptyPoints = createSVGElement('polygon', {
+      points: '',
+    });
 
     const polygon = await Polygon.fromElement(elPolygonWithEmptyPoints);
 
@@ -359,10 +318,7 @@ describe('Polygon', () => {
   });
 
   it('fromElement with points', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolygon = getFabricDocument().createElementNS(namespace, 'polygon');
-
-    elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
+    const elPolygon = createSVGElement('polygon', { points: '10,12 20,22' });
 
     const polygon = await Polygon.fromElement(elPolygon);
 
@@ -381,11 +337,10 @@ describe('Polygon', () => {
   });
 
   it('fromElement with points no strokewidth', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolygon = getFabricDocument().createElementNS(namespace, 'polygon');
-
-    elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
-    elPolygon.setAttributeNS(namespace, 'stroke-width', String(0));
+    const elPolygon = createSVGElement('polygon', {
+      points: '10,12 20,22',
+      'stroke-width': 0,
+    });
 
     const polygon = await Polygon.fromElement(elPolygon);
 
@@ -405,30 +360,18 @@ describe('Polygon', () => {
   });
 
   it('fromElement with points and custom attributes', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolygonWithAttrs = getFabricDocument().createElementNS(
-      namespace,
-      'polygon',
-    );
-
-    elPolygonWithAttrs.setAttributeNS(
-      namespace,
-      'points',
-      '10,10 20,20 30,30 10,10',
-    );
-    elPolygonWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'opacity', '0.34');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-width', '3');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
-    elPolygonWithAttrs.setAttributeNS(
-      namespace,
-      'transform',
-      'translate(-10,-20) scale(2)',
-    );
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-    elPolygonWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
+    const elPolygonWithAttrs = createSVGElement('polygon', {
+      points: '10,10 20,20 30,30 10,10',
+      fill: 'rgb(255,255,255)',
+      opacity: 0.34,
+      'stroke-width': 3,
+      stroke: 'blue',
+      transform: 'translate(-10,-20) scale(2)',
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+    });
 
     const polygonWithAttrs = await Polygon.fromElement(elPolygonWithAttrs);
 

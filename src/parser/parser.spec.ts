@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Gradient } from '../gradient';
-import { loadSVGFromString, getFabricDocument, Path } from '../../fabric';
+import { loadSVGFromString, Path } from '../../fabric';
 import { Rect } from '../shapes/Rect';
 import { cos, sin } from '../util';
 import { parseAttributes } from './parseAttributes';
@@ -9,13 +9,10 @@ import { parseFontDeclaration } from './parseFontDeclaration';
 import { parsePointsAttribute } from './parsePointsAttribute';
 import { parseTransformAttribute } from './parseTransformAttribute';
 import { getCSSRules } from './getCSSRules';
+import { createSVGElement } from '../../test/utils';
 
 function makeElement() {
-  const element = getFabricDocument().createElementNS(
-    'http://www.w3.org/2000/svg',
-    'path',
-  );
-  const attributes = {
+  return createSVGElement('path', {
     cx: 101,
     x: 102,
     cy: 103,
@@ -24,11 +21,7 @@ function makeElement() {
     opacity: 0.45,
     'fill-rule': 'foo',
     'stroke-width': 4,
-  };
-  for (const [key, value] of Object.entries(attributes)) {
-    element.setAttribute(key, String(value));
-  }
-  return element;
+  });
 }
 
 describe('fabric.Parser', () => {
@@ -53,10 +46,10 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributesNoneValues', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttributeNS(namespace, 'fill', 'none');
-    element.setAttributeNS(namespace, 'stroke', 'none');
+    const element = createSVGElement('path', {
+      fill: 'none',
+      stroke: 'none',
+    });
 
     expect(parseAttributes(element, 'fill stroke'.split(' '))).toEqual({
       fill: '',
@@ -65,9 +58,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributesFillRule', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttributeNS(namespace, 'fill-rule', 'evenodd');
+    const element = createSVGElement('path', {
+      'fill-rule': 'evenodd',
+    });
 
     expect(parseAttributes(element, ['fill-rule'])).toEqual({
       fillRule: 'evenodd',
@@ -75,9 +68,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributesFillRuleWithoutTransformation', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttributeNS(namespace, 'fill-rule', 'inherit');
+    const element = createSVGElement('path', {
+      'fill-rule': 'inherit',
+    });
 
     expect(parseAttributes(element, ['fill-rule'])).toEqual({
       fillRule: 'inherit',
@@ -85,26 +78,21 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributesTransform', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttributeNS(namespace, 'transform', 'translate(5, 10)');
+    const element = createSVGElement('path', {
+      transform: 'translate(5, 10)',
+    });
     expect(parseAttributes(element, ['transform'])).toEqual({
       transformMatrix: [1, 0, 0, 1, 5, 10],
     });
   });
 
   it('parseAttributesWithParent', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    const parent = getFabricDocument().createElementNS(namespace, 'g');
-    const grandParent = getFabricDocument().createElementNS(namespace, 'g');
+    const element = createSVGElement('path', { x: '100' });
+    const parent = createSVGElement('g', { y: '200' });
+    const grandParent = createSVGElement('g', { fill: 'red' });
 
     parent.appendChild(element);
     grandParent.appendChild(parent);
-
-    element.setAttributeNS(namespace, 'x', '100');
-    parent.setAttributeNS(namespace, 'y', '200');
-    grandParent.setAttributeNS(namespace, 'fill', 'red');
 
     expect(parseAttributes(element, 'x y fill'.split(' '))).toEqual({
       fill: 'red',
@@ -114,18 +102,15 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributesWithGrandParentSvg', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    const parent = getFabricDocument().createElementNS(namespace, 'g');
-    const grandParent = getFabricDocument().createElementNS(namespace, 'svg');
+    const element = createSVGElement('path', { x: '100' });
+    const parent = createSVGElement('g', { y: '200' });
+    const grandParent = createSVGElement('svg', {
+      width: '600',
+      height: '600',
+    });
 
     parent.appendChild(element);
     grandParent.appendChild(parent);
-
-    element.setAttributeNS(namespace, 'x', '100');
-    parent.setAttributeNS(namespace, 'y', '200');
-    grandParent.setAttributeNS(namespace, 'width', '600');
-    grandParent.setAttributeNS(namespace, 'height', '600');
 
     expect(parseAttributes(element, 'x y width height'.split(' '))).toEqual({
       left: 100,
@@ -136,11 +121,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributeFontValueStartWithFontSize', () => {
-    const element = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path',
-    );
-    element.setAttribute('style', 'font: 15px arial, sans-serif;');
+    const element = createSVGElement('path', {
+      style: 'font: 15px arial, sans-serif;',
+    });
     const styleObj = parseAttributes(element, ['font']);
     const expectedObject = {
       font: '15px arial, sans-serif',
@@ -151,14 +134,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseStyleAttribute', () => {
-    const element = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path',
-    );
-    element.setAttribute(
-      'style',
-      'left:10px;top:22.3em;width:103.45pt;height:20%;',
-    );
+    const element = createSVGElement('path', {
+      style: 'left:10px;top:22.3em;width:103.45pt;height:20%;',
+    });
     const styleObj = parseStyleAttribute(element);
     // TODO: looks like this still fails with % values
     const expectedObject = {
@@ -171,11 +149,7 @@ describe('fabric.Parser', () => {
   });
 
   it('parseStyleAttribute with one pair', () => {
-    const element = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path',
-    );
-    element.setAttribute('style', 'left:10px');
+    const element = createSVGElement('path', { style: 'left:10px' });
 
     const expectedObject = {
       left: '10px',
@@ -184,11 +158,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseStyleAttribute with trailing spaces', () => {
-    const element = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path',
-    );
-    element.setAttribute('style', 'left:10px;  top:5px;  ');
+    const element = createSVGElement('path', {
+      style: 'left:10px;  top:5px;  ',
+    });
 
     const expectedObject = {
       left: '10px',
@@ -198,11 +170,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseStyleAttribute with value normalization', () => {
-    const element = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path',
-    );
-    element.setAttribute('style', 'fill:none;  stroke-dasharray: 2 0.4;');
+    const element = createSVGElement('path', {
+      style: 'fill:none;  stroke-dasharray: 2 0.4;',
+    });
 
     const expectedObject = {
       fill: 'none',
@@ -212,14 +182,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parseStyleAttribute with short font declaration', () => {
-    const element = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'path',
-    );
-    element.setAttribute(
-      'style',
-      'font: italic 12px Arial,Helvetica,sans-serif',
-    );
+    const element = createSVGElement('path', {
+      style: 'font: italic 12px Arial,Helvetica,sans-serif',
+    });
     const styleObj = parseStyleAttribute(element);
     if (styleObj.font) {
       parseFontDeclaration(styleObj.font, styleObj);
@@ -253,10 +218,10 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributes (style to have higher priority than attribute)', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttribute('style', 'fill:red');
-    element.setAttributeNS(namespace, 'fill', 'green');
+    const element = createSVGElement('path', {
+      style: 'fill:red',
+      fill: 'green',
+    });
 
     const expectedObject = {
       fill: 'red',
@@ -267,16 +232,12 @@ describe('fabric.Parser', () => {
   });
 
   it('parseAttributes stroke-opacity and fill-opacity', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttributeNS(
-      namespace,
-      'style',
-      'fill:rgb(100,200,50);fill-opacity:0.2;',
-    );
-    element.setAttributeNS(namespace, 'stroke', 'green');
-    element.setAttributeNS(namespace, 'stroke-opacity', '0.5');
-    element.setAttributeNS(namespace, 'fill', 'green');
+    const element = createSVGElement('path', {
+      style: 'fill:rgb(100,200,50);fill-opacity:0.2;',
+      stroke: 'green',
+      'stroke-opacity': '0.5',
+      fill: 'green',
+    });
 
     const expectedObject = {
       fill: 'rgba(100,200,50,0.2)',
@@ -290,9 +251,7 @@ describe('fabric.Parser', () => {
   });
 
   it('parse 0 attribute', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    element.setAttributeNS(namespace, 'opacity', String(0));
+    const element = createSVGElement('path', { opacity: 0 });
 
     const expectedObject = {
       opacity: 0,
@@ -303,13 +262,9 @@ describe('fabric.Parser', () => {
   });
 
   it('parsePointsAttribute', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'polygon');
-    element.setAttributeNS(
-      namespace,
-      'points',
-      '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3E-2, 10,-1     ',
-    );
+    const element = createSVGElement('polygon', {
+      points: '10,  12           20 ,22,  -0.52,0.001 2.3e2,2.3E-2, 10,-1     ',
+    });
 
     const actualPoints = parsePointsAttribute(element.getAttribute('points'));
 
@@ -332,22 +287,22 @@ describe('fabric.Parser', () => {
   it('parseTransformAttribute', () => {
     let parsedValue;
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
+    const element = createSVGElement('path', {
+      transform: 'translate(5,10)',
+    });
 
     //'translate(-10,-20) scale(2) rotate(45) translate(5,10)'
 
-    element.setAttributeNS(namespace, 'transform', 'translate(5,10)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([1, 0, 0, 1, 5, 10]);
 
-    element.setAttributeNS(namespace, 'transform', 'translate(-10,-20)');
+    element.setAttribute('transform', 'translate(-10,-20)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([1, 0, 0, 1, -10, -20]);
 
     const ANGLE_DEG = 90;
     const ANGLE = (ANGLE_DEG * Math.PI) / 180;
-    element.setAttributeNS(namespace, 'transform', 'rotate(' + ANGLE_DEG + ')');
+    element.setAttribute('transform', 'rotate(' + ANGLE_DEG + ')');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([
       cos(ANGLE),
@@ -358,40 +313,31 @@ describe('fabric.Parser', () => {
       0,
     ]);
 
-    element.setAttributeNS(namespace, 'transform', 'scale(3.5)');
+    element.setAttribute('transform', 'scale(3.5)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([3.5, 0, 0, 3.5, 0, 0]);
 
-    element.setAttributeNS(namespace, 'transform', 'scale(2 13)');
+    element.setAttribute('transform', 'scale(2 13)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([2, 0, 0, 13, 0, 0]);
 
-    element.setAttributeNS(namespace, 'transform', 'skewX(2)');
+    element.setAttribute('transform', 'skewX(2)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([1, 0, 0.03492076949174773, 1, 0, 0]);
 
-    element.setAttributeNS(namespace, 'transform', 'skewY(234.111)');
+    element.setAttribute('transform', 'skewY(234.111)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([1, 1.3820043381762832, 0, 1, 0, 0]);
 
-    element.setAttributeNS(
-      namespace,
-      'transform',
-      'matrix(1,2,3.3,-4,5E1,6e-1)',
-    );
+    element.setAttribute('transform', 'matrix(1,2,3.3,-4,5E1,6e-1)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([1, 2, 3.3, -4, 50, 0.6]);
 
-    element.setAttributeNS(
-      namespace,
-      'transform',
-      'translate(21,31) translate(11,22)',
-    );
+    element.setAttribute('transform', 'translate(21,31) translate(11,22)');
     parsedValue = parseTransformAttribute(element.getAttribute('transform')!);
     expect(parsedValue).toEqual([1, 0, 0, 1, 32, 53]);
 
-    element.setAttributeNS(
-      namespace,
+    element.setAttribute(
       'transform',
       'scale(2 13) translate(5,15) skewX(11.22)',
     );
@@ -400,13 +346,11 @@ describe('fabric.Parser', () => {
   });
 
   it('parseNestedTransformAttribute', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(namespace, 'path');
-    const parent = getFabricDocument().createElementNS(namespace, 'g');
+    const element = createSVGElement('path', {
+      transform: 'translate(10 10)',
+    });
+    const parent = createSVGElement('g', { transform: 'translate(50)' });
     parent.appendChild(element);
-
-    parent.setAttributeNS(namespace, 'transform', 'translate(50)');
-    element.setAttributeNS(namespace, 'transform', 'translate(10 10)');
 
     const parsedAttributes = parseAttributes(element, ['transform']);
     expect(parsedAttributes.transformMatrix).toEqual([1, 0, 0, 1, 60, 10]);
@@ -566,15 +510,12 @@ describe('fabric.Parser', () => {
       'Polyline',
       'Text',
     ] as const;
-    const namespace = 'http://www.w3.org/2000/svg';
 
     const tests = tagNames.map(async (tagName) => {
-      const el = getFabricDocument().createElementNS(
-        namespace,
-        tagName.toLowerCase(),
-      );
       const opacityValue = Math.random().toFixed(2);
-      el.setAttributeNS(namespace, 'opacity', opacityValue);
+      const el = createSVGElement(tagName.toLowerCase(), {
+        opacity: opacityValue,
+      });
 
       const module = await import('../../fabric');
       const fabricClass = module[tagName];
@@ -588,12 +529,11 @@ describe('fabric.Parser', () => {
   });
 
   it('fill-opacity attribute with fill attribute', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const el = getFabricDocument().createElementNS(namespace, 'rect');
     const opacityValue = Math.random().toFixed(2);
-
-    el.setAttributeNS(namespace, 'fill-opacity', opacityValue);
-    el.setAttributeNS(namespace, 'fill', '#FF0000');
+    const el = createSVGElement('rect', {
+      'fill-opacity': opacityValue,
+      fill: '#FF0000',
+    });
 
     const obj = await Rect.fromElement(el);
 
@@ -601,11 +541,10 @@ describe('fabric.Parser', () => {
   });
 
   it('fill-opacity attribute without fill attribute', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const el = getFabricDocument().createElementNS(namespace, 'rect');
     const opacityValue = Math.random().toFixed(2);
-
-    el.setAttributeNS(namespace, 'fill-opacity', opacityValue);
+    const el = createSVGElement('rect', {
+      'fill-opacity': opacityValue,
+    });
 
     const obj = await Rect.fromElement(el);
 
@@ -613,12 +552,11 @@ describe('fabric.Parser', () => {
   });
 
   it('fill-opacity attribute with fill none', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const el = getFabricDocument().createElementNS(namespace, 'rect');
     const opacityValue = Math.random().toFixed(2);
-
-    el.setAttributeNS(namespace, 'fill-opacity', opacityValue);
-    el.setAttributeNS(namespace, 'fill', 'none');
+    const el = createSVGElement('rect', {
+      'fill-opacity': opacityValue,
+      fill: 'none',
+    });
 
     const obj = await Rect.fromElement(el);
 
@@ -626,12 +564,11 @@ describe('fabric.Parser', () => {
   });
 
   it('stroke-opacity attribute with stroke attribute', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const el = getFabricDocument().createElementNS(namespace, 'rect');
     const opacityValue = Math.random().toFixed(2);
-
-    el.setAttributeNS(namespace, 'stroke-opacity', opacityValue);
-    el.setAttributeNS(namespace, 'stroke', '#FF0000');
+    const el = createSVGElement('rect', {
+      'stroke-opacity': opacityValue,
+      stroke: '#FF0000',
+    });
 
     const obj = await Rect.fromElement(el);
 
@@ -639,11 +576,10 @@ describe('fabric.Parser', () => {
   });
 
   it('stroke-opacity attribute without stroke attribute', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const el = getFabricDocument().createElementNS(namespace, 'rect');
     const opacityValue = Math.random().toFixed(2);
-
-    el.setAttributeNS(namespace, 'stroke-opacity', opacityValue);
+    const el = createSVGElement('rect', {
+      'stroke-opacity': opacityValue,
+    });
 
     const obj = await Rect.fromElement(el);
 
@@ -651,12 +587,11 @@ describe('fabric.Parser', () => {
   });
 
   it('stroke-opacity attribute with stroke none', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const el = getFabricDocument().createElementNS(namespace, 'rect');
     const opacityValue = Math.random().toFixed(2);
-
-    el.setAttributeNS(namespace, 'stroke-opacity', opacityValue);
-    el.setAttributeNS(namespace, 'stroke', 'none');
+    const el = createSVGElement('rect', {
+      'stroke-opacity': opacityValue,
+      stroke: 'none',
+    });
 
     const obj = await Rect.fromElement(el);
 
@@ -696,12 +631,11 @@ describe('fabric.Parser', () => {
     rules[svgUid] = getCSSRules(doc);
     expect(rules[svgUid]).toEqual(expectedObject);
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolygon = getFabricDocument().createElementNS(namespace, 'polygon');
-
-    elPolygon.setAttributeNS(namespace, 'points', '10,12 20,22');
-    elPolygon.setAttributeNS(namespace, 'class', 'cls');
-    elPolygon.setAttributeNS(namespace, 'svgUid', svgUid);
+    const elPolygon = createSVGElement('polygon', {
+      points: '10,12 20,22',
+      class: 'cls',
+      svgUid: svgUid,
+    });
 
     const style = parseAttributes(elPolygon, ['fill', 'stroke']);
     expect(style).toEqual({});

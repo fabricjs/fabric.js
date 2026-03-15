@@ -1,15 +1,15 @@
-import { getFabricDocument } from '../env';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Gradient } from './Gradient';
-import type { GradientUnits, SVGOptions } from './typedefs';
+import type {
+  GradientUnits,
+  RadialGradientCoords,
+  SVGOptions,
+} from './typedefs';
 import { classRegistry } from '../ClassRegistry';
 
-import { describe, expect, it, test, vi } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 import { StaticCanvas } from '../canvas/StaticCanvas';
-
-vi.mock('../util/internals/uid', () => ({
-  uid: () => 0,
-}));
+import { createSVGElement } from '../../test/utils';
 
 function createLinearGradient(units: GradientUnits = 'pixels', id?: string) {
   return new Gradient({
@@ -85,17 +85,17 @@ function createRadialGradientSwapped() {
 }
 
 const SVG_LINEAR =
-  '<linearGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  x1="0" y1="10" x2="100" y2="200">\n<stop offset="0%" style="stop-color:rgba(255,0,0,0);"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
+  '<linearGradient id="SVGID" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  x1="0" y1="10" x2="100" y2="200">\n<stop offset="0%" style="stop-color:rgba(255,0,0,0);"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
 const SVG_RADIAL =
-  '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
+  '<radialGradient id="SVGID" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
 const SVG_INTERNALRADIUS =
-  '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="20%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
+  '<radialGradient id="SVGID" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="20%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
 const SVG_SWAPPED =
-  '<radialGradient id="SVGID_0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="0" cy="10" r="50" fx="100" fy="200">\n<stop offset="20%" style="stop-color:rgba(0,255,0,0);"/>\n<stop offset="100%" style="stop-color:red;"/>\n</radialGradient>\n';
+  '<radialGradient id="SVGID" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1 0 0 1 -50 -50)"  cx="0" cy="10" r="50" fx="100" fy="200">\n<stop offset="20%" style="stop-color:rgba(0,255,0,0);"/>\n<stop offset="100%" style="stop-color:red;"/>\n</radialGradient>\n';
 const SVG_LINEAR_PERCENTAGE =
-  '<linearGradient id="SVGID_0" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  x1="0" y1="10" x2="100" y2="200">\n<stop offset="0%" style="stop-color:rgba(255,0,0,0);"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
+  '<linearGradient id="SVGID" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  x1="0" y1="10" x2="100" y2="200">\n<stop offset="0%" style="stop-color:rgba(255,0,0,0);"/>\n<stop offset="100%" style="stop-color:green;"/>\n</linearGradient>\n';
 const SVG_RADIAL_PERCENTAGE =
-  '<radialGradient id="SVGID_0" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
+  '<radialGradient id="SVGID" gradientUnits="objectBoundingBox" gradientTransform="matrix(1 0 0 1 0 0)"  cx="100" cy="200" r="50" fx="0" fy="10">\n<stop offset="0%" style="stop-color:red;"/>\n<stop offset="100%" style="stop-color:rgba(0,255,0,0);"/>\n</radialGradient>\n';
 
 describe('Gradient', () => {
   function fromElement(
@@ -149,30 +149,73 @@ describe('Gradient', () => {
     test('toSVG linear', () => {
       const gradient = createLinearGradient();
       const baseObj = new FabricObject({ width: 100, height: 100 });
-      expect(gradient.toSVG(baseObj)).toEqual(SVG_LINEAR);
+      expect(gradient.toSVG(baseObj)).toEqualSVG(SVG_LINEAR);
     });
 
     test('toSVG radial', () => {
       const gradient = createRadialGradient();
       const baseObj = new FabricObject({ width: 100, height: 100 });
-      expect(gradient.toSVG(baseObj)).toEqual(SVG_RADIAL);
+      expect(gradient.toSVG(baseObj)).toEqualSVG(SVG_RADIAL);
+    });
+
+    test('toSVG linear sanitizes coord injection', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        coords: {
+          x1: '0" /><script>alert(1)</script>' as unknown as number,
+          y1: '0" /><script>alert(1)</script>' as unknown as number,
+          x2: '0" /><script>alert(1)</script>' as unknown as number,
+          y2: '0" /><script>alert(1)</script>' as unknown as number,
+        },
+        colorStops: [
+          { offset: 0, color: 'rgba(255,0,0,0)' },
+          { offset: 1, color: 'green' },
+        ],
+      });
+      const baseObj = new FabricObject({ width: 100, height: 100 });
+      const svg = gradient.toSVG(baseObj);
+      expect(svg).not.toContain('<script>');
+    });
+
+    test('toSVG radial sanitizes coord injection', () => {
+      const gradient = new Gradient({
+        type: 'radial',
+        coords: {
+          x1: '0" /><script>alert(1)</script>' as unknown as number,
+          y1: '0" /><script>alert(1)</script>' as unknown as number,
+          x2: '0" /><script>alert(1)</script>' as unknown as number,
+          y2: '0" /><script>alert(1)</script>' as unknown as number,
+          r1: '0" /><script>alert(1)</script>' as unknown as number,
+          r2: '50" /><script>alert(1)</script>' as unknown as number,
+        },
+        colorStops: [
+          { offset: 0, color: 'red' },
+          { offset: 1, color: 'rgba(0,255,0,0)' },
+        ],
+      });
+      const baseObj = new FabricObject({ width: 100, height: 100 });
+      const svg = gradient.toSVG(baseObj);
+      expect(svg).not.toContain('<script>');
     });
 
     test('toSVG radial with r1 > 0', () => {
       const gradient = createRadialGradientWithInternalRadius();
       const obj = new FabricObject({ width: 100, height: 100 });
-      expect(gradient.toSVG(obj)).toEqual(SVG_INTERNALRADIUS);
+      expect(gradient.toSVG(obj)).toEqualSVG(SVG_INTERNALRADIUS);
     });
 
     test('toSVG radial with r1 > 0 swapped', () => {
       const gradient = createRadialGradientSwapped();
       const obj = new FabricObject({ width: 100, height: 100 });
       const gradientColorStops = JSON.stringify(gradient.colorStops);
-      expect(gradient.toSVG(obj), 'it exports as expected').toBe(SVG_SWAPPED);
-      const gradientColorStopsAfterExport = JSON.stringify(gradient.colorStops);
-      expect(gradient.toSVG(obj), 'it exports as expected a second time').toBe(
+      expect(gradient.toSVG(obj), 'it exports as expected').toEqualSVG(
         SVG_SWAPPED,
       );
+      const gradientColorStopsAfterExport = JSON.stringify(gradient.colorStops);
+      expect(
+        gradient.toSVG(obj),
+        'it exports as expected a second time',
+      ).toEqualSVG(SVG_SWAPPED);
       expect(gradientColorStops, 'colorstops do not change').toBe(
         gradientColorStopsAfterExport,
       );
@@ -181,13 +224,13 @@ describe('Gradient', () => {
     test('toSVG linear objectBoundingBox', () => {
       const gradient = createLinearGradient('percentage');
       const obj = new FabricObject({ width: 100, height: 100 });
-      expect(gradient.toSVG(obj)).toBe(SVG_LINEAR_PERCENTAGE);
+      expect(gradient.toSVG(obj)).toEqualSVG(SVG_LINEAR_PERCENTAGE);
     });
 
     test('toSVG radial objectBoundingBox', () => {
       const gradient = createRadialGradient('percentage');
       const obj = new FabricObject({ width: 100, height: 100 });
-      expect(gradient.toSVG(obj)).toBe(SVG_RADIAL_PERCENTAGE);
+      expect(gradient.toSVG(obj)).toEqualSVG(SVG_RADIAL_PERCENTAGE);
     });
   });
 
@@ -235,8 +278,8 @@ describe('Gradient', () => {
 
   test('toObject with custom props', () => {
     const gradient = createLinearGradient('pixels', 'myId');
-    const object = gradient.toObject(['id']);
-    expect(object.id).toBe('myId_0');
+    const object = gradient.toObject(['id']) as { id: string };
+    expect(object.id).toMatch(/^myId_\d+$/);
   });
 
   test('toObject radialGradient', () => {
@@ -295,23 +338,17 @@ describe('Gradient', () => {
   test('fromElement linearGradient', () => {
     expect(typeof Gradient.fromElement === 'function').toBeTruthy();
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
+    const element = createSVGElement('linearGradient');
+    element.appendChild(
+      createSVGElement('stop', { offset: '0%', 'stop-color': 'white' }),
     );
-    const stop1 = getFabricDocument().createElement('stop');
-    const stop2 = getFabricDocument().createElement('stop');
-
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-    stop2.setAttributeNS(namespace, 'stop-opacity', '0');
-
-    element.appendChild(stop1);
-    element.appendChild(stop2);
+    element.appendChild(
+      createSVGElement('stop', {
+        offset: '100%',
+        'stop-color': 'black',
+        'stop-opacity': 0,
+      }),
+    );
 
     const object = new FabricObject({ width: 100, height: 100 });
     const gradient = fromElement(element, object, { opacity: '' });
@@ -332,28 +369,23 @@ describe('Gradient', () => {
   });
 
   test('fromElement linearGradient with floats percentage - objectBoundingBox', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
+    const element = createSVGElement('linearGradient', {
+      gradientUnits: 'objectBoundingBox',
+      x1: '10%',
+      y1: '0.2%',
+      x2: 200,
+      y2: '20%',
+    });
+    element.appendChild(
+      createSVGElement('stop', { offset: '0%', 'stop-color': 'white' }),
     );
-    element.setAttributeNS(namespace, 'gradientUnits', 'objectBoundingBox');
-    element.setAttributeNS(namespace, 'x1', '10%');
-    element.setAttributeNS(namespace, 'y1', '0.2%');
-    element.setAttributeNS(namespace, 'x2', '200');
-    element.setAttributeNS(namespace, 'y2', '20%');
-    const stop1 = getFabricDocument().createElement('stop');
-    const stop2 = getFabricDocument().createElement('stop');
-
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-    stop2.setAttributeNS(namespace, 'stop-opacity', '0');
-
-    element.appendChild(stop1);
-    element.appendChild(stop2);
+    element.appendChild(
+      createSVGElement('stop', {
+        offset: '100%',
+        'stop-color': 'black',
+        'stop-opacity': 0,
+      }),
+    );
 
     const object = new FabricObject({ width: 200, height: 200 });
     const gradient = fromElement(element, object, { opacity: '' });
@@ -368,28 +400,23 @@ describe('Gradient', () => {
   });
 
   test('fromElement linearGradient with floats percentage - userSpaceOnUse', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
+    const element = createSVGElement('linearGradient', {
+      gradientUnits: 'userSpaceOnUse',
+      x1: '10%',
+      y1: '0.2%',
+      x2: 200,
+      y2: '20%',
+    });
+    element.appendChild(
+      createSVGElement('stop', { offset: '0%', 'stop-color': 'white' }),
     );
-    element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
-    element.setAttributeNS(namespace, 'x1', '10%');
-    element.setAttributeNS(namespace, 'y1', '0.2%');
-    element.setAttributeNS(namespace, 'x2', '200');
-    element.setAttributeNS(namespace, 'y2', '20%');
-    const stop1 = getFabricDocument().createElement('stop');
-    const stop2 = getFabricDocument().createElement('stop');
-
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-    stop2.setAttributeNS(namespace, 'stop-opacity', '0');
-
-    element.appendChild(stop1);
-    element.appendChild(stop2);
+    element.appendChild(
+      createSVGElement('stop', {
+        offset: '100%',
+        'stop-color': 'black',
+        'stop-opacity': 0,
+      }),
+    );
 
     const object = new FabricObject({
       left: 10,
@@ -414,27 +441,22 @@ describe('Gradient', () => {
   });
 
   test('fromElement linearGradient with Infinity', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
+    const element = createSVGElement('linearGradient', {
+      x1: '-Infinity',
+      x2: 'Infinity',
+      y1: 'Infinity',
+      y2: '-Infinity',
+    });
+    element.appendChild(
+      createSVGElement('stop', { offset: '0%', 'stop-color': 'white' }),
     );
-    const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
-
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-    stop2.setAttributeNS(namespace, 'stop-opacity', '0');
-
-    element.setAttributeNS(namespace, 'x1', '-Infinity');
-    element.setAttributeNS(namespace, 'x2', 'Infinity');
-    element.setAttributeNS(namespace, 'y1', 'Infinity');
-    element.setAttributeNS(namespace, 'y2', '-Infinity');
-    element.appendChild(stop1);
-    element.appendChild(stop2);
+    element.appendChild(
+      createSVGElement('stop', {
+        offset: '100%',
+        'stop-color': 'black',
+        'stop-opacity': 0,
+      }),
+    );
 
     const object = new FabricObject({
       width: 100,
@@ -459,22 +481,15 @@ describe('Gradient', () => {
   });
 
   test('fromElement without stop', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
+    const element = createSVGElement('linearGradient');
+    element.appendChild(createSVGElement('stop', { 'stop-color': 'white' }));
+    element.appendChild(
+      createSVGElement('stop', {
+        offset: '100%',
+        'stop-color': 'black',
+        'stop-opacity': 0,
+      }),
     );
-    const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
-
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-    stop2.setAttributeNS(namespace, 'stop-opacity', '0');
-
-    element.appendChild(stop1);
-    element.appendChild(stop2);
 
     const object = new FabricObject({ width: 100, height: 100 });
     const gradient = fromElement(element, object, { opacity: '' });
@@ -486,16 +501,12 @@ describe('Gradient', () => {
   });
 
   describe('fromElement with x1,x2,y1,2 linear', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
-    );
-
-    element.setAttributeNS(namespace, 'x1', '30%');
-    element.setAttributeNS(namespace, 'x2', '20%');
-    element.setAttributeNS(namespace, 'y1', '0.1');
-    element.setAttributeNS(namespace, 'y2', 'Infinity');
+    const element = createSVGElement('linearGradient', {
+      x1: '30%',
+      x2: '20%',
+      y1: '0.1',
+      y2: 'Infinity',
+    });
 
     const object = new FabricObject({ width: 200, height: 200 });
     const gradient = fromElement(element, object, { opacity: '' });
@@ -520,64 +531,59 @@ describe('Gradient', () => {
   });
 
   describe('fromElement with x1,x2,y1,2 radial', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'radialGradient',
-    );
-
-    element.setAttributeNS(namespace, 'fx', '30%');
-    element.setAttributeNS(namespace, 'fy', '20%');
-    element.setAttributeNS(namespace, 'cx', '0.1');
-    element.setAttributeNS(namespace, 'cy', '1');
-    element.setAttributeNS(namespace, 'r', '100%');
+    const element = createSVGElement('radialGradient', {
+      fx: '30%',
+      fy: '20%',
+      cx: '0.1',
+      cy: 1,
+      r: '100%',
+    });
 
     let object = new FabricObject({ width: 200, height: 200 });
     let gradient = fromElement(element, object, { opacity: '' });
     it('should not change with width height', () => {
-      expect(gradient.coords.x1).toEqual(0.3);
-      expect(gradient.coords.y1).toEqual(0.2);
-      expect(gradient.coords.x2).toEqual(0.1);
-      expect(gradient.coords.y2).toEqual(1);
-      expect(gradient.coords.r1).toEqual(0);
-      expect(gradient.coords.r2).toEqual(1);
+      const coords = gradient.coords as RadialGradientCoords<number>;
+      expect(coords.x1).toEqual(0.3);
+      expect(coords.y1).toEqual(0.2);
+      expect(coords.x2).toEqual(0.1);
+      expect(coords.y2).toEqual(1);
+      expect(coords.r1).toEqual(0);
+      expect(coords.r2).toEqual(1);
     });
 
     it('should not change with top left', () => {
       object = new FabricObject({ width: 200, height: 200, top: 10, left: 10 });
       gradient = fromElement(element, object, { opacity: '' });
-      expect(gradient.coords.x1).toEqual(0.3);
-      expect(gradient.coords.y1).toEqual(0.2);
-      expect(gradient.coords.x2).toEqual(0.1);
-      expect(gradient.coords.y2).toEqual(1);
-      expect(gradient.coords.r1).toEqual(0);
-      expect(gradient.coords.r2).toEqual(1);
+      const coords = gradient.coords as RadialGradientCoords<number>;
+      expect(coords.x1).toEqual(0.3);
+      expect(coords.y1).toEqual(0.2);
+      expect(coords.x2).toEqual(0.1);
+      expect(coords.y2).toEqual(1);
+      expect(coords.r1).toEqual(0);
+      expect(coords.r2).toEqual(1);
     });
   });
 
   describe('fromElement with x1,x2,y1,2 radial userSpaceOnUse', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'radialGradient',
-    );
-
-    element.setAttributeNS(namespace, 'fx', '30');
-    element.setAttributeNS(namespace, 'fy', '20');
-    element.setAttributeNS(namespace, 'cx', '15');
-    element.setAttributeNS(namespace, 'cy', '18');
-    element.setAttributeNS(namespace, 'r', '100');
-    element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
+    const element = createSVGElement('radialGradient', {
+      fx: 30,
+      fy: 20,
+      cx: 15,
+      cy: 18,
+      r: 100,
+      gradientUnits: 'userSpaceOnUse',
+    });
 
     it('should not change with width height', () => {
       const object = new FabricObject({ width: 200, height: 200 });
       const gradient = fromElement(element, object, { opacity: '' });
-      expect(gradient.coords.x1).toEqual(30);
-      expect(gradient.coords.y1).toEqual(20);
-      expect(gradient.coords.x2).toEqual(15);
-      expect(gradient.coords.y2).toEqual(18);
-      expect(gradient.coords.r1).toEqual(0);
-      expect(gradient.coords.r2).toEqual(100);
+      const coords = gradient.coords as RadialGradientCoords<number>;
+      expect(coords.x1).toEqual(30);
+      expect(coords.y1).toEqual(20);
+      expect(coords.x2).toEqual(15);
+      expect(coords.y2).toEqual(18);
+      expect(coords.r1).toEqual(0);
+      expect(coords.r2).toEqual(100);
     });
 
     it('should not change with top left', () => {
@@ -588,27 +594,24 @@ describe('Gradient', () => {
         left: 60,
       });
       const gradient = fromElement(element, object, { opacity: '' });
-      expect(gradient.coords.x1).toEqual(30);
-      expect(gradient.coords.y1).toEqual(20);
-      expect(gradient.coords.x2).toEqual(15);
-      expect(gradient.coords.y2).toEqual(18);
-      expect(gradient.coords.r1).toEqual(0);
-      expect(gradient.coords.r2).toEqual(100);
+      const coords = gradient.coords as RadialGradientCoords<number>;
+      expect(coords.x1).toEqual(30);
+      expect(coords.y1).toEqual(20);
+      expect(coords.x2).toEqual(15);
+      expect(coords.y2).toEqual(18);
+      expect(coords.r1).toEqual(0);
+      expect(coords.r2).toEqual(100);
     });
   });
 
   describe('fromElement with x1,x2,y1,2 linear userSpaceOnUse', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
-    );
-
-    element.setAttributeNS(namespace, 'x1', '30');
-    element.setAttributeNS(namespace, 'y1', '20');
-    element.setAttributeNS(namespace, 'x2', '15');
-    element.setAttributeNS(namespace, 'y2', '18');
-    element.setAttributeNS(namespace, 'gradientUnits', 'userSpaceOnUse');
+    const element = createSVGElement('linearGradient', {
+      x1: 30,
+      y1: 20,
+      x2: 15,
+      y2: 18,
+      gradientUnits: 'userSpaceOnUse',
+    });
 
     it('should not change with width height', () => {
       const object = new FabricObject({ width: 200, height: 200 });
@@ -635,22 +638,13 @@ describe('Gradient', () => {
   });
 
   test('fromElement radialGradient defaults', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'radialGradient',
+    const element = createSVGElement('radialGradient');
+    element.appendChild(
+      createSVGElement('stop', { offset: '0%', 'stop-color': 'white' }),
     );
-    const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
-
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-
-    element.appendChild(stop1);
-    element.appendChild(stop2);
+    element.appendChild(
+      createSVGElement('stop', { offset: '100%', 'stop-color': 'black' }),
+    );
 
     const object = new FabricObject({ width: 100, height: 100 });
     const gradient = fromElement(element, object, {}) as Gradient<'radial'>;
@@ -672,26 +666,15 @@ describe('Gradient', () => {
   });
 
   test('fromElement radialGradient with transform', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'radialGradient',
+    const element = createSVGElement('radialGradient', {
+      gradientTransform:
+        'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)',
+    });
+    element.appendChild(
+      createSVGElement('stop', { offset: '0%', 'stop-color': 'white' }),
     );
-    const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
-
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop2.setAttributeNS(namespace, 'offset', '100%');
-    stop2.setAttributeNS(namespace, 'stop-color', 'black');
-
-    element.appendChild(stop1);
-    element.appendChild(stop2);
-    element.setAttributeNS(
-      namespace,
-      'gradientTransform',
-      'matrix(3.321 -0.6998 0.4077 1.9347 -440.9168 -408.0598)',
+    element.appendChild(
+      createSVGElement('stop', { offset: '100%', 'stop-color': 'black' }),
     );
     const object = new FabricObject({ width: 100, height: 100 });
     const gradient = fromElement(element, object, {});
@@ -701,41 +684,29 @@ describe('Gradient', () => {
   });
 
   test('fromElement linearGradient colorStop attributes/styles', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'linearGradient',
-    );
-    const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop3 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop4 = getFabricDocument().createElementNS(namespace, 'stop');
+    const stop1 = createSVGElement('stop', {
+      offset: '0%',
+      'stop-color': '',
+      'stop-opacity': '',
+    });
+    const stop2 = createSVGElement('stop', {
+      offset: '0.5',
+      style: 'stop-color: black; stop-opacity:;',
+      'stop-color': 'white',
+    });
+    const stop3 = createSVGElement('stop', {
+      offset: '75%',
+      style: 'stop-color:; stop-opacity:;',
+      'stop-opacity': '0.9',
+      'stop-color': 'blue',
+    });
+    const stop4 = createSVGElement('stop', {
+      offset: '100%',
+      style: 'stop-color: red; stop-opacity: 0.5;',
+      'stop-opacity': '0.9',
+    });
 
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', '');
-    stop1.setAttributeNS(namespace, 'stop-opacity', '');
-
-    stop2.setAttributeNS(namespace, 'offset', '0.5');
-    stop2.setAttributeNS(
-      namespace,
-      'style',
-      'stop-color: black; stop-opacity:;',
-    );
-    stop2.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop3.setAttributeNS(namespace, 'offset', '75%');
-    stop3.setAttributeNS(namespace, 'style', 'stop-color:; stop-opacity:;');
-    stop3.setAttributeNS(namespace, 'stop-opacity', '0.9');
-    stop3.setAttributeNS(namespace, 'stop-color', 'blue');
-
-    stop4.setAttributeNS(namespace, 'offset', '100%');
-    stop4.setAttributeNS(
-      namespace,
-      'style',
-      'stop-color: red; stop-opacity: 0.5;',
-    );
-    stop4.setAttributeNS(namespace, 'stop-opacity', '0.9');
-
+    const element = createSVGElement('linearGradient');
     element.appendChild(stop1);
     element.appendChild(stop2);
     element.appendChild(stop3);
@@ -763,41 +734,29 @@ describe('Gradient', () => {
   });
 
   test('fromElement radialGradient colorStop attributes/styles', () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const element = getFabricDocument().createElementNS(
-      namespace,
-      'radialGradient',
-    );
-    const stop1 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop2 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop3 = getFabricDocument().createElementNS(namespace, 'stop');
-    const stop4 = getFabricDocument().createElementNS(namespace, 'stop');
+    const stop1 = createSVGElement('stop', {
+      offset: '0%',
+      'stop-color': '',
+      'stop-opacity': '',
+    });
+    const stop2 = createSVGElement('stop', {
+      offset: '0.5',
+      style: 'stop-color: black; stop-opacity:;',
+      'stop-color': 'white',
+    });
+    const stop3 = createSVGElement('stop', {
+      offset: '75%',
+      style: 'stop-color:; stop-opacity:;',
+      'stop-opacity': '0.9',
+      'stop-color': 'blue',
+    });
+    const stop4 = createSVGElement('stop', {
+      offset: '100%',
+      style: 'stop-color: red; stop-opacity: 0.5;',
+      'stop-opacity': '0.9',
+    });
 
-    stop1.setAttributeNS(namespace, 'offset', '0%');
-    stop1.setAttributeNS(namespace, 'stop-color', '');
-    stop1.setAttributeNS(namespace, 'stop-opacity', '');
-
-    stop2.setAttributeNS(namespace, 'offset', '0.5');
-    stop2.setAttributeNS(
-      namespace,
-      'style',
-      'stop-color: black; stop-opacity:;',
-    );
-    stop2.setAttributeNS(namespace, 'stop-color', 'white');
-
-    stop3.setAttributeNS(namespace, 'offset', '75%');
-    stop3.setAttributeNS(namespace, 'style', 'stop-color:; stop-opacity:;');
-    stop3.setAttributeNS(namespace, 'stop-opacity', '0.9');
-    stop3.setAttributeNS(namespace, 'stop-color', 'blue');
-
-    stop4.setAttributeNS(namespace, 'offset', '100%');
-    stop4.setAttributeNS(
-      namespace,
-      'style',
-      'stop-color: red; stop-opacity: 0.5;',
-    );
-    stop4.setAttributeNS(namespace, 'stop-opacity', '0.9');
-
+    const element = createSVGElement('radialGradient');
     element.appendChild(stop1);
     element.appendChild(stop2);
     element.appendChild(stop3);
@@ -817,5 +776,13 @@ describe('Gradient', () => {
     expect(gradient.colorStops[1].color).toEqual('rgba(0,0,255,0.9)');
     expect(gradient.colorStops[2].color).toEqual('rgba(0,0,0,1)');
     expect(gradient.colorStops[3].color).toEqual('rgba(0,0,0,1)');
+  });
+
+  describe('Attrivbute injection', () => {
+    it('id injection', () => {
+      const gradient = new Gradient({ id: 'malicious"><script>' });
+      const svg = gradient.toSVG({} as any);
+      expect(svg).toContain('id="SVGID_malicious&quot;&gt;&lt;script&gt;');
+    });
   });
 });

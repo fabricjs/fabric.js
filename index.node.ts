@@ -12,12 +12,11 @@ import {
   Canvas as CanvasBase,
   StaticCanvas as StaticCanvasBase,
 } from './fabric';
-import { FabricObject } from './src/shapes/Object/Object';
+import { FabricObject as FabricObjectBase } from './src/shapes/Object/Object';
 
-FabricObject.ownDefaults.objectCaching = false;
+FabricObjectBase.ownDefaults.objectCaching = false;
 
 export * from './fabric';
-
 export class StaticCanvas extends StaticCanvasBase {
   getNodeCanvas() {
     return getNodeCanvas(this.getElement());

@@ -1,8 +1,9 @@
-import { FILL, LEFT, STROKE, reNewline } from '../../constants';
+import { FILL, LEFT, LTR, NORMAL, STROKE, reNewline } from '../../constants';
 import type { TClassProperties } from '../../typedefs';
 import type { FabricText } from './Text';
 
 export const TEXT_DECORATION_THICKNESS = 'textDecorationThickness';
+export const TEXT_DECORATION_COLOR = 'textDecorationColor';
 
 const fontProperties = [
   'fontSize',
@@ -36,6 +37,7 @@ export const additionalProps = [
   'textBackgroundColor',
   'direction',
   TEXT_DECORATION_THICKNESS,
+  TEXT_DECORATION_COLOR,
 ] as const;
 
 export type StylePropertiesType =
@@ -51,7 +53,8 @@ export type StylePropertiesType =
   | 'overline'
   | 'underline'
   | 'linethrough'
-  | typeof TEXT_DECORATION_THICKNESS;
+  | typeof TEXT_DECORATION_THICKNESS
+  | typeof TEXT_DECORATION_COLOR;
 
 export const styleProperties: Readonly<StylePropertiesType[]> = [
   ...fontProperties,
@@ -62,6 +65,7 @@ export const styleProperties: Readonly<StylePropertiesType[]> = [
   'deltaY',
   'textBackgroundColor',
   TEXT_DECORATION_THICKNESS,
+  TEXT_DECORATION_COLOR,
 ] as const;
 
 // @TODO: Many things here are configuration related and shouldn't be on the class nor prototype
@@ -73,13 +77,13 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,
   fontSize: 40,
-  fontWeight: 'normal',
+  fontWeight: NORMAL,
   fontFamily: 'Times New Roman',
   underline: false,
   overline: false,
   linethrough: false,
   textAlign: LEFT,
-  fontStyle: 'normal',
+  fontStyle: NORMAL,
   lineHeight: 1.16,
   textBackgroundColor: '',
   stroke: null,
@@ -90,7 +94,7 @@ export const textDefaultValues: Partial<TClassProperties<FabricText>> = {
   pathAlign: 'baseline',
   charSpacing: 0,
   deltaY: 0,
-  direction: 'ltr',
+  direction: LTR,
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
   // Text magic numbers

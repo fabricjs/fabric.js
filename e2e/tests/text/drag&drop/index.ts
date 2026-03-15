@@ -13,6 +13,7 @@ const styles = {
       textBackgroundColor: 'yellow',
       textDecoration: ' line-through',
       linethrough: true,
+      textDecorationColor: 'orange',
     },
     8: {
       textBackgroundColor: 'yellow',
@@ -38,6 +39,7 @@ const styles = {
       fill: 'green',
       fontStyle: 'italic',
       textDecoration: 'underline',
+      textDecorationColor: 'purple',
     },
   },
   2: {
@@ -63,6 +65,7 @@ const styles = {
     8: {
       textDecoration: ' overline',
       overline: true,
+      textDecorationColor: 'red',
     },
   },
   3: {

@@ -280,11 +280,11 @@ const getDevicePixelRatio = () => {
 };
 
 class Cache {
+  /**
+   * Cache of widths of chars in text rendering.
+   */
+
   constructor() {
-    /**
-     * Cache of widths of chars in text rendering.
-     */
-    _defineProperty(this, "charWidthsCache", {});
     /**
      * This object keeps the results of the boundsOfCurve calculation mapped by the joined arguments necessary to calculate it.
      * It does speed up calculation, if you parse and add always the same paths, but in case of heavy usage of freedrawing
@@ -294,7 +294,9 @@ class Cache {
      * It was an internal variable, is accessible since version 2.3.4
      */
     _defineProperty(this, "boundsOfCurveCache", {});
+    this.charWidthsCache = new Map();
   }
+
   /**
    * @return {Object} reference to cache
    */
@@ -305,15 +307,16 @@ class Cache {
       fontWeight
     } = _ref;
     fontFamily = fontFamily.toLowerCase();
-    if (!this.charWidthsCache[fontFamily]) {
-      this.charWidthsCache[fontFamily] = {};
+    const cache = this.charWidthsCache;
+    if (!cache.has(fontFamily)) {
+      cache.set(fontFamily, new Map());
     }
-    const fontCache = this.charWidthsCache[fontFamily];
+    const fontCache = cache.get(fontFamily);
     const cacheKey = `${fontStyle.toLowerCase()}_${(fontWeight + '').toLowerCase()}`;
-    if (!fontCache[cacheKey]) {
-      fontCache[cacheKey] = {};
+    if (!fontCache.has(cacheKey)) {
+      fontCache.set(cacheKey, new Map());
     }
-    return fontCache[cacheKey];
+    return fontCache.get(cacheKey);
   }
 
   /**
@@ -328,11 +331,10 @@ class Cache {
    * @param {String} [fontFamily] font family to clear
    */
   clearFontCache(fontFamily) {
-    fontFamily = (fontFamily || '').toLowerCase();
     if (!fontFamily) {
-      this.charWidthsCache = {};
-    } else if (this.charWidthsCache[fontFamily]) {
-      delete this.charWidthsCache[fontFamily];
+      this.charWidthsCache = new Map();
+    } else {
+      this.charWidthsCache.delete((fontFamily || '').toLowerCase());
     }
   }
 
@@ -354,7 +356,7 @@ class Cache {
 }
 const cache = new Cache();
 
-var version = "7.0.0-beta1";
+var version = "7.1.1";
 
 // use this syntax so babel plugin see this import here
 const VERSION = version;
@@ -394,6 +396,9 @@ const SKEW_Y = 'skewY';
 const FILL = 'fill';
 const STROKE = 'stroke';
 const MODIFIED = 'modified';
+const LTR = 'ltr';
+const RTL = 'rtl';
+const NORMAL = 'normal';
 
 /*
  * This Map connects the objects type value with their
@@ -497,8 +502,8 @@ class AnimationRegistry extends Array {
 const runningAnimations = new AnimationRegistry();
 
 /**
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#events}
- * @see {@link http://fabricjs.com/events|Events demo}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#events}
+ * @see {@link http://fabric5.fabricjs.com/events|Events demo}
  */
 class Observable {
   constructor() {
@@ -741,7 +746,6 @@ class Point {
    * Adds another point to this one
    * @param {XY} that
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   addEquals(that) {
@@ -763,7 +767,6 @@ class Point {
    * Adds value to this point
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarAddEquals(scalar) {
@@ -785,7 +788,6 @@ class Point {
    * Subtracts another point from this point
    * @param {XY} that
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   subtractEquals(that) {
@@ -807,7 +809,6 @@ class Point {
    * Subtracts value from this point
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarSubtractEquals(scalar) {
@@ -838,7 +839,6 @@ class Point {
    * Multiplies this point by a value
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarMultiplyEquals(scalar) {
@@ -869,7 +869,6 @@ class Point {
    * Divides this point by a value
    * @param {Number} scalar
    * @return {Point} thisArg
-   * @chainable
    * @deprecated
    */
   scalarDivideEquals(scalar) {
@@ -985,7 +984,6 @@ class Point {
    * Sets x/y of this point
    * @param {Number} x
    * @param {Number} y
-   * @chainable
    */
   setXY(x, y) {
     this.x = x;
@@ -996,7 +994,6 @@ class Point {
   /**
    * Sets x of this point
    * @param {Number} x
-   * @chainable
    */
   setX(x) {
     this.x = x;
@@ -1006,7 +1003,6 @@ class Point {
   /**
    * Sets y of this point
    * @param {Number} y
-   * @chainable
    */
   setY(y) {
     this.y = y;
@@ -1016,7 +1012,6 @@ class Point {
   /**
    * Sets x/y of this point from another point
    * @param {XY} that
-   * @chainable
    */
   setFromPoint(that) {
     this.x = that.x;
@@ -1588,7 +1583,7 @@ const invertTransform = t => {
 const multiplyTransformMatrices = (a, b, is2x2) => [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], is2x2 ? 0 : a[0] * b[4] + a[2] * b[5] + a[4], is2x2 ? 0 : a[1] * b[4] + a[3] * b[5] + a[5]];
 
 /**
- * Multiplies {@link matrices} such that a matrix defines the plane for the rest of the matrices **after** it
+ * Multiplies the matrices array such that a matrix defines the plane for the rest of the matrices **after** it
  *
  * `multiplyTransformMatrixArray([A, B, C, D])` is equivalent to `A(B(C(D)))`
  *
@@ -1632,7 +1627,7 @@ const qrDecompose = a => {
  * [ 0 1 y ]
  * [ 0 0 1 ]
  *
- * See @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate for more details
+ * See {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#translate} for more details
  *
  * @param {number} x translation on X axis
  * @param {number} [y] translation on Y axis
@@ -1678,7 +1673,7 @@ function createRotateMatrix() {
  * [0 y 0]
  * [0 0 1]
  *
- * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#scale
+ * {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#scale}
  *
  * @param {number} x scale on X axis
  * @param {number} [y] scale on Y axis
@@ -1698,7 +1693,7 @@ const angleToSkew = angle => Math.tan(degreesToRadians(angle));
  * [0 1 0]
  * [0 0 1]
  *
- * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx
+ * {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewx}
  *
  * @param {TDegree} skewValue translation on X axis
  * @returns {TMat2D} matrix
@@ -1713,7 +1708,7 @@ const createSkewXMatrix = skewValue => [1, 0, angleToSkew(skewValue), 1, 0, 0];
  * [y 1 0]
  * [0 0 1]
  *
- * @link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewy
+ * {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform#skewy}
  *
  * @param {TDegree} skewValue translation on Y axis
  * @returns {TMat2D} matrix
@@ -2192,8 +2187,114 @@ const staticCanvasDefaults = {
    * @todo move to Canvas
    */
   allowTouchScrolling: false,
-  viewportTransform: [...iMatrix]
+  viewportTransform: [...iMatrix],
+  patternQuality: 'best'
 };
+
+/**
+ * Capitalizes a string
+ * @param {String} string String to capitalize
+ * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
+ * and other letters stay untouched, if false first letter is capitalized
+ * and other letters are converted to lowercase.
+ * @return {String} Capitalized version of a string
+ */
+const capitalize = function (string) {
+  let firstLetterOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  return `${string.charAt(0).toUpperCase()}${firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase()}`;
+};
+
+/**
+ * Escapes XML in a string
+ * @param {String} string String to escape
+ * @return {String} Escaped version of a string
+ */
+const escapeXml = stringOrNumber => stringOrNumber.toString().replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+let segmenter;
+const getSegmenter = () => {
+  if (!segmenter) {
+    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
+      granularity: 'grapheme'
+    });
+  }
+  return segmenter;
+};
+
+/**
+ * Divide a string in the user perceived single units
+ * @param {String} textstring String to escape
+ * @return {Array} array containing the graphemes
+ */
+const graphemeSplit = textstring => {
+  segmenter || getSegmenter();
+  if (segmenter) {
+    const segments = segmenter.segment(textstring);
+    return Array.from(segments).map(_ref => {
+      let {
+        segment
+      } = _ref;
+      return segment;
+    });
+  }
+
+  //Fallback
+  return graphemeSplitImpl(textstring);
+};
+const graphemeSplitImpl = textstring => {
+  const graphemes = [];
+  for (let i = 0, chr; i < textstring.length; i++) {
+    if ((chr = getWholeChar(textstring, i)) === false) {
+      continue;
+    }
+    graphemes.push(chr);
+  }
+  return graphemes;
+};
+
+// taken from mdn in the charAt doc page.
+const getWholeChar = (str, i) => {
+  const code = str.charCodeAt(i);
+  if (isNaN(code)) {
+    return ''; // Position not found
+  }
+  if (code < 0xd800 || code > 0xdfff) {
+    return str.charAt(i);
+  }
+
+  // High surrogate (could change last hex to 0xDB7F to treat high private
+  // surrogates as single characters)
+  if (0xd800 <= code && code <= 0xdbff) {
+    if (str.length <= i + 1) {
+      throw 'High surrogate without following low surrogate';
+    }
+    const next = str.charCodeAt(i + 1);
+    if (0xdc00 > next || next > 0xdfff) {
+      throw 'High surrogate without following low surrogate';
+    }
+    return str.charAt(i) + str.charAt(i + 1);
+  }
+  // Low surrogate (0xDC00 <= code && code <= 0xDFFF)
+  if (i === 0) {
+    throw 'Low surrogate without preceding high surrogate';
+  }
+  const prev = str.charCodeAt(i - 1);
+
+  // (could change last hex to 0xDB7F to treat high private
+  // surrogates as single characters)
+  if (0xd800 > prev || prev > 0xdbff) {
+    throw 'Low surrogate without preceding high surrogate';
+  }
+  // We can pass over low surrogates now as the second component
+  // in a pair which we have already processed
+  return false;
+};
+
+var lang_string = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  capitalize: capitalize,
+  escapeXml: escapeXml,
+  graphemeSplit: graphemeSplit
+});
 
 /**
  * Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
@@ -2202,7 +2303,7 @@ const staticCanvasDefaults = {
 
 /**
  * Static canvas class
- * @see {@link http://fabricjs.com/static_canvas|StaticCanvas demo}
+ * @see {@link http://fabric5.fabricjs.com/static_canvas|StaticCanvas demo}
  * @fires before:render
  * @fires after:render
  * @fires canvas:cleared
@@ -2261,6 +2362,11 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * Usage of this boolean to build up other flows and features is not supported
    * @type Boolean
    * @default false
+   */
+
+  /**
+   * Controls the rendering of images under node-canvas.
+   * Has no effects on the browser context.
    */
 
   // reference to
@@ -2597,7 +2703,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
     this.clearContext(ctx);
     ctx.imageSmoothingEnabled = this.imageSmoothingEnabled;
     // @ts-expect-error node-canvas stuff
-    ctx.patternQuality = 'best';
+    ctx.patternQuality = this.patternQuality;
     this.fire('before:render', {
       ctx
     });
@@ -2828,7 +2934,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * Having a toJSON method means you can do JSON.stringify(myCanvas)
    * JSON does not support additional properties because toJSON has its own signature
    * @return {Object} JSON compatible object
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/pec86/|jsFiddle demo}
    * @example <caption>JSON representation of canvas </caption>
    * const json = canvas.toJSON();
@@ -2917,7 +3023,6 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
 
   /**
    * Returns SVG representation of canvas
-   * @function
    * @param {Object} [options] Options object for SVG output
    * @param {Boolean} [options.suppressPreamble=false] If true xml tag is not included
    * @param {Object} [options.viewBox] SVG viewbox object
@@ -2930,7 +3035,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * @param {String} [options.height] desired height of svg with or without units
    * @param {Function} [reviver] Method for further parsing of svg elements, called after each fabric object converted into svg representation.
    * @return {String} SVG string
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#serialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#serialization}
    * @see {@link http://jsfiddle.net/fabricjs/jQ3ZZ/|jsFiddle demo}
    * @example <caption>Normal SVG output</caption>
    * var svg = canvas.toSVG();
@@ -2960,7 +3065,8 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
     this._setSVGPreamble(markup, options);
     this._setSVGHeader(markup, options);
     if (this.clipPath) {
-      markup.push(`<g clip-path="url(#${this.clipPath.clipPathId})" >\n`);
+      var _this$clipPath$clipPa;
+      markup.push(`<g clip-path="url(#${escapeXml((_this$clipPath$clipPa = this.clipPath.clipPathId) !== null && _this$clipPath$clipPa !== void 0 ? _this$clipPath$clipPa : '')})" >\n`);
     }
     this._setSVGBgOverlayColor(markup, 'background');
     this._setSVGBgOverlayImage(markup, 'backgroundImage', reviver);
@@ -3148,7 +3254,7 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
    * @param {Object} [options] options
    * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @return {Promise<Canvas | StaticCanvas>} instance
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-3#deserialization}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
    * @example <caption>loadFromJSON</caption>
    * canvas.loadFromJSON(json).then((canvas) => canvas.requestRenderAll());
@@ -3171,9 +3277,11 @@ class StaticCanvas extends createCollectionMixin(CommonMethods) {
     }
 
     // parse json if it wasn't already
-    const serialized = typeof json === 'string' ? JSON.parse(json) : json;
     const {
       objects = [],
+      ...serialized
+    } = typeof json === 'string' ? JSON.parse(json) : json;
+    const {
       backgroundImage,
       background,
       overlayImage,
@@ -3637,20 +3745,6 @@ const sendObjectToPlane = (object, from, to) => {
   return t;
 };
 
-const fireEvent = (eventName, options) => {
-  var _target$canvas;
-  const {
-    transform: {
-      target
-    }
-  } = options;
-  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
-    ...options,
-    target
-  });
-  target.fire(eventName, options);
-};
-
 const originOffset = {
   left: -0.5,
   top: -0.5,
@@ -3853,32 +3947,7 @@ function getLocalPoint(_ref, originX, originY, x, y) {
   return localPoint;
 }
 
-/**
- * Action handler
- * @private
- * @param {Event} eventData javascript event that is doing the transform
- * @param {Object} transform javascript object containing a series of information around the current transform
- * @param {number} x current mouse x position, canvas normalized
- * @param {number} y current mouse y position, canvas normalized
- * @return {Boolean} true if the translation occurred
- */
-const dragHandler = (eventData, transform, x, y) => {
-  const {
-      target,
-      offsetX,
-      offsetY
-    } = transform,
-    newLeft = x - offsetX,
-    newTop = y - offsetY,
-    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
-    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
-  moveX && target.set(LEFT, newLeft);
-  moveY && target.set(TOP, newTop);
-  if (moveX || moveY) {
-    fireEvent(MOVING, commonEventInfo(eventData, transform, x, y));
-  }
-  return moveX || moveY;
-};
+const normalizeWs = value => value.replace(/\s+/g, ' ');
 
 /**
  * Map of the 148 color names with HEX code
@@ -4039,6 +4108,10 @@ const ColorNameMap = {
  * Regex matching color in RGB or RGBA formats (ex: `rgb(0, 0, 0)`, `rgba(255, 100, 10, 0.5)`, `rgba( 255 , 100 , 10 , 0.5 )`, `rgb(1,1,1)`, `rgba(100%, 60%, 10%, 0.5)`)
  * Also matching rgba(r g b / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
+ *
+ * In order to avoid performance issues, you have to clean the input string for this regex from multiple spaces before.
+ * ex: colorString.replace(/\s+/g, ' ');
+ *
  * Formal syntax at the time of writing:
  * <rgb()> =
  *  rgb( [ <percentage> | none ]{3} [ / [ <alpha-value> | none ] ]? )  |
@@ -4050,35 +4123,35 @@ const ColorNameMap = {
  *
  * /^          # Beginning of the string
  * rgba?       # "rgb" or "rgba"
- * \(\s*       # Opening parenthesis and optional whitespace
+ * \(\s?       # Opening parenthesis and zero or one whitespace character
  * (\d{0,3}    # 0 to three digits R channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the first color component
  * %?          # Optional percent sign after the first color component
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * [\s|,]      # Separator between color components can be a space or comma
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * (\d{0,3}    # 0 to three digits G channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the second color component
  * %?          # Optional percent sign after the second color component
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * [\s|,]      # Separator between color components can be a space or comma
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * (\d{0,3}    # 0 to three digits B channel
  *  (?:\.\d+)? # Optional decimal with one or more digits
  * )           # End of capturing group for the third color component
  * %?          # Optional percent sign after the third color component
- * \s*         # Optional whitespace
+ * \s?         # Zero or one whitespace character
  * (?:         # Beginning of non-capturing group for alpha value
- *  \s*        # Optional whitespace
+ *  \s?        # Zero or one whitespace character
  *  [,/]       # Comma or slash separator for alpha value
- *  \s*        # Optional whitespace
+ *  \s?        # Zero or one whitespace character
  *  (\d{0,3}   # Zero to three digits
  *    (?:\.\d+)? # Optional decimal with one or more digits
  *  )          # End of capturing group for alpha value
  *  %?         # Optional percent sign after alpha value
- *  \s*        # Optional whitespace
+ *  \s?        # Zero or one whitespace character
  * )?          # End of non-capturing group for alpha value (optional)
  * \)          # Closing parenthesis
  * $           # End of the string
@@ -4088,12 +4161,14 @@ const ColorNameMap = {
  * WARNING this regex doesn't fail on off spec colors. it matches everything that could be a color.
  * So the spec does not allow for `rgba(30 , 45%  35, 49%)` but this will work anyways for us
  */
-const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d{0,3}(?:\.\d+)?%?)\s*)?\)$/i;
+const reRGBa = () => /^rgba?\(\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?(?:\s?[,/]\s?(\d{0,3}(?:\.\d+)?%?)\s?)?\)$/i;
 
 /**
- * Regex matching color in HSL or HSLA formats (ex: hsl(0, 0, 0), rgba(255, 100, 10, 0.5), rgba( 255 , 100 , 10 , 0.5 ), rgb(1,1,1), rgba(100%, 60%, 10%, 0.5))
- * Also matching rgba(r g b / a) as per new specs
+ * Regex matching color in HSL or HSLA formats (ex: hsl(0deg 0%, 0%), hsla(160, 100, 10, 0.5), hsla( 180 , 100 , 10 , 0.5 ), hsl(1,1,1))
+ * Also matching hsla(h s l / a) as per new specs
  * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
+ * In order to avoid performance issues, you have to clean the input string for this regex from multiple spaces before.
+ * ex: colorString.replace(/\s+/g, ' ');
  * Formal syntax at the time of writing:
  * <hsl()> =
  *   hsl( [ <hue> | none ] [ <percentage> | none ] [ <percentage> | none ] [ / [ <alpha-value> | none ] ]? )
@@ -4110,30 +4185,30 @@ const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\
  * Regular expression for matching an hsla or hsl CSS color value
  *
  * /^hsla?\(         // Matches the beginning of the string and the opening parenthesis of "hsl" or "hsla"
- * \s*               // Matches any whitespace characters (space, tab, etc.) zero or more times
+ * \s?               // Matches any whitespace character (space, tab, etc.) zero or one time
  * (\d{0,3}          // Hue: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Hue: Optional (non capture group) decimal with one or more digits.
  * (?:deg|turn|rad)? // Hue: Optionally include suffix deg or turn or rad
  * )                 // Hue: End capture group
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * [\s|,]            // Matches a space, tab or comma
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * (\d{0,3}          // Saturation: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Saturation: Optional decimal with one or more digits in a non-capturing group
  * %?)               // Saturation: match optional % character and end capture group
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * [\s|,]            // Matches a space, tab or comma
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * (\d{0,3}          // Lightness: 0 to three digits - start capture in a group
  * (?:\.\d+)?        // Lightness: Optional decimal with one or more digits in a non-capturing group
  * %?)                // Lightness: match % character and end capture group
- * \s*               // Matches any whitespace characters zero or more times
+ * \s?               // Matches any whitespace character zero or one time
  * (?:               // Alpha: Begins a non-capturing group for the alpha value
- *   \s*             // Matches any whitespace characters zero or more times
+ *   \s?             // Matches any whitespace character zero or one time
  *   [,/]            // Matches a comma or forward slash
- *   \s*             // Matches any whitespace characters zero or more times
+ *   \s?             // Matches any whitespace character zero or one time
  *   (\d*(?:\.\d+)?%?) // Matches zero or more digits, optionally followed by a decimal point and one or more digits, followed by an optional percentage sign and captures it in a group
- *   \s*             // Matches any whitespace characters zero or more times
+ *   \s?             // Matches any whitespace character zero or one time
  * )?                // Makes the alpha value group optional
  * \)                // Matches the closing parenthesis
  * $/i               // Matches the end of the string and sets the regular expression to case-insensitive mode
@@ -4141,7 +4216,7 @@ const reRGBa = () => /^rgba?\(\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\
  * WARNING this regex doesn't fail on off spec colors. It matches everything that could be a color.
  * So the spec does not allow `hsl(30 , 45%  35, 49%)` but this will work anyways for us.
  */
-const reHSLa = () => /^hsla?\(\s*([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*[\s|,]\s*(\d{0,3}(?:\.\d+)?%?)\s*(?:\s*[,/]\s*(\d*(?:\.\d+)?%?)\s*)?\)$/i;
+const reHSLa = () => /^hsla?\(\s?([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?[\s|,]\s?(\d{0,3}(?:\.\d+)?%?)\s?(?:\s?[,/]\s?(\d*(?:\.\d+)?%?)\s?)?\)$/i;
 
 /**
  * Regex matching color in HEX format (ex: #FF5544CC, #FF5555, 010155, aff)
@@ -4230,7 +4305,7 @@ const greyAverage = _ref => {
 
 /**
  * @class Color common color operations
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2/#colors colors}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#colors colors}
  */
 class Color {
   /**
@@ -4405,7 +4480,6 @@ class Color {
 
   /**
    * Returns new color object, when given a color in RGBA format
-   * @function
    * @param {String} color
    * @return {Color}
    */
@@ -4419,7 +4493,7 @@ class Color {
    * @return {TRGBAColorSource | undefined} source
    */
   static sourceFromRgb(color) {
-    const match = color.match(reRGBa());
+    const match = normalizeWs(color).match(reRGBa());
     if (match) {
       const [r, g, b] = match.slice(1, 4).map(value => {
         const parsedValue = parseFloat(value);
@@ -4440,7 +4514,6 @@ class Color {
 
   /**
    * Returns new color object, when given a color in HSLA format
-   * @function
    * @param {String} color
    * @return {Color}
    */
@@ -4456,7 +4529,7 @@ class Color {
    * @see http://http://www.w3.org/TR/css3-color/#hsl-color
    */
   static sourceFromHsl(color) {
-    const match = color.match(reHSLa());
+    const match = normalizeWs(color).match(reHSLa());
     if (!match) {
       return;
     }
@@ -4620,7 +4693,7 @@ const colorPropToSVG = function (prop, value) {
   if (!value) {
     colorValue = 'none';
   } else if (value.toLive) {
-    colorValue = `url(#SVGID_${value.id})`;
+    colorValue = `url(#SVGID_${escapeXml(value.id)})`;
   } else {
     const color = new Color(value),
       opacity = color.getAlpha();
@@ -4673,7 +4746,7 @@ class FabricObjectSVGExportMixin {
       filter = skipShadow ? '' : this.getSvgFilter(),
       fill = colorPropToSVG(FILL, this.fill),
       stroke = colorPropToSVG(STROKE, this.stroke);
-    return [stroke, 'stroke-width: ', strokeWidth, '; ', 'stroke-dasharray: ', strokeDashArray, '; ', 'stroke-linecap: ', strokeLineCap, '; ', 'stroke-dashoffset: ', strokeDashOffset, '; ', 'stroke-linejoin: ', strokeLineJoin, '; ', 'stroke-miterlimit: ', strokeMiterLimit, '; ', fill, 'fill-rule: ', fillRule, '; ', 'opacity: ', opacity, ';', filter, visibility].join('');
+    return [stroke, 'stroke-width: ', strokeWidth, '; ', 'stroke-dasharray: ', strokeDashArray, '; ', 'stroke-linecap: ', strokeLineCap, '; ', 'stroke-dashoffset: ', strokeDashOffset, '; ', 'stroke-linejoin: ', strokeLineJoin, '; ', 'stroke-miterlimit: ', strokeMiterLimit, '; ', fill, 'fill-rule: ', fillRule, '; ', 'opacity: ', opacity, ';', filter, visibility].map(v => escapeXml(v)).join('');
   }
 
   /**
@@ -4681,7 +4754,7 @@ class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgFilter() {
-    return this.shadow ? `filter: url(#SVGID_${this.shadow.id});` : '';
+    return this.shadow ? `filter: url(#SVGID_${escapeXml(this.shadow.id)});` : '';
   }
 
   /**
@@ -4689,7 +4762,7 @@ class FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgCommons() {
-    return [this.id ? `id="${this.id}" ` : '', this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : ''].join('');
+    return [this.id ? `id="${escapeXml(String(this.id))}" ` : '', this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : ''].join('');
   }
 
   /**
@@ -4802,7 +4875,7 @@ class FabricObjectSVGExportMixin {
     return reviver ? reviver(markup.join('')) : markup.join('');
   }
   addPaintOrder() {
-    return this.paintFirst !== FILL ? ` paint-order="${this.paintFirst}" ` : '';
+    return this.paintFirst !== FILL ? ` paint-order="${escapeXml(this.paintFirst)}" ` : '';
   }
 }
 
@@ -4826,13 +4899,13 @@ const textDefaultValues = {
   _reSpaceAndTab: /[ \t\r]/,
   _reWords: /\S+/g,
   fontSize: 40,
-  fontWeight: 'normal',
+  fontWeight: NORMAL,
   fontFamily: 'Times New Roman',
   underline: false,
   overline: false,
   linethrough: false,
   textAlign: LEFT,
-  fontStyle: 'normal',
+  fontStyle: NORMAL,
   lineHeight: 1.16,
   textBackgroundColor: '',
   stroke: null,
@@ -4843,7 +4916,7 @@ const textDefaultValues = {
   pathAlign: 'baseline',
   charSpacing: 0,
   deltaY: 0,
-  direction: 'ltr',
+  direction: LTR,
   CACHE_FONT_SIZE: 400,
   MIN_TEXT_WIDTH: 2,
   // Text magic numbers
@@ -4940,7 +5013,6 @@ const reViewBoxAttrValue = new RegExp(String.raw`^\s*(${reNum})${viewportSeparat
 
 (?:$|\s): This captures either the end of the line or a whitespace character. It ensures that the match ends either at the end of the string or with a whitespace character.
    */
-// eslint-disable-next-line max-len
 
 const shadowOffsetRegex = '(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?';
 const reOffsetsAndBlur = new RegExp('(?:\\s|^)' + shadowOffsetRegex + shadowOffsetRegex + '(' + reNum + '?(?:px)?)?(?:\\s?|$)(?:$|\\s)');
@@ -4955,7 +5027,7 @@ const shadowDefaultValues = {
 };
 class Shadow {
   /**
-   * @see {@link http://fabricjs.com/shadows|Shadow demo}
+   * @see {@link http://fabric5.fabricjs.com/shadows|Shadow demo}
    * @param {Object|String} [options] Options object with any of color, blur, offsetX, offsetY properties or string (e.g. "rgba(0,0,0,0.2) 2px 2px 10px")
    */
 
@@ -4999,14 +5071,15 @@ class Shadow {
   toSVG(object) {
     const offset = rotateVector(new Point(this.offsetX, this.offsetY), degreesToRadians(-object.angle)),
       BLUR_BOX = 20,
+      NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS,
       color = new Color(this.color);
     let fBoxX = 40,
       fBoxY = 40;
     if (object.width && object.height) {
       //http://www.w3.org/TR/SVG/filters.html#FilterEffectsRegion
       // we add some extra space to filter box to contain the blur ( 20 )
-      fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, config.NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
-      fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, config.NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
+      fBoxX = toFixed((Math.abs(offset.x) + this.blur) / object.width, NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
+      fBoxY = toFixed((Math.abs(offset.y) + this.blur) / object.height, NUM_FRACTION_DIGITS) * 100 + BLUR_BOX;
     }
     if (object.flipX) {
       offset.x *= -1;
@@ -5014,7 +5087,7 @@ class Shadow {
     if (object.flipY) {
       offset.y *= -1;
     }
-    return `<filter id="SVGID_${this.id}" y="-${fBoxY}%" height="${100 + 2 * fBoxY}%" x="-${fBoxX}%" width="${100 + 2 * fBoxX}%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(this.blur ? this.blur / 2 : 0, config.NUM_FRACTION_DIGITS)}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(offset.x, config.NUM_FRACTION_DIGITS)}" dy="${toFixed(offset.y, config.NUM_FRACTION_DIGITS)}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
+    return `<filter id="SVGID_${escapeXml(this.id)}" y="-${fBoxY}%" height="${100 + 2 * fBoxY}%" x="-${fBoxX}%" width="${100 + 2 * fBoxX}%" >\n\t<feGaussianBlur in="SourceAlpha" stdDeviation="${toFixed(this.blur ? this.blur / 2 : 0, NUM_FRACTION_DIGITS)}"></feGaussianBlur>\n\t<feOffset dx="${toFixed(offset.x, NUM_FRACTION_DIGITS)}" dy="${toFixed(offset.y, NUM_FRACTION_DIGITS)}" result="oBlur" ></feOffset>\n\t<feFlood flood-color="${color.toRgb()}" flood-opacity="${color.getAlpha()}"/>\n\t<feComposite in2="oBlur" operator="in" />\n\t<feMerge>\n\t\t<feMergeNode></feMergeNode>\n\t\t<feMergeNode in="SourceGraphic"></feMergeNode>\n\t</feMerge>\n</filter>\n`;
   }
 
   /**
@@ -5090,8 +5163,8 @@ const fabricObjectDefaultValues = {
   minScaleLimit: 0,
   skewX: 0,
   skewY: 0,
-  originX: LEFT,
-  originY: TOP,
+  originX: CENTER,
+  originY: CENTER,
   strokeWidth: 1,
   strokeUniform: false,
   padding: 0,
@@ -5764,7 +5837,6 @@ class Intersection {
    * Appends points of intersection
    * @param {...Point[]} points
    * @return {Intersection} thisArg
-   * @chainable
    */
   append() {
     for (var _len = arguments.length, points = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -5812,7 +5884,7 @@ class Intersection {
   }
 
   /**
-   * Use the ray casting algorithm to determine if {@link point} is in the polygon defined by {@link points}
+   * Use the ray casting algorithm to determine if point is in the polygon defined by points
    * @see https://en.wikipedia.org/wiki/Point_in_polygon
    * @param point
    * @param points polygon points
@@ -6024,35 +6096,35 @@ class ObjectGeometry extends CommonMethods {
    */
 
   /**
-   * @returns {number} x position according to object's {@link originX} property in canvas coordinate plane
+   * @returns {number} x position according to object's originX property in canvas coordinate plane
    */
   getX() {
     return this.getXY().x;
   }
 
   /**
-   * @param {number} value x position according to object's {@link originX} property in canvas coordinate plane
+   * @param {number} value x position according to object's originX property in canvas coordinate plane
    */
   setX(value) {
     this.setXY(this.getXY().setX(value));
   }
 
   /**
-   * @returns {number} y position according to object's {@link originY} property in canvas coordinate plane
+   * @returns {number} y position according to object's originY property in canvas coordinate plane
    */
   getY() {
     return this.getXY().y;
   }
 
   /**
-   * @param {number} value y position according to object's {@link originY} property in canvas coordinate plane
+   * @param {number} value y position according to object's originY property in canvas coordinate plane
    */
   setY(value) {
     this.setXY(this.getXY().setY(value));
   }
 
   /**
-   * @returns {number} x position according to object's {@link originX} property in parent's coordinate plane\
+   * @returns {number} x position according to object's originX property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link getX}
    */
   getRelativeX() {
@@ -6060,7 +6132,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @param {number} value x position according to object's {@link originX} property in parent's coordinate plane\
+   * @param {number} value x position according to object's originX property in parent's coordinate plane\
    * if parent is canvas then this method is identical to {@link setX}
    */
   setRelativeX(value) {
@@ -6068,7 +6140,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {number} y position according to object's {@link originY} property in parent's coordinate plane\
+   * @returns {number} y position according to object's originY property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link getY}
    */
   getRelativeY() {
@@ -6076,7 +6148,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @param {number} value y position according to object's {@link originY} property in parent's coordinate plane\
+   * @param {number} value y position according to object's originY property in parent's coordinate plane\
    * if parent is canvas then this property is identical to {@link setY}
    */
   setRelativeY(value) {
@@ -6084,7 +6156,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {Point} x position according to object's {@link originX} {@link originY} properties in canvas coordinate plane
+   * @returns {Point} x position according to object's originX originY properties in canvas coordinate plane
    */
   getXY() {
     const relativePosition = this.getRelativeXY();
@@ -6093,7 +6165,7 @@ class ObjectGeometry extends CommonMethods {
 
   /**
    * Set an object position to a particular point, the point is intended in absolute ( canvas ) coordinate.
-   * You can specify {@link originX} and {@link originY} values,
+   * You can specify originX and originY values,
    * that otherwise are the object's current values.
    * @example <caption>Set object's bottom left corner to point (5,5) on canvas</caption>
    * object.setXY(new Point(5, 5), 'left', 'bottom').
@@ -6109,7 +6181,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * @returns {Point} x,y position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
+   * @returns {Point} x,y position according to object's originX originY properties in parent's coordinate plane
    */
   getRelativeXY() {
     return new Point(this.left, this.top);
@@ -6117,7 +6189,7 @@ class ObjectGeometry extends CommonMethods {
 
   /**
    * As {@link setXY}, but in current parent's coordinate plane (the current group if any or the canvas)
-   * @param {Point} point position according to object's {@link originX} {@link originY} properties in parent's coordinate plane
+   * @param {Point} point position according to object's originX originY properties in parent's coordinate plane
    * @param {TOriginX} [originX] Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} [originY] Vertical origin: 'top', 'center' or 'bottom'
    */
@@ -6153,7 +6225,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * Checks if object intersects with the scene rect formed by {@link tl} and {@link br}
+   * Checks if object intersects with the scene rect formed by tl and br
    */
   intersectsWithRect(tl, br) {
     const intersection = Intersection.intersectPolygonRectangle(this.getCoords(), tl, br);
@@ -6181,7 +6253,7 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * Checks if object is fully contained within the scene rect formed by {@link tl} and {@link br}
+   * Checks if object is fully contained within the scene rect formed by tl and br
    */
   isContainedWithinRect(tl, br) {
     const {
@@ -6374,7 +6446,7 @@ class ObjectGeometry extends CommonMethods {
   /**
    * Sets corner and controls position coordinates based on current angle, width and height, left and top.
    * aCoords are used to quickly find an object on the canvas.
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabric5.fabricjs.com/fabric-gotchas}
    */
   setCoords() {
     this.aCoords = this.calcACoords();
@@ -6425,7 +6497,7 @@ class ObjectGeometry extends CommonMethods {
   calcOwnMatrix() {
     const key = this.transformMatrixKey(true),
       cache = this.ownMatrixCache;
-    if (cache && cache.key === key) {
+    if (cache && cache.key.every((x, i) => x === key[i])) {
       return cache.value;
     }
     const center = this.getRelativeCenterPoint(),
@@ -6603,17 +6675,26 @@ class ObjectGeometry extends CommonMethods {
   }
 
   /**
-   * Returns the position of the object as if it has a different origin.
+   * Alias of {@link getPositionByOrigin}
+   * @deprecated use {@link getPositionByOrigin} instead
+   */
+  getPointByOrigin(originX, originY) {
+    return this.getPositionByOrigin(originX, originY);
+  }
+
+  /**
+   * This function is the mirror of {@link setPositionByOrigin}
+   * Returns the position of the object based on specified origin.
    * Take an object that has left, top set to 100, 100 with origin 'left', 'top'.
    * Return the values of left top ( wrapped in a point ) that you would need to keep
-   * the same position if origin where different.
+   * the same position if origin where different ( ex: center, bottom )
    * Alternatively you can use this to also find which point in the parent plane is a specific origin
    * ( where is the bottom right corner of my object? )
    * @param {TOriginX} originX Horizontal origin: 'left', 'center' or 'right'
    * @param {TOriginY} originY Vertical origin: 'top', 'center' or 'bottom'
    * @return {Point}
    */
-  getPointByOrigin(originX, originY) {
+  getPositionByOrigin(originX, originY) {
     return this.translateToOriginPoint(this.getRelativeCenterPoint(), originX, originY);
   }
 
@@ -6637,13 +6718,22 @@ class ObjectGeometry extends CommonMethods {
    * @private
    */
   _getLeftTopCoords() {
-    return this.translateToOriginPoint(this.getRelativeCenterPoint(), LEFT, TOP);
+    return this.getPositionByOrigin(LEFT, TOP);
+  }
+
+  /**
+   * An utility method to position the object by its left top corner.
+   * Useful to reposition objects since now the default origin is center/center
+   * Places the left/top corner of the object bounding box in p.
+   */
+  positionByLeftTop(p) {
+    return this.setPositionByOrigin(p, LEFT, TOP);
   }
 }
 
 /**
  * Root object class from which all 2d shape classes inherit from
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#objects}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#objects}
  *
  * @fires added
  * @fires removed
@@ -7148,6 +7238,9 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
     } else {
       this._renderBackground(ctx);
     }
+    this.fire('before:render', {
+      ctx
+    });
     this._render(ctx);
     this._drawClipPath(ctx, this.clipPath, context);
     this.fill = originalFill;
@@ -7488,6 +7581,8 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
   /**
    * This function is an helper for svg import. it returns the center of the object in the svg
    * untransformed coordinates
+   * It doesn't matter where the objects origin are, svg has left and top in the top left corner,
+   * And this method is only run once on the object after the fromElement parser.
    * @private
    * @return {Point} center point from element coordinates
    */
@@ -7702,7 +7797,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
       const {
         x,
         y
-      } = this.translateToOriginPoint(this.getRelativeCenterPoint(), originX, originY);
+      } = this.getPositionByOrigin(originX, originY);
       this.left = x;
       this.top = y;
       this.originX = originX;
@@ -7755,7 +7850,7 @@ let FabricObject$1 = class FabricObject extends ObjectGeometry {
    * Animates object's properties
    * @param {Record<string, number | number[] | TColorArg>} animatable map of keys and end values
    * @param {Partial<AnimationOptions<T>>} options
-   * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#animation}
+   * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#animation}
    * @return {Record<string, TAnimation<T>>} map of animation contexts
    *
    * As object — multiple properties
@@ -8146,6 +8241,20 @@ _defineProperty(FabricObject$1, "customProperties", []);
 classRegistry.setClass(FabricObject$1);
 classRegistry.setClass(FabricObject$1, 'object');
 
+const fireEvent = (eventName, options) => {
+  var _target$canvas;
+  const {
+    transform: {
+      target
+    }
+  } = options;
+  (_target$canvas = target.canvas) === null || _target$canvas === void 0 || _target$canvas.fire(`object:${eventName}`, {
+    ...options,
+    target
+  });
+  target.fire(eventName, options);
+};
+
 /**
  * Wrap an action handler with firing an event if the action is performed
  * @param {TModificationEvents} eventName the event we want to fire
@@ -8179,8 +8288,7 @@ function wrapWithFixedAnchor(actionHandler) {
         originX,
         originY
       } = transform,
-      centerPoint = target.getRelativeCenterPoint(),
-      constraint = target.translateToOriginPoint(centerPoint, originX, originY),
+      constraint = target.getPositionByOrigin(originX, originY),
       actionPerformed = actionHandler(eventData, transform, x, y);
     // flipping requires to change the transform origin, so we read from the mutated transform
     // instead of leveraging the one destructured before
@@ -8189,33 +8297,61 @@ function wrapWithFixedAnchor(actionHandler) {
   };
 }
 
+const changeObjectDimensionGen = (dimension, origin, xorY, scale) => (eventData, transform, x, y) => {
+  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
+  const localPointValue = localPoint[xorY];
+  //  make sure the control changes width ONLY from it's side of target
+  const originValue = resolveOrigin(transform[origin]);
+  if (originValue === 0 || originValue > 0 && localPointValue < 0 || originValue < 0 && localPointValue > 0) {
+    const {
+        target
+      } = transform,
+      strokePadding = target.strokeWidth / (target.strokeUniform ? target[scale] : 1),
+      multiplier = isTransformCentered(transform) ? 2 : 1,
+      oldWidth = target[dimension],
+      newWidth = Math.abs(localPointValue * multiplier / target[scale]) - strokePadding;
+    target.set(dimension, Math.max(newWidth, 1));
+    //  check against actual target width in case `newWidth` was rejected
+    return oldWidth !== target[dimension];
+  }
+  return false;
+};
+
 /**
  * Action handler to change object's width
  * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * You want to use this only if you are building a new control handler and you want
+ * to reuse some logic. use "changeWidth" if you are looking to just use a control for width
  * @param {Event} eventData javascript event that is doing the transform
  * @param {Object} transform javascript object containing a series of information around the current transform
  * @param {number} x current mouse x position, canvas normalized
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if some change happened
  */
-const changeObjectWidth = (eventData, transform, x, y) => {
-  const localPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-  //  make sure the control changes width ONLY from it's side of target
-  if (resolveOrigin(transform.originX) === resolveOrigin(CENTER) || resolveOrigin(transform.originX) === resolveOrigin(RIGHT) && localPoint.x < 0 || resolveOrigin(transform.originX) === resolveOrigin(LEFT) && localPoint.x > 0) {
-    const {
-        target
-      } = transform,
-      strokePadding = target.strokeWidth / (target.strokeUniform ? target.scaleX : 1),
-      multiplier = isTransformCentered(transform) ? 2 : 1,
-      oldWidth = target.width,
-      newWidth = Math.abs(localPoint.x * multiplier / target.scaleX) - strokePadding;
-    target.set('width', Math.max(newWidth, 1));
-    //  check against actual target width in case `newWidth` was rejected
-    return oldWidth !== target.width;
-  }
-  return false;
-};
+const changeObjectWidth = changeObjectDimensionGen('width', 'originX', 'x', 'scaleX');
+
+/**
+ * Action handler to change object's height
+ * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * You want to use this only if you are building a new control handler and you want
+ * to reuse some logic. use "changeHeight" if you are looking to just use a control for height
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if some change happened
+ */
+const changeObjectHeight = changeObjectDimensionGen('height', 'originY', 'y', 'scaleY');
+
+/**
+ * Control handler for changing width
+ */
 const changeWidth = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectWidth));
+
+/**
+ * Control handler for changing height
+ */
+const changeHeight = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectHeight));
 
 /**
  * Render a round control, as per fabric features.
@@ -8229,33 +8365,24 @@ const changeWidth = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObject
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 function renderCircleControl(ctx, left, top, styleOverride, fabricObject) {
-  styleOverride = styleOverride || {};
-  const xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-    transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ? styleOverride.transparentCorners : fabricObject.transparentCorners,
-    methodName = transparentCorners ? STROKE : FILL,
-    stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor);
-  let myLeft = left,
-    myTop = top,
-    size;
   ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
-  ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
+  const {
+    stroke,
+    xSize,
+    ySize,
+    opName
+  } = this.commonRenderProps(ctx, left, top, fabricObject, styleOverride);
+  let size = xSize;
   // TODO: use proper ellipse code.
   if (xSize > ySize) {
-    size = xSize;
     ctx.scale(1.0, ySize / xSize);
-    myTop = top * xSize / ySize;
   } else if (ySize > xSize) {
     size = ySize;
     ctx.scale(xSize / ySize, 1.0);
-    myLeft = left * ySize / xSize;
-  } else {
-    size = xSize;
   }
   ctx.beginPath();
-  ctx.arc(myLeft, myTop, size / 2, 0, twoMathPi, false);
-  ctx[methodName]();
+  ctx.arc(0, 0, size / 2, 0, twoMathPi, false);
+  ctx[opName]();
   if (stroke) {
     ctx.stroke();
   }
@@ -8274,25 +8401,19 @@ function renderCircleControl(ctx, left, top, styleOverride, fabricObject) {
  * @param {FabricObject} fabricObject the fabric object for which we are rendering controls
  */
 function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
-  styleOverride = styleOverride || {};
-  const xSize = this.sizeX || styleOverride.cornerSize || fabricObject.cornerSize,
-    ySize = this.sizeY || styleOverride.cornerSize || fabricObject.cornerSize,
-    transparentCorners = typeof styleOverride.transparentCorners !== 'undefined' ? styleOverride.transparentCorners : fabricObject.transparentCorners,
-    methodName = transparentCorners ? STROKE : FILL,
-    stroke = !transparentCorners && (styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor),
+  ctx.save();
+  const {
+      stroke,
+      xSize,
+      ySize,
+      opName
+    } = this.commonRenderProps(ctx, left, top, fabricObject, styleOverride),
     xSizeBy2 = xSize / 2,
     ySizeBy2 = ySize / 2;
-  ctx.save();
-  ctx.fillStyle = styleOverride.cornerColor || fabricObject.cornerColor || '';
-  ctx.strokeStyle = styleOverride.cornerStrokeColor || fabricObject.cornerStrokeColor || '';
-  ctx.translate(left, top);
-  //  angle is relative to canvas plane
-  const angle = fabricObject.getTotalAngle();
-  ctx.rotate(degreesToRadians(angle));
   // this does not work, and fixed with ( && ) does not make sense.
   // to have real transparent corners we need the controls on upperCanvas
   // transparentCorners || ctx.clearRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
-  ctx[`${methodName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
+  ctx[`${opName}Rect`](-xSizeBy2, -ySizeBy2, xSize, ySize);
   if (stroke) {
     ctx.strokeRect(-xSizeBy2, -ySizeBy2, xSize, ySize);
   }
@@ -8409,6 +8530,14 @@ class Control {
      */
     _defineProperty(this, "withConnection", false);
     Object.assign(this, options);
+  }
+  getTransformAnchorPoint() {
+    var _this$transformAnchor;
+    return (// return the control transformAnchorPoint
+      (_this$transformAnchor = this.transformAnchorPoint) !== null && _this$transformAnchor !== void 0 ? _this$transformAnchor :
+      // otherwise will return the opposite origin of where the control is located.
+      new Point(-this.x + 0.5, -this.y + 0.5)
+    );
   }
 
   /**
@@ -8553,6 +8682,41 @@ class Control {
   }
 
   /**
+   * This is an helper method to prepare the canvas to render a control
+   * It detectes common control properties and sets the correct fill and
+   * stroke styles on the context. It does not execute translations or
+   * rotations since different controls need differnt combination of these.
+   */
+  commonRenderProps(ctx, left, top, fabricObject) {
+    let styleOverride = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+    const {
+        cornerSize,
+        cornerColor,
+        transparentCorners,
+        cornerStrokeColor
+      } = styleOverride,
+      sizeFromProps = cornerSize || fabricObject.cornerSize,
+      xSize = this.sizeX || sizeFromProps,
+      ySize = this.sizeY || sizeFromProps,
+      transparent = typeof transparentCorners !== 'undefined' ? transparentCorners : fabricObject.transparentCorners,
+      opName = transparent ? STROKE : FILL,
+      strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
+      stroke = !transparent && !!strokeColor;
+    ctx.fillStyle = cornerColor || fabricObject.cornerColor || '';
+    ctx.strokeStyle = strokeColor || '';
+    ctx.translate(left, top);
+    //  angle is relative to canvas plane
+    ctx.rotate(degreesToRadians(fabricObject.getTotalAngle()));
+    return {
+      stroke,
+      xSize,
+      ySize,
+      transparentCorners: transparent,
+      opName
+    };
+  }
+
+  /**
    * Render function for the control.
    * When this function runs the context is unscaled. unrotate. Just retina scaled.
    * all the functions will have to translate to the point left,top before starting Drawing
@@ -8610,7 +8774,7 @@ const rotateObjectWithSnapping = (eventData, _ref, x, y) => {
     originX,
     originY
   } = _ref;
-  const pivotPoint = target.translateToOriginPoint(target.getRelativeCenterPoint(), originX, originY);
+  const pivotPoint = target.getPositionByOrigin(originX, originY);
   if (isLocked(target, 'lockRotation')) {
     return false;
   }
@@ -9319,7 +9483,7 @@ class InteractiveFabricObject extends FabricObject$1 {
 
   /**
    * @override set controls' coordinates as well
-   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link http://fabricjs.com/fabric-gotchas}
+   * See {@link https://github.com/fabricjs/fabric.js/wiki/When-to-call-setCoords} and {@link https://fabric5.fabricjs.com/fabric-gotchas}
    * @return {void}
    */
   setCoords() {
@@ -10191,111 +10355,6 @@ const cloneStyles = style => {
 };
 
 /**
- * Capitalizes a string
- * @param {String} string String to capitalize
- * @param {Boolean} [firstLetterOnly] If true only first letter is capitalized
- * and other letters stay untouched, if false first letter is capitalized
- * and other letters are converted to lowercase.
- * @return {String} Capitalized version of a string
- */
-const capitalize = function (string) {
-  let firstLetterOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  return `${string.charAt(0).toUpperCase()}${firstLetterOnly ? string.slice(1) : string.slice(1).toLowerCase()}`;
-};
-
-/**
- * Escapes XML in a string
- * @param {String} string String to escape
- * @return {String} Escaped version of a string
- */
-const escapeXml = string => string.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-let segmenter;
-const getSegmenter = () => {
-  if (!segmenter) {
-    segmenter = 'Intl' in getFabricWindow() && 'Segmenter' in Intl && new Intl.Segmenter(undefined, {
-      granularity: 'grapheme'
-    });
-  }
-  return segmenter;
-};
-
-/**
- * Divide a string in the user perceived single units
- * @param {String} textstring String to escape
- * @return {Array} array containing the graphemes
- */
-const graphemeSplit = textstring => {
-  segmenter || getSegmenter();
-  if (segmenter) {
-    const segments = segmenter.segment(textstring);
-    return Array.from(segments).map(_ref => {
-      let {
-        segment
-      } = _ref;
-      return segment;
-    });
-  }
-
-  //Fallback
-  return graphemeSplitImpl(textstring);
-};
-const graphemeSplitImpl = textstring => {
-  const graphemes = [];
-  for (let i = 0, chr; i < textstring.length; i++) {
-    if ((chr = getWholeChar(textstring, i)) === false) {
-      continue;
-    }
-    graphemes.push(chr);
-  }
-  return graphemes;
-};
-
-// taken from mdn in the charAt doc page.
-const getWholeChar = (str, i) => {
-  const code = str.charCodeAt(i);
-  if (isNaN(code)) {
-    return ''; // Position not found
-  }
-  if (code < 0xd800 || code > 0xdfff) {
-    return str.charAt(i);
-  }
-
-  // High surrogate (could change last hex to 0xDB7F to treat high private
-  // surrogates as single characters)
-  if (0xd800 <= code && code <= 0xdbff) {
-    if (str.length <= i + 1) {
-      throw 'High surrogate without following low surrogate';
-    }
-    const next = str.charCodeAt(i + 1);
-    if (0xdc00 > next || next > 0xdfff) {
-      throw 'High surrogate without following low surrogate';
-    }
-    return str.charAt(i) + str.charAt(i + 1);
-  }
-  // Low surrogate (0xDC00 <= code && code <= 0xDFFF)
-  if (i === 0) {
-    throw 'Low surrogate without preceding high surrogate';
-  }
-  const prev = str.charCodeAt(i - 1);
-
-  // (could change last hex to 0xDB7F to treat high private
-  // surrogates as single characters)
-  if (0xd800 > prev || prev > 0xdbff) {
-    throw 'Low surrogate without preceding high surrogate';
-  }
-  // We can pass over low surrogates now as the second component
-  // in a pair which we have already processed
-  return false;
-};
-
-var lang_string = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  capitalize: capitalize,
-  escapeXml: escapeXml,
-  graphemeSplit: graphemeSplit
-});
-
-/**
  * @param {Object} prevStyle first style to compare
  * @param {Object} thisStyle second style to compare
  * @param {boolean} forTextSpans whether to check overline, underline, and line-through properties
@@ -10477,9 +10536,9 @@ const normalizeAttr = attr => {
 };
 
 const regex$1 = new RegExp(`(${reNum})`, 'gi');
-const cleanupSvgAttribute = attributeValue => attributeValue.replace(regex$1, ' $1 ')
+const cleanupSvgAttribute = attributeValue => normalizeWs(attributeValue.replace(regex$1, ' $1 ')
 // replace annoying commas and arbitrary whitespace with single spaces
-.replace(/,/gi, ' ').replace(/\s+/gi, ' ');
+.replace(/,/gi, ' '));
 
 // == begin transform regexp
 const p$1 = `(${reNum})`;
@@ -10500,8 +10559,6 @@ const reTransformAll = new RegExp(transform, 'g');
 
 /**
  * Parses "transform" attribute, returning an array of values
- * @static
- * @function
  * @param {String} attributeValue String containing attribute value
  * @return {TTransformMatrix} Array of 6 elements representing transformation matrix
  */
@@ -10617,8 +10674,6 @@ function normalizeValue(attr, value, parentAttributes, fontSize) {
 
 /**
  * Parses a short font declaration, building adding its properties to a style object
- * @static
- * @function
  * @param {String} value font declaration
  * @param {Object} oStyle definition
  */
@@ -10647,7 +10702,7 @@ function parseFontDeclaration(value, oStyle) {
     oStyle.fontFamily = fontFamily;
   }
   if (lineHeight) {
-    oStyle.lineHeight = lineHeight === 'normal' ? 1 : lineHeight;
+    oStyle.lineHeight = lineHeight === NORMAL ? 1 : lineHeight;
   }
 }
 
@@ -10683,7 +10738,6 @@ function parseStyleString(style, oStyle) {
 
 /**
  * Parses "style" attribute, retuning an object with values
- * @static
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */
@@ -10883,7 +10937,7 @@ class Rect extends FabricObject {
       rx,
       ry
     } = this;
-    return ['<rect ', 'COMMON_PARTS', `x="${-width / 2}" y="${-height / 2}" rx="${rx}" ry="${ry}" width="${width}" height="${height}" />\n`];
+    return ['<rect ', 'COMMON_PARTS', `x="${-width / 2}" y="${-height / 2}" rx="${escapeXml(rx)}" ry="${escapeXml(ry)}" width="${escapeXml(width)}" height="${escapeXml(height)}" />\n`];
   }
 
   /**
@@ -11848,7 +11902,7 @@ class Group extends createCollectionMixin(FabricObject) {
    * @return {String}
    */
   getSvgStyles() {
-    const opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ? `opacity: ${this.opacity};` : '',
+    const opacity = typeof this.opacity !== 'undefined' && this.opacity !== 1 ? `opacity: ${escapeXml(this.opacity)};` : '',
       visibility = this.visible ? '' : ' visibility: hidden;';
     return [opacity, this.getSvgFilter(), visibility].join('');
   }
@@ -11914,7 +11968,6 @@ classRegistry.setClass(Group);
 /**
  * TODO experiment with different layout manager and svg results ( fixed fit content )
  * Groups SVG elements (usually those retrieved from SVG document)
- * @static
  * @param {FabricObject[]} elements FabricObject(s) parsed from svg, to group
  * @return {FabricObject | Group}
  */
@@ -13143,19 +13196,301 @@ const canvasDefaults = {
   perPixelTargetFind: false,
   targetFindTolerance: 0,
   skipTargetFind: false,
-  stopContextMenu: false,
-  fireRightClick: false,
-  fireMiddleClick: false,
+  stopContextMenu: true,
+  fireRightClick: true,
+  fireMiddleClick: true,
   enablePointerEvents: false,
   containerClass: 'canvas-container',
   preserveObjectStacking: true
 };
 
 /**
+ * Action handler
+ * @private
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if the translation occurred
+ */
+const dragHandler = (eventData, transform, x, y) => {
+  const {
+      target,
+      offsetX,
+      offsetY
+    } = transform,
+    newLeft = x - offsetX,
+    newTop = y - offsetY,
+    moveX = !isLocked(target, 'lockMovementX') && target.left !== newLeft,
+    moveY = !isLocked(target, 'lockMovementY') && target.top !== newTop;
+  moveX && target.set(LEFT, newLeft);
+  moveY && target.set(TOP, newTop);
+  if (moveX || moveY) {
+    fireEvent(MOVING, commonEventInfo(eventData, transform, x, y));
+  }
+  return moveX || moveY;
+};
+
+const ACTION_NAME$1 = MODIFY_POLY;
+/**
+ * This function locates the controls.
+ * It'll be used both for drawing and for interaction.
+ */
+const createPolyPositionHandler = pointIndex => {
+  return function (dim, finalMatrix, polyObject) {
+    const {
+      points,
+      pathOffset
+    } = polyObject;
+    return new Point(points[pointIndex]).subtract(pathOffset).transform(multiplyTransformMatrices(polyObject.getViewportTransform(), polyObject.calcTransformMatrix()));
+  };
+};
+
+/**
+ * This function defines what the control does.
+ * It'll be called on every mouse move after a control has been clicked and is being dragged.
+ * The function receives as argument the mouse event, the current transform object
+ * and the current position in canvas coordinate `transform.target` is a reference to the
+ * current object being transformed.
+ */
+const polyActionHandler = (eventData, transform, x, y) => {
+  const {
+    target,
+    pointIndex
+  } = transform;
+  const poly = target;
+  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, poly.calcOwnMatrix());
+  poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
+  poly.setDimensions();
+  poly.set('dirty', true);
+  return true;
+};
+
+/**
+ * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
+ */
+const factoryPolyActionHandler = (pointIndex, fn) => {
+  return function (eventData, transform, x, y) {
+    const poly = transform.target,
+      anchorPoint = new Point(poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]),
+      anchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix()),
+      actionPerformed = fn(eventData, {
+        ...transform,
+        pointIndex
+      }, x, y);
+    const newAnchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix());
+    const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
+    poly.left -= diff.x;
+    poly.top -= diff.y;
+    return actionPerformed;
+  };
+};
+const createPolyActionHandler = pointIndex => wrapWithFireEvent(ACTION_NAME$1, factoryPolyActionHandler(pointIndex, polyActionHandler));
+function createPolyControls(arg0) {
+  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const controls = {};
+  for (let idx = 0; idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length); idx++) {
+    controls[`p${idx}`] = new Control({
+      actionName: ACTION_NAME$1,
+      positionHandler: createPolyPositionHandler(idx),
+      actionHandler: createPolyActionHandler(idx),
+      ...options
+    });
+  }
+  return controls;
+}
+
+const ACTION_NAME = 'modifyPath';
+const calcPathPointPosition = (pathObject, commandIndex, pointIndex) => {
+  const {
+    path,
+    pathOffset
+  } = pathObject;
+  const command = path[commandIndex];
+  return new Point(command[pointIndex] - pathOffset.x, command[pointIndex + 1] - pathOffset.y).transform(multiplyTransformMatrices(pathObject.getViewportTransform(), pathObject.calcTransformMatrix()));
+};
+const movePathPoint = (pathObject, x, y, commandIndex, pointIndex) => {
+  const {
+    path,
+    pathOffset
+  } = pathObject;
+  const anchorCommand = path[(commandIndex > 0 ? commandIndex : path.length) - 1];
+  const anchorPoint = new Point(anchorCommand[pointIndex], anchorCommand[pointIndex + 1]);
+  const anchorPointInParentPlane = anchorPoint.subtract(pathOffset).transform(pathObject.calcOwnMatrix());
+  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, pathObject.calcOwnMatrix());
+  path[commandIndex][pointIndex] = mouseLocalPosition.x + pathOffset.x;
+  path[commandIndex][pointIndex + 1] = mouseLocalPosition.y + pathOffset.y;
+  pathObject.setDimensions();
+  const newAnchorPointInParentPlane = anchorPoint.subtract(pathObject.pathOffset).transform(pathObject.calcOwnMatrix());
+  const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
+  pathObject.left -= diff.x;
+  pathObject.top -= diff.y;
+  pathObject.set('dirty', true);
+  return true;
+};
+
+/**
+ * This function locates the controls.
+ * It'll be used both for drawing and for interaction.
+ */
+function pathPositionHandler(dim, finalMatrix, pathObject) {
+  const {
+    commandIndex,
+    pointIndex
+  } = this;
+  return calcPathPointPosition(pathObject, commandIndex, pointIndex);
+}
+
+/**
+ * This function defines what the control does.
+ * It'll be called on every mouse move after a control has been clicked and is being dragged.
+ * The function receives as argument the mouse event, the current transform object
+ * and the current position in canvas coordinate `transform.target` is a reference to the
+ * current object being transformed.
+ */
+function pathActionHandler(eventData, transform, x, y) {
+  const {
+    target
+  } = transform;
+  const {
+    commandIndex,
+    pointIndex
+  } = this;
+  const actionPerformed = movePathPoint(target, x, y, commandIndex, pointIndex);
+  {
+    fireEvent(this.actionName, {
+      ...commonEventInfo(eventData, transform, x, y),
+      commandIndex,
+      pointIndex
+    });
+  }
+  return actionPerformed;
+}
+const indexFromPrevCommand = previousCommandType => previousCommandType === 'C' ? 5 : previousCommandType === 'Q' ? 3 : 1;
+class PathPointControl extends Control {
+  constructor(options) {
+    super(options);
+  }
+  render(ctx, left, top, styleOverride, fabricObject) {
+    const overrides = {
+      ...styleOverride,
+      cornerColor: this.controlFill,
+      cornerStrokeColor: this.controlStroke,
+      transparentCorners: !this.controlFill
+    };
+    super.render(ctx, left, top, overrides, fabricObject);
+  }
+}
+class PathControlPointControl extends PathPointControl {
+  constructor(options) {
+    super(options);
+  }
+  render(ctx, left, top, styleOverride, fabricObject) {
+    const {
+      path
+    } = fabricObject;
+    const {
+      commandIndex,
+      pointIndex,
+      connectToCommandIndex,
+      connectToPointIndex
+    } = this;
+    ctx.save();
+    ctx.strokeStyle = this.controlStroke;
+    if (this.connectionDashArray) {
+      ctx.setLineDash(this.connectionDashArray);
+    }
+    const [commandType] = path[commandIndex];
+    const point = calcPathPointPosition(fabricObject, connectToCommandIndex, connectToPointIndex);
+    if (commandType === 'Q') {
+      // one control point connects to 2 points
+      const point2 = calcPathPointPosition(fabricObject, commandIndex, pointIndex + 2);
+      ctx.moveTo(point2.x, point2.y);
+      ctx.lineTo(left, top);
+    } else {
+      ctx.moveTo(left, top);
+    }
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    ctx.restore();
+    super.render(ctx, left, top, styleOverride, fabricObject);
+  }
+}
+const createControl = (commandIndexPos, pointIndexPos, isControlPoint, options, connectToCommandIndex, connectToPointIndex) => new (isControlPoint ? PathControlPointControl : PathPointControl)({
+  commandIndex: commandIndexPos,
+  pointIndex: pointIndexPos,
+  actionName: ACTION_NAME,
+  positionHandler: pathPositionHandler,
+  actionHandler: pathActionHandler,
+  connectToCommandIndex,
+  connectToPointIndex,
+  ...options,
+  ...(isControlPoint ? options.controlPointStyle : options.pointStyle)
+});
+function createPathControls(path) {
+  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  const controls = {};
+  let previousCommandType = 'M';
+  path.path.forEach((command, commandIndex) => {
+    const commandType = command[0];
+    if (commandType !== 'Z') {
+      controls[`c_${commandIndex}_${commandType}`] = createControl(commandIndex, command.length - 2, false, options);
+    }
+    switch (commandType) {
+      case 'C':
+        controls[`c_${commandIndex}_C_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex - 1, indexFromPrevCommand(previousCommandType));
+        controls[`c_${commandIndex}_C_CP_2`] = createControl(commandIndex, 3, true, options, commandIndex, 5);
+        break;
+      case 'Q':
+        controls[`c_${commandIndex}_Q_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex, 3);
+        break;
+    }
+    previousCommandType = commandType;
+  });
+  return controls;
+}
+
+var index = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  changeHeight: changeHeight,
+  changeObjectHeight: changeObjectHeight,
+  changeObjectWidth: changeObjectWidth,
+  changeWidth: changeWidth,
+  createObjectDefaultControls: createObjectDefaultControls,
+  createPathControls: createPathControls,
+  createPolyActionHandler: createPolyActionHandler,
+  createPolyControls: createPolyControls,
+  createPolyPositionHandler: createPolyPositionHandler,
+  createResizeControls: createResizeControls,
+  createTextboxDefaultControls: createTextboxDefaultControls,
+  dragHandler: dragHandler,
+  factoryPolyActionHandler: factoryPolyActionHandler,
+  getLocalPoint: getLocalPoint,
+  polyActionHandler: polyActionHandler,
+  renderCircleControl: renderCircleControl,
+  renderSquareControl: renderSquareControl,
+  rotationStyleHandler: rotationStyleHandler,
+  rotationWithSnapping: rotationWithSnapping,
+  scaleCursorStyleHandler: scaleCursorStyleHandler,
+  scaleOrSkewActionName: scaleOrSkewActionName,
+  scaleSkewCursorStyleHandler: scaleSkewCursorStyleHandler,
+  scalingEqually: scalingEqually,
+  scalingX: scalingX,
+  scalingXOrSkewingY: scalingXOrSkewingY,
+  scalingY: scalingY,
+  scalingYOrSkewingX: scalingYOrSkewingX,
+  skewCursorStyleHandler: skewCursorStyleHandler,
+  skewHandlerX: skewHandlerX,
+  skewHandlerY: skewHandlerY,
+  wrapWithFireEvent: wrapWithFireEvent,
+  wrapWithFixedAnchor: wrapWithFixedAnchor
+});
+
+/**
  * Canvas class
  * @class Canvas
  * @extends StaticCanvas
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#canvas}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#canvas}
  *
  * @fires object:modified at the end of a transform
  * @fires object:rotating while an object is being rotated from the control
@@ -13256,27 +13591,21 @@ class SelectableCanvas extends StaticCanvas {
      * When true, mouse events on canvas (mousedown/mousemove/mouseup) result in free drawing.
      * After mousedown, mousemove creates a shape,
      * and then mouseup finalizes it and adds an instance of `fabric.Path` onto canvas.
-     * @tutorial {@link http://fabricjs.com/fabric-intro-part-4#free_drawing}
+     * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-4#free_drawing}
      * @type Boolean
      */
     // event config
     /**
-     * Keep track of the hovered target
+     * Keep track of the hovered target in the previous event
      * @type FabricObject | null
      * @private
      */
     /**
-     * hold the list of nested targets hovered
+     * hold the list of nested targets hovered in the previous events
      * @type FabricObject[]
      * @private
      */
     _defineProperty(this, "_hoveredTargets", []);
-    /**
-     * hold the list of objects to render
-     * @type FabricObject[]
-     * @private
-     */
-    _defineProperty(this, "_objectsToRender", void 0);
     /**
      * hold a reference to a data structure that contains information
      * on the current on going transform
@@ -13527,11 +13856,13 @@ class SelectableCanvas extends StaticCanvas {
    * Given the control clicked, determine the origin of the transform.
    * This is bad because controls can totally have custom names
    * should disappear before release 4.0
+   * Fabric 7.1, jan 2026 we are still using this.
+   * Needs to go.
    * @private
    * @deprecated
    */
   _getOriginFromCorner(target, controlName) {
-    const origin = {
+    const origin = controlName ? target.controls[controlName].getTransformAnchorPoint() : {
       x: target.originX,
       y: target.originY
     };
@@ -13539,6 +13870,9 @@ class SelectableCanvas extends StaticCanvas {
       return origin;
     }
 
+    // this part down here is deprecated.
+    // It is left to do not change the standard behavior in the middle of a major version
+    // but when possible `getTransformAnchorPoint` will be the only source of truth
     // is a left control ?
     if (['ml', 'tl', 'bl'].includes(controlName)) {
       origin.x = RIGHT;
@@ -13578,37 +13912,52 @@ class SelectableCanvas extends StaticCanvas {
         x: CENTER,
         y: CENTER
       } : this._getOriginFromCorner(target, corner),
+      {
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+        left,
+        top,
+        angle,
+        width,
+        height,
+        cropX,
+        cropY
+      } = target,
       /**
        * relative to target's containing coordinate plane
        * both agree on every point
        **/
       transform = {
-        target: target,
+        target,
         action,
         actionHandler,
         actionPerformed: false,
         corner,
-        scaleX: target.scaleX,
-        scaleY: target.scaleY,
-        skewX: target.skewX,
-        skewY: target.skewY,
-        offsetX: pointer.x - target.left,
-        offsetY: pointer.y - target.top,
+        scaleX,
+        scaleY,
+        skewX,
+        skewY,
+        offsetX: pointer.x - left,
+        offsetY: pointer.y - top,
         originX: origin.x,
         originY: origin.y,
         ex: pointer.x,
         ey: pointer.y,
         lastX: pointer.x,
         lastY: pointer.y,
-        theta: degreesToRadians(target.angle),
-        width: target.width,
-        height: target.height,
+        theta: degreesToRadians(angle),
+        width,
+        height,
         shiftKey: e.shiftKey,
         altKey,
         original: {
           ...saveObjectTransform(target),
           originX: origin.x,
-          originY: origin.y
+          originY: origin.y,
+          cropX,
+          cropY
         }
       };
     this._currentTransform = transform;
@@ -14468,7 +14817,7 @@ class Canvas extends SelectableCanvas {
       this[eventHandler] = this[eventHandler].bind(this);
     });
     // register event handlers
-    this.addOrRemove(addListener, 'add');
+    this.addOrRemove(addListener);
   }
 
   /**
@@ -14478,7 +14827,8 @@ class Canvas extends SelectableCanvas {
   _getEventPrefix() {
     return this.enablePointerEvents ? 'pointer' : 'mouse';
   }
-  addOrRemove(functor, _eventjsFunctor) {
+  addOrRemove(functor) {
+    let forTouch = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     functor(getWindowFromElement(canvasElement), 'resize', this._onResize);
@@ -14486,11 +14836,14 @@ class Canvas extends SelectableCanvas {
     functor(canvasElement, `${eventTypePrefix}move`, this._onMouseMove, addEventOptions);
     functor(canvasElement, `${eventTypePrefix}out`, this._onMouseOut);
     functor(canvasElement, `${eventTypePrefix}enter`, this._onMouseEnter);
-    functor(canvasElement, 'wheel', this._onMouseWheel);
+    functor(canvasElement, 'wheel', this._onMouseWheel, {
+      passive: false
+    });
     functor(canvasElement, 'contextmenu', this._onContextMenu);
-    functor(canvasElement, 'click', this._onClick);
-    // decide if to remove in fabric 7.0
-    functor(canvasElement, 'dblclick', this._onClick);
+    if (!forTouch) {
+      functor(canvasElement, 'click', this._onClick);
+      functor(canvasElement, 'dblclick', this._onClick);
+    }
     functor(canvasElement, 'dragstart', this._onDragStart);
     functor(canvasElement, 'dragend', this._onDragEnd);
     functor(canvasElement, 'dragover', this._onDragOver);
@@ -14500,24 +14853,13 @@ class Canvas extends SelectableCanvas {
     if (!this.enablePointerEvents) {
       functor(canvasElement, 'touchstart', this._onTouchStart, addEventOptions);
     }
-    // if (typeof eventjs !== 'undefined' && eventjsFunctor in eventjs) {
-    //   eventjs[eventjsFunctor](canvasElement, 'gesture', this._onGesture);
-    //   eventjs[eventjsFunctor](canvasElement, 'drag', this._onDrag);
-    //   eventjs[eventjsFunctor](
-    //     canvasElement,
-    //     'orientation',
-    //     this._onOrientationChange
-    //   );
-    //   eventjs[eventjsFunctor](canvasElement, 'shake', this._onShake);
-    //   eventjs[eventjsFunctor](canvasElement, 'longpress', this._onLongPress);
-    // }
   }
 
   /**
    * Removes all event listeners, used when disposing the instance
    */
   removeListeners() {
-    this.addOrRemove(removeListener, 'remove');
+    this.addOrRemove(removeListener);
     // if you dispose on a mouseDown, before mouse up, you need to clean document to...
     const eventTypePrefix = this._getEventPrefix();
     const doc = getDocumentFromElement(this.upperCanvasEl);
@@ -14855,6 +15197,36 @@ class Canvas extends SelectableCanvas {
     this._cacheTransformEventData(e);
     clicks == 2 && e.type === 'dblclick' && this._handleEvent(e, 'dblclick');
     clicks == 3 && this._handleEvent(e, 'tripleclick');
+    this._resetTransformEventData();
+  }
+
+  /**
+   * This supports gesture event firing
+   * It is a method to keep some code organized, it exposes private methods
+   * in a way that works and still keep them private
+   * This is supposed to mirror _handleEvent
+   */
+  fireEventFromPointerEvent(e, eventName, secondaryName) {
+    let extraData = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    this._cacheTransformEventData(e);
+    const {
+        target,
+        subTargets
+      } = this.findTarget(e),
+      options = {
+        e,
+        target,
+        subTargets,
+        ...getEventPoints(this, e),
+        transform: this._currentTransform,
+        ...extraData
+      };
+    this.fire(eventName, options);
+    // this may be a little be more complicated of what we want to handle
+    target && target.fire(secondaryName, options);
+    for (let i = 0; i < subTargets.length; i++) {
+      subTargets[i] !== target && subTargets[i].fire(secondaryName, options);
+    }
     this._resetTransformEventData();
   }
 
@@ -15373,8 +15745,10 @@ class Canvas extends SelectableCanvas {
    * @private
    */
   _fireOverOutEvents(e, target) {
-    const _hoveredTarget = this._hoveredTarget,
-      _hoveredTargets = this._hoveredTargets,
+    const {
+        _hoveredTarget,
+        _hoveredTargets
+      } = this,
       {
         subTargets
       } = this.findTarget(e),
@@ -15386,6 +15760,9 @@ class Canvas extends SelectableCanvas {
       fireCanvas: true
     });
     for (let i = 0; i < length; i++) {
+      if (subTargets[i] === target || _hoveredTargets[i] && _hoveredTargets[i] === _hoveredTarget) {
+        continue;
+      }
       this.fireSyntheticInOutEvents('mouse', {
         e,
         target: subTargets[i],
@@ -15706,6 +16083,23 @@ class Canvas extends SelectableCanvas {
   }
 
   /**
+   * Wraps the original toCanvasElement with a function that removes
+   * the context top for the time the function is run.
+   * So we avoid painting side effects on the upper canvas when exporting
+   */
+  toCanvasElement() {
+    let multiplier = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    let options = arguments.length > 1 ? arguments[1] : undefined;
+    const {
+      upper
+    } = this.elements;
+    upper.ctx = undefined;
+    const htmlElement = super.toCanvasElement(multiplier, options);
+    upper.ctx = upper.el.getContext('2d');
+    return htmlElement;
+  }
+
+  /**
    * @override clear {@link textEditingManager}
    */
   clear() {
@@ -15745,15 +16139,20 @@ const ifNaN = (value, valueIfNaN) => {
   return isNaN(value) && typeof valueIfNaN === 'number' ? valueIfNaN : value;
 };
 
-const RE_PERCENT = /^(\d+\.\d+)%|(\d+)%$/;
+/**
+ * Will loosely accept as percent numbers that are not like
+ * 3.4a%. This function does not check for the correctness of a percentage
+ * but it checks that values that are in theory correct are or arent percentages
+ */
 function isPercent(value) {
-  return value && RE_PERCENT.test(value);
+  // /%$/ Matches strings that end with a percent sign (%)
+  return value && /%$/.test(value) && Number.isFinite(parseFloat(value));
 }
 
 /**
- *
+ * Parse a percentage value in an svg.
  * @param value
- * @param valueIfNaN
+ * @param fallback in case of not possible to parse the number
  * @returns ∈ [0, 1]
  */
 function parsePercent(value, valueIfNaN) {
@@ -15813,15 +16212,16 @@ function convertPercentUnitsToValues(valuesToConvert, _ref) {
     gradientUnits
   } = _ref;
   let finalValue;
-  return Object.keys(valuesToConvert).reduce((acc, prop) => {
-    const propValue = valuesToConvert[prop];
+  return Object.entries(valuesToConvert).reduce((acc, _ref2) => {
+    let [prop, propValue] = _ref2;
     if (propValue === 'Infinity') {
       finalValue = 1;
     } else if (propValue === '-Infinity') {
       finalValue = 0;
     } else {
-      finalValue = typeof propValue === 'string' ? parseFloat(propValue) : propValue;
-      if (typeof propValue === 'string' && isPercent(propValue)) {
+      const isString = typeof propValue === 'string';
+      finalValue = isString ? parseFloat(propValue) : propValue;
+      if (isString && isPercent(propValue)) {
         finalValue *= 0.01;
         if (gradientUnits === 'pixels') {
           // then we need to fix those percentages here in svg parsing
@@ -15869,7 +16269,7 @@ function parseCoords(el, size) {
 /**
  * Gradient class
  * @class Gradient
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#gradients}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#gradients}
  */
 class Gradient {
   constructor(options) {
@@ -15970,7 +16370,8 @@ class Gradient {
     }
     transform[4] -= offsetX;
     transform[5] -= offsetY;
-    const commonAttributes = [`id="SVGID_${this.id}"`, `gradientUnits="${gradientUnits}"`, `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`, ''].join(' ');
+    const commonAttributes = [`id="SVGID_${escapeXml(String(this.id))}"`, `gradientUnits="${gradientUnits}"`, `gradientTransform="${preTransform ? preTransform + ' ' : ''}${matrixToSVG(transform)}"`, ''].join(' ');
+    const sanitizeCoord = value => parseFloat(String(value));
     if (this.type === 'linear') {
       const {
         x1,
@@ -15978,7 +16379,11 @@ class Gradient {
         x2,
         y2
       } = this.coords;
-      markup.push('<linearGradient ', commonAttributes, ' x1="', x1, '" y1="', y1, '" x2="', x2, '" y2="', y2, '">\n');
+      const sx1 = sanitizeCoord(x1);
+      const sy1 = sanitizeCoord(y1);
+      const sx2 = sanitizeCoord(x2);
+      const sy2 = sanitizeCoord(y2);
+      markup.push('<linearGradient ', commonAttributes, ' x1="', sx1, '" y1="', sy1, '" x2="', sx2, '" y2="', sy2, '">\n');
     } else if (this.type === 'radial') {
       const {
         x1,
@@ -15988,9 +16393,15 @@ class Gradient {
         r1,
         r2
       } = this.coords;
-      const needsSwap = r1 > r2;
+      const sx1 = sanitizeCoord(x1);
+      const sy1 = sanitizeCoord(y1);
+      const sx2 = sanitizeCoord(x2);
+      const sy2 = sanitizeCoord(y2);
+      const sr1 = sanitizeCoord(r1);
+      const sr2 = sanitizeCoord(r2);
+      const needsSwap = sr1 > sr2;
       // svg radial gradient has just 1 radius. the biggest.
-      markup.push('<radialGradient ', commonAttributes, ' cx="', needsSwap ? x1 : x2, '" cy="', needsSwap ? y1 : y2, '" r="', needsSwap ? r1 : r2, '" fx="', needsSwap ? x2 : x1, '" fy="', needsSwap ? y2 : y1, '">\n');
+      markup.push('<radialGradient ', commonAttributes, ' cx="', needsSwap ? sx1 : sx2, '" cy="', needsSwap ? sy1 : sy2, '" r="', needsSwap ? sr1 : sr2, '" fx="', needsSwap ? sx2 : sx1, '" fy="', needsSwap ? sy2 : sy1, '">\n');
       if (needsSwap) {
         // svg goes from internal to external radius. if radius are inverted, swap color stops.
         colorStops.reverse(); //  mutates array
@@ -15998,16 +16409,17 @@ class Gradient {
           colorStop.offset = 1 - colorStop.offset;
         });
       }
-      const minRadius = Math.min(r1, r2);
+      const minRadius = Math.min(sr1, sr2);
       if (minRadius > 0) {
         // i have to shift all colorStops and add new one in 0.
-        const maxRadius = Math.max(r1, r2),
+        const maxRadius = Math.max(sr1, sr2),
           percentageShift = minRadius / maxRadius;
         colorStops.forEach(colorStop => {
           colorStop.offset += percentageShift * (1 - colorStop.offset);
         });
       }
     }
+    // todo make a malicious script tag injection test with color and also apply a fix with escapeXml
     colorStops.forEach(_ref => {
       let {
         color,
@@ -16180,8 +16592,8 @@ classRegistry.setClass(Gradient, 'linear');
 classRegistry.setClass(Gradient, 'radial');
 
 /**
- * @see {@link http://fabricjs.com/patterns demo}
- * @see {@link http://fabricjs.com/dynamic-patterns demo}
+ * @see {@link http://fabric5.fabricjs.com/patterns demo}
+ * @see {@link http://fabric5.fabricjs.com/dynamic-patterns demo}
  */
 class Pattern {
   /**
@@ -16323,7 +16735,7 @@ class Pattern {
       patternOffsetY = ifNaN(this.offsetY / height, 0),
       patternWidth = repeat === 'repeat-y' || repeat === 'no-repeat' ? 1 + Math.abs(patternOffsetX || 0) : ifNaN(patternSource.width / width, 0),
       patternHeight = repeat === 'repeat-x' || repeat === 'no-repeat' ? 1 + Math.abs(patternOffsetY || 0) : ifNaN(patternSource.height / height, 0);
-    return [`<pattern id="SVGID_${id}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`, `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${this.sourceToString()}"></image>`, `</pattern>`, ''].join('\n');
+    return [`<pattern id="SVGID_${escapeXml(id)}" x="${patternOffsetX}" y="${patternOffsetY}" width="${patternWidth}" height="${patternHeight}">`, `<image x="0" y="0" width="${patternSource.width}" height="${patternSource.height}" xlink:href="${escapeXml(this.sourceToString())}"></image>`, `</pattern>`, ''].join('\n');
   }
   /* _TO_SVG_END_ */
 
@@ -16351,7 +16763,7 @@ classRegistry.setClass(Pattern);
 classRegistry.setClass(Pattern, 'pattern');
 
 /**
- * @see {@link http://fabricjs.com/freedrawing|Freedrawing demo}
+ * @see {@link http://fabric5.fabricjs.com/freedrawing|Freedrawing demo}
  */
 class BaseBrush {
   /**
@@ -16605,8 +17017,7 @@ class Path extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const path = joinPath(this.path, config.NUM_FRACTION_DIGITS);
-    return ['<path ', 'COMMON_PARTS', `d="${path}" stroke-linecap="round" />\n`];
+    return ['<path ', 'COMMON_PARTS', `d="${joinPath(this.path, config.NUM_FRACTION_DIGITS)}" stroke-linecap="round" />\n`];
   }
 
   /**
@@ -17157,15 +17568,17 @@ class Circle extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const angle = (this.endAngle - this.startAngle) % 360;
+    const {
+      radius,
+      startAngle,
+      endAngle
+    } = this;
+    const angle = (endAngle - startAngle) % 360;
     if (angle === 0) {
-      return ['<circle ', 'COMMON_PARTS', 'cx="0" cy="0" ', 'r="', `${this.radius}`, '" />\n'];
+      return ['<circle ', 'COMMON_PARTS', 'cx="0" cy="0" ', 'r="', `${escapeXml(radius)}`, '" />\n'];
     } else {
-      const {
-        radius
-      } = this;
-      const start = degreesToRadians(this.startAngle),
-        end = degreesToRadians(this.endAngle),
+      const start = degreesToRadians(startAngle),
+        end = degreesToRadians(endAngle),
         startX = cos(start) * radius,
         startY = sin(start) * radius,
         endX = cos(end) * radius,
@@ -17693,7 +18106,6 @@ class Line extends FabricObject {
 
   /**
    * Returns object representation of an instance
-   * @method toObject
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
@@ -17738,17 +18150,13 @@ class Line extends FabricObject {
       width,
       height
     } = this;
-    const xMult = _x1 <= _x2 ? -1 : 1,
-      yMult = _y1 <= _y2 ? -1 : 1,
-      x1 = xMult * width / 2,
-      y1 = yMult * height / 2,
-      x2 = xMult * -width / 2,
-      y2 = yMult * -height / 2;
+    const xMult = _x1 <= _x2 ? -0.5 : 0.5,
+      yMult = _y1 <= _y2 ? -0.5 : 0.5;
     return {
-      x1,
-      x2,
-      y1,
-      y2
+      x1: xMult * width,
+      x2: xMult * -width,
+      y1: yMult * height,
+      y2: yMult * -height
     };
   }
 
@@ -17966,7 +18374,7 @@ class Ellipse extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    return ['<ellipse ', 'COMMON_PARTS', `cx="0" cy="0" rx="${this.rx}" ry="${this.ry}" />\n`];
+    return ['<ellipse ', 'COMMON_PARTS', `cx="0" cy="0" rx="${escapeXml(this.rx)}" ry="${escapeXml(this.ry)}" />\n`];
   }
 
   /**
@@ -18020,7 +18428,6 @@ classRegistry.setSVGClass(Ellipse);
 
 /**
  * Parses "points" attribute, returning an array of values
- * @static
  * @param {String} points points attribute string
  * @return {Array} array of points
  */
@@ -18285,14 +18692,17 @@ class Polyline extends FabricObject {
    * of the instance
    */
   _toSVG() {
-    const points = [],
-      diffX = this.pathOffset.x,
+    const diffX = this.pathOffset.x,
       diffY = this.pathOffset.y,
       NUM_FRACTION_DIGITS = config.NUM_FRACTION_DIGITS;
-    for (let i = 0, len = this.points.length; i < len; i++) {
-      points.push(toFixed(this.points[i].x - diffX, NUM_FRACTION_DIGITS), ',', toFixed(this.points[i].y - diffY, NUM_FRACTION_DIGITS), ' ');
-    }
-    return [`<${this.constructor.type.toLowerCase()} `, 'COMMON_PARTS', `points="${points.join('')}" />\n`];
+    const points = this.points.map(_ref2 => {
+      let {
+        x,
+        y
+      } = _ref2;
+      return `${toFixed(x - diffX, NUM_FRACTION_DIGITS)},${toFixed(y - diffY, NUM_FRACTION_DIGITS)}`;
+    }).join(' ');
+    return [`<${escapeXml(this.constructor.type).toLowerCase()} `, 'COMMON_PARTS', `points="${points}" />\n`];
   }
 
   /**
@@ -18415,7 +18825,6 @@ class StyledText extends FabricObject {
     };
     for (const p1 in obj) {
       for (const p2 in obj[p1]) {
-        // eslint-disable-next-line no-unused-vars
         for (const p3 in obj[p1][p2]) {
           return false;
         }
@@ -18441,9 +18850,7 @@ class StyledText extends FabricObject {
     const obj = typeof lineIndex === 'undefined' ? this.styles : {
       0: this.styles[lineIndex]
     };
-    // eslint-disable-next-line
     for (const p1 in obj) {
-      // eslint-disable-next-line
       for (const p2 in obj[p1]) {
         if (typeof obj[p1][p2][property] !== 'undefined') {
           return true;
@@ -18719,7 +19126,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     } = _ref;
     const noShadow = true,
       textDecoration = this.getSvgTextDecoration(this);
-    return [textBgRects.join(''), '\t\t<text xml:space="preserve" ', `font-family="${this.fontFamily.replace(dblQuoteRegex, "'")}" `, `font-size="${this.fontSize}" `, this.fontStyle ? `font-style="${this.fontStyle}" ` : '', this.fontWeight ? `font-weight="${this.fontWeight}" ` : '', textDecoration ? `text-decoration="${textDecoration}" ` : '', this.direction === 'rtl' ? `direction="${this.direction}" ` : '', 'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >', textSpans.join(''), '</text>\n'];
+    return [textBgRects.join(''), '\t\t<text xml:space="preserve" ', `font-family="${escapeXml(this.fontFamily.replace(dblQuoteRegex, "'"))}" `, `font-size="${escapeXml(this.fontSize)}" `, this.fontStyle ? `font-style="${escapeXml(this.fontStyle)}" ` : '', this.fontWeight ? `font-weight="${escapeXml(this.fontWeight)}" ` : '', textDecoration ? `text-decoration="${textDecoration}" ` : '', this.direction === 'rtl' ? `direction="rtl" ` : '', 'style="', this.getSvgStyles(noShadow), '"', this.addPaintOrder(), ' >', textSpans.join(''), '</text>\n'];
   }
 
   /**
@@ -18735,7 +19142,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       lineOffset;
 
     // bounding-box background
-    this.backgroundColor && textBgRects.push(...createSVGInlineRect(this.backgroundColor, -this.width / 2, -this.height / 2, this.width, this.height));
+    this.backgroundColor && textBgRects.push(createSVGInlineRect(this.backgroundColor, -this.width / 2, -this.height / 2, this.width, this.height));
 
     // text and text-background
     for (let i = 0, len = this._textLines.length; i < len; i++) {
@@ -18843,7 +19250,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       } = this.__charBounds[i][j];
       currentColor = this.getValueOfPropertyAt(i, j, 'textBackgroundColor');
       if (currentColor !== lastColor) {
-        lastColor && textBgRects.push(...createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
+        lastColor && textBgRects.push(createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
         boxStart = left;
         boxWidth = width;
         lastColor = currentColor;
@@ -18851,7 +19258,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         boxWidth += kernedWidth;
       }
     }
-    currentColor && textBgRects.push(...createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
+    currentColor && textBgRects.push(createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
   }
 
   /**
@@ -18878,7 +19285,6 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       fontSize,
       fontStyle,
       fontWeight,
-      deltaY,
       textDecorationThickness,
       linethrough,
       overline,
@@ -18890,7 +19296,7 @@ class TextSVGExportMixin extends FabricObjectSVGExportMixin {
       linethrough: linethrough !== null && linethrough !== void 0 ? linethrough : this.linethrough
     });
     const thickness = textDecorationThickness || this.textDecorationThickness;
-    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${strokeWidth}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${fontFamily}'` : fontFamily}; ` : '', fontSize ? `font-size: ${fontSize}px; ` : '', fontStyle ? `font-style: ${fontStyle}; ` : '', fontWeight ? `font-weight: ${fontWeight}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', deltaY ? `baseline-shift: ${-deltaY}; ` : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
+    return [stroke ? colorPropToSVG(STROKE, stroke) : '', strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : '', fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes('"') ? `'${escapeXml(fontFamily)}'` : escapeXml(fontFamily)}; ` : '', fontSize ? `font-size: ${escapeXml(fontSize)}px; ` : '', fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : '', fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : '', textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%; ` : '', fill ? colorPropToSVG(FILL, fill) : '', useWhiteSpace ? 'white-space: pre; ' : ''].join('');
   }
 
   /**
@@ -18930,7 +19336,7 @@ function getMeasuringContext() {
 
 /**
  * Text class
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-2#text}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#text}
  */
 class FabricText extends StyledText {
   static getDefaults() {
@@ -19220,6 +19626,7 @@ class FabricText extends StyledText {
       let drawStart;
       let currentColor;
       let lastColor = this.getValueOfPropertyAt(i, 0, 'textBackgroundColor');
+      const bgHeight = this.getHeightOfLineImpl(i);
       for (let j = 0; j < jlen; j++) {
         // at this point charbox are either standard or full with pathInfo if there is a path.
         const charBox = this.__charBounds[i][j];
@@ -19229,15 +19636,15 @@ class FabricText extends StyledText {
           ctx.translate(charBox.renderLeft, charBox.renderTop);
           ctx.rotate(charBox.angle);
           ctx.fillStyle = currentColor;
-          currentColor && ctx.fillRect(-charBox.width / 2, -heightOfLine / this.lineHeight * (1 - this._fontSizeFraction), charBox.width, heightOfLine / this.lineHeight);
+          currentColor && ctx.fillRect(-charBox.width / 2, -bgHeight * (1 - this._fontSizeFraction), charBox.width, bgHeight);
           ctx.restore();
         } else if (currentColor !== lastColor) {
           drawStart = leftOffset + lineLeftOffset + boxStart;
-          if (this.direction === 'rtl') {
+          if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
           }
           ctx.fillStyle = lastColor;
-          lastColor && ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
+          lastColor && ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastColor = currentColor;
@@ -19247,11 +19654,11 @@ class FabricText extends StyledText {
       }
       if (currentColor && !this.path) {
         drawStart = leftOffset + lineLeftOffset + boxStart;
-        if (this.direction === 'rtl') {
+        if (this.direction === RTL) {
           drawStart = this.width - drawStart - boxWidth;
         }
         ctx.fillStyle = currentColor;
-        ctx.fillRect(drawStart, lineTopOffset, boxWidth, heightOfLine / this.lineHeight);
+        ctx.fillRect(drawStart, lineTopOffset, boxWidth, bgHeight);
       }
       lineTopOffset += heightOfLine;
     }
@@ -19274,18 +19681,18 @@ class FabricText extends StyledText {
   _measureChar(_char, charStyle, previousChar, prevCharStyle) {
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
-      couple = previousChar + _char,
+      couple = previousChar ? previousChar + _char : _char,
       stylesAreEqual = previousChar && fontDeclaration === this._getFontDeclaration(prevCharStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
     let width, coupleWidth, previousWidth, kernedWidth;
-    if (previousChar && fontCache[previousChar] !== undefined) {
-      previousWidth = fontCache[previousChar];
+    if (previousChar && fontCache.has(previousChar)) {
+      previousWidth = fontCache.get(previousChar);
     }
-    if (fontCache[_char] !== undefined) {
-      kernedWidth = width = fontCache[_char];
+    if (fontCache.has(_char)) {
+      kernedWidth = width = fontCache.get(_char);
     }
-    if (stylesAreEqual && fontCache[couple] !== undefined) {
-      coupleWidth = fontCache[couple];
+    if (stylesAreEqual && fontCache.has(couple)) {
+      coupleWidth = fontCache.get(couple);
       kernedWidth = coupleWidth - previousWidth;
     }
     if (width === undefined || previousWidth === undefined || coupleWidth === undefined) {
@@ -19294,16 +19701,16 @@ class FabricText extends StyledText {
       this._setTextStyles(ctx, charStyle, true);
       if (width === undefined) {
         kernedWidth = width = ctx.measureText(_char).width;
-        fontCache[_char] = width;
+        fontCache.set(_char, width);
       }
       if (previousWidth === undefined && stylesAreEqual && previousChar) {
         previousWidth = ctx.measureText(previousChar).width;
-        fontCache[previousChar] = previousWidth;
+        fontCache.set(previousChar, previousWidth);
       }
       if (stylesAreEqual && coupleWidth === undefined) {
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
-        fontCache[couple] = coupleWidth;
+        fontCache.set(couple, coupleWidth);
         // safe to use the non-null since if undefined we defined it before.
         kernedWidth = coupleWidth - previousWidth;
       }
@@ -19460,13 +19867,16 @@ class FabricText extends StyledText {
   }
 
   /**
-   * Calculate height of line at 'lineIndex'
+   * Calculate height of line at 'lineIndex',
+   * without the lineHeigth multiplication factor
+   * @private
    * @param {Number} lineIndex index of line to calculate
    * @return {Number}
    */
-  getHeightOfLine(lineIndex) {
-    if (this.__lineHeights[lineIndex]) {
-      return this.__lineHeights[lineIndex];
+  getHeightOfLineImpl(lineIndex) {
+    const lh = this.__lineHeights;
+    if (lh[lineIndex]) {
+      return lh[lineIndex];
     }
 
     // char 0 is measured before the line cycle because it needs to char
@@ -19475,18 +19885,25 @@ class FabricText extends StyledText {
     for (let i = 1, len = this._textLines[lineIndex].length; i < len; i++) {
       maxHeight = Math.max(this.getHeightOfChar(lineIndex, i), maxHeight);
     }
-    return this.__lineHeights[lineIndex] = maxHeight * this.lineHeight * this._fontSizeMult;
+    return lh[lineIndex] = maxHeight * this._fontSizeMult;
+  }
+
+  /**
+   * Calculate height of line at 'lineIndex'
+   * @param {Number} lineIndex index of line to calculate
+   * @return {Number}
+   */
+  getHeightOfLine(lineIndex) {
+    return this.getHeightOfLineImpl(lineIndex) * this.lineHeight;
   }
 
   /**
    * Calculate text box height
    */
   calcTextHeight() {
-    let lineHeight,
-      height = 0;
+    let height = 0;
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      lineHeight = this.getHeightOfLine(i);
-      height += i === len - 1 ? lineHeight / this.lineHeight : lineHeight;
+      height += i === len - 1 ? this.getHeightOfLineImpl(i) : this.getHeightOfLine(i);
     }
     return height;
   }
@@ -19496,7 +19913,7 @@ class FabricText extends StyledText {
    * @return {Number} Left offset
    */
   _getLeftOffset() {
-    return this.direction === 'ltr' ? -this.width / 2 : this.width / 2;
+    return this.direction === LTR ? -this.width / 2 : this.width / 2;
   }
 
   /**
@@ -19518,11 +19935,8 @@ class FabricText extends StyledText {
     const left = this._getLeftOffset(),
       top = this._getTopOffset();
     for (let i = 0, len = this._textLines.length; i < len; i++) {
-      const heightOfLine = this.getHeightOfLine(i),
-        maxHeight = heightOfLine / this.lineHeight,
-        leftOffset = this._getLineLeftOffset(i);
-      this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i);
-      lineHeights += heightOfLine;
+      this._renderTextLine(method, ctx, this._textLines[i], left + this._getLineLeftOffset(i), top + lineHeights + this.getHeightOfLineImpl(i), i);
+      lineHeights += this.getHeightOfLine(i);
     }
     ctx.restore();
   }
@@ -19567,12 +19981,11 @@ class FabricText extends StyledText {
    * @param {Number} lineIndex
    */
   _renderChars(method, ctx, line, left, top, lineIndex) {
-    const lineHeight = this.getHeightOfLine(lineIndex),
-      isJustify = this.textAlign.includes(JUSTIFY),
+    const isJustify = this.textAlign.includes(JUSTIFY),
       path = this.path,
       shortCut = !isJustify && this.charSpacing === 0 && this.isEmptyStyles(lineIndex) && !path,
-      isLtr = this.direction === 'ltr',
-      sign = this.direction === 'ltr' ? 1 : -1,
+      isLtr = this.direction === LTR,
+      sign = this.direction === LTR ? 1 : -1,
       // this was changed in the PR #7674
       // currentDirection = ctx.canvas.getAttribute('dir');
       currentDirection = ctx.direction;
@@ -19585,11 +19998,11 @@ class FabricText extends StyledText {
       drawingLeft;
     ctx.save();
     if (currentDirection !== this.direction) {
-      ctx.canvas.setAttribute('dir', isLtr ? 'ltr' : 'rtl');
-      ctx.direction = isLtr ? 'ltr' : 'rtl';
+      ctx.canvas.setAttribute('dir', isLtr ? LTR : RTL);
+      ctx.direction = isLtr ? LTR : RTL;
       ctx.textAlign = isLtr ? LEFT : RIGHT;
     }
-    top -= lineHeight * this._fontSizeFraction / this.lineHeight;
+    top -= this.getHeightOfLineImpl(lineIndex) * this._fontSizeFraction;
     if (shortCut) {
       // render all the line in one pass without checking
       // drawingLeft = isLtr ? left : left - this.getLineWidth(lineIndex);
@@ -19838,8 +20251,8 @@ class FabricText extends StyledText {
     if (textAlign === JUSTIFY_RIGHT) {
       leftOffset = lineDiff;
     }
-    if (direction === 'rtl') {
-      if (textAlign === RIGHT || textAlign === JUSTIFY || textAlign === JUSTIFY_RIGHT) {
+    if (direction === RTL) {
+      if (textAlign === RIGHT || textAlign === JUSTIFY_RIGHT) {
         leftOffset = 0;
       } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
         leftOffset = -lineDiff;
@@ -19950,7 +20363,7 @@ class FabricText extends StyledText {
         } else if ((currentDecoration !== lastDecoration || currentFill !== lastFill || currentSize !== size || currentTickness !== lastTickness || currentDy !== dy) && boxWidth > 0) {
           const finalTickness = this.fontSize * lastTickness / 1000;
           let drawStart = leftOffset + lineLeftOffset + boxStart;
-          if (this.direction === 'rtl') {
+          if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
           }
           if (lastDecoration && lastFill && lastTickness) {
@@ -19970,7 +20383,7 @@ class FabricText extends StyledText {
         }
       }
       let drawStart = leftOffset + lineLeftOffset + boxStart;
-      if (this.direction === 'rtl') {
+      if (this.direction === RTL) {
         drawStart = this.width - drawStart - boxWidth;
       }
       ctx.fillStyle = currentFill;
@@ -20130,7 +20543,7 @@ class FabricText extends StyledText {
       ...options,
       ...parsedAttributes
     };
-    const textContent = (element.textContent || '').replace(/^\s+|\s+$|\n+/g, '').replace(/\s+/g, ' ');
+    const textContent = normalizeWs(element.textContent || '').trim();
 
     // this code here is probably the usual issue for SVG center find
     // this can later looked at again and probably removed.
@@ -20970,21 +21383,36 @@ class ITextBehavior extends FabricText {
   }
 
   /**
+   * This function updates the text value from the hidden textarea and recalculates the text bounding box
+   * size and position.
+   * It is called by fabricJS internals, do not use it directly.
    * @private
    */
   updateFromTextArea() {
-    if (!this.hiddenTextarea) {
+    const {
+      hiddenTextarea,
+      direction,
+      textAlign,
+      inCompositionMode
+    } = this;
+    if (!hiddenTextarea) {
       return;
     }
+    // we want to anchor the textarea position depending on text alignment
+    // or in case of text justify depending on ltr/rtl direction.
+    // this.textAlign.replace('justify-', '') leverages the fact that our textAlign values all contain the word left/right/center,
+    // that match the originX values.
+    const anchorX = textAlign !== JUSTIFY ? textAlign.replace('justify-', '') : direction === LTR ? LEFT : RIGHT;
+    const originalPosition = this.getPositionByOrigin(anchorX, 'top');
     this.cursorOffsetCache = {};
-    const textarea = this.hiddenTextarea;
-    this.text = textarea.value;
+    this.text = hiddenTextarea.value;
     this.set('dirty', true);
     this.initDimensions();
+    this.setPositionByOrigin(originalPosition, anchorX, 'top');
     this.setCoords();
-    const newSelection = this.fromStringToGraphemeSelection(textarea.selectionStart, textarea.selectionEnd, textarea.value);
+    const newSelection = this.fromStringToGraphemeSelection(hiddenTextarea.selectionStart, hiddenTextarea.selectionEnd, hiddenTextarea.value);
     this.selectionEnd = this.selectionStart = newSelection.selectionEnd;
-    if (!this.inCompositionMode) {
+    if (!inCompositionMode) {
       this.selectionStart = newSelection.selectionStart;
     }
     this.updateTextareaPosition();
@@ -21499,7 +21927,8 @@ class ITextKeyBehavior extends ITextBehavior {
       autocomplete: 'off',
       spellcheck: 'false',
       'data-fabric': 'textarea',
-      wrap: 'off'
+      wrap: 'off',
+      name: 'fabricTextarea'
     }).map(_ref => {
       let [attribute, value] = _ref;
       return textarea.setAttribute(attribute, value);
@@ -22678,6 +23107,10 @@ class IText extends ITextClickBehavior {
       charIndex,
       lineIndex
     } = this.get2DCursorLocation(index);
+    const {
+      textAlign,
+      direction
+    } = this;
     for (let i = 0; i < lineIndex; i++) {
       topOffset += this.getHeightOfLine(i);
     }
@@ -22687,20 +23120,20 @@ class IText extends ITextClickBehavior {
     if (this.charSpacing !== 0 && charIndex === this._textLines[lineIndex].length) {
       leftOffset -= this._getWidthOfCharSpacing();
     }
-    const boundaries = {
-      top: topOffset,
-      left: lineLeftOffset + (leftOffset > 0 ? leftOffset : 0)
-    };
-    if (this.direction === 'rtl') {
-      if (this.textAlign === RIGHT || this.textAlign === JUSTIFY || this.textAlign === JUSTIFY_RIGHT) {
-        boundaries.left *= -1;
-      } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
-        boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
-      } else if (this.textAlign === CENTER || this.textAlign === JUSTIFY_CENTER) {
-        boundaries.left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+    let left = lineLeftOffset + (leftOffset > 0 ? leftOffset : 0);
+    if (direction === RTL) {
+      if (textAlign === RIGHT || textAlign === JUSTIFY || textAlign === JUSTIFY_RIGHT) {
+        left *= -1;
+      } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
+        left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
+      } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
+        left = lineLeftOffset - (leftOffset > 0 ? leftOffset : 0);
       }
     }
-    return boundaries;
+    return {
+      top: topOffset,
+      left
+    };
   }
 
   /**
@@ -22799,9 +23232,13 @@ class IText extends ITextClickBehavior {
    * @param {CanvasRenderingContext2D} ctx transformed context to draw on
    */
   _renderSelection(ctx, selection, boundaries) {
+    const {
+      textAlign,
+      direction
+    } = this;
     const selectionStart = selection.selectionStart,
       selectionEnd = selection.selectionEnd,
-      isJustify = this.textAlign.includes(JUSTIFY),
+      isJustify = textAlign.includes(JUSTIFY),
       start = this.get2DCursorLocation(selectionStart),
       end = this.get2DCursorLocation(selectionEnd),
       startLine = start.lineIndex,
@@ -22842,12 +23279,12 @@ class IText extends ITextClickBehavior {
       } else {
         ctx.fillStyle = this.selectionColor;
       }
-      if (this.direction === 'rtl') {
-        if (this.textAlign === RIGHT || this.textAlign === JUSTIFY || this.textAlign === JUSTIFY_RIGHT) {
+      if (direction === RTL) {
+        if (textAlign === RIGHT || textAlign === JUSTIFY || textAlign === JUSTIFY_RIGHT) {
           drawStart = this.width - drawStart - drawWidth;
-        } else if (this.textAlign === LEFT || this.textAlign === JUSTIFY_LEFT) {
+        } else if (textAlign === LEFT || textAlign === JUSTIFY_LEFT) {
           drawStart = boundaries.left + lineOffset - boxEnd;
-        } else if (this.textAlign === CENTER || this.textAlign === JUSTIFY_CENTER) {
+        } else if (textAlign === CENTER || textAlign === JUSTIFY_CENTER) {
           drawStart = boundaries.left + lineOffset - boxEnd;
         }
       }
@@ -23413,7 +23850,6 @@ class Textbox extends IText {
 
   /**
    * Returns object representation of an instance
-   * @method toObject
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
    * @return {Object} object representation of an instance
    */
@@ -24029,6 +24465,8 @@ class WebGLFilterBackend {
     } else {
       gl.texImage2D(TEXTURE_2D, 0, RGBA, width, height, 0, RGBA, UNSIGNED_BYTE, null);
     }
+    // disabled because website and issues with different typescript version
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return texture;
   }
 
@@ -24210,7 +24648,7 @@ const imageDefaultValues = {
 const IMAGE_PROPS = ['cropX', 'cropY'];
 
 /**
- * @tutorial {@link http://fabricjs.com/fabric-intro-part-1#images}
+ * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#images}
  */
 class FabricImage extends FabricObject {
   static getDefaults() {
@@ -24422,13 +24860,13 @@ class FabricImage extends FabricObject {
     }
     if (this.hasCrop()) {
       const clipPathId = uid();
-      svgString.push('<clipPath id="imageCrop_' + clipPathId + '">\n', '\t<rect x="' + x + '" y="' + y + '" width="' + this.width + '" height="' + this.height + '" />\n', '</clipPath>\n');
+      svgString.push('<clipPath id="imageCrop_' + clipPathId + '">\n', '\t<rect x="' + x + '" y="' + y + '" width="' + escapeXml(this.width) + '" height="' + escapeXml(this.height) + '" />\n', '</clipPath>\n');
       clipPath = ' clip-path="url(#imageCrop_' + clipPathId + ')" ';
     }
     if (!this.imageSmoothing) {
       imageRendering = ' image-rendering="optimizeSpeed"';
     }
-    imageMarkup.push('\t<image ', 'COMMON_PARTS', `xlink:href="${this.getSvgSrc(true)}" x="${x - this.cropX}" y="${y - this.cropY
+    imageMarkup.push('\t<image ', 'COMMON_PARTS', `xlink:href="${escapeXml(this.getSrc(true))}" x="${x - this.cropX}" y="${y - this.cropY
     // we're essentially moving origin of transformation from top/left corner to the center of the shape
     // by wrapping it in container <g> element with actual transformation, then offsetting object to the top/left
     // so that object's center aligns with container's left/top
@@ -24436,7 +24874,7 @@ class FabricImage extends FabricObject {
     if (this.stroke || this.strokeDashArray) {
       const origFill = this.fill;
       this.fill = null;
-      strokeSvg = [`\t<rect x="${x}" y="${y}" width="${this.width}" height="${this.height}" style="${this.getSvgStyles()}" />\n`];
+      strokeSvg = [`\t<rect x="${x}" y="${y}" width="${escapeXml(this.width)}" height="${escapeXml(this.height)}" style="${this.getSvgStyles()}" />\n`];
       this.fill = origFill;
     }
     if (this.paintFirst !== FILL) {
@@ -24539,7 +24977,6 @@ class FabricImage extends FabricObject {
 
   /**
    * Applies filters assigned to this image (from "filters" array) or from filter param
-   * @method applyFilters
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
@@ -25310,8 +25747,6 @@ const createEmptyResponse = () => ({
 
 /**
  * Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
- * @static
- * @function
  * @param {HTMLElement} doc SVG document to parse
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
  * @param {TSvgReviverCallback} [reviver] Extra callback for further parsing of SVG elements, called after each fabric object has been created.
@@ -25421,258 +25856,6 @@ function loadSVGFromURL(url, reviver) {
     return createEmptyResponse();
   });
 }
-
-const ACTION_NAME$1 = MODIFY_POLY;
-/**
- * This function locates the controls.
- * It'll be used both for drawing and for interaction.
- */
-const createPolyPositionHandler = pointIndex => {
-  return function (dim, finalMatrix, polyObject) {
-    const {
-      points,
-      pathOffset
-    } = polyObject;
-    return new Point(points[pointIndex]).subtract(pathOffset).transform(multiplyTransformMatrices(polyObject.getViewportTransform(), polyObject.calcTransformMatrix()));
-  };
-};
-
-/**
- * This function defines what the control does.
- * It'll be called on every mouse move after a control has been clicked and is being dragged.
- * The function receives as argument the mouse event, the current transform object
- * and the current position in canvas coordinate `transform.target` is a reference to the
- * current object being transformed.
- */
-const polyActionHandler = (eventData, transform, x, y) => {
-  const {
-    target,
-    pointIndex
-  } = transform;
-  const poly = target;
-  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, poly.calcOwnMatrix());
-  poly.points[pointIndex] = mouseLocalPosition.add(poly.pathOffset);
-  poly.setDimensions();
-  poly.set('dirty', true);
-  return true;
-};
-
-/**
- * Keep the polygon in the same position when we change its `width`/`height`/`top`/`left`.
- */
-const factoryPolyActionHandler = (pointIndex, fn) => {
-  return function (eventData, transform, x, y) {
-    const poly = transform.target,
-      anchorPoint = new Point(poly.points[(pointIndex > 0 ? pointIndex : poly.points.length) - 1]),
-      anchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix()),
-      actionPerformed = fn(eventData, {
-        ...transform,
-        pointIndex
-      }, x, y);
-    const newAnchorPointInParentPlane = anchorPoint.subtract(poly.pathOffset).transform(poly.calcOwnMatrix());
-    const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
-    poly.left -= diff.x;
-    poly.top -= diff.y;
-    return actionPerformed;
-  };
-};
-const createPolyActionHandler = pointIndex => wrapWithFireEvent(ACTION_NAME$1, factoryPolyActionHandler(pointIndex, polyActionHandler));
-function createPolyControls(arg0) {
-  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const controls = {};
-  for (let idx = 0; idx < (typeof arg0 === 'number' ? arg0 : arg0.points.length); idx++) {
-    controls[`p${idx}`] = new Control({
-      actionName: ACTION_NAME$1,
-      positionHandler: createPolyPositionHandler(idx),
-      actionHandler: createPolyActionHandler(idx),
-      ...options
-    });
-  }
-  return controls;
-}
-
-const ACTION_NAME = 'modifyPath';
-const calcPathPointPosition = (pathObject, commandIndex, pointIndex) => {
-  const {
-    path,
-    pathOffset
-  } = pathObject;
-  const command = path[commandIndex];
-  return new Point(command[pointIndex] - pathOffset.x, command[pointIndex + 1] - pathOffset.y).transform(multiplyTransformMatrices(pathObject.getViewportTransform(), pathObject.calcTransformMatrix()));
-};
-const movePathPoint = (pathObject, x, y, commandIndex, pointIndex) => {
-  const {
-    path,
-    pathOffset
-  } = pathObject;
-  const anchorCommand = path[(commandIndex > 0 ? commandIndex : path.length) - 1];
-  const anchorPoint = new Point(anchorCommand[pointIndex], anchorCommand[pointIndex + 1]);
-  const anchorPointInParentPlane = anchorPoint.subtract(pathOffset).transform(pathObject.calcOwnMatrix());
-  const mouseLocalPosition = sendPointToPlane(new Point(x, y), undefined, pathObject.calcOwnMatrix());
-  path[commandIndex][pointIndex] = mouseLocalPosition.x + pathOffset.x;
-  path[commandIndex][pointIndex + 1] = mouseLocalPosition.y + pathOffset.y;
-  pathObject.setDimensions();
-  const newAnchorPointInParentPlane = anchorPoint.subtract(pathObject.pathOffset).transform(pathObject.calcOwnMatrix());
-  const diff = newAnchorPointInParentPlane.subtract(anchorPointInParentPlane);
-  pathObject.left -= diff.x;
-  pathObject.top -= diff.y;
-  pathObject.set('dirty', true);
-  return true;
-};
-
-/**
- * This function locates the controls.
- * It'll be used both for drawing and for interaction.
- */
-function pathPositionHandler(dim, finalMatrix, pathObject) {
-  const {
-    commandIndex,
-    pointIndex
-  } = this;
-  return calcPathPointPosition(pathObject, commandIndex, pointIndex);
-}
-
-/**
- * This function defines what the control does.
- * It'll be called on every mouse move after a control has been clicked and is being dragged.
- * The function receives as argument the mouse event, the current transform object
- * and the current position in canvas coordinate `transform.target` is a reference to the
- * current object being transformed.
- */
-function pathActionHandler(eventData, transform, x, y) {
-  const {
-    target
-  } = transform;
-  const {
-    commandIndex,
-    pointIndex
-  } = this;
-  const actionPerformed = movePathPoint(target, x, y, commandIndex, pointIndex);
-  {
-    fireEvent(this.actionName, {
-      ...commonEventInfo(eventData, transform, x, y),
-      commandIndex,
-      pointIndex
-    });
-  }
-  return actionPerformed;
-}
-const indexFromPrevCommand = previousCommandType => previousCommandType === 'C' ? 5 : previousCommandType === 'Q' ? 3 : 1;
-class PathPointControl extends Control {
-  constructor(options) {
-    super(options);
-  }
-  render(ctx, left, top, styleOverride, fabricObject) {
-    const overrides = {
-      ...styleOverride,
-      cornerColor: this.controlFill,
-      cornerStrokeColor: this.controlStroke,
-      transparentCorners: !this.controlFill
-    };
-    super.render(ctx, left, top, overrides, fabricObject);
-  }
-}
-class PathControlPointControl extends PathPointControl {
-  constructor(options) {
-    super(options);
-  }
-  render(ctx, left, top, styleOverride, fabricObject) {
-    const {
-      path
-    } = fabricObject;
-    const {
-      commandIndex,
-      pointIndex,
-      connectToCommandIndex,
-      connectToPointIndex
-    } = this;
-    ctx.save();
-    ctx.strokeStyle = this.controlStroke;
-    if (this.connectionDashArray) {
-      ctx.setLineDash(this.connectionDashArray);
-    }
-    const [commandType] = path[commandIndex];
-    const point = calcPathPointPosition(fabricObject, connectToCommandIndex, connectToPointIndex);
-    if (commandType === 'Q') {
-      // one control point connects to 2 points
-      const point2 = calcPathPointPosition(fabricObject, commandIndex, pointIndex + 2);
-      ctx.moveTo(point2.x, point2.y);
-      ctx.lineTo(left, top);
-    } else {
-      ctx.moveTo(left, top);
-    }
-    ctx.lineTo(point.x, point.y);
-    ctx.stroke();
-    ctx.restore();
-    super.render(ctx, left, top, styleOverride, fabricObject);
-  }
-}
-const createControl = (commandIndexPos, pointIndexPos, isControlPoint, options, connectToCommandIndex, connectToPointIndex) => new (isControlPoint ? PathControlPointControl : PathPointControl)({
-  commandIndex: commandIndexPos,
-  pointIndex: pointIndexPos,
-  actionName: ACTION_NAME,
-  positionHandler: pathPositionHandler,
-  actionHandler: pathActionHandler,
-  connectToCommandIndex,
-  connectToPointIndex,
-  ...options,
-  ...(isControlPoint ? options.controlPointStyle : options.pointStyle)
-});
-function createPathControls(path) {
-  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  const controls = {};
-  let previousCommandType = 'M';
-  path.path.forEach((command, commandIndex) => {
-    const commandType = command[0];
-    if (commandType !== 'Z') {
-      controls[`c_${commandIndex}_${commandType}`] = createControl(commandIndex, command.length - 2, false, options);
-    }
-    switch (commandType) {
-      case 'C':
-        controls[`c_${commandIndex}_C_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex - 1, indexFromPrevCommand(previousCommandType));
-        controls[`c_${commandIndex}_C_CP_2`] = createControl(commandIndex, 3, true, options, commandIndex, 5);
-        break;
-      case 'Q':
-        controls[`c_${commandIndex}_Q_CP_1`] = createControl(commandIndex, 1, true, options, commandIndex, 3);
-        break;
-    }
-    previousCommandType = commandType;
-  });
-  return controls;
-}
-
-var index = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  changeWidth: changeWidth,
-  createObjectDefaultControls: createObjectDefaultControls,
-  createPathControls: createPathControls,
-  createPolyActionHandler: createPolyActionHandler,
-  createPolyControls: createPolyControls,
-  createPolyPositionHandler: createPolyPositionHandler,
-  createResizeControls: createResizeControls,
-  createTextboxDefaultControls: createTextboxDefaultControls,
-  dragHandler: dragHandler,
-  factoryPolyActionHandler: factoryPolyActionHandler,
-  getLocalPoint: getLocalPoint,
-  polyActionHandler: polyActionHandler,
-  renderCircleControl: renderCircleControl,
-  renderSquareControl: renderSquareControl,
-  rotationStyleHandler: rotationStyleHandler,
-  rotationWithSnapping: rotationWithSnapping,
-  scaleCursorStyleHandler: scaleCursorStyleHandler,
-  scaleOrSkewActionName: scaleOrSkewActionName,
-  scaleSkewCursorStyleHandler: scaleSkewCursorStyleHandler,
-  scalingEqually: scalingEqually,
-  scalingX: scalingX,
-  scalingXOrSkewingY: scalingXOrSkewingY,
-  scalingY: scalingY,
-  scalingYOrSkewingX: scalingYOrSkewingX,
-  skewCursorStyleHandler: skewCursorStyleHandler,
-  skewHandlerX: skewHandlerX,
-  skewHandlerY: skewHandlerY,
-  wrapWithFireEvent: wrapWithFireEvent,
-  wrapWithFixedAnchor: wrapWithFixedAnchor
-});
 
 const isWebGLPipelineState = options => {
   return options.webgl !== undefined;
@@ -26769,8 +26952,8 @@ const colorMatrixDefaultValues = {
 
 /**
    * Color Matrix filter class
-   * @see {@link http://fabricjs.com/image-filters|ImageFilters demo}
-   * @see {@Link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
+   * @see {@link http://fabric5.fabricjs.com/image-filters|ImageFilters demo}
+   * @see {@link http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl demo}
    * @example <caption>Kodachrome filter</caption>
    * const filter = new ColorMatrix({
    *  matrix: [
