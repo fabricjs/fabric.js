@@ -26,7 +26,8 @@ export async function stopCoverage(page: Page, outputDir: string) {
           });
           await converter.load();
           converter.applyCoverage(functions);
-          return [pathTo, converter.toIstanbul()];
+          const istanbul = converter.toIstanbul();
+          return Object.entries(istanbul)[0];
         }),
       )
     ).filter(
