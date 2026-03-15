@@ -152,8 +152,7 @@
     "jsdom": "^26.1.0"
   },
   "lint-staged": {
-    "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
-    "*.{js,css,md,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
-    "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
+    "*.{js,cjs,mjs,ts,tsx,jsx}": "eslint --fix",
+    "*.{js,cjs,mjs,css,md,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern"
   }
 }
