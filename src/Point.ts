@@ -37,6 +37,10 @@ export class Point implements XY {
     return new Point(this.x + that.x, this.y + that.y);
   }
 
+  testCoverage(): Point {
+    return new Point();
+  }
+
   /**
    * Adds another point to this one
    * @param {XY} that
