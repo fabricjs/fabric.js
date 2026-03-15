@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump nyc from 17.1.0 to 18.0.0 [#10883](https://github.com/fabricjs/fabric.js/pull/10883)
 - chore(): migrate from prettier to oxfmt [#10881](https://github.com/fabricjs/fabric.js/pull/10881)
 - chore(): move transpiling building to rolldown [#10868](https://github.com/fabricjs/fabric.js/pull/10868)
 - chore(): update vitest to 4.1.0 [#10888](https://github.com/fabricjs/fabric.js/pull/10888)
