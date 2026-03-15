@@ -89,7 +89,6 @@
     "oxfmt": "^0.36.0",
     "ps-list": "^9.0.0",
     "rolldown": "^1.0.0-rc.9",
-    "semver": "^7.7.3",
     "serve": "^14.2.5",
     "tsc-files": "^1.1.4",
     "typescript": "^5.9.3",
