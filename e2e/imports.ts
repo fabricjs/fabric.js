@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 /**
  * The import map used by `./utils/setupApp` to inject into the page so test scripts can use modules.
  *
- * Relative imports are supported thanks to babel, see `./.babelrc.js`.
+ * Relative imports between test files resolve naturally since scripts are loaded via URL.
  *
  * **IMPORTANT**: be sure to update the paths field in `./tsconfig.json` to reflect imports correctly
  */

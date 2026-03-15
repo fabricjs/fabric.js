@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): move transpiling building to rolldown [#10868](https://github.com/fabricjs/fabric.js/pull/10868)
 - chore(): update vitest to 4.1.0 [#10888](https://github.com/fabricjs/fabric.js/pull/10888)
 - feat(): Support textDecoration color. [#10880](https://github.com/fabricjs/fabric.js/pull/10880)
 - feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
