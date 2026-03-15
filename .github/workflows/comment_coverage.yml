@@ -57,6 +57,11 @@ jobs:
           npx nyc report --reporter=text-summary >> ./cov.txt
           echo "\`\`\`" >> ./cov.txt
           echo "${{ env.unique_id }}" >> ./cov.txt
+      - name: Checkout actions
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          sparse-checkout: |
+            .github
       - name: Comment on PR for coverage
         uses: ./.github/actions/find-create-or-update-comment
         with:
