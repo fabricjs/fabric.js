@@ -76,12 +76,16 @@ Use `predicted_pr_num` in the changelog line before creating PR.
 1. Confirm branch has intended commits.
 2. Build PR title using conventional-commit style.
 3. If an issue number is provided, include `close #<issue-num>` in PR body; otherwise do not include issue-closing text.
-4. Predict next PR number.
-5. Update `CHANGELOG.md` `[next]` line with predicted number and title.
-6. Commit and push changelog/title-related edits.
-7. Create PR with `gh pr create --base <base> --head <branch> --title "<title>" --body-file <file>`.
-8. Fetch actual PR number.
-9. If actual number differs from prediction:
+4. Sync with latest `master` before opening the PR:
+
+```bash
+git checkout master
+git pull
+git checkout <working-branch>
+git merge master
+```
+
+If merge conflicts exist, resolve them before continuing. 5. Predict next PR number. 6. Update `CHANGELOG.md` `[next]` line with predicted number and title. 7. Commit and push changelog/title-related edits. 8. Create PR with `gh pr create --base <base> --head <branch> --title "<title>" --body-file <file>`. 9. Fetch actual PR number. 10. If actual number differs from prediction:
 
 - Update the changelog line to actual number/link.
 - Commit and push the correction.
@@ -94,6 +98,7 @@ Before finishing, verify:
 - PR title follows conventional commit style and matches changelog text.
 - PR body includes description.
 - If an issue number is provided, PR body includes `close #<issue-num>`.
+- Branch was synced with latest `master` before PR creation.
 - `CHANGELOG.md` has exactly one new `[next]` line for this PR.
 - Link uses `https://github.com/fabricjs/fabric.js/pull/<prNum>`.
 - If prediction mismatched, changelog has been corrected and pushed.
