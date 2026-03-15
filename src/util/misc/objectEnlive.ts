@@ -75,8 +75,9 @@ export type EnlivenObjectOptions = Abortable & {
       | TFiller,
   >(
     serializedObj: Record<string, any>,
-    instance: T,
-  ) => void;
+    instance: T | undefined,
+    error?: FabricError,
+  ) => void | Promise<T>;
 };
 
 /**
@@ -103,7 +104,7 @@ export const enlivenObjects = <
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
     signal && signal.addEventListener('abort', reject, { once: true });
-    Promise.all(
+    Promise.allSettled(
       objects.map((obj) =>
         classRegistry
           .getClass<
@@ -111,15 +112,28 @@ export const enlivenObjects = <
               fromObject(options: any, context: Abortable): Promise<T>;
             }
           >(obj.type)
-          .fromObject(obj, { signal })
-          .then((fabricInstance) => {
-            reviver(obj, fabricInstance);
-            instances.push(fabricInstance);
-            return fabricInstance;
-          }),
+          .fromObject(obj, { signal }),
       ),
     )
-      .then(resolve)
+      .then(async (elementsResult) => {
+        for (const [index, result] of elementsResult.entries()) {
+          if (result.status === 'fulfilled') {
+            await reviver(objects[index], result.value);
+            instances.push(result.value);
+          }
+          if (result.status === 'rejected') {
+            const fallback = await reviver(
+              objects[index],
+              undefined,
+              result.reason,
+            );
+            if (fallback) {
+              instances.push(fallback as T);
+            }
+          }
+        }
+        resolve(instances);
+      })
       .catch((error) => {
         // cleanup
         instances.forEach((instance) => {

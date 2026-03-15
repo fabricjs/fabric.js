@@ -1,13 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { Path } from './Path';
 import type { TSimpleParsedCommand } from '../util';
-import { FabricObject, getFabricDocument, version } from '../../fabric';
+import { FabricObject } from '../../fabric';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
 
-const REFERENCE_PATH_OBJECT = {
-  version: version,
-  type: 'Path',
-  originX: 'center' as const,
-  originY: 'center' as const,
+const REFERENCE_PATH_OBJECT = createReferenceObject('Path', {
   left: 200,
   top: 200,
   width: 200,
@@ -15,47 +12,24 @@ const REFERENCE_PATH_OBJECT = {
   fill: 'red',
   stroke: 'blue',
   strokeWidth: 0,
-  strokeDashArray: null,
-  strokeLineCap: 'butt' as const,
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter' as const,
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
   path: [
     ['M', 100, 100],
     ['L', 300, 100],
     ['L', 200, 300],
     ['Z'],
   ] as TSimpleParsedCommand[],
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  fillRule: 'nonzero' as const,
-  paintFirst: 'fill' as const,
-  globalCompositeOperation: 'source-over' as const,
-  skewX: 0,
-  skewY: 0,
-  strokeUniform: false,
-};
+});
 
 function getPathElement(path: string) {
-  const namespace = 'http://www.w3.org/2000/svg';
-  const el = getFabricDocument().createElementNS(namespace, 'path');
-
-  el.setAttributeNS(namespace, 'd', path);
-  el.setAttributeNS(namespace, 'fill', 'red');
-  el.setAttributeNS(namespace, 'stroke', 'blue');
-  el.setAttributeNS(namespace, 'stroke-width', String(1));
-  el.setAttributeNS(namespace, 'stroke-linecap', 'butt');
-  el.setAttributeNS(namespace, 'stroke-linejoin', 'miter');
-  el.setAttributeNS(namespace, 'stroke-miterlimit', String(4));
-
-  return el;
+  return createSVGElement('path', {
+    d: path,
+    fill: 'red',
+    stroke: 'blue',
+    'stroke-width': 1,
+    'stroke-linecap': 'butt',
+    'stroke-linejoin': 'miter',
+    'stroke-miterlimit': 4,
+  });
 }
 
 function makePathObject() {
@@ -393,19 +367,18 @@ describe('Path', () => {
       'function',
     );
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPath = getFabricDocument().createElementNS(namespace, 'path');
-
-    elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
-    elPath.setAttributeNS(namespace, 'fill', 'red');
-    elPath.setAttributeNS(namespace, 'opacity', '1');
-    elPath.setAttributeNS(namespace, 'stroke', 'blue');
-    elPath.setAttributeNS(namespace, 'stroke-width', '0');
-    elPath.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elPath.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elPath.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-    elPath.setAttributeNS(namespace, 'stroke-miterlimit', '5');
-    elPath.setAttributeNS(namespace, 'transform', 'scale(2)');
+    const elPath = createSVGElement('path', {
+      d: 'M 100 100 L 300 100 L 200 300 z',
+      fill: 'red',
+      opacity: 1,
+      stroke: 'blue',
+      'stroke-width': 0,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+      transform: 'scale(2)',
+    });
 
     const path = await Path.fromElement(elPath);
 
@@ -418,9 +391,7 @@ describe('Path', () => {
       strokeMiterLimit: 5,
     });
 
-    const ANGLE_DEG = 90;
-
-    elPath.setAttributeNS(namespace, 'transform', 'rotate(' + ANGLE_DEG + ')');
+    elPath.setAttribute('transform', 'rotate(90)');
 
     const rotatedPath = await Path.fromElement(elPath);
 
@@ -435,11 +406,10 @@ describe('Path', () => {
       'function',
     );
 
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPath = getFabricDocument().createElementNS(namespace, 'path');
-
-    elPath.setAttributeNS(namespace, 'd', 'M 100 100 L 300 100 L 200 300 z');
-    elPath.setAttributeNS(namespace, 'transform', 'scale(.2)');
+    const elPath = createSVGElement('path', {
+      d: 'M 100 100 L 300 100 L 200 300 z',
+      transform: 'scale(.2)',
+    });
 
     const path = await Path.fromElement(elPath);
 

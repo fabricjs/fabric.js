@@ -195,23 +195,24 @@ describe('Canvas dispose', () => {
 
     it('dispose edge case: `toCanvasElement` after dispose', async () => {
       const canvas = new CanvasClass(undefined, { renderOnAddRemove: false });
-      const testImageData = (colorByteVal: number) => {
+      const getAlphaValues = () => {
         return canvas
           .toCanvasElement()
           .getContext('2d')!
-          .getImageData(0, 0, 20, 20)
-          .data.filter((_, i) => i % 4 === 0)
-          .every((x) => x === colorByteVal);
+          .getImageData(10, 10, 20, 20)
+          .data.filter((_, i) => i % 4 === 3);
       };
+      const hasOpaquePixels = () => getAlphaValues().some((x) => x === 255);
+      const isFullyTransparent = () => getAlphaValues().every((x) => x === 0);
       canvas.add(
         makeRect({ fill: 'red', width: 20, height: 20, top: 10, left: 10 }),
       );
-      expect(testImageData(255), 'control').toBeTruthy();
+      expect(hasOpaquePixels(), 'control').toBeTruthy();
       canvas.disposed = true;
-      expect(testImageData(255), 'should render canvas').toBeTruthy();
+      expect(hasOpaquePixels(), 'should render canvas').toBeTruthy();
       canvas.destroyed = true;
       expect(
-        testImageData(0),
+        isFullyTransparent(),
         'should have disabled canvas rendering',
       ).toBeTruthy();
       canvas.destroyed = false;

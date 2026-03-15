@@ -7,6 +7,7 @@ import { ValueAnimation } from './ValueAnimation';
 import { Shadow } from '../../Shadow';
 
 import { describe, expect, it, afterEach, vi } from 'vitest';
+import { getFabricWindow } from '../../env';
 
 vi.useFakeTimers();
 const findAnimationsByTarget = (target: any) =>
@@ -450,6 +451,37 @@ describe('animate', () => {
     expect(context.state).toBe('running');
     vi.advanceTimersByTime(duration + offset);
     expect(context.state).toBe('completed');
+  });
+
+  it('aborting animation with delay should clear the timeout and not call requestAnimFrame', async () => {
+    const requestAnimationFrameSpy = vi.spyOn(
+      getFabricWindow(),
+      'requestAnimationFrame',
+    );
+
+    const delay = 500;
+    const context = animate({
+      startValue: 0,
+      endValue: 100,
+      delay,
+      duration: 200,
+    });
+
+    expect(context.state).toBe('pending');
+    // requestAnimationFrame should not have been called yet (still in delay period)
+    expect(requestAnimationFrameSpy).not.toHaveBeenCalled();
+
+    // Abort during the delay period, before requestAnimationFrame is called
+    context.abort();
+    expect(context.state).toBe('aborted');
+
+    // Advance time past the delay - the timeout should have been cleared
+    vi.advanceTimersByTime(delay + 100);
+
+    // requestAnimationFrame should never have been called since we aborted during delay
+    expect(requestAnimationFrameSpy).not.toHaveBeenCalled();
+
+    requestAnimationFrameSpy.mockRestore();
   });
 });
 

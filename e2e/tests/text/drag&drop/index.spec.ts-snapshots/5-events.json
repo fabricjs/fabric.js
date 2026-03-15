@@ -39,8 +39,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "b",
-      "nextTarget": "a",
       "viewportPoint": {
         "x": 120,
         "y": 55
@@ -48,7 +46,9 @@
       "scenePoint": {
         "x": 120,
         "y": 55
-      }
+      },
+      "target": "b",
+      "nextTarget": "a"
     },
     "b"
   ],
@@ -60,8 +60,6 @@
       "e": {
         "isTrusted": true
       },
-      "target": "a",
-      "previousTarget": "b",
       "viewportPoint": {
         "x": 120,
         "y": 55
@@ -69,7 +67,9 @@
       "scenePoint": {
         "x": 120,
         "y": 55
-      }
+      },
+      "target": "a",
+      "previousTarget": "b"
     },
     "a"
   ],

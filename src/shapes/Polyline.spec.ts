@@ -2,10 +2,9 @@ import { Polyline } from './Polyline';
 import { Point } from '../Point';
 
 import { describe, expect, it } from 'vitest';
-import { getFabricDocument } from '../env';
-import { version } from '../../package.json';
 import { Polygon } from './Polygon';
 import { FabricObject } from './Object/FabricObject';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
 
 const points = [
   { x: 2, y: 2 },
@@ -13,40 +12,13 @@ const points = [
   { x: 12, y: 7 },
 ];
 
-const REFERENCE_OBJECT = {
-  version: version,
-  type: 'Polyline',
-  originX: 'center',
-  originY: 'center',
+const REFERENCE_OBJECT = createReferenceObject('Polyline', {
   left: 15,
   top: 17,
   width: 10,
   height: 10,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeLineCap: 'butt',
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
   points: getPoints(),
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
-  skewX: 0,
-  skewY: 0,
-  strokeUniform: false,
-} as const;
+});
 
 describe('Polyline', () => {
   describe('_calcDimensions and pathOffset', () => {
@@ -229,7 +201,7 @@ describe('Polyline', () => {
     const polyline = new Polygon(getPoints(), { fill: 'red', stroke: 'blue' });
     expect(polyline.toSVG).toBeTypeOf('function');
     const EXPECTED_SVG =
-      '<g transform="matrix(1 0 0 1 15 17)"  >\n<polygon style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  points="-5,-5 5,5 " />\n</g>\n';
+      '<g transform="matrix(1 0 0 1 15 17)"  >\n<polygon style="stroke: rgb(0,0,255); stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-rule: nonzero; opacity: 1;"  points="-5,-5 5,5" />\n</g>\n';
     expect(polyline.toSVG()).toEqual(EXPECTED_SVG);
   });
 
@@ -241,13 +213,10 @@ describe('Polyline', () => {
   });
 
   it('creates from element without points nor strokeWidth', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
     expect(Polyline.fromElement).toBeTypeOf('function');
-    const elPolylineWithoutPoints = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolylineWithoutPoints.setAttributeNS(namespace, 'stroke-width', '0');
+    const elPolylineWithoutPoints = createSVGElement('polyline', {
+      'stroke-width': 0,
+    });
 
     const polyline = await Polyline.fromElement(elPolylineWithoutPoints);
     expect(polyline.toObject()).toEqual({
@@ -258,12 +227,9 @@ describe('Polyline', () => {
   });
 
   it('creates from element without points but takes strokeWidth into account', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolylineWithoutPoints = getFabricDocument().createElementNS(
-      'http://www.w3.org/2000/svg',
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolylineWithoutPoints.setAttributeNS(namespace, 'stroke-width', '8');
+    const elPolylineWithoutPoints = createSVGElement('polyline', {
+      'stroke-width': 8,
+    });
 
     const polyline = await Polyline.fromElement(elPolylineWithoutPoints);
     expect(polyline.toObject()).toEqual({
@@ -276,12 +242,9 @@ describe('Polyline', () => {
   });
 
   it('creates from element with empty points', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolylineWithEmptyPoints = getFabricDocument().createElementNS(
-      namespace,
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolylineWithEmptyPoints.setAttributeNS(namespace, 'points', '');
+    const elPolylineWithEmptyPoints = createSVGElement('polyline', {
+      points: '',
+    });
 
     const polyline = await Polyline.fromElement(elPolylineWithEmptyPoints);
     expect(polyline.toObject()).toEqual({
@@ -293,13 +256,10 @@ describe('Polyline', () => {
   });
 
   it('creates from element with points and strokeWidth', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolyline = getFabricDocument().createElementNS(
-      namespace,
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
-    elPolyline.setAttributeNS(namespace, 'stroke-width', '1');
+    const elPolyline = createSVGElement('polyline', {
+      points: '10,12 20,22',
+      'stroke-width': 1,
+    });
 
     const polyline = await Polyline.fromElement(elPolyline);
     expect(polyline.toObject()).toEqual({
@@ -310,13 +270,10 @@ describe('Polyline', () => {
   });
 
   it('creates from element without strokeWidth with top-left on top-left point', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolyline = getFabricDocument().createElementNS(
-      namespace,
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
-    elPolyline.setAttributeNS(namespace, 'stroke-width', String(0));
+    const elPolyline = createSVGElement('polyline', {
+      points: '10,12 20,22',
+      'stroke-width': 0,
+    });
 
     const polyline = await Polyline.fromElement(elPolyline);
     expect(polyline).toBeInstanceOf(Polyline);
@@ -329,12 +286,9 @@ describe('Polyline', () => {
   });
 
   it('creates from element with strokeWidth and adjusts space for stroke', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolyline = getFabricDocument().createElementNS(
-      namespace,
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolyline.setAttributeNS(namespace, 'points', '10,12 20,22');
+    const elPolyline = createSVGElement('polyline', {
+      points: '10,12 20,22',
+    });
 
     const polyline = await Polyline.fromElement(elPolyline);
     expect(polyline).toBeInstanceOf(Polyline);
@@ -346,29 +300,18 @@ describe('Polyline', () => {
   });
 
   it('creates from element with custom attributes', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elPolylineWithAttrs = getFabricDocument().createElementNS(
-      namespace,
-      'polyline',
-    ) as unknown as HTMLElement;
-    elPolylineWithAttrs.setAttributeNS(
-      namespace,
-      'points',
-      '10,10 20,20 30,30 10,10',
-    );
-    elPolylineWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'opacity', '0.34');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-width', '3');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
-    elPolylineWithAttrs.setAttributeNS(
-      namespace,
-      'transform',
-      'translate(-10,-20) scale(2)',
-    );
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-    elPolylineWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', '5');
+    const elPolylineWithAttrs = createSVGElement('polyline', {
+      points: '10,10 20,20 30,30 10,10',
+      fill: 'rgb(255,255,255)',
+      opacity: 0.34,
+      'stroke-width': 3,
+      stroke: 'blue',
+      transform: 'translate(-10,-20) scale(2)',
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+    });
 
     const polylineWithAttrs = await Polyline.fromElement(elPolylineWithAttrs);
     const expectedPoints = [

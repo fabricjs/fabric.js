@@ -176,11 +176,11 @@ export type DrawContext =
  * @fires drop
  */
 export class FabricObject<
-    Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    SProps extends SerializedObjectProps = SerializedObjectProps,
-    EventSpec extends ObjectEvents = ObjectEvents,
-  >
+  Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  SProps extends SerializedObjectProps = SerializedObjectProps,
+  EventSpec extends ObjectEvents = ObjectEvents,
+>
   extends ObjectGeometry<EventSpec>
   implements ObjectProps
 {

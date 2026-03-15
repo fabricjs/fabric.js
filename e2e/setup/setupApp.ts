@@ -81,22 +81,9 @@ export async function setupApp(page: Page, file: string) {
       `test script '${pathToBuiltApp}' not found: global setup script probably did not run`,
     );
   } else if (exists) {
-    // used to avoid a race condition that occurs because of script loading
-    const trigger = page.evaluate(
-      () =>
-        new Promise((resolve) => {
-          window.addEventListener('fabric:setup', resolve, { once: true });
-        }),
-    );
-    await page.addScriptTag({
-      type: 'module',
-      content: `${readFileSync(
-        path.relative(process.cwd(), pathToBuiltApp),
-      ).toString()}
-       window.dispatchEvent(new CustomEvent('fabric:setup'));
-       `,
-    });
-    await trigger;
+    const scriptUrl = `/${path.relative(process.cwd(), pathToBuiltApp).replaceAll('\\', '/')}`;
+    // addScriptTag with url resolves after the module is loaded and executed
+    await page.addScriptTag({ type: 'module', url: scriptUrl });
     await page.evaluate(() => window.__setupFabricHook());
   }
 }

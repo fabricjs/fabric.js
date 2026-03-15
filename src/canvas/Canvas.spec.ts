@@ -10,10 +10,12 @@ import type {
   MultiSelectionStacking,
   TPointerEvent,
 } from '../../fabric';
+import { createPointerEvent } from '../../test/utils';
 import {
   ActiveSelection,
   Circle,
   classRegistry,
+  FabricText,
   getFabricDocument,
   Group,
   Path,
@@ -28,6 +30,7 @@ import {
   PATH_WITHOUT_DEFAULTS_JSON,
   PATH_JSON,
   RECT_JSON,
+  ERROR_IMAGE_JSON,
 } from './Canvas.fixtures.ts';
 
 describe('Canvas', () => {
@@ -862,9 +865,7 @@ describe('Canvas', () => {
       deltaX: 5,
       deltaY: 5,
     });
-    canvas._onMouseUp({
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    canvas._onMouseUp(createPointerEvent({ target: canvas.upperCanvasEl }));
 
     expect(fired, 'event fired for each of 3 rects').toBe(3);
   });
@@ -885,9 +886,7 @@ describe('Canvas', () => {
       deltaX: 5,
       deltaY: 5,
     });
-    canvas._onMouseUp({
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    canvas._onMouseUp(createPointerEvent({ target: canvas.upperCanvasEl }));
 
     expect(isFired, 'selection created fired').toBe(true);
     expect(
@@ -917,9 +916,7 @@ describe('Canvas', () => {
       deltaX: 5,
       deltaY: 5,
     });
-    canvas._onMouseUp({
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    canvas._onMouseUp(createPointerEvent({ target: canvas.upperCanvasEl }));
 
     expect(isFired, 'selection:created fired').toBe(true);
     expect(canvas.getActiveObject(), 'rect1 is set as activeObject').toBe(
@@ -1115,18 +1112,22 @@ describe('Canvas', () => {
     const rect = makeRect({ left: 0, top: 0 });
     canvas.add(rect);
 
-    const { target } = canvas.findTarget({
-      clientX: 5,
-      clientY: 5,
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    const { target } = canvas.findTarget(
+      createPointerEvent({
+        clientX: 5,
+        clientY: 5,
+        target: canvas.upperCanvasEl,
+      }),
+    );
     expect(target, 'Should return the rect').toBe(rect);
 
-    const { target: target2 } = canvas.findTarget({
-      clientX: 30,
-      clientY: 30,
-      target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent);
+    const { target: target2 } = canvas.findTarget(
+      createPointerEvent({
+        clientX: 30,
+        clientY: 30,
+        target: canvas.upperCanvasEl,
+      }),
+    );
     expect(target2, 'Should not find target').toBeUndefined();
 
     canvas.remove(rect);
@@ -1410,6 +1411,39 @@ describe('Canvas', () => {
     expect(obj.get('flipY')).toBe(false);
     expect(obj.get('opacity')).toBe(1);
     expect(obj.get('path').length > 0).toBeTruthy();
+  });
+
+  it('loads from JSON string with loadFromJSON with images not existing', async () => {
+    expect(canvas.loadFromJSON).toBeTypeOf('function');
+    await canvas.loadFromJSON(ERROR_IMAGE_JSON);
+
+    const obj = canvas.item(0);
+
+    expect(canvas.isEmpty(), 'canvas is not empty').toBeFalsy();
+    expect(canvas.getObjects().length).toBe(1);
+    // @ts-expect-error -- constructor function has type
+    expect(obj.constructor.type, 'first object is a Image object').toBe('Text');
+  });
+
+  it('loads from JSON string with loadFromJSON with images not existing passing reviver', async () => {
+    expect(canvas.loadFromJSON).toBeTypeOf('function');
+    await canvas.loadFromJSON(
+      ERROR_IMAGE_JSON,
+      async (serializedObject, instance, error) => {
+        if (error) {
+          return new FabricText('text-placeholder');
+        }
+      },
+    );
+
+    const obj = canvas.item(0);
+
+    expect(canvas.isEmpty(), 'canvas is not empty').toBeFalsy();
+    expect(canvas.getObjects().length).toBe(2);
+    // @ts-expect-error -- constructor function has type
+    expect(obj.constructor.type, 'first object is a Image object').toBe('Text');
+    expect(obj).toBeInstanceOf(FabricText);
+    expect((obj as FabricText).text).toBe('text-placeholder');
   });
 
   it('loads from JSON object without default values', async () => {
@@ -1897,16 +1931,15 @@ describe('Canvas', () => {
   });
 
   it('cleans up transform when discarding active object', () => {
-    const e = {
+    const e = createPointerEvent({
       clientX: 5,
       clientY: 5,
-      which: 1,
       target: canvas.upperCanvasEl,
-    };
+    });
     const target = makeRect();
     canvas.add(target);
     canvas.setActiveObject(target);
-    canvas._setupCurrentTransform(e as unknown as TPointerEvent, target, true);
+    canvas._setupCurrentTransform(e, target, true);
     expect(canvas._currentTransform, 'transform should be set').toBeTruthy();
 
     target.isMoving = true;
@@ -2221,11 +2254,11 @@ describe('Canvas', () => {
     const rect = new Rect({ left: 100, top: 100, width: 50, height: 50 });
     canvas.add(rect);
     const canvasOffset = canvas.calcOffset();
-    let eventStub = {
+    let eventStub = createPointerEvent({
       clientX: canvasOffset.left + 100,
       clientY: canvasOffset.top + 100,
       target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent;
+    });
     canvas.setActiveObject(rect);
     const targetCorner = rect.findControl(canvas.getViewportPoint(eventStub));
     rect.__corner = targetCorner ? targetCorner.key : undefined;
@@ -2237,11 +2270,11 @@ describe('Canvas', () => {
     expect(t.originX, 'no origin change for drag').toBe(rect.originX);
     expect(t.originY, 'no origin change for drag').toBe(rect.originY);
 
-    eventStub = {
+    eventStub = createPointerEvent({
       clientX: canvasOffset.left + rect.oCoords.tl.corner.tl.x + 1,
       clientY: canvasOffset.top + rect.oCoords.tl.corner.tl.y + 1,
       target: canvas.upperCanvasEl,
-    } as unknown as TPointerEvent;
+    });
     rect.__corner = rect.findControl(canvas.getViewportPoint(eventStub))!.key;
     canvas._setupCurrentTransform(eventStub, rect, false);
     t = canvas._currentTransform!;
@@ -2264,12 +2297,12 @@ describe('Canvas', () => {
     expect(t.originY, 'origin in opposite direction').toBe('bottom');
     expect(t.shiftKey, 'shift was not pressed').toBe(undefined);
 
-    eventStub = {
+    eventStub = createPointerEvent({
       clientX: canvasOffset.left + rect.left - 2 - rect.width / 2,
       clientY: canvasOffset.top + rect.top,
       target: canvas.upperCanvasEl,
       shiftKey: true,
-    } as unknown as TPointerEvent;
+    });
     rect.__corner = rect.findControl(canvas.getViewportPoint(eventStub))!.key;
     canvas._setupCurrentTransform(eventStub, rect, alreadySelected);
     t = canvas._currentTransform!;

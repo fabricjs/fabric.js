@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { applyViewboxTransform } from './applyViewboxTransform';
 import { getFabricDocument } from '../env';
+import { createSVGElement } from '../../test/utils';
 
 const document = getFabricDocument();
 
@@ -18,12 +19,10 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle missing viewBox with valid dimensions', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('width', '100');
-    element.setAttribute('height', '200');
+    const element = createSVGElement('svg', {
+      width: '100',
+      height: '200',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -34,10 +33,7 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle missing viewBox and missing dimensions', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
+    const element = createSVGElement('svg');
 
     const result = applyViewboxTransform(element);
 
@@ -48,12 +44,10 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle missing viewBox with percentage dimensions', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('width', '100%');
-    element.setAttribute('height', '100%');
+    const element = createSVGElement('svg', {
+      width: '100%',
+      height: '100%',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -64,20 +58,14 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle x/y translation for missing viewBox', () => {
-    const parent = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'symbol',
-    );
+    const parent = createSVGElement('svg');
+    const element = createSVGElement('symbol', {
+      x: '10',
+      y: '20',
+      width: '100',
+      height: '200',
+    });
     parent.appendChild(element);
-
-    element.setAttribute('x', '10');
-    element.setAttribute('y', '20');
-    element.setAttribute('width', '100');
-    element.setAttribute('height', '200');
 
     const result = applyViewboxTransform(element);
 
@@ -91,13 +79,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handles invalid viewBox with 3 values', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0 0 408');
-    element.setAttribute('width', '100');
-    element.setAttribute('height', '200');
+    const element = createSVGElement('svg', {
+      viewBox: '0 0 408',
+      width: '100',
+      height: '200',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -108,13 +94,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle invalid viewBox with malformed values', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', 'invalid values here');
-    element.setAttribute('width', '100');
-    element.setAttribute('height', '200');
+    const element = createSVGElement('svg', {
+      viewBox: 'invalid values here',
+      width: '100',
+      height: '200',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -125,13 +109,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle empty viewBox', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '');
-    element.setAttribute('width', '100');
-    element.setAttribute('height', '200');
+    const element = createSVGElement('svg', {
+      viewBox: '',
+      width: '100',
+      height: '200',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -142,13 +124,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('parse valid viewBox with dimensions', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0 0 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '0 0 100 50',
+      width: '200',
+      height: '100',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -163,11 +143,9 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('parse valid viewBox without dimensions', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '10 20 100 50');
+    const element = createSVGElement('svg', {
+      viewBox: '10 20 100 50',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -182,13 +160,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle negative viewBox values', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '-10 -20 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '-10 -20 100 50',
+      width: '200',
+      height: '100',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -203,13 +179,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle decimal viewBox values', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0.5 1.5 100.5 50.5');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '0.5 1.5 100.5 50.5',
+      width: '200',
+      height: '100',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -224,13 +198,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('not generate transform for identity case', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0 0 100 50');
-    element.setAttribute('width', '100');
-    element.setAttribute('height', '50');
+    const element = createSVGElement('svg', {
+      viewBox: '0 0 100 50',
+      width: '100',
+      height: '50',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -246,13 +218,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('generate transform matrix for scaling', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0 0 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '0 0 100 50',
+      width: '200',
+      height: '100',
+    });
 
     applyViewboxTransform(element);
 
@@ -264,13 +234,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('generate transform matrix with translation', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '10 20 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '10 20 100 50',
+      width: '200',
+      height: '100',
+    });
 
     applyViewboxTransform(element);
 
@@ -281,21 +249,15 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle x/y attributes with viewBox', () => {
-    const parent = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'symbol',
-    );
+    const parent = createSVGElement('svg');
+    const element = createSVGElement('symbol', {
+      viewBox: '0 0 100 50',
+      width: '200',
+      height: '100',
+      x: '5',
+      y: '10',
+    });
     parent.appendChild(element);
-
-    element.setAttribute('viewBox', '0 0 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
-    element.setAttribute('x', '5');
-    element.setAttribute('y', '10');
 
     applyViewboxTransform(element);
 
@@ -304,18 +266,13 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('create g wrapper for svg elements', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0 0 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '0 0 100 50',
+      width: '200',
+      height: '100',
+    });
 
-    const child = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'rect',
-    );
+    const child = createSVGElement('rect');
     element.appendChild(child);
 
     applyViewboxTransform(element);
@@ -328,14 +285,12 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('apply transform directly to non-svg elements', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'symbol',
-    );
-    element.setAttribute('viewBox', '0 0 100 50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
-    element.setAttribute('transform', 'rotate(45)');
+    const element = createSVGElement('symbol', {
+      viewBox: '0 0 100 50',
+      width: '200',
+      height: '100',
+      transform: 'rotate(45)',
+    });
 
     applyViewboxTransform(element);
 
@@ -345,13 +300,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle scientific notation in viewBox', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '1e-2 2e-3 1e2 5e1');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '1e-2 2e-3 1e2 5e1',
+      width: '200',
+      height: '100',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -366,13 +319,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('viewBox with mixed separators', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '0,0 100,50');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '0,0 100,50',
+      width: '200',
+      height: '100',
+    });
 
     const result = applyViewboxTransform(element);
 
@@ -381,13 +332,11 @@ describe('applyViewboxTransform()', () => {
   });
 
   test('handle whitespace in viewBox', () => {
-    const element = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg',
-    );
-    element.setAttribute('viewBox', '  0   0   100   50  ');
-    element.setAttribute('width', '200');
-    element.setAttribute('height', '100');
+    const element = createSVGElement('svg', {
+      viewBox: '  0   0   100   50  ',
+      width: '200',
+      height: '100',
+    });
 
     const result = applyViewboxTransform(element);
 

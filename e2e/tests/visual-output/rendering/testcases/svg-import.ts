@@ -100,6 +100,7 @@ const svgFiles = [
   'use-and-style',
   'use-svg-style-2',
   'svg_text_underline_thick',
+  'svg_text_underline_color',
   'coords-viewattr-02-b',
 ];
 

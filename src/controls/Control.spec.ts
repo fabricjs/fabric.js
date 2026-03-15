@@ -25,13 +25,13 @@ describe('Controls', () => {
 
     target.setCoords();
 
-    vi.spyOn(target, 'findControl').mockImplementation(function (
-      this: FabricObject,
-    ) {
-      this.__corner = 'test';
+    vi.spyOn(target, 'findControl').mockImplementation(
+      function (this: FabricObject) {
+        this.__corner = 'test';
 
-      return { key: 'test', control };
-    });
+        return { key: 'test', control };
+      },
+    );
 
     const canvas = new Canvas();
     canvas.setActiveObject(target);

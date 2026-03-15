@@ -2,6 +2,38 @@
 
 ## [next]
 
+- ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
+- docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
+- refactor(tests): use createSVGElement helper across spec files [#10902](https://github.com/fabricjs/fabric.js/pull/10902)
+- chore(): simplify svg creation in unit tests via shared helper [#10895](https://github.com/fabricjs/fabric.js/pull/10895)
+- ci(): Move checkout step for coverage earlier [#10899](https://github.com/fabricjs/fabric.js/pull/10899)
+- ci(): fix the coverage comment action [#10898](https://github.com/fabricjs/fabric.js/pull/10898)
+- chore(): try to improve playwright tests speed [#10896](https://github.com/fabricjs/fabric.js/pull/10896)
+- chore: simplify issue templates and remove semver devDependency [#10892](https://github.com/fabricjs/fabric.js/pull/10892)
+- chore(deps-dev): bump nyc from 17.1.0 to 18.0.0 [#10883](https://github.com/fabricjs/fabric.js/pull/10883)
+- chore(deps-dev): bump @playwright/test from 1.58.1 to 1.58.2 [#10885](https://github.com/fabricjs/fabric.js/pull/10885)
+- chore(): migrate from prettier to oxfmt [#10881](https://github.com/fabricjs/fabric.js/pull/10881)
+- chore(): move transpiling building to rolldown [#10868](https://github.com/fabricjs/fabric.js/pull/10868)
+- chore(): update vitest to 4.1.0 [#10888](https://github.com/fabricjs/fabric.js/pull/10888)
+- feat(): Support textDecoration color. [#10880](https://github.com/fabricjs/fabric.js/pull/10880)
+- feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
+- Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
+- chore(): Update typescript-eslint to address a recent vulnerability [#10878](https://github.com/fabricjs/fabric.js/pull/10878)
+- chore(deps-dev): bump rollup from 4.52.4 to 4.59.0 in the npm_and_yarn group across 1 directory [#10877](https://github.com/fabricjs/fabric.js/pull/10877)
+- Gradient controls [#10844](https://github.com/fabricjs/fabric.js/pull/10844)
+- fix(): Fire mouseover/mouseleave for objects that are multi selection targets [#10874](https://github.com/fabricjs/fabric.js/pull/10874)
+- feat(extensions): Cropping controls with edge resize and flip support [#10851](https://github.com/fabricjs/fabric.js/pull/10851)
+
+## [7.2.0]
+
+- fix(): Fix for svg export stored xss CVE-2026-27013
+- chore(): update prettier [#10863](https://github.com/fabricjs/fabric.js/pull/10863)
+- chore(): reuse more of the createPointerEvent in unit tests [#10864](https://github.com/fabricjs/fabric.js/pull/10864)
+- test(): refactor test, put common data in shared function [#10861](https://github.com/fabricjs/fabric.js/pull/10861)
+- chore(): update playwright to latest [#10860](https://github.com/fabricjs/fabric.js/pull/10860)
+- chore(): fix Canvas-dispose tests on firefox [#10859](https://github.com/fabricjs/fabric.js/pull/10859)
+- chore(): update vitest to 4.0.18 [#10858](https://github.com/fabricjs/fabric.js/pull/10858)
+- chore(deps-dev): bump lodash from 4.17.21 to 4.17.23 in the npm_and_yarn group across 1 directory [#10853](https://github.com/fabricjs/fabric.js/pull/10853)
 - feat(): Cropping controls follow ups [#10839](https://github.com/fabricjs/fabric.js/pull/10839)
 - chore(): Add pre-commit hook to run lint, prettier, tsc on staged files. [#10834](https://github.com/fabricjs/fabric.js/pull/10834)
 

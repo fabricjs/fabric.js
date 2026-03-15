@@ -10,38 +10,15 @@ import {
   getFabricDocument,
   IText,
   Textbox,
-  version,
 } from '../../../fabric';
 import { toFixed } from '../../util';
+import { createReferenceObject, createSVGElement } from '../../../test/utils';
 
 const CHAR_WIDTH = 20;
 
-const REFERENCE_TEXT_OBJECT = {
-  version: version,
-  type: 'Text',
-  originX: 'center',
-  originY: 'center',
-  left: 0,
-  top: 0,
+const REFERENCE_TEXT_OBJECT = createReferenceObject('Text', {
   width: CHAR_WIDTH,
   height: 45.2,
-  fill: 'rgb(0,0,0)',
-  stroke: null,
-  strokeWidth: 1,
-  strokeDashArray: null,
-  strokeLineCap: 'butt',
-  strokeDashOffset: 0,
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 4,
-  scaleX: 1,
-  scaleY: 1,
-  angle: 0,
-  flipX: false,
-  flipY: false,
-  opacity: 1,
-  shadow: null,
-  visible: true,
-  backgroundColor: '',
   text: 'x',
   fontSize: 40,
   fontWeight: 'normal',
@@ -53,21 +30,15 @@ const REFERENCE_TEXT_OBJECT = {
   linethrough: false,
   textAlign: 'left',
   textBackgroundColor: '',
-  fillRule: 'nonzero',
-  paintFirst: 'fill',
-  globalCompositeOperation: 'source-over',
-  skewX: 0,
-  skewY: 0,
   charSpacing: 0,
   styles: [],
   path: undefined,
-  strokeUniform: false,
   direction: 'ltr',
   pathStartOffset: 0,
   pathSide: 'left',
   pathAlign: 'baseline',
   textDecorationThickness: 66.667,
-};
+});
 
 function createTextObject() {
   return new FabricText('x');
@@ -375,30 +346,27 @@ describe('FabricText', () => {
 
   it('fromElement with custom attributes', async () => {
     config.configure({ NUM_FRACTION_DIGITS: 2 });
-    const namespace = 'http://www.w3.org/2000/svg';
-    const elTextWithAttrs = getFabricDocument().createElementNS(
-      namespace,
-      'text',
-    );
-
+    const elTextWithAttrs = createSVGElement('text', {
+      x: 10,
+      y: 20,
+      fill: 'rgb(255,255,255)',
+      opacity: 0.45,
+      stroke: 'blue',
+      'stroke-width': 3,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+      'font-family': 'Monaco',
+      'font-style': 'italic',
+      'font-weight': 'bold',
+      'font-size': 123,
+      'letter-spacing': '1em',
+      'text-decoration': 'underline',
+      'text-decoration-color': 'green',
+      'text-anchor': 'middle',
+    });
     elTextWithAttrs.textContent = 'x';
-    elTextWithAttrs.setAttributeNS(namespace, 'x', String(10));
-    elTextWithAttrs.setAttributeNS(namespace, 'y', String(20));
-    elTextWithAttrs.setAttributeNS(namespace, 'fill', 'rgb(255,255,255)');
-    elTextWithAttrs.setAttributeNS(namespace, 'opacity', String(0.45));
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke', 'blue');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-width', String(3));
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linecap', 'round');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-linejoin', 'bevel');
-    elTextWithAttrs.setAttributeNS(namespace, 'stroke-miterlimit', String(5));
-    elTextWithAttrs.setAttributeNS(namespace, 'font-family', 'Monaco');
-    elTextWithAttrs.setAttributeNS(namespace, 'font-style', 'italic');
-    elTextWithAttrs.setAttributeNS(namespace, 'font-weight', 'bold');
-    elTextWithAttrs.setAttributeNS(namespace, 'font-size', '123');
-    elTextWithAttrs.setAttributeNS(namespace, 'letter-spacing', '1em');
-    elTextWithAttrs.setAttributeNS(namespace, 'text-decoration', 'underline');
-    elTextWithAttrs.setAttributeNS(namespace, 'text-anchor', 'middle');
 
     const textWithAttrs = await FabricText.fromElement(elTextWithAttrs);
 
@@ -431,6 +399,7 @@ describe('FabricText', () => {
       fontWeight: 'bold',
       fontSize: 123,
       underline: true,
+      textDecorationColor: 'green',
     };
 
     expect(
@@ -721,10 +690,10 @@ describe('FabricText', () => {
     text.initDimensions();
     text2.initDimensions();
 
-    const fothCache = cache.getFontCache(text);
+    const fontCache = cache.getFontCache(text);
     const cache2 = cache.getFontCache(text2);
 
-    expect(fothCache, 'you get the same cache').toBe(cache2);
+    expect(fontCache, 'you get the same cache').toBe(cache2);
   });
 
   it('getSelectionStyles with no arguments', () => {
@@ -921,6 +890,7 @@ describe('FabricText', () => {
       textBackgroundColor: '',
       deltaY: 0,
       textDecorationThickness: 66.667,
+      textDecorationColor: undefined,
     };
 
     const expectedStyle2 = {
@@ -937,6 +907,7 @@ describe('FabricText', () => {
       textBackgroundColor: '',
       deltaY: 0,
       textDecorationThickness: 66.667,
+      textDecorationColor: undefined,
     };
 
     expect(
@@ -965,6 +936,19 @@ describe('FabricText', () => {
       "stroke-width: 30; font-family: 'Verdana'; font-size: 25px; fill: rgb(255,0,0); ";
 
     expect(styleString, 'style is as expected').toBe(expected);
+  });
+
+  it('getSvgSpanStyles includes textDecorationColor', () => {
+    const iText = new IText('test foo bar-baz', {
+      underline: true,
+      textDecorationColor: 'blue',
+    });
+    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
+    const styleString = iText.getSvgSpanStyles({
+      fill: 'red',
+      underline: true,
+    });
+    expect(styleString).toContain('text-decoration-color: blue;');
   });
 
   it('getSvgSpanStyles produces correct output with useWhiteSpace', () => {
@@ -1210,7 +1194,7 @@ describe('FabricText', () => {
       FabricText.cacheProperties.join('-'),
       'cache properties include text-specific ones',
     ).toBe(
-      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness',
+      'fill-stroke-strokeWidth-strokeDashArray-width-height-paintFirst-strokeUniform-strokeLineCap-strokeDashOffset-strokeLineJoin-strokeMiterLimit-backgroundColor-clipPath-fontSize-fontWeight-fontFamily-fontStyle-lineHeight-text-charSpacing-textAlign-styles-path-pathStartOffset-pathSide-pathAlign-underline-overline-linethrough-textBackgroundColor-direction-textDecorationThickness-textDecorationColor',
     );
   });
 

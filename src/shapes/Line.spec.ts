@@ -1,46 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { Line } from './Line';
-import { getFabricDocument, version } from '../../fabric';
 import { FabricObject } from './Object/Object';
+import { createReferenceObject, createSVGElement } from '../../test/utils';
 
 describe('Line', () => {
-  const LINE_OBJECT = {
-    version: version,
-    type: 'Line',
-    originX: 'center',
-    originY: 'center',
+  const LINE_OBJECT = createReferenceObject('Line', {
     left: 12,
     top: 13,
     width: 2,
     height: 2,
-    fill: 'rgb(0,0,0)',
-    stroke: null,
-    strokeWidth: 1,
-    strokeDashArray: null,
-    strokeLineCap: 'butt',
-    strokeDashOffset: 0,
-    strokeLineJoin: 'miter',
-    strokeMiterLimit: 4,
-    scaleX: 1,
-    scaleY: 1,
-    angle: 0,
-    flipX: false,
-    flipY: false,
-    opacity: 1,
     x1: -1,
     y1: -1,
     x2: 1,
     y2: 1,
-    shadow: null,
-    visible: true,
-    backgroundColor: '',
-    fillRule: 'nonzero',
-    paintFirst: 'fill',
-    globalCompositeOperation: 'source-over',
-    skewX: 0,
-    skewY: 0,
-    strokeUniform: false,
-  } as const;
+  });
 
   it('initializes constructor correctly', () => {
     expect(Line).toBeTruthy();
@@ -92,60 +65,42 @@ describe('Line', () => {
   it('creates from SVG element correctly', async () => {
     expect(Line.fromElement).toBeTypeOf('function');
 
-    const namespace = 'http://www.w3.org/2000/svg';
     // TODO: should fromElement also accept SVGElement since test is doing it?
-    const lineEl = getFabricDocument().createElementNS(
-      namespace,
-      'line',
-    ) as unknown as HTMLElement;
-    const x1 = 11;
-    const y1 = 23;
-    const x2 = 34;
-    const y2 = 7;
-    const stroke = 'ff5555';
-    const strokeWidth = 2;
-    const strokeDashArray = [5, 2];
-    const strokeLineCap = 'round';
-    const strokeLineJoin = 'bevel';
-    const strokeMiterLimit = 5;
+    const lineEl = createSVGElement('line', {
+      x1: 11,
+      x2: 34,
+      y1: 23,
+      y2: 7,
+      stroke: 'ff5555',
+      'stroke-width': 2,
+      'stroke-dasharray': '5, 2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'bevel',
+      'stroke-miterlimit': 5,
+    });
 
-    lineEl.setAttributeNS(namespace, 'x1', String(x1));
-    lineEl.setAttributeNS(namespace, 'x2', String(x2));
-    lineEl.setAttributeNS(namespace, 'y1', String(y1));
-    lineEl.setAttributeNS(namespace, 'y2', String(y2));
-    lineEl.setAttributeNS(namespace, 'stroke', stroke);
-    lineEl.setAttributeNS(namespace, 'stroke-width', String(strokeWidth));
-    lineEl.setAttributeNS(namespace, 'stroke-dasharray', '5, 2');
-    lineEl.setAttributeNS(namespace, 'stroke-linecap', strokeLineCap);
-    lineEl.setAttributeNS(namespace, 'stroke-linejoin', strokeLineJoin);
-    lineEl.setAttributeNS(
-      namespace,
-      'stroke-miterlimit',
-      String(strokeMiterLimit),
-    );
-
-    const oLine = await Line.fromElement(lineEl);
+    const oLine = await Line.fromElement(lineEl as unknown as HTMLElement);
     expect(oLine).toBeInstanceOf(Line);
 
-    expect(oLine.get('x1')).toBe(x1);
-    expect(oLine.get('y1')).toBe(y1);
-    expect(oLine.get('x2')).toBe(x2);
-    expect(oLine.get('y2')).toBe(y2);
-    expect(oLine.get('stroke')).toBe(stroke);
-    expect(oLine.get('strokeWidth')).toBe(strokeWidth);
-    expect(oLine.get('strokeDashArray')).toEqual(strokeDashArray);
-    expect(oLine.get('strokeLineCap')).toBe(strokeLineCap);
-    expect(oLine.get('strokeLineJoin')).toBe(strokeLineJoin);
-    expect(oLine.get('strokeMiterLimit')).toBe(strokeMiterLimit);
+    expect(oLine.get('x1')).toBe(11);
+    expect(oLine.get('y1')).toBe(23);
+    expect(oLine.get('x2')).toBe(34);
+    expect(oLine.get('y2')).toBe(7);
+    expect(oLine.get('stroke')).toBe('ff5555');
+    expect(oLine.get('strokeWidth')).toBe(2);
+    expect(oLine.get('strokeDashArray')).toEqual([5, 2]);
+    expect(oLine.get('strokeLineCap')).toBe('round');
+    expect(oLine.get('strokeLineJoin')).toBe('bevel');
+    expect(oLine.get('strokeMiterLimit')).toBe(5);
 
-    const lineElWithMissingAttributes = getFabricDocument().createElementNS(
-      namespace,
-      'line',
-    ) as unknown as HTMLElement;
-    lineElWithMissingAttributes.setAttributeNS(namespace, 'x1', String(10));
-    lineElWithMissingAttributes.setAttributeNS(namespace, 'y1', String(20));
+    const lineElWithMissingAttributes = createSVGElement('line', {
+      x1: 10,
+      y1: 20,
+    });
 
-    const oLine2 = await Line.fromElement(lineElWithMissingAttributes);
+    const oLine2 = await Line.fromElement(
+      lineElWithMissingAttributes as unknown as HTMLElement,
+    );
     expect(oLine2.get('x2')).toBe(0);
     expect(oLine2.get('y2')).toBe(0);
   });
@@ -170,14 +125,10 @@ describe('Line', () => {
   });
 
   it('parses stroke width from style attribute', async () => {
-    const namespace = 'http://www.w3.org/2000/svg';
-    const lineEl = getFabricDocument().createElementNS(
-      namespace,
-      'line',
-    ) as unknown as HTMLElement;
+    const lineEl = createSVGElement('line');
     lineEl.setAttribute('style', 'stroke-width:4');
 
-    const oLine = await Line.fromElement(lineEl);
+    const oLine = await Line.fromElement(lineEl as unknown as HTMLElement);
     expect(oLine.strokeWidth).toBe(4);
   });
 

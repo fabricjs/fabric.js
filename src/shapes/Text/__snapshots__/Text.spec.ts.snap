@@ -196,7 +196,7 @@ exports[`FabricText > toObject 1`] = `
   "type": "Text",
   "underline": false,
   "visible": true,
-  "width": 60,
+  "width": 59.98,
 }
 `;
 

@@ -17,12 +17,18 @@ export {
   rotateEventHandler,
 } from './westures_integration';
 
-export { createImageCroppingControls } from './cropping_controls/croppingControls';
+export {
+  createImageCroppingControls,
+  createImageResizeControlsWithScaleToCover,
+} from './cropping_controls/croppingControls';
 export {
   changeCropY,
   changeCropX,
   changeCropWidth,
   changeCropHeight,
+  changeWidthAndScaleToCover,
+  changeHeightAndScaleToCover,
+  withFlip,
 } from './cropping_controls/croppingHandlers';
 export { enterCropMode } from './cropping_controls/enterCropMode';
 
@@ -37,3 +43,4 @@ export type {
 export { TableLayoutStrategy } from './table';
 export type { TableCell, TableCellText } from './table';
 export { createTableControls, initTableInteraction } from './table';
+export { createLinearGradientControls } from './linear_gradient_controls/linearGradientControls';
