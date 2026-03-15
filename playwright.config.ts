@@ -27,7 +27,6 @@ const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   /* Retry once to get the video and trace for truly failing tests */
   retries: 1,
-  /* Limit parallel workers on CI. */
   workers: process.env.CI ? '100%' : undefined,
   /* Do not update snapshot on CI */
   updateSnapshots: process.env.CI ? 'none' : 'missing',
