@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Move checkout step for coverage earlier [#10899](https://github.com/fabricjs/fabric.js/pull/10899)
 - ci(): fix the coverage comment action [#10898](https://github.com/fabricjs/fabric.js/pull/10898)
 - chore(): try to improve playwright tests speed [#10896](https://github.com/fabricjs/fabric.js/pull/10896)
 - chore: simplify issue templates and remove semver devDependency [#10892](https://github.com/fabricjs/fabric.js/pull/10892)
