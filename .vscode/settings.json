@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "markdown.validate.enabled": true,
   "markdown.validate.fileLinks.enabled": "warning",
   "markdown.validate.fragmentLinks.enabled": "warning",
@@ -31,6 +31,6 @@
   },
   "search.useIgnoreFiles": true,
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }
