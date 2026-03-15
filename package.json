@@ -63,8 +63,8 @@
     "sandbox": "npm run sandboxscript -- sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
     "lint": "eslint src extensions",
-    "prettier:check": "prettier --check .",
-    "prettier:write": "prettier --write .",
+    "prettier:check": "oxfmt --check .",
+    "prettier:write": "oxfmt .",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -86,7 +86,7 @@
     "lint-staged": "^16.2.7",
     "micromatch": "^4.0.8",
     "nyc": "^17.1.0",
-    "prettier": "^3.8.1",
+    "oxfmt": "^0.36.0",
     "ps-list": "^9.0.0",
     "rolldown": "^1.0.0-rc.9",
     "semver": "^7.7.3",
@@ -153,7 +153,7 @@
   },
   "lint-staged": {
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
-    "*.{js,css,md,ts,tsx,jsx,json}": "prettier --write",
+    "*.{js,css,md,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
     "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
   }
 }
