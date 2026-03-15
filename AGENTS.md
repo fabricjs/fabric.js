@@ -42,7 +42,6 @@ npm i --include=dev
 
 - Add or update tests for behavior changes.
 - Prefer targeted test runs while iterating, then run relevant full suites before finalizing.
-- For coverage-related changes, validate coverage artifacts/shape and `nyc` reporting locally when possible.
 
 ## Code Style
 
