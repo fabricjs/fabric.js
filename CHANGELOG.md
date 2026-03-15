@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): See if sonarqube installation see this change [#10904](https://github.com/fabricjs/fabric.js/pull/10904)
 - ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
 - docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
 - refactor(tests): use createSVGElement helper across spec files [#10902](https://github.com/fabricjs/fabric.js/pull/10902)
