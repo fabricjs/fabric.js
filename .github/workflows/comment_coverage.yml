@@ -5,6 +5,7 @@ on:
     types:
       - completed
 permissions:
+  actions: read
   contents: read
   pull-requests: write
 jobs:
@@ -48,7 +49,7 @@ jobs:
       - run: ls -l ./.nyc_output
       - name: Add pr number to output
         id: prnumber
-        run: echo "pr_number=$(cat ${{ runner.temp }}/prnumber.txt)" >> $GITHUB_OUTPUT
+        run: echo "pr_number=$(cat ${{ runner.temp }}/artifacts/prnumber.txt)" >> $GITHUB_OUTPUT
       - name: Build the report
         id: report
         run: |
