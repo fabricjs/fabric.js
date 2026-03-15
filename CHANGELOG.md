@@ -2,6 +2,7 @@
 
 ## [next]
 
+- docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
 - ci(): Move checkout step for coverage earlier [#10899](https://github.com/fabricjs/fabric.js/pull/10899)
 - ci(): fix the coverage comment action [#10898](https://github.com/fabricjs/fabric.js/pull/10898)
 - chore(): try to improve playwright tests speed [#10896](https://github.com/fabricjs/fabric.js/pull/10896)
