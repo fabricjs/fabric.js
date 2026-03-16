@@ -86,7 +86,7 @@
     "lint-staged": "^16.2.7",
     "micromatch": "^4.0.8",
     "nyc": "^18.0.0",
-    "oxfmt": "^0.36.0",
+    "oxfmt": "^0.40.0",
     "ps-list": "^9.0.0",
     "rolldown": "^1.0.0-rc.9",
     "serve": "^14.2.5",
