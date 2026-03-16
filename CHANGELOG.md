@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): remove coverage collection from playwright [#10912](https://github.com/fabricjs/fabric.js/pull/10912)
 - ci(): fix sonarqube lcov path after artifact download [#10910](https://github.com/fabricjs/fabric.js/pull/10910)
 - ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
 - docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)

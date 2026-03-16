@@ -93,7 +93,6 @@
     "tsc-files": "^1.1.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
-    "v8-to-istanbul": "^9.3.0",
     "vitest": "^4.1.0",
     "westures": "^1.1.1"
   },
