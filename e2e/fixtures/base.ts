@@ -1,7 +1,6 @@
 import { test as base } from '@playwright/test';
 import { setupSelectors } from '../setup/setupSelectors';
 import { CanvasUtil } from '../utils/CanvasUtil';
-import { stopCoverage } from '../setup/setupCoverage';
 import { setupApp } from '../setup/setupApp';
 import path from 'node:path';
 import { FabricNamespace } from '../tests/types';
@@ -59,7 +58,6 @@ export const test = base.extend<TestFixtures>({
   },
 
   page: async ({ page }, use, testInfo) => {
-    await page.coverage.startJSCoverage({ reportAnonymousScripts: false });
     await setupSelectors();
     const getImageFunctionString = getImage.toString();
     await page.addInitScript(
@@ -68,7 +66,6 @@ export const test = base.extend<TestFixtures>({
     await setupApp(page, testInfo.file);
     await use(page);
     await page.evaluate(() => window.__teardownFabricHook());
-    await stopCoverage(page, testInfo.outputDir);
   },
 });
 
