@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        with:
-          fetch-depth: 0
       - name: Create temporary directories
         run: |
           mkdir -p ${{ runner.temp }}/artifacts/nyc_output
