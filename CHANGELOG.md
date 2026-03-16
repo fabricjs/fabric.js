@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump es-toolkit from 1.40.0 to 1.45.1 [#10907](https://github.com/fabricjs/fabric.js/pull/10907)
 - refactor(tests): remove coverage collection from playwright [#10912](https://github.com/fabricjs/fabric.js/pull/10912)
 - ci(): fix sonarqube lcov path after artifact download [#10910](https://github.com/fabricjs/fabric.js/pull/10910)
 - ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
