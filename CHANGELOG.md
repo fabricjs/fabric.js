@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump oxfmt from 0.36.0 to 0.40.0 [#10908](https://github.com/fabricjs/fabric.js/pull/10908)
 - ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
 - docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
 - refactor(tests): use createSVGElement helper across spec files [#10902](https://github.com/fabricjs/fabric.js/pull/10902)
