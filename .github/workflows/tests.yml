@@ -120,10 +120,3 @@ jobs:
           name: e2e-report
           path: ./e2e/test-report/
           include-hidden-files: true
-      - name: Upload Test Coverage
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        if: always()
-        with:
-          name: coverage-e2e
-          path: ./e2e/test-results/**/coverage.json
-          include-hidden-files: true
