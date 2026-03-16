@@ -48,7 +48,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.javascript.lcov.reportPaths=${{ runner.temp }}/artifacts/nyc_output/lcov.info
             -Dsonar.pullrequest.key=${{ steps.prnumber.outputs.pr_number }}
             -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
             -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
@@ -60,6 +59,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.javascript.lcov.reportPaths=${{ runner.temp }}/artifacts/nyc_output/lcov.info
             -Dsonar.branch.name=${{ github.event.workflow_run.head_branch }}
-
