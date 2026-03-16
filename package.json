@@ -82,7 +82,7 @@
     "es-toolkit": "1.45.1",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
-    "inquirer": "^12.9.6",
+    "inquirer": "^13.3.2",
     "lint-staged": "^16.2.7",
     "micromatch": "^4.0.8",
     "nyc": "^18.0.0",
