@@ -79,7 +79,7 @@
     "@vitest/ui": "^4.1.0",
     "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
     "commander": "^14.0.1",
-    "es-toolkit": "1.40.0",
+    "es-toolkit": "1.45.1",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "inquirer": "^12.9.6",
@@ -93,7 +93,6 @@
     "tsc-files": "^1.1.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
-    "v8-to-istanbul": "^9.3.0",
     "vitest": "^4.1.0",
     "westures": "^1.1.1"
   },

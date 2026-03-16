@@ -16,7 +16,11 @@ Collect or infer:
 - Issue number to close (optional)
 - Short summary of changes (for title/description)
 
-If the user says there is no issue, skip issue-closing references.
+Issue-number handling:
+
+- If the thread already includes an issue number, reuse it and do not ask again.
+- If the user explicitly says there is no issue, do not ask for one and omit issue-closing text.
+- Otherwise, ask the user for the issue number before creating the PR body.
 
 ## Title Rules
 
@@ -75,8 +79,16 @@ Use `predicted_pr_num` in the changelog line before creating PR.
 
 1. Confirm branch has intended commits.
 2. Build PR title using conventional-commit style.
-3. If an issue number is provided, include `close #<issue-num>` in PR body; otherwise do not include issue-closing text.
-4. Sync with latest `master` before opening the PR:
+3. Resolve issue reference from thread context using the issue-number handling rules above.
+4. If an issue number is provided, include `close #<issue-num>` in PR body; otherwise do not include issue-closing text.
+5. Before any commit or PR creation, run quality checks:
+
+```bash
+npm run lint
+npm run prettier:check
+```
+
+6. Sync with latest `master` before opening the PR:
 
 ```bash
 git checkout master
@@ -85,13 +97,14 @@ git checkout <working-branch>
 git merge master
 ```
 
-5. If merge conflicts exist, resolve them before continuing.
-6. Predict next PR number.
-7. Update `CHANGELOG.md` `[next]` line with predicted number and title.
-8. Commit and push changelog/title-related edits.
-9. Create PR with `gh pr create --base <base> --head <branch> --title "<title>" --body-file <file>`.
-10. Fetch actual PR number.
-11. If actual number differs from prediction:
+7. If merge conflicts exist, resolve them before continuing.
+8. Predict next PR number.
+9. Update `CHANGELOG.md` `[next]` line with predicted number and title.
+10. Commit and push changelog/title-related edits. Never use `--no-verify`; pre-commit hooks must run and pass.
+11. If hooks modify files or fail, stage fixes and recommit until hooks pass.
+12. Create PR with `gh pr create --base <base> --head <branch> --title "<title>" --body-file <file>`.
+13. Fetch actual PR number.
+14. If actual number differs from prediction:
     - Update the changelog line to actual number/link.
     - Commit and push the correction.
     - Optionally update PR body with a short note if needed.
@@ -103,6 +116,9 @@ Before finishing, verify:
 - PR title follows conventional commit style and matches changelog text.
 - PR body includes description.
 - If an issue number is provided, PR body includes `close #<issue-num>`.
+- `npm run lint` passes.
+- `npm run prettier:check` passes.
+- Any commit made for this PR was created without `--no-verify` and pre-commit hooks passed.
 - Branch was synced with latest `master` before PR creation.
 - `CHANGELOG.md` has exactly one new `[next]` line for this PR.
 - Link uses `https://github.com/fabricjs/fabric.js/pull/<prNum>`.

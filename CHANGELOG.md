@@ -3,6 +3,9 @@
 ## [next]
 
 - chore(deps): bump canvas from 3.2.0 to 3.2.1 [#10906](https://github.com/fabricjs/fabric.js/pull/10906)
+- chore(deps-dev): bump es-toolkit from 1.40.0 to 1.45.1 [#10907](https://github.com/fabricjs/fabric.js/pull/10907)
+- refactor(tests): remove coverage collection from playwright [#10912](https://github.com/fabricjs/fabric.js/pull/10912)
+- ci(): fix sonarqube lcov path after artifact download [#10910](https://github.com/fabricjs/fabric.js/pull/10910)
 - ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
 - docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
 - refactor(tests): use createSVGElement helper across spec files [#10902](https://github.com/fabricjs/fabric.js/pull/10902)
