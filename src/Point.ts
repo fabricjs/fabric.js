@@ -41,6 +41,34 @@ export class Point implements XY {
     return new Point();
   }
 
+  testCoverage2(): Point {
+    return new Point();
+  }
+
+  testCoverage3(): Point {
+    return new Point();
+  }
+
+  testCoverage4(): Point {
+    return new Point();
+  }
+
+  testCoverage5(): Point {
+    return new Point();
+  }
+
+  testCoverage6(): Point {
+    return new Point();
+  }
+
+  testCoverage7(): Point {
+    return new Point();
+  }
+
+  testCoverage8(): Point {
+    return new Point();
+  }
+
   /**
    * Adds another point to this one
    * @param {XY} that
