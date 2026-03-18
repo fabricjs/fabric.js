@@ -1,5 +1,6 @@
 import type { TPointerEvent } from '../src/EventTypeDefs';
 import { getFabricDocument } from '../fabric';
+import { Rect } from '../src/shapes/Rect';
 import { version } from '../package.json';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -58,6 +59,32 @@ export function createReferenceObject<T extends Record<string, unknown>>(
     type,
     ...shapeProps,
   };
+}
+
+export function makeRect(options: Record<string, unknown> = {}) {
+  return new Rect({ width: 10, height: 10, ...options });
+}
+
+const RECT_FIXTURES = [
+  { top: 105, left: 115, width: 30, height: 10 },
+  { top: 140, left: 55, width: 10, height: 40 },
+  { top: 60, left: 10, width: 20, height: 40 },
+  { top: 95, left: 95, width: 40, height: 40 },
+];
+
+export function makeRects(
+  count: number,
+  options: Record<string, unknown> = {},
+) {
+  return Array.from({ length: count }, (_, i) => {
+    const fixture = RECT_FIXTURES[i] ?? {
+      top: 50 * (i + 1),
+      left: 50 * (i + 1),
+      width: 20,
+      height: 20,
+    };
+    return new Rect({ ...fixture, ...options });
+  });
 }
 
 export function createPointerEvent(
