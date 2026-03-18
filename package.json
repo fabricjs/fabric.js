@@ -77,7 +77,6 @@
     "@vitest/browser-playwright": "^4.1.0",
     "@vitest/coverage-v8": "^4.1.0",
     "@vitest/ui": "^4.1.0",
-    "babel-plugin-transform-imports": "git+https://git@github.com/fabricjs/babel-plugin-transform-imports.git",
     "commander": "^14.0.1",
     "es-toolkit": "1.45.1",
     "eslint-config-prettier": "^10.1.8",
