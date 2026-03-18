@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): harden privileged workflow_run actions [#10922](https://github.com/fabricjs/fabric.js/pull/10922)
 - ci(): fix SonarCloud PR changed-lines coverage [#10921](https://github.com/fabricjs/fabric.js/pull/10921)
 - refactor(tests): remove coverage merge step [#10913](https://github.com/fabricjs/fabric.js/pull/10913)
 - chore(): remove leftover babel dep [#10914](https://github.com/fabricjs/fabric.js/pull/10914)
