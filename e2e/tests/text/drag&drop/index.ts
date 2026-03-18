@@ -85,21 +85,86 @@ const roundPoint = (point: fabric.Point) => ({
   y: Math.round(point.y),
 });
 
+const pickEventKeys = (data: Record<string, any>, keys: string[]) => {
+  const out: Record<string, any> = {};
+  keys.forEach((key) => {
+    if (key in data) {
+      out[key] = data[key];
+    }
+  });
+  Object.keys(data).forEach((key) => {
+    if (!(key in out)) {
+      out[key] = data[key];
+    }
+  });
+  return out;
+};
+
 const parseEvent = (
   type: string,
-  { pointer, absolutePointer, ...ev }: Record<string, any> = {},
+  { pointer, absolutePointer, target, ...ev }: Record<string, any> = {},
   caller: fabric.Textbox | fabric.Canvas,
 ) =>
   JSON.parse(
     JSON.stringify([
       type,
-      {
-        ...ev,
-        ...(pointer ? { pointer: roundPoint(pointer) } : {}),
-        ...(absolutePointer
-          ? { absolutePointer: roundPoint(absolutePointer) }
-          : {}),
-      },
+      pickEventKeys(
+        {
+          ...ev,
+          ...(pointer ? { pointer: roundPoint(pointer) } : {}),
+          ...(absolutePointer
+            ? { absolutePointer: roundPoint(absolutePointer) }
+            : {}),
+          ...(target ? { target } : {}),
+        },
+        caller instanceof fabric.Canvas
+          ? [
+              'e',
+              'target',
+              'subTargets',
+              'dragSource',
+              'viewportPoint',
+              'scenePoint',
+              'didDrop',
+              'dropTarget',
+              'pointer',
+              'absolutePointer',
+              'index',
+              'action',
+              'canDrop',
+            ]
+          : type === 'dragenter' || type === 'dragleave'
+            ? [
+                'subTargets',
+                'dragSource',
+                'canDrop',
+                'e',
+                'viewportPoint',
+                'scenePoint',
+                'target',
+                'pointer',
+                'absolutePointer',
+                'didDrop',
+                'dropTarget',
+                'index',
+                'action',
+              ]
+            : [
+                'e',
+                'target',
+                'subTargets',
+                'dragSource',
+                'viewportPoint',
+                'scenePoint',
+                'didDrop',
+                'dropTarget',
+                'pointer',
+                'absolutePointer',
+                'index',
+                'action',
+                'canDrop',
+              ],
+      ),
       caller,
     ]),
   );
