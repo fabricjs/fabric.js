@@ -21,10 +21,19 @@ jobs:
       }}
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
+      - name: Checkout PR head
+        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - name: Checkout branch head
+        if: ${{ github.event.workflow_run.event == 'push' }}
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
       - name: Create temporary directories
         run: |
           mkdir -p ${{ runner.temp }}/artifacts/nyc_output
