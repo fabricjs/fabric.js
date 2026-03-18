@@ -100,6 +100,37 @@ const pickEventKeys = (data: Record<string, any>, keys: string[]) => {
   return out;
 };
 
+const sharedEventKeys = [
+  'viewportPoint',
+  'scenePoint',
+  'didDrop',
+  'dropTarget',
+  'pointer',
+  'absolutePointer',
+  'index',
+  'action',
+];
+
+const canvasEventKeys = [
+  'e',
+  'target',
+  'subTargets',
+  'dragSource',
+  ...sharedEventKeys,
+  'canDrop',
+];
+
+const objectEventKeys = ['e', 'target', 'subTargets', 'dragSource'];
+
+const objectDragHoverEventKeys = [
+  'subTargets',
+  'dragSource',
+  'canDrop',
+  'e',
+  ...sharedEventKeys,
+  'target',
+];
+
 const parseEvent = (
   type: string,
   { pointer, absolutePointer, target, ...ev }: Record<string, any> = {},
@@ -118,52 +149,10 @@ const parseEvent = (
           ...(target ? { target } : {}),
         },
         caller instanceof fabric.Canvas
-          ? [
-              'e',
-              'target',
-              'subTargets',
-              'dragSource',
-              'viewportPoint',
-              'scenePoint',
-              'didDrop',
-              'dropTarget',
-              'pointer',
-              'absolutePointer',
-              'index',
-              'action',
-              'canDrop',
-            ]
+          ? canvasEventKeys
           : type === 'dragenter' || type === 'dragleave'
-            ? [
-                'subTargets',
-                'dragSource',
-                'canDrop',
-                'e',
-                'viewportPoint',
-                'scenePoint',
-                'target',
-                'pointer',
-                'absolutePointer',
-                'didDrop',
-                'dropTarget',
-                'index',
-                'action',
-              ]
-            : [
-                'e',
-                'target',
-                'subTargets',
-                'dragSource',
-                'viewportPoint',
-                'scenePoint',
-                'didDrop',
-                'dropTarget',
-                'pointer',
-                'absolutePointer',
-                'index',
-                'action',
-                'canDrop',
-              ],
+            ? objectDragHoverEventKeys
+            : [...objectEventKeys, ...sharedEventKeys, 'canDrop'],
       ),
       caller,
     ]),
