@@ -20,38 +20,18 @@ jobs:
         with:
           sparse-checkout: |
             .github
-      - name: 'Create an empty tmp directory'
-        run: |
-          mkdir ${{ runner.temp }}/artifacts
-          mkdir ${{ runner.temp }}/artifacts/nyc_output
-          mkdir ./.nyc_output
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: coverage-e2e
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts/nyc_output
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-vitest
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts/nyc_output
+          path: ${{ runner.temp }}/artifacts
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: prnumber
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ${{ runner.temp }}/artifacts
-      - name: 'copy all coverage files at the same root level'
-        run: |
-          find ${{ runner.temp }}/artifacts/nyc_output -type f -name 'coverage.json' | while read file; do       
-            dir=$(dirname "$file");
-            base=$(basename "$dir");
-            cp "$file" "./.nyc_output/${base}.json";
-            rm -rf "$dir"
-          done;
-      - run: ls -l ./.nyc_output
       - name: Add pr number to output
         id: prnumber
         run: echo "pr_number=$(cat ${{ runner.temp }}/artifacts/prnumber.txt)" >> $GITHUB_OUTPUT
@@ -59,7 +39,7 @@ jobs:
         id: report
         run: |
           echo "\`\`\`" > ./cov.txt
-          npx nyc report --reporter=text-summary >> ./cov.txt
+          cat ${{ runner.temp }}/artifacts/coverage-summary.txt >> ./cov.txt
           echo "\`\`\`" >> ./cov.txt
           echo "${{ env.unique_id }}" >> ./cov.txt
       - name: Comment on PR for coverage
