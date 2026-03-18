@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump next from 15.5.13 to 16.1.7 in /.codesandbox/templates/next in the npm_and_yarn group across 1 directory [#10915](https://github.com/fabricjs/fabric.js/pull/10915)
 - chore(): remove leftover babel dep [#10914](https://github.com/fabricjs/fabric.js/pull/10914)
 - chore(deps-dev): bump inquirer from 12.10.0 to 13.3.2 [#10909](https://github.com/fabricjs/fabric.js/pull/10909)
 - chore(deps): bump canvas from 3.2.0 to 3.2.1 [#10906](https://github.com/fabricjs/fabric.js/pull/10906)
