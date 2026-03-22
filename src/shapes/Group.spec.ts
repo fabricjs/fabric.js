@@ -16,6 +16,7 @@ import { describe, expect, it, test, vi, afterEach } from 'vitest';
 import { StaticCanvas } from '../canvas/StaticCanvas';
 import { FabricText, Point, version } from '../../fabric';
 import { isTransparent } from '../util';
+import { makeRects } from '../../test/utils';
 
 const makeGenericGroup = (options?: Partial<GroupProps>) => {
   const objs = [new FabricObject(), new FabricObject()];
@@ -27,22 +28,7 @@ const makeGenericGroup = (options?: Partial<GroupProps>) => {
 };
 
 function makeGroupWith2Objects() {
-  const rect1 = new Rect({
-      top: 105,
-      left: 115,
-      width: 30,
-      height: 10,
-      strokeWidth: 0,
-    }),
-    rect2 = new Rect({
-      top: 140,
-      left: 55,
-      width: 10,
-      height: 40,
-      strokeWidth: 0,
-    });
-
-  return new Group([rect1, rect2], { strokeWidth: 0 });
+  return new Group(makeRects(2, { strokeWidth: 0 }), { strokeWidth: 0 });
 }
 
 function makeGroupWith2ObjectsWithOpacity() {
@@ -61,12 +47,7 @@ function makeGroupWith2ObjectsAndNoExport() {
 }
 
 function makeGroupWith4Objects() {
-  const rect1 = new Rect({ top: 105, left: 115, width: 30, height: 10 }),
-    rect2 = new Rect({ top: 140, left: 55, width: 10, height: 40 }),
-    rect3 = new Rect({ top: 60, left: 10, width: 20, height: 40 }),
-    rect4 = new Rect({ top: 95, left: 95, width: 40, height: 40 });
-
-  return new Group([rect1, rect2, rect3, rect4]);
+  return new Group(makeRects(4));
 }
 
 describe('Group', () => {

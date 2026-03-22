@@ -33,114 +33,108 @@ describe('Shadow', () => {
     expect(shadow.blur).toBe(10);
   });
 
-  it('initializing with string', () => {
+  it.each([
     // old text-shadow definition - color offsetX offsetY blur
-    const shadow1 = new Shadow('rgba(0,0,255,0.5) 10px 20px 5px');
-
-    expect(shadow1.color).toBe('rgba(0,0,255,0.5)');
-    expect(shadow1.offsetX).toBe(10);
-    expect(shadow1.offsetY).toBe(20);
-    expect(shadow1.blur).toBe(5);
-
-    const shadow2 = new Shadow('rgb(0,0,255) 10px 20px ');
-
-    expect(shadow2.color).toBe('rgb(0,0,255)');
-    expect(shadow2.offsetX).toBe(10);
-    expect(shadow2.offsetY).toBe(20);
-    expect(shadow2.blur).toBe(0);
-
-    const shadow3 = new Shadow('#00FF00 30 10 ');
-
-    expect(shadow3.color).toBe('#00FF00');
-    expect(shadow3.offsetX).toBe(30);
-    expect(shadow3.offsetY).toBe(10);
-    expect(shadow3.blur).toBe(0);
-
-    const shadow4 = new Shadow(' #FF0000 10px');
-
-    expect(shadow4.color).toBe('#FF0000');
-    expect(shadow4.offsetX).toBe(10);
-    expect(shadow4.offsetY).toBe(0);
-    expect(shadow4.blur).toBe(0);
-
-    const shadow5 = new Shadow('#000000');
-
-    expect(shadow5.color).toBe('#000000');
-    expect(shadow5.offsetX).toBe(0);
-    expect(shadow5.offsetY).toBe(0);
-    expect(shadow5.blur).toBe(0);
-
+    {
+      input: 'rgba(0,0,255,0.5) 10px 20px 5px',
+      color: 'rgba(0,0,255,0.5)',
+      offsetX: 10,
+      offsetY: 20,
+      blur: 5,
+    },
+    {
+      input: 'rgb(0,0,255) 10px 20px ',
+      color: 'rgb(0,0,255)',
+      offsetX: 10,
+      offsetY: 20,
+      blur: 0,
+    },
+    {
+      input: '#00FF00 30 10 ',
+      color: '#00FF00',
+      offsetX: 30,
+      offsetY: 10,
+      blur: 0,
+    },
+    {
+      input: ' #FF0000 10px',
+      color: '#FF0000',
+      offsetX: 10,
+      offsetY: 0,
+      blur: 0,
+    },
+    { input: '#000000', color: '#000000', offsetX: 0, offsetY: 0, blur: 0 },
     // new text-shadow definition - offsetX offsetY blur color
-    const shadow6 = new Shadow('10px 20px 5px rgba(0,0,255,0.5)');
-
-    expect(shadow6.color).toBe('rgba(0,0,255,0.5)');
-    expect(shadow6.offsetX).toBe(10);
-    expect(shadow6.offsetY).toBe(20);
-    expect(shadow6.blur).toBe(5);
-
-    const shadow7 = new Shadow('10 20 5px #00FF00');
-
-    expect(shadow7.color).toBe('#00FF00');
-    expect(shadow7.offsetX).toBe(10);
-    expect(shadow7.offsetY).toBe(20);
-    expect(shadow7.blur).toBe(5);
-
-    const shadow8 = new Shadow('10px 20px rgb(0,0,255)');
-
-    expect(shadow8.color).toBe('rgb(0,0,255)');
-    expect(shadow8.offsetX).toBe(10);
-    expect(shadow8.offsetY).toBe(20);
-    expect(shadow8.blur).toBe(0);
-
-    const shadow9 = new Shadow(' 10px #FF0000 ');
-
-    expect(shadow9.color).toBe('#FF0000');
-    expect(shadow9.offsetX).toBe(10);
-    expect(shadow9.offsetY).toBe(0);
-    expect(shadow9.blur).toBe(0);
-
-    const shadow10 = new Shadow('  #FF0000 ');
-
-    expect(shadow10.color).toBe('#FF0000');
-    expect(shadow10.offsetX).toBe(0);
-    expect(shadow10.offsetY).toBe(0);
-    expect(shadow10.blur).toBe(0);
-
-    const shadow11 = new Shadow('');
-
-    expect(shadow11.color).toBe('rgb(0,0,0)');
-    expect(shadow11.offsetX).toBe(0);
-    expect(shadow11.offsetY).toBe(0);
-    expect(shadow11.blur).toBe(0);
-
-    const shadow12 = new Shadow('#FF0000 0.1px 0.1px 0.28px');
-
-    expect(shadow12.color).toBe('#FF0000');
-    expect(shadow12.offsetX).toBe(0.1);
-    expect(shadow12.offsetY).toBe(0.1);
-    expect(shadow12.blur).toBe(0.28);
-
-    const shadow13 = new Shadow('rgba(0,0,255,0.5) -0.1px -0.1px 0.28px');
-
-    expect(shadow13.color).toBe('rgba(0,0,255,0.5)');
-    expect(shadow13.offsetX).toBe(-0.1);
-    expect(shadow13.offsetY).toBe(-0.1);
-    expect(shadow13.blur).toBe(0.28);
-
-    const shadow14 = new Shadow('rgba(0,0,255,0.5) -0.1 -0.1 0.77');
-
-    expect(shadow14.color).toBe('rgba(0,0,255,0.5)');
-    expect(shadow14.offsetX).toBe(-0.1);
-    expect(shadow14.offsetY).toBe(-0.1);
-    expect(shadow14.blur).toBe(0.77);
-
-    const shadow15 = new Shadow('rgba(0,0,255,0.5) 0.1 0.1 1');
-
-    expect(shadow15.color).toBe('rgba(0,0,255,0.5)');
-    expect(shadow15.offsetX).toBe(0.1);
-    expect(shadow15.offsetY).toBe(0.1);
-    expect(shadow15.blur).toBe(1);
-  });
+    {
+      input: '10px 20px 5px rgba(0,0,255,0.5)',
+      color: 'rgba(0,0,255,0.5)',
+      offsetX: 10,
+      offsetY: 20,
+      blur: 5,
+    },
+    {
+      input: '10 20 5px #00FF00',
+      color: '#00FF00',
+      offsetX: 10,
+      offsetY: 20,
+      blur: 5,
+    },
+    {
+      input: '10px 20px rgb(0,0,255)',
+      color: 'rgb(0,0,255)',
+      offsetX: 10,
+      offsetY: 20,
+      blur: 0,
+    },
+    {
+      input: ' 10px #FF0000 ',
+      color: '#FF0000',
+      offsetX: 10,
+      offsetY: 0,
+      blur: 0,
+    },
+    { input: '  #FF0000 ', color: '#FF0000', offsetX: 0, offsetY: 0, blur: 0 },
+    // empty string
+    { input: '', color: 'rgb(0,0,0)', offsetX: 0, offsetY: 0, blur: 0 },
+    // decimal and negative values
+    {
+      input: '#FF0000 0.1px 0.1px 0.28px',
+      color: '#FF0000',
+      offsetX: 0.1,
+      offsetY: 0.1,
+      blur: 0.28,
+    },
+    {
+      input: 'rgba(0,0,255,0.5) -0.1px -0.1px 0.28px',
+      color: 'rgba(0,0,255,0.5)',
+      offsetX: -0.1,
+      offsetY: -0.1,
+      blur: 0.28,
+    },
+    {
+      input: 'rgba(0,0,255,0.5) -0.1 -0.1 0.77',
+      color: 'rgba(0,0,255,0.5)',
+      offsetX: -0.1,
+      offsetY: -0.1,
+      blur: 0.77,
+    },
+    {
+      input: 'rgba(0,0,255,0.5) 0.1 0.1 1',
+      color: 'rgba(0,0,255,0.5)',
+      offsetX: 0.1,
+      offsetY: 0.1,
+      blur: 1,
+    },
+  ])(
+    'initializing with string "$input"',
+    ({ input, color, offsetX, offsetY, blur }) => {
+      const shadow = new Shadow(input);
+      expect(shadow.color).toBe(color);
+      expect(shadow.offsetX).toBe(offsetX);
+      expect(shadow.offsetY).toBe(offsetY);
+      expect(shadow.blur).toBe(blur);
+    },
+  );
 
   it('properties', () => {
     const shadow = new Shadow();

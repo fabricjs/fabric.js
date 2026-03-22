@@ -10,7 +10,7 @@ import type {
   MultiSelectionStacking,
   TPointerEvent,
 } from '../../fabric';
-import { createPointerEvent } from '../../test/utils';
+import { createPointerEvent, makeRect } from '../../test/utils';
 import {
   ActiveSelection,
   Circle,
@@ -2591,11 +2591,6 @@ describe('Canvas', () => {
     ).toBe(true);
   });
 });
-
-function makeRect(options = {}) {
-  const defaultOptions = { width: 10, height: 10 };
-  return new Rect({ ...defaultOptions, ...options });
-}
 
 function initActiveSelection(
   canvas: Canvas,

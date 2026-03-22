@@ -1,5 +1,4 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { Rect } from '../shapes/Rect';
 import { config } from '../config';
 import { Canvas } from './Canvas';
 import {
@@ -9,10 +8,7 @@ import {
   StaticCanvas,
   util,
 } from '../../fabric';
-
-function makeRect(options = {}) {
-  return new Rect({ top: 5, left: 5, width: 10, height: 10, ...options });
-}
+import { makeRect } from '../../test/utils';
 
 describe('Canvas dispose', () => {
   describe.for([

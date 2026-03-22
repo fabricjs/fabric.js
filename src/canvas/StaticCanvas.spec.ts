@@ -13,6 +13,7 @@ import { FabricImage } from '../shapes/Image';
 import { Point } from '../Point';
 import { Group } from '../shapes/Group';
 import { Path } from '../shapes/Path';
+import { makeRect } from '../../test/utils';
 import { Ellipse } from '../shapes/Ellipse';
 import { Line } from '../shapes/Line';
 import { Polyline } from '../shapes/Polyline';
@@ -2260,11 +2261,6 @@ describe('malicious tests', () => {
     expect(svg).not.toContain('onbegin="alert(1)"');
   });
 });
-
-function makeRect(options = {}) {
-  const defaultOptions = { width: 10, height: 10 };
-  return new Rect({ ...defaultOptions, ...options });
-}
 
 function createImageStub() {
   return new FabricImage(_createImageElement(), { width: 0, height: 0 });

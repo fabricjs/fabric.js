@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(tests): consolidate rectangle creation using makeRect [#10923](https://github.com/fabricjs/fabric.js/pull/10923)
 - test(e2e): stabilize drag and drop event snapshots [#10918](https://github.com/fabricjs/fabric.js/pull/10918)
 - ci(): harden privileged workflow_run actions [#10922](https://github.com/fabricjs/fabric.js/pull/10922)
 - ci(): fix SonarCloud PR changed-lines coverage [#10921](https://github.com/fabricjs/fabric.js/pull/10921)
