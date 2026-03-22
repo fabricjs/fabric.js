@@ -9,8 +9,7 @@ on:
 
 permissions:
   actions: write
-  issues: write
-  pull-requests: write
+  contents: read
 
 jobs:
   prime-build:

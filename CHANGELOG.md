@@ -3,6 +3,8 @@
 ## [next]
 
 - test(e2e): stabilize drag and drop event snapshots [#10918](https://github.com/fabricjs/fabric.js/pull/10918)
+- ci(): harden privileged workflow_run actions [#10922](https://github.com/fabricjs/fabric.js/pull/10922)
+- ci(): fix SonarCloud PR changed-lines coverage [#10921](https://github.com/fabricjs/fabric.js/pull/10921)
 - refactor(tests): remove coverage merge step [#10913](https://github.com/fabricjs/fabric.js/pull/10913)
 - chore(): remove leftover babel dep [#10914](https://github.com/fabricjs/fabric.js/pull/10914)
 - chore(deps-dev): bump inquirer from 12.10.0 to 13.3.2 [#10909](https://github.com/fabricjs/fabric.js/pull/10909)

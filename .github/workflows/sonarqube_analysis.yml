@@ -11,11 +11,29 @@ permissions:
 jobs:
   sonarqube_pr:
     name: SonarQube analysis
-    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion != 'cancelled' &&
+        (
+          github.event.workflow_run.event != 'pull_request' ||
+          github.event.workflow_run.head_repository.full_name == github.repository
+        )
+      }}
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
+      - name: Checkout PR head
+        if: ${{ github.event.workflow_run.event == 'pull_request' }}
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - name: Checkout branch head
+        if: ${{ github.event.workflow_run.event == 'push' }}
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
       - name: Create temporary directories
         run: |
           mkdir -p ${{ runner.temp }}/artifacts/nyc_output
@@ -27,17 +45,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ${{ runner.temp }}/artifacts/nyc_output
       - run: mv ${{ runner.temp }}/artifacts/nyc_output/lcov.info ./.nyc_output
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
-        with:
-          name: prnumber
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts
-      - name: Add pr number to output
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
-        id: prnumber
-        run: echo "pr_number=$(cat ${{ runner.temp }}/artifacts/prnumber.txt)" >> $GITHUB_OUTPUT
       - name: SonarQube Scan PR
         if: ${{github.event.workflow_run.event == 'pull_request'}}
         uses: SonarSource/sonarqube-scan-action@v6
@@ -46,7 +53,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.pullrequest.key=${{ steps.prnumber.outputs.pr_number }}
+            -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }}
             -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
             -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
       - name: SonarQube Scan Branch
