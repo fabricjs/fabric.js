@@ -1,3 +1,4 @@
+import { omit, pick } from 'es-toolkit';
 import * as fabric from 'fabric';
 import { before } from '../../test';
 
@@ -85,21 +86,65 @@ const roundPoint = (point: fabric.Point) => ({
   y: Math.round(point.y),
 });
 
+const pickEventKeys = (data: Record<string, any>, keys: string[]) => ({
+  ...pick(data, keys),
+  ...omit(data, keys),
+});
+
+const sharedEventKeys = [
+  'viewportPoint',
+  'scenePoint',
+  'didDrop',
+  'dropTarget',
+  'pointer',
+  'absolutePointer',
+  'index',
+  'action',
+];
+
+const canvasEventKeys = [
+  'e',
+  'target',
+  'subTargets',
+  'dragSource',
+  ...sharedEventKeys,
+  'canDrop',
+];
+
+const objectEventKeys = ['e', 'target', 'subTargets', 'dragSource'];
+
+const objectDragHoverEventKeys = [
+  'subTargets',
+  'dragSource',
+  'canDrop',
+  'e',
+  ...sharedEventKeys,
+  'target',
+];
+
 const parseEvent = (
   type: string,
-  { pointer, absolutePointer, ...ev }: Record<string, any> = {},
+  { pointer, absolutePointer, target, ...ev }: Record<string, any> = {},
   caller: fabric.Textbox | fabric.Canvas,
 ) =>
   JSON.parse(
     JSON.stringify([
       type,
-      {
-        ...ev,
-        ...(pointer ? { pointer: roundPoint(pointer) } : {}),
-        ...(absolutePointer
-          ? { absolutePointer: roundPoint(absolutePointer) }
-          : {}),
-      },
+      pickEventKeys(
+        {
+          ...ev,
+          ...(pointer ? { pointer: roundPoint(pointer) } : {}),
+          ...(absolutePointer
+            ? { absolutePointer: roundPoint(absolutePointer) }
+            : {}),
+          ...(target ? { target } : {}),
+        },
+        caller instanceof fabric.Canvas
+          ? canvasEventKeys
+          : type === 'dragenter' || type === 'dragleave'
+            ? objectDragHoverEventKeys
+            : [...objectEventKeys, ...sharedEventKeys, 'canDrop'],
+      ),
       caller,
     ]),
   );

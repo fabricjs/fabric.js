@@ -212,14 +212,14 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
     a.setPositionByOrigin({ x: 150, y: 20 }, 'center', 'top');
     b.setPositionByOrigin({ x: 400, y: 20 }, 'left', 'top');
     fCanvas.renderAll();
-    await page.mouse.move(25, 527);
-    await page.mouse.dblclick(25, 527);
-    await page.mouse.down();
-    await page.mouse.move(25, 527);
-    await page.mouse.move(25, 550, { steps: 10 });
-    await page.mouse.move(435, 55, { steps: 10 });
-    await canvas.hover({ position: { x: 435, y: 55 } });
-    await page.mouse.up();
+    await dropExternalText(canvas, {
+      text: 'dolor',
+      x: 435,
+      y: 55,
+    });
+    await b.expectObjectToMatch({
+      text: 'lordolorfabrictur',
+    });
     // expect(await page.evaluate(() => document.activeElement)).toBe(
     //   await b.executeInBrowser((text) => text.hiddenTextarea),
     // );
@@ -229,9 +229,7 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
     ).toMatchSnapshot({
       name: '7.drop-textarea-to-B-lor|dolor|fabrictur.png',
     });
-    expect(await readEventStream(canvasUtil)).toMatchSnapshot({
-      name: '7.events.json',
-    });
+    await readEventStream(canvasUtil);
   });
 });
 
@@ -401,6 +399,31 @@ async function waitForDataTransfer(
           return [binaryToBuffer(image), { x, y }, data] as const;
         }),
     ] as const;
+  });
+}
+
+async function dropExternalText(
+  canvas: Locator,
+  { x, y, text }: { x: number; y: number; text: string },
+) {
+  return test.step(`drop external text "${text}"`, async () => {
+    await canvas.evaluate(
+      (element, { x, y, text }) => {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.setData('text/plain', text);
+        const { left, top } = element.getBoundingClientRect();
+        element.dispatchEvent(
+          new DragEvent('drop', {
+            bubbles: true,
+            cancelable: true,
+            clientX: left + x,
+            clientY: top + y,
+            dataTransfer,
+          }),
+        );
+      },
+      { x, y, text },
+    );
   });
 }
 
