@@ -91,10 +91,8 @@ npm run prettier:check
 6. Sync with latest `master` before opening the PR:
 
 ```bash
-git checkout master
-git pull
-git checkout <working-branch>
-git merge master
+git fetch origin master
+git merge origin/master
 ```
 
 7. If merge conflicts exist, resolve them before continuing.
@@ -109,6 +107,16 @@ git merge master
     - Commit and push the correction.
     - Optionally update PR body with a short note if needed.
 
+## Existing PR Maintenance
+
+If the user asks to finish or unblock an existing Fabric.js PR:
+
+1. Fetch fresh `origin/master`.
+2. If the PR is behind base or blocked by merge conflicts, merge `origin/master` into the PR branch locally.
+3. If the conflict involves only `CHANGELOG.md`, resolve it locally as part of the merge instead of asking the user whether to do that.
+4. Push the merge commit to the PR branch.
+5. Only pause to ask the user if the conflict touches files beyond `CHANGELOG.md` or if the resolution is ambiguous.
+
 ## Verification Checklist
 
 Before finishing, verify:
@@ -120,6 +128,7 @@ Before finishing, verify:
 - `npm run prettier:check` passes.
 - Any commit made for this PR was created without `--no-verify` and pre-commit hooks passed.
 - Branch was synced with latest `master` before PR creation.
+- When maintaining an existing PR, `origin/master` was merged into the PR branch if that was enough to clear a `CHANGELOG.md`-only conflict.
 - `CHANGELOG.md` has exactly one new `[next]` line for this PR.
 - Link uses `https://github.com/fabricjs/fabric.js/pull/<prNum>`.
 - If prediction mismatched, changelog has been corrected and pushed.
