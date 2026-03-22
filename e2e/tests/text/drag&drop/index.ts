@@ -1,3 +1,4 @@
+import { omit, pick } from 'es-toolkit';
 import * as fabric from 'fabric';
 import { before } from '../../test';
 
@@ -85,20 +86,10 @@ const roundPoint = (point: fabric.Point) => ({
   y: Math.round(point.y),
 });
 
-const pickEventKeys = (data: Record<string, any>, keys: string[]) => {
-  const out: Record<string, any> = {};
-  keys.forEach((key) => {
-    if (key in data) {
-      out[key] = data[key];
-    }
-  });
-  Object.keys(data).forEach((key) => {
-    if (!(key in out)) {
-      out[key] = data[key];
-    }
-  });
-  return out;
-};
+const pickEventKeys = (data: Record<string, any>, keys: string[]) => ({
+  ...pick(data, keys),
+  ...omit(data, keys),
+});
 
 const sharedEventKeys = [
   'viewportPoint',
