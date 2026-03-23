@@ -142,7 +142,7 @@
   },
   "optionalDependencies": {
     "canvas": "^3.2.0",
-    "jsdom": "^26.1.0"
+    "jsdom": "^29.0.1"
   },
   "lint-staged": {
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
