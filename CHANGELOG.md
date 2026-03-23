@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump rolldown from 1.0.0-rc.9 to 1.0.0-rc.10 [#10925](https://github.com/fabricjs/fabric.js/pull/10925)
 - refactor(tests): consolidate rectangle creation using makeRect [#10923](https://github.com/fabricjs/fabric.js/pull/10923)
 - test(e2e): stabilize drag and drop event snapshots [#10918](https://github.com/fabricjs/fabric.js/pull/10918)
 - ci(): harden privileged workflow_run actions [#10922](https://github.com/fabricjs/fabric.js/pull/10922)
