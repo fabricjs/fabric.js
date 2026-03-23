@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump canvas from 3.2.1 to 3.2.2 [#10926](https://github.com/fabricjs/fabric.js/pull/10926)
 - refactor(tests): consolidate rectangle creation using makeRect [#10923](https://github.com/fabricjs/fabric.js/pull/10923)
 - test(e2e): stabilize drag and drop event snapshots [#10918](https://github.com/fabricjs/fabric.js/pull/10918)
 - ci(): harden privileged workflow_run actions [#10922](https://github.com/fabricjs/fabric.js/pull/10922)
