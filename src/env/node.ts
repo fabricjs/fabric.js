@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 import type { Canvas as NodeCanvas } from 'canvas';
 import { JSDOM } from 'jsdom';
 // @ts-expect-error internal import

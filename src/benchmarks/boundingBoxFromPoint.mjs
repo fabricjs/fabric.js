@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { util, Point } from '../../dist/index.mjs';
 
 const makeBBoxOld = (points) => {

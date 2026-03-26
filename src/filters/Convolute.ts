@@ -115,7 +115,6 @@ export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
             scy = y + cy - halfSide;
             scx = x + cx - halfSide;
 
-            // eslint-disable-next-line max-depth
             if (scy < 0 || scy >= sh || scx < 0 || scx >= sw) {
               continue;
             }
@@ -126,7 +125,7 @@ export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
             r += data[srcOff] * wt;
             g += data[srcOff + 1] * wt;
             b += data[srcOff + 2] * wt;
-            // eslint-disable-next-line max-depth
+
             if (!alphaFac) {
               a += data[srcOff + 3] * wt;
             }

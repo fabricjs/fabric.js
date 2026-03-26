@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { FabricObject, Group } from '../../dist/index.mjs';
 
 // Swapping of calcCornerCoords in #9377

@@ -389,7 +389,7 @@ export class BaseFilter<
 
     return {
       type: this.type,
-      ...defaultKeys.reduce<SerializedProps>((acc, key) => {
+      ...defaultKeys.reduce((acc, key) => {
         acc[key] = this[
           key as keyof this
         ] as unknown as (typeof acc)[typeof key];

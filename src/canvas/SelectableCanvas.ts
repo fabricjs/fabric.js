@@ -1469,7 +1469,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
         SKEW_Y,
         TOP,
       ] as (keyof typeof instance)[];
-      const originalValues = pick<typeof instance>(instance, layoutProps);
+      const originalValues = pick(instance, layoutProps);
       addTransformToObject(instance, group.calcOwnMatrix());
       return originalValues;
     } else {

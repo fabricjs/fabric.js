@@ -143,7 +143,6 @@ const benchmark2 = benchmark(() => {
   newPoints.forEach((point) => rect2.containsPoint(point));
 });
 
-// eslint-disable-next-line no-restricted-syntax
 console.log({
   benchmark1,
   benchmark2,
