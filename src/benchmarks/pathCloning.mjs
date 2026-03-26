@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { Path, FabricObject, util } from '../../dist/index.mjs';
 import { normalPath, insanelyLongButRealPath } from './pathData.mjs';
 import { cloneDeep } from 'es-toolkit';

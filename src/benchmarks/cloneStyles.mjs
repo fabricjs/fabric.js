@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { cloneStyles } from '../../dist/src/util/internals/cloneStyles.mjs';
 import { cloneDeep } from './cloneDeep.mjs';
 

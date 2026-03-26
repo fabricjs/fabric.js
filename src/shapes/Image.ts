@@ -57,7 +57,7 @@ interface UniqueImageProps {
   cropX: number;
   cropY: number;
   imageSmoothing: boolean;
-  filters: BaseFilter<string, Record<string, any>>[];
+  filters: BaseFilter<string>[];
   resizeFilter?: Resize;
 }
 
@@ -174,7 +174,7 @@ export class FabricImage<
 
   declare protected src: string;
 
-  declare filters: BaseFilter<string, Record<string, any>>[];
+  declare filters: BaseFilter<string>[];
   declare resizeFilter: Resize;
 
   declare _element: ImageSource;
@@ -528,9 +528,7 @@ export class FabricImage<
    * @param {Array} filters to be applied
    * @param {Boolean} forResizing specify if the filter operation is a resize operation
    */
-  applyFilters(
-    filters: BaseFilter<string, Record<string, any>>[] = this.filters || [],
-  ) {
+  applyFilters(filters: BaseFilter<string>[] = this.filters || []) {
     filters = filters.filter((filter) => filter && !filter.isNeutralState());
     this.set('dirty', true);
 

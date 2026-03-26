@@ -19,7 +19,7 @@ export const isPutImageFaster = (width: number, height: number): boolean => {
   const targetCanvas = createCanvasElementFor({ width, height });
   const sourceCanvas = createCanvasElement();
   const gl = sourceCanvas.getContext('webgl')!;
-  // eslint-disable-next-line no-undef
+
   const imageBuffer = new ArrayBuffer(width * height * 4);
 
   const testContext = {
