@@ -2,7 +2,6 @@ import {
   type BasicTransformEvent,
   type Canvas,
   type FabricObject,
-  type TPointerEvent,
   type Point,
   util,
 } from 'fabric';
@@ -22,7 +21,7 @@ import type { AligningLineConfig, OriginMap } from './typedefs';
 import { getObjectsByTarget } from './util/get-objects-by-target';
 import { getContraryMap, getPointMap } from './util/basic';
 
-type TransformEvent = BasicTransformEvent<TPointerEvent> & {
+type TransformEvent = BasicTransformEvent & {
   target: FabricObject;
 };
 
