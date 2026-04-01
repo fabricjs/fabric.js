@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update typescript to 6 [#10935](https://github.com/fabricjs/fabric.js/pull/10935)
 - chore(deps): update devDependencies to latest versions [#10929](https://github.com/fabricjs/fabric.js/pull/10929)
 - chore(deps-dev): bump picomatch from 2.3.1 to 2.3.2 in the npm_and_yarn group across 1 directory [#10928](https://github.com/fabricjs/fabric.js/pull/10928)
 - chore(deps): bump canvas from 3.2.1 to 3.2.2 [#10926](https://github.com/fabricjs/fabric.js/pull/10926)

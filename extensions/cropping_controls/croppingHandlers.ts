@@ -1,6 +1,5 @@
 import type {
   TModificationEvents,
-  Transform,
   TransformActionHandler,
   FabricImage,
   ObjectEvents,
@@ -175,7 +174,7 @@ export const changeCropY = wrapWithFireEvent(
  */
 export const cropPanMoveHandler = ({ transform }: ObjectEvents['moving']) => {
   // this makes the image pan too fast.
-  const { target, original } = transform as Transform;
+  const { target, original } = transform;
   const fabricImage = target as FabricImage;
   const p = new Point(
     target.left - original.left,
