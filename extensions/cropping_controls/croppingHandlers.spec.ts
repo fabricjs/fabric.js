@@ -482,7 +482,7 @@ describe('croppingHandlers', () => {
       const initialWidth = image.width;
 
       // Call the mlc action handler
-      image.controls.mlc.actionHandler!(eventData, transform, 30, 50);
+      image.controls.mlc.actionHandler(eventData, transform, 30, 50);
 
       // When flipX is true, mlc should change width, not cropX
       expect(image.cropX).toBe(initialCropX);
@@ -505,7 +505,7 @@ describe('croppingHandlers', () => {
       const initialCropX = image.cropX;
 
       // Call the mrc action handler
-      image.controls.mrc.actionHandler!(eventData, transform, 180, 50);
+      image.controls.mrc.actionHandler(eventData, transform, 180, 50);
 
       // When flipX is true, mrc should behave like mlc (change cropX)
       expect(image.cropX).not.toBe(initialCropX);
@@ -528,7 +528,7 @@ describe('croppingHandlers', () => {
       const initialHeight = image.height;
 
       // Call the mtc action handler
-      image.controls.mtc.actionHandler!(eventData, transform, 50, 30);
+      image.controls.mtc.actionHandler(eventData, transform, 50, 30);
 
       // When flipY is true, mtc should change height, not cropY
       expect(image.cropY).toBe(initialCropY);
@@ -551,7 +551,7 @@ describe('croppingHandlers', () => {
       const initialCropY = image.cropY;
 
       // Call the mbc action handler
-      image.controls.mbc.actionHandler!(eventData, transform, 50, 180);
+      image.controls.mbc.actionHandler(eventData, transform, 50, 180);
 
       // When flipY is true, mbc should behave like mtc (change cropY)
       expect(image.cropY).not.toBe(initialCropY);
