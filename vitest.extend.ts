@@ -1,4 +1,4 @@
-import { expect, chai } from 'vitest';
+import { expect, SnapshotMatchers } from 'vitest';
 
 import { cloneDeepWith } from 'es-toolkit/compat';
 import type { FabricObject } from './src/shapes/Object/Object';
@@ -46,13 +46,11 @@ export const roundSnapshotOptions = {
   },
 };
 
-const rawToMatchSnapshot = (chai.Assertion.prototype as any).toMatchSnapshot;
+const { toMatchSnapshot } = SnapshotMatchers;
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchObjectSnapshot',
-  function (
-    this: Chai.AssertionStatic,
+expect.extend({
+  toMatchObjectSnapshot(
+    received: unknown,
     {
       cloneDeepWith: customiser,
       includeDefaultValues,
@@ -60,8 +58,7 @@ chai.util.addMethod(
     }: ObjectOptions = {},
     hint?: string,
   ) {
-    const received = chai.util.flag(this, 'object');
-    let snap: Record<string, unknown> = received;
+    let snap = received as Record<string, unknown>;
 
     if (looksLikeFabricObject(received)) {
       const restore = received.includeDefaultValues;
@@ -82,21 +79,14 @@ chai.util.addMethod(
       if (k === 'id' && typeof v === 'number') return 0;
     });
 
-    chai.util.flag(this, 'object', value);
-    return rawToMatchSnapshot.call(this, properties, hint);
+    return toMatchSnapshot.call(this, value, properties, hint);
   },
-);
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchSnapshot',
-  function (
-    this: Chai.AssertionStatic,
+  toMatchSnapshot(
+    received: unknown,
     propertiesOrHint?: ExtendedOptions | string,
     hint?: string,
   ) {
-    const received = chai.util.flag(this, 'object');
-
     const { cloneDeepWith: customiser, ...rest } =
       typeof propertiesOrHint === 'object' && propertiesOrHint !== null
         ? propertiesOrHint
@@ -109,40 +99,20 @@ chai.util.addMethod(
           ? cloneDeepWith(received, customiser)
           : received;
 
-    chai.util.flag(this, 'object', value);
-
-    const args: unknown[] = [];
-
     if (typeof propertiesOrHint === 'string') {
-      args.push(propertiesOrHint);
+      return toMatchSnapshot.call(this, value, propertiesOrHint);
     } else if (propertiesOrHint && Object.keys(rest).length > 0) {
-      args.push(rest);
-      if (hint) args.push(hint);
+      return toMatchSnapshot.call(this, value, rest, hint);
     } else if (hint) {
-      args.push(hint);
+      return toMatchSnapshot.call(this, value, undefined, hint);
     }
-
-    return rawToMatchSnapshot.apply(this, args);
+    return toMatchSnapshot.call(this, value);
   },
-);
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchSVGSnapshot',
-  function (
-    this: Chai.AssertionStatic,
-    propertiesOrHint?: ExtendedOptions | string,
-    hint?: string,
-  ) {
-    const received = chai.util.flag(this, 'object');
-
-    const value = sanitizeSVG(received);
-
-    chai.util.flag(this, 'object', value);
-
-    return rawToMatchSnapshot.call(this, propertiesOrHint, hint);
+  toMatchSVGSnapshot(received: string, hint?: string) {
+    return toMatchSnapshot.call(this, sanitizeSVG(received), hint);
   },
-);
+});
 
 expect.extend({
   toSameImageObject(actual: FabricImage, expected: FabricImage) {

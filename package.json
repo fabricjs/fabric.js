@@ -71,9 +71,9 @@
     "@types/jsdom": "^21.1.7",
     "@types/micromatch": "^4.0.10",
     "@types/node": "^24.7.0",
-    "@vitest/browser-playwright": "^4.1.2",
-    "@vitest/coverage-v8": "^4.1.2",
-    "@vitest/ui": "^4.1.2",
+    "@vitest/browser-playwright": "https://pkg.pr.new/@vitest/browser-playwright@6392a1f",
+    "@vitest/coverage-v8": "https://pkg.pr.new/@vitest/coverage-v8@6392a1f",
+    "@vitest/ui": "https://pkg.pr.new/@vitest/ui@6392a1f",
     "commander": "^14.0.3",
     "es-toolkit": "1.45.1",
     "eslint-config-prettier": "^10.1.8",
@@ -88,7 +88,7 @@
     "tsc-files": "^1.1.4",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.0",
-    "vitest": "^4.1.2",
+    "vitest": "https://pkg.pr.new/vitest@6392a1f",
     "westures": "^1.1.1"
   },
   "engines": {
