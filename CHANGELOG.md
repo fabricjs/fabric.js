@@ -3,6 +3,8 @@
 ## [next]
 
 - chore(deps-dev): bump serialize-javascript from 7.0.4 to 7.0.5 in the npm_and_yarn group across 1 directory [#10936](https://github.com/fabricjs/fabric.js/pull/10936)
+- Vitest snapshot [#10937](https://github.com/fabricjs/fabric.js/pull/10937)
+- refactor(tests): Migrate to official vitest API for custom snapshot matchers [#10937](https://github.com/fabricjs/fabric.js/pull/10937)
 - refactor(test): fix dead assertions in Shadow.spec.ts [#10932](https://github.com/fabricjs/fabric.js/pull/10932)
 - chore(): update typescript to 6 [#10935](https://github.com/fabricjs/fabric.js/pull/10935)
 - chore(deps): update devDependencies to latest versions [#10929](https://github.com/fabricjs/fabric.js/pull/10929)
