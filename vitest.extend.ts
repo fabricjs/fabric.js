@@ -84,37 +84,20 @@ expect.extend({
 
   toMatchSnapshot(
     received: unknown,
-    propertiesOrHint?: ExtendedOptions | string,
+    { cloneDeepWith: customiser, ...rest }: ExtendedOptions = {},
     hint?: string,
   ) {
-    const { cloneDeepWith: customiser, ...rest } =
-      typeof propertiesOrHint === 'object' && propertiesOrHint !== null
-        ? propertiesOrHint
-        : {};
-
-    const value =
-      typeof received === 'string'
-        ? received
-        : customiser
-          ? cloneDeepWith(received, customiser)
-          : received;
-
-    if (typeof propertiesOrHint === 'string') {
-      return toMatchSnapshot.call(this, value, propertiesOrHint);
-    } else if (propertiesOrHint && Object.keys(rest).length > 0) {
-      return toMatchSnapshot.call(this, value, rest, hint);
-    } else if (hint) {
-      return toMatchSnapshot.call(this, value, undefined, hint);
-    }
-    return toMatchSnapshot.call(this, value);
+    const value = customiser ? cloneDeepWith(received, customiser) : received;
+    const hasProperties = Object.keys(rest).length > 0;
+    return hasProperties
+      ? toMatchSnapshot.call(this, value, rest, hint)
+      : toMatchSnapshot.call(this, value, hint);
   },
 
   toMatchSVGSnapshot(received: string, hint?: string) {
     return toMatchSnapshot.call(this, sanitizeSVG(received), hint);
   },
-});
 
-expect.extend({
   toSameImageObject(actual: FabricImage, expected: FabricImage) {
     const normalizedActual = {
       ...actual,
