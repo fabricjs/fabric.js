@@ -14,9 +14,11 @@ function basename(link: string) {
 }
 
 function replaceLinks(value: string) {
-  return (value.match(SVG_XLINK_HREF_RE) || []).reduce(function (final, curr) {
-    return final.replace(curr, `xlink:href="assets/${basename(curr)}"`);
-  }, value);
+  return (value.match(SVG_XLINK_HREF_RE) ?? []).reduce(
+    (acc, match) =>
+      acc.replace(match, `xlink:href="assets/${basename(match)}"`),
+    value,
+  );
 }
 
 export function sanitizeSVG(value: string) {
@@ -62,8 +64,7 @@ expect.extend({
 
     if (looksLikeFabricObject(received)) {
       const restore = received.includeDefaultValues;
-      if (typeof includeDefaultValues === 'boolean')
-        received.includeDefaultValues = includeDefaultValues;
+      received.includeDefaultValues = includeDefaultValues ?? restore;
       snap = received.toObject();
       received.includeDefaultValues = restore;
     }
@@ -88,8 +89,7 @@ expect.extend({
     hint?: string,
   ) {
     const value = customiser ? cloneDeepWith(received, customiser) : received;
-    const hasProperties = Object.keys(rest).length > 0;
-    return hasProperties
+    return Object.keys(rest).length > 0
       ? toMatchSnapshot.call(this, value, rest, hint)
       : toMatchSnapshot.call(this, value, hint);
   },
