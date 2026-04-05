@@ -155,15 +155,14 @@ describe('Shadow', () => {
     const shadow = new Shadow();
 
     const object = shadow.toObject();
-    expect(
-      JSON.stringify(object),
+    expect(JSON.stringify(object)).toBe(
       '{"color":"rgb(0,0,0)","blur":0,"offsetX":0,"offsetY":0,"affectStroke":false,"nonScaling":false,"type":"shadow"}',
     );
   });
 
   it('clone with affectStroke', () => {
     const shadow = new Shadow({ affectStroke: true, blur: 5 });
-    expect(typeof shadow.toObject === 'function');
+    expect(shadow.toObject).toBeTypeOf('function');
     const object = shadow.toObject(),
       shadow2 = new Shadow(object),
       object2 = shadow2.toObject();
@@ -175,24 +174,22 @@ describe('Shadow', () => {
     const shadow = new Shadow();
     shadow.includeDefaultValues = false;
 
-    expect(JSON.stringify(shadow.toObject()), '{"type":"shadow"}');
+    expect(JSON.stringify(shadow.toObject())).toBe('{"type":"shadow"}');
 
     shadow.color = 'red';
-    expect(
-      JSON.stringify(shadow.toObject()),
+    expect(JSON.stringify(shadow.toObject())).toBe(
       '{"color":"red","type":"shadow"}',
     );
 
     shadow.offsetX = 15;
-    expect(
-      JSON.stringify(shadow.toObject()),
+    expect(JSON.stringify(shadow.toObject())).toBe(
       '{"color":"red","offsetX":15,"type":"shadow"}',
     );
   });
 
   it('fromObject', async () => {
     return Shadow.fromObject({ color: 'red', offsetX: 15 }).then((shadow) => {
-      expect(shadow instanceof Shadow);
+      expect(shadow).toBeInstanceOf(Shadow);
     });
   });
 
