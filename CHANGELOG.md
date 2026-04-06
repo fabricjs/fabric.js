@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump canvas from 3.2.2 to 3.2.3 [#10940](https://github.com/fabricjs/fabric.js/pull/10940)
 - chore(deps-dev): bump serialize-javascript from 7.0.4 to 7.0.5 in the npm_and_yarn group across 1 directory [#10936](https://github.com/fabricjs/fabric.js/pull/10936)
 - refactor(test): fix dead assertions in Shadow.spec.ts [#10932](https://github.com/fabricjs/fabric.js/pull/10932)
 - chore(): update typescript to 6 [#10935](https://github.com/fabricjs/fabric.js/pull/10935)
