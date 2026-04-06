@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump vite from 8.0.3 to 8.0.5 in the npm_and_yarn group across 1 directory [#10942](https://github.com/fabricjs/fabric.js/pull/10942)
 - chore(deps-dev): bump serialize-javascript from 7.0.4 to 7.0.5 in the npm_and_yarn group across 1 directory [#10936](https://github.com/fabricjs/fabric.js/pull/10936)
 - refactor(test): fix dead assertions in Shadow.spec.ts [#10932](https://github.com/fabricjs/fabric.js/pull/10932)
 - chore(): update typescript to 6 [#10935](https://github.com/fabricjs/fabric.js/pull/10935)
