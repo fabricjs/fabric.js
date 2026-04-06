@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @types/node from 24.7.2 to 25.5.2 [#10941](https://github.com/fabricjs/fabric.js/pull/10941)
 - chore(deps-dev): bump serialize-javascript from 7.0.4 to 7.0.5 in the npm_and_yarn group across 1 directory [#10936](https://github.com/fabricjs/fabric.js/pull/10936)
 - refactor(test): fix dead assertions in Shadow.spec.ts [#10932](https://github.com/fabricjs/fabric.js/pull/10932)
 - chore(): update typescript to 6 [#10935](https://github.com/fabricjs/fabric.js/pull/10935)
