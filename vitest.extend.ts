@@ -1,4 +1,4 @@
-import { expect, SnapshotMatchers } from 'vitest';
+import { expect, Snapshots } from 'vitest';
 
 import { cloneDeepWith } from 'es-toolkit/compat';
 import type { FabricObject } from './src/shapes/Object/Object';
@@ -48,7 +48,7 @@ export const roundSnapshotOptions = {
   },
 };
 
-const { toMatchSnapshot } = SnapshotMatchers;
+const { toMatchSnapshot } = Snapshots;
 
 expect.extend({
   toMatchObjectSnapshot(
