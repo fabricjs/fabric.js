@@ -1,4 +1,4 @@
-import { expect, chai } from 'vitest';
+import { expect, Snapshots } from 'vitest';
 
 import { cloneDeepWith } from 'es-toolkit/compat';
 import type { FabricObject } from './src/shapes/Object/Object';
@@ -14,9 +14,11 @@ function basename(link: string) {
 }
 
 function replaceLinks(value: string) {
-  return (value.match(SVG_XLINK_HREF_RE) || []).reduce(function (final, curr) {
-    return final.replace(curr, `xlink:href="assets/${basename(curr)}"`);
-  }, value);
+  return (value.match(SVG_XLINK_HREF_RE) ?? []).reduce(
+    (acc, match) =>
+      acc.replace(match, `xlink:href="assets/${basename(match)}"`),
+    value,
+  );
 }
 
 export function sanitizeSVG(value: string) {
@@ -46,13 +48,11 @@ export const roundSnapshotOptions = {
   },
 };
 
-const rawToMatchSnapshot = (chai.Assertion.prototype as any).toMatchSnapshot;
+const { toMatchSnapshot } = Snapshots;
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchObjectSnapshot',
-  function (
-    this: Chai.AssertionStatic,
+expect.extend({
+  toMatchObjectSnapshot(
+    received: unknown,
     {
       cloneDeepWith: customiser,
       includeDefaultValues,
@@ -60,13 +60,11 @@ chai.util.addMethod(
     }: ObjectOptions = {},
     hint?: string,
   ) {
-    const received = chai.util.flag(this, 'object');
-    let snap: Record<string, unknown> = received;
+    let snap = received as Record<string, unknown>;
 
     if (looksLikeFabricObject(received)) {
       const restore = received.includeDefaultValues;
-      if (typeof includeDefaultValues === 'boolean')
-        received.includeDefaultValues = includeDefaultValues;
+      received.includeDefaultValues = includeDefaultValues ?? restore;
       snap = received.toObject();
       received.includeDefaultValues = restore;
     }
@@ -82,69 +80,24 @@ chai.util.addMethod(
       if (k === 'id' && typeof v === 'number') return 0;
     });
 
-    chai.util.flag(this, 'object', value);
-    return rawToMatchSnapshot.call(this, properties, hint);
+    return toMatchSnapshot.call(this, value, properties, hint);
   },
-);
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchSnapshot',
-  function (
-    this: Chai.AssertionStatic,
-    propertiesOrHint?: ExtendedOptions | string,
+  toMatchSnapshot(
+    received: unknown,
+    { cloneDeepWith: customiser, ...rest }: ExtendedOptions = {},
     hint?: string,
   ) {
-    const received = chai.util.flag(this, 'object');
-
-    const { cloneDeepWith: customiser, ...rest } =
-      typeof propertiesOrHint === 'object' && propertiesOrHint !== null
-        ? propertiesOrHint
-        : {};
-
-    const value =
-      typeof received === 'string'
-        ? received
-        : customiser
-          ? cloneDeepWith(received, customiser)
-          : received;
-
-    chai.util.flag(this, 'object', value);
-
-    const args: unknown[] = [];
-
-    if (typeof propertiesOrHint === 'string') {
-      args.push(propertiesOrHint);
-    } else if (propertiesOrHint && Object.keys(rest).length > 0) {
-      args.push(rest);
-      if (hint) args.push(hint);
-    } else if (hint) {
-      args.push(hint);
-    }
-
-    return rawToMatchSnapshot.apply(this, args);
+    const value = customiser ? cloneDeepWith(received, customiser) : received;
+    return Object.keys(rest).length > 0
+      ? toMatchSnapshot.call(this, value, rest, hint)
+      : toMatchSnapshot.call(this, value, hint);
   },
-);
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchSVGSnapshot',
-  function (
-    this: Chai.AssertionStatic,
-    propertiesOrHint?: ExtendedOptions | string,
-    hint?: string,
-  ) {
-    const received = chai.util.flag(this, 'object');
-
-    const value = sanitizeSVG(received);
-
-    chai.util.flag(this, 'object', value);
-
-    return rawToMatchSnapshot.call(this, propertiesOrHint, hint);
+  toMatchSVGSnapshot(received: string, hint?: string) {
+    return toMatchSnapshot.call(this, sanitizeSVG(received), hint);
   },
-);
 
-expect.extend({
   toSameImageObject(actual: FabricImage, expected: FabricImage) {
     const normalizedActual = {
       ...actual,
