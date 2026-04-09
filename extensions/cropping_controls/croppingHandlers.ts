@@ -249,6 +249,9 @@ export function ghostScalePositionHandler(
 const calcScale = (currentPoint: Point, height: number, width: number) =>
   Math.min(Math.abs(currentPoint.x / width), Math.abs(currentPoint.y / height));
 
+const flipNumericOrigin = (origin: number, flipped: boolean) =>
+  flipped ? 1 - origin : origin;
+
 /**
  * Reflects pointer position across object center when image is flipped.
  * This compensates for the inverted local coordinate system.
@@ -280,13 +283,14 @@ export const scaleEquallyCropGenerator =
     const { width: fullWidth, height: fullHeight } = target.getElement();
     const remainderX = fullWidth - target.width - target.cropX;
     const remainderY = fullHeight - target.height - target.cropY;
-    const anchorOriginX =
-      (cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width) *
-      (target.flipX ? -1 : 1);
-    const anchorOriginY =
-      (cy < 0
-        ? 1 + remainderY / target.height
-        : -target.cropY / target.height) * (target.flipY ? -1 : 1);
+    const anchorOriginX = flipNumericOrigin(
+      cx < 0 ? 1 + remainderX / target.width : -target.cropX / target.width,
+      target.flipX,
+    );
+    const anchorOriginY = flipNumericOrigin(
+      cy < 0 ? 1 + remainderY / target.height : -target.cropY / target.height,
+      target.flipY,
+    );
     const constraint = target.translateToOriginPoint(
       target.getCenterPoint(),
       anchorOriginX,
@@ -333,12 +337,14 @@ export const scaleEquallyCropGenerator =
     target.height = newHeight;
     target.cropX = newCropX;
     target.cropY = newCropY;
-    const newAnchorOriginX =
-      (cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth) *
-      (target.flipX ? -1 : 1);
-    const newAnchorOriginY =
-      (cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight) *
-      (target.flipY ? -1 : 1);
+    const newAnchorOriginX = flipNumericOrigin(
+      cx < 0 ? 1 + scaledRemainderX / newWidth : -newCropX / newWidth,
+      target.flipX,
+    );
+    const newAnchorOriginY = flipNumericOrigin(
+      cy < 0 ? 1 + scaledRemainderY / newHeight : -newCropY / newHeight,
+      target.flipY,
+    );
 
     target.setPositionByOrigin(constraint, newAnchorOriginX, newAnchorOriginY);
     return true;

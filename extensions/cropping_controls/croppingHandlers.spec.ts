@@ -702,6 +702,125 @@ describe('croppingHandlers', () => {
       expect(image.cropX).toBe(0);
       expect(image.cropY).toBe(0);
     });
+
+    test.each([
+      {
+        controlName: 'tls',
+        oppositeControlName: 'brs',
+        flipX: true,
+        flipY: false,
+      },
+      {
+        controlName: 'tls',
+        oppositeControlName: 'brs',
+        flipX: false,
+        flipY: true,
+      },
+      {
+        controlName: 'tls',
+        oppositeControlName: 'brs',
+        flipX: true,
+        flipY: true,
+      },
+      {
+        controlName: 'trs',
+        oppositeControlName: 'bls',
+        flipX: true,
+        flipY: false,
+      },
+      {
+        controlName: 'trs',
+        oppositeControlName: 'bls',
+        flipX: false,
+        flipY: true,
+      },
+      {
+        controlName: 'trs',
+        oppositeControlName: 'bls',
+        flipX: true,
+        flipY: true,
+      },
+      {
+        controlName: 'brs',
+        oppositeControlName: 'tls',
+        flipX: true,
+        flipY: false,
+      },
+      {
+        controlName: 'brs',
+        oppositeControlName: 'tls',
+        flipX: false,
+        flipY: true,
+      },
+      {
+        controlName: 'brs',
+        oppositeControlName: 'tls',
+        flipX: true,
+        flipY: true,
+      },
+      {
+        controlName: 'bls',
+        oppositeControlName: 'trs',
+        flipX: true,
+        flipY: false,
+      },
+      {
+        controlName: 'bls',
+        oppositeControlName: 'trs',
+        flipX: false,
+        flipY: true,
+      },
+      {
+        controlName: 'bls',
+        oppositeControlName: 'trs',
+        flipX: true,
+        flipY: true,
+      },
+    ])(
+      'keeps the opposite ghost corner fixed for $controlName when flipX=$flipX flipY=$flipY',
+      ({ controlName, oppositeControlName, flipX, flipY }) => {
+        image = createMockImage({
+          width: 120,
+          height: 100,
+          cropX: 40,
+          cropY: 50,
+          elementWidth: 320,
+          elementHeight: 260,
+          flipX,
+          flipY,
+        });
+        canvas.add(image);
+
+        const getControlPoint = (name: string) =>
+          ghostScalePositionHandler.call(
+            image.controls[name],
+            new Point(image.width, image.height),
+            [1, 0, 0, 1, 0, 0],
+            image,
+          );
+
+        const pointBefore = getControlPoint(controlName);
+        const oppositePointBefore = getControlPoint(oppositeControlName);
+        const center = image.getCenterPoint();
+        const dx = pointBefore.x < center.x ? 40 : -40;
+        const dy = pointBefore.y < center.y ? 30 : -30;
+
+        const handler = image.controls[controlName].actionHandler;
+        const localTransform = prepareTransform(image, controlName);
+        const changed = handler(
+          eventData,
+          localTransform,
+          pointBefore.x + dx,
+          pointBefore.y + dy,
+        );
+
+        expect(changed).toBe(true);
+
+        const oppositePointAfter = getControlPoint(oppositeControlName);
+        expect(oppositePointAfter.x).toBeCloseTo(oppositePointBefore.x, 6);
+        expect(oppositePointAfter.y).toBeCloseTo(oppositePointBefore.y, 6);
+      },
+    );
   });
 
   describe('renderGhostImage', () => {
