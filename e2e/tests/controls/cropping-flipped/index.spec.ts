@@ -46,29 +46,29 @@ test(`cropping controls offer a full cropping ux for flipped images`, async ({
     });
   });
 
-  await test.step(`drag the brs control `, async () => {
-    const contol = await imageUtil.getObjectControlPoint('brs');
+  await test.step(`drag the bls control `, async () => {
+    const contol = await imageUtil.getObjectControlPoint('bls');
     await page.mouse.move(contol.x, contol.y);
     await page.mouse.down();
-    await page.mouse.move(contol.x + 100, contol.y + 100, {
+    await page.mouse.move(contol.x - 200, contol.y - 200, {
       steps: 20,
     });
     await page.mouse.up();
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `04_moved_control_brs.png`,
+      name: `04_moved_control_bls.png`,
     });
   });
 
-  await test.step(`drag the trs control `, async () => {
-    const contol = await imageUtil.getObjectControlPoint('trs');
+  await test.step(`drag the tls control `, async () => {
+    const contol = await imageUtil.getObjectControlPoint('tls');
     await page.mouse.move(contol.x, contol.y);
     await page.mouse.down();
-    await page.mouse.move(contol.x - 400, contol.y + 30, {
+    await page.mouse.move(contol.x + 200, contol.y - 100, {
       steps: 20,
     });
     await page.mouse.up();
     await expect(await canvasUtil.screenshot()).toMatchSnapshot({
-      name: `05_moved_control_trs.png`,
+      name: `05_moved_control_tls.png`,
     });
   });
 

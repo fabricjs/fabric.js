@@ -55,7 +55,7 @@
     "test:vitest:all": "vitest --run",
     "test:vitest:coverage": "vitest --run --coverage --project unit-node",
     "test:vitest:coverage:watch": "npm run test:vitest --coverage=true",
-    "test:e2e": "npm run playwright:typecheck && playwright test",
+    "test:e2e": "npm run playwright:typecheck && playwright test --",
     "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
     "sandbox": "npm run sandboxscript -- sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
