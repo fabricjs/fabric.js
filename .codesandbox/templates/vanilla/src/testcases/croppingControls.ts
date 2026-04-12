@@ -5,18 +5,18 @@ export async function testCase(canvas: fabric.Canvas) {
   canvas.setDimensions({ width: 900, height: 700 });
   canvas.backgroundColor = '#f5f5f5';
 
-  // const edgeControls = extensions.createImageResizeControlsWithScaleToCover();
+  const edgeControls = extensions.createImageResizeControlsWithScaleToCover();
 
   const image = await fabric.FabricImage.fromURL(
     'https://fabricjs.com/assets/dragon.jpg',
   );
   image.once('mousedblclick', extensions.enterCropMode);
-  // Object.assign(image.controls, {
-  //   ml: edgeControls.mle,
-  //   mr: edgeControls.mre,
-  //   mt: edgeControls.mte,
-  //   mb: edgeControls.mbe,
-  // });
+  Object.assign(image.controls, {
+    ml: edgeControls.mle,
+    mr: edgeControls.mre,
+    mt: edgeControls.mte,
+    mb: edgeControls.mbe,
+  });
   image.set({
     left: 220,
     top: 200,
@@ -39,12 +39,12 @@ export async function testCase(canvas: fabric.Canvas) {
     'https://fabricjs.com/assets/dragon.jpg',
   );
   flippedImage.once('mousedblclick', extensions.enterCropMode);
-  // Object.assign(flippedImage.controls, {
-  //   ml: edgeControls.mle,
-  //   mr: edgeControls.mre,
-  //   mt: edgeControls.mte,
-  //   mb: edgeControls.mbe,
-  // });
+  Object.assign(flippedImage.controls, {
+    ml: edgeControls.mle,
+    mr: edgeControls.mre,
+    mt: edgeControls.mte,
+    mb: edgeControls.mbe,
+  });
   flippedImage.set({
     left: 620,
     top: 200,
@@ -69,12 +69,12 @@ export async function testCase(canvas: fabric.Canvas) {
     'https://fabricjs.com/assets/dragon.jpg',
   );
   groupedImage.once('mousedblclick', extensions.enterCropMode);
-  // Object.assign(groupedImage.controls, {
-  //   ml: edgeControls.mle,
-  //   mr: edgeControls.mre,
-  //   mt: edgeControls.mte,
-  //   mb: edgeControls.mbe,
-  // });
+  Object.assign(groupedImage.controls, {
+    ml: edgeControls.mle,
+    mr: edgeControls.mre,
+    mt: edgeControls.mte,
+    mb: edgeControls.mbe,
+  });
   groupedImage.set({
     cropX: 100,
     cropY: 60,
