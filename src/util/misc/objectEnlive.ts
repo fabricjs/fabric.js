@@ -171,7 +171,7 @@ export const enlivenObjectEnlivables = <
       /**
        * clipPath or shadow or gradient or text on a path or a pattern,
        * or the backgroundImage or overlayImage of canvas
-       * If we have a type and there is a classe registered for it, we enlive it.
+       * If we have a type and there is a class registered for it, we enlive it.
        * If there is no class registered for it we return the value as is
        * */
       if (value.type && classRegistry.has(value.type)) {

@@ -397,7 +397,7 @@ describe('animate', () => {
     expect(run).toBeGreaterThanOrEqual(3);
     vi.advanceTimersByTime(duration + 20);
   });
-  it('abort function is calle with object as context', async () => {
+  it('abort function is called with object as context', async () => {
     const object = new FabricObject({ left: 123, top: 124 });
     let context: any;
     object.animate(

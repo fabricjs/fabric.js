@@ -5,7 +5,7 @@ const commaWsp = `\\s*,?\\s*`;
 /**
  * p for param
  * using "bad naming" here because it makes the regex much easier to read
- * p is a number that is preceded by an arbitary number of spaces, maybe 0,
+ * p is a number that is preceded by an arbitrary number of spaces, maybe 0,
  * a comma or not, and then possibly more spaces or not.
  */
 const p = `${commaWsp}(${reNum})`;

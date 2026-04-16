@@ -1147,7 +1147,7 @@ export class FabricText<
    * @private
    * @param {String} method fillText or strokeText.
    * @param {CanvasRenderingContext2D} ctx Context to render on
-   * @param {Array} line Content of the line, splitted in an array by grapheme
+   * @param {Array} line Content of the line, split in an array by grapheme
    * @param {Number} left
    * @param {Number} top
    * @param {Number} lineIndex
