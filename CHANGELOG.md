@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): tighten workflow permissions for scorecard hardening [#10953](https://github.com/fabricjs/fabric.js/pull/10953)
 - feat(): Update cron schedule for scorecard workflow [#10952](https://github.com/fabricjs/fabric.js/pull/10952)
 - Version 7.3.0 [#10951](https://github.com/fabricjs/fabric.js/pull/10951)
 - fix(cropping): keep ghost scaling controls anchored on flipped images [#10943](https://github.com/fabricjs/fabric.js/pull/10943)
