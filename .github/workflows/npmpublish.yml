@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 22.x
           registry-url: https://registry.npmjs.org/
-      - run: npm install
+      - run: npm ci --audit false --fund false
       - run: npm run build
       - run: node publish.js
         env:

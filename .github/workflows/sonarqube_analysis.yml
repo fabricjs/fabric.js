@@ -7,37 +7,28 @@ on:
 permissions:
   actions: read
   contents: read
-  pull-requests: write
 jobs:
-  sonarqube_pr:
+  sonarqube:
     name: SonarQube analysis
-    if: >-
-      ${{
-        github.event.workflow_run.conclusion != 'cancelled' &&
-        (
-          github.event.workflow_run.event != 'pull_request' ||
-          github.event.workflow_run.head_repository.full_name == github.repository
-        )
-      }}
+    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout PR head
+      - name: Checkout PR merge ref
         if: ${{ github.event.workflow_run.event == 'pull_request' }}
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: refs/pull/${{ github.event.workflow_run.pull_requests[0].number }}/merge
           fetch-depth: 0
-      - name: Checkout branch head
+          persist-credentials: false
+      - name: Checkout default branch
         if: ${{ github.event.workflow_run.event == 'push' }}
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          persist-credentials: false
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: refs/heads/master
           fetch-depth: 0
+          persist-credentials: false
       - name: Create temporary directories
-        run: |
-          mkdir -p ${{ runner.temp }}/artifacts/nyc_output
-          mkdir .nyc_output
+        run: mkdir -p ${{ runner.temp }}/artifacts/nyc_output .nyc_output
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-vitest-sonarqube
@@ -46,8 +37,8 @@ jobs:
           path: ${{ runner.temp }}/artifacts/nyc_output
       - run: mv ${{ runner.temp }}/artifacts/nyc_output/lcov.info ./.nyc_output
       - name: SonarQube Scan PR
-        if: ${{github.event.workflow_run.event == 'pull_request'}}
-        uses: SonarSource/sonarqube-scan-action@v6
+        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -57,11 +48,11 @@ jobs:
             -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
             -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
       - name: SonarQube Scan Branch
-        if: ${{github.event.workflow_run.event == 'push'}}
-        uses: SonarSource/sonarqube-scan-action@v6
+        if: ${{ github.event.workflow_run.event == 'push' }}
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.branch.name=${{ github.event.workflow_run.head_branch }}
+            -Dsonar.branch.name=master
