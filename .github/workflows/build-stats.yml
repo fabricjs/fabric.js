@@ -6,9 +6,10 @@ on:
       - completed
 permissions:
   contents: read
-  pull-requests: write
 jobs:
   build-stats:
+    permissions:
+      pull-requests: write
     env:
       unique_id: <!-- build-stats -->
       minified: dist/index.min.js
