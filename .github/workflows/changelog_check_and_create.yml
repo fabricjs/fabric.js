@@ -1,62 +1,95 @@
 name: 'Check and create Changelog 📋'
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [master, 6.x]
     types: [opened, synchronize, reopened, edited]
 permissions:
-  contents: read
+  pull-requests: write
 jobs:
   changelog-creation:
     runs-on: ubuntu-24.04
-    env:
-      link: '[#${{ github.event.number }}](https://github.com/fabricjs/fabric.js/pull/${{ github.event.number }})'
-      title: ${{ github.event.pull_request.title }}
-      prev_title: ${{ github.event.changes.title.from }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        with:
-          fetch-depth: 0
-      - name: Check CHANGELOG.md
-        id: check
-
-        run: |
-          files=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
-            | jq -r '.[].filename')
-          echo "Changed files: $files"
-          if echo "$files" | grep -q "^CHANGELOG.md$"; then
-            echo "OK 'CHANGELOG.md' was modified"
-            echo "changelog_updated=true" >> $GITHUB_OUTPUT
-          else
-            echo "KO 'CHANGELOG.md' was NOT modified"
-            echo "changelog_updated=false" >> $GITHUB_OUTPUT
-          fi
-      - name: Create and upload the changelog line
-        id: changelog_string
-        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
+      - name: Check changelog and comment on PR
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
-          result-encoding: string
           script: |
-            return JSON.stringify({
-              log: `- ${process.env.title} ${process.env.link}`,
-              prev_log: !!'${process.env.prev_title}' ? `- ${process.env.prev_title} ${process.env.link}` : '',
-              pr_ref: `${{ github.event.pull_request.head.ref }}`,
-              full_name: `${{ github.event.pull_request.head.repo.full_name }}`
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+            const marker = '<!-- changelog-reminder -->';
+            const link = `[#${pr.number}](https://github.com/${owner}/${repo}/pull/${pr.number})`;
+            const expectedLine = `- ${pr.title} ${link}`;
+            const previousTitle = context.payload.changes?.title?.from;
+            const previousLine = previousTitle ? `- ${previousTitle} ${link}` : '';
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: pr.number,
+              per_page: 100,
             });
-      - name: Create changelog artifact
-        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
-      - name: Upload changelog artifact
-        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: changelog_artifact
-          path: ./changelog_artifact.txt
-      - name: Exit 1 if we need the changelog to be updated
-        if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        run: exit 1
-      - name: Exit 0 otherwise
-        run: exit 0
+            const changelogFile = files.find((file) => file.filename === 'CHANGELOG.md');
+            const patch = changelogFile?.patch || '';
+            const hasExpectedLine = patch.includes(expectedLine);
+            const hasPreviousLine = previousLine && patch.includes(previousLine);
+
+            let failureReason = '';
+            if (!changelogFile) {
+              failureReason = 'CHANGELOG.md was not modified in this pull request.';
+            } else if (!hasExpectedLine) {
+              failureReason =
+                previousTitle && previousTitle !== pr.title && hasPreviousLine
+                  ? 'The PR title changed, but the changelog entry still matches the previous title.'
+                  : 'CHANGELOG.md does not contain the expected changelog line for the current PR title.';
+            }
+
+            const commentBody = [
+              marker,
+              'The changelog entry is missing or stale for this pull request.',
+              '',
+              'Expected line under `## [next]`:',
+              '',
+              `\`${expectedLine}\``,
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: pr.number,
+              per_page: 100,
+            });
+            const existingComment = comments.find(
+              (comment) =>
+                comment.user?.login === 'github-actions[bot]' &&
+                typeof comment.body === 'string' &&
+                comment.body.includes(marker),
+            );
+
+            if (failureReason) {
+              if (existingComment) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existingComment.id,
+                  body: commentBody,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: commentBody,
+                });
+              }
+              core.setFailed(failureReason);
+              return;
+            }
+
+            if (existingComment) {
+              await github.rest.issues.deleteComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+              });
+            }
