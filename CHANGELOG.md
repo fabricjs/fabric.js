@@ -3,6 +3,7 @@
 ## [next]
 
 - feat(): Update cron schedule for scorecard workflow [#10952](https://github.com/fabricjs/fabric.js/pull/10952)
+- Version 7.3.0 [#10951](https://github.com/fabricjs/fabric.js/pull/10951)
 - fix(cropping): keep ghost scaling controls anchored on flipped images [#10943](https://github.com/fabricjs/fabric.js/pull/10943)
 - chore(deps): bump canvas from 3.2.2 to 3.2.3 [#10940](https://github.com/fabricjs/fabric.js/pull/10940)
 - chore(deps-dev): bump serialize-javascript from 7.0.4 to 7.0.5 in the npm_and_yarn group across 1 directory [#10936](https://github.com/fabricjs/fabric.js/pull/10936)
