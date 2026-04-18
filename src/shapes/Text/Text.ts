@@ -1595,7 +1595,7 @@ export class FabricText<
         TEXT_DECORATION_THICKNESS,
       );
       let currentDecoration = lastDecoration;
-      let currentFill = lastFill;
+      let currentFill: typeof lastFill;
       let currentDecorationColor = lastDecorationColor;
       let currentTickness = lastTickness;
       const top = topOffset + maxHeight * (1 - this._fontSizeFraction);

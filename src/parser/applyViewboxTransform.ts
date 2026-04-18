@@ -27,8 +27,6 @@ export function applyViewboxTransform(
   const viewBoxAttr: string | null = element.getAttribute('viewBox');
   let scaleX = 1;
   let scaleY = 1;
-  let minX = 0;
-  let minY = 0;
   let matrix;
   let el;
   const widthAttr = element.getAttribute('width');
@@ -79,8 +77,8 @@ export function applyViewboxTransform(
   }
 
   const pasedViewBox = viewBoxAttr.match(reViewBoxAttrValue)!;
-  minX = -parseFloat(pasedViewBox[1]);
-  minY = -parseFloat(pasedViewBox[2]);
+  const minX = -parseFloat(pasedViewBox[1]);
+  const minY = -parseFloat(pasedViewBox[2]);
   const viewBoxWidth = parseFloat(pasedViewBox[3]);
   const viewBoxHeight = parseFloat(pasedViewBox[4]);
   parsedDim.minX = minX;
