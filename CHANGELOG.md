@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): comment on changelog fixes instead of pushing [#10958](https://github.com/fabricjs/fabric.js/pull/10958)
 - docs(): Revise security vulnerability reporting process [#10955](https://github.com/fabricjs/fabric.js/pull/10955)
 - ci(): pin workflow dependencies for scorecard hardening [#10954](https://github.com/fabricjs/fabric.js/pull/10954)
 - ci(): tighten workflow permissions for scorecard hardening [#10953](https://github.com/fabricjs/fabric.js/pull/10953)
