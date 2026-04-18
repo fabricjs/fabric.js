@@ -30,6 +30,7 @@ Here is a section for recognition of companies or individuals that support fabri
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
 - Typed and modular
 - [Unit tested](CONTRIBUTING.md#-testing)
+- Security efforts [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12579/badge)](https://www.bestpractices.dev/projects/12579)
 
 #### Supported Browsers/Environments
 
@@ -188,7 +189,6 @@ See our ready to use [templates](./.codesandbox/templates/).
 
 ## More Resources
 
-- [WIP new fabricjs.com](https://fabricjs.github.io)
 - [Demos on `fabricjs.com`][demos]
 - [Fabric.js on `Twitter`][twitter]
 - [Fabric.js on `CodeTriage`][code_triage]
