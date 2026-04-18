@@ -3,6 +3,7 @@
 ## [next]
 
 - ci(): Change permission model and declaration to help with OSSF scorecard. [#10959](https://github.com/fabricjs/fabric.js/pull/10959)
+- chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
 - docs(): Revise security vulnerability reporting process [#10955](https://github.com/fabricjs/fabric.js/pull/10955)
 - ci(): pin workflow dependencies for scorecard hardening [#10954](https://github.com/fabricjs/fabric.js/pull/10954)
 - ci(): tighten workflow permissions for scorecard hardening [#10953](https://github.com/fabricjs/fabric.js/pull/10953)
