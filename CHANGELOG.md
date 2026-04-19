@@ -2,6 +2,8 @@
 
 ## [next]
 
+- ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
+
 ## [7.3.1]
 
 - ci(): fix the package version [#10961](https://github.com/fabricjs/fabric.js/pull/10961)
