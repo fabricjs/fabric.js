@@ -22,6 +22,10 @@ permissions:
   contents: read
 jobs:
   publish-npm:
+    env:
+      NPM_CONFIG_PROVENANCE: true
+    permissions:
+      id-token: write
     runs-on: ubuntu-24.04
     steps:
       - name: Resolve publish metadata
@@ -56,8 +60,6 @@ jobs:
       - run: npm ci --audit false --fund false
       - run: npm run build
       - name: Publish package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
         shell: bash
         run: |
           if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
