@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): inline npm publish workflow and add manual dispatch [#10960](https://github.com/fabricjs/fabric.js/pull/10960)
 - ci(): Change permission model and declaration to help with OSSF scorecard. [#10959](https://github.com/fabricjs/fabric.js/pull/10959)
 - docs(): Revise security vulnerability reporting process [#10955](https://github.com/fabricjs/fabric.js/pull/10955)
 - ci(): pin workflow dependencies for scorecard hardening [#10954](https://github.com/fabricjs/fabric.js/pull/10954)
