@@ -224,25 +224,19 @@ export function ghostScalePositionHandler(
   const vpt = fabricObject.getViewportTransform();
   const _finalMatrix = util.multiplyTransformMatrices(vpt, matrix);
 
-  let x = 0;
-  let y = 0;
-  if (this.x < 0) {
-    x = -fabricObject.width / 2 - fabricObject.cropX;
-  } else {
-    x =
-      fabricObject.getElement().width -
-      fabricObject.width / 2 -
-      fabricObject.cropX;
-  }
+  const x =
+    this.x < 0
+      ? -fabricObject.width / 2 - fabricObject.cropX
+      : fabricObject.getElement().width -
+        fabricObject.width / 2 -
+        fabricObject.cropX;
 
-  if (this.y < 0) {
-    y = -fabricObject.height / 2 - fabricObject.cropY;
-  } else {
-    y =
-      fabricObject.getElement().height -
-      fabricObject.height / 2 -
-      fabricObject.cropY;
-  }
+  const y =
+    this.y < 0
+      ? -fabricObject.height / 2 - fabricObject.cropY
+      : fabricObject.getElement().height -
+        fabricObject.height / 2 -
+        fabricObject.cropY;
   return new Point(x, y).transform(_finalMatrix);
 }
 

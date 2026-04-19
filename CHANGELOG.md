@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
 - ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
 
 ## [7.3.1]

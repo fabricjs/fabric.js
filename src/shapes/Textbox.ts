@@ -209,7 +209,7 @@ export class Textbox<
       return true;
     }
     let offset = 0,
-      nextLineIndex = lineIndex + 1,
+      nextLineIndex: number,
       nextOffset: number,
       shouldLimit = false;
     const map = this._styleMap[lineIndex],
@@ -450,7 +450,6 @@ export class Textbox<
     );
     // layout words
     const data = wordsData[lineIndex];
-    offset = 0;
     let i;
     for (i = 0; i < data.length; i++) {
       const { word, width: wordWidth } = data[i];
