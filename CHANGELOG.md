@@ -2,12 +2,18 @@
 
 ## [next]
 
+## [7.3.1]
+
+- ci(): fix the package version [#10961](https://github.com/fabricjs/fabric.js/pull/10961)
 - ci(): inline npm publish workflow and add manual dispatch [#10960](https://github.com/fabricjs/fabric.js/pull/10960)
 - ci(): Change permission model and declaration to help with OSSF scorecard. [#10959](https://github.com/fabricjs/fabric.js/pull/10959)
 - docs(): Revise security vulnerability reporting process [#10955](https://github.com/fabricjs/fabric.js/pull/10955)
 - ci(): pin workflow dependencies for scorecard hardening [#10954](https://github.com/fabricjs/fabric.js/pull/10954)
 - ci(): tighten workflow permissions for scorecard hardening [#10953](https://github.com/fabricjs/fabric.js/pull/10953)
 - feat(): Update cron schedule for scorecard workflow [#10952](https://github.com/fabricjs/fabric.js/pull/10952)
+
+## [7.3.0]
+
 - Version 7.3.0 [#10951](https://github.com/fabricjs/fabric.js/pull/10951)
 - fix(cropping): keep ghost scaling controls anchored on flipped images [#10943](https://github.com/fabricjs/fabric.js/pull/10943)
 - chore(deps): bump canvas from 3.2.2 to 3.2.3 [#10940](https://github.com/fabricjs/fabric.js/pull/10940)
