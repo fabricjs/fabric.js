@@ -355,7 +355,7 @@ export const makePathSimpler = (path: TComplexPathData): TSimplePathData => {
   let x = 0,
     y = 0;
   // x1 and y1 represent the last point of the subpath. the subpath is started with
-  // m or M command. When a z or Z command is drawn, x and y need to be resetted to
+  // m or M command. When a z or Z command is drawn, x and y need to be reset to
   // the last x1 and y1.
   let x1 = 0,
     y1 = 0;

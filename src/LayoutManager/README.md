@@ -6,7 +6,7 @@ Layout manager exposes a main public method that performs group layout given a t
 
 The layout manager will calculate the size and position of the group when is created or updated
 The FitContent strategy is the classic fabric 5.x group and will grow or shrink when objects are added or removed.
-In general the expectation is that wrapping objects in a group without specifying a new postion or transformations wont change the object visual position, the position of the objects will be the same that those object would have had on the canvas if they weren't on the group. Theyr coordinates will change to adapt to the group structure.
+In general the expectation is that wrapping objects in a group without specifying a new position or transformations won't change the object visual position, the position of the objects will be the same that those object would have had on the canvas if they weren't on the group. Their coordinates will change to adapt to the group structure.
 This is a legacy behaviour that carries over this new code.
 The behaviour is not important if you are building a group from scratch and you are adding it in a specific position or requesting a specific transform ( scaleX, angle, etc ). In that case the original position is meaningless and is overridden with your transform.
 
@@ -28,7 +28,7 @@ When larger or smaller than the actual boundingbox the group is centered on the 
 
 The Fixed layout strategy is the only strategy in which the developer can change the width and height of the group at will without having it reset when adding or removing objects.
 
-It must be clear that is also possible change width and height of the group in the other cases, but that is an ephemeral change that gets resetted at the next performLayout
+It must be clear that is also possible change width and height of the group in the other cases, but that is an ephemeral change that gets reset at the next performLayout
 
 ### Clippath layout strategy
 
@@ -60,7 +60,7 @@ performLayout -> onBeforeLayout -> getLayoutResult -> commitLayout -> onAfterLay
 The flow has the following goals/features:
 
 - alerting the user a layout ends and finish
-- subscribe to object events in order to preform layout on change
+- subscribe to object events in order to perform layout on change
 - calculate group new size and position
 - move the objects to their new position relative to the group center.
 
