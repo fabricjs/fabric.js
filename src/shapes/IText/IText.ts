@@ -671,7 +671,6 @@ export class IText<
     for (let i = startLine; i <= endLine; i++) {
       const lineOffset = this._getLineLeftOffset(i) || 0;
       let lineHeight = this.getHeightOfLine(i),
-        realLineHeight = 0,
         boxStart = 0,
         boxEnd = 0;
 
@@ -694,7 +693,7 @@ export class IText<
             charSpacing;
         }
       }
-      realLineHeight = lineHeight;
+      const realLineHeight = lineHeight;
       if (this.lineHeight < 1 || (i === endLine && this.lineHeight > 1)) {
         lineHeight /= this.lineHeight;
       }

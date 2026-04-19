@@ -5,9 +5,11 @@ on:
     types:
       - completed
 permissions:
-  contents: write
+  contents: read
 jobs:
   update_changelog:
+    permissions:
+      contents: write
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-24.04
     steps:
@@ -35,7 +37,6 @@ jobs:
           repository: ${{ steps.changelog_data.outputs.full_name }}
           sparse-checkout: |
             CHANGELOG.md
-            .oxfmtrc.json
       - name: Update CHANGELOG.md from PR title
         id: update
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
@@ -73,15 +74,9 @@ jobs:
             }
             fs.writeFileSync(file, content);
             return modified;
-      - name: Setup node
-        if: fromJson(steps.update.outputs.result)
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
-        with:
-          node-version: 24.x
       - name: Commit & Push
         if: fromJson(steps.update.outputs.result)
         run: |
-          npx oxfmt CHANGELOG.md
           git diff
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com

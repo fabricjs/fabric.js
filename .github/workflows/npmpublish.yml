@@ -7,21 +7,65 @@ on:
       - 5.x
       - 6.x
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Git tag to publish'
+        required: true
+        type: string
+      is_prerelease:
+        description: 'Publish using the prerelease npm dist-tag'
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
   publish-npm:
+    env:
+      NPM_CONFIG_PROVENANCE: true
+    permissions:
+      id-token: write
     runs-on: ubuntu-24.04
     steps:
+      - name: Resolve publish metadata
+        id: publish
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            ref_name='${{ github.event.release.tag_name }}'
+            is_prerelease='${{ github.event.release.prerelease }}'
+          else
+            ref_name='${{ inputs.tag_name }}'
+            is_prerelease='${{ inputs.is_prerelease }}'
+          fi
+
+          if [[ "$is_prerelease" == 'true' ]]; then
+            npm_tag='beta'
+          else
+            npm_tag=''
+          fi
+
+          echo "ref_name=$ref_name" >> "$GITHUB_OUTPUT"
+          echo "npm_tag=$npm_tag" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: refs/tags/${{ steps.publish.outputs.ref_name }}
+          persist-credentials: false
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
         with:
-          node-version: 22.x
+          node-version: 24.x
           registry-url: https://registry.npmjs.org/
       - run: npm ci --audit false --fund false
       - run: npm run build
-      - run: node publish.js
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-          PRE_RELEASE: ${{ github.event.release.prerelease }}
-          TAG_NAME: ${{ github.event.release.tag_name }}
+      - name: Publish package
+        shell: bash
+        run: |
+          if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
+            echo "npm publish --tag ${{ steps.publish.outputs.npm_tag }}"
+            npm publish --tag "${{ steps.publish.outputs.npm_tag }}"
+          else
+            echo "npm publish"
+            npm publish
+          fi
