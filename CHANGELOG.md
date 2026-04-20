@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @vitest/ui from 4.1.3 to 4.1.4 [#10965](https://github.com/fabricjs/fabric.js/pull/10965)
 - chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)
 - chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
 - ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
