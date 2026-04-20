@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump inquirer from 13.3.2 to 13.4.2 [#10963](https://github.com/fabricjs/fabric.js/pull/10963)
 - chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)
 - chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
 - ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
