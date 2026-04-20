@@ -81,7 +81,7 @@
     "inquirer": "^13.3.2",
     "lint-staged": "^16.4.0",
     "micromatch": "^4.0.8",
-    "oxfmt": "^0.42.0",
+    "oxfmt": "^0.45.0",
     "ps-list": "^9.0.0",
     "rolldown": "^1.0.0-rc.12",
     "serve": "^14.2.6",
