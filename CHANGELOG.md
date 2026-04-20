@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump rolldown from 1.0.0-rc.12 to 1.0.0-rc.16 [#10966](https://github.com/fabricjs/fabric.js/pull/10966)
 - chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)
 - chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
 - ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
