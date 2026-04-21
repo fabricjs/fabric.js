@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump oxfmt from 0.42.0 to 0.45.0 [#10964](https://github.com/fabricjs/fabric.js/pull/10964)
 - chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)
 - chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
 - ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
