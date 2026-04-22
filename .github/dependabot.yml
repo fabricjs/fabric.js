@@ -9,3 +9,14 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'weekly'
+    groups:
+      vite:
+        applies-to: 'version-updates'
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
+      vitest:
+        applies-to: 'version-updates'
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
