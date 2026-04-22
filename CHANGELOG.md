@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump the vitest group with 4 updates [#10968](https://github.com/fabricjs/fabric.js/pull/10968)
 - ci(dependabot): group vite-related npm updates [#10967](https://github.com/fabricjs/fabric.js/pull/10967)
 - chore(deps-dev): bump oxfmt from 0.42.0 to 0.45.0 [#10964](https://github.com/fabricjs/fabric.js/pull/10964)
 - chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)
