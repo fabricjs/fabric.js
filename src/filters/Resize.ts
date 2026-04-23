@@ -494,7 +494,7 @@ export class Resize extends BaseFilter<'Resize', ResizeOwnProps> {
     for (let j = 0; j < dH; j++) {
       for (let i = 0; i < dW; i++) {
         const x2 = (i + j * dW) * 4;
-        let weight = 0;
+        let weight: number;
         let weights = 0;
         let weightsAlpha = 0;
         let gxR = 0;

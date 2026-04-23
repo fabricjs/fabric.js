@@ -41,7 +41,7 @@ describe('typeAssertions', () => {
       const newText = new NewText('hello world');
       expect(isTextObject(newText)).toBe(true);
     });
-    test('can safeguard agains other FabricObjects', () => {
+    test('can safeguard against other FabricObjects', () => {
       const path = new Path('M 0 0 L 1 1');
       expect(isTextObject(path)).toBe(false);
     });

@@ -353,7 +353,7 @@ var Cache = class {
 const cache = new Cache();
 //#endregion
 //#region src/constants.ts
-const VERSION = "7.2.0";
+const VERSION = "7.3.1";
 function noop() {}
 const halfPI = Math.PI / 2;
 const quarterPI = Math.PI / 4;
