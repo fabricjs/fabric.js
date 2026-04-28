@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(deps-dev): bump rolldown from 1.0.0-rc.12 to 1.0.0-rc.16 [#10966](https://github.com/fabricjs/fabric.js/pull/10966)
+- chore(deps-dev): bump postcss from 8.5.8 to 8.5.12 [#10972](https://github.com/fabricjs/fabric.js/pull/10972)
 - chore(deps-dev): bump es-toolkit from 1.45.1 to 1.46.0 [#10971](https://github.com/fabricjs/fabric.js/pull/10971)
 - chore(deps-dev): bump the vitest group with 4 updates [#10968](https://github.com/fabricjs/fabric.js/pull/10968)
 - ci(dependabot): group vite-related npm updates [#10967](https://github.com/fabricjs/fabric.js/pull/10967)
