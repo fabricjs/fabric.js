@@ -5,7 +5,7 @@ prev: false
 title: "MiscEvents"
 ---
 
-Defined in: [src/EventTypeDefs.ts:283](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L283)
+Defined in: [src/EventTypeDefs.ts:288](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L288)
 
 ## Extended by
 
@@ -18,7 +18,7 @@ Defined in: [src/EventTypeDefs.ts:283](https://github.com/fabricjs/fabric.js/blo
 
 > **contextmenu**: `SimpleEventHandler`\<`Event`\>
 
-Defined in: [src/EventTypeDefs.ts:285](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L285)
+Defined in: [src/EventTypeDefs.ts:290](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L290)
 
 ***
 
@@ -26,4 +26,4 @@ Defined in: [src/EventTypeDefs.ts:285](https://github.com/fabricjs/fabric.js/blo
 
 > **contextmenu:before**: `SimpleEventHandler`\<`Event`\>
 
-Defined in: [src/EventTypeDefs.ts:284](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L284)
+Defined in: [src/EventTypeDefs.ts:289](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L289)

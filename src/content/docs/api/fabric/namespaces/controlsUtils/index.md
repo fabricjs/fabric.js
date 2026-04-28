@@ -11,6 +11,9 @@ title: "controlsUtils"
 
 ## Variables
 
+- [changeHeight](/api/fabric/namespaces/controlsutils/variables/changeheight/)
+- [changeObjectHeight](/api/fabric/namespaces/controlsutils/variables/changeobjectheight/)
+- [changeObjectWidth](/api/fabric/namespaces/controlsutils/variables/changeobjectwidth/)
 - [changeWidth](/api/fabric/namespaces/controlsutils/variables/changewidth/)
 - [rotationStyleHandler](/api/fabric/namespaces/controlsutils/variables/rotationstylehandler/)
 - [rotationWithSnapping](/api/fabric/namespaces/controlsutils/variables/rotationwithsnapping/)
@@ -42,3 +45,9 @@ title: "controlsUtils"
 - [renderSquareControl](/api/fabric/namespaces/controlsutils/functions/rendersquarecontrol/)
 - [wrapWithFireEvent](/api/fabric/namespaces/controlsutils/functions/wrapwithfireevent/)
 - [wrapWithFixedAnchor](/api/fabric/namespaces/controlsutils/functions/wrapwithfixedanchor/)
+
+## References
+
+### ControlRenderingStyleOverride
+
+Re-exports [ControlRenderingStyleOverride](/api/type-aliases/controlrenderingstyleoverride/)

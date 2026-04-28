@@ -111,6 +111,7 @@ title: "fabric"
 - [ControlActionHandler](/api/type-aliases/controlactionhandler/)
 - [ControlCallback](/api/type-aliases/controlcallback/)
 - [ControlCursorCallback](/api/type-aliases/controlcursorcallback/)
+- [ControlRenderingStyleOverride](/api/type-aliases/controlrenderingstyleoverride/)
 - [CursorBoundaries](/api/type-aliases/cursorboundaries/)
 - [CursorRenderingData](/api/type-aliases/cursorrenderingdata/)
 - [DrawContext](/api/type-aliases/drawcontext/)

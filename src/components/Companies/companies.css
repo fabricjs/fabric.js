@@ -30,6 +30,14 @@
   align-items: center;
 }
 
+#companies .textEllipsis {
+  max-width: 220px;
+  max-height: 60px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 #companies a img {
   max-width: 100%;
   display: flex;

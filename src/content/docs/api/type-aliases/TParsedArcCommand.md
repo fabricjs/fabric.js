@@ -7,4 +7,4 @@ title: "TParsedArcCommand"
 
 > **TParsedArcCommand** = [`TParsedAbsoluteArcCommand`](/api/type-aliases/tparsedabsolutearccommand/) \| [`TParsedRelativeArcCommand`](/api/type-aliases/tparsedrelativearccommand/)
 
-Defined in: [src/util/path/typedefs.ts:249](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/path/typedefs.ts#L249)
+Defined in: [src/util/path/typedefs.ts:249](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L249)

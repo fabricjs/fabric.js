@@ -7,7 +7,7 @@ title: "scaleOrSkewActionName"
 
 > `const` **scaleOrSkewActionName**: [`ControlCallback`](/api/type-aliases/controlcallback/)\<[`TAxisKey`](/api/type-aliases/taxiskey/)\<`"skew"` \| `"scale"`\> \| `""`\>
 
-Defined in: [src/controls/scaleSkew.ts:24](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/controls/scaleSkew.ts#L24)
+Defined in: [src/controls/scaleSkew.ts:24](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/scaleSkew.ts#L24)
 
 Inspect event, control and fabricObject to return the correct action name
 

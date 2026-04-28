@@ -5,7 +5,7 @@ prev: false
 title: "DropEventData"
 ---
 
-Defined in: [src/EventTypeDefs.ts:196](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L196)
+Defined in: [src/EventTypeDefs.ts:201](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L201)
 
 ## Extends
 
@@ -17,7 +17,7 @@ Defined in: [src/EventTypeDefs.ts:196](https://github.com/fabricjs/fabric.js/blo
 
 > `optional` **canDrop**: `boolean`
 
-Defined in: [src/EventTypeDefs.ts:191](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L191)
+Defined in: [src/EventTypeDefs.ts:196](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L196)
 
 #### Inherited from
 
@@ -29,7 +29,7 @@ Defined in: [src/EventTypeDefs.ts:191](https://github.com/fabricjs/fabric.js/blo
 
 > `optional` **didDrop**: `boolean`
 
-Defined in: [src/EventTypeDefs.ts:192](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L192)
+Defined in: [src/EventTypeDefs.ts:197](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L197)
 
 #### Inherited from
 
@@ -41,7 +41,7 @@ Defined in: [src/EventTypeDefs.ts:192](https://github.com/fabricjs/fabric.js/blo
 
 > `optional` **dragSource**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/EventTypeDefs.ts:190](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L190)
+Defined in: [src/EventTypeDefs.ts:195](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L195)
 
 #### Inherited from
 
@@ -53,7 +53,7 @@ Defined in: [src/EventTypeDefs.ts:190](https://github.com/fabricjs/fabric.js/blo
 
 > `optional` **dropTarget**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/EventTypeDefs.ts:193](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L193)
+Defined in: [src/EventTypeDefs.ts:198](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L198)
 
 #### Inherited from
 
@@ -65,7 +65,7 @@ Defined in: [src/EventTypeDefs.ts:193](https://github.com/fabricjs/fabric.js/blo
 
 > **e**: `DragEvent`
 
-Defined in: [src/EventTypeDefs.ts:102](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L102)
+Defined in: [src/EventTypeDefs.ts:104](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L104)
 
 #### Inherited from
 
@@ -77,7 +77,7 @@ Defined in: [src/EventTypeDefs.ts:102](https://github.com/fabricjs/fabric.js/blo
 
 > **scenePoint**: [`Point`](/api/classes/point/)
 
-Defined in: [src/EventTypeDefs.ts:197](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L197)
+Defined in: [src/EventTypeDefs.ts:202](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L202)
 
 ***
 
@@ -85,7 +85,7 @@ Defined in: [src/EventTypeDefs.ts:197](https://github.com/fabricjs/fabric.js/blo
 
 > `optional` **subTargets**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>[]
 
-Defined in: [src/EventTypeDefs.ts:189](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L189)
+Defined in: [src/EventTypeDefs.ts:194](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L194)
 
 #### Inherited from
 
@@ -97,7 +97,7 @@ Defined in: [src/EventTypeDefs.ts:189](https://github.com/fabricjs/fabric.js/blo
 
 > `optional` **target**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/EventTypeDefs.ts:188](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L188)
+Defined in: [src/EventTypeDefs.ts:193](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L193)
 
 #### Inherited from
 
@@ -109,4 +109,4 @@ Defined in: [src/EventTypeDefs.ts:188](https://github.com/fabricjs/fabric.js/blo
 
 > **viewportPoint**: [`Point`](/api/classes/point/)
 
-Defined in: [src/EventTypeDefs.ts:198](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/EventTypeDefs.ts#L198)
+Defined in: [src/EventTypeDefs.ts:203](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L203)

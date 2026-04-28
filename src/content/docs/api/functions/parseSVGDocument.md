@@ -7,7 +7,7 @@ title: "parseSVGDocument"
 
 > **parseSVGDocument**(`doc`, `reviver?`, `__namedParameters?`): `Promise`\<`SVGParsingOutput`\>
 
-Defined in: [src/parser/parseSVGDocument.ts:35](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/parser/parseSVGDocument.ts#L35)
+Defined in: [src/parser/parseSVGDocument.ts:35](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/parser/parseSVGDocument.ts#L35)
 
 Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
 

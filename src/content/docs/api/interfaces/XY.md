@@ -5,7 +5,7 @@ prev: false
 title: "XY"
 ---
 
-Defined in: [src/Point.ts:5](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/Point.ts#L5)
+Defined in: [src/Point.ts:5](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Point.ts#L5)
 
 ## Properties
 
@@ -13,7 +13,7 @@ Defined in: [src/Point.ts:5](https://github.com/fabricjs/fabric.js/blob/210ef03e
 
 > **x**: `number`
 
-Defined in: [src/Point.ts:6](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/Point.ts#L6)
+Defined in: [src/Point.ts:6](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Point.ts#L6)
 
 ***
 
@@ -21,4 +21,4 @@ Defined in: [src/Point.ts:6](https://github.com/fabricjs/fabric.js/blob/210ef03e
 
 > **y**: `number`
 
-Defined in: [src/Point.ts:7](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/Point.ts#L7)
+Defined in: [src/Point.ts:7](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Point.ts#L7)

@@ -7,7 +7,7 @@ title: "loadSVGFromString"
 
 > **loadSVGFromString**(`string`, `reviver?`, `options?`): `Promise`\<`SVGParsingOutput`\>
 
-Defined in: [src/parser/loadSVGFromString.ts:19](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/parser/loadSVGFromString.ts#L19)
+Defined in: [src/parser/loadSVGFromString.ts:19](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/parser/loadSVGFromString.ts#L19)
 
 Takes string corresponding to an SVG document, and parses it into a set of fabric objects
 

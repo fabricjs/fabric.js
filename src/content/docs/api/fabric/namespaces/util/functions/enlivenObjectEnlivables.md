@@ -7,7 +7,7 @@ title: "enlivenObjectEnlivables"
 
 > **enlivenObjectEnlivables**\<`R`\>(`serializedObject`, `options?`): `Promise`\<`R`\>
 
-Defined in: [src/util/misc/objectEnlive.ts:143](https://github.com/fabricjs/fabric.js/blob/210ef03ea157dba4ba760f1657f98d392ab02bc5/src/util/misc/objectEnlive.ts#L143)
+Defined in: [src/util/misc/objectEnlive.ts:143](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/misc/objectEnlive.ts#L143)
 
 Creates corresponding fabric instances residing in an object, e.g. `clipPath`
 
