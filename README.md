@@ -236,3 +236,7 @@ See our ready to use [templates](./.codesandbox/templates/).
 [three.js]: https://github.com/mrdoob/three.js/
 [twitter]: https://twitter.com/fabricjs
 [website]: http://fabricjs.com/
+
+## Used By
+
+* [Mini Canvas Editor](https://github.com/nocode-js/mini-canvas-editor)
