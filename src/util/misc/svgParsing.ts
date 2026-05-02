@@ -1,7 +1,12 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE, FILL, NONE } from '../../constants';
-import type { TBBox, SVGElementName, SupportedSVGUnit } from '../../typedefs';
+import type {
+  TBBox,
+  SVGElementName,
+  SupportedSVGUnit,
+  TFiller,
+} from '../../typedefs';
 import { escapeXml } from '../lang_string';
 import { isSafeSvgStyleValue } from './svgExport';
 import { toFixed } from './toFixed';
@@ -127,15 +132,15 @@ export const parsePreserveAspectRatioAttribute = (
  */
 export const colorPropToSVG = (
   prop: string,
-  value?: string | { toLive?: unknown; id?: string | number } | null,
+  value?: string | TFiller | null,
   inlineStyle = true,
 ) => {
   let colorValue;
   let opacityValue;
   if (!value) {
     colorValue = 'none';
-  } else if (value.toLive) {
-    colorValue = `url(#SVGID_${escapeXml(value.id)})`;
+  } else if ((value as TFiller).toLive) {
+    colorValue = `url(#SVGID_${escapeXml((value as TFiller).id)})`;
   } else {
     const rawValue = String(value);
     if (!isSafeSvgStyleValue(rawValue)) {
