@@ -7,8 +7,8 @@ import type {
   SupportedSVGUnit,
   TFiller,
 } from '../../typedefs';
+import { isSafeSvgStyleValue } from '../internals/svgExportCheck';
 import { escapeXml } from '../lang_string';
-import { isSafeSvgStyleValue } from './svgExport';
 import { toFixed } from './toFixed';
 
 /**

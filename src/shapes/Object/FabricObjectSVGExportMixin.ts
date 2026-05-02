@@ -1,14 +1,14 @@
 import type { TSVGReviver } from '../../typedefs';
+import {
+  getSafeSvgStyleNumber,
+  getSafeSvgStyleToken,
+} from '../../util/internals/svgExportCheck';
 import { uid } from '../../util/internals/uid';
 import { colorPropToSVG } from '../../util/misc/svgParsing';
 import { FILL, NONE, STROKE } from '../../constants';
 import type { FabricObject } from './FabricObject';
 import { isFiller } from '../../util/typeAssertions';
-import {
-  getSafeSvgStyleNumber,
-  getSafeSvgStyleToken,
-  matrixToSVG,
-} from '../../util/misc/svgExport';
+import { matrixToSVG } from '../../util/misc/svgExport';
 import { escapeXml } from '../../util/lang_string';
 
 export class FabricObjectSVGExportMixin {

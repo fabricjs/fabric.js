@@ -20,8 +20,8 @@ import {
   getSafeSvgStyleNumber,
   getSafeSvgStyleToken,
   isSafeSvgStyleValue,
-  matrixToSVG,
-} from '../../util/misc/svgExport';
+} from '../../util/internals/svgExportCheck';
+import { matrixToSVG } from '../../util/misc/svgExport';
 
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
