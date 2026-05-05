@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump typescript-eslint from 8.58.2 to 8.59.2 [#10974](https://github.com/fabricjs/fabric.js/pull/10974)
 - fix(): Fix typecheck from security advisory merge [#10973](https://github.com/fabricjs/fabric.js/pull/10973)
 - fix(svg): sanitize unsafe css during SVG export
 - chore(deps-dev): bump rolldown from 1.0.0-rc.12 to 1.0.0-rc.16 [#10966](https://github.com/fabricjs/fabric.js/pull/10966)
