@@ -347,11 +347,12 @@ export class StaticCanvas<
   }
 
   /**
-   * Returns canvas zoom level
+   * Returns the canvas zoom level as the magnitude of the viewport scale.
    * @return {Number}
    */
   getZoom() {
-    return this.viewportTransform[0];
+    const vpt = this.viewportTransform;
+    return Math.sqrt(vpt[0] ** 2 + vpt[1] ** 2);
   }
 
   /**
