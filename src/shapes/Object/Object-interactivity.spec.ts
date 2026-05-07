@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { FabricObject } from './FabricObject';
 import { Point } from '../../Point';
 
@@ -358,6 +358,29 @@ describe('ObjectInteractivity', () => {
     expect(cObj.oCoords.br.y, 'br.y is rotated 90 degrees').toBeCloseTo(50);
     expect(cObj.oCoords.bl.x, 'bl.x is rotated 90 degrees').toBeCloseTo(-50);
     expect(cObj.oCoords.bl.y, 'bl.y is rotated 90 degrees').toBeCloseTo(-50);
+  });
+
+  it('_renderControls rotates by the combined viewport and object angle', () => {
+    const cObj = new FabricObject({ width: 100, height: 100, strokeWidth: 0 });
+    const cos = Math.SQRT1_2,
+      sin = Math.SQRT1_2;
+    cObj.canvas = {
+      viewportTransform: [cos, sin, -sin, cos, 0, 0],
+    };
+    const rotate = vi.fn();
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      rotate,
+      lineWidth: 0,
+      globalAlpha: 0,
+    };
+    // @ts-expect-error -- mock context
+    cObj._renderControls(ctx, { hasBorders: false, hasControls: false });
+
+    expect(rotate).toHaveBeenCalledTimes(1);
+    expect(rotate.mock.calls[0][0]).toBeCloseTo(Math.PI / 4);
   });
 
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test

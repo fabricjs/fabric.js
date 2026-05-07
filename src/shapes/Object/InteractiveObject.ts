@@ -462,7 +462,7 @@ export class InteractiveFabricObject<
     if (this.flipX) {
       options.angle -= 180;
     }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
+    ctx.rotate(degreesToRadians(options.angle));
     shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();
