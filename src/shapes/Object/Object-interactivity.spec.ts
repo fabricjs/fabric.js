@@ -345,6 +345,7 @@ describe('ObjectInteractivity', () => {
       height: 100,
       strokeWidth: 0,
     });
+    // @ts-expect-error -- mock canvas
     cObj.canvas = {
       viewportTransform: [0, 1, -1, 0, 0, 0],
     };
@@ -364,6 +365,7 @@ describe('ObjectInteractivity', () => {
     const cObj = new FabricObject({ width: 100, height: 100, strokeWidth: 0 });
     const cos = Math.SQRT1_2,
       sin = Math.SQRT1_2;
+    // @ts-expect-error -- mock canvas
     cObj.canvas = {
       viewportTransform: [cos, sin, -sin, cos, 0, 0],
     };
@@ -767,6 +769,7 @@ describe('ObjectInteractivity', () => {
     const cObj = new FabricObject({ width: 200, height: 200, strokeWidth: 0 });
     const cos = Math.SQRT1_2,
       sin = Math.SQRT1_2;
+    // @ts-expect-error -- mock canvas
     cObj.canvas = {
       viewportTransform: [cos, sin, -sin, cos, 0, 0],
     };
