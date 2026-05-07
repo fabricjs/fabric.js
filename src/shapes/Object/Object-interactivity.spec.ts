@@ -337,6 +337,29 @@ describe('ObjectInteractivity', () => {
     );
   });
 
+  it('corner coords with a rotated viewport transform', () => {
+    const cObj = new FabricObject({
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      strokeWidth: 0,
+    });
+    cObj.canvas = {
+      viewportTransform: [0, 1, -1, 0, 0, 0],
+    };
+    cObj.setCoords();
+
+    expect(cObj.oCoords.tl.x, 'tl.x is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.tl.y, 'tl.y is rotated 90 degrees').toBeCloseTo(-50);
+    expect(cObj.oCoords.tr.x, 'tr.x is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.tr.y, 'tr.y is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.br.x, 'br.x is rotated 90 degrees').toBeCloseTo(-50);
+    expect(cObj.oCoords.br.y, 'br.y is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.bl.x, 'bl.x is rotated 90 degrees').toBeCloseTo(-50);
+    expect(cObj.oCoords.bl.y, 'bl.y is rotated 90 degrees').toBeCloseTo(-50);
+  });
+
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
   it('corner coords: custom control size', () => {
     //set custom corner size
