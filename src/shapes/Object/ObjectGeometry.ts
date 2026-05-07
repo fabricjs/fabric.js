@@ -553,8 +553,10 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @returns {Point} dimensions
    */
   _calculateCurrentDimensions(options?: any): Point {
+    const vpt = this.getViewportTransform();
+    const zoom = Math.sqrt(vpt[0] ** 2 + vpt[1] ** 2);
     return this._getTransformedDimensions(options)
-      .transform(this.getViewportTransform(), true)
+      .scalarMultiply(zoom)
       .scalarAdd(2 * this.padding);
   }
 

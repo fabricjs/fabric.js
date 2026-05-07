@@ -717,6 +717,22 @@ describe('ObjectInteractivity', () => {
     expect(dim.y.toFixed(0), 'height should change with padding').toBe('78');
   });
 
+  it('_calculateCurrentDimensions with a rotated viewport transform', () => {
+    const cObj = new FabricObject({ width: 200, height: 200, strokeWidth: 0 });
+    const cos = Math.SQRT1_2,
+      sin = Math.SQRT1_2;
+    cObj.canvas = {
+      viewportTransform: [cos, sin, -sin, cos, 0, 0],
+    };
+
+    const dim = cObj._calculateCurrentDimensions();
+
+    expect(dim.x, 'width is independent of viewport rotation').toBeCloseTo(200);
+    expect(dim.y, 'height is independent of viewport rotation').toBeCloseTo(
+      200,
+    );
+  });
+
   it('_getTransformedDimensions', () => {
     const cObj = new FabricObject({ width: 10, height: 15, strokeWidth: 0 });
 
