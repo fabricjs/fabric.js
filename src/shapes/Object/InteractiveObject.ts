@@ -462,7 +462,12 @@ export class InteractiveFabricObject<
     if (this.flipX) {
       options.angle -= 180;
     }
-    ctx.rotate(degreesToRadians(options.angle));
+    const vptAngle = Math.atan2(vpt[1], vpt[0]);
+    ctx.rotate(
+      this.group
+        ? degreesToRadians(options.angle)
+        : degreesToRadians(this.angle) + vptAngle,
+    );
     shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();
