@@ -365,7 +365,7 @@ describe('fabric.ObjectGeometry', () => {
       height: 100,
       strokeWidth: 0,
       // @ts-expect-error -- fake canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
     expect(cObj.setCoords).toBeTypeOf('function');
     cObj.setCoords();
@@ -435,6 +435,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0],
+      getZoom: () => 2,
     };
     cObj.setCoords();
 
@@ -720,6 +721,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0],
+      getZoom: () => 2,
     };
     cObj.scaleToWidth(100);
     expect(cObj.getScaledWidth(), 'is not influenced by zoom - width').toBe(
@@ -741,6 +743,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0],
+      getZoom: () => 2,
     };
     cObj.scaleToHeight(100);
     expect(cObj.getScaledHeight(), 'is not influenced by zoom - height').toBe(
@@ -790,6 +793,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 0, 0],
+      getZoom: () => 2,
     };
     cObj.setCoords();
     boundingRect = cObj.getBoundingRect();
@@ -955,6 +959,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 35, 35],
+      getZoom: () => 2,
     };
     const coords = cObj.getCoords();
     expect(coords[0]).toEqual(new Point(40, 30));
@@ -976,6 +981,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 35, 25],
+      getZoom: () => 2,
     };
     const coords = cObj.getCoords();
     expect(coords).toMatchSnapshot();
@@ -994,6 +1000,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 35, 25],
+      getZoom: () => 2,
     };
     const coords = cObj.getCoords();
     expect(coords).toMatchInlineSnapshot(`
@@ -1031,6 +1038,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 35, 25],
+      getZoom: () => 2,
     };
     const coords = cObj.getCoords();
     expect(coords).toMatchInlineSnapshot(`
@@ -1070,6 +1078,7 @@ describe('fabric.ObjectGeometry', () => {
     // @ts-expect-error -- partial canvas
     cObj.canvas = {
       viewportTransform: [2, 0, 0, 2, 35, 25],
+      getZoom: () => 2,
     };
     const coords = cObj.getCoords();
     expect(coords).toMatchInlineSnapshot(`

@@ -27,7 +27,11 @@ import {
 import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
 import { createCanvasElementFor, toBlob, toDataURL } from '../util/misc/dom';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
+import {
+  calcPlaneZoom,
+  invertTransform,
+  transformPoint,
+} from '../util/misc/matrix';
 import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
@@ -351,8 +355,7 @@ export class StaticCanvas<
    * @return {Number}
    */
   getZoom() {
-    const vpt = this.viewportTransform;
-    return Math.sqrt(vpt[0] ** 2 + vpt[1] ** 2);
+    return calcPlaneZoom(this.viewportTransform);
   }
 
   /**

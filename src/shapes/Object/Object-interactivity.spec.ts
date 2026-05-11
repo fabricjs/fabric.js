@@ -211,7 +211,7 @@ describe('ObjectInteractivity', () => {
       height: 10,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
     cObj.setCoords();
 
@@ -348,6 +348,7 @@ describe('ObjectInteractivity', () => {
     // @ts-expect-error -- mock canvas
     cObj.canvas = {
       viewportTransform: [0, 1, -1, 0, 0, 0],
+      getZoom: () => 1,
     };
     cObj.setCoords();
 
@@ -368,6 +369,7 @@ describe('ObjectInteractivity', () => {
     // @ts-expect-error -- mock canvas
     cObj.canvas = {
       viewportTransform: [cos, sin, -sin, cos, 0, 0],
+      getZoom: () => 1,
     };
     const rotate = vi.fn();
     const ctx = {
@@ -400,7 +402,7 @@ describe('ObjectInteractivity', () => {
       strokeWidth: 0,
       controls: sharedControls,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
     cObj.setCoords();
 
@@ -538,7 +540,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     expect(typeof cObj.findControl, 'findControl should exist').toBe(
@@ -551,6 +553,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return cObj;
       },
+      getZoom: () => 1,
     };
 
     expect(cObj.findControl(cObj.oCoords.br), 'br control').toEqual({
@@ -609,7 +612,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     cObj.setCoords();
@@ -618,6 +621,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return cObj;
       },
+      getZoom: () => 1,
     };
 
     const pointNearBr = new Point({
@@ -657,7 +661,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     expect(typeof cObj.findControl, 'findControl should exist').toBe(
@@ -670,6 +674,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return undefined;
       },
+      getZoom: () => 1,
     };
 
     expect(
@@ -686,7 +691,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     expect(typeof cObj.findControl, 'findControl should exist').toBe(
@@ -699,6 +704,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return cObj;
       },
+      getZoom: () => 1,
     };
 
     cObj.isControlVisible = () => false;
@@ -772,6 +778,7 @@ describe('ObjectInteractivity', () => {
     // @ts-expect-error -- mock canvas
     cObj.canvas = {
       viewportTransform: [cos, sin, -sin, cos, 0, 0],
+      getZoom: () => 1,
     };
 
     const dim = cObj._calculateCurrentDimensions();

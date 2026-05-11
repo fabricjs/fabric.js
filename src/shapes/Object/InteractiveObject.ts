@@ -5,6 +5,8 @@ import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   calcDimensionsMatrix,
+  calcPlaneRotation,
+  calcPlaneZoom,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
@@ -254,7 +256,7 @@ export class InteractiveFabricObject<
    */
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
-      zoom = Math.sqrt(vpt[0] ** 2 + vpt[1] ** 2),
+      zoom = calcPlaneZoom(vpt),
       center = this.getCenterPoint(),
       tMatrix = createTranslateMatrix(center.x, center.y),
       rMatrix = createRotateMatrix({
@@ -462,7 +464,7 @@ export class InteractiveFabricObject<
     if (this.flipX) {
       options.angle -= 180;
     }
-    const vptAngle = Math.atan2(vpt[1], vpt[0]);
+    const vptAngle = calcPlaneRotation(vpt);
     ctx.rotate(
       this.group
         ? degreesToRadians(options.angle)

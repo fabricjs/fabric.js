@@ -109,6 +109,12 @@ export const calcPlaneRotation = ([a, b]: TMat2D) =>
   Math.atan2(b, a) as TRadian;
 
 /**
+ * Returns the uniform scale (zoom) magnitude of a 2D affine matrix,
+ * computed as the length of the image of the unit X basis vector.
+ */
+export const calcPlaneZoom = ([a, b]: TMat2D) => Math.sqrt(a ** 2 + b ** 2);
+
+/**
  * Decomposes standard 2x3 matrix into transform components
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform
