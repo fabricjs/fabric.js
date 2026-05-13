@@ -34,10 +34,13 @@ test('controls follow the object under a rotated non-uniform viewport scale', as
 }) => {
   await canvasUtil.executeInBrowser(async (canvas) => {
     /* 45° rotation with scaleX=2, scaleY=3 — the combination that was broken:
-       pure non-uniform scale (no rotation) already worked pre-PR via vpt[0]/vpt[3]. */
+       pure non-uniform scale (no rotation) already worked pre-PR via vpt[0]/vpt[3].
+       Translation chosen to keep the object center (200, 150) at screen (400, 300). */
     const cos = Math.SQRT1_2;
     const sin = Math.SQRT1_2;
-    canvas.viewportTransform = [2 * cos, 2 * sin, -3 * sin, 3 * cos, 200, 0];
+    const tx = 400 - 2 * cos * 200 + 3 * sin * 150;
+    const ty = 300 - 2 * sin * 200 - 3 * cos * 150;
+    canvas.viewportTransform = [2 * cos, 2 * sin, -3 * sin, 3 * cos, tx, ty];
     canvas.calcViewportBoundaries();
     canvas.renderAll();
 
