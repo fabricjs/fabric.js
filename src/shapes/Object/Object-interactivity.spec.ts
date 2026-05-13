@@ -362,6 +362,42 @@ describe('ObjectInteractivity', () => {
     expect(cObj.oCoords.bl.y, 'bl.y is rotated 90 degrees').toBeCloseTo(-50);
   });
 
+  it('corner coords with a non-uniform viewport transform', () => {
+    // originX/Y default to 'center', so left=0,top=0 puts the canvas-space center
+    // at (0,0). With vpt=[2,0,0,3,0,0] (no translation) the screen center is also
+    // at (0,0); controls should span ±(width*scaleX/2) × ±(height*scaleY/2).
+    const cObj = new FabricObject({
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      strokeWidth: 0,
+    });
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = {
+      viewportTransform: [2, 0, 0, 3, 0, 0],
+      getZoom: () => 2,
+    };
+    cObj.setCoords();
+
+    expect(
+      cObj.oCoords.tl.x,
+      'tl.x: half-width scaled by scaleX=2',
+    ).toBeCloseTo(-100);
+    expect(
+      cObj.oCoords.tl.y,
+      'tl.y: half-height scaled by scaleY=3',
+    ).toBeCloseTo(-150);
+    expect(
+      cObj.oCoords.br.x,
+      'br.x: half-width scaled by scaleX=2',
+    ).toBeCloseTo(100);
+    expect(
+      cObj.oCoords.br.y,
+      'br.y: half-height scaled by scaleY=3',
+    ).toBeCloseTo(150);
+  });
+
   it('_renderControls rotates by the combined viewport and object angle', () => {
     const cObj = new FabricObject({ width: 100, height: 100, strokeWidth: 0 });
     const cos = Math.SQRT1_2,
@@ -787,6 +823,17 @@ describe('ObjectInteractivity', () => {
     expect(dim.y, 'height is independent of viewport rotation').toBeCloseTo(
       200,
     );
+  });
+
+  it('_calculateCurrentDimensions with a non-uniform viewport transform', () => {
+    const cObj = new FabricObject({ width: 200, height: 100, strokeWidth: 0 });
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = { viewportTransform: [2, 0, 0, 3, 0, 0], getZoom: () => 2 };
+
+    const dim = cObj._calculateCurrentDimensions();
+
+    expect(dim.x, 'width scales by vpt scaleX').toBeCloseTo(400);
+    expect(dim.y, 'height scales by vpt scaleY').toBeCloseTo(300);
   });
 
   it('_getTransformedDimensions', () => {

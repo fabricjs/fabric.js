@@ -28,3 +28,28 @@ test('controls follow the object under a rotated viewport transform', async ({
     name: 'viewport-rotation-controls.png',
   });
 });
+
+test('controls follow the object under a rotated non-uniform viewport scale', async ({
+  canvasUtil,
+}) => {
+  await canvasUtil.executeInBrowser(async (canvas) => {
+    /* 45° rotation with scaleX=2, scaleY=3 — the combination that was broken:
+       pure non-uniform scale (no rotation) already worked pre-PR via vpt[0]/vpt[3]. */
+    const cos = Math.SQRT1_2;
+    const sin = Math.SQRT1_2;
+    canvas.viewportTransform = [2 * cos, 2 * sin, -3 * sin, 3 * cos, 200, 0];
+    canvas.calcViewportBoundaries();
+    canvas.renderAll();
+
+    const [rect] = canvas.getObjects();
+    rect.setCoords();
+    rect._renderControls(canvas.contextContainer, {
+      borderColor: 'rgb(255, 0, 0)',
+      cornerColor: 'rgb(255, 0, 0)',
+    });
+  });
+
+  expect(await canvasUtil.screenshot()).toMatchSnapshot({
+    name: 'viewport-nonuniform-scale-controls.png',
+  });
+});

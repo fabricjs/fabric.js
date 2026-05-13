@@ -115,6 +115,13 @@ export const calcPlaneRotation = ([a, b]: TMat2D) =>
 export const calcPlaneZoom = ([a, b]: TMat2D) => Math.sqrt(a ** 2 + b ** 2);
 
 /**
+ * Returns the Y-axis scale magnitude of a 2D affine matrix,
+ * computed as the length of the image of the unit Y basis vector.
+ */
+export const calcPlaneScaleY = ([, , c, d]: TMat2D) =>
+  Math.sqrt(c ** 2 + d ** 2);
+
+/**
  * Decomposes standard 2x3 matrix into transform components
  * @param  {TMat2D} a transformMatrix
  * @return {Object} Components of transform

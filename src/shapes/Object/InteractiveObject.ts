@@ -7,6 +7,7 @@ import {
   calcDimensionsMatrix,
   calcPlaneRotation,
   calcPlaneZoom,
+  calcPlaneScaleY,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
@@ -256,7 +257,8 @@ export class InteractiveFabricObject<
    */
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
-      zoom = calcPlaneZoom(vpt),
+      vptScaleX = calcPlaneZoom(vpt),
+      vptScaleY = calcPlaneScaleY(vpt),
       center = this.getCenterPoint(),
       tMatrix = createTranslateMatrix(center.x, center.y),
       rMatrix = createRotateMatrix({
@@ -265,10 +267,10 @@ export class InteractiveFabricObject<
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
       startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
       finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / zoom,
+        1 / vptScaleX,
         0,
         0,
-        1 / zoom,
+        1 / vptScaleY,
         0,
         0,
       ]),

@@ -18,6 +18,8 @@ import {
   multiplyTransformMatrices,
   transformPoint,
   calcPlaneRotation,
+  calcPlaneZoom,
+  calcPlaneScaleY,
 } from '../../util/misc/matrix';
 import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 import type { Canvas } from '../../canvas/Canvas';
@@ -553,10 +555,14 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
    * @returns {Point} dimensions
    */
   _calculateCurrentDimensions(options?: any): Point {
-    const zoom = this.canvas?.getZoom() ?? 1;
-    return this._getTransformedDimensions(options)
-      .scalarMultiply(zoom)
-      .scalarAdd(2 * this.padding);
+    const vpt = this.canvas?.viewportTransform;
+    const dim = this._getTransformedDimensions(options);
+    if (vpt) {
+      return dim
+        .multiply(new Point(calcPlaneZoom(vpt), calcPlaneScaleY(vpt)))
+        .scalarAdd(2 * this.padding);
+    }
+    return dim.scalarAdd(2 * this.padding);
   }
 
   // #region Origin
