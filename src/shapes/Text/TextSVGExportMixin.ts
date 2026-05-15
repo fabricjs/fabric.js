@@ -16,6 +16,11 @@ import { STROKE, FILL } from '../../constants';
 import { createRotateMatrix } from '../../util/misc/matrix';
 import { radiansToDegrees } from '../../util/misc/radiansDegreesConversion';
 import { Point } from '../../Point';
+import {
+  getSafeSvgStyleNumber,
+  getSafeSvgStyleToken,
+  isSafeSvgStyleValue,
+} from '../../util/internals/svgExportCheck';
 import { matrixToSVG } from '../../util/misc/svgExport';
 
 const multipleSpacesRegex = /  +/g;
@@ -307,7 +312,9 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
    * @return {String}
    */
   getSvgStyles(this: TextSVGExportMixin & FabricText, skipShadow?: boolean) {
-    const objectLevelTextDecorationColor = this[TEXT_DECORATION_COLOR]
+    const objectLevelTextDecorationColor = isSafeSvgStyleValue(
+      this[TEXT_DECORATION_COLOR],
+    )
       ? ` text-decoration-color: ${escapeXml(this[TEXT_DECORATION_COLOR])};`
       : '';
     return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed((this.textDecorationThickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%;${objectLevelTextDecorationColor} white-space: pre;`;
@@ -347,23 +354,30 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     const thickness =
       textDecorationThickness || this[TEXT_DECORATION_THICKNESS];
     const decorationColor = textDecorationColor || this[TEXT_DECORATION_COLOR];
+    const safeStrokeWidth = getSafeSvgStyleNumber(strokeWidth);
+    const safeFontFamily = getSafeSvgStyleToken(fontFamily);
+    const safeFontSize = getSafeSvgStyleNumber(fontSize);
+    const safeFontStyle = getSafeSvgStyleToken(fontStyle);
+    const safeFontWeight =
+      getSafeSvgStyleNumber(fontWeight) || getSafeSvgStyleToken(fontWeight);
+    const safeDecorationColor = getSafeSvgStyleToken(decorationColor);
     return [
       stroke ? colorPropToSVG(STROKE, stroke) : '',
-      strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : '',
-      fontFamily
+      safeStrokeWidth ? `stroke-width: ${escapeXml(safeStrokeWidth)}; ` : '',
+      safeFontFamily
         ? `font-family: ${
-            !fontFamily.includes("'") && !fontFamily.includes('"')
-              ? `'${escapeXml(fontFamily)}'`
-              : escapeXml(fontFamily)
+            !safeFontFamily.includes("'") && !safeFontFamily.includes('"')
+              ? `'${escapeXml(safeFontFamily)}'`
+              : escapeXml(safeFontFamily)
           }; `
         : '',
-      fontSize ? `font-size: ${escapeXml(fontSize)}px; ` : '',
-      fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : '',
-      fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : '',
+      safeFontSize ? `font-size: ${escapeXml(safeFontSize)}px; ` : '',
+      safeFontStyle ? `font-style: ${escapeXml(safeFontStyle)}; ` : '',
+      safeFontWeight ? `font-weight: ${escapeXml(safeFontWeight)}; ` : '',
       textDecoration
         ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed((thickness * this.getObjectScaling().y) / 10, config.NUM_FRACTION_DIGITS)}%;${
-            decorationColor
-              ? ` text-decoration-color: ${escapeXml(decorationColor)};`
+            safeDecorationColor
+              ? ` text-decoration-color: ${escapeXml(safeDecorationColor)};`
               : ''
           } `
         : '',

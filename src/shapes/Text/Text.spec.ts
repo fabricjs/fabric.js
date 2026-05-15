@@ -967,6 +967,31 @@ describe('FabricText', () => {
     expect(styleString, 'style is as expected').toBe(expected);
   });
 
+  it('getSvgSpanStyles drops unsafe style declarations', () => {
+    const iText = new IText('test foo bar-baz', {
+      textDecorationColor: 'blue; fill:url(#x)' as never,
+    });
+    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
+    const styleString = iText.getSvgSpanStyles({
+      fill: 'red; stroke:url(javascript:alert(1))',
+      strokeWidth: '30; opacity:0' as never,
+      fontFamily: 'Verdana; font-size:999px',
+      fontSize: '25; opacity:0' as never,
+      fontStyle: 'italic; fill:url(#x)' as never,
+      fontWeight: 'bold; fill:url(#x)' as never,
+      underline: true,
+      textDecorationColor: 'green; fill:url(#x)' as never,
+    });
+    expect(styleString).toContain('fill: rgb(0,0,0); ');
+    expect(styleString).not.toContain('stroke-width: 30;');
+    expect(styleString).not.toContain('font-family:');
+    expect(styleString).not.toContain('font-size: 25px;');
+    expect(styleString).not.toContain('font-style:');
+    expect(styleString).not.toContain('font-weight:');
+    expect(styleString).not.toContain('text-decoration-color:');
+    expect(styleString).not.toContain('javascript:');
+  });
+
   it('getSvgTextDecoration with overline true produces correct output', () => {
     const iText = new IText('test foo bar-baz');
     const styleObject = {

@@ -1,7 +1,13 @@
 import { Color } from '../../color/Color';
 import { config } from '../../config';
 import { DEFAULT_SVG_FONT_SIZE, FILL, NONE } from '../../constants';
-import type { TBBox, SVGElementName, SupportedSVGUnit } from '../../typedefs';
+import type {
+  TBBox,
+  SVGElementName,
+  SupportedSVGUnit,
+  TFiller,
+} from '../../typedefs';
+import { isSafeSvgStyleValue } from '../internals/svgExportCheck';
 import { escapeXml } from '../lang_string';
 import { toFixed } from './toFixed';
 
@@ -126,24 +132,30 @@ export const parsePreserveAspectRatioAttribute = (
  */
 export const colorPropToSVG = (
   prop: string,
-  value?: any,
+  value?: string | TFiller | null,
   inlineStyle = true,
 ) => {
   let colorValue;
   let opacityValue;
   if (!value) {
     colorValue = 'none';
-  } else if (value.toLive) {
-    colorValue = `url(#SVGID_${escapeXml(value.id)})`;
+  } else if ((value as TFiller).toLive) {
+    colorValue = `url(#SVGID_${escapeXml((value as TFiller).id)})`;
   } else {
-    const color = new Color(value),
-      opacity = color.getAlpha();
+    const rawValue = String(value);
+    if (!isSafeSvgStyleValue(rawValue)) {
+      colorValue = new Color('black').toRgb();
+    } else {
+      const color = new Color(rawValue),
+        opacity = color.getAlpha();
 
-    colorValue = color.toRgb();
-    if (opacity !== 1) {
-      opacityValue = opacity.toString();
+      colorValue = color.toRgb();
+      if (opacity !== 1) {
+        opacityValue = opacity.toString();
+      }
     }
   }
+
   if (inlineStyle) {
     return `${prop}: ${colorValue}; ${
       opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ''

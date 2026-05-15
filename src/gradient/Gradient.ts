@@ -3,6 +3,7 @@ import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
 import { uid } from '../util/internals/uid';
+import { isSafeSvgStyleValue } from '../util/internals/svgExportCheck';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgExport';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
@@ -19,6 +20,7 @@ import type {
   SerializedGradientProps,
 } from './typedefs';
 import { classRegistry } from '../ClassRegistry';
+import { Color } from '../color/Color';
 import { isPath } from '../util/typeAssertions';
 import { escapeXml } from '../util/lang_string';
 
@@ -282,10 +284,15 @@ export class Gradient<
         });
       }
     }
-    // todo make a malicious script tag injection test with color and also apply a fix with escapeXml
     colorStops.forEach(({ color, offset }) => {
+      const rawColor = String(color);
+      // `escapeXml` protects the SVG attribute, but the value is also embedded in
+      // a CSS declaration, so reject tokens that can break either context.
+      const serializedColor = isSafeSvgStyleValue(rawColor)
+        ? rawColor
+        : new Color(rawColor).toRgba();
       markup.push(
-        `<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`,
+        `<stop offset="${offset * 100}%" style="stop-color:${escapeXml(serializedColor)};"/>\n`,
       );
     });
 

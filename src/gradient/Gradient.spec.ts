@@ -232,6 +232,34 @@ describe('Gradient', () => {
       const obj = new FabricObject({ width: 100, height: 100 });
       expect(gradient.toSVG(obj)).toEqualSVG(SVG_RADIAL_PERCENTAGE);
     });
+
+    test('toSVG preserves safe modern CSS stop colors', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        colorStops: [
+          { offset: 0, color: 'currentColor' },
+          { offset: 0.5, color: 'var(--theme-primary)' },
+          { offset: 1, color: 'oklch(62% 0.25 29)' },
+        ],
+      });
+      const obj = new FabricObject({ width: 100, height: 100 });
+      const svg = gradient.toSVG(obj);
+
+      expect(svg).toContain('style="stop-color:currentColor;"');
+      expect(svg).toContain('style="stop-color:var(--theme-primary);"');
+      expect(svg).toContain('style="stop-color:oklch(62% 0.25 29);"');
+    });
+
+    test('toSVG escapes safe stop colors in XML attributes', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        colorStops: [{ offset: 0, color: 'red&blue' }],
+      });
+      const obj = new FabricObject({ width: 100, height: 100 });
+      const svg = gradient.toSVG(obj);
+
+      expect(svg).toContain('style="stop-color:red&amp;blue;"');
+    });
   });
 
   test('properties radialGradient', () => {
@@ -781,8 +809,39 @@ describe('Gradient', () => {
   describe('Attrivbute injection', () => {
     it('id injection', () => {
       const gradient = new Gradient({ id: 'malicious"><script>' });
-      const svg = gradient.toSVG({} as any);
+      const svg = gradient.toSVG(new FabricObject({ width: 100, height: 100 }));
       expect(svg).toContain('id="SVGID_malicious&quot;&gt;&lt;script&gt;');
+    });
+
+    it('stop color HTML injection', () => {
+      const gradient = new Gradient({
+        colorStops: [
+          { offset: 0, color: 'red"><img src="x" onerror="alert(1)">' },
+        ],
+      });
+      const svg = gradient.toSVG(new FabricObject({ width: 100, height: 100 }));
+      expect(svg).not.toContain('<img');
+      expect(svg).not.toContain('onerror=');
+      expect(svg).not.toContain('red"><img src="x" onerror="alert(1)">');
+      expect(svg).toContain('style="stop-color:rgba(0,0,0,1);"');
+    });
+
+    it('stop color CSS declaration injection', () => {
+      const gradient = new Gradient({
+        colorStops: [{ offset: 0, color: 'red;stop-opacity:0' }],
+      });
+      const svg = gradient.toSVG(new FabricObject({ width: 100, height: 100 }));
+      expect(svg).not.toContain('stop-opacity:0');
+      expect(svg).toContain('style="stop-color:rgba(0,0,0,1);"');
+    });
+
+    it('stop color rejects url-based payloads', () => {
+      const gradient = new Gradient({
+        colorStops: [{ offset: 0, color: 'url(javascript:alert(1))' }],
+      });
+      const svg = gradient.toSVG(new FabricObject({ width: 100, height: 100 }));
+      expect(svg).not.toContain('javascript:');
+      expect(svg).toContain('style="stop-color:rgba(0,0,0,1);"');
     });
   });
 });

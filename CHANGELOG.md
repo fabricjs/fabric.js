@@ -3,6 +3,12 @@
 ## [next]
 
 - chore(deps-dev): bump @playwright/test from 1.58.2 to 1.59.1 [#10969](https://github.com/fabricjs/fabric.js/pull/10969)
+- fix(): Fix typecheck from security advisory merge [#10973](https://github.com/fabricjs/fabric.js/pull/10973)
+- fix(svg): sanitize unsafe css during SVG export
+- chore(deps-dev): bump rolldown from 1.0.0-rc.12 to 1.0.0-rc.16 [#10966](https://github.com/fabricjs/fabric.js/pull/10966)
+- chore(deps-dev): bump postcss from 8.5.8 to 8.5.12 [#10972](https://github.com/fabricjs/fabric.js/pull/10972)
+- chore(deps-dev): bump es-toolkit from 1.45.1 to 1.46.0 [#10971](https://github.com/fabricjs/fabric.js/pull/10971)
+- chore(deps-dev): bump the vitest group with 4 updates [#10968](https://github.com/fabricjs/fabric.js/pull/10968)
 - ci(dependabot): group vite-related npm updates [#10967](https://github.com/fabricjs/fabric.js/pull/10967)
 - chore(deps-dev): bump oxfmt from 0.42.0 to 0.45.0 [#10964](https://github.com/fabricjs/fabric.js/pull/10964)
 - chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)

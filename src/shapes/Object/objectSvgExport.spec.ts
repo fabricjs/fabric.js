@@ -110,3 +110,30 @@ describe.each([MALICIOUS, MALICIOUS2])(
     });
   },
 );
+
+describe('Object SVG style declaration sanitization', () => {
+  it('drops unsafe inline style values from object svg styles', () => {
+    const rect = new Rect({
+      width: 10,
+      height: 10,
+      fillRule: 'evenodd; filter:url(javascript:alert(1))' as never,
+      strokeLineCap: 'round; opacity:0' as never,
+      strokeLineJoin: 'bevel; fill:url(#x)' as never,
+      strokeDashArray: ['4', '2; fill:url(#x)'] as never,
+      strokeDashOffset: '1; opacity:0' as never,
+      strokeMiterLimit: '4; opacity:0' as never,
+      opacity: '1; visibility:hidden' as never,
+    });
+
+    const svgStyles = rect.getSvgStyles();
+    expect(svgStyles).not.toContain('fill-rule:');
+    expect(svgStyles).not.toContain('stroke-linecap:');
+    expect(svgStyles).not.toContain('stroke-linejoin:');
+    expect(svgStyles).not.toContain('stroke-dasharray:');
+    expect(svgStyles).not.toContain('stroke-dashoffset:');
+    expect(svgStyles).not.toContain('stroke-miterlimit:');
+    expect(svgStyles).not.toContain('opacity:');
+    expect(svgStyles).not.toContain('javascript:');
+    expect(svgStyles).not.toContain('filter:url');
+  });
+});
