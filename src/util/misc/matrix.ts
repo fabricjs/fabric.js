@@ -122,8 +122,7 @@ export const calcPlaneZoom = ([a, b]: TMat2D) => Math.sqrt(a * a + b * b);
  * Bug reports and features will be planned with zoom being just a number
  * that is the same for both axis
  */
-export const calcPlaneScaleY = ([, , c, d]: TMat2D) =>
-  Math.sqrt(c * c + d * d);
+export const calcPlaneScaleY = ([, , c, d]: TMat2D) => Math.sqrt(c * c + d * d);
 
 /**
  * Decomposes standard 2x3 matrix into transform components
