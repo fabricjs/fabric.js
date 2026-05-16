@@ -2,9 +2,11 @@
 
 ## [next]
 
-- fix(): Honor viewport rotation in getZoom, dimensions, and control coords [#10977](https://github.com/fabricjs/fabric.js/pull/10977)
+## [7.4.0]
+
+- feat(): Support viewport rotation in getZoom, dimensions, and control coords [#10977](https://github.com/fabricjs/fabric.js/pull/10977)
 - fix(): Fix typecheck from security advisory merge [#10973](https://github.com/fabricjs/fabric.js/pull/10973)
-- fix(svg): sanitize unsafe css during SVG export
+- fix(svg): sanitize unsafe css during SVG export CVE-2026-44311 and CWE-79, CWE-116
 - chore(deps-dev): bump rolldown from 1.0.0-rc.12 to 1.0.0-rc.16 [#10966](https://github.com/fabricjs/fabric.js/pull/10966)
 - chore(deps-dev): bump postcss from 8.5.8 to 8.5.12 [#10972](https://github.com/fabricjs/fabric.js/pull/10972)
 - chore(deps-dev): bump es-toolkit from 1.45.1 to 1.46.0 [#10971](https://github.com/fabricjs/fabric.js/pull/10971)
