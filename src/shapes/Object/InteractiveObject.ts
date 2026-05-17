@@ -5,6 +5,9 @@ import { degreesToRadians } from '../../util/misc/radiansDegreesConversion';
 import type { TQrDecomposeOut } from '../../util/misc/matrix';
 import {
   calcDimensionsMatrix,
+  calcPlaneRotation,
+  calcPlaneZoom,
+  calcPlaneScaleY,
   createRotateMatrix,
   createTranslateMatrix,
   multiplyTransformMatrices,
@@ -254,6 +257,8 @@ export class InteractiveFabricObject<
    */
   calcOCoords(): Record<string, TOCoord> {
     const vpt = this.getViewportTransform(),
+      vptScaleX = calcPlaneZoom(vpt),
+      vptScaleY = calcPlaneScaleY(vpt),
       center = this.getCenterPoint(),
       tMatrix = createTranslateMatrix(center.x, center.y),
       rMatrix = createRotateMatrix({
@@ -262,10 +267,10 @@ export class InteractiveFabricObject<
       positionMatrix = multiplyTransformMatrices(tMatrix, rMatrix),
       startMatrix = multiplyTransformMatrices(vpt, positionMatrix),
       finalMatrix = multiplyTransformMatrices(startMatrix, [
-        1 / vpt[0],
+        1 / vptScaleX,
         0,
         0,
-        1 / vpt[3],
+        1 / vptScaleY,
         0,
         0,
       ]),
@@ -461,7 +466,12 @@ export class InteractiveFabricObject<
     if (this.flipX) {
       options.angle -= 180;
     }
-    ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
+    const vptAngle = calcPlaneRotation(vpt);
+    ctx.rotate(
+      this.group
+        ? degreesToRadians(options.angle)
+        : degreesToRadians(this.angle) + vptAngle,
+    );
     shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
     shouldDrawControls && this.drawControls(ctx, styleOverride);
     ctx.restore();

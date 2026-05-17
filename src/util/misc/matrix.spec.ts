@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   calcDimensionsMatrix,
+  calcPlaneZoom,
+  calcPlaneScaleY,
   composeMatrix,
   createRotateMatrix,
   invertTransform,
@@ -110,6 +112,56 @@ describe('matrix', () => {
       expect(Math.round(options.angle), 'matrix has expected angle').toBe(11);
       expect(options.translateX, 'matrix has translateX 100').toBe(100);
       expect(options.translateY, 'matrix has translateY 200').toBe(200);
+    });
+  });
+
+  describe('calcPlaneZoom', () => {
+    it('returns 1 for the identity matrix', () => {
+      expect(calcPlaneZoom(iMatrix)).toBe(1);
+    });
+
+    it('returns the scale factor of a pure scale matrix', () => {
+      expect(calcPlaneZoom([2, 0, 0, 2, 0, 0])).toBe(2);
+    });
+
+    it('returns the scale factor of a rotated matrix regardless of angle', () => {
+      const cos = Math.SQRT1_2,
+        sin = Math.SQRT1_2;
+      expect(calcPlaneZoom([cos, sin, -sin, cos, 0, 0])).toBeCloseTo(1);
+      expect(
+        calcPlaneZoom([2 * cos, 2 * sin, -2 * sin, 2 * cos, 0, 0]),
+      ).toBeCloseTo(2);
+    });
+
+    it('is independent of translation', () => {
+      expect(calcPlaneZoom([3, 0, 0, 3, 100, 200])).toBe(3);
+    });
+  });
+
+  describe('calcPlaneScaleY', () => {
+    it('returns 1 for the identity matrix', () => {
+      expect(calcPlaneScaleY(iMatrix)).toBe(1);
+    });
+
+    it('returns the scale factor of a pure uniform scale matrix', () => {
+      expect(calcPlaneScaleY([2, 0, 0, 2, 0, 0])).toBe(2);
+    });
+
+    it('returns the Y scale factor of a rotated matrix regardless of angle', () => {
+      const cos = Math.SQRT1_2,
+        sin = Math.SQRT1_2;
+      expect(calcPlaneScaleY([cos, sin, -sin, cos, 0, 0])).toBeCloseTo(1);
+      expect(
+        calcPlaneScaleY([2 * cos, 2 * sin, -2 * sin, 2 * cos, 0, 0]),
+      ).toBeCloseTo(2);
+    });
+
+    it('returns the Y-axis scale independently for a non-uniform scale matrix', () => {
+      expect(calcPlaneScaleY([2, 0, 0, 3, 0, 0])).toBe(3);
+    });
+
+    it('is independent of translation', () => {
+      expect(calcPlaneScaleY([3, 0, 0, 5, 100, 200])).toBe(5);
     });
   });
 

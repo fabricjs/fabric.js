@@ -1947,6 +1947,25 @@ describe('StaticCanvas', () => {
     canvas.viewportTransform = StaticCanvas.getDefaults().viewportTransform;
   });
 
+  it('returns the scale magnitude when viewport transform encodes rotation', () => {
+    const cos = Math.SQRT1_2,
+      sin = Math.SQRT1_2;
+    canvas.setViewportTransform([cos, sin, -sin, cos, 0, 0] as TMat2D);
+    expect(canvas.getZoom()).toBeCloseTo(1);
+
+    canvas.setViewportTransform([
+      2 * cos,
+      2 * sin,
+      -2 * sin,
+      2 * cos,
+      0,
+      0,
+    ] as TMat2D);
+    expect(canvas.getZoom()).toBeCloseTo(2);
+
+    canvas.viewportTransform = StaticCanvas.getDefaults().viewportTransform;
+  });
+
   it('sets zoom level correctly', () => {
     expect(canvas.setZoom).toBeTypeOf('function');
 

@@ -27,7 +27,11 @@ import {
 import { runningAnimations } from '../util/animation/AnimationRegistry';
 import { uid } from '../util/internals/uid';
 import { createCanvasElementFor, toBlob, toDataURL } from '../util/misc/dom';
-import { invertTransform, transformPoint } from '../util/misc/matrix';
+import {
+  calcPlaneZoom,
+  invertTransform,
+  transformPoint,
+} from '../util/misc/matrix';
 import type { EnlivenObjectOptions } from '../util/misc/objectEnlive';
 import {
   enlivenObjectEnlivables,
@@ -347,11 +351,11 @@ export class StaticCanvas<
   }
 
   /**
-   * Returns canvas zoom level
+   * Returns the canvas zoom level as the magnitude of the viewport scale.
    * @return {Number}
    */
   getZoom() {
-    return this.viewportTransform[0];
+    return calcPlaneZoom(this.viewportTransform);
   }
 
   /**

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { FabricObject } from './FabricObject';
 import { Point } from '../../Point';
 
@@ -211,7 +211,7 @@ describe('ObjectInteractivity', () => {
       height: 10,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
     cObj.setCoords();
 
@@ -337,6 +337,92 @@ describe('ObjectInteractivity', () => {
     );
   });
 
+  it('corner coords with a rotated viewport transform', () => {
+    const cObj = new FabricObject({
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      strokeWidth: 0,
+    });
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = {
+      viewportTransform: [0, 1, -1, 0, 0, 0],
+      getZoom: () => 1,
+    };
+    cObj.setCoords();
+
+    expect(cObj.oCoords.tl.x, 'tl.x is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.tl.y, 'tl.y is rotated 90 degrees').toBeCloseTo(-50);
+    expect(cObj.oCoords.tr.x, 'tr.x is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.tr.y, 'tr.y is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.br.x, 'br.x is rotated 90 degrees').toBeCloseTo(-50);
+    expect(cObj.oCoords.br.y, 'br.y is rotated 90 degrees').toBeCloseTo(50);
+    expect(cObj.oCoords.bl.x, 'bl.x is rotated 90 degrees').toBeCloseTo(-50);
+    expect(cObj.oCoords.bl.y, 'bl.y is rotated 90 degrees').toBeCloseTo(-50);
+  });
+
+  it('corner coords with a non-uniform viewport transform', () => {
+    // originX/Y default to 'center', so left=0,top=0 puts the canvas-space center
+    // at (0,0). With vpt=[2,0,0,3,0,0] (no translation) the screen center is also
+    // at (0,0); controls should span ±(width*scaleX/2) × ±(height*scaleY/2).
+    const cObj = new FabricObject({
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      strokeWidth: 0,
+    });
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = {
+      viewportTransform: [2, 0, 0, 3, 0, 0],
+      getZoom: () => 2,
+    };
+    cObj.setCoords();
+
+    expect(
+      cObj.oCoords.tl.x,
+      'tl.x: half-width scaled by scaleX=2',
+    ).toBeCloseTo(-100);
+    expect(
+      cObj.oCoords.tl.y,
+      'tl.y: half-height scaled by scaleY=3',
+    ).toBeCloseTo(-150);
+    expect(
+      cObj.oCoords.br.x,
+      'br.x: half-width scaled by scaleX=2',
+    ).toBeCloseTo(100);
+    expect(
+      cObj.oCoords.br.y,
+      'br.y: half-height scaled by scaleY=3',
+    ).toBeCloseTo(150);
+  });
+
+  it('_renderControls rotates by the combined viewport and object angle', () => {
+    const cObj = new FabricObject({ width: 100, height: 100, strokeWidth: 0 });
+    const cos = Math.SQRT1_2,
+      sin = Math.SQRT1_2;
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = {
+      viewportTransform: [cos, sin, -sin, cos, 0, 0],
+      getZoom: () => 1,
+    };
+    const rotate = vi.fn();
+    const ctx = {
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      rotate,
+      lineWidth: 0,
+      globalAlpha: 0,
+    };
+    // @ts-expect-error -- mock context
+    cObj._renderControls(ctx, { hasBorders: false, hasControls: false });
+
+    expect(rotate).toHaveBeenCalledTimes(1);
+    expect(rotate.mock.calls[0][0]).toBeCloseTo(Math.PI / 4);
+  });
+
   // set size for bottom left corner and have different results for bl than normal setCornerCoords test
   it('corner coords: custom control size', () => {
     //set custom corner size
@@ -352,7 +438,7 @@ describe('ObjectInteractivity', () => {
       strokeWidth: 0,
       controls: sharedControls,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
     cObj.setCoords();
 
@@ -490,7 +576,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     expect(typeof cObj.findControl, 'findControl should exist').toBe(
@@ -503,6 +589,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return cObj;
       },
+      getZoom: () => 1,
     };
 
     expect(cObj.findControl(cObj.oCoords.br), 'br control').toEqual({
@@ -561,7 +648,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     cObj.setCoords();
@@ -570,6 +657,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return cObj;
       },
+      getZoom: () => 1,
     };
 
     const pointNearBr = new Point({
@@ -609,7 +697,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     expect(typeof cObj.findControl, 'findControl should exist').toBe(
@@ -622,6 +710,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return undefined;
       },
+      getZoom: () => 1,
     };
 
     expect(
@@ -638,7 +727,7 @@ describe('ObjectInteractivity', () => {
       height: 30,
       strokeWidth: 0,
       // @ts-expect-error -- mock canvas
-      canvas: {},
+      canvas: { getZoom: () => 1 },
     });
 
     expect(typeof cObj.findControl, 'findControl should exist').toBe(
@@ -651,6 +740,7 @@ describe('ObjectInteractivity', () => {
       getActiveObject() {
         return cObj;
       },
+      getZoom: () => 1,
     };
 
     cObj.isControlVisible = () => false;
@@ -715,6 +805,35 @@ describe('ObjectInteractivity', () => {
 
     expect(dim.x.toFixed(0), 'width should change with padding').toBe('102');
     expect(dim.y.toFixed(0), 'height should change with padding').toBe('78');
+  });
+
+  it('_calculateCurrentDimensions with a rotated viewport transform', () => {
+    const cObj = new FabricObject({ width: 200, height: 200, strokeWidth: 0 });
+    const cos = Math.SQRT1_2,
+      sin = Math.SQRT1_2;
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = {
+      viewportTransform: [cos, sin, -sin, cos, 0, 0],
+      getZoom: () => 1,
+    };
+
+    const dim = cObj._calculateCurrentDimensions();
+
+    expect(dim.x, 'width is independent of viewport rotation').toBeCloseTo(200);
+    expect(dim.y, 'height is independent of viewport rotation').toBeCloseTo(
+      200,
+    );
+  });
+
+  it('_calculateCurrentDimensions with a non-uniform viewport transform', () => {
+    const cObj = new FabricObject({ width: 200, height: 100, strokeWidth: 0 });
+    // @ts-expect-error -- mock canvas
+    cObj.canvas = { viewportTransform: [2, 0, 0, 3, 0, 0], getZoom: () => 2 };
+
+    const dim = cObj._calculateCurrentDimensions();
+
+    expect(dim.x, 'width scales by vpt scaleX').toBeCloseTo(400);
+    expect(dim.y, 'height scales by vpt scaleY').toBeCloseTo(300);
   });
 
   it('_getTransformedDimensions', () => {

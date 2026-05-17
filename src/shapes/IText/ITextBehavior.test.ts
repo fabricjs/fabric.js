@@ -142,21 +142,21 @@ describe('IText cursor animation snapshot', () => {
     vi.useRealTimers();
   });
   test('initDelayedCursor false - with delay', () => {
-    const iText = new IText('', { canvas: {} });
+    const iText = new IText('', { canvas: { getZoom: () => 1 } });
     iText.initDelayedCursor();
     vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('initDelayedCursor true - with NO delay', () => {
-    const iText = new IText('', { canvas: {} });
+    const iText = new IText('', { canvas: { getZoom: () => 1 } });
     iText.initDelayedCursor(true);
     vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('selectionStart/selection end will abort animation', () => {
-    const iText = new IText('asd', { canvas: {} });
+    const iText = new IText('asd', { canvas: { getZoom: () => 1 } });
     iText.initDelayedCursor(true);
     vi.advanceTimersByTime(160);
     iText.selectionStart = 0;
@@ -166,7 +166,7 @@ describe('IText cursor animation snapshot', () => {
     iText.abortCursorAnimation();
   });
   test('exiting from a canvas will abort animation', () => {
-    const iText = new IText('asd', { canvas: {} });
+    const iText = new IText('asd', { canvas: { getZoom: () => 1 } });
     iText.initDelayedCursor(true);
     vi.advanceTimersByTime(160);
     iText.canvas = undefined;
@@ -175,7 +175,7 @@ describe('IText cursor animation snapshot', () => {
     iText.abortCursorAnimation();
   });
   test('Animation is configurable - fast cursor with delay', () => {
-    const iText = new IText('', { canvas: {} });
+    const iText = new IText('', { canvas: { getZoom: () => 1 } });
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor();
@@ -184,7 +184,7 @@ describe('IText cursor animation snapshot', () => {
     iText.abortCursorAnimation();
   });
   test('Animation is configurable - fast cursor with no delay', () => {
-    const iText = new IText('', { canvas: {} });
+    const iText = new IText('', { canvas: { getZoom: () => 1 } });
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor(true);
