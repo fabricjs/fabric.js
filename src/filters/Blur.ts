@@ -183,11 +183,9 @@ export class Blur extends BaseFilter<'Blur', BlurOwnProps> {
         // image is wide, i want to shrink radius horizontal
         blurScale = 1 / aspectRatio;
       }
-    } else {
-      if (aspectRatio < 1) {
-        // image is tall, i want to shrink radius vertical
-        blurScale = aspectRatio;
-      }
+    } else if (aspectRatio < 1) {
+      // image is tall, i want to shrink radius vertical
+      blurScale = aspectRatio;
     }
     return blurScale * this.blur * 0.12;
   }

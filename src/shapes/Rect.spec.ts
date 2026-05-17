@@ -128,8 +128,8 @@ describe('Rect', () => {
   it('clone with rounded corners', async () => {
     const rect = new Rect({ width: 100, height: 100, rx: 20, ry: 30 });
     const clone = await rect.clone();
-    expect(clone.get('rx'), rect.get('rx'));
-    expect(clone.get('ry'), rect.get('ry'));
+    expect(clone.get('rx')).toBe(rect.get('rx'));
+    expect(clone.get('ry')).toBe(rect.get('ry'));
   });
 
   it('toSVG with rounded corners', async () => {

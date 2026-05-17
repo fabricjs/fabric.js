@@ -1,6 +1,17 @@
 import { cache } from '../../cache';
 import type { NORMAL } from '../../constants';
-import { DEFAULT_SVG_FONT_SIZE, FILL, LTR, RTL, STROKE } from '../../constants';
+import {
+  CENTER,
+  DEFAULT_SVG_FONT_SIZE,
+  FILL,
+  LEFT,
+  LTR,
+  RIGHT,
+  RTL,
+  BOTTOM,
+  STROKE,
+  TOP,
+} from '../../constants';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type {
   CompleteTextStyleDeclaration,
@@ -44,7 +55,7 @@ import {
   TEXT_DECORATION_COLOR,
   TEXT_DECORATION_THICKNESS,
 } from './constants';
-import { CENTER, LEFT, RIGHT, TOP, BOTTOM } from '../../constants';
+
 import { isFiller } from '../../util/typeAssertions';
 import type { Gradient } from '../../gradient/Gradient';
 import type { Pattern } from '../../Pattern';
