@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
 - fix(): Honor viewport rotation in getZoom, dimensions, and control coords [#10977](https://github.com/fabricjs/fabric.js/pull/10977)
 - fix(): Fix typecheck from security advisory merge [#10973](https://github.com/fabricjs/fabric.js/pull/10973)
 - fix(svg): sanitize unsafe css during SVG export
