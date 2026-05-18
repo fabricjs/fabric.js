@@ -353,7 +353,7 @@ var Cache = class {
 const cache = new Cache();
 //#endregion
 //#region src/constants.ts
-const VERSION = "7.3.1";
+const VERSION = "7.4.0";
 function noop() {}
 const halfPI = Math.PI / 2;
 const quarterPI = Math.PI / 4;
@@ -1325,6 +1325,20 @@ const multiplyTransformMatrices = (a, b, is2x2) => [
 const multiplyTransformMatrixArray = (matrices, is2x2) => matrices.reduceRight((product, curr) => curr && product ? multiplyTransformMatrices(curr, product, is2x2) : curr || product, void 0) || iMatrix.concat();
 const calcPlaneRotation = ([a, b]) => Math.atan2(b, a);
 /**
+* Returns the uniform scale (zoom) magnitude of a 2D affine matrix,
+* computed as the length of the image of the unit X basis vector.
+*/
+const calcPlaneZoom = ([a, b]) => Math.sqrt(a * a + b * b);
+/**
+* Returns the Y-axis scale magnitude of a 2D affine matrix,
+* computed as the length of the image of the unit Y basis vector.
+* We do not support non uniform zooming on the viewport but to make things work
+* we need to have a function that can return the value on Y axis.
+* Bug reports and features will be planned with zoom being just a number
+* that is the same for both axis
+*/
+const calcPlaneScaleY = ([, , c, d]) => Math.sqrt(c * c + d * d);
+/**
 * Decomposes standard 2x3 matrix into transform components
 * @param  {TMat2D} a transformMatrix
 * @return {Object} Components of transform
@@ -1583,7 +1597,7 @@ const enlivenObjectEnlivables = (serializedObject, { signal } = {}) => new Promi
 		/**
 		* clipPath or shadow or gradient or text on a path or a pattern,
 		* or the backgroundImage or overlayImage of canvas
-		* If we have a type and there is a classe registered for it, we enlive it.
+		* If we have a type and there is a class registered for it, we enlive it.
 		* If there is no class registered for it we return the value as is
 		* */
 		if (value.type && classRegistry.has(value.type)) return enlivenObjects([value], { signal }).then(([enlived]) => {
@@ -2014,11 +2028,11 @@ var StaticCanvas$1 = class StaticCanvas$1 extends createCollectionMixin(CommonMe
 		if (!options || !options.cssOnly) this.requestRenderAll();
 	}
 	/**
-	* Returns canvas zoom level
+	* Returns the canvas zoom level as the magnitude of the viewport scale.
 	* @return {Number}
 	*/
 	getZoom() {
-		return this.viewportTransform[0];
+		return calcPlaneZoom(this.viewportTransform);
 	}
 	/**
 	* Sets viewport transformation of this canvas instance
@@ -3152,6 +3166,15 @@ function getLocalPoint({ target, corner }, originX, originY, x, y) {
 	return localPoint;
 }
 //#endregion
+//#region src/util/internals/svgExportCheck.ts
+const unsafeSvgStyleValueRegex = new RegExp(String.raw`[\0-\x1F\x7F;<>\\]|\/\*|\*\/|url\s*\(|expression\s*\(|(?:java|vb)script\s*:|data\s*:|@import\b`, "iu");
+const isSafeSvgStyleValue = (value) => typeof value === "string" && value.trim().length > 0 && !unsafeSvgStyleValueRegex.test(value);
+const getSafeSvgStyleNumber = (value, fallback = "") => {
+	const numeric = Number(value);
+	return Number.isFinite(numeric) ? `${numeric}` : fallback;
+};
+const getSafeSvgStyleToken = (value, fallback = "") => typeof value === "string" && isSafeSvgStyleValue(value) ? value : fallback;
+//#endregion
 //#region src/util/internals/normalizeWhiteSpace.ts
 const normalizeWs = (value) => value.replace(/\s+/g, " ");
 //#endregion
@@ -3880,9 +3903,13 @@ const colorPropToSVG = (prop, value, inlineStyle = true) => {
 	if (!value) colorValue = "none";
 	else if (value.toLive) colorValue = `url(#SVGID_${escapeXml(value.id)})`;
 	else {
-		const color = new Color(value), opacity = color.getAlpha();
-		colorValue = color.toRgb();
-		if (opacity !== 1) opacityValue = opacity.toString();
+		const rawValue = String(value);
+		if (!isSafeSvgStyleValue(rawValue)) colorValue = new Color("black").toRgb();
+		else {
+			const color = new Color(rawValue), opacity = color.getAlpha();
+			colorValue = color.toRgb();
+			if (opacity !== 1) opacityValue = opacity.toString();
+		}
 	}
 	if (inlineStyle) return `${prop}: ${colorValue}; ${opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ""}`;
 	else return `${prop}="${colorValue}" ${opacityValue ? `${prop}-opacity="${opacityValue}" ` : ""}`;
@@ -3906,34 +3933,18 @@ var FabricObjectSVGExportMixin = class {
 	* @return {String}
 	*/
 	getSvgStyles(skipShadow) {
-		const fillRule = this.fillRule ? this.fillRule : "nonzero", strokeWidth = this.strokeWidth ? this.strokeWidth : "0", strokeDashArray = this.strokeDashArray ? this.strokeDashArray.join(" ") : NONE, strokeDashOffset = this.strokeDashOffset ? this.strokeDashOffset : "0", strokeLineCap = this.strokeLineCap ? this.strokeLineCap : "butt", strokeLineJoin = this.strokeLineJoin ? this.strokeLineJoin : "miter", strokeMiterLimit = this.strokeMiterLimit ? this.strokeMiterLimit : "4", opacity = typeof this.opacity !== "undefined" ? this.opacity : "1", visibility = this.visible ? "" : " visibility: hidden;", filter = skipShadow ? "" : this.getSvgFilter(), fill = colorPropToSVG(FILL, this.fill);
+		const fillRule = this.fillRule == null ? "nonzero" : getSafeSvgStyleToken(this.fillRule), strokeWidth = this.strokeWidth == null ? "0" : getSafeSvgStyleNumber(this.strokeWidth), strokeDashArray = this.strokeDashArray == null ? NONE : this.strokeDashArray.every((value) => Number.isFinite(Number(value))) ? this.strokeDashArray.join(" ") : "", strokeDashOffset = this.strokeDashOffset == null ? "0" : getSafeSvgStyleNumber(this.strokeDashOffset), strokeLineCap = this.strokeLineCap == null ? "butt" : getSafeSvgStyleToken(this.strokeLineCap), strokeLineJoin = this.strokeLineJoin == null ? "miter" : getSafeSvgStyleToken(this.strokeLineJoin), strokeMiterLimit = this.strokeMiterLimit == null ? "4" : getSafeSvgStyleNumber(this.strokeMiterLimit), opacity = this.opacity == null ? "1" : getSafeSvgStyleNumber(this.opacity), visibility = this.visible ? "" : " visibility: hidden;", filter = skipShadow ? "" : this.getSvgFilter(), fill = colorPropToSVG(FILL, this.fill);
 		return [
 			colorPropToSVG(STROKE, this.stroke),
-			"stroke-width: ",
-			strokeWidth,
-			"; ",
-			"stroke-dasharray: ",
-			strokeDashArray,
-			"; ",
-			"stroke-linecap: ",
-			strokeLineCap,
-			"; ",
-			"stroke-dashoffset: ",
-			strokeDashOffset,
-			"; ",
-			"stroke-linejoin: ",
-			strokeLineJoin,
-			"; ",
-			"stroke-miterlimit: ",
-			strokeMiterLimit,
-			"; ",
+			strokeWidth ? `stroke-width: ${strokeWidth}; ` : "",
+			strokeDashArray ? `stroke-dasharray: ${strokeDashArray}; ` : "",
+			strokeLineCap ? `stroke-linecap: ${strokeLineCap}; ` : "",
+			strokeDashOffset ? `stroke-dashoffset: ${strokeDashOffset}; ` : "",
+			strokeLineJoin ? `stroke-linejoin: ${strokeLineJoin}; ` : "",
+			strokeMiterLimit ? `stroke-miterlimit: ${strokeMiterLimit}; ` : "",
 			fill,
-			"fill-rule: ",
-			fillRule,
-			"; ",
-			"opacity: ",
-			opacity,
-			";",
+			fillRule ? `fill-rule: ${fillRule}; ` : "",
+			opacity ? `opacity: ${opacity};` : "",
 			filter,
 			visibility
 		].map((v) => escapeXml(v)).join("");
@@ -3950,7 +3961,7 @@ var FabricObjectSVGExportMixin = class {
 	* @return {String}
 	*/
 	getSvgCommons() {
-		return [this.id ? `id="${escapeXml(String(this.id))}" ` : "", this.clipPath ? `clip-path="url(#${this.clipPath.clipPathId})" ` : ""].join("");
+		return [this.id ? `id="${escapeXml(String(this.id))}" ` : "", this.clipPath ? `clip-path="url(#${escapeXml(this.clipPath.clipPathId)})" ` : ""].join("");
 	}
 	/**
 	* Returns transform-string for svg-export
@@ -4548,7 +4559,7 @@ const easeInOutExpo = (t, b, c, d) => {
 	if (t === d) return b + c;
 	t /= d / 2;
 	if (t < 1) return c / 2 * 2 ** (10 * (t - 1)) + b;
-	return c / 2 * -(2 ** (-10 * --t) + 2) + b;
+	return c / 2 * -(2 ** (-10 * (t - 1)) + 2) + b;
 };
 /**
 * Circular easing in
@@ -5351,7 +5362,10 @@ var ObjectGeometry = class extends CommonMethods {
 	* @returns {Point} dimensions
 	*/
 	_calculateCurrentDimensions(options) {
-		return this._getTransformedDimensions(options).transform(this.getViewportTransform(), true).scalarAdd(2 * this.padding);
+		const vpt = this.canvas?.viewportTransform;
+		const dim = this._getTransformedDimensions(options);
+		if (vpt) return dim.multiply(new Point(calcPlaneZoom(vpt), calcPlaneScaleY(vpt))).scalarAdd(2 * this.padding);
+		return dim.scalarAdd(2 * this.padding);
 	}
 	/**
 	* Calculate object bounding box dimensions from its properties scale, skew.
@@ -7527,11 +7541,11 @@ var InteractiveFabricObject = class InteractiveFabricObject extends FabricObject
 	* @return {Record<string, TOCoord>}
 	*/
 	calcOCoords() {
-		const vpt = this.getViewportTransform(), center = this.getCenterPoint(), finalMatrix = multiplyTransformMatrices(multiplyTransformMatrices(vpt, multiplyTransformMatrices(createTranslateMatrix(center.x, center.y), createRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }))), [
-			1 / vpt[0],
+		const vpt = this.getViewportTransform(), vptScaleX = calcPlaneZoom(vpt), vptScaleY = calcPlaneScaleY(vpt), center = this.getCenterPoint(), finalMatrix = multiplyTransformMatrices(multiplyTransformMatrices(vpt, multiplyTransformMatrices(createTranslateMatrix(center.x, center.y), createRotateMatrix({ angle: this.getTotalAngle() - (!!this.group && this.flipX ? 180 : 0) }))), [
+			1 / vptScaleX,
 			0,
 			0,
-			1 / vpt[3],
+			1 / vptScaleY,
 			0,
 			0
 		]), transformOptions = this.group ? qrDecompose(this.calcTransformMatrix()) : void 0;
@@ -7647,7 +7661,8 @@ var InteractiveFabricObject = class InteractiveFabricObject extends FabricObject
 		ctx.lineWidth = this.borderScaleFactor;
 		if (this.group === this.parent) ctx.globalAlpha = this.isMoving ? this.borderOpacityWhenMoving : 1;
 		if (this.flipX) options.angle -= 180;
-		ctx.rotate(degreesToRadians(this.group ? options.angle : this.angle));
+		const vptAngle = calcPlaneRotation(vpt);
+		ctx.rotate(this.group ? degreesToRadians(options.angle) : degreesToRadians(this.angle) + vptAngle);
 		shouldDrawBorders && this.drawBorders(ctx, options, styleOverride);
 		shouldDrawControls && this.drawControls(ctx, styleOverride);
 		ctx.restore();
@@ -9478,7 +9493,7 @@ const commaWsp = `\\s*,?\\s*`;
 /**
 * p for param
 * using "bad naming" here because it makes the regex much easier to read
-* p is a number that is preceded by an arbitary number of spaces, maybe 0,
+* p is a number that is preceded by an arbitrary number of spaces, maybe 0,
 * a comma or not, and then possibly more spaces or not.
 */
 const p = `${commaWsp}(${reNum})`;
@@ -10042,7 +10057,8 @@ const parsePath = (pathString) => {
 		let paramArr = [];
 		if (commandLetter === "a" || commandLetter === "A") {
 			regExpArcCommandPoints.lastIndex = 0;
-			for (let out = null; out = regExpArcCommandPoints.exec(matchStr);) paramArr.push(...out.slice(1));
+			let out;
+			while (out = regExpArcCommandPoints.exec(matchStr)) paramArr.push(...out.slice(1));
 		} else paramArr = matchStr.match(reMyNum) || [];
 		for (let i = 0; i < paramArr.length; i += commandLength) {
 			const newCommand = new Array(commandLength);
@@ -10171,7 +10187,7 @@ const joinPath = (pathData, fractionDigits) => pathData.map((segment) => {
 * Merges 2 clip paths into one visually equal clip path
 *
 * **IMPORTANT**:\
-* Does **NOT** clone the arguments, clone them proir if necessary.
+* Does **NOT** clone the arguments, clone them prior if necessary.
 *
 * Creates a wrapper (group) that contains one clip path and is clipped by the other so content is kept where both overlap.
 * Use this method if both the clip paths may have nested clip paths of their own, so assigning one to the other's clip path property is not possible.
@@ -12885,7 +12901,9 @@ var Gradient = class {
 			}
 		}
 		colorStops.forEach(({ color, offset }) => {
-			markup.push(`<stop offset="${offset * 100}%" style="stop-color:${color};"/>\n`);
+			const rawColor = String(color);
+			const serializedColor = isSafeSvgStyleValue(rawColor) ? rawColor : new Color(rawColor).toRgba();
+			markup.push(`<stop offset="${offset * 100}%" style="stop-color:${escapeXml(serializedColor)};"/>\n`);
 		});
 		markup.push(this.type === "linear" ? "</linearGradient>" : "</radialGradient>", "\n");
 		return markup.join("");
@@ -15083,7 +15101,7 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 	* @return {String}
 	*/
 	getSvgStyles(skipShadow) {
-		const objectLevelTextDecorationColor = this["textDecorationColor"] ? ` text-decoration-color: ${escapeXml(this[TEXT_DECORATION_COLOR])};` : "";
+		const objectLevelTextDecorationColor = isSafeSvgStyleValue(this["textDecorationColor"]) ? ` text-decoration-color: ${escapeXml(this[TEXT_DECORATION_COLOR])};` : "";
 		return `${super.getSvgStyles(skipShadow)} text-decoration-thickness: ${toFixed(this.textDecorationThickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%;${objectLevelTextDecorationColor} white-space: pre;`;
 	}
 	/**
@@ -15101,14 +15119,20 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 		});
 		const thickness = textDecorationThickness || this["textDecorationThickness"];
 		const decorationColor = textDecorationColor || this["textDecorationColor"];
+		const safeStrokeWidth = getSafeSvgStyleNumber(strokeWidth);
+		const safeFontFamily = getSafeSvgStyleToken(fontFamily);
+		const safeFontSize = getSafeSvgStyleNumber(fontSize);
+		const safeFontStyle = getSafeSvgStyleToken(fontStyle);
+		const safeFontWeight = getSafeSvgStyleNumber(fontWeight) || getSafeSvgStyleToken(fontWeight);
+		const safeDecorationColor = getSafeSvgStyleToken(decorationColor);
 		return [
 			stroke ? colorPropToSVG(STROKE, stroke) : "",
-			strokeWidth ? `stroke-width: ${escapeXml(strokeWidth)}; ` : "",
-			fontFamily ? `font-family: ${!fontFamily.includes("'") && !fontFamily.includes("\"") ? `'${escapeXml(fontFamily)}'` : escapeXml(fontFamily)}; ` : "",
-			fontSize ? `font-size: ${escapeXml(fontSize)}px; ` : "",
-			fontStyle ? `font-style: ${escapeXml(fontStyle)}; ` : "",
-			fontWeight ? `font-weight: ${escapeXml(fontWeight)}; ` : "",
-			textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%;${decorationColor ? ` text-decoration-color: ${escapeXml(decorationColor)};` : ""} ` : "",
+			safeStrokeWidth ? `stroke-width: ${escapeXml(safeStrokeWidth)}; ` : "",
+			safeFontFamily ? `font-family: ${!safeFontFamily.includes("'") && !safeFontFamily.includes("\"") ? `'${escapeXml(safeFontFamily)}'` : escapeXml(safeFontFamily)}; ` : "",
+			safeFontSize ? `font-size: ${escapeXml(safeFontSize)}px; ` : "",
+			safeFontStyle ? `font-style: ${escapeXml(safeFontStyle)}; ` : "",
+			safeFontWeight ? `font-weight: ${escapeXml(safeFontWeight)}; ` : "",
+			textDecoration ? `text-decoration: ${textDecoration}; text-decoration-thickness: ${toFixed(thickness * this.getObjectScaling().y / 10, config.NUM_FRACTION_DIGITS)}%;${safeDecorationColor ? ` text-decoration-color: ${escapeXml(safeDecorationColor)};` : ""} ` : "",
 			fill ? colorPropToSVG(FILL, fill) : "",
 			useWhiteSpace ? "white-space: pre; " : ""
 		].join("");
@@ -15670,7 +15694,7 @@ var FabricText = class FabricText extends StyledText {
 	* @private
 	* @param {String} method fillText or strokeText.
 	* @param {CanvasRenderingContext2D} ctx Context to render on
-	* @param {Array} line Content of the line, splitted in an array by grapheme
+	* @param {Array} line Content of the line, split in an array by grapheme
 	* @param {Number} left
 	* @param {Number} top
 	* @param {Number} lineIndex
@@ -15939,7 +15963,7 @@ var FabricText = class FabricText extends StyledText {
 			let lastDecorationColor = this.getValueOfPropertyAt(i, 0, "textDecorationColor") || lastFill;
 			let lastTickness = this.getValueOfPropertyAt(i, 0, TEXT_DECORATION_THICKNESS);
 			let currentDecoration = lastDecoration;
-			let currentFill = lastFill;
+			let currentFill;
 			let currentDecorationColor = lastDecorationColor;
 			let currentTickness = lastTickness;
 			const top = topOffset + maxHeight * (1 - this._fontSizeFraction);
@@ -17698,7 +17722,7 @@ const ctrlKeysMapDown = { 65: "cmdAll" };
 * Set the transform of the passed context to the same of a specific Canvas or StaticCanvas.
 * setTransform is used since this utility will RESET the ctx transform to the basic value
 * of retina scaling and viewport transform
-* It is not meant to be added to other transforms, it is used internally to preapre canvases to draw
+* It is not meant to be added to other transforms, it is used internally to prepare canvases to draw
 * @param ctx
 * @param canvas
 */
@@ -18098,7 +18122,7 @@ var IText = class IText extends ITextClickBehavior {
 		const selectionStart = selection.selectionStart, selectionEnd = selection.selectionEnd, isJustify = textAlign.includes(JUSTIFY), start = this.get2DCursorLocation(selectionStart), end = this.get2DCursorLocation(selectionEnd), startLine = start.lineIndex, endLine = end.lineIndex, startChar = start.charIndex < 0 ? 0 : start.charIndex, endChar = end.charIndex < 0 ? 0 : end.charIndex;
 		for (let i = startLine; i <= endLine; i++) {
 			const lineOffset = this._getLineLeftOffset(i) || 0;
-			let lineHeight = this.getHeightOfLine(i), realLineHeight = 0, boxStart = 0, boxEnd = 0;
+			let lineHeight = this.getHeightOfLine(i), boxStart = 0, boxEnd = 0;
 			if (i === startLine) boxStart = this.__charBounds[startLine][startChar].left;
 			if (i >= startLine && i < endLine) boxEnd = isJustify && !this.isEndOfWrapping(i) ? this.width : this.getLineWidth(i) || 5;
 			else if (i === endLine) if (endChar === 0) boxEnd = this.__charBounds[endLine][endChar].left;
@@ -18106,7 +18130,7 @@ var IText = class IText extends ITextClickBehavior {
 				const charSpacing = this._getWidthOfCharSpacing();
 				boxEnd = this.__charBounds[endLine][endChar - 1].left + this.__charBounds[endLine][endChar - 1].width - charSpacing;
 			}
-			realLineHeight = lineHeight;
+			const realLineHeight = lineHeight;
 			if (this.lineHeight < 1 || i === endLine && this.lineHeight > 1) lineHeight /= this.lineHeight;
 			let drawStart = boundaries.left + lineOffset + boxStart, drawHeight = lineHeight, extraTop = 0;
 			const drawWidth = boxEnd - boxStart;
@@ -18274,7 +18298,7 @@ var Textbox = class Textbox extends IText {
 	*/
 	isEmptyStyles(lineIndex) {
 		if (!this.styles) return true;
-		let offset = 0, nextLineIndex = lineIndex + 1, nextOffset, shouldLimit = false;
+		let offset = 0, nextLineIndex, nextOffset, shouldLimit = false;
 		const map = this._styleMap[lineIndex], mapNextLine = this._styleMap[lineIndex + 1];
 		if (map) {
 			lineIndex = map.line;
@@ -18445,7 +18469,6 @@ var Textbox = class Textbox extends IText {
 		desiredWidth -= reservedSpace;
 		const maxWidth = Math.max(desiredWidth, largestWordWidth, this.dynamicMinWidth);
 		const data = wordsData[lineIndex];
-		offset = 0;
 		let i;
 		for (i = 0; i < data.length; i++) {
 			const { word, width: wordWidth } = data[i];
@@ -19589,8 +19612,6 @@ function applyViewboxTransform(element) {
 	const viewBoxAttr = element.getAttribute("viewBox");
 	let scaleX = 1;
 	let scaleY = 1;
-	let minX = 0;
-	let minY = 0;
 	let matrix;
 	let el;
 	const widthAttr = element.getAttribute("width");
@@ -19625,8 +19646,8 @@ function applyViewboxTransform(element) {
 		return parsedDim;
 	}
 	const pasedViewBox = viewBoxAttr.match(reViewBoxAttrValue);
-	minX = -parseFloat(pasedViewBox[1]);
-	minY = -parseFloat(pasedViewBox[2]);
+	const minX = -parseFloat(pasedViewBox[1]);
+	const minY = -parseFloat(pasedViewBox[2]);
 	const viewBoxWidth = parseFloat(pasedViewBox[3]);
 	const viewBoxHeight = parseFloat(pasedViewBox[4]);
 	parsedDim.minX = minX;
@@ -22457,7 +22478,7 @@ var Resize = class extends BaseFilter {
 		const ratioW = this.rcpScaleX, ratioH = this.rcpScaleY, ratioWHalf = Math.ceil(ratioW / 2), ratioHHalf = Math.ceil(ratioH / 2), data = options.imageData.data, img2 = options.ctx.createImageData(dW, dH), data2 = img2.data;
 		for (let j = 0; j < dH; j++) for (let i = 0; i < dW; i++) {
 			const x2 = (i + j * dW) * 4;
-			let weight = 0;
+			let weight;
 			let weights = 0;
 			let weightsAlpha = 0;
 			let gxR = 0;
