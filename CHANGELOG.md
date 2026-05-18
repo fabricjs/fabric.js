@@ -1,6 +1,7 @@
 # Changelog
 
 ## [next]
+
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 
 ## [7.4.0]
