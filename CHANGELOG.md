@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump rolldown from 1.0.0-rc.16 to 1.0.1 [#10989](https://github.com/fabricjs/fabric.js/pull/10989)
 - chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
 
 ## [7.4.0]
