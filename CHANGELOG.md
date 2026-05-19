@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump inquirer from 13.3.2 to 13.4.3 [#10986](https://github.com/fabricjs/fabric.js/pull/10986)
 - chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
 
 ## [7.4.0]
