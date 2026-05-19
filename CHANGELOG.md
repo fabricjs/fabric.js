@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @playwright/test from 1.58.2 to 1.60.0 [#10987](https://github.com/fabricjs/fabric.js/pull/10987)
 - chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
 
 ## [7.4.0]
