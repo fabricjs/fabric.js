@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @types/node from 24.7.2 to 25.9.0 [#10988](https://github.com/fabricjs/fabric.js/pull/10988)
 - chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
 
 ## [7.4.0]
