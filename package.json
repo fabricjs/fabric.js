@@ -70,7 +70,7 @@
     "@rollup/plugin-terser": "^1.0.0",
     "@types/jsdom": "^21.1.7",
     "@types/micromatch": "^4.0.10",
-    "@types/node": "^24.7.0",
+    "@types/node": "^25.9.0",
     "@vitest/browser-playwright": "4.1.5",
     "@vitest/coverage-v8": "4.1.5",
     "@vitest/ui": "4.1.5",
