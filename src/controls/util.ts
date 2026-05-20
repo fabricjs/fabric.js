@@ -92,7 +92,6 @@ export function findCornerQuadrant(
   const center = sendPointToPlane(
     fabricObject.getCenterPoint(),
     fabricObject.canvas!.viewportTransform,
-    undefined,
   );
   const angle = calcVectorRotation(createVector(center, target)) + twoMathPi;
   return Math.round((angle % twoMathPi) / quarterPI);

@@ -61,7 +61,6 @@ export const tripleTapGesture = (canvas: Canvas) => {
         event,
         'mouse:tripleclick',
         'mousetripleclick',
-        undefined,
       );
       event.preventDefault();
     },
@@ -80,7 +79,6 @@ export const doubleTapGesture = (canvas: Canvas) => {
         event,
         'mouse:dblclick',
         'mousedblclick',
-        undefined,
       );
       event.preventDefault();
     },
