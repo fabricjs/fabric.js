@@ -272,7 +272,7 @@ describe('Gradient', () => {
     expect(gradient.coords.r1).toBe(0);
     expect(gradient.coords.r2).toBe(50);
 
-    expect(gradient.type, 'radial');
+    expect(gradient.type).toBe('radial');
 
     expect(gradient.colorStops[0].offset).toBe(0);
     expect(gradient.colorStops[0].color).toBe('red');
@@ -284,7 +284,7 @@ describe('Gradient', () => {
   test('toObject linearGradient', () => {
     const gradient = createLinearGradient();
     gradient.gradientTransform = [1, 0, 0, 1, 50, 50];
-    expect(typeof gradient.toObject === 'function');
+    expect(gradient.toObject).toBeTypeOf('function');
 
     const object = gradient.toObject();
 

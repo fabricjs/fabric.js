@@ -72,7 +72,7 @@ export abstract class ITextKeyBehavior<
       'data-fabric': 'textarea',
       wrap: 'off',
       name: 'fabricTextarea',
-    }).map(([attribute, value]) => textarea.setAttribute(attribute, value));
+    }).forEach(([attribute, value]) => textarea.setAttribute(attribute, value));
     const { top, left, fontSize } = this._calcTextareaPosition();
     // line-height: 1px; was removed from the style to fix this:
     // https://bugs.chromium.org/p/chromium/issues/detail?id=870966
@@ -91,7 +91,7 @@ export abstract class ITextKeyBehavior<
       compositionstart: 'onCompositionStart',
       compositionupdate: 'onCompositionUpdate',
       compositionend: 'onCompositionEnd',
-    } as Record<string, keyof this>).map(([eventName, handler]) =>
+    } as Record<string, keyof this>).forEach(([eventName, handler]) =>
       textarea.addEventListener(
         eventName,
         (this[handler] as EventListener).bind(this),
