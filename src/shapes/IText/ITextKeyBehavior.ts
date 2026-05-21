@@ -305,14 +305,14 @@ export abstract class ITextKeyBehavior<
     }
     const { copyPasteData } = getEnv();
     copyPasteData.copiedText = this.getSelectedText();
-    if (!config.disableStyleCopyPaste) {
+    if (config.disableStyleCopyPaste) {
+      copyPasteData.copiedTextStyle = undefined;
+    } else {
       copyPasteData.copiedTextStyle = this.getSelectionStyles(
         this.selectionStart,
         this.selectionEnd,
         true,
       );
-    } else {
-      copyPasteData.copiedTextStyle = undefined;
     }
     this._copyDone = true;
   }

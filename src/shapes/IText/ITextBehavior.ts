@@ -555,11 +555,11 @@ export abstract class ITextBehavior<
     // this.textAlign.replace('justify-', '') leverages the fact that our textAlign values all contain the word left/right/center,
     // that match the originX values.
     const anchorX: TOriginX =
-      textAlign !== JUSTIFY
-        ? (textAlign.replace('justify-', '') as TOriginX)
-        : direction === LTR
+      textAlign === JUSTIFY
+        ? direction === LTR
           ? LEFT
-          : RIGHT;
+          : RIGHT
+        : (textAlign.replace('justify-', '') as TOriginX);
     const originalPosition = this.getPositionByOrigin(anchorX, 'top');
     this.cursorOffsetCache = {};
     this.text = hiddenTextarea.value;
@@ -762,7 +762,23 @@ export abstract class ITextBehavior<
         end,
         true,
       );
-    if (lineStart !== lineEnd) {
+    if (lineStart === lineEnd) {
+      // remove and shift left on the same line
+      if (this.styles[lineStart]) {
+        const styleObj = this.styles[lineStart];
+        const diff = charEnd - charStart;
+        for (let i = charStart; i < charEnd; i++) {
+          delete styleObj[i];
+        }
+        for (const char in this.styles[lineStart]) {
+          const numericChar = parseInt(char, 10);
+          if (numericChar >= charEnd) {
+            styleObj[numericChar - diff] = styleObj[char];
+            delete styleObj[char];
+          }
+        }
+      }
+    } else {
       // step1 remove the trailing of lineStart
       if (this.styles[lineStart]) {
         for (
@@ -793,22 +809,6 @@ export abstract class ITextBehavior<
       }
       // step4 shift remaining lines.
       this.shiftLineStyles(lineEnd, lineStart - lineEnd);
-    } else {
-      // remove and shift left on the same line
-      if (this.styles[lineStart]) {
-        const styleObj = this.styles[lineStart];
-        const diff = charEnd - charStart;
-        for (let i = charStart; i < charEnd; i++) {
-          delete styleObj[i];
-        }
-        for (const char in this.styles[lineStart]) {
-          const numericChar = parseInt(char, 10);
-          if (numericChar >= charEnd) {
-            styleObj[numericChar - diff] = styleObj[char];
-            delete styleObj[char];
-          }
-        }
-      }
     }
   }
 

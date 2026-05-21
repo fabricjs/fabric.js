@@ -64,9 +64,9 @@ export class ColorAnimation extends AnimationBase<TRGBAColorSource> {
         // to correctly calculate the change ratio we must find a changed value
         value
           .map((p, i) =>
-            this.byValue[i] !== 0
-              ? Math.abs((p - this.startValue[i]) / this.byValue[i])
-              : 0,
+            this.byValue[i] === 0
+              ? 0
+              : Math.abs((p - this.startValue[i]) / this.byValue[i]),
           )
           .find((p) => p !== 0) || 0,
     };

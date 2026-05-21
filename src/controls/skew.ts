@@ -136,7 +136,7 @@ function skewObject(
     const { skewX, scaleX } = target,
       dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }),
       dimAfter = target._getTransformedDimensions(),
-      compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
+      compensationFactor = skewX === 0 ? 1 : dimBefore.x / dimAfter.x;
     compensationFactor !== 1 &&
       target.set(SCALE_X, compensationFactor * scaleX);
   }

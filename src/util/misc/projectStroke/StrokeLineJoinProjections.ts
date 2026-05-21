@@ -278,10 +278,10 @@ export class StrokeLineJoinProjections extends StrokeProjectionsBase {
       isProj0Start = crossProduct(proj0, comparisonVector) > 0,
       startCircle = isProj0Start ? proj0 : proj1,
       endCircle = isProj0Start ? proj1 : proj0;
-    if (!this.isSkewed()) {
-      projections.push(...this.projectRoundNoSkew(startCircle, endCircle));
-    } else {
+    if (this.isSkewed()) {
       projections.push(...this.projectRoundWithSkew(startCircle, endCircle));
+    } else {
+      projections.push(...this.projectRoundNoSkew(startCircle, endCircle));
     }
     return projections;
   }

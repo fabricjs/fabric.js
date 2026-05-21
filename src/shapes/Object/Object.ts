@@ -1836,9 +1836,9 @@ export class FabricObject<
       ...(clipPathData ? { clipPath: clipPathData } : null),
     };
 
-    return !this.includeDefaultValues
-      ? this._removeDefaultValues(object)
-      : object;
+    return this.includeDefaultValues
+      ? object
+      : this._removeDefaultValues(object);
   }
 
   /**
