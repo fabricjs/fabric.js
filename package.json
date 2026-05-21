@@ -148,5 +148,9 @@
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
     "*.{js,css,md,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
     "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
+  },
+  "dependencies": {
+    "@oxfmt/binding-darwin-arm64": "^0.51.0",
+    "@rolldown/binding-darwin-arm64": "^1.0.1"
   }
 }
