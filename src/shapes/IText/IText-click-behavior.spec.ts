@@ -184,6 +184,48 @@ describe('iText click interaction', () => {
     ).toBe(5);
   });
 
+  test('getSelectionStartFromPointer with RTL direction places cursor in correct order', () => {
+    const text = 'test text';
+    const iText = new IText(text, {
+      direction: 'rtl',
+      textAlign: 'right',
+      canvas,
+    });
+    iText.setPositionByOrigin(new Point(0, 0), 'left', 'top');
+
+    const width = iText.width;
+
+    // For RTL the rightmost visual position is charIndex 0.
+    // A click near the right edge should yield a lower charIndex than a click near the left edge.
+    const rightClick = createPointerEvent({
+      target: canvas.upperCanvasEl,
+      clientX: Math.round(width * 0.95),
+      clientY: 10,
+    });
+
+    const leftClick = createPointerEvent({
+      target: canvas.upperCanvasEl,
+      clientX: Math.round(width * 0.05),
+      clientY: 10,
+    });
+
+    const rightIndex = iText.getSelectionStartFromPointer(rightClick);
+    const leftIndex = iText.getSelectionStartFromPointer(leftClick);
+
+    expect(
+      rightIndex,
+      'click near right edge gives low charIndex',
+    ).toBeLessThan(text.length / 2);
+    expect(
+      leftIndex,
+      'click near left edge gives high charIndex',
+    ).toBeGreaterThan(text.length / 2);
+    expect(
+      rightIndex,
+      'right click should be at a lower index than left click for RTL',
+    ).toBeLessThan(leftIndex);
+  });
+
   test('mouse down aborts cursor animation', () => {
     const iText = new IText('test need some word\nsecond line', {
       canvas,
