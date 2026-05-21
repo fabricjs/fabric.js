@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): tackle sonar `Unexpected negated condition.` violations [#10992](https://github.com/fabricjs/fabric.js/pull/10992)
 - chore(): fix some sonar issues [#10990](https://github.com/fabricjs/fabric.js/pull/10990)
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#10985](https://github.com/fabricjs/fabric.js/pull/10985)
 - chore(deps): update devDependencies to latest versions [#10982](https://github.com/fabricjs/fabric.js/pull/10982)
