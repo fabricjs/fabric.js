@@ -3,6 +3,8 @@
 ## [next]
 
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
+- chore(): fix some sonar issues [#10990](https://github.com/fabricjs/fabric.js/pull/10990)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#10985](https://github.com/fabricjs/fabric.js/pull/10985)
 - chore(deps): update devDependencies to latest versions [#10982](https://github.com/fabricjs/fabric.js/pull/10982)
 - chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
 

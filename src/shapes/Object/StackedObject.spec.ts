@@ -64,10 +64,10 @@ describe('FabricObject stacking', () => {
     expect(object.group).toEqual(activeSelection);
     expect(object.parent).toEqual(parent);
     expect(object.canvas).toEqual(canvas);
-    expect(object.isDescendantOf(parent));
+    expect(object.isDescendantOf(parent)).toBe(true);
     expect(object.isDescendantOf(activeSelection)).toBe(true);
     delete object.parent;
-    expect(!object.isDescendantOf(parent));
+    expect(object.isDescendantOf(parent)).toBe(false);
     expect(object.isDescendantOf(activeSelection)).toBe(true);
   });
 
