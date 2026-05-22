@@ -7,7 +7,7 @@ This file defines how coding agents should operate in this repository.
 - Repository: `fabricjs/fabric.js`
 - Language: TypeScript/JavaScript
 - Package manager: `npm`
-- Runtime: Node `>=20`
+- Runtime: Node `>=20` (tests require Node 24 — use `nvm use 24` locally)
 - Main test stacks: `vitest` (unit) and `playwright` (e2e)
 
 ## Repository Priorities
@@ -83,6 +83,7 @@ Use the `fabricjs-open-pr` skill when any of these apply:
 - Never discard user changes unless explicitly asked.
 - Do not use destructive git commands without explicit instruction.
 - Commit only files relevant to the requested task.
+- Never commit `dist/` or `dist-extensions/` files — CI builds from source via `build-fabric-cached`; committed dist files cause test failures and pollute diffs.
 
 ## Communication
 

@@ -1831,7 +1831,13 @@ const staticCanvasDefaults = {
 	skipOffscreen: true,
 	enableRetinaScaling: true,
 	imageSmoothingEnabled: true,
+	/**
+	* @todo move to Canvas
+	*/
 	controlsAboveOverlay: false,
+	/**
+	* @todo move to Canvas
+	*/
 	allowTouchScrolling: false,
 	viewportTransform: [...iMatrix],
 	patternQuality: "best"
@@ -3136,7 +3142,7 @@ const commonEventInfo = (eventData, transform, x, y) => {
 */
 function findCornerQuadrant(fabricObject, control, coord) {
 	const target = coord;
-	const angle = calcVectorRotation(createVector(sendPointToPlane(fabricObject.getCenterPoint(), fabricObject.canvas.viewportTransform, void 0), target)) + twoMathPi;
+	const angle = calcVectorRotation(createVector(sendPointToPlane(fabricObject.getCenterPoint(), fabricObject.canvas.viewportTransform), target)) + twoMathPi;
 	return Math.round(angle % twoMathPi / quarterPI);
 }
 /**
@@ -12591,7 +12597,12 @@ var Canvas$1 = class extends SelectableCanvas {
 				this._fireSelectionEvents(prevActiveObjects, e);
 			} else {
 				activeObject.isEditing && activeObject.exitEditing();
-				const newActiveSelection = new (classRegistry.getClass("ActiveSelection"))([], { canvas: this });
+				const newActiveSelection = new (classRegistry.getClass("ActiveSelection"))([], { 
+				/**
+				* it is crucial to pass the canvas ref before calling {@link ActiveSelection#multiSelectAdd}
+				* since it uses {@link FabricObject#isInFrontOf} which relies on the canvas ref
+				*/
+canvas: this });
 				newActiveSelection.multiSelectAdd(activeObject, target);
 				this._hoveredTarget = newActiveSelection;
 				this._setActiveObject(newActiveSelection, e);
@@ -14504,7 +14515,11 @@ function parsePointsAttribute(points) {
 }
 //#endregion
 //#region src/shapes/Polyline.ts
-const polylineDefaultValues = { exactBoundingBox: false };
+const polylineDefaultValues = { 
+/**
+* @deprecated transient option soon to be removed in favor of a different design
+*/
+exactBoundingBox: false };
 var Polyline = class Polyline extends FabricObject$1 {
 	static ownDefaults = polylineDefaultValues;
 	static type = "Polyline";
@@ -17142,7 +17157,7 @@ var ITextKeyBehavior = class extends ITextBehavior {
 			"data-fabric": "textarea",
 			wrap: "off",
 			name: "fabricTextarea"
-		}).map(([attribute, value]) => textarea.setAttribute(attribute, value));
+		}).forEach(([attribute, value]) => textarea.setAttribute(attribute, value));
 		const { top, left, fontSize } = this._calcTextareaPosition();
 		textarea.style.cssText = `position: absolute; top: ${top}; left: ${left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${fontSize};`;
 		(this.hiddenTextareaContainer || doc.body).appendChild(textarea);
@@ -17157,7 +17172,7 @@ var ITextKeyBehavior = class extends ITextBehavior {
 			compositionstart: "onCompositionStart",
 			compositionupdate: "onCompositionUpdate",
 			compositionend: "onCompositionEnd"
-		}).map(([eventName, handler]) => textarea.addEventListener(eventName, this[handler].bind(this)));
+		}).forEach(([eventName, handler]) => textarea.addEventListener(eventName, this[handler].bind(this)));
 		this.hiddenTextarea = textarea;
 	}
 	/**
@@ -17658,18 +17673,33 @@ var ITextClickBehavior = class extends ITextKeyBehavior {
 			lineIndex = i;
 			if (i > 0) charIndex += this._textLines[i - 1].length + this.missingNewlineOffset(i - 1);
 		} else break;
-		let width = Math.abs(this._getLineLeftOffset(lineIndex));
 		const charLength = this._textLines[lineIndex].length;
 		const chars = this.__charBounds[lineIndex];
-		for (let j = 0; j < charLength; j++) {
-			const charWidth = chars[j].kernedWidth;
-			const widthAfter = width + charWidth;
-			if (mouseOffset.x <= widthAfter) {
-				if (Math.abs(mouseOffset.x - widthAfter) <= Math.abs(mouseOffset.x - width)) charIndex++;
-				break;
+		if (this.direction === "rtl") {
+			const effectiveX = this._getLineLeftOffset(lineIndex) - mouseOffset.x;
+			let w = 0;
+			for (let j = 0; j < charLength; j++) {
+				const kw = chars[j].kernedWidth;
+				const wAfter = w + kw;
+				if (effectiveX <= wAfter) {
+					if (Math.abs(effectiveX - wAfter) <= Math.abs(effectiveX - w)) charIndex++;
+					break;
+				}
+				w = wAfter;
+				charIndex++;
 			}
-			width = widthAfter;
-			charIndex++;
+		} else {
+			let width = Math.abs(this._getLineLeftOffset(lineIndex));
+			for (let j = 0; j < charLength; j++) {
+				const charWidth = chars[j].kernedWidth;
+				const widthAfter = width + charWidth;
+				if (mouseOffset.x <= widthAfter) {
+					if (Math.abs(mouseOffset.x - widthAfter) <= Math.abs(mouseOffset.x - width)) charIndex++;
+					break;
+				}
+				width = widthAfter;
+				charIndex++;
+			}
 		}
 		return Math.min(this.flipX ? charLength - charIndex : charIndex, this._text.length);
 	}
