@@ -211,9 +211,9 @@ export abstract class ITextClickBehavior<
       }
     }
     const charLength = this._textLines[lineIndex].length;
-    const chars = this.__charBounds[lineIndex];
     if (this.direction === 'rtl') {
       const lineLeftOffset = this._getLineLeftOffset(lineIndex);
+      const chars = this.__charBounds[lineIndex];
       const effectiveX = lineLeftOffset - mouseOffset.x;
       let w = 0;
       for (let j = 0; j < charLength; j++) {
@@ -230,6 +230,7 @@ export abstract class ITextClickBehavior<
       }
     } else {
       const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
+      const chars = this.__charBounds[lineIndex];
       let width = lineLeftOffset;
       for (let j = 0; j < charLength; j++) {
         // i removed something about flipX here, check.
