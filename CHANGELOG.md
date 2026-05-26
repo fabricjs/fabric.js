@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump typescript-eslint from 8.59.4 to 8.60.0 [#10995](https://github.com/fabricjs/fabric.js/pull/10995)
 - chore(): fix some sonar issues [#10990](https://github.com/fabricjs/fabric.js/pull/10990)
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#10985](https://github.com/fabricjs/fabric.js/pull/10985)
 - chore(deps): update devDependencies to latest versions [#10982](https://github.com/fabricjs/fabric.js/pull/10982)
