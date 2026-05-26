@@ -98,7 +98,7 @@ describe('position generators', () => {
 });
 
 describe('action generator', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   const eventData = {} as any;
   describe('color handling', () => {
     test('moves the color point data', () => {

@@ -439,7 +439,7 @@ export class IText<
    */
   findAncestorsWithClipPath(): FabricObject[] {
     const clipPathAncestors: FabricObject[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    // oxlint-disable-next-line typescript/no-this-alias
     let obj: FabricObject | undefined = this;
     while (obj) {
       if (obj.clipPath) {

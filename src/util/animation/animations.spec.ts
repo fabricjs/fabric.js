@@ -404,7 +404,7 @@ describe('animate', () => {
       { left: 223, top: 224 },
       {
         abort: function () {
-          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          // oxlint-disable-next-line typescript/no-this-alias
           context = this;
           return true;
         },

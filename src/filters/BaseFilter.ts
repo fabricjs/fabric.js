@@ -242,7 +242,7 @@ export class BaseFilter<
    * Other filters may need their own version ( ColorMatrix, HueRotation, gamma, ComposedFilter )
    * @param {Object} options
    **/
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // oxlint-disable-next-line typescript/no-unused-vars
   isNeutralState(options?: any): boolean {
     return false;
   }

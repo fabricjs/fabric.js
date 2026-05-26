@@ -25,7 +25,7 @@ import { JUSTIFY } from '../Text/constants';
  *  - `\?`     Matches a "?" character (char code 63).
  *  - `\-`     Matches a "-" character (char code 45).
  */
-// eslint-disable-next-line no-useless-escape
+// oxlint-disable-next-line no-useless-escape
 const reNonWord = /[ \n\.,;!\?\-]/;
 
 export type ITextEvents = ObjectEvents & {

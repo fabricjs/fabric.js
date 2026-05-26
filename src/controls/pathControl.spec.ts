@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-globals */
+/* oxlint-disable no-restricted-globals */
 import { Canvas } from '../canvas/Canvas';
 import { Path } from '../shapes/Path';
 import { createPathControls } from './pathControl';

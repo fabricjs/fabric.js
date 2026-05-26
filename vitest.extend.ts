@@ -71,7 +71,7 @@ expect.extend({
     delete snap.version;
 
     const value = cloneDeepWith(snap, (v, k, obj, stack) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
       const c = (customiser as any)?.(v, k, obj, stack);
       if (c !== undefined) return c;
       if ((k === 'width' || k === 'height') && typeof v === 'number')

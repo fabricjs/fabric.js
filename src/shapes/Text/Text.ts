@@ -953,7 +953,6 @@ export class FabricText<
       for (
         let i = reverse ? llength - 1 : 0;
         reverse ? i >= 0 : i < llength;
-        reverse ? i-- : i++
       ) {
         graphemeInfo = lineBounds[i];
         if (positionInPath > totalPathLength) {
@@ -965,6 +964,11 @@ export class FabricText<
         // and calculate path position/angle at once.
         this._setGraphemeOnPath(positionInPath, graphemeInfo);
         positionInPath += graphemeInfo.kernedWidth;
+        if (reverse) {
+          i -= 1;
+        } else {
+          i += 1;
+        }
       }
     }
     return { width: width, numOfSpaces: 0 };

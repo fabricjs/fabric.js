@@ -1,12 +1,6 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import prettier from 'eslint-config-prettier';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
+import tsParser from '@typescript-eslint/parser';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-export default tseslint.config(
+export default [
   {
     ignores: [
       'dist/*',
@@ -18,59 +12,14 @@ export default tseslint.config(
       'src/parkinglot',
     ],
   },
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-  prettier,
-
-  {
-    languageOptions: {
-      ecmaVersion: 5,
-      sourceType: 'script',
-      globals: {
-        console: 'readonly',
-      },
-      parserOptions: {
-        project: 'tsconfig.spec.json',
-        tsconfigRootDir: __dirname,
-      },
-    },
-  },
-
   {
     files: ['**/*.ts'],
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 5,
+      sourceType: 'module',
+    },
     rules: {
-      '@typescript-eslint/consistent-type-exports': 'error',
-      '@typescript-eslint/consistent-type-imports': 'error',
-      '@typescript-eslint/no-unnecessary-type-arguments': 'error',
-      '@typescript-eslint/no-restricted-types': 1,
-      '@typescript-eslint/ban-ts-comment': 1,
-      '@typescript-eslint/no-explicit-any': ['warn'],
-      '@typescript-eslint/no-unused-expressions': [
-        'error',
-        {
-          allowShortCircuit: true,
-        },
-      ],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          ignoreRestSiblings: true,
-          argsIgnorePattern: '^_',
-        },
-      ],
-      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-      'no-restricted-globals': [
-        'error',
-        {
-          name: 'window',
-          message: 'Use fabric window or other utils instead.',
-        },
-        {
-          name: 'document',
-          message: 'Use fabric document or other utils instead.',
-        },
-      ],
-
       'no-restricted-syntax': [
         'error',
         {
@@ -94,26 +43,10 @@ export default tseslint.config(
       ],
     },
   },
-
   {
-    files: ['playwright.setup.ts'],
+    files: ['playwright.setup.ts', 'e2e/**/*.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },
   },
-  {
-    files: ['e2e/**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: 'e2e/tsconfig.json',
-        tsconfigRootDir: __dirname,
-      },
-    },
-    rules: {
-      '@typescript-eslint/consistent-type-imports': 'off',
-      '@typescript-eslint/no-require-imports': 'off',
-      'no-restricted-globals': 'off',
-      'no-restricted-syntax': 'off',
-    },
-  },
-);
+];

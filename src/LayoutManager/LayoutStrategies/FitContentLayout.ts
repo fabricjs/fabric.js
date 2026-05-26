@@ -12,7 +12,7 @@ export class FitContentLayout extends LayoutStrategy {
    * @override layout on all triggers
    * Override at will
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // oxlint-disable-next-line typescript/no-unused-vars
   shouldPerformLayout(context: StrictLayoutContext) {
     return true;
   }

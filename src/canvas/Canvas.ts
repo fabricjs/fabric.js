@@ -150,7 +150,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         '_onDrop',
       ] as (keyof this)[]
     ).forEach((eventHandler) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+      // oxlint-disable-next-line typescript/no-unsafe-function-type
       this[eventHandler] = (this[eventHandler] as Function).bind(this);
     });
     // register event handlers

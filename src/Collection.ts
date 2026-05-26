@@ -20,17 +20,17 @@ export function createCollectionMixin<TBase extends Constructor>(Base: TBase) {
      */
     _objects: FabricObject[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // oxlint-disable-next-line typescript/no-unused-vars
     _onObjectAdded(object: FabricObject) {
       // subclasses should override this method
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // oxlint-disable-next-line typescript/no-unused-vars
     _onObjectRemoved(object: FabricObject) {
       // subclasses should override this method
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // oxlint-disable-next-line typescript/no-unused-vars
     _onStackOrderChanged(object: FabricObject) {
       // subclasses should override this method
     }

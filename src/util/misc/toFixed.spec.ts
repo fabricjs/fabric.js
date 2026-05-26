@@ -20,7 +20,7 @@ describe('toFixed', () => {
     testValue('166.66666666666666666666');
 
     // Test with number input
-    // eslint-disable-next-line no-loss-of-precision -- just a test
+    // oxlint-disable-next-line no-loss-of-precision -- just a test
     testValue(166.66666666666666666666);
   });
 });

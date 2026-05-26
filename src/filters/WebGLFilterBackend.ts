@@ -257,7 +257,7 @@ export class WebGLFilterBackend {
       );
     }
     // disabled because website and issues with different typescript version
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion
     return texture!;
   }
 

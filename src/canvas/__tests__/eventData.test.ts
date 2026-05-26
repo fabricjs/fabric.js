@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-globals */
+/* oxlint-disable no-restricted-globals */
 import type { TPointerEvent } from '../../EventTypeDefs';
 import { Point } from '../../Point';
 import { ActiveSelection } from '../../shapes/ActiveSelection';

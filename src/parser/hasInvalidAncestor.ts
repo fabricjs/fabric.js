@@ -5,8 +5,8 @@ import { getTagName } from './getTagName';
 const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
 
 export function hasInvalidAncestor(element: Element) {
-  let _element: Element | null = element;
-  while (_element && (_element = _element.parentElement)) {
+  let _element = element.parentElement;
+  while (_element) {
     if (
       _element &&
       _element.nodeName &&
@@ -15,6 +15,7 @@ export function hasInvalidAncestor(element: Element) {
     ) {
       return true;
     }
+    _element = _element.parentElement;
   }
   return false;
 }

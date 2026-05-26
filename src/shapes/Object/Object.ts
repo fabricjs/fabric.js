@@ -177,7 +177,7 @@ export type DrawContext =
  */
 export class FabricObject<
   Props extends TOptions<ObjectProps> = Partial<ObjectProps>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // oxlint-disable-next-line typescript/no-unused-vars
   SProps extends SerializedObjectProps = SerializedObjectProps,
   EventSpec extends ObjectEvents = ObjectEvents,
 >
@@ -1622,7 +1622,7 @@ export class FabricObject<
    */
   getAncestors(): Ancestors {
     const ancestors: TAncestor[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    // oxlint-disable-next-line typescript/no-this-alias
     let parent: TAncestor | undefined = this;
     do {
       parent = parent.parent;

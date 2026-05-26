@@ -41,7 +41,7 @@ describe('Controls', () => {
     const upEvent = new MouseEvent('mouseup', { clientX: 0, clientY: 0 });
 
     canvas.getSelectionElement().dispatchEvent(downEvent);
-    // eslint-disable-next-line no-restricted-globals
+    // oxlint-disable-next-line no-restricted-globals
     const doc = document;
     doc.dispatchEvent(moveEvent);
     canvas._currentTransform!.corner = 'test2';

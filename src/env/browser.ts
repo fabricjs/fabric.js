@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-globals */
+/* oxlint-disable no-restricted-globals */
 import { WebGLProbe } from '../filters/GLProbes/WebGLProbe';
 import type { TCopyPasteData, TFabricEnv } from './types';
 

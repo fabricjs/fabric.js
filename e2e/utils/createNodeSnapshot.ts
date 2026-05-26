@@ -9,7 +9,7 @@ export class TestingCanvas extends fabric.Canvas {
 export async function createNodeSnapshot(
   cb: (
     canvas: TestingCanvas,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    // oxlint-disable-next-line typescript/consistent-type-imports
     fabric: typeof import('fabric/node'),
   ) => any | Promise<any>,
   options: Partial<fabric.StaticCanvasOptions> = {},

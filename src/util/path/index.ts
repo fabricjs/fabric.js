@@ -230,7 +230,7 @@ export function getBoundsOfCurve(
 ): TRectBounds {
   let argsString: string;
   if (config.cachesBoundsOfCurve) {
-    // eslint-disable-next-line
+    // oxlint-disable-next-line prefer-rest-params
     argsString = [...arguments].join();
     if (cache.boundsOfCurveCache[argsString]) {
       return cache.boundsOfCurveCache[argsString];

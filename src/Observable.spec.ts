@@ -44,7 +44,7 @@ describe('Observable', () => {
     let eventFired = false;
     let context: Observable<AnyEventsSpec>;
     foo.once('bar:baz', function (this: Observable<AnyEventsSpec>) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias -- fine for testing
+      // oxlint-disable-next-line typescript/no-this-alias -- fine for testing
       context = this;
       eventFired = true;
     });
@@ -233,7 +233,7 @@ describe('Observable', () => {
     let context: Observable<AnyEventsSpec>;
 
     foo.on('bar:baz', function (this: Observable<AnyEventsSpec>) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias -- fine for testing
+      // oxlint-disable-next-line typescript/no-this-alias -- fine for testing
       context = this;
       eventFired = true;
     });
