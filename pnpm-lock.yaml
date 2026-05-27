@@ -41,6 +41,9 @@ importers:
       es-toolkit:
         specifier: 1.47.0
         version: 1.47.0
+      eslint:
+        specifier: ^10.0.1
+        version: 10.1.0
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@10.1.0)
