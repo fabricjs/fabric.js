@@ -52,7 +52,7 @@ function startWebsite() {
     console.log(gray('https://github.com/microsoft/WSL/issues/216'));
   }
 
-  cp.spawn('npm', args, {
+  cp.spawn('pnpm', args, {
     stdio: 'inherit',
     cwd: websiteDir,
     shell: true,
@@ -166,7 +166,7 @@ program
   .command('dev')
   .description('watch for changes in `src` directory')
   .action(() => {
-    cp.spawn('npm run build -- -f -w', { stdio: 'inherit', shell: true });
+    cp.spawn('pnpm run build -- -f -w', { stdio: 'inherit', shell: true });
   });
 
 program

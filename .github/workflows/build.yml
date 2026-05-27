@@ -15,7 +15,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-      - run: npm run build
+      - run: pnpm run build
   stats:
     name: Build stats
     runs-on: ubuntu-24.04
@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 24.x
       - name: Build fabric.js
-        run: npm run build
+        run: pnpm run build
       - name: Create prnumber artifact
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: 24.x
       - name: Type check
-        run: npm run typecheck
+        run: pnpm run typecheck
   lint:
     runs-on: ubuntu-24.04
     steps:
@@ -70,7 +70,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-      - run: npm run lint
+      - run: pnpm run lint
   prettier:
     runs-on: ubuntu-24.04
     steps:
@@ -79,4 +79,4 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-      - run: npm run prettier:check
+      - run: pnpm run prettier:check

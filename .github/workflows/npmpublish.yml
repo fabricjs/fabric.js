@@ -57,15 +57,18 @@ jobs:
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org/
-      - run: npm ci --audit false --fund false
-      - run: npm run build
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm run build
       - name: Publish package
         shell: bash
         run: |
           if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
-            echo "npm publish --tag ${{ steps.publish.outputs.npm_tag }}"
-            npm publish --tag "${{ steps.publish.outputs.npm_tag }}"
+            echo "pnpm publish --tag ${{ steps.publish.outputs.npm_tag }} --no-git-checks"
+            pnpm publish --tag "${{ steps.publish.outputs.npm_tag }}" --no-git-checks
           else
-            echo "npm publish"
-            npm publish
+            echo "pnpm publish --no-git-checks"
+            pnpm publish --no-git-checks
           fi

@@ -62,7 +62,7 @@ sandbox
           type: 'confirm',
           name: 'confirm',
           message: `Did you mean to run ${blue(
-            `npm run sandbox deploy -- -t ${template}\n`,
+            `pnpm run sandbox deploy -- -t ${template}\n`,
           )}?`,
           default: true,
         },
@@ -123,7 +123,7 @@ sandbox
           type: 'confirm',
           name: 'confirm',
           message: `Did you mean to run ${blue(
-            `npm run sandbox start -- -t ${pathToSandbox}\n`,
+            `pnpm run sandbox start -- -t ${pathToSandbox}\n`,
           )}?`,
           default: true,
         },
