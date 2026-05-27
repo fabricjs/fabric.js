@@ -13,13 +13,15 @@ runs:
       if: inputs.install-system-deps == 'true'
       run: sudo apt-get install libgif-dev libpng-dev libpango1.0-dev libjpeg-dev librsvg2-dev libcairo2-dev
       shell: bash
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.29.1
     - name: Use Node.js v${{ inputs.node-version }}
       uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
         cache-dependency-path: pnpm-lock.yaml
-    - run: corepack enable
-      shell: bash
     - run: pnpm install --frozen-lockfile --prefer-offline
       shell: bash

@@ -53,13 +53,15 @@ jobs:
         with:
           ref: refs/tags/${{ steps.publish.outputs.ref_name }}
           persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.1
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org/
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: corepack enable
       - run: pnpm install --frozen-lockfile --prefer-offline
       - run: pnpm run build
       - name: Publish package
