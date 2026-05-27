@@ -59,6 +59,7 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+      'no-negated-condition': 'error',
       'no-restricted-globals': [
         'error',
         {

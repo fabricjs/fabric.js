@@ -36,14 +36,14 @@ describe('animate', () => {
         expectRun += 1;
       },
       onChange: (val, complete) => {
-        if (complete !== 1) {
-          //  'color is not blue'
-          expectRun += 1;
-          expect(val).not.toBe('rgba(0,0,255,1)');
-        } else {
+        if (complete === 1) {
           // 'color is blue'
           expectRun += 1;
           expect(val).toBe('rgba(0,0,255,1)');
+        } else {
+          //  'color is not blue'
+          expectRun += 1;
+          expect(val).not.toBe('rgba(0,0,255,1)');
         }
         // 'expected type is String'
         expect(typeof val === 'string').toBe(true);
