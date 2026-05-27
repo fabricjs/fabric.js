@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(deps-dev): bump oxfmt from 0.51.0 to 0.52.0 [#10996](https://github.com/fabricjs/fabric.js/pull/10996)
+- chore(deps-dev): bump rolldown from 1.0.1 to 1.0.2 [#10998](https://github.com/fabricjs/fabric.js/pull/10998)
 - chore(deps-dev): bump es-toolkit from 1.46.1 to 1.47.0 [#10997](https://github.com/fabricjs/fabric.js/pull/10997)
 - chore(): fix some sonar issues [#10990](https://github.com/fabricjs/fabric.js/pull/10990)
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#10985](https://github.com/fabricjs/fabric.js/pull/10985)
