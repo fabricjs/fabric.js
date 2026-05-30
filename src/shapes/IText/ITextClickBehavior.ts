@@ -211,45 +211,23 @@ export abstract class ITextClickBehavior<
       }
     }
     const charLength = this._textLines[lineIndex].length;
-    if (this.direction === 'rtl') {
-      const lineLeftOffset = this._getLineLeftOffset(lineIndex);
-      const chars = this.__charBounds[lineIndex];
-      const effectiveX = lineLeftOffset - mouseOffset.x;
-      let w = 0;
-      for (let j = 0; j < charLength; j++) {
-        const kw = chars[j].kernedWidth;
-        const wAfter = w + kw;
-        if (effectiveX <= wAfter) {
-          if (Math.abs(effectiveX - wAfter) <= Math.abs(effectiveX - w)) {
-            charIndex++;
-          }
-          break;
+    // _getLineLeftOffset must be called before reading __charBounds — it lazily populates them via _measureLine
+    const lineLeftOffset = this._getLineLeftOffset(lineIndex);
+    const chars = this.__charBounds[lineIndex];
+    const isRtl = this.direction === 'rtl';
+    const effectiveX = isRtl ? lineLeftOffset - mouseOffset.x : mouseOffset.x;
+    let width = isRtl ? 0 : Math.abs(lineLeftOffset);
+    for (let j = 0; j < charLength; j++) {
+      const charWidth = chars[j].kernedWidth;
+      const widthAfter = width + charWidth;
+      if (effectiveX <= widthAfter) {
+        if (Math.abs(effectiveX - widthAfter) <= Math.abs(effectiveX - width)) {
+          charIndex++;
         }
-        w = wAfter;
-        charIndex++;
+        break;
       }
-    } else {
-      const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
-      const chars = this.__charBounds[lineIndex];
-      let width = lineLeftOffset;
-      for (let j = 0; j < charLength; j++) {
-        // i removed something about flipX here, check.
-        const charWidth = chars[j].kernedWidth;
-        const widthAfter = width + charWidth;
-        if (mouseOffset.x <= widthAfter) {
-          // if the pointer is closer to the end of the char we increment charIndex
-          // in order to position the cursor after the char
-          if (
-            Math.abs(mouseOffset.x - widthAfter) <=
-            Math.abs(mouseOffset.x - width)
-          ) {
-            charIndex++;
-          }
-          break;
-        }
-        width = widthAfter;
-        charIndex++;
-      }
+      width = widthAfter;
+      charIndex++;
     }
 
     return Math.min(
