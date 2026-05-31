@@ -22,21 +22,21 @@ This file defines how coding agents should operate in this repository.
 Run from repo root:
 
 ```bash
-npm i --include=dev
+pnpm install
 ```
 
 ## Common Commands
 
-- Build: `npm run build`
-- Fast build: `npm run build:fast`
-- Typecheck: `npm run typecheck`
-- Lint: `npm run lint`
-- Format check: `npm run prettier:check`
-- Format write: `npm run prettier:write`
-- Unit tests (node): `npm run test:vitest`
-- Unit tests with coverage: `npm run test:vitest:coverage`
-- E2E tests: `npm run test:e2e`
-- E2E typecheck: `npm run playwright:typecheck`
+- Build: `pnpm run build`
+- Fast build: `pnpm run build:fast`
+- Typecheck: `pnpm run typecheck`
+- Lint: `pnpm run lint`
+- Format check: `pnpm run prettier:check`
+- Format write: `pnpm run prettier:write`
+- Unit tests (node): `pnpm run test:vitest`
+- Unit tests with coverage: `pnpm run test:vitest:coverage`
+- E2E tests: `pnpm run test:e2e`
+- E2E typecheck: `pnpm run playwright:typecheck`
 
 ## Testing Expectations
 

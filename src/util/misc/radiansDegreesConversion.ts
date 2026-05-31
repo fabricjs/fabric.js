@@ -7,7 +7,7 @@ import { PiBy180 } from '../../constants';
  * @return {TRadian} value in radians
  */
 export const degreesToRadians = (degrees: TDegree): TRadian =>
-  (degrees * PiBy180) as TRadian;
+  degrees * PiBy180;
 
 /**
  * Transforms radians to degrees.
@@ -15,4 +15,4 @@ export const degreesToRadians = (degrees: TDegree): TRadian =>
  * @return {TDegree} value in degrees
  */
 export const radiansToDegrees = (radians: TRadian): TDegree =>
-  (radians / PiBy180) as TDegree;
+  radians / PiBy180;

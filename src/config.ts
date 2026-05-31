@@ -27,7 +27,7 @@ class BaseConfiguration {
    * @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
    */
   devicePixelRatio =
-    typeof window !== 'undefined' ? window.devicePixelRatio : 1; // eslint-disable-line no-restricted-globals
+    typeof window === 'undefined' ? 1 : window.devicePixelRatio; // eslint-disable-line no-restricted-globals
 
   /**
    * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.

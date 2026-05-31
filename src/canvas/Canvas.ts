@@ -1190,12 +1190,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       groupSelector.deltaY = pointer.y - groupSelector.y;
 
       this.renderTop();
-    } else if (!this._currentTransform) {
+    } else if (this._currentTransform) {
+      this._transformObject(e);
+    } else {
       const { target } = this.findTarget(e);
       this._setCursorFromEvent(e, target);
       this._fireOverOutEvents(e, target);
-    } else {
-      this._transformObject(e);
     }
     this.textEditingManager.onMouseMove(e);
     this._handleEvent(e, 'move');
@@ -1414,7 +1414,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         // the bigger touch area.
         target.findControl(this.getViewportPoint(e));
 
-    if (!corner) {
+    if (corner) {
+      const { control, coord } = corner;
+      this.setCursor(control.cursorStyleHandler(e, control, target, coord));
+    } else {
       if ((target as Group).subTargetCheck) {
         // hoverCursor should come from top-most subTarget,
         // so we walk the array backwards
@@ -1427,9 +1430,6 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
           });
       }
       this.setCursor(hoverCursor);
-    } else {
-      const { control, coord } = corner;
-      this.setCursor(control.cursorStyleHandler(e, control, target, coord));
     }
   }
 

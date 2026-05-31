@@ -233,7 +233,7 @@ export class FabricObjectSVGExportMixin {
     markup.push(
       '<g ',
       this.getSvgTransform(false),
-      !absoluteClipPath ? shadowInfo + this.getSvgCommons() : '',
+      absoluteClipPath ? '' : shadowInfo + this.getSvgCommons(),
       ' >\n',
     );
     const commonPieces = [
@@ -263,8 +263,8 @@ export class FabricObjectSVGExportMixin {
   }
 
   addPaintOrder(this: FabricObjectSVGExportMixin & FabricObject) {
-    return this.paintFirst !== FILL
-      ? ` paint-order="${escapeXml(this.paintFirst)}" `
-      : '';
+    return this.paintFirst === FILL
+      ? ''
+      : ` paint-order="${escapeXml(this.paintFirst)}" `;
   }
 }

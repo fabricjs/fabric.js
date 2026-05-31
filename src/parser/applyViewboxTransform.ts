@@ -85,14 +85,14 @@ export function applyViewboxTransform(
   parsedDim.minY = minY;
   parsedDim.viewBoxWidth = viewBoxWidth;
   parsedDim.viewBoxHeight = viewBoxHeight;
-  if (!missingDimAttr) {
+  if (missingDimAttr) {
+    parsedDim.width = viewBoxWidth;
+    parsedDim.height = viewBoxHeight;
+  } else {
     parsedDim.width = parseUnit(widthAttr);
     parsedDim.height = parseUnit(heightAttr);
     scaleX = parsedDim.width / viewBoxWidth;
     scaleY = parsedDim.height / viewBoxHeight;
-  } else {
-    parsedDim.width = viewBoxWidth;
-    parsedDim.height = viewBoxHeight;
   }
 
   // default is to preserve aspect ratio

@@ -426,10 +426,10 @@ export class FabricImage<
       ];
       this.fill = origFill;
     }
-    if (this.paintFirst !== FILL) {
-      svgString = svgString.concat(strokeSvg, imageMarkup);
-    } else {
+    if (this.paintFirst === FILL) {
       svgString = svgString.concat(imageMarkup, strokeSvg);
+    } else {
+      svgString = svgString.concat(strokeSvg, imageMarkup);
     }
     return svgString;
   }

@@ -139,20 +139,7 @@ export class Intersection {
       uaT = b2xb1x * a1yb1y - b2yb1y * a1xb1x,
       ubT = a2xa1x * a1yb1y - a2ya1y * a1xb1x,
       uB = b2yb1y * a2xa1x - b2xb1x * a2ya1y;
-    if (uB !== 0) {
-      const ua = uaT / uB,
-        ub = ubT / uB;
-      if (
-        (aInfinite || (0 <= ua && ua <= 1)) &&
-        (bInfinite || (0 <= ub && ub <= 1))
-      ) {
-        return new Intersection('Intersection').append(
-          new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y),
-        );
-      } else {
-        return new Intersection();
-      }
-    } else {
+    if (uB === 0) {
       if (uaT === 0 || ubT === 0) {
         const segmentsCoincide =
           aInfinite ||
@@ -164,6 +151,19 @@ export class Intersection {
         return new Intersection(segmentsCoincide ? 'Coincident' : undefined);
       } else {
         return new Intersection('Parallel');
+      }
+    } else {
+      const ua = uaT / uB,
+        ub = ubT / uB;
+      if (
+        (aInfinite || (0 <= ua && ua <= 1)) &&
+        (bInfinite || (0 <= ub && ub <= 1))
+      ) {
+        return new Intersection('Intersection').append(
+          new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y),
+        );
+      } else {
+        return new Intersection();
       }
     }
   }

@@ -127,10 +127,10 @@ export abstract class StyledText<
           allStyleObjectPropertiesMatch = false;
         }
 
-        if (Object.keys(styleObject).length !== 0) {
-          letterCount++;
-        } else {
+        if (Object.keys(styleObject).length === 0) {
           delete obj[p1][p2];
+        } else {
+          letterCount++;
         }
       }
 

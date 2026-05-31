@@ -775,7 +775,9 @@ export class FabricText<
               bgHeight,
             );
           ctx.restore();
-        } else if (currentColor !== lastColor) {
+        } else if (currentColor === lastColor) {
+          boxWidth += charBox.kernedWidth;
+        } else {
           drawStart = leftOffset + lineLeftOffset + boxStart;
           if (this.direction === RTL) {
             drawStart = this.width - drawStart - boxWidth;
@@ -786,8 +788,6 @@ export class FabricText<
           boxStart = charBox.left;
           boxWidth = charBox.width;
           lastColor = currentColor;
-        } else {
-          boxWidth += charBox.kernedWidth;
         }
       }
       if (currentColor && !this.path) {
@@ -932,7 +932,7 @@ export class FabricText<
       kernedWidth: 0,
       height: this.fontSize,
       deltaY: 0,
-    } as GraphemeBBox;
+    };
     if (path && path.segmentsInfo) {
       let positionInPath = 0;
       const totalPathLength =

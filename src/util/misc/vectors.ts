@@ -37,7 +37,7 @@ export const magnitude = (point: Point) => point.distanceFrom(zero);
  * @returns the angle in radians from `a` to `b`
  */
 export const calcAngleBetweenVectors = (a: Point, b: Point): TRadian =>
-  Math.atan2(crossProduct(a, b), dotProduct(a, b)) as TRadian;
+  Math.atan2(crossProduct(a, b), dotProduct(a, b));
 
 /**
  * Calculates the angle between the x axis and the vector

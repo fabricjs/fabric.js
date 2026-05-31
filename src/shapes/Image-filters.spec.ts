@@ -963,6 +963,32 @@ describe('Image filters', () => {
       );
     });
 
+    it('applyTo2d keeps alpha when the filter is opaque', () => {
+      const filter = new Convolute({ opaque: true });
+      const imageData = context.createImageData(1, 1);
+      imageData.data.set([10, 20, 30, 40]);
+      const options = { imageData, ctx: context } as T2DPipelineState;
+
+      filter.applyTo2d(options);
+
+      expect([...options.imageData.data]).toEqual([10, 20, 30, 40]);
+    });
+
+    it('applyTo2d convolves alpha when the filter is not opaque', () => {
+      const filter = new Convolute({
+        matrix: [0, 0, 0, 0, 1, 0.5, 0, 0, 0],
+      });
+      const imageData = context.createImageData(2, 1);
+      imageData.data.set([10, 20, 30, 40, 50, 60, 70, 80]);
+      const options = { imageData, ctx: context } as T2DPipelineState;
+
+      filter.applyTo2d(options);
+
+      expect([...options.imageData.data]).toEqual([
+        35, 50, 65, 80, 50, 60, 70, 80,
+      ]);
+    });
+
     it('toObject', () => {
       const filter = new Convolute({ opaque: true });
 
@@ -1775,6 +1801,20 @@ describe('Image filters', () => {
       expect(filter.applyTo2d, 'should have applyTo2d method').toBeTypeOf(
         'function',
       );
+    });
+
+    it('applyTo2d adjusts muted color channels and keeps the dominant channel', () => {
+      const filter = new Vibrance({ vibrance: 1 });
+      const imageData = context.createImageData(3, 1);
+      imageData.data.set([
+        200, 100, 50, 255, 30, 255, 10, 255, 10, 20, 30, 255,
+      ]);
+
+      filter.applyTo2d({ imageData } as T2DPipelineState);
+
+      expect([...imageData.data]).toEqual([
+        200, 35, 0, 255, 0, 255, 0, 255, 8, 19, 30, 255,
+      ]);
     });
 
     it('toObject', () => {

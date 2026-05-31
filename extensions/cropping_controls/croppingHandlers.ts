@@ -411,9 +411,9 @@ const changeImageSizeWithAutoCoverGenerator =
     const requestedSize = Math.max(10, rawSize / initialScale);
 
     const availableSize =
-      isNegativeEdge !== isFlipped
-        ? initialCrop + initialSize
-        : elementSize - initialCrop;
+      isNegativeEdge === isFlipped
+        ? elementSize - initialCrop
+        : initialCrop + initialSize;
 
     const setImageProps = (
       size: number,
@@ -439,9 +439,9 @@ const changeImageSizeWithAutoCoverGenerator =
 
     if (requestedSize <= availableSize) {
       const newCrop =
-        isNegativeEdge !== isFlipped
-          ? Math.max(0, initialCrop + initialSize - requestedSize)
-          : initialCrop;
+        isNegativeEdge === isFlipped
+          ? initialCrop
+          : Math.max(0, initialCrop + initialSize - requestedSize);
       setImageProps(
         Math.max(1, requestedSize),
         initialCrossSize,
@@ -467,7 +467,7 @@ const changeImageSizeWithAutoCoverGenerator =
         availableSize,
         newCrossSize,
         newScale,
-        isNegativeEdge !== isFlipped ? 0 : initialCrop,
+        isNegativeEdge === isFlipped ? initialCrop : 0,
         newCrossCrop,
       );
     }

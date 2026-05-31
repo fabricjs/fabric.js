@@ -53,9 +53,9 @@ export class Saturation extends BaseFilter<'Saturation', SaturationOwnProps> {
       const g = data[i + 1];
       const b = data[i + 2];
       const max = Math.max(r, g, b);
-      data[i] += max !== r ? (max - r) * adjust : 0;
-      data[i + 1] += max !== g ? (max - g) * adjust : 0;
-      data[i + 2] += max !== b ? (max - b) * adjust : 0;
+      data[i] += max === r ? 0 : (max - r) * adjust;
+      data[i + 1] += max === g ? 0 : (max - g) * adjust;
+      data[i + 2] += max === b ? 0 : (max - b) * adjust;
     }
   }
 

@@ -54,7 +54,7 @@ $ npm install fabric --save
 # or use yarn
 $ yarn add fabric
 # or use pnpm
-$ pnpm install fabric
+$ pnpm add fabric
 ```
 
 #### Browser

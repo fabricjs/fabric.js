@@ -20,7 +20,7 @@ export function recursivelyParseGradientsXlink(
   const xLink = gradient.getAttribute(xlinkAttr)?.slice(1) || '',
     referencedGradient = doc.getElementById(xLink);
   if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
-    recursivelyParseGradientsXlink(doc, referencedGradient as Element);
+    recursivelyParseGradientsXlink(doc, referencedGradient);
   }
   if (referencedGradient) {
     gradientsAttrs.forEach((attr) => {
