@@ -55,9 +55,9 @@ export class Vibrance extends BaseFilter<'Vibrance', VibranceOwnProps> {
       const max = Math.max(r, g, b);
       const avg = (r + g + b) / 3;
       const amt = ((Math.abs(max - avg) * 2) / 255) * adjust;
-      data[i] += max !== r ? (max - r) * amt : 0;
-      data[i + 1] += max !== g ? (max - g) * amt : 0;
-      data[i + 2] += max !== b ? (max - b) * amt : 0;
+      data[i] += max === r ? 0 : (max - r) * amt;
+      data[i + 1] += max === g ? 0 : (max - g) * amt;
+      data[i + 2] += max === b ? 0 : (max - b) * amt;
     }
   }
 

@@ -386,9 +386,9 @@ export class Control {
       xSize = this.sizeX || sizeFromProps,
       ySize = this.sizeY || sizeFromProps,
       transparent =
-        typeof transparentCorners !== 'undefined'
-          ? transparentCorners
-          : fabricObject.transparentCorners,
+        typeof transparentCorners === 'undefined'
+          ? fabricObject.transparentCorners
+          : transparentCorners,
       opName = transparent ? STROKE : FILL,
       strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor,
       stroke = !transparent && !!strokeColor;

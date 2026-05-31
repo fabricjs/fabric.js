@@ -224,9 +224,9 @@ export class Shadow {
       type: (this.constructor as typeof Shadow).type,
     };
     const defaults = Shadow.ownDefaults as SerializedShadowOptions;
-    return !this.includeDefaultValues
-      ? pickBy(data, (value, key) => value !== defaults[key])
-      : data;
+    return this.includeDefaultValues
+      ? data
+      : pickBy(data, (value, key) => value !== defaults[key]);
   }
 
   static async fromObject(options: Partial<TClassProperties<Shadow>>) {

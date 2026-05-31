@@ -140,7 +140,7 @@ export const qrDecompose = (a: TMat2D): TQrDecomposeOut => {
     scaleX,
     scaleY,
     skewX: radiansToDegrees(skewX),
-    skewY: 0 as TDegree,
+    skewY: 0,
     translateX: a[4] || 0,
     translateY: a[5] || 0,
   };
@@ -292,8 +292,8 @@ export const calcDimensionsMatrix = ({
   scaleY = 1,
   flipX = false,
   flipY = false,
-  skewX = 0 as TDegree,
-  skewY = 0 as TDegree,
+  skewX = 0,
+  skewY = 0,
 }: TScaleMatrixArgs) => {
   let matrix = createScaleMatrix(
     flipX ? -scaleX : scaleX,
@@ -326,7 +326,7 @@ export const calcDimensionsMatrix = ({
  * @return {Number[]} transform matrix
  */
 export const composeMatrix = (options: TComposeMatrixArgs): TMat2D => {
-  const { translateX = 0, translateY = 0, angle = 0 as TDegree } = options;
+  const { translateX = 0, translateY = 0, angle = 0 } = options;
   let matrix = createTranslateMatrix(translateX, translateY);
   if (angle) {
     matrix = multiplyTransformMatrices(matrix, createRotateMatrix({ angle }));

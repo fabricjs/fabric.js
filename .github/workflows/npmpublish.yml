@@ -53,19 +53,24 @@ jobs:
         with:
           ref: refs/tags/${{ steps.publish.outputs.ref_name }}
           persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.1
       - uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org/
-      - run: npm ci --audit false --fund false
-      - run: npm run build
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --prefer-offline
+      - run: pnpm run build
       - name: Publish package
         shell: bash
         run: |
           if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
-            echo "npm publish --tag ${{ steps.publish.outputs.npm_tag }}"
-            npm publish --tag "${{ steps.publish.outputs.npm_tag }}"
+            echo "pnpm publish --tag ${{ steps.publish.outputs.npm_tag }} --no-git-checks"
+            pnpm publish --tag "${{ steps.publish.outputs.npm_tag }}" --no-git-checks
           else
-            echo "npm publish"
-            npm publish
+            echo "pnpm publish --no-git-checks"
+            pnpm publish --no-git-checks
           fi

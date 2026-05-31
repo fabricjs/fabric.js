@@ -39,7 +39,7 @@ jobs:
           node-version: 24.x
           install-system-deps: false
       - name: Run Vitest unit test
-        run: npm run test:vitest:coverage
+        run: pnpm run test:vitest:coverage
       - name: Upload test coverage
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: always()
@@ -68,9 +68,9 @@ jobs:
           node-version: 24.x
           install-system-deps: false
       - name: Install Playwright Browsers ${{matrix.browser}}
-        run: npx playwright install --with-deps ${{matrix.browser}}
+        run: pnpm exec playwright install --with-deps ${{matrix.browser}}
       - name: Run Vitest unit test
-        run: xvfb-run npm run test:vitest:${{matrix.browser}}
+        run: xvfb-run pnpm run test:vitest:${{matrix.browser}}
         env:
           LIBGL_ALWAYS_SOFTWARE: true
   vitest-node-20:
@@ -83,7 +83,7 @@ jobs:
           node-version: 20.x
           install-system-deps: false
       - name: Run Vitest unit test
-        run: npm run test:vitest
+        run: pnpm run test:vitest
   vitest-node-22:
     name: Vitest tests node 22
     runs-on: ubuntu-24.04
@@ -94,7 +94,7 @@ jobs:
           node-version: 22.x
           install-system-deps: false
       - name: Run Vitest unit test
-        run: npm run test:vitest
+        run: pnpm run test:vitest
   e2e:
     needs: [prime-build]
     name: Playwright tests
@@ -108,9 +108,9 @@ jobs:
         uses: ./.github/actions/build-fabric-cached
         # Playwright suggests against caching the browser install
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
       - name: Run Playwright tests
-        run: xvfb-run npm run test:e2e
+        run: xvfb-run pnpm run test:e2e
       - name: Upload Test Output
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: failure()

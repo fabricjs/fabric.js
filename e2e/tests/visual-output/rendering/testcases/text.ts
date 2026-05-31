@@ -1136,6 +1136,39 @@ const cases: renderTestType[] = [
       canvas.add(text1, text2, text3, text4, text5);
     },
   },
+  {
+    title: 'RTL IText cursor positioned by click',
+    golden: 'rtl_cursor_click.png',
+    percentage: 0.05,
+    disabled: 'node',
+    size: [300, 80],
+    async renderFunction(canvas, fabric) {
+      const text = new fabric.IText('שלום עולם', {
+        direction: 'rtl',
+        textAlign: 'right',
+        fontFamily: 'Arial',
+        fontSize: 32,
+      });
+      text.positionByLeftTop(new fabric.Point(0, 10));
+      canvas.add(text);
+      canvas.setActiveObject(text);
+      text.enterEditing();
+      canvas.renderAll();
+
+      // simulate a click at roughly the left half of the text
+      // for RTL text this should place the cursor past the midpoint
+      // (high charIndex), not at 0 as the bug caused
+      // @ts-expect-error -- partial mock of TPointerEvent
+      text.setCursorByClick({
+        clientX: Math.round(text.width * 0.25),
+        clientY: 26,
+        target: canvas.upperCanvasEl,
+      });
+      canvas.renderAll();
+      canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
+      return canvas.lowerCanvasEl.toDataURL();
+    },
+  },
 ];
 
 export const textRenderingTests: renderTestType[] = cases.map((testCase) => ({

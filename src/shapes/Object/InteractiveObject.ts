@@ -497,14 +497,14 @@ export class InteractiveFabricObject<
           this.height,
           calcDimensionsMatrix(options),
         ),
-        stroke = !this.isStrokeAccountedForInDimensions()
-          ? (this.strokeUniform
+        stroke = this.isStrokeAccountedForInDimensions()
+          ? ZERO
+          : (this.strokeUniform
               ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1)
               : // this is extremely confusing. options comes from the upper function
                 // and is the qrDecompose of a matrix that takes in account zoom too
                 new Point(options.scaleX, options.scaleY)
-            ).scalarMultiply(this.strokeWidth)
-          : ZERO;
+            ).scalarMultiply(this.strokeWidth);
       size = bbox
         .add(stroke)
         .scalarAdd(this.borderScaleFactor)

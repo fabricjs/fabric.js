@@ -210,21 +210,18 @@ export abstract class ITextClickBehavior<
         break;
       }
     }
-    const lineLeftOffset = Math.abs(this._getLineLeftOffset(lineIndex));
-    let width = lineLeftOffset;
     const charLength = this._textLines[lineIndex].length;
+    // _getLineLeftOffset must be called before reading __charBounds — it lazily populates them via _measureLine
+    const lineLeftOffset = this._getLineLeftOffset(lineIndex);
     const chars = this.__charBounds[lineIndex];
+    const isRtl = this.direction === 'rtl';
+    const effectiveX = isRtl ? lineLeftOffset - mouseOffset.x : mouseOffset.x;
+    let width = isRtl ? 0 : Math.abs(lineLeftOffset);
     for (let j = 0; j < charLength; j++) {
-      // i removed something about flipX here, check.
       const charWidth = chars[j].kernedWidth;
       const widthAfter = width + charWidth;
-      if (mouseOffset.x <= widthAfter) {
-        // if the pointer is closer to the end of the char we increment charIndex
-        // in order to position the cursor after the char
-        if (
-          Math.abs(mouseOffset.x - widthAfter) <=
-          Math.abs(mouseOffset.x - width)
-        ) {
+      if (effectiveX <= widthAfter) {
+        if (Math.abs(effectiveX - widthAfter) <= Math.abs(effectiveX - width)) {
           charIndex++;
         }
         break;

@@ -41,7 +41,7 @@ describe.each([MALICIOUS, MALICIOUS2])(
           offsetY: 0,
         }),
       });
-      rect.shadow.id = payload as unknown as number;
+      rect.shadow.id = payload;
 
       const svg = rect.toSVG();
       expect(svg).not.toContain('<script>');

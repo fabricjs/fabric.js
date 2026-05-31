@@ -54,10 +54,10 @@ export class Cache {
    * @param {String} [fontFamily] font family to clear
    */
   clearFontCache(fontFamily?: string) {
-    if (!fontFamily) {
-      this.charWidthsCache = new Map();
-    } else {
+    if (fontFamily) {
       this.charWidthsCache.delete((fontFamily || '').toLowerCase());
+    } else {
+      this.charWidthsCache = new Map();
     }
   }
 

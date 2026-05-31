@@ -39,25 +39,26 @@
     "url": "https://github.com/fabricjs/fabric.js/issues"
   },
   "license": "MIT",
+  "packageManager": "pnpm@10.29.1",
   "scripts": {
     "docs": "typedoc",
     "cli": "node ./scripts/index.mjs",
     "sandboxscript": "node ./scripts/sandbox.mjs",
     "typecheck": "tsc -p ./tsconfig.build.json --noEmit && tsc -p ./tsconfig-extensions.json --noEmit",
-    "build": "npm run cli -- build",
-    "build:fast": "npm run build -- -f",
-    "dev": "npm run cli -- dev",
-    "start": "npm run sandboxscript -- start",
-    "export": "npm run cli -- website export",
+    "build": "node ./scripts/index.mjs build",
+    "build:fast": "node ./scripts/index.mjs build -f",
+    "dev": "node ./scripts/index.mjs dev",
+    "start": "node ./scripts/sandbox.mjs start",
+    "export": "node ./scripts/index.mjs website export",
     "test:vitest": "vitest --run --project unit-node",
     "test:vitest:chromium": "vitest --run --project unit-chromium",
     "test:vitest:firefox": "vitest --run --project unit-firefox",
     "test:vitest:all": "vitest --run",
     "test:vitest:coverage": "vitest --run --coverage --project unit-node",
-    "test:vitest:coverage:watch": "npm run test:vitest --coverage=true",
-    "test:e2e": "npm run playwright:typecheck && playwright test --",
+    "test:vitest:coverage:watch": "pnpm run test:vitest --coverage=true",
+    "test:e2e": "pnpm run playwright:typecheck && pnpm exec playwright test --",
     "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
-    "sandbox": "npm run sandboxscript -- sandbox",
+    "sandbox": "node ./scripts/sandbox.mjs sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
     "lint": "eslint src extensions --fix",
     "prettier:check": "oxfmt --check .",
@@ -76,6 +77,7 @@
     "@vitest/ui": "4.1.7",
     "commander": "^14.0.3",
     "es-toolkit": "1.47.0",
+    "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "inquirer": "^13.4.3",
@@ -98,6 +100,11 @@
     "canvas": {
       "canvas": "3.2.0"
     }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "canvas"
+    ]
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

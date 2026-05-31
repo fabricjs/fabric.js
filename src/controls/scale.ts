@@ -156,8 +156,8 @@ function scaleObject(
     // by center and scaling using one middle control ( default: mr, mt, ml, mb), the mouse movement can easily
     // cross many time the origin point and flip the object. so we need a way to filter out the noise.
     // This ternary here should be ok to filter out X scaling when we want Y only and vice versa.
-    signX = by !== 'y' ? Math.sign(newPoint.x || transform.signX || 1) : 1;
-    signY = by !== 'x' ? Math.sign(newPoint.y || transform.signY || 1) : 1;
+    signX = by === 'y' ? 1 : Math.sign(newPoint.x || transform.signX || 1);
+    signY = by === 'x' ? 1 : Math.sign(newPoint.y || transform.signY || 1);
     if (!transform.signX) {
       transform.signX = signX;
     }
@@ -207,13 +207,13 @@ function scaleObject(
   // minScale is taken care of in the setter.
   const oldScaleX = target.scaleX,
     oldScaleY = target.scaleY;
-  if (!by) {
-    !isLocked(target, 'lockScalingX') && target.set(SCALE_X, scaleX);
-    !isLocked(target, 'lockScalingY') && target.set(SCALE_Y, scaleY);
-  } else {
+  if (by) {
     // forbidden cases already handled on top here.
     by === 'x' && target.set(SCALE_X, scaleX);
     by === 'y' && target.set(SCALE_Y, scaleY);
+  } else {
+    !isLocked(target, 'lockScalingX') && target.set(SCALE_X, scaleX);
+    !isLocked(target, 'lockScalingY') && target.set(SCALE_Y, scaleY);
   }
   return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
 }

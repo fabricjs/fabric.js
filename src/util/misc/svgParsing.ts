@@ -143,9 +143,7 @@ export const colorPropToSVG = (
     colorValue = `url(#SVGID_${escapeXml((value as TFiller).id)})`;
   } else {
     const rawValue = String(value);
-    if (!isSafeSvgStyleValue(rawValue)) {
-      colorValue = new Color('black').toRgb();
-    } else {
+    if (isSafeSvgStyleValue(rawValue)) {
       const color = new Color(rawValue),
         opacity = color.getAlpha();
 
@@ -153,6 +151,8 @@ export const colorPropToSVG = (
       if (opacity !== 1) {
         opacityValue = opacity.toString();
       }
+    } else {
+      colorValue = new Color('black').toRgb();
     }
   }
 

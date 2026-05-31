@@ -134,10 +134,10 @@ export class Convolute extends BaseFilter<'Convolute', ConvoluteOwnProps> {
         dst[dstOff] = r;
         dst[dstOff + 1] = g;
         dst[dstOff + 2] = b;
-        if (!alphaFac) {
-          dst[dstOff + 3] = a;
-        } else {
+        if (alphaFac) {
           dst[dstOff + 3] = data[dstOff + 3];
+        } else {
+          dst[dstOff + 3] = a;
         }
       }
     }

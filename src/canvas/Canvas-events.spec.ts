@@ -958,7 +958,7 @@ describe('Canvas events mixin', () => {
       }
 
       if (eventType === 'mouseenter') {
-        eventname = 'mouse:over' as keyof CanvasEvents;
+        eventname = 'mouse:over';
       }
 
       let counter = 0;
