@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.0.7 [#11006](https://github.com/fabricjs/fabric.js/pull/11006)
 - fix(text): correct RTL cursor positioning in `getSelectionStartFromPointer` so clicks land on the right character in RTL `IText`/`Textbox` objects
 - chore(): tackle sonar `Unexpected negated condition.` violations [#10992](https://github.com/fabricjs/fabric.js/pull/10992)
 - chore(): switch repo tooling and CI to pnpm [#11002](https://github.com/fabricjs/fabric.js/pull/11002)
