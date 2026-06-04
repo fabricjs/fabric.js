@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump typescript-eslint from 8.59.4 to 8.60.1 [#11004](https://github.com/fabricjs/fabric.js/pull/11004)
 - chore(deps-dev): bump rolldown from 1.0.2 to 1.1.0 [#11005](https://github.com/fabricjs/fabric.js/pull/11005)
 - fix(text): correct RTL cursor positioning in `getSelectionStartFromPointer` so clicks land on the right character in RTL `IText`/`Textbox` objects
 - chore(): tackle sonar `Unexpected negated condition.` violations [#10992](https://github.com/fabricjs/fabric.js/pull/10992)
