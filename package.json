@@ -72,9 +72,9 @@
     "@types/jsdom": "^21.1.7",
     "@types/micromatch": "^4.0.10",
     "@types/node": "^24.7.0",
-    "@vitest/browser-playwright": "4.1.7",
-    "@vitest/coverage-v8": "4.1.7",
-    "@vitest/ui": "4.1.7",
+    "@vitest/browser-playwright": "4.1.8",
+    "@vitest/coverage-v8": "4.1.8",
+    "@vitest/ui": "4.1.8",
     "commander": "^14.0.3",
     "es-toolkit": "1.47.0",
     "eslint": "^10.0.1",
@@ -90,7 +90,7 @@
     "tsc-files": "^1.1.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.4",
-    "vitest": "4.1.7",
+    "vitest": "4.1.8",
     "westures": "^1.1.1"
   },
   "engines": {
