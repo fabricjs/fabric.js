@@ -11,7 +11,7 @@ const basename = path.basename(buildOutput, '.js');
 
 // match .browserslistrc targets for syntax lowering
 const transform = {
-  target: ['chrome88', 'safari13', 'firefox85', 'edge88'],
+  target: ['es2020'],
 };
 
 /**

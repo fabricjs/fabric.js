@@ -1,7 +1,7 @@
 # Browsers that we support
 # Picked up for fabric 7.0 In April 2025 Browsers released jan 2021
 chrome >= 88
-safari >= 13
+safari >= 13.1
 firefox >= 85
 edge >= 88
 Opera >= 73
