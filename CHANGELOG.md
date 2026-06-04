@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): disable Sonar optional chaining suggestions
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11003](https://github.com/fabricjs/fabric.js/pull/11003)
 - chore(deps-dev): bump typescript-eslint from 8.59.4 to 8.60.1 [#11004](https://github.com/fabricjs/fabric.js/pull/11004)
 - chore(deps-dev): bump rolldown from 1.0.2 to 1.1.0 [#11005](https://github.com/fabricjs/fabric.js/pull/11005)
