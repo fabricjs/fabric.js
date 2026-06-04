@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "fabric": ["./index"],
+      "fabric/node": ["./index.node"],
+      "fabric/extensions": ["./extensions/index"],
+      "@fabricjs/core": ["./fabric"],
+      "@fabricjs/browser": ["./packages/browser/src/index"],
+      "@fabricjs/node": ["./packages/node/src/index"]
+    }
+  },
+  "include": ["packages/*/src/**/*.ts"],
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}

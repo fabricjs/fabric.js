@@ -44,7 +44,7 @@
     "docs": "typedoc",
     "cli": "node ./scripts/index.mjs",
     "sandboxscript": "node ./scripts/sandbox.mjs",
-    "typecheck": "tsc -p ./tsconfig.build.json --noEmit && tsc -p ./tsconfig-extensions.json --noEmit",
+    "typecheck": "tsc -p ./tsconfig.build.json --noEmit && tsc -p ./tsconfig-extensions.json --noEmit && tsc -p ./tsconfig.packages.json --noEmit",
     "build": "node ./scripts/index.mjs build",
     "build:fast": "node ./scripts/index.mjs build -f",
     "dev": "node ./scripts/index.mjs dev",
@@ -60,7 +60,7 @@
     "playwright:typecheck": "tsc -p ./e2e/tsconfig.json --noEmit",
     "sandbox": "node ./scripts/sandbox.mjs sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
-    "lint": "eslint src extensions --fix",
+    "lint": "eslint src extensions packages/*/src --fix",
     "prettier:check": "oxfmt --check .",
     "prettier:write": "oxfmt .",
     "prepare": "husky install"

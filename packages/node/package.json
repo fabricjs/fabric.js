@@ -1,0 +1,38 @@
+{
+  "name": "@fabricjs/node",
+  "description": "Node.js entrypoint for Fabric.js.",
+  "version": "7.4.0",
+  "homepage": "http://fabricjs.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabricjs/fabric.js.git",
+    "directory": "packages/node"
+  },
+  "bugs": {
+    "url": "https://github.com/fabricjs/fabric.js/issues"
+  },
+  "license": "MIT",
+  "sideEffects": true,
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@fabricjs/core": "workspace:^",
+    "canvas": "^3.2.0",
+    "jsdom": "^26.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

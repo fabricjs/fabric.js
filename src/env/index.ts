@@ -8,8 +8,7 @@
 
 import { config } from '../config';
 import { getEnv as getBrowserEnv } from './browser';
-import type { TFabricEnv } from './types';
-import type { DOMWindow } from 'jsdom';
+import type { TFabricEnv, TFabricWindow } from './types';
 
 let env: TFabricEnv;
 
@@ -37,8 +36,7 @@ export const getEnv = () => env || (env = getBrowserEnv());
 
 export const getFabricDocument = (): Document => getEnv().document;
 
-export const getFabricWindow = (): (Window & typeof globalThis) | DOMWindow =>
-  getEnv().window;
+export const getFabricWindow = (): TFabricWindow => getEnv().window;
 
 /**
  * @returns the config value if defined, fallbacks to the environment value

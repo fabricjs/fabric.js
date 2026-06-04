@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 // @ts-expect-error internal import
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
 import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
-import type { TCopyPasteData, TFabricEnv } from './types';
+import type { TCopyPasteData, TFabricEnv, TFabricWindow } from './types';
 
 const { implForWrapper: jsdomImplForWrapper } = utils;
 
@@ -40,7 +40,7 @@ export const dispose = (element: Element) => {
 export const getEnv = (): TFabricEnv => {
   return {
     document: JSDOMWindow.document,
-    window: JSDOMWindow,
+    window: JSDOMWindow as unknown as TFabricWindow,
     isTouchSupported: false,
     WebGLProbe: new NodeGLProbe(),
     dispose,

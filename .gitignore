@@ -20,6 +20,8 @@ e2e/dist/
 !/dist/index.min.js.map
 !/dist/index.min.mjs
 !/dist/index.min.mjs.map
+/packages/*/node_modules/
+/packages/*/dist/
 /cli_output/
 e2e/test-report/
 e2e/test-results/

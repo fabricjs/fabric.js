@@ -7,13 +7,17 @@
     "paths": {
       "fabric": ["./src"],
       "fabric/node": ["./src/node"],
-      "fabric/extensions": ["./extensions"]
+      "fabric/extensions": ["./extensions"],
+      "@fabricjs/core": ["./fabric"],
+      "@fabricjs/browser": ["./packages/browser/src/index"],
+      "@fabricjs/node": ["./packages/node/src/index"]
     }
   },
   "include": [
     "src/**/*",
     "e2e/**/*",
     "extensions/**/*",
+    "packages/*/src/**/*",
     "vitest.d.ts",
     "vitest.env.d.ts",
     "vitest.setup.ts",

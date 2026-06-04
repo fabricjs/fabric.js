@@ -125,6 +125,40 @@ export default [
     onwarn,
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
+  // WORKSPACE PACKAGES
+
+  {
+    input: ['./packages/browser/src/index.ts'],
+    external: ['@fabricjs/core'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/browser/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
+  {
+    input: ['./packages/node/src/index.ts'],
+    external: [
+      '@fabricjs/core',
+      'jsdom',
+      'jsdom/lib/jsdom/living/generated/utils.js',
+      'canvas',
+    ],
+    tsconfig: './tsconfig.packages.json',
+    output: [
+      {
+        file: path.resolve('./packages/node/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
   // EXTENSIONS
 
   {

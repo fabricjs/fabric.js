@@ -11,6 +11,7 @@ export default tseslint.config(
     ignores: [
       'dist/*',
       'dist-extensions/*',
+      'packages/*/dist/*',
       '.codesandbox/**/*',
       'e2e/*',
       'src/mixins/eraser_brush.mixin.ts',
