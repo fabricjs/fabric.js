@@ -24,7 +24,7 @@ export function normalizeValue(
       ouputValue = value.replace(/,/g, ' ').split(/\s+/).map(parseFloat);
     }
   } else if (attr === 'transformMatrix') {
-    if (parentAttributes && parentAttributes.transformMatrix) {
+    if (parentAttributes?.transformMatrix) {
       ouputValue = multiplyTransformMatrices(
         parentAttributes.transformMatrix,
         parseTransformAttribute(value),
@@ -35,12 +35,12 @@ export function normalizeValue(
   } else if (attr === 'visible') {
     ouputValue = value !== NONE && value !== 'hidden';
     // display=none on parent element always takes precedence over child element
-    if (parentAttributes && parentAttributes.visible === false) {
+    if (parentAttributes?.visible === false) {
       ouputValue = false;
     }
   } else if (attr === 'opacity') {
     ouputValue = parseFloat(value);
-    if (parentAttributes && typeof parentAttributes.opacity !== 'undefined') {
+    if (typeof parentAttributes?.opacity !== 'undefined') {
       ouputValue *= parentAttributes.opacity as number;
     }
   } else if (attr === 'textAnchor' /* text-anchor */) {

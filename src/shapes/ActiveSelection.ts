@@ -164,7 +164,7 @@ export class ActiveSelection extends Group {
   exitGroup(object: FabricObject, removeParentTransform?: boolean) {
     this._exitGroup(object, removeParentTransform);
     // return to parent
-    object.parent && object.parent._enterGroup(object, true);
+    object.parent?._enterGroup(object, true);
   }
 
   /**

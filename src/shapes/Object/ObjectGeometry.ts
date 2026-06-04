@@ -491,7 +491,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
     }
     const key = this.transformMatrixKey(skipGroup),
       cache = this.matrixCache;
-    if (cache && cache.key.every((x, i) => x === key[i])) {
+    if (cache?.key.every((x, i) => x === key[i])) {
       return cache.value;
     }
     if (this.group) {
@@ -515,7 +515,7 @@ export class ObjectGeometry<EventSpec extends ObjectEvents = ObjectEvents>
   calcOwnMatrix(): TMat2D {
     const key = this.transformMatrixKey(true),
       cache = this.ownMatrixCache;
-    if (cache && cache.key.every((x, i) => x === key[i])) {
+    if (cache?.key.every((x, i) => x === key[i])) {
       return cache.value;
     }
     const center = this.getRelativeCenterPoint(),

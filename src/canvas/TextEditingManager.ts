@@ -15,7 +15,7 @@ export class TextEditingManager {
     const cb = () => {
       const { hiddenTextarea } =
         (canvas.getActiveObject() as ITextBehavior) || {};
-      hiddenTextarea && hiddenTextarea.focus();
+      hiddenTextarea?.focus();
     };
     const el = canvas.upperCanvasEl;
     el.addEventListener('click', cb);

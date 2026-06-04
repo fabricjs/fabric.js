@@ -933,7 +933,7 @@ export class FabricText<
       height: this.fontSize,
       deltaY: 0,
     };
-    if (path && path.segmentsInfo) {
+    if (path?.segmentsInfo) {
       let positionInPath = 0;
       const totalPathLength =
         path.segmentsInfo[path.segmentsInfo.length - 1].length;

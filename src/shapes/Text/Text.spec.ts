@@ -671,10 +671,7 @@ describe('FabricText', () => {
     const charCache = cache.charWidthsCache.get(text.fontFamily.toLowerCase());
     const cacheProp = text.fontStyle + '_400';
 
-    expect(
-      charCache && charCache.has(cacheProp),
-      '400 is converted to string',
-    ).toBe(true);
+    expect(charCache?.has(cacheProp), '400 is converted to string').toBe(true);
   });
 
   it('getFontCache is case insensitive', () => {

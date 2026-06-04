@@ -28,8 +28,7 @@ Object.assign(Canvas.prototype, {
   __onTransformGesture: function (e, self) {
     if (
       this.isDrawingMode ||
-      !e.touches ||
-      e.touches.length !== 2 ||
+      e.touches?.length !== 2 ||
       'gesture' !== self.gesture
     ) {
       return;

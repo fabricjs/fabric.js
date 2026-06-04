@@ -471,8 +471,8 @@ describe('IText', () => {
       lockMovementY: iText.lockMovementY,
       hoverCursor: iText.hoverCursor,
       selectable: iText.selectable,
-      defaultCursor: iText.canvas && iText.canvas.defaultCursor,
-      moveCursor: iText.canvas && iText.canvas.moveCursor,
+      defaultCursor: iText.canvas?.defaultCursor,
+      moveCursor: iText.canvas?.moveCursor,
     };
 
     iText.enterEditing();

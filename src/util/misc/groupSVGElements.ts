@@ -12,7 +12,7 @@ export const groupSVGElements = (
   elements: FabricObject[],
   options?: Partial<GroupProps>,
 ) => {
-  if (elements && elements.length === 1) {
+  if (elements?.length === 1) {
     return elements[0];
   }
   return new Group(elements, options);

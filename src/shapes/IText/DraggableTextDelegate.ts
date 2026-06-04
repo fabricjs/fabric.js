@@ -154,7 +154,7 @@ export class DraggableTextDelegate {
       width: `${dragImage.width / retinaScaling}px`,
       height: `${dragImage.height / retinaScaling}px`,
     });
-    this.__dragImageDisposer && this.__dragImageDisposer();
+    this.__dragImageDisposer?.();
     this.__dragImageDisposer = () => {
       dragImage.remove();
     };
@@ -375,13 +375,13 @@ export class DraggableTextDelegate {
       }
     }
 
-    this.__dragImageDisposer && this.__dragImageDisposer();
+    this.__dragImageDisposer?.();
     delete this.__dragImageDisposer;
     delete this.__dragStartSelection;
     this.__isDraggingOver = false;
   }
 
   dispose() {
-    this._dispose && this._dispose();
+    this._dispose?.();
   }
 }

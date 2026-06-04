@@ -31,7 +31,7 @@ export const loadImage = (
   { signal, crossOrigin = null }: LoadImageOptions = {},
 ) =>
   new Promise<HTMLImageElement>(function (resolve, reject) {
-    if (signal && signal.aborted) {
+    if (signal?.aborted) {
       return reject(new SignalAbortedError('loadImage'));
     }
     const img = createImage();
@@ -103,7 +103,7 @@ export const enlivenObjects = <
 ) =>
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
-    signal && signal.addEventListener('abort', reject, { once: true });
+    signal?.addEventListener('abort', reject, { once: true });
     Promise.allSettled(
       objects.map((obj) =>
         classRegistry
@@ -137,13 +137,12 @@ export const enlivenObjects = <
       .catch((error) => {
         // cleanup
         instances.forEach((instance) => {
-          (instance as FabricObject).dispose &&
-            (instance as FabricObject).dispose();
+          (instance as FabricObject).dispose?.();
         });
         reject(error);
       })
       .finally(() => {
-        signal && signal.removeEventListener('abort', reject);
+        signal?.removeEventListener('abort', reject);
       });
   });
 
@@ -162,7 +161,7 @@ export const enlivenObjectEnlivables = <
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: (FabricObject | TFiller | Shadow)[] = [];
-    signal && signal.addEventListener('abort', reject, { once: true });
+    signal?.addEventListener('abort', reject, { once: true });
     // enlive every possible property
     const promises = Object.values(serializedObject).map((value: any) => {
       if (!value) {
@@ -196,11 +195,11 @@ export const enlivenObjectEnlivables = <
       .catch((error) => {
         // cleanup
         instances.forEach((instance: any) => {
-          instance.dispose && instance.dispose();
+          instance.dispose?.();
         });
         reject(error);
       })
       .finally(() => {
-        signal && signal.removeEventListener('abort', reject);
+        signal?.removeEventListener('abort', reject);
       });
   });

@@ -138,7 +138,7 @@ export abstract class ITextKeyBehavior<
       this.clearContextTop();
       this.renderCursorOrSelection();
     } else {
-      this.canvas && this.canvas.requestRenderAll();
+      this.canvas?.requestRenderAll();
     }
   }
 
@@ -164,7 +164,7 @@ export abstract class ITextKeyBehavior<
     }
     e.stopImmediatePropagation();
     e.preventDefault();
-    this.canvas && this.canvas.requestRenderAll();
+    this.canvas?.requestRenderAll();
   }
 
   /**
@@ -175,7 +175,7 @@ export abstract class ITextKeyBehavior<
     const fromPaste = this.fromPaste;
     const { value, selectionStart, selectionEnd } = this.hiddenTextarea;
     this.fromPaste = false;
-    e && e.stopPropagation();
+    e?.stopPropagation();
     if (!this.isEditing) {
       return;
     }
@@ -200,7 +200,7 @@ export abstract class ITextKeyBehavior<
       _selectionEnd = this.selectionEnd,
       selection = _selectionStart !== _selectionEnd;
     let copiedStyle: TextStyleDeclaration[] | undefined,
-      removedText,
+      removedText: string[] | undefined,
       charDiff = nextCharCount - charCount,
       removeFrom,
       removeTo;
@@ -229,7 +229,7 @@ export abstract class ITextKeyBehavior<
       textareaSelection.selectionEnd - charDiff,
       textareaSelection.selectionEnd,
     );
-    if (removedText && removedText.length) {
+    if (removedText?.length) {
       if (insertedText.length) {
         // let's copy some style before deleting.
         // we want to copy the style before the cursor OR the style at the cursor if selection

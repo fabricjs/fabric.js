@@ -160,7 +160,7 @@ export class WebGLFilterBackend {
     const tempFbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
     filters.forEach((filter: any) => {
-      filter && filter.applyTo(pipelineState);
+      filter?.applyTo(pipelineState);
     });
     resizeCanvasIfNeeded(pipelineState);
     this.copyGLTo2D(gl, pipelineState);

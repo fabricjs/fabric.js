@@ -173,23 +173,20 @@ export class LayoutManager {
     target.fire('layout:before', {
       context,
     });
-    canvas &&
-      canvas.fire('object:layout:before', {
-        target,
-        context,
-      });
+    canvas?.fire('object:layout:before', {
+      target,
+      context,
+    });
 
     if (type === LAYOUT_TYPE_IMPERATIVE && context.deep) {
       const { strategy: _, ...tricklingContext } = context;
       // traverse the tree
-      target.forEachObject(
-        (object) =>
-          (object as Group).layoutManager &&
-          (object as Group).layoutManager.performLayout({
-            ...tricklingContext,
-            bubbles: false,
-            target: object as Group,
-          }),
+      target.forEachObject((object) =>
+        (object as Group).layoutManager?.performLayout({
+          ...tricklingContext,
+          bubbles: false,
+          target: object as Group,
+        }),
       );
     }
   }
@@ -316,12 +313,11 @@ export class LayoutManager {
       context,
       result: layoutResult,
     });
-    canvas &&
-      canvas.fire('object:layout:after', {
-        context,
-        result: layoutResult,
-        target,
-      });
+    canvas?.fire('object:layout:after', {
+      context,
+      result: layoutResult,
+      target,
+    });
 
     //  bubble
     const parent = target.parent;

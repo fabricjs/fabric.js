@@ -417,7 +417,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   renderTopLayer(ctx: CanvasRenderingContext2D): void {
     ctx.save();
     if (this.isDrawingMode && this._isCurrentlyDrawing) {
-      this.freeDrawingBrush && this.freeDrawingBrush._render();
+      this.freeDrawingBrush?._render();
       this.contextTopDirty = true;
     }
     // we render the top context - last object
@@ -1110,8 +1110,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     this._resetTransformEventData();
     super._setDimensionsImpl(dimensions, options);
     if (this._isCurrentlyDrawing) {
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush._setBrushStyles(this.contextTop);
+      this.freeDrawingBrush?._setBrushStyles(this.contextTop);
     }
   }
 
@@ -1292,7 +1291,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       if (obj.onDeselect({ e, object })) {
         return false;
       }
-      if (this._currentTransform && this._currentTransform.target === obj) {
+      if (this._currentTransform?.target === obj) {
         this.endCurrentTransform(e);
       }
       if (isActiveSelection(obj) && obj === this._hoveredTarget) {
@@ -1335,7 +1334,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
   endCurrentTransform(e?: TPointerEvent) {
     const transform = this._currentTransform;
     this._finalizeCurrentTransform(e);
-    if (transform && transform.target) {
+    if (transform?.target) {
       // this could probably go inside _finalizeCurrentTransform
       transform.target.isMoving = false;
     }

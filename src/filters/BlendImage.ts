@@ -196,7 +196,7 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
   } & BlendImageOwnProps {
     return {
       ...super.toObject(),
-      image: this.image && this.image.toObject(),
+      image: this.image?.toObject(),
     };
   }
 

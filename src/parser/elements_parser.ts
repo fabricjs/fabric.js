@@ -88,7 +88,7 @@ export class ElementsParser {
         removeTransformMatrixForSvgParsing(obj);
       }
       await this.resolveClipPath(obj, el);
-      this.reviver && this.reviver(el, obj);
+      this.reviver?.(el, obj);
       return obj;
     }
     return null;

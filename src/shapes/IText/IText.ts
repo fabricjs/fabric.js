@@ -286,7 +286,7 @@ export class IText<
    */
   _fireSelectionChanged() {
     this.fire('selection:changed');
-    this.canvas && this.canvas.fire('text:selection:changed', { target: this });
+    this.canvas?.fire('text:selection:changed', { target: this });
   }
 
   /**

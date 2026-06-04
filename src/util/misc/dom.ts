@@ -7,7 +7,7 @@ import { FabricError } from '../internals/console';
  */
 export const createCanvasElement = (): HTMLCanvasElement => {
   const element = getFabricDocument().createElement('canvas');
-  if (!element || typeof element.getContext === 'undefined') {
+  if (typeof element?.getContext === 'undefined') {
     throw new FabricError('Failed to create `canvas` element');
   }
   return element;

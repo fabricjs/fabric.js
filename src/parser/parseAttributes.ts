@@ -82,7 +82,7 @@ export function parseAttributes(
     );
     normalizedStyle[normalizedAttr] = normalizedValue;
   }
-  if (normalizedStyle && normalizedStyle.font) {
+  if (normalizedStyle?.font) {
     parseFontDeclaration(normalizedStyle.font as string, normalizedStyle);
   }
   const mergedAttrs = { ...parentAttributes, ...normalizedStyle };

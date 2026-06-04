@@ -11,7 +11,7 @@ export const getEnv = (): TFabricEnv => {
     isTouchSupported:
       'ontouchstart' in window ||
       'ontouchstart' in document ||
-      (window && window.navigator && window.navigator.maxTouchPoints > 0),
+      (window.navigator?.maxTouchPoints ?? 0) > 0,
     WebGLProbe: new WebGLProbe(),
     dispose() {
       // noop

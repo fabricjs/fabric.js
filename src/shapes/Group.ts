@@ -365,7 +365,7 @@ export class Group
    * @param {boolean} [removeParentTransform] true if object is in canvas coordinate plane
    */
   enterGroup(object: FabricObject, removeParentTransform?: boolean) {
-    object.group && object.group.remove(object);
+    object.group?.remove(object);
     object._set('parent', this);
     this._enterGroup(object, removeParentTransform);
   }
@@ -390,10 +390,7 @@ export class Group
     object._set('group', this);
     object._set('canvas', this.canvas);
     this._watchObject(true, object);
-    const activeObject =
-      this.canvas &&
-      this.canvas.getActiveObject &&
-      this.canvas.getActiveObject();
+    const activeObject = this.canvas?.getActiveObject?.();
     // if we are adding the activeObject in a group
     if (
       activeObject &&

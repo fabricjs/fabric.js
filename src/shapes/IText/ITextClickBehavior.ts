@@ -147,8 +147,8 @@ export abstract class ITextClickBehavior<
 
     if (
       !this.editable ||
-      (this.group && !this.group.interactive) ||
-      (transform && transform.actionPerformed) ||
+      this.group?.interactive === false ||
+      transform?.actionPerformed ||
       notALeftClick(e) ||
       didDrag
     ) {

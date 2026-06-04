@@ -259,7 +259,7 @@ export abstract class StyledText<
     lineIndex: number,
     charIndex: number,
   ): TextStyleDeclaration {
-    const lineStyle = this.styles && this.styles[lineIndex];
+    const lineStyle = this.styles?.[lineIndex];
     return lineStyle ? (lineStyle[charIndex] ?? {}) : {};
   }
 

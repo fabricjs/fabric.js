@@ -345,7 +345,7 @@ export class StaticCanvas<
     options?: TCanvasSizeOptions,
   ) {
     this._setDimensionsImpl(dimensions, options);
-    if (!options || !options.cssOnly) {
+    if (!options?.cssOnly) {
       this.requestRenderAll();
     }
   }
@@ -607,7 +607,7 @@ export class StaticCanvas<
    */
   _renderObjects(ctx: CanvasRenderingContext2D, objects: FabricObject[]) {
     for (let i = 0, len = objects.length; i < len; ++i) {
-      objects[i] && objects[i].render(ctx);
+      objects[i]?.render(ctx);
     }
   }
 

@@ -251,10 +251,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     };
     this.fire('mouse:out', { ...shared, target });
     this._hoveredTarget = undefined;
-    target && target.fire('mouseout', { ...shared });
+    target?.fire('mouseout', { ...shared });
     this._hoveredTargets.forEach((nestedTarget) => {
       this.fire('mouse:out', { ...shared, target: nestedTarget });
-      nestedTarget && nestedTarget.fire('mouseout', { ...shared });
+      nestedTarget?.fire('mouseout', { ...shared });
     });
     this._hoveredTargets = [];
   }
@@ -292,7 +292,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   private _onDragStart(e: DragEvent) {
     this._isClick = false;
     const activeObject = this.getActiveObject();
-    if (activeObject && activeObject.onDragStart(e)) {
+    if (activeObject?.onDragStart(e)) {
       this._dragSource = activeObject;
       const options = { e, target: activeObject };
       this.fire('dragstart', options);
@@ -373,7 +373,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this._onDragProgress as EventListener,
     );
     this.fire('dragend', options);
-    this._dragSource && this._dragSource.fire('dragend', options);
+    this._dragSource?.fire('dragend', options);
     delete this._dragSource;
     // we need to call mouse up synthetically because the browser won't
     this._onMouseUp(e);
@@ -392,7 +392,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       dropTarget: this._draggedoverTarget as FabricObject,
     };
     this.fire('drag', options);
-    this._dragSource && this._dragSource.fire('drag', options);
+    this._dragSource?.fire('drag', options);
   }
 
   /**
@@ -567,7 +567,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       };
     this.fire(eventName, options);
     // this may be a little be more complicated of what we want to handle
-    target && target.fire(secondaryName, options);
+    target?.fire(secondaryName, options);
     for (let i = 0; i < subTargets.length; i++) {
       subTargets[i] !== target && subTargets[i].fire(secondaryName, options);
     }
@@ -584,7 +584,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     const changedTouches = (evt as TouchEvent).changedTouches;
 
     if (changedTouches) {
-      return changedTouches[0] && changedTouches[0].identifier;
+      return changedTouches[0]?.identifier;
     }
 
     if (this.enablePointerEvents) {
@@ -778,12 +778,10 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     const activeObject = this.getActiveObject();
     !this.allowTouchScrolling &&
-      (!activeObject ||
-        // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
-        // we must not prevent the event's default behavior in order for the window to start dragging
-        !activeObject.shouldStartDragging(e)) &&
-      e.preventDefault &&
-      e.preventDefault();
+      // a drag event sequence is started by the active object flagging itself on mousedown / mousedown:before
+      // we must not prevent the event's default behavior in order for the window to start dragging
+      !activeObject?.shouldStartDragging(e) &&
+      e.preventDefault?.();
     this.__onMouseMove(e);
     this._resetTransformEventData();
   }
@@ -888,31 +886,29 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       transform &&
       (transform.target !== target || transform.corner !== corner)
     ) {
-      const originalControl =
-          transform.target && transform.target.controls[transform.corner],
-        originalMouseUpHandler =
-          originalControl &&
-          originalControl.getMouseUpHandler(
-            e,
-            transform.target,
-            originalControl,
-          );
-      pointer = pointer || this.getScenePoint(e);
-      originalMouseUpHandler &&
-        originalMouseUpHandler.call(
-          originalControl,
+      const originalControl = transform.target?.controls[transform.corner],
+        originalMouseUpHandler = originalControl?.getMouseUpHandler(
           e,
-          transform,
-          pointer.x,
-          pointer.y,
+          transform.target,
+          originalControl,
         );
+      pointer = pointer || this.getScenePoint(e);
+      originalMouseUpHandler?.call(
+        originalControl,
+        e,
+        transform,
+        pointer.x,
+        pointer.y,
+      );
     }
     this._setCursorFromEvent(e, target);
     this._handleEvent(e, 'up');
     this._groupSelector = null;
     this._currentTransform = null;
     // reset the target information about which corner is selected
-    target && (target.__corner = undefined);
+    if (target) {
+      target.__corner = undefined;
+    }
     if (shouldRender) {
       this.requestRenderAll();
     } else if (!isClick && !(this._activeObject as IText)?.isEditing) {
@@ -929,7 +925,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       subTargets: FabricObject[];
     };
     this.fire(eventType, options);
-    target && target.fire(eventType, options);
+    target?.fire(eventType, options);
     for (let i = 0; i < subTargets.length; i++) {
       subTargets[i] !== target && subTargets[i].fire(eventType, options);
     }
@@ -964,7 +960,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
 
     this.fire(`mouse:${eventType}`, options);
     // this may be a little be more complicated of what we want to handle
-    target && target.fire(`mouse${eventType}`, options);
+    target?.fire(`mouse${eventType}`, options);
     for (let i = 0; i < subTargets.length; i++) {
       subTargets[i] !== target &&
         subTargets[i].fire(`mouse${eventType}`, options);
@@ -983,8 +979,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
     }
     // TODO: this is a scene point so it should be renamed
     const pointer = this.getScenePoint(e);
-    this.freeDrawingBrush &&
-      this.freeDrawingBrush.onMouseDown(pointer, { e, pointer });
+    this.freeDrawingBrush?.onMouseDown(pointer, { e, pointer });
     this._handleEvent(e, 'down', { alreadySelected: false });
   }
 
@@ -995,12 +990,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _onMouseMoveInDrawingMode(e: TPointerEvent) {
     if (this._isCurrentlyDrawing) {
       const pointer = this.getScenePoint(e);
-      this.freeDrawingBrush &&
-        this.freeDrawingBrush.onMouseMove(pointer, {
-          e,
-          // this is an absolute pointer, the naming is wrong
-          pointer,
-        });
+      this.freeDrawingBrush?.onMouseMove(pointer, {
+        e,
+        // this is an absolute pointer, the naming is wrong
+        pointer,
+      });
     }
     this.setCursor(this.freeDrawingCursor);
     this._handleEvent(e, 'move');
@@ -1109,16 +1103,14 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
         this._setupCurrentTransform(e, target, alreadySelected);
         const control = handle ? handle.control : undefined,
           pointer = this.getScenePoint(e),
-          mouseDownHandler =
-            control && control.getMouseDownHandler(e, target, control);
-        mouseDownHandler &&
-          mouseDownHandler.call(
-            control,
-            e,
-            this._currentTransform!,
-            pointer.x,
-            pointer.y,
-          );
+          mouseDownHandler = control?.getMouseDownHandler(e, target, control);
+        mouseDownHandler?.call(
+          control,
+          e,
+          this._currentTransform!,
+          pointer.x,
+          pointer.y,
+        );
       }
     }
     //  we clear `_objectsToRender` in case of a change in order to repopulate it at rendering
@@ -1490,7 +1482,7 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
             subTargets = targetInfo.subTargets;
           }
           // if nothing is found bail out
-          if (!target || !target.selectable) {
+          if (!target?.selectable) {
             return false;
           }
         }

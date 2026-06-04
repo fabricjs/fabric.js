@@ -774,7 +774,7 @@ export class FabricObject<
    */
   shouldCache() {
     this.ownCaching =
-      (this.objectCaching && (!this.parent || !this.parent.isOnACache())) ||
+      (this.objectCaching && !this.parent?.isOnACache()) ||
       this.needsItsOwnCache();
     return this.ownCaching;
   }
@@ -918,7 +918,7 @@ export class FabricObject<
       // in this case the context is already cleared.
       return true;
     } else {
-      if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
+      if (this.dirty || this.clipPath?.absolutePositioned) {
         if (canvas && ctx && !skipCanvas) {
           ctx.save();
           ctx.setTransform(1, 0, 0, 1, 0, 0);

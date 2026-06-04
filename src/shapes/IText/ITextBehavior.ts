@@ -665,8 +665,8 @@ export abstract class ITextBehavior<
       lockMovementY: this.lockMovementY,
       hoverCursor: this.hoverCursor,
       selectable: this.selectable,
-      defaultCursor: this.canvas && this.canvas.defaultCursor,
-      moveCursor: this.canvas && this.canvas.moveCursor,
+      defaultCursor: this.canvas?.defaultCursor,
+      moveCursor: this.canvas?.moveCursor,
     };
   }
 
@@ -705,9 +705,8 @@ export abstract class ITextBehavior<
     this.isEditing = false;
 
     if (hiddenTextarea) {
-      hiddenTextarea.blur && hiddenTextarea.blur();
-      hiddenTextarea.parentNode &&
-        hiddenTextarea.parentNode.removeChild(hiddenTextarea);
+      hiddenTextarea.blur?.();
+      hiddenTextarea.parentNode?.removeChild(hiddenTextarea);
     }
     this.hiddenTextarea = null;
     this.abortCursorAnimation();
@@ -886,7 +885,7 @@ export abstract class ITextBehavior<
     // for the all the lines or all the other lines
     // we clone current char style onto the next (otherwise empty) line
     while (qty > 0) {
-      if (copiedStyle && copiedStyle[qty - 1]) {
+      if (copiedStyle?.[qty - 1]) {
         this.styles[lineIndex + qty] = {
           0: { ...copiedStyle[qty - 1] },
         };
@@ -992,7 +991,7 @@ export abstract class ITextBehavior<
         addedLines[0],
         copiedStyle,
       );
-      copiedStyle = copiedStyle && copiedStyle.slice(addedLines[0] + 1);
+      copiedStyle = copiedStyle?.slice(addedLines[0] + 1);
     }
     linesLength &&
       this.insertNewlineStyleObject(
@@ -1014,11 +1013,11 @@ export abstract class ITextBehavior<
         // when a pasted buffer begins with a newline then
         // this.styles[cursorLoc.lineIndex + i] and copiedStyle[0]
         // may be undefined for some reason
-        if (this.styles[cursorLoc.lineIndex + i] && copiedStyle[0]) {
+        if (this.styles[cursorLoc.lineIndex + i] && copiedStyle?.[0]) {
           this.styles[cursorLoc.lineIndex + i][0] = copiedStyle[0];
         }
       }
-      copiedStyle = copiedStyle && copiedStyle.slice(addedLines[i] + 1);
+      copiedStyle = copiedStyle?.slice(addedLines[i] + 1);
     }
     if (addedLines[i] > 0) {
       this.insertCharStyleObject(

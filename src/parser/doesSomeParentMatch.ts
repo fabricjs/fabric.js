@@ -6,11 +6,7 @@ export function doesSomeParentMatch(
 ) {
   let selector: string,
     parentMatching = true;
-  while (
-    element.parentElement &&
-    element.parentElement.nodeType === 1 &&
-    selectors.length
-  ) {
+  while (element.parentElement?.nodeType === 1 && selectors.length) {
     if (parentMatching) {
       selector = selectors.pop()!;
     }

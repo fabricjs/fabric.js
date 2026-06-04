@@ -37,7 +37,7 @@ export async function parseSVGDocument(
   reviver?: TSvgReviverCallback,
   { crossOrigin, signal }: LoadImageOptions = {},
 ): Promise<SVGParsingOutput> {
-  if (signal && signal.aborted) {
+  if (signal?.aborted) {
     log('log', new SignalAbortedError('parseSVGDocument'));
     // this is an unhappy path, we dont care about speed
     return createEmptyResponse();

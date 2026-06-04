@@ -213,7 +213,7 @@ export class FabricObjectSVGExportMixin {
       vectorEffect = this.strokeUniform
         ? 'vector-effect="non-scaling-stroke" '
         : '',
-      absoluteClipPath = clipPath && clipPath.absolutePositioned,
+      absoluteClipPath = clipPath?.absolutePositioned,
       stroke = this.stroke,
       fill = this.fill,
       shadow = this.shadow,

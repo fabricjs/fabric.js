@@ -179,15 +179,11 @@ export class InteractiveFabricObject<
    */
   _updateCacheCanvas() {
     const targetCanvas = this.canvas;
-    if (this.noScaleCache && targetCanvas && targetCanvas._currentTransform) {
+    if (this.noScaleCache && targetCanvas?._currentTransform) {
       const transform = targetCanvas._currentTransform,
         target = transform.target,
         action = transform.action;
-      if (
-        this === (target as unknown as this) &&
-        action &&
-        action.startsWith(SCALE)
-      ) {
+      if (this === (target as unknown as this) && action?.startsWith(SCALE)) {
         return false;
       }
     }
@@ -491,7 +487,7 @@ export class InteractiveFabricObject<
     styleOverride: TStyleOverride,
   ): void {
     let size;
-    if ((styleOverride && styleOverride.forActiveSelection) || this.group) {
+    if (styleOverride?.forActiveSelection || this.group) {
       const bbox = sizeAfterTransform(
           this.width,
           this.height,
@@ -592,10 +588,7 @@ export class InteractiveFabricObject<
    * @returns {boolean} true if the specified control is visible, false otherwise
    */
   isControlVisible(controlKey: string): boolean {
-    return (
-      this.controls[controlKey] &&
-      this.controls[controlKey].getVisibility(this, controlKey)
-    );
+    return this.controls[controlKey]?.getVisibility(this, controlKey);
   }
 
   /**

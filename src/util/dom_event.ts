@@ -6,7 +6,7 @@ const touchEvents = ['touchstart', 'touchmove', 'touchend'];
 
 function getTouchInfo(event: TouchEvent | MouseEvent): MouseEvent | Touch {
   const touchProp = (event as TouchEvent).changedTouches;
-  if (touchProp && touchProp[0]) {
+  if (touchProp?.[0]) {
     return touchProp[0];
   }
   return event as MouseEvent;
