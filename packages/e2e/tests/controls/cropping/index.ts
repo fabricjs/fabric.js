@@ -1,5 +1,5 @@
 import { FabricImage } from 'fabric';
-import { enterCropMode } from 'fabric/extensions';
+import { enterCropMode } from '@fabricjs/cropping-controls';
 import { beforeAll } from '../../test';
 
 beforeAll(async (canvas) => {

@@ -1,5 +1,5 @@
 import { FabricImage } from 'fabric';
-import { createImageResizeControlsWithScaleToCover } from 'fabric/extensions';
+import { createImageResizeControlsWithScaleToCover } from '@fabricjs/cropping-controls';
 import { beforeAll } from '../../test';
 
 beforeAll(async (canvas) => {

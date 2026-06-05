@@ -4,9 +4,9 @@
  */
 
 import { Rect } from 'fabric';
-import { AligningGuidelines } from 'fabric/extensions';
+import { AligningGuidelines } from '@fabricjs/aligning-guidelines';
 import { beforeAll } from '../../test';
-import type { AligningLineConfig } from 'fabric/extensions';
+import type { AligningLineConfig } from '@fabricjs/aligning-guidelines';
 
 beforeAll(async (canvas) => {
   canvas.setDimensions({ width: 400, height: 150 });

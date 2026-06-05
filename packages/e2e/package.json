@@ -7,10 +7,14 @@
     "test": "playwright test"
   },
   "dependencies": {
+    "@fabricjs/aligning-guidelines": "workspace:^",
     "@fabricjs/browser": "workspace:^",
     "@fabricjs/core": "workspace:^",
+    "@fabricjs/cropping-controls": "workspace:^",
+    "@fabricjs/data-updaters": "workspace:^",
     "@fabricjs/gradient-controls": "workspace:^",
     "@fabricjs/node": "workspace:^",
+    "@fabricjs/westures-integration": "workspace:^",
     "jsdom": "^26.1.0",
     "westures": "^1.1.1"
   },

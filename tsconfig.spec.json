@@ -9,9 +9,17 @@
       "fabric/node": ["./src/node"],
       "fabric/extensions": ["./extensions"],
       "@fabricjs/core": ["./fabric"],
+      "@fabricjs/aligning-guidelines": [
+        "./packages/aligning-guidelines/src/index"
+      ],
       "@fabricjs/browser": ["./packages/browser/src/index"],
+      "@fabricjs/cropping-controls": ["./packages/cropping-controls/src/index"],
+      "@fabricjs/data-updaters": ["./packages/data-updaters/src/index"],
       "@fabricjs/gradient-controls": ["./packages/gradient-controls/src/index"],
-      "@fabricjs/node": ["./packages/node/src/index"]
+      "@fabricjs/node": ["./packages/node/src/index"],
+      "@fabricjs/westures-integration": [
+        "./packages/westures-integration/src/index"
+      ]
     }
   },
   "include": [

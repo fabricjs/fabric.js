@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.packages.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "rootDir": ".",
+    "outDir": "./cli_output/package-types"
+  }
+}

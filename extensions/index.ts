@@ -1,26 +1,26 @@
-export { AligningGuidelines } from './aligning_guidelines';
-export type * from './aligning_guidelines/typedefs';
+export { AligningGuidelines } from '../packages/aligning-guidelines/src';
+export type * from '../packages/aligning-guidelines/src/typedefs';
 
 export {
   originUpdaterWrapper,
   installOriginWrapperUpdater,
-} from './data_updaters/origins';
+} from '../packages/data-updaters/src/origins';
 
 export {
   gradientUpdaterWrapper,
   installGradientUpdater,
-} from './data_updaters/gradient';
+} from '../packages/data-updaters/src/gradient';
 
 export {
   addGestures,
   pinchEventHandler,
   rotateEventHandler,
-} from './westures_integration';
+} from '../packages/westures-integration/src';
 
 export {
   createImageCroppingControls,
   createImageResizeControlsWithScaleToCover,
-} from './cropping_controls/croppingControls';
+} from '../packages/cropping-controls/src/croppingControls';
 export {
   changeCropY,
   changeCropX,
@@ -29,6 +29,6 @@ export {
   changeWidthAndScaleToCover,
   changeHeightAndScaleToCover,
   withFlip,
-} from './cropping_controls/croppingHandlers';
-export { enterCropMode } from './cropping_controls/enterCropMode';
+} from '../packages/cropping-controls/src/croppingHandlers';
+export { enterCropMode } from '../packages/cropping-controls/src/enterCropMode';
 export { createLinearGradientControls } from './linear_gradient_controls/linearGradientControls';

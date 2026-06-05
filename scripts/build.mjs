@@ -7,6 +7,18 @@ import { wd } from './dirname.mjs';
 const packageDist = (packageName) =>
   path.resolve(wd, 'packages', packageName, 'dist');
 
+const packageTypeBuildDir = path.resolve(wd, 'cli_output', 'package-types');
+
+const typedWorkspacePackages = [
+  'browser',
+  'node',
+  'gradient-controls',
+  'cropping-controls',
+  'aligning-guidelines',
+  'data-updaters',
+  'westures-integration',
+];
+
 function ensureCleanDir(dir) {
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -23,6 +35,24 @@ function copyFiles(from, to, predicate) {
       fs.copyFileSync(source, target);
     }
   }
+}
+
+function removeFiles(dir, predicate) {
+  if (!fs.existsSync(dir)) {
+    return;
+  }
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const file = path.resolve(dir, entry.name);
+    if (entry.isDirectory()) {
+      removeFiles(file, predicate);
+    } else if (predicate(file)) {
+      fs.rmSync(file);
+    }
+  }
+}
+
+function isDeclaration(file) {
+  return file.endsWith('.d.ts') || file.endsWith('.d.ts.map');
 }
 
 function isNodeOnlyDeclaration(file) {
@@ -51,53 +81,25 @@ function stageCorePackage() {
   });
 }
 
-function writeEntrypointTypes(packageName, content) {
-  fs.mkdirSync(packageDist(packageName), { recursive: true });
-  fs.writeFileSync(
-    path.resolve(packageDist(packageName), 'index.d.ts'),
-    content,
+function stagePackageTypes(packageName) {
+  const source = path.resolve(
+    packageTypeBuildDir,
+    'packages',
+    packageName,
+    'src',
   );
+  if (!fs.existsSync(source)) {
+    throw new Error(`Package type output missing: ${source}`);
+  }
+  const dist = packageDist(packageName);
+  fs.mkdirSync(dist, { recursive: true });
+  removeFiles(dist, isDeclaration);
+  copyFiles(source, dist, isDeclaration);
 }
 
 function stageWorkspacePackages() {
   stageCorePackage();
-  writeEntrypointTypes('browser', "export * from '@fabricjs/core';\n");
-  writeEntrypointTypes(
-    'gradient-controls',
-    [
-      "import type { Control, Gradient } from '@fabricjs/core';",
-      'export declare function createLinearGradientControls(',
-      "  gradient: Gradient<'linear'>,",
-      '  options?: Partial<Control>,',
-      '): Record<string, Control>;',
-      '',
-    ].join('\n'),
-  );
-  writeEntrypointTypes(
-    'node',
-    [
-      "import type { JpegConfig, PngConfig } from 'canvas';",
-      "import { Canvas as CanvasBase, StaticCanvas as StaticCanvasBase } from '@fabricjs/core';",
-      "export * from '@fabricjs/core';",
-      'export declare class StaticCanvas extends StaticCanvasBase {',
-      '  getNodeCanvas(): import("canvas").Canvas;',
-      '  createPNGStream(opts?: PngConfig): import("canvas").PNGStream;',
-      '  createJPEGStream(opts?: JpegConfig): import("canvas").JPEGStream;',
-      '}',
-      '/**',
-      ' * **NOTICE**:',
-      ' * {@link Canvas} is designed for interactivity.',
-      ' * Therefore, using it in node has no benefit.',
-      ' * Use {@link StaticCanvas} instead.',
-      ' */',
-      'export declare class Canvas extends CanvasBase {',
-      '  getNodeCanvas(): import("canvas").Canvas;',
-      '  createPNGStream(opts?: PngConfig): import("canvas").PNGStream;',
-      '  createJPEGStream(opts?: JpegConfig): import("canvas").JPEGStream;',
-      '}',
-      '',
-    ].join('\n'),
-  );
+  typedWorkspacePackages.forEach(stagePackageTypes);
   console.log('Workspace package artifacts staged.\n');
 }
 
@@ -115,6 +117,13 @@ function buildTypes() {
     });
     // Also build extensions types
     cp.execSync('tsc -p ./tsconfig-extensions.json', {
+      stdio: 'inherit',
+      shell: true,
+      cwd: wd,
+    });
+    // Build declaration files for workspace packages into a temp tree.
+    fs.rmSync(packageTypeBuildDir, { recursive: true, force: true });
+    cp.execSync('tsc -p ./tsconfig.packages.build.json', {
       stdio: 'inherit',
       shell: true,
       cwd: wd,

@@ -173,6 +173,62 @@ export default [
     ],
     onwarn,
   },
+  {
+    input: ['./packages/cropping-controls/src/index.ts'],
+    external: ['@fabricjs/core'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/cropping-controls/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
+  {
+    input: ['./packages/aligning-guidelines/src/index.ts'],
+    external: ['@fabricjs/core'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/aligning-guidelines/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
+  {
+    input: ['./packages/data-updaters/src/index.ts'],
+    external: ['@fabricjs/core'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/data-updaters/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
+  {
+    input: ['./packages/westures-integration/src/index.ts'],
+    external: ['@fabricjs/core', 'westures'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/westures-integration/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
   // EXTENSIONS
 
   {

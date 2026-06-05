@@ -1,7 +1,7 @@
 import { beforeAll } from '../../test';
-import * as fabricExtensions from 'fabric/extensions';
+import { installOriginWrapperUpdater } from '@fabricjs/data-updaters';
 
 beforeAll(() => {
-  fabricExtensions.installOriginWrapperUpdater();
+  installOriginWrapperUpdater();
   return {};
 });

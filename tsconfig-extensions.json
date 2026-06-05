@@ -110,5 +110,8 @@
     "**/*.spec.ts",
     "**/*.test.ts"
   ],
-  "include": ["extensions/**/*"]
+  "include": [
+    "extensions/**/*",
+    "packages/westures-integration/src/westures.d.ts"
+  ]
 }

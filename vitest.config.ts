@@ -86,6 +86,8 @@ export default defineConfig({
       'src/**/*.spec.{ts,tsx}',
       'extensions/**/*.spec.{ts,tsx}',
       'extensions/**/*.test.{ts,tsx}',
+      'packages/*/src/**/*.spec.{ts,tsx}',
+      'packages/*/src/**/*.test.{ts,tsx}',
     ],
     coverage: {
       reportsDirectory: '.nyc_output',

@@ -15,12 +15,28 @@ fs.mkdirSync(path.join(nodeModules, '@fabricjs'), { recursive: true });
 const workspacePackages = [
   { dir: wd, importName: 'fabric' },
   { dir: path.join(wd, 'packages/core'), importName: '@fabricjs/core' },
+  {
+    dir: path.join(wd, 'packages/aligning-guidelines'),
+    importName: '@fabricjs/aligning-guidelines',
+  },
   { dir: path.join(wd, 'packages/browser'), importName: '@fabricjs/browser' },
+  {
+    dir: path.join(wd, 'packages/cropping-controls'),
+    importName: '@fabricjs/cropping-controls',
+  },
+  {
+    dir: path.join(wd, 'packages/data-updaters'),
+    importName: '@fabricjs/data-updaters',
+  },
   {
     dir: path.join(wd, 'packages/gradient-controls'),
     importName: '@fabricjs/gradient-controls',
   },
   { dir: path.join(wd, 'packages/node'), importName: '@fabricjs/node' },
+  {
+    dir: path.join(wd, 'packages/westures-integration'),
+    importName: '@fabricjs/westures-integration',
+  },
 ];
 
 function log(message) {
@@ -180,6 +196,7 @@ try {
 
   linkRuntimeDependency('canvas');
   linkRuntimeDependency('jsdom');
+  linkRuntimeDependency('westures');
 
   smokeImport(
     'fabric',
@@ -190,8 +207,24 @@ try {
     "import { StaticCanvas, Rect } from 'fabric/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node import failed');",
   );
   smokeImport(
+    'fabric/extensions',
+    "import { AligningGuidelines, createImageCroppingControls, installOriginWrapperUpdater, addGestures } from 'fabric/extensions'; if (typeof AligningGuidelines !== 'function' || typeof createImageCroppingControls !== 'function' || typeof installOriginWrapperUpdater !== 'function' || typeof addGestures !== 'function') throw new Error('fabric/extensions import failed');",
+  );
+  smokeImport(
     '@fabricjs/browser',
     "import { Canvas, Rect } from '@fabricjs/browser'; if (typeof Canvas !== 'function' || typeof Rect !== 'function') throw new Error('@fabricjs/browser import failed');",
+  );
+  smokeImport(
+    '@fabricjs/aligning-guidelines',
+    "import { AligningGuidelines } from '@fabricjs/aligning-guidelines'; if (typeof AligningGuidelines !== 'function') throw new Error('@fabricjs/aligning-guidelines import failed');",
+  );
+  smokeImport(
+    '@fabricjs/cropping-controls',
+    "import { createImageCroppingControls, enterCropMode } from '@fabricjs/cropping-controls'; if (typeof createImageCroppingControls !== 'function' || typeof enterCropMode !== 'function') throw new Error('@fabricjs/cropping-controls import failed');",
+  );
+  smokeImport(
+    '@fabricjs/data-updaters',
+    "import { installGradientUpdater, installOriginWrapperUpdater } from '@fabricjs/data-updaters'; if (typeof installGradientUpdater !== 'function' || typeof installOriginWrapperUpdater !== 'function') throw new Error('@fabricjs/data-updaters import failed');",
   );
   smokeImport(
     '@fabricjs/gradient-controls',
@@ -200,6 +233,10 @@ try {
   smokeImport(
     '@fabricjs/node',
     "import { StaticCanvas, Rect } from '@fabricjs/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('@fabricjs/node import failed');",
+  );
+  smokeImport(
+    '@fabricjs/westures-integration',
+    "import { addGestures, pinchEventHandler } from '@fabricjs/westures-integration'; if (typeof addGestures !== 'function' || typeof pinchEventHandler !== 'function') throw new Error('@fabricjs/westures-integration import failed');",
   );
 
   log('Cleaning temp directory');
