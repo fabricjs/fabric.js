@@ -1,5 +1,6 @@
 import path from 'path';
 import { redBright } from './scripts/colors.mjs';
+import { buildableWorkspacePackages } from './scripts/workspace-packages.mjs';
 
 const splitter = /\n|\s|,/g;
 
@@ -33,6 +34,23 @@ function onwarn(warning, warn) {
     }
   }
   warn(warning);
+}
+
+function workspacePackageBuildConfig({ directory, bundle }) {
+  return {
+    input: [`./packages/${directory}/src/index.ts`],
+    external: bundle.external,
+    tsconfig: './tsconfig.packages.json',
+    ...(bundle.transform ? { transform } : {}),
+    output: [
+      {
+        file: path.resolve(`./packages/${directory}/dist/index.mjs`),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  };
 }
 
 // https://rolldown.rs/guide/getting-started
@@ -126,109 +144,7 @@ export default [
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
   // WORKSPACE PACKAGES
-
-  {
-    input: ['./packages/browser/src/index.ts'],
-    external: ['@fabricjs/core'],
-    tsconfig: './tsconfig.packages.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./packages/browser/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
-  {
-    input: ['./packages/node/src/index.ts'],
-    external: [
-      '@fabricjs/core',
-      'jsdom',
-      'jsdom/lib/jsdom/living/generated/utils.js',
-      'canvas',
-    ],
-    tsconfig: './tsconfig.packages.json',
-    output: [
-      {
-        file: path.resolve('./packages/node/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
-  {
-    input: ['./packages/gradient-controls/src/index.ts'],
-    external: ['@fabricjs/core'],
-    tsconfig: './tsconfig.packages.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./packages/gradient-controls/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
-  {
-    input: ['./packages/cropping-controls/src/index.ts'],
-    external: ['@fabricjs/core'],
-    tsconfig: './tsconfig.packages.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./packages/cropping-controls/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
-  {
-    input: ['./packages/aligning-guidelines/src/index.ts'],
-    external: ['@fabricjs/core'],
-    tsconfig: './tsconfig.packages.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./packages/aligning-guidelines/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
-  {
-    input: ['./packages/data-updaters/src/index.ts'],
-    external: ['@fabricjs/core'],
-    tsconfig: './tsconfig.packages.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./packages/data-updaters/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
-  {
-    input: ['./packages/westures-integration/src/index.ts'],
-    external: ['@fabricjs/core', 'westures'],
-    tsconfig: './tsconfig.packages.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./packages/westures-integration/dist/index.mjs'),
-        format: 'es',
-        sourcemap: true,
-      },
-    ],
-    onwarn,
-  },
+  ...buildableWorkspacePackages.map(workspacePackageBuildConfig),
   // EXTENSIONS
 
   {

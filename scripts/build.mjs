@@ -3,21 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { wd } from './dirname.mjs';
+import { typedWorkspacePackages } from './workspace-packages.mjs';
 
 const packageDist = (packageName) =>
   path.resolve(wd, 'packages', packageName, 'dist');
 
 const packageTypeBuildDir = path.resolve(wd, 'cli_output', 'package-types');
-
-const typedWorkspacePackages = [
-  'browser',
-  'node',
-  'gradient-controls',
-  'cropping-controls',
-  'aligning-guidelines',
-  'data-updaters',
-  'westures-integration',
-];
 
 function ensureCleanDir(dir) {
   fs.rmSync(dir, { recursive: true, force: true });
@@ -81,17 +72,17 @@ function stageCorePackage() {
   });
 }
 
-function stagePackageTypes(packageName) {
+function stagePackageTypes({ directory }) {
   const source = path.resolve(
     packageTypeBuildDir,
     'packages',
-    packageName,
+    directory,
     'src',
   );
   if (!fs.existsSync(source)) {
     throw new Error(`Package type output missing: ${source}`);
   }
-  const dist = packageDist(packageName);
+  const dist = packageDist(directory);
   fs.mkdirSync(dist, { recursive: true });
   removeFiles(dist, isDeclaration);
   copyFiles(source, dist, isDeclaration);

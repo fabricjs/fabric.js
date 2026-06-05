@@ -3,41 +3,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { wd } from './dirname.mjs';
+import { publishablePackages } from './workspace-packages.mjs';
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fabric-package-smoke-'));
 const packDir = path.join(tmp, 'packs');
-const projectDir = path.join(tmp, 'project');
-const nodeModules = path.join(projectDir, 'node_modules');
 
 fs.mkdirSync(packDir, { recursive: true });
-fs.mkdirSync(path.join(nodeModules, '@fabricjs'), { recursive: true });
-
-const workspacePackages = [
-  { dir: wd, importName: 'fabric' },
-  { dir: path.join(wd, 'packages/core'), importName: '@fabricjs/core' },
-  {
-    dir: path.join(wd, 'packages/aligning-guidelines'),
-    importName: '@fabricjs/aligning-guidelines',
-  },
-  { dir: path.join(wd, 'packages/browser'), importName: '@fabricjs/browser' },
-  {
-    dir: path.join(wd, 'packages/cropping-controls'),
-    importName: '@fabricjs/cropping-controls',
-  },
-  {
-    dir: path.join(wd, 'packages/data-updaters'),
-    importName: '@fabricjs/data-updaters',
-  },
-  {
-    dir: path.join(wd, 'packages/gradient-controls'),
-    importName: '@fabricjs/gradient-controls',
-  },
-  { dir: path.join(wd, 'packages/node'), importName: '@fabricjs/node' },
-  {
-    dir: path.join(wd, 'packages/westures-integration'),
-    importName: '@fabricjs/westures-integration',
-  },
-];
 
 function log(message) {
   console.log(`[package-smoke] ${message}`);
@@ -114,6 +85,22 @@ function tarList(tarball) {
   return fs.readFileSync(listFile, 'utf8').trim().split('\n');
 }
 
+function tarPackageJson(tarball) {
+  log(`Reading package manifest for ${path.basename(tarball)}`);
+  const result = cp.spawnSync(
+    'tar',
+    ['-xzf', tarball, '-O', 'package/package.json'],
+    {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'inherit'],
+    },
+  );
+  if (result.status !== 0) {
+    throw new Error(`Failed to read package.json from ${tarball}`);
+  }
+  return JSON.parse(result.stdout);
+}
+
 function expectIncludes(list, file, label) {
   if (!list.includes(file)) {
     throw new Error(`${label} tarball is missing ${file}`);
@@ -131,10 +118,16 @@ function verifyRootTarball(list) {
   expectIncludes(list, 'package/dist/index.min.mjs', 'fabric');
   expectIncludes(list, 'package/dist/index.node.mjs', 'fabric');
   expectIncludes(list, 'package/dist-extensions/index.mjs', 'fabric');
+  expectIncludes(list, 'package/extensions/README.MD', 'fabric');
   expectIncludes(list, 'package/src/env/index.ts', 'fabric');
   expectExcludesPrefix(list, 'package/packages/', 'fabric');
   expectExcludesPrefix(list, 'package/.github/', 'fabric');
   expectExcludesPrefix(list, 'package/src/benchmarks/', 'fabric');
+  if (list.some((file) => /^package\/extensions\/.+\/.*\.ts$/.test(file))) {
+    throw new Error(
+      'fabric tarball should not include extension implementation source files',
+    );
+  }
   if (list.some((file) => /\.(spec|test)\.ts$/.test(file))) {
     throw new Error('fabric tarball should not include spec or test files');
   }
@@ -146,6 +139,42 @@ function verifyRootTarball(list) {
   log('Root fabric tarball contents look correct');
 }
 
+function expectNoDeclaredRuntimeDependency(pkg, dependencyName, label) {
+  for (const field of [
+    'dependencies',
+    'peerDependencies',
+    'optionalDependencies',
+  ]) {
+    if (pkg[field]?.[dependencyName]) {
+      throw new Error(
+        `${label} should not declare ${dependencyName} in ${field}`,
+      );
+    }
+  }
+}
+
+function verifyRootPackageManifest(pkg) {
+  log('Checking root fabric package manifest');
+  expectNoDeclaredRuntimeDependency(pkg, 'westures', 'fabric');
+  log('Root fabric package manifest looks correct');
+}
+
+function verifyWorkspaceTarball(importName, list) {
+  log(`Checking ${importName} tarball contents`);
+  expectIncludes(list, 'package/package.json', importName);
+  expectIncludes(list, 'package/README.md', importName);
+  expectIncludes(list, 'package/dist/index.mjs', importName);
+  expectIncludes(list, 'package/dist/index.d.ts', importName);
+  expectExcludesPrefix(list, 'package/src/', importName);
+  expectExcludesPrefix(list, 'package/test/', importName);
+  if (list.some((file) => /\.(spec|test)\.(ts|tsx|js|jsx)$/.test(file))) {
+    throw new Error(
+      `${importName} tarball should not include spec or test files`,
+    );
+  }
+  log(`${importName} tarball contents look correct`);
+}
+
 function extractPackage(tarball, target) {
   const extractDir = fs.mkdtempSync(path.join(tmp, 'extract-'));
   run('tar', ['-xzf', tarball, '-C', extractDir]);
@@ -153,88 +182,145 @@ function extractPackage(tarball, target) {
   fs.rmSync(extractDir, { recursive: true, force: true });
 }
 
-function linkPackage(importName, tarball) {
-  log(`Extracting ${importName} into smoke project`);
+function createSmokeProject(name) {
+  const projectDir = path.join(tmp, name);
+  const nodeModules = path.join(projectDir, 'node_modules');
+  fs.mkdirSync(nodeModules, { recursive: true });
+  return { name, projectDir, nodeModules };
+}
+
+function packageTarget(project, importName) {
+  return importName.startsWith('@fabricjs/')
+    ? path.join(project.nodeModules, '@fabricjs', importName.split('/')[1])
+    : path.join(project.nodeModules, importName);
+}
+
+function linkPackage(project, importName, tarball) {
+  log(`Extracting ${importName} into ${project.name}`);
   const target = importName.startsWith('@fabricjs/')
-    ? path.join(nodeModules, '@fabricjs', importName.split('/')[1])
-    : path.join(nodeModules, importName);
+    ? path.join(project.nodeModules, '@fabricjs', importName.split('/')[1])
+    : path.join(project.nodeModules, importName);
   fs.rmSync(target, { recursive: true, force: true });
+  fs.mkdirSync(path.dirname(target), { recursive: true });
   extractPackage(tarball, target);
 }
 
-function linkRuntimeDependency(name) {
-  log(`Linking runtime dependency ${name}`);
+function expectPackageAbsent(project, importName) {
+  const target = packageTarget(project, importName);
+  if (fs.existsSync(target)) {
+    throw new Error(`${project.name} should not contain ${importName}`);
+  }
+}
+
+function linkRuntimeDependency(project, name) {
+  log(`Linking runtime dependency ${name} into ${project.name}`);
   const source = path.join(wd, 'node_modules', name);
   if (!fs.existsSync(source)) {
     throw new Error(
       `Missing ${name} in root node_modules. Run pnpm install before package smoke.`,
     );
   }
-  fs.symlinkSync(source, path.join(nodeModules, name), 'dir');
+  fs.symlinkSync(source, path.join(project.nodeModules, name), 'dir');
 }
 
-function smokeImport(label, source) {
-  log(`Importing ${label}`);
-  run('node', ['--input-type=module', '-e', source], { cwd: projectDir });
-  log(`Imported ${label}`);
+function smokeImport(project, label, source) {
+  log(`Importing ${label} in ${project.name}`);
+  run('node', ['--input-type=module', '-e', source], {
+    cwd: project.projectDir,
+  });
+  log(`Imported ${label} in ${project.name}`);
 }
 
 try {
   log(`Using temp directory ${tmp}`);
   const packed = new Map(
-    workspacePackages.map((workspacePackage) => {
+    publishablePackages.map((workspacePackage) => {
       const result = pack(workspacePackage);
       return [workspacePackage.importName, result];
     }),
   );
 
   verifyRootTarball(tarList(packed.get('fabric').tarball));
-
-  for (const { importName } of workspacePackages) {
-    linkPackage(importName, packed.get(importName).tarball);
+  verifyRootPackageManifest(tarPackageJson(packed.get('fabric').tarball));
+  for (const { importName } of publishablePackages) {
+    if (importName !== 'fabric') {
+      verifyWorkspaceTarball(
+        importName,
+        tarList(packed.get(importName).tarball),
+      );
+    }
   }
 
-  linkRuntimeDependency('canvas');
-  linkRuntimeDependency('jsdom');
-  linkRuntimeDependency('westures');
+  const rootProject = createSmokeProject('root-project');
+  linkPackage(rootProject, 'fabric', packed.get('fabric').tarball);
+  expectPackageAbsent(rootProject, '@fabricjs/core');
+
+  linkRuntimeDependency(rootProject, 'canvas');
+  linkRuntimeDependency(rootProject, 'jsdom');
+  // Preserve the historical fabric/extensions contract: westures is external
+  // and supplied by the consuming app, not by the root fabric package.
+  linkRuntimeDependency(rootProject, 'westures');
 
   smokeImport(
+    rootProject,
     'fabric',
     "import { Canvas, Rect } from 'fabric'; if (typeof Canvas !== 'function' || typeof Rect !== 'function') throw new Error('fabric import failed');",
   );
   smokeImport(
+    rootProject,
     'fabric/node',
     "import { StaticCanvas, Rect } from 'fabric/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node import failed');",
   );
   smokeImport(
+    rootProject,
     'fabric/extensions',
     "import { AligningGuidelines, createImageCroppingControls, installOriginWrapperUpdater, addGestures } from 'fabric/extensions'; if (typeof AligningGuidelines !== 'function' || typeof createImageCroppingControls !== 'function' || typeof installOriginWrapperUpdater !== 'function' || typeof addGestures !== 'function') throw new Error('fabric/extensions import failed');",
   );
+
+  const splitProject = createSmokeProject('split-project');
+  expectPackageAbsent(splitProject, 'fabric');
+  for (const { importName } of publishablePackages) {
+    if (importName !== 'fabric') {
+      linkPackage(splitProject, importName, packed.get(importName).tarball);
+    }
+  }
+
+  linkRuntimeDependency(splitProject, 'canvas');
+  linkRuntimeDependency(splitProject, 'jsdom');
+  linkRuntimeDependency(splitProject, 'westures');
+
   smokeImport(
+    splitProject,
     '@fabricjs/browser',
     "import { Canvas, Rect } from '@fabricjs/browser'; if (typeof Canvas !== 'function' || typeof Rect !== 'function') throw new Error('@fabricjs/browser import failed');",
   );
   smokeImport(
+    splitProject,
     '@fabricjs/aligning-guidelines',
     "import { AligningGuidelines } from '@fabricjs/aligning-guidelines'; if (typeof AligningGuidelines !== 'function') throw new Error('@fabricjs/aligning-guidelines import failed');",
   );
   smokeImport(
+    splitProject,
     '@fabricjs/cropping-controls',
     "import { createImageCroppingControls, enterCropMode } from '@fabricjs/cropping-controls'; if (typeof createImageCroppingControls !== 'function' || typeof enterCropMode !== 'function') throw new Error('@fabricjs/cropping-controls import failed');",
   );
   smokeImport(
+    splitProject,
     '@fabricjs/data-updaters',
     "import { installGradientUpdater, installOriginWrapperUpdater } from '@fabricjs/data-updaters'; if (typeof installGradientUpdater !== 'function' || typeof installOriginWrapperUpdater !== 'function') throw new Error('@fabricjs/data-updaters import failed');",
   );
   smokeImport(
+    splitProject,
     '@fabricjs/gradient-controls',
     "import { createLinearGradientControls } from '@fabricjs/gradient-controls'; if (typeof createLinearGradientControls !== 'function') throw new Error('@fabricjs/gradient-controls import failed');",
   );
   smokeImport(
+    splitProject,
     '@fabricjs/node',
     "import { StaticCanvas, Rect } from '@fabricjs/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('@fabricjs/node import failed');",
   );
   smokeImport(
+    splitProject,
     '@fabricjs/westures-integration',
     "import { addGestures, pinchEventHandler } from '@fabricjs/westures-integration'; if (typeof addGestures !== 'function' || typeof pinchEventHandler !== 'function') throw new Error('@fabricjs/westures-integration import failed');",
   );

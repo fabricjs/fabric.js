@@ -49,10 +49,8 @@
     "!src/**/__screenshots__/**",
     "!src/**/__snapshots__/**",
     "!src/benchmarks/**",
-    "extensions/**/*.ts",
-    "!extensions/**/*.spec.ts",
-    "!extensions/**/*.test.ts",
     "extensions/README.MD",
+    "!extensions/**/*.ts",
     "fabric.ts",
     "index.ts",
     "index.node.ts"
