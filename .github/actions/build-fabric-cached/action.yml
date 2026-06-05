@@ -11,6 +11,7 @@ runs:
         path: |
           ./dist
           ./dist-extensions
+          ./packages/*/dist
         key: build-${{ github.event.pull_request.head.sha }}
     - name: Build fabric.js dist folder
       if: steps.build-cache.outputs.cache-hit != 'true'
