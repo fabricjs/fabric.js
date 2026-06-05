@@ -159,11 +159,25 @@ export default [
     ],
     onwarn,
   },
+  {
+    input: ['./packages/gradient-controls/src/index.ts'],
+    external: ['@fabricjs/core'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/gradient-controls/dist/index.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
   // EXTENSIONS
 
   {
     input: ['./extensions/index.ts'],
-    external: ['fabric', 'westures'],
+    external: ['fabric', '@fabricjs/core', 'westures'],
     tsconfig: './tsconfig-extensions.json',
     transform,
     output: [
@@ -174,6 +188,9 @@ export default [
         preserveModules: true,
         entryFileNames: '[name].mjs',
         sourcemap: true,
+        paths: {
+          '@fabricjs/core': 'fabric',
+        },
       },
       // umd module, the cdn one for fiddles, minified
       {
@@ -183,7 +200,11 @@ export default [
         sourcemap: true,
         globals: {
           fabric: 'fabric',
+          '@fabricjs/core': 'fabric',
           westures: 'westures',
+        },
+        paths: {
+          '@fabricjs/core': 'fabric',
         },
         minify: true,
       },

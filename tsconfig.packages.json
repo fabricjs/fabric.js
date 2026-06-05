@@ -8,6 +8,7 @@
       "fabric/extensions": ["./extensions/index"],
       "@fabricjs/core": ["./fabric"],
       "@fabricjs/browser": ["./packages/browser/src/index"],
+      "@fabricjs/gradient-controls": ["./packages/gradient-controls/src/index"],
       "@fabricjs/node": ["./packages/node/src/index"]
     }
   },

@@ -63,6 +63,17 @@ function stageWorkspacePackages() {
   stageCorePackage();
   writeEntrypointTypes('browser', "export * from '@fabricjs/core';\n");
   writeEntrypointTypes(
+    'gradient-controls',
+    [
+      "import type { Control, Gradient } from '@fabricjs/core';",
+      'export declare function createLinearGradientControls(',
+      "  gradient: Gradient<'linear'>,",
+      '  options?: Partial<Control>,',
+      '): Record<string, Control>;',
+      '',
+    ].join('\n'),
+  );
+  writeEntrypointTypes(
     'node',
     [
       "import type { JpegConfig, PngConfig } from 'canvas';",

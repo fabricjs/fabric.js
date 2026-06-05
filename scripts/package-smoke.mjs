@@ -16,6 +16,10 @@ const workspacePackages = [
   { dir: wd, importName: 'fabric' },
   { dir: path.join(wd, 'packages/core'), importName: '@fabricjs/core' },
   { dir: path.join(wd, 'packages/browser'), importName: '@fabricjs/browser' },
+  {
+    dir: path.join(wd, 'packages/gradient-controls'),
+    importName: '@fabricjs/gradient-controls',
+  },
   { dir: path.join(wd, 'packages/node'), importName: '@fabricjs/node' },
 ];
 
@@ -188,6 +192,10 @@ try {
   smokeImport(
     '@fabricjs/browser',
     "import { Canvas, Rect } from '@fabricjs/browser'; if (typeof Canvas !== 'function' || typeof Rect !== 'function') throw new Error('@fabricjs/browser import failed');",
+  );
+  smokeImport(
+    '@fabricjs/gradient-controls',
+    "import { createLinearGradientControls } from '@fabricjs/gradient-controls'; if (typeof createLinearGradientControls !== 'function') throw new Error('@fabricjs/gradient-controls import failed');",
   );
   smokeImport(
     '@fabricjs/node',

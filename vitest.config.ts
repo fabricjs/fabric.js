@@ -16,6 +16,7 @@ const pool = nodeMajor <= 20 ? 'vmThreads' : 'threads';
 export default defineConfig({
   resolve: {
     alias: {
+      '@fabricjs/core': resolve(__dirname, './fabric.ts'),
       fabric: resolve(__dirname, './fabric.ts'),
     },
   },
