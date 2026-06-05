@@ -106,7 +106,7 @@ export default defineConfig({
         '**/node_modules/**',
         '.codesandbox/**',
         'lib/**',
-        'e2e/**',
+        'packages/e2e/**',
         'scripts/**',
         'publish-next.js',
         'publish.js',

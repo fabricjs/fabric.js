@@ -16,16 +16,13 @@
   },
   "include": [
     "src/**/*",
-    "e2e/**/*",
     "extensions/**/*",
     "packages/*/src/**/*",
     "vitest.d.ts",
     "vitest.env.d.ts",
     "vitest.setup.ts",
     "vitest.config.ts",
-    "vitest.extend.ts",
-    "playwright.setup.ts",
-    "playwright.config.ts"
+    "vitest.extend.ts"
   ],
-  "exclude": ["dist", "dist-extensions", "e2e", "test"]
+  "exclude": ["dist", "dist-extensions", "packages/e2e", "test"]
 }

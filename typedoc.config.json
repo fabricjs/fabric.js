@@ -5,7 +5,7 @@
     "dist",
     "dist-extensions",
     "test",
-    "e2e",
+    "packages/e2e",
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.fixtures.ts"

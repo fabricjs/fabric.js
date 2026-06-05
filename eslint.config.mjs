@@ -12,8 +12,9 @@ export default tseslint.config(
       'dist/*',
       'dist-extensions/*',
       'packages/*/dist/*',
+      'packages/e2e/test-report/*',
+      'packages/e2e/test-results/*',
       '.codesandbox/**/*',
-      'e2e/*',
       'src/mixins/eraser_brush.mixin.ts',
       'src/util/lang_class.ts',
       'src/parkinglot',
@@ -98,24 +99,27 @@ export default tseslint.config(
   },
 
   {
-    files: ['playwright.setup.ts'],
+    files: ['packages/e2e/playwright.setup.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },
   },
   {
-    files: ['e2e/**/*.ts'],
+    files: ['packages/e2e/**/*.ts'],
     languageOptions: {
       parserOptions: {
-        project: 'e2e/tsconfig.json',
+        project: 'packages/e2e/tsconfig.json',
         tsconfigRootDir: __dirname,
       },
     },
     rules: {
       '@typescript-eslint/consistent-type-imports': 'off',
       '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-empty': 'off',
       'no-restricted-globals': 'off',
       'no-restricted-syntax': 'off',
+      'no-shadow-restricted-names': 'off',
     },
   },
 );

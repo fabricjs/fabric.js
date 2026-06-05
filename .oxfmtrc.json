@@ -25,8 +25,8 @@
     ".next/",
     ".parcel-cache/",
     "/docs/",
-    "/e2e/test-results/",
-    "/e2e/test-report/",
-    "/e2e/tests/**/*-snapshots/*.json"
+    "/packages/e2e/test-results/",
+    "/packages/e2e/test-report/",
+    "/packages/e2e/tests/**/*-snapshots/*.json"
   ]
 }

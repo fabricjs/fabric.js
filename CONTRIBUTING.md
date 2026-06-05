@@ -114,15 +114,15 @@ It is more than likely you will be requested to change stuff and refine your wor
 
 We use Vitest and Playwright.
 
-| Suite                                                                                                         | unit (node)                                       | e2e (browser)                                                                        |
-| ------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ | :----------------------------------------------------------------------------------- |
-| Framework                                                                                                     | [`vitest`][vitest]                                | [`playwright`][playwright]                                                           |
-| Setup                                                                                                         |                                                   | <pre>pnpm run build -- -f -w</pre>                                                   |
-| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>pnpm run test:vitest -- [filters] [-w]</pre> | <pre>pnpm run test:e2e -- [filters] [--ui]</pre>                                     |
-| Writing Tests                                                                                                 | Add/update `src/*.(spec\|test).ts` files          | - Update tests in `e2e/tests`<br>- Create a new test based on `e2e/template`         |
-| Test Gen                                                                                                      |                                                   | <pre>pnpm start vanilla<br>pnpm exec playwright codegen http://localhost:1234</pre>  |
-| Test Spec                                                                                                     |                                                   | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br> |
-| Outputs                                                                                                       | Snapshots next to the test file                   | - Snapshots next to the test file <br>- `e2e/test-report`<br>- `e2e/test-results`    |
+| Suite                                                                                                         | unit (node)                                       | e2e (browser)                                                                                        |
+| ------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
+| Framework                                                                                                     | [`vitest`][vitest]                                | [`playwright`][playwright]                                                                           |
+| Setup                                                                                                         |                                                   | <pre>pnpm run build -- -f -w</pre>                                                                   |
+| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>pnpm run test:vitest -- [filters] [-w]</pre> | <pre>pnpm run test:e2e -- [filters] [--ui]</pre>                                                     |
+| Writing Tests                                                                                                 | Add/update `src/*.(spec\|test).ts` files          | - Update tests in `packages/e2e/tests`<br>- Create a new test based on `packages/e2e/tests/template` |
+| Test Gen                                                                                                      |                                                   | <pre>pnpm start vanilla<br>pnpm exec playwright codegen http://localhost:1234</pre>                  |
+| Test Spec                                                                                                     |                                                   | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br>                 |
+| Outputs                                                                                                       | Snapshots next to the test file                   | - Snapshots next to the test file <br>- `packages/e2e/test-report`<br>- `packages/e2e/test-results`  |
 
 ## Developing
 

@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "strict": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    /**
+     * A reflection of the configured imports used by test scripts
+     * **IMPORTANT**: be sure to keep this updated to reflect `./imports.ts` correctly
+     */
+    "paths": {
+      "@fabricjs/browser": ["../browser/dist/index"],
+      "@fabricjs/core": ["../core/dist/index"],
+      "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
+      "@fabricjs/node": ["../node/dist/index"],
+      "fabric": ["../browser/dist/index"],
+      "fabric/extensions": ["../../dist-extensions/extensions"],
+      "fabric/node": ["../node/dist/index"]
+    },
+    "resolveJsonModule": true
+  },
+  "include": ["./**/*.ts", "env.d.ts"],
+  "exclude": []
+}

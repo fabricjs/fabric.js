@@ -107,7 +107,6 @@
     "dist",
     "dist-extensions",
     "test",
-    "e2e",
     "**/*.spec.ts",
     "**/*.test.ts"
   ],

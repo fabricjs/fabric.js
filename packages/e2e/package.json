@@ -1,0 +1,28 @@
+{
+  "name": "@fabricjs/e2e",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "typecheck": "tsc -p ./tsconfig.json --noEmit",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@fabricjs/browser": "workspace:^",
+    "@fabricjs/core": "workspace:^",
+    "@fabricjs/gradient-controls": "workspace:^",
+    "@fabricjs/node": "workspace:^",
+    "jsdom": "^26.1.0",
+    "westures": "^1.1.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/micromatch": "^4.0.10",
+    "@types/node": "^24.7.0",
+    "micromatch": "^4.0.8",
+    "rolldown": "^1.0.1",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
