@@ -39,6 +39,24 @@
     "url": "https://github.com/fabricjs/fabric.js/issues"
   },
   "license": "MIT",
+  "files": [
+    "dist",
+    "dist-extensions",
+    "src/**/*.ts",
+    "!src/**/*.spec.ts",
+    "!src/**/*.test.ts",
+    "!src/**/__tests__/**",
+    "!src/**/__screenshots__/**",
+    "!src/**/__snapshots__/**",
+    "!src/benchmarks/**",
+    "extensions/**/*.ts",
+    "!extensions/**/*.spec.ts",
+    "!extensions/**/*.test.ts",
+    "extensions/README.MD",
+    "fabric.ts",
+    "index.ts",
+    "index.node.ts"
+  ],
   "packageManager": "pnpm@10.29.1",
   "scripts": {
     "docs": "typedoc",
@@ -47,6 +65,7 @@
     "typecheck": "tsc -p ./tsconfig.build.json --noEmit && tsc -p ./tsconfig-extensions.json --noEmit && tsc -p ./tsconfig.packages.json --noEmit",
     "build": "node ./scripts/index.mjs build",
     "build:fast": "node ./scripts/index.mjs build -f",
+    "smoke:packages": "node ./scripts/package-smoke.mjs",
     "dev": "node ./scripts/index.mjs dev",
     "start": "node ./scripts/sandbox.mjs start",
     "export": "node ./scripts/index.mjs website export",

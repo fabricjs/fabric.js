@@ -1,6 +1,7 @@
 .github/
 .nyc_output/
 .vscode/
+.vitest-attachments/
 cli_output/
 lib/*.jar
 lib/*.png
@@ -9,6 +10,10 @@ test/
 test*
 e2e/
 src/benchmarks
+**/*.spec.ts
+**/*.test.ts
+**/__screenshots__/
+**/__snapshots__/
 .DS_Store
 .codesandbox/
 .devcontainer/
