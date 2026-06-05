@@ -158,6 +158,7 @@ export default [
         dir: path.resolve('./dist-extensions'),
         format: 'es',
         preserveModules: true,
+        preserveModulesRoot: 'extensions',
         entryFileNames: '[name].mjs',
         sourcemap: true,
         paths: {
