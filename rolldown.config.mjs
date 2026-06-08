@@ -1,4 +1,3 @@
-import terser from '@rollup/plugin-terser';
 import path from 'path';
 import { redBright } from './scripts/colors.mjs';
 
@@ -58,7 +57,6 @@ export default [
             preserveModules: true,
             entryFileNames: '[name].min.mjs',
             sourcemap: true,
-            plugins: [terser({ maxWorkers: 4 })],
             minify: true,
           }
         : null,
@@ -83,7 +81,6 @@ export default [
             name: 'fabric',
             format: 'es',
             sourcemap: true,
-            plugins: [terser({ maxWorkers: 4 })],
             minify: true,
           }
         : null,
@@ -101,7 +98,6 @@ export default [
             name: 'fabric',
             format: 'umd',
             sourcemap: true,
-            plugins: [terser({ maxWorkers: 4 })],
             minify: true,
           }
         : null,
@@ -155,7 +151,6 @@ export default [
           fabric: 'fabric',
           westures: 'westures',
         },
-        plugins: [terser({ maxWorkers: 4 })],
         minify: true,
       },
     ],
