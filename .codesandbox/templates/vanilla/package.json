@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "fabric on Vanilla.js",
   "scripts": {
-    "dev": "open-cli http://localhost:1234/ && parcel index.html",
-    "start": "parcel index.html",
+    "dev": "open-cli http://localhost:1234/ && parcel index.html --watch-dir .",
+    "start": "parcel index.html --watch-dir .",
     "build": "parcel build index.html"
   },
   "dependencies": {

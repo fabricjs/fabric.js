@@ -1,6 +1,6 @@
-import chalk from 'chalk';
 import cp from 'child_process';
 import fs from 'node:fs';
+import { blue, bold, yellow } from '../scripts/colors.mjs';
 import { formatFullTimestamp } from '../scripts/date-time.mjs';
 import path from 'node:path';
 import { build } from '../scripts/build.mjs';
@@ -14,7 +14,7 @@ import { wd } from '../scripts/dirname.mjs';
  * @param {string} destination
  */
 export function startSandbox(destination, buildAndWatch, installDeps = false) {
-  console.log(chalk.blue('\n> linking fabric'));
+  console.log(blue('\n> linking fabric'));
   cp.execSync('npm link', { cwd: wd, stdio: 'inherit' });
   cp.execSync('npm link fabric --include=dev --save', {
     cwd: destination,
@@ -25,37 +25,46 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
     installDeps ||
     !fs.existsSync(path.resolve(destination, 'node_modules'))
   ) {
-    console.log(chalk.blue('\n> installing dependencies'));
+    console.log(blue('\n> installing dependencies'));
     cp.execSync('npm i --include=dev', { cwd: destination, stdio: 'inherit' });
   }
 
   if (buildAndWatch) {
-    console.log(chalk.blue('\n> building and watching for changes'));
+    console.log(blue('\n> building and watching for changes'));
     build({ watch: true, fast: true });
   }
 
   const pathToTrigger = path.resolve(destination, 'package.json');
-  subscribe((locked) => {
-    if (!locked) {
-      const packageJSON = JSON.parse(fs.readFileSync(pathToTrigger, 'utf8'));
-      fs.writeFileSync(
-        pathToTrigger,
-        JSON.stringify(
-          {
-            ...packageJSON,
-            trigger: formatFullTimestamp(),
-          },
-          null,
-          2,
+  if (buildAndWatch) {
+    const watcher = subscribe((locked) => {
+      if (!locked) {
+        const packageJSON = JSON.parse(fs.readFileSync(pathToTrigger, 'utf8'));
+        fs.writeFileSync(
+          pathToTrigger,
+          JSON.stringify(
+            {
+              ...packageJSON,
+              trigger: formatFullTimestamp(),
+            },
+            null,
+            2,
+          ),
+        );
+        fs.writeFileSync(pathToTrigger, JSON.stringify(packageJSON, null, 2));
+      }
+    }, 500);
+    watcher.on('error', (error) => {
+      console.warn(
+        yellow(
+          `> failed to watch build status (${error.code}); reload the sandbox manually after builds`,
         ),
       );
-      fs.writeFileSync(pathToTrigger, JSON.stringify(packageJSON, null, 2));
-    }
-  }, 500);
+    });
+  }
 
   console.log(
-    chalk.blue(
-      `\n> starting ${chalk.bold(
+    blue(
+      `\n> starting ${bold(
         JSON.parse(fs.readFileSync(pathToTrigger)).name,
       )}`,
     ),
@@ -67,7 +76,7 @@ export function startSandbox(destination, buildAndWatch, installDeps = false) {
     console.log('> failed to open VSCode');
   }
 
-  return cp.spawn('npm run dev', {
+  return cp.spawn('npm run dev -- --no-cache', {
     cwd: destination,
     stdio: 'inherit',
     shell: true,
