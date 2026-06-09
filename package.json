@@ -79,7 +79,7 @@
     "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
-    "inquirer": "^13.4.3",
+    "inquirer": "^14.0.2",
     "lint-staged": "^17.0.5",
     "micromatch": "^4.0.8",
     "oxfmt": "^0.51.0",
