@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(sandbox): restore vanilla startup with pnpm [#11012](https://github.com/fabricjs/fabric.js/pull/11012)
+- fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): try native oxc minifier [#11008](https://github.com/fabricjs/fabric.js/pull/11008)
 - chore(): disable Sonar optional chaining suggestions
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11003](https://github.com/fabricjs/fabric.js/pull/11003)
