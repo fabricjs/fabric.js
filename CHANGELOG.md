@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @types/node from 24.7.2 to 25.9.2 [#11013](https://github.com/fabricjs/fabric.js/pull/11013)
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): try native oxc minifier [#11008](https://github.com/fabricjs/fabric.js/pull/11008)
 - chore(): disable Sonar optional chaining suggestions
