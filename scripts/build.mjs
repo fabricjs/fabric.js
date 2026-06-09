@@ -15,19 +15,6 @@ function ensureCleanDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
-function copyFiles(from, to, predicate) {
-  for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
-    const source = path.resolve(from, entry.name);
-    const target = path.resolve(to, entry.name);
-    if (entry.isDirectory()) {
-      copyFiles(source, target, predicate);
-    } else if (predicate(source)) {
-      fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.copyFileSync(source, target);
-    }
-  }
-}
-
 function removeFiles(dir, predicate) {
   if (!fs.existsSync(dir)) {
     return;
@@ -58,18 +45,42 @@ function isNodeOnlyDeclaration(file) {
   );
 }
 
+const declarationMapComment =
+  /\r?\n\/\/# sourceMappingURL=[^\r\n]*\.d\.ts\.map[ \t]*$/;
+
+/**
+ * Copies `.d.ts` files (skipping their `.d.ts.map` siblings) and strips the
+ * trailing `sourceMappingURL` comment. Workspace packages publish only `dist`
+ * (no `src`), so a shipped declaration map would dangle and point at sources
+ * that are never published.
+ */
+function copyDeclarations(from, to, predicate) {
+  for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
+    const source = path.resolve(from, entry.name);
+    const target = path.resolve(to, entry.name);
+    if (entry.isDirectory()) {
+      copyDeclarations(source, target, predicate);
+    } else if (source.endsWith('.d.ts') && predicate(source)) {
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      const contents = fs
+        .readFileSync(source, 'utf8')
+        .replace(declarationMapComment, '');
+      fs.writeFileSync(target, contents);
+    }
+  }
+}
+
 function stageCorePackage() {
   const dist = packageDist('core');
   ensureCleanDir(dist);
   for (const file of ['index.mjs', 'index.mjs.map']) {
     fs.copyFileSync(path.resolve(wd, 'dist', file), path.resolve(dist, file));
   }
-  copyFiles(path.resolve(wd, 'dist'), dist, (file) => {
-    return (
-      (file.endsWith('.d.ts') || file.endsWith('.d.ts.map')) &&
-      !isNodeOnlyDeclaration(file)
-    );
-  });
+  copyDeclarations(
+    path.resolve(wd, 'dist'),
+    dist,
+    (file) => !isNodeOnlyDeclaration(file),
+  );
 }
 
 function stagePackageTypes({ directory }) {
@@ -85,7 +96,7 @@ function stagePackageTypes({ directory }) {
   const dist = packageDist(directory);
   fs.mkdirSync(dist, { recursive: true });
   removeFiles(dist, isDeclaration);
-  copyFiles(source, dist, isDeclaration);
+  copyDeclarations(source, dist, () => true);
 }
 
 function stageWorkspacePackages() {
