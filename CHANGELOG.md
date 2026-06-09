@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump eslint from 10.1.0 to 10.4.1 [#11014](https://github.com/fabricjs/fabric.js/pull/11014)
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): try native oxc minifier [#11008](https://github.com/fabricjs/fabric.js/pull/11008)
 - chore(): disable Sonar optional chaining suggestions
