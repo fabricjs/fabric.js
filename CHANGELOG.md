@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @types/node from 24.7.2 to 25.9.3 [#11019](https://github.com/fabricjs/fabric.js/pull/11019)
 - fix(sandbox): restore vanilla startup with pnpm [#11012](https://github.com/fabricjs/fabric.js/pull/11012)
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): try native oxc minifier [#11008](https://github.com/fabricjs/fabric.js/pull/11008)
