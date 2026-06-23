@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump eslint from 10.1.0 to 10.5.0 [#11027](https://github.com/fabricjs/fabric.js/pull/11027)
 - fix(sandbox): restore vanilla startup with pnpm [#11012](https://github.com/fabricjs/fabric.js/pull/11012)
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
 - chore(): try native oxc minifier [#11008](https://github.com/fabricjs/fabric.js/pull/11008)
