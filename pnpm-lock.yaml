@@ -91,6 +91,111 @@ importers:
         specifier: ^26.1.0
         version: 26.1.0(canvas@3.2.3)
 
+  packages/aligning-guidelines:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/browser:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/core: {}
+
+  packages/cropping-controls:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/data-updaters:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/e2e:
+    dependencies:
+      '@fabricjs/aligning-guidelines':
+        specifier: workspace:^
+        version: link:../aligning-guidelines
+      '@fabricjs/browser':
+        specifier: workspace:^
+        version: link:../browser
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+      '@fabricjs/cropping-controls':
+        specifier: workspace:^
+        version: link:../cropping-controls
+      '@fabricjs/data-updaters':
+        specifier: workspace:^
+        version: link:../data-updaters
+      '@fabricjs/gradient-controls':
+        specifier: workspace:^
+        version: link:../gradient-controls
+      '@fabricjs/node':
+        specifier: workspace:^
+        version: link:../node
+      '@fabricjs/westures-integration':
+        specifier: workspace:^
+        version: link:../westures-integration
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(canvas@3.2.3)
+      westures:
+        specifier: ^1.1.1
+        version: 1.1.1
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.60.0
+        version: 1.60.0
+      '@types/micromatch':
+        specifier: ^4.0.10
+        version: 4.0.10
+      '@types/node':
+        specifier: ^24.7.0
+        version: 24.7.2
+      micromatch:
+        specifier: ^4.0.8
+        version: 4.0.8
+      rolldown:
+        specifier: ^1.0.1
+        version: 1.1.2
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/gradient-controls:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+
+  packages/node:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+      canvas:
+        specifier: ^3.2.0
+        version: 3.2.3
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0(canvas@3.2.3)
+
+  packages/westures-integration:
+    dependencies:
+      '@fabricjs/core':
+        specifier: workspace:^
+        version: link:../core
+      westures:
+        specifier: ^1.1.1
+        version: 1.1.1
+
 packages:
 
   '@asamuzakjp/css-color@3.2.0':
@@ -728,9 +833,6 @@ packages:
   '@types/esrecurse@4.3.1':
     resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
 
-  '@types/estree@1.0.8':
-    resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
-
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
@@ -869,11 +971,6 @@ packages:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
       acorn: ^6.0.0 || ^7.0.0 || ^8.0.0
-
-  acorn@8.16.0:
-    resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
 
   acorn@8.17.0:
     resolution: {integrity: sha512-xRQbDb9BnwDafYNn6Vwl839DYVjqXYb1XVGtWAZ1kcDc6iwAL4hg3B1dZlRiuENFeO2H53gFG3in621AdERVAg==}
@@ -1092,10 +1189,6 @@ packages:
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
-
-  detect-libc@2.0.4:
-    resolution: {integrity: sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==}
-    engines: {node: '>=8'}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -1920,10 +2013,6 @@ packages:
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
 
-  tinyexec@1.1.2:
-    resolution: {integrity: sha512-dAqSqE/RabpBKI8+h26GfLq6Vb3JVXs30XYQjdMjaj/c2tS8IYYMbIzP599KtRj7c57/wYApb3QjgRgXmrCukA==}
-    engines: {node: '>=18'}
-
   tinyexec@1.2.4:
     resolution: {integrity: sha512-SHf/r48b7vOrjve9PxJo3MN5v5yuyjHvdUcrQffT3WXMUfnGmHDVbC4k3sHJaJTgZCwpUplIaAo5ANtMyp3YHg==}
     engines: {node: '>=18'}
@@ -2158,18 +2247,6 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  ws@8.19.0:
-    resolution: {integrity: sha512-blAT2mjOEIi0ZzruJfIhb3nps74PRWTCz1IjglWEEpQl5XS/UNama6u2/rjFkDDouqr4L67ry+1aGIALViWjDg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   ws@8.21.0:
     resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
     engines: {node: '>=10.0.0'}
@@ -2207,7 +2284,6 @@ snapshots:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
-    optional: true
 
   '@babel/helper-string-parser@7.29.7': {}
 
@@ -2226,14 +2302,12 @@ snapshots:
 
   '@blazediff/core@1.9.1': {}
 
-  '@csstools/color-helpers@5.1.0':
-    optional: true
+  '@csstools/color-helpers@5.1.0': {}
 
   '@csstools/css-calc@2.1.4(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)':
     dependencies:
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
-    optional: true
 
   '@csstools/css-color-parser@3.1.0(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)':
     dependencies:
@@ -2241,15 +2315,12 @@ snapshots:
       '@csstools/css-calc': 2.1.4(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
-    optional: true
 
   '@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4)':
     dependencies:
       '@csstools/css-tokenizer': 3.0.4
-    optional: true
 
-  '@csstools/css-tokenizer@3.0.4':
-    optional: true
+  '@csstools/css-tokenizer@3.0.4': {}
 
   '@emnapi/core@1.10.0':
     dependencies:
@@ -2669,8 +2740,6 @@ snapshots:
 
   '@types/esrecurse@4.3.1': {}
 
-  '@types/estree@1.0.8': {}
-
   '@types/estree@1.0.9': {}
 
   '@types/jsdom@21.1.7':
@@ -2882,17 +2951,13 @@ snapshots:
 
   '@zeit/schemas@2.36.0': {}
 
-  acorn-jsx@5.3.2(acorn@8.16.0):
+  acorn-jsx@5.3.2(acorn@8.17.0):
     dependencies:
-      acorn: 8.16.0
+      acorn: 8.17.0
 
-  acorn@8.16.0: {}
+  acorn@8.17.0: {}
 
-  acorn@8.17.0:
-    optional: true
-
-  agent-base@7.1.4:
-    optional: true
+  agent-base@7.1.4: {}
 
   ajv@6.15.0:
     dependencies:
@@ -2942,15 +3007,13 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  base64-js@1.5.1:
-    optional: true
+  base64-js@1.5.1: {}
 
   bl@4.1.0:
     dependencies:
       buffer: 5.7.1
       inherits: 2.0.4
       readable-stream: 3.6.2
-    optional: true
 
   boxen@7.0.0:
     dependencies:
@@ -2983,7 +3046,6 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
-    optional: true
 
   bytes@3.0.0: {}
 
@@ -2995,7 +3057,6 @@ snapshots:
     dependencies:
       node-addon-api: 7.1.1
       prebuild-install: 7.1.3
-    optional: true
 
   chai@6.2.2: {}
 
@@ -3012,8 +3073,7 @@ snapshots:
 
   chardet@2.1.1: {}
 
-  chownr@1.1.4:
-    optional: true
+  chownr@1.1.4: {}
 
   cli-boxes@3.0.0: {}
 
@@ -3077,13 +3137,11 @@ snapshots:
     dependencies:
       '@asamuzakjp/css-color': 3.2.0
       rrweb-cssom: 0.8.0
-    optional: true
 
   data-urls@5.0.0:
     dependencies:
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.2.0
-    optional: true
 
   debug@2.6.9:
     dependencies:
@@ -3093,20 +3151,15 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  decimal.js@10.6.0:
-    optional: true
+  decimal.js@10.6.0: {}
 
   decompress-response@6.0.0:
     dependencies:
       mimic-response: 3.1.0
-    optional: true
 
   deep-extend@0.6.0: {}
 
   deep-is@0.1.4: {}
-
-  detect-libc@2.0.4:
-    optional: true
 
   detect-libc@2.1.2: {}
 
@@ -3121,7 +3174,6 @@ snapshots:
   end-of-stream@1.4.5:
     dependencies:
       once: 1.4.0
-    optional: true
 
   entities@6.0.1: {}
 
@@ -3140,7 +3192,7 @@ snapshots:
   eslint-scope@9.1.2:
     dependencies:
       '@types/esrecurse': 4.3.1
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       esrecurse: 4.3.0
       estraverse: 5.3.0
 
@@ -3159,7 +3211,7 @@ snapshots:
       '@humanfs/node': 0.16.6
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.3
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       ajv: 6.15.0
       cross-spawn: 7.0.6
       debug: 4.4.3
@@ -3185,8 +3237,8 @@ snapshots:
 
   espree@11.2.0:
     dependencies:
-      acorn: 8.16.0
-      acorn-jsx: 5.3.2(acorn@8.16.0)
+      acorn: 8.17.0
+      acorn-jsx: 5.3.2(acorn@8.17.0)
       eslint-visitor-keys: 5.0.1
 
   esquery@1.7.0:
@@ -3219,8 +3271,7 @@ snapshots:
       signal-exit: 3.0.7
       strip-final-newline: 2.0.0
 
-  expand-template@2.0.3:
-    optional: true
+  expand-template@2.0.3: {}
 
   expect-type@1.3.0: {}
 
@@ -3268,8 +3319,7 @@ snapshots:
 
   flatted@3.4.2: {}
 
-  fs-constants@1.0.0:
-    optional: true
+  fs-constants@1.0.0: {}
 
   fsevents@2.3.2:
     optional: true
@@ -3281,8 +3331,7 @@ snapshots:
 
   get-stream@6.0.1: {}
 
-  github-from-package@0.0.0:
-    optional: true
+  github-from-package@0.0.0: {}
 
   glob-parent@6.0.2:
     dependencies:
@@ -3293,7 +3342,6 @@ snapshots:
   html-encoding-sniffer@4.0.0:
     dependencies:
       whatwg-encoding: 3.1.1
-    optional: true
 
   html-escaper@2.0.2: {}
 
@@ -3303,7 +3351,6 @@ snapshots:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   https-proxy-agent@7.0.6:
     dependencies:
@@ -3311,7 +3358,6 @@ snapshots:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   human-signals@2.1.0: {}
 
@@ -3320,14 +3366,12 @@ snapshots:
   iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
-    optional: true
 
   iconv-lite@0.7.2:
     dependencies:
       safer-buffer: 2.1.2
 
-  ieee754@1.2.1:
-    optional: true
+  ieee754@1.2.1: {}
 
   ignore@5.3.2: {}
 
@@ -3335,8 +3379,7 @@ snapshots:
 
   imurmurhash@0.1.4: {}
 
-  inherits@2.0.4:
-    optional: true
+  inherits@2.0.4: {}
 
   ini@1.3.8: {}
 
@@ -3370,8 +3413,7 @@ snapshots:
 
   is-port-reachable@4.0.0: {}
 
-  is-potential-custom-element-name@1.0.1:
-    optional: true
+  is-potential-custom-element-name@1.0.1: {}
 
   is-stream@2.0.1: {}
 
@@ -3416,7 +3458,7 @@ snapshots:
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.2.0
-      ws: 8.19.0
+      ws: 8.21.0
       xml-name-validator: 5.0.0
     optionalDependencies:
       canvas: 3.2.3
@@ -3424,7 +3466,6 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
-    optional: true
 
   json-buffer@3.0.1: {}
 
@@ -3497,7 +3538,7 @@ snapshots:
       listr2: 10.2.1
       picomatch: 4.0.4
       string-argv: 0.3.2
-      tinyexec: 1.1.2
+      tinyexec: 1.2.4
     optionalDependencies:
       yaml: 2.9.0
 
@@ -3521,8 +3562,7 @@ snapshots:
       strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
 
-  lru-cache@10.4.3:
-    optional: true
+  lru-cache@10.4.3: {}
 
   magic-string@0.30.21:
     dependencies:
@@ -3557,8 +3597,7 @@ snapshots:
 
   mimic-function@5.0.1: {}
 
-  mimic-response@3.1.0:
-    optional: true
+  mimic-response@3.1.0: {}
 
   minimatch@10.2.5:
     dependencies:
@@ -3570,8 +3609,7 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  mkdirp-classic@0.5.3:
-    optional: true
+  mkdirp-classic@0.5.3: {}
 
   mrmime@2.0.1: {}
 
@@ -3583,8 +3621,7 @@ snapshots:
 
   nanoid@3.3.15: {}
 
-  napi-build-utils@2.0.0:
-    optional: true
+  napi-build-utils@2.0.0: {}
 
   natural-compare@1.4.0: {}
 
@@ -3593,17 +3630,14 @@ snapshots:
   node-abi@3.75.0:
     dependencies:
       semver: 7.8.1
-    optional: true
 
-  node-addon-api@7.1.1:
-    optional: true
+  node-addon-api@7.1.1: {}
 
   npm-run-path@4.0.1:
     dependencies:
       path-key: 3.1.1
 
-  nwsapi@2.2.21:
-    optional: true
+  nwsapi@2.2.21: {}
 
   obug@2.1.1: {}
 
@@ -3612,7 +3646,6 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
-    optional: true
 
   onetime@5.1.2:
     dependencies:
@@ -3701,7 +3734,7 @@ snapshots:
 
   prebuild-install@7.1.3:
     dependencies:
-      detect-libc: 2.0.4
+      detect-libc: 2.1.2
       expand-template: 2.0.3
       github-from-package: 0.0.0
       minimist: 1.2.8
@@ -3713,7 +3746,6 @@ snapshots:
       simple-get: 4.0.1
       tar-fs: 2.1.4
       tunnel-agent: 0.6.0
-    optional: true
 
   prelude-ls@1.2.1: {}
 
@@ -3723,7 +3755,6 @@ snapshots:
     dependencies:
       end-of-stream: 1.4.5
       once: 1.4.0
-    optional: true
 
   punycode@2.3.1: {}
 
@@ -3741,7 +3772,6 @@ snapshots:
       inherits: 2.0.4
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
-    optional: true
 
   registry-auth-token@3.3.2:
     dependencies:
@@ -3803,8 +3833,7 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.1.2
       '@rolldown/binding-win32-x64-msvc': 1.1.2
 
-  rrweb-cssom@0.8.0:
-    optional: true
+  rrweb-cssom@0.8.0: {}
 
   run-async@4.0.6: {}
 
@@ -3819,7 +3848,6 @@ snapshots:
   saxes@6.0.0:
     dependencies:
       xmlchars: 2.2.0
-    optional: true
 
   semver@7.8.1: {}
 
@@ -3861,15 +3889,13 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  simple-concat@1.0.1:
-    optional: true
+  simple-concat@1.0.1: {}
 
   simple-get@4.0.1:
     dependencies:
       decompress-response: 6.0.0
       once: 1.4.0
       simple-concat: 1.0.1
-    optional: true
 
   sirv@3.0.2:
     dependencies:
@@ -3930,7 +3956,6 @@ snapshots:
   string_decoder@1.3.0:
     dependencies:
       safe-buffer: 5.2.1
-    optional: true
 
   strip-ansi@6.0.1:
     dependencies:
@@ -3948,8 +3973,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  symbol-tree@3.2.4:
-    optional: true
+  symbol-tree@3.2.4: {}
 
   tar-fs@2.1.4:
     dependencies:
@@ -3957,7 +3981,6 @@ snapshots:
       mkdirp-classic: 0.5.3
       pump: 3.0.3
       tar-stream: 2.2.0
-    optional: true
 
   tar-stream@2.2.0:
     dependencies:
@@ -3966,7 +3989,6 @@ snapshots:
       fs-constants: 1.0.0
       inherits: 2.0.4
       readable-stream: 3.6.2
-    optional: true
 
   terser@5.43.1:
     dependencies:
@@ -3977,8 +3999,6 @@ snapshots:
     optional: true
 
   tinybench@2.9.0: {}
-
-  tinyexec@1.1.2: {}
 
   tinyexec@1.2.4: {}
 
@@ -3991,13 +4011,11 @@ snapshots:
 
   tinyrainbow@3.1.0: {}
 
-  tldts-core@6.1.86:
-    optional: true
+  tldts-core@6.1.86: {}
 
   tldts@6.1.86:
     dependencies:
       tldts-core: 6.1.86
-    optional: true
 
   to-regex-range@5.0.1:
     dependencies:
@@ -4008,12 +4026,10 @@ snapshots:
   tough-cookie@5.1.2:
     dependencies:
       tldts: 6.1.86
-    optional: true
 
   tr46@5.1.1:
     dependencies:
       punycode: 2.3.1
-    optional: true
 
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
@@ -4028,7 +4044,6 @@ snapshots:
   tunnel-agent@0.6.0:
     dependencies:
       safe-buffer: 5.2.1
-    optional: true
 
   type-check@0.4.0:
     dependencies:
@@ -4060,8 +4075,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  util-deprecate@1.0.2:
-    optional: true
+  util-deprecate@1.0.2: {}
 
   vary@1.1.2: {}
 
@@ -4112,26 +4126,21 @@ snapshots:
   w3c-xmlserializer@5.0.0:
     dependencies:
       xml-name-validator: 5.0.0
-    optional: true
 
-  webidl-conversions@7.0.0:
-    optional: true
+  webidl-conversions@7.0.0: {}
 
   westures@1.1.1: {}
 
   whatwg-encoding@3.1.1:
     dependencies:
       iconv-lite: 0.6.3
-    optional: true
 
-  whatwg-mimetype@4.0.0:
-    optional: true
+  whatwg-mimetype@4.0.0: {}
 
   whatwg-url@14.2.0:
     dependencies:
       tr46: 5.1.1
       webidl-conversions: 7.0.0
-    optional: true
 
   which@2.0.2:
     dependencies:
@@ -4166,19 +4175,13 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.2.0
 
-  wrappy@1.0.2:
-    optional: true
-
-  ws@8.19.0:
-    optional: true
+  wrappy@1.0.2: {}
 
   ws@8.21.0: {}
 
-  xml-name-validator@5.0.0:
-    optional: true
+  xml-name-validator@5.0.0: {}
 
-  xmlchars@2.2.0:
-    optional: true
+  xmlchars@2.2.0: {}
 
   yaml@2.9.0:
     optional: true
