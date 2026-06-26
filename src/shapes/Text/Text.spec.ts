@@ -4,7 +4,7 @@ import { config } from '../../config';
 import { Path } from '../Path';
 import { FabricText } from './Text';
 
-import { describe, expect, it, afterEach } from 'vitest';
+import { describe, expect, it, afterEach, vi } from 'vitest';
 import {
   FabricObject,
   getFabricDocument,
@@ -1344,6 +1344,67 @@ describe('FabricText', () => {
         ?.keys();
       expect(cacheKeys?.next().value).not.toBe('undefineda');
       expect(cacheKeys?.next().done).toBe(true);
+    });
+
+    it('does not re-enter the measuring path when only kerning-irrelevant entries are missing', () => {
+      cache.clearFontCache();
+      const text = new FabricText('');
+      const style = text.getCompleteStyleDeclaration(0, 0);
+      // a different style so the previous char cannot form a kerning pair
+      const otherStyle = { ...style, fontFamily: 'OtherFont' };
+
+      // prime the cache for 'a' without a usable previous char
+      text._measureChar('a', style, undefined, style);
+      expect(
+        cache.charWidthsCache
+          .get(style.fontFamily.toLowerCase())
+          ?.get(`${style.fontStyle}_${style.fontWeight}`)
+          ?.has('a'),
+        'single char width is cached',
+      ).toBe(true);
+
+      const setTextStylesSpy = vi.spyOn(text, '_setTextStyles');
+      // second call: width is cached and no same-style kerning pair applies
+      const second = text._measureChar('a', style, 'b', otherStyle);
+      expect(second.width, 'returns the cached width').toBe(
+        text._measureChar('a', style, undefined, style).width,
+      );
+      expect(
+        setTextStylesSpy,
+        'does not touch the measuring context when nothing needs measuring',
+      ).not.toHaveBeenCalled();
+      setTextStylesSpy.mockRestore();
+    });
+
+    it('measures coupleWidth and previousWidth via measureText when both are undefined and same-style kerning pair applies', () => {
+      cache.clearFontCache();
+      const text = new FabricText('');
+      const style = text.getCompleteStyleDeclaration(0, 0);
+
+      // prime only the single-character width for 'a'; 'b' and 'ba' stay uncached
+      text._measureChar('a', style, undefined, style);
+
+      const setTextStylesSpy = vi.spyOn(text, '_setTextStyles');
+      // 'a' width is cached, but previousWidth ('b') and coupleWidth ('ba') are not.
+      const result = text._measureChar('a', style, 'b', style);
+
+      const fontCache = cache.getFontCache(style);
+      expect(fontCache.get('b'), 'previousChar is now cached').toBeTypeOf(
+        'number',
+      );
+      expect(fontCache.get('ba'), 'couple is now cached').toBeTypeOf('number');
+      expect(
+        result.kernedWidth,
+        'kernedWidth is coupleWidth - previousWidth',
+      ).toBe(
+        (fontCache.get('ba') - fontCache.get('b')) *
+          (style.fontSize / text.CACHE_FONT_SIZE),
+      );
+      expect(
+        setTextStylesSpy,
+        'does not touch the measuring context when nothing needs measuring',
+      ).toHaveBeenCalledOnce();
+      setTextStylesSpy.mockRestore();
     });
   });
 });
