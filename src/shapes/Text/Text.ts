@@ -1806,21 +1806,27 @@ export class FabricText<
 
   set(key: string | any, value?: any) {
     const { textLayoutProperties } = this.constructor as typeof FabricText;
-    super.set(key, value);
+    // detect layout-relevant changes before super.set mutates the instance,
+    // so initDimensions is only requested when a value actually changed.
     let needsDims = false;
     let isAddingPath = false;
     if (typeof key === 'object') {
       for (const _key in key) {
-        if (_key === 'path') {
-          this.setPathInfo();
-        }
-        needsDims = needsDims || textLayoutProperties.includes(_key);
         isAddingPath = isAddingPath || _key === 'path';
+        needsDims =
+          needsDims ||
+          (textLayoutProperties.includes(_key) &&
+            this[_key as keyof this] !== key[_key]);
       }
     } else {
-      needsDims = textLayoutProperties.includes(key);
       isAddingPath = key === 'path';
+      needsDims =
+        textLayoutProperties.includes(key) && this[key as keyof this] !== value;
     }
+
+    super.set(key, value);
+
+    // setPathInfo must run after super.set so it reads the new path
     if (isAddingPath) {
       this.setPathInfo();
     }
