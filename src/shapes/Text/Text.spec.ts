@@ -4,7 +4,7 @@ import { config } from '../../config';
 import { Path } from '../Path';
 import { FabricText } from './Text';
 
-import { describe, expect, it, afterEach } from 'vitest';
+import { describe, expect, it, afterEach, vi } from 'vitest';
 import {
   FabricObject,
   getFabricDocument,
@@ -1344,6 +1344,62 @@ describe('FabricText', () => {
         ?.keys();
       expect(cacheKeys?.next().value).not.toBe('undefineda');
       expect(cacheKeys?.next().done).toBe(true);
+    });
+  });
+
+  describe('set & initDimensions', () => {
+    it('does not call initDimensions when a textLayoutProperty is set to the same value', () => {
+      const text = new FabricText('hello');
+      const initSpy = vi.spyOn(text, 'initDimensions');
+      const setCoordsSpy = vi.spyOn(text, 'setCoords');
+
+      // set to the same value it already has
+      text.set('text', 'hello');
+      expect(
+        initSpy,
+        'initDimensions is not called for a no-op set',
+      ).not.toHaveBeenCalled();
+      expect(setCoordsSpy).not.toHaveBeenCalled();
+
+      // changing the value does trigger it
+      text.set('text', 'world');
+      expect(
+        initSpy,
+        'initDimensions is called when value changes',
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        setCoordsSpy,
+        'setCoords is called when value changes',
+      ).toHaveBeenCalledTimes(1);
+
+      initSpy.mockRestore();
+      setCoordsSpy.mockRestore();
+    });
+
+    it('does not call initDimensions when textLayoutProperties are set to the same values via object', () => {
+      const text = new FabricText('hello', { fontSize: 40, charSpacing: 0 });
+      const initSpy = vi.spyOn(text, 'initDimensions');
+      const setCoordsSpy = vi.spyOn(text, 'setCoords');
+
+      text.set({ text: 'hello', fontSize: 40, charSpacing: 0 });
+      expect(
+        initSpy,
+        'no initDimensions for no-op object set',
+      ).not.toHaveBeenCalled();
+      expect(setCoordsSpy).not.toHaveBeenCalled();
+
+      text.set({ text: 'hello', fontSize: 50, charSpacing: 0 });
+      expect(
+        initSpy,
+        'initDimensions runs when at least one value changes',
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        setCoordsSpy,
+        'setCoords runs when at least one value changes',
+      ).toHaveBeenCalledTimes(1);
+
+      initSpy.mockRestore();
+      setCoordsSpy.mockRestore();
     });
   });
 });
