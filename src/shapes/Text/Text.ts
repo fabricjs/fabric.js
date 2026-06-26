@@ -1823,8 +1823,9 @@ export class FabricText<
       needsDims =
         textLayoutProperties.includes(key) && this[key as keyof this] !== value;
     }
-    // keep the existing fabric code path that calls _set via super.set
+
     super.set(key, value);
+
     // setPathInfo must run after super.set so it reads the new path
     if (isAddingPath) {
       this.setPathInfo();
