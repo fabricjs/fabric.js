@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(text): avoid spurious measuring in `_measureChar` when only kerning-irrelevant entries are missing [#11028](https://github.com/fabricjs/fabric.js/pull/11028)
 - chore(deps-dev): bump rolldown from 1.1.0 to 1.1.2 [#11025](https://github.com/fabricjs/fabric.js/pull/11025)
 - fix(sandbox): restore vanilla startup with pnpm [#11012](https://github.com/fabricjs/fabric.js/pull/11012)
 - fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
