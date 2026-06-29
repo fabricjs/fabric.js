@@ -825,7 +825,7 @@ export class FabricText<
     const fontCache = cache.getFontCache(charStyle),
       fontDeclaration = this._getFontDeclaration(charStyle),
       fontMultiplier = charStyle.fontSize / this.CACHE_FONT_SIZE;
-    const hasPrevChar = Boolean(previousChar),
+    const hasPrevChar = !!previousChar,
       stylesAreEqual =
         hasPrevChar &&
         fontDeclaration === this._getFontDeclaration(prevCharStyle),
@@ -835,15 +835,19 @@ export class FabricText<
       previousWidth: number | undefined,
       kernedWidth: number | undefined;
 
-    if (hasPrevChar && fontCache.has(previousChar!)) {
-      previousWidth = fontCache.get(previousChar!);
+    if (hasPrevChar && fontCache.has(previousChar)) {
+      previousWidth = fontCache.get(previousChar);
     }
     if (fontCache.has(_char)) {
       kernedWidth = width = fontCache.get(_char);
     }
-    if (stylesAreEqual && fontCache.has(couple)) {
+    if (
+      stylesAreEqual &&
+      fontCache.has(couple) &&
+      previousWidth !== undefined
+    ) {
       coupleWidth = fontCache.get(couple)!;
-      kernedWidth = coupleWidth - previousWidth!;
+      kernedWidth = coupleWidth - previousWidth;
     }
     // only enter the measuring path when the single-character width is missing
     // or a same-style kerning pair actually needs measuring
@@ -857,8 +861,8 @@ export class FabricText<
       }
       if (stylesAreEqual && coupleWidth === undefined) {
         if (previousWidth === undefined) {
-          previousWidth = ctx.measureText(previousChar!).width;
-          fontCache.set(previousChar!, previousWidth);
+          previousWidth = ctx.measureText(previousChar).width;
+          fontCache.set(previousChar, previousWidth);
         }
         // we can measure the kerning couple and subtract the width of the previous character
         coupleWidth = ctx.measureText(couple).width;
