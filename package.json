@@ -101,7 +101,7 @@
     "inquirer": "^13.4.3",
     "lint-staged": "^17.0.5",
     "micromatch": "^4.0.8",
-    "oxfmt": "^0.51.0",
+    "oxfmt": "^0.57.0",
     "ps-list": "^9.0.0",
     "rolldown": "^1.0.1",
     "serve": "^14.2.6",
