@@ -5,6 +5,15 @@ import path from 'node:path';
 import { wd } from './dirname.mjs';
 import { publishablePackages } from './workspace-packages.mjs';
 
+/**
+ * Smoke-tests the actual npm artifacts, not the workspace source.
+ *
+ * Vitest runs inside the repo, where pnpm links, TS path aliases, and dev
+ * dependencies can hide packaging bugs. This script packs each publishable
+ * package, inspects the tarballs, installs them into temporary consumer
+ * projects, and imports them through their published `exports` maps.
+ */
+
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fabric-package-smoke-'));
 const packDir = path.join(tmp, 'packs');
 
@@ -153,10 +162,31 @@ function expectNoDeclaredRuntimeDependency(pkg, dependencyName, label) {
   }
 }
 
+function hasDeclaredRuntimeDependency(pkg, dependencyName) {
+  return ['dependencies', 'peerDependencies', 'optionalDependencies'].some(
+    (field) => pkg[field]?.[dependencyName],
+  );
+}
+
 function verifyRootPackageManifest(pkg) {
   log('Checking root fabric package manifest');
   expectNoDeclaredRuntimeDependency(pkg, 'westures', 'fabric');
   log('Root fabric package manifest looks correct');
+}
+
+function verifyCorePackageManifest(pkg) {
+  log('Checking @fabricjs/core package manifest');
+  expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/core');
+  expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/core');
+  log('@fabricjs/core package manifest looks correct');
+}
+
+function isFacadeRootPackage(pkg) {
+  return (
+    hasDeclaredRuntimeDependency(pkg, '@fabricjs/core') ||
+    hasDeclaredRuntimeDependency(pkg, '@fabricjs/browser') ||
+    hasDeclaredRuntimeDependency(pkg, '@fabricjs/node')
+  );
 }
 
 function verifyWorkspaceTarball(importName, list) {
@@ -231,6 +261,49 @@ function smokeImport(project, label, source) {
   log(`Imported ${label} in ${project.name}`);
 }
 
+function smokeSplitCoreIdentity(project) {
+  smokeImport(
+    project,
+    '@fabricjs/core',
+    "import { Rect, Canvas } from '@fabricjs/core'; if (typeof Rect !== 'function' || typeof Canvas !== 'function') throw new Error('@fabricjs/core import failed');",
+  );
+  smokeImport(
+    project,
+    '@fabricjs/browser core identity',
+    "import { Rect as CoreRect } from '@fabricjs/core'; import { Rect as BrowserRect } from '@fabricjs/browser'; if (CoreRect !== BrowserRect) throw new Error('@fabricjs/browser does not share @fabricjs/core runtime');",
+  );
+  smokeImport(
+    project,
+    '@fabricjs/node core identity',
+    "import { Rect as CoreRect } from '@fabricjs/core'; import { Rect as NodeRect } from '@fabricjs/node'; if (CoreRect !== NodeRect) throw new Error('@fabricjs/node does not share @fabricjs/core runtime');",
+  );
+  smokeImport(
+    project,
+    '@fabricjs/browser and @fabricjs/node core identity',
+    "import { Rect as BrowserRect } from '@fabricjs/browser'; import { Rect as NodeRect } from '@fabricjs/node'; if (BrowserRect !== NodeRect) throw new Error('@fabricjs/browser and @fabricjs/node do not share @fabricjs/core runtime');",
+  );
+}
+
+function smokeRootFacadeCoreIdentity(project, rootPkg, fabricTarball) {
+  if (!isFacadeRootPackage(rootPkg)) {
+    log(
+      'Skipping root fabric facade identity checks; root package is not a facade yet',
+    );
+    return;
+  }
+  linkPackage(project, 'fabric', fabricTarball);
+  smokeImport(
+    project,
+    'fabric and @fabricjs/core core identity',
+    "import { Rect as FabricRect } from 'fabric'; import { Rect as CoreRect } from '@fabricjs/core'; if (FabricRect !== CoreRect) throw new Error('fabric does not share @fabricjs/core runtime');",
+  );
+  smokeImport(
+    project,
+    'fabric/node and @fabricjs/node core identity',
+    "import { Rect as FabricNodeRect } from 'fabric/node'; import { Rect as NodeRect } from '@fabricjs/node'; if (FabricNodeRect !== NodeRect) throw new Error('fabric/node does not share @fabricjs/node runtime');",
+  );
+}
+
 try {
   log(`Using temp directory ${tmp}`);
   const packed = new Map(
@@ -241,7 +314,14 @@ try {
   );
 
   verifyRootTarball(tarList(packed.get('fabric').tarball));
-  verifyRootPackageManifest(tarPackageJson(packed.get('fabric').tarball));
+  const packedManifests = new Map(
+    publishablePackages.map(({ importName }) => [
+      importName,
+      tarPackageJson(packed.get(importName).tarball),
+    ]),
+  );
+  verifyRootPackageManifest(packedManifests.get('fabric'));
+  verifyCorePackageManifest(packedManifests.get('@fabricjs/core'));
   for (const { importName } of publishablePackages) {
     if (importName !== 'fabric') {
       verifyWorkspaceTarball(
@@ -289,6 +369,7 @@ try {
   linkRuntimeDependency(splitProject, 'jsdom');
   linkRuntimeDependency(splitProject, 'westures');
 
+  smokeSplitCoreIdentity(splitProject);
   smokeImport(
     splitProject,
     '@fabricjs/browser',
@@ -323,6 +404,11 @@ try {
     splitProject,
     '@fabricjs/westures-integration',
     "import { addGestures, pinchEventHandler } from '@fabricjs/westures-integration'; if (typeof addGestures !== 'function' || typeof pinchEventHandler !== 'function') throw new Error('@fabricjs/westures-integration import failed');",
+  );
+  smokeRootFacadeCoreIdentity(
+    splitProject,
+    packedManifests.get('fabric'),
+    packed.get('fabric').tarball,
   );
 
   log('Cleaning temp directory');
