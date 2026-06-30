@@ -68,9 +68,9 @@ jobs:
         shell: bash
         run: |
           if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
-            echo "pnpm publish --tag ${{ steps.publish.outputs.npm_tag }} --no-git-checks"
-            pnpm publish --tag "${{ steps.publish.outputs.npm_tag }}" --no-git-checks
+            echo "pnpm -r publish --tag ${{ steps.publish.outputs.npm_tag }} --access public --no-git-checks"
+            pnpm -r publish --tag "${{ steps.publish.outputs.npm_tag }}" --access public --no-git-checks
           else
-            echo "pnpm publish --no-git-checks"
-            pnpm publish --no-git-checks
+            echo "pnpm -r publish --access public --no-git-checks"
+            pnpm -r publish --access public --no-git-checks
           fi
