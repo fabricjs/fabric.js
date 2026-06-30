@@ -16,6 +16,8 @@ jobs:
         with:
           node-version: 24.x
       - run: pnpm run build
+      - name: Smoke test packages
+        run: pnpm run smoke:packages
   stats:
     name: Build stats
     runs-on: ubuntu-24.04

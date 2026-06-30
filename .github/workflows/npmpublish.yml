@@ -64,6 +64,8 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile --prefer-offline
       - run: pnpm run build
+      - name: Smoke test packages
+        run: pnpm run smoke:packages
       - name: Publish package
         shell: bash
         run: |
