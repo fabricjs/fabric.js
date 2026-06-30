@@ -12,6 +12,9 @@
     "url": "https://github.com/fabricjs/fabric.js/issues"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
