@@ -8,7 +8,7 @@ import { config } from '../config';
 import { Rect } from '../shapes/Rect';
 import { Circle } from '../shapes/Circle';
 import type { FabricObject } from '../shapes/Object/Object';
-import { getFabricDocument } from '../env';
+import { getDevicePixelRatio, getFabricDocument } from '../env';
 import { FabricImage } from '../shapes/Image';
 import { Point } from '../Point';
 import { Group } from '../shapes/Group';
@@ -502,8 +502,8 @@ describe('StaticCanvas', () => {
     return new Promise<void>((resolve) => {
       const img = getFabricDocument().createElement('img');
       img.onload = () => {
-        expect(img.width).toBe(c.width * config.devicePixelRatio);
-        expect(img.height).toBe(c.height * config.devicePixelRatio);
+        expect(img.width).toBe(c.width * getDevicePixelRatio());
+        expect(img.height).toBe(c.height * getDevicePixelRatio());
         resolve();
       };
       img.src = dataUrl;
@@ -523,8 +523,8 @@ describe('StaticCanvas', () => {
     return new Promise<void>((resolve) => {
       const img = getFabricDocument().createElement('img');
       img.onload = () => {
-        expect(img.width).toBe(c.width * config.devicePixelRatio);
-        expect(img.height).toBe(c.height * config.devicePixelRatio);
+        expect(img.width).toBe(c.width * getDevicePixelRatio());
+        expect(img.height).toBe(c.height * getDevicePixelRatio());
         resolve();
       };
       img.src = dataUrl;
@@ -544,8 +544,8 @@ describe('StaticCanvas', () => {
     return new Promise<void>((resolve) => {
       const img = getFabricDocument().createElement('img');
       img.onload = () => {
-        expect(img.width).toBe(c.width * config.devicePixelRatio * 3);
-        expect(img.height).toBe(c.height * config.devicePixelRatio * 3);
+        expect(img.width).toBe(c.width * getDevicePixelRatio() * 3);
+        expect(img.height).toBe(c.height * getDevicePixelRatio() * 3);
         resolve();
       };
       img.src = dataUrl;

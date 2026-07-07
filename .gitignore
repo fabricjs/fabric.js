@@ -25,6 +25,7 @@ before_commit
 /cli_output/
 /packages/e2e/test-report/
 /packages/e2e/test-results/
+/e2e/
 **/.cache/
 docs/
 __screenshots__

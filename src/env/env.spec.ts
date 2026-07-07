@@ -1,8 +1,63 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import { config } from '../config';
+import { getDevicePixelRatio, getEnv, setEnv } from '.';
+import type { TFabricWindow } from './types';
 
 describe('env', () => {
-  it('passes', () => {
-    expect(true).toBeTruthy();
+  afterEach(() => {
+    config.restoreDefaults();
+  });
+
+  const setDevicePixelRatioEnv = (devicePixelRatio?: number) => {
+    const env = getEnv();
+    const fabricWindow = Object.create(env.window, {
+      devicePixelRatio: {
+        configurable: true,
+        value: devicePixelRatio,
+      },
+    }) as TFabricWindow;
+    setEnv({ ...env, window: fabricWindow });
+    return env;
+  };
+
+  it('uses configured device pixel ratio', () => {
+    const env = setDevicePixelRatioEnv(2);
+    try {
+      config.configure({ devicePixelRatio: 3 });
+
+      expect(getDevicePixelRatio()).toBe(3);
+    } finally {
+      setEnv(env);
+    }
+  });
+
+  it('falls back to the environment device pixel ratio', () => {
+    const env = setDevicePixelRatioEnv(2.5);
+    try {
+      expect(getDevicePixelRatio()).toBe(2.5);
+    } finally {
+      setEnv(env);
+    }
+  });
+
+  it('falls back to 1 without a configured or environment device pixel ratio', () => {
+    const env = setDevicePixelRatioEnv();
+    try {
+      expect(getDevicePixelRatio()).toBe(1);
+    } finally {
+      setEnv(env);
+    }
+  });
+
+  it('falls back to 1 when environment window access is unavailable', () => {
+    const env = getEnv();
+    try {
+      setEnv({ ...env, window: undefined as unknown as TFabricWindow });
+
+      expect(getDevicePixelRatio()).toBe(1);
+    } finally {
+      setEnv(env);
+    }
   });
   // afterEach(() => {
   //   delete globalThis.window;
