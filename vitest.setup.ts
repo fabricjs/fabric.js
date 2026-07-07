@@ -1,12 +1,17 @@
 import './vitest.extend';
-import { getEnv, setEnv } from './src/env';
+import { setEnv } from './src/env';
+import { getEnv } from './packages/browser/src/env';
 import { beforeAll } from 'vitest';
 import { isJSDOM } from './vitest.extend';
 
 // set custom env
 beforeAll(() => {
   if (isJSDOM()) {
-    setEnv({ ...getEnv(), window, document });
+    setEnv({
+      ...getEnv(),
+      window: globalThis.window,
+      document: globalThis.document,
+    });
   }
 
   // Polyfill for jsdom

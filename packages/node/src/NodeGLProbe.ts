@@ -1,4 +1,4 @@
-import { GLProbe } from './GLProbe';
+import { GLProbe } from '../../../src/filters/GLProbes/GLProbe';
 
 /**
  * @todo GL rendering in node is possible:

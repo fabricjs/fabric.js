@@ -5,7 +5,7 @@ import {
   StaticCanvas as StaticCanvasBase,
   setEnv,
 } from '@fabricjs/core';
-import { getEnv, getNodeCanvas } from '../../../src/env/node';
+import { getEnv, getNodeCanvas } from './env';
 
 setEnv(getEnv());
 

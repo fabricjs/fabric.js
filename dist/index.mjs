@@ -10,7 +10,7 @@ var __exportAll = (all, no_symbols) => {
 	return target;
 };
 //#endregion
-//#region \0@oxc-project+runtime@0.122.0/helpers/typeof.js
+//#region \0@oxc-project+runtime@0.137.0/helpers/esm/typeof.js
 function _typeof(o) {
 	"@babel/helpers - typeof";
 	return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o) {
@@ -20,7 +20,7 @@ function _typeof(o) {
 	}, _typeof(o);
 }
 //#endregion
-//#region \0@oxc-project+runtime@0.122.0/helpers/toPrimitive.js
+//#region \0@oxc-project+runtime@0.137.0/helpers/esm/toPrimitive.js
 function toPrimitive(t, r) {
 	if ("object" != _typeof(t) || !t) return t;
 	var e = t[Symbol.toPrimitive];
@@ -32,13 +32,13 @@ function toPrimitive(t, r) {
 	return ("string" === r ? String : Number)(t);
 }
 //#endregion
-//#region \0@oxc-project+runtime@0.122.0/helpers/toPropertyKey.js
+//#region \0@oxc-project+runtime@0.137.0/helpers/esm/toPropertyKey.js
 function toPropertyKey(t) {
 	var i = toPrimitive(t, "string");
 	return "symbol" == _typeof(i) ? i : i + "";
 }
 //#endregion
-//#region \0@oxc-project+runtime@0.122.0/helpers/defineProperty.js
+//#region \0@oxc-project+runtime@0.137.0/helpers/esm/defineProperty.js
 function _defineProperty(e, r, t) {
 	return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
 		value: t,
@@ -85,7 +85,7 @@ var BaseConfiguration = class {
 			* @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
 			*/
 			"devicePixelRatio",
-			typeof window !== "undefined" ? window.devicePixelRatio : 1
+			typeof window === "undefined" ? 1 : window.devicePixelRatio
 		);
 		_defineProperty(
 			this,
@@ -250,6 +250,48 @@ var SignalAbortedError = class extends FabricError {
 	}
 };
 //#endregion
+//#region src/env/index.ts
+let env;
+let envFactory;
+/**
+* Sets the environment variables used by fabric.\
+* This is exposed for special cases, such as configuring a test environment, and should be used with care.
+*
+* **CAUTION**: Must be called before using the package.
+*
+* @example
+* <caption>Passing `window` and `document` objects to fabric (in case they are mocked or something)</caption>
+* import { getEnv, setEnv } from 'fabric';
+* // we want fabric to use the `window` and `document` objects exposed by the environment we are running in.
+* setEnv({ ...getEnv(), window, document });
+* // done with setup, using fabric is now safe
+*/
+const setEnv = (value) => {
+	env = value;
+};
+/**
+* Sets the environment factory used by package entrypoints.
+*
+* **CAUTION**: Must be called before using APIs that access the environment.
+*/
+const setEnvFactory = (factory) => {
+	envFactory = factory;
+};
+const getEnv = () => {
+	if (env) return env;
+	if (envFactory) return env = envFactory();
+	throw new FabricError("Fabric env was not initialized. Import fabric, fabric/node, @fabricjs/browser, or @fabricjs/node before using environment-dependent APIs, or call setEnv/setEnvFactory.");
+};
+const getFabricDocument = () => getEnv().document;
+const getFabricWindow = () => getEnv().window;
+/**
+* @returns the config value if defined, fallbacks to the environment value
+*/
+const getDevicePixelRatio = () => {
+	var _config$devicePixelRa;
+	return Math.max((_config$devicePixelRa = config.devicePixelRatio) !== null && _config$devicePixelRa !== void 0 ? _config$devicePixelRa : getFabricWindow().devicePixelRatio, 1);
+};
+//#endregion
 //#region src/filters/GLProbes/GLProbe.ts
 var GLProbe = class {};
 //#endregion
@@ -293,7 +335,7 @@ var WebGLProbe = class extends GLProbe {
 	}
 };
 //#endregion
-//#region src/env/browser.ts
+//#region packages/browser/src/env.ts
 const copyPasteData = {};
 const getEnv$1 = () => {
 	return {
@@ -304,45 +346,6 @@ const getEnv$1 = () => {
 		dispose() {},
 		copyPasteData
 	};
-};
-//#endregion
-//#region src/env/index.ts
-/**
-* This file is consumed by fabric.
-* The `./node` and `./browser` files define the env variable that is used by this module.
-* The `./browser` module is defined to be the default env and doesn't set the env at all.
-* This is done in order to support isomorphic usage for browser and node applications
-* since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
-*/
-let env;
-/**
-* Sets the environment variables used by fabric.\
-* This is exposed for special cases, such as configuring a test environment, and should be used with care.
-*
-* **CAUTION**: Must be called before using the package.
-*
-* @example
-* <caption>Passing `window` and `document` objects to fabric (in case they are mocked or something)</caption>
-* import { getEnv, setEnv } from 'fabric';
-* // we want fabric to use the `window` and `document` objects exposed by the environment we are running in.
-* setEnv({ ...getEnv(), window, document });
-* // done with setup, using fabric is now safe
-*/
-const setEnv = (value) => {
-	env = value;
-};
-/**
-* In order to support SSR we **MUST** access the browser env only after the window has loaded
-*/
-const getEnv = () => env || (env = getEnv$1());
-const getFabricDocument = () => getEnv().document;
-const getFabricWindow = () => getEnv().window;
-/**
-* @returns the config value if defined, fallbacks to the environment value
-*/
-const getDevicePixelRatio = () => {
-	var _config$devicePixelRa;
-	return Math.max((_config$devicePixelRa = config.devicePixelRatio) !== null && _config$devicePixelRa !== void 0 ? _config$devicePixelRa : getFabricWindow().devicePixelRatio, 1);
 };
 //#endregion
 //#region src/cache.ts
@@ -387,8 +390,8 @@ var Cache = class {
 	* @param {String} [fontFamily] font family to clear
 	*/
 	clearFontCache(fontFamily) {
-		if (!fontFamily) this.charWidthsCache = /* @__PURE__ */ new Map();
-		else this.charWidthsCache.delete((fontFamily || "").toLowerCase());
+		if (fontFamily) this.charWidthsCache.delete((fontFamily || "").toLowerCase());
+		else this.charWidthsCache = /* @__PURE__ */ new Map();
 	}
 	/**
 	* Given current aspect ratio, determines the max width and height that can
@@ -1896,7 +1899,13 @@ const staticCanvasDefaults = {
 	skipOffscreen: true,
 	enableRetinaScaling: true,
 	imageSmoothingEnabled: true,
+	/**
+	* @todo move to Canvas
+	*/
 	controlsAboveOverlay: false,
+	/**
+	* @todo move to Canvas
+	*/
 	allowTouchScrolling: false,
 	viewportTransform: [...iMatrix],
 	patternQuality: "best"
@@ -3206,7 +3215,7 @@ const commonEventInfo = (eventData, transform, x, y) => {
 */
 function findCornerQuadrant(fabricObject, control, coord) {
 	const target = coord;
-	const angle = calcVectorRotation(createVector(sendPointToPlane(fabricObject.getCenterPoint(), fabricObject.canvas.viewportTransform, void 0), target)) + twoMathPi;
+	const angle = calcVectorRotation(createVector(sendPointToPlane(fabricObject.getCenterPoint(), fabricObject.canvas.viewportTransform), target)) + twoMathPi;
 	return Math.round(angle % twoMathPi / quarterPI);
 }
 /**
@@ -3975,12 +3984,11 @@ const colorPropToSVG = (prop, value, inlineStyle = true) => {
 	else if (value.toLive) colorValue = `url(#SVGID_${escapeXml(value.id)})`;
 	else {
 		const rawValue = String(value);
-		if (!isSafeSvgStyleValue(rawValue)) colorValue = new Color("black").toRgb();
-		else {
+		if (isSafeSvgStyleValue(rawValue)) {
 			const color = new Color(rawValue), opacity = color.getAlpha();
 			colorValue = color.toRgb();
 			if (opacity !== 1) opacityValue = opacity.toString();
-		}
+		} else colorValue = new Color("black").toRgb();
 	}
 	if (inlineStyle) return `${prop}: ${colorValue}; ${opacityValue ? `${prop}-opacity: ${opacityValue}; ` : ""}`;
 	else return `${prop}="${colorValue}" ${opacityValue ? `${prop}-opacity="${opacityValue}" ` : ""}`;
@@ -4087,7 +4095,7 @@ var FabricObjectSVGExportMixin = class {
 			clipPathMarkup = `<clipPath id="${clipPath.clipPathId}" >\n${clipPath.toClipPathSVG(reviver)}</clipPath>\n`;
 		}
 		if (absoluteClipPath) markup.push("<g ", shadowInfo, this.getSvgCommons(), " >\n");
-		markup.push("<g ", this.getSvgTransform(false), !absoluteClipPath ? shadowInfo + this.getSvgCommons() : "", " >\n");
+		markup.push("<g ", this.getSvgTransform(false), absoluteClipPath ? "" : shadowInfo + this.getSvgCommons(), " >\n");
 		objectMarkup[index] = [
 			styleInfo,
 			vectorEffect,
@@ -4105,7 +4113,7 @@ var FabricObjectSVGExportMixin = class {
 		return reviver ? reviver(markup.join("")) : markup.join("");
 	}
 	addPaintOrder() {
-		return this.paintFirst !== "fill" ? ` paint-order="${escapeXml(this.paintFirst)}" ` : "";
+		return this.paintFirst === "fill" ? "" : ` paint-order="${escapeXml(this.paintFirst)}" `;
 	}
 };
 //#endregion
@@ -4287,24 +4295,7 @@ const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 const reViewBoxAttrValue = new RegExp(String.raw`^\s*(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})\s*$`);
 //#endregion
 //#region src/Shadow.ts
-/**
-* Regex matching shadow offsetX, offsetY and blur (ex: "2px 2px 10px rgba(0,0,0,0.2)", "rgb(0,255,0) 2px 2px")
-* - (?:\s|^): This part captures either a whitespace character (\s) or the beginning of a line (^). It's non-capturing (due to (?:...)), meaning it doesn't create a capturing group.
-* - (-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?: This captures the first component of the shadow, which is the horizontal offset. Breaking it down:
-*   - (-?\d+): Captures an optional minus sign followed by one or more digits (integer part of the number).
-*   - (?:\.\d*)?: Optionally captures a decimal point followed by zero or more digits (decimal part of the number).
-*   - (?:px)?: Optionally captures the "px" unit.
-*   - (?:\s?|$): Captures either an optional whitespace or the end of the line. This whole part is wrapped in a non-capturing group and marked as optional with ?.
-* - (-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?: Similar to the previous step, this captures the vertical offset.
-
-(\d+(?:\.\d*)?(?:px)?)?: This captures the blur radius. It's similar to the horizontal offset but without the optional minus sign.
-
-(?:\s+(-?\d+(?:\.\d*)?(?:px)?(?:\s?|$))?){0,1}: This captures an optional part for the color. It allows for whitespace followed by a component with an optional minus sign, digits, decimal point, and "px" unit.
-
-(?:$|\s): This captures either the end of the line or a whitespace character. It ensures that the match ends either at the end of the string or with a whitespace character.
-*/
-const shadowOffsetRegex = "(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?";
-const reOffsetsAndBlur = new RegExp("(?:\\s|^)" + shadowOffsetRegex + shadowOffsetRegex + "(" + reNum + "?(?:px)?)?(?:\\s?|$)(?:$|\\s)");
+const reOffsetsAndBlur = new RegExp("(?:\\s|^)(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?(" + reNum + "?(?:px)?)?(?:\\s?|$)(?:$|\\s)");
 const shadowDefaultValues = {
 	color: "rgb(0,0,0)",
 	blur: 0,
@@ -4377,7 +4368,7 @@ var Shadow = class Shadow {
 			type: this.constructor.type
 		};
 		const defaults = Shadow.ownDefaults;
-		return !this.includeDefaultValues ? pickBy(data, (value, key) => value !== defaults[key]) : data;
+		return this.includeDefaultValues ? data : pickBy(data, (value, key) => value !== defaults[key]);
 	}
 	static async fromObject(options) {
 		return new this(options);
@@ -4892,7 +4883,7 @@ var ColorAnimation = class extends AnimationBase {
 		].map(Math.round), capValue(0, a, 1)];
 		return {
 			value,
-			valueProgress: value.map((p, i) => this.byValue[i] !== 0 ? Math.abs((p - this.startValue[i]) / this.byValue[i]) : 0).find((p) => p !== 0) || 0
+			valueProgress: value.map((p, i) => this.byValue[i] === 0 ? 0 : Math.abs((p - this.startValue[i]) / this.byValue[i])).find((p) => p !== 0) || 0
 		};
 	}
 };
@@ -4987,12 +4978,13 @@ var Intersection = class Intersection {
 	*/
 	static intersectLineLine(a1, a2, b1, b2, aInfinite = true, bInfinite = true) {
 		const a2xa1x = a2.x - a1.x, a2ya1y = a2.y - a1.y, b2xb1x = b2.x - b1.x, b2yb1y = b2.y - b1.y, a1xb1x = a1.x - b1.x, a1yb1y = a1.y - b1.y, uaT = b2xb1x * a1yb1y - b2yb1y * a1xb1x, ubT = a2xa1x * a1yb1y - a2ya1y * a1xb1x, uB = b2yb1y * a2xa1x - b2xb1x * a2ya1y;
-		if (uB !== 0) {
+		if (uB === 0) if (uaT === 0 || ubT === 0) return new Intersection(aInfinite || bInfinite || Intersection.isPointContained(a1, b1, b2) || Intersection.isPointContained(a2, b1, b2) || Intersection.isPointContained(b1, a1, a2) || Intersection.isPointContained(b2, a1, a2) ? "Coincident" : void 0);
+		else return new Intersection("Parallel");
+		else {
 			const ua = uaT / uB, ub = ubT / uB;
 			if ((aInfinite || 0 <= ua && ua <= 1) && (bInfinite || 0 <= ub && ub <= 1)) return new Intersection("Intersection").append(new Point(a1.x + ua * a2xa1x, a1.y + ua * a2ya1y));
 			else return new Intersection();
-		} else if (uaT === 0 || ubT === 0) return new Intersection(aInfinite || bInfinite || Intersection.isPointContained(a1, b1, b2) || Intersection.isPointContained(a2, b1, b2) || Intersection.isPointContained(b1, a1, a2) || Intersection.isPointContained(b2, a1, a2) ? "Coincident" : void 0);
-		else return new Intersection("Parallel");
+		}
 	}
 	/**
 	* Checks if a segment intersects a line
@@ -6612,7 +6604,7 @@ var FabricObject = class FabricObject extends ObjectGeometry {
 			skewY: toFixedBound(skewY),
 			...clipPathData ? { clipPath: clipPathData } : null
 		};
-		return !this.includeDefaultValues ? this._removeDefaultValues(object) : object;
+		return this.includeDefaultValues ? object : this._removeDefaultValues(object);
 	}
 	/**
 	* Returns (dataless) object representation of an instance
@@ -7098,7 +7090,7 @@ var Control = class {
 	* rotations since different controls need differnt combination of these.
 	*/
 	commonRenderProps(ctx, left, top, fabricObject, styleOverride = {}) {
-		const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } = styleOverride, sizeFromProps = cornerSize || fabricObject.cornerSize, xSize = this.sizeX || sizeFromProps, ySize = this.sizeY || sizeFromProps, transparent = typeof transparentCorners !== "undefined" ? transparentCorners : fabricObject.transparentCorners, opName = transparent ? STROKE : FILL, strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor, stroke = !transparent && !!strokeColor;
+		const { cornerSize, cornerColor, transparentCorners, cornerStrokeColor } = styleOverride, sizeFromProps = cornerSize || fabricObject.cornerSize, xSize = this.sizeX || sizeFromProps, ySize = this.sizeY || sizeFromProps, transparent = typeof transparentCorners === "undefined" ? fabricObject.transparentCorners : transparentCorners, opName = transparent ? STROKE : FILL, strokeColor = cornerStrokeColor || fabricObject.cornerStrokeColor, stroke = !transparent && !!strokeColor;
 		ctx.fillStyle = cornerColor || fabricObject.cornerColor || "";
 		ctx.strokeStyle = strokeColor || "";
 		ctx.translate(left, top);
@@ -7248,8 +7240,8 @@ function scaleObject(eventData, transform, x, y, options = {}) {
 		scaleY = transform.scaleY * transform.gestureScale;
 	} else {
 		newPoint = getLocalPoint(transform, transform.originX, transform.originY, x, y);
-		signX = by !== "y" ? Math.sign(newPoint.x || transform.signX || 1) : 1;
-		signY = by !== "x" ? Math.sign(newPoint.y || transform.signY || 1) : 1;
+		signX = by === "y" ? 1 : Math.sign(newPoint.x || transform.signX || 1);
+		signY = by === "x" ? 1 : Math.sign(newPoint.y || transform.signY || 1);
 		if (!transform.signX) transform.signX = signX;
 		if (!transform.signY) transform.signY = signY;
 		if (isLocked(target, "lockScalingFlip") && (transform.signX !== signX || transform.signY !== signY)) return false;
@@ -7278,12 +7270,12 @@ function scaleObject(eventData, transform, x, y, options = {}) {
 		}
 	}
 	const oldScaleX = target.scaleX, oldScaleY = target.scaleY;
-	if (!by) {
-		!isLocked(target, "lockScalingX") && target.set("scaleX", scaleX);
-		!isLocked(target, "lockScalingY") && target.set("scaleY", scaleY);
-	} else {
+	if (by) {
 		by === "x" && target.set("scaleX", scaleX);
 		by === "y" && target.set("scaleY", scaleY);
+	} else {
+		!isLocked(target, "lockScalingX") && target.set("scaleX", scaleX);
+		!isLocked(target, "lockScalingY") && target.set("scaleY", scaleY);
 	}
 	return oldScaleX !== target.scaleX || oldScaleY !== target.scaleY;
 }
@@ -7382,7 +7374,7 @@ function skewObject(axis, { target, ex, ey, skewingSide, ...transform }, pointer
 	target.set(skewKey, skewing);
 	const changed = skewingBefore !== target[skewKey];
 	if (changed && axis === "y") {
-		const { skewX, scaleX } = target, dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }), dimAfter = target._getTransformedDimensions(), compensationFactor = skewX !== 0 ? dimBefore.x / dimAfter.x : 1;
+		const { skewX, scaleX } = target, dimBefore = target._getTransformedDimensions({ skewY: skewingBefore }), dimAfter = target._getTransformedDimensions(), compensationFactor = skewX === 0 ? 1 : dimBefore.x / dimAfter.x;
 		compensationFactor !== 1 && target.set("scaleX", compensationFactor * scaleX);
 	}
 	return changed;
@@ -7789,7 +7781,7 @@ var InteractiveFabricObject = class InteractiveFabricObject extends FabricObject
 	drawBorders(ctx, options, styleOverride) {
 		let size;
 		if (styleOverride && styleOverride.forActiveSelection || this.group) {
-			const bbox = sizeAfterTransform(this.width, this.height, calcDimensionsMatrix(options)), stroke = !this.isStrokeAccountedForInDimensions() ? (this.strokeUniform ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1) : new Point(options.scaleX, options.scaleY)).scalarMultiply(this.strokeWidth) : ZERO;
+			const bbox = sizeAfterTransform(this.width, this.height, calcDimensionsMatrix(options)), stroke = this.isStrokeAccountedForInDimensions() ? ZERO : (this.strokeUniform ? new Point().scalarAdd(this.canvas ? this.canvas.getZoom() : 1) : new Point(options.scaleX, options.scaleY)).scalarMultiply(this.strokeWidth);
 			size = bbox.add(stroke).scalarAdd(this.borderScaleFactor).scalarAdd(this.padding * 2);
 		} else size = this._calculateCurrentDimensions().scalarAdd(this.borderScaleFactor);
 		this._drawBorders(ctx, size, styleOverride);
@@ -8174,8 +8166,8 @@ var StrokeLineJoinProjections = class StrokeLineJoinProjections extends StrokePr
 		const projections = [];
 		projections.push(...this.projectBevel());
 		const isStraightLine = this.alpha % twoMathPi === 0, newOrigin = this.applySkew(this.A), proj0 = projections[isStraightLine ? 0 : 2].subtract(newOrigin), proj1 = projections[isStraightLine ? 1 : 0].subtract(newOrigin), isProj0Start = crossProduct(proj0, isStraightLine ? this.applySkew(this.AB.scalarMultiply(-1)) : this.applySkew(this.bisector.multiply(this.strokeUniformScalar).scalarMultiply(-1))) > 0, startCircle = isProj0Start ? proj0 : proj1, endCircle = isProj0Start ? proj1 : proj0;
-		if (!this.isSkewed()) projections.push(...this.projectRoundNoSkew(startCircle, endCircle));
-		else projections.push(...this.projectRoundWithSkew(startCircle, endCircle));
+		if (this.isSkewed()) projections.push(...this.projectRoundWithSkew(startCircle, endCircle));
+		else projections.push(...this.projectRoundNoSkew(startCircle, endCircle));
 		return projections;
 	}
 	/**
@@ -12522,11 +12514,12 @@ var Canvas = class extends SelectableCanvas {
 			groupSelector.deltaX = pointer.x - groupSelector.x;
 			groupSelector.deltaY = pointer.y - groupSelector.y;
 			this.renderTop();
-		} else if (!this._currentTransform) {
+		} else if (this._currentTransform) this._transformObject(e);
+		else {
 			const { target } = this.findTarget(e);
 			this._setCursorFromEvent(e, target);
 			this._fireOverOutEvents(e, target);
-		} else this._transformObject(e);
+		}
 		this.textEditingManager.onMouseMove(e);
 		this._handleEvent(e, "move");
 	}
@@ -12662,7 +12655,10 @@ var Canvas = class extends SelectableCanvas {
 		}
 		let hoverCursor = target.hoverCursor || this.hoverCursor;
 		const activeSelection = isActiveSelection(this._activeObject) ? this._activeObject : null, corner = (!activeSelection || target.group !== activeSelection) && target.findControl(this.getViewportPoint(e));
-		if (!corner) {
+		if (corner) {
+			const { control, coord } = corner;
+			this.setCursor(control.cursorStyleHandler(e, control, target, coord));
+		} else {
 			if (target.subTargetCheck) {
 				const { subTargets } = this.findTarget(e);
 				subTargets.concat().reverse().forEach((_target) => {
@@ -12670,9 +12666,6 @@ var Canvas = class extends SelectableCanvas {
 				});
 			}
 			this.setCursor(hoverCursor);
-		} else {
-			const { control, coord } = corner;
-			this.setCursor(control.cursorStyleHandler(e, control, target, coord));
 		}
 	}
 	/**
@@ -12721,7 +12714,12 @@ var Canvas = class extends SelectableCanvas {
 				this._fireSelectionEvents(prevActiveObjects, e);
 			} else {
 				activeObject.isEditing && activeObject.exitEditing();
-				const newActiveSelection = new (classRegistry.getClass("ActiveSelection"))([], { canvas: this });
+				const newActiveSelection = new (classRegistry.getClass("ActiveSelection"))([], { 
+				/**
+				* it is crucial to pass the canvas ref before calling {@link ActiveSelection#multiSelectAdd}
+				* since it uses {@link FabricObject#isInFrontOf} which relies on the canvas ref
+				*/
+canvas: this });
 				newActiveSelection.multiSelectAdd(activeObject, target);
 				this._hoveredTarget = newActiveSelection;
 				this._setActiveObject(newActiveSelection, e);
@@ -14300,8 +14298,8 @@ var PatternBrush = class extends PencilBrush {
 		super(canvas);
 	}
 	getPatternSrc() {
-		const dotWidth = 20, dotDistance = 5, patternCanvas = createCanvasElement(), patternCtx = patternCanvas.getContext("2d");
-		patternCanvas.width = patternCanvas.height = dotWidth + dotDistance;
+		const dotWidth = 20, patternCanvas = createCanvasElement(), patternCtx = patternCanvas.getContext("2d");
+		patternCanvas.width = patternCanvas.height = 25;
 		if (patternCtx) {
 			patternCtx.fillStyle = this.color;
 			patternCtx.beginPath();
@@ -14709,7 +14707,11 @@ function parsePointsAttribute(points) {
 }
 //#endregion
 //#region src/shapes/Polyline.ts
-const polylineDefaultValues = { exactBoundingBox: false };
+const polylineDefaultValues = { 
+/**
+* @deprecated transient option soon to be removed in favor of a different design
+*/
+exactBoundingBox: false };
 var Polyline = class Polyline extends FabricObject$1 {
 	static getDefaults() {
 		return {
@@ -15015,8 +15017,8 @@ var StyledText = class extends FabricObject$1 {
 					else if (styleObject[property] !== stylePropertyValue) allStyleObjectPropertiesMatch = false;
 					if (styleObject[property] === this[property]) delete styleObject[property];
 				} else allStyleObjectPropertiesMatch = false;
-				if (Object.keys(styleObject).length !== 0) letterCount++;
-				else delete obj[p1][p2];
+				if (Object.keys(styleObject).length === 0) delete obj[p1][p2];
+				else letterCount++;
 			}
 			if (letterCount === 0) delete obj[p1];
 		}
@@ -15288,12 +15290,13 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 		for (let j = 0; j < line.length; j++) {
 			const { left, width, kernedWidth } = this.__charBounds[i][j];
 			currentColor = this.getValueOfPropertyAt(i, j, "textBackgroundColor");
-			if (currentColor !== lastColor) {
+			if (currentColor === lastColor) boxWidth += kernedWidth;
+			else {
 				lastColor && textBgRects.push(createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
 				boxStart = left;
 				boxWidth = width;
 				lastColor = currentColor;
-			} else boxWidth += kernedWidth;
+			}
 		}
 		currentColor && textBgRects.push(createSVGInlineRect(lastColor, leftOffset + boxStart, textTopOffset, boxWidth, heightOfLine));
 	}
@@ -15629,7 +15632,8 @@ var FabricText = class FabricText extends StyledText {
 					ctx.fillStyle = currentColor;
 					currentColor && ctx.fillRect(-charBox.width / 2, -bgHeight * (1 - this._fontSizeFraction), charBox.width, bgHeight);
 					ctx.restore();
-				} else if (currentColor !== lastColor) {
+				} else if (currentColor === lastColor) boxWidth += charBox.kernedWidth;
+				else {
 					drawStart = leftOffset + lineLeftOffset + boxStart;
 					if (this.direction === "rtl") drawStart = this.width - drawStart - boxWidth;
 					ctx.fillStyle = lastColor;
@@ -15637,7 +15641,7 @@ var FabricText = class FabricText extends StyledText {
 					boxStart = charBox.left;
 					boxWidth = charBox.width;
 					lastColor = currentColor;
-				} else boxWidth += charBox.kernedWidth;
+				}
 			}
 			if (currentColor && !this.path) {
 				drawStart = leftOffset + lineLeftOffset + boxStart;
@@ -16995,7 +16999,7 @@ var ITextBehavior = class extends FabricText {
 	updateFromTextArea() {
 		const { hiddenTextarea, direction, textAlign, inCompositionMode } = this;
 		if (!hiddenTextarea) return;
-		const anchorX = textAlign !== "justify" ? textAlign.replace("justify-", "") : direction === "ltr" ? LEFT : RIGHT;
+		const anchorX = textAlign === "justify" ? direction === "ltr" ? LEFT : RIGHT : textAlign.replace("justify-", "");
 		const originalPosition = this.getPositionByOrigin(anchorX, "top");
 		this.cursorOffsetCache = {};
 		this.text = hiddenTextarea.value;
@@ -17123,7 +17127,20 @@ var ITextBehavior = class extends FabricText {
 	*/
 	removeStyleFromTo(start, end) {
 		const { lineIndex: lineStart, charIndex: charStart } = this.get2DCursorLocation(start, true), { lineIndex: lineEnd, charIndex: charEnd } = this.get2DCursorLocation(end, true);
-		if (lineStart !== lineEnd) {
+		if (lineStart === lineEnd) {
+			if (this.styles[lineStart]) {
+				const styleObj = this.styles[lineStart];
+				const diff = charEnd - charStart;
+				for (let i = charStart; i < charEnd; i++) delete styleObj[i];
+				for (const char in this.styles[lineStart]) {
+					const numericChar = parseInt(char, 10);
+					if (numericChar >= charEnd) {
+						styleObj[numericChar - diff] = styleObj[char];
+						delete styleObj[char];
+					}
+				}
+			}
+		} else {
 			if (this.styles[lineStart]) for (let i = charStart; i < this._unwrappedTextLines[lineStart].length; i++) delete this.styles[lineStart][i];
 			if (this.styles[lineEnd]) for (let i = charEnd; i < this._unwrappedTextLines[lineEnd].length; i++) {
 				const styleObj = this.styles[lineEnd][i];
@@ -17134,17 +17151,6 @@ var ITextBehavior = class extends FabricText {
 			}
 			for (let i = lineStart + 1; i <= lineEnd; i++) delete this.styles[i];
 			this.shiftLineStyles(lineEnd, lineStart - lineEnd);
-		} else if (this.styles[lineStart]) {
-			const styleObj = this.styles[lineStart];
-			const diff = charEnd - charStart;
-			for (let i = charStart; i < charEnd; i++) delete styleObj[i];
-			for (const char in this.styles[lineStart]) {
-				const numericChar = parseInt(char, 10);
-				if (numericChar >= charEnd) {
-					styleObj[numericChar - diff] = styleObj[char];
-					delete styleObj[char];
-				}
-			}
 		}
 	}
 	/**
@@ -17345,7 +17351,7 @@ var ITextKeyBehavior = class extends ITextBehavior {
 			"data-fabric": "textarea",
 			wrap: "off",
 			name: "fabricTextarea"
-		}).map(([attribute, value]) => textarea.setAttribute(attribute, value));
+		}).forEach(([attribute, value]) => textarea.setAttribute(attribute, value));
 		const { top, left, fontSize } = this._calcTextareaPosition();
 		textarea.style.cssText = `position: absolute; top: ${top}; left: ${left}; z-index: -999; opacity: 0; width: 1px; height: 1px; font-size: 1px; padding-top: ${fontSize};`;
 		(this.hiddenTextareaContainer || doc.body).appendChild(textarea);
@@ -17360,7 +17366,7 @@ var ITextKeyBehavior = class extends ITextBehavior {
 			compositionstart: "onCompositionStart",
 			compositionupdate: "onCompositionUpdate",
 			compositionend: "onCompositionEnd"
-		}).map(([eventName, handler]) => textarea.addEventListener(eventName, this[handler].bind(this)));
+		}).forEach(([eventName, handler]) => textarea.addEventListener(eventName, this[handler].bind(this)));
 		this.hiddenTextarea = textarea;
 	}
 	/**
@@ -17487,8 +17493,8 @@ var ITextKeyBehavior = class extends ITextBehavior {
 		if (this.selectionStart === this.selectionEnd) return;
 		const { copyPasteData } = getEnv();
 		copyPasteData.copiedText = this.getSelectedText();
-		if (!config.disableStyleCopyPaste) copyPasteData.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
-		else copyPasteData.copiedTextStyle = void 0;
+		if (config.disableStyleCopyPaste) copyPasteData.copiedTextStyle = void 0;
+		else copyPasteData.copiedTextStyle = this.getSelectionStyles(this.selectionStart, this.selectionEnd, true);
 		this._copyDone = true;
 	}
 	/**
@@ -17864,14 +17870,17 @@ var ITextClickBehavior = class extends ITextKeyBehavior {
 			lineIndex = i;
 			if (i > 0) charIndex += this._textLines[i - 1].length + this.missingNewlineOffset(i - 1);
 		} else break;
-		let width = Math.abs(this._getLineLeftOffset(lineIndex));
 		const charLength = this._textLines[lineIndex].length;
+		const lineLeftOffset = this._getLineLeftOffset(lineIndex);
 		const chars = this.__charBounds[lineIndex];
+		const isRtl = this.direction === "rtl";
+		const effectiveX = isRtl ? lineLeftOffset - mouseOffset.x : mouseOffset.x;
+		let width = isRtl ? 0 : Math.abs(lineLeftOffset);
 		for (let j = 0; j < charLength; j++) {
 			const charWidth = chars[j].kernedWidth;
 			const widthAfter = width + charWidth;
-			if (mouseOffset.x <= widthAfter) {
-				if (Math.abs(mouseOffset.x - widthAfter) <= Math.abs(mouseOffset.x - width)) charIndex++;
+			if (effectiveX <= widthAfter) {
+				if (Math.abs(effectiveX - widthAfter) <= Math.abs(effectiveX - width)) charIndex++;
 				break;
 			}
 			width = widthAfter;
@@ -19163,9 +19172,9 @@ var WebGLFilterBackend = class {
 			destinationWidth: width,
 			destinationHeight: height,
 			context: gl,
-			sourceTexture: this.createTexture(gl, width, height, !cachedTexture ? source : void 0),
+			sourceTexture: this.createTexture(gl, width, height, cachedTexture ? void 0 : source),
 			targetTexture: this.createTexture(gl, width, height),
-			originalTexture: cachedTexture || this.createTexture(gl, width, height, !cachedTexture ? source : void 0),
+			originalTexture: cachedTexture || this.createTexture(gl, width, height, cachedTexture ? void 0 : source),
 			passes: filters.length,
 			webgl: true,
 			aPosition: this.aPosition,
@@ -19513,8 +19522,8 @@ var FabricImage = class FabricImage extends FabricObject$1 {
 			strokeSvg = [`\t<rect x="${x}" y="${y}" width="${escapeXml(this.width)}" height="${escapeXml(this.height)}" style="${this.getSvgStyles()}" />\n`];
 			this.fill = origFill;
 		}
-		if (this.paintFirst !== "fill") svgString = svgString.concat(strokeSvg, imageMarkup);
-		else svgString = svgString.concat(imageMarkup, strokeSvg);
+		if (this.paintFirst === "fill") svgString = svgString.concat(imageMarkup, strokeSvg);
+		else svgString = svgString.concat(strokeSvg, imageMarkup);
 		return svgString;
 	}
 	/**
@@ -19848,14 +19857,14 @@ function applyViewboxTransform(element) {
 	parsedDim.minY = minY;
 	parsedDim.viewBoxWidth = viewBoxWidth;
 	parsedDim.viewBoxHeight = viewBoxHeight;
-	if (!missingDimAttr) {
+	if (missingDimAttr) {
+		parsedDim.width = viewBoxWidth;
+		parsedDim.height = viewBoxHeight;
+	} else {
 		parsedDim.width = parseUnit(widthAttr);
 		parsedDim.height = parseUnit(heightAttr);
 		scaleX = parsedDim.width / viewBoxWidth;
 		scaleY = parsedDim.height / viewBoxHeight;
-	} else {
-		parsedDim.width = viewBoxWidth;
-		parsedDim.height = viewBoxHeight;
 	}
 	const preserveAspectRatio = parsePreserveAspectRatioAttribute(element.getAttribute("preserveAspectRatio") || "");
 	if (preserveAspectRatio.alignX !== "none") {
@@ -20083,27 +20092,34 @@ var ElementsParser = class {
 		return null;
 	}
 	extractPropertyDefinition(obj, property, storage) {
-		const value = obj[property], regex = this.regexUrl;
+		const value = obj[property];
+		if (typeof value !== "string") return;
+		const regex = this.regexUrl;
 		if (!regex.test(value)) return;
 		regex.lastIndex = 0;
 		const id = regex.exec(value)[1];
 		regex.lastIndex = 0;
-		return storage[id];
+		return storage[id] ? {
+			def: storage[id],
+			id
+		} : void 0;
 	}
 	resolveGradient(obj, el, property) {
-		const gradientDef = this.extractPropertyDefinition(obj, property, this.gradientDefs);
-		if (gradientDef) {
+		const gradientDefinition = this.extractPropertyDefinition(obj, property, this.gradientDefs);
+		if (gradientDefinition) {
 			const opacityAttr = el.getAttribute(property + "-opacity");
-			const gradient = Gradient.fromElement(gradientDef, obj, {
+			const gradient = Gradient.fromElement(gradientDefinition.def, obj, {
 				...this.options,
 				opacity: opacityAttr
 			});
 			obj.set(property, gradient);
 		}
 	}
-	async resolveClipPath(obj, usingElement, exactOwner) {
-		const clipPathElements = this.extractPropertyDefinition(obj, "clipPath", this.clipPaths);
-		if (clipPathElements) {
+	async resolveClipPath(obj, usingElement, exactOwner, processedClipPaths = /* @__PURE__ */ new Set()) {
+		if (typeof obj.clipPath !== "string") return;
+		const clipPathDefinition = this.extractPropertyDefinition(obj, "clipPath", this.clipPaths);
+		if (clipPathDefinition && !processedClipPaths.has(clipPathDefinition.id)) {
+			const clipPathElements = clipPathDefinition.def;
 			const objTransformInv = invertTransform(obj.calcTransformMatrix());
 			const clipPathTag = clipPathElements[0].parentElement;
 			let clipPathOwner = usingElement;
@@ -20111,17 +20127,25 @@ var ElementsParser = class {
 			clipPathOwner.parentElement.appendChild(clipPathTag);
 			const finalTransform = parseTransformAttribute(`${clipPathOwner.getAttribute("transform") || ""} ${clipPathTag.getAttribute("originalTransform") || ""}`);
 			clipPathTag.setAttribute("transform", `matrix(${finalTransform.join(",")})`);
-			const container = await Promise.all(clipPathElements.map((clipPathElement) => {
-				return findTag(clipPathElement).fromElement(clipPathElement, this.options, this.cssRules).then((enlivedClippath) => {
-					removeTransformMatrixForSvgParsing(enlivedClippath);
-					enlivedClippath.fillRule = enlivedClippath.clipRule;
-					delete enlivedClippath.clipRule;
-					return enlivedClippath;
-				});
+			const updatedProcessedClipPaths = new Set(processedClipPaths);
+			updatedProcessedClipPaths.add(clipPathDefinition.id);
+			const container = await Promise.all(clipPathElements.map(async (clipPathElement) => {
+				const enlivedClippath = await findTag(clipPathElement).fromElement(clipPathElement, this.options, this.cssRules);
+				removeTransformMatrixForSvgParsing(enlivedClippath);
+				enlivedClippath.fillRule = enlivedClippath.clipRule;
+				delete enlivedClippath.clipRule;
+				await this.resolveClipPath(enlivedClippath, clipPathElement, void 0, updatedProcessedClipPaths);
+				return enlivedClippath;
 			}));
 			const clipPath = container.length === 1 ? container[0] : new Group(container);
 			const gTransform = multiplyTransformMatrices(objTransformInv, clipPath.calcTransformMatrix());
-			if (clipPath.clipPath) await this.resolveClipPath(clipPath, clipPathOwner, clipPathTag.getAttribute("clip-path") ? clipPathOwner : void 0);
+			let outerClipPathOwner = clipPathOwner.parentElement;
+			while (outerClipPathOwner && outerClipPathOwner.getAttribute("clip-path") !== obj.clipPath) outerClipPathOwner = outerClipPathOwner.parentElement;
+			if (outerClipPathOwner && !clipPath.clipPath) clipPath.clipPath = obj.clipPath;
+			if (clipPath.clipPath) {
+				var _outerClipPathOwner, _outerClipPathOwner2;
+				await this.resolveClipPath(clipPath, (_outerClipPathOwner = outerClipPathOwner) !== null && _outerClipPathOwner !== void 0 ? _outerClipPathOwner : clipPathOwner, (_outerClipPathOwner2 = outerClipPathOwner) !== null && _outerClipPathOwner2 !== void 0 ? _outerClipPathOwner2 : clipPathTag.getAttribute("clip-path") ? clipPathOwner : void 0, outerClipPathOwner ? processedClipPaths : updatedProcessedClipPaths);
+			}
 			const { scaleX, scaleY, angle, skewX, translateX, translateY } = qrDecompose(gTransform);
 			clipPath.set({
 				flipX: false,
@@ -20970,7 +20994,7 @@ var Blur = class extends BaseFilter {
 			let r = 0, g = 0, b = 0, a = 0, totalA = 0;
 			const minIRow = i - i % bytesInRow;
 			const maxIRow = minIRow + bytesInRow;
-			for (let j = -samples + 1; j < samples; j++) {
+			for (let j = -14; j < samples; j++) {
 				const percent = j / samples;
 				const distance = Math.floor(blurValue * percent) * 4;
 				const weight = 1 - Math.abs(percent);
@@ -20995,7 +21019,7 @@ var Blur = class extends BaseFilter {
 			let r = 0, g = 0, b = 0, a = 0, totalA = 0;
 			const minIRow = i % bytesInRow;
 			const maxIRow = imageData.length - bytesInRow + minIRow;
-			for (let j = -samples + 1; j < samples; j++) {
+			for (let j = -14; j < samples; j++) {
 				const percent = j / samples;
 				const distance = Math.floor(blurValue * percent) * bytesInRow;
 				const weight = 1 - Math.abs(percent);
@@ -21766,8 +21790,8 @@ var Convolute = class extends BaseFilter {
 			dst[dstOff] = r;
 			dst[dstOff + 1] = g;
 			dst[dstOff + 2] = b;
-			if (!alphaFac) dst[dstOff + 3] = a;
-			else dst[dstOff + 3] = data[dstOff + 3];
+			if (alphaFac) dst[dstOff + 3] = data[dstOff + 3];
+			else dst[dstOff + 3] = a;
 		}
 		options.imageData = output;
 	}
@@ -21852,9 +21876,9 @@ var Gamma = class extends BaseFilter {
 	applyTo2d({ imageData: { data } }) {
 		const gamma = this.gamma, rInv = 1 / gamma[0], gInv = 1 / gamma[1], bInv = 1 / gamma[2];
 		if (!this.rgbValues) this.rgbValues = {
-			r: new Uint8Array(256),
-			g: new Uint8Array(256),
-			b: new Uint8Array(256)
+			r: /* @__PURE__ */ new Uint8Array(256),
+			g: /* @__PURE__ */ new Uint8Array(256),
+			b: /* @__PURE__ */ new Uint8Array(256)
 		};
 		const rgb = this.rgbValues;
 		for (let i = 0; i < 256; i++) {
@@ -22742,9 +22766,9 @@ var Saturation = class extends BaseFilter {
 			const g = data[i + 1];
 			const b = data[i + 2];
 			const max = Math.max(r, g, b);
-			data[i] += max !== r ? (max - r) * adjust : 0;
-			data[i + 1] += max !== g ? (max - g) * adjust : 0;
-			data[i + 2] += max !== b ? (max - b) * adjust : 0;
+			data[i] += max === r ? 0 : (max - r) * adjust;
+			data[i + 1] += max === g ? 0 : (max - g) * adjust;
+			data[i + 2] += max === b ? 0 : (max - b) * adjust;
 		}
 	}
 	/**
@@ -22813,9 +22837,9 @@ var Vibrance = class extends BaseFilter {
 			const max = Math.max(r, g, b);
 			const avg = (r + g + b) / 3;
 			const amt = Math.abs(max - avg) * 2 / 255 * adjust;
-			data[i] += max !== r ? (max - r) * amt : 0;
-			data[i + 1] += max !== g ? (max - g) * amt : 0;
-			data[i + 2] += max !== b ? (max - b) * amt : 0;
+			data[i] += max === r ? 0 : (max - r) * amt;
+			data[i + 1] += max === g ? 0 : (max - g) * amt;
+			data[i + 2] += max === b ? 0 : (max - b) * amt;
 		}
 	}
 	/**
@@ -22866,6 +22890,9 @@ var filters_exports = /* @__PURE__ */ __exportAll({
 	Vintage: () => Vintage
 });
 //#endregion
-export { ActiveSelection, BaseBrush, FabricObject as BaseFabricObject, Canvas, Canvas2dFilterBackend, CanvasDOMManager, Circle, CircleBrush, ClipPathLayout, Color, Control, Ellipse, FabricImage, FabricImage as Image, FabricObject$1 as FabricObject, FabricObject$1 as Object, FabricText, FabricText as Text, FitContentLayout, FixedLayout, Gradient, Group, IText, InteractiveFabricObject, Intersection, LayoutManager, LayoutStrategy, Line, Observable, Path, Pattern, PatternBrush, PencilBrush, Point, Polygon, Polyline, Rect, Shadow, SprayBrush, StaticCanvas, StaticCanvasDOMManager, Textbox, Triangle, WebGLFilterBackend, cache, classRegistry, config, controls_exports as controlsUtils, createCollectionMixin, filters_exports as filters, getEnv, getFabricDocument, getFabricWindow, getFilterBackend, iMatrix, initFilterBackend, isPutImageFaster, isWebGLPipelineState, loadSVGFromString, loadSVGFromURL, parseSVGDocument, runningAnimations, setEnv, setFilterBackend, util_exports as util, VERSION as version };
+//#region index.ts
+setEnvFactory(getEnv$1);
+//#endregion
+export { ActiveSelection, BaseBrush, FabricObject as BaseFabricObject, Canvas, Canvas2dFilterBackend, CanvasDOMManager, Circle, CircleBrush, ClipPathLayout, Color, Control, Ellipse, FabricImage, FabricImage as Image, FabricObject$1 as FabricObject, FabricObject$1 as Object, FabricText, FabricText as Text, FitContentLayout, FixedLayout, Gradient, Group, IText, InteractiveFabricObject, Intersection, LayoutManager, LayoutStrategy, Line, Observable, Path, Pattern, PatternBrush, PencilBrush, Point, Polygon, Polyline, Rect, Shadow, SprayBrush, StaticCanvas, StaticCanvasDOMManager, Textbox, Triangle, WebGLFilterBackend, cache, classRegistry, config, controls_exports as controlsUtils, createCollectionMixin, filters_exports as filters, getDevicePixelRatio, getEnv, getFabricDocument, getFabricWindow, getFilterBackend, iMatrix, initFilterBackend, isPutImageFaster, isWebGLPipelineState, loadSVGFromString, loadSVGFromURL, parseSVGDocument, runningAnimations, setEnv, setEnvFactory, setFilterBackend, util_exports as util, VERSION as version };
 
 //# sourceMappingURL=index.mjs.map

@@ -2,8 +2,12 @@ import type { Canvas as NodeCanvas } from 'canvas';
 import { JSDOM } from 'jsdom';
 // @ts-expect-error internal import
 import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
-import { NodeGLProbe } from '../filters/GLProbes/NodeGLProbe';
-import type { TCopyPasteData, TFabricEnv, TFabricWindow } from './types';
+import type {
+  TCopyPasteData,
+  TFabricEnv,
+  TFabricWindow,
+} from '../../../src/env/types';
+import { NodeGLProbe } from './NodeGLProbe';
 
 const { implForWrapper: jsdomImplForWrapper } = utils;
 

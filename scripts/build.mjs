@@ -40,9 +40,18 @@ function isNodeOnlyDeclaration(file) {
     .join('/');
   return (
     relative.startsWith('index.node.') ||
+    relative.startsWith('src/env/browser.') ||
     relative.startsWith('src/env/node.') ||
     relative.startsWith('src/filters/GLProbes/NodeGLProbe.')
   );
+}
+
+function isWorkspacePackageDeclaration(file) {
+  const relative = path
+    .relative(path.resolve(wd, 'dist'), file)
+    .split(path.sep)
+    .join('/');
+  return relative.startsWith('packages/');
 }
 
 const declarationMapComment =
@@ -73,13 +82,18 @@ function copyDeclarations(from, to, predicate) {
 function stageCorePackage() {
   const dist = packageDist('core');
   ensureCleanDir(dist);
+  const coreBundleDir = path.resolve(wd, 'cli_output', 'core-package');
   for (const file of ['index.mjs', 'index.mjs.map']) {
-    fs.copyFileSync(path.resolve(wd, 'dist', file), path.resolve(dist, file));
+    fs.copyFileSync(
+      path.resolve(coreBundleDir, file),
+      path.resolve(dist, file),
+    );
   }
   copyDeclarations(
     path.resolve(wd, 'dist'),
     dist,
-    (file) => !isNodeOnlyDeclaration(file),
+    (file) =>
+      !isNodeOnlyDeclaration(file) && !isWorkspacePackageDeclaration(file),
   );
 }
 

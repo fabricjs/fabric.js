@@ -1,16 +1,9 @@
-/**
- * This file is consumed by fabric.
- * The `./node` and `./browser` files define the env variable that is used by this module.
- * The `./browser` module is defined to be the default env and doesn't set the env at all.
- * This is done in order to support isomorphic usage for browser and node applications
- * since window and document aren't defined at time of import in SSR, we can't set env so we avoid it by deferring to the default env.
- */
-
 import { config } from '../config';
-import { getEnv as getBrowserEnv } from './browser';
+import { FabricError } from '../util/internals/console';
 import type { TFabricEnv, TFabricWindow } from './types';
 
 let env: TFabricEnv;
+let envFactory: (() => TFabricEnv) | undefined;
 
 /**
  * Sets the environment variables used by fabric.\
@@ -30,9 +23,25 @@ export const setEnv = (value: TFabricEnv) => {
 };
 
 /**
- * In order to support SSR we **MUST** access the browser env only after the window has loaded
+ * Sets the environment factory used by package entrypoints.
+ *
+ * **CAUTION**: Must be called before using APIs that access the environment.
  */
-export const getEnv = () => env || (env = getBrowserEnv());
+export const setEnvFactory = (factory: () => TFabricEnv) => {
+  envFactory = factory;
+};
+
+export const getEnv = () => {
+  if (env) {
+    return env;
+  }
+  if (envFactory) {
+    return (env = envFactory());
+  }
+  throw new FabricError(
+    'Fabric env was not initialized. Import fabric, fabric/node, @fabricjs/browser, or @fabricjs/node before using environment-dependent APIs, or call setEnv/setEnvFactory.',
+  );
+};
 
 export const getFabricDocument = (): Document => getEnv().document;
 
@@ -43,3 +52,5 @@ export const getFabricWindow = (): TFabricWindow => getEnv().window;
  */
 export const getDevicePixelRatio = () =>
   Math.max(config.devicePixelRatio ?? getFabricWindow().devicePixelRatio, 1);
+
+export type * from './types';

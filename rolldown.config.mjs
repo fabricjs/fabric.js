@@ -123,6 +123,20 @@ export default [
     onwarn,
   },
   {
+    input: ['./fabric.ts'],
+    tsconfig: './tsconfig.build.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./cli_output/core-package/index.mjs'),
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
+  {
     input: ['./index.node.ts'],
     tsconfig: './tsconfig.build.json',
     output: [

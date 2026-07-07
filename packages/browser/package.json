@@ -15,7 +15,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "sideEffects": false,
+  "sideEffects": true,
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {

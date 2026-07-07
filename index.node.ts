@@ -1,7 +1,7 @@
 // First we set the env variable
 
 import { setEnv } from './src/env';
-import { getEnv, getNodeCanvas } from './src/env/node';
+import { getEnv, getNodeCanvas } from './packages/node/src/env';
 
 setEnv(getEnv());
 
