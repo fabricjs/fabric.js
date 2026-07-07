@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump @playwright/test from 1.60.0 to 1.61.1 [#11035](https://github.com/fabricjs/fabric.js/pull/11035)
 - chore(): Monorepo follow up steps [#11033](https://github.com/fabricjs/fabric.js/pull/11033)
 - chore(deps-dev): bump rolldown from 1.1.0 to 1.1.2 [#11025](https://github.com/fabricjs/fabric.js/pull/11025)
 - fix(sandbox): restore vanilla startup with pnpm [#11012](https://github.com/fabricjs/fabric.js/pull/11012)
