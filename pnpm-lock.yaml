@@ -13,7 +13,7 @@ importers:
         version: 10.0.1(eslint@10.1.0)
       '@playwright/test':
         specifier: ^1.60.0
-        version: 1.60.0
+        version: 1.61.1
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7
@@ -25,7 +25,7 @@ importers:
         version: 24.7.2
       '@vitest/browser-playwright':
         specifier: 4.1.8
-        version: 4.1.8(playwright@1.60.0)(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)
+        version: 4.1.8(playwright@1.61.1)(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)
       '@vitest/coverage-v8':
         specifier: 4.1.8
         version: 4.1.8(@vitest/browser@4.1.8)(vitest@4.1.8)
@@ -152,7 +152,7 @@ importers:
     devDependencies:
       '@playwright/test':
         specifier: ^1.60.0
-        version: 1.60.0
+        version: 1.61.1
       '@types/micromatch':
         specifier: ^4.0.10
         version: 4.0.10
@@ -486,6 +486,12 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
+  '@napi-rs/wasm-runtime@1.1.6':
+    resolution: {integrity: sha512-ZLv/JdUfkvOy9eCnnBaGfiO+XimbjebAeO+MRQqD/B+FR1tnRN0tpKSJHRbE8sFfS6aqsXZ67TQjfwfsxULVbg==}
+    peerDependencies:
+      '@emnapi/core': ^1.7.1
+      '@emnapi/runtime': ^1.7.1
+
   '@oxc-project/types@0.130.0':
     resolution: {integrity: sha512-ibD2usx9JRu7f5pu2tMKMI4cpA4NgXJQoYRP4pQ7Pxmn1l6k/53qWtQWZayhYy3X4QZkt90Ot+mJEaeXouio6Q==}
 
@@ -614,8 +620,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@playwright/test@1.60.0':
-    resolution: {integrity: sha512-O71yZIbAh/PxDMNGns37GHBIfrVkEVyn+AXyIa5dOTfb4/xNvRWV+Vv/NMbNCtODB/pO7vLlF2OTmMVLhmr7Ag==}
+  '@playwright/test@1.61.1':
+    resolution: {integrity: sha512-8nKv6+0RJSL9FE4jYOEGXnPeM/Hg12qZpmqzZjRh3qM0Y7c3z1mrOTfFLids72RDQYVh9WpLEfR5WdpNX4fkig==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -820,6 +826,9 @@ packages:
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
+
+  '@tybys/wasm-util@0.10.3':
+    resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
 
   '@types/braces@3.0.5':
     resolution: {integrity: sha512-SQFof9H+LXeWNz8wDe7oN5zu7ket0qwMu5vZubW4GCJ8Kkeh6nBWUz87+KTz/G3Kqsrp0j/W253XJb3KMEeg3w==}
@@ -1787,13 +1796,17 @@ packages:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
 
-  playwright-core@1.60.0:
-    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
+  picomatch@4.0.5:
+    resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
+    engines: {node: '>=12'}
+
+  playwright-core@1.61.1:
+    resolution: {integrity: sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.60.0:
-    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
+  playwright@1.61.1:
+    resolution: {integrity: sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -1801,8 +1814,8 @@ packages:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
     engines: {node: '>=14.19.0'}
 
-  postcss@8.5.15:
-    resolution: {integrity: sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==}
+  postcss@8.5.16:
+    resolution: {integrity: sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==}
     engines: {node: ^10 || ^12 || >=14}
 
   prebuild-install@7.1.3:
@@ -2541,18 +2554,18 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
-    dependencies:
-      '@emnapi/core': 1.10.0
-      '@emnapi/runtime': 1.10.0
-      '@tybys/wasm-util': 0.10.2
-    optional: true
-
   '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
       '@emnapi/core': 1.11.1
       '@emnapi/runtime': 1.11.1
       '@tybys/wasm-util': 0.10.2
+    optional: true
+
+  '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
+    dependencies:
+      '@emnapi/core': 1.10.0
+      '@emnapi/runtime': 1.10.0
+      '@tybys/wasm-util': 0.10.3
     optional: true
 
   '@oxc-project/types@0.130.0': {}
@@ -2616,9 +2629,9 @@ snapshots:
   '@oxfmt/binding-win32-x64-msvc@0.51.0':
     optional: true
 
-  '@playwright/test@1.60.0':
+  '@playwright/test@1.61.1':
     dependencies:
-      playwright: 1.60.0
+      playwright: 1.61.1
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -2698,7 +2711,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.10.0
       '@emnapi/runtime': 1.10.0
-      '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
+      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
     optional: true
 
   '@rolldown/binding-wasm32-wasi@1.1.2':
@@ -2725,6 +2738,11 @@ snapshots:
   '@standard-schema/spec@1.1.0': {}
 
   '@tybys/wasm-util@0.10.2':
+    dependencies:
+      tslib: 2.8.1
+    optional: true
+
+  '@tybys/wasm-util@0.10.3':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -2851,11 +2869,11 @@ snapshots:
       '@typescript-eslint/types': 8.60.1
       eslint-visitor-keys: 5.0.1
 
-  '@vitest/browser-playwright@4.1.8(playwright@1.60.0)(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)':
+  '@vitest/browser-playwright@4.1.8(playwright@1.61.1)(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)':
     dependencies:
       '@vitest/browser': 4.1.8(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)
       '@vitest/mocker': 4.1.8(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))
-      playwright: 1.60.0
+      playwright: 1.61.1
       tinyrainbow: 3.1.0
       vitest: 4.1.8(@types/node@24.7.2)(@vitest/browser-playwright@4.1.8)(@vitest/coverage-v8@4.1.8)(@vitest/ui@4.1.8)(jsdom@26.1.0(canvas@3.2.3))(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))
     transitivePeerDependencies:
@@ -3716,17 +3734,19 @@ snapshots:
 
   picomatch@4.0.4: {}
 
-  playwright-core@1.60.0: {}
+  picomatch@4.0.5: {}
 
-  playwright@1.60.0:
+  playwright-core@1.61.1: {}
+
+  playwright@1.61.1:
     dependencies:
-      playwright-core: 1.60.0
+      playwright-core: 1.61.1
     optionalDependencies:
       fsevents: 2.3.2
 
   pngjs@7.0.0: {}
 
-  postcss@8.5.15:
+  postcss@8.5.16:
     dependencies:
       nanoid: 3.3.15
       picocolors: 1.1.1
@@ -4082,8 +4102,8 @@ snapshots:
   vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
-      picomatch: 4.0.4
-      postcss: 8.5.15
+      picomatch: 4.0.5
+      postcss: 8.5.16
       rolldown: 1.0.1
       tinyglobby: 0.2.17
     optionalDependencies:
@@ -4116,7 +4136,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.7.2
-      '@vitest/browser-playwright': 4.1.8(playwright@1.60.0)(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)
+      '@vitest/browser-playwright': 4.1.8(playwright@1.61.1)(vite@8.0.13(@types/node@24.7.2)(terser@5.43.1)(yaml@2.9.0))(vitest@4.1.8)
       '@vitest/coverage-v8': 4.1.8(@vitest/browser@4.1.8)(vitest@4.1.8)
       '@vitest/ui': 4.1.8(vitest@4.1.8)
       jsdom: 26.1.0(canvas@3.2.3)
