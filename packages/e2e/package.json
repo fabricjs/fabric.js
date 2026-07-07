@@ -21,7 +21,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/micromatch": "^4.0.10",
-    "@types/node": "^24.7.0",
+    "@types/node": "^26.1.0",
     "micromatch": "^4.0.8",
     "rolldown": "^1.0.1",
     "typescript": "^6.0.3"
