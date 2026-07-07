@@ -1,6 +1,7 @@
 .DS_Store
 *.iml
 change-output.md
+/.pnpm-store/
 /.nyc_output/
 /node_modules/
 /npm-debug.log
