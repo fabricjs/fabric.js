@@ -1,8 +1,10 @@
 import './vitest.extend';
-import { setEnv } from './src/env';
+import { setEnv, setEnvFactory } from './src/env';
 import { getEnv } from './packages/browser/src/env';
 import { beforeAll } from 'vitest';
 import { isJSDOM } from './vitest.extend';
+
+setEnvFactory(getEnv);
 
 // set custom env
 beforeAll(() => {
