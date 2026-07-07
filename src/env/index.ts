@@ -55,11 +55,7 @@ export const getDevicePixelRatio = () => {
     return Math.max(config.devicePixelRatio, 1);
   }
 
-  try {
-    return Math.max(getFabricWindow().devicePixelRatio ?? 1, 1);
-  } catch {
-    return 1;
-  }
+  return Math.max(getFabricWindow().devicePixelRatio ?? 1, 1);
 };
 
 export type * from './types';

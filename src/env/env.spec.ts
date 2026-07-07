@@ -48,17 +48,6 @@ describe('env', () => {
       setEnv(env);
     }
   });
-
-  it('falls back to 1 when environment window access is unavailable', () => {
-    const env = getEnv();
-    try {
-      setEnv({ ...env, window: undefined as unknown as TFabricWindow });
-
-      expect(getDevicePixelRatio()).toBe(1);
-    } finally {
-      setEnv(env);
-    }
-  });
   // afterEach(() => {
   //   delete globalThis.window;
   //   delete globalThis.document;
