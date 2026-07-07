@@ -1,4 +1,4 @@
-import { GLProbe } from '../../../src/filters/GLProbes/GLProbe';
+import { GLProbe } from '@fabricjs/core';
 
 /**
  * @todo GL rendering in node is possible:

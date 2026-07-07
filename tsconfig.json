@@ -31,7 +31,8 @@
     "paths": {
       "fabric": ["./index"],
       "fabric/node": ["./index.node"],
-      "fabric/extensions": ["./extensions/index"]
+      "fabric/extensions": ["./extensions/index"],
+      "@fabricjs/core": ["./packages/core/src/index"]
     } /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
@@ -106,12 +107,18 @@
     "dist-extensions",
     "test",
     "packages/e2e",
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.fixtures.ts",
+    "packages/core/src/**/*.test.ts",
+    "packages/core/src/**/*.spec.ts",
+    "packages/core/src/**/*.fixtures.ts",
     "vitest.extend.ts",
     "vitest.config.ts",
     "vitest.d.ts"
   ],
-  "include": ["src", "fabric.ts", "index.ts", "index.node.ts", "extensions"]
+  "include": [
+    "packages/core/src",
+    "fabric.ts",
+    "index.ts",
+    "index.node.ts",
+    "extensions"
+  ]
 }

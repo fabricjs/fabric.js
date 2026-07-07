@@ -32,7 +32,7 @@
       "fabric": ["./index"],
       "fabric/node": ["./index.node"],
       "fabric/extensions": ["./extensions/index"],
-      "@fabricjs/core": ["./index"]
+      "@fabricjs/core": ["./packages/core/src/index"]
     },
     // "paths": {} /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

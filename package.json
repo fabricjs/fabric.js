@@ -42,18 +42,8 @@
   "files": [
     "dist",
     "dist-extensions",
-    "src/**/*.ts",
-    "!src/**/*.spec.ts",
-    "!src/**/*.test.ts",
-    "!src/**/__tests__/**",
-    "!src/**/__screenshots__/**",
-    "!src/**/__snapshots__/**",
-    "!src/benchmarks/**",
     "extensions/README.MD",
-    "!extensions/**/*.ts",
-    "fabric.ts",
-    "index.ts",
-    "index.node.ts"
+    "!extensions/**/*.ts"
   ],
   "packageManager": "pnpm@10.29.1",
   "scripts": {
@@ -79,7 +69,7 @@
     "playwright:typecheck": "pnpm --dir packages/e2e run typecheck",
     "sandbox": "node ./scripts/sandbox.mjs sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
-    "lint": "eslint src extensions packages --fix",
+    "lint": "eslint extensions packages --fix",
     "prettier:check": "oxfmt --check .",
     "prettier:write": "oxfmt .",
     "prepare": "husky install"

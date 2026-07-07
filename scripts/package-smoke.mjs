@@ -128,14 +128,22 @@ function verifyRootTarball(list) {
   expectIncludes(list, 'package/dist/index.node.mjs', 'fabric');
   expectIncludes(list, 'package/dist-extensions/index.mjs', 'fabric');
   expectIncludes(list, 'package/extensions/README.MD', 'fabric');
-  expectIncludes(list, 'package/src/env/index.ts', 'fabric');
   expectExcludesPrefix(list, 'package/packages/', 'fabric');
+  expectExcludesPrefix(list, 'package/src/', 'fabric');
   expectExcludesPrefix(list, 'package/.github/', 'fabric');
-  expectExcludesPrefix(list, 'package/src/benchmarks/', 'fabric');
   if (list.some((file) => /^package\/extensions\/.+\/.*\.ts$/.test(file))) {
     throw new Error(
       'fabric tarball should not include extension implementation source files',
     );
+  }
+  for (const file of [
+    'package/fabric.ts',
+    'package/index.ts',
+    'package/index.node.ts',
+  ]) {
+    if (list.includes(file)) {
+      throw new Error(`fabric tarball should not include ${file}`);
+    }
   }
   if (list.some((file) => /\.(spec|test)\.ts$/.test(file))) {
     throw new Error('fabric tarball should not include spec or test files');

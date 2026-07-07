@@ -1,8 +1,8 @@
 import { expect, Snapshots } from 'vitest';
 
 import { cloneDeepWith } from 'es-toolkit/compat';
-import type { FabricObject } from './src/shapes/Object/Object';
-import type { TMat2D } from './src/typedefs';
+import type { FabricObject } from './packages/core/src/shapes/Object/Object';
+import type { TMat2D } from './packages/core/src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
 import type { FabricImage } from './dist-extensions';
 

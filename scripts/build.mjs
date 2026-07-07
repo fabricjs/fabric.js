@@ -33,27 +33,6 @@ function isDeclaration(file) {
   return file.endsWith('.d.ts') || file.endsWith('.d.ts.map');
 }
 
-function isNodeOnlyDeclaration(file) {
-  const relative = path
-    .relative(path.resolve(wd, 'dist'), file)
-    .split(path.sep)
-    .join('/');
-  return (
-    relative.startsWith('index.node.') ||
-    relative.startsWith('src/env/browser.') ||
-    relative.startsWith('src/env/node.') ||
-    relative.startsWith('src/filters/GLProbes/NodeGLProbe.')
-  );
-}
-
-function isWorkspacePackageDeclaration(file) {
-  const relative = path
-    .relative(path.resolve(wd, 'dist'), file)
-    .split(path.sep)
-    .join('/');
-  return relative.startsWith('packages/');
-}
-
 const declarationMapComment =
   /\r?\n\/\/# sourceMappingURL=[^\r\n]*\.d\.ts\.map[ \t]*$/;
 
@@ -79,24 +58,6 @@ function copyDeclarations(from, to, predicate) {
   }
 }
 
-function stageCorePackage() {
-  const dist = packageDist('core');
-  ensureCleanDir(dist);
-  const coreBundleDir = path.resolve(wd, 'cli_output', 'core-package');
-  for (const file of ['index.mjs', 'index.mjs.map']) {
-    fs.copyFileSync(
-      path.resolve(coreBundleDir, file),
-      path.resolve(dist, file),
-    );
-  }
-  copyDeclarations(
-    path.resolve(wd, 'dist'),
-    dist,
-    (file) =>
-      !isNodeOnlyDeclaration(file) && !isWorkspacePackageDeclaration(file),
-  );
-}
-
 function stagePackageTypes({ directory }) {
   const source = path.resolve(
     packageTypeBuildDir,
@@ -114,7 +75,6 @@ function stagePackageTypes({ directory }) {
 }
 
 function stageWorkspacePackages() {
-  stageCorePackage();
   typedWorkspacePackages.forEach(stagePackageTypes);
   console.log('Workspace package artifacts staged.\n');
 }

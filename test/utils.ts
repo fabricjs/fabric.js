@@ -1,6 +1,6 @@
-import type { TPointerEvent } from '../src/EventTypeDefs';
+import type { TPointerEvent } from '../packages/core/src/EventTypeDefs';
 import { getFabricDocument } from '../fabric';
-import { Rect } from '../src/shapes/Rect';
+import { Rect } from '../packages/core/src/shapes/Rect';
 import { version } from '../package.json';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';

@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
 - fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
 - refactor(env): move runtime env setup to packages [#11039](https://github.com/fabricjs/fabric.js/pull/11039)
 - chore(): Monorepo follow up steps [#11033](https://github.com/fabricjs/fabric.js/pull/11033)

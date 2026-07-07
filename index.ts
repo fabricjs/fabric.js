@@ -1,4 +1,4 @@
-import { setEnvFactory } from './src/env';
+import { setEnvFactory } from './packages/core/src/env';
 import { getEnv } from './packages/browser/src/env';
 
 setEnvFactory(getEnv);

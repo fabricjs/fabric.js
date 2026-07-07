@@ -5,10 +5,10 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "fabric": ["./src"],
-      "fabric/node": ["./src/node"],
+      "fabric": ["./index"],
+      "fabric/node": ["./index.node"],
       "fabric/extensions": ["./extensions"],
-      "@fabricjs/core": ["./fabric"],
+      "@fabricjs/core": ["./packages/core/src/index"],
       "@fabricjs/aligning-guidelines": [
         "./packages/aligning-guidelines/src/index"
       ],
@@ -23,7 +23,10 @@
     }
   },
   "include": [
-    "src/**/*",
+    "fabric.ts",
+    "index.ts",
+    "index.node.ts",
+    "packages/core/src/**/*",
     "extensions/**/*",
     "packages/*/src/**/*",
     "vitest.d.ts",

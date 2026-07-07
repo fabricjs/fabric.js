@@ -65,6 +65,7 @@ export default [
         dir: path.resolve(dirname),
         format: 'es',
         preserveModules: true,
+        preserveModulesRoot: './packages/core',
         entryFileNames: '[name].mjs',
         sourcemap: true,
       },
@@ -73,6 +74,7 @@ export default [
             dir: path.resolve(dirname),
             format: 'es',
             preserveModules: true,
+            preserveModulesRoot: './packages/core',
             entryFileNames: '[name].min.mjs',
             sourcemap: true,
             minify: true,
@@ -119,20 +121,6 @@ export default [
             minify: true,
           }
         : null,
-    ],
-    onwarn,
-  },
-  {
-    input: ['./fabric.ts'],
-    tsconfig: './tsconfig.build.json',
-    transform,
-    output: [
-      {
-        file: path.resolve('./cli_output/core-package/index.mjs'),
-        name: 'fabric',
-        format: 'es',
-        sourcemap: true,
-      },
     ],
     onwarn,
   },

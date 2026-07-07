@@ -10,7 +10,11 @@ export const workspacePackages = [
   {
     directory: 'core',
     importName: '@fabricjs/core',
-    typeStage: 'core',
+    bundle: {
+      external: [],
+      transform: true,
+    },
+    typeStage: 'package',
   },
   {
     directory: 'browser',

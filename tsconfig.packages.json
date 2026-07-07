@@ -6,7 +6,7 @@
       "fabric": ["./index"],
       "fabric/node": ["./index.node"],
       "fabric/extensions": ["./extensions/index"],
-      "@fabricjs/core": ["./fabric"],
+      "@fabricjs/core": ["./packages/core/src/index"],
       "@fabricjs/aligning-guidelines": [
         "./packages/aligning-guidelines/src/index"
       ],
@@ -26,6 +26,7 @@
     "dist-extensions",
     "node_modules",
     "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "**/*.fixtures.ts"
   ]
 }

@@ -1,6 +1,6 @@
 // First we set the env variable
 
-import { setEnv } from './src/env';
+import { setEnv } from './packages/core/src/env';
 import { getEnv, getNodeCanvas } from './packages/node/src/env';
 
 setEnv(getEnv());
@@ -12,7 +12,7 @@ import {
   Canvas as CanvasBase,
   StaticCanvas as StaticCanvasBase,
 } from './fabric';
-import { FabricObject as FabricObjectBase } from './src/shapes/Object/Object';
+import { FabricObject as FabricObjectBase } from './packages/core/src/shapes/Object/Object';
 
 FabricObjectBase.ownDefaults.objectCaching = false;
 

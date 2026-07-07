@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type -- augmenting vitest matchers */
 import 'vitest';
-import type { TMat2D } from './src/typedefs';
+import type { TMat2D } from './packages/core/src/typedefs';
 import type { cloneDeepWith } from 'es-toolkit/compat';
-import type { FabricImage } from './src/shapes/Image';
+import type { FabricImage } from './packages/core/src/shapes/Image';
 
 type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
   includeDefaultValues?: boolean;

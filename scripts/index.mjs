@@ -92,7 +92,10 @@ function copy(from, to) {
   }
 }
 
-const BUILD_SOURCE = ['src', 'lib'];
+const BUILD_SOURCE = [
+  { from: 'packages/core/src', to: 'src' },
+  { from: 'lib', to: 'lib' },
+];
 
 function exportBuildToWebsite(options = {}) {
   defaultsDeep(options, { gestures: true });
@@ -116,15 +119,18 @@ function exportAssetsToWebsite(options) {
     path.resolve(wd, './package.json'),
     path.resolve(websiteDir, './lib/package.json'),
   );
-  BUILD_SOURCE.forEach((p) =>
-    copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p)),
+  BUILD_SOURCE.forEach(({ from, to }) =>
+    copy(path.resolve(wd, from), path.resolve(websiteDir, './build/files', to)),
   );
   console.log(bold(`[${formatTime()}] exported assets to fabricjs.com`));
   options.watch &&
-    BUILD_SOURCE.forEach((p) => {
-      watch(path.resolve(wd, p), () => {
-        copy(path.resolve(wd, p), path.resolve(websiteDir, './build/files', p));
-        console.log(bold(`[${formatTime()}] exported ${p} to fabricjs.com`));
+    BUILD_SOURCE.forEach(({ from, to }) => {
+      watch(path.resolve(wd, from), () => {
+        copy(
+          path.resolve(wd, from),
+          path.resolve(websiteDir, './build/files', to),
+        );
+        console.log(bold(`[${formatTime()}] exported ${from} to fabricjs.com`));
       });
     });
 }
@@ -156,15 +162,17 @@ function createChoiceData(type, file) {
   };
 }
 
-program
-  .name('fabric.js')
-  .description('fabric.js DEV CLI tools')
-  .version(process.env.npm_package_version)
-  .showSuggestionAfterError();
+program.name('fabric.js');
+program.description('fabric.js DEV CLI tools');
+program.version(process.env.npm_package_version);
+
+if (typeof program.showSuggestionAfterError === 'function') {
+  program.showSuggestionAfterError();
+}
 
 program
   .command('dev')
-  .description('watch for changes in `src` directory')
+  .description('watch for changes in the core source tree')
   .action(() => {
     cp.spawn('pnpm run build -- -f -w', { stdio: 'inherit', shell: true });
   });
