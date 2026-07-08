@@ -48,7 +48,7 @@ function _defineProperty(e, r, t) {
 	}) : e[r] = t, e;
 }
 //#endregion
-//#region packages/core/src/config.ts
+//#region src/config.ts
 var BaseConfiguration = class {
 	constructor() {
 		_defineProperty(
@@ -85,7 +85,7 @@ var BaseConfiguration = class {
 			* @see https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/HTML-canvas-guide/SettingUptheCanvas/SettingUptheCanvas.html
 			*/
 			"devicePixelRatio",
-			void 0
+			typeof window === "undefined" ? 1 : window.devicePixelRatio
 		);
 		_defineProperty(
 			this,
@@ -237,7 +237,7 @@ var Configuration = class extends BaseConfiguration {
 };
 const config = new Configuration();
 //#endregion
-//#region packages/core/src/util/internals/console.ts
+//#region src/util/internals/console.ts
 const log = (severity, ...optionalParams) => console[severity]("fabric", ...optionalParams);
 var FabricError = class extends Error {
 	constructor(message, options) {
@@ -250,7 +250,7 @@ var SignalAbortedError = class extends FabricError {
 	}
 };
 //#endregion
-//#region packages/core/src/env/index.ts
+//#region src/env/index.ts
 let env;
 let envFactory;
 /**
@@ -288,11 +288,67 @@ const getFabricWindow = () => getEnv().window;
 * @returns the config value if defined, fallbacks to the environment value
 */
 const getDevicePixelRatio = () => {
-	var _ref, _config$devicePixelRa;
-	return Math.max((_ref = (_config$devicePixelRa = config.devicePixelRatio) !== null && _config$devicePixelRa !== void 0 ? _config$devicePixelRa : getFabricWindow().devicePixelRatio) !== null && _ref !== void 0 ? _ref : 1, 1);
+	var _config$devicePixelRa;
+	return Math.max((_config$devicePixelRa = config.devicePixelRatio) !== null && _config$devicePixelRa !== void 0 ? _config$devicePixelRa : getFabricWindow().devicePixelRatio, 1);
 };
 //#endregion
-//#region packages/core/src/cache.ts
+//#region src/filters/GLProbes/GLProbe.ts
+var GLProbe = class {};
+//#endregion
+//#region src/filters/GLProbes/WebGLProbe.ts
+/**
+* Lazy initialize WebGL constants
+*/
+var WebGLProbe = class extends GLProbe {
+	/**
+	* Tests if webgl supports certain precision
+	* @param {WebGL} Canvas WebGL context to test on
+	* @param {GLPrecision} Precision to test can be any of following
+	* @returns {Boolean} Whether the user's browser WebGL supports given precision.
+	*/
+	testPrecision(gl, precision) {
+		const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
+		const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		if (!fragmentShader) return false;
+		gl.shaderSource(fragmentShader, fragmentSource);
+		gl.compileShader(fragmentShader);
+		return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
+	}
+	/**
+	* query browser for WebGL
+	*/
+	queryWebGL(canvas) {
+		const gl = canvas.getContext("webgl");
+		if (gl) {
+			this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+			this.GLPrecision = [
+				"highp",
+				"mediump",
+				"lowp"
+			].find((precision) => this.testPrecision(gl, precision));
+			gl.getExtension("WEBGL_lose_context").loseContext();
+			log("log", `WebGL: max texture size ${this.maxTextureSize}`);
+		}
+	}
+	isSupported(textureSize) {
+		return !!this.maxTextureSize && this.maxTextureSize >= textureSize;
+	}
+};
+//#endregion
+//#region packages/browser/src/env.ts
+const copyPasteData = {};
+const getEnv$1 = () => {
+	return {
+		document,
+		window,
+		isTouchSupported: "ontouchstart" in window || "ontouchstart" in document || window && window.navigator && window.navigator.maxTouchPoints > 0,
+		WebGLProbe: new WebGLProbe(),
+		dispose() {},
+		copyPasteData
+	};
+};
+//#endregion
+//#region src/cache.ts
 var Cache = class {
 	constructor() {
 		_defineProperty(
@@ -351,7 +407,7 @@ var Cache = class {
 };
 const cache = new Cache();
 //#endregion
-//#region packages/core/src/constants.ts
+//#region src/constants.ts
 const VERSION = "7.4.0";
 function noop() {}
 const halfPI = Math.PI / 2;
@@ -391,7 +447,7 @@ const STROKE = "stroke";
 const MODIFIED = "modified";
 const NORMAL = "normal";
 //#endregion
-//#region packages/core/src/ClassRegistry.ts
+//#region src/ClassRegistry.ts
 const JSON$1 = "json";
 var ClassRegistry = class {
 	constructor() {
@@ -422,7 +478,7 @@ var ClassRegistry = class {
 };
 const classRegistry = new ClassRegistry();
 //#endregion
-//#region packages/core/src/util/animation/AnimationRegistry.ts
+//#region src/util/animation/AnimationRegistry.ts
 /**
 * Array holding all running animations
 */
@@ -469,7 +525,7 @@ var AnimationRegistry = class extends Array {
 };
 const runningAnimations = new AnimationRegistry();
 //#endregion
-//#region packages/core/src/Observable.ts
+//#region src/Observable.ts
 /**
 * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#events}
 * @see {@link http://fabric5.fabricjs.com/events|Events demo}
@@ -541,7 +597,7 @@ var Observable = class {
 	}
 };
 //#endregion
-//#region packages/core/src/util/internals/removeFromArray.ts
+//#region src/util/internals/removeFromArray.ts
 /**
 * Removes value from an array.
 * Presence of value (and its position in an array) is determined via `Array.prototype.indexOf`
@@ -555,7 +611,7 @@ const removeFromArray = (array, value) => {
 	return array;
 };
 //#endregion
-//#region packages/core/src/util/misc/cos.ts
+//#region src/util/misc/cos.ts
 /**
 * Calculate the cos of an angle, avoiding returning floats for known results
 * This function is here just to avoid getting 0.999999999999999 when dealing
@@ -573,7 +629,7 @@ const cos = (angle) => {
 	return Math.cos(angle);
 };
 //#endregion
-//#region packages/core/src/util/misc/sin.ts
+//#region src/util/misc/sin.ts
 /**
 * Calculate the cos of an angle, avoiding returning floats for known results
 * This function is here just to avoid getting 0.999999999999999 when dealing
@@ -593,7 +649,7 @@ const sin = (angle) => {
 	return Math.sin(angle);
 };
 //#endregion
-//#region packages/core/src/Point.ts
+//#region src/Point.ts
 /**
 * Adaptation of work of Kevin Lindsey(kevin@kevlindev.com)
 */
@@ -904,7 +960,7 @@ var Point = class Point {
 };
 const ZERO = new Point(0, 0);
 //#endregion
-//#region packages/core/src/Collection.ts
+//#region src/Collection.ts
 const isCollection = (fabricObject) => {
 	return !!fabricObject && Array.isArray(fabricObject._objects);
 };
@@ -1155,7 +1211,7 @@ function createCollectionMixin(Base) {
 	return Collection;
 }
 //#endregion
-//#region packages/core/src/CommonMethods.ts
+//#region src/CommonMethods.ts
 var CommonMethods = class extends Observable {
 	/**
 	* Sets object's properties from options, for initialization only
@@ -1203,7 +1259,7 @@ var CommonMethods = class extends Observable {
 	}
 };
 //#endregion
-//#region packages/core/src/util/animation/AnimationFrameProvider.ts
+//#region src/util/animation/AnimationFrameProvider.ts
 function requestAnimFrame(callback) {
 	return getFabricWindow().requestAnimationFrame(callback);
 }
@@ -1211,11 +1267,11 @@ function cancelAnimFrame(handle) {
 	return getFabricWindow().cancelAnimationFrame(handle);
 }
 //#endregion
-//#region packages/core/src/util/internals/uid.ts
+//#region src/util/internals/uid.ts
 let id = 0;
 const uid = () => id++;
 //#endregion
-//#region packages/core/src/util/misc/dom.ts
+//#region src/util/misc/dom.ts
 /**
 * Creates canvas element
 * @return {CanvasElement} initialized canvas element
@@ -1268,7 +1324,7 @@ const toBlob = (canvasEl, format, quality) => new Promise((resolve, _) => {
 	canvasEl.toBlob(resolve, `image/${format}`, quality);
 });
 //#endregion
-//#region packages/core/src/util/misc/radiansDegreesConversion.ts
+//#region src/util/misc/radiansDegreesConversion.ts
 /**
 * Transforms degrees to radians.
 * @param {TDegree} degrees value in degrees
@@ -1282,7 +1338,7 @@ const degreesToRadians = (degrees) => degrees * PiBy180;
 */
 const radiansToDegrees = (radians) => radians / PiBy180;
 //#endregion
-//#region packages/core/src/util/misc/matrix.ts
+//#region src/util/misc/matrix.ts
 const isIdentityMatrix = (mat) => mat.every((value, index) => value === iMatrix[index]);
 /**
 * Apply transform t to point p
@@ -1526,7 +1582,7 @@ const composeMatrix = (options) => {
 	return matrix;
 };
 //#endregion
-//#region packages/core/src/util/misc/objectEnlive.ts
+//#region src/util/misc/objectEnlive.ts
 /**
 * Loads image element from given url and resolve it, or catch.
 * @param {String} url URL representing an image
@@ -1635,7 +1691,7 @@ const enlivenObjectEnlivables = (serializedObject, { signal } = {}) => new Promi
 	});
 });
 //#endregion
-//#region packages/core/src/util/misc/pick.ts
+//#region src/util/misc/pick.ts
 /**
 * Populates an object with properties of another object
 * @param {Object} source Source object
@@ -1655,7 +1711,7 @@ const pickBy = (source, predicate) => {
 	}, {});
 };
 //#endregion
-//#region packages/core/src/util/misc/toFixed.ts
+//#region src/util/misc/toFixed.ts
 /**
 * A wrapper around Number#toFixed, which contrary to native method returns number, not string.
 * @param {number|string} number number to operate on
@@ -1664,7 +1720,7 @@ const pickBy = (source, predicate) => {
 */
 const toFixed = (number, fractionDigits) => parseFloat(Number(number).toFixed(fractionDigits));
 //#endregion
-//#region packages/core/src/util/misc/svgExport.ts
+//#region src/util/misc/svgExport.ts
 /**
 * given an array of 6 number returns something like `"matrix(...numbers)"`
 * @param {TMat2D} transform an array with 6 numbers
@@ -1672,7 +1728,7 @@ const toFixed = (number, fractionDigits) => parseFloat(Number(number).toFixed(fr
 */
 const matrixToSVG = (transform) => "matrix(" + transform.map((value) => toFixed(value, config.NUM_FRACTION_DIGITS)).join(" ") + ")";
 //#endregion
-//#region packages/core/src/util/typeAssertions.ts
+//#region src/util/typeAssertions.ts
 const isFiller = (filler) => {
 	return !!filler && filler.toLive !== void 0;
 };
@@ -1690,7 +1746,7 @@ const isPath = (fabricObject) => {
 };
 const isActiveSelection = (fabricObject) => !!fabricObject && "multiSelectionStacking" in fabricObject;
 //#endregion
-//#region packages/core/src/util/dom_misc.ts
+//#region src/util/dom_misc.ts
 /**
 * Returns element scroll offsets
 * @param {HTMLElement} element Element to operate on
@@ -1730,7 +1786,7 @@ const getWindowFromElement = (el) => {
 	return ((_el$ownerDocument = el.ownerDocument) === null || _el$ownerDocument === void 0 ? void 0 : _el$ownerDocument.defaultView) || null;
 };
 //#endregion
-//#region packages/core/src/canvas/DOMManagers/util.ts
+//#region src/canvas/DOMManagers/util.ts
 const setCanvasDimensions = (el, ctx, { width, height }, retinaScaling = 1) => {
 	el.width = width;
 	el.height = height;
@@ -1784,7 +1840,7 @@ function makeElementUnselectable(element) {
 	return element;
 }
 //#endregion
-//#region packages/core/src/canvas/DOMManagers/StaticCanvasDOMManager.ts
+//#region src/canvas/DOMManagers/StaticCanvasDOMManager.ts
 var StaticCanvasDOMManager = class {
 	constructor(arg0) {
 		_defineProperty(this, "_originalCanvasStyle", void 0);
@@ -1831,7 +1887,7 @@ var StaticCanvasDOMManager = class {
 	}
 };
 //#endregion
-//#region packages/core/src/canvas/StaticCanvasOptions.ts
+//#region src/canvas/StaticCanvasOptions.ts
 const staticCanvasDefaults = {
 	backgroundVpt: true,
 	backgroundColor: "",
@@ -1855,7 +1911,7 @@ const staticCanvasDefaults = {
 	patternQuality: "best"
 };
 //#endregion
-//#region packages/core/src/util/lang_string.ts
+//#region src/util/lang_string.ts
 var lang_string_exports = /* @__PURE__ */ __exportAll({
 	capitalize: () => capitalize,
 	escapeXml: () => escapeXml,
@@ -1918,7 +1974,7 @@ const getWholeChar = (str, i) => {
 	return false;
 };
 //#endregion
-//#region packages/core/src/canvas/StaticCanvas.ts
+//#region src/canvas/StaticCanvas.ts
 /**
 * Static canvas class
 * @see {@link http://fabric5.fabricjs.com/static_canvas|StaticCanvas demo}
@@ -2828,7 +2884,7 @@ var StaticCanvas = class StaticCanvas extends createCollectionMixin(CommonMethod
 };
 _defineProperty(StaticCanvas, "ownDefaults", staticCanvasDefaults);
 //#endregion
-//#region packages/core/src/util/dom_event.ts
+//#region src/util/dom_event.ts
 const touchEvents = [
 	"touchstart",
 	"touchmove",
@@ -2849,7 +2905,7 @@ const stopEvent = (e) => {
 	e.stopPropagation();
 };
 //#endregion
-//#region packages/core/src/util/misc/boundingBoxFromPoints.ts
+//#region src/util/misc/boundingBoxFromPoints.ts
 /**
 * Calculates bounding box (left, top, width, height) from given `points`
 * @param {XY[]} points
@@ -2872,7 +2928,7 @@ const makeBoundingBoxFromPoints = (points) => {
 	};
 };
 //#endregion
-//#region packages/core/src/util/misc/objectTransforms.ts
+//#region src/util/misc/objectTransforms.ts
 /**
 * given an object and a transform, apply the inverse transform to the object,
 * this is equivalent to remove from that object that transformation, so that
@@ -2960,7 +3016,7 @@ const sizeAfterTransform = (width, height, t) => {
 	return new Point(bbox.width, bbox.height);
 };
 //#endregion
-//#region packages/core/src/util/misc/planeChange.ts
+//#region src/util/misc/planeChange.ts
 /**
 * We are actually looking for the transformation from the destination plane to the source plane (change of basis matrix)\
 * The object will exist on the destination plane and we want it to seem unchanged by it so we invert the destination matrix (`to`) and then apply the source matrix (`from`)
@@ -3026,7 +3082,7 @@ const sendObjectToPlane = (object, from, to) => {
 	return t;
 };
 //#endregion
-//#region packages/core/src/util/misc/resolveOrigin.ts
+//#region src/util/misc/resolveOrigin.ts
 const originOffset = {
 	left: -.5,
 	top: -.5,
@@ -3042,7 +3098,7 @@ const originOffset = {
 */
 const resolveOrigin = (originValue) => typeof originValue === "string" ? originOffset[originValue] : originValue - .5;
 //#endregion
-//#region packages/core/src/util/misc/vectors.ts
+//#region src/util/misc/vectors.ts
 const unitVectorX = new Point(1, 0);
 const zero = new Point();
 /**
@@ -3118,7 +3174,7 @@ const isBetweenVectors = (t, a, b) => {
 	return AxB >= 0 ? AxT >= 0 && BxT <= 0 : !(AxT <= 0 && BxT >= 0);
 };
 //#endregion
-//#region packages/core/src/controls/util.ts
+//#region src/controls/util.ts
 const NOT_ALLOWED_CURSOR = "not-allowed";
 /**
 * @param {Boolean} alreadySelected true if target is already selected
@@ -3190,7 +3246,7 @@ function getLocalPoint({ target, corner }, originX, originY, x, y) {
 	return localPoint;
 }
 //#endregion
-//#region packages/core/src/util/internals/svgExportCheck.ts
+//#region src/util/internals/svgExportCheck.ts
 const unsafeSvgStyleValueRegex = new RegExp(String.raw`[\0-\x1F\x7F;<>\\]|\/\*|\*\/|url\s*\(|expression\s*\(|(?:java|vb)script\s*:|data\s*:|@import\b`, "iu");
 const isSafeSvgStyleValue = (value) => typeof value === "string" && value.trim().length > 0 && !unsafeSvgStyleValueRegex.test(value);
 const getSafeSvgStyleNumber = (value, fallback = "") => {
@@ -3199,10 +3255,10 @@ const getSafeSvgStyleNumber = (value, fallback = "") => {
 };
 const getSafeSvgStyleToken = (value, fallback = "") => typeof value === "string" && isSafeSvgStyleValue(value) ? value : fallback;
 //#endregion
-//#region packages/core/src/util/internals/normalizeWhiteSpace.ts
+//#region src/util/internals/normalizeWhiteSpace.ts
 const normalizeWs = (value) => value.replace(/\s+/g, " ");
 //#endregion
-//#region packages/core/src/color/color_map.ts
+//#region src/color/color_map.ts
 /**
 * Map of the 148 color names with HEX code
 * @see: https://www.w3.org/TR/css3-color/#svg-color
@@ -3358,7 +3414,7 @@ const ColorNameMap = {
 	yellowgreen: "#9ACD32"
 };
 //#endregion
-//#region packages/core/src/color/constants.ts
+//#region src/color/constants.ts
 /**
 * Regex matching color in RGB or RGBA formats (ex: `rgb(0, 0, 0)`, `rgba(255, 100, 10, 0.5)`, `rgba( 255 , 100 , 10 , 0.5 )`, `rgb(1,1,1)`, `rgba(100%, 60%, 10%, 0.5)`)
 * Also matching rgba(r g b / a) as per new specs
@@ -3476,7 +3532,7 @@ const reHSLa = () => /^hsla?\(\s?([+-]?\d{0,3}(?:\.\d+)?(?:deg|turn|rad)?)\s?[\s
 */
 const reHex = () => /^#?(([0-9a-f]){3,4}|([0-9a-f]{2}){3,4})$/i;
 //#endregion
-//#region packages/core/src/color/util.ts
+//#region src/color/util.ts
 /**
 * @param {Number} p
 * @param {Number} q
@@ -3548,7 +3604,7 @@ const greyAverage = ([r, g, b, a = 1]) => {
 	];
 };
 //#endregion
-//#region packages/core/src/color/Color.ts
+//#region src/color/Color.ts
 /**
 * @class Color common color operations
 * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#colors colors}
@@ -3833,7 +3889,7 @@ var Color = class Color {
 	}
 };
 //#endregion
-//#region packages/core/src/util/misc/svgParsing.ts
+//#region src/util/misc/svgParsing.ts
 /**
 * Returns array of attributes for given svg that fabric parses
 * @param {SVGElementName} type Type of svg element (eg. 'circle')
@@ -3948,7 +4004,7 @@ const createSVGRect = (color, { left, top, width, height }, precision = config.N
 	return `<rect ${svgColor} x="${x}" y="${y}" width="${w}" height="${h}"></rect>`;
 };
 //#endregion
-//#region packages/core/src/shapes/Object/FabricObjectSVGExportMixin.ts
+//#region src/shapes/Object/FabricObjectSVGExportMixin.ts
 var FabricObjectSVGExportMixin = class {
 	/**
 	* Returns styles-string for svg-export
@@ -4061,12 +4117,12 @@ var FabricObjectSVGExportMixin = class {
 	}
 };
 //#endregion
-//#region packages/core/src/parser/getSvgRegex.ts
+//#region src/parser/getSvgRegex.ts
 function getSvgRegex(arr) {
 	return new RegExp("^(" + arr.join("|") + ")\\b", "i");
 }
 //#endregion
-//#region packages/core/src/shapes/Text/constants.ts
+//#region src/shapes/Text/constants.ts
 const TEXT_DECORATION_THICKNESS = "textDecorationThickness";
 const TEXT_DECORATION_COLOR = "textDecorationColor";
 const fontProperties = [
@@ -4156,7 +4212,7 @@ const textDefaultValues = {
 };
 const JUSTIFY = "justify";
 //#endregion
-//#region packages/core/src/parser/constants.ts
+//#region src/parser/constants.ts
 const reNum = String.raw`[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?`;
 const viewportSeparator = String.raw`(?:\s*,?\s+|\s*,\s*)`;
 const svgNS = "http://www.w3.org/2000/svg";
@@ -4238,7 +4294,7 @@ const svgViewBoxElementsRegEx = getSvgRegex(svgViewBoxElements);
 const svgValidParentsRegEx = getSvgRegex(svgValidParents);
 const reViewBoxAttrValue = new RegExp(String.raw`^\s*(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})${viewportSeparator}(${reNum})\s*$`);
 //#endregion
-//#region packages/core/src/Shadow.ts
+//#region src/Shadow.ts
 const reOffsetsAndBlur = new RegExp("(?:\\s|^)(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?(-?\\d+(?:\\.\\d*)?(?:px)?(?:\\s?|$))?(" + reNum + "?(?:px)?)?(?:\\s?|$)(?:$|\\s)");
 const shadowDefaultValues = {
 	color: "rgb(0,0,0)",
@@ -4322,10 +4378,10 @@ _defineProperty(Shadow, "ownDefaults", shadowDefaultValues);
 _defineProperty(Shadow, "type", "shadow");
 classRegistry.setClass(Shadow, "shadow");
 //#endregion
-//#region packages/core/src/util/misc/capValue.ts
+//#region src/util/misc/capValue.ts
 const capValue = (min, value, max) => Math.max(min, Math.min(value, max));
 //#endregion
-//#region packages/core/src/shapes/Object/defaultValues.ts
+//#region src/shapes/Object/defaultValues.ts
 const stateProperties = [
 	"top",
 	LEFT,
@@ -4433,7 +4489,7 @@ const interactiveObjectDefaultValues = {
 	moveCursor: null
 };
 //#endregion
-//#region packages/core/src/util/animation/easing.ts
+//#region src/util/animation/easing.ts
 /**
 * Easing functions
 * @see {@link http://gizma.com/easing/ Easing Equations by Robert Penner}
@@ -4673,7 +4729,7 @@ const easeInOutQuad = (t, b, c, d) => {
 	return -c / 2 * (--t * (t - 2) - 1) + b;
 };
 //#endregion
-//#region packages/core/src/util/animation/AnimationBase.ts
+//#region src/util/animation/AnimationBase.ts
 const defaultAbort = () => false;
 var AnimationBase = class {
 	constructor({ startValue, byValue, duration = 500, delay = 0, easing = defaultEasing, onStart = noop, onChange = noop, onComplete = noop, abort = defaultAbort, target }) {
@@ -4763,7 +4819,7 @@ var AnimationBase = class {
 	}
 };
 //#endregion
-//#region packages/core/src/util/animation/ValueAnimation.ts
+//#region src/util/animation/ValueAnimation.ts
 var ValueAnimation = class extends AnimationBase {
 	constructor({ startValue = 0, endValue = 100, ...otherOptions }) {
 		super({
@@ -4781,7 +4837,7 @@ var ValueAnimation = class extends AnimationBase {
 	}
 };
 //#endregion
-//#region packages/core/src/util/animation/ArrayAnimation.ts
+//#region src/util/animation/ArrayAnimation.ts
 var ArrayAnimation = class extends AnimationBase {
 	constructor({ startValue = [0], endValue = [100], ...options }) {
 		super({
@@ -4799,7 +4855,7 @@ var ArrayAnimation = class extends AnimationBase {
 	}
 };
 //#endregion
-//#region packages/core/src/util/animation/ColorAnimation.ts
+//#region src/util/animation/ColorAnimation.ts
 const defaultColorEasing = (timeElapsed, startValue, byValue, duration) => {
 	return startValue + byValue * (1 - Math.cos(timeElapsed / duration * halfPI));
 };
@@ -4832,7 +4888,7 @@ var ColorAnimation = class extends AnimationBase {
 	}
 };
 //#endregion
-//#region packages/core/src/util/animation/animate.ts
+//#region src/util/animation/animate.ts
 const isArrayAnimation = (options) => {
 	return Array.isArray(options.startValue) || Array.isArray(options.endValue);
 };
@@ -4847,7 +4903,7 @@ function animateColor(options) {
 	return animation;
 }
 //#endregion
-//#region packages/core/src/Intersection.ts
+//#region src/Intersection.ts
 var Intersection = class Intersection {
 	constructor(status) {
 		this.status = status;
@@ -5032,7 +5088,7 @@ var Intersection = class Intersection {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/Object/ObjectGeometry.ts
+//#region src/shapes/Object/ObjectGeometry.ts
 var ObjectGeometry = class extends CommonMethods {
 	/**
 	* @returns {number} x position according to object's originX property in canvas coordinate plane
@@ -5530,7 +5586,7 @@ var ObjectGeometry = class extends CommonMethods {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/Object/Object.ts
+//#region src/shapes/Object/Object.ts
 /**
 * Root object class from which all 2d shape classes inherit from
 * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-1#objects}
@@ -6619,7 +6675,7 @@ _defineProperty(FabricObject, "customProperties", []);
 classRegistry.setClass(FabricObject);
 classRegistry.setClass(FabricObject, "object");
 //#endregion
-//#region packages/core/src/controls/fireEvent.ts
+//#region src/controls/fireEvent.ts
 const fireEvent = (eventName, options) => {
 	var _target$canvas;
 	const { transform: { target } } = options;
@@ -6630,7 +6686,7 @@ const fireEvent = (eventName, options) => {
 	target.fire(eventName, options);
 };
 //#endregion
-//#region packages/core/src/controls/wrapWithFireEvent.ts
+//#region src/controls/wrapWithFireEvent.ts
 /**
 * Wrap an action handler with firing an event if the action is performed
 * @param {TModificationEvents} eventName the event we want to fire
@@ -6649,7 +6705,7 @@ const wrapWithFireEvent = (eventName, actionHandler, extraEventInfo) => {
 	});
 };
 //#endregion
-//#region packages/core/src/controls/wrapWithFixedAnchor.ts
+//#region src/controls/wrapWithFixedAnchor.ts
 /**
 * Wrap an action handler with saving/restoring object position on the transform.
 * this is the code that permits to objects to keep their position while transforming.
@@ -6664,7 +6720,7 @@ function wrapWithFixedAnchor(actionHandler) {
 	});
 }
 //#endregion
-//#region packages/core/src/controls/changeWidth.ts
+//#region src/controls/changeWidth.ts
 const changeObjectDimensionGen = (dimension, origin, xorY, scale) => (eventData, transform, x, y) => {
 	const localPointValue = getLocalPoint(transform, transform.originX, transform.originY, x, y)[xorY];
 	const originValue = resolveOrigin(transform[origin]);
@@ -6708,7 +6764,7 @@ const changeWidth = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObject
 */
 const changeHeight = wrapWithFireEvent(RESIZING, wrapWithFixedAnchor(changeObjectHeight));
 //#endregion
-//#region packages/core/src/controls/controlRendering.ts
+//#region src/controls/controlRendering.ts
 /**
 * Render a round control, as per fabric features.
 * This function is written to respect object properties like transparentCorners, cornerSize
@@ -6754,7 +6810,7 @@ function renderSquareControl(ctx, left, top, styleOverride, fabricObject) {
 	ctx.restore();
 }
 //#endregion
-//#region packages/core/src/controls/Control.ts
+//#region src/controls/Control.ts
 var Control = class {
 	constructor(options) {
 		_defineProperty(
@@ -7070,7 +7126,7 @@ var Control = class {
 	}
 };
 //#endregion
-//#region packages/core/src/controls/rotate.ts
+//#region src/controls/rotate.ts
 /**
 * Find the correct style for the control that is used for rotation.
 * this function is very simple and it just take care of not-allowed or standard cursor
@@ -7111,7 +7167,7 @@ const rotateObjectWithSnapping = (eventData, { target, ex, ey, theta, originX, o
 };
 const rotationWithSnapping = wrapWithFireEvent(ROTATING, wrapWithFixedAnchor(rotateObjectWithSnapping));
 //#endregion
-//#region packages/core/src/controls/scale.ts
+//#region src/controls/scale.ts
 /**
 * Inspect event and fabricObject properties to understand if the scaling action
 * @param {Event} eventData from the user action
@@ -7263,7 +7319,7 @@ const scalingEqually = wrapWithFireEvent(SCALING, wrapWithFixedAnchor(scaleObjec
 const scalingX = wrapWithFireEvent(SCALING, wrapWithFixedAnchor(scaleObjectX));
 const scalingY = wrapWithFireEvent(SCALING, wrapWithFixedAnchor(scaleObjectY));
 //#endregion
-//#region packages/core/src/controls/skew.ts
+//#region src/controls/skew.ts
 const AXIS_KEYS = {
 	x: {
 		counterAxis: "y",
@@ -7367,7 +7423,7 @@ const skewHandlerY = (eventData, transform, x, y) => {
 	return skewHandler("y", eventData, transform, x, y);
 };
 //#endregion
-//#region packages/core/src/controls/scaleSkew.ts
+//#region src/controls/scaleSkew.ts
 function isAltAction(eventData, target) {
 	return eventData[target.canvas.altActionKey];
 }
@@ -7419,7 +7475,7 @@ const scalingYOrSkewingX = (eventData, transform, x, y) => {
 	return isAltAction(eventData, transform.target) ? skewHandlerX(eventData, transform, x, y) : scalingY(eventData, transform, x, y);
 };
 //#endregion
-//#region packages/core/src/controls/commonControls.ts
+//#region src/controls/commonControls.ts
 const createObjectDefaultControls = () => ({
 	ml: new Control({
 		x: -.5,
@@ -7504,7 +7560,7 @@ const createTextboxDefaultControls = () => ({
 	...createResizeControls()
 });
 //#endregion
-//#region packages/core/src/shapes/Object/InteractiveObject.ts
+//#region src/shapes/Object/InteractiveObject.ts
 var InteractiveFabricObject = class InteractiveFabricObject extends FabricObject {
 	static getDefaults() {
 		return {
@@ -7898,7 +7954,7 @@ var InteractiveFabricObject = class InteractiveFabricObject extends FabricObject
 };
 _defineProperty(InteractiveFabricObject, "ownDefaults", interactiveObjectDefaultValues);
 //#endregion
-//#region packages/core/src/util/applyMixins.ts
+//#region src/util/applyMixins.ts
 /***
 * https://www.typescriptlang.org/docs/handbook/mixins.html#alternative-pattern
 */
@@ -7911,13 +7967,13 @@ function applyMixins(derivedCtor, constructors) {
 	return derivedCtor;
 }
 //#endregion
-//#region packages/core/src/shapes/Object/FabricObject.ts
+//#region src/shapes/Object/FabricObject.ts
 var FabricObject$1 = class extends InteractiveFabricObject {};
 applyMixins(FabricObject$1, [FabricObjectSVGExportMixin]);
 classRegistry.setClass(FabricObject$1);
 classRegistry.setClass(FabricObject$1, "object");
 //#endregion
-//#region packages/core/src/util/misc/isTransparent.ts
+//#region src/util/misc/isTransparent.ts
 /**
 * Returns true if context has transparent pixel
 * at specified location (taking tolerance into account)
@@ -7935,13 +7991,13 @@ const isTransparent = (ctx, x, y, tolerance) => {
 	return true;
 };
 //#endregion
-//#region packages/core/src/util/internals/findRight.ts
+//#region src/util/internals/findRight.ts
 const findIndexRight = (array, predicate) => {
 	for (let index = array.length - 1; index >= 0; index--) if (predicate(array[index], index, array)) return index;
 	return -1;
 };
 //#endregion
-//#region packages/core/src/util/misc/projectStroke/StrokeProjectionsBase.ts
+//#region src/util/misc/projectStroke/StrokeProjectionsBase.ts
 /**
 * @see https://github.com/fabricjs/fabric.js/pull/8344
 * @todo consider removing skewing from points before calculating stroke projection,
@@ -7978,7 +8034,7 @@ var StrokeProjectionsBase = class {
 	}
 };
 //#endregion
-//#region packages/core/src/util/misc/projectStroke/StrokeLineJoinProjections.ts
+//#region src/util/misc/projectStroke/StrokeLineJoinProjections.ts
 const zeroVector = new Point();
 /**
 * class in charge of finding projections for each type of line join
@@ -8137,7 +8193,7 @@ var StrokeLineJoinProjections = class StrokeLineJoinProjections extends StrokePr
 	}
 };
 //#endregion
-//#region packages/core/src/util/misc/projectStroke/StrokeLineCapProjections.ts
+//#region src/util/misc/projectStroke/StrokeLineCapProjections.ts
 /**
 * class in charge of finding projections for each type of line cap for start/end of an open path
 * @see {@link [Open path projections at #8344](https://github.com/fabricjs/fabric.js/pull/8344#1-open-path)}
@@ -8217,7 +8273,7 @@ var StrokeLineCapProjections = class extends StrokeProjectionsBase {
 	}
 };
 //#endregion
-//#region packages/core/src/util/misc/projectStroke/index.ts
+//#region src/util/misc/projectStroke/index.ts
 /**
 *
 * Used to calculate object's bounding box
@@ -8257,7 +8313,7 @@ const projectStrokeOnPoints = (points, options, openPath = false) => {
 	return projections;
 };
 //#endregion
-//#region packages/core/src/util/internals/cloneStyles.ts
+//#region src/util/internals/cloneStyles.ts
 const cloneStyles = (style) => {
 	const newObj = {};
 	Object.keys(style).forEach((key) => {
@@ -8269,7 +8325,7 @@ const cloneStyles = (style) => {
 	return newObj;
 };
 //#endregion
-//#region packages/core/src/util/misc/textStyles.ts
+//#region src/util/misc/textStyles.ts
 /**
 * @param {Object} prevStyle first style to compare
 * @param {Object} thisStyle second style to compare
@@ -8336,7 +8392,7 @@ const stylesFromArray = (styles, text) => {
 	return stylesObject;
 };
 //#endregion
-//#region packages/core/src/parser/attributes.ts
+//#region src/parser/attributes.ts
 /**
 * Attributes parsed from all SVG elements
 * @type array
@@ -8363,7 +8419,7 @@ const SHARED_ATTRIBUTES = [
 	"clip-path"
 ];
 //#endregion
-//#region packages/core/src/parser/selectorMatches.ts
+//#region src/parser/selectorMatches.ts
 function selectorMatches(element, selector) {
 	const nodeName = element.nodeName;
 	const classNames = element.getAttribute("class");
@@ -8386,7 +8442,7 @@ function selectorMatches(element, selector) {
 	return selector.length === 0;
 }
 //#endregion
-//#region packages/core/src/parser/doesSomeParentMatch.ts
+//#region src/parser/doesSomeParentMatch.ts
 function doesSomeParentMatch(element, selectors) {
 	let selector, parentMatching = true;
 	while (element.parentElement && element.parentElement.nodeType === 1 && selectors.length) {
@@ -8397,7 +8453,7 @@ function doesSomeParentMatch(element, selectors) {
 	return selectors.length === 0;
 }
 //#endregion
-//#region packages/core/src/parser/elementMatchesRule.ts
+//#region src/parser/elementMatchesRule.ts
 /**
 * @private
 */
@@ -8408,7 +8464,7 @@ function elementMatchesRule(element, selectors) {
 	return firstMatching && parentMatching && selectors.length === 0;
 }
 //#endregion
-//#region packages/core/src/parser/getGlobalStylesForElement.ts
+//#region src/parser/getGlobalStylesForElement.ts
 /**
 * @private
 */
@@ -8421,17 +8477,17 @@ function getGlobalStylesForElement(element, cssRules = {}) {
 	return styles;
 }
 //#endregion
-//#region packages/core/src/parser/normalizeAttr.ts
+//#region src/parser/normalizeAttr.ts
 const normalizeAttr = (attr) => {
 	var _attributesMap;
 	return (_attributesMap = attributesMap[attr]) !== null && _attributesMap !== void 0 ? _attributesMap : attr;
 };
 //#endregion
-//#region packages/core/src/util/internals/cleanupSvgAttribute.ts
+//#region src/util/internals/cleanupSvgAttribute.ts
 const regex$1 = new RegExp(`(${reNum})`, "gi");
 const cleanupSvgAttribute = (attributeValue) => normalizeWs(attributeValue.replace(regex$1, " $1 ").replace(/,/gi, " "));
 //#endregion
-//#region packages/core/src/parser/parseTransformAttribute.ts
+//#region src/parser/parseTransformAttribute.ts
 const p$1 = `(${reNum})`;
 const skewX = String.raw`(skewX)\(${p$1}\)`;
 const skewY = String.raw`(skewY)\(${p$1}\)`;
@@ -8494,7 +8550,7 @@ function parseTransformAttribute(attributeValue) {
 	return multiplyTransformMatrixArray(matrices);
 }
 //#endregion
-//#region packages/core/src/parser/normalizeValue.ts
+//#region src/parser/normalizeValue.ts
 function normalizeValue(attr, value, parentAttributes, fontSize) {
 	const isArray = Array.isArray(value);
 	let parsed;
@@ -8525,7 +8581,7 @@ function normalizeValue(attr, value, parentAttributes, fontSize) {
 	return !isArray && isNaN(parsed) ? ouputValue : parsed;
 }
 //#endregion
-//#region packages/core/src/parser/parseFontDeclaration.ts
+//#region src/parser/parseFontDeclaration.ts
 /**
 * Parses a short font declaration, building adding its properties to a style object
 * @param {String} value font declaration
@@ -8542,7 +8598,7 @@ function parseFontDeclaration(value, oStyle) {
 	if (lineHeight) oStyle.lineHeight = lineHeight === "normal" ? 1 : lineHeight;
 }
 //#endregion
-//#region packages/core/src/parser/parseStyleObject.ts
+//#region src/parser/parseStyleObject.ts
 /**
 * Takes a style object and parses it in one that has only defined values
 * and lowercases properties
@@ -8556,7 +8612,7 @@ function parseStyleObject(style, oStyle) {
 	});
 }
 //#endregion
-//#region packages/core/src/parser/parseStyleString.ts
+//#region src/parser/parseStyleString.ts
 /**
 * Takes a style string and parses it in one that has only defined values
 * and lowercases properties
@@ -8571,7 +8627,7 @@ function parseStyleString(style, oStyle) {
 	});
 }
 //#endregion
-//#region packages/core/src/parser/parseStyleAttribute.ts
+//#region src/parser/parseStyleAttribute.ts
 /**
 * Parses "style" attribute, retuning an object with values
 * @param {SVGElement} element Element to parse
@@ -8585,7 +8641,7 @@ function parseStyleAttribute(element) {
 	return oStyle;
 }
 //#endregion
-//#region packages/core/src/parser/setStrokeFillOpacity.ts
+//#region src/parser/setStrokeFillOpacity.ts
 const colorAttributesMap = {
 	stroke: "strokeOpacity",
 	fill: "fillOpacity"
@@ -8609,7 +8665,7 @@ function setStrokeFillOpacity(attributes) {
 	return attributes;
 }
 //#endregion
-//#region packages/core/src/parser/parseAttributes.ts
+//#region src/parser/parseAttributes.ts
 /**
 * Returns an object of attributes' name/value, given element and an array of attribute names;
 * Parses parent "g" nodes recursively upwards.
@@ -8651,7 +8707,7 @@ function parseAttributes(element, attributes, cssRules) {
 	return svgValidParentsRegEx.test(element.nodeName) ? mergedAttrs : setStrokeFillOpacity(mergedAttrs);
 }
 //#endregion
-//#region packages/core/src/shapes/Rect.ts
+//#region src/shapes/Rect.ts
 const rectDefaultValues = {
 	rx: 0,
 	ry: 0
@@ -8761,7 +8817,7 @@ _defineProperty(Rect, "ATTRIBUTE_NAMES", [
 classRegistry.setClass(Rect);
 classRegistry.setSVGClass(Rect);
 //#endregion
-//#region packages/core/src/LayoutManager/constants.ts
+//#region src/LayoutManager/constants.ts
 const LAYOUT_TYPE_INITIALIZATION = "initialization";
 const LAYOUT_TYPE_ADDED = "added";
 const LAYOUT_TYPE_REMOVED = "removed";
@@ -8769,7 +8825,7 @@ const LAYOUT_TYPE_IMPERATIVE = "imperative";
 const LAYOUT_TYPE_OBJECT_MODIFIED = "object_modified";
 const LAYOUT_TYPE_OBJECT_MODIFYING = "object_modifying";
 //#endregion
-//#region packages/core/src/LayoutManager/LayoutStrategies/utils.ts
+//#region src/LayoutManager/LayoutStrategies/utils.ts
 /**
 * @returns 2 points, the tl and br corners of the non rotated bounding box of an object
 * in the {@link group} plane, taking into account objects that {@link group} is their parent
@@ -8786,7 +8842,7 @@ const getObjectBounds = (destinationGroup, object) => {
 	return [objectCenter.subtract(sizeVector), objectCenter.add(sizeVector)];
 };
 //#endregion
-//#region packages/core/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts
+//#region src/LayoutManager/LayoutStrategies/LayoutStrategy.ts
 /**
 * Exposes a main public method {@link calcLayoutResult} that is used by the `LayoutManager` to perform layout.
 * Returning `undefined` signals the `LayoutManager` to skip the layout.
@@ -8840,7 +8896,7 @@ var LayoutStrategy = class {
 };
 _defineProperty(LayoutStrategy, "type", "strategy");
 //#endregion
-//#region packages/core/src/LayoutManager/LayoutStrategies/FitContentLayout.ts
+//#region src/LayoutManager/LayoutStrategies/FitContentLayout.ts
 /**
 * Layout will adjust the bounding box to fit target's objects.
 */
@@ -8856,7 +8912,7 @@ var FitContentLayout = class extends LayoutStrategy {
 _defineProperty(FitContentLayout, "type", "fit-content");
 classRegistry.setClass(FitContentLayout);
 //#endregion
-//#region packages/core/src/LayoutManager/LayoutManager.ts
+//#region src/LayoutManager/LayoutManager.ts
 const LAYOUT_MANAGER = "layoutManager";
 var LayoutManager = class {
 	constructor(strategy = new FitContentLayout()) {
@@ -9044,7 +9100,7 @@ var LayoutManager = class {
 };
 classRegistry.setClass(LayoutManager, LAYOUT_MANAGER);
 //#endregion
-//#region packages/core/src/shapes/Group.ts
+//#region src/shapes/Group.ts
 /**
 * This class handles the specific case of creating a group using {@link Group#fromObject} and is not meant to be used in any other case.
 * We could have used a boolean in the constructor, as we did previously, but we think the boolean
@@ -9514,7 +9570,7 @@ _defineProperty(Group, "type", "Group");
 _defineProperty(Group, "ownDefaults", groupDefaultValues);
 classRegistry.setClass(Group);
 //#endregion
-//#region packages/core/src/util/misc/groupSVGElements.ts
+//#region src/util/misc/groupSVGElements.ts
 /**
 * TODO experiment with different layout manager and svg results ( fixed fit content )
 * Groups SVG elements (usually those retrieved from SVG document)
@@ -9526,7 +9582,7 @@ const groupSVGElements = (elements, options) => {
 	return new Group(elements, options);
 };
 //#endregion
-//#region packages/core/src/util/misc/findScaleTo.ts
+//#region src/util/misc/findScaleTo.ts
 /**
 * Finds the scale for the object source to fit inside the object destination,
 * keeping aspect ratio intact.
@@ -9546,7 +9602,7 @@ const findScaleToFit = (source, destination) => Math.min(destination.width / sou
 */
 const findScaleToCover = (source, destination) => Math.max(destination.width / source.width, destination.height / source.height);
 //#endregion
-//#region packages/core/src/util/path/regex.ts
+//#region src/util/path/regex.ts
 const commaWsp = `\\s*,?\\s*`;
 /**
 * p for param
@@ -9558,7 +9614,7 @@ const p = `${commaWsp}(${reNum})`;
 const reArcCommandPoints = `${p}${p}${p}${commaWsp}([01])${commaWsp}([01])${p}${p}`;
 const rePathCommand = "[mzlhvcsqta][^mzlhvcsqta]*";
 //#endregion
-//#region packages/core/src/util/path/index.ts
+//#region src/util/path/index.ts
 /**
 * Commands that may be repeated
 */
@@ -10241,7 +10297,7 @@ const joinPath = (pathData, fractionDigits) => pathData.map((segment) => {
 	}).join(" ");
 }).join(" ");
 //#endregion
-//#region packages/core/src/util/misc/mergeClipPaths.ts
+//#region src/util/misc/mergeClipPaths.ts
 /**
 * Merges 2 clip paths into one visually equal clip path
 *
@@ -10276,7 +10332,7 @@ const mergeClipPaths = (c1, c2) => {
 	});
 };
 //#endregion
-//#region packages/core/src/util/internals/getRandomInt.ts
+//#region src/util/internals/getRandomInt.ts
 /**
 * Returns random number between 2 specified ones.
 * @param {Number} min lower limit
@@ -10285,7 +10341,7 @@ const mergeClipPaths = (c1, c2) => {
 */
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 //#endregion
-//#region packages/core/src/util/transform_matrix_removal.ts
+//#region src/util/transform_matrix_removal.ts
 /**
 * This function is an helper for svg import. it decompose the transformMatrix
 * and assign properties to object.
@@ -10330,7 +10386,7 @@ const removeTransformMatrixForSvgParsing = (object, preserveAspectRatioOptions) 
 	object.setPositionByOrigin(center, CENTER, CENTER);
 };
 //#endregion
-//#region packages/core/src/util/index.ts
+//#region src/util/index.ts
 var util_exports = /* @__PURE__ */ __exportAll({
 	addTransformToObject: () => addTransformToObject,
 	animate: () => animate,
@@ -10416,7 +10472,7 @@ var util_exports = /* @__PURE__ */ __exportAll({
 	transformPoint: () => transformPoint
 });
 //#endregion
-//#region packages/core/src/util/internals/dom_style.ts
+//#region src/util/internals/dom_style.ts
 /**
 * wrapper for setting element's style
 * @param {HTMLElement} element an HTMLElement
@@ -10428,7 +10484,7 @@ function setStyle(element, styles) {
 	Object.entries(styles).forEach(([property, value]) => elementStyle.setProperty(property, value));
 }
 //#endregion
-//#region packages/core/src/canvas/DOMManagers/CanvasDOMManager.ts
+//#region src/canvas/DOMManagers/CanvasDOMManager.ts
 var CanvasDOMManager = class extends StaticCanvasDOMManager {
 	constructor(arg0, { allowTouchScrolling = false, containerClass = "" } = {}) {
 		super(arg0);
@@ -10510,7 +10566,7 @@ var CanvasDOMManager = class extends StaticCanvasDOMManager {
 	}
 };
 //#endregion
-//#region packages/core/src/canvas/CanvasOptions.ts
+//#region src/canvas/CanvasOptions.ts
 const canvasDefaults = {
 	uniformScaling: true,
 	uniScaleKey: "shiftKey",
@@ -10541,7 +10597,7 @@ const canvasDefaults = {
 	preserveObjectStacking: true
 };
 //#endregion
-//#region packages/core/src/controls/drag.ts
+//#region src/controls/drag.ts
 /**
 * Action handler
 * @private
@@ -10559,7 +10615,7 @@ const dragHandler = (eventData, transform, x, y) => {
 	return moveX || moveY;
 };
 //#endregion
-//#region packages/core/src/controls/polyControl.ts
+//#region src/controls/polyControl.ts
 const ACTION_NAME$1 = MODIFY_POLY;
 /**
 * This function locates the controls.
@@ -10614,7 +10670,7 @@ function createPolyControls(arg0, options = {}) {
 	return controls;
 }
 //#endregion
-//#region packages/core/src/controls/pathControl.ts
+//#region src/controls/pathControl.ts
 const ACTION_NAME = "modifyPath";
 const calcPathPointPosition = (pathObject, commandIndex, pointIndex) => {
 	const { path, pathOffset } = pathObject;
@@ -10731,7 +10787,7 @@ function createPathControls(path, options = {}) {
 	return controls;
 }
 //#endregion
-//#region packages/core/src/controls/index.ts
+//#region src/controls/index.ts
 var controls_exports = /* @__PURE__ */ __exportAll({
 	changeHeight: () => changeHeight,
 	changeObjectHeight: () => changeObjectHeight,
@@ -10767,7 +10823,7 @@ var controls_exports = /* @__PURE__ */ __exportAll({
 	wrapWithFixedAnchor: () => wrapWithFixedAnchor
 });
 //#endregion
-//#region packages/core/src/canvas/SelectableCanvas.ts
+//#region src/canvas/SelectableCanvas.ts
 /**
 * Canvas class
 * @class Canvas
@@ -11678,7 +11734,7 @@ var SelectableCanvas = class SelectableCanvas extends StaticCanvas {
 };
 _defineProperty(SelectableCanvas, "ownDefaults", canvasDefaults);
 //#endregion
-//#region packages/core/src/canvas/TextEditingManager.ts
+//#region src/canvas/TextEditingManager.ts
 /**
 * In charge of synchronizing all interactive text instances of a canvas
 */
@@ -11728,7 +11784,7 @@ var TextEditingManager = class {
 	}
 };
 //#endregion
-//#region packages/core/src/canvas/Canvas.ts
+//#region src/canvas/Canvas.ts
 const addEventOptions = { passive: false };
 const getEventPoints = (canvas, e) => {
 	return {
@@ -12727,7 +12783,7 @@ canvas: this });
 	}
 };
 //#endregion
-//#region packages/core/src/gradient/constants.ts
+//#region src/gradient/constants.ts
 const linearDefaultCoords = {
 	x1: 0,
 	y1: 0,
@@ -12740,7 +12796,7 @@ const radialDefaultCoords = {
 	r2: 0
 };
 //#endregion
-//#region packages/core/src/util/internals/ifNaN.ts
+//#region src/util/internals/ifNaN.ts
 /**
 *
 * @param value value to check if NaN
@@ -12751,7 +12807,7 @@ const ifNaN = (value, valueIfNaN) => {
 	return isNaN(value) && typeof valueIfNaN === "number" ? valueIfNaN : value;
 };
 //#endregion
-//#region packages/core/src/parser/percent.ts
+//#region src/parser/percent.ts
 /**
 * Will loosely accept as percent numbers that are not like
 * 3.4a%. This function does not check for the correctness of a percentage
@@ -12770,7 +12826,7 @@ function parsePercent(value, valueIfNaN) {
 	return capValue(0, ifNaN(typeof value === "number" ? value : typeof value === "string" ? parseFloat(value) / (isPercent(value) ? 100 : 1) : NaN, valueIfNaN), 1);
 }
 //#endregion
-//#region packages/core/src/gradient/parser/parseColorStops.ts
+//#region src/gradient/parser/parseColorStops.ts
 const RE_KEY_VALUE_PAIRS = /\s*;\s*/;
 const RE_KEY_VALUE = /\s*:\s*/;
 function parseColorStop(el, opacityMultiplier) {
@@ -12800,7 +12856,7 @@ function parseColorStops(el, opacityAttr) {
 	return colorStops;
 }
 //#endregion
-//#region packages/core/src/gradient/parser/misc.ts
+//#region src/gradient/parser/misc.ts
 function parseType(el) {
 	return el.nodeName === "linearGradient" || el.nodeName === "LINEARGRADIENT" ? "linear" : "radial";
 }
@@ -12808,7 +12864,7 @@ function parseGradientUnits(el) {
 	return el.getAttribute("gradientUnits") === "userSpaceOnUse" ? "pixels" : "percentage";
 }
 //#endregion
-//#region packages/core/src/gradient/parser/parseCoords.ts
+//#region src/gradient/parser/parseCoords.ts
 function convertPercentUnitsToValues(valuesToConvert, { width, height, gradientUnits }) {
 	let finalValue;
 	return Object.entries(valuesToConvert).reduce((acc, [prop, propValue]) => {
@@ -12857,7 +12913,7 @@ function parseCoords(el, size) {
 	});
 }
 //#endregion
-//#region packages/core/src/gradient/Gradient.ts
+//#region src/gradient/Gradient.ts
 /**
 * Gradient class
 * @class Gradient
@@ -13070,7 +13126,7 @@ classRegistry.setClass(Gradient, "gradient");
 classRegistry.setClass(Gradient, "linear");
 classRegistry.setClass(Gradient, "radial");
 //#endregion
-//#region packages/core/src/Pattern/Pattern.ts
+//#region src/Pattern/Pattern.ts
 /**
 * @see {@link http://fabric5.fabricjs.com/patterns demo}
 * @see {@link http://fabric5.fabricjs.com/dynamic-patterns demo}
@@ -13204,7 +13260,7 @@ _defineProperty(Pattern, "type", "Pattern");
 classRegistry.setClass(Pattern);
 classRegistry.setClass(Pattern, "pattern");
 //#endregion
-//#region packages/core/src/brushes/BaseBrush.ts
+//#region src/brushes/BaseBrush.ts
 /**
 * @see {@link http://fabric5.fabricjs.com/freedrawing|Freedrawing demo}
 */
@@ -13344,7 +13400,7 @@ var BaseBrush = class {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/Path.ts
+//#region src/shapes/Path.ts
 var Path = class Path extends FabricObject$1 {
 	/**
 	* Constructor
@@ -13588,7 +13644,7 @@ _defineProperty(Path, "ATTRIBUTE_NAMES", [...SHARED_ATTRIBUTES, "d"]);
 classRegistry.setClass(Path);
 classRegistry.setSVGClass(Path);
 //#endregion
-//#region packages/core/src/brushes/PencilBrush.ts
+//#region src/brushes/PencilBrush.ts
 /**
 * @private
 * @param {TSimplePathData} pathData SVG path commands
@@ -13813,7 +13869,7 @@ var PencilBrush = class PencilBrush extends BaseBrush {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/Circle.ts
+//#region src/shapes/Circle.ts
 const CIRCLE_PROPS = [
 	"radius",
 	"startAngle",
@@ -13952,7 +14008,7 @@ _defineProperty(Circle, "ATTRIBUTE_NAMES", [
 classRegistry.setClass(Circle);
 classRegistry.setSVGClass(Circle);
 //#endregion
-//#region packages/core/src/brushes/CircleBrush.ts
+//#region src/brushes/CircleBrush.ts
 var CircleBrush = class extends BaseBrush {
 	constructor(canvas) {
 		super(canvas);
@@ -14059,7 +14115,7 @@ var CircleBrush = class extends BaseBrush {
 	}
 };
 //#endregion
-//#region packages/core/src/brushes/SprayBrush.ts
+//#region src/brushes/SprayBrush.ts
 /**
 *
 * @param rects
@@ -14236,7 +14292,7 @@ var SprayBrush = class extends BaseBrush {
 	}
 };
 //#endregion
-//#region packages/core/src/brushes/PatternBrush.ts
+//#region src/brushes/PatternBrush.ts
 var PatternBrush = class extends PencilBrush {
 	constructor(canvas) {
 		super(canvas);
@@ -14283,50 +14339,7 @@ var PatternBrush = class extends PencilBrush {
 	}
 };
 //#endregion
-//#region packages/core/src/filters/GLProbes/GLProbe.ts
-var GLProbe = class {};
-//#endregion
-//#region packages/core/src/filters/GLProbes/WebGLProbe.ts
-/**
-* Lazy initialize WebGL constants
-*/
-var WebGLProbe = class extends GLProbe {
-	/**
-	* Tests if webgl supports certain precision
-	* @param {WebGL} Canvas WebGL context to test on
-	* @param {GLPrecision} Precision to test can be any of following
-	* @returns {Boolean} Whether the user's browser WebGL supports given precision.
-	*/
-	testPrecision(gl, precision) {
-		const fragmentSource = `precision ${precision} float;\nvoid main(){}`;
-		const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		if (!fragmentShader) return false;
-		gl.shaderSource(fragmentShader, fragmentSource);
-		gl.compileShader(fragmentShader);
-		return !!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS);
-	}
-	/**
-	* query browser for WebGL
-	*/
-	queryWebGL(canvas) {
-		const gl = canvas.getContext("webgl");
-		if (gl) {
-			this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-			this.GLPrecision = [
-				"highp",
-				"mediump",
-				"lowp"
-			].find((precision) => this.testPrecision(gl, precision));
-			gl.getExtension("WEBGL_lose_context").loseContext();
-			log("log", `WebGL: max texture size ${this.maxTextureSize}`);
-		}
-	}
-	isSupported(textureSize) {
-		return !!this.maxTextureSize && this.maxTextureSize >= textureSize;
-	}
-};
-//#endregion
-//#region packages/core/src/shapes/Line.ts
+//#region src/shapes/Line.ts
 const coordProps = [
 	"x1",
 	"x2",
@@ -14508,7 +14521,7 @@ _defineProperty(Line, "ATTRIBUTE_NAMES", SHARED_ATTRIBUTES.concat(coordProps));
 classRegistry.setClass(Line);
 classRegistry.setSVGClass(Line);
 //#endregion
-//#region packages/core/src/shapes/Triangle.ts
+//#region src/shapes/Triangle.ts
 const triangleDefaultValues = {
 	width: 100,
 	height: 100
@@ -14563,7 +14576,7 @@ _defineProperty(Triangle, "ownDefaults", triangleDefaultValues);
 classRegistry.setClass(Triangle);
 classRegistry.setSVGClass(Triangle);
 //#endregion
-//#region packages/core/src/shapes/Ellipse.ts
+//#region src/shapes/Ellipse.ts
 const ellipseDefaultValues = {
 	rx: 0,
 	ry: 0
@@ -14676,7 +14689,7 @@ _defineProperty(Ellipse, "ATTRIBUTE_NAMES", [
 classRegistry.setClass(Ellipse);
 classRegistry.setSVGClass(Ellipse);
 //#endregion
-//#region packages/core/src/parser/parsePointsAttribute.ts
+//#region src/parser/parsePointsAttribute.ts
 /**
 * Parses "points" attribute, returning an array of values
 * @param {String} points points attribute string
@@ -14693,7 +14706,7 @@ function parsePointsAttribute(points) {
 	return parsedPoints;
 }
 //#endregion
-//#region packages/core/src/shapes/Polyline.ts
+//#region src/shapes/Polyline.ts
 const polylineDefaultValues = { 
 /**
 * @deprecated transient option soon to be removed in favor of a different design
@@ -14943,7 +14956,7 @@ _defineProperty(Polyline, "ATTRIBUTE_NAMES", [...SHARED_ATTRIBUTES]);
 classRegistry.setClass(Polyline);
 classRegistry.setSVGClass(Polyline);
 //#endregion
-//#region packages/core/src/shapes/Polygon.ts
+//#region src/shapes/Polygon.ts
 var Polygon = class extends Polyline {
 	isOpen() {
 		return false;
@@ -14954,7 +14967,7 @@ _defineProperty(Polygon, "type", "Polygon");
 classRegistry.setClass(Polygon);
 classRegistry.setSVGClass(Polygon);
 //#endregion
-//#region packages/core/src/shapes/Text/StyledText.ts
+//#region src/shapes/Text/StyledText.ts
 var StyledText = class extends FabricObject$1 {
 	/**
 	* Returns true if object has no styling or no styling in a line
@@ -15146,7 +15159,7 @@ var StyledText = class extends FabricObject$1 {
 };
 _defineProperty(StyledText, "_styleProperties", styleProperties);
 //#endregion
-//#region packages/core/src/shapes/Text/TextSVGExportMixin.ts
+//#region src/shapes/Text/TextSVGExportMixin.ts
 const multipleSpacesRegex = /  +/g;
 const dblQuoteRegex = /"/g;
 function createSVGInlineRect(color, left, top, width, height) {
@@ -15343,7 +15356,7 @@ var TextSVGExportMixin = class extends FabricObjectSVGExportMixin {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/Text/Text.ts
+//#region src/shapes/Text/Text.ts
 let measuringContext;
 /**
 * Return a context for measurement of text string.
@@ -16364,7 +16377,7 @@ applyMixins(FabricText, [TextSVGExportMixin]);
 classRegistry.setClass(FabricText);
 classRegistry.setSVGClass(FabricText);
 //#endregion
-//#region packages/core/src/shapes/IText/DraggableTextDelegate.ts
+//#region src/shapes/IText/DraggableTextDelegate.ts
 /**
 * #### Dragging IText/Textbox Lifecycle
 * - {@link start} is called from `mousedown` {@link IText#_mouseDownHandler} and determines if dragging should start by testing {@link isPointerOverSelection}
@@ -16642,7 +16655,7 @@ var DraggableTextDelegate = class {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/IText/ITextBehavior.ts
+//#region src/shapes/IText/ITextBehavior.ts
 /**
 *  extend this regex to support non english languages
 *
@@ -17322,7 +17335,7 @@ var ITextBehavior = class extends FabricText {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/IText/ITextKeyBehavior.ts
+//#region src/shapes/IText/ITextKeyBehavior.ts
 var ITextKeyBehavior = class extends ITextBehavior {
 	/**
 	* Initializes hidden textarea (needed to bring up keyboard in iOS)
@@ -17728,7 +17741,7 @@ var ITextKeyBehavior = class extends ITextBehavior {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/IText/ITextClickBehavior.ts
+//#region src/shapes/IText/ITextClickBehavior.ts
 /**
 * `LEFT_CLICK === 0`
 */
@@ -17877,7 +17890,7 @@ var ITextClickBehavior = class extends ITextKeyBehavior {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/IText/constants.ts
+//#region src/shapes/IText/constants.ts
 const MOVE_CURSOR_UP = "moveCursorUp";
 const MOVE_CURSOR_DOWN = "moveCursorDown";
 const MOVE_CURSOR_LEFT = "moveCursorLeft";
@@ -17919,7 +17932,7 @@ const ctrlKeysMapUp = {
 */
 const ctrlKeysMapDown = { 65: "cmdAll" };
 //#endregion
-//#region packages/core/src/util/internals/applyCanvasTransform.ts
+//#region src/util/internals/applyCanvasTransform.ts
 /**
 * Set the transform of the passed context to the same of a specific Canvas or StaticCanvas.
 * setTransform is used since this utility will RESET the ctx transform to the basic value
@@ -18393,7 +18406,7 @@ _defineProperty(IText, "type", "IText");
 classRegistry.setClass(IText);
 classRegistry.setClass(IText, "i-text");
 //#endregion
-//#region packages/core/src/shapes/Textbox.ts
+//#region src/shapes/Textbox.ts
 const textboxDefaultValues = {
 	minWidth: 20,
 	dynamicMinWidth: 2,
@@ -18757,7 +18770,7 @@ _defineProperty(Textbox, "textLayoutProperties", [...IText.textLayoutProperties,
 _defineProperty(Textbox, "ownDefaults", textboxDefaultValues);
 classRegistry.setClass(Textbox);
 //#endregion
-//#region packages/core/src/LayoutManager/LayoutStrategies/ClipPathLayout.ts
+//#region src/LayoutManager/LayoutStrategies/ClipPathLayout.ts
 /**
 * Layout will adjust the bounding box to match the clip path bounding box.
 */
@@ -18797,7 +18810,7 @@ var ClipPathLayout = class extends LayoutStrategy {
 _defineProperty(ClipPathLayout, "type", "clip-path");
 classRegistry.setClass(ClipPathLayout);
 //#endregion
-//#region packages/core/src/LayoutManager/LayoutStrategies/FixedLayout.ts
+//#region src/LayoutManager/LayoutStrategies/FixedLayout.ts
 /**
 * Layout will keep target's initial size.
 */
@@ -18812,7 +18825,7 @@ var FixedLayout = class extends LayoutStrategy {
 _defineProperty(FixedLayout, "type", "fixed");
 classRegistry.setClass(FixedLayout);
 //#endregion
-//#region packages/core/src/LayoutManager/ActiveSelectionLayoutManager.ts
+//#region src/LayoutManager/ActiveSelectionLayoutManager.ts
 /**
 * Today the LayoutManager class also takes care of subscribing event handlers
 * to update the group layout when the group is interactive and a transform is applied
@@ -18856,7 +18869,7 @@ var ActiveSelectionLayoutManager = class extends LayoutManager {
 	}
 };
 //#endregion
-//#region packages/core/src/shapes/ActiveSelection.ts
+//#region src/shapes/ActiveSelection.ts
 const activeSelectionDefaultValues = { multiSelectionStacking: "canvas-stacking" };
 /**
 * Used by Canvas to manage selection.
@@ -19013,7 +19026,7 @@ _defineProperty(ActiveSelection, "ownDefaults", activeSelectionDefaultValues);
 classRegistry.setClass(ActiveSelection);
 classRegistry.setClass(ActiveSelection, "activeSelection");
 //#endregion
-//#region packages/core/src/filters/Canvas2dFilterBackend.ts
+//#region src/filters/Canvas2dFilterBackend.ts
 var Canvas2dFilterBackend = class {
 	constructor() {
 		_defineProperty(
@@ -19069,7 +19082,7 @@ var Canvas2dFilterBackend = class {
 	}
 };
 //#endregion
-//#region packages/core/src/filters/WebGLFilterBackend.ts
+//#region src/filters/WebGLFilterBackend.ts
 var WebGLFilterBackend = class {
 	constructor({ tileSize = config.textureSize } = {}) {
 		_defineProperty(
@@ -19323,7 +19336,7 @@ function resizeCanvasIfNeeded(pipelineState) {
 	}
 }
 //#endregion
-//#region packages/core/src/filters/FilterBackend.ts
+//#region src/filters/FilterBackend.ts
 let filterBackend;
 /**
 * Verifies if it is possible to initialize webgl or fallback on a canvas2d filtering backend
@@ -19347,7 +19360,7 @@ function setFilterBackend(backend) {
 	filterBackend = backend;
 }
 //#endregion
-//#region packages/core/src/shapes/Image.ts
+//#region src/shapes/Image.ts
 const imageDefaultValues = {
 	strokeWidth: 0,
 	srcFromAttribute: false,
@@ -19793,7 +19806,7 @@ _defineProperty(FabricImage, "ATTRIBUTE_NAMES", [
 classRegistry.setClass(FabricImage);
 classRegistry.setSVGClass(FabricImage);
 //#endregion
-//#region packages/core/src/parser/applyViewboxTransform.ts
+//#region src/parser/applyViewboxTransform.ts
 /**
 * Add a <g> element that envelop all child elements and makes the viewbox transformMatrix descend on all elements
 */
@@ -19881,10 +19894,10 @@ function applyViewboxTransform(element) {
 	return parsedDim;
 }
 //#endregion
-//#region packages/core/src/parser/getTagName.ts
+//#region src/parser/getTagName.ts
 const getTagName = (node) => node.tagName.replace("svg:", "");
 //#endregion
-//#region packages/core/src/parser/hasInvalidAncestor.ts
+//#region src/parser/hasInvalidAncestor.ts
 const svgInvalidAncestorsRegEx = getSvgRegex(svgInvalidAncestors);
 function hasInvalidAncestor(element) {
 	let _element = element;
@@ -19892,7 +19905,7 @@ function hasInvalidAncestor(element) {
 	return false;
 }
 //#endregion
-//#region packages/core/src/parser/getMultipleNodes.ts
+//#region src/parser/getMultipleNodes.ts
 function getMultipleNodes(doc, nodeNames) {
 	let nodeName, nodeArray = [], nodeList, i, len;
 	for (i = 0, len = nodeNames.length; i < len; i++) {
@@ -19903,7 +19916,7 @@ function getMultipleNodes(doc, nodeNames) {
 	return nodeArray;
 }
 //#endregion
-//#region packages/core/src/parser/parseUseDirectives.ts
+//#region src/parser/parseUseDirectives.ts
 function parseUseDirectives(doc) {
 	const nodelist = getMultipleNodes(doc, ["use", "svg:use"]);
 	const skipAttributes = [
@@ -19956,7 +19969,7 @@ function parseUseDirectives(doc) {
 	}
 }
 //#endregion
-//#region packages/core/src/parser/recursivelyParseGradientsXlink.ts
+//#region src/parser/recursivelyParseGradientsXlink.ts
 const gradientsAttrs = [
 	"gradientTransform",
 	"x1",
@@ -19988,7 +20001,7 @@ function recursivelyParseGradientsXlink(doc, gradient) {
 	gradient.removeAttribute(xlinkAttr);
 }
 //#endregion
-//#region packages/core/src/parser/getGradientDefs.ts
+//#region src/parser/getGradientDefs.ts
 const tagArray = [
 	"linearGradient",
 	"radialGradient",
@@ -20013,7 +20026,7 @@ function getGradientDefs(doc) {
 	return gradientDefs;
 }
 //#endregion
-//#region packages/core/src/parser/getCSSRules.ts
+//#region src/parser/getCSSRules.ts
 /**
 * Returns CSS rules for a given SVG document
 * @param {HTMLElement} doc SVG document to parse
@@ -20048,7 +20061,7 @@ function getCSSRules(doc) {
 	return allRules;
 }
 //#endregion
-//#region packages/core/src/parser/elements_parser.ts
+//#region src/parser/elements_parser.ts
 const findTag = (el) => classRegistry.getSVGClass(getTagName(el).toLowerCase());
 var ElementsParser = class {
 	constructor(elements, options, reviver, doc, clipPaths) {
@@ -20154,7 +20167,7 @@ var ElementsParser = class {
 	}
 };
 //#endregion
-//#region packages/core/src/parser/parseSVGDocument.ts
+//#region src/parser/parseSVGDocument.ts
 const isValidSvgTag = (el) => svgValidTagNamesRegEx.test(getTagName(el));
 const createEmptyResponse = () => ({
 	objects: [],
@@ -20211,7 +20224,7 @@ async function parseSVGDocument(doc, reviver, { crossOrigin, signal } = {}) {
 	};
 }
 //#endregion
-//#region packages/core/src/parser/loadSVGFromString.ts
+//#region src/parser/loadSVGFromString.ts
 /**
 * Takes string corresponding to an SVG document, and parses it into a set of fabric objects
 * @param {String} string representing the svg
@@ -20229,7 +20242,7 @@ function loadSVGFromString(string, reviver, options) {
 	return parseSVGDocument(new (getFabricWindow()).DOMParser().parseFromString(string.trim(), "text/xml"), reviver, options);
 }
 //#endregion
-//#region packages/core/src/parser/loadSVGFromURL.ts
+//#region src/parser/loadSVGFromURL.ts
 /**
 * Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
 * Note that SVG is fetched via fetch API, so it needs to conform to SOP (Same Origin Policy)
@@ -20255,7 +20268,7 @@ function loadSVGFromURL(url, reviver, options = {}) {
 	});
 }
 //#endregion
-//#region packages/core/src/filters/utils.ts
+//#region src/filters/utils.ts
 const isWebGLPipelineState = (options) => {
 	return options.webgl !== void 0;
 };
@@ -20286,7 +20299,7 @@ const isPutImageFaster = (width, height) => {
 	return drawImageTime > getFabricWindow().performance.now() - startTime;
 };
 //#endregion
-//#region packages/core/src/filters/shaders/baseFilter.ts
+//#region src/filters/shaders/baseFilter.ts
 const highPsourceCode = `precision highp float`;
 const identityFragmentShader = `
     ${highPsourceCode};
@@ -20303,7 +20316,7 @@ const vertexSource$1 = `
       gl_Position = vec4(aPosition * 2.0 - 1.0, 0.0, 1.0);
     }`;
 //#endregion
-//#region packages/core/src/filters/BaseFilter.ts
+//#region src/filters/BaseFilter.ts
 const regex = new RegExp(highPsourceCode, "g");
 var BaseFilter = class {
 	/**
@@ -20555,7 +20568,7 @@ var BaseFilter = class {
 _defineProperty(BaseFilter, "type", "BaseFilter");
 _defineProperty(BaseFilter, "uniformLocations", []);
 //#endregion
-//#region packages/core/src/filters/shaders/blendColor.ts
+//#region src/filters/shaders/blendColor.ts
 const blendColorFragmentSource = {
 	multiply: "gl_FragColor.rgb *= uColor.rgb;\n",
 	screen: "gl_FragColor.rgb = 1.0 - (1.0 - gl_FragColor.rgb) * (1.0 - uColor.rgb);\n",
@@ -20588,7 +20601,7 @@ const blendColorFragmentSource = {
     `
 };
 //#endregion
-//#region packages/core/src/filters/BlendColor.ts
+//#region src/filters/BlendColor.ts
 const blendColorDefaultValues = {
 	color: "#F95C63",
 	mode: "multiply",
@@ -20723,7 +20736,7 @@ _defineProperty(BlendColor, "type", "BlendColor");
 _defineProperty(BlendColor, "uniformLocations", ["uColor"]);
 classRegistry.setClass(BlendColor);
 //#endregion
-//#region packages/core/src/filters/shaders/blendImage.ts
+//#region src/filters/shaders/blendImage.ts
 const fragmentSource$12 = {
 	multiply: `
     precision highp float;
@@ -20766,7 +20779,7 @@ const vertexSource = `
     }
     `;
 //#endregion
-//#region packages/core/src/filters/BlendImage.ts
+//#region src/filters/BlendImage.ts
 const blendImageDefaultValues = {
 	mode: "multiply",
 	alpha: 1
@@ -20908,7 +20921,7 @@ _defineProperty(BlendImage, "defaults", blendImageDefaultValues);
 _defineProperty(BlendImage, "uniformLocations", ["uTransformMatrix", "uImage"]);
 classRegistry.setClass(BlendImage);
 //#endregion
-//#region packages/core/src/filters/shaders/blur.ts
+//#region src/filters/shaders/blur.ts
 const fragmentSource$11 = `
     precision highp float;
     uniform sampler2D uTexture;
@@ -20940,7 +20953,7 @@ const fragmentSource$11 = `
     }
   `;
 //#endregion
-//#region packages/core/src/filters/Blur.ts
+//#region src/filters/Blur.ts
 const blurDefaultValues = { blur: 0 };
 /**
 * Blur filter class
@@ -21061,7 +21074,7 @@ _defineProperty(Blur, "defaults", blurDefaultValues);
 _defineProperty(Blur, "uniformLocations", ["uDelta"]);
 classRegistry.setClass(Blur);
 //#endregion
-//#region packages/core/src/filters/shaders/brightness.ts
+//#region src/filters/shaders/brightness.ts
 const fragmentSource$10 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -21074,7 +21087,7 @@ const fragmentSource$10 = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Brightness.ts
+//#region src/filters/Brightness.ts
 const brightnessDefaultValues = { brightness: 0 };
 /**
 * Brightness filter class
@@ -21121,7 +21134,7 @@ _defineProperty(Brightness, "defaults", brightnessDefaultValues);
 _defineProperty(Brightness, "uniformLocations", ["uBrightness"]);
 classRegistry.setClass(Brightness);
 //#endregion
-//#region packages/core/src/filters/shaders/colorMatrix.ts
+//#region src/filters/shaders/colorMatrix.ts
 const fragmentSource$9 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -21135,7 +21148,7 @@ const fragmentSource$9 = `
     gl_FragColor = color;
   }`;
 //#endregion
-//#region packages/core/src/filters/ColorMatrix.ts
+//#region src/filters/ColorMatrix.ts
 const colorMatrixDefaultValues = {
 	matrix: [
 		1,
@@ -21250,7 +21263,7 @@ _defineProperty(ColorMatrix, "defaults", colorMatrixDefaultValues);
 _defineProperty(ColorMatrix, "uniformLocations", ["uColorMatrix", "uConstants"]);
 classRegistry.setClass(ColorMatrix);
 //#endregion
-//#region packages/core/src/filters/ColorMatrixFilters.ts
+//#region src/filters/ColorMatrixFilters.ts
 function createColorMatrixFilter(key, matrix) {
 	var _Class;
 	const newClass = (_Class = class extends ColorMatrix {
@@ -21422,7 +21435,7 @@ const BlackWhite = createColorMatrixFilter("BlackWhite", [
 	0
 ]);
 //#endregion
-//#region packages/core/src/filters/Composed.ts
+//#region src/filters/Composed.ts
 /**
 * A container class that knows how to apply a sequence of filters to an input image.
 */
@@ -21470,7 +21483,7 @@ var Composed = class extends BaseFilter {
 _defineProperty(Composed, "type", "Composed");
 classRegistry.setClass(Composed);
 //#endregion
-//#region packages/core/src/filters/shaders/constrast.ts
+//#region src/filters/shaders/constrast.ts
 const fragmentSource$8 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -21483,7 +21496,7 @@ const fragmentSource$8 = `
     gl_FragColor = color;
   }`;
 //#endregion
-//#region packages/core/src/filters/Contrast.ts
+//#region src/filters/Contrast.ts
 const contrastDefaultValues = { contrast: 0 };
 /**
 * Contrast filter class
@@ -21530,7 +21543,7 @@ _defineProperty(Contrast, "defaults", contrastDefaultValues);
 _defineProperty(Contrast, "uniformLocations", ["uContrast"]);
 classRegistry.setClass(Contrast);
 //#endregion
-//#region packages/core/src/filters/shaders/convolute.ts
+//#region src/filters/shaders/convolute.ts
 const fragmentSource$7 = {
 	Convolute_3_1: `
     precision highp float;
@@ -21686,7 +21699,7 @@ const fragmentSource$7 = {
     `
 };
 //#endregion
-//#region packages/core/src/filters/Convolute.ts
+//#region src/filters/Convolute.ts
 const convoluteDefaultValues = {
 	opaque: false,
 	matrix: [
@@ -21813,7 +21826,7 @@ _defineProperty(Convolute, "uniformLocations", [
 ]);
 classRegistry.setClass(Convolute);
 //#endregion
-//#region packages/core/src/filters/shaders/gamma.ts
+//#region src/filters/shaders/gamma.ts
 const fragmentSource$6 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -21830,7 +21843,7 @@ const fragmentSource$6 = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Gamma.ts
+//#region src/filters/Gamma.ts
 const GAMMA = "Gamma";
 const gammaDefaultValues = { gamma: [
 	1,
@@ -21904,7 +21917,7 @@ _defineProperty(Gamma, "defaults", gammaDefaultValues);
 _defineProperty(Gamma, "uniformLocations", ["uGamma"]);
 classRegistry.setClass(Gamma);
 //#endregion
-//#region packages/core/src/filters/shaders/grayscale.ts
+//#region src/filters/shaders/grayscale.ts
 const fragmentSource$5 = {
 	average: `
     precision highp float;
@@ -21940,7 +21953,7 @@ const fragmentSource$5 = {
     `
 };
 //#endregion
-//#region packages/core/src/filters/Grayscale.ts
+//#region src/filters/Grayscale.ts
 const grayscaleDefaultValues = { mode: "average" };
 /**
 * Grayscale image filter class
@@ -22004,7 +22017,7 @@ _defineProperty(Grayscale, "defaults", grayscaleDefaultValues);
 _defineProperty(Grayscale, "uniformLocations", ["uMode"]);
 classRegistry.setClass(Grayscale);
 //#endregion
-//#region packages/core/src/filters/HueRotation.ts
+//#region src/filters/HueRotation.ts
 const hueRotationDefaultValues = {
 	...colorMatrixDefaultValues,
 	rotation: 0
@@ -22062,7 +22075,7 @@ _defineProperty(HueRotation, "type", "HueRotation");
 _defineProperty(HueRotation, "defaults", hueRotationDefaultValues);
 classRegistry.setClass(HueRotation);
 //#endregion
-//#region packages/core/src/filters/shaders/invert.ts
+//#region src/filters/shaders/invert.ts
 const fragmentSource$4 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -22083,7 +22096,7 @@ const fragmentSource$4 = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Invert.ts
+//#region src/filters/Invert.ts
 const invertDefaultValues = {
 	alpha: false,
 	invert: true
@@ -22137,7 +22150,7 @@ _defineProperty(Invert, "defaults", invertDefaultValues);
 _defineProperty(Invert, "uniformLocations", ["uInvert", "uAlpha"]);
 classRegistry.setClass(Invert);
 //#endregion
-//#region packages/core/src/filters/shaders/noise.ts
+//#region src/filters/shaders/noise.ts
 const fragmentSource$3 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -22155,7 +22168,7 @@ const fragmentSource$3 = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Noise.ts
+//#region src/filters/Noise.ts
 const noiseDefaultValues = { noise: 0 };
 /**
 * Noise filter class
@@ -22205,7 +22218,7 @@ _defineProperty(Noise, "defaults", noiseDefaultValues);
 _defineProperty(Noise, "uniformLocations", ["uNoise", "uSeed"]);
 classRegistry.setClass(Noise);
 //#endregion
-//#region packages/core/src/filters/shaders/pixelate.ts
+//#region src/filters/shaders/pixelate.ts
 const fragmentSource$2 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -22226,7 +22239,7 @@ const fragmentSource$2 = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Pixelate.ts
+//#region src/filters/Pixelate.ts
 const pixelateDefaultValues = { blocksize: 4 };
 /**
 * Pixelate filter class
@@ -22284,7 +22297,7 @@ _defineProperty(Pixelate, "defaults", pixelateDefaultValues);
 _defineProperty(Pixelate, "uniformLocations", ["uBlocksize"]);
 classRegistry.setClass(Pixelate);
 //#endregion
-//#region packages/core/src/filters/shaders/removeColor.ts
+//#region src/filters/shaders/removeColor.ts
 const fragmentShader = `
 precision highp float;
 uniform sampler2D uTexture;
@@ -22299,7 +22312,7 @@ void main() {
 }
 `;
 //#endregion
-//#region packages/core/src/filters/RemoveColor.ts
+//#region src/filters/RemoveColor.ts
 const removeColorDefaultValues = {
 	color: "#FFFFFF",
 	distance: .02,
@@ -22367,7 +22380,7 @@ _defineProperty(RemoveColor, "defaults", removeColorDefaultValues);
 _defineProperty(RemoveColor, "uniformLocations", ["uLow", "uHigh"]);
 classRegistry.setClass(RemoveColor);
 //#endregion
-//#region packages/core/src/filters/Resize.ts
+//#region src/filters/Resize.ts
 const resizeDefaultValues = {
 	resizeType: "hermite",
 	scaleX: 1,
@@ -22708,7 +22721,7 @@ _defineProperty(Resize, "defaults", resizeDefaultValues);
 _defineProperty(Resize, "uniformLocations", ["uDelta", "uTaps"]);
 classRegistry.setClass(Resize);
 //#endregion
-//#region packages/core/src/filters/shaders/saturation.ts
+//#region src/filters/shaders/saturation.ts
 const fragmentSource$1 = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -22725,7 +22738,7 @@ const fragmentSource$1 = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Saturation.ts
+//#region src/filters/Saturation.ts
 const saturationDefaultValues = { saturation: 0 };
 /**
 * Saturate filter class
@@ -22776,7 +22789,7 @@ _defineProperty(Saturation, "defaults", saturationDefaultValues);
 _defineProperty(Saturation, "uniformLocations", ["uSaturation"]);
 classRegistry.setClass(Saturation);
 //#endregion
-//#region packages/core/src/filters/shaders/vibrance.ts
+//#region src/filters/shaders/vibrance.ts
 const fragmentSource = `
   precision highp float;
   uniform sampler2D uTexture;
@@ -22794,7 +22807,7 @@ const fragmentSource = `
   }
 `;
 //#endregion
-//#region packages/core/src/filters/Vibrance.ts
+//#region src/filters/Vibrance.ts
 const vibranceDefaultValues = { vibrance: 0 };
 /**
 * Vibrance filter class
@@ -22847,7 +22860,7 @@ _defineProperty(Vibrance, "defaults", vibranceDefaultValues);
 _defineProperty(Vibrance, "uniformLocations", ["uVibrance"]);
 classRegistry.setClass(Vibrance);
 //#endregion
-//#region packages/core/src/filters/filters.ts
+//#region src/filters/filters.ts
 var filters_exports = /* @__PURE__ */ __exportAll({
 	BaseFilter: () => BaseFilter,
 	BlackWhite: () => BlackWhite,
@@ -22877,22 +22890,9 @@ var filters_exports = /* @__PURE__ */ __exportAll({
 	Vintage: () => Vintage
 });
 //#endregion
-//#region packages/browser/src/env.ts
-const copyPasteData = {};
-const getEnv$1 = () => {
-	return {
-		document,
-		window,
-		isTouchSupported: "ontouchstart" in window || "ontouchstart" in document || window && window.navigator && window.navigator.maxTouchPoints > 0,
-		WebGLProbe: new WebGLProbe(),
-		dispose() {},
-		copyPasteData
-	};
-};
-//#endregion
 //#region index.ts
 setEnvFactory(getEnv$1);
 //#endregion
-export { ActiveSelection, BaseBrush, FabricObject as BaseFabricObject, Canvas, Canvas2dFilterBackend, CanvasDOMManager, Circle, CircleBrush, ClipPathLayout, Color, Control, Ellipse, FabricImage, FabricImage as Image, FabricObject$1 as FabricObject, FabricObject$1 as Object, FabricText, FabricText as Text, FitContentLayout, FixedLayout, GLProbe, Gradient, Group, IText, InteractiveFabricObject, Intersection, LayoutManager, LayoutStrategy, Line, Observable, Path, Pattern, PatternBrush, PencilBrush, Point, Polygon, Polyline, Rect, Shadow, SprayBrush, StaticCanvas, StaticCanvasDOMManager, Textbox, Triangle, WebGLFilterBackend, WebGLProbe, cache, classRegistry, config, controls_exports as controlsUtils, createCollectionMixin, filters_exports as filters, getDevicePixelRatio, getEnv, getFabricDocument, getFabricWindow, getFilterBackend, iMatrix, initFilterBackend, isPutImageFaster, isWebGLPipelineState, loadSVGFromString, loadSVGFromURL, parseSVGDocument, runningAnimations, setEnv, setEnvFactory, setFilterBackend, util_exports as util, VERSION as version };
+export { ActiveSelection, BaseBrush, FabricObject as BaseFabricObject, Canvas, Canvas2dFilterBackend, CanvasDOMManager, Circle, CircleBrush, ClipPathLayout, Color, Control, Ellipse, FabricImage, FabricImage as Image, FabricObject$1 as FabricObject, FabricObject$1 as Object, FabricText, FabricText as Text, FitContentLayout, FixedLayout, Gradient, Group, IText, InteractiveFabricObject, Intersection, LayoutManager, LayoutStrategy, Line, Observable, Path, Pattern, PatternBrush, PencilBrush, Point, Polygon, Polyline, Rect, Shadow, SprayBrush, StaticCanvas, StaticCanvasDOMManager, Textbox, Triangle, WebGLFilterBackend, cache, classRegistry, config, controls_exports as controlsUtils, createCollectionMixin, filters_exports as filters, getDevicePixelRatio, getEnv, getFabricDocument, getFabricWindow, getFilterBackend, iMatrix, initFilterBackend, isPutImageFaster, isWebGLPipelineState, loadSVGFromString, loadSVGFromURL, parseSVGDocument, runningAnimations, setEnv, setEnvFactory, setFilterBackend, util_exports as util, VERSION as version };
 
 //# sourceMappingURL=index.mjs.map
