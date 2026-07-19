@@ -2113,7 +2113,8 @@ describe('StaticCanvas', () => {
 
   it('provides Node.js stream methods when in Node environment', async () => {
     if (isJSDOM()) {
-      const { Canvas: FabricNodeCanvas } = await import('../../index.node');
+      const { Canvas: FabricNodeCanvas } =
+        await import('../../../../index.node');
       const canvas = new FabricNodeCanvas();
       expect(canvas.createPNGStream).toBeTypeOf('function');
       expect(canvas.createJPEGStream).toBeTypeOf('function');
