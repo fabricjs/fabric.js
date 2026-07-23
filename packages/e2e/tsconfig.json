@@ -12,21 +12,23 @@
     "skipDefaultLibCheck": true,
     "allowSyntheticDefaultImports": true,
     /**
-     * A reflection of the configured imports used by test scripts
-     * **IMPORTANT**: be sure to keep this updated to reflect `./imports.ts` correctly
+     * A reflection of the configured imports used by test scripts.
+     * Runtime-facing imports that Playwright executes in Node should point at
+     * fully bundled root outputs to avoid re-entering workspace source during
+     * Playwright's own TS/Babel transform step.
      */
     "paths": {
       "@fabricjs/aligning-guidelines": ["../aligning-guidelines/dist/index"],
       "@fabricjs/browser": ["../browser/dist/index"],
-      "@fabricjs/core": ["../core/dist/index"],
+      "@fabricjs/core": ["../../dist/packages/core/src/index"],
       "@fabricjs/cropping-controls": ["../cropping-controls/dist/index"],
       "@fabricjs/data-updaters": ["../data-updaters/dist/index"],
       "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
-      "@fabricjs/node": ["../node/dist/index"],
+      "@fabricjs/node": ["../../dist/index.node"],
       "@fabricjs/westures-integration": ["../westures-integration/dist/index"],
-      "fabric": ["../browser/dist/index"],
-      "fabric/extensions": ["../../dist-extensions/extensions"],
-      "fabric/node": ["../node/dist/index"]
+      "fabric": ["../../dist/index"],
+      "fabric/extensions": ["../../dist-extensions/extensions/index"],
+      "fabric/node": ["../../dist/index.node"]
     },
     "resolveJsonModule": true
   },
