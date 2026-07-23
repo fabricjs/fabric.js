@@ -30,7 +30,12 @@ function removeFacadeDependencyDeclarations() {
 function copyBrowserStandaloneArtifacts() {
   const sourceDir = packageDist('browser');
   const targetDir = path.resolve(wd, 'dist');
-  for (const file of ['index.js', 'index.js.map', 'index.min.js', 'index.min.js.map']) {
+  for (const file of [
+    'index.js',
+    'index.js.map',
+    'index.min.js',
+    'index.min.js.map',
+  ]) {
     const source = path.resolve(sourceDir, file);
     if (fs.existsSync(source)) {
       fs.copyFileSync(source, path.resolve(targetDir, file));

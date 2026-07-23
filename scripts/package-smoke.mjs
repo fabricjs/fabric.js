@@ -187,7 +187,9 @@ function expectNoDeclaredRuntimeDependency(pkg, dependencyName, label) {
 
 function expectDependency(pkg, dependencyName, label) {
   if (!pkg.dependencies?.[dependencyName]) {
-    throw new Error(`${label} should declare ${dependencyName} in dependencies`);
+    throw new Error(
+      `${label} should declare ${dependencyName} in dependencies`,
+    );
   }
 }
 
