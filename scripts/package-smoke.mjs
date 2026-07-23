@@ -302,6 +302,14 @@ function smokeImport(project, label, source) {
   log(`Imported ${label} in ${project.name}`);
 }
 
+function smokeRequire(project, label, source) {
+  log(`Requiring ${label} in ${project.name}`);
+  run('node', ['-e', source], {
+    cwd: project.projectDir,
+  });
+  log(`Required ${label} in ${project.name}`);
+}
+
 function smokeSplitCoreIdentity(project) {
   smokeImport(
     project,
@@ -393,6 +401,11 @@ try {
     rootProject,
     'fabric/node',
     "import { StaticCanvas, Rect } from 'fabric/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node import failed');",
+  );
+  smokeRequire(
+    rootProject,
+    'fabric/node CommonJS',
+    "const { StaticCanvas, Rect } = require('fabric/node'); const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node CommonJS require failed');",
   );
   smokeImport(
     rootProject,

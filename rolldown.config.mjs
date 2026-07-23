@@ -138,7 +138,14 @@ export default [
         format: 'es',
         sourcemap: true,
       },
-      // deprecated remove
+    ],
+    onwarn,
+    external: ['@fabricjs/node'],
+  },
+  {
+    input: ['./packages/node/src/index.ts'],
+    tsconfig: './tsconfig.packages.json',
+    output: [
       {
         file: path.resolve(dirname, `${basename}.node.cjs`),
         name: 'fabric',
@@ -147,7 +154,7 @@ export default [
       },
     ],
     onwarn,
-    external: ['@fabricjs/node'],
+    external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
   },
   // WORKSPACE PACKAGES
   ...buildableWorkspacePackages.map(workspacePackageBuildConfig),
