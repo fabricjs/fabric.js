@@ -15,6 +15,18 @@ function ensureCleanDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
 }
 
+function cleanFacadeArtifacts() {
+  for (const dir of ['dist', 'dist-extensions']) {
+    fs.rmSync(path.resolve(wd, dir), { recursive: true, force: true });
+  }
+}
+
+function removeFacadeDependencyDeclarations() {
+  for (const dir of ['dist/packages', 'dist-extensions/packages']) {
+    fs.rmSync(path.resolve(wd, dir), { recursive: true, force: true });
+  }
+}
+
 function removeFiles(dir, predicate) {
   if (!fs.existsSync(dir)) {
     return;
@@ -97,6 +109,7 @@ function buildTypes() {
       shell: true,
       cwd: wd,
     });
+    removeFacadeDependencyDeclarations();
     // Build declaration files for workspace packages into a temp tree.
     fs.rmSync(packageTypeBuildDir, { recursive: true, force: true });
     cp.execSync('tsc -p ./tsconfig.packages.build.json', {
@@ -118,6 +131,9 @@ function buildTypes() {
  * @param {*} options
  */
 export function build({ watch, fast, input, output, stats = false } = {}) {
+  if (!watch && !output) {
+    cleanFacadeArtifacts();
+  }
   const cmd = ['rolldown', '-c', watch ? '--watch' : ''].join(' ');
   const processOptions = {
     stdio: 'inherit',

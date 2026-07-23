@@ -130,6 +130,14 @@ function verifyRootTarball(list) {
   expectIncludes(list, 'package/extensions/README.MD', 'fabric');
   expectExcludesPrefix(list, 'package/packages/', 'fabric');
   expectExcludesPrefix(list, 'package/src/', 'fabric');
+  expectExcludesPrefix(list, 'package/dist/src/', 'fabric');
+  expectExcludesPrefix(list, 'package/dist/packages/', 'fabric');
+  expectExcludesPrefix(list, 'package/dist-extensions/packages/', 'fabric');
+  expectExcludesPrefix(
+    list,
+    'package/dist-extensions/linear_gradient_controls/',
+    'fabric',
+  );
   expectExcludesPrefix(list, 'package/.github/', 'fabric');
   if (list.some((file) => /^package\/extensions\/.+\/.*\.ts$/.test(file))) {
     throw new Error(
@@ -170,15 +178,34 @@ function expectNoDeclaredRuntimeDependency(pkg, dependencyName, label) {
   }
 }
 
-function hasDeclaredRuntimeDependency(pkg, dependencyName) {
-  return ['dependencies', 'peerDependencies', 'optionalDependencies'].some(
-    (field) => pkg[field]?.[dependencyName],
-  );
+function expectDependency(pkg, dependencyName, label) {
+  if (!pkg.dependencies?.[dependencyName]) {
+    throw new Error(`${label} should declare ${dependencyName} in dependencies`);
+  }
+}
+
+function expectOptionalDependency(pkg, dependencyName, label) {
+  if (!pkg.optionalDependencies?.[dependencyName]) {
+    throw new Error(
+      `${label} should declare ${dependencyName} in optionalDependencies`,
+    );
+  }
 }
 
 function verifyRootPackageManifest(pkg) {
   log('Checking root fabric package manifest');
   expectNoDeclaredRuntimeDependency(pkg, 'westures', 'fabric');
+  for (const dependency of [
+    '@fabricjs/aligning-guidelines',
+    '@fabricjs/browser',
+    '@fabricjs/cropping-controls',
+    '@fabricjs/data-updaters',
+    '@fabricjs/gradient-controls',
+    '@fabricjs/westures-integration',
+  ]) {
+    expectDependency(pkg, dependency, 'fabric');
+  }
+  expectOptionalDependency(pkg, '@fabricjs/node', 'fabric');
   log('Root fabric package manifest looks correct');
 }
 
@@ -187,14 +214,6 @@ function verifyCorePackageManifest(pkg) {
   expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/core');
   expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/core');
   log('@fabricjs/core package manifest looks correct');
-}
-
-function isFacadeRootPackage(pkg) {
-  return (
-    hasDeclaredRuntimeDependency(pkg, '@fabricjs/core') ||
-    hasDeclaredRuntimeDependency(pkg, '@fabricjs/browser') ||
-    hasDeclaredRuntimeDependency(pkg, '@fabricjs/node')
-  );
 }
 
 function verifyWorkspaceTarball(importName, list) {
@@ -252,8 +271,11 @@ function expectPackageAbsent(project, importName) {
 
 function linkRuntimeDependency(project, name) {
   log(`Linking runtime dependency ${name} into ${project.name}`);
-  const source = path.join(wd, 'node_modules', name);
-  if (!fs.existsSync(source)) {
+  const source = [
+    path.join(wd, 'node_modules', name),
+    path.join(wd, 'packages', 'node', 'node_modules', name),
+  ].find((candidate) => fs.existsSync(candidate));
+  if (!source) {
     throw new Error(
       `Missing ${name} in root node_modules. Run pnpm install before package smoke.`,
     );
@@ -292,13 +314,7 @@ function smokeSplitCoreIdentity(project) {
   );
 }
 
-function smokeRootFacadeCoreIdentity(project, rootPkg, fabricTarball) {
-  if (!isFacadeRootPackage(rootPkg)) {
-    log(
-      'Skipping root fabric facade identity checks; root package is not a facade yet',
-    );
-    return;
-  }
+function smokeRootFacadeCoreIdentity(project, fabricTarball) {
   linkPackage(project, 'fabric', fabricTarball);
   smokeImport(
     project,
@@ -310,6 +326,14 @@ function smokeRootFacadeCoreIdentity(project, rootPkg, fabricTarball) {
     'fabric/node and @fabricjs/node core identity',
     "import { Rect as FabricNodeRect } from 'fabric/node'; import { Rect as NodeRect } from '@fabricjs/node'; if (FabricNodeRect !== NodeRect) throw new Error('fabric/node does not share @fabricjs/node runtime');",
   );
+}
+
+function linkWorkspacePackages(project, packed) {
+  for (const { importName } of publishablePackages) {
+    if (importName !== 'fabric') {
+      linkPackage(project, importName, packed.get(importName).tarball);
+    }
+  }
 }
 
 try {
@@ -341,7 +365,7 @@ try {
 
   const rootProject = createSmokeProject('root-project');
   linkPackage(rootProject, 'fabric', packed.get('fabric').tarball);
-  expectPackageAbsent(rootProject, '@fabricjs/core');
+  linkWorkspacePackages(rootProject, packed);
 
   linkRuntimeDependency(rootProject, 'canvas');
   linkRuntimeDependency(rootProject, 'jsdom');
@@ -364,14 +388,11 @@ try {
     'fabric/extensions',
     "import { AligningGuidelines, createImageCroppingControls, installOriginWrapperUpdater, addGestures } from 'fabric/extensions'; if (typeof AligningGuidelines !== 'function' || typeof createImageCroppingControls !== 'function' || typeof installOriginWrapperUpdater !== 'function' || typeof addGestures !== 'function') throw new Error('fabric/extensions import failed');",
   );
+  smokeRootFacadeCoreIdentity(rootProject, packed.get('fabric').tarball);
 
   const splitProject = createSmokeProject('split-project');
   expectPackageAbsent(splitProject, 'fabric');
-  for (const { importName } of publishablePackages) {
-    if (importName !== 'fabric') {
-      linkPackage(splitProject, importName, packed.get(importName).tarball);
-    }
-  }
+  linkWorkspacePackages(splitProject, packed);
 
   linkRuntimeDependency(splitProject, 'canvas');
   linkRuntimeDependency(splitProject, 'jsdom');
@@ -413,11 +434,7 @@ try {
     '@fabricjs/westures-integration',
     "import { addGestures, pinchEventHandler } from '@fabricjs/westures-integration'; if (typeof addGestures !== 'function' || typeof pinchEventHandler !== 'function') throw new Error('@fabricjs/westures-integration import failed');",
   );
-  smokeRootFacadeCoreIdentity(
-    splitProject,
-    packedManifests.get('fabric'),
-    packed.get('fabric').tarball,
-  );
+  smokeRootFacadeCoreIdentity(splitProject, packed.get('fabric').tarball);
 
   log('Cleaning temp directory');
   fs.rmSync(tmp, { recursive: true, force: true });

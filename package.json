@@ -101,6 +101,14 @@
     "vitest": "4.1.8",
     "westures": "^1.1.1"
   },
+  "dependencies": {
+    "@fabricjs/aligning-guidelines": "workspace:^",
+    "@fabricjs/browser": "workspace:^",
+    "@fabricjs/cropping-controls": "workspace:^",
+    "@fabricjs/data-updaters": "workspace:^",
+    "@fabricjs/gradient-controls": "workspace:^",
+    "@fabricjs/westures-integration": "workspace:^"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
@@ -141,10 +149,10 @@
       "default": null
     },
     "./node": {
-      "node": "./dist/index.node.cjs",
       "types": "./dist/index.node.d.ts",
       "import": "./dist/index.node.mjs",
       "require": "./dist/index.node.cjs",
+      "node": "./dist/index.node.cjs",
       "default": "./dist/index.node.cjs"
     },
     "./extensions": {
@@ -156,8 +164,7 @@
     }
   },
   "optionalDependencies": {
-    "canvas": "^3.2.0",
-    "jsdom": "^26.1.0"
+    "@fabricjs/node": "workspace:^"
   },
   "lint-staged": {
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
