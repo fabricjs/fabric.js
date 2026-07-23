@@ -124,9 +124,16 @@ function expectExcludesPrefix(list, prefix, label) {
 
 function verifyRootTarball(list) {
   log('Checking root fabric tarball contents');
+  expectIncludes(list, 'package/dist/index.js', 'fabric');
   expectIncludes(list, 'package/dist/index.min.mjs', 'fabric');
+  expectIncludes(list, 'package/dist/index.min.js', 'fabric');
   expectIncludes(list, 'package/dist/index.node.mjs', 'fabric');
   expectIncludes(list, 'package/dist-extensions/index.mjs', 'fabric');
+  expectIncludes(
+    list,
+    'package/dist-extensions/fabric-extensions.min.js',
+    'fabric',
+  );
   expectIncludes(list, 'package/extensions/README.MD', 'fabric');
   expectExcludesPrefix(list, 'package/packages/', 'fabric');
   expectExcludesPrefix(list, 'package/src/', 'fabric');
@@ -222,6 +229,10 @@ function verifyWorkspaceTarball(importName, list) {
   expectIncludes(list, 'package/README.md', importName);
   expectIncludes(list, 'package/dist/index.mjs', importName);
   expectIncludes(list, 'package/dist/index.d.ts', importName);
+  if (importName === '@fabricjs/browser') {
+    expectIncludes(list, 'package/dist/index.js', importName);
+    expectIncludes(list, 'package/dist/index.min.js', importName);
+  }
   expectExcludesPrefix(list, 'package/src/', importName);
   expectExcludesPrefix(list, 'package/test/', importName);
   if (list.some((file) => /\.(spec|test)\.(ts|tsx|js|jsx)$/.test(file))) {

@@ -27,6 +27,17 @@ function removeFacadeDependencyDeclarations() {
   }
 }
 
+function copyBrowserStandaloneArtifacts() {
+  const sourceDir = packageDist('browser');
+  const targetDir = path.resolve(wd, 'dist');
+  for (const file of ['index.js', 'index.js.map', 'index.min.js', 'index.min.js.map']) {
+    const source = path.resolve(sourceDir, file);
+    if (fs.existsSync(source)) {
+      fs.copyFileSync(source, path.resolve(targetDir, file));
+    }
+  }
+}
+
 function removeFiles(dir, predicate) {
   if (!fs.existsSync(dir)) {
     return;
@@ -152,6 +163,7 @@ export function build({ watch, fast, input, output, stats = false } = {}) {
   } else {
     try {
       cp.execSync(cmd, processOptions);
+      copyBrowserStandaloneArtifacts();
       // Generate .d.ts files after successful rollup build
       buildTypes();
       stageWorkspacePackages();

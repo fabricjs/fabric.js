@@ -53,6 +53,32 @@ function workspacePackageBuildConfig({ directory, bundle }) {
   };
 }
 
+function browserStandaloneBuildConfig() {
+  return {
+    input: ['./packages/browser/src/index.ts'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/browser/dist/index.js'),
+        name: 'fabric',
+        format: 'umd',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve('./packages/browser/dist/index.min.js'),
+            name: 'fabric',
+            format: 'umd',
+            sourcemap: true,
+            minify: true,
+          }
+        : null,
+    ],
+    onwarn,
+  };
+}
+
 // https://rolldown.rs/guide/getting-started
 export default [
   {
@@ -75,29 +101,6 @@ export default [
             format: 'es',
             sourcemap: true,
             minify: true,
-          }
-        : null,
-      // umd module in bundle, the cdn one for fiddles
-      // deprecated, this will be available only minified for cdn.
-      {
-        file: path.resolve(dirname, `${basename}.js`),
-        name: 'fabric',
-        format: 'umd',
-        sourcemap: true,
-        globals: {
-          '@fabricjs/browser': 'fabricBrowser',
-        },
-      },
-      Number(process.env.MINIFY)
-        ? {
-            file: path.resolve(dirname, `${basename}.min.js`),
-            name: 'fabric',
-            format: 'umd',
-            sourcemap: true,
-            minify: true,
-            globals: {
-              '@fabricjs/browser': 'fabricBrowser',
-            },
           }
         : null,
     ],
@@ -148,6 +151,7 @@ export default [
   },
   // WORKSPACE PACKAGES
   ...buildableWorkspacePackages.map(workspacePackageBuildConfig),
+  browserStandaloneBuildConfig(),
   // EXTENSIONS
 
   {
@@ -171,18 +175,26 @@ export default [
         entryFileNames: '[name].mjs',
         sourcemap: true,
       },
-      // umd module, the cdn one for fiddles, minified
+    ],
+    onwarn,
+  },
+  {
+    input: ['./extensions/index.ts'],
+    external: ['@fabricjs/core', 'westures'],
+    tsconfig: './tsconfig-extensions.json',
+    transform,
+    output: [
       {
         file: path.resolve('./dist-extensions', `fabric-extensions.min.js`),
         name: 'fabricExtensions',
         format: 'umd',
         sourcemap: true,
         globals: {
-          '@fabricjs/aligning-guidelines': 'fabricAligningGuidelines',
-          '@fabricjs/cropping-controls': 'fabricCroppingControls',
-          '@fabricjs/data-updaters': 'fabricDataUpdaters',
-          '@fabricjs/gradient-controls': 'fabricGradientControls',
-          '@fabricjs/westures-integration': 'fabricWesturesIntegration',
+          '@fabricjs/core': 'fabric',
+          westures: 'westures',
+        },
+        paths: {
+          '@fabricjs/core': 'fabric',
         },
         minify: true,
       },
