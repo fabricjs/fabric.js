@@ -62,6 +62,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Install system deps for node canvas
+        run: sudo apt-get update && sudo apt-get install --yes libgif-dev libpng-dev libpango1.0-dev libjpeg-dev librsvg2-dev libcairo2-dev
       - run: pnpm install --frozen-lockfile --prefer-offline
       - run: pnpm run build
       - name: Smoke test packages

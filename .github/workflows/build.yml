@@ -15,6 +15,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
+          install-system-deps: true
       - run: pnpm run build
       - name: Smoke test packages
         run: pnpm run smoke:packages
