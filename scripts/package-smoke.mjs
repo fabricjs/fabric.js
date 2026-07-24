@@ -225,6 +225,20 @@ function verifyCorePackageManifest(pkg) {
   log('@fabricjs/core package manifest looks correct');
 }
 
+function verifyBrowserPackageManifest(pkg) {
+  log('Checking @fabricjs/browser package manifest');
+  expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/browser');
+  expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/browser');
+  log('@fabricjs/browser package manifest looks correct');
+}
+
+function verifyNodePackageManifest(pkg) {
+  log('Checking @fabricjs/node package manifest');
+  expectDependency(pkg, 'canvas', '@fabricjs/node');
+  expectDependency(pkg, 'jsdom', '@fabricjs/node');
+  log('@fabricjs/node package manifest looks correct');
+}
+
 function verifyWorkspaceTarball(importName, list) {
   log(`Checking ${importName} tarball contents`);
   expectIncludes(list, 'package/package.json', importName);
@@ -344,8 +358,18 @@ function smokeRootFacadeCoreIdentity(project, fabricTarball) {
   );
   smokeImport(
     project,
+    'fabric and @fabricjs/browser core identity',
+    "import { Rect as FabricRect } from 'fabric'; import { Rect as BrowserRect } from '@fabricjs/browser'; if (FabricRect !== BrowserRect) throw new Error('fabric does not share @fabricjs/browser runtime');",
+  );
+  smokeImport(
+    project,
     'fabric/node and @fabricjs/node core identity',
     "import { Rect as FabricNodeRect } from 'fabric/node'; import { Rect as NodeRect } from '@fabricjs/node'; if (FabricNodeRect !== NodeRect) throw new Error('fabric/node does not share @fabricjs/node runtime');",
+  );
+  smokeImport(
+    project,
+    '@fabricjs/browser and @fabricjs/node core identity',
+    "import { Rect as BrowserRect } from '@fabricjs/browser'; import { Rect as NodeRect } from '@fabricjs/node'; if (BrowserRect !== NodeRect) throw new Error('@fabricjs/browser and @fabricjs/node do not share @fabricjs/core runtime');",
   );
 }
 
@@ -375,6 +399,8 @@ try {
   );
   verifyRootPackageManifest(packedManifests.get('fabric'));
   verifyCorePackageManifest(packedManifests.get('@fabricjs/core'));
+  verifyBrowserPackageManifest(packedManifests.get('@fabricjs/browser'));
+  verifyNodePackageManifest(packedManifests.get('@fabricjs/node'));
   for (const { importName } of publishablePackages) {
     if (importName !== 'fabric') {
       verifyWorkspaceTarball(
