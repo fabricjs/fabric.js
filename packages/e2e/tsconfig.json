@@ -20,11 +20,11 @@
     "paths": {
       "@fabricjs/aligning-guidelines": ["../aligning-guidelines/dist/index"],
       "@fabricjs/browser": ["../browser/dist/index"],
-      "@fabricjs/core": ["../../dist/packages/core/src/index"],
+      "@fabricjs/core": ["../core/dist/index"],
       "@fabricjs/cropping-controls": ["../cropping-controls/dist/index"],
       "@fabricjs/data-updaters": ["../data-updaters/dist/index"],
       "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
-      "@fabricjs/node": ["../../dist/index.node"],
+      "@fabricjs/node": ["../node/dist/index"],
       "@fabricjs/westures-integration": ["../westures-integration/dist/index"],
       "fabric": ["../../dist/index"],
       "fabric/extensions": ["../../dist-extensions/extensions/index"],
