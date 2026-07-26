@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump postcss from 8.5.15 to 8.5.23 [#11048](https://github.com/fabricjs/fabric.js/pull/11048)
 - refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
 - fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
 - refactor(env): move runtime env setup to packages [#11039](https://github.com/fabricjs/fabric.js/pull/11039)
