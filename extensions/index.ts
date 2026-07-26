@@ -1,6 +1,9 @@
 export { AligningGuidelines } from '../packages/aligning-guidelines/src';
 export type * from '../packages/aligning-guidelines/src/typedefs';
 
+export { CenteringGuidelines } from './centering_guidelines';
+export type { CenteringGuidelinesConfig } from './centering_guidelines';
+
 export {
   originUpdaterWrapper,
   installOriginWrapperUpdater,
