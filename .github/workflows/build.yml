@@ -42,8 +42,8 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const { packageStats } = await import('${{ github.workspace }}/scripts/packageStats.mjs');
-            const size = packageStats();
+            const { buildStats } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const size = buildStats();
             return JSON.stringify({
               // Keep the default-branch build-stats workflow compatible while
               // this PR's workflow artifact uses the new package metrics.
@@ -52,8 +52,8 @@ jobs:
                   name,
                   {
                     ...stats,
-                    bundled: stats.tarball,
-                    minified: stats.unpacked,
+                    bundled: stats.generated || 0,
+                    minified: stats.minified || 0,
                   },
                 ]),
               ),

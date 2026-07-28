@@ -52,9 +52,9 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const { packageStats } = await import('${{ github.workspace }}/scripts/packageStats.mjs');
+            const { buildStats } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
             return JSON.stringify({
-              size: packageStats(),
+              size: buildStats(),
             });
       - name: process
         id: stats-message
