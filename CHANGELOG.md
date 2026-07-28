@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.2.0 [#11051](https://github.com/fabricjs/fabric.js/pull/11051)
 - refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
 - fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
 - refactor(env): move runtime env setup to packages [#11039](https://github.com/fabricjs/fabric.js/pull/11039)
