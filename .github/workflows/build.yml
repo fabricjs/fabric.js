@@ -42,20 +42,21 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const fs = require('fs');
             const { packageStats } = await import('${{ github.workspace }}/scripts/packageStats.mjs');
             const size = packageStats();
             return JSON.stringify({
-              size: {
-                ...size,
-                // Keep the default-branch build-stats workflow compatible while
-                // this PR's workflow artifact uses the new package metrics.
-                fabric: {
-                  ...size.fabric,
-                  bundled: fs.statSync('dist/index.mjs').size,
-                  minified: fs.statSync('dist/index.min.js').size,
-                },
-              },
+              // Keep the default-branch build-stats workflow compatible while
+              // this PR's workflow artifact uses the new package metrics.
+              size: Object.fromEntries(
+                Object.entries(size).map(([name, stats]) => [
+                  name,
+                  {
+                    ...stats,
+                    bundled: stats.tarball,
+                    minified: stats.unpacked,
+                  },
+                ]),
+              ),
             });
       - name: Create the artifact for stats
         run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
