@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump eslint from 10.1.0 to 10.8.0 [#11053](https://github.com/fabricjs/fabric.js/pull/11053)
 - refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
 - fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
 - refactor(env): move runtime env setup to packages [#11039](https://github.com/fabricjs/fabric.js/pull/11039)
