@@ -13,18 +13,18 @@ function printSizeKByte(a, b) {
 
 export async function run_simple({ original, modified }) {
   const table = [
-    ['file / KB (diff)', 'bundled', 'minified'],
+    ['package / KiB (diff)', 'tarball', 'unpacked'],
     ['---', '---', '---'],
     ...Object.entries(modified.size).map(([file, _modified]) => {
       const _original = {
-        bundled: 0,
-        minified: 0,
+        tarball: 0,
+        unpacked: 0,
         ...(original.size[file] || {}),
       };
       return [
         file,
-        printSizeKByte(_original.bundled, _modified.bundled),
-        printSizeKByte(_original.minified, _modified.minified),
+        printSizeKByte(_original.tarball, _modified.tarball),
+        printSizeKByte(_original.unpacked, _modified.unpacked),
       ];
     }),
   ];

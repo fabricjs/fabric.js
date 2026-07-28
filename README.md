@@ -49,6 +49,18 @@ Fabric.js does not use polyfills by default, or tries to keep it at minimum. the
 
 ## Installation
 
+For new applications, install the environment-specific package:
+
+```bash
+# Browser applications
+npm install @fabricjs/browser
+
+# Node.js applications
+npm install @fabricjs/node
+```
+
+The legacy `fabric` package remains supported for existing applications:
+
 ```bash
 $ npm install fabric --save
 # or use yarn
@@ -56,6 +68,40 @@ $ yarn add fabric
 # or use pnpm
 $ pnpm add fabric
 ```
+
+## Packages and migration
+
+| Package             | Role                                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `fabric`            | Legacy compatibility facade. It re-exports `@fabricjs/browser`.                                                                 |
+| `@fabricjs/browser` | Preferred entrypoint for new browser applications.                                                                              |
+| `@fabricjs/node`    | Preferred entrypoint for new Node.js applications. It owns the Node-specific dependencies.                                      |
+| `@fabricjs/core`    | Shared, environment-neutral runtime used by the browser and Node packages. It is intended for advanced and shared dependencies. |
+| Extension packages  | Optional features imported individually, such as `@fabricjs/aligning-guidelines`.                                               |
+
+Existing imports continue to work:
+
+```js
+import { Canvas } from 'fabric';
+import { StaticCanvas } from 'fabric/node';
+```
+
+New applications should prefer the explicit entrypoints:
+
+```js
+import { Canvas } from '@fabricjs/browser';
+import { StaticCanvas } from '@fabricjs/node';
+import { AligningGuidelines } from '@fabricjs/aligning-guidelines';
+```
+
+The `fabric` and `fabric/node` facades share the same class identities as
+their corresponding workspace packages. Keep `fabric` and every
+`@fabricjs/*` package on matching versions; mixing mismatched versions can
+load separate runtimes.
+
+`@fabricjs/core` has no Node-specific runtime dependencies, but it is not a
+DOM-free API. Advanced consumers using core APIs that touch DOM or canvas must
+provide a suitable environment implementation.
 
 #### Browser
 
@@ -68,7 +114,7 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 We strongly recommend to run your applications only LTS versions of node.
 
-Said so the minimum supported version of node is 18.
+Said so the minimum supported version of node is 20.
 We bump up the minimum version of node with a Major release only when the dependencies force us to do so.
 
 Fabric.js depends on [node-canvas][node_canvas] for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom][jsdom] for a `window` implementation on node.
@@ -79,11 +125,17 @@ Follow these [instructions][node_canvas_install] to get `node-canvas` up and run
 ## Quick Start
 
 ```js
-// v6
-import { Canvas, Rect } from 'fabric'; // browser
-import { StaticCanvas, Rect } from 'fabric/node'; // node
+// Preferred entrypoints for new applications
+import { Canvas } from '@fabricjs/browser';
+import { StaticCanvas } from '@fabricjs/node';
+```
 
-// v5
+```js
+// Supported compatibility entrypoints
+import { Canvas } from 'fabric';
+import { StaticCanvas } from 'fabric/node';
+
+// v5 compatibility
 import { fabric } from 'fabric';
 ```
 

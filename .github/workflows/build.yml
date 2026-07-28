@@ -22,9 +22,6 @@ jobs:
   stats:
     name: Build stats
     runs-on: ubuntu-24.04
-    env:
-      minified: dist/index.min.js
-      bundled: dist/index.mjs
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
@@ -46,8 +43,19 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs');
+            const { packageStats } = await import('${{ github.workspace }}/scripts/packageStats.mjs');
+            const size = packageStats();
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync(process.env.minified).size, bundled: fs.statSync(process.env.bundled).size } }
+              size: {
+                ...size,
+                // Keep the default-branch build-stats workflow compatible while
+                // this PR's workflow artifact uses the new package metrics.
+                fabric: {
+                  ...size.fabric,
+                  bundled: fs.statSync('dist/index.mjs').size,
+                  minified: fs.statSync('dist/index.min.js').size,
+                },
+              },
             });
       - name: Create the artifact for stats
         run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
