@@ -17,6 +17,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@fabricjs/core': resolve(__dirname, './fabric.ts'),
+      '@fabricjs/node': resolve(__dirname, './packages/node/src/index.ts'),
       fabric: resolve(__dirname, './fabric.ts'),
     },
   },

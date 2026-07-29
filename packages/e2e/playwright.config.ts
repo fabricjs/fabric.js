@@ -6,6 +6,9 @@ import { devices } from '@playwright/test';
  */
 const config: PlaywrightTestConfig = {
   testDir: './tests',
+  // Keep workspace package imports on their built artifacts when Playwright
+  // resolves imports from symlinked workspace packages.
+  tsconfig: './tsconfig.json',
   /* Transpiles app files */
   globalSetup: './playwright.setup.ts',
   /* Maximum time one test can run for. */

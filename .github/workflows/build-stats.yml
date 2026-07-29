@@ -12,8 +12,6 @@ jobs:
       pull-requests: write
     env:
       unique_id: <!-- build-stats -->
-      minified: dist/index.min.js
-      bundled: dist/index.mjs
     name: Build stats
     runs-on: ubuntu-24.04
     steps:
@@ -54,9 +52,9 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const fs = require('fs');
+            const { buildStats } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync(process.env.minified).size, bundled: fs.statSync(process.env.bundled).size } }
+              size: buildStats(),
             });
       - name: process
         id: stats-message

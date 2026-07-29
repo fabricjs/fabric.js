@@ -53,38 +53,37 @@ function workspacePackageBuildConfig({ directory, bundle }) {
   };
 }
 
-// https://rolldown.rs/guide/getting-started
-export default [
-  {
-    input: ['./fabric.ts'],
-    tsconfig: './tsconfig.build.json',
+function browserStandaloneBuildConfig() {
+  return {
+    input: ['./packages/browser/src/index.ts'],
+    tsconfig: './tsconfig.packages.json',
     transform,
     output: [
-      // es modules in files
       {
-        dir: path.resolve(dirname),
-        format: 'es',
-        preserveModules: true,
-        preserveModulesRoot: './packages/core',
-        entryFileNames: '[name].mjs',
+        file: path.resolve('./packages/browser/dist/index.js'),
+        name: 'fabric',
+        format: 'umd',
         sourcemap: true,
       },
       Number(process.env.MINIFY)
         ? {
-            dir: path.resolve(dirname),
-            format: 'es',
-            preserveModules: true,
-            preserveModulesRoot: './packages/core',
-            entryFileNames: '[name].min.mjs',
+            file: path.resolve('./packages/browser/dist/index.min.js'),
+            name: 'fabric',
+            format: 'umd',
             sourcemap: true,
             minify: true,
           }
         : null,
     ],
     onwarn,
-  },
+  };
+}
+
+// https://rolldown.rs/guide/getting-started
+export default [
   {
     input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    external: ['@fabricjs/browser'],
     tsconfig: './tsconfig.build.json',
     transform,
     output: [
@@ -104,19 +103,24 @@ export default [
             minify: true,
           }
         : null,
-      // umd module in bundle, the cdn one for fiddles
-      // deprecated, this will be available only minified for cdn.
+    ],
+    onwarn,
+  },
+  {
+    input: ['./index.ts'],
+    external: ['@fabricjs/browser'],
+    tsconfig: './tsconfig.build.json',
+    transform,
+    output: [
       {
-        file: path.resolve(dirname, `${basename}.js`),
-        name: 'fabric',
-        format: 'umd',
+        file: path.resolve(dirname, 'fabric.mjs'),
+        format: 'es',
         sourcemap: true,
       },
       Number(process.env.MINIFY)
         ? {
-            file: path.resolve(dirname, `${basename}.min.js`),
-            name: 'fabric',
-            format: 'umd',
+            file: path.resolve(dirname, 'fabric.min.mjs'),
+            format: 'es',
             sourcemap: true,
             minify: true,
           }
@@ -134,7 +138,14 @@ export default [
         format: 'es',
         sourcemap: true,
       },
-      // deprecated remove
+    ],
+    onwarn,
+    external: ['@fabricjs/node'],
+  },
+  {
+    input: ['./packages/node/src/index.ts'],
+    tsconfig: './tsconfig.packages.json',
+    output: [
       {
         file: path.resolve(dirname, `${basename}.node.cjs`),
         name: 'fabric',
@@ -147,11 +158,18 @@ export default [
   },
   // WORKSPACE PACKAGES
   ...buildableWorkspacePackages.map(workspacePackageBuildConfig),
+  browserStandaloneBuildConfig(),
   // EXTENSIONS
 
   {
     input: ['./extensions/index.ts'],
-    external: ['fabric', '@fabricjs/core', 'westures'],
+    external: [
+      '@fabricjs/aligning-guidelines',
+      '@fabricjs/cropping-controls',
+      '@fabricjs/data-updaters',
+      '@fabricjs/gradient-controls',
+      '@fabricjs/westures-integration',
+    ],
     tsconfig: './tsconfig-extensions.json',
     transform,
     output: [
@@ -163,18 +181,22 @@ export default [
         preserveModulesRoot: 'extensions',
         entryFileNames: '[name].mjs',
         sourcemap: true,
-        paths: {
-          '@fabricjs/core': 'fabric',
-        },
       },
-      // umd module, the cdn one for fiddles, minified
+    ],
+    onwarn,
+  },
+  {
+    input: ['./extensions/index.ts'],
+    external: ['@fabricjs/core', 'westures'],
+    tsconfig: './tsconfig-extensions.json',
+    transform,
+    output: [
       {
         file: path.resolve('./dist-extensions', `fabric-extensions.min.js`),
         name: 'fabricExtensions',
         format: 'umd',
         sourcemap: true,
         globals: {
-          fabric: 'fabric',
           '@fabricjs/core': 'fabric',
           westures: 'westures',
         },

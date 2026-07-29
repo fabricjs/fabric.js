@@ -7,6 +7,25 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@fabricjs/aligning-guidelines':
+        specifier: workspace:^
+        version: link:packages/aligning-guidelines
+      '@fabricjs/browser':
+        specifier: workspace:^
+        version: link:packages/browser
+      '@fabricjs/cropping-controls':
+        specifier: workspace:^
+        version: link:packages/cropping-controls
+      '@fabricjs/data-updaters':
+        specifier: workspace:^
+        version: link:packages/data-updaters
+      '@fabricjs/gradient-controls':
+        specifier: workspace:^
+        version: link:packages/gradient-controls
+      '@fabricjs/westures-integration':
+        specifier: workspace:^
+        version: link:packages/westures-integration
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -84,12 +103,9 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
     optionalDependencies:
-      canvas:
-        specifier: ^3.2.0
-        version: 3.2.3
-      jsdom:
-        specifier: ^26.1.0
-        version: 26.1.0(canvas@3.2.3)
+      '@fabricjs/node':
+        specifier: workspace:^
+        version: link:packages/node
 
   packages/aligning-guidelines:
     dependencies:

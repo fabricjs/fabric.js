@@ -15,15 +15,13 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
+          install-system-deps: true
       - run: pnpm run build
       - name: Smoke test packages
         run: pnpm run smoke:packages
   stats:
     name: Build stats
     runs-on: ubuntu-24.04
-    env:
-      minified: dist/index.min.js
-      bundled: dist/index.mjs
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
@@ -44,9 +42,21 @@ jobs:
         with:
           result-encoding: string
           script: |
-            const fs = require('fs');
+            const { buildStats } = await import('${{ github.workspace }}/scripts/buildStats.mjs');
+            const size = buildStats();
             return JSON.stringify({
-              size: { fabric: { minified: fs.statSync(process.env.minified).size, bundled: fs.statSync(process.env.bundled).size } }
+              // Keep the default-branch build-stats workflow compatible while
+              // this PR's workflow artifact uses the new package metrics.
+              size: Object.fromEntries(
+                Object.entries(size).map(([name, stats]) => [
+                  name,
+                  {
+                    ...stats,
+                    bundled: stats.generated || 0,
+                    minified: stats.minified || 0,
+                  },
+                ]),
+              ),
             });
       - name: Create the artifact for stats
         run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt

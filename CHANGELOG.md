@@ -2,6 +2,7 @@
 
 ## [next]
 
+- refactor(): Change the standard fabric package to be a combination of the new packages [#11045](https://github.com/fabricjs/fabric.js/pull/11045)
 - chore(deps): bump postcss from 8.5.15 to 8.5.24 [#11054](https://github.com/fabricjs/fabric.js/pull/11054)
 - Refresh text measuring context when env document changes [#11046](https://github.com/fabricjs/fabric.js/pull/11046)
 - refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)

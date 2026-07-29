@@ -124,12 +124,27 @@ function expectExcludesPrefix(list, prefix, label) {
 
 function verifyRootTarball(list) {
   log('Checking root fabric tarball contents');
+  expectIncludes(list, 'package/dist/index.js', 'fabric');
   expectIncludes(list, 'package/dist/index.min.mjs', 'fabric');
+  expectIncludes(list, 'package/dist/index.min.js', 'fabric');
   expectIncludes(list, 'package/dist/index.node.mjs', 'fabric');
   expectIncludes(list, 'package/dist-extensions/index.mjs', 'fabric');
+  expectIncludes(
+    list,
+    'package/dist-extensions/fabric-extensions.min.js',
+    'fabric',
+  );
   expectIncludes(list, 'package/extensions/README.MD', 'fabric');
   expectExcludesPrefix(list, 'package/packages/', 'fabric');
   expectExcludesPrefix(list, 'package/src/', 'fabric');
+  expectExcludesPrefix(list, 'package/dist/src/', 'fabric');
+  expectExcludesPrefix(list, 'package/dist/packages/', 'fabric');
+  expectExcludesPrefix(list, 'package/dist-extensions/packages/', 'fabric');
+  expectExcludesPrefix(
+    list,
+    'package/dist-extensions/linear_gradient_controls/',
+    'fabric',
+  );
   expectExcludesPrefix(list, 'package/.github/', 'fabric');
   if (list.some((file) => /^package\/extensions\/.+\/.*\.ts$/.test(file))) {
     throw new Error(
@@ -170,15 +185,36 @@ function expectNoDeclaredRuntimeDependency(pkg, dependencyName, label) {
   }
 }
 
-function hasDeclaredRuntimeDependency(pkg, dependencyName) {
-  return ['dependencies', 'peerDependencies', 'optionalDependencies'].some(
-    (field) => pkg[field]?.[dependencyName],
-  );
+function expectDependency(pkg, dependencyName, label) {
+  if (!pkg.dependencies?.[dependencyName]) {
+    throw new Error(
+      `${label} should declare ${dependencyName} in dependencies`,
+    );
+  }
+}
+
+function expectOptionalDependency(pkg, dependencyName, label) {
+  if (!pkg.optionalDependencies?.[dependencyName]) {
+    throw new Error(
+      `${label} should declare ${dependencyName} in optionalDependencies`,
+    );
+  }
 }
 
 function verifyRootPackageManifest(pkg) {
   log('Checking root fabric package manifest');
   expectNoDeclaredRuntimeDependency(pkg, 'westures', 'fabric');
+  for (const dependency of [
+    '@fabricjs/aligning-guidelines',
+    '@fabricjs/browser',
+    '@fabricjs/cropping-controls',
+    '@fabricjs/data-updaters',
+    '@fabricjs/gradient-controls',
+    '@fabricjs/westures-integration',
+  ]) {
+    expectDependency(pkg, dependency, 'fabric');
+  }
+  expectOptionalDependency(pkg, '@fabricjs/node', 'fabric');
   log('Root fabric package manifest looks correct');
 }
 
@@ -189,12 +225,18 @@ function verifyCorePackageManifest(pkg) {
   log('@fabricjs/core package manifest looks correct');
 }
 
-function isFacadeRootPackage(pkg) {
-  return (
-    hasDeclaredRuntimeDependency(pkg, '@fabricjs/core') ||
-    hasDeclaredRuntimeDependency(pkg, '@fabricjs/browser') ||
-    hasDeclaredRuntimeDependency(pkg, '@fabricjs/node')
-  );
+function verifyBrowserPackageManifest(pkg) {
+  log('Checking @fabricjs/browser package manifest');
+  expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/browser');
+  expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/browser');
+  log('@fabricjs/browser package manifest looks correct');
+}
+
+function verifyNodePackageManifest(pkg) {
+  log('Checking @fabricjs/node package manifest');
+  expectDependency(pkg, 'canvas', '@fabricjs/node');
+  expectDependency(pkg, 'jsdom', '@fabricjs/node');
+  log('@fabricjs/node package manifest looks correct');
 }
 
 function verifyWorkspaceTarball(importName, list) {
@@ -203,6 +245,10 @@ function verifyWorkspaceTarball(importName, list) {
   expectIncludes(list, 'package/README.md', importName);
   expectIncludes(list, 'package/dist/index.mjs', importName);
   expectIncludes(list, 'package/dist/index.d.ts', importName);
+  if (importName === '@fabricjs/browser') {
+    expectIncludes(list, 'package/dist/index.js', importName);
+    expectIncludes(list, 'package/dist/index.min.js', importName);
+  }
   expectExcludesPrefix(list, 'package/src/', importName);
   expectExcludesPrefix(list, 'package/test/', importName);
   if (list.some((file) => /\.(spec|test)\.(ts|tsx|js|jsx)$/.test(file))) {
@@ -252,8 +298,11 @@ function expectPackageAbsent(project, importName) {
 
 function linkRuntimeDependency(project, name) {
   log(`Linking runtime dependency ${name} into ${project.name}`);
-  const source = path.join(wd, 'node_modules', name);
-  if (!fs.existsSync(source)) {
+  const source = [
+    path.join(wd, 'node_modules', name),
+    path.join(wd, 'packages', 'node', 'node_modules', name),
+  ].find((candidate) => fs.existsSync(candidate));
+  if (!source) {
     throw new Error(
       `Missing ${name} in root node_modules. Run pnpm install before package smoke.`,
     );
@@ -267,6 +316,14 @@ function smokeImport(project, label, source) {
     cwd: project.projectDir,
   });
   log(`Imported ${label} in ${project.name}`);
+}
+
+function smokeRequire(project, label, source) {
+  log(`Requiring ${label} in ${project.name}`);
+  run('node', ['-e', source], {
+    cwd: project.projectDir,
+  });
+  log(`Required ${label} in ${project.name}`);
 }
 
 function smokeSplitCoreIdentity(project) {
@@ -292,13 +349,7 @@ function smokeSplitCoreIdentity(project) {
   );
 }
 
-function smokeRootFacadeCoreIdentity(project, rootPkg, fabricTarball) {
-  if (!isFacadeRootPackage(rootPkg)) {
-    log(
-      'Skipping root fabric facade identity checks; root package is not a facade yet',
-    );
-    return;
-  }
+function smokeRootFacadeCoreIdentity(project, fabricTarball) {
   linkPackage(project, 'fabric', fabricTarball);
   smokeImport(
     project,
@@ -307,9 +358,27 @@ function smokeRootFacadeCoreIdentity(project, rootPkg, fabricTarball) {
   );
   smokeImport(
     project,
+    'fabric and @fabricjs/browser core identity',
+    "import { Rect as FabricRect } from 'fabric'; import { Rect as BrowserRect } from '@fabricjs/browser'; if (FabricRect !== BrowserRect) throw new Error('fabric does not share @fabricjs/browser runtime');",
+  );
+  smokeImport(
+    project,
     'fabric/node and @fabricjs/node core identity',
     "import { Rect as FabricNodeRect } from 'fabric/node'; import { Rect as NodeRect } from '@fabricjs/node'; if (FabricNodeRect !== NodeRect) throw new Error('fabric/node does not share @fabricjs/node runtime');",
   );
+  smokeImport(
+    project,
+    '@fabricjs/browser and @fabricjs/node core identity',
+    "import { Rect as BrowserRect } from '@fabricjs/browser'; import { Rect as NodeRect } from '@fabricjs/node'; if (BrowserRect !== NodeRect) throw new Error('@fabricjs/browser and @fabricjs/node do not share @fabricjs/core runtime');",
+  );
+}
+
+function linkWorkspacePackages(project, packed) {
+  for (const { importName } of publishablePackages) {
+    if (importName !== 'fabric') {
+      linkPackage(project, importName, packed.get(importName).tarball);
+    }
+  }
 }
 
 try {
@@ -330,6 +399,8 @@ try {
   );
   verifyRootPackageManifest(packedManifests.get('fabric'));
   verifyCorePackageManifest(packedManifests.get('@fabricjs/core'));
+  verifyBrowserPackageManifest(packedManifests.get('@fabricjs/browser'));
+  verifyNodePackageManifest(packedManifests.get('@fabricjs/node'));
   for (const { importName } of publishablePackages) {
     if (importName !== 'fabric') {
       verifyWorkspaceTarball(
@@ -341,7 +412,7 @@ try {
 
   const rootProject = createSmokeProject('root-project');
   linkPackage(rootProject, 'fabric', packed.get('fabric').tarball);
-  expectPackageAbsent(rootProject, '@fabricjs/core');
+  linkWorkspacePackages(rootProject, packed);
 
   linkRuntimeDependency(rootProject, 'canvas');
   linkRuntimeDependency(rootProject, 'jsdom');
@@ -359,19 +430,21 @@ try {
     'fabric/node',
     "import { StaticCanvas, Rect } from 'fabric/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node import failed');",
   );
+  smokeRequire(
+    rootProject,
+    'fabric/node CommonJS',
+    "const { StaticCanvas, Rect } = require('fabric/node'); const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node CommonJS require failed');",
+  );
   smokeImport(
     rootProject,
     'fabric/extensions',
     "import { AligningGuidelines, createImageCroppingControls, installOriginWrapperUpdater, addGestures } from 'fabric/extensions'; if (typeof AligningGuidelines !== 'function' || typeof createImageCroppingControls !== 'function' || typeof installOriginWrapperUpdater !== 'function' || typeof addGestures !== 'function') throw new Error('fabric/extensions import failed');",
   );
+  smokeRootFacadeCoreIdentity(rootProject, packed.get('fabric').tarball);
 
   const splitProject = createSmokeProject('split-project');
   expectPackageAbsent(splitProject, 'fabric');
-  for (const { importName } of publishablePackages) {
-    if (importName !== 'fabric') {
-      linkPackage(splitProject, importName, packed.get(importName).tarball);
-    }
-  }
+  linkWorkspacePackages(splitProject, packed);
 
   linkRuntimeDependency(splitProject, 'canvas');
   linkRuntimeDependency(splitProject, 'jsdom');
@@ -413,11 +486,7 @@ try {
     '@fabricjs/westures-integration',
     "import { addGestures, pinchEventHandler } from '@fabricjs/westures-integration'; if (typeof addGestures !== 'function' || typeof pinchEventHandler !== 'function') throw new Error('@fabricjs/westures-integration import failed');",
   );
-  smokeRootFacadeCoreIdentity(
-    splitProject,
-    packedManifests.get('fabric'),
-    packed.get('fabric').tarball,
-  );
+  smokeRootFacadeCoreIdentity(splitProject, packed.get('fabric').tarball);
 
   log('Cleaning temp directory');
   fs.rmSync(tmp, { recursive: true, force: true });

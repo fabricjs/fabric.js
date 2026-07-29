@@ -32,7 +32,18 @@
       "fabric": ["./index"],
       "fabric/node": ["./index.node"],
       "fabric/extensions": ["./extensions/index"],
-      "@fabricjs/core": ["./packages/core/src/index"]
+      "@fabricjs/core": ["./packages/core/src/index"],
+      "@fabricjs/aligning-guidelines": [
+        "./packages/aligning-guidelines/src/index"
+      ],
+      "@fabricjs/browser": ["./packages/browser/src/index"],
+      "@fabricjs/cropping-controls": ["./packages/cropping-controls/src/index"],
+      "@fabricjs/data-updaters": ["./packages/data-updaters/src/index"],
+      "@fabricjs/gradient-controls": ["./packages/gradient-controls/src/index"],
+      "@fabricjs/node": ["./packages/node/src/index"],
+      "@fabricjs/westures-integration": [
+        "./packages/westures-integration/src/index"
+      ]
     },
     // "paths": {} /* Specify a set of entries that re-map imports to additional lookup locations. */,
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
@@ -111,7 +122,7 @@
     "**/*.test.ts"
   ],
   "include": [
-    "extensions/**/*",
+    "extensions/index.ts",
     "packages/westures-integration/src/westures.d.ts"
   ]
 }
