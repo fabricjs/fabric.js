@@ -103,6 +103,20 @@ load separate runtimes.
 DOM-free API. Advanced consumers using core APIs that touch DOM or canvas must
 provide a suitable environment implementation.
 
+### Legacy distribution files
+
+The ESM `fabric` and `fabric/node` entries are small compatibility facades over
+the workspace packages. The legacy standalone files remain available for
+existing usage:
+
+- `dist/index.js` and `dist/index.min.js` are full browser UMD builds from
+  `@fabricjs/browser`, for `<script>` tags and `require('fabric')`.
+- `dist/index.node.cjs` is the legacy CommonJS compatibility build for
+  `require('fabric/node')`.
+
+New ESM applications should continue to import `@fabricjs/browser` or
+`@fabricjs/node` directly.
+
 #### Browser
 
 [![cdnjs](https://img.shields.io/cdnjs/v/fabric.js.svg)][cdnjs]
