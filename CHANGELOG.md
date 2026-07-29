@@ -5,6 +5,7 @@
 - doc(): Small readme tweak [#11055](https://github.com/fabricjs/fabric.js/pull/11055)
 - refactor(): Change the standard fabric package to be a combination of the new packages [#11045](https://github.com/fabricjs/fabric.js/pull/11045)
 - chore(deps): bump postcss from 8.5.15 to 8.5.24 [#11054](https://github.com/fabricjs/fabric.js/pull/11054)
+- Fix clipped groups with child shadow offsets [#11047](https://github.com/fabricjs/fabric.js/pull/11047)
 - Refresh text measuring context when env document changes [#11046](https://github.com/fabricjs/fabric.js/pull/11046)
 - refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
 - fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
