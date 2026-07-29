@@ -4,11 +4,13 @@ import { config } from '../../config';
 import { Path } from '../Path';
 import { FabricText } from './Text';
 
-import { describe, expect, it, afterEach } from 'vitest';
+import { describe, expect, it, afterEach, vi } from 'vitest';
 import {
   FabricObject,
+  getEnv,
   getFabricDocument,
   IText,
+  setEnv,
   Textbox,
 } from '../../../../../fabric';
 import { toFixed } from '../../util';
@@ -71,6 +73,36 @@ describe('FabricText', () => {
       const measurement = text._measureChar('a', style, zwc, style);
       expect(measurement).toMatchSnapshot(roundSnapshotOptions);
       expect(measurement).toEqual(text._measureChar('a', style, zwc, style));
+    });
+
+    it('refreshes the measuring context when the env document changes', () => {
+      cache.clearFontCache();
+      const env = getEnv();
+      const iframe = getFabricDocument().createElement('iframe');
+      getFabricDocument().body.appendChild(iframe);
+      const nextWindow = iframe.contentWindow!;
+      const nextDocument = nextWindow.document;
+      const createElement = nextDocument.createElement.bind(nextDocument);
+      const createElementSpy = vi
+        .spyOn(nextDocument, 'createElement')
+        .mockImplementation(
+          (tagName: string, options?: ElementCreationOptions) =>
+            createElement(tagName, options),
+        );
+      const text = new FabricText('');
+      const style = text.getCompleteStyleDeclaration(0, 0);
+
+      try {
+        text._measureChar('a', style, undefined, {});
+        cache.clearFontCache();
+        setEnv({ ...env, window: nextWindow, document: nextDocument });
+        text._measureChar('b', style, undefined, {});
+
+        expect(createElementSpy).toHaveBeenCalledWith('canvas');
+      } finally {
+        setEnv(env);
+        iframe.remove();
+      }
     });
 
     it('splits into lines', () => {
