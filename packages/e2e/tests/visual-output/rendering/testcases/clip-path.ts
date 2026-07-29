@@ -170,6 +170,45 @@ export const clipPathRenderingTests: renderTestType[] = [
   },
 
   {
+    title: 'ClipPath - Clip a group with child shadow offsets',
+    golden: 'clipping-group-shadow-offset.png',
+    percentage: 0.06,
+    size: [180, 160],
+    async renderFunction(canvas, fabric) {
+      canvas.backgroundColor = '#ffffff';
+
+      const rect = new fabric.Rect({
+        width: 70,
+        height: 50,
+        left: 30,
+        top: 30,
+        strokeWidth: 0,
+        fill: '#e94848',
+        shadow: new fabric.Shadow({
+          color: 'rgba(0, 0, 0, 0.55)',
+          offsetX: 35,
+          offsetY: 25,
+          blur: 0,
+        }),
+      });
+
+      const group = new fabric.Group([rect], {
+        left: 70,
+        top: 60,
+        clipPath: new fabric.Rect({
+          width: 125,
+          height: 105,
+          left: 0,
+          top: 0,
+          strokeWidth: 0,
+        }),
+      });
+
+      canvas.add(group);
+    },
+  },
+
+  {
     title: 'ClipPath - Isolation of clipPath of group and inner objects',
     golden: 'clipping3.png',
     percentage: 0.06,
