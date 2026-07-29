@@ -7,7 +7,7 @@ title: "CursorBoundaries"
 
 > **CursorBoundaries** = `object`
 
-Defined in: [src/shapes/IText/IText.ts:25](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/shapes/IText/IText.ts#L25)
+Defined in: [src/shapes/IText/IText.ts:25](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/IText/IText.ts#L25)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/shapes/IText/IText.ts:25](https://github.com/fabricjs/fabric.js
 
 > **left**: `number`
 
-Defined in: [src/shapes/IText/IText.ts:26](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/shapes/IText/IText.ts#L26)
+Defined in: [src/shapes/IText/IText.ts:26](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/IText/IText.ts#L26)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/shapes/IText/IText.ts:26](https://github.com/fabricjs/fabric.js
 
 > **leftOffset**: `number`
 
-Defined in: [src/shapes/IText/IText.ts:28](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/shapes/IText/IText.ts#L28)
+Defined in: [src/shapes/IText/IText.ts:28](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/IText/IText.ts#L28)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [src/shapes/IText/IText.ts:28](https://github.com/fabricjs/fabric.js
 
 > **top**: `number`
 
-Defined in: [src/shapes/IText/IText.ts:27](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/shapes/IText/IText.ts#L27)
+Defined in: [src/shapes/IText/IText.ts:27](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/IText/IText.ts#L27)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [src/shapes/IText/IText.ts:27](https://github.com/fabricjs/fabric.js
 
 > **topOffset**: `number`
 
-Defined in: [src/shapes/IText/IText.ts:29](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/shapes/IText/IText.ts#L29)
+Defined in: [src/shapes/IText/IText.ts:29](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/IText/IText.ts#L29)

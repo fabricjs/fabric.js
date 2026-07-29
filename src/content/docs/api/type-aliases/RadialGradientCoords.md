@@ -7,7 +7,7 @@ title: "RadialGradientCoords"
 
 > **RadialGradientCoords**\<`T`\> = `object`
 
-Defined in: [src/gradient/typedefs.ts:33](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L33)
+Defined in: [src/gradient/typedefs.ts:33](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L33)
 
 ## Type Parameters
 
@@ -21,7 +21,7 @@ Defined in: [src/gradient/typedefs.ts:33](https://github.com/fabricjs/fabric.js/
 
 > **r1**: `T`
 
-Defined in: [src/gradient/typedefs.ts:53](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L53)
+Defined in: [src/gradient/typedefs.ts:53](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L53)
 
 radius of the inner circle
 
@@ -31,7 +31,7 @@ radius of the inner circle
 
 > **r2**: `T`
 
-Defined in: [src/gradient/typedefs.ts:57](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L57)
+Defined in: [src/gradient/typedefs.ts:57](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L57)
 
 radius of the outer circle
 
@@ -41,7 +41,7 @@ radius of the outer circle
 
 > **x1**: `T`
 
-Defined in: [src/gradient/typedefs.ts:37](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L37)
+Defined in: [src/gradient/typedefs.ts:37](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L37)
 
 X coordinate of the first focal point
 
@@ -51,9 +51,9 @@ X coordinate of the first focal point
 
 > **x2**: `T`
 
-Defined in: [src/gradient/typedefs.ts:45](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L45)
+Defined in: [src/gradient/typedefs.ts:45](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L45)
 
-X coordiante of the second focal point
+X coordinate of the second focal point
 
 ***
 
@@ -61,9 +61,9 @@ X coordiante of the second focal point
 
 > **y1**: `T`
 
-Defined in: [src/gradient/typedefs.ts:41](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L41)
+Defined in: [src/gradient/typedefs.ts:41](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L41)
 
-Y coordiante of the first focal point
+Y coordinate of the first focal point
 
 ***
 
@@ -71,6 +71,6 @@ Y coordiante of the first focal point
 
 > **y2**: `T`
 
-Defined in: [src/gradient/typedefs.ts:49](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L49)
+Defined in: [src/gradient/typedefs.ts:49](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L49)
 
-Y coordiante of the second focal point
+Y coordinate of the second focal point

@@ -7,4 +7,4 @@ title: "MultiSelectionStacking"
 
 > **MultiSelectionStacking** = `"canvas-stacking"` \| `"selection-order"`
 
-Defined in: [src/shapes/ActiveSelection.ts:14](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/shapes/ActiveSelection.ts#L14)
+Defined in: [src/shapes/ActiveSelection.ts:14](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/ActiveSelection.ts#L14)

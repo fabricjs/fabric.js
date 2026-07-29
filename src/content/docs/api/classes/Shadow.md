@@ -5,7 +5,7 @@ prev: false
 title: "Shadow"
 ---
 
-Defined in: [src/Shadow.ts:63](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L63)
+Defined in: [src/Shadow.ts:63](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L63)
 
 ## Constructors
 
@@ -13,7 +13,7 @@ Defined in: [src/Shadow.ts:63](https://github.com/fabricjs/fabric.js/blob/22fda4
 
 > **new Shadow**(`options?`): `Shadow`
 
-Defined in: [src/Shadow.ts:118](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L118)
+Defined in: [src/Shadow.ts:118](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L118)
 
 #### Parameters
 
@@ -35,7 +35,7 @@ Options object with any of color, blur, offsetX, offsetY properties or string (e
 
 > **new Shadow**(`svgAttribute`): `Shadow`
 
-Defined in: [src/Shadow.ts:119](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L119)
+Defined in: [src/Shadow.ts:119](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L119)
 
 #### Parameters
 
@@ -53,7 +53,7 @@ Defined in: [src/Shadow.ts:119](https://github.com/fabricjs/fabric.js/blob/22fda
 
 > **affectStroke**: `boolean`
 
-Defined in: [src/Shadow.ts:92](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L92)
+Defined in: [src/Shadow.ts:92](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L92)
 
 Whether the shadow should affect stroke operations
 
@@ -63,7 +63,7 @@ Whether the shadow should affect stroke operations
 
 > **blur**: `number`
 
-Defined in: [src/Shadow.ts:74](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L74)
+Defined in: [src/Shadow.ts:74](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L74)
 
 Shadow blur
 
@@ -73,7 +73,7 @@ Shadow blur
 
 > **color**: `string`
 
-Defined in: [src/Shadow.ts:68](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L68)
+Defined in: [src/Shadow.ts:68](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L68)
 
 Shadow color
 
@@ -83,7 +83,7 @@ Shadow color
 
 > **id**: `string` \| `number`
 
-Defined in: [src/Shadow.ts:108](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L108)
+Defined in: [src/Shadow.ts:108](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L108)
 
 ***
 
@@ -91,7 +91,7 @@ Defined in: [src/Shadow.ts:108](https://github.com/fabricjs/fabric.js/blob/22fda
 
 > **includeDefaultValues**: `boolean`
 
-Defined in: [src/Shadow.ts:98](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L98)
+Defined in: [src/Shadow.ts:98](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L98)
 
 Indicates whether toObject should include default values
 
@@ -101,7 +101,7 @@ Indicates whether toObject should include default values
 
 > **nonScaling**: `boolean`
 
-Defined in: [src/Shadow.ts:106](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L106)
+Defined in: [src/Shadow.ts:106](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L106)
 
 When `false`, the shadow will scale with the object.
 When `true`, the shadow's offsetX, offsetY, and blur will not be affected by the object's scale.
@@ -113,7 +113,7 @@ default to false
 
 > **offsetX**: `number`
 
-Defined in: [src/Shadow.ts:80](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L80)
+Defined in: [src/Shadow.ts:80](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L80)
 
 Shadow horizontal offset
 
@@ -123,7 +123,7 @@ Shadow horizontal offset
 
 > **offsetY**: `number`
 
-Defined in: [src/Shadow.ts:86](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L86)
+Defined in: [src/Shadow.ts:86](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L86)
 
 Shadow vertical offset
 
@@ -133,7 +133,7 @@ Shadow vertical offset
 
 > `static` **ownDefaults**: `Partial`\<[`TClassProperties`](/api/type-aliases/tclassproperties/)\<`Shadow`\>\> = `shadowDefaultValues`
 
-Defined in: [src/Shadow.ts:110](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L110)
+Defined in: [src/Shadow.ts:110](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L110)
 
 ***
 
@@ -141,7 +141,7 @@ Defined in: [src/Shadow.ts:110](https://github.com/fabricjs/fabric.js/blob/22fda
 
 > `static` **type**: `string` = `'shadow'`
 
-Defined in: [src/Shadow.ts:112](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L112)
+Defined in: [src/Shadow.ts:112](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L112)
 
 ## Methods
 
@@ -149,7 +149,7 @@ Defined in: [src/Shadow.ts:112](https://github.com/fabricjs/fabric.js/blob/22fda
 
 > **toObject**(): `Partial`\<[`SerializedShadowOptions`](/api/type-aliases/serializedshadowoptions/)\>
 
-Defined in: [src/Shadow.ts:216](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L216)
+Defined in: [src/Shadow.ts:216](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L216)
 
 Returns object representation of a shadow
 
@@ -165,7 +165,7 @@ Object representation of a shadow instance
 
 > **toString**(): `string`
 
-Defined in: [src/Shadow.ts:151](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L151)
+Defined in: [src/Shadow.ts:151](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L151)
 
 Returns a string representation of an instance
 
@@ -185,7 +185,7 @@ http://www.w3.org/TR/css-text-decor-3/#text-shadow
 
 > **toSVG**(`object`): `string`
 
-Defined in: [src/Shadow.ts:160](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L160)
+Defined in: [src/Shadow.ts:160](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L160)
 
 Returns SVG representation of a shadow
 
@@ -207,7 +207,7 @@ SVG representation of a shadow
 
 > `static` **fromObject**(`options`): `Promise`\<`Shadow`\>
 
-Defined in: [src/Shadow.ts:232](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L232)
+Defined in: [src/Shadow.ts:232](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L232)
 
 #### Parameters
 
@@ -225,7 +225,7 @@ Defined in: [src/Shadow.ts:232](https://github.com/fabricjs/fabric.js/blob/22fda
 
 > `static` **parseShadow**(`value`): `object`
 
-Defined in: [src/Shadow.ts:131](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/Shadow.ts#L131)
+Defined in: [src/Shadow.ts:131](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Shadow.ts#L131)
 
 #### Parameters
 

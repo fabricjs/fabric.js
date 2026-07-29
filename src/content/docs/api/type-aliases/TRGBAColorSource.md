@@ -7,6 +7,6 @@ title: "TRGBAColorSource"
 
 > **TRGBAColorSource** = \[`number`, `number`, `number`, `number`\]
 
-Defined in: [src/color/typedefs.ts:11](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/color/typedefs.ts#L11)
+Defined in: [src/color/typedefs.ts:11](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/color/typedefs.ts#L11)
 
 RGBA format

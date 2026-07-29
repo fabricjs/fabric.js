@@ -7,7 +7,7 @@ title: "getBoundsOfCurve"
 
 > **getBoundsOfCurve**(`begx`, `begy`, `cp1x`, `cp1y`, `cp2x`, `cp2y`, `endx`, `endy`): [`TRectBounds`](/api/type-aliases/trectbounds/)
 
-Defined in: [src/util/path/index.ts:221](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/index.ts#L221)
+Defined in: [src/util/path/index.ts:221](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/index.ts#L221)
 
 Calculate bounding box of a cubic Bezier curve
 Taken from http://jsbin.com/ivomiq/56/edit (no credits available)

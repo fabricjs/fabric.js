@@ -7,7 +7,7 @@ title: "loadSVGFromURL"
 
 > **loadSVGFromURL**(`url`, `reviver?`, `options?`): `Promise`\<`SVGParsingOutput`\>
 
-Defined in: [src/parser/loadSVGFromURL.ts:21](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/parser/loadSVGFromURL.ts#L21)
+Defined in: [src/parser/loadSVGFromURL.ts:21](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/parser/loadSVGFromURL.ts#L21)
 
 Takes url corresponding to an SVG document, and parses it into a set of fabric objects.
 Note that SVG is fetched via fetch API, so it needs to conform to SOP (Same Origin Policy)

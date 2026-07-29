@@ -24,7 +24,7 @@
     "astro": "^5.17.3",
     "canvas": "^3.2.0",
     "codemirror": "^6.0.1",
-    "fabric": "^7.0.0-rc1",
+    "fabric": "^7.4.0",
     "jsdom": "^26.1.0",
     "prettier": "^3.4.2",
     "react": "19.2",
@@ -40,6 +40,7 @@
   "packageManager": "npm@10.8.1+sha512.0e9d42e92bd2318408ed81eaff2da5f78baf23ee7d12a6eed44a6e2901d0f29d7ab715d1b918ade601f72e769a824d9a5c322383f22bbbda5dd396e79de2a077",
   "devDependencies": {
     "typedoc": "^0.28.11",
-    "typedoc-plugin-markdown": "^4.7.0"
+    "typedoc-plugin-markdown": "^4.7.0",
+    "westures": "^1.1.1"
   }
 }

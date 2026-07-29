@@ -5,7 +5,7 @@ prev: false
 title: "StaticCanvasOptions"
 ---
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:115](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L115)
+Defined in: [src/canvas/StaticCanvasOptions.ts:115](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L115)
 
 ## Extends
 
@@ -21,7 +21,7 @@ Defined in: [src/canvas/StaticCanvasOptions.ts:115](https://github.com/fabricjs/
 
 > **allowTouchScrolling**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:148](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L148)
+Defined in: [src/canvas/StaticCanvasOptions.ts:148](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L148)
 
 Indicates whether the browser can be scrolled when using a touchscreen and dragging on the canvas
 It gives PRIORITY to DOM scrolling, it doesn't make it always possible.
@@ -38,7 +38,7 @@ move to Canvas
 
 > **backgroundColor**: `string` \| [`TFiller`](/api/type-aliases/tfiller/)
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:18](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L18)
+Defined in: [src/canvas/StaticCanvasOptions.ts:18](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L18)
 
 Background color of canvas instance.
 
@@ -52,7 +52,7 @@ Background color of canvas instance.
 
 > `optional` **backgroundImage**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:27](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L27)
+Defined in: [src/canvas/StaticCanvasOptions.ts:27](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L27)
 
 Background image of canvas instance.
 since 2.4.0 image caching is active, please when putting an image as background, add to the
@@ -69,7 +69,7 @@ vale. As an alternative you can disable image objectCaching
 
 > **backgroundVpt**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:12](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L12)
+Defined in: [src/canvas/StaticCanvasOptions.ts:12](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L12)
 
 if set to false background image is not affected by viewport transform
 
@@ -91,7 +91,7 @@ we should really find a different way to do this
 
 > `optional` **clipPath**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:96](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L96)
+Defined in: [src/canvas/StaticCanvasOptions.ts:96](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L96)
 
 a fabricObject that, without stroke define a clipping area with their shape. filled in black
 the clipPath object gets used when the canvas has rendered, and the context is placed in the
@@ -108,7 +108,7 @@ clipPath will clip away controls, if you do not want this to happen use controls
 
 > **controlsAboveOverlay**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:137](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L137)
+Defined in: [src/canvas/StaticCanvasOptions.ts:137](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L137)
 
 Indicates whether object controls (borders/controls) are rendered above overlay image
 
@@ -122,7 +122,7 @@ move to Canvas
 
 > **enableRetinaScaling**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:81](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L81)
+Defined in: [src/canvas/StaticCanvasOptions.ts:81](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L81)
 
 When true, canvas is scaled by devicePixelRatio for better rendering on retina screens
 
@@ -136,7 +136,7 @@ When true, canvas is scaled by devicePixelRatio for better rendering on retina s
 
 > **height**: `number`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:129](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L129)
+Defined in: [src/canvas/StaticCanvasOptions.ts:129](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L129)
 
 Height in virtual/logical pixels of the canvas.
 The canvas can be taller than width if retina scaling is active
@@ -147,7 +147,7 @@ The canvas can be taller than width if retina scaling is active
 
 > **imageSmoothingEnabled**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:87](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L87)
+Defined in: [src/canvas/StaticCanvasOptions.ts:87](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L87)
 
 Indicates whether this canvas will use image smoothing, this is on by default in browsers
 
@@ -161,7 +161,7 @@ Indicates whether this canvas will use image smoothing, this is on by default in
 
 > **includeDefaultValues**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:105](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L105)
+Defined in: [src/canvas/StaticCanvasOptions.ts:105](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L105)
 
 Indicates whether toObject/toDatalessObject should include default values
 if set to false, takes precedence over the object value.
@@ -176,7 +176,7 @@ if set to false, takes precedence over the object value.
 
 > **overlayColor**: `string` \| [`TFiller`](/api/type-aliases/tfiller/)
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:42](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L42)
+Defined in: [src/canvas/StaticCanvasOptions.ts:42](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L42)
 
 Overlay color of canvas instance.
 
@@ -194,7 +194,7 @@ Overlay color of canvas instance.
 
 > `optional` **overlayImage**: [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:51](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L51)
+Defined in: [src/canvas/StaticCanvasOptions.ts:51](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L51)
 
 Overlay image of canvas instance.
 since 2.4.0 image caching is active, please when putting an image as overlay, add to the
@@ -211,7 +211,7 @@ vale. As an alternative you can disable image objectCaching
 
 > **overlayVpt**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:35](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L35)
+Defined in: [src/canvas/StaticCanvasOptions.ts:35](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L35)
 
 if set to false overlay image is not affected by viewport transform
 
@@ -233,7 +233,7 @@ we should really find a different way to do this
 
 > **renderOnAddRemove**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:64](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L64)
+Defined in: [src/canvas/StaticCanvasOptions.ts:64](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L64)
 
 Indicates whether [StaticCanvas#add](/api/classes/staticcanvas/#add), [StaticCanvas#insertAt](/api/classes/staticcanvas/#insertat) and StaticCanvas#remove,
 StaticCanvas#moveTo, [StaticCanvas#clear](/api/classes/staticcanvas/#clear) and many more, should also re-render canvas.
@@ -252,7 +252,7 @@ Left default to true to do not break documentation and old app, fiddles.
 
 > **skipOffscreen**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:75](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L75)
+Defined in: [src/canvas/StaticCanvasOptions.ts:75](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L75)
 
 Based on vptCoords and object.aCoords, skip rendering of objects that
 are not included in current viewport.
@@ -276,7 +276,7 @@ true
 
 > **svgViewportTransformation**: `boolean`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:112](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L112)
+Defined in: [src/canvas/StaticCanvasOptions.ts:112](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L112)
 
 When true, getSvgTransform() will apply the StaticCanvas.viewportTransform to the SVG transformation. When true,
 a zoomed canvas will then produce zoomed SVG output.
@@ -291,7 +291,7 @@ a zoomed canvas will then produce zoomed SVG output.
 
 > **viewportTransform**: [`TMat2D`](/api/type-aliases/tmat2d/)
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:158](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L158)
+Defined in: [src/canvas/StaticCanvasOptions.ts:158](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L158)
 
 The transformation (a Canvas 2D API transform matrix) which focuses the viewport
 
@@ -311,7 +311,7 @@ canvas.viewportTransform = [0.7, 0, 0, 0.7, 50, 50];
 
 > **width**: `number`
 
-Defined in: [src/canvas/StaticCanvasOptions.ts:122](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/canvas/StaticCanvasOptions.ts#L122)
+Defined in: [src/canvas/StaticCanvasOptions.ts:122](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvasOptions.ts#L122)
 
 Width in virtual/logical pixels of the canvas.
 The canvas can be larger than width if retina scaling is active

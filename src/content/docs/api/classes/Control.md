@@ -5,7 +5,7 @@ prev: false
 title: "Control"
 ---
 
-Defined in: [src/controls/Control.ts:31](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L31)
+Defined in: [src/controls/Control.ts:31](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L31)
 
 ## Constructors
 
@@ -13,7 +13,7 @@ Defined in: [src/controls/Control.ts:31](https://github.com/fabricjs/fabric.js/b
 
 > **new Control**(`options?`): `Control`
 
-Defined in: [src/controls/Control.ts:157](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L157)
+Defined in: [src/controls/Control.ts:157](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L157)
 
 #### Parameters
 
@@ -31,7 +31,7 @@ Defined in: [src/controls/Control.ts:157](https://github.com/fabricjs/fabric.js/
 
 > **actionHandler**: [`TransformActionHandler`](/api/type-aliases/transformactionhandler/)
 
-Defined in: [src/controls/Control.ts:181](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L181)
+Defined in: [src/controls/Control.ts:181](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L181)
 
 The control actionHandler, provide one to handle action ( control being moved )
 
@@ -61,7 +61,7 @@ true if the action/event modified the object
 
 > **actionName**: `string` = `SCALE`
 
-Defined in: [src/controls/Control.ts:53](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L53)
+Defined in: [src/controls/Control.ts:53](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L53)
 
 Name of the action that the control will likely execute.
 This is optional. FabricJS uses to identify what the user is doing for some
@@ -83,7 +83,7 @@ default to scale since is the most common, used on 4 corners by default
 
 > **angle**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:62](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L62)
+Defined in: [src/controls/Control.ts:62](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L62)
 
 Drawing angle of the control.
 NOT used for now, but name marked as needed for internal logic
@@ -101,7 +101,7 @@ example: to reuse the same drawing function for different rotated controls
 
 > **cursorStyle**: `string` = `'crosshair'`
 
-Defined in: [src/controls/Control.ts:142](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L142)
+Defined in: [src/controls/Control.ts:142](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L142)
 
 Css cursor style to display when the control is hovered.
 if the method `cursorStyleHandler` is provided, this property is ignored.
@@ -118,7 +118,7 @@ if the method `cursorStyleHandler` is provided, this property is ignored.
 
 > `optional` **mouseDownHandler**: [`ControlActionHandler`](/api/type-aliases/controlactionhandler/)
 
-Defined in: [src/controls/Control.ts:191](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L191)
+Defined in: [src/controls/Control.ts:191](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L191)
 
 The control handler for mouse down, provide one to handle mouse down on control
 
@@ -148,7 +148,7 @@ true if the action/event modified the object
 
 > `optional` **mouseUpHandler**: [`ControlActionHandler`](/api/type-aliases/controlactionhandler/)
 
-Defined in: [src/controls/Control.ts:201](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L201)
+Defined in: [src/controls/Control.ts:201](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L201)
 
 The control mouseUpHandler, provide one to handle an effect on mouse up.
 
@@ -178,7 +178,7 @@ true if the action/event modified the object
 
 > **offsetX**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:94](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L94)
+Defined in: [src/controls/Control.ts:94](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L94)
 
 Horizontal offset of the control from the defined position. In pixels
 Positive offset moves the control to the right, negative to the left.
@@ -201,7 +201,7 @@ of the bounding box.
 
 > **offsetY**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:102](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L102)
+Defined in: [src/controls/Control.ts:102](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L102)
 
 Vertical offset of the control from the defined position. In pixels
 Positive offset moves the control to the bottom, negative to the top.
@@ -218,7 +218,7 @@ Positive offset moves the control to the bottom, negative to the top.
 
 > **sizeX**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:110](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L110)
+Defined in: [src/controls/Control.ts:110](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L110)
 
 Sets the length of the control. If null, defaults to object's cornerSize.
 Expects both sizeX and sizeY to be set when set.
@@ -235,7 +235,7 @@ null
 
 > **sizeY**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:118](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L118)
+Defined in: [src/controls/Control.ts:118](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L118)
 
 Sets the height of the control. If null, defaults to object's cornerSize.
 Expects both sizeX and sizeY to be set when set.
@@ -252,7 +252,7 @@ null
 
 > **touchSizeX**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:126](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L126)
+Defined in: [src/controls/Control.ts:126](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L126)
 
 Sets the length of the touch area of the control. If null, defaults to object's touchCornerSize.
 Expects both touchSizeX and touchSizeY to be set when set.
@@ -269,7 +269,7 @@ null
 
 > **touchSizeY**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:134](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L134)
+Defined in: [src/controls/Control.ts:134](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L134)
 
 Sets the height of the touch area of the control. If null, defaults to object's touchCornerSize.
 Expects both touchSizeX and touchSizeY to be set when set.
@@ -286,7 +286,7 @@ null
 
 > `optional` **transformAnchorPoint**: `object`
 
-Defined in: [src/controls/Control.ts:152](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L152)
+Defined in: [src/controls/Control.ts:152](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L152)
 
 #### x
 
@@ -302,7 +302,7 @@ Defined in: [src/controls/Control.ts:152](https://github.com/fabricjs/fabric.js/
 
 > **visible**: `boolean` = `true`
 
-Defined in: [src/controls/Control.ts:40](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L40)
+Defined in: [src/controls/Control.ts:40](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L40)
 
 keep track of control visibility.
 mainly for backward compatibility.
@@ -321,7 +321,7 @@ true
 
 > **withConnection**: `boolean` = `false`
 
-Defined in: [src/controls/Control.ts:150](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L150)
+Defined in: [src/controls/Control.ts:150](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L150)
 
 If controls has an offsetY or offsetX, draw a line that connects
 the control to the bounding box
@@ -338,7 +338,7 @@ false
 
 > **x**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:71](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L71)
+Defined in: [src/controls/Control.ts:71](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L71)
 
 Relative position of the control. X
 0,0 is the center of the Object, while -0.5 (left) or 0.5 (right) are the extremities
@@ -356,7 +356,7 @@ of the bounding box.
 
 > **y**: `number` = `0`
 
-Defined in: [src/controls/Control.ts:80](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L80)
+Defined in: [src/controls/Control.ts:80](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L80)
 
 Relative position of the control. Y
 0,0 is the center of the Object, while -0.5 (top) or 0.5 (bottom) are the extremities
@@ -374,7 +374,7 @@ of the bounding box.
 
 > **calcCornerCoords**(`angle`, `objectCornerSize`, `centerX`, `centerY`, `isTouch`, `fabricObject`): `object`
 
-Defined in: [src/controls/Control.ts:340](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L340)
+Defined in: [src/controls/Control.ts:340](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L340)
 
 Returns the coords for this control based on object values.
 
@@ -439,7 +439,7 @@ true if touch corner, false if normal corner
 
 > **commonRenderProps**(`ctx`, `left`, `top`, `fabricObject`, `styleOverride`): `object`
 
-Defined in: [src/controls/Control.ts:370](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L370)
+Defined in: [src/controls/Control.ts:370](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L370)
 
 This is an helper method to prepare the canvas to render a control
 It detectes common control properties and sets the correct fill and
@@ -498,7 +498,7 @@ rotations since different controls need differnt combination of these.
 
 > **cursorStyleHandler**(`eventData`, `control`, `fabricObject`, `coord`): `string`
 
-Defined in: [src/controls/Control.ts:272](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L272)
+Defined in: [src/controls/Control.ts:272](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L272)
 
 Returns control cursorStyle for css using cursorStyle. If you need a more elaborate
 function you can pass one in the constructor
@@ -536,7 +536,7 @@ the current control ( likely this)
 
 > **getActionHandler**(`eventData`, `fabricObject`, `control`): `undefined` \| [`TransformActionHandler`](/api/type-aliases/transformactionhandler/)
 
-Defined in: [src/controls/Control.ts:224](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L224)
+Defined in: [src/controls/Control.ts:224](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L224)
 
 Returns control actionHandler
 
@@ -572,7 +572,7 @@ the action handler
 
 > **getActionName**(`eventData`, `control`, `fabricObject`): `string`
 
-Defined in: [src/controls/Control.ts:288](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L288)
+Defined in: [src/controls/Control.ts:288](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L288)
 
 Returns the action name. The basic implementation just return the actionName property.
 
@@ -604,7 +604,7 @@ the current control ( likely this)
 
 > **getMouseDownHandler**(`eventData`, `fabricObject`, `control`): `undefined` \| [`ControlActionHandler`](/api/type-aliases/controlactionhandler/)
 
-Defined in: [src/controls/Control.ts:239](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L239)
+Defined in: [src/controls/Control.ts:239](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L239)
 
 Returns control mouseDown handler
 
@@ -640,7 +640,7 @@ the action handler
 
 > **getMouseUpHandler**(`eventData`, `fabricObject`, `control`): `undefined` \| [`ControlActionHandler`](/api/type-aliases/controlactionhandler/)
 
-Defined in: [src/controls/Control.ts:255](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L255)
+Defined in: [src/controls/Control.ts:255](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L255)
 
 Returns control mouseUp handler.
 During actions the fabricObject or the control can be of different obj
@@ -677,7 +677,7 @@ the action handler
 
 > **getTransformAnchorPoint**(): `object`
 
-Defined in: [src/controls/Control.ts:161](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L161)
+Defined in: [src/controls/Control.ts:161](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L161)
 
 #### Returns
 
@@ -697,7 +697,7 @@ Defined in: [src/controls/Control.ts:161](https://github.com/fabricjs/fabric.js/
 
 > **getVisibility**(`fabricObject`, `controlKey`): `boolean`
 
-Defined in: [src/controls/Control.ts:302](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L302)
+Defined in: [src/controls/Control.ts:302](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L302)
 
 Returns controls visibility
 
@@ -723,7 +723,7 @@ key where the control is memorized on the
 
 > **positionHandler**(`dim`, `finalMatrix`, `fabricObject`, `currentControl`): [`Point`](/api/classes/point/)
 
-Defined in: [src/controls/Control.ts:319](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L319)
+Defined in: [src/controls/Control.ts:319](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L319)
 
 #### Parameters
 
@@ -753,7 +753,7 @@ Defined in: [src/controls/Control.ts:319](https://github.com/fabricjs/fabric.js/
 
 > **render**(`ctx`, `left`, `top`, `styleOverride`, `fabricObject`): `void`
 
-Defined in: [src/controls/Control.ts:421](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L421)
+Defined in: [src/controls/Control.ts:421](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L421)
 
 Render function for the control.
 When this function runs the context is unscaled. unrotate. Just retina scaled.
@@ -801,7 +801,7 @@ the object where the control is about to be rendered
 
 > **setVisibility**(`visibility`, `name?`, `fabricObject?`): `void`
 
-Defined in: [src/controls/Control.ts:311](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L311)
+Defined in: [src/controls/Control.ts:311](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L311)
 
 Sets controls visibility
 
@@ -831,7 +831,7 @@ for the object
 
 > **shouldActivate**(`controlKey`, `fabricObject`, `pointer`, `__namedParameters`): `boolean`
 
-Defined in: [src/controls/Control.ts:203](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/Control.ts#L203)
+Defined in: [src/controls/Control.ts:203](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/Control.ts#L203)
 
 #### Parameters
 

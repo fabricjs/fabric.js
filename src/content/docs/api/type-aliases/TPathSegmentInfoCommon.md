@@ -7,7 +7,7 @@ title: "TPathSegmentInfoCommon"
 
 > **TPathSegmentInfoCommon**\<`C`\> = `object`
 
-Defined in: [src/util/path/typedefs.ts:4](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L4)
+Defined in: [src/util/path/typedefs.ts:4](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L4)
 
 ## Type Parameters
 
@@ -21,7 +21,7 @@ Defined in: [src/util/path/typedefs.ts:4](https://github.com/fabricjs/fabric.js/
 
 > `optional` **command**: `C`
 
-Defined in: [src/util/path/typedefs.ts:7](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L7)
+Defined in: [src/util/path/typedefs.ts:7](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L7)
 
 ***
 
@@ -29,7 +29,7 @@ Defined in: [src/util/path/typedefs.ts:7](https://github.com/fabricjs/fabric.js/
 
 > **length**: `number`
 
-Defined in: [src/util/path/typedefs.ts:8](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L8)
+Defined in: [src/util/path/typedefs.ts:8](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L8)
 
 ***
 
@@ -37,7 +37,7 @@ Defined in: [src/util/path/typedefs.ts:8](https://github.com/fabricjs/fabric.js/
 
 > **x**: `number`
 
-Defined in: [src/util/path/typedefs.ts:5](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L5)
+Defined in: [src/util/path/typedefs.ts:5](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L5)
 
 ***
 
@@ -45,4 +45,4 @@ Defined in: [src/util/path/typedefs.ts:5](https://github.com/fabricjs/fabric.js/
 
 > **y**: `number`
 
-Defined in: [src/util/path/typedefs.ts:6](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L6)
+Defined in: [src/util/path/typedefs.ts:6](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L6)

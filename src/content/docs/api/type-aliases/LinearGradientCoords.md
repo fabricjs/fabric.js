@@ -7,7 +7,7 @@ title: "LinearGradientCoords"
 
 > **LinearGradientCoords**\<`T`\> = `object`
 
-Defined in: [src/gradient/typedefs.ts:14](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L14)
+Defined in: [src/gradient/typedefs.ts:14](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L14)
 
 ## Type Parameters
 
@@ -21,9 +21,9 @@ Defined in: [src/gradient/typedefs.ts:14](https://github.com/fabricjs/fabric.js/
 
 > **x1**: `T`
 
-Defined in: [src/gradient/typedefs.ts:18](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L18)
+Defined in: [src/gradient/typedefs.ts:18](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L18)
 
-X coordiante of the first point
+X coordinate of the first point
 
 ***
 
@@ -31,9 +31,9 @@ X coordiante of the first point
 
 > **x2**: `T`
 
-Defined in: [src/gradient/typedefs.ts:26](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L26)
+Defined in: [src/gradient/typedefs.ts:26](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L26)
 
-X coordiante of the second point
+X coordinate of the second point
 
 ***
 
@@ -41,9 +41,9 @@ X coordiante of the second point
 
 > **y1**: `T`
 
-Defined in: [src/gradient/typedefs.ts:22](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L22)
+Defined in: [src/gradient/typedefs.ts:22](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L22)
 
-Y coordiante of the first point
+Y coordinate of the first point
 
 ***
 
@@ -51,6 +51,6 @@ Y coordiante of the first point
 
 > **y2**: `T`
 
-Defined in: [src/gradient/typedefs.ts:30](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/gradient/typedefs.ts#L30)
+Defined in: [src/gradient/typedefs.ts:30](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/gradient/typedefs.ts#L30)
 
-Y coordiante of the second point
+Y coordinate of the second point

@@ -7,7 +7,7 @@ title: "ImperativeLayoutContext"
 
 > **ImperativeLayoutContext** = [`CommonLayoutContext`](/api/type-aliases/commonlayoutcontext/) & `ImperativeLayoutCommonOptions` & `object`
 
-Defined in: [src/LayoutManager/types.ts:115](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/types.ts#L115)
+Defined in: [src/LayoutManager/types.ts:115](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L115)
 
 ## Type Declaration
 

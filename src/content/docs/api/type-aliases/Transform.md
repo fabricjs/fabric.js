@@ -7,7 +7,7 @@ title: "Transform"
 
 > **Transform** = `object`
 
-Defined in: [src/EventTypeDefs.ts:72](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L72)
+Defined in: [src/EventTypeDefs.ts:72](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L72)
 
 relative to target's containing coordinate plane
 both agree on every point
@@ -18,7 +18,7 @@ both agree on every point
 
 > `optional` **action**: `string`
 
-Defined in: [src/EventTypeDefs.ts:74](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L74)
+Defined in: [src/EventTypeDefs.ts:74](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L74)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [src/EventTypeDefs.ts:74](https://github.com/fabricjs/fabric.js/blob
 
 > `optional` **actionHandler**: [`TransformActionHandler`](/api/type-aliases/transformactionhandler/)
 
-Defined in: [src/EventTypeDefs.ts:75](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L75)
+Defined in: [src/EventTypeDefs.ts:75](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L75)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [src/EventTypeDefs.ts:75](https://github.com/fabricjs/fabric.js/blob
 
 > **actionPerformed**: `boolean`
 
-Defined in: [src/EventTypeDefs.ts:100](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L100)
+Defined in: [src/EventTypeDefs.ts:100](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L100)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [src/EventTypeDefs.ts:100](https://github.com/fabricjs/fabric.js/blo
 
 > **altKey**: `boolean`
 
-Defined in: [src/EventTypeDefs.ts:93](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L93)
+Defined in: [src/EventTypeDefs.ts:93](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L93)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: [src/EventTypeDefs.ts:93](https://github.com/fabricjs/fabric.js/blob
 
 > **corner**: `string`
 
-Defined in: [src/EventTypeDefs.ts:76](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L76)
+Defined in: [src/EventTypeDefs.ts:76](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L76)
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: [src/EventTypeDefs.ts:76](https://github.com/fabricjs/fabric.js/blob
 
 > **ex**: `number`
 
-Defined in: [src/EventTypeDefs.ts:85](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L85)
+Defined in: [src/EventTypeDefs.ts:85](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L85)
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: [src/EventTypeDefs.ts:85](https://github.com/fabricjs/fabric.js/blob
 
 > **ey**: `number`
 
-Defined in: [src/EventTypeDefs.ts:86](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L86)
+Defined in: [src/EventTypeDefs.ts:86](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L86)
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: [src/EventTypeDefs.ts:86](https://github.com/fabricjs/fabric.js/blob
 
 > **height**: `number`
 
-Defined in: [src/EventTypeDefs.ts:91](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L91)
+Defined in: [src/EventTypeDefs.ts:91](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L91)
 
 ***
 
@@ -82,7 +82,7 @@ Defined in: [src/EventTypeDefs.ts:91](https://github.com/fabricjs/fabric.js/blob
 
 > **lastX**: `number`
 
-Defined in: [src/EventTypeDefs.ts:87](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L87)
+Defined in: [src/EventTypeDefs.ts:87](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L87)
 
 ***
 
@@ -90,7 +90,7 @@ Defined in: [src/EventTypeDefs.ts:87](https://github.com/fabricjs/fabric.js/blob
 
 > **lastY**: `number`
 
-Defined in: [src/EventTypeDefs.ts:88](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L88)
+Defined in: [src/EventTypeDefs.ts:88](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L88)
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: [src/EventTypeDefs.ts:88](https://github.com/fabricjs/fabric.js/blob
 
 > **offsetX**: `number`
 
-Defined in: [src/EventTypeDefs.ts:81](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L81)
+Defined in: [src/EventTypeDefs.ts:81](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L81)
 
 ***
 
@@ -106,7 +106,7 @@ Defined in: [src/EventTypeDefs.ts:81](https://github.com/fabricjs/fabric.js/blob
 
 > **offsetY**: `number`
 
-Defined in: [src/EventTypeDefs.ts:82](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L82)
+Defined in: [src/EventTypeDefs.ts:82](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L82)
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: [src/EventTypeDefs.ts:82](https://github.com/fabricjs/fabric.js/blob
 
 > **original**: `ReturnType`\<*typeof* [`saveObjectTransform`](/api/fabric/namespaces/util/functions/saveobjecttransform/)\> & `object`
 
-Defined in: [src/EventTypeDefs.ts:94](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L94)
+Defined in: [src/EventTypeDefs.ts:94](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L94)
 
 #### Type Declaration
 
@@ -140,7 +140,7 @@ Defined in: [src/EventTypeDefs.ts:94](https://github.com/fabricjs/fabric.js/blob
 
 > **originX**: [`TOriginX`](/api/type-aliases/toriginx/)
 
-Defined in: [src/EventTypeDefs.ts:83](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L83)
+Defined in: [src/EventTypeDefs.ts:83](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L83)
 
 ***
 
@@ -148,7 +148,7 @@ Defined in: [src/EventTypeDefs.ts:83](https://github.com/fabricjs/fabric.js/blob
 
 > **originY**: [`TOriginY`](/api/type-aliases/toriginy/)
 
-Defined in: [src/EventTypeDefs.ts:84](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L84)
+Defined in: [src/EventTypeDefs.ts:84](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L84)
 
 ***
 
@@ -156,7 +156,7 @@ Defined in: [src/EventTypeDefs.ts:84](https://github.com/fabricjs/fabric.js/blob
 
 > **scaleX**: `number`
 
-Defined in: [src/EventTypeDefs.ts:77](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L77)
+Defined in: [src/EventTypeDefs.ts:77](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L77)
 
 ***
 
@@ -164,7 +164,7 @@ Defined in: [src/EventTypeDefs.ts:77](https://github.com/fabricjs/fabric.js/blob
 
 > **scaleY**: `number`
 
-Defined in: [src/EventTypeDefs.ts:78](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L78)
+Defined in: [src/EventTypeDefs.ts:78](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L78)
 
 ***
 
@@ -172,7 +172,7 @@ Defined in: [src/EventTypeDefs.ts:78](https://github.com/fabricjs/fabric.js/blob
 
 > **shiftKey**: `boolean`
 
-Defined in: [src/EventTypeDefs.ts:92](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L92)
+Defined in: [src/EventTypeDefs.ts:92](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L92)
 
 ***
 
@@ -180,7 +180,7 @@ Defined in: [src/EventTypeDefs.ts:92](https://github.com/fabricjs/fabric.js/blob
 
 > **skewX**: `number`
 
-Defined in: [src/EventTypeDefs.ts:79](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L79)
+Defined in: [src/EventTypeDefs.ts:79](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L79)
 
 ***
 
@@ -188,7 +188,7 @@ Defined in: [src/EventTypeDefs.ts:79](https://github.com/fabricjs/fabric.js/blob
 
 > **skewY**: `number`
 
-Defined in: [src/EventTypeDefs.ts:80](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L80)
+Defined in: [src/EventTypeDefs.ts:80](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L80)
 
 ***
 
@@ -196,7 +196,7 @@ Defined in: [src/EventTypeDefs.ts:80](https://github.com/fabricjs/fabric.js/blob
 
 > **target**: [`FabricObject`](/api/classes/fabricobject/)
 
-Defined in: [src/EventTypeDefs.ts:73](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L73)
+Defined in: [src/EventTypeDefs.ts:73](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L73)
 
 ***
 
@@ -204,7 +204,7 @@ Defined in: [src/EventTypeDefs.ts:73](https://github.com/fabricjs/fabric.js/blob
 
 > **theta**: [`TRadian`](/api/type-aliases/tradian/)
 
-Defined in: [src/EventTypeDefs.ts:89](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L89)
+Defined in: [src/EventTypeDefs.ts:89](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L89)
 
 ***
 
@@ -212,4 +212,4 @@ Defined in: [src/EventTypeDefs.ts:89](https://github.com/fabricjs/fabric.js/blob
 
 > **width**: `number`
 
-Defined in: [src/EventTypeDefs.ts:90](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/EventTypeDefs.ts#L90)
+Defined in: [src/EventTypeDefs.ts:90](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L90)

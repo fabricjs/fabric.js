@@ -7,7 +7,7 @@ title: "skewHandlerY"
 
 > `const` **skewHandlerY**: [`TransformActionHandler`](/api/type-aliases/transformactionhandler/)
 
-Defined in: [src/controls/skew.ts:244](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/skew.ts#L244)
+Defined in: [src/controls/skew.ts:244](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/skew.ts#L244)
 
 Wrapped Action handler for skewing on the Y axis, takes care of the
 skew direction and determines the correct transform origin for the anchor point

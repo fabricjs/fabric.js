@@ -7,13 +7,13 @@ title: "EnlivenObjectOptions"
 
 > **EnlivenObjectOptions** = [`Abortable`](/api/type-aliases/abortable/) & `object`
 
-Defined in: [src/util/misc/objectEnlive.ts:64](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/misc/objectEnlive.ts#L64)
+Defined in: [src/util/misc/objectEnlive.ts:64](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/objectEnlive.ts#L64)
 
 ## Type Declaration
 
 ### reviver()?
 
-> `optional` **reviver**: \<`T`\>(`serializedObj`, `instance`) => `void`
+> `optional` **reviver**: \<`T`\>(`serializedObj`, `instance`, `error?`) => `void` \| `Promise`\<`T`\>
 
 Method for further parsing of object elements,
 called after each fabric object created.
@@ -32,8 +32,12 @@ called after each fabric object created.
 
 ##### instance
 
-`T`
+`T` | `undefined`
+
+##### error?
+
+`FabricError`
 
 #### Returns
 
-`void`
+`void` \| `Promise`\<`T`\>

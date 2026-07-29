@@ -1,0 +1,94 @@
+---
+date: '2026-07-29'
+title: 'Cropping controls'
+description: 'Interactive image cropping with the fabric/extensions cropping controls'
+thumbnail: 'cropping-controls.png'
+tags: ['cropping', 'controls', 'image', 'extensions']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import cropModeCode from './cropMode?raw';
+
+Cropping a `FabricImage` means changing four properties: `cropX` and `cropY`
+pick the top-left corner of the crop window in the image's own pixel space,
+while `width` and `height` set its size. `fabric/extensions` ships two ready-made
+control sets that drive those properties for you, so you do not have to write
+the transform handlers yourself.
+
+<CodeEditor code={code} canvasId="cropping-controls" client:idle canvasDown>
+  <canvas width="800" height="440" id="cropping-controls"></canvas>
+</CodeEditor>
+
+## The two control sets
+
+`createImageCroppingControls()` returns a **complete replacement** for an
+image's controls — twelve handles in three groups:
+
+- `mlc`, `mrc`, `mtc`, `mbc` — the side handles. Each one moves one edge of the
+  crop window, revealing or hiding source pixels on that side.
+- `tlc`, `trc`, `blc`, `brc` — the corner handles, which crop on two axes at
+  once. They use a custom `shouldActivate` that hit-tests the pointer against
+  the L-shaped bracket actually drawn on screen, instead of the usual square
+  around the control point, so they do not steal clicks from the side handles.
+- `tls`, `trs`, `bls`, `brs` — these do not crop. They scale the source image
+  *inside* the crop window, keeping the window itself fixed.
+
+`createImageResizeControlsWithScaleToCover()` is the smaller, more targeted set:
+just `mle`, `mre`, `mte`, `mbe`. These resize the visible rectangle, and once
+there are no source pixels left to reveal they scale the image up so it keeps
+covering the frame. Because it only contains four handles, it is meant to be
+merged into an existing control set rather than replace it.
+
+## Assigning them
+
+Both functions are factories that build fresh `Control` instances on every call,
+so each image can own its handles and you can restyle or drop individual ones
+without affecting other objects. Replace the whole set, or merge a few handles
+in:
+
+```js
+// full replacement
+image.controls = createImageCroppingControls();
+
+// or keep the default controls and override just the sides
+const edge = createImageResizeControlsWithScaleToCover();
+Object.assign(image.controls, {
+  ml: edge.mle,
+  mr: edge.mre,
+  mt: edge.mte,
+  mb: edge.mbe,
+});
+```
+
+Note the `padding: 0` in the example: the handles that scale the source inside
+the crop window position themselves without accounting for padding, so a padded
+image would render them in the wrong place.
+
+## About `enterCropMode`
+
+You will often see these controls introduced through `enterCropMode`, wired to a
+double click:
+
+```js
+image.once('mousedblclick', enterCropMode);
+```
+
+That helper swaps in `createImageCroppingControls()`, draws a ghost of the full
+source image so you can see what you are hiding, turns dragging into panning of
+the crop window, and installs another double-click handler to undo all of it.
+
+It is a packaged crop mode experience meant to be a baseline and an inspiration to build yours.
+
+
+**Double-click the dragon** to toggle crop mode. The full source image appears at
+50% opacity with a border around its real bounds, the handles become the crop
+set, and dragging the image pans the crop window instead of moving the object.
+Double-click again to put everything back.
+
+<CodeEditor code={cropModeCode} canvasId="crop-mode" client:idle canvasDown>
+  <canvas width="750" height="480" id="crop-mode"></canvas>
+</CodeEditor>
+
+The image starts cropped to a 500×500 window centred in a 1920×1200 photo, which
+is why there is empty canvas around it — that space is where the semi transparent layer appears.

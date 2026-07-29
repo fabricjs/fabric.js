@@ -7,7 +7,7 @@ title: "transformPoint"
 
 > **transformPoint**(`p`, `t`, `ignoreOffset?`): [`Point`](/api/classes/point/)
 
-Defined in: [src/util/misc/matrix.ts:46](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/misc/matrix.ts#L46)
+Defined in: [src/util/misc/matrix.ts:46](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/matrix.ts#L46)
 
 Apply transform t to point p
 

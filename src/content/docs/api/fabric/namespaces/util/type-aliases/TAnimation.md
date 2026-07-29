@@ -7,7 +7,7 @@ title: "TAnimation"
 
 > **TAnimation**\<`T`\> = `T` *extends* [`TColorArg`](/api/type-aliases/tcolorarg/) ? `ColorAnimation` : `T` *extends* `number`[] ? `ArrayAnimation` : `ValueAnimation`
 
-Defined in: [src/util/animation/animate.ts:11](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/animation/animate.ts#L11)
+Defined in: [src/util/animation/animate.ts:11](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/animation/animate.ts#L11)
 
 ## Type Parameters
 

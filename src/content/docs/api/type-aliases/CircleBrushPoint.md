@@ -7,7 +7,7 @@ title: "CircleBrushPoint"
 
 > **CircleBrushPoint** = `object`
 
-Defined in: [src/brushes/typedefs.ts:6](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/brushes/typedefs.ts#L6)
+Defined in: [src/brushes/typedefs.ts:6](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/brushes/typedefs.ts#L6)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/brushes/typedefs.ts:6](https://github.com/fabricjs/fabric.js/bl
 
 > **fill**: `string`
 
-Defined in: [src/brushes/typedefs.ts:10](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/brushes/typedefs.ts#L10)
+Defined in: [src/brushes/typedefs.ts:10](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/brushes/typedefs.ts#L10)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/brushes/typedefs.ts:10](https://github.com/fabricjs/fabric.js/b
 
 > **radius**: `number`
 
-Defined in: [src/brushes/typedefs.ts:9](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/brushes/typedefs.ts#L9)
+Defined in: [src/brushes/typedefs.ts:9](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/brushes/typedefs.ts#L9)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [src/brushes/typedefs.ts:9](https://github.com/fabricjs/fabric.js/bl
 
 > **x**: `number`
 
-Defined in: [src/brushes/typedefs.ts:7](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/brushes/typedefs.ts#L7)
+Defined in: [src/brushes/typedefs.ts:7](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/brushes/typedefs.ts#L7)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [src/brushes/typedefs.ts:7](https://github.com/fabricjs/fabric.js/bl
 
 > **y**: `number`
 
-Defined in: [src/brushes/typedefs.ts:8](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/brushes/typedefs.ts#L8)
+Defined in: [src/brushes/typedefs.ts:8](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/brushes/typedefs.ts#L8)

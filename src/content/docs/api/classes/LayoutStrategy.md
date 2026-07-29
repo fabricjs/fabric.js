@@ -5,7 +5,7 @@ prev: false
 title: "LayoutStrategy"
 ---
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:21](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L21)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:21](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L21)
 
 Exposes a main public method [calcLayoutResult](/api/classes/layoutstrategy/#calclayoutresult) that is used by the `LayoutManager` to perform layout.
 Returning `undefined` signals the `LayoutManager` to skip the layout.
@@ -34,7 +34,7 @@ In charge of calculating the bounding box of the passed objects.
 
 > `static` **type**: `string` = `'strategy'`
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:25](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L25)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:25](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L25)
 
 override by subclass for persistence (TS does not support `static abstract`)
 
@@ -44,7 +44,7 @@ override by subclass for persistence (TS does not support `static abstract`)
 
 > **calcBoundingBox**(`objects`, `context`): `undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:68](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L68)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:68](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L68)
 
 Override this method to customize layout.
 
@@ -68,7 +68,7 @@ Override this method to customize layout.
 
 > **calcLayoutResult**(`context`, `objects`): `undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:33](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L33)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:33](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L33)
 
 Used by the `LayoutManager` to perform layout
 @TODO/fix: if this method is calcResult, should calc unconditionally.
@@ -96,7 +96,7 @@ layout result **OR** `undefined` to skip layout
 
 > **getInitialSize**(`context`, `result`): [`Point`](/api/classes/point/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L58)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L58)
 
 #### Parameters
 
@@ -118,7 +118,7 @@ Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://gi
 
 > **shouldLayoutClipPath**(`__namedParameters`): `undefined` \| `boolean`
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L50)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L50)
 
 #### Parameters
 
@@ -136,7 +136,7 @@ Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://gi
 
 > **shouldPerformLayout**(`__namedParameters`): `boolean`
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:42](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L42)
+Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:42](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L42)
 
 #### Parameters
 

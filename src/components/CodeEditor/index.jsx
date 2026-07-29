@@ -6,6 +6,28 @@ import {
 import { StateField, EditorState } from '@codemirror/state';
 import { EditorView, basicSetup } from 'codemirror';
 import * as fabric from 'fabric';
+// Named imports, not `import * as`: a namespace object assigned to `window`
+// keeps every export alive, which drags the westures gesture integration
+// (and its `westures` dependency) into the client bundle. Listing the
+// helpers explicitly lets rollup drop the ones no demo uses.
+import {
+  AligningGuidelines,
+  createImageCroppingControls,
+  createImageResizeControlsWithScaleToCover,
+  createLinearGradientControls,
+  enterCropMode,
+  changeCropX,
+  changeCropY,
+  changeCropWidth,
+  changeCropHeight,
+  changeWidthAndScaleToCover,
+  changeHeightAndScaleToCover,
+  withFlip,
+  installGradientUpdater,
+  installOriginWrapperUpdater,
+  gradientUpdaterWrapper,
+  originUpdaterWrapper,
+} from 'fabric/extensions';
 import { debounce } from '../../utils/debounce';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { espresso } from 'thememirror';
@@ -23,6 +45,7 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
       }
       const preamble = [
         `const fabric = window.fabric;`,
+        `const extensions = window.fabricExtensions;`,
         `const canvasEl = document.getElementById('${canvasId}');`,
       ];
       // when click 'run me' button, makes code string change to trigger 'setCode' function.
@@ -43,6 +66,25 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
     // and add to window canvases for cleanup/restart
     // seems hacky, maybe it is, but it allow us to use the imported version
     window.fabric = fabric;
+    // exposed to demo code as `extensions` (see the eval preamble below)
+    window.fabricExtensions = {
+      AligningGuidelines,
+      createImageCroppingControls,
+      createImageResizeControlsWithScaleToCover,
+      createLinearGradientControls,
+      enterCropMode,
+      changeCropX,
+      changeCropY,
+      changeCropWidth,
+      changeCropHeight,
+      changeWidthAndScaleToCover,
+      changeHeightAndScaleToCover,
+      withFlip,
+      installGradientUpdater,
+      installOriginWrapperUpdater,
+      gradientUpdaterWrapper,
+      originUpdaterWrapper,
+    };
     window.canvasesId = window.canvasesId || {};
 
     // https://github.com/codemirror/dev/issues/44#issuecomment-789093799

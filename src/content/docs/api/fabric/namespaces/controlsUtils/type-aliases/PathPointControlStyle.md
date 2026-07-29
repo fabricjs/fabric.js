@@ -7,7 +7,7 @@ title: "PathPointControlStyle"
 
 > **PathPointControlStyle** = `object`
 
-Defined in: [src/controls/pathControl.ts:21](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/pathControl.ts#L21)
+Defined in: [src/controls/pathControl.ts:21](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/pathControl.ts#L21)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/controls/pathControl.ts:21](https://github.com/fabricjs/fabric.
 
 > `optional` **connectionDashArray**: `number`[]
 
-Defined in: [src/controls/pathControl.ts:24](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/pathControl.ts#L24)
+Defined in: [src/controls/pathControl.ts:24](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/pathControl.ts#L24)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/controls/pathControl.ts:24](https://github.com/fabricjs/fabric.
 
 > `optional` **controlFill**: `string`
 
-Defined in: [src/controls/pathControl.ts:22](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/pathControl.ts#L22)
+Defined in: [src/controls/pathControl.ts:22](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/pathControl.ts#L22)
 
 ***
 
@@ -31,4 +31,4 @@ Defined in: [src/controls/pathControl.ts:22](https://github.com/fabricjs/fabric.
 
 > `optional` **controlStroke**: `string`
 
-Defined in: [src/controls/pathControl.ts:23](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/controls/pathControl.ts#L23)
+Defined in: [src/controls/pathControl.ts:23](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/pathControl.ts#L23)

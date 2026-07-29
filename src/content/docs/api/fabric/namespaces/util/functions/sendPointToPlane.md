@@ -7,7 +7,7 @@ title: "sendPointToPlane"
 
 > **sendPointToPlane**(`point`, `from?`, `to?`): [`Point`](/api/classes/point/)
 
-Defined in: [src/util/misc/planeChange.ts:36](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/misc/planeChange.ts#L36)
+Defined in: [src/util/misc/planeChange.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/planeChange.ts#L36)
 
 Sends a point from the source coordinate plane to the destination coordinate plane.\
 From the canvas/viewer's perspective the point remains unchanged.

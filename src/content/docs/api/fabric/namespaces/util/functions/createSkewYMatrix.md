@@ -7,7 +7,7 @@ title: "createSkewYMatrix"
 
 > **createSkewYMatrix**(`skewValue`): [`TMat2D`](/api/type-aliases/tmat2d/)
 
-Defined in: [src/util/misc/matrix.ts:250](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/misc/matrix.ts#L250)
+Defined in: [src/util/misc/matrix.ts:266](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/matrix.ts#L266)
 
 Generate a skew matrix for the Y axis
 

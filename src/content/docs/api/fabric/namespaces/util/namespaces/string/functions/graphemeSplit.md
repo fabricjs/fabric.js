@@ -7,7 +7,7 @@ title: "graphemeSplit"
 
 > **graphemeSplit**(`textstring`): `string`[]
 
-Defined in: [src/util/lang\_string.ts:49](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/lang_string.ts#L49)
+Defined in: [src/util/lang\_string.ts:49](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/lang_string.ts#L49)
 
 Divide a string in the user perceived single units
 

@@ -7,7 +7,7 @@ title: "TPathSegmentCommandInfo"
 
 > **TPathSegmentCommandInfo** = `object`
 
-Defined in: [src/util/path/typedefs.ts:37](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L37)
+Defined in: [src/util/path/typedefs.ts:37](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L37)
 
 Relevant info to calculate path length/points on path
 for each command type in a simplified parsed path
@@ -18,7 +18,7 @@ for each command type in a simplified parsed path
 
 > **C**: [`TCurveInfo`](/api/type-aliases/tcurveinfo/)\<`"C"`\>
 
-Defined in: [src/util/path/typedefs.ts:40](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L40)
+Defined in: [src/util/path/typedefs.ts:40](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L40)
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: [src/util/path/typedefs.ts:40](https://github.com/fabricjs/fabric.js
 
 > **L**: [`TPathSegmentInfoCommon`](/api/type-aliases/tpathsegmentinfocommon/)\<`"L"`\>
 
-Defined in: [src/util/path/typedefs.ts:39](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L39)
+Defined in: [src/util/path/typedefs.ts:39](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L39)
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: [src/util/path/typedefs.ts:39](https://github.com/fabricjs/fabric.js
 
 > **M**: [`TPathSegmentInfoCommon`](/api/type-aliases/tpathsegmentinfocommon/)\<`"M"`\>
 
-Defined in: [src/util/path/typedefs.ts:38](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L38)
+Defined in: [src/util/path/typedefs.ts:38](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L38)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: [src/util/path/typedefs.ts:38](https://github.com/fabricjs/fabric.js
 
 > **Q**: [`TCurveInfo`](/api/type-aliases/tcurveinfo/)\<`"Q"`\>
 
-Defined in: [src/util/path/typedefs.ts:41](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L41)
+Defined in: [src/util/path/typedefs.ts:41](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L41)
 
 ***
 
@@ -50,4 +50,4 @@ Defined in: [src/util/path/typedefs.ts:41](https://github.com/fabricjs/fabric.js
 
 > **Z**: [`TEndPathInfo`](/api/type-aliases/tendpathinfo/)
 
-Defined in: [src/util/path/typedefs.ts:42](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/util/path/typedefs.ts#L42)
+Defined in: [src/util/path/typedefs.ts:42](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/path/typedefs.ts#L42)

@@ -7,7 +7,7 @@ title: "CollectionChangeLayoutContext"
 
 > **CollectionChangeLayoutContext** = [`CommonLayoutContext`](/api/type-aliases/commonlayoutcontext/) & `object`
 
-Defined in: [src/LayoutManager/types.ts:91](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/LayoutManager/types.ts#L91)
+Defined in: [src/LayoutManager/types.ts:91](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L91)
 
 ## Type Declaration
 

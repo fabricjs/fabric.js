@@ -7,7 +7,7 @@ title: "TMat2D"
 
 > **TMat2D** = \[`number`, `number`, `number`, `number`, `number`, `number`\]
 
-Defined in: [src/typedefs.ts:64](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/typedefs.ts#L64)
+Defined in: [src/typedefs.ts:64](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L64)
 
 A transform matrix.
 Basically a matrix in the form

@@ -7,7 +7,7 @@ title: "setEnv"
 
 > **setEnv**(`value`): `void`
 
-Defined in: [src/env/index.ts:29](https://github.com/fabricjs/fabric.js/blob/22fda4575b9a171e8efe201e21ee2bd9d77651b8/src/env/index.ts#L29)
+Defined in: [src/env/index.ts:29](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/env/index.ts#L29)
 
 Sets the environment variables used by fabric.\
 This is exposed for special cases, such as configuring a test environment, and should be used with care.
