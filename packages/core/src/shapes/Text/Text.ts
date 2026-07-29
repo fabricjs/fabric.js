@@ -31,6 +31,7 @@ import type {
 import { classRegistry } from '../../ClassRegistry';
 import { graphemeSplit } from '../../util/lang_string';
 import { createCanvasElementFor } from '../../util/misc/dom';
+import { getFabricDocument } from '../../env';
 import type { TextStyleArray } from '../../util/misc/textStyles';
 import {
   hasStyleChanged,
@@ -63,18 +64,21 @@ import type { CSSRules } from '../../parser/typedefs';
 import { normalizeWs } from '../../util/internals/normalizeWhiteSpace';
 
 let measuringContext: CanvasRenderingContext2D | null;
+let measuringContextDocument: Document | null;
 
 /**
  * Return a context for measurement of text string.
  * if created it gets stored for reuse
  */
 function getMeasuringContext() {
-  if (!measuringContext) {
+  const fabricDocument = getFabricDocument();
+  if (!measuringContext || measuringContextDocument !== fabricDocument) {
     const canvas = createCanvasElementFor({
       width: 0,
       height: 0,
     });
     measuringContext = canvas.getContext('2d');
+    measuringContextDocument = fabricDocument;
   }
   return measuringContext;
 }
