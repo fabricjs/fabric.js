@@ -14,7 +14,7 @@ import { SignalAbortedError } from '../util/internals/console';
 
 import { describe, expect, it, test, vi, afterEach } from 'vitest';
 import { StaticCanvas } from '../canvas/StaticCanvas';
-import { FabricText, Point, version } from '../../../../fabric';
+import { FabricText, Point, Shadow, version } from '../../../../fabric';
 import { isTransparent } from '../util';
 import { makeRects } from '../../../../test/utils';
 
@@ -1564,6 +1564,33 @@ describe('Group', () => {
       rect3.shouldCache(),
       'rect3 will not cache because group2 is caching',
     ).toBe(false);
+  });
+
+  it('renders a clipped group with child shadow offsets', () => {
+    const canvas = new StaticCanvas(undefined, {
+      width: 100,
+      height: 100,
+    });
+    const rect = new Rect({
+      width: 50,
+      height: 50,
+      fill: 'red',
+      shadow: new Shadow({
+        color: 'black',
+        offsetX: 10,
+        offsetY: 10,
+      }),
+    });
+    const group = new Group([rect], {
+      clipPath: new Rect({
+        width: 60,
+        height: 60,
+      }),
+    });
+
+    canvas.add(group);
+
+    expect(() => canvas.renderAll()).not.toThrow();
   });
 
   it('canvas prop propagation with set', () => {

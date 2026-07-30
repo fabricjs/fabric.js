@@ -452,7 +452,7 @@ export class Group
    */
   shouldCache() {
     const ownCache = FabricObject.prototype.shouldCache.call(this);
-    if (ownCache) {
+    if (ownCache && !this.clipPath) {
       for (let i = 0; i < this._objects.length; i++) {
         if (this._objects[i].willDrawShadow()) {
           this.ownCaching = false;
