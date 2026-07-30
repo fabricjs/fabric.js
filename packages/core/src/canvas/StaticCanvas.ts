@@ -8,7 +8,6 @@ import type { Pattern } from '../Pattern';
 import { Point } from '../Point';
 import type { TCachedFabricObject } from '../shapes/Object/Object';
 import type {
-  Abortable,
   Constructor,
   TCornerPoint,
   TDataUrlOptions,
@@ -1219,6 +1218,7 @@ export class StaticCanvas<
    * if creation was successfully or with defined error if not. If a FabricObject is returned in the reviver, and an error occurred, this instance will be used in place of that one witch generated error.
    * @param {Object} [options] options
    * @param {AbortSignal} [options.signal] see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
+   * @param {(url: string) => boolean | Promise<boolean>} [options.resourceValidator] validates an external resource URL before loading it; return `false` to skip it
    * @return {Promise<Canvas | StaticCanvas>} instance
    * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-3#deserialization}
    * @see {@link http://jsfiddle.net/fabricjs/fmgXt/|jsFiddle demo}
@@ -1241,7 +1241,7 @@ export class StaticCanvas<
   loadFromJSON(
     json: string | Record<string, any>,
     reviver?: EnlivenObjectOptions['reviver'],
-    { signal }: Abortable = {},
+    options: EnlivenObjectOptions = {},
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new FabricError('`json` is undefined'));
@@ -1258,7 +1258,7 @@ export class StaticCanvas<
     return Promise.all([
       enlivenObjects<FabricObject>(objects, {
         reviver,
-        signal,
+        ...options,
       }),
       enlivenObjectEnlivables(
         {
@@ -1268,7 +1268,7 @@ export class StaticCanvas<
           overlayColor: overlay,
           clipPath,
         },
-        { signal },
+        options,
       ),
     ]).then(([enlived, enlivedMap]) => {
       this.clear();

@@ -2,6 +2,7 @@ import { BaseFilter } from './BaseFilter';
 import type { T2DPipelineState, TWebGLPipelineState } from './typedefs';
 import { isWebGLPipelineState } from './utils';
 import { classRegistry } from '../ClassRegistry';
+import type { Abortable } from '../typedefs';
 
 type ComposedOwnProps = {
   subFilters: BaseFilter<string, object, object>[];
@@ -72,7 +73,7 @@ export class Composed extends BaseFilter<
    */
   static fromObject(
     object: Record<string, any>,
-    options?: { signal: AbortSignal },
+    options?: Abortable,
   ): Promise<Composed> {
     return Promise.all(
       ((object.subFilters || []) as BaseFilter<string>[]).map((filter) =>

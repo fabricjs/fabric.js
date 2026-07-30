@@ -8,6 +8,7 @@ import type {
 } from './typedefs';
 import type { WebGLFilterBackend } from './WebGLFilterBackend';
 import { classRegistry } from '../ClassRegistry';
+import type { Abortable } from '../typedefs';
 import { fragmentSource, vertexSource } from './shaders/blendImage';
 
 export type TBlendImageMode = 'multiply' | 'mask';
@@ -209,7 +210,7 @@ export class BlendImage extends BaseFilter<'BlendImage', BlendImageOwnProps> {
    */
   static async fromObject(
     { type, image, ...filterOptions }: Record<string, any>,
-    options: { signal: AbortSignal },
+    options?: Abortable,
   ): Promise<BaseFilter<'BlendImage', BlendImageOwnProps>> {
     return FabricImage.fromObject(image, options).then(
       (enlivedImage) => new this({ ...filterOptions, image: enlivedImage }),

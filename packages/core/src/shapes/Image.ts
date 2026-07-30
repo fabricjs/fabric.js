@@ -471,11 +471,9 @@ export class FabricImage<
    * @param {String} src Source string (URL)
    * @param {LoadImageOptions} [options] Options object
    */
-  setSrc(
-    src: string,
-    { crossOrigin, signal }: LoadImageOptions = {},
-  ): Promise<void> {
-    return loadImage(src, { crossOrigin, signal }).then((img) => {
+  setSrc(src: string, options: LoadImageOptions = {}): Promise<void> {
+    const { crossOrigin } = options;
+    return loadImage(src, options).then((img) => {
       typeof crossOrigin !== 'undefined' && this.set({ crossOrigin });
       this.setElement(img);
     });
@@ -819,10 +817,11 @@ export class FabricImage<
    */
   static fromURL<T extends TOptions<ImageProps>>(
     url: string,
-    { crossOrigin = null, signal }: LoadImageOptions = {},
+    options: LoadImageOptions = {},
     imageOptions?: T,
   ): Promise<FabricImage> {
-    return loadImage(url, { crossOrigin, signal }).then(
+    const { crossOrigin = null } = options;
+    return loadImage(url, { ...options, crossOrigin }).then(
       (img) => new this(img, imageOptions),
     );
   }
