@@ -33,7 +33,7 @@
   "dependencies": {
     "@fabricjs/core": "workspace:^",
     "canvas": "^3.2.0",
-    "jsdom": "^26.1.0"
+    "jsdom": "^30.0.1"
   },
   "engines": {
     "node": ">=20.0.0"
