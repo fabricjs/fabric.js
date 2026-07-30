@@ -15,7 +15,7 @@
     "@fabricjs/gradient-controls": "workspace:^",
     "@fabricjs/node": "workspace:^",
     "@fabricjs/westures-integration": "workspace:^",
-    "jsdom": "^26.1.0",
+    "jsdom": "^30.0.1",
     "westures": "^1.1.1"
   },
   "devDependencies": {
