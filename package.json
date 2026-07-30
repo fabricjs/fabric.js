@@ -84,7 +84,7 @@
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "4.1.10",
     "commander": "^14.0.3",
-    "es-toolkit": "1.47.0",
+    "es-toolkit": "1.50.0",
     "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
