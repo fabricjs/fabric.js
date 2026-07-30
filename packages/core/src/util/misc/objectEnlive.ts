@@ -28,9 +28,25 @@ export type LoadImageOptions = Abortable & {
  */
 export const loadImage = (
   url: string,
-  { signal, crossOrigin = null }: LoadImageOptions = {},
-) =>
-  new Promise<HTMLImageElement>(function (resolve, reject) {
+  { signal, crossOrigin = null, resourceValidator }: LoadImageOptions = {},
+): Promise<HTMLImageElement> => {
+  if (signal && signal.aborted) {
+    return Promise.reject(new SignalAbortedError('loadImage'));
+  }
+  if (url && resourceValidator) {
+    return Promise.resolve()
+      .then(() => resourceValidator(url))
+      .then((isAllowed) => {
+        if (!isAllowed) {
+          throw new FabricError(`Resource '${url}' is not allowed`);
+        }
+        if (signal && signal.aborted) {
+          throw new SignalAbortedError('loadImage');
+        }
+        return loadImage(url, { signal, crossOrigin });
+      });
+  }
+  return new Promise<HTMLImageElement>(function (resolve, reject) {
     if (signal && signal.aborted) {
       return reject(new SignalAbortedError('loadImage'));
     }
@@ -60,6 +76,7 @@ export const loadImage = (
     crossOrigin && (img.crossOrigin = crossOrigin);
     img.src = url;
   });
+};
 
 export type EnlivenObjectOptions = Abortable & {
   /**
@@ -99,7 +116,7 @@ export const enlivenObjects = <
     | TFiller,
 >(
   objects: any[],
-  { signal, reviver = noop }: EnlivenObjectOptions = {},
+  { signal, reviver = noop, ...options }: EnlivenObjectOptions = {},
 ) =>
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
@@ -112,7 +129,7 @@ export const enlivenObjects = <
               fromObject(options: any, context: Abortable): Promise<T>;
             }
           >(obj.type)
-          .fromObject(obj, { signal }),
+          .fromObject(obj, { signal, ...options }),
       ),
     )
       .then(async (elementsResult) => {
@@ -158,7 +175,7 @@ export const enlivenObjectEnlivables = <
   R = Record<string, FabricObject | TFiller | null>,
 >(
   serializedObject: any,
-  { signal }: Abortable = {},
+  { signal, ...options }: Abortable = {},
 ) =>
   new Promise<R>((resolve, reject) => {
     const instances: (FabricObject | TFiller | Shadow)[] = [];
@@ -177,8 +194,9 @@ export const enlivenObjectEnlivables = <
       if (value.type && classRegistry.has(value.type)) {
         return enlivenObjects<FabricObject | Shadow | TFiller>([value], {
           signal,
+          ...options,
         }).then(([enlived]) => {
-          instances.push(enlived);
+          enlived && instances.push(enlived);
           return enlived;
         });
       }
