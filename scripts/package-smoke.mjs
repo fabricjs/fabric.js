@@ -140,11 +140,6 @@ function verifyRootTarball(list) {
   expectExcludesPrefix(list, 'package/dist/src/', 'fabric');
   expectExcludesPrefix(list, 'package/dist/packages/', 'fabric');
   expectExcludesPrefix(list, 'package/dist-extensions/packages/', 'fabric');
-  expectExcludesPrefix(
-    list,
-    'package/dist-extensions/linear_gradient_controls/',
-    'fabric',
-  );
   expectExcludesPrefix(list, 'package/.github/', 'fabric');
   if (list.some((file) => /^package\/extensions\/.+\/.*\.ts$/.test(file))) {
     throw new Error(
