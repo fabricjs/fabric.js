@@ -1,1 +1,0 @@
-export { createLinearGradientControls } from './linearGradientControls';

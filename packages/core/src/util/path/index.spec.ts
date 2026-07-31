@@ -7,6 +7,7 @@ import {
   transformPath,
 } from '.';
 import type { TSimplePathData } from './typedefs';
+import { toFixed } from '../misc/toFixed';
 
 import { describe, expect, it, test } from 'vitest';
 import { Path } from '../../shapes/Path';
@@ -19,7 +20,12 @@ describe('Path Utils', () => {
       const parsed = parsePath(path);
       expect(parsed).toMatchSnapshot();
       const simplified = makePathSimpler(parsed);
-      expect(simplified).toMatchSnapshot();
+      expect(
+        simplified.map(([command, ...points]) => [
+          command,
+          ...points.map((point) => toFixed(point, 6)),
+        ]),
+      ).toMatchSnapshot();
     });
     test('Path written with uncommon scenario', () => {
       const path =

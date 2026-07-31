@@ -1523,6 +1523,55 @@ describe('StaticCanvas', () => {
     expect(canvas.item(0)).toBeInstanceOf(FabricImage);
   });
 
+  it('validates every resource in a deeply nested JSON payload', async () => {
+    const badUrl = 'http://www.badlink.com';
+    const image = () => ({
+      ...REFERENCE_IMG_OBJECT,
+      src: badUrl,
+    });
+    const pattern = () => ({
+      type: 'pattern',
+      source: badUrl,
+    });
+    const rect = () => ({
+      ...new Rect({ width: 10, height: 10 }).toObject(),
+      fill: pattern(),
+      stroke: pattern(),
+    });
+    const group = (objects: Record<string, unknown>[]) => ({
+      ...new Group([]).toObject(),
+      objects,
+    });
+    const resourceValidator = vi.fn(async () => false);
+
+    await canvas.loadFromJSON(
+      {
+        backgroundImage: image(),
+        overlayImage: image(),
+        objects: [
+          rect(),
+          group([
+            image(),
+            group([
+              rect(),
+              {
+                ...image(),
+                fill: pattern(),
+                stroke: pattern(),
+              },
+            ]),
+          ]),
+        ],
+      },
+      undefined,
+      { resourceValidator },
+    );
+
+    expect(resourceValidator).toHaveBeenCalledTimes(10);
+    expect(resourceValidator).toHaveBeenCalledWith(badUrl);
+    expect(resourceValidator.mock.calls.flat()).toEqual(Array(10).fill(badUrl));
+  });
+
   it('preserves custom properties when loading from JSON', async () => {
     const rect = new Rect({ width: 10, height: 20 });
     rect.padding = 123;
