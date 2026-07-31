@@ -1,7 +1,7 @@
 import { StaticCanvas } from './StaticCanvas';
 import { Canvas } from './Canvas';
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { TMat2D } from '../typedefs';
 import { FabricText, Gradient, Pattern, version } from '../../../../fabric';
 import { config } from '../config';
@@ -1468,6 +1468,59 @@ describe('StaticCanvas', () => {
     } catch (err) {
       expect(err).toHaveProperty('type', 'abort');
     }
+  });
+
+  it('validates external resources before loading JSON', async () => {
+    const blockedUrl = IMG_SRC;
+    const image = {
+      ...REFERENCE_IMG_OBJECT,
+      src: blockedUrl,
+    };
+    const group = new Group([]).toObject();
+    const rect = new Rect({ width: 10, height: 10 }).toObject();
+    const resourceValidator = vi.fn(async () => false);
+
+    await canvas.loadFromJSON(
+      {
+        objects: [
+          { ...group, objects: [image] },
+          {
+            ...rect,
+            fill: {
+              type: 'pattern',
+              source: blockedUrl,
+            },
+          },
+        ],
+        backgroundImage: image,
+      },
+      undefined,
+      { resourceValidator },
+    );
+
+    expect(resourceValidator).toHaveBeenCalledTimes(3);
+    expect(resourceValidator).toHaveBeenCalledWith(blockedUrl);
+    expect(canvas.getObjects()).toHaveLength(2);
+    expect(canvas.item(0)).toBeInstanceOf(Group);
+    expect((canvas.item(0) as Group).getObjects()).toHaveLength(0);
+    expect(canvas.item(1)).toBeInstanceOf(Rect);
+    expect((canvas.item(1) as Rect).fill).toBeUndefined();
+    expect(canvas.backgroundImage).toBeUndefined();
+  });
+
+  it('loads resources accepted by an async resource validator', async () => {
+    const image = {
+      ...REFERENCE_IMG_OBJECT,
+      src: IMG_SRC,
+    };
+    const resourceValidator = vi.fn(async () => true);
+
+    await canvas.loadFromJSON({ objects: [image] }, undefined, {
+      resourceValidator,
+    });
+
+    expect(resourceValidator).toHaveBeenCalledWith(IMG_SRC);
+    expect(canvas.item(0)).toBeInstanceOf(FabricImage);
   });
 
   it('preserves custom properties when loading from JSON', async () => {

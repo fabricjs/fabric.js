@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): Add backend network request callback [#11064](https://github.com/fabricjs/fabric.js/pull/11064)
 - chore(deps-dev): bump es-toolkit from 1.47.0 to 1.50.0 [#11062](https://github.com/fabricjs/fabric.js/pull/11062)
 - chore(deps-dev): bump the vitest group with 4 updates [#11059](https://github.com/fabricjs/fabric.js/pull/11059)
 - refactor(): Change the standard fabric package to be a combination of the new packages [#11045](https://github.com/fabricjs/fabric.js/pull/11045)

@@ -127,6 +127,11 @@ export type Abortable = {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    */
   signal?: AbortSignal;
+  /**
+   * Validates a URL before Fabric loads it as an external resource.
+   * Return `false` to skip the resource.
+   */
+  resourceValidator?: (url: string) => boolean | Promise<boolean>;
 };
 
 export type TOptions<T> = Partial<T> & Record<string, any>;
