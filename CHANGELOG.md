@@ -12,6 +12,7 @@
 - Fix clipped groups with child shadow offsets [#11047](https://github.com/fabricjs/fabric.js/pull/11047)
 - Refresh text measuring context when env document changes [#11046](https://github.com/fabricjs/fabric.js/pull/11046)
 - refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
+- fix(parser): match class/id selectors exactly so `.st12` is not lost when `.st1` also exists [#8838](https://github.com/fabricjs/fabric.js/issues/8838)
 - fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
 - refactor(env): move runtime env setup to packages [#11039](https://github.com/fabricjs/fabric.js/pull/11039)
 - chore(): Monorepo follow up steps [#11033](https://github.com/fabricjs/fabric.js/pull/11033)
