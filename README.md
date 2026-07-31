@@ -14,7 +14,9 @@ A **simple and powerful Javascript HTML5 canvas library**.
 Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
 
    <a href="https://www.atlascloud.ai/" >
-      <img alt="Atlascloud sponsorship" width="300" height="auto" src="https://www.atlascloud.ai/logo.svg" style="background-color: white;">
+     <table><tbody><tr><td bgcolor="white">
+       <img alt="Atlascloud sponsorship" width="300" height="auto" src="https://www.atlascloud.ai/logo.svg" />
+     </td></tr></tbody></table>
    </a>
 
 Atlas Cloud is a full-modal AI inference platform that gives developers a single AI API to access video generation, image generation, and LLM APIs. Instead of managing multiple vendor integrations, you connect once and get unified access to 300+ curated models across all modalities.
