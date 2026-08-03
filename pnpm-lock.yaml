@@ -90,6 +90,9 @@ importers:
       tsc-files:
         specifier: ^1.1.4
         version: 1.1.4(typescript@6.0.3)
+      typedoc:
+        specifier: ^0.28.11
+        version: 0.28.20(typescript@6.0.3)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -9197,6 +9200,15 @@ snapshots:
       markdown-it: 14.3.0
       minimatch: 10.2.5
       typescript: 5.9.3
+      yaml: 2.9.0
+
+  typedoc@0.28.20(typescript@6.0.3):
+    dependencies:
+      '@gerrit0/mini-shiki': 3.23.0
+      lunr: 2.3.9
+      markdown-it: 14.3.0
+      minimatch: 10.2.5
+      typescript: 6.0.3
       yaml: 2.9.0
 
   typesafe-path@0.2.2: {}
