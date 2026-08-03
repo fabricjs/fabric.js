@@ -7,7 +7,7 @@ title: "GraphemeData"
 
 > **GraphemeData** = `object`
 
-Defined in: [src/shapes/Textbox.ts:24](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Textbox.ts#L24)
+Defined in: [shapes/Textbox.ts:24](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Textbox.ts#L24)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/shapes/Textbox.ts:24](https://github.com/fabricjs/fabric.js/blo
 
 > **largestWordWidth**: `number`
 
-Defined in: [src/shapes/Textbox.ts:29](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Textbox.ts#L29)
+Defined in: [shapes/Textbox.ts:29](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Textbox.ts#L29)
 
 ***
 
@@ -23,4 +23,4 @@ Defined in: [src/shapes/Textbox.ts:29](https://github.com/fabricjs/fabric.js/blo
 
 > **wordsData**: `object`[][]
 
-Defined in: [src/shapes/Textbox.ts:25](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Textbox.ts#L25)
+Defined in: [shapes/Textbox.ts:25](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Textbox.ts#L25)

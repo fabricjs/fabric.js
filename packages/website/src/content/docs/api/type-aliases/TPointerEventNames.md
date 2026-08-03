@@ -7,4 +7,4 @@ title: "TPointerEventNames"
 
 > **TPointerEventNames** = `WithBeforeSuffix`\<`"down"`\> \| `WithBeforeSuffix`\<`"move"`\> \| `WithBeforeSuffix`\<`"up"`\> \| `"dblclick"` \| `"tripleclick"` \| `"wheel"`
 
-Defined in: [src/EventTypeDefs.ts:281](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/EventTypeDefs.ts#L281)
+Defined in: [EventTypeDefs.ts:281](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/EventTypeDefs.ts#L281)

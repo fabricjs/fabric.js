@@ -7,7 +7,7 @@ title: "PatternOptions"
 
 > **PatternOptions** = `Partial`\<`Pick`\<[`Pattern`](/api/classes/pattern/), `ExportedKeys`\>\> & `object`
 
-Defined in: [src/Pattern/types.ts:13](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Pattern/types.ts#L13)
+Defined in: [Pattern/types.ts:13](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/Pattern/types.ts#L13)
 
 ## Type Declaration
 

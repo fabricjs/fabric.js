@@ -7,7 +7,7 @@ title: "calcAngleBetweenVectors"
 
 > **calcAngleBetweenVectors**(`a`, `b`): [`TRadian`](/api/type-aliases/tradian/)
 
-Defined in: [src/util/misc/vectors.ts:39](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/vectors.ts#L39)
+Defined in: [util/misc/vectors.ts:39](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/vectors.ts#L39)
 
 Calculates the angle between 2 vectors
 

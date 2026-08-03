@@ -7,7 +7,7 @@ title: "TEasingFunction"
 
 > **TEasingFunction**\<`T`\> = `T` *extends* `number`[] ? (`timeElapsed`, `startValue`, `byValue`, `duration`, `index`) => `number` : (`timeElapsed`, `startValue`, `byValue`, `duration`) => `number`
 
-Defined in: [src/util/animation/types.ts:34](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/animation/types.ts#L34)
+Defined in: [util/animation/types.ts:34](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/animation/types.ts#L34)
 
 An easing function used to calculate the current value
 
@@ -23,13 +23,21 @@ AnimationBase#calculate
 
 ## Param
 
+**timeElapsed**
+
 ms elapsed since start
 
 ## Param
 
-## Param
+**startValue**
 
 ## Param
+
+**byValue**
+
+## Param
+
+**duration**
 
 in ms
 

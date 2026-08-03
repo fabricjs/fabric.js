@@ -119,7 +119,9 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "canvas"
+      "canvas",
+      "esbuild",
+      "sharp"
     ]
   },
   "module": "./dist/index.mjs",

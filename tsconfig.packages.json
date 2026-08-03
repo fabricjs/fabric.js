@@ -25,6 +25,7 @@
     "dist",
     "dist-extensions",
     "node_modules",
+    "packages/website",
     "**/*.spec.ts",
     "**/*.test.ts",
     "**/*.fixtures.ts"

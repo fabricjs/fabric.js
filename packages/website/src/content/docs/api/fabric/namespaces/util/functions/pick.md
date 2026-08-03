@@ -5,9 +5,9 @@ prev: false
 title: "pick"
 ---
 
-> **pick**\<`T`\>(`source`, `keys`): `Partial`\<`T`\>
+> **pick**\<`T`\>(`source`, `keys?`): `Partial`\<`T`\>
 
-Defined in: [src/util/misc/pick.ts:7](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/pick.ts#L7)
+Defined in: [util/misc/pick.ts:7](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/pick.ts#L7)
 
 Populates an object with properties of another object
 
@@ -25,7 +25,7 @@ Populates an object with properties of another object
 
 Source object
 
-### keys
+### keys?
 
 keyof `T`[] = `[]`
 

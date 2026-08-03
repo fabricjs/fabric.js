@@ -7,7 +7,7 @@ title: "T2DPipelineState"
 
 > **T2DPipelineState** = `object`
 
-Defined in: [src/filters/typedefs.ts:35](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L35)
+Defined in: [filters/typedefs.ts:35](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L35)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/filters/typedefs.ts:35](https://github.com/fabricjs/fabric.js/b
 
 > **canvasEl**: `HTMLCanvasElement`
 
-Defined in: [src/filters/typedefs.ts:39](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L39)
+Defined in: [filters/typedefs.ts:39](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L39)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/filters/typedefs.ts:39](https://github.com/fabricjs/fabric.js/b
 
 > **ctx**: `CanvasRenderingContext2D`
 
-Defined in: [src/filters/typedefs.ts:43](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L43)
+Defined in: [filters/typedefs.ts:43](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L43)
 
 ***
 
@@ -31,15 +31,15 @@ Defined in: [src/filters/typedefs.ts:43](https://github.com/fabricjs/fabric.js/b
 
 > **filterBackend**: [`Canvas2dFilterBackend`](/api/classes/canvas2dfilterbackend/)
 
-Defined in: [src/filters/typedefs.ts:38](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L38)
+Defined in: [filters/typedefs.ts:38](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L38)
 
 ***
 
 ### helpLayer?
 
-> `optional` **helpLayer**: `HTMLCanvasElement`
+> `optional` **helpLayer?**: `HTMLCanvasElement`
 
-Defined in: [src/filters/typedefs.ts:44](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L44)
+Defined in: [filters/typedefs.ts:44](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L44)
 
 ***
 
@@ -47,7 +47,7 @@ Defined in: [src/filters/typedefs.ts:44](https://github.com/fabricjs/fabric.js/b
 
 > **imageData**: `ImageData`
 
-Defined in: [src/filters/typedefs.ts:40](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L40)
+Defined in: [filters/typedefs.ts:40](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L40)
 
 ***
 
@@ -55,15 +55,15 @@ Defined in: [src/filters/typedefs.ts:40](https://github.com/fabricjs/fabric.js/b
 
 > **originalEl**: `CanvasImageSource`
 
-Defined in: [src/filters/typedefs.ts:41](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L41)
+Defined in: [filters/typedefs.ts:41](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L41)
 
 ***
 
 ### originalImageData?
 
-> `optional` **originalImageData**: `ImageData`
+> `optional` **originalImageData?**: `ImageData`
 
-Defined in: [src/filters/typedefs.ts:42](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L42)
+Defined in: [filters/typedefs.ts:42](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L42)
 
 ***
 
@@ -71,7 +71,7 @@ Defined in: [src/filters/typedefs.ts:42](https://github.com/fabricjs/fabric.js/b
 
 > **sourceHeight**: `number`
 
-Defined in: [src/filters/typedefs.ts:37](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L37)
+Defined in: [filters/typedefs.ts:37](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L37)
 
 ***
 
@@ -79,4 +79,4 @@ Defined in: [src/filters/typedefs.ts:37](https://github.com/fabricjs/fabric.js/b
 
 > **sourceWidth**: `number`
 
-Defined in: [src/filters/typedefs.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/typedefs.ts#L36)
+Defined in: [filters/typedefs.ts:36](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/typedefs.ts#L36)

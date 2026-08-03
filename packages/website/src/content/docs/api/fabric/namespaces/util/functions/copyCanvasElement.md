@@ -7,7 +7,7 @@ title: "copyCanvasElement"
 
 > **copyCanvasElement**(`canvas`): `HTMLCanvasElement`
 
-Defined in: [src/util/misc/dom.ts:28](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/dom.ts#L28)
+Defined in: [util/misc/dom.ts:28](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/dom.ts#L28)
 
 Creates a canvas element that is a copy of another and is also painted
 

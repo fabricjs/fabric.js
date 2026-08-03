@@ -7,19 +7,25 @@ title: "skewCursorStyleHandler"
 
 > `const` **skewCursorStyleHandler**: [`ControlCursorCallback`](/api/type-aliases/controlcursorcallback/)
 
-Defined in: [src/controls/skew.ts:71](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/skew.ts#L71)
+Defined in: [controls/skew.ts:71](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/controls/skew.ts#L71)
 
 return the correct cursor style for the skew action
 
 ## Param
 
+**eventData**
+
 the javascript event that is causing the scale
 
 ## Param
 
+**control**
+
 the control that is interested in the action
 
 ## Param
+
+**fabricObject**
 
 the fabric object that is interested in the action
 

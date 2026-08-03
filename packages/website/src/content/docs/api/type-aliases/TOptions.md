@@ -7,7 +7,7 @@ title: "TOptions"
 
 > **TOptions**\<`T`\> = `Partial`\<`T`\> & `Record`\<`string`, `any`\>
 
-Defined in: [src/typedefs.ts:132](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L132)
+Defined in: [typedefs.ts:137](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L137)
 
 ## Type Parameters
 

@@ -5,12 +5,10 @@ prev: false
 title: "getEnv"
 ---
 
-> **getEnv**(): `TFabricEnv`
+> **getEnv**(): [`TFabricEnv`](/api/type-aliases/tfabricenv/)
 
-Defined in: [src/env/index.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/env/index.ts#L36)
-
-In order to support SSR we **MUST** access the browser env only after the window has loaded
+Defined in: [env/index.ts:34](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/env/index.ts#L34)
 
 ## Returns
 
-`TFabricEnv`
+[`TFabricEnv`](/api/type-aliases/tfabricenv/)

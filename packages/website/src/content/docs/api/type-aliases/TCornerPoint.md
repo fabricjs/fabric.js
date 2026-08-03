@@ -7,7 +7,7 @@ title: "TCornerPoint"
 
 > **TCornerPoint** = `object`
 
-Defined in: [src/typedefs.ts:82](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L82)
+Defined in: [typedefs.ts:82](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L82)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/typedefs.ts:82](https://github.com/fabricjs/fabric.js/blob/ce64
 
 > **bl**: [`Point`](/api/classes/point/)
 
-Defined in: [src/typedefs.ts:85](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L85)
+Defined in: [typedefs.ts:85](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L85)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/typedefs.ts:85](https://github.com/fabricjs/fabric.js/blob/ce64
 
 > **br**: [`Point`](/api/classes/point/)
 
-Defined in: [src/typedefs.ts:86](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L86)
+Defined in: [typedefs.ts:86](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L86)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [src/typedefs.ts:86](https://github.com/fabricjs/fabric.js/blob/ce64
 
 > **tl**: [`Point`](/api/classes/point/)
 
-Defined in: [src/typedefs.ts:83](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L83)
+Defined in: [typedefs.ts:83](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L83)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [src/typedefs.ts:83](https://github.com/fabricjs/fabric.js/blob/ce64
 
 > **tr**: [`Point`](/api/classes/point/)
 
-Defined in: [src/typedefs.ts:84](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L84)
+Defined in: [typedefs.ts:84](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L84)

@@ -5,9 +5,9 @@ prev: false
 title: "sendVectorToPlane"
 ---
 
-> **sendVectorToPlane**(`point`, `from`, `to`): [`Point`](/api/classes/point/)
+> **sendVectorToPlane**(`point`, `from?`, `to?`): [`Point`](/api/classes/point/)
 
-Defined in: [src/util/misc/planeChange.ts:45](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/planeChange.ts#L45)
+Defined in: [util/misc/planeChange.ts:45](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/planeChange.ts#L45)
 
 See [sendPointToPlane](/api/fabric/namespaces/util/functions/sendpointtoplane/)
 
@@ -17,11 +17,11 @@ See [sendPointToPlane](/api/fabric/namespaces/util/functions/sendpointtoplane/)
 
 [`Point`](/api/classes/point/)
 
-### from
+### from?
 
 [`TMat2D`](/api/type-aliases/tmat2d/) = `iMatrix`
 
-### to
+### to?
 
 [`TMat2D`](/api/type-aliases/tmat2d/) = `iMatrix`
 

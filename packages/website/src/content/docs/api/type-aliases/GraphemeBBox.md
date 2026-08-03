@@ -7,7 +7,7 @@ title: "GraphemeBBox"
 
 > **GraphemeBBox** = `object`
 
-Defined in: [src/shapes/Text/Text.ts:98](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L98)
+Defined in: [shapes/Text/Text.ts:113](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L113)
 
 Measure and return the info of a single grapheme.
 needs the the info of previous graphemes already filled
@@ -17,9 +17,9 @@ Override to customize measuring
 
 ### angle?
 
-> `optional` **angle**: `number`
+> `optional` **angle?**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:106](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L106)
+Defined in: [shapes/Text/Text.ts:121](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L121)
 
 ***
 
@@ -27,7 +27,7 @@ Defined in: [src/shapes/Text/Text.ts:106](https://github.com/fabricjs/fabric.js/
 
 > **deltaY**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:103](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L103)
+Defined in: [shapes/Text/Text.ts:118](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L118)
 
 ***
 
@@ -35,7 +35,7 @@ Defined in: [src/shapes/Text/Text.ts:103](https://github.com/fabricjs/fabric.js/
 
 > **height**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:100](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L100)
+Defined in: [shapes/Text/Text.ts:115](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L115)
 
 ***
 
@@ -43,7 +43,7 @@ Defined in: [src/shapes/Text/Text.ts:100](https://github.com/fabricjs/fabric.js/
 
 > **kernedWidth**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:101](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L101)
+Defined in: [shapes/Text/Text.ts:116](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L116)
 
 ***
 
@@ -51,23 +51,23 @@ Defined in: [src/shapes/Text/Text.ts:101](https://github.com/fabricjs/fabric.js/
 
 > **left**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:102](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L102)
+Defined in: [shapes/Text/Text.ts:117](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L117)
 
 ***
 
 ### renderLeft?
 
-> `optional` **renderLeft**: `number`
+> `optional` **renderLeft?**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:104](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L104)
+Defined in: [shapes/Text/Text.ts:119](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L119)
 
 ***
 
 ### renderTop?
 
-> `optional` **renderTop**: `number`
+> `optional` **renderTop?**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:105](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L105)
+Defined in: [shapes/Text/Text.ts:120](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L120)
 
 ***
 
@@ -75,4 +75,4 @@ Defined in: [src/shapes/Text/Text.ts:105](https://github.com/fabricjs/fabric.js/
 
 > **width**: `number`
 
-Defined in: [src/shapes/Text/Text.ts:99](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/shapes/Text/Text.ts#L99)
+Defined in: [shapes/Text/Text.ts:114](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/shapes/Text/Text.ts#L114)

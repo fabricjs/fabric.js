@@ -5,7 +5,7 @@ prev: false
 title: "ColorMatrix"
 ---
 
-Defined in: [src/filters/ColorMatrix.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L36)
+Defined in: [filters/ColorMatrix.ts:36](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L36)
 
 Color Matrix filter class
 
@@ -15,6 +15,8 @@ Color Matrix filter class
  - [demo](http://phoboslab.org/log/2013/11/fast-image-filters-with-webgl)
 
 ## Example
+
+**Kodachrome filter**
 
 ```ts
 const filter = new ColorMatrix({
@@ -57,7 +59,7 @@ object.applyFilters();
 
 > **new ColorMatrix**\<`Name`, `OwnProps`, `SerializedProps`\>(`options?`): `ColorMatrix`\<`Name`, `OwnProps`, `SerializedProps`\>
 
-Defined in: [src/filters/BaseFilter.ts:55](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L55)
+Defined in: [filters/BaseFilter.ts:55](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L55)
 
 Constructor
 
@@ -83,7 +85,7 @@ Options object
 
 > **colorsOnly**: `boolean`
 
-Defined in: [src/filters/ColorMatrix.ts:56](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L56)
+Defined in: [filters/ColorMatrix.ts:56](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L56)
 
 Lock the colormatrix on the color part, skipping alpha, mainly for non webgl scenario
 to save some calculation
@@ -100,7 +102,7 @@ true
 
 > **matrix**: [`TMatColorMatrix`](/api/type-aliases/tmatcolormatrix/)
 
-Defined in: [src/filters/ColorMatrix.ts:48](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L48)
+Defined in: [filters/ColorMatrix.ts:48](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L48)
 
 Colormatrix for pixels.
 array of 20 floats. Numbers in positions 4, 9, 14, 19 loose meaning
@@ -108,6 +110,8 @@ outside the -1, 1 range.
 0.0039215686 is the part of 1 that get translated to 1 in 2d
 
 #### Param
+
+**matrix**
 
 array of 20 numbers.
 
@@ -117,7 +121,7 @@ array of 20 numbers.
 
 > `static` **defaults**: `ColorMatrixOwnProps` = `colorMatrixDefaultValues`
 
-Defined in: [src/filters/ColorMatrix.ts:60](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L60)
+Defined in: [filters/ColorMatrix.ts:60](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L60)
 
 #### Overrides
 
@@ -129,7 +133,7 @@ Defined in: [src/filters/ColorMatrix.ts:60](https://github.com/fabricjs/fabric.j
 
 > `static` **type**: `string` = `'ColorMatrix'`
 
-Defined in: [src/filters/ColorMatrix.ts:58](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L58)
+Defined in: [filters/ColorMatrix.ts:58](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L58)
 
 The class type. Used to identify which class this is.
 This is used for serialization purposes and internally it can be used
@@ -147,7 +151,7 @@ to avoid doing that.
 
 > `static` **uniformLocations**: `string`[]
 
-Defined in: [src/filters/ColorMatrix.ts:62](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L62)
+Defined in: [filters/ColorMatrix.ts:62](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L62)
 
 Contains the uniform locations for the fragment shader.
 uStepW and uStepH are handled by the BaseFilter, each filter class
@@ -165,7 +169,7 @@ needs to specify all the one that are needed
 
 > **get** **type**(): `Name`
 
-Defined in: [src/filters/BaseFilter.ts:29](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L29)
+Defined in: [filters/BaseFilter.ts:29](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L29)
 
 Filter type
 
@@ -183,7 +187,7 @@ Filter type
 
 > **\_setupFrameBuffer**(`options`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:203](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L203)
+Defined in: [filters/BaseFilter.ts:203](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L203)
 
 #### Parameters
 
@@ -205,7 +209,7 @@ Defined in: [src/filters/BaseFilter.ts:203](https://github.com/fabricjs/fabric.j
 
 > **\_swapTextures**(`options`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:230](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L230)
+Defined in: [filters/BaseFilter.ts:230](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L230)
 
 #### Parameters
 
@@ -227,7 +231,7 @@ Defined in: [src/filters/BaseFilter.ts:230](https://github.com/fabricjs/fabric.j
 
 > **applyTo**(`options`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:263](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L263)
+Defined in: [filters/BaseFilter.ts:263](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L263)
 
 Apply this filter to the input image data provided.
 
@@ -237,7 +241,13 @@ Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
 
 ##### options
 
-[`TWebGLPipelineState`](/api/type-aliases/twebglpipelinestate/) | [`T2DPipelineState`](/api/type-aliases/t2dpipelinestate/)
+[`TWebGLPipelineState`](/api/type-aliases/twebglpipelinestate/) \| [`T2DPipelineState`](/api/type-aliases/t2dpipelinestate/)
+
+[`TWebGLPipelineState`](/api/type-aliases/twebglpipelinestate/)
+
+***
+
+[`T2DPipelineState`](/api/type-aliases/t2dpipelinestate/)
 
 #### Returns
 
@@ -253,7 +263,7 @@ Determines whether to use WebGL or Canvas2D based on the options.webgl flag.
 
 > **applyTo2d**(`options`): `void`
 
-Defined in: [src/filters/ColorMatrix.ts:74](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L74)
+Defined in: [filters/ColorMatrix.ts:74](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L74)
 
 Apply the ColorMatrix operation to a Uint8Array representing the pixels of an image.
 
@@ -277,7 +287,7 @@ Apply the ColorMatrix operation to a Uint8Array representing the pixels of an im
 
 > **applyToWebGL**(`options`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:313](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L313)
+Defined in: [filters/BaseFilter.ts:313](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L313)
 
 Apply this filter using webgl.
 
@@ -301,7 +311,7 @@ Apply this filter using webgl.
 
 > **bindAdditionalTexture**(`gl`, `texture`, `textureUnit`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:332](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L332)
+Defined in: [filters/BaseFilter.ts:332](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L332)
 
 #### Parameters
 
@@ -331,7 +341,7 @@ Defined in: [src/filters/BaseFilter.ts:332](https://github.com/fabricjs/fabric.j
 
 > **createHelpLayer**(`options`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:368](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L368)
+Defined in: [filters/BaseFilter.ts:368](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L368)
 
 If needed by a 2d filter, this functions can create an helper canvas to be used
 remember that options.targetCanvas is available for use till end of chain.
@@ -354,9 +364,9 @@ remember that options.targetCanvas is available for use till end of chain.
 
 ### createProgram()
 
-> **createProgram**(`gl`, `fragmentSource`, `vertexSource`): `object`
+> **createProgram**(`gl`, `fragmentSource?`, `vertexSource?`): `object`
 
-Defined in: [src/filters/BaseFilter.ts:81](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L81)
+Defined in: [filters/BaseFilter.ts:81](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L81)
 
 Compile this filter's shader program.
 
@@ -368,13 +378,13 @@ Compile this filter's shader program.
 
 The GL canvas context to use for shader compilation.
 
-##### fragmentSource
+##### fragmentSource?
 
 `string` = `...`
 
 fragmentShader source for compilation
 
-##### vertexSource
+##### vertexSource?
 
 `string` = `...`
 
@@ -406,7 +416,7 @@ vertexShader source for compilation
 
 > **getAttributeLocations**(`gl`, `program`): [`TWebGLAttributeLocationMap`](/api/type-aliases/twebglattributelocationmap/)
 
-Defined in: [src/filters/BaseFilter.ts:151](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L151)
+Defined in: [filters/BaseFilter.ts:151](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L151)
 
 Return a map of attribute names to WebGLAttributeLocation objects.
 
@@ -440,7 +450,7 @@ A map of attribute names to attribute locations.
 
 > **getCacheKey**(): `string`
 
-Defined in: [src/filters/BaseFilter.ts:282](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L282)
+Defined in: [filters/BaseFilter.ts:282](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L282)
 
 Returns a string that represent the current selected shader code for the filter.
 Used to force recompilation when parameters change or to retrieve the shader from cache
@@ -459,7 +469,7 @@ Used to force recompilation when parameters change or to retrieve the shader fro
 
 > **getFragmentSource**(): `string`
 
-Defined in: [src/filters/ColorMatrix.ts:64](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L64)
+Defined in: [filters/ColorMatrix.ts:64](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L64)
 
 #### Returns
 
@@ -475,7 +485,7 @@ Defined in: [src/filters/ColorMatrix.ts:64](https://github.com/fabricjs/fabric.j
 
 > **getUniformLocations**(`gl`, `program`): [`TWebGLUniformLocationMap`](/api/type-aliases/twebgluniformlocationmap/)
 
-Defined in: [src/filters/BaseFilter.ts:167](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L167)
+Defined in: [filters/BaseFilter.ts:167](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L167)
 
 Return a map of uniform names to WebGLUniformLocation objects.
 
@@ -509,7 +519,7 @@ A map of uniform names to uniform locations.
 
 > **getVertexSource**(): `string`
 
-Defined in: [src/filters/BaseFilter.ts:70](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L70)
+Defined in: [filters/BaseFilter.ts:70](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L70)
 
 #### Returns
 
@@ -525,7 +535,7 @@ Defined in: [src/filters/BaseFilter.ts:70](https://github.com/fabricjs/fabric.js
 
 > **isNeutralState**(`options?`): `boolean`
 
-Defined in: [src/filters/BaseFilter.ts:246](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L246)
+Defined in: [filters/BaseFilter.ts:246](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L246)
 
 Generic isNeutral implementation for one parameter based filters.
 Used only in image applyFilters to discard filters that will not have an effect
@@ -552,7 +562,7 @@ Other filters may need their own version ( ColorMatrix, HueRotation, gamma, Comp
 
 > **retrieveShader**(`options`): [`TWebGLProgramCacheItem`](/api/type-aliases/twebglprogramcacheitem/)
 
-Defined in: [src/filters/BaseFilter.ts:293](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L293)
+Defined in: [filters/BaseFilter.ts:293](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L293)
 
 Retrieves the cached shader.
 
@@ -578,7 +588,7 @@ the compiled program shader
 
 > **sendAttributeData**(`gl`, `attributeLocations`, `aPositionData`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:190](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L190)
+Defined in: [filters/BaseFilter.ts:190](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L190)
 
 Send attribute data from this filter to its shader program on the GPU.
 
@@ -614,7 +624,7 @@ A map of shader attribute names to their locations.
 
 > **sendUniformData**(`gl`, `uniformLocations`): `void`
 
-Defined in: [src/filters/ColorMatrix.ts:105](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L105)
+Defined in: [filters/ColorMatrix.ts:105](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L105)
 
 Send data from this filter to its shader program's uniforms.
 
@@ -646,7 +656,7 @@ A map of string uniform names to WebGLUniformLocation objects
 
 > **toJSON**(): `object` & `SerializedProps`
 
-Defined in: [src/filters/BaseFilter.ts:405](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L405)
+Defined in: [filters/BaseFilter.ts:405](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L405)
 
 Returns a JSON representation of an instance
 
@@ -666,7 +676,7 @@ JSON
 
 > **toObject**(): `object` & `SerializedProps`
 
-Defined in: [src/filters/ColorMatrix.ts:133](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/ColorMatrix.ts#L133)
+Defined in: [filters/ColorMatrix.ts:133](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/ColorMatrix.ts#L133)
 
 Returns object representation of an instance
 It will automatically export the default values of a filter,
@@ -688,7 +698,7 @@ Object representation of an instance
 
 > **unbindAdditionalTexture**(`gl`, `textureUnit`): `void`
 
-Defined in: [src/filters/BaseFilter.ts:343](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L343)
+Defined in: [filters/BaseFilter.ts:343](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L343)
 
 #### Parameters
 
@@ -714,7 +724,7 @@ Defined in: [src/filters/BaseFilter.ts:343](https://github.com/fabricjs/fabric.j
 
 > `static` **fromObject**(`__namedParameters`, `_options?`): `Promise`\<[`BaseFilter`](/api/fabric/namespaces/filters/classes/basefilter/)\<`string`, `object`, `object`\>\>
 
-Defined in: [src/filters/BaseFilter.ts:410](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/BaseFilter.ts#L410)
+Defined in: [filters/BaseFilter.ts:410](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/BaseFilter.ts#L410)
 
 #### Parameters
 

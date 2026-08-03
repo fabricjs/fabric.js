@@ -7,7 +7,7 @@ title: "setEnv"
 
 > **setEnv**(`value`): `void`
 
-Defined in: [src/env/index.ts:29](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/env/index.ts#L29)
+Defined in: [env/index.ts:21](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/env/index.ts#L21)
 
 Sets the environment variables used by fabric.\
 This is exposed for special cases, such as configuring a test environment, and should be used with care.
@@ -18,13 +18,15 @@ This is exposed for special cases, such as configuring a test environment, and s
 
 ### value
 
-`TFabricEnv`
+[`TFabricEnv`](/api/type-aliases/tfabricenv/)
 
 ## Returns
 
 `void`
 
 ## Example
+
+**Passing \`window\` and \`document\` objects to fabric (in case they are mocked or something)**
 
 ```ts
 import { getEnv, setEnv } from 'fabric';

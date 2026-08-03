@@ -5,9 +5,9 @@ prev: false
 title: "parseSVGDocument"
 ---
 
-> **parseSVGDocument**(`doc`, `reviver?`, `__namedParameters?`): `Promise`\<`SVGParsingOutput`\>
+> **parseSVGDocument**(`doc`, `reviver?`, `callback?`): `Promise`\<`SVGParsingOutput`\>
 
-Defined in: [src/parser/parseSVGDocument.ts:35](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/parser/parseSVGDocument.ts#L35)
+Defined in: [parser/parseSVGDocument.ts:35](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/parser/parseSVGDocument.ts#L35)
 
 Parses an SVG document, converts it to an array of corresponding fabric.* instances and passes them to a callback
 
@@ -27,9 +27,11 @@ Extra callback for further parsing of SVG elements, called after each fabric obj
 Takes as input the original svg element and the generated `FabricObject` as arguments. Used to inspect extra properties not parsed by fabric,
 or extra custom manipulation
 
-### \_\_namedParameters?
+### callback?
 
 [`LoadImageOptions`](/api/fabric/namespaces/util/type-aliases/loadimageoptions/) = `{}`
+
+Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
 
 ## Returns
 

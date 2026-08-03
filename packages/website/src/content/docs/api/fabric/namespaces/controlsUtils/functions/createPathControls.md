@@ -5,9 +5,9 @@ prev: false
 title: "createPathControls"
 ---
 
-> **createPathControls**(`path`, `options`): `Record`\<`string`, [`Control`](/api/classes/control/)\>
+> **createPathControls**(`path`, `options?`): `Record`\<`string`, [`Control`](/api/classes/control/)\>
 
-Defined in: [src/controls/pathControl.ts:240](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/pathControl.ts#L240)
+Defined in: [controls/pathControl.ts:240](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/controls/pathControl.ts#L240)
 
 ## Parameters
 
@@ -15,7 +15,7 @@ Defined in: [src/controls/pathControl.ts:240](https://github.com/fabricjs/fabric
 
 [`Path`](/api/classes/path/)
 
-### options
+### options?
 
 `Partial`\<[`Control`](/api/classes/control/)\> & `object` = `{}`
 

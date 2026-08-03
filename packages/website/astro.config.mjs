@@ -2,7 +2,6 @@ import { defineConfig } from 'astro/config';
 import react from "@astrojs/react";
 import starlight from "@astrojs/starlight";
 import starlightTypeDoc, { typeDocSidebarGroup } from 'starlight-typedoc';
-import fs from 'node:fs'
 
 import sitemap from '@astrojs/sitemap';
 
@@ -48,23 +47,19 @@ export default defineConfig({
       './src/layouts/colorvars.css',
     ],
     plugins: [
-      // Generate the documentation only if local sources exist.
-      // This avoids dev crashes when `fabric.js` sources are not checked out.
-      (fs.existsSync(new URL('./fabric.js/fabric.ts', import.meta.url)) &&
-       fs.existsSync(new URL('./fabric.js/typedoc.config.json', import.meta.url))) &&
-        starlightTypeDoc({
-          entryPoints: ['./fabric.js/fabric.ts'],
-          tsconfig: './fabric.js/typedoc.config.json',
-          typeDoc: {
-            plugin: ['typedoc-plugin-no-inherit'],
-            readme: 'none',
-            gitRemote: 'https://github.com/fabricjs/fabric.js/blob',
-            entryFileName: 'index.md',
-            includeVersion: true,
-            sourceLinkExternal: true,
-            sourceLinkTemplate: 'https://github.com/fabricjs/fabric.js/blob/{gitRevision}/{path}#L{line}',
-          },
-        }),
-    ].filter(Boolean),
+      starlightTypeDoc({
+        entryPoints: ['../../fabric.ts'],
+        tsconfig: './typedoc.config.json',
+        typeDoc: {
+          plugin: ['typedoc-plugin-no-inherit'],
+          readme: 'none',
+          gitRemote: 'https://github.com/fabricjs/fabric.js/blob',
+          entryFileName: 'index.md',
+          includeVersion: true,
+          sourceLinkExternal: true,
+          sourceLinkTemplate: 'https://github.com/fabricjs/fabric.js/blob/{gitRevision}/{path}#L{line}',
+        },
+      }),
+    ],
   }), react(), sitemap()],
 });

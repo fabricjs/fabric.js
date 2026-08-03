@@ -7,7 +7,7 @@ title: "StrictLayoutContext"
 
 > **StrictLayoutContext** = [`LayoutContext`](/api/type-aliases/layoutcontext/) & `object`
 
-Defined in: [src/LayoutManager/types.ts:127](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L127)
+Defined in: [LayoutManager/types.ts:127](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L127)
 
 ## Type Declaration
 
@@ -17,7 +17,7 @@ Defined in: [src/LayoutManager/types.ts:127](https://github.com/fabricjs/fabric.
 
 ### prevStrategy?
 
-> `optional` **prevStrategy**: [`LayoutStrategy`](/api/classes/layoutstrategy/)
+> `optional` **prevStrategy?**: [`LayoutStrategy`](/api/classes/layoutstrategy/)
 
 ### strategy
 

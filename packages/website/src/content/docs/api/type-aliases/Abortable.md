@@ -7,15 +7,36 @@ title: "Abortable"
 
 > **Abortable** = `object`
 
-Defined in: [src/typedefs.ts:124](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L124)
+Defined in: [typedefs.ts:124](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L124)
 
 ## Properties
 
+### resourceValidator?
+
+> `optional` **resourceValidator?**: (`url`) => `boolean` \| `Promise`\<`boolean`\>
+
+Defined in: [typedefs.ts:134](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L134)
+
+Validates a URL before Fabric loads it as an external resource.
+Return `false` to skip the resource.
+
+#### Parameters
+
+##### url
+
+`string`
+
+#### Returns
+
+`boolean` \| `Promise`\<`boolean`\>
+
+***
+
 ### signal?
 
-> `optional` **signal**: `AbortSignal`
+> `optional` **signal?**: `AbortSignal`
 
-Defined in: [src/typedefs.ts:129](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L129)
+Defined in: [typedefs.ts:129](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L129)
 
 handle aborting
 

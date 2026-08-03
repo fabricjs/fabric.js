@@ -7,7 +7,7 @@ title: "changeObjectHeight"
 
 > `const` **changeObjectHeight**: [`TransformActionHandler`](/api/type-aliases/transformactionhandler/)
 
-Defined in: [src/controls/changeWidth.ts:71](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/changeWidth.ts#L71)
+Defined in: [controls/changeWidth.ts:71](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/controls/changeWidth.ts#L71)
 
 Action handler to change object's height
 Needs to be wrapped with `wrapWithFixedAnchor` to be effective
@@ -16,17 +16,25 @@ to reuse some logic. use "changeHeight" if you are looking to just use a control
 
 ## Param
 
+**eventData**
+
 javascript event that is doing the transform
 
 ## Param
+
+**transform**
 
 javascript object containing a series of information around the current transform
 
 ## Param
 
+**x**
+
 current mouse x position, canvas normalized
 
 ## Param
+
+**y**
 
 current mouse y position, canvas normalized
 

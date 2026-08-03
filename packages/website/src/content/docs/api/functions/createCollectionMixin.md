@@ -7,7 +7,7 @@ title: "createCollectionMixin"
 
 > **createCollectionMixin**\<`TBase`\>(`Base`): \{(...`args`): `Collection`; `prototype`: `Collection`\<`any`\>; \} & `TBase`
 
-Defined in: [src/Collection.ts:15](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/Collection.ts#L15)
+Defined in: [Collection.ts:15](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/Collection.ts#L15)
 
 ## Type Parameters
 

@@ -5,9 +5,9 @@ prev: false
 title: "projectStrokeOnPoints"
 ---
 
-> **projectStrokeOnPoints**(`points`, `options`, `openPath`): [`TProjection`](/api/fabric/namespaces/util/type-aliases/tprojection/)[]
+> **projectStrokeOnPoints**(`points`, `options`, `openPath?`): [`TProjection`](/api/fabric/namespaces/util/type-aliases/tprojection/)[]
 
-Defined in: [src/util/misc/projectStroke/index.ts:16](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/projectStroke/index.ts#L16)
+Defined in: [util/misc/projectStroke/index.ts:16](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/projectStroke/index.ts#L16)
 
 Used to calculate object's bounding box
 
@@ -21,7 +21,7 @@ Used to calculate object's bounding box
 
 [`TProjectStrokeOnPointsOptions`](/api/fabric/namespaces/util/type-aliases/tprojectstrokeonpointsoptions/)
 
-### openPath
+### openPath?
 
 `boolean` = `false`
 

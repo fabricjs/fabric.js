@@ -5,9 +5,9 @@ prev: false
 title: "createRotateMatrix"
 ---
 
-> **createRotateMatrix**(`angle`, `pivotPoint?`): [`TMat2D`](/api/type-aliases/tmat2d/)
+> **createRotateMatrix**(`angle?`, `pivotPoint?`): [`TMat2D`](/api/type-aliases/tmat2d/)
 
-Defined in: [src/util/misc/matrix.ts:185](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/matrix.ts#L185)
+Defined in: [util/misc/matrix.ts:185](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/matrix.ts#L185)
 
 Generate a rotation matrix around around a point (x,y), defaulting to (0,0)
 
@@ -18,7 +18,7 @@ A matrix in the form of
 
 ## Parameters
 
-### angle
+### angle?
 
 [`TRotateMatrixArgs`](/api/fabric/namespaces/util/type-aliases/trotatematrixargs/) = `{}`
 

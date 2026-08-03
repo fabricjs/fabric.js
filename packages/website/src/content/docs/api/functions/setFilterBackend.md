@@ -7,7 +7,7 @@ title: "setFilterBackend"
 
 > **setFilterBackend**(`backend`): `void`
 
-Defined in: [src/filters/FilterBackend.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/FilterBackend.ts#L36)
+Defined in: [filters/FilterBackend.ts:36](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/FilterBackend.ts#L36)
 
 ## Parameters
 

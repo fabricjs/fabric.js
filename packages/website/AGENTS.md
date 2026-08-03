@@ -9,16 +9,16 @@ HTML5 canvas library). Built with [Astro](https://astro.build) using the
 for interactive bits. Deployed to GitHub Pages.
 
 This is a documentation/marketing site, **not** the Fabric.js library
-itself — the library source lives in the `fabric.js` git submodule and is
-only used here to generate the API reference via TypeDoc.
+itself — this package lives inside the fabric.js monorepo and uses the
+monorepo source only to generate the API reference via TypeDoc.
 
 ## Repo structure
 
 ```
 /
-├── fabric.js/              git submodule → fabricjs/fabric.js (library source)
-│                            used only as TypeDoc input for the API reference;
-│                            not built/bundled into the site otherwise
+├── ../../fabric.ts           monorepo root: library entry point, used only as
+│                              TypeDoc input for the API reference; not built
+│                              or bundled into the site otherwise
 ├── src/
 │   ├── pages/               Astro routes: index, demos, resources, team, 404
 │   │   └── demos/[...slug].astro   renders each entry from the `demo` collection
@@ -75,9 +75,9 @@ Practical consequences when adding content:
   code demos, schema: title/tags/thumbnail/description) and `docs`
   (Starlight's schema, covers both guides and API reference pages).
 - **API reference generation**: `astro.config.mjs` runs
-  `starlight-typedoc` against `./fabric.js/fabric.ts`, but only if the
-  `fabric.js` submodule is checked out locally (`fs.existsSync` guard) —
-  this lets `npm run dev` work without the submodule, skipping API docs.
+  `starlight-typedoc` against the monorepo root entry point
+  (`../../fabric.ts` with `../../typedoc.config.json`), so the API
+  reference always matches the exact monorepo commit it is built from.
 - **Demos**: each demo is a folder under `src/content/demo/<name>/` with
   an `index.mdx` that imports `code.js` as raw text and renders it inside
   `<CodeEditor>` (a React island using CodeMirror) next to a live
@@ -98,39 +98,33 @@ Practical consequences when adding content:
   `autogenerate` pointing at `src/content/docs/docs` and
   `src/content/docs/api`.
 
-## Working with the submodule
+## Working in the monorepo
 
-The `fabric.js` submodule must be checked out for the API reference to
-build. If it's missing/out of date:
-
-```bash
-git submodule update --init --recursive
-```
-
-Without it, `npm run dev`/`build` still work but the `Api` sidebar
-section won't be generated.
+The API reference is generated from the monorepo source at the current
+commit, so there is no submodule to check out. Note that `fabric` is a
+`workspace:*` dependency on the monorepo root package: the root `dist`
+build must exist for the site to build (`pnpm run build` at the repo
+root). Install dependencies with `pnpm install` at the repo root.
 
 ## Commands
 
-| Command           | Action                                                  |
-| ------------------ | -------------------------------------------------------- |
-| `npm install`       | install dependencies                                     |
-| `npm run dev`       | start local dev server at `localhost:4321`                |
-| `npm run build`     | `astro check` (typecheck) then `astro build` → `./dist/` |
-| `npm run preview`   | preview the production build locally                     |
-| `npm run astro ...` | run Astro CLI commands (e.g. `astro add`)                 |
+| Command                     | Action                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `pnpm install` (repo root)  | install dependencies (workspace)                         |
+| `pnpm run dev`              | start local dev server at `localhost:4321`               |
+| `pnpm run build`            | `astro check` (typecheck) then `astro build` → `./dist/` |
+| `pnpm run preview`          | preview the production build locally                     |
+| `pnpm run astro ...`        | run Astro CLI commands (e.g. `astro add`)                |
 
-CI (`.github/workflows/build.yml`, `deploy.yml`) checks out the
-submodule, runs the same Astro build on PRs, and deploys `main` to
-GitHub Pages.
+CI runs the same Astro build on PRs; deployment to GitHub Pages is a
+follow-up decision for the monorepo workflow.
 
 ## Conventions
 
 - Formatting via Prettier (`.prettierrc.json`: semicolons, single
-  quotes, 2-space tabs). `.prettierignore` excludes `fabric.js` and a
-  few content dirs.
+  quotes, 2-space tabs). `.prettierignore` excludes a few content dirs.
 - `src/content/docs/api/**` is generated output from TypeDoc — treat it
   as build output, not hand-authored content (regenerated whenever the
-  submodule/docs build runs).
+  docs build runs).
 - Guides live under `src/content/docs/docs/**` as `.md`/`.mdx` with
   Starlight frontmatter (title, description, etc.).

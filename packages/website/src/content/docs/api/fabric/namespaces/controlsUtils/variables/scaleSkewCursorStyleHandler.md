@@ -7,19 +7,25 @@ title: "scaleSkewCursorStyleHandler"
 
 > `const` **scaleSkewCursorStyleHandler**: [`ControlCursorCallback`](/api/type-aliases/controlcursorcallback/)
 
-Defined in: [src/controls/scaleSkew.ts:46](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/controls/scaleSkew.ts#L46)
+Defined in: [controls/scaleSkew.ts:46](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/controls/scaleSkew.ts#L46)
 
 Combine skew and scale style handlers to cover fabric standard use case
 
 ## Param
 
+**eventData**
+
 the javascript event that is causing the scale
 
 ## Param
 
+**control**
+
 the control that is interested in the action
 
 ## Param
+
+**fabricObject**
 
 the fabric object that is interested in the action
 

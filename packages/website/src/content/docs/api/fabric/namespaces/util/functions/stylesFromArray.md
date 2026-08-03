@@ -7,7 +7,7 @@ title: "stylesFromArray"
 
 > **stylesFromArray**(`styles`, `text`): [`TextStyle`](/api/type-aliases/textstyle/)
 
-Defined in: [src/util/misc/textStyles.ts:101](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/textStyles.ts#L101)
+Defined in: [util/misc/textStyles.ts:101](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/textStyles.ts#L101)
 
 Returns the object form of the styles property with styles that are assigned per
 character rather than grouped by range. This format is more verbose, and is
@@ -17,9 +17,9 @@ only used during runtime (not for serialization/storage)
 
 ### styles
 
-the serialized form of a text object's styles
+[`TextStyle`](/api/type-aliases/textstyle/) \| [`TextStyleArray`](/api/fabric/namespaces/util/type-aliases/textstylearray/)
 
-[`TextStyle`](/api/type-aliases/textstyle/) | [`TextStyleArray`](/api/fabric/namespaces/util/type-aliases/textstylearray/)
+the serialized form of a text object's styles
 
 ### text
 

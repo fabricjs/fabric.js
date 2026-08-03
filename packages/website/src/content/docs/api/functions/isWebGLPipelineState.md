@@ -7,13 +7,13 @@ title: "isWebGLPipelineState"
 
 > **isWebGLPipelineState**(`options`): `options is TWebGLPipelineState`
 
-Defined in: [src/filters/utils.ts:6](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/filters/utils.ts#L6)
+Defined in: [filters/utils.ts:6](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/filters/utils.ts#L6)
 
 ## Parameters
 
 ### options
 
-[`TWebGLPipelineState`](/api/type-aliases/twebglpipelinestate/) | [`T2DPipelineState`](/api/type-aliases/t2dpipelinestate/)
+[`TWebGLPipelineState`](/api/type-aliases/twebglpipelinestate/) \| [`T2DPipelineState`](/api/type-aliases/t2dpipelinestate/)
 
 ## Returns
 

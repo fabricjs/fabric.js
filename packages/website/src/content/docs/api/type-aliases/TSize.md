@@ -7,7 +7,7 @@ title: "TSize"
 
 > **TSize** = `object`
 
-Defined in: [src/typedefs.ts:34](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L34)
+Defined in: [typedefs.ts:34](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L34)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/typedefs.ts:34](https://github.com/fabricjs/fabric.js/blob/ce64
 
 > **height**: `number`
 
-Defined in: [src/typedefs.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L36)
+Defined in: [typedefs.ts:36](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L36)
 
 ***
 
@@ -23,4 +23,4 @@ Defined in: [src/typedefs.ts:36](https://github.com/fabricjs/fabric.js/blob/ce64
 
 > **width**: `number`
 
-Defined in: [src/typedefs.ts:35](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/typedefs.ts#L35)
+Defined in: [typedefs.ts:35](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/typedefs.ts#L35)

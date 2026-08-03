@@ -7,7 +7,7 @@ title: "TCanvasSizeOptions"
 
 > **TCanvasSizeOptions** = \{ `backstoreOnly?`: `true`; `cssOnly?`: `false`; \} \| \{ `backstoreOnly?`: `false`; `cssOnly?`: `true`; \}
 
-Defined in: [src/canvas/StaticCanvas.ts:57](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/canvas/StaticCanvas.ts#L57)
+Defined in: [canvas/StaticCanvas.ts:56](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/canvas/StaticCanvas.ts#L56)
 
 Having both options in TCanvasSizeOptions set to true transform the call in a calcOffset
 Better try to restrict with types to avoid confusion.

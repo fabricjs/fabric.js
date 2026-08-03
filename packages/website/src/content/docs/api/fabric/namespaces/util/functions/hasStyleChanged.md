@@ -5,9 +5,9 @@ prev: false
 title: "hasStyleChanged"
 ---
 
-> **hasStyleChanged**(`prevStyle`, `thisStyle`, `forTextSpans`): `boolean`
+> **hasStyleChanged**(`prevStyle`, `thisStyle`, `forTextSpans?`): `boolean`
 
-Defined in: [src/util/misc/textStyles.ts:21](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/textStyles.ts#L21)
+Defined in: [util/misc/textStyles.ts:21](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/textStyles.ts#L21)
 
 ## Parameters
 
@@ -23,7 +23,7 @@ first style to compare
 
 second style to compare
 
-### forTextSpans
+### forTextSpans?
 
 `boolean` = `false`
 

@@ -30,6 +30,7 @@ title: "fabric"
 - [FabricText](/api/classes/fabrictext/)
 - [FitContentLayout](/api/classes/fitcontentlayout/)
 - [FixedLayout](/api/classes/fixedlayout/)
+- [GLProbe](/api/classes/glprobe/)
 - [Gradient](/api/classes/gradient/)
 - [Group](/api/classes/group/)
 - [InteractiveFabricObject](/api/classes/interactivefabricobject/)
@@ -54,6 +55,7 @@ title: "fabric"
 - [Textbox](/api/classes/textbox/)
 - [Triangle](/api/classes/triangle/)
 - [WebGLFilterBackend](/api/classes/webglfilterbackend/)
+- [WebGLProbe](/api/classes/webglprobe/)
 
 ## Interfaces
 
@@ -171,6 +173,7 @@ title: "fabric"
 - [TComplexParsedCommand](/api/type-aliases/tcomplexparsedcommand/)
 - [TComplexParsedCommandType](/api/type-aliases/tcomplexparsedcommandtype/)
 - [TComplexPathData](/api/type-aliases/tcomplexpathdata/)
+- [TCopyPasteData](/api/type-aliases/tcopypastedata/)
 - [TCornerPoint](/api/type-aliases/tcornerpoint/)
 - [TCrossOrigin](/api/type-aliases/tcrossorigin/)
 - [TCubicCurveCommand](/api/type-aliases/tcubiccurvecommand/)
@@ -182,7 +185,9 @@ title: "fabric"
 - [TEventsExtraData](/api/type-aliases/teventsextradata/)
 - [TextStyle](/api/type-aliases/textstyle/)
 - [TextStyleDeclaration](/api/type-aliases/textstyledeclaration/)
+- [TFabricEnv](/api/type-aliases/tfabricenv/)
 - [TFabricObjectProps](/api/type-aliases/tfabricobjectprops/)
+- [TFabricWindow](/api/type-aliases/tfabricwindow/)
 - [TFiller](/api/type-aliases/tfiller/)
 - [THorizontalLineCommand](/api/type-aliases/thorizontallinecommand/)
 - [TLineCommand](/api/type-aliases/tlinecommand/)
@@ -271,6 +276,7 @@ title: "fabric"
 ## Functions
 
 - [createCollectionMixin](/api/functions/createcollectionmixin/)
+- [getDevicePixelRatio](/api/functions/getdevicepixelratio/)
 - [getEnv](/api/functions/getenv/)
 - [getFabricDocument](/api/functions/getfabricdocument/)
 - [getFabricWindow](/api/functions/getfabricwindow/)
@@ -282,6 +288,7 @@ title: "fabric"
 - [loadSVGFromURL](/api/functions/loadsvgfromurl/)
 - [parseSVGDocument](/api/functions/parsesvgdocument/)
 - [setEnv](/api/functions/setenv/)
+- [setEnvFactory](/api/functions/setenvfactory/)
 - [setFilterBackend](/api/functions/setfilterbackend/)
 
 ## References

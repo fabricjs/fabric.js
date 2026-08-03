@@ -7,6 +7,6 @@ title: "easeOutCirc"
 
 > `const` **easeOutCirc**: [`TEasingFunction`](/api/fabric/namespaces/util/type-aliases/teasingfunction/)
 
-Defined in: [src/util/animation/easing.ts:164](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/animation/easing.ts#L164)
+Defined in: [util/animation/easing.ts:164](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/animation/easing.ts#L164)
 
 Circular easing out

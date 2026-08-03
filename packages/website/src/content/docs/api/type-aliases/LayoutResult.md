@@ -7,7 +7,7 @@ title: "LayoutResult"
 
 > **LayoutResult** = `object`
 
-Defined in: [src/LayoutManager/types.ts:54](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L54)
+Defined in: [LayoutManager/types.ts:54](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L54)
 
 ## Properties
 
@@ -15,7 +15,7 @@ Defined in: [src/LayoutManager/types.ts:54](https://github.com/fabricjs/fabric.j
 
 > **nextCenter**: [`Point`](/api/classes/point/)
 
-Defined in: [src/LayoutManager/types.ts:57](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L57)
+Defined in: [LayoutManager/types.ts:57](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L57)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: [src/LayoutManager/types.ts:57](https://github.com/fabricjs/fabric.j
 
 > **offset**: [`Point`](/api/classes/point/)
 
-Defined in: [src/LayoutManager/types.ts:61](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L61)
+Defined in: [LayoutManager/types.ts:61](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L61)
 
 The vector used to offset objects by, as measured by the plane
 
@@ -33,12 +33,12 @@ The vector used to offset objects by, as measured by the plane
 
 > **prevCenter**: [`Point`](/api/classes/point/)
 
-Defined in: [src/LayoutManager/types.ts:56](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L56)
+Defined in: [LayoutManager/types.ts:56](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L56)
 
 ***
 
 ### result?
 
-> `optional` **result**: [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
+> `optional` **result?**: [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
 
-Defined in: [src/LayoutManager/types.ts:55](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/types.ts#L55)
+Defined in: [LayoutManager/types.ts:55](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L55)

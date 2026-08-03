@@ -7,4 +7,4 @@ title: "runningAnimations"
 
 > `const` **runningAnimations**: `AnimationRegistry`
 
-Defined in: [src/util/animation/AnimationRegistry.ts:59](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/animation/AnimationRegistry.ts#L59)
+Defined in: [util/animation/AnimationRegistry.ts:59](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/animation/AnimationRegistry.ts#L59)

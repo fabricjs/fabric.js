@@ -5,9 +5,9 @@ prev: false
 title: "enlivenObjectEnlivables"
 ---
 
-> **enlivenObjectEnlivables**\<`R`\>(`serializedObject`, `options?`): `Promise`\<`R`\>
+> **enlivenObjectEnlivables**\<`R`\>(`serializedObject`, `object?`): `Promise`\<`R`\>
 
-Defined in: [src/util/misc/objectEnlive.ts:157](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/objectEnlive.ts#L157)
+Defined in: [util/misc/objectEnlive.ts:174](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/objectEnlive.ts#L174)
 
 Creates corresponding fabric instances residing in an object, e.g. `clipPath`
 
@@ -15,7 +15,7 @@ Creates corresponding fabric instances residing in an object, e.g. `clipPath`
 
 ### R
 
-`R` = `Record`\<`string`, `null` \| [`TFiller`](/api/type-aliases/tfiller/) \| [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\>\>
+`R` = `Record`\<`string`, [`TFiller`](/api/type-aliases/tfiller/) \| [`FabricObject`](/api/classes/fabricobject/)\<`Partial`\<[`FabricObjectProps`](/api/interfaces/fabricobjectprops/)\>, [`SerializedObjectProps`](/api/interfaces/serializedobjectprops/), [`ObjectEvents`](/api/interfaces/objectevents/)\> \| `null`\>
 
 ## Parameters
 
@@ -23,9 +23,11 @@ Creates corresponding fabric instances residing in an object, e.g. `clipPath`
 
 `any`
 
-### options?
+### object?
 
 [`Abortable`](/api/type-aliases/abortable/) = `{}`
+
+with properties to enlive ( fill, stroke, clipPath, path )
 
 ## Returns
 

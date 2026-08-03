@@ -7,7 +7,7 @@ title: "stylesToArray"
 
 > **stylesToArray**(`styles`, `text`): [`TextStyleArray`](/api/fabric/namespaces/util/type-aliases/textstylearray/)
 
-Defined in: [src/util/misc/textStyles.ts:50](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/textStyles.ts#L50)
+Defined in: [util/misc/textStyles.ts:50](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/textStyles.ts#L50)
 
 Returns the array form of a text object's inline styles property with styles grouped in ranges
 rather than per character. This format is less verbose, and is better suited for storage

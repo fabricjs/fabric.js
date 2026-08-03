@@ -5,10 +5,10 @@ prev: false
 title: "getFabricWindow"
 ---
 
-> **getFabricWindow**(): `Window` & *typeof* `globalThis` \| `DOMWindow`
+> **getFabricWindow**(): [`TFabricWindow`](/api/type-aliases/tfabricwindow/)
 
-Defined in: [src/env/index.ts:40](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/env/index.ts#L40)
+Defined in: [env/index.ts:48](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/env/index.ts#L48)
 
 ## Returns
 
-`Window` & *typeof* `globalThis` \| `DOMWindow`
+[`TFabricWindow`](/api/type-aliases/tfabricwindow/)

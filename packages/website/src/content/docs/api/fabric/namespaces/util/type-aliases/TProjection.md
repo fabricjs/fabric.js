@@ -7,23 +7,23 @@ title: "TProjection"
 
 > **TProjection** = `object`
 
-Defined in: [src/util/misc/projectStroke/types.ts:19](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/projectStroke/types.ts#L19)
+Defined in: [util/misc/projectStroke/types.ts:19](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/projectStroke/types.ts#L19)
 
 ## Properties
 
 ### angle?
 
-> `optional` **angle**: [`TRadian`](/api/type-aliases/tradian/)
+> `optional` **angle?**: [`TRadian`](/api/type-aliases/tradian/)
 
-Defined in: [src/util/misc/projectStroke/types.ts:22](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/projectStroke/types.ts#L22)
+Defined in: [util/misc/projectStroke/types.ts:22](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/projectStroke/types.ts#L22)
 
 ***
 
 ### bisector?
 
-> `optional` **bisector**: [`Point`](/api/classes/point/)
+> `optional` **bisector?**: [`Point`](/api/classes/point/)
 
-Defined in: [src/util/misc/projectStroke/types.ts:23](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/projectStroke/types.ts#L23)
+Defined in: [util/misc/projectStroke/types.ts:23](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/projectStroke/types.ts#L23)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: [src/util/misc/projectStroke/types.ts:23](https://github.com/fabricj
 
 > **originPoint**: [`Point`](/api/classes/point/)
 
-Defined in: [src/util/misc/projectStroke/types.ts:21](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/projectStroke/types.ts#L21)
+Defined in: [util/misc/projectStroke/types.ts:21](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/projectStroke/types.ts#L21)
 
 ***
 
@@ -39,4 +39,4 @@ Defined in: [src/util/misc/projectStroke/types.ts:21](https://github.com/fabricj
 
 > **projectedPoint**: [`Point`](/api/classes/point/)
 
-Defined in: [src/util/misc/projectStroke/types.ts:20](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/projectStroke/types.ts#L20)
+Defined in: [util/misc/projectStroke/types.ts:20](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/projectStroke/types.ts#L20)

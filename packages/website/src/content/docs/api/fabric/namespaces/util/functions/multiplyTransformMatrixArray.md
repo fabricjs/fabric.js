@@ -7,7 +7,7 @@ title: "multiplyTransformMatrixArray"
 
 > **multiplyTransformMatrixArray**(`matrices`, `is2x2?`): [`TMat2D`](/api/type-aliases/tmat2d/)
 
-Defined in: [src/util/misc/matrix.ts:96](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/matrix.ts#L96)
+Defined in: [util/misc/matrix.ts:96](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/matrix.ts#L96)
 
 Multiplies the matrices array such that a matrix defines the plane for the rest of the matrices **after** it
 
@@ -17,7 +17,7 @@ Multiplies the matrices array such that a matrix defines the plane for the rest 
 
 ### matrices
 
-(`undefined` \| `null` \| `false` \| [`TMat2D`](/api/type-aliases/tmat2d/))[]
+(`false` \| [`TMat2D`](/api/type-aliases/tmat2d/) \| `null` \| `undefined`)[]
 
 an array of matrices
 

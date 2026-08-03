@@ -5,7 +5,7 @@ prev: false
 title: "FitContentLayout"
 ---
 
-Defined in: [src/LayoutManager/LayoutStrategies/FitContentLayout.ts:8](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/FitContentLayout.ts#L8)
+Defined in: [LayoutManager/LayoutStrategies/FitContentLayout.ts:8](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/FitContentLayout.ts#L8)
 
 Layout will adjust the bounding box to fit target's objects.
 
@@ -33,7 +33,7 @@ Layout will adjust the bounding box to fit target's objects.
 
 > `readonly` `static` **type**: `"fit-content"` = `'fit-content'`
 
-Defined in: [src/LayoutManager/LayoutStrategies/FitContentLayout.ts:9](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/FitContentLayout.ts#L9)
+Defined in: [LayoutManager/LayoutStrategies/FitContentLayout.ts:9](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/FitContentLayout.ts#L9)
 
 override by subclass for persistence (TS does not support `static abstract`)
 
@@ -45,9 +45,9 @@ override by subclass for persistence (TS does not support `static abstract`)
 
 ### calcBoundingBox()
 
-> **calcBoundingBox**(`objects`, `context`): `undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
+> **calcBoundingBox**(`objects`, `context`): [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/) \| `undefined`
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:68](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L68)
+Defined in: [LayoutManager/LayoutStrategies/LayoutStrategy.ts:68](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L68)
 
 Override this method to customize layout.
 
@@ -63,7 +63,7 @@ Override this method to customize layout.
 
 #### Returns
 
-`undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
+[`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/) \| `undefined`
 
 #### Inherited from
 
@@ -73,9 +73,9 @@ Override this method to customize layout.
 
 ### calcLayoutResult()
 
-> **calcLayoutResult**(`context`, `objects`): `undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
+> **calcLayoutResult**(`context`, `objects`): [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/) \| `undefined`
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:33](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L33)
+Defined in: [LayoutManager/LayoutStrategies/LayoutStrategy.ts:33](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L33)
 
 Used by the `LayoutManager` to perform layout
 @TODO/fix: if this method is calcResult, should calc unconditionally.
@@ -93,7 +93,7 @@ the condition to not calc should be evaluated by the layoutManager.
 
 #### Returns
 
-`undefined` \| [`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/)
+[`LayoutStrategyResult`](/api/type-aliases/layoutstrategyresult/) \| `undefined`
 
 layout result **OR** `undefined` to skip layout
 
@@ -107,7 +107,7 @@ layout result **OR** `undefined` to skip layout
 
 > **getInitialSize**(`context`, `result`): [`Point`](/api/classes/point/)
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L58)
+Defined in: [LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L58)
 
 #### Parameters
 
@@ -131,9 +131,9 @@ Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:58](https://gi
 
 ### shouldLayoutClipPath()
 
-> **shouldLayoutClipPath**(`__namedParameters`): `undefined` \| `boolean`
+> **shouldLayoutClipPath**(`__namedParameters`): `boolean` \| `undefined`
 
-Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L50)
+Defined in: [LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/LayoutStrategy.ts#L50)
 
 #### Parameters
 
@@ -143,7 +143,7 @@ Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://gi
 
 #### Returns
 
-`undefined` \| `boolean`
+`boolean` \| `undefined`
 
 #### Inherited from
 
@@ -155,7 +155,7 @@ Defined in: [src/LayoutManager/LayoutStrategies/LayoutStrategy.ts:50](https://gi
 
 > **shouldPerformLayout**(`context`): `boolean`
 
-Defined in: [src/LayoutManager/LayoutStrategies/FitContentLayout.ts:16](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/LayoutManager/LayoutStrategies/FitContentLayout.ts#L16)
+Defined in: [LayoutManager/LayoutStrategies/FitContentLayout.ts:16](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/LayoutStrategies/FitContentLayout.ts#L16)
 
 layout on all triggers
 Override at will

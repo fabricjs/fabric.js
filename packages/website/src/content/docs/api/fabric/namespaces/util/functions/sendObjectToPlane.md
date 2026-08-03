@@ -7,7 +7,7 @@ title: "sendObjectToPlane"
 
 > **sendObjectToPlane**(`object`, `from?`, `to?`): [`TMat2D`](/api/type-aliases/tmat2d/)
 
-Defined in: [src/util/misc/planeChange.ts:81](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/planeChange.ts#L81)
+Defined in: [util/misc/planeChange.ts:81](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/planeChange.ts#L81)
 
 A util that abstracts applying transform to objects.\
 Sends `object` to the destination coordinate plane by applying the relevant transformations.\
@@ -40,6 +40,8 @@ the transform matrix that was applied to `object`
 
 ## Examples
 
+**Move clip path from one object to another while preserving it's appearance as viewed by canvas/viewer**
+
 ```ts
 let obj, obj2;
 let clipPath = new Circle({ radius: 50 });
@@ -50,6 +52,8 @@ obj.clipPath = undefined;
 obj2.clipPath = clipPath;
 // render, clipPath now clips obj2 but seems unchanged from the eyes of the viewer
 ```
+
+**Clip an object's clip path with an existing object**
 
 ```ts
 let obj, existingObj;

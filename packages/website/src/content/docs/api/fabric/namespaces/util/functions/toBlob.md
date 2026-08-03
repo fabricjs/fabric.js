@@ -5,9 +5,9 @@ prev: false
 title: "toBlob"
 ---
 
-> **toBlob**(`canvasEl`, `format?`, `quality?`): `Promise`\<`null` \| `Blob`\>
+> **toBlob**(`canvasEl`, `format?`, `quality?`): `Promise`\<`Blob` \| `null`\>
 
-Defined in: [src/util/misc/dom.ts:70](https://github.com/fabricjs/fabric.js/blob/ce64f450bad811750cb5a75aa749fc1502c644be/src/util/misc/dom.ts#L70)
+Defined in: [util/misc/dom.ts:70](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/util/misc/dom.ts#L70)
 
 ## Parameters
 
@@ -25,4 +25,4 @@ Defined in: [src/util/misc/dom.ts:70](https://github.com/fabricjs/fabric.js/blob
 
 ## Returns
 
-`Promise`\<`null` \| `Blob`\>
+`Promise`\<`Blob` \| `null`\>
