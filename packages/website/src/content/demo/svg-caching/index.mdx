@@ -1,0 +1,23 @@
+---
+date: '2013-11-02'
+title: 'Svg caching'
+thumbnail: 'svg-caching.png'
+tags: ['svg', 'caching']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import '../../../css/demo-common.css';
+
+When rendering complex shapes onto canvas — those consisting of thousands of paths — it's usually faster to have them cached so that they get rendered with <code>ctx.drawImage</code>.<br />
+This essentially replaces thousands of low-level commands (<code>lineTo</code>, <code>moveTo</code>, <code>bezierCurveTo</code>, <code>arcTo</code>, etc.) with a single <code>drawImage</code>.<br />
+
+The downside is an higher memory usage since all svgs gets a canvas with a image copy of the svg.
+
+<div className="controls">
+  <button id="cache">toggle cache</button>
+</div>
+
+<CodeEditor code={code} canvasId="c" client:idle>
+    <canvas id="c" width="650" height="1000"></canvas>
+</CodeEditor>

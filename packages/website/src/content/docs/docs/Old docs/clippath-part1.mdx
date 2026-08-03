@@ -1,0 +1,29 @@
+---
+date: 2018-06-23
+description: ClipPath introdcution
+title: ClipPath introdcution
+---
+import { Example1, Example2, Example3 } from './clippath-part1/clippath-part1';
+
+### The new clipPath property
+
+In 2.4.0 we introduced the clipPath property for all objects. ClipPath replaces `clipTo: function() {}`, achieving the same flexibility, but with better compatibility.  
+ClipPath REQUIRES objectCaching, and will use it automatically for any object containing a clipPath.
+
+### How to use it
+
+Create your own clipPath using any normal Fabric Object, and then assign it to the clipPath property of the object you want to clip.  
+According to the official SVG specs, clipPath has no stroke and is filled with black. The pixels of the object that overlap with the black pixels of the clipPath will be visible, while the other will not.  
+Let's start with some basic examples.  
+In this first example, a red rectangle is clipped with a circle, making only the area inside the circle visible.  
+Please note: the clipPath is positioned starting from the center of the object. The object's originX and originY values do not play any role, while clipPath originX and originY do. This is the same positioning logic used for `fabric.Group`.
+
+<Example1 client:idle />
+
+We can clip a group:
+
+<Example2 client:idle />
+
+Or We can clip using groups. In the case of groups, remember that each object in the group will be logically OR with others, there is no `nonzero` or `evenodd` clip-rule
+
+<Example3 client:idle />

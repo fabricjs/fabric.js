@@ -1,0 +1,33 @@
+---
+date: '2026-07-30'
+title: 'Gradient controls'
+description: 'Drag a linear gradient into place with interactive handles'
+thumbnail: 'linear-gradient-controls.png'
+tags: ['gradient', 'controls', 'extensions']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+
+A gradient is normally something you configure in code and then leave alone. The
+`createLinearGradientControls()` helper from `fabric/extensions` turns it into
+something you can drag directly on the canvas.
+
+Select the rectangle and try the handles:
+
+- The two handles joined by a line are the **ends of the gradient vector**
+  (`coords.x1/y1` and `coords.x2/y2`). Drag them to aim the gradient anywhere —
+  the colours always run along that line.
+- The four handles sitting *on* the line are the **colour stops**. Dragging one
+  changes its `offset`, sliding that colour along the gradient. They project onto
+  the vector, so they stay on the line no matter where you drop them.
+
+The object's own corner handles still work, and the gradient handles follow along
+when you move, scale or rotate it.
+
+<CodeEditor code={code} canvasId="linear-gradient-controls" client:idle canvasDown>
+  <canvas width="700" height="420" id="linear-gradient-controls"></canvas>
+</CodeEditor>
+
+For the gradient object itself — linear versus radial, coordinates and units —
+see the [using gradients](/docs/using-gradients) guide.

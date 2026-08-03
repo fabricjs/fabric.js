@@ -1,0 +1,34 @@
+---
+date: '2020-12-25'
+title: 'Duotone filter'
+description: 'Use the Composed filter to create a duotone effect'
+thumbnail: 'duotone-filter.png'
+tags: ['filters', 'customization']
+---
+
+import { InputEventAttacher } from './DuotoneFilter'
+
+### Use the Composed filter to create a duotone effect
+
+Fabric has a `Composed` filter that can be used to mix together different effects into a single one.
+This is not much different than adding more than one filter in the `.filters` property of an image, but it comes handy when you want to define those 3 effects as a single block of effects with a meaning.
+
+### The duotone effect
+
+The duotone effect is obtained by reducing an image to two main tones that contrast with each other. This is similar to a black and white image, but mixing color A and color B rather than black to white.
+
+Some tutorials such as this [one](https://codeburst.io/build-spotifys-colorizer-effect-with-javascript-35cb75fc638c) demonstrate how to create this effect with the standard canvas api.
+
+The logic is as follow:
+1. take a picture
+2. make it black and white
+3. blend a light color with multiply mode
+4. blend a dark color with lighten mode
+
+What follows is a simple Fabric.js implementation of this technique.
+Above the canvas we place two color pickers in order to change the input values to obtain different outputs.
+
+<input type="color" id="colorLight" value="#00ff36" />
+<input type="color" id="colorDark" value="#23278a" />
+<canvas id="canvas" width="500" height="620" ></canvas>
+<InputEventAttacher client:idle />

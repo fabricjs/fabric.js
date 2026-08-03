@@ -1,0 +1,35 @@
+---
+date: '2017-10-10'
+title: 'Realtime lanczos'
+description: 'Intersections in Fabric.js'
+thumbnail: 'lanczos-webgl.png'
+tags: ['filters']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import './index.css';
+import '../../../css/demo-common.css';
+
+This demo shows a 1920x1200 large jpeg displayed in a small FabricImage object.
+The image starts with a scaling of 0.2 and you can use the corner to increase or decrease the scale.
+While changing the scale you can observe the lower canvases that offer a detailed view of the image scaling with and without the lanczos filter.
+
+Right click on the image object to change the magnified point in the canvases below.
+
+On the right of the canvases you can see the number and values of the taps used for the filter.
+The more you shrink the image, the more taps, the more performance hit but also the smoother scaling.
+
+This filter affects performace, you may consider it if your application is exporting small png or jpegs but is using large images.
+
+<canvas id="canvas" width="800" height="500"></canvas>
+<div class="flexH">
+	<div class="flexV">
+		<canvas id="c" width="550" height="400" style="border:1px solid #ccc"></canvas>
+		<canvas id="b" width="550" height="400" style="border:1px solid #ccc"></canvas>
+	</div>
+	<pre id="log" ></pre>
+</div>
+<CodeEditor code={code} canvasId="canvas" client:idle>
+  
+</CodeEditor>

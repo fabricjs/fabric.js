@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="226" height="200"
+       xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example stroke5 - stroke-dasharray</desc>
+
+  <line stroke="black" stroke-width="10" stroke-dasharray="5, 5" x1="10" y1="10" x2="216" y2="10" />
+  <line stroke="black" stroke-width="10" stroke-dasharray="5, 10" x1="10" y1="30" x2="216" y2="30" />
+  <line stroke="black" style="stroke-width:10; stroke-dasharray:10, 5;" x1="10" y1="50" x2="216" y2="50" />
+  <line stroke="black" stroke-width="10" stroke-dasharray="5, 1" x1="10" y1="70" x2="216" y2="70" />
+  <line stroke="black" stroke-width="10" stroke-dasharray="1, 5" x1="10" y1="90" x2="216" y2="90" />
+  <line style="stroke: black; stroke-width: 10; stroke-dasharray: 0.9;" x1="10" y1="110" x2="216" y2="110" />
+  <line style="stroke: black; stroke-width: 10; stroke-dasharray: 15 10 5;" x1="10" y1="130" x2="216" y2="130" />
+  <line stroke="black" stroke-width="10" stroke-dasharray="15, 10, 5, 10" x1="10" y1="150" x2="216" y2="150" />
+  <line stroke="black" stroke-width="10" stroke-dasharray="15, 10, 5, 10, 15" x1="10" y1="170" x2="216" y2="170" />
+  <line stroke="black" stroke-width="10" stroke-dasharray="5, 5, 1, 5" x1="10" y1="190" x2="216" y2="190" />
+</svg>
