@@ -1,0 +1,75 @@
+---
+date: '2024-07-01'
+title: 'Configuring defaults properties'
+description: ''
+sidebar:
+  order: 400
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code1 from './configuring-controls/code1.js?raw';
+
+## Configuring default controls for objects
+
+If you are looking for configuring default controls please check this other page [Configuring controls](/docs/configuring-controls/).
+
+Every object in Fabric.js ( rect, path, circle...) come with a series of state properties that determine how the object looks like and some of the default interactive behaviours.
+
+You can configure those value when instantiating the object or you may want to set certain properties at project level and forget about them.
+There are a couple of common reasons why you would like to do that globally:
+- you decide you don't want use caching
+- you don't like the transparent 1px stroke around objects
+- you want all your text objects to start with a custom font
+- you may want to setup the project to work with originX and originY set on 'center' as suggested
+
+Most of the defaults are stored in a static property called <strong>ownDefaults</strong>.
+When the instance is constructed this bag of properties is assigned to the instance with an Object.assign
+
+if you want to change the default Font for the FabricText class for example you can do so by doing
+
+```ts
+import { FabricText } from 'fabric';
+
+FabricText.ownDefaults.fontFamily = 'Lobster';
+```
+
+This will make every FabricText and every subclasses that inherits from it have the default font family as `Lobster` unless you specify differently in the constructor.
+
+```ts
+new FabricText('Hello World!') // Will have Lobster font
+
+new FabricText('Hello World!', { fontFamily: 'Arial' }) // Will have Arial font
+```
+
+Take care you need to discover where FontFamily is defined before changing it.
+Changing FontFamily on FabricObject will have no effect because FabricText has its own default, while setting it on IText or Textbox will leave FabricText with the original default.
+
+As a thumb rule you should change your own defaults once as a way to configure Fabric.js to adapt to your application needs.
+Configuring defaults instead of setting every option on every object instance is something that will reduce clutter in your code, but is not going to be faster or better from a performance point of view.
+
+There is a method called `getDefaults()` on the instances.
+This will return an object that shows you which are the defaults for that instance.
+
+This method is used on the `toObject` export to optionally avoid to export the default values to reduce the size of the output.
+
+## A note on Prototype
+
+Differently from Fabric.js version 5 and earlier, this won't affect already constructed instances.
+
+Javascript Classes syntax does not support properties on the Prototype that Fabric.js was leveraging with Objects before.
+
+If you really like the old behavior you can still switch to it by writing some code.
+
+Here is an example for FabricObject:
+
+```ts
+import { FabricObject } from 'fabric';
+
+Object.assign(FabricObject.prototype, FabricObject.ownDefaults);
+FabricObject.ownDefaults = {};
+```
+
+Note that you really need some strong reason to do so.
+There are good points, like for example properties that are objects or arrays are not going to be duplicated per instance but shared across all of them.
+On the other side this will create unexpected mutation side effects that you may not want in your application.
+The default for fabricJS is on the safer side, with an eye to overridability.

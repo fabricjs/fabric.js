@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 600 400">
+<defs>
+  <clipPath id="mask">
+    <circle r="100" cx="100" cy="100" />
+    <circle r="100" cx="500" cy="100" />
+    <circle r="100" cx="100" cy="300" />
+    <circle r="100" cx="500" cy="300" />
+  </clipPath>
+</defs>
+<image clip-path="url(#mask)" xlink:href="/assets/mononoke.jpg" width="600" height="400" />
+</svg>

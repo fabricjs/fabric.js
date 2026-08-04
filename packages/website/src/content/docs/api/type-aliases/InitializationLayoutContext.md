@@ -1,0 +1,28 @@
+---
+editUrl: false
+next: false
+prev: false
+title: "InitializationLayoutContext"
+---
+
+> **InitializationLayoutContext** = [`CommonLayoutContext`](/api/type-aliases/commonlayoutcontext/) & `object`
+
+Defined in: [LayoutManager/types.ts:84](https://github.com/fabricjs/fabric.js/blob/51d44795817982682ed08b732d2811d0959cd527/packages/core/src/LayoutManager/types.ts#L84)
+
+## Type Declaration
+
+### targets
+
+> **targets**: [`FabricObject`](/api/classes/fabricobject/)[]
+
+### type
+
+> **type**: *typeof* `LAYOUT_TYPE_INITIALIZATION`
+
+### x?
+
+> `optional` **x?**: `number`
+
+### y?
+
+> `optional` **y?**: `number`

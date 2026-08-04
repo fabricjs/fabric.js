@@ -1,0 +1,31 @@
+---
+date: '2017-08-29'
+title: 'Copy and paste'
+description: 'Copy and paste in Fabric.js'
+thumbnail: 'copy-paste.png'
+tags: ['clipboard', 'copy', 'paste', 'text']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+
+The embedded serialization properties of fabricJS are good enough for a clipboard like implementation. When you want to copy an object, just store to your destination of choice a cloned copy of the object using
+
+```js
+const copy = await activeObject.clone();
+```
+
+You can also decide to leverage serialization and just store in the clipboard the result of `activeObject.toObject()` call and then use the `fromObject` counterpart to get it back. Unless you are dealing with some mechanism for which live instances can't be transferred around, the choice between the approaches is a matter of preferences.
+Both approaches safeguard from unwanted mutation by cloning the object on copy and on paste, so that you can do multiple copies and changes to the origin and following copies without fear of mutating the clipboard
+
+<div className="controls">
+  <p>
+    <button id="copy">Copy Selected Objects</button>
+  </p>
+  <p>
+    <button id="paste">Paste Selected Objects</button>
+  </p>
+</div>
+<CodeEditor code={code} canvasId="test1" client:idle>
+    <canvas  width="600" height="500" id="test1"></canvas>
+</CodeEditor>

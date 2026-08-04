@@ -1,0 +1,442 @@
+---
+date: '2016-11-26'
+description: 'Caching of object, properties and behavior'
+title: Caching of object, properties and behavior
+sidebar:
+  order: 700
+---
+
+import { Example1, Example2, Example3, Example4 } from './fabric-object-caching/fabric-object-caching.jsx';
+
+## Caching in Fabric.js
+
+When fabric object caching is active, the objects you paint on canvas are actually pre painted on another smaller canvas,
+ outside of the DOM, as big as the object pixel dimension itself.
+During the `render` method this pre painted canvas gets copied on the main canvas with a `drawImage` operation.
+
+That means that during `drag` `rotate` `skew` `scale` operations the object is not redrawn on canvas, but just its copied cached image gets drawn over the canvas.
+
+In general every top level object on the fabric.canvas ends up on its own image counterpart stored on a HTMLCanvas
+ of which a reference is saved in the property `_cacheCanvas`. Every render cycle the code checks if this object is dirty
+ and in case it refreshes the copy and then uses it for painting again.
+
+The caching strategy is very simple in Fabric.js and there are few properties on the objects or in the top level configuration to slightly tweak it.
+In practice then this process has a lot of contrains and performance pitfalls. Please be sure to read this entire page to
+ understand the basics.
+
+## Tweaks and configuration
+
+### Object configuration
+
+Fabric.js objects have some top level properties to handle caching.
+
+```ts
+myObject.objectCaching = true;
+```
+objectCaching property is the main switch of caching per object.
+When is false caching is skipped, unless is required because of some other constrain ( more on that later )
+
+```ts
+myObject.noScaleCache = true;
+```
+noScaleCache is a boolean that will stop cache invalidation during a scaling operation with the mouse.
+At the end of the scaling operation the object will be redrawn and a new cache will be created for that scale value.
+
+Also spot differences in scaling between `noScaleCache` true or false.  
+In canvases below left canvas is `true`, that means that during the scaling transformation the object is not regenerated.
+The right canvas has scaling that invalidates the cache every scale change.
+You can also open your developer tools and record scaling performances in both cases and compare.
+Take care that the below yellow care is a large complex object made of 417 inner objects and gradients.
+if you scale an object more than 3 times the original size you will notice blurring that then gets fixed with a new cached
+ copy as soon as you perform a mouse up. Try it by yourself by scaling the little yellow cars on both canvases:
+
+<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+<Example3 client:idle hideCode canvasStyle={{ border: '1px solid black' }} />
+<Example4 client:idle hideCode canvasStyle={{ border: '1px solid black' }}/>
+</div>
+
+```ts
+myObject.dirty = true;
+```
+This boolean flags the cache status as old/invalid/dirty and will cause a re-render at the next render cycle.
+As of today there isn't a method to force cache refresh imperatively.
+
+Fabric.js takes care to set the dirty flag during the operations that will likely cause a cache invalidation,
+ like text typing for example.
+
+### Classes configuration
+
+On top of those per instance properties there are some that are at class level.
+Each class has a static array of `cacheProperties` as this one below:
+
+```ts
+static cacheProperties = [
+  'fill',
+  'stroke',
+  'strokeWidth',
+  'strokeDashArray',
+  'width',
+  'height',
+  'paintFirst',
+  'strokeUniform',
+  'strokeLineCap',
+  'strokeDashOffset',
+  'strokeLineJoin',
+  'strokeMiterLimit',
+  'backgroundColor',
+  'clipPath',
+];
+```
+
+Being static you will find this array on the class definition like:
+
+```ts
+import { Path } from 'fabric';
+
+console.log(Path.cacheProperties);
+
+// outputs
+['fill', 'stroke', 'strokeWidth', ...]
+```
+This array is used from the `set` method to check on cache invalidation.
+The moment you call:
+```ts
+myObject.set({ fill: 'red', name: 'John' });
+```
+Both keys fill and name get checked against the array and if one is found the object status is set to dirty.
+It is suggested to always use the set method, with the object signature or the simpler one when you want to
+ change properties to your objects to avoid stale caches.
+
+If you are creating a custom class and you have some property that influences rendering you should add to your
+ new class `cacheProperties` all the properties of the base class and add your own.
+
+When a cache property is set in an object that is inside a group, all the parents of the object get invalidated as well.
+
+### Fabric.js configuration
+
+Caching has a list of compromises in order to be somehow convenient most of the time.
+A cached canvas can't be too big or it will be too slow to be refreshed for example.
+It can't be too small or it will not trigger certain GPU optimization paths in browsers
+ ( this information may be obsolete with browser changes )
+
+In the Fabric.js configuration object there are 3 values that relate to caching:
+
+```ts
+  /**
+   * Pixel limit for cache canvases. 1Mpx , 4Mpx should be fine.
+   * @since 1.7.14
+   * @type Number
+   * @default
+   */
+  perfLimitSizeTotal = 2097152;
+
+  /**
+   * Pixel limit for cache canvases width or height. IE11 was the historical reason why this number is below 5000
+   * @since 1.7.14
+   * @type Number
+   * @default
+   */
+  maxCacheSideLimit = 4096;
+
+  /**
+   * Lowest pixel limit for cache canvases, set at 256PX
+   * @since 1.7.14
+   * @type Number
+   * @default
+   */
+  minCacheSideLimit = 256;
+```
+
+minCacheSideLimit will determine the mini size of a side of the cache. At any object size the cache canvas will be at least 256 by 256 pixels.
+If you are caching a Rect that is 1 by 1, you will have a 256 by 156 canvas with a single pixel filled.
+
+maxCacheSizeLimit and perfLimitSizeTotal are determining the maximum side and the maximum surface of the cache canvas.
+So with a value of 4k pixels and a perfLimitSizeTotal of around 2 million pixels, if your object is 5000 by 10000 it will cached to a size of
+ 4096 by (2097152 / 4096). The biggest side will be reduce to 4096 and the other one will be fit in what 2Milion pixels allow.
+
+You can change those value to experiment with what quality and speed fit best for your application by doing the following:
+
+```ts
+import { config } from 'fabric';
+config.perfLimitSizeTotal = 4096 * 1024;
+config.maxCacheSideLimit = 8192;
+```
+Please continue reading for considerations of various kind, mobile performance, output quality when exporting and so on.
+
+### Caching and render loop
+
+This little paragraph will try to illustrate the current logic of handling cache in Fabric.js.
+
+When executing `Canvas.renderAll` the library loop over every top object on the canvas, everything that has been added to the canvas with `canvas.add`
+For each object the code checks if the object should cache.
+This `shouldCache()` check is not as straight forward as we would like:
+
+```ts
+  /**
+   * Decide if the object should cache or not. Create its own cache level
+   * objectCaching is a global flag, wins over everything
+   * needsItsOwnCache should be used when the object drawing method requires
+   * a cache step. None of the fabric classes requires it.
+   * Generally you do not cache objects in groups because the group outside is cached.
+   * Read as: cache if is needed, or if the feature is enabled but we are not already caching.
+   * @return {Boolean}
+   */
+  shouldCache() {
+    this.ownCaching = (this.objectCaching && (!this.parent || !this.parent.isOnACache())) ||
+      this.needsItsOwnCache();
+    return this.ownCaching;
+  }
+
+  /**
+   * When returns `true`, force the object to have its own cache, even if it is inside a group
+   * it may be needed when your object behave in a particular way on the cache and always needs
+   * its own isolated canvas to render correctly.
+   * Created to be overridden
+   * since 1.7.12
+   * @returns Boolean
+   */
+  needsItsOwnCache() {
+    if (
+      this.paintFirst === STROKE &&
+      this.hasFill() &&
+      this.hasStroke() &&
+      !!this.shadow
+    ) {
+      return true;
+    }
+    if (this.clipPath) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check if this object will cast a shadow with an offset.
+   * used by Group.shouldCache to know if child has a shadow recursively
+   * @return {Boolean}
+   * @deprecated
+   */
+  willDrawShadow() {
+    return (
+      !!this.shadow && (this.shadow.offsetX !== 0 || this.shadow.offsetY !== 0)
+    );
+  }
+
+
+  /**
+   * Check if instance or its group are caching, recursively up
+   * @return {Boolean}
+   */
+  isOnACache(): boolean {
+    return this.ownCaching || (!!this.parent && this.parent.isOnACache());
+  }
+```
+
+Let's read it as:
+We will cache if objectCaching is true, unless we have a parent that is already on a cache.
+Regardless if we need a cache we are going to cache anyway.
+When do we need a cache? When there is a clipPath or if we have a shadow and we are painting stroke first.
+
+So in case of a plain object outside of a group it boils down to having cache enabled.
+If paintFirst is set to stroke ( default is fill ) we need a cache to avoid that the paint
+ of fill would cast a shadow on the stroke.
+
+When an object is cached the painted copy is done without opacity or shadow. The resulting canvas then gets blended 
+with the correct opacity and cast the shadow realtime every draw.
+The reasons behind those are that shadows in canvas keep the orientation regardless of the rotation. An object casting
+ a shadow south east will continue to cast a shadow in that direction also when you rotate it. If we want to have that
+ working we can't cache a shadow. The reasons behind opacity is that a semi transparent cache still needs to be blended 
+ with the background, so caching or not caching the opacity is not giving us any speed advantage, on the other side not caching the opacity 
+ allow us to reuse the cache when the user changes the opacity of an object.
+
+Now when caching a group things get more complicated.
+
+```ts
+  /**
+   * Decide if the group should cache or not. Create its own cache level
+   * needsItsOwnCache should be used when the object drawing method requires
+   * a cache step.
+   * Generally you do not cache objects in groups because the group is already cached.
+   * @return {Boolean}
+   */
+  shouldCache() {
+    const ownCache = FabricObject.prototype.shouldCache.call(this);
+    if (ownCache) {
+      for (let i = 0; i < this._objects.length; i++) {
+        if (this._objects[i].willDrawShadow()) {
+          this.ownCaching = false;
+          return false;
+        }
+      }
+    }
+    return ownCache;
+  }
+
+  /**
+   * Check if this object or a child object will cast a shadow
+   * @return {Boolean}
+   */
+  willDrawShadow() {
+    if (super.willDrawShadow()) {
+      return true;
+    }
+    for (let i = 0; i < this._objects.length; i++) {
+      if (this._objects[i].willDrawShadow()) {
+        return true;
+      }
+    }
+    return false;
+  }
+```
+
+When caching the group we start with the same `shouldCache` check. If it returns true we will check every child
+ recursively for a **shadow with offset**. If a shadow with offset is found, we can't cache. A shadow without offset
+ can still be cached since the rotation won't affect the shadow cast.
+
+Running `shouldCache` will flag the group property `ownCache` that will tell us if the group is caching, when later on we are checking
+each object for its own caching strategy it will be useful to determine if they are being cached already in the group.
+
+With the current code when caching a group, the group has first to check recursively down if it can cache, and every object has anyway to check
+ recursively up if it is already being cached.
+
+The above logic takes care only about the decision to cache.
+
+Then we need either to paint an object on the cache and then just render the cache on the canvas.
+
+Fabric.js has to understand if the cache is dirty first of all.
+Is dirty when is dirty or when it doesn't exist or when it changed size.
+
+In case the cache needs to be created or painted, dimensions needs to be calculated.
+A cache is going to be rendered on a zoomed canvas with retina scaling possibly and all of this needs to be taken in account.
+
+All of those parameters are accounted for in `_getCacheCanvasDimensions` and limited down to fit in the cache size configuration.
+
+```ts
+  _getCacheCanvasDimensions(): TCacheCanvasDimensions {
+    const objectScale = this.getTotalObjectScaling(),
+      // calculate dimensions without skewing
+      dim = this._getTransformedDimensions({ skewX: 0, skewY: 0 }),
+      neededX = (dim.x * objectScale.x) / this.scaleX,
+      neededY = (dim.y * objectScale.y) / this.scaleY;
+    return {
+      // for sure this ALIASING_LIMIT is slightly creating problem
+      // in situation in which the cache canvas gets an upper limit
+      // also objectScale contains already scaleX and scaleY
+      width: Math.ceil(neededX + ALIASING_LIMIT),
+      height: Math.ceil(neededY + ALIASING_LIMIT),
+      zoomX: objectScale.x,
+      zoomY: objectScale.y,
+      x: neededX,
+      y: neededY,
+    };
+  }
+```
+
+If the canvas has the exact same dimension of the previous render cycle the canvas is going to be cleaned and repainted.
+If the object grew bigger or smaller the canvas will be resized and repainted.
+
+Once painted and optimally centered the cache canvas is built and then painted on the canvas on the right place.
+
+### Performance pitfalls and issues
+
+Performance gains are not always there and there are also issues with blurriness rarely.
+
+Caching is beneficial depending on what your project looks like.
+If Are you drawing just a bunch of circles, rects or simple polygons caching is not a big deal. Calling `ctx.fillRect` or `ctx.drawImage`
+is mostly the same and if isn't exactly the same you save on cache canvas creation and size comparison and a lot of ram.
+
+On the other side if you importing and displaying large and complex svgs or groups well in that case cache is helpful.
+
+You have always to keep in mind that if you are dealing with really static groups of objects you always have the option to export them to canvases
+and use those canvases to instantiate some FabricImage and keep them fast and really static.
+Also consider that complex SVG can also be not parsed and used as plain image.
+
+Cache is always really helpful with large text objects or with styled text objects.
+
+#### Viewport Zoom
+
+The first performance pitfall that is common to all caching situation is viewport zooming. Zoom causes a change in size of
+all the canvas objects at once and so the resizing and repainting of all objects.
+
+The below flamegraph is from a canvas with 900 simple rects ( not a real use case ) and we are measuring the time used to during a zoom level change:
+
+**Rects are 50px:**
+![performance flamegraph 50px](/article_assets/cache_min.png)
+
+**Rects are 130px:**
+![performance flamegraph 130px](/article_assets/cache_normal.png)
+
+**Rects are 130px and uncached:**
+
+![performance flamegraph uncached 130px](/article_assets/uncached_normal.png)
+
+As you can see drawing 900 simple rects takes around 4-5ms on a modern laptop. As much as it would to render the cached copies.
+Disabling cache for this synthetic test we skip all the overhead of checking the cache size and actually resizing the cache canvases.
+
+You can see that **50px are much faster than 130px** and this is because the 50px with retina scaling and 1.2 zoom is still under the minimum
+ cache size of 256px, so the caches are cleaned but not resized. The 130px rect breaks at 260 with retina scaling and every subsequent zoom 
+ requires a canvas resize with a context lost and a new memory allocation. Of the 70+ms required around 30 are of garbage collecting. While no
+major GC event happens when the canvas aren't resized.
+
+In general viewport zooming is a performance killer with many objects and cache.
+
+#### Object blurriness and anti aliasing
+
+The canvas vector drawing is anti aliased. This means that if you draw a black single pixel line at at position X, you will get 
+ the line across pixel X and X-1. This across line means that both pixels will be grey and none black, you get a blurry line.
+it is very important that things are drawn as crisp as possible in the cache canvas to avoid to add blurriness on top of blurriness.
+To produce the below screenshot i created 2 cached rects, one wide 51px, another wide 51.5px, both with a 1px stroke.
+
+![Cache blurriness](/article_assets/cache_compare.png)
+
+Fabric.js is able to make both sides crisp in the case of the 51px rect, by pixel align the rect on a 256px surface, understanding that
+ we need to draw on integer pixels as much as possible. For the 51.5 pixel rect this is not possible and a single side is blurry.
+ This same issue would happen without caching, but in the moment we would translate our rectangle of fractions of pixels, the canvas would
+ reoptimize aliasing pixels trying to always produce a crisp line. This is not possible for the cached copy that has its peak crispness when
+ is pixel aligned and has sub optimal results when is not.
+
+This is easier to understand if we look at the cache of the triangle:
+
+![Cache blurryness](/article_assets/cache_triangle.png)
+
+When the triangles are put one near the other, the difference between the cached one and the non cached one are basically zero.
+If we factor in rotation, things change a lot. When rotating of 26.57 degree the non cached triangle, one of the sides completely aligns
+ with the pixel grid and becomes a perfect black line. The cached anti-aliased line gets aligned vertically and anti-aliased again, 
+ creating a blurry mess. This is not fixable and it is what is is.
+
+![Cache blurryness](/article_assets/triangle_rotated_cache.png)
+
+A nice effort has been done to ensure the cache is painted on the cache canvas with the most crisp pixels to lower the impact of double 
+anti aliasing, but some issues are part of the canvas itself and can't be fixed.
+
+### Sharp output and printing
+
+Because of the above details, Png or Jpeg exports with caching active is in general a bad idea.
+If you are working to produce optimum print files you should disable caching before exporting and enabling it back after.
+For the shapes that require caching enabled there is no embedded solution now, but one is planned
+
+### Caching in action
+
+Example of a cache canvas that is bigger than the drawn object (256x256 is the minimum by default):
+
+<div style={{ width: '256px', height: '256px', border: '1px solid black'}}>
+  <img src="/article_assets/carMinCache.png" style={{ width: '256px' }} />
+</div>
+
+Example of the biggest size cache canvas at default values ( 2 Mega pixels ). Scroll inside the white area to see image at 100% zoom:
+
+<div style={{ width: '100%', height: '256px', overflow: 'scroll', border: '1px solid black'}}>
+  <img src="/article_assets/carMaxCache.png" style={{ maxWidth: 'unset', width: '1773px' }} />
+</div>
+
+The default cache setting is not small, is enough for crisp images on a standard screen.
+
+Below you can see 2 fabric canvases. The left one is the default cached, while the right one is drawn with cache disabled.  
+The canvases are loaded with heavy pathgroups, the snowman, the heaviest I could find is in 3 copies and makes the render speed cripple down.
+Try to drag around one of the shapes on the left or right canvas and notice the speed difference.
+On a modern machine without caching is still usable, at the time of writing this article for the first time ( around 2017 ) the difference was night and day.
+
+<Example1 client:idle hideCode canvasStyle={{ border: '1px solid black', display: 'inline-block' }} />
+<Example2 client:idle hideCode canvasStyle={{ border: '1px solid black', display: 'inline-block' }} />
+
+As a reference, on my machine, an m1 pro from 2021 the cached canvas takes 0.8ms to render, while the non cached one takes 25ms.

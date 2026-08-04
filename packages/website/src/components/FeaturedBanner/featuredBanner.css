@@ -1,0 +1,28 @@
+#featuredBanner {
+  position: relative;
+  height: 70vh /*calc(100vh - var(--header-height))/*100vmin*/;
+  background-color: var(--primary-color);
+}
+
+h1 > span {
+  font-size: 0.6em;
+}
+
+#featuresList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#featuresList h2 {
+  border-bottom: 2px solid #000;
+  margin: 0 44px;
+  padding-bottom: 10px;
+}
+
+#featuresList .col {
+  padding: 0 10px;
+  text-align: center;
+  width: 300px;
+  max-width: 50%;
+}

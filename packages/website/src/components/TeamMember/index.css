@@ -1,0 +1,33 @@
+.team-member {
+    display: flex;
+    align-items: start;
+  }
+  
+  .team-member img.profile {
+    margin: 1rem;
+    padding: 8px;
+    display: inline-block;
+    height: 300px;
+  }
+  
+  .team-member .content {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .team-member .sponsor-button {
+    display: flex;
+    align-items: center;
+    border-radius: var(--border-radius-normal);
+    border: 2px solid var(--primary-color);
+    max-width: 130px;
+    justify-content: center;
+  }
+  
+  .team-member .sponsor-button svg {
+    margin-right: 16px;
+    stroke: var(--primary-color);
+    fill: var(--primary-color);
+  }
+  

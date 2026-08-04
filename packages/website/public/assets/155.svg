@@ -1,0 +1,9 @@
+<svg width="79" height="30" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_3">
+   <path id="svg_1" d="m1,1l77,0l0,29l-77,0l0,-29z" stroke="#000000" fill="#cecece"/>
+   <text font-family="Cursive" font-size="15" y="22" x="30" stroke-width="0" stroke="#000000" fill="#000000">Button</text>
+  </g>
+ </g>
+</svg>

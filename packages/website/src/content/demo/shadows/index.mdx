@@ -1,0 +1,16 @@
+---
+date: '2013-02-05'
+title: 'Shadows'
+thumbnail: 'shadows.png'
+tags: ['shadow', 'animation', 'svg']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import '../../../css/demo-common.css';
+
+This simple example shows some simple shadow animation on objects.
+
+<CodeEditor code={code} canvasId="c" client:idle>
+    <canvas id="c" width="500" height="500"></canvas>
+</CodeEditor>

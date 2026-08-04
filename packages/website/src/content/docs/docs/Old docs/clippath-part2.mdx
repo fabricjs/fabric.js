@@ -1,0 +1,24 @@
+---
+date: 2018-06-23
+description: ClipPath more advanced use cases
+title: ClipPath more advanced use cases
+---
+import { Example1, Example2, Example3 } from './clippath-part2/clippath-part2';
+
+### Nesting clipPaths
+
+One problem of clipTo and usage of canvas.clip() was that you could not have more than one clipPath at time.
+
+With this implementation clippaths can have their own clippaths. While this is less intuitive to program manually, it allows to intersect clipPaths togheter.
+
+<Example1 client:idle />
+
+ClipPaths in objects inside groups should be isolated from the clipPath of the group itself:
+
+<Example2 client:idle />
+
+### Clipping with Text
+
+Clipping with text was not possible with clipTo too, dev had usually to fallback on patterns for that
+
+<Example3 client:idle />

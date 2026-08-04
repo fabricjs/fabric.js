@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="10cm" height="3cm" viewBox="0 0 1000 300"
+  xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>
+    Example tspan04 - The number of rotate values is less than the number of
+    characters in the string.
+  </desc>
+  <text font-family="Verdana" font-size="55" fill="blue" >
+    <tspan x="250" y="150" rotate="-30,0,30">
+      Hello, out there
+    </tspan>
+  </text>
+</svg>

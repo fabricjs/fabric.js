@@ -1,0 +1,19 @@
+#resources {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+}
+#resources ul {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+}
+#resources li {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+#resources .resource-label {
+  color: var(--primary-color);
+}

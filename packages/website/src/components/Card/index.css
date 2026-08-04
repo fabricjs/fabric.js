@@ -1,0 +1,19 @@
+.card {
+    background-color: #fff;
+    border: 1px solid var(--info-color);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .card::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    bottom: 10px;
+    pointer-events: none;
+    opacity: 0.5;
+  }
