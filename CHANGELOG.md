@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.3.0 [#11067](https://github.com/fabricjs/fabric.js/pull/11067)
 - chore(deps-dev): bump @playwright/test from 1.60.0 to 1.62.0 [#11063](https://github.com/fabricjs/fabric.js/pull/11063)
 - test(), chore(): Various things i forgot [#11065](https://github.com/fabricjs/fabric.js/pull/11065)
 - feat(): Add backend network request callback [#11064](https://github.com/fabricjs/fabric.js/pull/11064)
