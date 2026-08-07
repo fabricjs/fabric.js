@@ -96,8 +96,12 @@ const arcToSegments = (
   sweep: number,
   rotateX: TRadian,
 ): TParsedAbsoluteCubicCurveCommand[] => {
-  if (rx === 0 || ry === 0) {
+  if (toX === 0 && toY === 0) {
     return [];
+  }
+  if (rx === 0 || ry === 0) {
+    // an arc with a zero radius is a straight line to the endpoint
+    return [['C', toX / 3, toY / 3, (toX * 2) / 3, (toY * 2) / 3, toX, toY]];
   }
   let fromX = 0,
     fromY = 0,
