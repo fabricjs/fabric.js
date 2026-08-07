@@ -130,11 +130,11 @@ describe('Path Utils', () => {
     test('an arc with a zero radius becomes a line to the endpoint', () => {
       expect(makePathSimpler(parsePath('M 0 0 A 0 5 0 1 0 10 10'))).toEqual([
         ['M', 0, 0],
-        ['C', 10 / 3, 10 / 3, 20 / 3, 20 / 3, 10, 10],
+        ['L', 10, 10],
       ]);
       expect(makePathSimpler(parsePath('M 5 5 a 0 0 0 0 1 10 0'))).toEqual([
         ['M', 5, 5],
-        ['C', 5 + 10 / 3, 5, 5 + 20 / 3, 5, 15, 5],
+        ['L', 15, 5],
       ]);
     });
     test('an arc that ends where it starts is dropped', () => {

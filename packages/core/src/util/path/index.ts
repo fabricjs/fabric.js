@@ -10,6 +10,7 @@ import type {
   TCurveInfo,
   TComplexPathData,
   TParsedAbsoluteCubicCurveCommand,
+  TParsedAbsoluteLineCommand,
   TPathSegmentInfo,
   TPointAngle,
   TSimpleParsedCommand,
@@ -96,13 +97,6 @@ const arcToSegments = (
   sweep: number,
   rotateX: TRadian,
 ): TParsedAbsoluteCubicCurveCommand[] => {
-  if (toX === 0 && toY === 0) {
-    return [];
-  }
-  if (rx === 0 || ry === 0) {
-    // an arc with a zero radius is a straight line to the endpoint
-    return [['C', toX / 3, toY / 3, (toX * 2) / 3, (toY * 2) / 3, toX, toY]];
-  }
   let fromX = 0,
     fromY = 0,
     root = 0;
@@ -318,7 +312,8 @@ export function getBoundsOfCurve(
 }
 
 /**
- * Converts arc to a bunch of cubic Bezier curves
+ * Converts arc to a bunch of cubic Bezier curves, or to a single line for the
+ * degenerate arcs that SVG defines as straight
  * @param {number} fx starting point x
  * @param {number} fy starting point y
  * @param {TParsedArcCommand} coords Arc command
@@ -327,7 +322,15 @@ export const fromArcToBeziers = (
   fx: number,
   fy: number,
   [_, rx, ry, rot, large, sweep, tx, ty]: TParsedArcCommand,
-): TParsedAbsoluteCubicCurveCommand[] => {
+): (TParsedAbsoluteCubicCurveCommand | TParsedAbsoluteLineCommand)[] => {
+  // SVG 2 §9.5.1: an arc whose endpoints coincide is dropped, and one with a
+  // zero radius is drawn as a line to its endpoint
+  if (tx === fx && ty === fy) {
+    return [];
+  }
+  if (rx === 0 || ry === 0) {
+    return [['L', tx, ty]];
+  }
   const segsNorm = arcToSegments(tx - fx, ty - fy, rx, ry, large, sweep, rot);
 
   for (let i = 0, len = segsNorm.length; i < len; i++) {
