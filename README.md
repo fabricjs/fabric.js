@@ -13,7 +13,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
 
-   <a href="https://www.atlascloud.ai/" >
+   <a href="https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=fabric.js" >
       <img alt="Atlascloud sponsorship" width="300" height="auto" src="https://www.atlascloud.ai/logo.svg" style="background-color: white;">
    </a>
 
