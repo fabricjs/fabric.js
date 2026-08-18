@@ -4,6 +4,9 @@ dist/
 # generated types
 .astro/
 
+# TypeDoc-generated API reference (regenerated at build time)
+src/content/docs/api/
+
 # dependencies
 node_modules/
 
