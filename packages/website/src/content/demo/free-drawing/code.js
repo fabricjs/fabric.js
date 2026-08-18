@@ -150,16 +150,16 @@
   };
   drawingLineWidthEl.onchange = function () {
     canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
-    this.previousSibling.querySelector('span').innerHTML = this.value;
+    this.previousSibling.querySelector('span').textContent = this.value;
   };
   drawingShadowWidth.onchange = function () {
     canvas.freeDrawingBrush.shadow.blur = parseInt(this.value, 10) || 0;
-    this.previousSibling.querySelector('span').innerHTML = this.value;
+    this.previousSibling.querySelector('span').textContent = this.value;
   };
   drawingShadowOffset.onchange = function () {
     canvas.freeDrawingBrush.shadow.offsetX = parseInt(this.value, 10) || 0;
     canvas.freeDrawingBrush.shadow.offsetY = parseInt(this.value, 10) || 0;
-    this.previousSibling.querySelector('span').innerHTML = this.value;
+    this.previousSibling.querySelector('span').textContent = this.value;
   };
 
   if (canvas.freeDrawingBrush) {
