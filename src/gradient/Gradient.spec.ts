@@ -567,4 +567,56 @@ describe('Gradient', () => {
     expect(gradient.colorStops[2].opacity).toEqual(1);
     expect(gradient.colorStops[3].opacity).toEqual(1);
   });
+
+  describe('toSVG colorStop sanitization (GHSA-w22m-hvvm-xmwx)', () => {
+    const exportObject = () => new FabricObject({ width: 100, height: 100 });
+
+    it('neutralizes HTML/attribute breakout in a stop color', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        colorStops: [
+          { offset: 0, color: 'red"><img src="x" onerror="alert(1)">' },
+        ],
+      });
+      const svg = gradient.toSVG(exportObject());
+      expect(svg).not.toContain('<img');
+      expect(svg).not.toContain('onerror=');
+      expect(svg).toContain('style="stop-color:rgba(0,0,0,1);"');
+    });
+
+    it('neutralizes CSS declaration injection in a stop color', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        colorStops: [{ offset: 0, color: 'red;stop-opacity:0' }],
+      });
+      const svg = gradient.toSVG(exportObject());
+      expect(svg).not.toContain('stop-opacity:0');
+      expect(svg).toContain('style="stop-color:rgba(0,0,0,1);"');
+    });
+
+    it('rejects url-based stop color payloads', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        colorStops: [{ offset: 0, color: 'url(javascript:alert(1))' }],
+      });
+      const svg = gradient.toSVG(exportObject());
+      expect(svg).not.toContain('javascript:');
+      expect(svg).toContain('style="stop-color:rgba(0,0,0,1);"');
+    });
+
+    it('preserves valid stop colors and escapes XML metacharacters', () => {
+      const gradient = new Gradient({
+        type: 'linear',
+        colorStops: [
+          { offset: 0, color: 'currentColor' },
+          { offset: 0.5, color: 'var(--brand)' },
+          { offset: 1, color: 'red&blue' },
+        ],
+      });
+      const svg = gradient.toSVG(exportObject());
+      expect(svg).toContain('style="stop-color:currentColor;"');
+      expect(svg).toContain('style="stop-color:var(--brand);"');
+      expect(svg).toContain('style="stop-color:red&amp;blue;"');
+    });
+  });
 });
