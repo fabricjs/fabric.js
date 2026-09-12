@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump the npm_and_yarn group across 1 directory with 2 updates [#11077](https://github.com/fabricjs/fabric.js/pull/11077)
 - Pull in docs [#11070](https://github.com/fabricjs/fabric.js/pull/11070)
 - chore(deps-dev): bump @playwright/test from 1.60.0 to 1.62.0 [#11063](https://github.com/fabricjs/fabric.js/pull/11063)
 - test(), chore(): Various things i forgot [#11065](https://github.com/fabricjs/fabric.js/pull/11065)
