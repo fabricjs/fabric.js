@@ -71,6 +71,7 @@
     "lint": "eslint extensions packages --fix",
     "prettier:check": "oxfmt --check .",
     "prettier:write": "oxfmt .",
+    "web-dev": "pnpm run build && node ./scripts/index.mjs build -f -w & pnpm --dir packages/website run dev; kill $!",
     "prepare": "husky install"
   },
   "devDependencies": {
