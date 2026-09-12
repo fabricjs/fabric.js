@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.5.0 [#11067](https://github.com/fabricjs/fabric.js/pull/11067)
 - chore(deps-dev): bump rolldown from 1.1.2 to 1.2.8 [#11069](https://github.com/fabricjs/fabric.js/pull/11069)
 - ci(): Fix the banner of the website. [#11083](https://github.com/fabricjs/fabric.js/pull/11083)
 - Ci(): Fix GitHub pages deploy [#11082](https://github.com/fabricjs/fabric.js/pull/11082)
