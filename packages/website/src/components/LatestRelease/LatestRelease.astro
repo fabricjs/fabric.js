@@ -1,11 +1,17 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = path.resolve(process.cwd(), '../..');
+const fabricPkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf-8'));
+
 export interface Props {
   version?: string;
   url?: string;
   subtitle?: string;
 }
 const {
-  version = '7.4.0',
+  version = fabricPkg.version,
   url = 'https://github.com/fabricjs/fabric.js/releases',
   subtitle = 'Download latest release from GitHub',
 } = Astro.props as Props;
