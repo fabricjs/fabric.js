@@ -3,6 +3,10 @@
 ## [next]
 
 - ci(): pin build-stats checkout to master to avoid running PR code [#11085](https://github.com/fabricjs/fabric.js/pull/11085)
+- chore(deps-dev): bump typescript-eslint from 8.60.1 to 8.70.0 [#11060](https://github.com/fabricjs/fabric.js/pull/11060)
+- chore(deps): bump sharp from 0.34.5 to 0.35.4 [#11079](https://github.com/fabricjs/fabric.js/pull/11079)
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.5.0 [#11067](https://github.com/fabricjs/fabric.js/pull/11067)
+- chore(deps-dev): bump rolldown from 1.1.2 to 1.2.8 [#11069](https://github.com/fabricjs/fabric.js/pull/11069)
 - ci(): Fix the banner of the website. [#11083](https://github.com/fabricjs/fabric.js/pull/11083)
 - Ci(): Fix GitHub pages deploy [#11082](https://github.com/fabricjs/fabric.js/pull/11082)
 - ci(): add GitHub Pages deploy workflow for website [#11081](https://github.com/fabricjs/fabric.js/pull/11081)
