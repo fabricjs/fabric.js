@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): Fix the banner of the website. [#11083](https://github.com/fabricjs/fabric.js/pull/11083)
 - Ci(): Fix GitHub pages deploy [#11082](https://github.com/fabricjs/fabric.js/pull/11082)
 - ci(): add GitHub Pages deploy workflow for website [#11081](https://github.com/fabricjs/fabric.js/pull/11081)
 - Pull in docs [#11070](https://github.com/fabricjs/fabric.js/pull/11070)

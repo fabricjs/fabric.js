@@ -1,8 +1,8 @@
 name: Deploy website
 
 on:
-  push:
-    branches: [master]
+  release:
+    types: [published]
   workflow_dispatch:
 
 # Allow only one concurrent deployment
