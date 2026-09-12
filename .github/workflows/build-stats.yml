@@ -19,6 +19,8 @@ jobs:
         run: mkdir ${{ runner.temp }}/artifacts
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: master
       - name: Install dependencies
         uses: ./.github/actions/cached-install
         with:
