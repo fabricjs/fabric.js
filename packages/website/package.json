@@ -29,7 +29,7 @@
     "prettier": "^3.4.2",
     "react": "19.2",
     "react-dom": "19.2",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.4",
     "starlight-typedoc": "^0.21.4",
     "thememirror": "^2.0.1",
     "typedoc-plugin-no-inherit": "^1.6.1",
