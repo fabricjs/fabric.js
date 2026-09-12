@@ -86,7 +86,10 @@ Reporting workflows run trusted workflow code from the default branch. Build-sta
 and coverage reporters check artifact availability before installing or reporting.
 PR artifact contents are data, never inline shell or JavaScript source. The
 changelog updater obtains its target repository, branch, and title from GitHub's
-PR API instead of trusting the artifact, and skips outdated runs.
+PR API instead of trusting the artifact, and skips outdated runs. It reads and
+updates only the changelog blob through the Git Data API, without checking out
+PR files. Updates use the validated head as their parent and cannot force-push
+over a contributor's newer commits.
 
 SonarQube scans the revision recorded with coverage, validating that it matches the
 triggering commit or its PR merge. Older artifacts fall back to the triggering head

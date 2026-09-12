@@ -31,6 +31,9 @@ jobs:
       - name: Type check
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: pnpm run typecheck
+      - name: Workflow helper tests
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: node --test .github/scripts/*.test.cjs
   build:
     name: Packages and website
     runs-on: ubuntu-24.04

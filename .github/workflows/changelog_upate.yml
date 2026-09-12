@@ -19,81 +19,15 @@ jobs:
       }}
     runs-on: ubuntu-24.04
     steps:
-      - name: Resolve changelog update
-        id: pr
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
-        with:
-          script: |
-            const run = context.payload.workflow_run;
-            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
-              ...context.repo, run_id: run.id,
-            });
-            if (!artifacts.some(({ name, expired }) => name === 'changelog_artifact' && !expired)) return;
-            // The artifact is only a signal. It cannot choose a repository,
-            // branch, or text for this write-privileged workflow.
-            const number = run.pull_requests[0]?.number;
-            if (!number) throw new Error('Missing pull request metadata');
-            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
-            if (pr.state !== 'open' || pr.head.sha !== run.head_sha) return;
-            if (pr.head.repo.full_name !== run.head_repository.full_name) {
-              throw new Error('PR does not match the triggering run');
-            }
-            core.setOutput('repository', pr.head.repo.full_name);
-            core.setOutput('ref', pr.head.ref);
-            core.setOutput('sha', pr.head.sha);
-            core.setOutput('link', `[#${number}](https://github.com/${context.repo.owner}/${context.repo.repo}/pull/${number})`);
-            core.setOutput('title', pr.title.replace(/[\r\n]+/g, ' '));
-            core.setOutput('update', true);
-      - name: Checkout PR changelog
-        if: steps.pr.outputs.update == 'true'
+      - name: Checkout trusted automation
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: ${{ steps.pr.outputs.ref }}
-          repository: ${{ steps.pr.outputs.repository }}
-          sparse-checkout: |
-            CHANGELOG.md
-      - name: Update CHANGELOG.md from PR title
-        if: steps.pr.outputs.update == 'true'
-        id: update
+          ref: ${{ github.sha }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - name: Update changelog through GitHub API
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
-        env:
-          PR_TITLE: ${{ steps.pr.outputs.title }}
-          PR_LINK: ${{ steps.pr.outputs.link }}
-          EXPECTED_SHA: ${{ steps.pr.outputs.sha }}
         with:
-          result-encoding: string
           script: |
-            const fs = require('node:fs');
-            const { execFileSync } = require('node:child_process');
-            if (execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim() !== process.env.EXPECTED_SHA) return false;
-            const file = 'CHANGELOG.md';
-            if (!fs.lstatSync(file).isFile()) throw new Error('CHANGELOG.md must be a regular file');
-            const original = fs.readFileSync(file, 'utf8');
-            let content = original;
-            const log = `- ${process.env.PR_TITLE} ${process.env.PR_LINK}`;
-            const lines = content.split('\n');
-            const previous = lines.findIndex(line => line.startsWith('- ') && line.endsWith(` ${process.env.PR_LINK}`));
-            if (previous !== -1) {
-              lines[previous] = log;
-              content = lines.join('\n');
-            } else {
-              const title = '## [next]';
-              if (!content.includes(title)) {
-                const insertAt = content.indexOf('\n') + 1;
-                content = content.slice(0, insertAt) + `\n${title}\n\n` + content.slice(insertAt);
-              }
-              const insertAt = content.indexOf('\n', content.indexOf(title)) + 1;
-              content = content.slice(0, insertAt) + log + '\n' + content.slice(insertAt);
-            }
-            if (content === original) return false;
-            fs.writeFileSync(file, content);
-            return true;
-      - name: Commit & Push
-        if: steps.update.outputs.result == 'true'
-        run: |
-          git diff
-          git config user.name github-actions[bot]
-          git config user.email github-actions[bot]@users.noreply.github.com
-          git add CHANGELOG.md
-          git -c core.hooksPath=/dev/null commit -m "update CHANGELOG.md"
-          git -c core.hooksPath=/dev/null push
+            const { updateChangelog } = require('./.github/scripts/update-changelog.cjs');
+            await updateChangelog({ github, context });

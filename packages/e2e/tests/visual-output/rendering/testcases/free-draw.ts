@@ -19,8 +19,8 @@ function pointDrawer(
   setBrush(brush.canvas, brush);
   brush.onMouseDown(pointsToDraw[0], pointerEventOptions);
   for (let i = 1; i < pointsToDraw.length; i++) {
-    pointsToDraw[i].x = parseFloat(pointsToDraw[i].x as unknown as string);
-    pointsToDraw[i].y = parseFloat(pointsToDraw[i].y as unknown as string);
+    pointsToDraw[i].x = parseFloat(String(pointsToDraw[i].x));
+    pointsToDraw[i].y = parseFloat(String(pointsToDraw[i].y));
     brush.onMouseMove(pointsToDraw[i], pointerEventOptions);
     if (onMove) {
       onMove(pointsToDraw[i], i, pointsToDraw);
