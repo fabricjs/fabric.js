@@ -137,7 +137,16 @@
       ]
     }
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/index.mjs",
+    "./dist/index.min.mjs",
+    "./dist/index.js",
+    "./dist/index.min.js",
+    "./dist/fabric.mjs",
+    "./dist/fabric.min.mjs",
+    "./dist/index.node.mjs",
+    "./dist/index.node.cjs"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
