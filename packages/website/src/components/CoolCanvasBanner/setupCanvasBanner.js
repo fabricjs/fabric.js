@@ -15,7 +15,7 @@ import {
   Path,
   Gradient,
   classRegistry,
-} from 'fabric';
+} from 'fabric/es';
 
 
 
