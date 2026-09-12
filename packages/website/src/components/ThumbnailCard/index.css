@@ -1,0 +1,44 @@
+.thumbCntnr {
+    display: block;
+    position: relative;
+    height: 0;
+    padding-bottom: 60%; /*50*/
+    overflow: hidden;
+    border: 1px dashed var(--info-color);
+  }
+  .thumbCntnr > .img-wrapper {
+    /*margin-top:-20%;/*-25*/
+    width: 100%;
+    height: auto;
+    position: absolute !important;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    /*transition: transform 0.5s ease;*/
+  }
+
+  .img-wrapper > img {
+    width: 100%;
+    height: auto;
+  }
+
+  .card h4 {
+    padding: 0;
+    margin: 0;
+  }
+  .card h4 {
+    display: block;
+    margin: 0;
+    padding: 0;
+    font-size: var(--font-size-smaller2);
+  }
+  
+  .card span.desc {
+    display: block;
+    font-size: 14px;
+    line-height: 1.2;
+    color: var(--font-color-normal);
+    text-align: justify;
+    margin-top: 5px;
+  }
+  

@@ -1,0 +1,20 @@
+---
+date: '2022-02-02'
+title: 'Importing PDF files'
+description: 'Importing PDF files'
+thumbnail: 'import-pdf.png'
+tags: ['FabricImage', 'pdf']
+---
+
+import { InputEventAttacher } from './useLoader';
+
+<script is:inline src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<div>
+<input
+    id="pdfInput"
+    type="file"
+    accept="application/pdf"
+/>
+</div>
+<canvas id="c" width="500" height="620" />
+<InputEventAttacher client:idle />

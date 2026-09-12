@@ -1,0 +1,42 @@
+---
+date: '2013-02-12'
+title: 'Dynamic patterns'
+description: 'Patterns options demonstration'
+thumbnail: 'dynamic-patterns.png'
+tags: ['pattern']
+---
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import '../../../css/demo-common.css';
+
+<div class="controls">
+  <p>
+    <label>Repeat pattern?</label>
+    <input type="checkbox" id="img-repeat" checked />
+  </p>
+  <p>
+    <label>Pattern image width</label>
+    <input type="range" min="10" max="300" value="20" id="img-width" />
+  </p>
+  <p>
+    <label>Pattern left offset</label>
+    <input type="range" min="0" max="300" value="0" id="img-offset-x" />
+  </p>
+  <p>
+    <label>Pattern top offset</label>
+    <input type="range" min="0" max="300" value="0" id="img-offset-y" />
+  </p>
+  <br />
+  <p>
+    <label>Pattern image angle</label>
+    <input type="range" min="-90" max="90" value="0" id="img-angle" />
+  </p>
+  <p>
+    <label>Pattern image padding</label>
+    <input type="range" min="-50" max="50" value="0" id="img-padding" />
+  </p>
+</div>
+
+<CodeEditor code={code} canvasId="canvas" client:idle>
+  <canvas id="canvas" width="500" height="500"></canvas>
+</CodeEditor>

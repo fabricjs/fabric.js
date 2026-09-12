@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 600 400">
+<defs>
+  <clipPath id="mask">
+    <circle r="40" cx="0" cy="0" />
+    <circle r="30" cx="100" cy="0" />
+    <circle r="40" cx="20" cy="100" />
+    <circle r="30" cx="100" cy="200" />
+    <circle r="40" cx="80" cy="350" />
+    <circle r="40" cx="100" cy="90" />
+    <circle r="30" cx="200" cy="0" />
+    <circle r="40" cx="120" cy="100" />
+    <circle r="30" cx="200" cy="200" />
+    <circle r="40" cx="180" cy="350" />
+    <circle r="40" cx="250" cy="0" />
+    <circle r="30" cx="350" cy="0" />
+    <circle r="40" cx="270" cy="100" />
+    <circle r="30" cx="350" cy="200" />
+    <circle r="40" cx="330" cy="350" />
+    <circle r="40" cx="450" cy="0" />
+    <circle r="30" cx="550" cy="0" />
+    <circle r="40" cx="470" cy="100" />
+    <circle r="30" cx="550" cy="200" />
+    <circle r="40" cx="530" cy="350" />
+    <circle r="40" cx="450" cy="300" />
+  </clipPath>
+</defs>
+<image clip-path="url(#mask)" xlink:href="/assets/mononoke.jpg" width="600" height="400" />
+</svg>

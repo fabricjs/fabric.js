@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="12cm" height="3.6cm" viewBox="0 0 1000 300" version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <path id="MyPath"
+          d="M 100 200
+             C 200 100 300   0 400 100
+             C 500 200 600 300 700 200
+             C 800 100 900 100 900 100" />
+  </defs>
+  <desc>Example toap01 - simple text on a path</desc>
+
+  <use xlink:href="#MyPath" fill="none" stroke="red"  />
+  <text font-family="Verdana" font-size="42.5" fill="blue" >
+    <textPath xlink:href="#MyPath">
+      We go up, then we go down, then up again
+    </textPath>
+  </text>
+</svg>
+

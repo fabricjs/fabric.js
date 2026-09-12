@@ -1,0 +1,35 @@
+---
+import Card from '../Card/index.astro';
+import { Image } from 'astro:assets';
+import './index.css';
+
+interface Props {
+    title: string;
+    linkToUrlSlug: string;
+    description?: string;
+    imgSrc: Promise<{ default: ImageMetadata }>;
+}
+
+const { title, linkToUrlSlug, description, imgSrc } = Astro.props;
+
+---
+
+<Card>
+    <a
+      title={title}
+      href={linkToUrlSlug}
+      draggable="false"
+      ondragstart="function onDragStart(e) { e.prefentDefault(); }"
+    >
+      <span class="thumbCntnr">
+        <div class="img-wrapper">
+          <Image
+            alt={title}
+            src={imgSrc}
+          />
+        </div>
+      </span>
+      <h4>{title}</h4>
+      {description && <span class="desc">{description}</span>}
+    </a>
+</Card>

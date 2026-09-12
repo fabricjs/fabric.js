@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="226" height="90"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example stroke10 - stroke-opacity</desc>
+
+  <g fill="none" stroke="black">
+    <path stroke-width="6" stroke-opacity="0.2" d="M5 20 l215 0" />
+    <path stroke-width="6" stroke-opacity="0.7" d="M5 40 l215 0" />
+    <path style="stroke-width: 6; stroke-opacity: 0.95;" stroke="#000" d="M5 60 l215 0" />
+    <path stroke-width="6" stroke-opacity="1" d="M5 80 l215 0" />
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+---
+date: '2017-10-24'
+title: 'Loading custom fonts'
+description: 'Loading custom fonts in Fabric.js'
+thumbnail: 'load-custom-fonts.png'
+tags: ['fonts', 'typography', 'custom']
+---
+
+When working with custom fonts on a fabric canvas, it is recommended to
+use the [CSS Font loader api](https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API).
+Not doing so will make your app do FOUT(s) (Flash of Unstyled Text).
+This happens because font loading involve network and is async by nature, and so when you will be adding a text object with a custom font, or switching font, the canvas will try to render before the font has been actually loaded and so the browser will fallback on the specified fallback font or the default one.
+
+If for some reason your target browsers do not support that api yet you can pick from a selection of font preloading libraries like [Font Face Observer](https://github.com/bramstein/fontfaceobserver)
+
+In this example we are using the browser native CSS Font loader api to load 2 google fonts from google's cdn.
+We load the font, then we create a textbox and then use the loaded font family. Note that you could create the textbox, add them to canvas and just re-render when the font is loaded, doing so you would have saved in Fabric.js cache some values calculated with the font not correctly loaded and likely **have cursor positioning issues** or **wrong bounding boxes issues**. Always assign the font family after the font has correctly loaded.
+
+When dealing with fonts with multiple weights and styles is easier to assign a different font family to each of them and just use different font families, in the example's code we do show how to load different weights with the same family name, but be aware that one font file has one family, one weight and one style. Loading the font `Lato` doesn't grant you access to all variants of the fonts, but just one. there is one file per variant.
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw'
+
+<CodeEditor code={code} canvasId="c" client:idle>
+    <canvas  width="600" height="600" id="c"></canvas>
+</CodeEditor>

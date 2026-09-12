@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="12cm" height="4cm" viewBox="0 0 1200 400"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example textdecoration01 - behavior of 'text-decoration' property</desc>
+  <g font-size="60" fill="blue" stroke="red" stroke-width="1" >
+    <text x="100" y="75">Normal text</text>
+    <text x="100" y="165" text-decoration="line-through" >Text with line-through</text>
+    <text x="100" y="255" text-decoration="underline" >Underlined text</text>
+    <text x="100" y="345" text-decoration="underline" >
+      <tspan>One </tspan>
+      <tspan fill="yellow" stroke="purple" >word </tspan>
+      <tspan fill="yellow" stroke="black" >has </tspan>
+      <tspan fill="yellow" stroke="darkgreen" text-decoration="underline" >different </tspan>
+      <tspan fill="yellow" stroke="blue" >underlining</tspan>
+    </text>
+  </g>
+</svg>
+
+

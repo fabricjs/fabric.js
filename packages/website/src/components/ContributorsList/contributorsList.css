@@ -1,0 +1,13 @@
+.contributor-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+#contributors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+}

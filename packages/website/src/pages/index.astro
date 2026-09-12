@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Companies from '../components/Companies/Companies.astro';
+import FeaturedBanner from '../components/FeaturedBanner/FeaturedBanner.astro';
+import Features from '../components/Features/Features.astro';
+import LatestRelease from '../components/LatestRelease/LatestRelease.astro';
+import ContributorsList from '../components/ContributorsList/ContributorsList.astro';
+---
+
+<Layout
+  title="Fabric.js Javascript Library"
+  description="A simple and powerful canvas library"
+>
+  <main>
+    <FeaturedBanner />
+    <Features />
+    <Companies />
+    <ContributorsList />
+  </main>
+</Layout>

@@ -92,3 +92,16 @@ jobs:
         with:
           node-version: 24.x
       - run: pnpm run prettier:check
+  website:
+    name: Website build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: 24.x
+          install-system-deps: true
+      - name: Build fabric.js
+        run: pnpm run build
+      - name: Build website
+        run: pnpm --dir packages/website run build

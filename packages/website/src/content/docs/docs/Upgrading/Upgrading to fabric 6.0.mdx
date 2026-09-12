@@ -1,0 +1,143 @@
+---
+date: '2024-06-29'
+title: 'Upgrading to Fabric.js 6.0'
+description: 'Understanding the general changes to Fabric.js 6.0'
+sidebar:
+  order: 1000
+---
+
+Fabric 6.0 has been a large rewrite and not all breaking changes have a suggested action items.
+Not all the desired outcome has been achieved because we were stuck in a long beta stage with frequent breaking changes.
+This is a list of the largest conceptual changes.
+
+## Typescript
+
+Fabric.js is now written in Typescript. Types will help you discover the api quickly, especially with things like events.
+As a consequence of this change if you are using `@types/fabric` you should remove it.
+
+![](/article_assets/autocomplete.gif)
+
+## Imports
+
+Imports changed, we moved from
+```js
+import { fabric } from 'fabric'
+```
+to:
+```js
+import { Canvas, Rect } from 'fabric'
+```
+and
+```js
+import { Canvas, Rect } from 'fabric/node'
+```
+for node usage.
+Imports will require some changes in the future again, because the `filter` and `util` namespaces are a bit of an issue for tree shaking.
+Indeed now you can also do:
+```js
+import { StaticCanvas, Rect } from 'fabric/es'
+```
+and import only the parts of fabric you are actually using, but **BE AWARE** you are not protected for safe usage of `loadFromJSON` and svg loading, for now use at your own risk and if you are not sure ask informations.
+
+Some classes have been renamed because their name was a reserved keyword
+- fabric.Object is now known as FabricObject
+- fabric.Text is now known as FabricText
+- fabric.Image is now known as FabricImage
+
+## Classes vs Functions
+
+Before fabric was using functions with augmented prototype and an utility to create inheritance and mixins.
+That was ok and functional, but didn't really play well with Typescript.
+
+So before we would have something like this:
+
+```js
+function Rect() {
+
+}
+
+Object.assign(Rect.prototype, {
+  strokeWidth: 0,
+  fill: 'black',
+});
+```
+The class was created with an utility, createClass that took care of running the custom `initialize` method for every new instance that was created, and that took care of inheritance.
+As a result this was the situation:
+- Default values for properties were defined on the prototype exactly as method were
+- All Instances shared the same on the prototype for properties that weren't assigned
+- Subclassing required specific fabricjs syntax
+- Mixins were possible as simple object merges and were used for code organization and sharing
+
+You could mutate the prototype at runtime to change default values for all classes:
+
+```js
+fabric.Object.prototype.originX = 'center';
+```
+
+Would have made all instances with originX set to center, apart the ones for which you ever set the origin to some value before changing the prototype.
+If you were not comfortable with this concept this could have led to unexpected results.
+
+Classes works differently, the syntax does not support default values on the prototype at all, and anyway typescript does not understands it.
+The setup we picked up for fabricJS main classes is:
+- We do not do any prototype mutation by default, but the developer can still opt in for that
+- Default values for properties are assigned on the instance as it would be if you are using public properties
+- Each class has a mutable static object that holds the default values for that class and that get assigned during the contructor
+- There are no more default shared objects between instances for which mutation is tricky ( ex: controls )
+- Mixins are there as leftovers, will need to be removed in the future
+- Subclassing is done with standard `extends` syntax
+
+```ts
+class Rect extends FabricObject {
+  _render(ctx) {
+    ....
+  }
+}
+```
+
+Changing default values and getting shared controls is still possible following specific instructions available here:
+
+## Callbacks vs Promise
+
+All the apis that where having a callback with one or parameters are now `Promise` based.
+Everything that was `loadSomething(arg, callback, arg2, arg3)` is now `loadSomething(arg, arg2, arg3).then(callback)`
+
+To make an example for loadSVGFromString
+```js
+loadSVGFromString: function(string, callback, reviver, options) {
+    ...
+    callback(results, _options, elements, allElements);
+};
+```
+is now
+```ts
+loadSVGFromString(
+  string: string,
+  reviver?: TSvgReviverCallback,
+  options?: LoadImageOptions
+).then((result: {
+  objects: (FabricObject | null)[];
+  options: Record<string, any>;
+  elements: Element[];
+  allElements: Element[];
+}) => {
+    ....
+});
+```
+
+## Method chaining is deprecated
+If it still works somewhere, don't use it. It is a leftover.
+```ts
+myRect.set({ fill: 'red' }).rotate(90);
+```
+is now:
+```ts
+myRect.set({ fill: 'red' });
+myRect.rotate(90);
+```
+
+## Lot of breaking changes here and there
+
+There are many breaking changes in Group, in Canvas, in methods signatures and more.
+If you have a large project with large customizations and subclassing upgrading will be hard, we are sorry about that.
+There is a more extensive list of changes here: [#8299](https://github.com/fabricjs/fabric.js/issues/8299).
+

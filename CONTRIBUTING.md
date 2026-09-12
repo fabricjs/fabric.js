@@ -62,7 +62,7 @@ It's a good and simple way to start contributing.
 Improving **DOCS** is **SUPER** important for everyone.\
 Even if it's a small fix it is valuable **don't hesitate**!
 
-We have a website that is easy to contribute to.
+We have a website that is easy to contribute to, it lives in this repository under [packages/website][website_repo].
 
 [Adding demos](#Adding Demos) is also a great contribution.
 
@@ -176,7 +176,7 @@ Don't forget to unlink the package once you're done.
 [discussions]: ../../discussions
 [search_issues]: ../../search?type=Issues
 [bug_report]: ../../issues/new?template=bug_report.md
-[website_repo]: https://github.com/fabricjs/fabricjs.com
+[website_repo]: packages/website
 [website]: http://fabricjs.com/
 [docs]: http://fabricjs.com/api
 [demos]: http://fabricjs.com/demos/

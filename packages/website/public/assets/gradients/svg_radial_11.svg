@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<radialGradient id="three_stops">
+    <stop offset="0%" style="stop-color: #f96;"/>
+    <stop offset="50%" style="stop-color: #9c9;"/>
+    <stop offset="100%" style="stop-color: #906;"/>
+</radialGradient>
+</defs>
+
+<rect x="0" y="0" width="100" height="100"
+    style="fill: url(#three_stops); stroke: black;"/>
+</svg>

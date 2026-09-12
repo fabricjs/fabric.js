@@ -1,0 +1,32 @@
+---
+import Header from '../components/Header/Header.astro';
+import LatestRelease from '../components/LatestRelease/LatestRelease.astro';
+import './style.css';
+import './colorvars.css';
+import CarbonAd from '../components/CarbonAd/InlineCarbonAd.astro';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<Header ><LatestRelease /></Header>
+		<CarbonAd />
+		<slot />
+	</body>
+</html>

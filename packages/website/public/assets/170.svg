@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0"
+  width="300" height="300" >
+  <path id="p1" d="M 100,250 150,50 200,250 z"
+    stroke="none" fill="red" />
+  <path id="p2" d="M 50,250 100,50 150,250 z"
+    transform="translate(50,0)"
+    stroke="none" fill="red" />
+  <path id="p3" d="M 100,200 150,00 200,200 z"
+    transform="translate(0,50)"
+    stroke="none" fill="red" />
+  <path id="p4" d="M 50,200 100,00 150,200 z"
+    transform="translate(50,50)"
+    stroke="none" fill="red" />
+  <path id="p5" d="M 200,250 300,50 400,250 z"
+    transform="scale(0.5, 1)"
+    stroke="none" fill="red" />
+  <path id="p6" d="M 100,500 150,100 200,500 z"
+    transform="scale(1, 0.5)"
+    stroke="none" fill="red" />
+  <path id="p7" d="M 200,500 300,100 400,500 z"
+    transform="scale(0.5, 0.5)"
+    stroke="none" fill="red" />
+  <path id="p8" d="M 250,-100 50,-150 250,-200 z"
+    transform="rotate(90)"
+    stroke="none" fill="red" />
+  <path id="p9" d="M -100,-250 -150,-50 -200,-250 z"
+    transform="rotate(180)"
+    stroke="none" fill="red" />
+  <path id="p10" d="M -250,100 -50,150 -250,200 z"
+    transform="rotate(-90)"
+    stroke="none" fill="red" />
+  <path id="p11" d="M 150,450 250,50 350,450 z"
+    transform="scale(0.5, 0.5) translate(50,50)"
+    stroke="none" fill="red" />
+  <path id="p12" d="M 100,400 200,0 300,400 z"
+    transform="translate(50,50) scale(0.5, 0.5)"
+    stroke="none" fill="red" />
+  <path id="p13" d="M -150,-300 -200,-100 -250,-300 z"
+    transform="rotate(180) translate(50,50)"
+    stroke="none" fill="red" />
+  <path id="p14" d="M -50,-200 -100,0 -150,-200 z"
+    transform="translate(50,50) rotate(180)"
+    stroke="none" fill="red" />
+  <path id="p15" d="M 500,-200 100,-300 500,-400 z"
+    transform="rotate(90) scale(0.5, 0.5)"
+    stroke="none" fill="red" />
+  <path id="p16" d="M -200,-500 -300,-100 -400,-500 z"
+    transform="rotate(180) scale(0.5, 0.5)"
+    stroke="none" fill="red" />
+  <path id="p17" d="M 250,-200 50,-300 250,-400 z"
+    transform="scale(0.5, 1) rotate(90)"
+    stroke="none" fill="red" />
+  <path id="p18" d="M 250,-200 50,-300 250,-400 z"
+    transform="rotate(90) scale(1, 0.5)"
+    stroke="none" fill="red" />
+  <path id="p19" d="M 250,-100 50,-200 250,-300 z"
+    transform="translate(50, 0) scale(0.5, 1) rotate(90)"
+    stroke="none" fill="red" />
+  <path id="p20" d="M 200,-200 0,-300 200,-400 z"
+    transform="translate(0, 50) scale(0.5, 1) rotate(90)"
+    stroke="none" fill="red" />
+  <path id="p21" d="M -100,250 -150,50 -200,250 z"
+    transform="scale(-1, 1)"
+    stroke="none" fill="red" />
+  <path id="p22" d="M -250,-100 -50,-150 -250,-200 z"
+    transform="rotate(90) scale(-1, 1)"
+    stroke="none" fill="red" />
+  <path id="p23" d="M 100,-250 150,-50 200,-250 z"
+    transform="rotate(180) scale(-1, 1)"
+    stroke="none" fill="red" />
+  <path id="p24" d="M 250,100 50,150 250,200 z"
+    transform="rotate(-90) scale(-1, 1)"
+    stroke="none" fill="red" />
+  <path id="p25" d="M -250,-200 -50,-300 -250,-400 z"
+    transform="scale(0.5, -1) rotate(90)"
+    stroke="none" fill="red" />
+  <path id="p26" d="M 250,200 50,300 250,400 z"
+    transform="scale(-0.5, 1) rotate(90)"
+    stroke="none" fill="red" />
+  <path id="p27" d="M -300,-250 -100,-350 -300,-450 z"
+    transform="scale(0.5, -1) rotate(90) translate(50, 50)"
+    stroke="none" fill="red" />
+  <path id="p28" d="M 200,150 0,250 200,350 z"
+    transform="scale(-0.5, 1) rotate(90) translate(50, 50)"
+    stroke="none" fill="red" />
+  <path id="p29" d="M -250,100 -50,150 -250,200 z"
+    transform="rotate(-90, 0, 0)"
+    stroke="none" fill="red" />
+  <path id="p30" d="M -100,-50 100,0 -100,50 z"
+    transform="rotate(-90, 150, 0)"
+    stroke="none" fill="red" />
+  <path id="p31" d="M -100,250 100,300 -100,350 z"
+    transform="rotate(-90, 0, 150)"
+    stroke="none" fill="red" />
+  <path id="p32" d="M 50,100 250,150 50,200 z"
+    transform="rotate(-90, 150, 150)"
+    stroke="none" fill="red" />
+</svg>

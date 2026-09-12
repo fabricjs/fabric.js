@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import GithubEditLink from '../../components/GithubEditLink/index.astro';
+
+interface Entry {
+	render: () => Promise<{ Content: any }>;
+	data: {
+		title: string;
+	};
+	slug: string;
+}
+
+// 1. Generate a new path for every collection entry
+export async function getStaticPaths() {
+	const demoEntries = await getCollection('demo');
+	return demoEntries.map((entry) => ({
+		params: { slug: entry.slug },
+		props: { entry },
+	}));
+}
+// 2. For your template, you can get the entry directly from the prop
+const { entry }: { entry: Entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout title="Fabric.js">
+	<main>
+		<h1>{entry.data.title}</h1>
+		<article>
+			<Content />
+		</article>
+		<GithubEditLink relativePath={`demo/${entry.slug}/index.mdx`} />
+		<!-- <PrevNextLinks
+      prev={
+        pageContext.prev || { title: 'All Fabric.js demos', slug: '/demos' }
+      }
+      next={pageContext.next}
+    /> -->
+	</main>
+</Layout>

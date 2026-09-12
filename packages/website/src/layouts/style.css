@@ -1,0 +1,147 @@
+  @media (min-width: 800px) and (orientation: landscape) {
+    body {
+      margin-bottom: 0;
+    }
+  }
+  
+  /* ---------------------------
+  ###   Generic page styling   |
+  ----------------------------*/
+  
+  * {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  ::selection {
+    background-color: transparent;
+  }
+  
+  html {
+    height: 100%;
+  }
+  body {
+    margin: 0px;
+    padding: 0px;
+    margin-top: var(--header-height);
+    margin-bottom: var(--bottom-nav-height);
+    font-size: var(--font-size-normal);
+    color: var(--font-color-normal);
+    font-weight: 400; /*normal;*/
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      'century gothic', sans-serif;
+    direction: ltr;
+    line-height: 1.6;
+    cursor: default; /*forces a pointer type cursor instead of selecton caret*/
+    /*font-feature-settings: 'kern';
+      text-rendering: optimizeLegibility;*/
+  }
+  a {
+    text-decoration: none;
+    color: var(--font-color-dark2); /*#0b9,05a;font-style:italic*/
+  }
+  a:active,
+  *:active {
+    outline: none;
+  }
+  a:focus,
+  *:focus {
+    outline: 0; /*-moz-outline-style:none;*/
+    outline-style: none;
+  }
+  a img {
+    border: 0 none;
+  }
+  
+  h1,
+  h2 {
+    font-weight: 600;
+    color: var(--font-color-dark2);
+  }
+  h1 {
+    font-size: var(--font-size-bigger3);
+  }
+  h2 {
+    font-size: var(--font-size-bigger2);
+  }
+  h3 {
+    color: var(--font-color-dark);
+  }
+
+  
+  /* ---------------------------
+  ###   Main element styling   |
+  ----------------------------*/
+  
+  main > #breadcrumb-nav {
+    padding: 5px var(--padding-left-right);
+    margin: 0;
+    font-size: var(--font-size-smaller2);
+  }
+  
+  main > * {
+    padding: 20px var(--padding-left-right) 20px var(--padding-left-right);
+    margin: 0;
+  }
+  main > h1 {
+    text-align: center;
+    position: relative;
+  }
+  
+  /* ---------------------------
+  ###   Main article styling   |
+  ----------------------------*/
+  
+  main > article > h2 {
+    margin: var(--padding-above) 0 3% 0;
+    padding: 0 0 0 20px;
+    border-left: 3px solid var(--primary-color);
+  }
+  main > article > h2:first-child {
+    margin-top: 3%;
+  }
+  
+  /*main > article > h3::before{
+      content: '|';
+      color:var(--primary-color);
+      font-weight:bold;
+      line-height:0;
+      padding-right:15px
+  }*/
+  
+  main > article > h2:hover > a:before {
+    content: '🔗';
+    font-weight: normal;
+    margin-left: 10px;
+  }
+  
+  main > article p {
+    text-align: justify;
+  }
+  main > article > p:first-child {
+    margin-top: 0;
+  }
+  main > article > p > strong {
+    color: var(--font-color-dark);
+    font-weight: 600;
+  }
+  main > article > p > img {
+    max-width: 100%;
+  }
+  
+  article a {
+    border-bottom: 1px dashed var(--primary-color);
+  }
+  
+  #code-editor {
+    all: unset;
+  }
+  
+  /*blockquote > p{
+      background-color:#ffb;
+      padding: 20px;
+      box-shadow: 0 0 0 1px #fe8 inset;
+      font-size: var(--font-size-smaller);
+  }*/
+  

@@ -1,0 +1,74 @@
+---
+date: '2015-03-10'
+title: 'Polygon Controls'
+description: 'Polygon Controls'
+thumbnail: 'thumbnail.png'
+tags: ['controls', 'customization', 'polygon']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+
+This demo shows how to use the controls api to do something like changing the shape of a polygon.
+This is generally harder to grasp because require understanding the internal polygon logic,
+anchor points and transformations.
+
+In the demo the canvas has zoom and translation, so we are sure our code is generic enough.
+The polygon is given some big strokeWidth for the same reason.
+
+We have a function that trigger the `none>edit mode`.
+When we enter in edit mode we create one new control for each polygon point.
+To those controls we attach a property, called point index, to remember to which point they are bound to.
+
+Those controls use their own custom position handler: `none>polygonPositionHandler`. This function
+look at the pointIndex of the control and return the current canvas position for that particular point.
+In this way interaction and rendering are done.
+
+To make the actual control change the current point, we need to write a custom action handler.
+
+Changing a point position is actually easy:
+
+```javascript
+fabricObject.points[index].x = number;
+fabricObject.points[index].y = number;
+```
+
+The hard part is handling the object that change dimensions while mantaining the correct position.
+
+We need an anchor point. We choose to fix the polygon position on the actual position of any point of the points array that is not the one that we are dragging.
+
+So having chosen the point, we calculate its actual absolute position:
+
+```javascript
+var absolutePoint = fabric.util.transformPoint(
+  {
+    x: fabricObject.points[anchorIndex].x - fabricObject.pathOffset.x,
+    y: fabricObject.points[anchorIndex].y - fabricObject.pathOffset.y,
+  },
+  fabricObject.calcTransformMatrix()
+);
+```
+
+We will use this absolute position after we have modified the polygon.
+
+Then we swap the dragged point with the new one, we recalculate the width/height and pathOffset of the polygon ( basically we reinitialize its dimensions ).
+
+Now to keep its position steady, we want to know the point that represent the anchor point, in what position is now relative to polygon size.
+
+```javascript
+var newX = (fabricObject.points[anchorIndex].x - fabricObject.pathOffset.x) / fabricObject.width,
+  newY = (fabricObject.points[anchorIndex].y - fabricObject.pathOffset.y) / fabricObject.height;
+```
+
+Now newX and newY represent the point position with a range from -0.5 to 0.5 for X and Y.
+Fabric supports numeric origins for objects with a range from 0 to 1. This let us use the relative position as an origin to translate the old absolutePoint we find before.
+
+```javascript
+fabricObject.setPositionByOrigin(absolutePoint, newX + 0.5, newY + 0.5);
+```
+
+In the below canvas, use the classic controls to scale and rotate the polygon, use a double click to switch back and forth in polygon editing mode. Once in polygon editing mode, you can drag point of the polygon around with an orchestrated user experience that feels correct.
+
+<CodeEditor code={code} canvasId="canvas" client:idle>
+  <canvas id="canvas" width="500" height="500"></canvas>
+</CodeEditor>

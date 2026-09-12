@@ -1,0 +1,72 @@
+.demo-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.column-main,
+.column-events {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-header {
+  display: flex;
+  flex-direction: row;
+}
+.demo-body {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+.log-entry {
+  white-space: pre;
+  border-bottom: 1px solid var(--primary-color);
+  margin-bottom: 3px;
+}
+.bold {
+  font-weight: bold;
+}
+.log-entry > code {
+  font-weight: initial;
+}
+.log-entry > button {
+  margin: 0 2px;
+}
+*[hidden] {
+  display: none;
+}
+.log-container,
+#log1 {
+  display: inline-block;
+  height: 260px;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  font-family: monospace;
+  font-size: 11px;
+}
+#drag-me {
+  display: inline-block;
+  width: 100px;
+  background-color: purple;
+  height: 100px;
+}
+label {
+  display: inline-block;
+  margin-right: 8px;
+}
+.bold label {
+  font-weight: bold;
+}
+.log-container {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.events-checkboxes {
+  padding-top: 24px;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+

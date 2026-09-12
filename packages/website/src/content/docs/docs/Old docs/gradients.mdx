@@ -1,0 +1,78 @@
+---
+date: '2019-08-19'
+description: Gradients
+title: Gradients
+---
+
+An even more expressive way to work with colors is via gradients. Gradients allow us to blend one color into another, creating some stunning graphical effects.
+
+Fabric supports gradients via the `Gradient` class.
+
+```
+var circle = new fabric.Circle({
+  left: 100,
+  top: 100,
+  radius: 50,
+  fill = new fabric.Gradient({
+    coords: {
+      x1: 0,
+      y1: 0,
+      x2: 0,
+      y2: circle.height,
+    },
+    colorStops: {
+        0: '#000',
+        1: '#fff'
+    }
+  }),
+});
+```
+
+![](/article_assets/2_15.png)
+
+In the above example, we create a circle at 100,100 location, with 50px radius. We then set its fill to a gradient that spans throughout entire height of that circle, from black to white.
+
+The argument passed to a method is an options object, which expects 2 coordinate pairs (x1, y1 and x2, y2), as well as "colorStops" object. Coordinates specify where gradient starts and where it ends. colorStops specify which colors a gradient is made of. You can define as many color stops as you want, as long as they range from 0 to 1 (e.g. 0, 0.1, 0.3, 0.5, 0.75, 1). 0 represents beginning of a gradient, 1 — its end.
+
+Coordinates are relative to object top left corner, so the highest point of the circle is `0`, and the lowest point is `circle.height`. `setGradient` calculates width coordinates (x1, x2) in the same way.
+
+Here's an example of left-to-right red-blue gradient:
+
+```js
+circle.fill = new Gradient({
+  coords: {
+    x1: 0,
+    y1: 0,
+    x2: circle.width,
+    y2: 0,
+  },
+  colorStops: {
+    0: "red",
+    1: "blue"
+  }
+});
+```
+![](/article_assets/2_16.png)
+
+And here's a 5-stops rainbow gradient, with colors spanning at even 20% intervals:
+```js
+circle.fill = new Gradient({
+  coords: {
+    x1: 0,
+    y1: 0,
+    x2: circle.width,
+    y2: 0,
+  },
+  colorStops: {
+    0: "red",
+    0.2: "orange",
+    0.4: "yellow",
+    0.6: "green",
+    0.8: "blue",
+    1: "purple"
+  }
+});
+```
+![](/article_assets/2_17.png)
+
+Which cool versions can you come up with?

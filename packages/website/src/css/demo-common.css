@@ -1,0 +1,11 @@
+/* controls is a box that contain buttons on top of a canvas */
+.controls {
+	display: flex;
+    column-gap: 16px;
+    margin-bottom: 16px;
+}
+
+canvas {
+    border: 1px solid black;
+    box-sizing: content-box;
+}

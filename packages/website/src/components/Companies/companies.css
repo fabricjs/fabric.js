@@ -1,0 +1,45 @@
+#companies {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+}
+
+#companies #logos {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  row-gap: 16px;
+  align-items: center;
+}
+
+#companies a {
+  justify-content: space-around;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#companies .imageContainer {
+  height: 180px;
+  width: 180px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#companies .textEllipsis {
+  max-width: 220px;
+  max-height: 60px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#companies a img {
+  max-width: 100%;
+  display: flex;
+  justify-content: space-around;
+}

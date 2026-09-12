@@ -1,0 +1,30 @@
+---
+date: '2015-05-04'
+title: 'Manage selection'
+description: 'Manage selection'
+thumbnail: 'manage-selection.png'
+tags: ['selection']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import '../../../css/demo-common.css';
+
+This demo is shows how to handle the selection programmatically.
+In the code editor below you can see some simple functions that let you:
+
+- Select all items in a canvas
+- Convert the selection in a group
+- Convert a group into a selection
+
+<div className="controls">
+  <button id="group" >Group selected objecs</button>
+  <button id="ungroup" >Ungroup selected objects</button>
+  <button id="multiselect" >Select all</button>
+  <button id="discard" >Discard selection</button>
+  <button id="addmore" >Add more shapes</button>
+</div>
+
+<CodeEditor code={code} canvasId="canvas" client:idle>
+  <canvas id="canvas" width="450" height="450" style="border:1px solid #aaa"></canvas>
+</CodeEditor>
