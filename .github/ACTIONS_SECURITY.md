@@ -68,3 +68,34 @@ Consider using tools like:
 - [Dependabot](https://docs.github.com/en/code-security/dependabot/working-with-dependabot) for automated updates
 - [pin-github-action](https://github.com/mheap/pin-github-action) for CLI pinning
 - [action-validator](https://github.com/mpalmer/action-validator) for validation
+
+## CI checks and privileged reporting
+
+The main PR workflows use seven runners: `Quality checks`, `Packages and website`,
+`Playwright tests`, `Vitest browser tests`, and `Vitest tests Node 20`, `22`, and
+`24`. Update branch protection to use these names when replacing the old separate
+lint, prettier, typecheck, website, and browser checks. The workflow names remain
+unchanged so existing `workflow_run` subscribers continue to receive events.
+
+Independent checks in a combined job use `!cancelled()` plus the successful setup
+or build outcome. They continue after another check fails without masking that
+failure. Node versions retain isolated dependency installations and coverage is
+uploaded only by Node 24.
+
+Reporting workflows run trusted workflow code from the default branch. Build-stat
+and coverage reporters check artifact availability before installing or reporting.
+PR artifact contents are data, never inline shell or JavaScript source. The
+changelog updater obtains its target repository, branch, and title from GitHub's
+PR API instead of trusting the artifact, and skips outdated runs.
+
+SonarQube scans the revision recorded with coverage, validating that it matches the
+triggering commit or its PR merge. Older artifacts fall back to the triggering head
+SHA. The scanner configuration comes from the default-branch commit associated
+with the reporting workflow, replacing any PR-supplied configuration or symlink.
+Coverage, scanner output, and scanner home live outside the source checkout. No
+PR dependency installation or build runs in this privileged job. Changes to
+`sonar-project.properties` take effect after merging into the default branch.
+
+Validate workflow syntax and expressions with `actionlint`. GitHub-hosted browser
+execution, artifact handoffs, and SonarQube submission still require a CI run;
+`workflow_run` changes themselves take effect after they reach the default branch.

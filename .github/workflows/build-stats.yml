@@ -5,30 +5,55 @@ on:
     types:
       - completed
 permissions:
+  actions: read
   contents: read
 jobs:
   build-stats:
     permissions:
+      actions: read
+      contents: read
       pull-requests: write
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion != 'cancelled' &&
+        github.event.workflow_run.event == 'pull_request'
+      }}
     env:
       unique_id: <!-- build-stats -->
     name: Build stats
     runs-on: ubuntu-24.04
     steps:
+      - name: Find report artifacts
+        id: artifacts
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            const names = new Set(artifacts.filter(({ expired }) => !expired).map(({ name }) => name));
+            core.setOutput('available', ['prstats', 'prnumber'].every(name => names.has(name)));
       - name: 'Create an empty tmp directory'
+        if: steps.artifacts.outputs.available == 'true'
         run: mkdir ${{ runner.temp }}/artifacts
       - name: Checkout
+        if: steps.artifacts.outputs.available == 'true'
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: master
+          ref: ${{ github.sha }}
+          persist-credentials: false
       - name: Install dependencies
+        if: steps.artifacts.outputs.available == 'true'
         uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
           install-system-deps: false
       - name: Build fabric.js
+        if: steps.artifacts.outputs.available == 'true'
         run: npm run build
       - name: Recover build stats
+        if: steps.artifacts.outputs.available == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: prstats
@@ -36,9 +61,17 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ${{ runner.temp }}/artifacts
       - name: Put stats in GITHUB_OUTPUT
+        if: steps.artifacts.outputs.available == 'true'
         id: pr_stats
-        run: echo "pr_stats=$(cat ${{ runner.temp }}/artifacts/prstats.txt)" >> $GITHUB_OUTPUT
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const stats = JSON.parse(fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'artifacts/prstats.txt'), 'utf8'));
+            core.setOutput('pr_stats', JSON.stringify(stats));
       - name: Recover pr number
+        if: steps.artifacts.outputs.available == 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: prnumber
@@ -46,9 +79,23 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ${{ runner.temp }}/artifacts
       - name: Add pr number to output
+        if: steps.artifacts.outputs.available == 'true'
         id: prnumber
-        run: echo "pr_number=$(cat ${{ runner.temp }}/artifacts/prnumber.txt)" >> $GITHUB_OUTPUT
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const number = Number(fs.readFileSync(path.join(process.env.RUNNER_TEMP, 'artifacts/prnumber.txt'), 'utf8').trim());
+            if (!Number.isSafeInteger(number) || number <= 0) throw new Error('Invalid PR number');
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
+            const run = context.payload.workflow_run;
+            if (pr.head.sha !== run.head_sha || pr.head.repo.full_name !== run.head_repository.full_name) {
+              throw new Error('PR does not match the triggering run');
+            }
+            core.setOutput('pr_number', number);
       - name: Create upstream stats
+        if: steps.artifacts.outputs.available == 'true'
         id: upstream_stats
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
@@ -59,6 +106,7 @@ jobs:
               size: buildStats(),
             });
       - name: process
+        if: steps.artifacts.outputs.available == 'true'
         id: stats-message
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         env:
@@ -73,6 +121,7 @@ jobs:
               original: JSON.parse(process.env.upstream_stats),
             });
       - name: Comment on PR for build stats
+        if: steps.artifacts.outputs.available == 'true'
         uses: ./.github/actions/find-create-or-update-comment
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -14,10 +14,6 @@ jobs:
       title: ${{ github.event.pull_request.title }}
       prev_title: ${{ github.event.changes.title.from }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        with:
-          fetch-depth: 0
       - name: Check CHANGELOG.md
         id: check
 
@@ -42,13 +38,15 @@ jobs:
           script: |
             return JSON.stringify({
               log: `- ${process.env.title} ${process.env.link}`,
-              prev_log: !!'${process.env.prev_title}' ? `- ${process.env.prev_title} ${process.env.link}` : '',
-              pr_ref: `${{ github.event.pull_request.head.ref }}`,
-              full_name: `${{ github.event.pull_request.head.repo.full_name }}`
+              prev_log: process.env.prev_title ? `- ${process.env.prev_title} ${process.env.link}` : '',
+              pr_ref: context.payload.pull_request.head.ref,
+              full_name: context.payload.pull_request.head.repo.full_name
             });
       - name: Create changelog artifact
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
-        run: echo '${{ steps.changelog_string.outputs.result }}' > ./changelog_artifact.txt
+        env:
+          CHANGELOG_DATA: ${{ steps.changelog_string.outputs.result }}
+        run: printf '%s\n' "$CHANGELOG_DATA" > ./changelog_artifact.txt
       - name: Upload changelog artifact
         if: steps.check.outputs.changelog_updated == 'false' || (!!github.event.changes.title.from && github.event.changes.title.from != github.event.pull_request.title)
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

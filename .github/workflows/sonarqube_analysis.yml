@@ -10,49 +10,101 @@ permissions:
 jobs:
   sonarqube:
     name: SonarQube analysis
-    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion != 'cancelled' &&
+        (github.event.workflow_run.event == 'push' ||
+          github.event.workflow_run.event == 'pull_request')
+      }}
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout PR merge ref
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Find coverage artifact
+        id: artifact
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
-          ref: refs/pull/${{ github.event.workflow_run.pull_requests[0].number }}/merge
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Checkout default branch
-        if: ${{ github.event.workflow_run.event == 'push' }}
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-        with:
-          ref: refs/heads/master
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Create temporary directories
-        run: mkdir -p ${{ runner.temp }}/artifacts/nyc_output .nyc_output
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+          script: |
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            core.setOutput('available', artifacts.some(({ name, expired }) =>
+              name === 'coverage-vitest-sonarqube' && !expired));
+      - name: Download coverage
+        if: steps.artifact.outputs.available == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-vitest-sonarqube
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts/nyc_output
-      - run: mv ${{ runner.temp }}/artifacts/nyc_output/lcov.info ./.nyc_output
-      - name: SonarQube Scan PR
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+          path: ${{ runner.temp }}/sonar-coverage
+      - name: Validate tested revision
+        if: steps.artifact.outputs.available == 'true'
+        id: revision
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const run = context.payload.workflow_run;
+            const file = path.join(process.env.RUNNER_TEMP, 'sonar-coverage/revision.txt');
+            // Older test runs did not record their merge revision.
+            const revision = fs.existsSync(file) ? fs.readFileSync(file, 'utf8').trim() : run.head_sha;
+            if (!/^[0-9a-f]{40}$/.test(revision)) {
+              throw new Error('Invalid coverage revision');
+            }
+            if (revision !== run.head_sha) {
+              const { data: commit } = await github.rest.repos.getCommit({
+                ...context.repo, ref: revision,
+              });
+              if (run.event !== 'pull_request' || commit.parents.length !== 2 ||
+                  commit.parents[1].sha !== run.head_sha) {
+                throw new Error('Coverage revision does not match the triggering run');
+              }
+            }
+            core.setOutput('sha', revision);
+      - name: Checkout tested source
+        if: steps.artifact.outputs.available == 'true'
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: ${{ steps.revision.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Use trusted scanner configuration
+        if: steps.artifact.outputs.available == 'true'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            // workflow_run's SHA belongs to the default branch. Never let PR
+            // properties choose the scanner's server or executable settings.
+            const { data } = await github.rest.repos.getContent({
+              ...context.repo, path: 'sonar-project.properties', ref: context.sha,
+            });
+            let properties = Buffer.from(data.content, 'base64').toString('utf8');
+            const run = context.payload.workflow_run;
+            const property = (key, value) => {
+              const escaped = String(value).replace(/\\/g, '\\\\').replace(/\r/g, '\\r').replace(/\n/g, '\\n');
+              properties += `\n${key}=${escaped}`;
+            };
+            if (run.event === 'pull_request') {
+              const pr = run.pull_requests[0];
+              if (!pr) throw new Error('Missing pull request metadata');
+              property('sonar.pullrequest.key', pr.number);
+              property('sonar.pullrequest.base', pr.base.ref);
+              property('sonar.pullrequest.branch', pr.head.ref);
+            } else {
+              property('sonar.branch.name', run.head_branch);
+            }
+            property('sonar.host.url', 'https://sonarcloud.io');
+            property('sonar.javascript.lcov.reportPaths', path.join(process.env.RUNNER_TEMP, 'sonar-coverage/lcov.info'));
+            property('sonar.working.directory', path.join(process.env.RUNNER_TEMP, 'sonar-work'));
+            // Remove a PR-controlled symlink before writing the trusted file.
+            fs.rmSync('sonar-project.properties', { force: true, recursive: true });
+            fs.writeFileSync('sonar-project.properties', properties + '\n');
+      - name: SonarQube scan
+        if: steps.artifact.outputs.available == 'true'
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }}
-            -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
-            -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
-      - name: SonarQube Scan Branch
-        if: ${{ github.event.workflow_run.event == 'push' }}
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.branch.name=master
+          SONAR_USER_HOME: ${{ runner.temp }}/sonar-home

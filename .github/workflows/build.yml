@@ -4,30 +4,46 @@ on:
   pull_request:
     branches: [master]
     paths-ignore: [CHANGELOG.md]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 jobs:
-  build:
+  quality:
+    name: Quality checks
     runs-on: ubuntu-24.04
     steps:
-      - name: Uglified build
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/cached-install
+        id: deps
+        with:
+          node-version: 24.x
+      - name: Format check
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: pnpm run prettier:check
+      - name: Lint
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: pnpm exec eslint extensions packages
+      - name: Type check
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: pnpm run typecheck
+  build:
+    name: Packages and website
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
           install-system-deps: true
-      - run: pnpm run build
-      - name: Smoke test packages
-        run: pnpm run smoke:packages
-  stats:
-    name: Build stats
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
       - name: Build fabric.js
+        id: build
         run: pnpm run build
       - name: Create prnumber artifact
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
@@ -59,49 +75,17 @@ jobs:
               ),
             });
       - name: Create the artifact for stats
-        run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
+        env:
+          PR_STATS: ${{ steps.stats.outputs.result }}
+        run: printf '%s\n' "$PR_STATS" > ./prstats.txt
       - name: Upload Pr stats
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: prstats
           path: ./prstats.txt
-  typecheck:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-      - name: Type check
-        run: pnpm run typecheck
-  lint:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Linting
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-      - run: pnpm run lint
-  prettier:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Prettier check
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-      - run: pnpm run prettier:check
-  website:
-    name: Website build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-          install-system-deps: true
-      - name: Build fabric.js
-        run: pnpm run build
+      - name: Smoke test packages
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: pnpm run smoke:packages
       - name: Build website
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: pnpm --dir packages/website run build
