@@ -8,36 +8,34 @@ permissions:
   contents: read
 jobs:
   build:
+    name: Build and website
     runs-on: ubuntu-24.04
     steps:
-      - name: Uglified build
+      - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
+      - name: Install dependencies
+        id: deps
+        uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
           install-system-deps: true
-      - run: pnpm run build
-      - name: Smoke test packages
-        run: pnpm run smoke:packages
-  stats:
-    name: Build stats
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
       - name: Build fabric.js
+        id: fabric
         run: pnpm run build
       - name: Create prnumber artifact
+        id: prnumber
+        if: ${{ !cancelled() && steps.fabric.outcome == 'success' }}
         run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
       - name: Upload Pr Number
+        id: prnumber-upload
+        if: ${{ !cancelled() && steps.prnumber.outcome == 'success' }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: prnumber
           path: ./prnumber.txt
       - name: Prepare pr stats
         id: stats
+        if: ${{ !cancelled() && steps.fabric.outcome == 'success' }}
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
           result-encoding: string
@@ -59,12 +57,43 @@ jobs:
               ),
             });
       - name: Create the artifact for stats
-        run: echo '${{ steps.stats.outputs.result }}' > ./prstats.txt
+        id: stats-file
+        if: ${{ !cancelled() && steps.stats.outcome == 'success' }}
+        env:
+          BUILD_STATS: ${{ steps.stats.outputs.result }}
+        run: printf '%s\n' "$BUILD_STATS" > ./prstats.txt
       - name: Upload Pr stats
+        id: stats-upload
+        if: ${{ !cancelled() && steps.stats-file.outcome == 'success' }}
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: prstats
           path: ./prstats.txt
+      - name: Smoke test packages
+        id: smoke
+        if: ${{ !cancelled() && steps.fabric.outcome == 'success' }}
+        run: pnpm run smoke:packages
+      # Attempt the website even if Fabric fails: partial output may be enough.
+      - name: Build website
+        id: website
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: pnpm --dir packages/website run build
+      - name: Show results summary
+        if: ${{ !cancelled() }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          | Step | Result |
+          | --- | --- |
+          | Install dependencies | ${{ steps.deps.outcome }} |
+          | Build Fabric | ${{ steps.fabric.outcome }} |
+          | Create PR number | ${{ steps.prnumber.outcome }} |
+          | Upload PR number | ${{ steps.prnumber-upload.outcome }} |
+          | Collect build statistics | ${{ steps.stats.outcome }} |
+          | Create statistics file | ${{ steps.stats-file.outcome }} |
+          | Upload statistics | ${{ steps.stats-upload.outcome }} |
+          | Smoke test packages | ${{ steps.smoke.outcome }} |
+          | Build website | ${{ steps.website.outcome }} |
+          EOF
   quality:
     name: Quality checks
     runs-on: ubuntu-24.04
@@ -84,16 +113,3 @@ jobs:
       - name: Lint
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: pnpm run lint
-  website:
-    name: Website build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-          install-system-deps: true
-      - name: Build fabric.js
-        run: pnpm run build
-      - name: Build website
-        run: pnpm --dir packages/website run build
