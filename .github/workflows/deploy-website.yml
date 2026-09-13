@@ -20,7 +20,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Build fabric.js
         run: pnpm run build
       - name: Build website

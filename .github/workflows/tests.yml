@@ -19,7 +19,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest:coverage
       - name: Upload test coverage
@@ -63,7 +63,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 20.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest
   vitest-node-22:
@@ -74,7 +74,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 22.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest
   e2e:
@@ -85,7 +85,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Build fabric.js
         run: pnpm run build:fast
         # Playwright suggests against caching the browser install
