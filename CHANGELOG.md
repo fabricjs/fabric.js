@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
 - ci(): build directly in the Playwright job and remove the prebuild cache handoff
 - ci(): pin build-stats checkout to master to avoid running PR code [#11085](https://github.com/fabricjs/fabric.js/pull/11085)
