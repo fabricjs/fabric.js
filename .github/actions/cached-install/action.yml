@@ -5,10 +5,12 @@ inputs:
     required: true
     description: 'the node version'
   install-system-deps:
-    description: 'install node-canvas deps with apt-get'
+    description: 'Install system dependencies for compiling node-canvas from source'
+    default: 'false'
 runs:
   using: 'composite'
   steps:
+    # Ubuntu x64 uses prebuilt canvas binaries; opt in only for source builds.
     - name: Install system deps for node canvas
       if: inputs.install-system-deps == 'true'
       run: sudo apt-get update && sudo apt-get install --yes libgif-dev libpng-dev libpango1.0-dev libjpeg-dev librsvg2-dev libcairo2-dev
@@ -18,7 +20,7 @@ runs:
       with:
         version: 10.29.1
     - name: Use Node.js v${{ inputs.node-version }}
-      uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
