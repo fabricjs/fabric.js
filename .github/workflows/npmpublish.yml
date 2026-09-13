@@ -2,10 +2,6 @@ name: Node.js Package
 
 on:
   release:
-    branches:
-      - master
-      - 5.x
-      - 6.x
     types: [published]
   workflow_dispatch:
     inputs:
@@ -25,27 +21,33 @@ jobs:
     env:
       NPM_CONFIG_PROVENANCE: true
     permissions:
+      contents: read
       id-token: write
     runs-on: ubuntu-24.04
     steps:
       - name: Resolve publish metadata
         id: publish
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+          INPUT_TAG: ${{ inputs.tag_name }}
+          INPUT_PRERELEASE: ${{ inputs.is_prerelease }}
         run: |
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            ref_name='${{ github.event.release.tag_name }}'
-            is_prerelease='${{ github.event.release.prerelease }}'
+          if [[ "$EVENT_NAME" == "release" ]]; then
+            ref_name="$RELEASE_TAG"
+            is_prerelease="$RELEASE_PRERELEASE"
           else
-            ref_name='${{ inputs.tag_name }}'
-            is_prerelease='${{ inputs.is_prerelease }}'
+            ref_name="$INPUT_TAG"
+            is_prerelease="$INPUT_PRERELEASE"
           fi
-
+          git check-ref-format "refs/tags/$ref_name"
           if [[ "$is_prerelease" == 'true' ]]; then
             npm_tag='beta'
           else
             npm_tag=''
           fi
-
           echo "ref_name=$ref_name" >> "$GITHUB_OUTPUT"
           echo "npm_tag=$npm_tag" >> "$GITHUB_OUTPUT"
 
@@ -53,15 +55,14 @@ jobs:
         with:
           ref: refs/tags/${{ steps.publish.outputs.ref_name }}
           persist-credentials: false
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
         with:
           version: 10.29.1
+      # Release builds use a fresh dependency store, not a CI cache.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24.x
           registry-url: https://registry.npmjs.org/
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
       - name: Install system deps for node canvas
         run: sudo apt-get update && sudo apt-get install --yes libgif-dev libpng-dev libpango1.0-dev libjpeg-dev librsvg2-dev libcairo2-dev
       - run: pnpm install --frozen-lockfile --prefer-offline
@@ -70,10 +71,12 @@ jobs:
         run: pnpm run smoke:packages
       - name: Publish package
         shell: bash
+        env:
+          NPM_TAG: ${{ steps.publish.outputs.npm_tag }}
         run: |
-          if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
-            echo "pnpm -r publish --tag ${{ steps.publish.outputs.npm_tag }} --access public --no-git-checks"
-            pnpm -r publish --tag "${{ steps.publish.outputs.npm_tag }}" --access public --no-git-checks
+          if [[ -n "$NPM_TAG" ]]; then
+            echo "pnpm -r publish --tag $NPM_TAG --access public --no-git-checks"
+            pnpm -r publish --tag "$NPM_TAG" --access public --no-git-checks
           else
             echo "pnpm -r publish --access public --no-git-checks"
             pnpm -r publish --access public --no-git-checks

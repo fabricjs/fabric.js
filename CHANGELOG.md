@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): secure privileged reporting and support checks on fork pull requests
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job

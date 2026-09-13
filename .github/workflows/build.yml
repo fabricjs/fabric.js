@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - name: Install dependencies
         id: deps
         uses: ./.github/actions/cached-install
@@ -99,6 +101,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/cached-install
         id: deps
         with:
@@ -113,3 +117,9 @@ jobs:
       - name: Lint
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: pnpm run lint
+      - name: Workflow helper tests
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: node --test .github/scripts/*.test.cjs
+      - name: Sonar source preparation tests
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'

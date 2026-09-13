@@ -68,3 +68,56 @@ Consider using tools like:
 - [Dependabot](https://docs.github.com/en/code-security/dependabot/working-with-dependabot) for automated updates
 - [pin-github-action](https://github.com/mheap/pin-github-action) for CLI pinning
 - [action-validator](https://github.com/mpalmer/action-validator) for validation
+
+## Fork pull requests and reporting
+
+PR builds and tests have read-only tokens and no persisted checkout credentials.
+Reporting uses `workflow_run` so fork contributions can receive comments without
+receiving a write token. All executable helpers are loaded from the immutable
+`github.sha` of the default-branch reporting workflow, never from the PR checkout.
+
+`workflow-reports.cjs` re-fetches the triggering run and resolves its current PR
+through GitHub's API, including when `workflow_run.pull_requests` is empty. It
+checks the workflow path, repository, head repository, branch and commit. Closed,
+superseded and ambiguous PRs are not updated. Artifacts cannot select a PR number,
+repository, branch or executable command; reports are bounded and treated as data.
+
+| Job                                | Elevated access                               | Executed code                             |
+| ---------------------------------- | --------------------------------------------- | ----------------------------------------- |
+| Coverage/build-statistics comments | PR comments                                   | Trusted helpers only                      |
+| Build-statistics baseline          | None                                          | Default-branch build and dependencies     |
+| Changelog update                   | Contents and PR comments                      | Trusted GitHub API helper only            |
+| Sonar source preparation           | None                                          | Trusted Python helper and Git blob reads  |
+| Sonar scan                         | Existing `SONAR_TOKEN`, no GitHub write token | Pinned scanner with trusted configuration |
+
+The changelog updater can commit only `CHANGELOG.md` to an existing same-repository
+PR branch. Updates are non-force and based on the validated head commit. For forks
+it posts the required entry; the repository token cannot push to contributors'
+forks, and no cross-repository PAT is used.
+
+Sonar preparation never runs checkout filters, hooks, package installs or PR
+scripts. It stages regular source files and Git history in a separate directory,
+rejects source symlinks, and supplies Sonar/TypeScript configuration from the
+trusted branch. Coverage paths must resolve to staged source files. The secret is
+provided only to the subsequent scanner job. The scanner uses the runner's Node
+executable, not a path supplied by the PR. This retains the normal trust in the
+pinned scanner and its analyzers to parse untrusted source safely.
+
+`workflow_run` trigger warnings still require review: the separation above is
+intentional, and adding a PR checkout, package install or artifact-selected script
+to a privileged job would violate it. Changes to these reporting workflows become
+active after merging to the default branch. Test fork reporting after merge,
+including an update to the fork while an older run is completing.
+
+Run the local security regression tests with:
+
+```sh
+node --test .github/scripts/*.test.cjs
+python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'
+```
+
+The npm release workflow deliberately omits the `cache` input on the pinned
+`setup-node` v4 action, where caching is opt-in. Tools that assume the automatic
+npm caching introduced in later major versions may still flag that step. The
+existing Dependabot cooldown recommendation and local-action syntax suggestions
+are separate policy/maintenance findings, not permissions granted to fork code.

@@ -2,57 +2,101 @@ name: 'Run scan and submit coverage Sonarqube'
 on:
   workflow_run:
     workflows: ['🧪']
-    types:
-      - completed
-permissions:
-  actions: read
-  contents: read
+    types: [completed]
+permissions: {}
 jobs:
-  sonarqube:
-    name: SonarQube analysis
-    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
+  prepare:
+    name: Prepare SonarQube source
+    if: github.event.workflow_run.conclusion != 'cancelled'
     runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    outputs:
+      ready: ${{ steps.target.outputs.ready }}
     steps:
-      - name: Checkout PR merge ref
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+      - name: Checkout trusted workflow code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: refs/pull/${{ github.event.workflow_run.pull_requests[0].number }}/merge
-          fetch-depth: 0
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Checkout default branch
-        if: ${{ github.event.workflow_run.event == 'push' }}
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Resolve the tested revision
+        id: target
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
-          ref: refs/heads/master
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Create temporary directories
-        run: mkdir -p ${{ runner.temp }}/artifacts/nyc_output .nyc_output
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+          script: |
+            const { resolveRun, artifact } = require('./.github/scripts/workflow-reports.cjs');
+            const target = await resolveRun({ github, context, workflow: 'tests.yml' });
+            if (!target) return;
+            const { run, pr } = target;
+            core.setOutput('metadata', JSON.stringify({
+              repository: `${context.repo.owner}/${context.repo.repo}`, sha: run.head_sha,
+              number: pr?.number, branch: pr?.head.ref, base: pr?.base.ref || 'master',
+            }));
+            core.setOutput('coverage', Boolean(await artifact({ github, context, run, name: 'coverage-vitest-sonarqube' })));
+            core.setOutput('ready', true);
+      - name: Download coverage data
+        if: steps.target.outputs.ready == 'true' && steps.target.outputs.coverage == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-vitest-sonarqube
           run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts/nyc_output
-      - run: mv ${{ runner.temp }}/artifacts/nyc_output/lcov.info ./.nyc_output
-      - name: SonarQube Scan PR
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/sonar-coverage
+      # This job has no secrets or write token. Git blobs are read as data;
+      # PR scripts, configs, symlinks and dependencies never enter the scan setup.
+      - name: Prepare source with trusted scan configuration
+        if: steps.target.outputs.ready == 'true'
+        env:
+          SCAN_METADATA: ${{ steps.target.outputs.metadata }}
+          SCAN_SOURCE: ${{ runner.temp }}/sonar-source
+          COVERAGE_FILE: ${{ steps.target.outputs.coverage == 'true' && format('{0}/sonar-coverage/lcov.info', runner.temp) || '' }}
+        run: python3 .github/scripts/prepare-sonar.py
+      - name: Upload scan input
+        if: steps.target.outputs.ready == 'true'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: sonar-source-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/sonar-source
+          include-hidden-files: true
+          retention-days: 1
+  sonarqube:
+    name: SonarQube analysis
+    needs: prepare
+    if: needs.prepare.outputs.ready == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout trusted workflow code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Ignore superseded revisions
+        id: target
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const { resolveRun } = require('./.github/scripts/workflow-reports.cjs');
+            core.setOutput('ready', Boolean(await resolveRun({ github, context, workflow: 'tests.yml' })));
+      - name: Download prepared scan input
+        if: steps.target.outputs.ready == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: sonar-source-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/sonar-source
+      - name: Select trusted Node runtime
+        if: steps.target.outputs.ready == 'true'
+        run: printf '\nsonar.nodejs.executable=%s\n' "$(command -v node)" >> "$RUNNER_TEMP/sonar-source/sonar-project.properties"
+      # No install/build step, GitHub write token, PR action, or PR configuration.
+      - name: SonarQube Scan
+        if: steps.target.outputs.ready == 'true'
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          args: >
-            -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }}
-            -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
-            -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
-      - name: SonarQube Scan Branch
-        if: ${{ github.event.workflow_run.event == 'push' }}
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.branch.name=master
+          projectBaseDir: ${{ runner.temp }}/sonar-source

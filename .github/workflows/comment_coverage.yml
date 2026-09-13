@@ -2,50 +2,48 @@ name: 'Comment coverage on PR'
 on:
   workflow_run:
     workflows: ['🧪']
-    types:
-      - completed
-permissions:
-  actions: read
-  contents: read
+    types: [completed]
+permissions: {}
 jobs:
   coverage:
-    permissions:
-      pull-requests: write
-    if: >-
-      ${{
-        github.event.workflow_run.event == 'pull_request' &&
-        github.event.workflow_run.head_repository.full_name == github.repository
-      }}
-    env:
-      unique_id: <!-- coverage-report -->
     name: Coverage reporting
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'
     runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
     steps:
-      - name: Checkout actions
+      - name: Checkout trusted workflow code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          sparse-checkout: |
-            .github
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - name: Resolve pull request and coverage
+        id: target
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const { resolveRun, artifact } = require('./.github/scripts/workflow-reports.cjs');
+            const target = await resolveRun({ github, context, workflow: 'tests.yml' });
+            if (!target?.pr) return;
+            const report = await artifact({ github, context, run: target.run, name: 'coverage-vitest' });
+            core.setOutput('ready', Boolean(report));
+      - name: Download coverage data
+        if: steps.target.outputs.ready == 'true'
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-vitest
           run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts
-      - name: Build the report
-        id: report
-        run: |
-          echo "\`\`\`" > ./cov.txt
-          cat ${{ runner.temp }}/artifacts/coverage-summary.txt >> ./cov.txt
-          echo "\`\`\`" >> ./cov.txt
-          echo "${{ env.unique_id }}" >> ./cov.txt
-      - name: Comment on PR for coverage
-        uses: ./.github/actions/find-create-or-update-comment
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/coverage-report
+      - name: Comment on the validated PR
+        if: steps.target.outputs.ready == 'true'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
-          body-includes: '${{ env.unique_id }}'
-          comment-author: 'github-actions[bot]'
-          body-path: ./cov.txt
-          edit-mode: replace
+          script: |
+            const { resolveRun, readReport, escapeText, comment } = require('./.github/scripts/workflow-reports.cjs');
+            const target = await resolveRun({ github, context, workflow: 'tests.yml' });
+            if (!target?.pr) return;
+            const text = readReport(`${process.env.RUNNER_TEMP}/coverage-report/coverage-summary.txt`, 50000);
+            await comment({ github, context, pr: target.pr, marker: '<!-- coverage-report -->', body: `<pre>${escapeText(text)}</pre>` });
