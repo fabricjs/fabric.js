@@ -65,33 +65,25 @@ jobs:
         with:
           name: prstats
           path: ./prstats.txt
-  typecheck:
+  quality:
+    name: Quality checks
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
+        id: deps
         with:
           node-version: 24.x
+      - name: Format check
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: pnpm run prettier:check
       - name: Type check
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: pnpm run typecheck
-  lint:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Linting
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-      - run: pnpm run lint
-  prettier:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Prettier check
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-      - run: pnpm run prettier:check
+      # Lint currently fixes files, so run it after the read-only checks.
+      - name: Lint
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: pnpm run lint
   website:
     name: Website build
     runs-on: ubuntu-24.04

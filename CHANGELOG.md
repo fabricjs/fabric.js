@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): combine lint, formatting, and type checks in one job
 - ci(): pin build-stats checkout to master to avoid running PR code [#11085](https://github.com/fabricjs/fabric.js/pull/11085)
 - chore(deps-dev): bump typescript-eslint from 8.60.1 to 8.70.0 [#11060](https://github.com/fabricjs/fabric.js/pull/11060)
 - chore(deps): bump sharp from 0.34.5 to 0.35.4 [#11079](https://github.com/fabricjs/fabric.js/pull/11079)
