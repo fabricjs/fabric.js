@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(Gradient): Escape colorStop colors in SVG export, backport of GHSA-w22m-hvvm-xmwx [#11032](https://github.com/fabricjs/fabric.js/pull/11032)
+
 ## [6.9.1]
 
 - fix(): Fix the situation where undefined + char exists when calculating couple [#10816](https://github.com/fabricjs/fabric.js/pull/10816)
