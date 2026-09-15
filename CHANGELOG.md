@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump @types/node from 24.7.2 to 26.5.1 [#11093](https://github.com/fabricjs/fabric.js/pull/11093)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
