@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump @codemirror/state from 6.7.1 to 6.7.4 [#11094](https://github.com/fabricjs/fabric.js/pull/11094)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
