@@ -18,7 +18,7 @@
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/state": "^6.4.1",
     "@types/jsdom": "^21.1.6",
-    "@types/node": "^24.3.0",
+    "@types/node": "^26.5.1",
     "@types/react": "^18.x",
     "@types/react-dom": "^18.x",
     "astro": "^5.17.3",
