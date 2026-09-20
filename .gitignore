@@ -29,4 +29,5 @@ before_commit
 **/.cache/
 docs/
 __screenshots__
+.vitest/
 .vitest-attachments

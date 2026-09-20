@@ -149,28 +149,26 @@ function createPreview(
 }
 
 function generateGlobalCompositeTests(): renderTestType[] {
-  return OPERATIONS.map(
-    (operation): renderTestType => ({
-      title: `globalCompositeOperation: ${operation}`,
-      golden: `${operation}.png`,
-      snapshotSuffix: 'gco',
-      percentage: 0.04,
-      size: [size.width, size.height],
-      async renderFunction(canvas, fabric) {
-        // goldens are transparent
-        canvas.backgroundColor = 'transparent';
+  return OPERATIONS.map((operation): renderTestType => ({
+    title: `globalCompositeOperation: ${operation}`,
+    golden: `${operation}.png`,
+    snapshotSuffix: 'gco',
+    percentage: 0.04,
+    size: [size.width, size.height],
+    async renderFunction(canvas, fabric) {
+      // goldens are transparent
+      canvas.backgroundColor = 'transparent';
 
-        const bg = createExisting(fabric);
-        bg.canvas = canvas;
-        canvas.backgroundImage = bg;
-        canvas.add(
-          createPreview(fabric, operation),
-          createNew(fabric, operation),
-        );
-        canvas.renderAll();
-      },
-    }),
-  );
+      const bg = createExisting(fabric);
+      bg.canvas = canvas;
+      canvas.backgroundImage = bg;
+      canvas.add(
+        createPreview(fabric, operation),
+        createNew(fabric, operation),
+      );
+      canvas.renderAll();
+    },
+  }));
 }
 
 export const globalCompositeOperationTests = generateGlobalCompositeTests();
