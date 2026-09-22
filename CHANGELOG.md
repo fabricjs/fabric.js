@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump the vitest group with 4 updates [#11097](https://github.com/fabricjs/fabric.js/pull/11097)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
