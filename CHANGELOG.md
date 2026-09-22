@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump @astrojs/starlight from 0.37.7 to 0.42.2 [#11098](https://github.com/fabricjs/fabric.js/pull/11098)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
