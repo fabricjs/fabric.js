@@ -14,7 +14,7 @@
     "@astrojs/mdx": "^4.3.13",
     "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "^3.7.0",
-    "@astrojs/starlight": "^0.37.6",
+    "@astrojs/starlight": "^0.42.2",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/state": "^6.4.1",
     "@types/jsdom": "^21.1.6",
