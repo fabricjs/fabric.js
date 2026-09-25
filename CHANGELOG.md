@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
