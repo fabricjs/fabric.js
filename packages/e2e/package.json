@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "dev": "vite",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "test": "playwright test"
   },
@@ -15,18 +16,16 @@
     "@fabricjs/gradient-controls": "workspace:^",
     "@fabricjs/node": "workspace:^",
     "@fabricjs/westures-integration": "workspace:^",
-    "jsdom": "^26.1.0",
+    "fabric": "workspace:*",
     "westures": "^1.1.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
-    "@types/micromatch": "^4.0.10",
     "@types/node": "^24.7.0",
-    "micromatch": "^4.0.8",
-    "rolldown": "^1.0.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "^8.3.1"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "^20.19.0 || >=22.12.0"
   }
 }
