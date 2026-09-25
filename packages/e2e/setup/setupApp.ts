@@ -1,8 +1,6 @@
 import { Page } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
-import imports from '../imports';
-import { JSDOM } from 'jsdom';
 
 const packageRoot = process.cwd();
 const repoRoot = path.resolve(packageRoot, '..', '..');
@@ -18,33 +16,7 @@ export async function setupApp(page: Page, file: string) {
     };
   });
 
-  await page.goto('/packages/e2e/site');
-
-  // Provide CommonJS shim for westures
-  await page.addScriptTag({
-    content: `
-      window.module = { exports: {} };
-      window.exports = window.module.exports;
-    `,
-  });
-
-  // Load westures as a global module
-  await page.addScriptTag({
-    path: path.resolve(packageRoot, 'node_modules/westures/dist/index.js'),
-  });
-
-  // Expose westures from module.exports
-  await page.evaluate(() => {
-    (window as any).westures = window.module.exports;
-  });
-
-  // expose imports for consumption
-  await page.addScriptTag({
-    type: 'importmap',
-    content: JSON.stringify({
-      imports,
-    }),
-  });
+  await page.goto('/packages/e2e/site/index.html');
 
   // add test script
   const testDir = path.relative(
@@ -53,21 +25,20 @@ export async function setupApp(page: Page, file: string) {
   );
   const pathToHTML = path.resolve(packageRoot, 'tests', testDir, 'index.html');
   if (existsSync(pathToHTML)) {
-    const doc = new JSDOM(readFileSync(pathToHTML).toString()).window.document;
-    await page.evaluate((html) => {
-      document.body.innerHTML = `${html}`;
-    }, doc.body.innerHTML);
+    await page.evaluate(
+      (html) => {
+        document.body.innerHTML = new DOMParser().parseFromString(
+          html,
+          'text/html',
+        ).body.innerHTML;
+      },
+      readFileSync(pathToHTML, 'utf8'),
+    );
   }
   const pathToApp = path.resolve(packageRoot, 'tests', testDir, 'index.ts');
-  const pathToBuiltApp = path.resolve(packageRoot, 'dist', testDir, 'index.js');
-  const exists = existsSync(pathToBuiltApp);
-  if (!exists && existsSync(pathToApp)) {
-    throw new Error(
-      `test script '${pathToBuiltApp}' not found: global setup script probably did not run`,
-    );
-  } else if (exists) {
+  if (existsSync(pathToApp)) {
     const scriptUrl = `/${path
-      .relative(repoRoot, pathToBuiltApp)
+      .relative(repoRoot, pathToApp)
       .replaceAll('\\', '/')}`;
     // addScriptTag with url resolves after the module is loaded and executed
     await page.addScriptTag({ type: 'module', url: scriptUrl });
