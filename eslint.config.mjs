@@ -100,12 +100,6 @@ export default tseslint.config(
   },
 
   {
-    files: ['packages/e2e/playwright.setup.ts'],
-    rules: {
-      'no-restricted-syntax': 'off',
-    },
-  },
-  {
     files: ['packages/e2e/**/*.ts'],
     languageOptions: {
       parserOptions: {

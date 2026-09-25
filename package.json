@@ -64,7 +64,7 @@
     "test:vitest:all": "vitest --run",
     "test:vitest:coverage": "vitest --run --coverage --project unit-node",
     "test:vitest:coverage:watch": "pnpm run test:vitest --coverage=true",
-    "test:e2e": "pnpm run playwright:typecheck && pnpm --dir packages/e2e run test",
+    "test:e2e": "pnpm run build && pnpm run playwright:typecheck && pnpm --dir packages/e2e run test",
     "playwright:typecheck": "pnpm --dir packages/e2e run typecheck",
     "sandbox": "node ./scripts/sandbox.mjs sandbox",
     "local-server": "serve ./ -l tcp://localhost:8080",
