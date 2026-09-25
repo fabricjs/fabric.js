@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): build Fabric automatically and serve Playwright scenes with vite instead of a custom compiler and import map [#11104](https://github.com/fabricjs/fabric.js/pull/11104)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
