@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): replace custom canvas selector engines with Playwright locators [#11103](https://github.com/fabricjs/fabric.js/pull/11103)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job
