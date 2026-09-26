@@ -55,14 +55,14 @@ jobs:
         run: xvfb-run pnpm run test:vitest:${{matrix.browser}}
         env:
           LIBGL_ALWAYS_SOFTWARE: true
-  vitest-node-20:
-    name: Vitest tests node 20
+  vitest-node-26:
+    name: Vitest tests node 26
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
+          node-version: 26.x
           install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest

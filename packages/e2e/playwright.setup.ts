@@ -32,7 +32,7 @@ const shouldBuild = (file: string) =>
 
 const getRolldownOptions = (input: string[]) => ({
   input,
-  external: [/^fabric/, /^@fabricjs\//, 'westures', 'canvas', /^node:/],
+  external: [/^fabric/, /^@fabricjs\//, 'canvas', /^node:/],
   transform: {
     target: 'chrome100' as const,
   },

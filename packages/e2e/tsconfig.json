@@ -25,9 +25,7 @@
       "@fabricjs/data-updaters": ["../data-updaters/dist/index"],
       "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
       "@fabricjs/node": ["../node/dist/index"],
-      "@fabricjs/westures-integration": ["../westures-integration/dist/index"],
       "fabric": ["../../dist/index"],
-      "fabric/extensions": ["../../dist-extensions/extensions/index"],
       "fabric/node": ["../../dist/index.node"]
     },
     "resolveJsonModule": true

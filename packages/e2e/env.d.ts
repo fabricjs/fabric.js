@@ -18,7 +18,6 @@ declare global {
 
   interface Window {
     fabric: FabricNamespace;
-    fabricExtensions: typeof import('fabric/extensions');
 
     canvasMap: Map<HTMLCanvasElement, Canvas>;
     objectMap: Map<string, FabricObject>;

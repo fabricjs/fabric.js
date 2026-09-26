@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["@vitest/browser/providers/playwright"],
+    "types": [],
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
