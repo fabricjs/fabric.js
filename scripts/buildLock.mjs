@@ -3,7 +3,6 @@ import fs from 'node:fs';
 import { formatFullTimestamp } from './date-time.mjs';
 import path from 'node:path';
 import process from 'node:process';
-import psList from 'ps-list';
 import { dumpsPath } from './dirname.mjs';
 import { debounce } from 'es-toolkit/compat';
 
@@ -18,6 +17,19 @@ function readLockFile() {
 }
 
 /**
+ * Signal 0 performs the existence/permission check without sending a signal.
+ * `EPERM` means the process exists but belongs to another user.
+ */
+function isProcessAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code === 'EPERM';
+  }
+}
+
+/**
  * For concurrency reasons, the last process to lock is granted permission to unlock.
  * If the process died the next process to try to unlock will be granted permission.
  */
@@ -26,8 +38,7 @@ export async function unlock() {
   if (!lock) return;
   const lockPID = lock.start.pid;
   const hasPermissionToUnlock =
-    process.pid === lockPID ||
-    !(await psList()).find(({ pid }) => pid === lockPID);
+    process.pid === lockPID || !isProcessAlive(lockPID);
   try {
     hasPermissionToUnlock && fs.unlinkSync(lockFile);
   } catch (error) {}

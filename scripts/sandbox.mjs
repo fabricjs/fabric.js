@@ -1,9 +1,9 @@
 import { red, blue, yellow, cyanBright, bold } from './colors.mjs';
 import * as commander from 'commander';
 import fs from 'node:fs';
-import inquirer from 'inquirer';
 import path from 'node:path';
 import process from 'node:process';
+import readline from 'node:readline/promises';
 import { createCodeSandbox, ignore } from '../.codesandbox/deploy.mjs';
 import { startSandbox } from '../.codesandbox/start.mjs';
 import { wd } from './dirname.mjs';
@@ -12,6 +12,19 @@ const program = new commander.Command()
   .showHelpAfterError()
   .allowUnknownOption(false)
   .allowExcessArguments(false);
+
+async function confirm(message) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  try {
+    const answer = await rl.question(`? ${message} (Y/n) `);
+    return !/^n(o)?$/i.test(answer.trim());
+  } finally {
+    rl.close();
+  }
+}
 
 const codesandboxTemplatesDir = path.resolve(wd, '.codesandbox', 'templates');
 
@@ -57,17 +70,10 @@ sandbox
     ) {
       template = deploy;
       deploy = undefined;
-      const { confirm } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirm',
-          message: `Did you mean to run ${blue(
-            `pnpm run sandbox deploy -- -t ${template}\n`,
-          )}?`,
-          default: true,
-        },
-      ]);
-      if (!confirm) {
+      const confirmed = await confirm(
+        `Did you mean to run ${blue(`pnpm run sandbox deploy -- -t ${template}`)}?`,
+      );
+      if (!confirmed) {
         context.help({ error: true });
         return;
       }
@@ -118,17 +124,10 @@ sandbox
   )
   .action(async (pathToSandbox, { template, watch }, context) => {
     if (!fs.existsSync(pathToSandbox) && templates.includes(pathToSandbox)) {
-      const { confirm } = await inquirer.prompt([
-        {
-          type: 'confirm',
-          name: 'confirm',
-          message: `Did you mean to run ${blue(
-            `pnpm run sandbox start -- -t ${pathToSandbox}\n`,
-          )}?`,
-          default: true,
-        },
-      ]);
-      if (!confirm) {
+      const confirmed = await confirm(
+        `Did you mean to run ${blue(`pnpm run sandbox start -- -t ${pathToSandbox}`)}?`,
+      );
+      if (!confirmed) {
         context.help({ error: true });
         return;
       }

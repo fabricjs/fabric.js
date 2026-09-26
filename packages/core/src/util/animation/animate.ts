@@ -56,7 +56,7 @@ export function animate<
 ): T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation;
 export function animate<
   T extends ValueAnimationOptions | ArrayAnimationOptions,
-  R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation,
+  R extends (T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation),
 >(options: T): R {
   const animation = (
     isArrayAnimation(options)

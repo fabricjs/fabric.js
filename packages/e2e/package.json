@@ -17,11 +17,11 @@
     "jsdom": "^26.1.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.63.0",
     "@types/micromatch": "^4.0.10",
-    "@types/node": "^24.7.0",
+    "@types/node": "^24.13.6",
     "micromatch": "^4.0.8",
-    "rolldown": "^1.0.1",
+    "rolldown": "^1.2.9",
     "typescript": "^6.0.3"
   },
   "engines": {

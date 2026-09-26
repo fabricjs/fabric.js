@@ -17,7 +17,7 @@ export function selectorMatches(
   }
   if (classNames && selector.length) {
     const splitClassNames = classNames.split(' ');
-    for (let i = splitClassNames.length; i--; ) {
+    for (let i = splitClassNames.length; i--;) {
       matcher = new RegExp('\\.' + splitClassNames[i] + azAz, 'i');
       selector = selector.replace(matcher, '');
     }
