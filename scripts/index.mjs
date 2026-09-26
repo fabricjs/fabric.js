@@ -41,7 +41,7 @@ program
   .description('build dist')
   .option('-f, --fast', 'skip minifying')
   .option('-w, --watch')
-  .option('-i, --input <...path>', 'specify the build input paths')
+  .option('-i, --input <path...>', 'specify the build input paths')
   .option('-o, --output <path>', 'specify the build output path')
   .option('-x, --exclude <exclude...>')
   .option('-m, --modules <modules...>')

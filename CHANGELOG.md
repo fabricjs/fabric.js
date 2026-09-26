@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(): remove inquirer and ps-list [#11100](https://github.com/fabricjs/fabric.js/pull/11100)
 - chore(): update dev deps [#11095](https://github.com/fabricjs/fabric.js/pull/11095)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
