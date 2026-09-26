@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): replace custom canvas selector engines with Playwright locators [#11103](https://github.com/fabricjs/fabric.js/pull/11103)
 - chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)
 - chore(): remove inquirer and ps-list [#11100](https://github.com/fabricjs/fabric.js/pull/11100)
 - chore(): update dev deps [#11095](https://github.com/fabricjs/fabric.js/pull/11095)
