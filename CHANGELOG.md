@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump astro from 5.18.2 to 7.2.8 in /packages/website in the npm_and_yarn group across 1 directory [#11106](https://github.com/fabricjs/fabric.js/pull/11106)
 - chore(): update dev deps [#11095](https://github.com/fabricjs/fabric.js/pull/11095)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
