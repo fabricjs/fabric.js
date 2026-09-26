@@ -14,9 +14,7 @@
     "@fabricjs/data-updaters": "workspace:^",
     "@fabricjs/gradient-controls": "workspace:^",
     "@fabricjs/node": "workspace:^",
-    "@fabricjs/westures-integration": "workspace:^",
-    "jsdom": "^26.1.0",
-    "westures": "^1.1.1"
+    "jsdom": "^26.1.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

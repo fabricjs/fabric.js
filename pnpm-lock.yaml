@@ -153,15 +153,9 @@ importers:
       '@fabricjs/node':
         specifier: workspace:^
         version: link:../node
-      '@fabricjs/westures-integration':
-        specifier: workspace:^
-        version: link:../westures-integration
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0(canvas@3.2.3)
-      westures:
-        specifier: ^1.1.1
-        version: 1.1.1
     devDependencies:
       '@playwright/test':
         specifier: ^1.63.0
