@@ -6,6 +6,7 @@
 - chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)
 - chore(): remove inquirer and ps-list [#11100](https://github.com/fabricjs/fabric.js/pull/11100)
 - chore(): update dev deps [#11095](https://github.com/fabricjs/fabric.js/pull/11095)
+- test(): build Fabric automatically and serve Playwright scenes with vite instead of a custom compiler and import map [#11104](https://github.com/fabricjs/fabric.js/pull/11104)
 - ci(): update the pnpm cache client and skip canvas compilation dependencies
 - ci(): share one Fabric build across statistics, package smoke tests, and website checks
 - ci(): combine lint, formatting, and type checks in one job

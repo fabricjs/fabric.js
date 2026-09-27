@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "dev": "vite",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "test": "playwright test"
   },
@@ -14,17 +15,15 @@
     "@fabricjs/data-updaters": "workspace:^",
     "@fabricjs/gradient-controls": "workspace:^",
     "@fabricjs/node": "workspace:^",
-    "jsdom": "^26.1.0"
+    "fabric": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "@types/micromatch": "^4.0.10",
     "@types/node": "^24.13.6",
-    "micromatch": "^4.0.8",
-    "rolldown": "^1.2.9",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "^8.3.1"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "^20.19.0 || >=22.12.0"
   }
 }

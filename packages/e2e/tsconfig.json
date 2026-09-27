@@ -7,16 +7,10 @@
     "moduleDetection": "force",
     "strict": true,
     "sourceMap": true,
-    "outDir": "./dist",
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    /**
-     * A reflection of the configured imports used by test scripts.
-     * Runtime-facing imports that Playwright executes in Node should point at
-     * fully bundled root outputs to avoid re-entering workspace source during
-     * Playwright's own TS/Babel transform step.
-     */
+    // Override the root source aliases so Playwright loads the built packages.
     "paths": {
       "@fabricjs/aligning-guidelines": ["../aligning-guidelines/dist/index"],
       "@fabricjs/browser": ["../browser/dist/index"],
