@@ -5,6 +5,7 @@ import {
   FitContentLayout,
 } from '../LayoutManager';
 import { Canvas } from '../canvas/Canvas';
+import { ActiveSelection } from './ActiveSelection';
 import { Group } from './Group';
 import type { GroupProps } from './Group';
 import { Rect } from './Rect';
@@ -364,6 +365,21 @@ describe('Group', () => {
     expect(object.canvas).toBeUndefined();
 
     expect(eventsSpy).toBeCalledTimes(3);
+  });
+
+  test('removes an active selection object from the canvas when grouping it', () => {
+    const object = new Rect();
+    const interactiveCanvas = new Canvas();
+    interactiveCanvas.add(object);
+
+    const activeSelection = new ActiveSelection([object]);
+    interactiveCanvas.setActiveObject(activeSelection);
+
+    const group = new Group();
+    group.add(object);
+
+    expect(interactiveCanvas.getObjects()).toEqual([]);
+    expect(group.getObjects()).toEqual([object]);
   });
 
   const canvas = new StaticCanvas(undefined, {
@@ -792,6 +808,58 @@ describe('Group', () => {
       objectFromNewGroup.objects[1],
     );
     expect(objectFromOldGroup).toEqual(objectFromNewGroup);
+  });
+
+  it('preserves hidden children positions after loading and ungrouping', async () => {
+    const hidden = new Rect({
+      left: 80,
+      top: 40,
+      width: 20,
+      height: 30,
+      visible: false,
+    });
+    const visible = new Rect({
+      left: 10,
+      top: 20,
+      width: 40,
+      height: 50,
+    });
+    canvas.add(hidden, visible);
+
+    const group = new Group([], {
+      left: 200,
+      top: 150,
+      angle: 30,
+      scaleX: 1.5,
+      scaleY: 0.75,
+    });
+    group.add(hidden, visible);
+    canvas.add(group);
+
+    const hiddenCenter = hidden.getCenterPoint();
+    const visibleCenter = visible.getCenterPoint();
+    const serialized = canvas.toJSON();
+
+    await canvas.loadFromJSON(serialized);
+
+    expect(canvas.getObjects()).toHaveLength(1);
+
+    const restoredGroup = canvas.item(0) as Group;
+    const [restoredHidden, restoredVisible] = restoredGroup.getObjects();
+    expect(restoredHidden.visible).toBe(false);
+    expect(restoredHidden.getCenterPoint().x).toBeCloseTo(hiddenCenter.x, 3);
+    expect(restoredHidden.getCenterPoint().y).toBeCloseTo(hiddenCenter.y, 3);
+    expect(restoredVisible.getCenterPoint().x).toBeCloseTo(visibleCenter.x, 3);
+    expect(restoredVisible.getCenterPoint().y).toBeCloseTo(visibleCenter.y, 3);
+
+    const ungroupedObjects = restoredGroup.removeAll();
+    canvas.remove(restoredGroup);
+    canvas.add(...ungroupedObjects);
+
+    expect(restoredHidden.getCenterPoint().x).toBeCloseTo(hiddenCenter.x, 3);
+    expect(restoredHidden.getCenterPoint().y).toBeCloseTo(hiddenCenter.y, 3);
+    expect(restoredVisible.getCenterPoint().x).toBeCloseTo(visibleCenter.x, 3);
+    expect(restoredVisible.getCenterPoint().y).toBeCloseTo(visibleCenter.y, 3);
   });
 
   it('fromObject with clipPath', async () => {
