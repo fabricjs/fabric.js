@@ -18,10 +18,10 @@
     "fabric": "workspace:*"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^24.13.6",
-    "typescript": "^6.0.3",
-    "vite": "^8.3.1"
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "8.3.1"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
