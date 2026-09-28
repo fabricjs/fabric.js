@@ -36,8 +36,6 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
   const divRef = useRef();
   const editorRef = useRef();
 
-  const [code, setCode] = useState('');
-  
   const runCallback = useCallback(
     debounce((newcode = [codeProp], isClickByRunMeButton = false) => {
       if (window.canvasesId[canvasId]) {
@@ -90,7 +88,7 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
     // https://github.com/codemirror/dev/issues/44#issuecomment-789093799
     const onChangeHook = StateField.define({
       create: () => null,
-      update: (value, transaction) => {
+      update: (_value, transaction) => {
         if (transaction.docChanged) {
           runOnChange && runCallback(transaction.newDoc.toJSON());
         }

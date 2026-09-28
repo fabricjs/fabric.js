@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, Suspense } from 'react'
+import { useEffect, useState } from 'react'
 
 const CarbonAd = () => {
   const [showReminder, setShowreminder] = useState(false);
