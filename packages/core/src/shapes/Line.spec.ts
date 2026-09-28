@@ -68,7 +68,6 @@ describe('Line', () => {
   it('creates from SVG element correctly', async () => {
     expect(Line.fromElement).toBeTypeOf('function');
 
-    // TODO: should fromElement also accept SVGElement since test is doing it?
     const lineEl = createSVGElement('line', {
       x1: 11,
       x2: 34,
@@ -82,7 +81,7 @@ describe('Line', () => {
       'stroke-miterlimit': 5,
     });
 
-    const oLine = await Line.fromElement(lineEl as unknown as HTMLElement);
+    const oLine = await Line.fromElement(lineEl);
     expect(oLine).toBeInstanceOf(Line);
 
     expect(oLine.get('x1')).toBe(11);
@@ -101,9 +100,7 @@ describe('Line', () => {
       y1: 20,
     });
 
-    const oLine2 = await Line.fromElement(
-      lineElWithMissingAttributes as unknown as HTMLElement,
-    );
+    const oLine2 = await Line.fromElement(lineElWithMissingAttributes);
     expect(oLine2.get('x2')).toBe(0);
     expect(oLine2.get('y2')).toBe(0);
   });
@@ -131,7 +128,7 @@ describe('Line', () => {
     const lineEl = createSVGElement('line');
     lineEl.setAttribute('style', 'stroke-width:4');
 
-    const oLine = await Line.fromElement(lineEl as unknown as HTMLElement);
+    const oLine = await Line.fromElement(lineEl);
     expect(oLine.strokeWidth).toBe(4);
   });
 

@@ -1,11 +1,18 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, expectTypeOf, it } from 'vitest';
 import { config } from '../config';
 import { initFilterBackend } from './FilterBackend';
 import { WebGLFilterBackend } from './WebGLFilterBackend';
 import { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 import { isJSDOM } from '../../../../vitest.extend';
+import type { TProgramCache, TWebGLProgramCacheItem } from './typedefs';
 
 describe('WebGL', () => {
+  it('types shader cache entries as possibly missing', () => {
+    expectTypeOf<TProgramCache[string]>().toEqualTypeOf<
+      TWebGLProgramCacheItem | undefined
+    >();
+  });
+
   afterEach(() => {
     config.restoreDefaults();
   });

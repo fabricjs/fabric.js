@@ -345,7 +345,6 @@ const raw: renderTestType[] = [
     async renderFunction(canvas) {
       await canvas.loadFromJSON(canvasWithObjects);
 
-      // @ts-expect-error: TODO fix this, filter should be part of types
       return canvas.toDataURL({
         filter: (object) => object.isType('Polygon', 'Rect'),
       });
