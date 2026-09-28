@@ -3,9 +3,143 @@ import { noop } from '../../constants';
 import { getEnv, getFabricWindow } from '../../env';
 import { IText } from './IText';
 import { expect, vi, describe, test, beforeEach, afterEach } from 'vitest';
+import { Canvas } from '../../canvas/Canvas';
+import { Group } from '../Group';
+import { Rect } from '../Rect';
+import { Textbox } from '../Textbox';
 
 const keybEventShiftFalse = { shiftKey: false } as KeyboardEvent;
 const keybEventShiftTrue = { shiftKey: true } as KeyboardEvent;
+
+describe.each([
+  { name: 'IText', TextClass: IText },
+  { name: 'Textbox', TextClass: Textbox },
+])('$name select-all highlight', ({ TextClass }) => {
+  describe.each([true, false])('objectCaching=%s', (objectCaching) => {
+    describe.each([true, false])('clipPath=%s', (clipped) => {
+      test.each(['ctrlKey', 'metaKey'] as const)(
+        'preserves grouped selection after %s+A',
+        async (modifier) => {
+          const canvas = new Canvas(undefined, { width: 300, height: 150 });
+          const text: IText = new TextClass('select this text', {
+            fontSize: 24,
+            selectionColor: 'red',
+          });
+          const group = new Group([text], {
+            left: 20,
+            top: 20,
+            selectable: false,
+            subTargetCheck: true,
+            interactive: true,
+            objectCaching,
+            ...(clipped && {
+              clipPath: new Rect({ width: 300, height: 150 }),
+            }),
+          });
+          try {
+            canvas.add(group);
+            text.enterEditing();
+            text.abortCursorAnimation();
+            canvas.renderAll();
+            const requestRender = vi.spyOn(canvas, 'requestRenderAll');
+            text.onKeyDown({
+              keyCode: 65,
+              [modifier]: true,
+              stopImmediatePropagation: noop,
+              preventDefault: noop,
+            } as KeyboardEvent);
+
+            expect(text.getSelectedText()).toBe(text.text);
+            await new Promise<void>((resolve) =>
+              getFabricWindow().requestAnimationFrame(() => resolve()),
+            );
+            expect(
+              canvas.contextTop
+                .getImageData(0, 0, 300, 150)
+                .data.some((value, index) => index % 4 === 3 && value > 0),
+            ).toBe(true);
+            expect(requestRender).not.toHaveBeenCalled();
+          } finally {
+            await canvas.dispose();
+          }
+        },
+      );
+    });
+  });
+});
+
+describe('IText custom keyboard mappings', () => {
+  test.each(['keysMap', 'ctrlKeysMapDown'] as const)(
+    'still requests a render when %s maps Ctrl+A to exitEditing',
+    async (map) => {
+      const canvas = new Canvas(undefined);
+      const text = new IText('select this text');
+      try {
+        canvas.add(text);
+        text.enterEditing();
+        text.abortCursorAnimation();
+        canvas.renderAll();
+        text[map] = { ...text[map], 65: 'exitEditing' };
+        const requestRender = vi.spyOn(canvas, 'requestRenderAll');
+        text.onKeyDown({
+          keyCode: 65,
+          ctrlKey: true,
+          stopImmediatePropagation: noop,
+          preventDefault: noop,
+        } as KeyboardEvent);
+        expect(text.isEditing).toBe(false);
+        expect(requestRender).toHaveBeenCalled();
+      } finally {
+        await canvas.dispose();
+      }
+    },
+  );
+
+  test.each(['keysMap', 'keysMapRtl', 'ctrlKeysMapDown'] as const)(
+    'preserves grouped selection when %s maps another key to cmdAll',
+    async (map) => {
+      const canvas = new Canvas(undefined, { width: 300, height: 150 });
+      const text = new IText('select this text', {
+        fontSize: 24,
+        selectionColor: 'red',
+        direction: map === 'keysMapRtl' ? 'rtl' : 'ltr',
+      });
+      const group = new Group([text], {
+        left: 20,
+        top: 20,
+        selectable: false,
+        subTargetCheck: true,
+        interactive: true,
+      });
+      try {
+        canvas.add(group);
+        text.enterEditing();
+        text.abortCursorAnimation();
+        canvas.renderAll();
+        text[map] = { ...text[map], 66: 'cmdAll' };
+        const requestRender = vi.spyOn(canvas, 'requestRenderAll');
+        text.onKeyDown({
+          keyCode: 66,
+          ctrlKey: true,
+          stopImmediatePropagation: noop,
+          preventDefault: noop,
+        } as KeyboardEvent);
+        expect(text.getSelectedText()).toBe(text.text);
+        await new Promise<void>((resolve) =>
+          getFabricWindow().requestAnimationFrame(() => resolve()),
+        );
+        expect(
+          canvas.contextTop
+            .getImageData(0, 0, 300, 150)
+            .data.some((value, index) => index % 4 === 3 && value > 0),
+        ).toBe(true);
+        expect(requestRender).not.toHaveBeenCalled();
+      } finally {
+        await canvas.dispose();
+      }
+    },
+  );
+});
 
 describe('IText move cursor', () => {
   let iText: IText;
