@@ -18,14 +18,19 @@ Select the rectangle and try the handles:
 - The two handles joined by a line are the **ends of the gradient vector**
   (`coords.x1/y1` and `coords.x2/y2`). Drag them to aim the gradient anywhere —
   the colours always run along that line.
-- The four handles sitting *on* the line are the **colour stops**. Dragging one
+- The four handles sitting _on_ the line are the **colour stops**. Dragging one
   changes its `offset`, sliding that colour along the gradient. They project onto
   the vector, so they stay on the line no matter where you drop them.
 
 The object's own corner handles still work, and the gradient handles follow along
 when you move, scale or rotate it.
 
-<CodeEditor code={code} canvasId="linear-gradient-controls" client:idle canvasDown>
+<CodeEditor
+  code={code}
+  canvasId="linear-gradient-controls"
+  client:idle
+  canvasDown
+>
   <canvas width="700" height="420" id="linear-gradient-controls"></canvas>
 </CodeEditor>
 

@@ -32,7 +32,14 @@ import { debounce } from '../../utils/debounce';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { espresso } from 'thememirror';
 
-export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true, runOnChange = true, canvasDown = false }) => {
+export const CodeEditor = ({
+  code: codeProp,
+  children,
+  canvasId,
+  autoRun = true,
+  runOnChange = true,
+  canvasDown = false,
+}) => {
   const divRef = useRef();
   const editorRef = useRef();
 
@@ -47,7 +54,8 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
         `const canvasEl = document.getElementById('${canvasId}');`,
       ];
       // when click 'run me' button, makes code string change to trigger 'setCode' function.
-      if (isClickByRunMeButton) preamble.push(`const randomValue = ${Math.random()};`);
+      if (isClickByRunMeButton)
+        preamble.push(`const randomValue = ${Math.random()};`);
       const exec = `try {
           ${newcode.join('\n')}
           window.canvasesId['${canvasId}'] = canvas;
@@ -55,9 +63,10 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
           console.error(error);
           window.dispatchEvent(new CustomEvent('canvas_dispose'));
         }`;
-      eval([...preamble, exec].join('\n'))
-    }, 500)
-  , []);
+      eval([...preamble, exec].join('\n'));
+    }, 500),
+    [],
+  );
 
   useEffect(() => {
     // need to assign fabric to window
@@ -118,8 +127,6 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
     return () => editor.destroy();
   }, []);
 
-
-
   useEffect(() => {
     const handler = () => console.log('TODO: handle disposing gracefully');
     window.addEventListener('canvas_dispose', handler);
@@ -127,11 +134,17 @@ export const CodeEditor = ({ code: codeProp, children, canvasId, autoRun = true,
   }, []);
 
   return (
-    <div className='not-content'>
+    <div className="not-content">
       {/* <script type="module">{code}</script> */}
       {canvasDown || children}
       <div ref={divRef} style={{ marginTop: '1rem' }} />
-      <button onClick={() => runCallback([editorRef.current.state.doc.toString()], true)}>Run me</button>
+      <button
+        onClick={() =>
+          runCallback([editorRef.current.state.doc.toString()], true)
+        }
+      >
+        Run me
+      </button>
       {canvasDown && children}
     </div>
   );

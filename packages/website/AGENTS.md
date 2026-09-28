@@ -43,14 +43,14 @@ monorepo source only to generate the API reference via TypeDoc.
 The two sections have different jobs, and content written for one does not
 belong in the other.
 
-**Demos** (`src/content/demo/`) show *what the library can do*. They are a
+**Demos** (`src/content/demo/`) show _what the library can do_. They are a
 showcase: the visual result is the point, the code is there so a reader can
 see it is achievable and poke at it. Keep the snippet as short as the effect
 allows — no scaffolding, no hand-rolled reimplementations of something the
 library already exports. Prose is minimal, just enough to say what to try
 (what to drag, what to double-click) and what each thing on the canvas is.
 
-**Docs** (`src/content/docs/docs/`) explain *how it works, and why*. They are
+**Docs** (`src/content/docs/docs/`) explain _how it works, and why_. They are
 allowed — encouraged — to go deep and get technical: quote the library's own
 source when it teaches something, walk through a helper line by line, name the
 internal functions involved, explain which pieces are exported and how to
@@ -60,7 +60,7 @@ carries the explanation rather than the sample code.
 
 Practical consequences when adding content:
 
-- A long code listing is fine in a guide if it is *explanatory* (the
+- A long code listing is fine in a guide if it is _explanatory_ (the
   implementation of a helper being taught). It is not fine as example
   scaffolding in either place.
 - Explaining an extension means saying it exists, what it packages, how to
@@ -108,21 +108,21 @@ root). Install dependencies with `pnpm install` at the repo root.
 
 ## Commands
 
-| Command                     | Action                                                  |
-| --------------------------- | -------------------------------------------------------- |
-| `pnpm install` (repo root)  | install dependencies (workspace)                         |
-| `pnpm run dev`              | start local dev server at `localhost:4321`               |
-| `pnpm run build`            | `astro check` (typecheck) then `astro build` → `./dist/` |
-| `pnpm run preview`          | preview the production build locally                     |
-| `pnpm run astro ...`        | run Astro CLI commands (e.g. `astro add`)                |
+| Command                    | Action                                                   |
+| -------------------------- | -------------------------------------------------------- |
+| `pnpm install` (repo root) | install dependencies (workspace)                         |
+| `pnpm run dev`             | start local dev server at `localhost:4321`               |
+| `pnpm run build`           | `astro check` (typecheck) then `astro build` → `./dist/` |
+| `pnpm run preview`         | preview the production build locally                     |
+| `pnpm run astro ...`       | run Astro CLI commands (e.g. `astro add`)                |
 
 CI runs the same Astro build on PRs; deployment to GitHub Pages is a
 follow-up decision for the monorepo workflow.
 
 ## Conventions
 
-- Formatting via Prettier (`.prettierrc.json`: semicolons, single
-  quotes, 2-space tabs). `.prettierignore` excludes a few content dirs.
+- Formatting is handled by the root `oxfmt` setup (`.oxfmtrc.json`);
+  run `pnpm run prettier:write` from the repo root.
 - `src/content/docs/api/**` is generated output from TypeDoc — treat it
   as build output, not hand-authored content (regenerated whenever the
   docs build runs).
