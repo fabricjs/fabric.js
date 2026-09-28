@@ -30,7 +30,7 @@ fabric.Image.fromURL('../assets/pug.jpg').then((img) => {
         angle: -30,
         fill: pattern,
         objectCaching: false,
-        stroke: 'black'
+        stroke: 'black',
       },
     ),
   );
