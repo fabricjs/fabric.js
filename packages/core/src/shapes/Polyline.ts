@@ -38,8 +38,15 @@ export interface SerializedPolylineProps extends SerializedObjectProps {
   points: XY[];
 }
 
+export interface PolylineProps extends FabricObjectProps {
+  /**
+   * @deprecated transient option soon to be removed in favor of a different design
+   */
+  exactBoundingBox: boolean;
+}
+
 export class Polyline<
-  Props extends TOptions<FabricObjectProps> = Partial<FabricObjectProps>,
+  Props extends TOptions<PolylineProps> = Partial<PolylineProps>,
   SProps extends SerializedPolylineProps = SerializedPolylineProps,
   EventSpec extends ObjectEvents = ObjectEvents,
 > extends FabricObject<Props, SProps, EventSpec> {

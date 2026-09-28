@@ -965,7 +965,6 @@ describe('FabricText', () => {
       fontFamily: 'Verdana',
       fontSize: 25,
     };
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgSpanStyles(styleObject);
     const expected =
       "stroke-width: 30; font-family: 'Verdana'; font-size: 25px; fill: rgb(255,0,0); ";
@@ -978,7 +977,6 @@ describe('FabricText', () => {
       underline: true,
       textDecorationColor: 'blue',
     });
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgSpanStyles({
       fill: 'red',
       underline: true,
@@ -994,7 +992,6 @@ describe('FabricText', () => {
       fontFamily: 'Verdana',
       fontSize: 25,
     };
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgSpanStyles(styleObject, true);
     const expected =
       "stroke-width: 30; font-family: 'Verdana'; font-size: 25px; fill: rgb(255,0,0); white-space: pre; ";
@@ -1006,16 +1003,15 @@ describe('FabricText', () => {
     const iText = new IText('test foo bar-baz', {
       textDecorationColor: 'blue; fill:url(#x)' as never,
     });
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgSpanStyles({
       fill: 'red; stroke:url(javascript:alert(1))',
       strokeWidth: '30; opacity:0' as never,
       fontFamily: 'Verdana; font-size:999px',
       fontSize: '25; opacity:0' as never,
       fontStyle: 'italic; fill:url(#x)' as never,
-      fontWeight: 'bold; fill:url(#x)' as never,
+      fontWeight: 'bold; fill:url(#x)',
       underline: true,
-      textDecorationColor: 'green; fill:url(#x)' as never,
+      textDecorationColor: 'green; fill:url(#x)',
     });
     expect(styleString).toContain('fill: rgb(0,0,0); ');
     expect(styleString).not.toContain('stroke-width: 30;');
@@ -1027,12 +1023,22 @@ describe('FabricText', () => {
     expect(styleString).not.toContain('javascript:');
   });
 
+  it('allows subclasses to override SVG text decoration', () => {
+    class UnderlinedText extends IText {
+      getSvgTextDecoration() {
+        return 'underline';
+      }
+    }
+
+    const text = new UnderlinedText('test');
+    expect(text.getSvgSpanStyles({})).toContain('text-decoration: underline;');
+  });
+
   it('getSvgTextDecoration with overline true produces correct output', () => {
     const iText = new IText('test foo bar-baz');
     const styleObject = {
       overline: true,
     };
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgTextDecoration(styleObject);
     const expected = 'overline';
 
@@ -1045,7 +1051,6 @@ describe('FabricText', () => {
       overline: true,
       underline: true,
     };
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgTextDecoration(styleObject);
     const expected = 'overline underline';
 
@@ -1062,7 +1067,6 @@ describe('FabricText', () => {
       linethrough: true,
     };
 
-    // @ts-expect-error -- TODO: this is added by the mixing, can the types be improved here?
     const styleString = iText.getSvgTextDecoration(styleObject);
     const expected = 'overline underline line-through';
 
@@ -1187,7 +1191,6 @@ describe('FabricText', () => {
       width: 5,
     });
 
-    // @ts-expect-error -- TODO: should lineIndex be made an optional argument? test fails if it is provided but it is mandatory according to the types
     expect(textbox.styleHas('fontSize'), 'style has fontSize').toBe(true);
     expect(
       textbox.styleHas('fontSize', 0),
@@ -1197,7 +1200,6 @@ describe('FabricText', () => {
       textbox.styleHas('fontSize', 1),
       'style does not have fontSize on line 1',
     ).toBe(false);
-    // @ts-expect-error -- TODO: should lineIndex be made an optional argument? test fails if it is provided but it is mandatory according to the types
     expect(textbox.styleHas('fontFamily'), 'style has fontFamily').toBe(true);
     expect(
       textbox.styleHas('fontFamily', 0),
