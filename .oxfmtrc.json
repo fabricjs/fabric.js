@@ -27,6 +27,7 @@
     "/docs/",
     "/packages/e2e/test-results/",
     "/packages/e2e/test-report/",
-    "/packages/e2e/tests/**/*-snapshots/*.json"
+    "/packages/e2e/tests/**/*-snapshots/*.json",
+    "/packages/website/public/google*.html"
   ]
 }

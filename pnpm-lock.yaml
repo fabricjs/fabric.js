@@ -262,9 +262,6 @@ importers:
       jsdom:
         specifier: 'catalog:'
         version: 26.1.0(canvas@3.2.3)
-      prettier:
-        specifier: 3.9.6
-        version: 3.9.6
       react:
         specifier: 19.2.8
         version: 19.2.8
