@@ -186,11 +186,11 @@ export class Textbox<
 
   /**
    * Returns true if object has a style property or has it on a specified line
-   * @param {Number} lineIndex
+   * @param {Number} [lineIndex]
    * @return {Boolean}
    */
-  styleHas(property: keyof TextStyleDeclaration, lineIndex: number): boolean {
-    if (this._styleMap && !this.isWrapping) {
+  styleHas(property: keyof TextStyleDeclaration, lineIndex?: number): boolean {
+    if (lineIndex !== undefined && this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (map) {
         lineIndex = map.line;
@@ -201,10 +201,10 @@ export class Textbox<
 
   /**
    * Returns true if object has no styling or no styling in a line
-   * @param {Number} lineIndex , lineIndex is on wrapped lines.
+   * @param {Number} [lineIndex] lineIndex is on wrapped lines.
    * @return {Boolean}
    */
-  isEmptyStyles(lineIndex: number): boolean {
+  isEmptyStyles(lineIndex?: number): boolean {
     if (!this.styles) {
       return true;
     }
@@ -212,8 +212,9 @@ export class Textbox<
       nextLineIndex: number,
       nextOffset: number,
       shouldLimit = false;
-    const map = this._styleMap[lineIndex],
-      mapNextLine = this._styleMap[lineIndex + 1];
+    const map = lineIndex === undefined ? undefined : this._styleMap[lineIndex],
+      mapNextLine =
+        lineIndex === undefined ? undefined : this._styleMap[lineIndex + 1];
     if (map) {
       lineIndex = map.line;
       offset = map.offset;

@@ -967,7 +967,7 @@ export const getSmoothPathFromPoints = (
 export const transformPath = (
   path: TSimplePathData,
   transform: TMat2D,
-  pathOffset: Point,
+  pathOffset?: Point,
 ): TSimplePathData => {
   if (pathOffset) {
     transform = multiplyTransformMatrices(transform, [
