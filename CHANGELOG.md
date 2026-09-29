@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(IText): preserve select-all highlights in cached groups [#11116](https://github.com/fabricjs/fabric.js/pull/11116)
 - chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
 - test(): replace custom canvas selector engines with Playwright locators [#11103](https://github.com/fabricjs/fabric.js/pull/11103)
 - chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)
