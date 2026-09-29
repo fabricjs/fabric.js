@@ -369,7 +369,7 @@ export class Group
     if (object.group) {
       object.group.remove(object);
     }
-    if (canvas) {
+    if (canvas && canvas !== this.canvas) {
       canvas.remove(object);
     }
     object._set('parent', this);

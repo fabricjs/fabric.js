@@ -382,6 +382,38 @@ describe('Group', () => {
     expect(group.getObjects()).toEqual([object]);
   });
 
+  test('removes an object from a different canvas when it enters the group', () => {
+    const object = new Rect();
+    const objectCanvas = new Canvas();
+    const groupCanvas = new Canvas();
+    objectCanvas.add(object);
+    const group = new Group();
+    groupCanvas.add(group);
+
+    const removeSpy = vi.spyOn(objectCanvas, 'remove');
+    group.add(object);
+
+    expect(removeSpy).toBeCalledWith(object);
+    expect(objectCanvas.getObjects()).toEqual([]);
+    expect(group.getObjects()).toEqual([object]);
+    expect(object.canvas).toBe(groupCanvas);
+  });
+
+  test('does not remove an object that already shares the group canvas', () => {
+    const object = new Rect();
+    const sharedCanvas = new Canvas();
+    const group = new Group();
+    sharedCanvas.add(group, object);
+
+    const removeSpy = vi.spyOn(sharedCanvas, 'remove');
+    group.add(object);
+
+    expect(removeSpy).not.toBeCalled();
+    expect(sharedCanvas.getObjects()).toContain(object);
+    expect(group.getObjects()).toEqual([object]);
+    expect(object.canvas).toBe(sharedCanvas);
+  });
+
   const canvas = new StaticCanvas(undefined, {
     enableRetinaScaling: false,
     width: 600,
