@@ -189,7 +189,7 @@ importers:
     dependencies:
       '@astrojs/check':
         specifier: 0.9.10
-        version: 0.9.10(prettier@3.9.6)(typescript@5.9.3)
+        version: 0.9.10(prettier@3.9.6)(typescript@6.0.3)
       '@astrojs/mdx':
         specifier: ^8.0.2
         version: 8.0.2(@astrojs/markdown-satteri@0.4.2)(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))
@@ -201,7 +201,7 @@ importers:
         version: 3.7.4
       '@astrojs/starlight':
         specifier: ^0.42.4
-        version: 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3)
+        version: 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3)
       '@codemirror/lang-javascript':
         specifier: ^6.2.2
         version: 6.2.5
@@ -249,23 +249,23 @@ importers:
         version: 0.35.4(@types/node@24.13.6)
       starlight-typedoc:
         specifier: ^0.23.1
-        version: 0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@5.9.3)))(typedoc@0.28.20(typescript@5.9.3))
+        version: 0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3))
       thememirror:
         specifier: ^2.0.1
         version: 2.0.1(@codemirror/language@6.12.4)(@codemirror/state@6.7.1)(@codemirror/view@6.43.7)
       typedoc-plugin-no-inherit:
         specifier: ^1.6.1
-        version: 1.6.1(typedoc@0.28.20(typescript@5.9.3))
+        version: 1.6.1(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: ^5.4.2
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
     devDependencies:
       typedoc:
         specifier: ^0.28.20
-        version: 0.28.20(typescript@5.9.3)
+        version: 0.28.20(typescript@6.0.3)
       typedoc-plugin-markdown:
         specifier: ^4.13.1
-        version: 4.13.1(typedoc@0.28.20(typescript@5.9.3))
+        version: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
       westures:
         specifier: ^1.1.1
         version: 1.1.1
@@ -3110,11 +3110,6 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
@@ -3562,12 +3557,12 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
 
-  '@astrojs/check@0.9.10(prettier@3.9.6)(typescript@5.9.3)':
+  '@astrojs/check@0.9.10(prettier@3.9.6)(typescript@6.0.3)':
     dependencies:
-      '@astrojs/language-server': 2.16.13(prettier@3.9.6)(typescript@5.9.3)
+      '@astrojs/language-server': 2.16.13(prettier@3.9.6)(typescript@6.0.3)
       chokidar: 4.0.3
       kleur: 4.1.5
-      typescript: 5.9.3
+      typescript: 6.0.3
       yargs: 18.1.0
     transitivePeerDependencies:
       - prettier
@@ -3637,12 +3632,12 @@ snapshots:
       smol-toml: 1.7.1
       unified: 11.0.5
 
-  '@astrojs/language-server@2.16.13(prettier@3.9.6)(typescript@5.9.3)':
+  '@astrojs/language-server@2.16.13(prettier@3.9.6)(typescript@6.0.3)':
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/yaml2ts': 0.2.4
       '@jridgewell/sourcemap-codec': 1.6.0
-      '@volar/kit': 2.4.28(typescript@5.9.3)
+      '@volar/kit': 2.4.28(typescript@6.0.3)
       '@volar/language-core': 2.4.28
       '@volar/language-server': 2.4.28
       '@volar/language-service': 2.4.28
@@ -3712,7 +3707,7 @@ snapshots:
       sitemap: 9.0.1
       zod: 4.4.3
 
-  '@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3)':
+  '@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3)':
     dependencies:
       '@astrojs/markdown-satteri': 0.4.2
       '@astrojs/mdx': 8.0.2(@astrojs/markdown-satteri@0.4.2)(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))
@@ -3729,7 +3724,7 @@ snapshots:
       hast-util-to-html: 9.0.5
       hast-util-to-string: 3.0.1
       hastscript: 9.0.1
-      i18next: 26.4.2(typescript@5.9.3)
+      i18next: 26.4.2(typescript@6.0.3)
       js-yaml: 4.3.1
       klona: 2.0.6
       magic-string: 1.4.1
@@ -4743,12 +4738,12 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  '@volar/kit@2.4.28(typescript@5.9.3)':
+  '@volar/kit@2.4.28(typescript@6.0.3)':
     dependencies:
       '@volar/language-service': 2.4.28
       '@volar/typescript': 2.4.28
       typesafe-path: 0.2.2
-      typescript: 5.9.3
+      typescript: 6.0.3
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.1.0
 
@@ -5534,9 +5529,9 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next@26.4.2(typescript@5.9.3):
+  i18next@26.4.2(typescript@6.0.3):
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   iconv-lite@0.6.3:
     dependencies:
@@ -6392,13 +6387,13 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  starlight-typedoc@0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@5.9.3)))(typedoc@0.28.20(typescript@5.9.3)):
+  starlight-typedoc@0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      '@astrojs/starlight': 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3)
+      '@astrojs/starlight': 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3)
       astro: 7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0)
       github-slugger: 2.0.0
-      typedoc: 0.28.20(typescript@5.9.3)
-      typedoc-plugin-markdown: 4.13.1(typedoc@0.28.20(typescript@5.9.3))
+      typedoc: 0.28.20(typescript@6.0.3)
+      typedoc-plugin-markdown: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
 
   std-env@4.2.0: {}
 
@@ -6535,22 +6530,13 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
 
-  typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@5.9.3)):
+  typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.20(typescript@5.9.3)
+      typedoc: 0.28.20(typescript@6.0.3)
 
-  typedoc-plugin-no-inherit@1.6.1(typedoc@0.28.20(typescript@5.9.3)):
+  typedoc-plugin-no-inherit@1.6.1(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.20(typescript@5.9.3)
-
-  typedoc@0.28.20(typescript@5.9.3):
-    dependencies:
-      '@gerrit0/mini-shiki': 3.23.0
-      lunr: 2.3.9
-      markdown-it: 14.3.0
-      minimatch: 10.2.6
-      typescript: 5.9.3
-      yaml: 2.9.0
+      typedoc: 0.28.20(typescript@6.0.3)
 
   typedoc@0.28.20(typescript@6.0.3):
     dependencies:
@@ -6577,8 +6563,6 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  typescript@5.9.3: {}
 
   typescript@6.0.3: {}
 

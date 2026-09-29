@@ -33,7 +33,7 @@
     "starlight-typedoc": "^0.23.1",
     "thememirror": "^2.0.1",
     "typedoc-plugin-no-inherit": "^1.6.1",
-    "typescript": "^5.4.2"
+    "typescript": "^6.0.3"
   },
   "engines": {
     "node": "^20.3.0 || ^22.16.0 || ^24.8.0"
