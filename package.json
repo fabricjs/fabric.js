@@ -76,7 +76,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
-    "@types/jsdom": "^21.1.7",
+    "@types/jsdom": "^30.0.0",
     "@types/micromatch": "^4.0.10",
     "@types/node": "^24.13.6",
     "@vitest/browser-playwright": "5.0.1",
