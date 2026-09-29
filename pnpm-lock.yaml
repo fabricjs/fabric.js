@@ -195,7 +195,7 @@ importers:
         version: 8.0.2(@astrojs/markdown-satteri@0.4.2)(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))
       '@astrojs/react':
         specifier: ^7.0.0
-        version: 7.0.0(@types/node@24.13.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(terser@5.43.1)(yaml@2.9.0)
+        version: 7.0.0(@types/node@24.13.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)(terser@5.43.1)(yaml@2.9.0)
       '@astrojs/sitemap':
         specifier: ^3.7.4
         version: 3.7.4
@@ -239,11 +239,11 @@ importers:
         specifier: ^3.4.2
         version: 3.9.6
       react:
-        specifier: '19.2'
-        version: 19.2.8
+        specifier: '19.3'
+        version: 19.3.0
       react-dom:
         specifier: '19.2'
-        version: 19.2.8(react@19.2.8)
+        version: 19.2.8(react@19.3.0)
       sharp:
         specifier: ^0.35.4
         version: 0.35.4(@types/node@24.13.6)
@@ -2782,8 +2782,8 @@ packages:
     peerDependencies:
       react: ^19.2.8
 
-  react@19.2.8:
-    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
+  react@19.3.0:
+    resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
     engines: {node: '>=0.10.0'}
 
   readable-stream@3.6.2:
@@ -3680,15 +3680,15 @@ snapshots:
     dependencies:
       prismjs: 1.30.0
 
-  '@astrojs/react@7.0.0(@types/node@24.13.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(terser@5.43.1)(yaml@2.9.0)':
+  '@astrojs/react@7.0.0(@types/node@24.13.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.8(react@19.3.0))(react@19.3.0)(terser@5.43.1)(yaml@2.9.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.11.0
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
       '@vitejs/plugin-react': 6.1.1(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.0))
       devalue: 5.9.4
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
+      react: 19.3.0
+      react-dom: 19.2.8(react@19.3.0)
       ultrahtml: 1.7.0
       vite: 8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.0)
     transitivePeerDependencies:
@@ -6190,12 +6190,12 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-dom@19.2.8(react@19.2.8):
+  react-dom@19.2.8(react@19.3.0):
     dependencies:
-      react: 19.2.8
+      react: 19.3.0
       scheduler: 0.27.0
 
-  react@19.2.8: {}
+  react@19.3.0: {}
 
   readable-stream@3.6.2:
     dependencies:
