@@ -1,6 +1,8 @@
 {
+  // Use the root source aliases for editors and type-aware linting.
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "rootDir": "../..",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -9,18 +11,6 @@
     "sourceMap": true,
     "skipDefaultLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    // Override the root source aliases so Playwright loads the built packages.
-    "paths": {
-      "@fabricjs/aligning-guidelines": ["../aligning-guidelines/dist/index"],
-      "@fabricjs/browser": ["../browser/dist/index"],
-      "@fabricjs/core": ["../core/dist/index"],
-      "@fabricjs/cropping-controls": ["../cropping-controls/dist/index"],
-      "@fabricjs/data-updaters": ["../data-updaters/dist/index"],
-      "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
-      "@fabricjs/node": ["../node/dist/index"],
-      "fabric": ["../../dist/index"],
-      "fabric/node": ["../../dist/index.node"]
-    },
     "resolveJsonModule": true
   },
   "include": ["./**/*.ts", "env.d.ts"],
