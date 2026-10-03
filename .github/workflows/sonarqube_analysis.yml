@@ -2,57 +2,140 @@ name: 'Run scan and submit coverage Sonarqube'
 on:
   workflow_run:
     workflows: ['🧪']
-    types:
-      - completed
+    types: [completed]
 permissions:
   actions: read
   contents: read
+  pull-requests: read
 jobs:
   sonarqube:
     name: SonarQube analysis
-    if: ${{ github.event.workflow_run.conclusion != 'cancelled' }}
+    if: github.event.workflow_run.conclusion != 'cancelled' && (github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.event == 'push')
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout PR merge ref
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+      - name: Checkout trusted scanner configuration
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: refs/pull/${{ github.event.workflow_run.pull_requests[0].number }}/merge
-          fetch-depth: 0
+          ref: ${{ github.sha }}
+          path: trusted
           persist-credentials: false
-      - name: Checkout default branch
-        if: ${{ github.event.workflow_run.event == 'push' }}
+      - name: Validate originating run
+        id: source
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const event = context.payload.workflow_run;
+            const { data: run } = await github.rest.actions.getWorkflowRun({ owner, repo, run_id: event.id });
+            if (run.path !== '.github/workflows/tests.yml' || run.repository.id !== context.payload.repository.id ||
+                run.status !== 'completed' || run.conclusion === 'cancelled' ||
+                run.event !== event.event || run.head_sha !== event.head_sha || run.run_attempt !== event.run_attempt) {
+              throw new Error('Unexpected test run metadata');
+            }
+            if (run.event === 'push') {
+              const { data: branch } = await github.rest.repos.getBranch({ owner, repo, branch: 'master' });
+              if (run.head_repository.id === run.repository.id && run.head_branch === 'master' && run.head_sha === branch.commit.sha) {
+                core.setOutput('sha', run.head_sha);
+              }
+              return;
+            }
+            // Fork runs can have no pull_requests or commit-to-PR association.
+            const prs = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'open',
+              head: `${run.head_repository.owner.login}:${run.head_branch}`,
+              per_page: 100,
+            });
+            const matches = prs.filter((pr) => pr.state === 'open' && pr.base.repo.id === run.repository.id &&
+              pr.base.ref === 'master' && pr.head.repo?.id === run.head_repository.id &&
+              pr.head.ref === run.head_branch && pr.head.sha === run.head_sha &&
+              Date.parse(pr.created_at) <= Date.parse(run.created_at) &&
+              (!run.pull_requests.length || run.pull_requests.some((origin) => origin.number === pr.number)));
+            const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+              owner, repo, workflow_id: run.workflow_id, event: 'pull_request', head_sha: run.head_sha, per_page: 100,
+            });
+            if (matches.length !== 1 || runs.some((other) => other.id > run.id &&
+                other.head_repository?.id === run.head_repository.id && other.head_branch === run.head_branch)) {
+              core.info('Skipping stale, closed, mismatched, or ambiguous PR run');
+              return;
+            }
+            core.setOutput('pr', matches[0].number);
+            core.setOutput('sha', run.head_sha);
+      - name: Keep PR symlinks as text files
+        if: steps.source.outputs.sha
+        run: git config --global core.symlinks false
+      - name: Checkout source for analysis only
+        if: steps.source.outputs.sha
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: refs/heads/master
+          ref: ${{ steps.source.outputs.sha }}
+          path: source
           fetch-depth: 0
           persist-credentials: false
-      - name: Create temporary directories
-        run: mkdir -p ${{ runner.temp }}/artifacts/nyc_output .nyc_output
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - name: Download untrusted coverage data
+        if: steps.source.outputs.sha
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: coverage-vitest-sonarqube
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ${{ runner.temp }}/artifacts/nyc_output
-      - run: mv ${{ runner.temp }}/artifacts/nyc_output/lcov.info ./.nyc_output
-      - name: SonarQube Scan PR
-        if: ${{ github.event.workflow_run.event == 'pull_request' }}
+          path: ${{ runner.temp }}/sonar-coverage
+      - name: Prepare trusted scanner settings and revalidate PR
+        id: scan
+        if: steps.source.outputs.sha
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        env:
+          PR_NUMBER: ${{ steps.source.outputs.pr }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const event = context.payload.workflow_run;
+            const { data: run } = await github.rest.actions.getWorkflowRun({ ...context.repo, run_id: event.id });
+            if (run.status !== 'completed' || run.run_attempt !== event.run_attempt) return;
+            let pr;
+            if (event.event === 'pull_request') {
+              ({ data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: Number(process.env.PR_NUMBER) }));
+              if (pr.state !== 'open' || pr.head.sha !== event.head_sha || pr.head.ref !== run.head_branch ||
+                  pr.head.repo?.id !== run.head_repository.id || pr.base.repo.id !== context.payload.repository.id ||
+                  pr.base.ref !== 'master') return;
+            }
+            if (event.event === 'push') {
+              const { data: branch } = await github.rest.repos.getBranch({ ...context.repo, branch: 'master' });
+              if (branch.commit.sha !== event.head_sha) return;
+            }
+            const root = process.env.GITHUB_WORKSPACE;
+            const temp = process.env.RUNNER_TEMP;
+            // Java properties escaping: metadata must remain a value, never another setting.
+            const escape = (value) => String(value).replace(/[\\\s:=#!]/g, (c) => {
+              if (c === '\n') return '\\n';
+              if (c === '\r') return '\\r';
+              if (c === '\t') return '\\t';
+              return `\\${c}`;
+            });
+            const settings = {
+              'sonar.host.url': 'https://sonarcloud.io',
+              'sonar.scm.revision': event.head_sha,
+              'sonar.typescript.tsconfigPaths': path.join(root, 'trusted/.github/sonar-tsconfig.json'),
+              'sonar.working.directory': path.join(temp, 'sonar-work'),
+              'sonar.javascript.lcov.reportPaths': path.join(temp, 'sonar-coverage/lcov.info'),
+              ...(pr ? {
+                'sonar.pullrequest.key': pr.number,
+                'sonar.pullrequest.base': pr.base.ref,
+                'sonar.pullrequest.branch': pr.head.ref,
+              } : { 'sonar.branch.name': 'master' }),
+            };
+            const coverage = fs.lstatSync(path.join(temp, 'sonar-coverage/lcov.info'));
+            if (!coverage.isFile() || coverage.size > 50000000) throw new Error('Invalid coverage file');
+            const config = path.join(root, 'source/sonar-project.properties');
+            fs.rmSync(config, { force: true });
+            const trusted = fs.readFileSync('trusted/sonar-project.properties', 'utf8');
+            fs.writeFileSync(config, trusted + '\n' + Object.entries(settings).map(([key, value]) => `${key}=${escape(value)}`).join('\n') + '\n');
+            core.setOutput('ready', 'true');
+      - name: SonarQube scan
+        if: steps.scan.outputs.ready == 'true'
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_USER_HOME: ${{ runner.temp }}/sonar-home
         with:
-          args: >
-            -Dsonar.pullrequest.key=${{ github.event.workflow_run.pull_requests[0].number }}
-            -Dsonar.pullrequest.base=${{ github.event.workflow_run.pull_requests[0].base.ref }}
-            -Dsonar.pullrequest.branch=${{ github.event.workflow_run.pull_requests[0].head.ref }}
-      - name: SonarQube Scan Branch
-        if: ${{ github.event.workflow_run.event == 'push' }}
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.branch.name=master
+          projectBaseDir: source

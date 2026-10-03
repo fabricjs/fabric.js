@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": [
+    "../../source/packages/**/*",
+    "../../source/extensions/**/*",
+    "../../source/fabric.ts",
+    "../../source/index.ts",
+    "../../source/index.node.ts"
+  ],
+  "exclude": [
+    "../../source/**/node_modules",
+    "../../source/**/dist",
+    "../../source/dist-extensions"
+  ]
+}
