@@ -54,10 +54,11 @@ jobs:
           script: |
             await require('./trusted/.github/scripts/prepare-sonarqube-scan.cjs')({ github, context, core });
       - name: SonarQube scan
-        if: steps.scan.outputs.ready == 'true'
+        if: steps.scan.outputs.parameters
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_USER_HOME: ${{ runner.temp }}/sonar-home
+          SONAR_SCANNER_JSON_PARAMS: ${{ steps.scan.outputs.parameters }}
         with:
           projectBaseDir: source

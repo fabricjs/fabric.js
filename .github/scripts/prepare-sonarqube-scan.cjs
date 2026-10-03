@@ -18,6 +18,7 @@ module.exports = async ({ github, context, core }) => {
       pr.state !== 'open' ||
       pr.head.sha !== event.head_sha ||
       pr.head.ref !== run.head_branch ||
+      pr.head.ref.includes('${') ||
       pr.head.repo?.id !== run.head_repository.id ||
       pr.base.repo.id !== context.payload.repository.id ||
       pr.base.ref !== 'master'
@@ -33,15 +34,8 @@ module.exports = async ({ github, context, core }) => {
   }
   const root = process.env.GITHUB_WORKSPACE;
   const temp = process.env.RUNNER_TEMP;
-  // Java properties escaping: metadata must remain a value, never another setting.
-  const escape = (value) =>
-    String(value).replace(/[\\\s:=#!]/g, (c) => {
-      if (c === '\n') return '\\n';
-      if (c === '\r') return '\\r';
-      if (c === '\t') return '\\t';
-      return `\\${c}`;
-    });
   const settings = {
+    'project.settings': path.join(root, 'trusted/sonar-project.properties'),
     'sonar.host.url': 'https://sonarcloud.io',
     'sonar.scm.revision': event.head_sha,
     'sonar.typescript.tsconfigPaths': path.join(
@@ -55,7 +49,7 @@ module.exports = async ({ github, context, core }) => {
     ),
     ...(pr
       ? {
-          'sonar.pullrequest.key': pr.number,
+          'sonar.pullrequest.key': String(pr.number),
           'sonar.pullrequest.base': pr.base.ref,
           'sonar.pullrequest.branch': pr.head.ref,
         }
@@ -64,17 +58,5 @@ module.exports = async ({ github, context, core }) => {
   const coverage = fs.lstatSync(path.join(temp, 'sonar-coverage/lcov.info'));
   if (!coverage.isFile() || coverage.size > 50000000)
     throw new Error('Invalid coverage file');
-  const config = path.join(root, 'source/sonar-project.properties');
-  fs.rmSync(config, { force: true });
-  const trusted = fs.readFileSync('trusted/sonar-project.properties', 'utf8');
-  fs.writeFileSync(
-    config,
-    trusted +
-      '\n' +
-      Object.entries(settings)
-        .map(([key, value]) => `${key}=${escape(value)}`)
-        .join('\n') +
-      '\n',
-  );
-  core.setOutput('ready', 'true');
+  core.setOutput('parameters', JSON.stringify(settings));
 };
