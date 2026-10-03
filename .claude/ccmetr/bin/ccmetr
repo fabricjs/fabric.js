@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Dispatcher so the model can run `ccmetr submit ...` (matches the skills'
+# allowed-tools: Bash(.claude/ccmetr/bin/ccmetr *)). Forwards every arg to the
+# Python client; reads gateway URL + key from the session env, like the hook.
+exec python3 "$SCRIPT_DIR/ccmetr-client.py" "$@"

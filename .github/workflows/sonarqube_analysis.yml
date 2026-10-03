@@ -52,7 +52,100 @@ jobs:
           SCAN_METADATA: ${{ steps.target.outputs.metadata }}
           SCAN_SOURCE: ${{ runner.temp }}/sonar-source
           COVERAGE_FILE: ${{ steps.target.outputs.coverage == 'true' && format('{0}/sonar-coverage/lcov.info', runner.temp) || '' }}
-        run: python3 .github/scripts/prepare-sonar.py
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const { execFileSync } = require('node:child_process');
+            const { repository, sha, number, base, branch } = JSON.parse(process.env.SCAN_METADATA);
+            const target = process.env.SCAN_SOURCE;
+            if (!/^[\w.-]+\/[\w.-]+$/.test(repository) || !/^[a-f0-9]{40}$/.test(sha) || base !== 'master' ||
+                (number !== undefined && (!Number.isSafeInteger(number) || number <= 0))) {
+              throw new Error('Invalid analysis target');
+            }
+            fs.mkdirSync(target); // Require a new directory, separate from trusted workflow code.
+            const git = (...args) => execFileSync('git', ['-C', target, ...args], { maxBuffer: 64 * 1024 * 1024 });
+            git('init', '--quiet');
+            git('remote', 'add', 'origin', `https://github.com/${repository}.git`);
+            git('-c', 'credential.helper=', 'fetch', '--no-tags', 'origin', '+refs/heads/master:refs/remotes/origin/master');
+            if (number) git('-c', 'credential.helper=', 'fetch', '--no-tags', 'origin', `+refs/pull/${number}/head:refs/heads/sonar-head`);
+            if (git('rev-parse', number ? 'refs/heads/sonar-head' : 'refs/remotes/origin/master').toString().trim() !== sha) {
+              throw new Error('Source changed after workflow completion');
+            }
+            git('symbolic-ref', 'HEAD', 'refs/heads/sonar-head');
+            git('update-ref', 'HEAD', sha);
+            git('read-tree', sha);
+            const excluded = new Set(['node_modules', 'dist', 'dist-extensions', 'e2e']);
+            const isSource = name => {
+              const parts = name.split('/');
+              const file = parts.at(-1);
+              return !/[\x00-\x1f\\]/.test(name) &&
+                !parts.some(part => !part || part.startsWith('.') || excluded.has(part)) &&
+                (['packages', 'extensions'].includes(parts[0]) || ['fabric.ts', 'index.ts', 'index.node.ts'].includes(name)) &&
+                !file.startsWith('tsconfig') && !['package.json', 'jsconfig.json'].includes(file) &&
+                /\.(ts|tsx|js|jsx|mjs|cjs|css|scss|html|vue|astro|json)$/.test(file);
+            };
+            const tree = git('ls-tree', '-rz', sha);
+            if (!Buffer.from(tree.toString(), 'utf8').equals(tree)) throw new Error('Non-UTF-8 source path');
+            let total = 0;
+            let count = 0;
+            // Read raw blobs: no checkout filters, hooks, submodules or PR tooling can run.
+            for (const entry of tree.toString().split('\0').filter(Boolean)) {
+              const separator = entry.indexOf('\t');
+              const name = entry.slice(separator + 1);
+              if (!isSource(name)) continue;
+              const [mode, kind, blob] = entry.slice(0, separator).split(' ');
+              if (kind !== 'blob' || !['100644', '100755'].includes(mode)) throw new Error('Source must be a regular file');
+              const size = Number(git('cat-file', '-s', blob).toString());
+              total += size;
+              if (size > 5 * 1024 * 1024 || total > 64 * 1024 * 1024) throw new Error('Source exceeds scan size limit');
+              const destination = path.join(target, name);
+              fs.mkdirSync(path.dirname(destination), { recursive: true });
+              fs.writeFileSync(destination, git('cat-file', 'blob', blob));
+              count++;
+            }
+            fs.copyFileSync('tsconfig.json', path.join(target, 'tsconfig.base.json'));
+            fs.writeFileSync(path.join(target, 'tsconfig.sonar.json'), JSON.stringify({
+              extends: './tsconfig.base.json',
+              compilerOptions: { noEmit: true, types: [], jsx: 'preserve' },
+              include: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'], exclude: ['node_modules'],
+            }));
+            const settings = {
+              'sonar.host.url': 'https://sonarcloud.io', 'sonar.scm.revision': sha,
+              'sonar.typescript.tsconfigPaths': 'tsconfig.sonar.json',
+              ...(number ? { 'sonar.pullrequest.key': number, 'sonar.pullrequest.base': base, 'sonar.pullrequest.branch': branch } : { 'sonar.branch.name': 'master' }),
+            };
+            const propertyValue = value => String(value).replace(/[\\:=#! \x00-\x1f]/g,
+              char => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`);
+            const config = fs.readFileSync('sonar-project.properties', 'utf8').split(/\r?\n/)
+              .filter(line => !line.startsWith('sonar.projectBaseDir=')).join('\n');
+            fs.writeFileSync(path.join(target, 'sonar-project.properties'), config + '\n' +
+              Object.entries(settings).map(([key, value]) => `${key}=${propertyValue(value)}`).join('\n') + '\n');
+            const records = [];
+            if (process.env.COVERAGE_FILE) {
+              const stat = fs.lstatSync(process.env.COVERAGE_FILE);
+              if (!stat.isFile() || stat.size > 50 * 1024 * 1024) throw new Error('Invalid coverage file');
+              const repoName = repository.split('/')[1];
+              const prefix = `/home/runner/work/${repoName}/${repoName}/`;
+              for (const record of fs.readFileSync(process.env.COVERAGE_FILE, 'utf8').split('end_of_record')) {
+                if (!record.trim()) continue;
+                const lines = record.trim().split(/\r?\n/);
+                const files = lines.filter(line => line.startsWith('SF:'));
+                if (files.length !== 1) throw new Error('Invalid LCOV record');
+                let name = files[0].slice(3);
+                if (name.startsWith(prefix)) name = name.slice(prefix.length);
+                if (name.startsWith('./')) name = name.slice(2);
+                if (!isSource(name) || !fs.existsSync(path.join(target, name))) continue;
+                if (lines.some(line => !/^(TN|SF|FN|FNDA|FNF|FNH|DA|LF|LH|BRDA|BRF|BRH):/.test(line) || line.includes('\0'))) {
+                  throw new Error('Invalid LCOV data');
+                }
+                records.push(lines.map(line => line.startsWith('SF:') ? `SF:${name}` : line).join('\n') + '\nend_of_record\n');
+              }
+            }
+            fs.mkdirSync(path.join(target, '.nyc_output'));
+            fs.writeFileSync(path.join(target, '.nyc_output/lcov.info'), records.join(''));
+            core.info(`Prepared ${count} source files for ${sha}; no PR code was executed.`);
       - name: Upload scan input
         if: steps.target.outputs.ready == 'true'
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0

@@ -1,0 +1,71 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/ccmetr/bin/hook",
+            "args": [
+              "UserPromptSubmit"
+            ],
+            "timeout": 30000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/ccmetr/bin/hook",
+            "args": [
+              "SubagentStart"
+            ],
+            "timeout": 15000
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/ccmetr/bin/hook",
+            "args": [
+              "SubagentStop"
+            ],
+            "timeout": 15000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/ccmetr/bin/session-start",
+            "timeout": 15000
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "${CLAUDE_PROJECT_DIR}/.claude/ccmetr/bin/statusline",
+    "refreshInterval": 5,
+    "padding": 1
+  },
+  "permissions": {
+    "allow": [
+      "Bash(.claude/ccmetr/bin/ccmetr *)"
+    ]
+  },
+  "cleanupPeriodDays": 365,
+  "$schema": "https://json.schemastore.org/claude-code-settings.json"
+}

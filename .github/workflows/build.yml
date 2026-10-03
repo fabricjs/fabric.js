@@ -120,6 +120,3 @@ jobs:
       - name: Workflow helper tests
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: node --test .github/scripts/*.test.cjs
-      - name: Sonar source preparation tests
-        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
-        run: python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'

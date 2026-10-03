@@ -1,0 +1,39 @@
+{
+  "mode": "merge",
+  "target": "/Users/andrea/develop/jtcores/.claude",
+  "timestamp": "2026-09-03T22:21:41Z",
+  "added": [
+    "ccmetr/bin",
+    "skills/metr-bug",
+    "skills/metr-cancel",
+    "skills/metr-confusing",
+    "skills/metr-continue",
+    "skills/metr-ditch",
+    "skills/metr-finish",
+    "skills/metr-help",
+    "skills/metr-idea",
+    "skills/metr-list",
+    "skills/metr-note",
+    "skills/metr-temp",
+    "skills/metr-start",
+    "skills/metr-status"
+  ],
+  "settings_keys_merged": [
+    "hooks",
+    "statusLine",
+    "permissions"
+  ],
+  "permission_added": "Bash(.claude/ccmetr/bin/ccmetr *)",
+  "hook_command_substring": "/ccmetr/bin/",
+  "statusLine_was_set": true,
+  "prior_statusLine": null,
+  "schema_was_added": true,
+  "gitignore_created": true,
+  "gitignore_lines_appended": [
+    "settings.local.json",
+    "settings.local.json.bak",
+    "settings.json.bak",
+    "__pycache__/"
+  ],
+  "wrote_settings_local": true
+}

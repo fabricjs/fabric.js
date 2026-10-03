@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# On session start, report a forked/derived session to the gateway so it can
+# re-attach it to the source's task (see ccmetr-client.py session-start).
+exec python3 "$SCRIPT_DIR/ccmetr-client.py" session-start

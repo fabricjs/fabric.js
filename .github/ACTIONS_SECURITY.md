@@ -87,7 +87,7 @@ repository, branch or executable command; reports are bounded and treated as dat
 | Coverage/build-statistics comments | PR comments                                   | Trusted helpers only                      |
 | Build-statistics baseline          | None                                          | Default-branch build and dependencies     |
 | Changelog update                   | Contents and PR comments                      | Trusted GitHub API helper only            |
-| Sonar source preparation           | None                                          | Trusted Python helper and Git blob reads  |
+| Sonar source preparation           | None                                          | Trusted JavaScript and Git blob reads  |
 | Sonar scan                         | Existing `SONAR_TOKEN`, no GitHub write token | Pinned scanner with trusted configuration |
 
 The changelog updater can commit only `CHANGELOG.md` to an existing same-repository
@@ -113,7 +113,6 @@ Run the local security regression tests with:
 
 ```sh
 node --test .github/scripts/*.test.cjs
-python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'
 ```
 
 The npm release workflow deliberately omits the `cache` input on the pinned
