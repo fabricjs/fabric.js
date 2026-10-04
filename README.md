@@ -12,6 +12,7 @@ A **simple and powerful Javascript HTML5 canvas library**.
 ## Special Thanks
 
 Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
+
 <div>
    <a href="https://go.warp.dev/fabric">
       <img alt="Warp sponsorship" width="300" src="https://github.com/warpdotdev/brand-assets/blob/main/Github/Sponsor/Warp-Github-LG-01.png">
