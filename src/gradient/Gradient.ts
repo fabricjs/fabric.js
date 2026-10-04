@@ -3,7 +3,9 @@ import { iMatrix } from '../constants';
 import { parseTransformAttribute } from '../parser/parseTransformAttribute';
 import type { FabricObject } from '../shapes/Object/FabricObject';
 import type { TMat2D } from '../typedefs';
+import { isSafeSvgStyleValue } from '../util/internals/svgExportCheck';
 import { uid } from '../util/internals/uid';
+import { escapeXml } from '../util/lang_string';
 import { pick } from '../util/misc/pick';
 import { matrixToSVG } from '../util/misc/svgExport';
 import { linearDefaultCoords, radialDefaultCoords } from './constants';
@@ -271,12 +273,18 @@ export class Gradient<
     }
 
     colorStops.forEach(({ color, offset, opacity }) => {
+      const rawColor = String(color);
+      // `escapeXml` protects the SVG attribute, but the value is also embedded
+      // in a CSS declaration, so reject tokens that can break either context.
+      const serializedColor = isSafeSvgStyleValue(rawColor)
+        ? rawColor
+        : new Color(rawColor).toRgba();
       markup.push(
         '<stop ',
         'offset="',
         offset * 100 + '%',
         '" style="stop-color:',
-        color,
+        escapeXml(serializedColor),
         typeof opacity !== 'undefined' ? ';stop-opacity: ' + opacity : ';',
         '"/>\n',
       );

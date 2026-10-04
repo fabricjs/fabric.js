@@ -4,7 +4,7 @@ import { IText } from '../shapes/IText/IText';
 import '../shapes/ActiveSelection';
 
 describe('Canvas', () => {
-    it('implements toCanvasElement method that clears the contextTop', () => {
+  it('implements toCanvasElement method that clears the contextTop', () => {
     const canvas = new Canvas();
     const mockSetCtx = jest.fn();
     class UpperMock {
