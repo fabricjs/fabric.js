@@ -4,6 +4,33 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@playwright/test':
+      specifier: 1.63.0
+      version: 1.63.0
+    '@types/jsdom':
+      specifier: 21.1.7
+      version: 21.1.7
+    '@types/node':
+      specifier: 24.13.6
+      version: 24.13.6
+    canvas:
+      specifier: 3.2.3
+      version: 3.2.3
+    jsdom:
+      specifier: 26.1.0
+      version: 26.1.0
+    typedoc:
+      specifier: 0.28.20
+      version: 0.28.20
+    typescript:
+      specifier: 6.0.3
+      version: 6.0.3
+    westures:
+      specifier: 1.1.1
+      version: 1.1.1
+
 importers:
 
   .:
@@ -28,19 +55,19 @@ importers:
         version: link:packages/westures-integration
     devDependencies:
       '@eslint/js':
-        specifier: ^10.0.1
+        specifier: 10.0.1
         version: 10.0.1(eslint@10.11.0)
       '@playwright/test':
-        specifier: ^1.63.0
+        specifier: 'catalog:'
         version: 1.63.0
       '@types/jsdom':
-        specifier: ^21.1.7
+        specifier: 'catalog:'
         version: 21.1.7
       '@types/micromatch':
-        specifier: ^4.0.10
+        specifier: 4.0.10
         version: 4.0.10
       '@types/node':
-        specifier: ^24.13.6
+        specifier: 'catalog:'
         version: 24.13.6
       '@vitest/browser-playwright':
         specifier: 5.0.1
@@ -52,49 +79,49 @@ importers:
         specifier: 5.0.1
         version: 5.0.1(vitest@5.0.1)
       commander:
-        specifier: ^15.0.0
+        specifier: 15.0.0
         version: 15.0.0
       es-toolkit:
         specifier: 1.52.0
         version: 1.52.0
       eslint:
-        specifier: ^10.11.0
+        specifier: 10.11.0
         version: 10.11.0
       eslint-config-prettier:
-        specifier: ^10.1.8
+        specifier: 10.1.8
         version: 10.1.8(eslint@10.11.0)
       husky:
-        specifier: ^9.1.7
+        specifier: 9.1.7
         version: 9.1.7
       lint-staged:
-        specifier: ^17.5.1
+        specifier: 17.5.1
         version: 17.5.1
       micromatch:
-        specifier: ^4.0.8
+        specifier: 4.0.8
         version: 4.0.8
       oxfmt:
-        specifier: ^0.68.0
+        specifier: 0.68.0
         version: 0.68.0
       rolldown:
-        specifier: ^1.2.9
+        specifier: 1.2.9
         version: 1.2.9
       tsc-files:
-        specifier: ^1.1.4
+        specifier: 1.1.4
         version: 1.1.4(typescript@6.0.3)
       typedoc:
-        specifier: ^0.28.11
+        specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-eslint:
-        specifier: ^8.70.0
+        specifier: 8.70.0
         version: 8.70.0(eslint@10.11.0)(typescript@6.0.3)
       vitest:
         specifier: 5.0.1
         version: 5.0.1(@types/node@24.13.6)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(jsdom@26.1.0(canvas@3.2.3))(vite@8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.0))
       westures:
-        specifier: ^1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
     optionalDependencies:
       '@fabricjs/node':
@@ -155,16 +182,16 @@ importers:
         version: link:../..
     devDependencies:
       '@playwright/test':
-        specifier: ^1.63.0
+        specifier: 'catalog:'
         version: 1.63.0
       '@types/node':
-        specifier: ^24.13.6
+        specifier: 'catalog:'
         version: 24.13.6
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vite:
-        specifier: ^8.3.1
+        specifier: 8.3.1
         version: 8.3.1(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.0)
 
   packages/gradient-controls:
@@ -179,95 +206,95 @@ importers:
         specifier: workspace:^
         version: link:../core
       canvas:
-        specifier: ^3.2.0
+        specifier: 'catalog:'
         version: 3.2.3
       jsdom:
-        specifier: ^26.1.0
+        specifier: 'catalog:'
         version: 26.1.0(canvas@3.2.3)
 
   packages/website:
     dependencies:
       '@astrojs/check':
         specifier: 0.9.10
-        version: 0.9.10(prettier@3.9.6)(typescript@5.9.3)
+        version: 0.9.10(prettier@3.9.6)(typescript@6.0.3)
       '@astrojs/mdx':
-        specifier: ^8.0.2
+        specifier: 8.0.2
         version: 8.0.2(@astrojs/markdown-satteri@0.4.2)(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))
       '@astrojs/react':
-        specifier: ^7.0.0
+        specifier: 7.0.0
         version: 7.0.0(@types/node@24.13.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(terser@5.43.1)(yaml@2.9.0)
       '@astrojs/sitemap':
-        specifier: ^3.7.4
+        specifier: 3.7.4
         version: 3.7.4
       '@astrojs/starlight':
-        specifier: ^0.42.4
-        version: 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3)
+        specifier: 0.42.4
+        version: 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3)
       '@codemirror/lang-javascript':
-        specifier: ^6.2.2
+        specifier: 6.2.5
         version: 6.2.5
       '@codemirror/state':
-        specifier: ^6.4.1
+        specifier: 6.7.1
         version: 6.7.1
       '@types/jsdom':
-        specifier: ^21.1.6
+        specifier: 'catalog:'
         version: 21.1.7
       '@types/node':
-        specifier: ^24.3.0
+        specifier: 'catalog:'
         version: 24.13.6
       '@types/react':
-        specifier: ^19.3.0
+        specifier: 19.3.0
         version: 19.3.0
       '@types/react-dom':
-        specifier: ^19.3.0
+        specifier: 19.3.0
         version: 19.3.0(@types/react@19.3.0)
       astro:
-        specifier: ^7.3.5
+        specifier: 7.3.5
         version: 7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0)
       canvas:
-        specifier: ^3.2.0
+        specifier: 'catalog:'
         version: 3.2.3
       codemirror:
-        specifier: ^6.0.1
+        specifier: 6.0.2
         version: 6.0.2
       fabric:
         specifier: workspace:*
         version: link:../..
       jsdom:
-        specifier: ^26.1.0
+        specifier: 'catalog:'
         version: 26.1.0(canvas@3.2.3)
       prettier:
-        specifier: ^3.4.2
+        specifier: 3.9.6
         version: 3.9.6
       react:
-        specifier: '19.2'
+        specifier: 19.2.8
         version: 19.2.8
       react-dom:
-        specifier: '19.2'
+        specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
       sharp:
-        specifier: ^0.35.4
+        specifier: 0.35.4
         version: 0.35.4(@types/node@24.13.6)
       starlight-typedoc:
-        specifier: ^0.23.1
-        version: 0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@5.9.3)))(typedoc@0.28.20(typescript@5.9.3))
+        specifier: 0.23.1
+        version: 0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3))
       thememirror:
-        specifier: ^2.0.1
+        specifier: 2.0.1
         version: 2.0.1(@codemirror/language@6.12.4)(@codemirror/state@6.7.1)(@codemirror/view@6.43.7)
       typedoc-plugin-no-inherit:
-        specifier: ^1.6.1
-        version: 1.6.1(typedoc@0.28.20(typescript@5.9.3))
+        specifier: 1.6.1
+        version: 1.6.1(typedoc@0.28.20(typescript@6.0.3))
       typescript:
-        specifier: ^5.4.2
-        version: 5.9.3
+        specifier: 'catalog:'
+        version: 6.0.3
     devDependencies:
       typedoc:
-        specifier: ^0.28.20
-        version: 0.28.20(typescript@5.9.3)
+        specifier: 'catalog:'
+        version: 0.28.20(typescript@6.0.3)
       typedoc-plugin-markdown:
-        specifier: ^4.13.1
-        version: 4.13.1(typedoc@0.28.20(typescript@5.9.3))
+        specifier: 4.13.1
+        version: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
       westures:
-        specifier: ^1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
 
   packages/westures-integration:
@@ -276,7 +303,7 @@ importers:
         specifier: workspace:^
         version: link:../core
       westures:
-        specifier: ^1.1.1
+        specifier: 'catalog:'
         version: 1.1.1
 
 packages:
@@ -1887,9 +1914,6 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
-  devalue@5.9.0:
-    resolution: {integrity: sha512-RWrqdArjvPbsATEhOPUo6Wndc/iWnkWKlhIrdlF3zMMYo/c3CVtoaVAyLtWxz5h8nSlkHzxnzV2uLydPXmtF+A==}
-
   devalue@5.9.4:
     resolution: {integrity: sha512-sPAT4pztbu6586/hrhOnMKS17IJrvg12mXiSPSS3W5qDeN2RGgvZ0diZCm31dBbnevfVmujNO3IM2wrS4Y2Rhg==}
 
@@ -2281,10 +2305,6 @@ packages:
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
-
-  js-yaml@4.3.1:
-    resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
-    hasBin: true
 
   js-yaml@4.3.2:
     resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
@@ -2904,10 +2924,6 @@ packages:
     engines: {node: '>=20.19.5', npm: '>=10.8.2'}
     hasBin: true
 
-  smol-toml@1.7.1:
-    resolution: {integrity: sha512-PPlsspAZ4jbMBu5DMFhfUGDQLu/vrL4SyBROVS37x8ynnVmFIs1VPBz1Co8Xks3TvpIaZXmU85y4DrQ+UyVFoQ==}
-    engines: {node: '>= 18'}
-
   smol-toml@1.9.0:
     resolution: {integrity: sha512-hpd+HLON7HdZXqYchMM/+LaTTbdK0AU3NngIJ4KVyWbY9bfQqdL9cD+4yf6dUoU2Ap4VsU0JkQi6FxAI1B2mXQ==}
     engines: {node: '>= 18'}
@@ -3109,11 +3125,6 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
-
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
 
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
@@ -3543,9 +3554,6 @@ packages:
     resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
     engines: {node: '>=12.20'}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
-
   zod@4.6.5:
     resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
 
@@ -3562,12 +3570,12 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
 
-  '@astrojs/check@0.9.10(prettier@3.9.6)(typescript@5.9.3)':
+  '@astrojs/check@0.9.10(prettier@3.9.6)(typescript@6.0.3)':
     dependencies:
-      '@astrojs/language-server': 2.16.13(prettier@3.9.6)(typescript@5.9.3)
+      '@astrojs/language-server': 2.16.13(prettier@3.9.6)(typescript@6.0.3)
       chokidar: 4.0.3
       kleur: 4.1.5
-      typescript: 5.9.3
+      typescript: 6.0.3
       yargs: 18.1.0
     transitivePeerDependencies:
       - prettier
@@ -3630,19 +3638,19 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.5
       '@types/mdast': 4.0.4
-      js-yaml: 4.3.1
+      js-yaml: 4.3.2
       picomatch: 4.0.7
       retext-smartypants: 6.2.0
       shiki: 4.4.3
-      smol-toml: 1.7.1
+      smol-toml: 1.9.0
       unified: 11.0.5
 
-  '@astrojs/language-server@2.16.13(prettier@3.9.6)(typescript@5.9.3)':
+  '@astrojs/language-server@2.16.13(prettier@3.9.6)(typescript@6.0.3)':
     dependencies:
       '@astrojs/compiler': 2.13.1
       '@astrojs/yaml2ts': 0.2.4
       '@jridgewell/sourcemap-codec': 1.6.0
-      '@volar/kit': 2.4.28(typescript@5.9.3)
+      '@volar/kit': 2.4.28(typescript@6.0.3)
       '@volar/language-core': 2.4.28
       '@volar/language-server': 2.4.28
       '@volar/language-service': 2.4.28
@@ -3710,9 +3718,9 @@ snapshots:
   '@astrojs/sitemap@3.7.4':
     dependencies:
       sitemap: 9.0.1
-      zod: 4.4.3
+      zod: 4.6.5
 
-  '@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3)':
+  '@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3)':
     dependencies:
       '@astrojs/markdown-satteri': 0.4.2
       '@astrojs/mdx': 8.0.2(@astrojs/markdown-satteri@0.4.2)(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))
@@ -3729,8 +3737,8 @@ snapshots:
       hast-util-to-html: 9.0.5
       hast-util-to-string: 3.0.1
       hastscript: 9.0.1
-      i18next: 26.4.2(typescript@5.9.3)
-      js-yaml: 4.3.1
+      i18next: 26.4.2(typescript@6.0.3)
+      js-yaml: 4.3.2
       klona: 2.0.6
       magic-string: 1.4.1
       mdast-util-directive: 3.1.0
@@ -4743,12 +4751,12 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  '@volar/kit@2.4.28(typescript@5.9.3)':
+  '@volar/kit@2.4.28(typescript@6.0.3)':
     dependencies:
       '@volar/language-service': 2.4.28
       '@volar/typescript': 2.4.28
       typesafe-path: 0.2.2
-      typescript: 5.9.3
+      typescript: 6.0.3
       vscode-languageserver-textdocument: 1.0.12
       vscode-uri: 3.1.0
 
@@ -4872,7 +4880,7 @@ snapshots:
       clsx: 2.1.1
       common-ancestor-path: 2.0.0
       cookie: 2.0.1
-      devalue: 5.9.0
+      devalue: 5.9.4
       diff: 9.0.0
       dset: 3.1.4
       es-module-lexer: 2.3.2
@@ -5134,8 +5142,6 @@ snapshots:
   destr@2.0.5: {}
 
   detect-libc@2.1.2: {}
-
-  devalue@5.9.0: {}
 
   devalue@5.9.4: {}
 
@@ -5534,9 +5540,9 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next@26.4.2(typescript@5.9.3):
+  i18next@26.4.2(typescript@6.0.3):
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   iconv-lite@0.6.3:
     dependencies:
@@ -5584,10 +5590,6 @@ snapshots:
   isexe@2.0.0: {}
 
   js-tokens@10.0.0: {}
-
-  js-yaml@4.3.1:
-    dependencies:
-      argparse: 2.0.1
 
   js-yaml@4.3.2:
     dependencies:
@@ -6373,8 +6375,6 @@ snapshots:
       arg: 5.0.2
       sax: 1.6.1
 
-  smol-toml@1.7.1: {}
-
   smol-toml@1.9.0: {}
 
   source-map-js@1.2.1: {}
@@ -6392,13 +6392,13 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  starlight-typedoc@0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@5.9.3)))(typedoc@0.28.20(typescript@5.9.3)):
+  starlight-typedoc@0.23.1(@astrojs/starlight@0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3))(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      '@astrojs/starlight': 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@5.9.3)
+      '@astrojs/starlight': 0.42.4(astro@7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0))(typescript@6.0.3)
       astro: 7.3.5(@types/node@24.13.6)(terser@5.43.1)(yaml@2.9.0)
       github-slugger: 2.0.0
-      typedoc: 0.28.20(typescript@5.9.3)
-      typedoc-plugin-markdown: 4.13.1(typedoc@0.28.20(typescript@5.9.3))
+      typedoc: 0.28.20(typescript@6.0.3)
+      typedoc-plugin-markdown: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
 
   std-env@4.2.0: {}
 
@@ -6535,22 +6535,13 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
 
-  typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@5.9.3)):
+  typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.20(typescript@5.9.3)
+      typedoc: 0.28.20(typescript@6.0.3)
 
-  typedoc-plugin-no-inherit@1.6.1(typedoc@0.28.20(typescript@5.9.3)):
+  typedoc-plugin-no-inherit@1.6.1(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.20(typescript@5.9.3)
-
-  typedoc@0.28.20(typescript@5.9.3):
-    dependencies:
-      '@gerrit0/mini-shiki': 3.23.0
-      lunr: 2.3.9
-      markdown-it: 14.3.0
-      minimatch: 10.2.6
-      typescript: 5.9.3
-      yaml: 2.9.0
+      typedoc: 0.28.20(typescript@6.0.3)
 
   typedoc@0.28.20(typescript@6.0.3):
     dependencies:
@@ -6577,8 +6568,6 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  typescript@5.9.3: {}
 
   typescript@6.0.3: {}
 
@@ -6901,8 +6890,6 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yocto-queue@1.2.2: {}
-
-  zod@4.4.3: {}
 
   zod@4.6.5: {}
 
