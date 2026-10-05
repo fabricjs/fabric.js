@@ -199,7 +199,6 @@ describe('Circle', () => {
       'stroke-miterlimit': 5,
     });
 
-    // @ts-expect-error -- svg circle element is not an HTMLElement
     const oCircle = await Circle.fromElement(elCircle, {});
     expect(oCircle).toBeInstanceOf(Circle);
     expect(oCircle.get('radius')).toBe(10);
@@ -215,14 +214,12 @@ describe('Circle', () => {
 
     {
       const elFaultyCircle = createSVGElement('circle', { r: -10 });
-      // @ts-expect-error -- svg circle element is not an HTMLElement
       const circle = await Circle.fromElement(elFaultyCircle, {});
       expect(circle.radius, 'radius will default to -10').toBe(-10);
     }
 
     {
       const elFaultyCircle = createSVGElement('circle');
-      // @ts-expect-error -- svg circle element is not an HTMLElement
       const circle = await Circle.fromElement(elFaultyCircle, {});
       expect(circle.radius, 'radius will default to 0').toBe(0);
     }

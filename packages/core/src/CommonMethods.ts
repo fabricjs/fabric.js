@@ -56,6 +56,8 @@ export class CommonMethods<EventSpec> extends Observable<EventSpec> {
    * @param {String} property Property name
    * @return {*} value of a property
    */
+  get<K extends keyof this>(property: K): this[K];
+  get(property: string): any;
   get(property: string): any {
     return this[property as keyof this];
   }

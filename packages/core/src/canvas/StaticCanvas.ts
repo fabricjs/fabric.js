@@ -1337,7 +1337,7 @@ export class StaticCanvas<
    *   filter: (object) => object.isContainedWithinObject(myObject) || object.intersectsWithObject(myObject)
    * });
    */
-  toDataURL(options = {} as TDataUrlOptions): string {
+  toDataURL(options: TDataUrlOptions = {}): string {
     const {
       format = 'png',
       quality = 1,
@@ -1353,7 +1353,7 @@ export class StaticCanvas<
       quality,
     );
   }
-  toBlob(options = {} as TDataUrlOptions): Promise<Blob | null> {
+  toBlob(options: TDataUrlOptions = {}): Promise<Blob | null> {
     const {
       format = 'png',
       quality = 1,

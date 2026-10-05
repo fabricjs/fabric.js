@@ -214,12 +214,24 @@ describe('Textbox', () => {
       textbox._unwrappedTextLines.length,
       'there is only one text line',
     ).toBe(1);
-    // @ts-expect-error -- TODO: check if lineIndex should be optional?
     expect(textbox.isEmptyStyles(), 'style is not empty').toBe(false);
     expect(textbox.isEmptyStyles(0), 'style is not empty at line 0').toBe(
       false,
     );
     expect(textbox.isEmptyStyles(1), 'style is empty at line 1').toBe(true);
+  });
+
+  it('isEmptyStyles checks later lines when the line index is omitted', () => {
+    const textbox = new Textbox('first\nsecond', {
+      styles: { 1: { 0: { fill: 'red' } } },
+    });
+
+    expect(textbox.isEmptyStyles()).toBe(false);
+    expect(textbox.isEmptyStyles(0)).toBe(true);
+    expect(textbox.isEmptyStyles(1)).toBe(false);
+
+    textbox.styles = { 1: { 0: {} } };
+    expect(textbox.isEmptyStyles()).toBe(true);
   });
 
   it('isEmptyStyles does not crash on null styles', () => {
@@ -233,6 +245,7 @@ describe('Textbox', () => {
       'there is only one text line',
     ).toBe(1);
     expect(textbox.isEmptyStyles(1), 'style is empty').toBe(true);
+    expect(textbox.isEmptyStyles(), 'all styles are empty').toBe(true);
   });
 
   it('isEmptyStyles alternate lines', () => {
@@ -254,7 +267,6 @@ describe('Textbox', () => {
       textbox._unwrappedTextLines.length,
       'there is only one text line',
     ).toBe(2);
-    // @ts-expect-error -- TODO: check why lineIndex is mandatory but test doesn't provide it
     expect(textbox.isEmptyStyles(), 'style is not empty').toBe(false);
     expect(textbox.isEmptyStyles(0), 'style is not empty at line 0').toBe(
       false,
@@ -941,13 +953,11 @@ describe('Textbox', () => {
       width: 5,
     });
 
-    // @ts-expect-error -- TODO: check why lineIndex is mandatory but test doesn't provide it
     expect(textbox.styleHas('fontSize'), 'style has fontSize').toBe(true);
     expect(
       textbox.styleHas('fontSize', 0),
       'style has fontSize on line 0',
     ).toBe(true);
-    // @ts-expect-error -- TODO: check why lineIndex is mandatory but test doesn't provide it
     expect(textbox.styleHas('fontFamily'), 'style has fontFamily').toBe(true);
     expect(
       textbox.styleHas('fontFamily', 1),

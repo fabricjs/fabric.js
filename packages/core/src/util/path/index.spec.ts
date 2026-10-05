@@ -148,7 +148,6 @@ describe('Path Utils', () => {
 
       const path = new Path('M 100 100 L 200 100 L 170 200 z');
       const oldPath = path.path;
-      // @ts-expect-error -- transformPath requires 3 arguments
       const newPath = transformPath(path.path, [2, 0, 0, 2, 0, 0]);
 
       expect(joinPath(oldPath)).toBe('M 100 100 L 200 100 L 170 200 Z');
