@@ -221,6 +221,19 @@ describe('Textbox', () => {
     expect(textbox.isEmptyStyles(1), 'style is empty at line 1').toBe(true);
   });
 
+  it('isEmptyStyles checks later lines when the line index is omitted', () => {
+    const textbox = new Textbox('first\nsecond', {
+      styles: { 1: { 0: { fill: 'red' } } },
+    });
+
+    expect(textbox.isEmptyStyles()).toBe(false);
+    expect(textbox.isEmptyStyles(0)).toBe(true);
+    expect(textbox.isEmptyStyles(1)).toBe(false);
+
+    textbox.styles = { 1: { 0: {} } };
+    expect(textbox.isEmptyStyles()).toBe(true);
+  });
+
   it('isEmptyStyles does not crash on null styles', () => {
     const textbox = new Textbox('x x', { width: 5 });
 
@@ -232,6 +245,7 @@ describe('Textbox', () => {
       'there is only one text line',
     ).toBe(1);
     expect(textbox.isEmptyStyles(1), 'style is empty').toBe(true);
+    expect(textbox.isEmptyStyles(), 'all styles are empty').toBe(true);
   });
 
   it('isEmptyStyles alternate lines', () => {

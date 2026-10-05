@@ -205,6 +205,9 @@ export class Textbox<
    * @return {Boolean}
    */
   isEmptyStyles(lineIndex?: number): boolean {
+    if (lineIndex === undefined) {
+      return super.isEmptyStyles();
+    }
     if (!this.styles) {
       return true;
     }
@@ -212,9 +215,8 @@ export class Textbox<
       nextLineIndex: number,
       nextOffset: number,
       shouldLimit = false;
-    const map = lineIndex === undefined ? undefined : this._styleMap[lineIndex],
-      mapNextLine =
-        lineIndex === undefined ? undefined : this._styleMap[lineIndex + 1];
+    const map = this._styleMap[lineIndex],
+      mapNextLine = this._styleMap[lineIndex + 1];
     if (map) {
       lineIndex = map.line;
       offset = map.offset;
@@ -224,17 +226,15 @@ export class Textbox<
       shouldLimit = nextLineIndex === lineIndex;
       nextOffset = mapNextLine.offset;
     }
-    const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
-    for (const p1 in obj) {
-      for (const p2 in obj[p1]) {
-        const p2Number = parseInt(p2, 10);
-        if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
-          for (const p3 in obj[p1][p2]) {
-            return false;
-          }
+    const lineStyles = this.styles[lineIndex];
+    for (const charIndex in lineStyles) {
+      const charIndexNumber = parseInt(charIndex, 10);
+      if (
+        charIndexNumber >= offset &&
+        (!shouldLimit || charIndexNumber < nextOffset!)
+      ) {
+        for (const property in lineStyles[charIndex]) {
+          return false;
         }
       }
     }

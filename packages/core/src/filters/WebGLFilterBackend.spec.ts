@@ -7,14 +7,14 @@ import { isJSDOM } from '../../../../vitest.extend';
 import type { TProgramCache, TWebGLProgramCacheItem } from './typedefs';
 
 describe('WebGL', () => {
+  afterEach(() => {
+    config.restoreDefaults();
+  });
+
   it('types shader cache entries as possibly missing', () => {
     expectTypeOf<TProgramCache[string]>().toEqualTypeOf<
       TWebGLProgramCacheItem | undefined
     >();
-  });
-
-  afterEach(() => {
-    config.restoreDefaults();
   });
 
   it('initFilterBackend exists', () => {
