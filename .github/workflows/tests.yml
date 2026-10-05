@@ -36,6 +36,29 @@ jobs:
           name: coverage-vitest-sonarqube
           path: ./.nyc_output/lcov.info
           include-hidden-files: true
+  sonarqube:
+    name: SonarQube analysis
+    needs: vitest-coverage
+    if: >-
+      !cancelled() &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download coverage
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage-vitest-sonarqube
+          path: .nyc_output
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
   vitest-browser:
     name: Vitest tests ${{matrix.browser}}
     runs-on: ubuntu-24.04
