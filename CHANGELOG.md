@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump sharp from 0.35.4 to 0.35.5 [#11129](https://github.com/fabricjs/fabric.js/pull/11129)
 - ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
 - chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
 - chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
