@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump prettier from 3.9.6 to 3.9.9 [#11130](https://github.com/fabricjs/fabric.js/pull/11130)
 - ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
 - chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
 - chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
