@@ -26,7 +26,7 @@
     "codemirror": "6.0.2",
     "fabric": "workspace:*",
     "jsdom": "catalog:",
-    "prettier": "3.9.6",
+    "prettier": "3.9.9",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sharp": "0.35.4",
