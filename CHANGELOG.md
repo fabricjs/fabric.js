@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump eslint from 10.11.0 to 10.12.0 [#11128](https://github.com/fabricjs/fabric.js/pull/11128)
 - ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
 - chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
 - chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
