@@ -117,11 +117,15 @@ export abstract class ITextKeyBehavior<
       return;
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
+    let shouldRenderAll: boolean;
     if (e.keyCode in keyMap) {
+      shouldRenderAll = keyMap[e.keyCode] !== 'cmdAll';
       (this[keyMap[e.keyCode] as keyof this] as (arg: KeyboardEvent) => void)(
         e,
       );
     } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
+      // cmdAll already draws the selection on the upper canvas.
+      shouldRenderAll = this.ctrlKeysMapDown[e.keyCode] !== 'cmdAll';
       (
         this[this.ctrlKeysMapDown[e.keyCode] as keyof this] as (
           arg: KeyboardEvent,
@@ -137,7 +141,7 @@ export abstract class ITextKeyBehavior<
       this.inCompositionMode = false;
       this.clearContextTop();
       this.renderCursorOrSelection();
-    } else {
+    } else if (shouldRenderAll) {
       this.canvas && this.canvas.requestRenderAll();
     }
   }
