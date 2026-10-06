@@ -21,7 +21,7 @@
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
-    "vite": "8.3.1"
+    "vite": "8.3.2"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
