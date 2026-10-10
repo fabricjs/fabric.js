@@ -2,6 +2,7 @@
 
 ## [next]
 
+- [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
 - chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
 - chore(deps): update transitive markdown-it to 14.3.1 and source-map-js to 1.2.2
 - chore(deps): update fast-uri to 3.1.8 and sharp to 0.35.5
