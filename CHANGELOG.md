@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump sharp from 0.35.4 to 0.35.5 in /packages/website in the npm_and_yarn group across 1 directory [#11133](https://github.com/fabricjs/fabric.js/pull/11133)
 - fix(): Textbox resize cursor ignores lockScalingX [#11114](https://github.com/fabricjs/fabric.js/pull/11114)
 - ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
 - chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
