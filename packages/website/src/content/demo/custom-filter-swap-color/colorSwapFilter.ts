@@ -3,7 +3,7 @@ import { filters, Color, type T2DPipelineState } from 'fabric';
 type SwapColorOwnProps = {
   colorSource: string;
   colorDestination: string;
-}
+};
 
 /**
  * Fragment source for the SwapColor program
@@ -34,8 +34,10 @@ const fragmentSource = `
  * object.filters.push(filter);
  * object.applyFilters();
  */
-export class SwapColor extends filters.BaseFilter<'SwapColor', SwapColorOwnProps> {
-
+export class SwapColor extends filters.BaseFilter<
+  'SwapColor',
+  SwapColorOwnProps
+> {
   /**
    * Filter type
    * @param {String} type
@@ -46,7 +48,7 @@ export class SwapColor extends filters.BaseFilter<'SwapColor', SwapColorOwnProps
   static defaults = {
     colorSource: 'rgb(255, 0, 0)',
     colorDestination: 'rgb(0, 255, 0)',
-  }
+  };
 
   /**
    * SwapColor colorSource, a css color
@@ -54,7 +56,7 @@ export class SwapColor extends filters.BaseFilter<'SwapColor', SwapColorOwnProps
    * @default
    */
   declare colorSource: string;
-    
+
   /**
    * SwapColor colorSource, a css color
    * @param {String} colorDestination
@@ -63,7 +65,7 @@ export class SwapColor extends filters.BaseFilter<'SwapColor', SwapColorOwnProps
   declare colorDestination: string;
 
   static uniformLocations = ['uColorSource', 'uColorDestination'];
- 
+
   protected getFragmentSource(): string {
     return fragmentSource;
   }
@@ -78,15 +80,18 @@ export class SwapColor extends filters.BaseFilter<'SwapColor', SwapColorOwnProps
     const source = new Color(this.colorSource).getSource(),
       destination = new Color(this.colorDestination).getSource();
     for (let i = 0; i < data.length; i += 4) {
-        if (data[i] === source[0] && data[i + 1] === source[1] && data[i + 2] === source[2]) {
-            data[i] = destination[0];
-            data[i + 1] = destination[1];
-            data[i + 2] = destination[2];
-        }
+      if (
+        data[i] === source[0] &&
+        data[i + 1] === source[1] &&
+        data[i + 2] === source[2]
+      ) {
+        data[i] = destination[0];
+        data[i + 1] = destination[1];
+        data[i + 2] = destination[2];
+      }
     }
   }
-  
-  
+
   /**
    * Send data from this filter to its shader program's uniforms.
    *
@@ -95,7 +100,7 @@ export class SwapColor extends filters.BaseFilter<'SwapColor', SwapColorOwnProps
    */
   sendUniformData(gl, uniformLocations) {
     var source = new Color(this.colorSource).getSource(),
-        destination = new Color(this.colorDestination).getSource();
+      destination = new Color(this.colorDestination).getSource();
     source[0] /= 255;
     source[1] /= 255;
     source[2] /= 255;

@@ -13,7 +13,7 @@ import type {
   TPointerEventInfo,
   TPointerEvent,
 } from '../EventTypeDefs.ts';
-import { getFabricDocument, IText, version } from '../../../../fabric';
+import { getFabricDocument, IText, Textbox, version } from '../../../../fabric';
 import { createPointerEvent } from '../../../../test/utils';
 
 describe('Canvas events mixin', () => {
@@ -1670,6 +1670,29 @@ describe('Canvas events mixin', () => {
         canvas.upperCanvasEl.style.cursor,
         `${corner} is ${expectedLockSkewingX[corner]} for lockSkewingX`,
       ).toBe(expectedLockSkewingX[corner]);
+    }
+  });
+
+  it('textbox resize controls cursor is not affected by lockScalingX', () => {
+    const target = new Textbox('text', { width: 100, lockScalingX: true });
+
+    canvas.add(target);
+    canvas.setActiveObject(target);
+    target.setCoords();
+
+    const expected: Record<string, string> = {
+      ml: 'w-resize',
+      mr: 'e-resize',
+    };
+
+    for (const [corner, cursor] of Object.entries(expected)) {
+      const e = createPointerEvent({
+        clientX: target.oCoords[corner].x,
+        clientY: target.oCoords[corner].y,
+      });
+
+      canvas._setCursorFromEvent(e, target);
+      expect(canvas.upperCanvasEl.style.cursor, corner).toBe(cursor);
     }
   });
 
