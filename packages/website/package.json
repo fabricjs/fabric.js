@@ -28,7 +28,7 @@
     "jsdom": "catalog:",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "starlight-typedoc": "0.23.1",
     "thememirror": "2.0.1",
     "typedoc-plugin-no-inherit": "1.6.1",
