@@ -5,4 +5,4 @@
  * @return {Number} random value (between min and max)
  */
 export const getRandomInt = (min: number, max: number): number =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+  Math.floor(Math.random() * (max - min + 1)) + min; // NOSONAR: drawing randomness.

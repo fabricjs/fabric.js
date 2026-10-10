@@ -1,22 +1,22 @@
 function add() {
   const { width, height } = canvas;
   var red = new fabric.Rect({
-    top: Math.random() * (height - 25),
-    left: Math.random() * (width - 40),
+    top: Math.random() * (height - 25), // NOSONAR: demo coordinates.
+    left: Math.random() * (width - 40), // NOSONAR: demo coordinates.
     width: 80,
     height: 50,
     fill: 'red',
   });
   var blue = new fabric.Rect({
-    top: Math.random() * (height - 35),
-    left: Math.random() * (width - 25),
+    top: Math.random() * (height - 35), // NOSONAR: demo coordinates.
+    left: Math.random() * (width - 25), // NOSONAR: demo coordinates.
     width: 50,
     height: 70,
     fill: 'blue',
   });
   var green = new fabric.Rect({
-    top: Math.random() * (height - 30),
-    left: Math.random() * (width - 30),
+    top: Math.random() * (height - 30), // NOSONAR: demo coordinates.
+    left: Math.random() * (width - 30), // NOSONAR: demo coordinates.
     width: 60,
     height: 60,
     fill: 'green',
