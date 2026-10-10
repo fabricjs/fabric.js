@@ -3,6 +3,10 @@ packages:
 
 savePrefix: ''
 
+overrides:
+  # Expressive Code still uses postcss-nested 6, which requests the vulnerable parser 6.
+  'postcss-nested@6>postcss-selector-parser': 7.1.6
+
 catalog:
   '@playwright/test': 1.63.0
   '@types/jsdom': 21.1.7

@@ -55,7 +55,9 @@ export const CodeEditor = ({
       ];
       // when click 'run me' button, makes code string change to trigger 'setCode' function.
       if (isClickByRunMeButton)
-        preamble.push(`const randomValue = ${Math.random()};`);
+        preamble.push(
+          `const randomValue = ${Math.random()};`, // NOSONAR: rerun marker only.
+        );
       const exec = `try {
           ${newcode.join('\n')}
           window.canvasesId['${canvasId}'] = canvas;

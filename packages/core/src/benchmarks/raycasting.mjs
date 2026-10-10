@@ -125,7 +125,13 @@ const rect2 = new FabricObject({
 
 const points = Array(1_000_000)
   .fill(null)
-  .map(() => new Point(Math.random() * 40, Math.random() * 40));
+  .map(
+    () =>
+      new Point(
+        Math.random() * 40, // NOSONAR: benchmark coordinates.
+        Math.random() * 40, // NOSONAR: benchmark coordinates.
+      ),
+  );
 
 const benchmark = (callback) => {
   const start = Date.now();
