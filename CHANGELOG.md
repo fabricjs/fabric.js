@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): update transitive markdown-it to 14.3.1 and source-map-js to 1.2.2
 - chore(deps): update fast-uri to 3.1.8 and sharp to 0.35.5
 - fix(): Textbox resize cursor ignores lockScalingX [#11114](https://github.com/fabricjs/fabric.js/pull/11114)
 - ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
