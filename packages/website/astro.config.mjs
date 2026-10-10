@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
-import react from "@astrojs/react";
-import starlight from "@astrojs/starlight";
+import react from '@astrojs/react';
+import starlight from '@astrojs/starlight';
 import starlightTypeDoc from 'starlight-typedoc';
 
 import sitemap from '@astrojs/sitemap';
@@ -13,51 +13,56 @@ export default defineConfig({
     '/fabric-object-caching': '/docs/fabric-object-caching',
     '/docs/old-docs/fabric-object-caching': '/docs/fabric-object-caching',
   },
-  integrations: [starlight({
-    favicon: '/favicon.ico',
-    title: 'Docs and Guides',
-    disable404Route: true, 
-    logo: {
-      src: './src/assets/logo.svg',
-    },
-    components: {
-      Header: './src/components/Header/HeaderWithSearch.astro',
-      PageTitle: './src/components/PageTitleDocs/PageTitle.astro',
-    },
-    sidebar: [
-      {
-        label: 'Docs',
-        collapsed: true,
-        items: [{ autogenerate: { directory: 'docs' } }],
+  integrations: [
+    starlight({
+      favicon: '/favicon.ico',
+      title: 'Docs and Guides',
+      disable404Route: true,
+      logo: {
+        src: './src/assets/logo.svg',
       },
-      {
-        label: 'Api',
-        collapsed: true,
-        items: [{ autogenerate: { directory: 'api' } }],
+      components: {
+        Header: './src/components/Header/HeaderWithSearch.astro',
+        PageTitle: './src/components/PageTitleDocs/PageTitle.astro',
       },
-      {
-        label: 'Fabric.js v5',
-        link: 'https://fabric5.fabricjs.com/docs',
-      }
-    ],
-    customCss: [
-      // Relative path to your custom CSS file
-      './src/layouts/colorvars.css',
-    ],
-    plugins: [
-      starlightTypeDoc({
-        entryPoints: ['../../fabric.ts'],
-        tsconfig: './typedoc.config.json',
-        typeDoc: {
-          plugin: ['typedoc-plugin-no-inherit'],
-          readme: 'none',
-          gitRemote: 'https://github.com/fabricjs/fabric.js/blob',
-          entryFileName: 'index.md',
-          includeVersion: true,
-          sourceLinkExternal: true,
-          sourceLinkTemplate: 'https://github.com/fabricjs/fabric.js/blob/{gitRevision}/{path}#L{line}',
+      sidebar: [
+        {
+          label: 'Docs',
+          collapsed: true,
+          items: [{ autogenerate: { directory: 'docs' } }],
         },
-      }),
-    ],
-  }), react(), sitemap()],
+        {
+          label: 'Api',
+          collapsed: true,
+          items: [{ autogenerate: { directory: 'api' } }],
+        },
+        {
+          label: 'Fabric.js v5',
+          link: 'https://fabric5.fabricjs.com/docs',
+        },
+      ],
+      customCss: [
+        // Relative path to your custom CSS file
+        './src/layouts/colorvars.css',
+      ],
+      plugins: [
+        starlightTypeDoc({
+          entryPoints: ['../../fabric.ts'],
+          tsconfig: './typedoc.config.json',
+          typeDoc: {
+            plugin: ['typedoc-plugin-no-inherit'],
+            readme: 'none',
+            gitRemote: 'https://github.com/fabricjs/fabric.js/blob',
+            entryFileName: 'index.md',
+            includeVersion: true,
+            sourceLinkExternal: true,
+            sourceLinkTemplate:
+              'https://github.com/fabricjs/fabric.js/blob/{gitRevision}/{path}#L{line}',
+          },
+        }),
+      ],
+    }),
+    react(),
+    sitemap(),
+  ],
 });

@@ -18,8 +18,7 @@ class Cross extends fabric.Object {
     const interval = 2;
 
     if (this.h2 >= 30 && this.h2 <= 100) {
-      const actualInterval =
-        this.animDirection === 'up' ? interval : -interval;
+      const actualInterval = this.animDirection === 'up' ? interval : -interval;
       this.h2 += actualInterval;
       this.w1 += actualInterval;
     }
@@ -62,7 +61,7 @@ canvas.add(
   new Cross({
     top: 450,
     left: 400,
-  })
+  }),
 );
 
 requestAnimationFrame(function animate() {
@@ -70,4 +69,3 @@ requestAnimationFrame(function animate() {
   canvas.requestRenderAll();
   requestAnimationFrame(animate);
 });
-
