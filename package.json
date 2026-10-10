@@ -85,6 +85,7 @@
     "es-toolkit": "1.52.0",
     "eslint": "10.11.0",
     "eslint-config-prettier": "10.1.8",
+    "fast-check": "4.10.2",
     "husky": "9.1.7",
     "lint-staged": "17.5.1",
     "oxfmt": "0.68.0",
