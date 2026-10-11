@@ -512,7 +512,7 @@ describe('fabric.Parser', () => {
     ] as const;
 
     const tests = tagNames.map(async (tagName) => {
-      const opacityValue = Math.random().toFixed(2);
+      const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
       const el = createSVGElement(tagName.toLowerCase(), {
         opacity: opacityValue,
       });
@@ -528,7 +528,7 @@ describe('fabric.Parser', () => {
   });
 
   it('fill-opacity attribute with fill attribute', async () => {
-    const opacityValue = Math.random().toFixed(2);
+    const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
     const el = createSVGElement('rect', {
       'fill-opacity': opacityValue,
       fill: '#FF0000',
@@ -540,7 +540,7 @@ describe('fabric.Parser', () => {
   });
 
   it('fill-opacity attribute without fill attribute', async () => {
-    const opacityValue = Math.random().toFixed(2);
+    const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
     const el = createSVGElement('rect', {
       'fill-opacity': opacityValue,
     });
@@ -551,7 +551,7 @@ describe('fabric.Parser', () => {
   });
 
   it('fill-opacity attribute with fill none', async () => {
-    const opacityValue = Math.random().toFixed(2);
+    const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
     const el = createSVGElement('rect', {
       'fill-opacity': opacityValue,
       fill: 'none',
@@ -563,7 +563,7 @@ describe('fabric.Parser', () => {
   });
 
   it('stroke-opacity attribute with stroke attribute', async () => {
-    const opacityValue = Math.random().toFixed(2);
+    const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
     const el = createSVGElement('rect', {
       'stroke-opacity': opacityValue,
       stroke: '#FF0000',
@@ -575,7 +575,7 @@ describe('fabric.Parser', () => {
   });
 
   it('stroke-opacity attribute without stroke attribute', async () => {
-    const opacityValue = Math.random().toFixed(2);
+    const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
     const el = createSVGElement('rect', {
       'stroke-opacity': opacityValue,
     });
@@ -586,7 +586,7 @@ describe('fabric.Parser', () => {
   });
 
   it('stroke-opacity attribute with stroke none', async () => {
-    const opacityValue = Math.random().toFixed(2);
+    const opacityValue = Math.random().toFixed(2); // NOSONAR: test opacity.
     const el = createSVGElement('rect', {
       'stroke-opacity': opacityValue,
       stroke: 'none',

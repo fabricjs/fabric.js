@@ -24,7 +24,6 @@ animateBtn.onclick = function () {
         animateBtn.disabled = false;
       },
       easing: fabric.util.ease[document.getElementById('easing').value],
-    }
+    },
   );
 };
-

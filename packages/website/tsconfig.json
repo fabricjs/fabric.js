@@ -4,7 +4,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "strictNullChecks": true,
-    "allowJs": true,
+    "allowJs": true
   },
-  "exclude": ["fabric.js", "src/content/", "dist", "**/*.astro"],
+  "exclude": ["fabric.js", "src/content/", "dist", "**/*.astro"]
 }

@@ -10,8 +10,10 @@ const canvas = new fabric.Canvas(canvasEl, {
 //   } from 'fabric/extensions';
 //
 // In this editor they are pre-imported for you as `extensions`.
-const { createImageCroppingControls, createImageResizeControlsWithScaleToCover } =
-  extensions;
+const {
+  createImageCroppingControls,
+  createImageResizeControlsWithScaleToCover,
+} = extensions;
 
 const shared = {
   scaleX: 0.45,
@@ -78,7 +80,12 @@ Promise.all([
     label('createImageCroppingControls()', 210, 380, '#7c3aed'),
     label('drag any handle to move the crop window', 210, 404, '#64748b'),
     label('createImageResizeControlsWithScaleToCover()', 590, 380, '#0284c7'),
-    label('drag a side handle to resize, corners still scale', 590, 404, '#64748b'),
+    label(
+      'drag a side handle to resize, corners still scale',
+      590,
+      404,
+      '#64748b',
+    ),
   );
   canvas.setActiveObject(cropped);
 });

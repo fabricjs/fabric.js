@@ -8,13 +8,13 @@ tags: ['FabricImage', 'pdf']
 
 import { InputEventAttacher } from './useLoader';
 
-<script is:inline src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script
+  is:inline
+  src="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js"
+></script>
+
 <div>
-<input
-    id="pdfInput"
-    type="file"
-    accept="application/pdf"
-/>
+  <input id="pdfInput" type="file" accept="application/pdf" />
 </div>
 <canvas id="c" width="500" height="620" />
 <InputEventAttacher client:idle />

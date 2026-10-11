@@ -32,7 +32,7 @@ image's controls — twelve handles in three groups:
   the L-shaped bracket actually drawn on screen, instead of the usual square
   around the control point, so they do not steal clicks from the side handles.
 - `tls`, `trs`, `bls`, `brs` — these do not crop. They scale the source image
-  *inside* the crop window, keeping the window itself fixed.
+  _inside_ the crop window, keeping the window itself fixed.
 
 `createImageResizeControlsWithScaleToCover()` is the smaller, more targeted set:
 just `mle`, `mre`, `mte`, `mbe`. These resize the visible rectangle, and once
@@ -79,7 +79,6 @@ source image so you can see what you are hiding, turns dragging into panning of
 the crop window, and installs another double-click handler to undo all of it.
 
 It is a packaged crop mode experience meant to be a baseline and an inspiration to build yours.
-
 
 **Double-click the dragon** to toggle crop mode. The full source image appears at
 50% opacity with a border around its real bounds, the handles become the crop

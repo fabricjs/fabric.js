@@ -73,12 +73,14 @@ export const eventGroups = [
     id: 'all',
     enabled: false,
     events: [...canvasEvents, ...objectsEvents],
-  }, {
+  },
+  {
     label: 'Canvas events',
     enabled: true,
     id: 'canvas',
     events: canvasEvents,
-  }, {
+  },
+  {
     label: 'High volume events',
     id: 'move',
     enabled: false,
@@ -91,8 +93,8 @@ export const eventGroups = [
       'rotating',
       'skewing',
       'resizing',
-      'mousemove', 
-      'mousemove:before', 
+      'mousemove',
+      'mousemove:before',
       'mouse:move',
       'mouse:move:before',
       'object:moving',
@@ -101,20 +103,28 @@ export const eventGroups = [
       'object:skewing',
       'object:resizing',
     ],
-  }];
+  },
+];
 
 export const EventCheckbox = memo(({ eventName, onChange, checked }) => {
-
   const labelId = `chk_${eventName}`;
 
-  const onChangeWrapped = useCallback((e) => {
-    const checked = e.target.checked;
-    onChange && onChange(eventName, checked);
-  }, [onChange])
+  const onChangeWrapped = useCallback(
+    (e) => {
+      const checked = e.target.checked;
+      onChange && onChange(eventName, checked);
+    },
+    [onChange],
+  );
 
   return (
     <div>
-      <input type="checkbox" checked={checked} onChange={onChangeWrapped} id={labelId} />
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChangeWrapped}
+        id={labelId}
+      />
       <label htmlFor={labelId}>{eventName}</label>
     </div>
   );
@@ -123,7 +133,7 @@ export const EventCheckbox = memo(({ eventName, onChange, checked }) => {
 export const LogEntry = memo(({ logEntry, color }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className='log-entry' style={{ color }}>
+    <div className="log-entry" style={{ color }}>
       <button onClick={() => setOpen(!open)}>{open ? '-' : '+'}</button>
       <strong>{logEntry.eventName}</strong>
       {open && <code>{logEntry.code}</code>}
@@ -132,21 +142,31 @@ export const LogEntry = memo(({ logEntry, color }) => {
   );
 });
 
-export const EventGroupCheckbox = memo(({ groupName, label, onChange, initialChecked }) => {
+export const EventGroupCheckbox = memo(
+  ({ groupName, label, onChange, initialChecked }) => {
     const labelId = `grp_${groupName}`;
 
     const [checked, setChecked] = useState(initialChecked);
 
-    const onChangeWrapped = useCallback((e) => {
-      const checked = e.target.checked;
-      setChecked(checked);
-      onChange && onChange(groupName, checked);
-    }, [onChange, checked]);
-  
+    const onChangeWrapped = useCallback(
+      (e) => {
+        const checked = e.target.checked;
+        setChecked(checked);
+        onChange && onChange(groupName, checked);
+      },
+      [onChange, checked],
+    );
+
     return (
       <label htmlFor={labelId}>
-        <input type="checkbox" onChange={onChangeWrapped} id={labelId} checked={checked} />
+        <input
+          type="checkbox"
+          onChange={onChangeWrapped}
+          id={labelId}
+          checked={checked}
+        />
         {label}
       </label>
     );
-});
+  },
+);

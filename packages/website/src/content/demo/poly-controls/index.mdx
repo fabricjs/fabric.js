@@ -45,7 +45,7 @@ var absolutePoint = fabric.util.transformPoint(
     x: fabricObject.points[anchorIndex].x - fabricObject.pathOffset.x,
     y: fabricObject.points[anchorIndex].y - fabricObject.pathOffset.y,
   },
-  fabricObject.calcTransformMatrix()
+  fabricObject.calcTransformMatrix(),
 );
 ```
 
@@ -56,8 +56,12 @@ Then we swap the dragged point with the new one, we recalculate the width/height
 Now to keep its position steady, we want to know the point that represent the anchor point, in what position is now relative to polygon size.
 
 ```javascript
-var newX = (fabricObject.points[anchorIndex].x - fabricObject.pathOffset.x) / fabricObject.width,
-  newY = (fabricObject.points[anchorIndex].y - fabricObject.pathOffset.y) / fabricObject.height;
+var newX =
+    (fabricObject.points[anchorIndex].x - fabricObject.pathOffset.x) /
+    fabricObject.width,
+  newY =
+    (fabricObject.points[anchorIndex].y - fabricObject.pathOffset.y) /
+    fabricObject.height;
 ```
 
 Now newX and newY represent the point position with a range from -0.5 to 0.5 for X and Y.

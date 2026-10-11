@@ -86,6 +86,24 @@ export function scalingIsForbidden(
 const scaleMap = ['e', 'se', 's', 'sw', 'w', 'nw', 'n', 'ne', 'e'];
 
 /**
+ * return the correct resize cursor for the control position, regardless of scaling locks.
+ * Used by controls that change dimensions (e.g. width) instead of scale.
+ * @param {Event} eventData the javascript event that is causing the resize
+ * @param {Control} control the control that is interested in the action
+ * @param {FabricObject} fabricObject the fabric object that is interested in the action
+ * @return {String} a valid css string for the cursor
+ */
+export const resizeCursorStyleHandler: ControlCursorCallback = (
+  eventData,
+  control,
+  fabricObject,
+  coord,
+) => {
+  const n = findCornerQuadrant(fabricObject, control, coord);
+  return `${scaleMap[n]}-resize`;
+};
+
+/**
  * return the correct cursor style for the scale action
  * @param {Event} eventData the javascript event that is causing the scale
  * @param {Control} control the control that is interested in the action
@@ -108,8 +126,7 @@ export const scaleCursorStyleHandler: ControlCursorCallback = (
   if (scalingIsForbidden(fabricObject, by, scaleProportionally)) {
     return NOT_ALLOWED_CURSOR;
   }
-  const n = findCornerQuadrant(fabricObject, control, coord);
-  return `${scaleMap[n]}-resize`;
+  return resizeCursorStyleHandler(eventData, control, fabricObject, coord);
 };
 
 /**

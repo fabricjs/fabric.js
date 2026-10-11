@@ -85,5 +85,5 @@ function rnd(start: number, end?: number) {
     end = start;
     start = 0;
   }
-  return Math.floor(Math.random() * (end - start)) + start;
+  return Math.floor(Math.random() * (end - start)) + start; // NOSONAR: test data.
 }

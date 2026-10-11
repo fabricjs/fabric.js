@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import match from 'micromatch';
+import picomatch from 'picomatch';
 import path from 'path';
 import { getGitInfo } from '../scripts/git.mjs';
 import { compact, flatten } from 'es-toolkit/compat';
@@ -12,7 +12,7 @@ function bufferToBase64DataUrl(buffer, mimeType) {
 }
 
 function globToRegex(glob, opts) {
-  return match.makeRe(glob, opts);
+  return picomatch.makeRe(glob, opts);
 }
 
 function parseIgnoreFile(file) {
