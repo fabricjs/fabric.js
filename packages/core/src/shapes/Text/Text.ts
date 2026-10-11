@@ -690,7 +690,7 @@ export class FabricText<
    */
   _setTextStyles(
     ctx: CanvasRenderingContext2D,
-    charStyle?: any,
+    charStyle?: TextStyleDeclaration,
     forMeasuring?: boolean,
   ) {
     ctx.textBaseline = 'alphabetic';
@@ -1186,7 +1186,7 @@ export class FabricText<
   _renderChars(
     method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
-    line: Array<any>,
+    line: string[],
     left: number,
     top: number,
     lineIndex: number,

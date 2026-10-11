@@ -7,7 +7,6 @@
     "moduleDetection": "force",
     "strict": true,
     "sourceMap": true,
-    "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "allowSyntheticDefaultImports": true,
     // Override the root source aliases so Playwright loads the built packages.

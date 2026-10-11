@@ -1,4 +1,5 @@
-import { FabricNamespace } from './tests/types';
+import type { Canvas, FabricObject } from 'fabric';
+import type { FabricNamespace } from './tests/types';
 
 declare global {
   var canvasMap: Map<HTMLCanvasElement, Canvas>;
