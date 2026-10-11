@@ -20,7 +20,6 @@ It checks the approved head and reviewer write access, then rechecks the PR and
 approval before pushing. An explicit head-SHA lease rejects concurrent branch
 updates. Fork and Dependabot PRs are excluded.
 
-Run `node --test .github/scripts/resolve-changelog-conflict.test.mjs` locally.
 The workflow needs to be on `master` for a live approval-event trial. Bot pushes
 using `GITHUB_TOKEN` do not normally trigger other workflows; verify the project's
 CI requirements during that trial.
