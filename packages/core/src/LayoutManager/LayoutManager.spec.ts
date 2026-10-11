@@ -1,6 +1,7 @@
 import type { TModificationEvents } from '../EventTypeDefs';
 import { Point } from '../Point';
 import { StaticCanvas } from '../canvas/StaticCanvas';
+import { Canvas } from '../canvas/Canvas';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/Rect';
@@ -16,7 +17,7 @@ import {
 } from './constants';
 import type { LayoutContext, LayoutResult, StrictLayoutContext } from './types';
 
-import { describe, expect, it, beforeEach, test, vi } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, test, vi } from 'vitest';
 import type { MockInstance } from 'vitest';
 
 describe('Layout Manager', () => {
@@ -27,7 +28,7 @@ describe('Layout Manager', () => {
   describe('Lifecycle', () => {
     test.each([true, false])('performLayout with result of %s', (result) => {
       const lifecycle: MockInstance[] = [];
-      const layoutResult: LayoutResult | undefined = result
+      const layoutResult: Required<LayoutResult> | undefined = result
         ? {
             result: { center: new Point(), size: new Point() },
             prevCenter: new Point(),
@@ -136,9 +137,13 @@ describe('Layout Manager', () => {
         const object = new FabricObject();
         const on = vi.spyOn(object, 'on').mockImplementation(() => {
           lifecycle.push(on);
+          return vi.fn<VoidFunction>();
         });
 
-        manager['subscribe'](object, {});
+        manager['subscribe'](object, {
+          target: new Group(),
+          targets: [object],
+        });
 
         expect(lifecycle).toEqual([
           unsubscribe,
@@ -152,7 +157,8 @@ describe('Layout Manager', () => {
         const performLayout = vi.spyOn(manager, 'performLayout');
         const object = new FabricObject();
         const target = new Group([object], { layoutManager: manager });
-        manager['subscribe'](object, { target });
+        const context = { target, targets: [object] };
+        manager['subscribe'](object, context);
         performLayout.mockClear();
         const event = { foo: 'bar' };
         triggers.forEach((trigger) => object.fire(trigger, event));
@@ -177,7 +183,7 @@ describe('Layout Manager', () => {
 
         performLayout.mockClear();
         expect(manager['_subscriptions'].get(object)).toBeDefined();
-        manager['unsubscribe'](object, { target });
+        manager['unsubscribe'](object, context);
         expect(manager['_subscriptions'].get(object)).toBeUndefined();
         triggers.forEach((trigger) => object.fire(trigger, event));
         expect(performLayout).not.toHaveBeenCalled();
@@ -187,6 +193,7 @@ describe('Layout Manager', () => {
       let manager: LayoutManager;
       let targets: FabricObject[];
       let target: Group;
+      let canvas: Canvas;
       let context: StrictLayoutContext;
       beforeEach(() => {
         manager = new LayoutManager();
@@ -196,9 +203,11 @@ describe('Layout Manager', () => {
           new FabricObject(),
         ];
         target = new Group(targets, { layoutManager: manager });
-        target.canvas = { fire: vi.fn() };
+        canvas = new Canvas(undefined, { renderOnAddRemove: false });
+        target.canvas = canvas;
 
         vi.spyOn(target, 'fire');
+        vi.spyOn(canvas, 'fire');
 
         context = {
           bubbles: true,
@@ -212,6 +221,7 @@ describe('Layout Manager', () => {
           },
         };
       });
+      afterEach(() => canvas.dispose());
       it(`initialization trigger should subscribe targets and call target hooks`, () => {
         vi.spyOn(manager, 'subscribe');
         context.type = LAYOUT_TYPE_INITIALIZATION;
@@ -221,7 +231,7 @@ describe('Layout Manager', () => {
         expect(target.fire).toBeCalledWith('layout:before', {
           context,
         });
-        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+        expect(canvas.fire).toBeCalledWith('object:layout:before', {
           context,
           target,
         });
@@ -238,7 +248,7 @@ describe('Layout Manager', () => {
         expect(target.fire).toBeCalledWith('layout:before', {
           context,
         });
-        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+        expect(canvas.fire).toBeCalledWith('object:layout:before', {
           context,
           target,
         });
@@ -252,7 +262,7 @@ describe('Layout Manager', () => {
         expect(target.fire).toBeCalledWith('layout:before', {
           context,
         });
-        expect(target.canvas.fire).toBeCalledWith('object:layout:before', {
+        expect(canvas.fire).toBeCalledWith('object:layout:before', {
           context,
           target,
         });
@@ -303,7 +313,7 @@ describe('Layout Manager', () => {
     test.each([
       { type: LAYOUT_TYPE_INITIALIZATION, targets: [] },
       { type: LAYOUT_TYPE_IMPERATIVE },
-    ] as const)('$type trigger', (options) => {
+    ] satisfies Partial<LayoutContext>[])('$type trigger', (options) => {
       const manager = new LayoutManager();
       vi.spyOn(manager.strategy, 'calcLayoutResult').mockReturnValue({
         center: new Point(50, 100),
@@ -347,7 +357,7 @@ describe('Layout Manager', () => {
         type: typeof LAYOUT_TYPE_INITIALIZATION | typeof LAYOUT_TYPE_ADDED;
       } & Partial<LayoutContext>,
     ) => {
-      const lifecycle: vi.SpyInstance[] = [];
+      const lifecycle: MockInstance[] = [];
 
       const targets = [new Group([new FabricObject()]), new FabricObject()];
       const target = new Group(targets, {
@@ -355,6 +365,7 @@ describe('Layout Manager', () => {
       });
       const targetSet = vi.spyOn(target, 'set').mockImplementation(() => {
         lifecycle.push(targetSet);
+        return target;
       });
       const targetSetCoords = vi
         .spyOn(target, 'setCoords')
@@ -475,8 +486,8 @@ describe('Layout Manager', () => {
   describe('onAfterLayout', () => {
     it.each([true, false])(
       'should call target hooks with bubbling %s',
-      (bubbles) => {
-        const lifecycle: vi.SpyInstance[] = [];
+      async (bubbles) => {
+        const lifecycle: MockInstance[] = [];
         const manager = new LayoutManager();
         const targets = [
           new Group([new FabricObject()], { layoutManager: manager }),
@@ -494,8 +505,9 @@ describe('Layout Manager', () => {
             lifecycle.push(parentPerformLayout);
           });
 
-        const canvasFire = vi.fn();
-        target.canvas = { fire: canvasFire };
+        const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+        const canvasFire = vi.spyOn(canvas, 'fire');
+        target.canvas = canvas;
 
         const context: StrictLayoutContext = {
           bubbles,
@@ -538,6 +550,7 @@ describe('Layout Manager', () => {
               path: [target],
             },
           ]);
+        await canvas.dispose();
       },
     );
 
@@ -631,7 +644,7 @@ describe('Layout Manager', () => {
         },
         result: expect.any(Object),
       });
-      expect(canvas.fire.mock.calls.length).toBe(2);
+      expect(canvas.fire).toHaveBeenCalledTimes(2);
     });
     it('fires canvas events for a perform layout deep: true', () => {
       const manager = new LayoutManager();
@@ -732,7 +745,7 @@ describe('Layout Manager', () => {
         },
         result: expect.any(Object),
       });
-      expect(canvas.fire.mock.calls.length).toBe(8);
+      expect(canvas.fire).toHaveBeenCalledTimes(8);
     });
   });
 
