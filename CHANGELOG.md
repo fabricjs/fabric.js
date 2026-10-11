@@ -2,6 +2,8 @@
 
 ## [next]
 
+- fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
 - fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
 - [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
 - chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
