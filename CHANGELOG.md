@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(brushes): respect zoom and pan when limiting free drawing to the  canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
 - fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
 - [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
 - chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
