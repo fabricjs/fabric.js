@@ -520,7 +520,6 @@ describe('fabric.Parser', () => {
       const module = await import('../../../../fabric');
       const fabricClass = module[tagName];
 
-      // @ts-expect-error -- TODO: not all elements fromElement accept SVGElement as a type, but should it? currently it accepts only HTMLElement
       const obj = await fabricClass.fromElement(el, {});
       expect(obj.opacity).toBe(parseFloat(opacityValue));
     });

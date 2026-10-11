@@ -177,10 +177,7 @@ describe('Ellipse', () => {
       'stroke-miterlimit': 5,
     });
 
-    const oEllipse = await Ellipse.fromElement(
-      elEllipse as unknown as HTMLElement,
-      {},
-    );
+    const oEllipse = await Ellipse.fromElement(elEllipse, {});
 
     expect(oEllipse).toBeInstanceOf(Ellipse);
     expect(oEllipse.get('rx')).toBe(5);
