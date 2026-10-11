@@ -31,13 +31,10 @@ jobs:
           ref: master
           persist-credentials: false
           sparse-checkout: .github/scripts
-      - name: Resolve changelog additions
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6.4.1
+      - name: Merge master with union for the changelog
         env:
-          CHANGELOG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          script: |
-            const { resolveChangelogConflict } = await import(
-              `${process.env.GITHUB_WORKSPACE}/.github/scripts/resolve-changelog-conflict.mjs`
-            );
-            await resolveChangelogConflict({ github, context, core });
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_ID: ${{ github.event.review.id }}
+        run: bash .github/scripts/resolve-changelog-conflict.sh

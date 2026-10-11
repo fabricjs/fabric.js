@@ -1,105 +1,20 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { test } from 'node:test';
-import {
-  createChangelogMerge,
-  mergeChangelogAdditions,
-  pushChangelogMerge,
-  resolveChangelogConflict,
-} from './resolve-changelog-conflict.mjs';
 
-const history = '## [7.4.0]\n\n- Historical entry\n';
-const changelog = (entries = ['- Existing entry']) =>
-  `# Changelog\n\n## [next]\n\n${entries.join('\n')}\n\n${history}`;
+const script = resolve('.github/scripts/resolve-changelog-conflict.sh');
 
-test('preserves both additions, existing entries and release history', () => {
-  assert.equal(
-    mergeChangelogAdditions(
-      changelog(),
-      changelog(['- PR entry', '- Existing entry']),
-      changelog(['- Master entry', '- Existing entry']),
-    ),
-    changelog(['- PR entry', '- Master entry', '- Existing entry']),
-  );
-});
-
-test('deduplicates identical additions from both branches', () => {
-  assert.equal(
-    mergeChangelogAdditions(
-      changelog(),
-      changelog(['- Shared entry', '- PR entry', '- Existing entry']),
-      changelog(['- Shared entry', '- Master entry', '- Existing entry']),
-    ),
-    changelog([
-      '- Shared entry',
-      '- PR entry',
-      '- Master entry',
-      '- Existing entry',
-    ]),
-  );
-});
-
-test('supports an initially empty next section', () => {
-  assert.equal(
-    mergeChangelogAdditions(
-      changelog([]),
-      changelog(['- PR entry']),
-      changelog(['- Master entry']),
-    ),
-    changelog(['- PR entry', '- Master entry']),
-  );
-});
-
-for (const [name, edited] of [
-  ['edited existing entry', changelog(['- Edited existing entry'])],
-  ['deleted existing entry', changelog([])],
-  [
-    'changed release history',
-    changelog().replace('Historical entry', 'Edited history'),
-  ],
-  ['release rollover', changelog().replace('[next]', '[7.5.0]')],
-  [
-    'extra section heading',
-    changelog(['### Fixes', '- PR entry', '- Existing entry']),
-  ],
-  ['multiline entry', changelog(['- PR entry\n  details', '- Existing entry'])],
-]) {
-  test(`skips ${name}`, () => {
-    assert.equal(
-      mergeChangelogAdditions(
-        changelog(),
-        edited,
-        changelog(['- Master entry', '- Existing entry']),
-      ),
-      null,
-    );
-  });
-}
-
-test('skips different new entries with the same PR link', () => {
-  const link = '[#123](https://github.com/fabricjs/fabric.js/pull/123)';
-  assert.equal(
-    mergeChangelogAdditions(
-      changelog(),
-      changelog([`- First title ${link}`, '- Existing entry']),
-      changelog([`- Second title ${link}`, '- Existing entry']),
-    ),
-    null,
-  );
-});
-
-function fixture(
-  t,
-  { codeConflict = false, historyConflict = false, logConflict = true } = {},
-) {
+function fixture(t, { codeConflict = false, unionAll = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'fabric-changelog-test-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const work = join(root, 'work');
-  const bare = join(root, 'remote.git');
+  const remote = join(root, 'remote.git');
+  const bin = join(root, 'bin');
   mkdirSync(work);
+  mkdirSync(bin);
   const git = (cwd, ...args) =>
     execFileSync('git', args, {
       cwd,
@@ -116,241 +31,134 @@ function fixture(
       },
     }).trim();
   const write = (path, content) => writeFileSync(join(work, path), content);
-  const commit = (message) => {
+  const commit = () => {
     git(work, 'add', '.');
-    git(work, 'commit', '-m', message);
+    git(work, 'commit', '-m', 'Fixture');
     return git(work, 'rev-parse', 'HEAD');
   };
   git(work, 'init', '-b', 'master');
   write('.gitattributes', 'CHANGELOG.md merge=union\n');
-  write('CHANGELOG.md', changelog());
+  write('CHANGELOG.md', '# Changelog\n\n## [next]\n\n- Existing\n');
   write('code.txt', 'Original code\n');
-  commit('Initial');
+  const original = commit();
   git(work, 'checkout', '-b', 'pr');
-  write('CHANGELOG.md', changelog(['- PR entry', '- Existing entry']));
+  write('CHANGELOG.md', '# Changelog\n\n## [next]\n\n- PR\n- Existing\n');
   write('code.txt', 'PR code\n');
-  const head = commit('PR');
+  if (unionAll) write('.gitattributes', '* merge=union\n');
+  const head = commit();
   git(work, 'checkout', 'master');
-  if (logConflict) {
-    write('CHANGELOG.md', changelog(['- Master entry', '- Existing entry']));
-  }
-  if (historyConflict) {
-    write(
-      'CHANGELOG.md',
-      changelog(['- Master entry', '- Existing entry']).replace(
-        'Historical entry',
-        'Updated history',
-      ),
-    );
-  }
-  if (codeConflict) {
-    write('code.txt', 'Master code\n');
-  }
-  write('master-only.txt', 'Cleanly merged master change\n');
-  const base = commit('Master');
-  git(root, 'clone', '--bare', work, bare);
-  git(bare, 'remote', 'set-url', 'origin', work);
-  return { root, work, bare, git, write, commit, head, base };
+  write('CHANGELOG.md', '# Changelog\n\n## [next]\n\n- Master\n- Existing\n');
+  write('master-only.txt', 'Clean master change\n');
+  if (codeConflict) write('code.txt', 'Master code\n');
+  const base = commit();
+  git(root, 'clone', '--bare', work, remote);
+  git(remote, 'update-ref', 'refs/pull/123/head', head);
+  const pr = {
+    state: 'open',
+    draft: false,
+    mergeable: false,
+    base: { ref: 'master', sha: base },
+    head: { ref: 'pr', sha: head, repo: { full_name: 'fabricjs/fabric.js' } },
+  };
+  const review = {
+    state: 'APPROVED',
+    commit_id: head,
+    user: { type: 'User', login: 'reviewer' },
+  };
+  writeFileSync(join(root, 'counter'), '0');
+  writeFileSync(
+    join(bin, 'gh'),
+    `#!/usr/bin/env bash
+case "$2" in
+  */permission) echo write ;;
+  */reviews/*) cat "$FIXTURE_ROOT/review.json" ;;
+  *)
+    count=$(cat "$FIXTURE_ROOT/counter")
+    echo $((count + 1)) > "$FIXTURE_ROOT/counter"
+    if [[ $count == 1 && -n \${RACE_HEAD:-} ]]; then
+      git --git-dir="$FIXTURE_ROOT/remote.git" update-ref refs/heads/pr "$RACE_HEAD"
+    fi
+    cat "$FIXTURE_ROOT/pr.json"
+    ;;
+esac
+`,
+    { mode: 0o755 },
+  );
+  const run = (extraEnv = {}) => {
+    writeFileSync(join(root, 'pr.json'), JSON.stringify(pr));
+    writeFileSync(join(root, 'review.json'), JSON.stringify(review));
+    return spawnSync('bash', [script, remote], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        PATH: `${bin}:${process.env.PATH}`,
+        FIXTURE_ROOT: root,
+        GH_REPO: 'fabricjs/fabric.js',
+        GH_TOKEN: 'test-token',
+        PR_NUMBER: '123',
+        REVIEW_ID: '456',
+        ...extraEnv,
+      },
+    });
+  };
+  return { git, remote, head, base, original, pr, review, run };
 }
 
-test('creates a bot merge commit while preserving clean code changes', (t) => {
+test('merges master with changelog union and preserves clean code changes', (t) => {
   const f = fixture(t);
-  const result = createChangelogMerge({
-    cwd: f.bare,
-    head: f.head,
-    base: f.base,
-    number: 123,
-  });
-  assert.equal(result.status, 'resolved');
+  const result = f.run();
+  assert.equal(result.status, 0, result.stderr);
+  const merged = f.git(f.remote, 'rev-parse', 'pr');
+  assert.notEqual(merged, f.head);
   assert.equal(
-    f.git(f.bare, 'show', `${result.commit}:CHANGELOG.md`),
-    changelog(['- PR entry', '- Master entry', '- Existing entry']).trim(),
-  );
-  assert.equal(f.git(f.bare, 'show', `${result.commit}:code.txt`), 'PR code');
-  assert.equal(
-    f.git(f.bare, 'show', `${result.commit}:master-only.txt`),
-    'Cleanly merged master change',
-  );
-  assert.equal(
-    f.git(f.bare, 'show', '-s', '--format=%P', result.commit),
+    f.git(f.remote, 'show', '-s', '--format=%P', merged),
     `${f.head} ${f.base}`,
   );
   assert.equal(
-    f.git(f.bare, 'show', '-s', '--format=%an / %cn', result.commit),
+    f.git(f.remote, 'show', `${merged}:CHANGELOG.md`),
+    '# Changelog\n\n## [next]\n\n- PR\n- Master\n- Existing',
+  );
+  assert.equal(f.git(f.remote, 'show', `${merged}:code.txt`), 'PR code');
+  assert.equal(
+    f.git(f.remote, 'show', `${merged}:master-only.txt`),
+    'Clean master change',
+  );
+  assert.equal(
+    f.git(f.remote, 'show', '-s', '--format=%an / %cn', merged),
     'github-actions[bot] / github-actions[bot]',
   );
-  // Preparing the resolution does not move either branch.
-  assert.equal(f.git(f.bare, 'rev-parse', 'pr'), f.head);
-  assert.equal(f.git(f.bare, 'rev-parse', 'master'), f.base);
-  pushChangelogMerge({
-    cwd: f.bare,
-    branch: 'pr',
-    head: f.head,
-    commit: result.commit,
+});
+
+for (const unionAll of [false, true]) {
+  test(`does not push code conflicts${unionAll ? ' even when PR attributes request union for everything' : ''}`, (t) => {
+    const f = fixture(t, { codeConflict: true, unionAll });
+    const result = f.run();
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /merge still has conflicts/);
+    assert.equal(f.git(f.remote, 'rev-parse', 'pr'), f.head);
   });
-  assert.equal(f.git(f.work, 'rev-parse', 'pr'), result.commit);
-});
+}
 
-test('does not resolve a code conflict alongside the changelog', (t) => {
-  const f = fixture(t, { codeConflict: true });
-  const result = createChangelogMerge({
-    cwd: f.bare,
-    head: f.head,
-    base: f.base,
-    number: 123,
-  });
-  assert.equal(result.status, 'skipped');
-  assert.match(result.reason, /beyond CHANGELOG/);
-});
-
-test('skips historical edits even when only the changelog conflicts', (t) => {
-  const f = fixture(t, { historyConflict: true });
-  const result = createChangelogMerge({
-    cwd: f.bare,
-    head: f.head,
-    base: f.base,
-    number: 123,
-  });
-  assert.equal(result.status, 'skipped');
-  assert.match(result.reason, /not limited to additions/);
-});
-
-test('does not update a PR that merges cleanly', (t) => {
-  const f = fixture(t, { logConflict: false });
-  assert.equal(
-    createChangelogMerge({
-      cwd: f.bare,
-      head: f.head,
-      base: f.base,
-      number: 123,
-    }).status,
-    'skipped',
-  );
-});
-
-test('refuses to overwrite a concurrent contributor push', (t) => {
+test('does not act on an approval of an older head', (t) => {
   const f = fixture(t);
-  const result = createChangelogMerge({
-    cwd: f.bare,
-    head: f.head,
-    base: f.base,
-    number: 123,
-  });
-  f.git(f.work, 'checkout', 'pr');
-  f.write('new.txt', 'New contributor work\n');
-  const newer = f.commit('Concurrent update');
-  assert.throws(
-    () =>
-      pushChangelogMerge({
-        cwd: f.bare,
-        branch: 'pr',
-        head: f.head,
-        commit: result.commit,
-      }),
-    /git push failed/,
-  );
-  assert.equal(f.git(f.work, 'rev-parse', 'pr'), newer);
+  f.review.commit_id = f.original;
+  const result = f.run();
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(f.git(f.remote, 'rev-parse', 'pr'), f.head);
 });
 
-test('refuses a concurrent branch rewind even if the resolution could fast-forward', (t) => {
+test('does not act on a second approval once the PR is mergeable', (t) => {
   const f = fixture(t);
-  const result = createChangelogMerge({
-    cwd: f.bare,
-    head: f.head,
-    base: f.base,
-    number: 123,
-  });
-  const ancestor = f.git(f.work, 'rev-parse', `${f.head}^`);
-  f.git(f.work, 'update-ref', 'refs/heads/pr', ancestor);
-  assert.throws(
-    () =>
-      pushChangelogMerge({
-        cwd: f.bare,
-        branch: 'pr',
-        head: f.head,
-        commit: result.commit,
-      }),
-    /git push failed/,
-  );
-  assert.equal(f.git(f.work, 'rev-parse', 'pr'), ancestor);
+  f.pr.mergeable = true;
+  const result = f.run();
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(f.git(f.remote, 'rev-parse', 'pr'), f.head);
 });
 
-test('a second approval on a mergeable PR does not create another commit', async () => {
-  const notices = [];
-  await resolveChangelogConflict({
-    context: {
-      repo: { owner: 'fabricjs', repo: 'fabric.js' },
-      payload: { pull_request: { number: 123 }, review: { id: 456 } },
-    },
-    github: {
-      rest: {
-        pulls: {
-          get: async () => ({
-            data: {
-              state: 'open',
-              draft: false,
-              mergeable: true,
-              base: { ref: 'master' },
-              head: {
-                sha: 'resolved-head',
-                ref: 'pr',
-                repo: { full_name: 'fabricjs/fabric.js' },
-              },
-            },
-          }),
-          getReview: async () => ({
-            data: {
-              state: 'APPROVED',
-              commit_id: 'resolved-head',
-              user: { type: 'User', login: 'reviewer' },
-            },
-          }),
-        },
-        repos: {
-          getCollaboratorPermissionLevel: async () => ({
-            data: { permission: 'write' },
-          }),
-        },
-      },
-    },
-    core: { notice: (message) => notices.push(message) },
-  });
-  assert.match(notices[0], /No confirmed conflict/);
-});
-
-test('requires an approval of the current head', async () => {
-  const notices = [];
-  const pr = {
-    number: 123,
-    state: 'open',
-    draft: false,
-    base: { ref: 'master' },
-    head: {
-      sha: 'new-head',
-      ref: 'pr',
-      repo: { full_name: 'fabricjs/fabric.js' },
-    },
-  };
-  await resolveChangelogConflict({
-    context: {
-      repo: { owner: 'fabricjs', repo: 'fabric.js' },
-      payload: { pull_request: { number: 123 }, review: { id: 456 } },
-    },
-    github: {
-      rest: {
-        pulls: {
-          get: async () => ({ data: pr }),
-          getReview: async () => ({
-            data: {
-              state: 'APPROVED',
-              commit_id: 'old-head',
-              user: { type: 'User' },
-            },
-          }),
-        },
-      },
-    },
-    core: { notice: (message) => notices.push(message) },
-  });
-  assert.match(notices[0], /current human review/);
+test('the push lease rejects a concurrent branch rewind', (t) => {
+  const f = fixture(t);
+  const result = f.run({ RACE_HEAD: f.original });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /stale info/);
+  assert.equal(f.git(f.remote, 'rev-parse', 'pr'), f.original);
 });
