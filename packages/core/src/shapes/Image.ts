@@ -294,8 +294,8 @@ export class FabricImage<
   /**
    * Returns original size of an image
    */
-  getOriginalSize() {
-    const element = this.getElement() as any;
+  getOriginalSize(): TSize {
+    const element = this.getElement();
     if (!element) {
       return {
         width: 0,
@@ -303,8 +303,10 @@ export class FabricImage<
       };
     }
     return {
-      width: element.naturalWidth || element.width,
-      height: element.naturalHeight || element.height,
+      width:
+        ('naturalWidth' in element && element.naturalWidth) || element.width,
+      height:
+        ('naturalHeight' in element && element.naturalHeight) || element.height,
     };
   }
 

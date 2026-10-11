@@ -27,7 +27,7 @@ describe('Canvas event data', () => {
   let spyFire: MockInstance;
 
   const snapshotOptions = {
-    cloneDeepWith: (value: any) => {
+    cloneDeepWith: (value: unknown) => {
       if (value instanceof Point) {
         return new Point(Math.round(value.x), Math.round(value.y));
       }
@@ -64,7 +64,7 @@ describe('Canvas event data', () => {
           detail: type === 'dblclick' ? 2 : undefined,
         }),
       );
-      expect(spyFire.mock.calls).toMatchSnapshot(snapshotOptions);
+      expect(spyFire.mock.calls).toMatchSnapshotWithOptions(snapshotOptions);
     },
   );
 
@@ -78,7 +78,7 @@ describe('Canvas event data', () => {
     document.dispatchEvent(
       new MouseEvent('mouseup', { clientX: 50, clientY: 50 }),
     );
-    expect(spyFire.mock.calls).toMatchSnapshot(snapshotOptions);
+    expect(spyFire.mock.calls).toMatchSnapshotWithOptions(snapshotOptions);
   });
 
   test.each([
@@ -114,7 +114,7 @@ describe('Canvas event data', () => {
           clientY: 50,
         }),
       );
-      expect(spyFire.mock.calls).toMatchSnapshot(snapshotOptions);
+      expect(spyFire.mock.calls).toMatchSnapshotWithOptions(snapshotOptions);
     },
   );
 

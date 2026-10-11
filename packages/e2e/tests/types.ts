@@ -2,6 +2,8 @@ import type { Canvas } from 'fabric';
 
 export type FabricNamespace = typeof import('fabric');
 
+export type RenderCallback = () => void | string | Promise<void | string>;
+
 export type renderTestType = {
   size: [number, number];
   percentage: number;

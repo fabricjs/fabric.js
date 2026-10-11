@@ -159,11 +159,11 @@ export abstract class AnimationBase<
   }
 
   private register() {
-    runningAnimations.push(this as unknown as AnimationBase);
+    runningAnimations.push(this);
   }
 
   private unregister() {
-    runningAnimations.remove(this as unknown as AnimationBase);
+    runningAnimations.remove(this);
   }
 
   abort() {

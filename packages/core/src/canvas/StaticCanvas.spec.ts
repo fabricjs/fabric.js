@@ -776,7 +776,6 @@ describe('StaticCanvas', () => {
     expect(canvas.toSVG).toBeTypeOf('function');
     canvas.clear();
     canvas.viewportTransform = [1, 0, 0, 1, 0, 0];
-    // @ts-expect-error -- TS2322: Type 'ISO-8859-1' is not assignable to type 'UTF-8, seems like types don't allow this encoding
     const svg = canvas.toSVG({ encoding: 'ISO-8859-1' });
     const svgDefaultEncoding = canvas.toSVG();
     expect(svg).not.toBe(svgDefaultEncoding);

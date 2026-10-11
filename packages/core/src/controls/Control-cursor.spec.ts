@@ -5,7 +5,6 @@ import { Canvas } from '../canvas/Canvas';
 import { Rect } from '../shapes/Rect';
 import { Point } from '../Point';
 import type { TOCoord } from '../shapes/Object/InteractiveObject';
-import type { TPointerEvent } from '../EventTypeDefs';
 
 const points = [
   [new Point(0, 0), 'nw-resize'],
@@ -20,7 +19,7 @@ const points = [
 
 describe('fabric.controls.cursor', () => {
   let canvas: Canvas;
-  let rect, groupRect: Rect;
+  let rect: Rect, groupRect: Rect;
   let group: Group;
   beforeAll(() => {
     canvas = new Canvas(undefined);
@@ -42,7 +41,7 @@ describe('fabric.controls.cursor', () => {
         [true, false],
         [true, true],
       ])('when flipX is %s and flipY is %s', ([flipX, flipY]) => {
-        const pointerEvent = {} as TPointerEvent;
+        const pointerEvent = new MouseEvent('mousemove');
         rect.set({ flipX, flipY });
         groupRect.set({ flipX, flipY });
         const res = scaleSkewCursorStyleHandler(

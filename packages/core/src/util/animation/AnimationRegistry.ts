@@ -2,15 +2,17 @@ import type { StaticCanvas } from '../../canvas/StaticCanvas';
 import type { FabricObject } from '../../shapes/Object/FabricObject';
 import type { AnimationBase } from './AnimationBase';
 
+type AnimationContext = Pick<AnimationBase, keyof AnimationBase>;
+
 /**
  * Array holding all running animations
  */
-class AnimationRegistry extends Array<AnimationBase> {
+class AnimationRegistry extends Array<AnimationContext> {
   /**
    * Remove a single animation using an animation context
-   * @param {AnimationBase} context
+   * @param {AnimationContext} context
    */
-  remove(context: AnimationBase) {
+  remove(context: AnimationContext) {
     const index = this.indexOf(context);
     index > -1 && this.splice(index, 1);
   }
@@ -26,9 +28,9 @@ class AnimationRegistry extends Array<AnimationBase> {
 
   /**
    * Cancel all running animations attached to a canvas on the next frame
-   * @param {StaticCanvas} canvas
+   * @param {StaticCanvas} [canvas]
    */
-  cancelByCanvas(canvas: StaticCanvas) {
+  cancelByCanvas(canvas?: StaticCanvas) {
     if (!canvas) {
       return [];
     }
@@ -44,9 +46,9 @@ class AnimationRegistry extends Array<AnimationBase> {
 
   /**
    * Cancel all running animations for target on the next frame
-   * @param target
+   * @param [target]
    */
-  cancelByTarget(target: AnimationBase['target']) {
+  cancelByTarget(target?: AnimationContext['target']) {
     if (!target) {
       return [];
     }

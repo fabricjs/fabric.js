@@ -1,8 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { pick } from './pick';
 
 describe('pick', () => {
   describe('pick', () => {
+    it('infers selected readonly keys and skips missing properties', () => {
+      const source: { foo: string; bar?: number; baz: boolean } = {
+        foo: 'bar',
+        baz: true,
+      };
+      const destination = pick(source, ['foo', 'bar'] as const);
+
+      expectTypeOf(destination).toEqualTypeOf<{
+        foo?: string;
+        bar?: number;
+      }>();
+      expect(destination).toEqual({ foo: 'bar' });
+    });
+
     it('correctly picks properties from objects', () => {
       const source = {
         foo: 'bar',
