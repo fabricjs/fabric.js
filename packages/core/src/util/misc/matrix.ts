@@ -194,8 +194,8 @@ export function createRotateMatrix(
     sinValue,
     -sinValue,
     cosValue,
-    x ? x - (cosValue * x - sinValue * y) : 0,
-    y ? y - (sinValue * x + cosValue * y) : 0,
+    x - (cosValue * x - sinValue * y),
+    y - (sinValue * x + cosValue * y),
   ];
 }
 
