@@ -94,7 +94,6 @@ describe('Polygon', () => {
         { x: 20, y: 100 },
       ],
       {
-        // @ts-expect-error -- TODO: are types wrong for Polygon? seems like it doesn't accept exactBoundingBox property
         exactBoundingBox: false,
         strokeWidth: 60,
       },
@@ -121,7 +120,6 @@ describe('Polygon', () => {
         { x: 10, y: 10 },
       ],
       {
-        // @ts-expect-error -- TODO: are types wrong for Polygon? seems like it doesn't accept exactBoundingBox property
         exactBoundingBox: true,
         strokeWidth: 60,
         stroke: 'blue',
@@ -172,7 +170,6 @@ describe('Polygon', () => {
         { x: 20, y: 100 },
       ],
       {
-        // @ts-expect-error -- TODO: are types wrong for Polygon? seems like it doesn't accept exactBoundingBox property
         exactBoundingBox: true,
         strokeWidth: 60,
         stroke: 'blue',
@@ -416,7 +413,6 @@ describe('Polygon', () => {
       strokeMiterLimit: 10,
       strokeUniform: false,
       strokeLineJoin: 'miter',
-      // @ts-expect-error -- TODO: are types wrong for Polygon? seems like it doesn't accept exactBoundingBox property
       exactBoundingBox: true,
     });
 
@@ -462,7 +458,6 @@ describe('Polygon', () => {
       strokeMiterLimit: 10,
       strokeUniform: false,
       strokeLineJoin: 'miter',
-      // @ts-expect-error -- TODO: are types wrong for Polygon? seems like it doesn't accept exactBoundingBox property
       exactBoundingBox: true,
     });
 

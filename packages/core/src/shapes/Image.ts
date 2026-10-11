@@ -828,13 +828,13 @@ export class FabricImage<
 
   /**
    * Returns {@link FabricImage} instance from an SVG element
-   * @param {HTMLElement} element Element to parse
+   * @param {HTMLElement | SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
   static async fromElement(
-    element: HTMLElement,
+    element: HTMLElement | SVGElement,
     options: Abortable = {},
     cssRules?: CSSRules,
   ) {
