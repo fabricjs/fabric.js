@@ -5,12 +5,13 @@ import { Color } from '../../color/Color';
 import { FabricObject } from '../../shapes/Object/FabricObject';
 import { ValueAnimation } from './ValueAnimation';
 import { Shadow } from '../../Shadow';
+import { StaticCanvas } from '../../canvas/StaticCanvas';
 
-import { describe, expect, it, afterEach, vi } from 'vitest';
+import { describe, expect, expectTypeOf, it, afterEach, vi } from 'vitest';
 import { getFabricWindow } from '../../env';
 
 vi.useFakeTimers();
-const findAnimationsByTarget = (target: any) =>
+const findAnimationsByTarget = (target: unknown) =>
   runningAnimations.filter(({ target: t }) => target === t);
 
 describe('animate', () => {
@@ -143,8 +144,7 @@ describe('animate', () => {
     vi.advanceTimersByTime(duration + 16);
   });
   it('animation context', async () => {
-    const options = { foo: 'bar' };
-    const context = animate(options);
+    const context = animate({});
     expect(context.state).toBe('pending');
     expect(typeof context.abort === 'function').toBe(true);
     expect(context.duration).toEqual(500);
@@ -200,8 +200,7 @@ describe('animate', () => {
     expect(context.state).toBe('aborted');
   });
   it('runningAnimations with imperative abort', async () => {
-    const options = { foo: 'bar' };
-    const context = animate(options);
+    const context = animate({});
     expect(context.state).toBe('pending');
     vi.advanceTimersByTime(32);
     expect(context.state).toBe('running');
@@ -210,11 +209,10 @@ describe('animate', () => {
     expect(context.state).toBe('aborted');
   });
   it('runningAnimations cancelAll', async () => {
-    const options = { foo: 'bar' };
-    animate(options);
-    animate(options);
-    animate(options);
-    animate(options);
+    animate({});
+    animate({});
+    animate({});
+    animate({});
     expect(runningAnimations.length).toBe(4);
     expect(typeof runningAnimations.cancelAll === 'function').toBe(true);
     const cancelledAnimations = runningAnimations.cancelAll();
@@ -223,12 +221,30 @@ describe('animate', () => {
     //  make sure splice didn't destroy instance
     expect(runningAnimations instanceof Array).toBe(true);
   });
+  it('runningAnimations accepts value, array, and color animations', () => {
+    const animations = [
+      animate({ startValue: 0, endValue: 1 }),
+      animate({ startValue: [0, 1], endValue: [1, 2] }),
+      animateColor({ startValue: 'red', endValue: 'blue' }),
+    ];
+
+    expectTypeOf(runningAnimations[0].value).toEqualTypeOf<number | number[]>();
+    animations.forEach((animation, index) => {
+      expect(runningAnimations.indexOf(animation)).toBe(index);
+    });
+    expect(runningAnimations.cancelAll()).toEqual(animations);
+    expect(runningAnimations).toHaveLength(0);
+    animations.forEach((animation) => {
+      expect(animation.state).toBe('aborted');
+    });
+  });
   it('runningAnimations cancelByCanvas', async () => {
-    const canvas = { pip: 'py' };
-    animate({ foo: 'bar', target: 'pip' });
-    animate({ foo: 'bar', target: { canvas: 'pip' } });
-    animate({ foo: 'bar' });
-    animate({ target: { canvas } });
+    const canvas = new StaticCanvas(undefined, { renderOnAddRemove: false });
+    const target = { canvas };
+    animate({ target: 'pip' });
+    animate({ target: { canvas: 'pip' } });
+    animate({});
+    animate({ target });
     // 'should have registered animations'
     expect(runningAnimations.length).toBe(4);
     let cancelledAnimations = runningAnimations.cancelByCanvas();
@@ -239,18 +255,18 @@ describe('animate', () => {
     cancelledAnimations = runningAnimations.cancelByCanvas(canvas);
     // 'should return cancelled animations'
     expect(cancelledAnimations.length).toBe(1);
-    expect(cancelledAnimations[0].target.canvas).toBe(canvas);
+    expect(cancelledAnimations[0].target).toBe(target);
     // 'should have left registered animation'
     expect(runningAnimations.length).toBe(3);
     vi.advanceTimersByTime(1000);
+    await canvas.dispose();
   });
   it('runningAnimations cancelByTarget', async () => {
-    const options = { foo: 'bar', target: 'pip' },
-      opt2 = { bar: 'baz' };
+    const options = { target: 'pip' };
     animate(options);
     animate(options);
     animate(options);
-    const baz = animate(opt2);
+    const baz = animate({});
     expect(runningAnimations.length).toBe(4);
     let cancelledAnimations = runningAnimations.cancelByTarget();
     expect(cancelledAnimations.length).toBe(0);
@@ -314,7 +330,7 @@ describe('animate', () => {
     });
     vi.advanceTimersByTime(1000);
     properties.forEach((prop) => {
-      expect(object[prop]).toBe('rgba(0,0,255,1)');
+      expect(object).toHaveProperty(prop, 'rgba(0,0,255,1)');
     });
   });
   it('animate with decrement', async () => {
@@ -399,7 +415,7 @@ describe('animate', () => {
   });
   it('abort function is called with object as context', async () => {
     const object = new FabricObject({ left: 123, top: 124 });
-    let context: any;
+    let context: unknown;
     object.animate(
       { left: 223, top: 224 },
       {
@@ -493,7 +509,7 @@ describe('easing', () => {
   Object.entries(ease).map(([easingName, easingFunction]) => {
     it(easingName, async () => {
       const duration = 320;
-      const snapshot: any[] = [];
+      const snapshot: { val: string; percentage: string }[] = [];
       expect(typeof ease.easeInQuad === 'function').toBe(true);
       const object = new FabricObject({ left: 0 });
       object.animate(
