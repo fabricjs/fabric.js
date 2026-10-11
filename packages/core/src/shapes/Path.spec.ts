@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { omit } from 'es-toolkit';
 import { Path } from './Path';
 import type { TSimpleParsedCommand } from '../util';
 import { FabricObject } from '../../../../fabric';
@@ -150,14 +151,7 @@ describe('Path', () => {
 
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
 
-    const opts: typeof REFERENCE_PATH_OBJECT & {
-      sourcePath?: string;
-    } = {
-      ...REFERENCE_PATH_OBJECT,
-    };
-
-    // @ts-expect-error -- deleting intentionally
-    delete opts.path;
+    const opts = omit(REFERENCE_PATH_OBJECT, ['path']);
 
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -184,13 +178,7 @@ describe('Path', () => {
 
     updatePath(path, REFERENCE_PATH_OBJECT.path, false);
 
-    const opts: typeof REFERENCE_PATH_OBJECT & {
-      sourcePath?: string;
-    } = {
-      ...REFERENCE_PATH_OBJECT,
-    };
-    // @ts-expect-error -- deleting intentionally
-    delete opts.path;
+    const opts = omit(REFERENCE_PATH_OBJECT, ['path']);
 
     path.set(opts);
     updatePath(path, 'M 100 100 L 300 100 L 200 300 z', true);
@@ -314,16 +302,10 @@ describe('Path', () => {
 
     path.sourcePath = src;
 
-    const clonedRef: typeof REFERENCE_PATH_OBJECT & {
-      sourcePath?: string;
-    } = {
-      ...REFERENCE_PATH_OBJECT,
+    const clonedRef = {
+      ...omit(REFERENCE_PATH_OBJECT, ['path']),
+      sourcePath: src,
     };
-
-    clonedRef.sourcePath = src;
-
-    // @ts-expect-error -- deleting intentionally
-    delete clonedRef.path;
 
     expect(
       path.toDatalessObject(),

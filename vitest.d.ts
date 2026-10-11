@@ -2,7 +2,7 @@
 import 'vitest';
 import type { TMat2D } from './packages/core/src/typedefs';
 import type { cloneDeepWith } from 'es-toolkit/compat';
-import type { FabricImage } from './packages/core/src/shapes/Image';
+import type { SerializedImageProps } from './packages/core/src/shapes/Image';
 
 type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
   includeDefaultValues?: boolean;
@@ -23,7 +23,7 @@ interface CustomMatchers<R = unknown, T = unknown> {
 
   toEqualSVG(expected: string): void;
 
-  toSameImageObject(expected: Partial<FabricImage>): void;
+  toSameImageObject(expected: SerializedImageProps): void;
 }
 
 declare module 'vitest' {
