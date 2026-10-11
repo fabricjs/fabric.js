@@ -1,8 +1,8 @@
-name: 'Resolve approved PR changelog conflicts'
+name: 'Resolve labeled PR changelog conflicts'
 
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request_target:
+    types: [labeled]
 
 permissions:
   contents: read
@@ -15,7 +15,8 @@ concurrency:
 jobs:
   resolve:
     if: >-
-      github.event.review.state == 'approved' &&
+      github.event.label.name == 'resolve-changelog' &&
+      github.event.sender.type == 'User' &&
       github.event.pull_request.base.ref == 'master' &&
       github.event.pull_request.user.login != 'dependabot[bot]' &&
       github.event.pull_request.head.repo.full_name == github.repository
@@ -36,5 +37,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          REVIEW_ID: ${{ github.event.review.id }}
+          REQUESTED_BY: ${{ github.event.sender.login }}
+          REQUESTED_HEAD: ${{ github.event.pull_request.head.sha }}
         run: bash .github/scripts/resolve-changelog-conflict.sh
