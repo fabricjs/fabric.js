@@ -1,19 +1,22 @@
 /**
  * Populates an object with properties of another object
  * @param {Object} source Source object
- * @param {string[]} properties Properties names to include
+ * @param keys Property names to include
  * @returns object populated with the picked keys
  */
-export const pick = <T extends Record<string, any>>(
+export const pick = <T extends object, K extends keyof T = keyof T>(
   source: T,
-  keys: (keyof T)[] = [],
+  keys: readonly K[] = [],
 ) => {
-  return keys.reduce((o, key) => {
-    if (key in source) {
-      o[key] = source[key];
-    }
-    return o;
-  }, {} as Partial<T>);
+  return keys.reduce(
+    (o, key) => {
+      if (key in source) {
+        o[key] = source[key];
+      }
+      return o;
+    },
+    {} as Partial<Pick<T, K>>,
+  );
 };
 
 export const pickBy = <T extends Record<string, any>>(

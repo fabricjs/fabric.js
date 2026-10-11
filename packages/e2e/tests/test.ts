@@ -6,17 +6,18 @@ import type { FabricObject } from 'fabric';
 import { Canvas } from 'fabric';
 import * as fabric from 'fabric';
 import type { CanvasOptions } from 'fabric';
+import type { RenderCallback } from './types';
 
 const canvasMap = (window.canvasMap = new Map<HTMLCanvasElement, Canvas>());
 const objectMap = (window.objectMap = new Map<string, FabricObject>());
 const renderingTestMap = (window.renderingTestMap = new Map<
   string,
-  () => void | string
+  RenderCallback
 >());
 type AsyncReturnValue<T> = T | Promise<T>;
 
 const setupTasks: Promise<void>[] = [];
-const teardownTasks: Awaited<VoidFunction>[] = [];
+const teardownTasks: (() => AsyncReturnValue<void>)[] = [];
 
 // makes possible call things in browser context.
 window.fabric = fabric;
@@ -28,7 +29,6 @@ window.__teardownFabricHook = () =>
  *
  * @param selector canvas selector
  * @param cb **IMPORTANT** return a map of objects for playwright to access during tests
- * @param options canvas options
  */
 export function before(
   selector: string,
@@ -59,7 +59,7 @@ export function before(
 export async function beforeRenderTest(
   cb: (
     canvas: Canvas,
-  ) => AsyncReturnValue<{ title: string; boundFunction: () => void }[]>,
+  ) => AsyncReturnValue<{ title: string; boundFunction: RenderCallback }[]>,
   options: Partial<CanvasOptions> | undefined,
 ) {
   const el = document.querySelector<HTMLCanvasElement>('#canvas')!;
