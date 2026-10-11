@@ -186,11 +186,11 @@ export class Textbox<
 
   /**
    * Returns true if object has a style property or has it on a specified line
-   * @param {Number} lineIndex
+   * @param {Number} [lineIndex]
    * @return {Boolean}
    */
-  styleHas(property: keyof TextStyleDeclaration, lineIndex: number): boolean {
-    if (this._styleMap && !this.isWrapping) {
+  styleHas(property: keyof TextStyleDeclaration, lineIndex?: number): boolean {
+    if (lineIndex !== undefined && this._styleMap && !this.isWrapping) {
       const map = this._styleMap[lineIndex];
       if (map) {
         lineIndex = map.line;
@@ -201,10 +201,13 @@ export class Textbox<
 
   /**
    * Returns true if object has no styling or no styling in a line
-   * @param {Number} lineIndex , lineIndex is on wrapped lines.
+   * @param {Number} [lineIndex] lineIndex is on wrapped lines.
    * @return {Boolean}
    */
-  isEmptyStyles(lineIndex: number): boolean {
+  isEmptyStyles(lineIndex?: number): boolean {
+    if (lineIndex === undefined) {
+      return super.isEmptyStyles();
+    }
     if (!this.styles) {
       return true;
     }
@@ -223,17 +226,15 @@ export class Textbox<
       shouldLimit = nextLineIndex === lineIndex;
       nextOffset = mapNextLine.offset;
     }
-    const obj =
-      typeof lineIndex === 'undefined'
-        ? this.styles
-        : { line: this.styles[lineIndex] };
-    for (const p1 in obj) {
-      for (const p2 in obj[p1]) {
-        const p2Number = parseInt(p2, 10);
-        if (p2Number >= offset && (!shouldLimit || p2Number < nextOffset!)) {
-          for (const p3 in obj[p1][p2]) {
-            return false;
-          }
+    const lineStyles = this.styles[lineIndex];
+    for (const charIndex in lineStyles) {
+      const charIndexNumber = parseInt(charIndex, 10);
+      if (
+        charIndexNumber >= offset &&
+        (!shouldLimit || charIndexNumber < nextOffset!)
+      ) {
+        for (const property in lineStyles[charIndex]) {
+          return false;
         }
       }
     }

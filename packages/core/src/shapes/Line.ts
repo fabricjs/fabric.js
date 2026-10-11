@@ -234,12 +234,12 @@ export class Line<
 
   /**
    * Returns Line instance from an SVG element
-   * @param {HTMLElement} element Element to parse
+   * @param {HTMLElement | SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {Function} [callback] callback function invoked after parsing
    */
   static async fromElement(
-    element: HTMLElement,
+    element: HTMLElement | SVGElement,
     options?: Abortable,
     cssRules?: CSSRules,
   ) {

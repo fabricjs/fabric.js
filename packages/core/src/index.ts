@@ -99,7 +99,7 @@ export type { RectProps, SerializedRectProps } from './shapes/Rect';
 export { Rect } from './shapes/Rect';
 export type { PathProps, SerializedPathProps } from './shapes/Path';
 export { Path } from './shapes/Path';
-export type { SerializedPolylineProps } from './shapes/Polyline';
+export type { PolylineProps, SerializedPolylineProps } from './shapes/Polyline';
 export { Polyline } from './shapes/Polyline';
 export { Polygon } from './shapes/Polygon';
 export type {

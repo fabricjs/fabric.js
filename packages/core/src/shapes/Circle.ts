@@ -213,12 +213,12 @@ export class Circle<
 
   /**
    * Returns {@link Circle} instance from an SVG element
-   * @param {HTMLElement} element Element to parse
+   * @param {HTMLElement | SVGElement} element Element to parse
    * @param {Object} [options] Partial Circle object to default missing properties on the element.
    * @throws {Error} If value of `r` attribute is missing or invalid
    */
   static async fromElement(
-    element: HTMLElement,
+    element: HTMLElement | SVGElement,
     options: Abortable,
     cssRules?: CSSRules,
   ): Promise<Circle> {

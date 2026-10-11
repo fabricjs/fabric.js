@@ -72,14 +72,15 @@ describe('StaticCanvas', () => {
     config.configure({ devicePixelRatio: 1 });
   });
 
-  it('toBlob', async () => {
-    const canvas = new StaticCanvas(undefined, { width: 300, height: 300 });
-    const blob = await canvas.toBlob({
-      multiplier: 3,
-    });
-    expect(blob).toBeInstanceOf(Blob);
-    expect(blob?.type).toBe('image/png');
-  });
+  it.each([{}, { multiplier: 3 }])(
+    'toBlob with options %o',
+    async (options) => {
+      const canvas = new StaticCanvas(undefined, { width: 300, height: 300 });
+      const blob = await canvas.toBlob(options);
+      expect(blob).toBeInstanceOf(Blob);
+      expect(blob?.type).toBe('image/png');
+    },
+  );
   it('attempts webp format but may fallback to png in node environment', () => {
     const canvas = new StaticCanvas(undefined, { width: 300, height: 300 });
     const dataURL = canvas.toDataURL({
@@ -495,7 +496,6 @@ describe('StaticCanvas', () => {
       width: 10,
       height: 10,
     });
-    // @ts-expect-error -- multiplier is missing in options and it is mandatory per typescript
     const dataUrl = c.toDataURL({ enableRetinaScaling: true });
     c.cancelRequestedRender();
 
@@ -559,7 +559,6 @@ describe('StaticCanvas', () => {
       width: 10,
       height: 10,
     });
-    // @ts-expect-error -- multiplier is missing in options and it is mandatory per typescript
     const dataUrl = c.toDataURL({ enableRetinaScaling: false });
     c.cancelRequestedRender();
 
@@ -624,7 +623,6 @@ describe('StaticCanvas', () => {
 
   it('generates JPEG data URL correctly', () => {
     try {
-      // @ts-expect-error -- multiplier is mandatory option per typescript types
       const dataURL = canvas.toDataURL({ format: 'jpeg' });
       expect(dataURL.substring(0, 22)).toBe('data:image/jpeg;base64');
     } catch {
@@ -637,7 +635,6 @@ describe('StaticCanvas', () => {
     expect(canvas.toDataURL).toBeTypeOf('function');
     const croppingWidth = 75;
     const croppingHeight = 50;
-    // @ts-expect-error -- multiplier is mandatory option per typescript types
     const dataURL = canvas.toDataURL({
       width: croppingWidth,
       height: croppingHeight,

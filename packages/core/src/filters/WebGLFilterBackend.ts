@@ -159,7 +159,7 @@ export class WebGLFilterBackend {
     };
     const tempFbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
-    filters.forEach((filter: any) => {
+    filters.forEach((filter) => {
       filter && filter.applyTo(pipelineState);
     });
     resizeCanvasIfNeeded(pipelineState);
