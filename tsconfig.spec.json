@@ -3,6 +3,9 @@
   "compilerOptions": {
     "types": [],
     "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
     "allowSyntheticDefaultImports": true,
     "paths": {
       "fabric": ["./index"],

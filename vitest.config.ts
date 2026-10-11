@@ -38,7 +38,9 @@ export default defineConfig({
           environmentOptions: {
             jsdom: {
               resources: 'usable',
-              url: fixturesUrl,
+              // Keep a normal document origin while resolving fixtures from disk.
+              url: 'http://localhost/',
+              html: `<!DOCTYPE html><html><head><base href="${fixturesUrl}"></head><body></body></html>`,
             },
           },
           name: 'unit-node',

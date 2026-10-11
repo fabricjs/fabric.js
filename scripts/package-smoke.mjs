@@ -423,12 +423,12 @@ try {
   smokeImport(
     rootProject,
     'fabric/node',
-    "import { StaticCanvas, Rect } from 'fabric/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node import failed');",
+    "import { StaticCanvas, Rect } from 'fabric/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node import failed'); canvas.renderAll(); if (!canvas.getNodeCanvas().toBuffer().length) throw new Error('fabric/node PNG export failed');",
   );
   smokeRequire(
     rootProject,
     'fabric/node CommonJS',
-    "const { StaticCanvas, Rect } = require('fabric/node'); const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node CommonJS require failed');",
+    "const { StaticCanvas, Rect } = require('fabric/node'); const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('fabric/node CommonJS require failed'); canvas.renderAll(); if (!canvas.getNodeCanvas().toBuffer().length) throw new Error('fabric/node CommonJS PNG export failed');",
   );
   smokeImport(
     rootProject,
@@ -474,7 +474,7 @@ try {
   smokeImport(
     splitProject,
     '@fabricjs/node',
-    "import { StaticCanvas, Rect } from '@fabricjs/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('@fabricjs/node import failed');",
+    "import { StaticCanvas, Rect } from '@fabricjs/node'; const canvas = new StaticCanvas(undefined, { width: 10, height: 10 }); canvas.add(new Rect({ width: 1, height: 1 })); if (canvas.getObjects().length !== 1) throw new Error('@fabricjs/node import failed'); canvas.renderAll(); if (!canvas.getNodeCanvas().toBuffer().length) throw new Error('@fabricjs/node PNG export failed');",
   );
   smokeImport(
     splitProject,

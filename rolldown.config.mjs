@@ -154,7 +154,7 @@ export default [
       },
     ],
     onwarn,
-    external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+    external: ['jsdom', 'jsdom/lib/generated/idl/utils.js', 'canvas'],
   },
   // WORKSPACE PACKAGES
   ...buildableWorkspacePackages.map(workspacePackageBuildConfig),

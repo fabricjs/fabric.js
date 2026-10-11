@@ -1,7 +1,7 @@
 import type { Canvas as NodeCanvas } from 'canvas';
 import { JSDOM } from 'jsdom';
 // @ts-expect-error internal import
-import utils from 'jsdom/lib/jsdom/living/generated/utils.js';
+import utils from 'jsdom/lib/generated/idl/utils.js';
 import type { TCopyPasteData, TFabricEnv, TFabricWindow } from '@fabricjs/core';
 import { NodeGLProbe } from './NodeGLProbe';
 

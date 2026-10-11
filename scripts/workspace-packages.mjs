@@ -32,7 +32,7 @@ export const workspacePackages = [
       external: [
         '@fabricjs/core',
         'jsdom',
-        'jsdom/lib/jsdom/living/generated/utils.js',
+        'jsdom/lib/generated/idl/utils.js',
         'canvas',
       ],
     },
