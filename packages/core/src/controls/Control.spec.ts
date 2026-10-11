@@ -30,7 +30,7 @@ describe('Controls', () => {
     ) {
       this.__corner = 'test';
 
-      return { key: 'test', control };
+      return { key: 'test', control, coord: this.oCoords.test };
     });
 
     const canvas = new Canvas();
