@@ -12,6 +12,7 @@
 - ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
 - fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
 - test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- chore(): update fabric repo to typescript 7, keep astro on typescript 6 [#11140](https://github.com/fabricjs/fabric.js/pull/11140)
 - chore(): migrate eslint to oxlint [#11139](https://github.com/fabricjs/fabric.js/pull/11139)
 - fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
 - [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
