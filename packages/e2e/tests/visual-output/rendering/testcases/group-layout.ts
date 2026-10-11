@@ -1,6 +1,11 @@
-import type { renderTestType } from '../../../types';
+import type { GroupProps, TOriginX, TOriginY } from 'fabric';
+import type { FabricNamespace, renderTestType } from '../../../types';
 
-const createGroupForLayoutTests = (fabric: any, text: string, options: any) => {
+const createGroupForLayoutTests = (
+  fabric: FabricNamespace,
+  text: string,
+  options: Partial<GroupProps>,
+) => {
   const circle = new fabric.Circle({
     radius: 50,
   });
@@ -22,10 +27,10 @@ const createGroupForLayoutTests = (fabric: any, text: string, options: any) => {
 };
 
 const createObjectsForOriginTests = (
-  fabric: any,
-  originX: string,
-  originY: string,
-  options: any,
+  fabric: FabricNamespace,
+  originX: TOriginX,
+  originY: TOriginY,
+  options: Partial<GroupProps>,
 ) => {
   const rect1 = new fabric.Rect({
     width: 30,
@@ -113,7 +118,7 @@ const fitContentReLayout: renderTestType = {
     });
     const objects = g.removeAll();
     // layout
-    objects.forEach((o: any) => g.add(o));
+    objects.forEach((o) => g.add(o));
     canvas.add(g);
     canvas.renderAll();
   },
@@ -237,7 +242,7 @@ const fitContentLayoutChange: renderTestType = {
     );
 
     g.item(0).setPositionByOrigin(
-      new fabric.Point(point.x, g.item(0).y),
+      new fabric.Point(point.x, g.item(0).top),
       'left',
       g.item(0).originY,
     );
@@ -375,8 +380,8 @@ const absClipPathLayout: renderTestType = {
 };
 
 const originTests: renderTestType[] = [];
-const originX = ['left', 'center', 'right'];
-const originY = ['top', 'center', 'bottom'];
+const originX = ['left', 'center', 'right'] as const;
+const originY = ['top', 'center', 'bottom'] as const;
 
 for (let angle = 0; angle < 360; angle += 30) {
   originX.forEach((ox) => {

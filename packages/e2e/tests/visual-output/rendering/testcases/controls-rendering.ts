@@ -469,14 +469,13 @@ export const controlsRenderingTests: renderTestType[] = [
 
       const activeSelection = new fabric.ActiveSelection([rect, rect2], {
         canvas: canvas,
-        // @ts-expect-error -- TODO: why is `isMoving` not part of options?
-        isMoving: true,
         cornerSize: 12,
         cornerColor: 'black',
         cornerStrokeColor: 'black',
         borderColor: 'black',
         borderScaleFactor: 4,
       });
+      activeSelection.isMoving = true;
 
       canvas.setActiveObject(activeSelection);
     },

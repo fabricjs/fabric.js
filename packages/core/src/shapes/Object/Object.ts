@@ -680,7 +680,7 @@ export class FabricObject<
     /* no op */
   }
 
-  renderCache(this: TCachedFabricObject, options?: any) {
+  renderCache(this: TCachedFabricObject, options?: { forClipping?: boolean }) {
     options = options || {};
     if (!this._cacheCanvas || !this._cacheContext) {
       this._createCacheCanvas();

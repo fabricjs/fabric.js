@@ -71,7 +71,7 @@ export type TSVGExportOptions = {
     width: number;
     height: number;
   };
-  encoding?: 'UTF-8'; // test Encoding type and see what happens
+  encoding?: string;
   width?: string;
   height?: string;
   reviver?: TSVGReviver;
