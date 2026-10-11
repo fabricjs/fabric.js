@@ -13,10 +13,12 @@ import {
   it,
 } from 'vitest';
 import { FabricText } from '../Text/Text';
+import type { SerializedTextProps } from '../Text/Text';
 import { version } from '../../../package.json';
 import { getFabricWindow } from '../../env';
 import { config } from '../../config';
 import { LEFT, LTR } from '../../constants';
+import type { TOptions } from '../../typedefs';
 
 const ITEXT_OBJECT = {
   version: version,
@@ -69,7 +71,7 @@ const ITEXT_OBJECT = {
   pathSide: LEFT,
   pathAlign: 'baseline' as const,
   textDecorationThickness: 66.67,
-};
+} satisfies TOptions<SerializedTextProps>;
 
 describe('IText', () => {
   let canvas: Canvas;
