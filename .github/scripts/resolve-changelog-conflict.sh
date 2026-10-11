@@ -3,19 +3,16 @@ set -euo pipefail
 
 endpoint="repos/$GH_REPO/pulls/$PR_NUMBER"
 pr=$(gh api "$endpoint")
-review=$(gh api "$endpoint/reviews/$REVIEW_ID")
 head=$(jq -r '.head.sha' <<< "$pr")
 base=$(jq -r '.base.sha' <<< "$pr")
 branch=$(jq -r '.head.ref' <<< "$pr")
 
-if ! jq -e --arg repo "$GH_REPO" '.state == "open" and .draft == false and .mergeable == false and .base.ref == "master" and .head.ref != "master" and .head.repo.full_name == $repo' <<< "$pr" >/dev/null ||
-   ! jq -e --arg head "$head" '.state == "APPROVED" and .commit_id == $head and .user.type == "User"' <<< "$review" >/dev/null; then
-  echo '::notice::No conflict on an open repository PR with a current human approval'
+if ! jq -e --arg repo "$GH_REPO" --arg head "$REQUESTED_HEAD" '.state == "open" and .draft == false and .mergeable != true and .head.sha == $head and (any(.labels[]; .name == "resolve-changelog")) and .base.ref == "master" and .head.ref != "master" and .head.repo.full_name == $repo' <<< "$pr" >/dev/null; then
+  echo '::notice::No eligible conflict on the labeled repository PR head'
   exit 0
 fi
-reviewer=$(jq -r '.user.login' <<< "$review")
-if ! gh api "repos/$GH_REPO/collaborators/$reviewer/permission" --jq '.permission' | grep -Eq '^(write|maintain|admin)$'; then
-  echo '::notice::The approving reviewer must have write access'
+if ! gh api "repos/$GH_REPO/collaborators/$REQUESTED_BY/permission" --jq '.permission' | grep -Eq '^(write|maintain|admin)$'; then
+  echo '::notice::The person adding the label must have write access'
   exit 0
 fi
 
@@ -34,7 +31,7 @@ printf '* merge=text -filter\n/CHANGELOG.md merge=union\n' > .git/info/attribute
 git remote add origin "${1:-https://github.com/$GH_REPO.git}"
 git fetch --no-tags origin "refs/heads/master:refs/heads/base" "refs/pull/$PR_NUMBER/head:refs/heads/head"
 if [[ $(git rev-parse head) != "$head" || $(git rev-parse base) != "$base" ]]; then
-  echo '::notice::A branch changed while fetching; approve again to retry'
+  echo '::notice::A branch changed while fetching; remove and reapply the label to retry'
   exit 0
 fi
 git checkout --quiet --detach "$head"
@@ -44,14 +41,12 @@ if ! git merge --no-ff --no-commit "$base"; then
 fi
 git commit -m "Merge master into PR #$PR_NUMBER and resolve changelog with union"
 
-# Confirm the PR and approval are still current before updating the branch.
+# Confirm the labeled PR still points to the same branches before pushing.
 pr=$(gh api "$endpoint")
-review=$(gh api "$endpoint/reviews/$REVIEW_ID")
-if ! jq -e --arg head "$head" --arg base "$base" --arg branch "$branch" --arg repo "$GH_REPO" '.state == "open" and .draft == false and .head.sha == $head and .base.sha == $base and .head.ref == $branch and .base.ref == "master" and .head.repo.full_name == $repo' <<< "$pr" >/dev/null ||
-   ! jq -e --arg head "$head" '.state == "APPROVED" and .commit_id == $head' <<< "$review" >/dev/null; then
-  echo '::notice::The PR or approval changed; nothing will be pushed'
+if ! jq -e --arg head "$head" --arg base "$base" --arg branch "$branch" --arg repo "$GH_REPO" '.state == "open" and .draft == false and (any(.labels[]; .name == "resolve-changelog")) and .head.sha == $head and .base.sha == $base and .head.ref == $branch and .base.ref == "master" and .head.repo.full_name == $repo' <<< "$pr" >/dev/null; then
+  echo '::notice::The PR or label changed; nothing will be pushed'
   exit 0
 fi
-# The merge extends the reviewed head; the lease rejects concurrent pushes/rebases.
+# The merge extends the requested head; the lease rejects concurrent pushes/rebases.
 git push "--force-with-lease=refs/heads/$branch:$head" origin "HEAD:refs/heads/$branch"
-echo '::notice::Changelog merged by github-actions[bot]; review and approve again if required'
+echo '::notice::Changelog merged by github-actions[bot]; review the merge and approve when ready'

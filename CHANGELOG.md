@@ -2,6 +2,7 @@
 
 ## [next]
 
+- ci(): trigger changelog conflict resolution with a label
 - ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
 - fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
 - test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
