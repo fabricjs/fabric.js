@@ -115,7 +115,7 @@ describe('IText', () => {
 
         text.renderCursorAt(1);
         const call = fillRect.mock.calls[0];
-        expect({ width: call[2], height: call[3] }).toMatchSnapshot({
+        expect({ width: call[2], height: call[3] }).toMatchSnapshotWithOptions({
           cloneDeepWith: (value: unknown) =>
             typeof value === 'number' ? value.toFixed(3) : undefined,
         });

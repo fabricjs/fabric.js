@@ -71,7 +71,7 @@ describe('FabricText', () => {
       const text = new FabricText('');
       const style = text.getCompleteStyleDeclaration(0, 0);
       const measurement = text._measureChar('a', style, zwc, style);
-      expect(measurement).toMatchSnapshot(roundSnapshotOptions);
+      expect(measurement).toMatchSnapshotWithOptions(roundSnapshotOptions);
       expect(measurement).toEqual(text._measureChar('a', style, zwc, style));
     });
 

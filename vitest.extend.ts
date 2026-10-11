@@ -71,8 +71,7 @@ expect.extend({
     delete snap.version;
 
     const value = cloneDeepWith(snap, (v, k, obj, stack) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const c = (customiser as any)?.(v, k, obj, stack);
+      const c = customiser?.(v, k, obj, stack);
       if (c !== undefined) return c;
       if ((k === 'width' || k === 'height') && typeof v === 'number')
         return Math.round(v * 100) / 100;
@@ -83,7 +82,7 @@ expect.extend({
     return toMatchSnapshot.call(this, value, properties, hint);
   },
 
-  toMatchSnapshot(
+  toMatchSnapshotWithOptions(
     received: unknown,
     { cloneDeepWith: customiser, ...rest }: ExtendedOptions = {},
     hint?: string,

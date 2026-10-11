@@ -331,8 +331,8 @@ describe('Layout Manager', () => {
         },
       };
 
-      expect(manager['getLayoutResult'](context)).toMatchSnapshot({
-        cloneDeepWith: (value: any) => {
+      expect(manager['getLayoutResult'](context)).toMatchSnapshotWithOptions({
+        cloneDeepWith: (value) => {
           if (value instanceof Point) {
             return new Point(Math.round(value.x), Math.round(value.y));
           }

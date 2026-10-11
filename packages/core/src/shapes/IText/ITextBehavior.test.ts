@@ -17,7 +17,7 @@ export function matchTextStateSnapshot(text: IText) {
     text: t,
     lines,
     charBounds,
-  }).toMatchSnapshot(roundSnapshotOptions);
+  }).toMatchSnapshotWithOptions(roundSnapshotOptions);
   expect(text).toMatchObjectSnapshot({ includeDefaultValues: false });
 }
 

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type -- augmenting vitest matchers */
 import 'vitest';
 import type { TMat2D } from './packages/core/src/typedefs';
-import type { cloneDeepWith } from 'es-toolkit/compat';
 import type { SerializedImageProps } from './packages/core/src/shapes/Image';
 
 type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
@@ -9,11 +8,16 @@ type ObjectOptions<T = unknown> = ExtendedOptions<T> & {
 };
 
 type ExtendedOptions<T = unknown> = {
-  cloneDeepWith?: Parameters<typeof cloneDeepWith<T>>[1];
-} & object;
+  cloneDeepWith?: (
+    value: unknown,
+    key: PropertyKey | undefined,
+    object: T | undefined,
+    stack: Map<unknown, unknown>,
+  ) => unknown;
+};
 
 interface CustomMatchers<R = unknown, T = unknown> {
-  toMatchSnapshot(propertiesOrHint?: ExtendedOptions<T>, hint?: string): R;
+  toMatchSnapshotWithOptions(options?: ExtendedOptions<T>, hint?: string): R;
 
   toMatchObjectSnapshot(propertiesOrHint?: ObjectOptions<T>, hint?: string): R;
 
