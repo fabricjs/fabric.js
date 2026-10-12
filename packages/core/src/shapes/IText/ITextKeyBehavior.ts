@@ -117,31 +117,25 @@ export abstract class ITextKeyBehavior<
       return;
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
-    let shouldRenderAll: boolean;
-    if (e.keyCode in keyMap) {
-      shouldRenderAll = keyMap[e.keyCode] !== 'cmdAll';
-      (this[keyMap[e.keyCode] as keyof this] as (arg: KeyboardEvent) => void)(
-        e,
-      );
-    } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-      // cmdAll already draws the selection on the upper canvas.
-      shouldRenderAll = this.ctrlKeysMapDown[e.keyCode] !== 'cmdAll';
-      (
-        this[this.ctrlKeysMapDown[e.keyCode] as keyof this] as (
-          arg: KeyboardEvent,
-        ) => void
-      )(e);
-    } else {
+    const action =
+      e.keyCode in keyMap
+        ? keyMap[e.keyCode]
+        : e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)
+          ? this.ctrlKeysMapDown[e.keyCode]
+          : undefined;
+    if (!action) {
       return;
     }
+    const isSelectAll = action === 'cmdAll';
+    (this[action as keyof this] as (arg: KeyboardEvent) => void)(e);
     e.stopImmediatePropagation();
     e.preventDefault();
-    if (e.keyCode >= 33 && e.keyCode <= 40) {
-      // if i press an arrow key just update selection
+    if ((e.keyCode >= 33 && e.keyCode <= 40) || isSelectAll) {
+      // Navigation and select-all only update the selection.
       this.inCompositionMode = false;
       this.clearContextTop();
       this.renderCursorOrSelection();
-    } else if (shouldRenderAll) {
+    } else {
       this.canvas && this.canvas.requestRenderAll();
     }
   }

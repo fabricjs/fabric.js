@@ -68,6 +68,35 @@ describe.each([
   });
 });
 
+describe('IText select-all redraw', () => {
+  test.each(['ctrlKey', 'metaKey'] as const)(
+    'ends composition and redraws the full selection after %s+A',
+    async (modifier) => {
+      const canvas = new Canvas(undefined, { width: 300, height: 150 });
+      const text = new IText('select this text');
+      try {
+        canvas.add(text);
+        text.enterEditing();
+        text.abortCursorAnimation();
+        canvas.renderAll();
+        Object.assign(text, { inCompositionMode: true });
+        const requestRender = vi.spyOn(canvas, 'requestRenderAll');
+        text.onKeyDown({
+          keyCode: 65,
+          [modifier]: true,
+          stopImmediatePropagation: noop,
+          preventDefault: noop,
+        } as KeyboardEvent);
+        expect(text).toHaveProperty('inCompositionMode', false);
+        expect(text.getSelectedText()).toBe(text.text);
+        expect(requestRender).not.toHaveBeenCalled();
+      } finally {
+        await canvas.dispose();
+      }
+    },
+  );
+});
+
 describe('IText custom keyboard mappings', () => {
   test.each(['keysMap', 'ctrlKeysMapDown'] as const)(
     'still requests a render when %s maps Ctrl+A to exitEditing',
