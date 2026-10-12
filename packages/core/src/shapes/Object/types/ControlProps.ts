@@ -1,4 +1,11 @@
+import type { TControlSet } from '../InteractiveObject';
+
 export interface ControlProps {
+  /**
+   * Controls used to manipulate the object.
+   */
+  controls: TControlSet;
+
   /**
    * Size of object's controlling corners (in pixels)
    * @type Number
