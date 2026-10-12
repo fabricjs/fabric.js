@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(types): allow custom controls in object options [#11147](https://github.com/fabricjs/fabric.js/pull/11147)
+- fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
 - chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
 - ci(): use fetched master when resolving changelog conflicts
 - ci(): trigger changelog conflict resolution with a label
