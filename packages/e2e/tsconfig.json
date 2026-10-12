@@ -3,6 +3,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "../..",
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",

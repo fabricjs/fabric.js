@@ -127,7 +127,7 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 We strongly recommend to run your applications only LTS versions of node.
 
-Said so the minimum supported version of node is 20.
+Supported Node.js versions are 22.22.2+, 24.15+, and 26 or newer, matching jsdom's requirements.
 We bump up the minimum version of node with a Major release only when the dependencies force us to do so.
 
 Fabric.js depends on [node-canvas][node_canvas] for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom][jsdom] for a `window` implementation on node.

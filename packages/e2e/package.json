@@ -20,10 +20,7 @@
   "devDependencies": {
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
-    "typescript": "catalog:",
+    "@typescript/native": "catalog:",
     "vite": "8.3.1"
-  },
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
   }
 }

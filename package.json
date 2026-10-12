@@ -78,6 +78,7 @@
     "@playwright/test": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "@vitest/browser-playwright": "5.0.1",
     "@vitest/coverage-v8": "5.0.1",
     "@vitest/ui": "5.0.1",
@@ -89,7 +90,7 @@
     "oxlint": "1.87.0",
     "oxlint-tsgolint": "7.0.2004",
     "picomatch": "2.3.2",
-    "rolldown": "1.2.9",
+    "rolldown": "1.2.13",
     "typedoc": "catalog:",
     "typescript": "catalog:",
     "vitest": "5.0.1",
@@ -104,7 +105,7 @@
     "@fabricjs/westures-integration": "workspace:^"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
   },
   "overrides": {
     "canvas": {
