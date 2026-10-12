@@ -2,7 +2,7 @@ export const log = (
   severity: 'log' | 'warn' | 'error',
   ...optionalParams: any[]
 ) =>
-  // eslint-disable-next-line no-restricted-syntax
+  // oxlint-disable-next-line fabric/no-restricted-syntax
   console[severity]('fabric', ...optionalParams);
 
 export class FabricError extends Error {

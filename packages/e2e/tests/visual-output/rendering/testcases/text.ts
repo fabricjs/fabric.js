@@ -889,8 +889,7 @@ const cases: renderTestType[] = [
         target: canvas.upperCanvasEl,
       });
 
-      // @ts-expect-error -- private method
-      canvas._onDragStart({
+      const dragStartEvent = {
         clientX: 5,
         clientY: 5,
         target: canvas.upperCanvasEl,
@@ -900,7 +899,9 @@ const cases: renderTestType[] = [
           setData() {},
           setDragImage() {},
         },
-      });
+      };
+      // @ts-expect-error -- private method and partial mock of DragEvent
+      canvas._onDragStart(dragStartEvent);
 
       // @ts-expect-error -- partial mock of DragEvent
       canvas._onDragOver({
