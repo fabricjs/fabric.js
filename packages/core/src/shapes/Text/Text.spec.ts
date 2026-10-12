@@ -2,6 +2,8 @@ import { roundSnapshotOptions } from '../../../../../vitest.extend';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { Path } from '../Path';
+import { Group } from '../Group';
+import { Shadow } from '../../Shadow';
 import { FabricText } from './Text';
 
 import { describe, expect, it, afterEach, vi } from 'vitest';
@@ -61,6 +63,40 @@ describe('FabricText', () => {
   it('fromObject', async () => {
     expect((await FabricText.fromObject({ text: 'text' })).toObject()).toEqual(
       new FabricText('text').toObject(),
+    );
+  });
+
+  describe('decoration shadows', () => {
+    it.each(['overline', 'linethrough'] as const)(
+      'requires a cache for a shadow with %s',
+      (decoration) => {
+        const text = new FabricText('Shadow', {
+          objectCaching: false,
+          shadow: new Shadow({ color: 'red' }),
+          [decoration]: true,
+        });
+
+        expect(text.shouldCache()).toBe(true);
+        text.set(decoration, false);
+        expect(text.shouldCache()).toBe(false);
+      },
+    );
+
+    it.each(['underline', 'overline', 'linethrough'] as const)(
+      'keeps character-level %s shadows on their own cache inside a cached group',
+      (decoration) => {
+        const text = new FabricText('Shadow', {
+          objectCaching: false,
+          shadow: new Shadow({ color: 'red', blur: 5 }),
+          styles: { 0: { 1: { [decoration]: true } } },
+        });
+        const group = new Group([text]);
+
+        expect(group.shouldCache()).toBe(true);
+        expect(text.shouldCache()).toBe(true);
+        text.set('shadow', null);
+        expect(text.shouldCache()).toBe(false);
+      },
     );
   });
 

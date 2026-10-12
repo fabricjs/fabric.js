@@ -137,6 +137,35 @@ function createTextBoxSubclass(fabric: FabricNamespace) {
 
 const cases: renderTestType[] = [
   {
+    title: 'Text decoration shadow with objectCaching disabled',
+    golden: 'textDecorationShadow.png',
+    percentage: 0.005,
+    size: [400, 160],
+    async renderFunction(canvas, fabric) {
+      // Regression for #5364: both glyphs and underline should cast a shadow.
+      canvas.backgroundColor = 'white';
+      canvas.add(
+        new fabric.FabricText('Shadow', {
+          left: 30,
+          top: 20,
+          originX: 'left',
+          originY: 'top',
+          fontSize: 80,
+          fill: 'black',
+          underline: true,
+          objectCaching: false,
+          shadow: new fabric.Shadow({
+            color: 'red',
+            offsetX: 8,
+            offsetY: 8,
+            blur: 0,
+          }),
+        }),
+      );
+      canvas.renderAll();
+    },
+  },
+  {
     title: 'Simple text test',
     golden: 'text1.png',
     percentage: 0.06,

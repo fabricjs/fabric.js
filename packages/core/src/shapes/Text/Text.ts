@@ -48,6 +48,7 @@ import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
   textDefaultValues,
+  textDecorationProperties,
   textLayoutProperties,
   JUSTIFY,
   JUSTIFY_CENTER,
@@ -647,6 +648,19 @@ export class FabricText<
     dims.width += fontSize * dims.zoomX;
     dims.height += fontSize * dims.zoomY;
     return dims;
+  }
+
+  /**
+   * Keep the shadow behind the combined glyphs and decorations.
+   */
+  needsItsOwnCache() {
+    return (
+      super.needsItsOwnCache() ||
+      (!!this.shadow &&
+        textDecorationProperties.some(
+          (property) => this[property] || this.styleHas(property),
+        ))
+    );
   }
 
   /**
