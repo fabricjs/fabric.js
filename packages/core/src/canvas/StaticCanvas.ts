@@ -1240,8 +1240,8 @@ export class StaticCanvas<
    */
   loadFromJSON(
     json: string | Record<string, any>,
-    reviver?: EnlivenObjectOptions['reviver'],
-    options: EnlivenObjectOptions = {},
+    reviver?: EnlivenObjectOptions<FabricObject>['reviver'],
+    options: EnlivenObjectOptions<FabricObject> = {},
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new FabricError('`json` is undefined'));
