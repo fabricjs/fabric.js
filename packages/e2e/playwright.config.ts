@@ -8,7 +8,7 @@ const config: PlaywrightTestConfig = {
   testDir: './tests',
   // Keep workspace package imports on their built artifacts when Playwright
   // resolves imports from symlinked workspace packages.
-  tsconfig: './tsconfig.json',
+  tsconfig: './tsconfig.playwright.json',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {

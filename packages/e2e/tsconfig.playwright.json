@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@fabricjs/aligning-guidelines": ["../aligning-guidelines/dist/index"],
+      "@fabricjs/browser": ["../browser/dist/index"],
+      "@fabricjs/core": ["../core/dist/index"],
+      "@fabricjs/cropping-controls": ["../cropping-controls/dist/index"],
+      "@fabricjs/data-updaters": ["../data-updaters/dist/index"],
+      "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
+      "@fabricjs/node": ["../node/dist/index"],
+      "fabric": ["../../dist/index"],
+      "fabric/node": ["../../dist/index.node"]
+    }
+  }
+}

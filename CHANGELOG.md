@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(types): align revivers with enlivened object types [#11148](https://github.com/fabricjs/fabric.js/pull/11148)
+- fix(brushes): keep spray dots in place when finishing a stroke [#11150](https://github.com/fabricjs/fabric.js/pull/11150)
 - fix(path): draw an arc with a zero radius as a line instead of dropping it
 - test(): preserve transform names in fuzz generators [#11149](https://github.com/fabricjs/fabric.js/pull/11149)
 - fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
@@ -12,6 +13,7 @@
 - ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
 - fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
 - test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- chore(): migrate eslint to oxlint [#11139](https://github.com/fabricjs/fabric.js/pull/11139)
 - fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
 - [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
 - chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
