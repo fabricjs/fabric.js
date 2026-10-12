@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(IText): preserve select-all highlights in cached groups [#11116](https://github.com/fabricjs/fabric.js/pull/11116)
 - fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
 - chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
 - ci(): use fetched master when resolving changelog conflicts
