@@ -8,10 +8,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 describe('polyControl', () => {
   it('should fire events', () => {
+    const controls = createPolyControls(4);
     const poly = new Polygon(
       [new Point(), new Point(50, 0), new Point(50, 50), new Point(0, 50)],
-      { controls: createPolyControls(4) },
+      { controls },
     );
+    expect(poly.controls).toBe(controls);
     vi.spyOn(poly, 'set');
     const canvas = new Canvas();
     canvas.add(poly);
