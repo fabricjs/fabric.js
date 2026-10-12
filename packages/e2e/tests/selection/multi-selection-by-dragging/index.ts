@@ -1,6 +1,5 @@
 /**
  * Runs in the **BROWSER**
- * Imports are defined in 'packages/e2e/imports.ts'
  */
 
 import { Rect, ActiveSelection, Point } from 'fabric';

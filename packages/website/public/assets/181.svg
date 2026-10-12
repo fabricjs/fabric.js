@@ -1,0 +1,84 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="60.249" height="82.274" viewBox="0 0 15.940842 21.768412">
+	<defs>
+		<linearGradient id="d">
+			<stop offset="0" stop-color="#d3bc5f"/>
+			<stop offset=".096" stop-color="#786721"/>
+			<stop offset=".24" stop-color="#a0892c"/>
+			<stop offset=".299" stop-color="#c8ab37"/>
+			<stop offset=".467" stop-color="#fff"/>
+			<stop offset=".607" stop-color="#a0892c"/>
+			<stop offset=".78" stop-color="#504416"/>
+			<stop offset=".9" stop-color="#540"/>
+			<stop offset="1" stop-color="#a0892c"/>
+		</linearGradient>
+		<linearGradient id="e">
+			<stop offset="0" stop-color="#a0892c"/>
+			<stop offset=".1" stop-color="#540"/>
+			<stop offset=".22" stop-color="#504416"/>
+			<stop offset=".393" stop-color="#a0892c"/>
+			<stop offset=".533" stop-color="#fff"/>
+			<stop offset=".701" stop-color="#c8ab37"/>
+			<stop offset=".76" stop-color="#a0892c"/>
+			<stop offset=".904" stop-color="#786721"/>
+			<stop offset="1" stop-color="#d3bc5f"/>
+		</linearGradient>
+		<linearGradient id="f">
+			<stop offset="0" stop-color="#c8ab37"/>
+			<stop offset="1" stop-color="#786721"/>
+		</linearGradient>
+		<linearGradient id="g">
+			<stop offset="0" stop-color="#786721"/>
+			<stop offset="1" stop-color="#c8ab37"/>
+		</linearGradient>
+		<radialGradient xlink:href="#a" id="n" gradientUnits="userSpaceOnUse" gradientTransform="matrix(.3487 .40483 -.40345 .34752 108.054 40.97)" cx="193.676" cy="141.252" fx="193.676" fy="141.252" r="4.082"/>
+		<linearGradient id="a">
+			<stop offset="0"/>
+			<stop offset=".817"/>
+			<stop offset=".837" stop-color="#ededed"/>
+			<stop offset=".874" stop-color="#4d4d4d"/>
+			<stop offset=".904" stop-color="#ececec"/>
+			<stop offset=".969"/>
+			<stop offset="1"/>
+		</linearGradient>
+		<linearGradient xlink:href="#b" id="o" gradientUnits="userSpaceOnUse" gradientTransform="translate(16.3 93.714) scale(.52872)" x1="195.171" y1="143.461" x2="191.574" y2="138.568"/>
+		<linearGradient id="b">
+			<stop offset="0" stop-color="#fff"/>
+			<stop offset=".687" stop-color="#fff"/>
+			<stop offset="1" stop-color="#ccc"/>
+		</linearGradient>
+		<linearGradient xlink:href="#c" id="p" gradientUnits="userSpaceOnUse" x1="656.429" y1="320.934" x2="506.429" y2="131.648" gradientTransform="matrix(.0017 0 0 .0017 117.64 168.082)"/>
+		<linearGradient id="c">
+			<stop offset="0" stop-color="#666"/>
+			<stop offset="1" stop-color="#f2f2f2"/>
+		</linearGradient>
+		<linearGradient xlink:href="#d" id="h" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 921.58 0)" x1="481.066" y1="785.465" x2="480.953" y2="793.102"/>
+		<linearGradient xlink:href="#e" id="i" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 921.58 0)" x1="473.934" y1="792.821" x2="473.822" y2="784.005"/>
+		<linearGradient xlink:href="#f" id="j" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 921.58 0)" x1="475.081" y1="785.381" x2="479.3" y2="788.975"/>
+		<linearGradient xlink:href="#f" id="k" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 921.58 0)" x1="476.181" y1="791.235" x2="477.099" y2="794.257"/>
+		<linearGradient xlink:href="#g" id="l" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 921.58 0)" x1="473.32" y1="784.06" x2="479.896" y2="784.06"/>
+		<linearGradient xlink:href="#d" id="m" gradientUnits="userSpaceOnUse" gradientTransform="matrix(.93343 0 0 .85628 -219.064 163.965)" x1="481.066" y1="785.465" x2="480.953" y2="793.102"/>
+	</defs>
+	<path d="M442.142 794.394l-2.583-1.46c-.644-2.39-.512-5.004-.113-7.693l2.808-1.29" fill="url(#h)" transform="matrix(0 -.53538 .6074 0 -471.088 256.86)"/>
+	<path d="M448.32 783.332l.673 2.02c-.885 1.242-.83 2.952-.075 7.92l-1.16 1.57-1.18-4.49.17-5.673z" fill="url(#i)" transform="matrix(0 -.53538 .6074 0 -471.088 256.86)"/>
+	<path d="M447.365 784.68h-5.616c-.592 1.87-.812 3.743-.506 5.615l5.952.056c.658-1.976.554-3.843.17-5.67z" fill="url(#j)" transform="matrix(0 -.53538 .6074 0 -471.088 256.86)"/>
+	<path d="M447.196 790.248c.397 1.492.613 3.14.562 4.483l-5.503-.056c-.974-1.853-.957-3.128-1.067-4.406z" fill="url(#k)" transform="matrix(0 -.53538 .6074 0 -471.088 256.86)"/>
+	<path d="M447.196 784.68c.783-.43.715-.862.955-1.292l-5.67.224c-.308.343-.704.64-.73 1.123z" fill="url(#l)" transform="matrix(0 -.53538 .6074 0 -471.088 256.86)"/>
+	<path d="M228.298 844.02l2.57-1.083c.6-2.048.477-4.285.104-6.587l-2.62-1.106" fill="url(#m)" transform="matrix(0 .53538 .6074 0 -501.802 -106.863)"/>
+	<g transform="matrix(3.43426 0 0 3.43426 -399.38 -570.662)">
+		<circle cx="118.614" cy="168.488" r="2.321" fill="url(#n)"/>
+		<circle cx="118.606" cy="168.45" r="1.789" fill="url(#o)" stroke="#b3b3b3" stroke-width=".017" stroke-linecap="round"/>
+		<circle id="IoTa_RotateCenter" r=".23" cy="168.45" cx="118.606" fill="url(#p)" stroke="#999" stroke-width=".002" stroke-linecap="round"/>
+		<path d="M117.195 168.45h-.295M120.016 168.45h.295M118.606 167.04v-.295M117.9 167.23l-.147-.257M119.827 167.745l.256-.148M119.31 167.23l.15-.257M117.384 167.745l-.256-.148M119.968 168.815l.285.077M117.244 168.815l-.286.077M119.968 168.085l.285-.076M118.24 167.088l-.076-.285M117.61 167.453l-.21-.21M119.603 167.453l.21-.21M118.97 167.088l.077-.285M117.244 168.085l-.286-.076" fill="#e6e6e6" stroke="#4d4d4d" stroke-width=".05"/>
+	</g>
+	<g id="IoTa_Rotate_0_210">
+		<path d="M2.018 9.394L9.69 7.676l.287-.363-.466-.14z" fill="#a02c2c"/>
+		<path d="M2.018 9.394L9.69 7.676l.287-.363z" fill="#ff2a2a"/>
+	</g>
+	<text id="IoTa_ValueStart" y="174.717" x="119.499" style="line-height:.96508598px;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start" font-weight="normal" font-size="1.67" font-family="Arial" letter-spacing="0" word-spacing="0" fill="#4d4d4d" stroke-width=".089" transform="translate(-116.293 -163.59)">
+		<tspan style="-inkscape-font-specification:Arial;text-align:start" y="174.717" x="119.499">0</tspan>
+	</text>
+	<text id="IoTa_ValueEnd" style="line-height:.96508598px;-inkscape-font-specification:Arial;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:end" x="129.199" y="174.717" font-weight="400" font-size="1.67" font-family="Arial" letter-spacing="0" word-spacing="0" text-anchor="end" fill="#4d4d4d" stroke-width=".089" transform="translate(-116.293 -163.59)">
+		<tspan x="129.199" y="174.717" style="-inkscape-font-specification:Arial;text-align:end">100</tspan>
+	</text>
+</svg>

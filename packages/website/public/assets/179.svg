@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="500" height="500" id="svg2" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+<linearGradient id="linearGradient2865" x1="0" y1="0" x2="1.2" y2="0" gradientTransform="scale(2, 2) rotate(45)" >
+  <stop id="stop2867" offset="0" style="stop-color:red;stop-opacity:1;"/>
+  <stop id="stop11581" offset="0.24" style="stop-color:cyan;stop-opacity:1;"/>
+  <stop id="stop11581" offset="0.25" style="stop-color:blue;stop-opacity:1;"/>
+  <stop id="stop11581" offset="0.26" style="stop-color:white;stop-opacity:1;"/>
+  <stop id="stop11583" offset="0.35" style="stop-color:green;stop-opacity:1;"/>
+  <stop id="stop11583" offset="0.36" style="stop-color:white;stop-opacity:1;"/>
+  <stop id="stop2869" offset="0.5" style="stop-color:purple;stop-opacity:1;"/>
+</linearGradient>
+</defs>
+<rect x="1" y="1"  width="1"  height="1" />
+<rect transform="translate(250) rotate(30)" stroke-width="25" x="15" y="30" width="200" height="400" fill="url(#linearGradient2865)" stroke-opacity="0.75" stroke="url(#linearGradient2865)" />
+</svg>

@@ -1,0 +1,18 @@
+---
+interface Props {
+    name: string;
+    githubName: string;
+}
+
+const { githubName, name } = Astro.props;
+---
+<strong>
+    {name}
+    <a
+      href={`https://github.com/${githubName}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      @{githubName}
+    </a>
+</strong>

@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["@vitest/browser/providers/playwright"],
+    "types": [],
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
@@ -35,5 +35,11 @@
     "vitest.config.ts",
     "vitest.extend.ts"
   ],
-  "exclude": ["dist", "dist-extensions", "packages/e2e", "test"]
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "packages/e2e",
+    "packages/website",
+    "test"
+  ]
 }

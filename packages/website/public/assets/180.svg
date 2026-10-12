@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <svg width="450px" height="300px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" >
+  <desc>Example PreserveAspectRatio - illustrates preserveAspectRatio attribute</desc>
+  <rect x="1" y="1" width="448" height="298"
+        fill="none" stroke="blue"/>
+  <g font-size="9">
+    <text x="10" y="30">SVG to fit</text>
+    <g transform="translate(20,40)"><image xlink:href="/assets/smile.png" width="30" height="40" ></image></g>
+    <text x="10" y="110">Viewport 1</text>
+    <g transform="translate(10,120)"><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/></g>
+    <text x="10" y="180">Viewport 2</text>
+    <g transform="translate(20,190)"><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/></g>
+
+    <g id="meet-group-1" transform="translate(100, 60)">
+      <text x="0" y="-30">--------------- meet ---------------</text>
+      <g><text y="-10">xMin*</text><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMinYMin meet" width="50" height="30" ></image></g>
+      <g transform="translate(70,0)"><text y="-10">xMid*</text><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMidYMid meet"
+             width="50" height="30"></image></g>
+      <g transform="translate(0,70)"><text y="-10">xMax*</text><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMaxYMax meet"
+             width="50" height="30"></image></g>
+    </g>
+
+    <g id="meet-group-2" transform="translate(250, 60)">
+      <text x="0" y="-30">---------- meet ----------</text>
+      <g><text y="-10">*YMin</text><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMinYMin meet"
+             width="30" height="60"></image></g>
+      <g transform="translate(50, 0)"><text y="-10">*YMid</text><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMidYMid meet"
+             width="30" height="60"></image></g>
+      <g transform="translate(100, 0)"><text y="-10">*YMax</text><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMaxYMax meet"
+             width="30" height="60"></image></g>
+    </g>
+
+    <g id="slice-group-1" transform="translate(100, 220)">
+      <text x="0" y="-30">---------- slice ----------</text>
+      <g><text y="-10">xMin*</text><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMinYMin slice"
+             width="30" height="60" viewBox="0 0 30 40"></image></g>
+      <g transform="translate(50,0)"><text y="-10">xMid*</text><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMidYMid slice"
+             width="30" height="60" viewBox="0 0 30 40"></image></g>
+      <g transform="translate(100,0)"><text y="-10">xMax*</text><rect x='.5' y='.5' width='29' height='59' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMaxYMax slice"
+             width="30" height="60" viewBox="0 0 30 40"></image></g>
+    </g>
+
+    <g id="slice-group-2" transform="translate(250, 220)">
+      <text x="0" y="-30">--------------- slice ---------------</text>
+      <g><text y="-10">*YMin</text><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMinYMin slice"
+             width="50" height="30"></image></g>
+      <g transform="translate(70,0)"><text y="-10">*YMid</text><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMidYMid slice"
+             width="50" height="30"></image></g>
+      <g transform="translate(140,0)"><text y="-10">*YMax</text><rect x='.5' y='.5' width='49' height='29' fill='none' stroke='blue'/>
+        <image xlink:href="/assets/smile.png" preserveAspectRatio="xMaxYMax slice"
+             width="50" height="30"></image></g>
+    </g>
+  </g>
+</svg>

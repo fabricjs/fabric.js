@@ -1,0 +1,46 @@
+{
+  "name": "fabric-astro-7",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check --tsconfig ./tsconfig.json  && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "0.9.10",
+    "@astrojs/mdx": "8.0.2",
+    "@astrojs/react": "7.0.0",
+    "@astrojs/sitemap": "3.7.4",
+    "@astrojs/starlight": "0.42.4",
+    "@codemirror/lang-javascript": "6.2.5",
+    "@codemirror/state": "6.7.1",
+    "@types/jsdom": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "astro": "7.3.5",
+    "canvas": "catalog:",
+    "codemirror": "6.0.2",
+    "fabric": "workspace:*",
+    "jsdom": "catalog:",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "sharp": "0.35.5",
+    "starlight-typedoc": "0.23.1",
+    "thememirror": "2.0.1",
+    "typedoc-plugin-no-inherit": "1.6.1",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": "^20.3.0 || ^22.16.0 || ^24.8.0"
+  },
+  "packageManager": "pnpm@10.29.1",
+  "devDependencies": {
+    "typedoc": "catalog:",
+    "typedoc-plugin-markdown": "4.13.1",
+    "westures": "catalog:"
+  }
+}

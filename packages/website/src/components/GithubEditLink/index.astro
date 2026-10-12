@@ -1,0 +1,15 @@
+---
+interface Props {
+	relativePath: string;
+}
+
+const { relativePath } = Astro.props;
+---
+<a
+    class="github-edit-link"
+    target="_blank"
+    rel="noreferrer"
+    href={`https://github.com/fabricjs/fabric.js/edit/master/packages/website/src/content/${relativePath}`}
+>
+    Edit this page on Github
+</a>

@@ -1,9 +1,10 @@
-import { FabricNamespace } from './tests/types';
+import type { Canvas, FabricObject } from 'fabric';
+import type { FabricNamespace, RenderCallback } from './tests/types';
 
 declare global {
   var canvasMap: Map<HTMLCanvasElement, Canvas>;
   var objectMap: Map<string, FabricObject>;
-  var renderingTestMap: Map<string, () => void | string>;
+  var renderingTestMap: Map<string, RenderCallback>;
 
   function getFixtureName(filename: string): string;
 
@@ -18,15 +19,14 @@ declare global {
 
   interface Window {
     fabric: FabricNamespace;
-    fabricExtensions: typeof import('fabric/extensions');
 
     canvasMap: Map<HTMLCanvasElement, Canvas>;
     objectMap: Map<string, FabricObject>;
-    renderingTestMap: Map<string, () => void | string>;
+    renderingTestMap: Map<string, RenderCallback>;
 
     __setupFabricHook: () => Promise<void[]>;
 
-    __teardownFabricHook(): void;
+    __teardownFabricHook(): Promise<void[]>;
   }
 }
 

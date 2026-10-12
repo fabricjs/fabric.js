@@ -115,7 +115,7 @@ export type TToCanvasElementOptions<
 
 export type TDataUrlOptions<T extends BaseFabricObject = BaseFabricObject> =
   TToCanvasElementOptions<T> & {
-    multiplier: number;
+    multiplier?: number;
     format?: ImageFormat;
     quality?: number;
     enableRetinaScaling?: boolean;

@@ -33,11 +33,13 @@ const makeBBoxOld = (points) => {
 const size = 10000;
 const arraySize = 6000;
 
-const points = new Array(arraySize)
-  .fill(0)
-  .map(
-    () => new Point((Math.random() - 0.5) * 1000, (Math.random() - 0.5) * 1000),
-  );
+const points = new Array(arraySize).fill(0).map(
+  () =>
+    new Point(
+      (Math.random() - 0.5) * 1000, // NOSONAR: benchmark coordinates.
+      (Math.random() - 0.5) * 1000, // NOSONAR: benchmark coordinates.
+    ),
+);
 
 const benchmark = (callback) => {
   const start = Date.now();

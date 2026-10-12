@@ -1,0 +1,26 @@
+#drawing-mode-options {
+  max-width: 350px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+#drawing-mode {
+  margin-bottom: 10px;
+  vertical-align: top;
+}
+.info {
+  display: inline-block;
+  width: 35px;
+}
+#bd-wrapper {
+  min-width: 1500px;
+}
+canvas {
+  border: 1px solid var(--primary-color);
+}

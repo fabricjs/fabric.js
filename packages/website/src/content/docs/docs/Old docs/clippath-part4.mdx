@@ -1,0 +1,19 @@
+---
+date: 2018-07-07
+description: Clipping the objects with absolute clipPaths
+title: Clipping the objects with absolute clipPaths
+---
+import { Example1, Example2 } from './clippath-part4/clippath-part4';
+
+We can apply a clipPath to an object specify that it should be absolute positioned. That means that instead of the clipPath to be relative to the center of the object, is just positioned on the canvas.  
+The object will be free of movement, while the clipPath will be steady. The effect is that the clipPath creates a shape on the canvas, and ONLY its own object is allowed to appear inside there.
+
+<Example1 client:idle />
+
+### Inverted clipPaths
+
+We can also clip an object with the inverted shape defined from a clipPath.  
+Warning: if you create a group, you have to invert the group. Inverting the single objects inside a group, used as a clipPath, does not make any effect and is unsupported.  
+You can also probably obtain cool effects using globalCompositeOperation of single objects, but that is unsupported too.
+
+<Example2 client:idle />

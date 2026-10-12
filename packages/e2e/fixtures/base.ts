@@ -1,5 +1,4 @@
 import { test as base } from '@playwright/test';
-import { setupSelectors } from '../setup/setupSelectors';
 import { CanvasUtil } from '../utils/CanvasUtil';
 import { setupApp } from '../setup/setupApp';
 import path from 'node:path';
@@ -59,7 +58,6 @@ export const test = base.extend<TestFixtures>({
   },
 
   page: async ({ page }, use, testInfo) => {
-    await setupSelectors();
     const getImageFunctionString = getImage.toString();
     await page.addInitScript(
       `globalThis.getImage = ${getImageFunctionString};`,

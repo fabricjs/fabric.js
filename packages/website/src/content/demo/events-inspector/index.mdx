@@ -1,0 +1,21 @@
+---
+date: '2018-02-18'
+title: 'Events inspector'
+description: 'Inspect interaction events being logged to the console'
+thumbnail: 'events-inspector.png'
+tags: ['events', 'log']
+---
+
+import { EventInspectorUI } from './EventInspectorUI';
+import '../../../css/demo-common.css';
+
+This demo is a quick reference of the events you can get out of the objects or the canvas.
+For a better understanding of events refer to this document: [Events](/docs/events).
+
+This UI will let you understand which kind of events are available when working with Fabric.js.
+
+There are 3 checkboxes to filter the events logging since events tied to mouse movements tend to be very noisy.
+Each Log will have a 'plus' icon that will let you expand the data that comes with the event.
+The log is capped at 100 events to avoid the UI to become unresponsive.
+
+<EventInspectorUI client:idle />

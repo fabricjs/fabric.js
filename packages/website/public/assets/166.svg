@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<svg width="100%" height="100%" viewBox="0 0 400 400"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <path d="M 200,200 300,200 300,300 Z L 200,300 100,300 Z M 200,200 100,200 100,100 Z L 200,100 300,100 Z"
+        fill="#cccccc" />
+</svg>

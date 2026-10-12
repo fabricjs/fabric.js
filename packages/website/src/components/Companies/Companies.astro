@@ -1,0 +1,38 @@
+---
+import './companies.css';
+
+const logos = [
+    {
+        link: 'https://zaparoo.org/',
+        description: 'Zaparoo',
+        logo: '/logos/zaparoo.webp',
+    },
+    {
+        link: 'https://automatio.ai',
+        description: 'Automatio AI',
+        logo: '/logos/automatio.ai.webp',
+    },
+    {
+        link: 'https://www.rembg.com/en/apps',
+        description: 'www.rembg.com',
+        logo: '/logos/rembg.webp',
+    },
+    {
+        link: 'https://bytemancer.com/',
+        description: 'Motion Magic, physics simulator and solver',
+        logo: '/logos/bytemancer.motionmagic.webp',
+    }
+]
+
+---
+<section id="companies">
+  <h2>Companies using Fabric.js</h2>
+  <div id="logos">
+    {logos.map((logo) => <a href={logo.link} target="_blank">
+        <div class="imageContainer">
+            <img src={logo.logo} alt="Company logo" width="180px" max-height="180px">
+        </div>
+        <p class="textEllipsis">{logo.description}</p>
+    </a>)}
+  </div>
+</section>

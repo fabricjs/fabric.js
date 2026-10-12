@@ -15,6 +15,7 @@ export default tseslint.config(
       'packages/e2e/test-report/*',
       'packages/e2e/test-results/*',
       '.codesandbox/**/*',
+      'packages/website/**/*',
       'packages/core/src/mixins/eraser_brush.mixin.ts',
       'packages/core/src/util/lang_class.ts',
       'packages/core/src/parkinglot',
@@ -98,12 +99,6 @@ export default tseslint.config(
     },
   },
 
-  {
-    files: ['packages/e2e/playwright.setup.ts'],
-    rules: {
-      'no-restricted-syntax': 'off',
-    },
-  },
   {
     files: ['packages/e2e/**/*.ts'],
     languageOptions: {

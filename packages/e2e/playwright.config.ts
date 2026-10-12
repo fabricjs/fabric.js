@@ -9,8 +9,6 @@ const config: PlaywrightTestConfig = {
   // Keep workspace package imports on their built artifacts when Playwright
   // resolves imports from symlinked workspace packages.
   tsconfig: './tsconfig.json',
-  /* Transpiles app files */
-  globalSetup: './playwright.setup.ts',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {
@@ -47,7 +45,7 @@ const config: PlaywrightTestConfig = {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://127.0.0.1:5173',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -68,12 +66,11 @@ const config: PlaywrightTestConfig = {
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: [
-    {
-      command: 'pnpm --dir ../.. run local-server',
-      port: 8080,
-    },
-  ],
+  webServer: {
+    command: 'pnpm run dev',
+    url: 'http://127.0.0.1:5173/packages/e2e/site/index.html',
+    reuseExistingServer: !process.env.CI,
+  },
 };
 
 export default config;

@@ -155,11 +155,11 @@ export class Ellipse<
 
   /**
    * Returns {@link Ellipse} instance from an SVG element
-   * @param {HTMLElement} element Element to parse
+   * @param {HTMLElement | SVGElement} element Element to parse
    * @return {Ellipse}
    */
   static async fromElement(
-    element: HTMLElement,
+    element: HTMLElement | SVGElement,
     options?: Abortable,
     cssRules?: CSSRules,
   ) {

@@ -62,7 +62,7 @@ It's a good and simple way to start contributing.
 Improving **DOCS** is **SUPER** important for everyone.\
 Even if it's a small fix it is valuable **don't hesitate**!
 
-We have a website that is easy to contribute to.
+We have a website that is easy to contribute to, it lives in this repository under [packages/website][website_repo].
 
 [Adding demos](#Adding Demos) is also a great contribution.
 
@@ -117,12 +117,19 @@ We use Vitest and Playwright.
 | Suite                                                                                                         | unit (node)                                       | e2e (browser)                                                                                        |
 | ------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
 | Framework                                                                                                     | [`vitest`][vitest]                                | [`playwright`][playwright]                                                                           |
-| Setup                                                                                                         |                                                   | <pre>pnpm run build -- -f -w</pre>                                                                   |
-| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>pnpm run test:vitest -- [filters] [-w]</pre> | <pre>pnpm run test:e2e -- [filters] [--ui]</pre>                                                     |
+| Setup                                                                                                         |                                                   | Fabric is built automatically by the test command                                                    |
+| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>pnpm run test:vitest -- [filters] [-w]</pre> | <pre>pnpm run test:e2e [filters]</pre>                                                               |
 | Writing Tests                                                                                                 | Add/update `src/*.(spec\|test).ts` files          | - Update tests in `packages/e2e/tests`<br>- Create a new test based on `packages/e2e/tests/template` |
 | Test Gen                                                                                                      |                                                   | <pre>pnpm start vanilla<br>pnpm exec playwright codegen http://localhost:1234</pre>                  |
-| Test Spec                                                                                                     |                                                   | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br>                 |
+| Test Spec                                                                                                     |                                                   | - `index.ts`: served directly by Vite in the browser<br> - `index.spec.ts`: test spec<br>            |
 | Outputs                                                                                                       | Snapshots next to the test file                   | - Snapshots next to the test file <br>- `packages/e2e/test-report`<br>- `packages/e2e/test-results`  |
+
+Run `pnpm run test:e2e` to build Fabric, typecheck the tests, and run the E2E suite.
+Playwright starts Vite automatically at `http://127.0.0.1:5173` and stops it when
+the run finishes. Vite serves test scenes directly from TypeScript; Fabric imports
+resolve to the built workspace packages. No separate build, watcher, or server
+command is needed. The `--ui` flag is optional and opens Playwright's interactive
+test runner.
 
 ## Developing
 
@@ -176,7 +183,7 @@ Don't forget to unlink the package once you're done.
 [discussions]: ../../discussions
 [search_issues]: ../../search?type=Issues
 [bug_report]: ../../issues/new?template=bug_report.md
-[website_repo]: https://github.com/fabricjs/fabricjs.com
+[website_repo]: packages/website
 [website]: http://fabricjs.com/
 [docs]: http://fabricjs.com/api
 [demos]: http://fabricjs.com/demos/

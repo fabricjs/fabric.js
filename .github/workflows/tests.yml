@@ -11,24 +11,6 @@ permissions:
   contents: read
 
 jobs:
-  prime-build:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - name: Install dependencies
-        uses: ./.github/actions/cached-install
-        with:
-          node-version: 24.x
-          install-system-deps: false
-      - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
-      - name: Create prnumber artifact
-        run: echo "${{ github.event.pull_request.number }}" >> ./prnumber.txt
-      - name: Upload Pr Number
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: prnumber
-          path: ./prnumber.txt
   vitest-coverage:
     name: Vitest tests Node 24
     runs-on: ubuntu-24.04
@@ -37,7 +19,7 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest:coverage
       - name: Upload test coverage
@@ -54,6 +36,29 @@ jobs:
           name: coverage-vitest-sonarqube
           path: ./.nyc_output/lcov.info
           include-hidden-files: true
+  sonarqube:
+    name: SonarQube analysis
+    needs: vitest-coverage
+    if: >-
+      !cancelled() &&
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download coverage
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage-vitest-sonarqube
+          path: .nyc_output
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
   vitest-browser:
     name: Vitest tests ${{matrix.browser}}
     runs-on: ubuntu-24.04
@@ -73,15 +78,15 @@ jobs:
         run: xvfb-run pnpm run test:vitest:${{matrix.browser}}
         env:
           LIBGL_ALWAYS_SOFTWARE: true
-  vitest-node-20:
-    name: Vitest tests node 20
+  vitest-node-26:
+    name: Vitest tests node 26
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
         with:
-          node-version: 20.x
-          install-system-deps: true
+          node-version: 26.x
+          install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest
   vitest-node-22:
@@ -92,11 +97,10 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 22.x
-          install-system-deps: true
+          install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest
   e2e:
-    needs: [prime-build]
     name: Playwright tests
     runs-on: ubuntu-24.04
     steps:
@@ -104,10 +108,8 @@ jobs:
       - uses: ./.github/actions/cached-install
         with:
           node-version: 24.x
-          install-system-deps: true
-      - name: Build fabric.js
-        uses: ./.github/actions/build-fabric-cached
-        # Playwright suggests against caching the browser install
+          install-system-deps: false
+      # Playwright suggests against caching the browser install
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Playwright tests

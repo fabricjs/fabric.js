@@ -1,0 +1,119 @@
+---
+date: '2026-07-30'
+title: 'Using gradients'
+description: 'Linear and radial gradients in Fabric.js, and the extension that makes linear ones interactive'
+sidebar:
+  order: 650
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import linearCode from './using-gradients/linear.js?raw';
+import radialCode from './using-gradients/radial.js?raw';
+
+## The Gradient object
+
+A `Gradient` is not a shape — it is a paint. You build one and hand it to an
+object's `fill` or `stroke`, in place of a colour string:
+
+```js
+rect.fill = new fabric.Gradient({ type, coords, colorStops });
+```
+
+Three things define it:
+
+- **`type`** — `'linear'` or `'radial'`.
+- **`coords`** — the geometry the gradient is painted along. What the keys mean
+  depends on the type, and this is the part worth getting straight.
+- **`colorStops`** — an array of `{ offset, color }`, where `offset` runs from `0`
+  at the start of that geometry to `1` at its end. Colours interpolate between
+  consecutive stops.
+
+By default coordinates are **pixels in the object's own unscaled space**, with
+`0,0` at the top-left of the object's bounding box — so for a 280×160 rect, `x`
+runs `0` to `280` regardless of how the object is later scaled or rotated. Set
+`gradientUnits: 'percentage'` to use `0` to `1` fractions of the object's width
+and height instead.
+
+### Linear
+
+A linear gradient has a straight axis: `x1,y1` is where it starts and `x2,y2` is
+where it ends. Colours run along that line, and every point off the line takes
+the colour of its perpendicular projection onto it. Making the axis diagonal is
+just a matter of moving one end.
+
+<CodeEditor code={linearCode} canvasId="gradient-linear" client:idle canvasDown>
+  <canvas width="320" height="200" id="gradient-linear"></canvas>
+</CodeEditor>
+
+### Radial
+
+A radial gradient interpolates between **two circles** rather than two points, so
+its `coords` carry a radius each: `x1,y1,r1` is the inner circle and `x2,y2,r2`
+the outer one. Offset `0` sits on the inner circle, offset `1` on the outer.
+
+Giving both circles the same centre and an `r1` of `0` produces the familiar
+glow spreading from a point. Offsetting the centres instead tilts the whole
+thing, which is how you fake a light source coming from one side.
+
+<CodeEditor code={radialCode} canvasId="gradient-radial" client:idle canvasDown>
+  <canvas width="320" height="200" id="gradient-radial"></canvas>
+</CodeEditor>
+
+## Making gradients interactive
+
+Everything above is static: you pick the numbers, and to change them you edit
+code. Dragging a gradient around by hand is a different problem, because the
+handles have to be positioned from the gradient's own coordinates while
+following the object's transform and the canvas viewport.
+
+`fabric/extensions` provides that as a prepared control set:
+
+```js
+import { createLinearGradientControls } from 'fabric/extensions';
+```
+
+It takes the gradient instance itself — not the object — and returns controls
+keyed so you can merge them into whatever the object already has:
+
+```js
+const gradient = new fabric.Gradient({ type: 'linear', coords, colorStops });
+const rect = new fabric.Rect({ width: 400, height: 250, fill: gradient });
+
+rect.controls = {
+  ...rect.controls,
+  ...createLinearGradientControls(gradient),
+};
+```
+
+You get one handle per moving part:
+
+- **`lgp_1`** and **`lgp_2`** — the two ends of the gradient axis. Dragging them
+  writes straight to `coords.x1/y1` and `coords.x2/y2`. `lgp_1` also draws the
+  line joining the pair, so the axis is visible while you work.
+- **`lgo_0`, `lgo_1`, …** — one per entry in `colorStops`. Dragging one sets that
+  stop's `offset`. The handler projects the pointer onto the gradient axis and
+  clamps the result to `0`–`1`, which is why these handles slide along the line
+  instead of following the cursor freely.
+
+The controls hold a reference to the gradient you passed and mutate it in place,
+marking the object dirty so it repaints. Both `gradientUnits` modes work — the
+handlers divide by the object's width and height when the gradient is in
+percentage mode.
+
+A second argument lets you pass `Control` options applied to every handle, which
+is the hook for sizing or custom rendering:
+
+```js
+createLinearGradientControls(gradient, { sizeX: 12, sizeY: 12 });
+```
+
+### Current limits
+
+- **Linear only.** There is no radial equivalent yet, so radial gradients stay
+  code-configured. The extra degrees of freedom — two centres and two radii —
+  need a different handle design, not just a port.
+- **No `gradientTransform` support.** A gradient carrying its own transform matrix
+  will render correctly but the handles will not line up with it.
+
+For a canvas to try this on, see the
+[gradient controls demo](/demos/linear-gradient-controls).

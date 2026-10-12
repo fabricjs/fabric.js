@@ -36,7 +36,7 @@ describe('getRandomInt', () => {
     globalThis.Math.random = originalMathRandom;
 
     const randomInts: number[] = [];
-    for (let i = 100; i--; ) {
+    for (let i = 100; i--;) {
       const randomInt = getRandomInt(100, 200);
       randomInts.push(randomInt);
       expect(randomInt).toBeGreaterThanOrEqual(100);

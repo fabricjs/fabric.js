@@ -1,10 +1,17 @@
-import type { TPointerEvent } from '../packages/core/src/EventTypeDefs';
 import { getFabricDocument } from '../fabric';
 import { Rect } from '../packages/core/src/shapes/Rect';
 import { version } from '../package.json';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+export function createSVGElement<K extends keyof SVGElementTagNameMap>(
+  tag: K,
+  attrs?: Record<string, string | number>,
+): SVGElementTagNameMap[K];
+export function createSVGElement(
+  tag: string,
+  attrs?: Record<string, string | number>,
+): SVGElement;
 export function createSVGElement(
   tag: string,
   attrs: Record<string, string | number> = {},
@@ -54,8 +61,10 @@ export function createReferenceObject<T extends Record<string, unknown>>(
   type: string,
   shapeProps: T = {} as T,
 ) {
+  const defaults: Omit<typeof BASE_OBJECT_PROPS, keyof T | 'type'> =
+    BASE_OBJECT_PROPS;
   return {
-    ...BASE_OBJECT_PROPS,
+    ...defaults,
     type,
     ...shapeProps,
   };
@@ -97,12 +106,12 @@ export function createPointerEvent(
     shiftKey: boolean;
     type: string;
   }> = {},
-): TPointerEvent {
+): MouseEvent {
   return {
     clientX: 0,
     clientY: 0,
     which: 1,
     bubbles: true,
     ...options,
-  } as TPointerEvent;
+  } as MouseEvent;
 }

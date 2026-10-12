@@ -3,6 +3,41 @@
 ## [next]
 
 - fix(path): draw an arc with a zero radius as a line instead of dropping it
+- fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
+- chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
+- ci(): use fetched master when resolving changelog conflicts
+- ci(): trigger changelog conflict resolution with a label
+- ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
+- fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
+- [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
+- chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
+- chore(deps): update transitive markdown-it to 14.3.1 and source-map-js to 1.2.2
+- chore(deps): update fast-uri to 3.1.8 and sharp to 0.35.5
+- fix(): Textbox resize cursor ignores lockScalingX [#11114](https://github.com/fabricjs/fabric.js/pull/11114)
+- ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
+- chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
+- chore(website): drop prettier and format the website package with oxfmt [#11112](https://github.com/fabricjs/fabric.js/pull/11112)
+- chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
+- test(): replace custom canvas selector engines with Playwright locators [#11103](https://github.com/fabricjs/fabric.js/pull/11103)
+- chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)
+- chore(): remove inquirer and ps-list [#11100](https://github.com/fabricjs/fabric.js/pull/11100)
+- chore(): update dev deps [#11095](https://github.com/fabricjs/fabric.js/pull/11095)
+- test(): build Fabric automatically and serve Playwright scenes with vite instead of a custom compiler and import map [#11104](https://github.com/fabricjs/fabric.js/pull/11104)
+- ci(): update the pnpm cache client and skip canvas compilation dependencies
+- ci(): share one Fabric build across statistics, package smoke tests, and website checks
+- ci(): combine lint, formatting, and type checks in one job
+- ci(): build directly in the Playwright job and remove the prebuild cache handoff
+- ci(): pin build-stats checkout to master to avoid running PR code [#11085](https://github.com/fabricjs/fabric.js/pull/11085)
+- chore(deps-dev): bump typescript-eslint from 8.60.1 to 8.70.0 [#11060](https://github.com/fabricjs/fabric.js/pull/11060)
+- chore(deps): bump sharp from 0.34.5 to 0.35.4 [#11079](https://github.com/fabricjs/fabric.js/pull/11079)
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.5.0 [#11067](https://github.com/fabricjs/fabric.js/pull/11067)
+- chore(deps-dev): bump rolldown from 1.1.2 to 1.2.8 [#11069](https://github.com/fabricjs/fabric.js/pull/11069)
+- ci(): Fix the banner of the website. [#11083](https://github.com/fabricjs/fabric.js/pull/11083)
+- Ci(): Fix GitHub pages deploy [#11082](https://github.com/fabricjs/fabric.js/pull/11082)
+- ci(): add GitHub Pages deploy workflow for website [#11081](https://github.com/fabricjs/fabric.js/pull/11081)
+- Pull in docs [#11070](https://github.com/fabricjs/fabric.js/pull/11070)
 - chore(deps-dev): bump @playwright/test from 1.60.0 to 1.62.0 [#11063](https://github.com/fabricjs/fabric.js/pull/11063)
 - test(), chore(): Various things i forgot [#11065](https://github.com/fabricjs/fabric.js/pull/11065)
 - feat(): Add backend network request callback [#11064](https://github.com/fabricjs/fabric.js/pull/11064)

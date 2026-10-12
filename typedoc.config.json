@@ -6,6 +6,8 @@
     "dist-extensions",
     "test",
     "packages/e2e",
+    "packages/core/src/benchmarks",
+    "extensions",
     "**/*.test.ts",
     "**/*.spec.ts",
     "**/*.fixtures.ts"

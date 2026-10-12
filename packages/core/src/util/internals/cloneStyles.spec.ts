@@ -21,6 +21,7 @@ describe('cloneStyles', () => {
       overline: true,
       underline: false,
       linethrough: true,
+      textDecorationThickness: 66.667,
     };
 
     const testObject: TextStyle = {

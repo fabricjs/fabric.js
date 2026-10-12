@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="226" height="110"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example stroke6 - stroke</desc>
+
+  <g fill="none" stroke="purple" stroke-width="10">
+    <path stroke="rgba(10, 244,50,.1)" d="M5 20 l215 0" />
+    <path stroke="red" d="M5 40 l215 0" />
+    <path stroke="rgb(244,120,60)" d="M5 60 l215 0" />
+    <path style="stroke: #aa5511;" d="M5 80 l215 0" />
+    <path d="M5 100 l215 0" />
+  </g>
+</svg>

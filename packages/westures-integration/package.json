@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "@fabricjs/core": "workspace:^",
-    "westures": "^1.1.1"
+    "westures": "catalog:"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -1,0 +1,46 @@
+---
+date: '2024-07-01'
+title: 'Your first app'
+description: 'Your hello world application'
+sidebar:
+  order: 200
+---
+
+import { CodeEditor } from '../../../../components/CodeEditor';
+import code from './helloworld?raw';
+
+## Your first basic application
+
+Let's see the simplest app you can write, the `Hello world!` case in a browser.
+
+You will need to import at least the `StaticCanvas` and the `FabricText` classes.
+
+```ts
+import { StaticCanvas, FabricText } from 'fabric'
+```
+
+Then instantiate both of them and combine them
+
+```ts
+const canvas = new StaticCanvas();
+const helloWorld = new FabricText('Hello world!');
+canvas.add(helloWorld);
+canvas.centerObject(helloWorld);
+```
+
+Then you want to download your PNG file with it
+
+```ts
+const imageSrc = canvas.toDataURL();
+// some download code down here
+const a = document.createElement('a');
+a.href = imageSrc;
+a.download = 'image.png';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+```
+
+Now try it:
+
+<CodeEditor code={code} canvasId="" client:idle autoRun={false} runOnChange={false} />

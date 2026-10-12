@@ -1,0 +1,19 @@
+---
+date: '2014-10-16'
+title: 'Video element'
+description: 'FabricImage with video drawable'
+thumbnail: 'video-element.png'
+tags: ['video', 'image']
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code from './code?raw';
+import '../../../css/demo-common.css';
+
+This demo show how you can use video elements ( or any other drawable or stream ) as a source for FabricImage.
+Fabric.js does not support a FabricVideo class per se, nor does it support video export directly.
+Video export is still possible with a smart use of the stream api.
+
+<CodeEditor code={code} canvasId="canvas" client:idle>
+  <canvas id="canvas" width="1000" height="700"></canvas>
+</CodeEditor>

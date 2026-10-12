@@ -47,7 +47,7 @@
   ],
   "packageManager": "pnpm@10.29.1",
   "scripts": {
-    "docs": "typedoc",
+    "docs": "typedoc --tsconfig typedoc.config.json",
     "cli": "node ./scripts/index.mjs",
     "sandboxscript": "node ./scripts/sandbox.mjs",
     "typecheck": "tsc -p ./tsconfig.build.json --noEmit && tsc -p ./tsconfig-extensions.json --noEmit && tsc -p ./tsconfig.packages.json --noEmit",
@@ -58,48 +58,45 @@
     "smoke:packages": "node ./scripts/package-smoke.mjs",
     "dev": "node ./scripts/index.mjs dev",
     "start": "node ./scripts/sandbox.mjs start",
-    "export": "node ./scripts/index.mjs website export",
     "test:vitest": "vitest --run --project unit-node",
     "test:vitest:chromium": "vitest --run --project unit-chromium",
     "test:vitest:firefox": "vitest --run --project unit-firefox",
     "test:vitest:all": "vitest --run",
     "test:vitest:coverage": "vitest --run --coverage --project unit-node",
     "test:vitest:coverage:watch": "pnpm run test:vitest --coverage=true",
-    "test:e2e": "pnpm run playwright:typecheck && pnpm --dir packages/e2e run test",
+    "test:e2e": "pnpm run build && pnpm run playwright:typecheck && pnpm --dir packages/e2e run test",
     "playwright:typecheck": "pnpm --dir packages/e2e run typecheck",
     "sandbox": "node ./scripts/sandbox.mjs sandbox",
-    "local-server": "serve ./ -l tcp://localhost:8080",
     "lint": "eslint extensions packages --fix",
     "prettier:check": "oxfmt --check .",
     "prettier:write": "oxfmt .",
+    "web-dev": "pnpm run build && node ./scripts/index.mjs build -f -w & pnpm --dir packages/website run dev; kill $!",
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.60.0",
-    "@types/jsdom": "^21.1.7",
-    "@types/micromatch": "^4.0.10",
-    "@types/node": "^24.7.0",
-    "@vitest/browser-playwright": "4.1.10",
-    "@vitest/coverage-v8": "4.1.10",
-    "@vitest/ui": "4.1.10",
-    "commander": "^14.0.3",
-    "es-toolkit": "1.50.0",
-    "eslint": "^10.0.1",
-    "eslint-config-prettier": "^10.1.8",
-    "husky": "^9.1.7",
-    "inquirer": "^13.4.3",
-    "lint-staged": "^17.0.5",
-    "micromatch": "^4.0.8",
-    "oxfmt": "^0.51.0",
-    "ps-list": "^9.0.0",
-    "rolldown": "^1.0.1",
-    "serve": "^14.2.6",
-    "tsc-files": "^1.1.4",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.4",
-    "vitest": "4.1.10",
-    "westures": "^1.1.1"
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "catalog:",
+    "@types/jsdom": "catalog:",
+    "@types/node": "catalog:",
+    "@vitest/browser-playwright": "5.0.1",
+    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/ui": "5.0.1",
+    "commander": "15.0.0",
+    "es-toolkit": "1.52.0",
+    "eslint": "10.11.0",
+    "eslint-config-prettier": "10.1.8",
+    "fast-check": "4.10.2",
+    "husky": "9.1.7",
+    "lint-staged": "17.5.1",
+    "oxfmt": "0.68.0",
+    "picomatch": "2.3.2",
+    "rolldown": "1.2.9",
+    "tsc-files": "1.1.4",
+    "typedoc": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.1",
+    "westures": "catalog:"
   },
   "dependencies": {
     "@fabricjs/aligning-guidelines": "workspace:^",
@@ -119,7 +116,9 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "canvas"
+      "canvas",
+      "esbuild",
+      "sharp"
     ]
   },
   "module": "./dist/index.mjs",
@@ -134,7 +133,16 @@
       ]
     }
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/index.mjs",
+    "./dist/index.min.mjs",
+    "./dist/index.js",
+    "./dist/index.min.js",
+    "./dist/fabric.mjs",
+    "./dist/fabric.min.mjs",
+    "./dist/index.node.mjs",
+    "./dist/index.node.cjs"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -168,7 +176,7 @@
   },
   "lint-staged": {
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
-    "*.{js,css,md,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
+    "*.{js,css,md,mdx,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
     "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
   }
 }

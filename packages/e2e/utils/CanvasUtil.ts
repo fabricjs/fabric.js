@@ -1,5 +1,6 @@
 import type {
   JSHandle,
+  Locator,
   LocatorScreenshotOptions,
   Page,
 } from '@playwright/test';
@@ -9,6 +10,8 @@ import type { ObjectUtil } from './ObjectUtil';
 import * as fabric from 'fabric';
 
 export class CanvasUtil {
+  readonly wrapper: Locator;
+  readonly upperCanvas: Locator;
   executeInBrowser: JSHandle<Canvas>['evaluate'];
   evaluateHandle: JSHandle<Canvas>['evaluateHandle'];
 
@@ -16,17 +19,21 @@ export class CanvasUtil {
     readonly page: Page,
     readonly selector = '#canvas',
   ) {
+    this.wrapper = page
+      .locator('[data-fabric="wrapper"]')
+      .filter({ has: page.locator(selector) });
+    this.upperCanvas = this.wrapper.locator('[data-fabric="top"]');
     this.executeInBrowser = this._executeInBrowserImpl.bind(this);
     this.evaluateHandle = this._evaluateHandleImpl.bind(this);
   }
 
-  click(clickProperties: Parameters<Page['click']>[1]) {
-    return this.page.click(`canvas_top=${this.selector}`, clickProperties);
+  click(clickProperties: Parameters<Locator['click']>[0]) {
+    return this.upperCanvas.click(clickProperties);
   }
 
   async makeActiveSelectionWith(objects: ObjectUtil[]) {
     for (const objectUtil of objects) {
-      await this.page.click(`canvas_top=${this.selector}`, {
+      await this.click({
         modifiers: ['Shift'],
         position: await objectUtil.getObjectCenter(),
       });
@@ -80,9 +87,7 @@ export class CanvasUtil {
   }
 
   screenshot(options: LocatorScreenshotOptions = {}) {
-    return this.page
-      .locator(`canvas_wrapper=${this.selector}`)
-      .screenshot({ omitBackground: true, ...options });
+    return this.wrapper.screenshot({ omitBackground: true, ...options });
   }
 
   renderAll() {

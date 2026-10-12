@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="10cm" height="3cm" viewBox="0 0 1000 300"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example tspan03 - using tspan's x and y attributes
+        for multiline text and precise glyph positioning</desc>
+
+  <g font-family="Verdana" font-size="45" >
+    <text fill="rgb(255,164,0)" >
+      <tspan x="300 350 400 450 500 550 600 650" y="100">
+        Cute and
+      </tspan>
+      <tspan x="375 425 475 525 575" y="200">
+         fuzzy
+      </tspan>
+    </text>
+  </g>
+</svg>
+

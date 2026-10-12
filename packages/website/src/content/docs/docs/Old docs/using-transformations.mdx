@@ -1,0 +1,116 @@
+---
+date: '2018-02-10'
+description: Using transformations
+title: Using transformations
+---
+import { Example1 } from './using-transformations/using-transformations';
+
+Understanding how transformations work on fabricJS is a key aspect to code your application as smoothly as possible.
+
+### Methods and properties related to transformations
+
+Those are the methods you should learn to use most if you plan to understand and use fabricJS transformations with custom code.  
+Generally speaking in this page we refer to `matrix` as an array of 6 numbers that represent a transformation on the plane and to `point` as a simple JS object that looks like `{ x: number, y: number }`, or a fabric.Point class instance. ( often it does not make difference )
+
+```
+Canvas:
+- viewportTransform = matrix;
+Objects:
+- matrix = fabric.Object.prototype.calcTransformMatrix();
+- matrix = fabric.Object.prototype.calcOwnMatrix();
+Utils:
+- point = fabric.util.transformPoint(point, matrix);
+- matrix = fabric.util.multiplyTransformMatrices(matrix, matrix);
+- matrix = fabric.util.invertTransform(matrix);
+- options = fabric.util.qrDecompose(matrix);
+```
+
+### Moving from one space to another
+
+Using fabricJS you often have to interact with coordinates and position, but understanding where those coordinates are can be troublesome if you do not have the right background.  
+I'm going to list the transformation and its usage and then I'll try to make 2 examples to clarify better what happened, and how to do it.
+
+Canvas.viewportTransform: Move a point of your virtual canvas to the zoom and pan space.  
+A point that is at position P when the canvas is not zoomed and not panned, after applying a zoom and pan represented from the viewportTransfrom M, can be found at coordinates:  
+`newP = fabric.util.transformPoint(P, canvas.viewportTransform);`
+
+Object.calcTransformMatrix: Returns the matrix that represents the generic object transform at that particular moment ( influenced by top, left, scale and many other properties ), and moves points from object space to canvas space, not zoomed. So given a point in the object space coordinates that is at coordinates P, the point will be drawn on the canvas at:  
+`newP = fabric.util.transformPoint(P, object.calcTransformMatrix());`
+
+### Transforms order
+
+During rendering, Fabric applies transformations in this order:  
+`zoom and pan => object transformation => nested object ( group ) => additionally nested objects ( nested groups )`
+
+### Reverting order
+
+The invertTransform utility is used to move back in the transformation logic in order to do some reverse calculation:  
+Imagine you want to mark an object is on your canvas, with a mouse click, in the point clicked. You click at point P, for that is for example 10,10 pixels on the element. Your object is scaled and rotated, and the canvas is zoomed and panned.  
+To reverse the rendering calculation you can to follow this logic:  
+
+```js
+// calculate the total transformation that is applied to the objects pixels:
+var mCanvas = canvas.viewportTransform;
+var mObject = object.calcTransformMatrix();
+var mTotal = fabric.util.multiplyTransformMatrices(mCanvas, mObject); // inverting the order gives wrong result
+var mInverse = fabric.util.invertTransform(mTotal);
+var pointInObjectPixels = fabric.util.transformPoint(pointClicked, mInverse);
+```
+
+Now `pointInObjectPixels` is a point that is in a coordinate space where at `0, 0` sits the center of the object.
+
+### Understanding the effect of a matrix
+
+Given top, left, angle, scaleX, scaleY, skewX, skewY, flipX, flipY is relatively simple to create a matrix that represent that transformation.  
+What is not immediate is how to go back. A matrix has 6 dimensions, being of 6 numbers, while the properties are 7, since we can assimilate flip to scale. There are indeed a infinite number of matrices, but a the number of possible combinations of properties is one infinite bigger.  
+Here comes in play the `fabric.util.qrDecompose(matrix);` that can decode a matrix for us. Given a generic invertible matrix to the function, it returns an option object containing those informations:
+
+```js
+{
+  angle: number, // in degree
+  scaleX: number,
+  scaleY: number,
+  skewX: number, // in degree
+  skewY: 0, // always 0! in degree.
+  translateX: number,
+  translateY: number,
+}
+```
+
+The function gives back one of the possible solution for this matrix, putting as constrain a skewY to 0.
+
+### A real use case
+
+One developer wants to group objects together, but keep them free at the same time. Ideally when a main object moves he wants some other objects to follow it.  
+To explain this example i will call the main object BOSS and the other MINIONS.  
+So let's imagine to have some objects around the canvas and we can move them freely. At some point we want to lock their relative position and scale together and move one. When we setup the position we want, the BOSS position is described by a MATRIX, as we learned till now, and each minion too.  
+I m sure it exist a matrix that defines the necessary transformation to move from the boss to the minion, and i have to find it.
+
+```js
+// i m looking for the UNKNOW relation matrix where:
+BOSS * UNKNOW = MINION
+// i multiply left for BOSS-INV
+BOSS-INV * BOSS * UNKNOW = BOSS-INV * MINION
+// BOSS-INV * BOSS = IDENTIY, a neutral matrix.
+IDENTITY * UNKNOW = BOSS-INV * MINION
+// so...
+UNKNOW = BOSS-INV \* MINION
+
+// that in fabricJS code equals to:
+var minions = canvas.getObjects().filter(o => o !== boss);
+var bossTransform = boss.calcTransformMatrix();
+var invertedBossTransform = fabric.util.invertTransform(bossTransform);
+minions.forEach(o => {
+  var desiredTransform = multiply(invertedBossTransform, o.calcTransformMatrix());
+  // save the desired relation here.
+  o.relationship = desiredTransform;
+});
+```
+
+Ok so now that i know how to find the relationship, i can write some event handler to apply this relationship on each BOSS action.
+
+<Example1 client:idle />
+
+<button id="bind">
+Bind minions to boss
+</button>

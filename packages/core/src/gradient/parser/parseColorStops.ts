@@ -16,7 +16,7 @@ function parseColorStop(el: SVGStopElement, opacityMultiplier: number) {
       keyValuePairs.pop();
     }
 
-    for (let i = keyValuePairs.length; i--; ) {
+    for (let i = keyValuePairs.length; i--;) {
       const [key, value] = keyValuePairs[i]
         .split(RE_KEY_VALUE)
         .map((s) => s.trim());
@@ -51,7 +51,7 @@ export function parseColorStops(
   const colorStops: ColorStop[] = [],
     colorStopEls = el.getElementsByTagName('stop'),
     multiplier = parsePercent(opacityAttr, 1);
-  for (let i = colorStopEls.length; i--; ) {
+  for (let i = colorStopEls.length; i--;) {
     colorStops.push(parseColorStop(colorStopEls[i], multiplier));
   }
   return colorStops;

@@ -1,0 +1,20 @@
+---
+date: 2018-07-07
+description: ClipPath - clipping the canvas
+title: ClipPath - clipping the canvas
+---
+import { Example1, Example2, Example3 } from './clippath-part3/clippath-part3';
+
+We can apply a clipPath to a StaticCanvas exactly as we do for objects. The clipPath in this case is influenced by zoom and pan and contrary from Object.clipPath is positioned fom the top-left corner.
+
+<Example1 client:idle />
+
+As the old clipTo function, clipPath is clipping controls too, unless you use canvas.controlsAboveOverlay set to true
+
+<Example2 client:idle />
+
+### Animating the clipPaths
+
+ClipPaths can be animated as any other object. Canvas clipPath animation is very efficent, while animating the Object's one will invalidate the object cache each time.
+
+<Example3 client:idle />

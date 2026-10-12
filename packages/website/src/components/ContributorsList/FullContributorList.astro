@@ -1,0 +1,18 @@
+---
+import { list } from './data';
+import './contributorsList.css';
+import ContributorCard from '../ContributorCard/ContributorCard.astro';
+---
+<section id="contributors">
+    <h2>Contributors</h2>
+
+    <div class="contributor-container">
+    {list.map(({ login, avatar_url, html_url }) => (
+    <ContributorCard
+        name={login}
+        picUrl={avatar_url}
+        url={html_url}
+    />
+    ))}
+    </div>
+</section>

@@ -1,0 +1,7 @@
+<svg version="1.1" id="testSVG3" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="200px" height="200px">
+	<circle fill="#FF0000" cx="100" cy="100" r="100"></circle>
+	<!-- <circle fill="#ffff00" cx="100" cy="100" r="75"></circle> -->
+	<!-- <ellipse transform="matrix(0.70711 0.70711 -0.70711 0.70711 100.00024 -41.42145)" fill="#00ffff" cx="100" cy="100" rx="100" ry="50"></ellipse> -->
+	<rect x="10" y="10" fill="#ff00ff" width="155.56245" height="70.70826"></rect>
+	<!-- <circle fill="#ffffff" cx="100" cy="100" opacity="0.5" r="25"></circle> -->
+</svg>

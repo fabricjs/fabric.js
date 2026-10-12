@@ -1,0 +1,34 @@
+---
+date: '2024-08-04'
+title: 'Creating custom controls'
+sidebar:
+  order: 4
+---
+
+Fabric.js offers a series of functions and classes to build your own controls for the objects and custom functionalities.
+
+The fabric Canvas code is built to look into any object `controls` property for a map of controls to render target and use.
+
+A default object, a Rect, has a map of Control classes that looks like this:
+
+```ts
+
+myRect.controls = {
+  tl: Control{},
+  tr: Control{},
+  bl: Control{},
+  br: Control{},
+  ml: Control{},
+  mr: Control{},
+  mt: Control{},
+  mb: Control{},
+  mtr: Control{},
+}
+
+```
+
+Each Control instance has as a minimum:
+
+- a function to determine the position to render
+- a function to render the control
+- a function to run effects when the control is used
