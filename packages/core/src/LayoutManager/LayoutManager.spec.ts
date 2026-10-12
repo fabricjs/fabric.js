@@ -6,6 +6,8 @@ import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { Rect } from '../shapes/Rect';
 import { LayoutManager } from './LayoutManager';
+import { createLayoutEvent } from '../../../../test/utils';
+import { IText } from '../shapes/IText/IText';
 import { ClipPathLayout } from './LayoutStrategies/ClipPathLayout';
 import { FitContentLayout } from './LayoutStrategies/FitContentLayout';
 import { FixedLayout } from './LayoutStrategies/FixedLayout';
@@ -155,12 +157,12 @@ describe('Layout Manager', () => {
       it('a subscribed object should trigger layout', () => {
         const manager = new LayoutManager();
         const performLayout = vi.spyOn(manager, 'performLayout');
-        const object = new FabricObject();
+        const object = new IText('text');
         const target = new Group([object], { layoutManager: manager });
         const context = { target, targets: [object] };
         manager['subscribe'](object, context);
         performLayout.mockClear();
-        const event = { foo: 'bar' };
+        const event = createLayoutEvent(object);
         triggers.forEach((trigger) => object.fire(trigger, event));
         expect(performLayout.mock.calls).toMatchObject([
           [
