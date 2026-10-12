@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(text): preserve shadows on text with decorations when object caching is disabled [#11151](https://github.com/fabricjs/fabric.js/pull/11151)
 - fix(brushes): keep spray dots in place when finishing a stroke [#11150](https://github.com/fabricjs/fabric.js/pull/11150)
 - fix(path): draw an arc with a zero radius as a line instead of dropping it
 - test(): preserve transform names in fuzz generators [#11149](https://github.com/fabricjs/fabric.js/pull/11149)
