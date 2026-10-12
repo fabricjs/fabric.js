@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): preserve transform names in fuzz generators [#11149](https://github.com/fabricjs/fabric.js/pull/11149)
 - chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
 - ci(): use fetched master when resolving changelog conflicts
 - ci(): trigger changelog conflict resolution with a label
