@@ -3,8 +3,61 @@ import { Rect, type RectProps } from '../../shapes/Rect';
 import { Shadow } from '../../Shadow';
 import { classRegistry } from '../../ClassRegistry';
 import { FabricImage } from '../../../../../fabric';
+import { FabricError } from '../internals/console';
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
+
+describe('enlivenObjects reviver', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('does not infer the loaded object type from a reviver fallback', async () => {
+    const fallback = new Shadow();
+    const objects = await enlivenObjects([{ type: 'Rect' }], {
+      reviver: () => fallback,
+    });
+
+    expectTypeOf(objects).toEqualTypeOf<
+      Awaited<ReturnType<typeof enlivenObjects>>
+    >();
+    expect(objects).toHaveLength(1);
+    expect(objects[0]).toBeInstanceOf(Rect);
+    expect(objects[0]).not.toBe(fallback);
+  });
+
+  it('uses a synchronous fallback when an object cannot be enlivened', async () => {
+    const error = new FabricError('Cannot enliven object');
+    vi.spyOn(Rect, 'fromObject').mockRejectedValueOnce(error);
+    const serialized = { type: 'Rect' };
+    const fallback = new Rect({ width: 42 });
+    const objects = await enlivenObjects<Rect>([serialized], {
+      reviver: (serializedObject, instance, reviverError) => {
+        expectTypeOf(instance).toEqualTypeOf<Rect | undefined>();
+        expect(serializedObject).toBe(serialized);
+        expect(instance).toBeUndefined();
+        expect(reviverError).toBe(error);
+        return fallback;
+      },
+    });
+
+    expectTypeOf(objects).toEqualTypeOf<Rect[]>();
+    expect(objects).toEqual([fallback]);
+  });
+
+  it('accepts an async reviver that modifies the instance without returning it', async () => {
+    const objects = await enlivenObjects<Rect>([{ type: 'Rect' }], {
+      reviver: async (_serializedObject, instance) => {
+        expectTypeOf(instance).toEqualTypeOf<Rect | undefined>();
+        await Promise.resolve();
+        instance?.set({ width: 42 });
+      },
+    });
+
+    expectTypeOf(objects).toEqualTypeOf<Rect[]>();
+    expect(objects).toHaveLength(1);
+    expect(objects[0]).toBeInstanceOf(Rect);
+    expect(objects[0].width).toBe(42);
+  });
+});
 
 const mockedRectWithCustomProperty = {
   type: 'rect',
