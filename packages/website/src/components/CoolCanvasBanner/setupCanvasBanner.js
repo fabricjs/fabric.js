@@ -17,8 +17,6 @@ import {
   classRegistry,
 } from 'fabric/es';
 
-
-
 export const setupCanvasBanner = ({ canvasEl, container }) => {
   classRegistry.setClass(Path);
   classRegistry.setSVGClass(Path);
@@ -36,10 +34,13 @@ export const setupCanvasBanner = ({ canvasEl, container }) => {
       if (entry.target === container) {
         const bbox = entry.target.getBoundingClientRect();
         const { width, height } = bbox;
-        canvas.setDimensions({
-          width,
-          height,
-        }, {});
+        canvas.setDimensions(
+          {
+            width,
+            height,
+          },
+          {},
+        );
       }
     }
   });
@@ -251,7 +252,7 @@ export const setupCanvasBanner = ({ canvasEl, container }) => {
         .scale(0.5);
 
       canvas.add(shape);
-    }
+    },
   );
   loadSVGFromURL('assets/gradients/svg_linear_8.svg').then(
     ({ objects, options }) => {
@@ -268,7 +269,7 @@ export const setupCanvasBanner = ({ canvasEl, container }) => {
 
       canvas.add(shape);
       canvas.calcOffset();
-    }
+    },
   );
 
   // group

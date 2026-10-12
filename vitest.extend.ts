@@ -4,7 +4,7 @@ import { cloneDeepWith } from 'es-toolkit/compat';
 import type { FabricObject } from './packages/core/src/shapes/Object/Object';
 import type { TMat2D } from './packages/core/src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
-import type { FabricImage } from './dist-extensions';
+import type { SerializedImageProps } from './packages/core/src/shapes/Image';
 
 const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
 const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
@@ -71,8 +71,7 @@ expect.extend({
     delete snap.version;
 
     const value = cloneDeepWith(snap, (v, k, obj, stack) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const c = (customiser as any)?.(v, k, obj, stack);
+      const c = customiser?.(v, k, obj, stack);
       if (c !== undefined) return c;
       if ((k === 'width' || k === 'height') && typeof v === 'number')
         return Math.round(v * 100) / 100;
@@ -83,7 +82,7 @@ expect.extend({
     return toMatchSnapshot.call(this, value, properties, hint);
   },
 
-  toMatchSnapshot(
+  toMatchSnapshotWithOptions(
     received: unknown,
     { cloneDeepWith: customiser, ...rest }: ExtendedOptions = {},
     hint?: string,
@@ -98,16 +97,17 @@ expect.extend({
     return toMatchSnapshot.call(this, sanitizeSVG(received), hint);
   },
 
-  toSameImageObject(actual: FabricImage, expected: FabricImage) {
+  toSameImageObject(
+    actual: SerializedImageProps,
+    expected: SerializedImageProps,
+  ) {
     const normalizedActual = {
       ...actual,
-      // @ts-expect-error -- src is protected in FabricImage class
       src: basename(actual.src),
     };
 
     const normalizedExpected = {
       ...expected,
-      // @ts-expect-error -- src is protected in FabricImage class
       src: basename(expected.src),
     };
 

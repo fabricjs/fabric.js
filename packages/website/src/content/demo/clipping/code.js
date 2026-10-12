@@ -39,4 +39,3 @@ fabric.Image.fromURL(demoImg).then((img) => {
   canvas.add(img);
   canvas.setActiveObject(img);
 });
-

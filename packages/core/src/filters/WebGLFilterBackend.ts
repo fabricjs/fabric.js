@@ -42,7 +42,7 @@ export class WebGLFilterBackend {
   /**
    * Contains GPU info for debug
    **/
-  declare gpuInfo: any;
+  declare gpuInfo?: { renderer: string; vendor: string };
 
   /**
    * Experimental. This object is a sort of repository of help layers used to avoid
@@ -159,7 +159,7 @@ export class WebGLFilterBackend {
     };
     const tempFbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tempFbo);
-    filters.forEach((filter: any) => {
+    filters.forEach((filter) => {
       filter && filter.applyTo(pipelineState);
     });
     resizeCanvasIfNeeded(pipelineState);

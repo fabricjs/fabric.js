@@ -1,5 +1,5 @@
 import { VERSION as version } from '../constants';
-import { type FabricImage } from '../shapes/Image';
+import { type SerializedImageProps } from '../shapes/Image';
 import { isJSDOM } from '../../../../vitest.extend';
 import TEST_IMAGE_GIF from '../../../../test/fixtures/test_image.gif';
 
@@ -250,9 +250,10 @@ export const IMG_SRC = isJSDOM() ? 'test_image.gif' : TEST_IMAGE_GIF;
 export const IMG_WIDTH = 276;
 export const IMG_HEIGHT = 110;
 
-export const REFERENCE_IMG_OBJECT: Partial<
-  FabricImage & { version: string; src: string; crossOrigin: null }
-> = {
+export const REFERENCE_IMG_OBJECT: SerializedImageProps & {
+  type: string;
+  version: string;
+} = {
   version: version,
   type: 'Image',
   originX: 'center',

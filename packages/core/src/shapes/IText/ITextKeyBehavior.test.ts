@@ -186,11 +186,11 @@ describe('IText move cursor', () => {
       selectionMock.mockClear();
     });
     test('enterEditing does not use delayedCursor', () => {
-      vi.spyOn(iText, '_tick');
+      const tick = vi.spyOn(iText, '_tick');
       iText.enterEditing();
       // enter editing will set the cursor and set selection to 1
       expect(selectionMock).toHaveBeenCalledTimes(1);
-      expect(iText._tick).toBeCalledWith();
+      expect(tick).toBeCalledWith();
       expect(_initDelayedMock).not.toHaveBeenCalled();
     });
     test('enterEditing and onInput', () => {

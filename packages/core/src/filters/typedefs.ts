@@ -1,7 +1,7 @@
 import type { WebGLFilterBackend } from './WebGLFilterBackend';
 import type { Canvas2dFilterBackend } from './Canvas2dFilterBackend';
 
-export type TProgramCache = any;
+export type TProgramCache = Partial<Record<string, TWebGLProgramCacheItem>>;
 
 export type TTextureCache = Record<string, WebGLTexture>;
 

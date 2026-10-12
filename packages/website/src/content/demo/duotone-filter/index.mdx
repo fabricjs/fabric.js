@@ -6,7 +6,7 @@ thumbnail: 'duotone-filter.png'
 tags: ['filters', 'customization']
 ---
 
-import { InputEventAttacher } from './DuotoneFilter'
+import { InputEventAttacher } from './DuotoneFilter';
 
 ### Use the Composed filter to create a duotone effect
 
@@ -20,6 +20,7 @@ The duotone effect is obtained by reducing an image to two main tones that contr
 Some tutorials such as this [one](https://codeburst.io/build-spotifys-colorizer-effect-with-javascript-35cb75fc638c) demonstrate how to create this effect with the standard canvas api.
 
 The logic is as follow:
+
 1. take a picture
 2. make it black and white
 3. blend a light color with multiply mode
@@ -30,5 +31,5 @@ Above the canvas we place two color pickers in order to change the input values 
 
 <input type="color" id="colorLight" value="#00ff36" />
 <input type="color" id="colorDark" value="#23278a" />
-<canvas id="canvas" width="500" height="620" ></canvas>
+<canvas id="canvas" width="500" height="620"></canvas>
 <InputEventAttacher client:idle />

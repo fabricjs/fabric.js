@@ -1,4 +1,4 @@
-import { beforeAll, expect, it, describe } from 'vitest';
+import { beforeAll, expect, it, describe, vi } from 'vitest';
 import { Rect } from '../shapes/Rect';
 import { Pattern } from './Pattern';
 import { getFabricDocument } from '../env';
@@ -190,8 +190,12 @@ describe('Pattern', () => {
 
   describe('attribute injection', () => {
     it('escapes correctly the src', () => {
+      const source = getFabricDocument().createElement('img');
+      source.width = 10;
+      source.height = 10;
+      vi.spyOn(source, 'src', 'get').mockReturnValue('"><svg onload=alert(1)>');
       const pattern = new Pattern({
-        source: { src: '"><svg onload=alert(1)>', width: 10, height: 10 },
+        source,
       });
       const svg = pattern.toSVG({ width: 100, height: 100 });
       expect(svg).toContain(

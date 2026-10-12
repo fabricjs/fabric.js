@@ -13,6 +13,7 @@ import { Group } from '../Group';
 import { config } from '../../config';
 import type {
   ObjectPointerEvents,
+  TPointerEvent,
   TPointerEventInfo,
 } from '../../EventTypeDefs';
 import { Point } from '../../Point';

@@ -1,8 +1,11 @@
 import { roundSnapshotOptions } from '../../../../../vitest.extend';
 import { IText } from './IText';
 import { describe, expect, it, beforeEach, afterEach, test, vi } from 'vitest';
+import type { MockInstance } from 'vitest';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
+import { Canvas } from '../../canvas/Canvas';
+import { Point } from '../../Point';
 
 export function matchTextStateSnapshot(text: IText) {
   const {
@@ -17,12 +20,12 @@ export function matchTextStateSnapshot(text: IText) {
     text: t,
     lines,
     charBounds,
-  }).toMatchSnapshot(roundSnapshotOptions);
+  }).toMatchSnapshotWithOptions(roundSnapshotOptions);
   expect(text).toMatchObjectSnapshot({ includeDefaultValues: false });
 }
 
 function create() {
-  return IText.fromObject<any, IText>({
+  const object = {
     text: 'test',
     fontSize: 25,
     styles: [
@@ -31,7 +34,8 @@ function create() {
       { fill: 'blue' },
       { fill: 'green' },
     ].map((style, index) => ({ style, start: index, end: index + 1 })),
-  });
+  };
+  return IText.fromObject<typeof object, IText>(object);
 }
 
 describe('text imperative changes', () => {
@@ -121,42 +125,47 @@ describe('text imperative changes', () => {
 
 describe('IText cursor animation snapshot', () => {
   let currentAnimation: string[] = [];
-  const origCalculate = ValueAnimation.prototype.calculate;
+  let canvas: Canvas;
+  let calculateSpy: MockInstance<ValueAnimation['calculate']>;
+  const origCalculate = ValueAnimation.prototype['calculate'];
 
   beforeEach(() => {
-    vi.spyOn(ValueAnimation.prototype, 'calculate').mockImplementation(
-      function (timeElapsed: number) {
+    calculateSpy = vi
+      .spyOn(ValueAnimation.prototype, 'calculate')
+      .mockImplementation(function (this: ValueAnimation, timeElapsed: number) {
         const value = origCalculate.call(this, timeElapsed);
         currentAnimation.push(value.value.toFixed(3));
         return value;
-      },
-    );
+      });
     vi.useFakeTimers();
     vi.runAllTimers();
     currentAnimation = [];
+    canvas = new Canvas(undefined, { renderOnAddRemove: false });
   });
 
   afterEach(() => {
-    ValueAnimation.prototype.calculate = origCalculate;
+    calculateSpy.mockRestore();
     vi.resetAllMocks();
+    canvas.cancelRequestedRender();
     vi.useRealTimers();
+    return canvas.dispose();
   });
   test('initDelayedCursor false - with delay', () => {
-    const iText = new IText('', { canvas: { getZoom: () => 1 } });
+    const iText = new IText('', { canvas });
     iText.initDelayedCursor();
     vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('initDelayedCursor true - with NO delay', () => {
-    const iText = new IText('', { canvas: { getZoom: () => 1 } });
+    const iText = new IText('', { canvas });
     iText.initDelayedCursor(true);
     vi.advanceTimersByTime(2000);
     expect(currentAnimation).toMatchSnapshot();
     iText.abortCursorAnimation();
   });
   test('selectionStart/selection end will abort animation', () => {
-    const iText = new IText('asd', { canvas: { getZoom: () => 1 } });
+    const iText = new IText('asd', { canvas });
     iText.initDelayedCursor(true);
     vi.advanceTimersByTime(160);
     iText.selectionStart = 0;
@@ -166,7 +175,7 @@ describe('IText cursor animation snapshot', () => {
     iText.abortCursorAnimation();
   });
   test('exiting from a canvas will abort animation', () => {
-    const iText = new IText('asd', { canvas: { getZoom: () => 1 } });
+    const iText = new IText('asd', { canvas });
     iText.initDelayedCursor(true);
     vi.advanceTimersByTime(160);
     iText.canvas = undefined;
@@ -175,7 +184,7 @@ describe('IText cursor animation snapshot', () => {
     iText.abortCursorAnimation();
   });
   test('Animation is configurable - fast cursor with delay', () => {
-    const iText = new IText('', { canvas: { getZoom: () => 1 } });
+    const iText = new IText('', { canvas });
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor();
@@ -184,7 +193,7 @@ describe('IText cursor animation snapshot', () => {
     iText.abortCursorAnimation();
   });
   test('Animation is configurable - fast cursor with no delay', () => {
-    const iText = new IText('', { canvas: { getZoom: () => 1 } });
+    const iText = new IText('', { canvas });
     iText.cursorDelay = 200;
     iText.cursorDuration = 80;
     iText.initDelayedCursor(true);
@@ -211,11 +220,12 @@ describe('IText _tick', () => {
     iText.enterEditing();
     expect(_tickMock).toHaveBeenCalledWith();
     _tickMock.mockClear();
-    iText.selected = true;
+    iText['selected'] = true;
     iText.mouseUpHandler({
-      e: {
-        button: 0,
-      },
+      e: new MouseEvent('mouseup', { button: 0 }),
+      scenePoint: new Point(),
+      viewportPoint: new Point(),
+      isClick: true,
     });
     expect(_tickMock).toHaveBeenCalledWith(0);
   });

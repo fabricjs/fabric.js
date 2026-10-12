@@ -150,10 +150,26 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
   styles: TextStyle;
 }
 
+export interface FabricText<
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Props extends TOptions<TextProps> = Partial<TextProps>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  SProps extends SerializedTextProps = SerializedTextProps,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  EventSpec extends ObjectEvents = ObjectEvents,
+> {
+  getSvgSpanStyles(
+    style: TextStyleDeclaration,
+    useWhiteSpace?: boolean,
+  ): string;
+  getSvgTextDecoration(style: TextStyleDeclaration): string;
+}
+
 /**
  * Text class
  * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#text}
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FabricText<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
@@ -674,7 +690,7 @@ export class FabricText<
    */
   _setTextStyles(
     ctx: CanvasRenderingContext2D,
-    charStyle?: any,
+    charStyle?: TextStyleDeclaration,
     forMeasuring?: boolean,
   ) {
     ctx.textBaseline = 'alphabetic';
@@ -1170,7 +1186,7 @@ export class FabricText<
   _renderChars(
     method: 'fillText' | 'strokeText',
     ctx: CanvasRenderingContext2D,
-    line: Array<any>,
+    line: string[],
     left: number,
     top: number,
     lineIndex: number,

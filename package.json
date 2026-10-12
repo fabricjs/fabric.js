@@ -77,7 +77,6 @@
     "@eslint/js": "10.0.1",
     "@playwright/test": "catalog:",
     "@types/jsdom": "catalog:",
-    "@types/micromatch": "4.0.10",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "5.0.1",
     "@vitest/coverage-v8": "5.0.1",
@@ -86,10 +85,11 @@
     "es-toolkit": "1.52.0",
     "eslint": "10.11.0",
     "eslint-config-prettier": "10.1.8",
+    "fast-check": "4.10.2",
     "husky": "9.1.7",
     "lint-staged": "17.5.1",
-    "micromatch": "4.0.8",
     "oxfmt": "0.68.0",
+    "picomatch": "2.3.2",
     "rolldown": "1.2.9",
     "tsc-files": "1.1.4",
     "typedoc": "catalog:",
@@ -176,7 +176,7 @@
   },
   "lint-staged": {
     "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
-    "*.{js,css,md,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
+    "*.{js,css,md,mdx,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
     "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
   }
 }

@@ -1,4 +1,5 @@
-#gentle-reminder.show, #carbonads {
+#gentle-reminder.show,
+#carbonads {
   width: 100%;
   border-radius: 8px;
   border: 1px solid var(--info-color-hover);
@@ -20,7 +21,11 @@
 
 .reminder {
   border: 1px solid transparent;
-  transition: height 250ms linear, background-color 500ms linear, border 250ms linear 500ms, line-height 350ms linear;
+  transition:
+    height 250ms linear,
+    background-color 500ms linear,
+    border 250ms linear 500ms,
+    line-height 350ms linear;
   text-align: center;
   line-height: 1;
 }
@@ -32,20 +37,20 @@
 }
 
 #carbonads span {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 #carbonads > span {
-    width: 100%;
-    justify-content: space-between;
-    flex-direction: column;
+  width: 100%;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 #carbonads .carbon-wrap {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
 }
 
 #carbonads {
@@ -93,21 +98,21 @@
 }
 
 @media (min-width: 431px) {
-    #carbonads > span {
-        width: 100%;
-        justify-content: space-between;
-        flex-direction: row;
-    }
+  #carbonads > span {
+    width: 100%;
+    justify-content: space-between;
+    flex-direction: row;
+  }
 
-    #carbonads .carbon-wrap {
-        gap: 16px;
-    }
+  #carbonads .carbon-wrap {
+    gap: 16px;
+  }
 
-    .ads-placeholder {
-      min-height: 162px;
-    }
+  .ads-placeholder {
+    min-height: 162px;
+  }
 
-    .sl-container .ads-placeholder {
-      min-height: 122px;
-    }
+  .sl-container .ads-placeholder {
+    min-height: 122px;
+  }
 }

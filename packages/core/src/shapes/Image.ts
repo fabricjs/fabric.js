@@ -294,8 +294,8 @@ export class FabricImage<
   /**
    * Returns original size of an image
    */
-  getOriginalSize() {
-    const element = this.getElement() as any;
+  getOriginalSize(): TSize {
+    const element = this.getElement();
     if (!element) {
       return {
         width: 0,
@@ -303,8 +303,10 @@ export class FabricImage<
       };
     }
     return {
-      width: element.naturalWidth || element.width,
-      height: element.naturalHeight || element.height,
+      width:
+        ('naturalWidth' in element && element.naturalWidth) || element.width,
+      height:
+        ('naturalHeight' in element && element.naturalHeight) || element.height,
     };
   }
 
@@ -828,13 +830,13 @@ export class FabricImage<
 
   /**
    * Returns {@link FabricImage} instance from an SVG element
-   * @param {HTMLElement} element Element to parse
+   * @param {HTMLElement | SVGElement} element Element to parse
    * @param {Object} [options] Options object
    * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
    * @param {Function} callback Callback to execute when Image object is created
    */
   static async fromElement(
-    element: HTMLElement,
+    element: HTMLElement | SVGElement,
     options: Abortable = {},
     cssRules?: CSSRules,
   ) {

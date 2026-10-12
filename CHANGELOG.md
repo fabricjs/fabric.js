@@ -3,8 +3,22 @@
 ## [next]
 
 - fix(IText): preserve select-all highlights in cached groups [#11116](https://github.com/fabricjs/fabric.js/pull/11116)
+- fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
+- chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
+- ci(): use fetched master when resolving changelog conflicts
+- ci(): trigger changelog conflict resolution with a label
+- ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
+- fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
+- [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
+- chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
+- chore(deps): update transitive markdown-it to 14.3.1 and source-map-js to 1.2.2
+- chore(deps): update fast-uri to 3.1.8 and sharp to 0.35.5
+- fix(): Textbox resize cursor ignores lockScalingX [#11114](https://github.com/fabricjs/fabric.js/pull/11114)
 - ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
 - chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
+- chore(website): drop prettier and format the website package with oxfmt [#11112](https://github.com/fabricjs/fabric.js/pull/11112)
 - chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
 - test(): replace custom canvas selector engines with Playwright locators [#11103](https://github.com/fabricjs/fabric.js/pull/11103)
 - chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)

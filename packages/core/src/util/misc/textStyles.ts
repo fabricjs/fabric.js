@@ -51,7 +51,7 @@ export const stylesToArray = (
   styles: TextStyle,
   text: string,
 ): TextStyleArray => {
-  const textLines = text.split('\n'),
+  const textLines = text.split(reNewline),
     stylesArray = [];
   let charIndex = -1,
     prevStyle = {};

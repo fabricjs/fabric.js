@@ -47,7 +47,7 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
   applyTo2d({ imageData: { data } }: T2DPipelineState) {
     const noise = this.noise;
     for (let i = 0; i < data.length; i += 4) {
-      const rand = (0.5 - Math.random()) * noise;
+      const rand = (0.5 - Math.random()) * noise; // NOSONAR: visual noise only.
       data[i] += rand;
       data[i + 1] += rand;
       data[i + 2] += rand;
@@ -65,7 +65,7 @@ export class Noise extends BaseFilter<'Noise', NoiseOwnProps> {
     uniformLocations: TWebGLUniformLocationMap,
   ) {
     gl.uniform1f(uniformLocations.uNoise, this.noise / 255);
-    gl.uniform1f(uniformLocations.uSeed, Math.random());
+    gl.uniform1f(uniformLocations.uSeed, Math.random()); // NOSONAR: visual noise seed.
   }
 
   isNeutralState() {

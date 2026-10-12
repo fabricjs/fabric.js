@@ -24,12 +24,20 @@ This filter affects performace, you may consider it if your application is expor
 
 <canvas id="canvas" width="800" height="500"></canvas>
 <div class="flexH">
-	<div class="flexV">
-		<canvas id="c" width="550" height="400" style="border:1px solid #ccc"></canvas>
-		<canvas id="b" width="550" height="400" style="border:1px solid #ccc"></canvas>
-	</div>
-	<pre id="log" ></pre>
+  <div class="flexV">
+    <canvas
+      id="c"
+      width="550"
+      height="400"
+      style="border:1px solid #ccc"
+    ></canvas>
+    <canvas
+      id="b"
+      width="550"
+      height="400"
+      style="border:1px solid #ccc"
+    ></canvas>
+  </div>
+  <pre id="log"></pre>
 </div>
-<CodeEditor code={code} canvasId="canvas" client:idle>
-  
-</CodeEditor>
+<CodeEditor code={code} canvasId="canvas" client:idle></CodeEditor>

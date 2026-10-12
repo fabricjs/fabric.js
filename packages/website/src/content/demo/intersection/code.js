@@ -72,7 +72,7 @@ function onChange({ target }) {
     }
     const intersection = fabric.Intersection.intersectPolygonPolygon(
       target.getCoords(true),
-      obj.getCoords(true)
+      obj.getCoords(true),
     );
 
     hit.set({ fill: obj.fill });
