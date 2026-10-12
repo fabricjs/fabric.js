@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): update canvas event fixtures and target assertions [#11153](https://github.com/fabricjs/fabric.js/pull/11153)
 - fix(types): align revivers with enlivened object types [#11148](https://github.com/fabricjs/fabric.js/pull/11148)
 - fix(types): allow custom controls in object options [#11147](https://github.com/fabricjs/fabric.js/pull/11147)
 - fix(brushes): keep spray dots in place when finishing a stroke [#11150](https://github.com/fabricjs/fabric.js/pull/11150)
