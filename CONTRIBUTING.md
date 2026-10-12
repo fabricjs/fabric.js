@@ -86,7 +86,7 @@ Answering questions and addressing issues, as well as fixing and adding types (s
 - **Be patient** \
   Sometimes it takes time to get back to you. Someone eventually will. Having a small, concise and super clear change will make maintainers more prone to handle it quickly.
 - **Code Style** \
-  Fabric uses [`oxfmt`][prettier] to format files and [`eslint`][eslint] for linting (`pnpm run lint -- --fix`).\
+  Fabric uses [`oxfmt`][prettier] to format files and [`oxlint`][oxlint] for linting (`pnpm run lint:fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
   If that doesn't work, once the PR is ready run `pnpm run prettier:write` and commit the changes.
   Do not reorder imports. Irrelevant changes in a PR that are not created by prettier aren't needed nor welcome.
@@ -195,7 +195,7 @@ Don't forget to unlink the package once you're done.
 [wsl]: https://learn.microsoft.com/en-us/windows/wsl/
 [oxfmt]: https://oxc.rs/docs/guide/usage/formatter.html
 [prettier_extension]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
-[eslint]: https://eslint.org/
+[oxlint]: https://oxc.rs/docs/guide/usage/linter.html
 [jsdoc]: https://jsdoc.app/
 [tsjsdoc]: https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
 [playwright]: https://playwright.dev/

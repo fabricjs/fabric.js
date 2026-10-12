@@ -109,7 +109,6 @@ jobs:
       - name: Type check
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: pnpm run typecheck
-      # Lint currently fixes files, so run it after the read-only checks.
       - name: Lint
         if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
         run: pnpm run lint
