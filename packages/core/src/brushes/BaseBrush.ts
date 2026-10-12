@@ -139,16 +139,17 @@ export abstract class BaseBrush {
   }
 
   /**
-   * Check is pointer is outside canvas boundaries
-   * @param {Object} pointer
+   * Check whether a scene point is outside the visible canvas boundaries
+   * @param {Point} pointer
    * @private
    */
   protected _isOutSideCanvas(pointer: Point) {
+    const { x, y } = pointer.transform(this.canvas.viewportTransform);
     return (
-      pointer.x < 0 ||
-      pointer.x > this.canvas.getWidth() ||
-      pointer.y < 0 ||
-      pointer.y > this.canvas.getHeight()
+      x < 0 ||
+      x > this.canvas.getWidth() ||
+      y < 0 ||
+      y > this.canvas.getHeight()
     );
   }
 }
