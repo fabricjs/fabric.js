@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(types): align revivers with enlivened object types [#11148](https://github.com/fabricjs/fabric.js/pull/11148)
 - chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
 - ci(): use fetched master when resolving changelog conflicts
 - ci(): trigger changelog conflict resolution with a label
