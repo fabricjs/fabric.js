@@ -78,24 +78,25 @@ export const loadImage = (
   });
 };
 
-export type EnlivenObjectOptions = Abortable & {
-  /**
-   * Method for further parsing of object elements,
-   * called after each fabric object created.
-   */
-  reviver?: <
-    T extends
-      | BaseFabricObject
-      | FabricObject
-      | BaseFilter<string>
-      | Shadow
-      | TFiller,
-  >(
-    serializedObj: Record<string, any>,
-    instance: T | undefined,
-    error?: FabricError,
-  ) => void | Promise<T>;
-};
+type EnlivenedObject =
+  | BaseFabricObject
+  | FabricObject
+  | BaseFilter<string>
+  | Shadow
+  | TFiller;
+
+export type EnlivenObjectOptions<T extends EnlivenedObject = EnlivenedObject> =
+  Abortable & {
+    /**
+     * Called after each object creation attempt.
+     * Return a replacement instance when creation fails.
+     */
+    reviver?: (
+      serializedObj: Record<string, any>,
+      instance: T | undefined,
+      error?: FabricError,
+    ) => T | void | Promise<T | void>;
+  };
 
 /**
  * @TODO type this correctly.
@@ -107,16 +108,9 @@ export type EnlivenObjectOptions = Abortable & {
  * @param {AbortSignal} [options.signal] handle aborting, see https://developer.mozilla.org/en-US/docs/Web/API/AbortController/signal
  * @returns {Promise<FabricObject[]>}
  */
-export const enlivenObjects = <
-  T extends
-    | BaseFabricObject
-    | FabricObject
-    | BaseFilter<string>
-    | Shadow
-    | TFiller,
->(
+export const enlivenObjects = <T extends EnlivenedObject>(
   objects: any[],
-  { signal, reviver = noop, ...options }: EnlivenObjectOptions = {},
+  { signal, reviver = noop, ...options }: EnlivenObjectOptions<NoInfer<T>> = {},
 ) =>
   new Promise<T[]>((resolve, reject) => {
     const instances: T[] = [];
@@ -145,7 +139,7 @@ export const enlivenObjects = <
               result.reason,
             );
             if (fallback) {
-              instances.push(fallback as T);
+              instances.push(fallback);
             }
           }
         }
