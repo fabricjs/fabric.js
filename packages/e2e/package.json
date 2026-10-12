@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit",
+    "typecheck": "tsc -p ./tsconfig.playwright.json --noEmit",
     "test": "playwright test"
   },
   "dependencies": {

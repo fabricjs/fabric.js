@@ -1,1 +1,1 @@
-npx lint-staged
+pnpm run lint && pnpm run prettier:check && pnpm run typecheck

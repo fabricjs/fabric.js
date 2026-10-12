@@ -1,0 +1,7 @@
+{
+  // Let Oxlint discover the source aliases and test files in tsconfig.spec.json
+  "extends": "../tsconfig.spec.json",
+  "compilerOptions": {
+    "rootDir": ".."
+  }
+}

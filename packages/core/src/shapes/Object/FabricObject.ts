@@ -8,7 +8,7 @@ import { classRegistry } from '../../ClassRegistry';
 
 // TODO somehow we have to make a tree-shakeable import
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface FabricObject<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
@@ -16,9 +16,9 @@ export interface FabricObject<
   SProps extends SerializedObjectProps = SerializedObjectProps,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   EventSpec extends ObjectEvents = ObjectEvents,
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 > extends FabricObjectSVGExportMixin {}
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FabricObject<
   Props extends TFabricObjectProps = Partial<FabricObjectProps>,
   SProps extends SerializedObjectProps = SerializedObjectProps,
