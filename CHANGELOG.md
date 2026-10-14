@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11157](https://github.com/fabricjs/fabric.js/pull/11157)
 - chore(deps): bump @playwright/test from 1.63.0 to 1.64.0 [#11159](https://github.com/fabricjs/fabric.js/pull/11159)
 - fix(types): align revivers with enlivened object types [#11148](https://github.com/fabricjs/fabric.js/pull/11148)
 - fix(types): allow custom controls in object options [#11147](https://github.com/fabricjs/fabric.js/pull/11147)
