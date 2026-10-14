@@ -21,7 +21,7 @@
     "@types/node": "catalog:",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "astro": "7.3.5",
+    "astro": "7.3.8",
     "canvas": "catalog:",
     "codemirror": "6.0.2",
     "fabric": "workspace:*",
