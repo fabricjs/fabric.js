@@ -48,6 +48,7 @@ import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
   textDefaultValues,
+  textDecorationProperties,
   textLayoutProperties,
   JUSTIFY,
   JUSTIFY_CENTER,
@@ -647,6 +648,20 @@ export class FabricText<
     dims.width += fontSize * dims.zoomX;
     dims.height += fontSize * dims.zoomY;
     return dims;
+  }
+
+  /**
+   * Decorations clear the shadow from the context once drawn, so glyphs painted
+   * after them would cast none: render through a cache so everything casts it.
+   */
+  needsItsOwnCache() {
+    return (
+      super.needsItsOwnCache() ||
+      (!!this.shadow &&
+        textDecorationProperties.some(
+          (decoration) => this[decoration] || this.styleHas(decoration),
+        ))
+    );
   }
 
   /**
