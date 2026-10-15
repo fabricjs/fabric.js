@@ -1,6 +1,16 @@
 import { getFabricDocument } from '../fabric';
 import { Rect } from '../packages/core/src/shapes/Rect';
 import { version } from '../package.json';
+import type {
+  BasicTransformEvent,
+  ModifiedEvent,
+  ModifyPathEvent,
+} from '../packages/core/src/EventTypeDefs';
+import { Point } from '../packages/core/src/Point';
+import type { ITextEvents } from '../packages/core/src/shapes/IText/ITextBehavior';
+import type { FabricObject } from '../packages/core/src/shapes/Object/FabricObject';
+import { saveObjectTransform } from '../packages/core/src/util/misc/objectTransforms';
+import { degreesToRadians } from '../packages/core/src/util/misc/radiansDegreesConversion';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -115,3 +125,42 @@ export function createPointerEvent(
     ...options,
   } as MouseEvent;
 }
+
+export const createLayoutEvent = (
+  target: FabricObject,
+): BasicTransformEvent &
+  ModifiedEvent &
+  ModifyPathEvent &
+  ITextEvents['changed'] => ({
+  target,
+  e: new MouseEvent('mousemove'),
+  pointer: new Point(),
+  action: 'drag',
+  index: 0,
+  commandIndex: 0,
+  pointIndex: 0,
+  transform: {
+    target,
+    ...saveObjectTransform(target),
+    corner: 'tl',
+    offsetX: 0,
+    offsetY: 0,
+    originX: target.originX,
+    originY: target.originY,
+    ex: 0,
+    ey: 0,
+    lastX: 0,
+    lastY: 0,
+    theta: degreesToRadians(target.angle),
+    width: target.width,
+    height: target.height,
+    shiftKey: false,
+    altKey: false,
+    original: {
+      ...saveObjectTransform(target),
+      originX: target.originX,
+      originY: target.originY,
+    },
+    actionPerformed: true,
+  },
+});
