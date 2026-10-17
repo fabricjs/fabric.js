@@ -1,6 +1,6 @@
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type {
   CanvasEvents,
   ModifierKey,
@@ -739,12 +739,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     maxX -= strokeOffset;
     maxY -= strokeOffset;
     // selection border
-    // @TODO: is _setLineDash still necessary on modern canvas?
-    FabricObject.prototype._setLineDash.call(
-      this,
-      ctx,
-      this.selectionDashArray,
-    );
+    ctx.setLineDash(this.selectionDashArray || []);
     ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
   }
 
