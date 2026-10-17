@@ -1,4 +1,4 @@
-# AGENTS.md instructions for /Users/andreabogazzi/develop/fabric.js
+# Fabric.js repository instructions
 
 This file defines how coding agents should operate in this repository.
 
@@ -6,9 +6,20 @@ This file defines how coding agents should operate in this repository.
 
 - Repository: `fabricjs/fabric.js`
 - Language: TypeScript/JavaScript
-- Package manager: `npm`
-- Runtime: Node `>=20`
+- Package manager: `pnpm`
+- Declared library runtime: Node `>=20`.
+- Development: use Node 24.x, matching primary CI and satisfying workspace engine requirements.
 - Main test stacks: `vitest` (unit) and `playwright` (e2e)
+
+## Repository Layout
+
+- `packages/core/src`: shared, environment-neutral library runtime.
+- `packages/browser/src`: browser entrypoint and environment setup.
+- `packages/node/src`: Node entrypoint and environment setup; keep Node-specific dependencies such as `canvas` and `jsdom` here, out of core and browser packages.
+- `packages/e2e`: Playwright tests and browser test scenes.
+- `packages/website`: documentation and demos; read [its AGENTS.md](packages/website/AGENTS.md) before working there.
+
+For package boundaries and legacy `fabric` compatibility entrypoints, see [Packages and migration](README.md#packages-and-migration) and the affected package's README.
 
 ## Repository Priorities
 
@@ -22,26 +33,31 @@ This file defines how coding agents should operate in this repository.
 Run from repo root:
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 ```
 
-## Common Commands
+Use `pnpm install` when dependency changes require updating `pnpm-lock.yaml`.
 
-- Build: `pnpm run build`
-- Fast build: `pnpm run build:fast`
-- Typecheck: `pnpm run typecheck`
-- Lint: `pnpm run lint`
-- Format check: `pnpm run prettier:check`
-- Format write: `pnpm run prettier:write`
-- Unit tests (node): `pnpm run test:vitest`
-- Unit tests with coverage: `pnpm run test:vitest:coverage`
-- E2E tests: `pnpm run test:e2e`
-- E2E typecheck: `pnpm run playwright:typecheck`
+## Validation
+
+The [pre-commit hook](.husky/pre-commit) runs `pnpm run lint`, `pnpm run prettier:check`, and `pnpm run typecheck`. Let the hook perform these checks when committing. When handing off code changes without a commit, or if the hook did not run, run them manually. Avoid repeating successful checks unless relevant files changed.
+
+Run commands from the repository root. Select additional checks based on the change; other scripts are listed in [package.json](package.json).
+
+- Unit tests: the same test files run in Node/jsdom, Chromium, and Firefox. Run affected tests across all three with `pnpm run test:vitest:all <test-file>`; `pnpm run test:vitest <test-file>` runs only Node/jsdom and is useful for quick iteration.
+- Browser interactions: run relevant E2E tests with `pnpm run test:e2e`; it already builds Fabric and typechecks E2E tests.
+- Package exports or distribution: run `pnpm run build`, then `pnpm run smoke:packages`.
+- Website: follow [the website instructions](packages/website/AGENTS.md) for validation and build prerequisites.
+- Documentation-only changes outside the website: verify any changed links or commands; library tests are unnecessary.
 
 ## Testing Expectations
 
 - Add or update tests for behavior changes.
 - Prefer targeted test runs while iterating, then run relevant full suites before finalizing.
+- Keep tests minimal. Be mindful of the number of tests you add.
+- **Extend before you add**: before you write a new test, look for an existing test that covers the same feature or code path.
+- If one exists, add the new edge case or assertion to it.
+- Create a new test only when no existing test is a good fit, or when the new scenario needs a different setup.
 
 ## Code Style
 
@@ -56,23 +72,10 @@ pnpm install
 - Prefer conventional-commit style in titles when possible:
   - `feat`, `fix`, `docs`, `ci`, `test`, `refactor`, `chore`
 - Add `close #<issue-num>` in PR body only when an issue number exists; if the user states there is no issue, omit it.
-- Ensure `CHANGELOG.md` (`## [next]`) is updated for notable changes.
-- Keep changelog entry style consistent with existing lines.
 
 ## In-Repo Skills
 
-Agents should check and use repository skills when tasks match.
-
-Available skill:
-
-- `fabricjs-open-pr`
-  - Path: `.codex/skills/fabricjs-open-pr/SKILL.md`
-  - Use when opening PRs for this repository.
-  - Handles PR title/body quality, optional `close #<issue-num>`, changelog entry, and predicted PR number flow.
-
-## Skill Trigger Guidance
-
-Use the `fabricjs-open-pr` skill when any of these apply:
+Use [fabricjs-open-pr](.agents/skills/fabricjs-open-pr/SKILL.md) when any of these apply:
 
 - User asks to open/create a PR.
 - User asks to prepare PR metadata (title/body/changelog).
