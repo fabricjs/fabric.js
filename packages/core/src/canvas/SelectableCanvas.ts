@@ -728,7 +728,13 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
     }
 
-    if (!this.selectionLineWidth || !this.selectionBorderColor) {
+    if (
+      !this.selectionLineWidth ||
+      !this.selectionBorderColor ||
+      // the border is drawn inside the box, skip it when it doesn't fit
+      maxX - minX < this.selectionLineWidth ||
+      maxY - minY < this.selectionLineWidth
+    ) {
       return;
     }
     ctx.lineWidth = this.selectionLineWidth;
