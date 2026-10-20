@@ -126,10 +126,9 @@ describe('Canvas event data', () => {
     });
     vi.spyOn(canvas, 'getRetinaScaling').mockReturnValue(200);
     const spy = vi.spyOn(canvas, '_getPointerImpl');
-    vi.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue({
-      width: 500,
-      height: 500,
-    });
+    vi.spyOn(canvas.upperCanvasEl, 'getBoundingClientRect').mockReturnValue(
+      new DOMRect(0, 0, 500, 500),
+    );
     vi.spyOn(canvas.upperCanvasEl, 'width', 'get').mockReturnValue(200);
     vi.spyOn(canvas.upperCanvasEl, 'height', 'get').mockReturnValue(200);
     const ev = new MouseEvent('mousemove', {
@@ -221,7 +220,7 @@ describe('Event targets', () => {
     const getTargetsFromEventStream = (mock: MockInstance) =>
       mock.mock.calls.map((args) => args[0].target);
 
-    registerTestObjects({
+    const objects: Record<string, FabricObject> = {
       rect1,
       rect2,
       rect3,
@@ -230,18 +229,10 @@ describe('Event targets', () => {
       group1,
       group2,
       group,
-    });
+    };
+    registerTestObjects(objects);
 
-    Object.values({
-      rect1,
-      rect2,
-      rect3,
-      rect4,
-      rect5,
-      group1,
-      group2,
-      group,
-    }).forEach((object) => {
+    Object.values(objects).forEach((object) => {
       object.on('mouseover', enter);
       object.on('mouseout', exit);
     });
@@ -275,46 +266,52 @@ describe('Event targets', () => {
   });
 
   describe('findTarget', () => {
-    test.skip.each([true, false])(
-      'findTargetsTraversal: search all is %s',
-      (searchAll) => {
-        const subTarget1 = new FabricObject();
-        const target1 = new Group([subTarget1], {
-          subTargetCheck: true,
-          interactive: true,
-        });
-        const subTarget2 = new FabricObject();
-        const target2 = new Group([subTarget2], {
-          subTargetCheck: true,
-        });
-        const parent = new Group([target1, target2], {
-          subTargetCheck: true,
-          interactive: true,
-        });
-        registerTestObjects({
-          subTarget1,
-          target1,
-          subTarget2,
-          target2,
-          parent,
-        });
-
-        const canvas = new Canvas();
-        canvas.add(parent);
-
-        vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
-        const found = canvas['findTargetsTraversal']([parent], new Point(), {
-          searchStrategy: searchAll ? 'search-all' : 'first-hit',
-        });
-        expect(found).toEqual(
-          searchAll
-            ? [subTarget2, target2, subTarget1, target1, parent]
-            : [subTarget2, target2, parent],
-        );
-      },
+    test.todo(
+      'collect every hit in nested groups from top to bottom (requires search-all traversal)',
     );
 
-    test.fails('searchPossibleTargets', () => {
+    test('searchPossibleTargets stops at the first hit and collects its nested targets', async () => {
+      const subTarget1 = new FabricObject();
+      const target1 = new Group([subTarget1], {
+        subTargetCheck: true,
+        interactive: true,
+      });
+      const subTarget2 = new FabricObject();
+      const target2 = new Group([subTarget2], {
+        subTargetCheck: true,
+      });
+      const parent = new Group([target1, target2], {
+        subTargetCheck: true,
+        interactive: true,
+      });
+      registerTestObjects({
+        subTarget1,
+        target1,
+        subTarget2,
+        target2,
+        parent,
+      });
+
+      const canvas = new Canvas();
+      try {
+        canvas.add(parent);
+        const checkTarget = vi
+          .spyOn(canvas, '_checkTarget')
+          .mockReturnValue(true);
+        const point = new Point();
+        const found = canvas.searchPossibleTargets([parent], point);
+
+        expect(found.target).toBe(target2);
+        expect(found.container).toBe(parent);
+        expect(found.subTargets).toEqual([subTarget2, target2]);
+        expect(checkTarget).not.toHaveBeenCalledWith(target1, point);
+        expect(checkTarget).not.toHaveBeenCalledWith(subTarget1, point);
+      } finally {
+        await canvas.dispose();
+      }
+    });
+
+    test('searchPossibleTargets', () => {
       const subTarget = new FabricObject();
       const target = new Group([subTarget], {
         subTargetCheck: true,
@@ -330,8 +327,9 @@ describe('Event targets', () => {
 
       vi.spyOn(canvas, '_checkTarget').mockReturnValue(true);
       const found = canvas.searchPossibleTargets([parent], new Point());
-      expect(found).toBe(target);
-      expect(canvas.targets).toEqual([subTarget, target, parent]);
+      expect(found.target).toBe(target);
+      expect(found.container).toBe(parent);
+      expect(found.subTargets).toEqual([subTarget, target]);
     });
 
     test('searchPossibleTargets with selection', () => {

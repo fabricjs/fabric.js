@@ -1286,6 +1286,25 @@ describe('StaticCanvas', () => {
     expect(canvas.isEmpty()).toBeFalsy();
   });
 
+  it('restores renderOnAddRemove when loadFromJSON is rejected', async () => {
+    canvas.renderOnAddRemove = true;
+    await expect(
+      canvas.loadFromJSON({ objects: [{ type: 'UnregisteredExampleObject' }] }),
+    ).rejects.toThrow();
+    expect(canvas.renderOnAddRemove).toBe(true);
+  });
+
+  it('restores renderOnAddRemove when loadFromJSON is aborted', async () => {
+    canvas.renderOnAddRemove = true;
+    const abortController = new AbortController();
+    const promise = canvas.loadFromJSON(PATH_JSON, undefined, {
+      signal: abortController.signal,
+    });
+    abortController.abort();
+    await expect(promise).rejects.toThrow();
+    expect(canvas.renderOnAddRemove).toBe(true);
+  });
+
   it('loads from JSON string correctly', async () => {
     expect(canvas.loadFromJSON).toBeTypeOf('function');
 
