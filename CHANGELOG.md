@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(text): preserve shadows on text with decorations when object caching is disabled [#11152](https://github.com/fabricjs/fabric.js/pull/11152)
+- fix(canvas): keep the selection border dash independent of free drawing brushes [#11162](https://github.com/fabricjs/fabric.js/pull/11162)
 - test(): use typed layout event fixtures [#11154](https://github.com/fabricjs/fabric.js/pull/11154)
 - test(): update canvas event fixtures and target assertions [#11153](https://github.com/fabricjs/fabric.js/pull/11153)
 - fix(StaticCanvas): restore `renderOnAddRemove` when `loadFromJSON` is rejected or aborted
