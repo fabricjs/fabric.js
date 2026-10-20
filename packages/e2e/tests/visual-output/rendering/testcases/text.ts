@@ -1,3 +1,4 @@
+import type { Canvas } from 'fabric';
 import { FabricNamespace, renderTestType } from '../../../types';
 
 function registerUbuntuFonts() {
@@ -133,6 +134,44 @@ function createTextBoxSubclass(fabric: FabricNamespace) {
   }
 
   return TestTextbox;
+}
+
+/**
+ * #9889: a justified textbox with charSpacing and textBackgroundColor,
+ * outlined in blue. The red background must end at the outline.
+ */
+function addCharSpacingBackgroundScene(
+  canvas: Canvas,
+  fabric: FabricNamespace,
+) {
+  canvas.backgroundColor = 'white';
+  const textbox = new fabric.Textbox('ADD A BIG TEXT WITH SOME CHAR SPACING', {
+    left: 20,
+    top: 20,
+    originX: 'left',
+    originY: 'top',
+    width: 300,
+    fontSize: 28,
+    fontWeight: 'bold',
+    lineHeight: 1,
+    textAlign: 'justify',
+    charSpacing: 400,
+    textBackgroundColor: 'red',
+  });
+  canvas.add(
+    textbox,
+    new fabric.Rect({
+      left: textbox.left,
+      top: textbox.top,
+      originX: 'left',
+      originY: 'top',
+      width: textbox.width,
+      height: textbox.height,
+      fill: '',
+      stroke: 'blue',
+      strokeWidth: 1,
+    }),
+  );
 }
 
 const cases: renderTestType[] = [
@@ -1202,6 +1241,34 @@ const cases: renderTestType[] = [
       canvas.renderAll();
       canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
       return canvas.lowerCanvasEl.toDataURL();
+    },
+  },
+  {
+    title: 'Text background with charSpacing stays inside the textbox',
+    golden: 'textBackgroundCharSpacing.png',
+    percentage: 0.01,
+    size: [340, 170],
+    async renderFunction(canvas, fabric) {
+      addCharSpacingBackgroundScene(canvas, fabric);
+      canvas.renderAll();
+    },
+  },
+  {
+    title: 'SVG text background with charSpacing stays inside the textbox',
+    golden: 'textBackgroundCharSpacing.png',
+    percentage: 0.01,
+    size: [340, 170],
+    disabled: 'node',
+    async renderFunction(canvas, fabric) {
+      addCharSpacingBackgroundScene(canvas, fabric);
+      const image = await fabric.util.loadImage(
+        `data:image/svg+xml,${encodeURIComponent(canvas.toSVG())}`,
+      );
+      const el = fabric.util.createCanvasElement();
+      el.width = canvas.width;
+      el.height = canvas.height;
+      el.getContext('2d')!.drawImage(image, 0, 0);
+      return el.toDataURL();
     },
   },
 ];

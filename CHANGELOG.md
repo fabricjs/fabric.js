@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(text): keep textBackgroundColor inside the line with charSpacing [#11173](https://github.com/fabricjs/fabric.js/pull/11173)
 - chore(deps): group related Dependabot updates [#11172](https://github.com/fabricjs/fabric.js/pull/11172)
 - fix(canvas): dont draw the drag-selection border when it doesnt fit [#11170](https://github.com/fabricjs/fabric.js/pull/11170)
 - fix(controls): remove padding from the pointer when scaling vertically [#11171](https://github.com/fabricjs/fabric.js/pull/11171)
