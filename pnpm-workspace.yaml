@@ -9,10 +9,10 @@ overrides:
 
 catalog:
   '@playwright/test': 1.64.0
-  '@types/jsdom': 21.1.7
+  '@types/jsdom': 30.0.0
   '@types/node': 24.13.6
   canvas: 3.2.3
-  jsdom: 26.1.0
+  jsdom: 30.1.3
   typedoc: 0.28.20
   typescript: 6.0.3
   westures: 1.1.1
