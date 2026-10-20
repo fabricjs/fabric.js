@@ -48,7 +48,6 @@ import type { StylePropertiesType } from './constants';
 import {
   additionalProps,
   textDefaultValues,
-  textDecorationProperties,
   textLayoutProperties,
   JUSTIFY,
   JUSTIFY_CENTER,
@@ -658,9 +657,12 @@ export class FabricText<
     return (
       super.needsItsOwnCache() ||
       (!!this.shadow &&
-        textDecorationProperties.some(
-          (decoration) => this[decoration] || this.styleHas(decoration),
-        ))
+        (this.underline ||
+          this.overline ||
+          this.linethrough ||
+          this.styleHas('underline') ||
+          this.styleHas('overline') ||
+          this.styleHas('linethrough')))
     );
   }
 
