@@ -1,4 +1,5 @@
-import type { renderTestType } from '../../../types';
+import type { Canvas } from 'fabric';
+import type { FabricNamespace, renderTestType } from '../../../types';
 
 const textpath1: renderTestType = {
   title: 'text on a circle path',
@@ -151,6 +152,59 @@ const textpath6: renderTestType = {
   },
 };
 
+/**
+ * #6958: spaces give their tspan a style attribute, which the SVG export
+ * used to glue to the rotate attribute, so the whole SVG failed to load.
+ */
+function addCurvedTextPath(canvas: Canvas, fabric: FabricNamespace) {
+  const text = new fabric.FabricText('TEXT ON A CURVED PATH', {
+    fontSize: 28,
+    fontWeight: 'bold',
+    path: new fabric.Path('M 0 130 Q 160 -50 320 130', { visible: false }),
+  });
+  canvas.add(text);
+  canvas.centerObject(text);
+}
+
+const textpath7: renderTestType = {
+  title: 'textpath with spaces',
+  golden: 'textpath7.png',
+  percentage: 0.01,
+  size: [360, 200],
+  // node-canvas draws text on a path too differently for this tolerance
+  disabled: 'node',
+  async renderFunction(canvas, fabric) {
+    addCurvedTextPath(canvas, fabric);
+    canvas.renderAll();
+  },
+};
+
+const textpath7SVG: renderTestType = {
+  title: 'textpath with spaces exported to SVG',
+  golden: 'textpath7.png',
+  percentage: 0.01,
+  size: [360, 200],
+  disabled: 'node',
+  async renderFunction(canvas, fabric) {
+    addCurvedTextPath(canvas, fabric);
+    const el = fabric.util.createCanvasElement();
+    el.width = canvas.width;
+    el.height = canvas.height;
+    const ctx = el.getContext('2d')!;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, el.width, el.height);
+    try {
+      const image = await fabric.util.loadImage(
+        `data:image/svg+xml,${encodeURIComponent(canvas.toSVG())}`,
+      );
+      ctx.drawImage(image, 0, 0);
+    } catch {
+      // an invalid SVG doesn't load, leaving the canvas blank
+    }
+    return el.toDataURL();
+  },
+};
+
 export const textPathTests = [
   textpath1,
   textpath2,
@@ -158,4 +212,6 @@ export const textPathTests = [
   textpath4,
   textpath5,
   textpath6,
+  textpath7,
+  textpath7SVG,
 ];

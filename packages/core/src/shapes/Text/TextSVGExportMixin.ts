@@ -180,7 +180,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     if (renderLeft !== undefined) {
       const wBy2 = width / 2;
       angle &&
-        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}"`);
+        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}" `);
       const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
       m[4] = renderLeft!;
       m[5] = renderTop!;
