@@ -85,7 +85,7 @@
     "es-toolkit": "1.52.0",
     "fast-check": "4.10.2",
     "husky": "9.1.7",
-    "oxfmt": "0.72.0",
+    "oxfmt": "0.73.0",
     "oxlint": "1.87.0",
     "oxlint-tsgolint": "7.0.2004",
     "picomatch": "2.3.2",
