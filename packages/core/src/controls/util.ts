@@ -152,7 +152,7 @@ export function getLocalPoint(
   if (localPoint.y >= padding) {
     localPoint.y -= padding;
   }
-  if (localPoint.y <= padding) {
+  if (localPoint.y <= -padding) {
     localPoint.y += padding;
   }
   localPoint.x -= control.offsetX;
