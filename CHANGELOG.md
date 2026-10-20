@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump oxfmt from 0.72.0 to 0.73.0 [#11168](https://github.com/fabricjs/fabric.js/pull/11168)
 - chore(): remove claude.md and refresh agents.md [#11163](https://github.com/fabricjs/fabric.js/pull/11163)
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11165](https://github.com/fabricjs/fabric.js/pull/11165)
 - fix(canvas): keep the selection border dash independent of free drawing brushes [#11162](https://github.com/fabricjs/fabric.js/pull/11162)
