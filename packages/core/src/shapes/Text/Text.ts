@@ -775,7 +775,8 @@ export class FabricText<
       return;
     }
     const originalFill = ctx.fillStyle,
-      leftOffset = this._getLeftOffset();
+      leftOffset = this._getLeftOffset(),
+      charSpacing = this._getWidthOfCharSpacing();
     let lineTopOffset = this._getTopOffset();
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
@@ -828,6 +829,8 @@ export class FabricText<
         }
       }
       if (currentColor && !this.path) {
+        // the line width doesn't include the char spacing after the last char
+        boxWidth -= charSpacing;
         drawStart = leftOffset + lineLeftOffset + boxStart;
         if (this.direction === RTL) {
           drawStart = this.width - drawStart - boxWidth;

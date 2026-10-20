@@ -10,6 +10,30 @@ updates:
     schedule:
       interval: 'weekly'
     groups:
+      react:
+        applies-to: 'version-updates'
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+      astro:
+        applies-to: 'version-updates'
+        patterns:
+          - 'astro'
+          - '@astrojs/*'
+          - 'starlight-typedoc'
+      typedoc:
+        applies-to: 'version-updates'
+        patterns:
+          - 'typedoc'
+          - 'typedoc-plugin-*'
+      node-canvas:
+        applies-to: 'version-updates'
+        patterns:
+          - 'canvas'
+          - 'jsdom'
+          - '@types/jsdom'
       vite:
         applies-to: 'version-updates'
         patterns:
