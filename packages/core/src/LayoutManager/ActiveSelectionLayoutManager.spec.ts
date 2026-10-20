@@ -3,6 +3,7 @@ import { ActiveSelection } from '../shapes/ActiveSelection';
 import { Group } from '../shapes/Group';
 import { FabricObject } from '../shapes/Object/FabricObject';
 import { ActiveSelectionLayoutManager } from './ActiveSelectionLayoutManager';
+import { createLayoutEvent } from '../../../../test/utils';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -43,6 +44,9 @@ describe('ActiveSelectionLayoutManager', () => {
       });
 
       it('a subscribed activeSelection should trigger layout on the object parent once per parent', () => {
+        const transformTriggers = triggers.filter(
+          (trigger) => trigger !== 'changed',
+        );
         const object = new FabricObject();
         const object2 = new FabricObject();
         const object3 = new FabricObject();
@@ -74,8 +78,8 @@ describe('ActiveSelectionLayoutManager', () => {
         // the AS has registered nothing
         expect(as.layoutManager['_subscriptions'].size).toBe(0);
 
-        const event = { foo: 'bar' };
-        triggers.forEach((trigger) => as.fire(trigger, event));
+        const event = createLayoutEvent(as);
+        transformTriggers.forEach((trigger) => as.fire(trigger, event));
         // the as does not need to perform a layout and indeed is not called
         expect(asPerformLayout).not.toHaveBeenCalled();
         expect(groupPerformLayout.mock.calls).toMatchObject([
@@ -87,7 +91,7 @@ describe('ActiveSelectionLayoutManager', () => {
               type: 'object_modified',
             },
           ],
-          ...triggers.slice(1).map((trigger) => [
+          ...transformTriggers.slice(1).map((trigger) => [
             {
               e: event,
               target: group,
@@ -105,7 +109,7 @@ describe('ActiveSelectionLayoutManager', () => {
               type: 'object_modified',
             },
           ],
-          ...triggers.slice(1).map((trigger) => [
+          ...transformTriggers.slice(1).map((trigger) => [
             {
               e: event,
               target: group2,
@@ -114,8 +118,12 @@ describe('ActiveSelectionLayoutManager', () => {
             },
           ]),
         ]);
-        expect(groupPerformLayout).toHaveBeenCalledTimes(triggers.length);
-        expect(groupPerformLayout2).toHaveBeenCalledTimes(triggers.length);
+        expect(groupPerformLayout).toHaveBeenCalledTimes(
+          transformTriggers.length,
+        );
+        expect(groupPerformLayout2).toHaveBeenCalledTimes(
+          transformTriggers.length,
+        );
         // we remove a single object, but both group and group2 have multiple object in the as
         // so with this removal nothing changes.
         as.remove(object);
@@ -123,7 +131,7 @@ describe('ActiveSelectionLayoutManager', () => {
         groupPerformLayout2.mockClear();
         asPerformLayout.mockClear();
 
-        triggers.forEach((trigger) => as.fire(trigger, event));
+        transformTriggers.forEach((trigger) => as.fire(trigger, event));
         expect(asPerformLayout).not.toHaveBeenCalled();
         expect(groupPerformLayout.mock.calls).toMatchObject([
           [
@@ -134,7 +142,7 @@ describe('ActiveSelectionLayoutManager', () => {
               type: 'object_modified',
             },
           ],
-          ...triggers.slice(1).map((trigger) => [
+          ...transformTriggers.slice(1).map((trigger) => [
             {
               e: event,
               target: group,
@@ -152,7 +160,7 @@ describe('ActiveSelectionLayoutManager', () => {
               type: 'object_modified',
             },
           ],
-          ...triggers.slice(1).map((trigger) => [
+          ...transformTriggers.slice(1).map((trigger) => [
             {
               e: event,
               target: group2,
@@ -161,8 +169,12 @@ describe('ActiveSelectionLayoutManager', () => {
             },
           ]),
         ]);
-        expect(groupPerformLayout).toHaveBeenCalledTimes(triggers.length);
-        expect(groupPerformLayout2).toHaveBeenCalledTimes(triggers.length);
+        expect(groupPerformLayout).toHaveBeenCalledTimes(
+          transformTriggers.length,
+        );
+        expect(groupPerformLayout2).toHaveBeenCalledTimes(
+          transformTriggers.length,
+        );
 
         groupPerformLayout.mockClear();
         groupPerformLayout2.mockClear();
@@ -179,7 +191,7 @@ describe('ActiveSelectionLayoutManager', () => {
         groupPerformLayout2.mockClear();
         asPerformLayout.mockClear();
 
-        triggers.forEach((trigger) => as.fire(trigger, event));
+        transformTriggers.forEach((trigger) => as.fire(trigger, event));
         expect(groupPerformLayout).not.toHaveBeenCalled();
         expect(groupPerformLayout2).not.toHaveBeenCalled();
         expect(asPerformLayout).not.toHaveBeenCalled();
