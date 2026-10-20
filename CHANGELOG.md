@@ -3,6 +3,7 @@
 ## [next]
 
 - chore(deps): group related Dependabot updates [#11172](https://github.com/fabricjs/fabric.js/pull/11172)
+- fix(canvas): dont draw the drag-selection border when it doesnt fit [#11170](https://github.com/fabricjs/fabric.js/pull/11170)
 - fix(controls): remove padding from the pointer when scaling vertically [#11171](https://github.com/fabricjs/fabric.js/pull/11171)
 - fix(text): preserve shadows on text with decorations when object caching is disabled [#11152](https://github.com/fabricjs/fabric.js/pull/11152)
 - chore(deps-dev): bump typedoc-plugin-markdown from 4.13.1 to 4.14.0 [#11169](https://github.com/fabricjs/fabric.js/pull/11169)

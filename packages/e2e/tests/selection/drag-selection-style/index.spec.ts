@@ -1,6 +1,3 @@
-// https://github.com/fabricjs/fabric.js/issues/7732
-// After free drawing with a dashed `freeDrawingBrush`, the drag-selection
-// rectangle is drawn with the brush's `strokeDashArray` instead of a solid border.
 import type { Page } from '@playwright/test';
 import type { Canvas } from 'fabric';
 import { expect, test } from '../../../fixtures/base';
@@ -47,6 +44,7 @@ const screenshotDragSelection = async (page: Page, canvasUtil: CanvasUtil) => {
   return image;
 };
 
+// https://github.com/fabricjs/fabric.js/issues/7732
 test('drag selection stays solid after drawing with a dashed brush', async ({
   page,
   canvasUtil,
@@ -78,4 +76,25 @@ test('drag selection keeps its own dash pattern after drawing with a dashed brus
   expect(await screenshotDragSelection(page, canvasUtil)).toEqual(
     beforeDrawing,
   );
+});
+
+// https://github.com/fabricjs/fabric.js/issues/9123
+test('drag selection smaller than its border draws no border', async ({
+  page,
+  canvasUtil,
+}) => {
+  const blank = await canvasUtil.screenshot();
+  const box = (await canvasUtil.upperCanvas.boundingBox())!;
+  await page.mouse.move(box.x + 150, box.y + 150);
+  await page.mouse.down();
+  // a click that fires a mousemove without moving
+  await page.mouse.move(box.x + 150, box.y + 150, { steps: 5 });
+  expect(await canvasUtil.screenshot()).toEqual(blank);
+  // pointer jitter, thinner than the 4px border
+  await page.mouse.move(box.x + 152, box.y + 153);
+  expect(await canvasUtil.screenshot()).toEqual(blank);
+  // one axis exactly the border width still draws
+  await page.mouse.move(box.x + 154, box.y + 160);
+  expect(await canvasUtil.screenshot()).not.toEqual(blank);
+  await page.mouse.up();
 });
