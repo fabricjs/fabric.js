@@ -300,7 +300,8 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
           lastColor,
           leftOffset + boxStart,
           textTopOffset,
-          boxWidth,
+          // the line width doesn't include the char spacing after the last char
+          boxWidth - this._getWidthOfCharSpacing(),
           heightOfLine,
         ),
       );
