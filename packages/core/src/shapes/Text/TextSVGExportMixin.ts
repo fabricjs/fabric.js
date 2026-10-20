@@ -172,7 +172,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         styleDecl,
         char !== char.trim() || !!char.match(multipleSpacesRegex),
       ),
-      fillStyles = styleProps ? `style="${styleProps}"` : '',
+      fillStyles = styleProps ? `style="${styleProps}" ` : '',
       dy = styleDecl.deltaY,
       dySpan = dy ? ` dy="${toFixed(dy, numFractionDigit)}" ` : '',
       { angle, renderLeft, renderTop, width } = charBox;
@@ -180,7 +180,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
     if (renderLeft !== undefined) {
       const wBy2 = width / 2;
       angle &&
-        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}"`);
+        (angleAttr = ` rotate="${toFixed(radiansToDegrees(angle), numFractionDigit)}" `);
       const m = createRotateMatrix({ angle: radiansToDegrees(angle!) });
       m[4] = renderLeft!;
       m[5] = renderTop!;
