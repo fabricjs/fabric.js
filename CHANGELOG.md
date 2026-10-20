@@ -3,6 +3,9 @@
 ## [next]
 
 - chore(): remove claude.md and refresh agents.md [#11163](https://github.com/fabricjs/fabric.js/pull/11163)
+- test(): use typed layout event fixtures [#11154](https://github.com/fabricjs/fabric.js/pull/11154)
+- test(): update canvas event fixtures and target assertions [#11153](https://github.com/fabricjs/fabric.js/pull/11153)
+- fix(StaticCanvas): restore `renderOnAddRemove` when `loadFromJSON` is rejected or aborted
 - chore(deps-dev): bump vite from 8.3.1 to 8.3.4 in the vite group across 1 directory [#11155](https://github.com/fabricjs/fabric.js/pull/11155)
 - chore(deps): bump astro from 7.3.5 to 7.3.8 [#11156](https://github.com/fabricjs/fabric.js/pull/11156)
 - chore(deps): bump @astrojs/react from 7.0.0 to 7.0.1 [#11158](https://github.com/fabricjs/fabric.js/pull/11158)
