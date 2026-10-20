@@ -264,7 +264,7 @@ importers:
         version: 0.35.5(@types/node@24.13.6)
       starlight-typedoc:
         specifier: 0.23.1
-        version: 0.23.1(@astrojs/starlight@0.42.4(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typescript@6.0.3))(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3))
+        version: 0.23.1(@astrojs/starlight@0.42.4(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typescript@6.0.3))(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typedoc-plugin-markdown@4.14.0(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3))
       thememirror:
         specifier: 2.0.1
         version: 2.0.1(@codemirror/language@6.12.4)(@codemirror/state@6.7.1)(@codemirror/view@6.43.7)
@@ -279,8 +279,8 @@ importers:
         specifier: 'catalog:'
         version: 0.28.20(typescript@6.0.3)
       typedoc-plugin-markdown:
-        specifier: 4.13.1
-        version: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
+        specifier: 4.14.0
+        version: 4.14.0(typedoc@0.28.20(typescript@6.0.3))
       westures:
         specifier: 'catalog:'
         version: 1.1.1
@@ -3002,8 +3002,8 @@ packages:
   tunnel-agent@0.6.0:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
 
-  typedoc-plugin-markdown@4.13.1:
-    resolution: {integrity: sha512-d3jchJ4CyIrV9w9uozTSkfMYG8IEM1RvvGOaybJ/3rRporzoX7p0lprffo95GOGUviQqP0phjHJE3bY8PQbilA==}
+  typedoc-plugin-markdown@4.14.0:
+    resolution: {integrity: sha512-Y2a3oDV9ekrbkk6RBSGH8GyNkh0xIdemIOOTr3tiRN/33nvFGStOs9nw+6Q84gF1XFkcVZrgM4Ckcsf6e/YpKQ==}
     engines: {node: '>= 18'}
     peerDependencies:
       typedoc: 0.28.x
@@ -6120,13 +6120,13 @@ snapshots:
 
   space-separated-tokens@2.0.2: {}
 
-  starlight-typedoc@0.23.1(@astrojs/starlight@0.42.4(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typescript@6.0.3))(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3)):
+  starlight-typedoc@0.23.1(@astrojs/starlight@0.42.4(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typescript@6.0.3))(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typedoc-plugin-markdown@4.14.0(typedoc@0.28.20(typescript@6.0.3)))(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
       '@astrojs/starlight': 0.42.4(astro@7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1))(typescript@6.0.3)
       astro: 7.3.8(@types/node@24.13.6)(esbuild@0.28.2)(terser@5.43.1)(yaml@2.9.1)
       github-slugger: 2.0.0
       typedoc: 0.28.20(typescript@6.0.3)
-      typedoc-plugin-markdown: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
+      typedoc-plugin-markdown: 4.14.0(typedoc@0.28.20(typescript@6.0.3))
 
   std-env@4.3.0: {}
 
@@ -6243,7 +6243,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)):
+  typedoc-plugin-markdown@4.14.0(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
       typedoc: 0.28.20(typescript@6.0.3)
 
