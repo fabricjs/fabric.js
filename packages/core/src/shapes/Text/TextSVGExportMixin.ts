@@ -172,7 +172,7 @@ export class TextSVGExportMixin extends FabricObjectSVGExportMixin {
         styleDecl,
         char !== char.trim() || !!char.match(multipleSpacesRegex),
       ),
-      fillStyles = styleProps ? `style="${styleProps}"` : '',
+      fillStyles = styleProps ? `style="${styleProps}" ` : '',
       dy = styleDecl.deltaY,
       dySpan = dy ? ` dy="${toFixed(dy, numFractionDigit)}" ` : '',
       { angle, renderLeft, renderTop, width } = charBox;
