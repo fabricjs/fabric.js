@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump @types/node from 24.13.6 to 26.6.5 [#11166](https://github.com/fabricjs/fabric.js/pull/11166)
 - chore(deps-dev): bump vite from 8.3.1 to 8.3.4 in the vite group across 1 directory [#11155](https://github.com/fabricjs/fabric.js/pull/11155)
 - chore(deps): bump astro from 7.3.5 to 7.3.8 [#11156](https://github.com/fabricjs/fabric.js/pull/11156)
 - chore(deps): bump @astrojs/react from 7.0.0 to 7.0.1 [#11158](https://github.com/fabricjs/fabric.js/pull/11158)
