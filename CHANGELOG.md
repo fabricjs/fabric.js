@@ -2,6 +2,7 @@
 
 ## [next]
 
+- test(): use typed layout event fixtures [#11154](https://github.com/fabricjs/fabric.js/pull/11154)
 - test(): update canvas event fixtures and target assertions [#11153](https://github.com/fabricjs/fabric.js/pull/11153)
 - fix(StaticCanvas): restore `renderOnAddRemove` when `loadFromJSON` is rejected or aborted
 - chore(deps-dev): bump vite from 8.3.1 to 8.3.4 in the vite group across 1 directory [#11155](https://github.com/fabricjs/fabric.js/pull/11155)
