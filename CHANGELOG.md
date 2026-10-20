@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(text): preserve shadows on text with decorations when object caching is disabled [#11152](https://github.com/fabricjs/fabric.js/pull/11152)
 - chore(deps-dev): bump typedoc-plugin-markdown from 4.13.1 to 4.14.0 [#11169](https://github.com/fabricjs/fabric.js/pull/11169)
 - chore(deps-dev): bump oxfmt from 0.72.0 to 0.73.0 [#11168](https://github.com/fabricjs/fabric.js/pull/11168)
 - chore(): remove claude.md and refresh agents.md [#11163](https://github.com/fabricjs/fabric.js/pull/11163)

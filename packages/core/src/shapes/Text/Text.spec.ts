@@ -2,6 +2,7 @@ import { roundSnapshotOptions } from '../../../../../vitest.extend';
 import { cache } from '../../cache';
 import { config } from '../../config';
 import { Path } from '../Path';
+import { Shadow } from '../../Shadow';
 import { FabricText } from './Text';
 
 import { describe, expect, it, afterEach, vi } from 'vitest';
@@ -62,6 +63,60 @@ describe('FabricText', () => {
     expect((await FabricText.fromObject({ text: 'text' })).toObject()).toEqual(
       new FabricText('text').toObject(),
     );
+  });
+
+  describe('caching of decorated text with a shadow', () => {
+    const shadow = () => new Shadow({ color: 'red', offsetX: 8, offsetY: 8 });
+
+    it.each(['underline', 'overline', 'linethrough'] as const)(
+      'needs its own cache with %s and a shadow',
+      (decoration) => {
+        const text = new FabricText('Shadow', {
+          objectCaching: false,
+          [decoration]: true,
+          shadow: shadow(),
+        });
+        expect(text.needsItsOwnCache()).toBe(true);
+        expect(text.shouldCache()).toBe(true);
+      },
+    );
+
+    it('needs its own cache with a character-level decoration and a shadow', () => {
+      const text = new FabricText('Shadow', {
+        objectCaching: false,
+        styles: { 0: { 2: { underline: true } } },
+        shadow: shadow(),
+      });
+      expect(text.needsItsOwnCache()).toBe(true);
+      expect(text.shouldCache()).toBe(true);
+    });
+
+    it('needs its own cache inside a cached parent', () => {
+      const text = new FabricText('Shadow', {
+        underline: true,
+        shadow: shadow(),
+      });
+      // @ts-expect-error -- Mock group
+      text.parent = { isOnACache: () => true };
+      expect(text.shouldCache()).toBe(true);
+      text.underline = false;
+      expect(text.shouldCache()).toBe(false);
+    });
+
+    it('keeps the default caching without a shadow or without a decoration', () => {
+      const withoutShadow = new FabricText('Shadow', {
+        objectCaching: false,
+        underline: true,
+      });
+      const withoutDecoration = new FabricText('Shadow', {
+        objectCaching: false,
+        shadow: shadow(),
+      });
+      for (const text of [withoutShadow, withoutDecoration]) {
+        expect(text.needsItsOwnCache()).toBe(false);
+        expect(text.shouldCache()).toBe(false);
+      }
+    });
   });
 
   describe('measuring, splitting', () => {

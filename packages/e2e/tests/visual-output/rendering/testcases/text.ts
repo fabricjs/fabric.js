@@ -137,6 +137,40 @@ function createTextBoxSubclass(fabric: FabricNamespace) {
 
 const cases: renderTestType[] = [
   {
+    title:
+      'Decorated text casts the same shadow with and without object caching',
+    golden: 'textDecorationShadow.png',
+    percentage: 0.005,
+    size: [340, 270],
+    async renderFunction(canvas, fabric) {
+      // #5364: each uncached text (right) must look like its cached twin (left)
+      canvas.backgroundColor = 'white';
+      [{ underline: true }, { overline: true }, { linethrough: true }].forEach(
+        (decoration, row) =>
+          [true, false].forEach((objectCaching, column) =>
+            canvas.add(
+              new fabric.FabricText('Agyp', {
+                left: 20 + column * 170,
+                top: 15 + row * 85,
+                originX: 'left',
+                originY: 'top',
+                fontSize: 60,
+                fill: 'black',
+                objectCaching,
+                ...decoration,
+                shadow: new fabric.Shadow({
+                  color: 'red',
+                  offsetX: 6,
+                  offsetY: 6,
+                }),
+              }),
+            ),
+          ),
+      );
+      canvas.renderAll();
+    },
+  },
+  {
     title: 'Simple text test',
     golden: 'text1.png',
     percentage: 0.06,

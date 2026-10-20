@@ -650,6 +650,23 @@ export class FabricText<
   }
 
   /**
+   * Decorations clear the shadow from the context once drawn, so glyphs painted
+   * after them would cast none: render through a cache so everything casts it.
+   */
+  needsItsOwnCache() {
+    return (
+      super.needsItsOwnCache() ||
+      (!!this.shadow &&
+        (this.underline ||
+          this.overline ||
+          this.linethrough ||
+          this.styleHas('underline') ||
+          this.styleHas('overline') ||
+          this.styleHas('linethrough')))
+    );
+  }
+
+  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
