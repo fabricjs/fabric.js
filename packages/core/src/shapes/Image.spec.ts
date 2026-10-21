@@ -17,6 +17,7 @@ import {
 } from '../../../../fabric';
 import { removeTransformMatrixForSvgParsing } from '../util';
 import * as FilterBackend from '../filters/FilterBackend';
+import { Canvas2dFilterBackend } from '../filters/Canvas2dFilterBackend';
 import { FabricError } from '../util/internals/console';
 import TestImageGif from '../../../../test/fixtures/test_image.gif';
 import { isJSDOM } from '../../../../vitest.extend';
@@ -763,6 +764,41 @@ describe('FabricImage', () => {
     // @ts-expect-error -- protected prop
     expect(image._lastScaleY, 'lastScale Y is reset').toBe(1);
     expect(image._needsResize(), 'resizing is needed again').toBe(true);
+  });
+
+  it('apply filters again with a Resize in the filters keeps the whole image', () => {
+    const source = getFabricDocument().createElement('canvas');
+    source.width = 4;
+    source.height = 4;
+    const sourceCtx = source.getContext('2d')!;
+    sourceCtx.fillStyle = 'rgb(255, 0, 0)';
+    sourceCtx.fillRect(0, 0, 4, 4);
+    const image = new FabricImage(source);
+    image.filters = [new Resize({ scaleX: 0.5, scaleY: 0.5 })];
+
+    const readPixels = () => {
+      const el = image.getElement() as HTMLCanvasElement;
+      return Array.from(
+        el.getContext('2d')!.getImageData(0, 0, el.width, el.height).data,
+      );
+    };
+
+    const backend = FilterBackend.getFilterBackend();
+    FilterBackend.setFilterBackend(new Canvas2dFilterBackend());
+    try {
+      image.applyFilters();
+      const firstPass = readPixels();
+      expect(firstPass, 'first pass is opaque red').toEqual(
+        Array(4).fill([255, 0, 0, 255]).flat(),
+      );
+
+      image.applyFilters();
+      expect(image.getElement().width, 'still resized').toBe(2);
+      expect(image.getElement().height, 'still resized').toBe(2);
+      expect(readPixels(), 'second pass matches the first').toEqual(firstPass);
+    } finally {
+      FilterBackend.setFilterBackend(backend);
+    }
   });
 
   it('apply filters set the image dirty and also the group', async () => {

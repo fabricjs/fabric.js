@@ -38,6 +38,14 @@ export class Canvas2dFilterBackend {
     if (!ctx) {
       return;
     }
+    // the target can still have the size of a previous output, e.g. after a Resize filter
+    if (
+      targetCanvas.width !== sourceWidth ||
+      targetCanvas.height !== sourceHeight
+    ) {
+      targetCanvas.width = sourceWidth;
+      targetCanvas.height = sourceHeight;
+    }
     ctx.drawImage(sourceElement, 0, 0, sourceWidth, sourceHeight);
     const imageData = ctx.getImageData(0, 0, sourceWidth, sourceHeight);
     const originalImageData = ctx.getImageData(0, 0, sourceWidth, sourceHeight);
