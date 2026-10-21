@@ -393,6 +393,34 @@ describe('fabric.Parser', () => {
     expect(objects[2]!.fill).toHaveProperty('type', 'linear');
   });
 
+  it('parseSVGFromString with gradients referenced by plain href', async () => {
+    const string =
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+      '<linearGradient id="units" gradientUnits="userSpaceOnUse"/>' +
+      '<linearGradient id="href" x1="0" y1="0" x2="100" y2="0" href="#units">' +
+      '<stop offset="0" stop-color="black"/><stop offset="1" stop-color="white"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="base" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">' +
+      '<stop offset="0" stop-color="blue"/><stop offset="1" stop-color="yellow"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="xlink" xlink:href="#base"/>' +
+      '<linearGradient id="chain" href="#xlink"/>' +
+      '<rect width="100" height="50" fill="url(#href)"/>' +
+      '<rect width="100" height="50" fill="url(#chain)"/>' +
+      '</svg>';
+
+    const { objects } = await loadSVGFromString(string);
+    const [inherited, chained] = objects.map(
+      (object) => object!.fill as Gradient<'linear'>,
+    );
+    // gradientUnits comes from the gradient referenced with href
+    expect(inherited.gradientUnits).toBe('pixels');
+    expect(inherited.colorStops).toHaveLength(2);
+    // href -> xlink:href chain brings both gradientUnits and stops
+    expect(chained.gradientUnits).toBe('pixels');
+    expect(chained.colorStops).toHaveLength(2);
+  });
+
   it('parseSVGFromString with xlink:href', async () => {
     const string =
       '<?xml version="1.0" standalone="no"?><svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
