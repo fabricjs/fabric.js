@@ -12,14 +12,22 @@ const gradientsAttrs = [
   'fy',
 ];
 const xlinkAttr = 'xlink:href';
+const hrefAttr = 'href';
+
+/**
+ * SVG2 plain `href` takes precedence over the deprecated `xlink:href`
+ * @see https://www.w3.org/TR/SVG2/linking.html#XLinkRefAttrs
+ */
+export const getGradientHref = (gradient: Element) =>
+  gradient.getAttribute(hrefAttr) || gradient.getAttribute(xlinkAttr);
 
 export function recursivelyParseGradientsXlink(
   doc: Document,
   gradient: Element,
 ) {
-  const xLink = gradient.getAttribute(xlinkAttr)?.slice(1) || '',
+  const xLink = getGradientHref(gradient)?.slice(1) || '',
     referencedGradient = doc.getElementById(xLink);
-  if (referencedGradient && referencedGradient.getAttribute(xlinkAttr)) {
+  if (referencedGradient && getGradientHref(referencedGradient)) {
     recursivelyParseGradientsXlink(doc, referencedGradient);
   }
   if (referencedGradient) {
@@ -37,4 +45,5 @@ export function recursivelyParseGradientsXlink(
     }
   }
   gradient.removeAttribute(xlinkAttr);
+  gradient.removeAttribute(hrefAttr);
 }
