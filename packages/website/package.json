@@ -16,7 +16,7 @@
     "@astrojs/sitemap": "3.7.4",
     "@astrojs/starlight": "0.42.4",
     "@codemirror/lang-javascript": "6.2.5",
-    "@codemirror/state": "6.7.1",
+    "@codemirror/state": "6.7.6",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "19.3.0",
