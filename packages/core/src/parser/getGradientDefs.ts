@@ -1,5 +1,8 @@
 import { getMultipleNodes } from './getMultipleNodes';
-import { recursivelyParseGradientsXlink } from './recursivelyParseGradientsXlink';
+import {
+  getGradientHref,
+  recursivelyParseGradientsXlink,
+} from './recursivelyParseGradientsXlink';
 
 const tagArray = [
   'linearGradient',
@@ -21,7 +24,7 @@ export function getGradientDefs(
   let j = elList.length;
   while (j--) {
     const el = elList[j];
-    if (el.getAttribute('xlink:href')) {
+    if (getGradientHref(el)) {
       recursivelyParseGradientsXlink(doc, el);
     }
     const id = el.getAttribute('id');
