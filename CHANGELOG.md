@@ -3,6 +3,10 @@
 ## [next]
 
 -   fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
+- chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
+- chore(deps): bump @codemirror/state from 6.7.1 to 6.7.6 [#11179](https://github.com/fabricjs/fabric.js/pull/11179)
+- chore(deps): bump the react group across 1 directory with 2 updates [#11175](https://github.com/fabricjs/fabric.js/pull/11175)
+- chore(deps): bump @playwright/test from 1.64.0 to 1.64.1 [#11178](https://github.com/fabricjs/fabric.js/pull/11178)
 - fix(text): keep SVG export of text on a path valid with spaces [#11174](https://github.com/fabricjs/fabric.js/pull/11174)
 - fix(text): keep textBackgroundColor inside the line with charSpacing [#11173](https://github.com/fabricjs/fabric.js/pull/11173)
 - chore(deps): group related Dependabot updates [#11172](https://github.com/fabricjs/fabric.js/pull/11172)
