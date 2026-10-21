@@ -369,6 +369,19 @@ describe('Canvas', () => {
     expect(objs[0]).toBe(rect);
     expect(objs[1]).toBe(rect2);
     expect(objs[2]).toBe(rect3);
+
+    // #9749: a group child is drawn by its group, lifting it paints it twice
+    const child = makeRect();
+    const group = new Group([child], { interactive: true });
+    canvas.add(group);
+    canvas.preserveObjectStacking = false;
+    canvas.setActiveObject(child);
+    expect(canvas._chooseObjectsToRender()).toEqual([
+      rect,
+      rect2,
+      rect3,
+      group,
+    ]);
   });
 
   it('implements calcOffset method', () => {
