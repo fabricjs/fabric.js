@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump the react group across 1 directory with 2 updates [#11175](https://github.com/fabricjs/fabric.js/pull/11175)
 - chore(deps): bump @playwright/test from 1.64.0 to 1.64.1 [#11178](https://github.com/fabricjs/fabric.js/pull/11178)
 - fix(text): keep SVG export of text on a path valid with spaces [#11174](https://github.com/fabricjs/fabric.js/pull/11174)
 - fix(text): keep textBackgroundColor inside the line with charSpacing [#11173](https://github.com/fabricjs/fabric.js/pull/11173)
