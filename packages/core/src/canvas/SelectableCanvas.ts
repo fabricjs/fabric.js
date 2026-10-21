@@ -383,7 +383,8 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
    */
   _chooseObjectsToRender(): FabricObject[] {
     const activeObject = this._activeObject;
-    return !this.preserveObjectStacking && activeObject
+    // a group child is drawn by its group, lifting it would paint it twice
+    return !this.preserveObjectStacking && activeObject && !activeObject.group
       ? this._objects
           .filter((object) => !object.group && object !== activeObject)
           .concat(activeObject)

@@ -480,4 +480,31 @@ export const controlsRenderingTests: renderTestType[] = [
       canvas.setActiveObject(activeSelection);
     },
   },
+
+  {
+    title: 'Selected object in a group is painted once',
+    golden: 'controls15.png',
+    percentage: 0.004,
+    size: [250, 130],
+    async renderFunction(canvas, fabric) {
+      // #9749: the selected left rect must have the same tint as the right one
+      const rectOptions = {
+        top: 65,
+        width: 100,
+        height: 100,
+        fill: 'blue',
+        opacity: 0.4,
+        strokeWidth: 0,
+      };
+      const left = new fabric.Rect({ ...rectOptions, left: 65 });
+      const right = new fabric.Rect({ ...rectOptions, left: 185 });
+      const group = new fabric.Group([left, right], {
+        interactive: true,
+        subTargetCheck: true,
+      });
+      canvas.preserveObjectStacking = false;
+      canvas.add(group);
+      canvas.setActiveObject(left);
+    },
+  },
 ];
