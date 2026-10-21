@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(canvas): do not paint a selected group child twice [#11182](https://github.com/fabricjs/fabric.js/pull/11182)
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
 - chore(deps): bump @codemirror/state from 6.7.1 to 6.7.6 [#11179](https://github.com/fabricjs/fabric.js/pull/11179)
 - chore(deps): bump the react group across 1 directory with 2 updates [#11175](https://github.com/fabricjs/fabric.js/pull/11175)
