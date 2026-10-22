@@ -1621,14 +1621,13 @@ export class FabricObject<
    * @returns {Group[]} ancestors (excluding `ActiveSelection`) from bottom to top
    */
   getAncestors(): Group[] {
-    const ancestors: TAncestor[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let parent: TAncestor | undefined = this;
-    do {
+    const ancestors: Group[] = [];
+    let parent = this.parent;
+    while (parent) {
+      ancestors.push(parent);
       parent = parent.parent;
-      parent && ancestors.push(parent);
-    } while (parent);
-    return ancestors as Group[];
+    }
+    return ancestors;
   }
 
   /**
