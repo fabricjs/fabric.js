@@ -18,7 +18,7 @@ function getUniqueRects(rects: Rect[]) {
   const uniqueRectsArray: Rect[] = [];
 
   for (let i = 0, key: string; i < rects.length; i++) {
-    key = `${rects[i].left}${rects[i].top}`;
+    key = `${rects[i].left},${rects[i].top},${rects[i].width}`;
     if (!uniqueRects[key]) {
       uniqueRects[key] = true;
       uniqueRectsArray.push(rects[i]);
@@ -121,8 +121,8 @@ export class SprayBrush extends BaseBrush {
         const rect = new Rect({
           width: chunck.width,
           height: chunck.width,
-          left: chunck.x + 1,
-          top: chunck.y + 1,
+          left: chunck.x + chunck.width / 2,
+          top: chunck.y + chunck.width / 2,
           originX: CENTER,
           originY: CENTER,
           fill: this.color,

@@ -737,7 +737,7 @@ describe('Object', () => {
         'JPEG dataURL should start with JPEG data',
       ).toBe('data:image/jpeg;base64');
     } catch {
-      // eslint-disable-next-line no-restricted-syntax -- fine in test
+      // oxlint-disable-next-line fabric/no-restricted-syntax -- fine in test
       console.log('jpeg toDataURL not supported');
     }
   });

@@ -67,35 +67,32 @@
     "test:e2e": "pnpm run build && pnpm run playwright:typecheck && pnpm --dir packages/e2e run test",
     "playwright:typecheck": "pnpm --dir packages/e2e run typecheck",
     "sandbox": "node ./scripts/sandbox.mjs sandbox",
-    "lint": "eslint extensions packages --fix",
+    "lint": "oxlint extensions packages",
+    "lint:fix": "oxlint --fix extensions packages",
     "prettier:check": "oxfmt --check .",
     "prettier:write": "oxfmt .",
     "web-dev": "pnpm run build && node ./scripts/index.mjs build -f -w & pnpm --dir packages/website run dev; kill $!",
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
     "@playwright/test": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
-    "@vitest/browser-playwright": "5.0.1",
-    "@vitest/coverage-v8": "5.0.1",
-    "@vitest/ui": "5.0.1",
+    "@vitest/browser-playwright": "5.0.5",
+    "@vitest/coverage-v8": "5.0.5",
+    "@vitest/ui": "5.0.5",
     "commander": "15.0.0",
     "es-toolkit": "1.52.0",
-    "eslint": "10.11.0",
-    "eslint-config-prettier": "10.1.8",
     "fast-check": "4.10.2",
     "husky": "9.1.7",
-    "lint-staged": "17.5.1",
-    "oxfmt": "0.68.0",
+    "oxfmt": "0.73.0",
+    "oxlint": "1.87.0",
+    "oxlint-tsgolint": "7.0.2004",
     "picomatch": "2.3.2",
     "rolldown": "1.2.9",
-    "tsc-files": "1.1.4",
     "typedoc": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "8.70.0",
-    "vitest": "5.0.1",
+    "vitest": "5.0.5",
     "westures": "catalog:"
   },
   "dependencies": {
@@ -173,10 +170,5 @@
   },
   "optionalDependencies": {
     "@fabricjs/node": "workspace:^"
-  },
-  "lint-staged": {
-    "*.{js,md,css,ts,tsx,jsx,json}": "eslint --fix",
-    "*.{js,css,md,mdx,ts,tsx,jsx,json}": "oxfmt --no-error-on-unmatched-pattern",
-    "**/*.ts !(**/*.spec.ts) !(**/*.test.ts) !(vitest*.ts)": "tsc-files --noEmit"
   }
 }

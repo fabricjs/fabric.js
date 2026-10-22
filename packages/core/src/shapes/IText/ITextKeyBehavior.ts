@@ -130,8 +130,14 @@ export abstract class ITextKeyBehavior<
     (this[action as keyof this] as (arg: KeyboardEvent) => void)(e);
     e.stopImmediatePropagation();
     e.preventDefault();
-    if ((e.keyCode >= 33 && e.keyCode <= 40) || isSelectAll) {
-      // Navigation and select-all only update the selection.
+    if (
+      isSelectAll ||
+      action === 'moveCursorUp' ||
+      action === 'moveCursorDown' ||
+      action === 'moveCursorLeft' ||
+      action === 'moveCursorRight'
+    ) {
+      // Cursor movement and select-all only update the selection.
       this.inCompositionMode = false;
       this.clearContextTop();
       this.renderCursorOrSelection();

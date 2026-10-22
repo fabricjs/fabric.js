@@ -25,6 +25,7 @@ export default defineConfig({
     pool,
     clearMocks: true,
     mockReset: true,
+    restoreMocks: true,
     snapshotSerializers: [
       'test/snapshot-serializers/canvas-rendering-context.ts',
     ],

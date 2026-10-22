@@ -20,7 +20,7 @@ const pivot = fc.oneof(
   fc.tuple(fc.constant(0), coordinate),
   fc.tuple(coordinate, fc.constant(0)),
 );
-const transform: fc.Arbitrary<Transform> = fc.oneof(
+const transform = fc.oneof<fc.Arbitrary<Transform>[]>(
   fc.tuple(coordinate, coordinate).map((args) => ({ name: 'translate', args })),
   coordinate.map((x) => ({ name: 'translate', args: [x] })),
   fc.tuple(scale, scale).map((args) => ({ name: 'scale', args })),

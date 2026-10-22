@@ -1,6 +1,6 @@
 import { getActionFromCorner } from '../controls/util';
 import { Point } from '../Point';
-import { FabricObject } from '../shapes/Object/FabricObject';
+import type { FabricObject } from '../shapes/Object/FabricObject';
 import type {
   CanvasEvents,
   ModifierKey,
@@ -722,13 +722,21 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
       minY = Math.min(start.y, extent.y),
       maxX = Math.max(start.x, extent.x),
       maxY = Math.max(start.y, extent.y);
+    const width = maxX - minX,
+      height = maxY - minY;
 
     if (this.selectionColor) {
       ctx.fillStyle = this.selectionColor;
-      ctx.fillRect(minX, minY, maxX - minX, maxY - minY);
+      ctx.fillRect(minX, minY, width, height);
     }
 
-    if (!this.selectionLineWidth || !this.selectionBorderColor) {
+    if (
+      !this.selectionLineWidth ||
+      !this.selectionBorderColor ||
+      // the border is drawn inside the box, skip it when it doesn't fit
+      width < this.selectionLineWidth ||
+      height < this.selectionLineWidth
+    ) {
       return;
     }
     ctx.lineWidth = this.selectionLineWidth;
@@ -739,12 +747,7 @@ export class SelectableCanvas<EventSpec extends CanvasEvents = CanvasEvents>
     maxX -= strokeOffset;
     maxY -= strokeOffset;
     // selection border
-    // @TODO: is _setLineDash still necessary on modern canvas?
-    FabricObject.prototype._setLineDash.call(
-      this,
-      ctx,
-      this.selectionDashArray,
-    );
+    ctx.setLineDash(this.selectionDashArray || []);
     ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
   }
 

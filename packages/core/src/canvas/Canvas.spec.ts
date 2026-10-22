@@ -31,7 +31,7 @@ import {
   PATH_JSON,
   RECT_JSON,
   ERROR_IMAGE_JSON,
-} from './Canvas.fixtures.ts';
+} from './Canvas.fixtures';
 
 describe('Canvas', () => {
   let canvas: Canvas;

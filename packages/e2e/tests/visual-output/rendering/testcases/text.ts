@@ -1,3 +1,4 @@
+import type { Canvas } from 'fabric';
 import { FabricNamespace, renderTestType } from '../../../types';
 
 function registerUbuntuFonts() {
@@ -135,7 +136,79 @@ function createTextBoxSubclass(fabric: FabricNamespace) {
   return TestTextbox;
 }
 
+/**
+ * #9889: a justified textbox with charSpacing and textBackgroundColor,
+ * outlined in blue. The red background must end at the outline.
+ */
+function addCharSpacingBackgroundScene(
+  canvas: Canvas,
+  fabric: FabricNamespace,
+) {
+  canvas.backgroundColor = 'white';
+  const textbox = new fabric.Textbox('ADD A BIG TEXT WITH SOME CHAR SPACING', {
+    left: 20,
+    top: 20,
+    originX: 'left',
+    originY: 'top',
+    width: 300,
+    fontSize: 28,
+    fontWeight: 'bold',
+    lineHeight: 1,
+    textAlign: 'justify',
+    charSpacing: 400,
+    textBackgroundColor: 'red',
+  });
+  canvas.add(
+    textbox,
+    new fabric.Rect({
+      left: textbox.left,
+      top: textbox.top,
+      originX: 'left',
+      originY: 'top',
+      width: textbox.width,
+      height: textbox.height,
+      fill: '',
+      stroke: 'blue',
+      strokeWidth: 1,
+    }),
+  );
+}
+
 const cases: renderTestType[] = [
+  {
+    title:
+      'Decorated text casts the same shadow with and without object caching',
+    golden: 'textDecorationShadow.png',
+    percentage: 0.005,
+    size: [340, 270],
+    async renderFunction(canvas, fabric) {
+      // #5364: each uncached text (right) must look like its cached twin (left)
+      canvas.backgroundColor = 'white';
+      [{ underline: true }, { overline: true }, { linethrough: true }].forEach(
+        (decoration, row) =>
+          [true, false].forEach((objectCaching, column) =>
+            canvas.add(
+              new fabric.FabricText('Agyp', {
+                left: 20 + column * 170,
+                top: 15 + row * 85,
+                originX: 'left',
+                originY: 'top',
+                fontSize: 60,
+                fill: 'black',
+                objectCaching,
+                ...decoration,
+                shadow: new fabric.Shadow({
+                  color: 'red',
+                  offsetX: 6,
+                  offsetY: 6,
+                }),
+              }),
+            ),
+          ),
+      );
+      canvas.renderAll();
+    },
+  },
   {
     title: 'Simple text test',
     golden: 'text1.png',
@@ -855,8 +928,7 @@ const cases: renderTestType[] = [
         target: canvas.upperCanvasEl,
       });
 
-      // @ts-expect-error -- private method
-      canvas._onDragStart({
+      const dragStartEvent = {
         clientX: 5,
         clientY: 5,
         target: canvas.upperCanvasEl,
@@ -866,7 +938,9 @@ const cases: renderTestType[] = [
           setData() {},
           setDragImage() {},
         },
-      });
+      };
+      // @ts-expect-error -- private method and partial mock of DragEvent
+      canvas._onDragStart(dragStartEvent);
 
       // @ts-expect-error -- partial mock of DragEvent
       canvas._onDragOver({
@@ -1167,6 +1241,34 @@ const cases: renderTestType[] = [
       canvas.renderAll();
       canvas.getContext().drawImage(canvas.upperCanvasEl, 0, 0);
       return canvas.lowerCanvasEl.toDataURL();
+    },
+  },
+  {
+    title: 'Text background with charSpacing stays inside the textbox',
+    golden: 'textBackgroundCharSpacing.png',
+    percentage: 0.01,
+    size: [340, 170],
+    async renderFunction(canvas, fabric) {
+      addCharSpacingBackgroundScene(canvas, fabric);
+      canvas.renderAll();
+    },
+  },
+  {
+    title: 'SVG text background with charSpacing stays inside the textbox',
+    golden: 'textBackgroundCharSpacing.png',
+    percentage: 0.01,
+    size: [340, 170],
+    disabled: 'node',
+    async renderFunction(canvas, fabric) {
+      addCharSpacingBackgroundScene(canvas, fabric);
+      const image = await fabric.util.loadImage(
+        `data:image/svg+xml,${encodeURIComponent(canvas.toSVG())}`,
+      );
+      const el = fabric.util.createCanvasElement();
+      el.width = canvas.width;
+      el.height = canvas.height;
+      el.getContext('2d')!.drawImage(image, 0, 0);
+      return el.toDataURL();
     },
   },
 ];

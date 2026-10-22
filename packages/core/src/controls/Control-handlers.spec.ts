@@ -105,6 +105,17 @@ describe('fabric.controlsUtils', () => {
     expect(returned, 'action was not permitted Y').toBe(false);
   });
 
+  it('scaling with padding removes the padding from the pointer distance', () => {
+    target.padding = 20;
+    // pointer 30px from the anchored edge, between padding and 2 * padding
+    transform = prepareTransform(target, 'mr');
+    scalingXOrSkewingY(eventData, transform, 30, 0);
+    expect(transform.target.scaleX).toBeCloseTo(0.1);
+    transform = prepareTransform(target, 'mb');
+    scalingYOrSkewingX(eventData, transform, 0, 30);
+    expect(transform.target.scaleY).toBeCloseTo(0.1);
+  });
+
   it('scalingXOrSkewingY changes skewY if shift pressed', () => {
     transform = prepareTransform(target, 'mr');
     // @ts-expect-error -- readonly

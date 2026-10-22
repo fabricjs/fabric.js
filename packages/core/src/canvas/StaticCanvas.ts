@@ -1240,8 +1240,8 @@ export class StaticCanvas<
    */
   loadFromJSON(
     json: string | Record<string, any>,
-    reviver?: EnlivenObjectOptions['reviver'],
-    options: EnlivenObjectOptions = {},
+    reviver?: EnlivenObjectOptions<FabricObject>['reviver'],
+    options: EnlivenObjectOptions<FabricObject> = {},
   ): Promise<this> {
     if (!json) {
       return Promise.reject(new FabricError('`json` is undefined'));
@@ -1270,14 +1270,18 @@ export class StaticCanvas<
         },
         options,
       ),
-    ]).then(([enlived, enlivedMap]) => {
-      this.clear();
-      this.add(...enlived);
-      this.set(serialized);
-      this.set(enlivedMap);
-      this.renderOnAddRemove = renderOnAddRemove;
-      return this;
-    });
+    ])
+      .then(([enlived, enlivedMap]) => {
+        this.clear();
+        this.add(...enlived);
+        this.set(serialized);
+        this.set(enlivedMap);
+        return this;
+      })
+      .finally(() => {
+        // also restore it when loading is rejected or aborted
+        this.renderOnAddRemove = renderOnAddRemove;
+      });
   }
 
   /**

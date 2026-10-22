@@ -150,6 +150,7 @@ export interface TextProps extends FabricObjectProps, UniqueTextProps {
   styles: TextStyle;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface FabricText<
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Props extends TOptions<TextProps> = Partial<TextProps>,
@@ -169,7 +170,6 @@ export interface FabricText<
  * Text class
  * @see {@link http://fabric5.fabricjs.com/fabric-intro-part-2#text}
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class FabricText<
   Props extends TOptions<TextProps> = Partial<TextProps>,
   SProps extends SerializedTextProps = SerializedTextProps,
@@ -650,6 +650,23 @@ export class FabricText<
   }
 
   /**
+   * Decorations clear the shadow from the context once drawn, so glyphs painted
+   * after them would cast none: render through a cache so everything casts it.
+   */
+  needsItsOwnCache() {
+    return (
+      super.needsItsOwnCache() ||
+      (!!this.shadow &&
+        (this.underline ||
+          this.overline ||
+          this.linethrough ||
+          this.styleHas('underline') ||
+          this.styleHas('overline') ||
+          this.styleHas('linethrough')))
+    );
+  }
+
+  /**
    * @private
    * @param {CanvasRenderingContext2D} ctx Context to render on
    */
@@ -758,7 +775,8 @@ export class FabricText<
       return;
     }
     const originalFill = ctx.fillStyle,
-      leftOffset = this._getLeftOffset();
+      leftOffset = this._getLeftOffset(),
+      charSpacing = this._getWidthOfCharSpacing();
     let lineTopOffset = this._getTopOffset();
 
     for (let i = 0, len = this._textLines.length; i < len; i++) {
@@ -811,6 +829,8 @@ export class FabricText<
         }
       }
       if (currentColor && !this.path) {
+        // the line width doesn't include the char spacing after the last char
+        boxWidth -= charSpacing;
         drawStart = leftOffset + lineLeftOffset + boxStart;
         if (this.direction === RTL) {
           drawStart = this.width - drawStart - boxWidth;

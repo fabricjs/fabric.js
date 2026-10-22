@@ -98,6 +98,32 @@ describe('IText select-all redraw', () => {
 });
 
 describe('IText custom keyboard mappings', () => {
+  test.each(['ltr', 'rtl'] as const)(
+    'requests a full render when an arrow maps to exitEditing in %s text',
+    async (direction) => {
+      const canvas = new Canvas(undefined);
+      const text = new IText('select this text', { direction });
+      try {
+        canvas.add(text);
+        text.enterEditing();
+        text.abortCursorAnimation();
+        canvas.renderAll();
+        const map = direction === 'rtl' ? 'keysMapRtl' : 'keysMap';
+        text[map] = { ...text[map], 38: 'exitEditing' };
+        const requestRender = vi.spyOn(canvas, 'requestRenderAll');
+        text.onKeyDown({
+          keyCode: 38,
+          stopImmediatePropagation: noop,
+          preventDefault: noop,
+        } as KeyboardEvent);
+        expect(text.isEditing).toBe(false);
+        expect(requestRender).toHaveBeenCalled();
+      } finally {
+        await canvas.dispose();
+      }
+    },
+  );
+
   test.each(['keysMap', 'ctrlKeysMapDown'] as const)(
     'still requests a render when %s maps Ctrl+A to exitEditing',
     async (map) => {

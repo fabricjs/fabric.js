@@ -56,6 +56,7 @@ const svgFiles = [
   'svg_linear_7',
   'svg_linear_8',
   'svg_linear_9',
+  'svg_linear_href',
   'svg_radial_1',
   'svg_radial_2',
   'svg_radial_3',

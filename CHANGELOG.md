@@ -3,6 +3,35 @@
 ## [next]
 
 - fix(IText): preserve select-all highlights in cached groups [#11116](https://github.com/fabricjs/fabric.js/pull/11116)
+- fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
+- chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
+- chore(deps): bump @codemirror/state from 6.7.1 to 6.7.6 [#11179](https://github.com/fabricjs/fabric.js/pull/11179)
+- chore(deps): bump the react group across 1 directory with 2 updates [#11175](https://github.com/fabricjs/fabric.js/pull/11175)
+- chore(deps): bump @playwright/test from 1.64.0 to 1.64.1 [#11178](https://github.com/fabricjs/fabric.js/pull/11178)
+- fix(text): keep SVG export of text on a path valid with spaces [#11174](https://github.com/fabricjs/fabric.js/pull/11174)
+- fix(text): keep textBackgroundColor inside the line with charSpacing [#11173](https://github.com/fabricjs/fabric.js/pull/11173)
+- chore(deps): group related Dependabot updates [#11172](https://github.com/fabricjs/fabric.js/pull/11172)
+- fix(canvas): dont draw the drag-selection border when it doesnt fit [#11170](https://github.com/fabricjs/fabric.js/pull/11170)
+- fix(controls): remove padding from the pointer when scaling vertically [#11171](https://github.com/fabricjs/fabric.js/pull/11171)
+- fix(text): preserve shadows on text with decorations when object caching is disabled [#11152](https://github.com/fabricjs/fabric.js/pull/11152)
+- chore(deps-dev): bump typedoc-plugin-markdown from 4.13.1 to 4.14.0 [#11169](https://github.com/fabricjs/fabric.js/pull/11169)
+- chore(deps-dev): bump oxfmt from 0.72.0 to 0.73.0 [#11168](https://github.com/fabricjs/fabric.js/pull/11168)
+- chore(): remove claude.md and refresh agents.md [#11163](https://github.com/fabricjs/fabric.js/pull/11163)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11165](https://github.com/fabricjs/fabric.js/pull/11165)
+- fix(canvas): keep the selection border dash independent of free drawing brushes [#11162](https://github.com/fabricjs/fabric.js/pull/11162)
+- test(): use typed layout event fixtures [#11154](https://github.com/fabricjs/fabric.js/pull/11154)
+- test(): update canvas event fixtures and target assertions [#11153](https://github.com/fabricjs/fabric.js/pull/11153)
+- fix(StaticCanvas): restore `renderOnAddRemove` when `loadFromJSON` is rejected or aborted
+- chore(deps-dev): bump vite from 8.3.1 to 8.3.4 in the vite group across 1 directory [#11155](https://github.com/fabricjs/fabric.js/pull/11155)
+- chore(deps): bump astro from 7.3.5 to 7.3.8 [#11156](https://github.com/fabricjs/fabric.js/pull/11156)
+- chore(deps): bump @astrojs/react from 7.0.0 to 7.0.1 [#11158](https://github.com/fabricjs/fabric.js/pull/11158)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11157](https://github.com/fabricjs/fabric.js/pull/11157)
+- chore(deps): bump @playwright/test from 1.63.0 to 1.64.0 [#11159](https://github.com/fabricjs/fabric.js/pull/11159)
+- fix(types): align revivers with enlivened object types [#11148](https://github.com/fabricjs/fabric.js/pull/11148)
+- fix(types): allow custom controls in object options [#11147](https://github.com/fabricjs/fabric.js/pull/11147)
+- fix(brushes): keep spray dots in place when finishing a stroke [#11150](https://github.com/fabricjs/fabric.js/pull/11150)
+- fix(path): draw an arc with a zero radius as a line instead of dropping it
+- test(): preserve transform names in fuzz generators [#11149](https://github.com/fabricjs/fabric.js/pull/11149)
 - fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
 - chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
 - ci(): use fetched master when resolving changelog conflicts
@@ -10,6 +39,7 @@
 - ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
 - fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
 - test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- chore(): migrate eslint to oxlint [#11139](https://github.com/fabricjs/fabric.js/pull/11139)
 - fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
 - [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
 - chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
