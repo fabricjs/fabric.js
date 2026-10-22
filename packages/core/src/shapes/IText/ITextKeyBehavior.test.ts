@@ -283,7 +283,7 @@ describe('IText move cursor', () => {
       expect(_initDelayedMock).toBeCalledWith();
     });
   });
-  test('mousedown calls key maps', () => {
+  test('keydown calls key maps', () => {
     const event = {
       stopPropagation: noop,
       stopImmediatePropagation: noop,
@@ -292,10 +292,17 @@ describe('IText move cursor', () => {
       keyCode: 0,
     } as KeyboardEvent;
     const fired: string[] = [];
-    class TestIText extends IText {}
-    ['default', 'rtl', 'ctrl'].forEach((x) => {
-      TestIText.prototype[`__test_${x}`] = () => fired.push(x);
-    });
+    class TestIText extends IText {
+      __test_default() {
+        fired.push('default');
+      }
+      __test_rtl() {
+        fired.push('rtl');
+      }
+      __test_ctrl() {
+        fired.push('ctrl');
+      }
+    }
     const iText = new TestIText('test', {
       fontSize: 25,
       styles: { 0: { 0: { fill: 'red' }, 1: { fill: 'blue' } } },

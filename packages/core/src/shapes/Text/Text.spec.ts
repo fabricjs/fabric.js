@@ -150,7 +150,7 @@ describe('FabricText', () => {
       try {
         text._measureChar('a', style, undefined, {});
         cache.clearFontCache();
-        setEnv({ ...env, window: nextWindow, document: nextDocument });
+        setEnv({ ...env, document: nextDocument });
         text._measureChar('b', style, undefined, {});
 
         expect(createElementSpy).toHaveBeenCalledWith('canvas');
@@ -770,10 +770,12 @@ describe('FabricText', () => {
   it('getFontCache is case insensitive', () => {
     const text = new FabricText('xxx', {
       fontWeight: 'BOld',
+      // @ts-expect-error -- mixed case font style
       fontStyle: 'NormaL',
     });
     const text2 = new FabricText('xxx', {
       fontWeight: 'bOLd',
+      // @ts-expect-error -- mixed case font style
       fontStyle: 'nORMAl',
     });
 
