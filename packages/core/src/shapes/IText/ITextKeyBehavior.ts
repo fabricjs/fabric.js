@@ -117,23 +117,27 @@ export abstract class ITextKeyBehavior<
       return;
     }
     const keyMap = this.direction === 'rtl' ? this.keysMapRtl : this.keysMap;
-    if (e.keyCode in keyMap) {
-      (this[keyMap[e.keyCode] as keyof this] as (arg: KeyboardEvent) => void)(
-        e,
-      );
-    } else if (e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)) {
-      (
-        this[this.ctrlKeysMapDown[e.keyCode] as keyof this] as (
-          arg: KeyboardEvent,
-        ) => void
-      )(e);
-    } else {
+    const action =
+      e.keyCode in keyMap
+        ? keyMap[e.keyCode]
+        : e.keyCode in this.ctrlKeysMapDown && (e.ctrlKey || e.metaKey)
+          ? this.ctrlKeysMapDown[e.keyCode]
+          : undefined;
+    if (!action) {
       return;
     }
+    const isSelectAll = action === 'cmdAll';
+    (this[action as keyof this] as (arg: KeyboardEvent) => void)(e);
     e.stopImmediatePropagation();
     e.preventDefault();
-    if (e.keyCode >= 33 && e.keyCode <= 40) {
-      // if i press an arrow key just update selection
+    if (
+      isSelectAll ||
+      action === 'moveCursorUp' ||
+      action === 'moveCursorDown' ||
+      action === 'moveCursorLeft' ||
+      action === 'moveCursorRight'
+    ) {
+      // Cursor movement and select-all only update the selection.
       this.inCompositionMode = false;
       this.clearContextTop();
       this.renderCursorOrSelection();

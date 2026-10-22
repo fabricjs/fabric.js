@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(IText): preserve select-all highlights in cached groups [#11116](https://github.com/fabricjs/fabric.js/pull/11116)
 - fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
 - chore(deps): bump @codemirror/state from 6.7.1 to 6.7.6 [#11179](https://github.com/fabricjs/fabric.js/pull/11179)
