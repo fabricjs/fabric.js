@@ -12,8 +12,9 @@ export function parseStyleString(
     .replace(/;\s*$/, '')
     .split(';')
     .forEach((chunk) => {
-      if (!chunk) return;
       const [attr, value] = chunk.split(':');
+      // skip empty or blank declarations, e.g. `fill:red; ;` or `style=" "`
+      if (value === undefined) return;
       oStyle[attr.trim().toLowerCase()] = value.trim();
     });
 }
