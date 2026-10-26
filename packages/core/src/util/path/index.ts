@@ -894,8 +894,9 @@ export const parsePath = (pathString: string): TComplexPathData => {
 
     // inspect the length of paramArr, if is longer than commandLength
     // we are dealing with repeated commands
-    const completeLength = paramArr.length - (paramArr.length % commandLength);
-    for (let i = 0; i < completeLength; i += commandLength) {
+    const totalLength = paramArr.length;
+    const correctLength = totalLength - (totalLength % commandLength);
+    for (let i = 0; i < correctLength; i += commandLength) {
       const newCommand = new Array(commandLength) as TComplexParsedCommand;
       const transformedCommand = repeatedCommands[commandLetter];
       newCommand[0] =
@@ -907,7 +908,7 @@ export const parsePath = (pathString: string): TComplexPathData => {
     }
     // missing parameters are an error in the path data,
     // keep the commands before it and ignore the rest as SVG renderers do
-    if (completeLength < paramArr.length || paramArr.length === 0) {
+    if (correctLength < totalLength || totalLength === 0) {
       return chain;
     }
   }
