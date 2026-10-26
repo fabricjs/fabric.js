@@ -43,6 +43,20 @@ describe('Path Utils', () => {
       const command = parsed[0];
       expect(command).toEqual(expected);
     });
+    test('stops at a command with missing parameters', () => {
+      expect(parsePath('M 0 0 L 10 10 20')).toEqual([
+        ['M', 0, 0],
+        ['L', 10, 10],
+      ]);
+      expect(parsePath('M 0 0 L 10 10 C 1 1 2 2 L 5 5')).toEqual([
+        ['M', 0, 0],
+        ['L', 10, 10],
+      ]);
+      expect(parsePath('M 0 0 h 5 v Z')).toEqual([
+        ['M', 0, 0],
+        ['h', 5],
+      ]);
+    });
     test('getPathSegmentsInfo', () => {
       const parsed = makePathSimpler(parsePath(path));
       const infos = getPathSegmentsInfo(parsed);
