@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump the node-canvas group with 2 updates [#11190](https://github.com/fabricjs/fabric.js/pull/11190)
 - fix(path): stop parsing at a command with missing parameters [#11186](https://github.com/fabricjs/fabric.js/pull/11186)
 - fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
