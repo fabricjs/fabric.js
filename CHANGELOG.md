@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump picomatch from 2.3.2 to 4.0.7 [#11192](https://github.com/fabricjs/fabric.js/pull/11192)
 - fix(path): stop parsing at a command with missing parameters [#11186](https://github.com/fabricjs/fabric.js/pull/11186)
 - fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
