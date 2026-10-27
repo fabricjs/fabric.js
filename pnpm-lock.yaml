@@ -97,8 +97,8 @@ importers:
         specifier: 7.0.2004
         version: 7.0.2004
       picomatch:
-        specifier: 2.3.2
-        version: 2.3.2
+        specifier: 4.0.7
+        version: 4.0.7
       rolldown:
         specifier: 1.2.9
         version: 1.2.9
