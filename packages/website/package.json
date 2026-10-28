@@ -40,7 +40,7 @@
   "packageManager": "pnpm@10.29.1",
   "devDependencies": {
     "typedoc": "catalog:",
-    "typedoc-plugin-markdown": "4.14.0",
+    "typedoc-plugin-markdown": "4.14.1",
     "westures": "catalog:"
   }
 }
