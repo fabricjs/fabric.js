@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump vite from 8.3.4 to 8.3.5 in the vite group across 1 directory [#11191](https://github.com/fabricjs/fabric.js/pull/11191)
 - chore(deps-dev): bump picomatch from 2.3.2 to 4.0.7 [#11192](https://github.com/fabricjs/fabric.js/pull/11192)
 - fix(path): stop parsing at a command with missing parameters [#11186](https://github.com/fabricjs/fabric.js/pull/11186)
 - fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
