@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump typedoc-plugin-markdown from 4.14.0 to 4.14.1 in the typedoc group across 1 directory [#11189](https://github.com/fabricjs/fabric.js/pull/11189)
 - chore(deps): bump the astro group across 1 directory with 5 updates [#11188](https://github.com/fabricjs/fabric.js/pull/11188)
 - chore(deps-dev): bump vite from 8.3.4 to 8.3.5 in the vite group across 1 directory [#11191](https://github.com/fabricjs/fabric.js/pull/11191)
 - chore(deps-dev): bump picomatch from 2.3.2 to 4.0.7 [#11192](https://github.com/fabricjs/fabric.js/pull/11192)
