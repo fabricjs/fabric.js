@@ -169,6 +169,24 @@ describe('fabric.Parser', () => {
     expect(parseStyleAttribute(element)).toEqual(expectedObject);
   });
 
+  it('parseStyleAttribute with empty declarations', () => {
+    const element = createSVGElement('path', {
+      style: 'left:10px; ; top:5px; ;',
+    });
+
+    const expectedObject = {
+      left: '10px',
+      top: '5px',
+    };
+    expect(parseStyleAttribute(element)).toEqual(expectedObject);
+  });
+
+  it('parseStyleAttribute with a blank style', () => {
+    const element = createSVGElement('path', { style: ' ' });
+
+    expect(parseStyleAttribute(element)).toEqual({});
+  });
+
   it('parseStyleAttribute with value normalization', () => {
     const element = createSVGElement('path', {
       style: 'fill:none;  stroke-dasharray: 2 0.4;',

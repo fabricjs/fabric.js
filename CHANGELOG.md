@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(parser): ignore empty declarations in SVG style attributes instead of failing the import [#11185](https://github.com/fabricjs/fabric.js/pull/11185)
 - fix(): make unit tests typecheck finally green [#11183](https://github.com/fabricjs/fabric.js/pull/11183)
 - chore(deps-dev): bump typedoc-plugin-markdown from 4.14.0 to 4.14.1 in the typedoc group across 1 directory [#11189](https://github.com/fabricjs/fabric.js/pull/11189)
 - chore(deps): bump the astro group across 1 directory with 5 updates [#11188](https://github.com/fabricjs/fabric.js/pull/11188)
