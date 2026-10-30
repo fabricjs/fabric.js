@@ -10,18 +10,18 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "0.9.10",
-    "@astrojs/mdx": "8.1.0",
-    "@astrojs/react": "7.1.0",
+    "@astrojs/check": "0.9.12",
+    "@astrojs/mdx": "8.1.1",
+    "@astrojs/react": "7.1.1",
     "@astrojs/sitemap": "3.7.4",
-    "@astrojs/starlight": "0.42.6",
+    "@astrojs/starlight": "0.42.7",
     "@codemirror/lang-javascript": "6.2.5",
     "@codemirror/state": "6.7.6",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "astro": "7.4.0",
+    "astro": "7.4.2",
     "canvas": "catalog:",
     "codemirror": "6.0.2",
     "fabric": "workspace:*",
@@ -40,7 +40,7 @@
   "packageManager": "pnpm@10.29.1",
   "devDependencies": {
     "typedoc": "catalog:",
-    "typedoc-plugin-markdown": "4.14.0",
+    "typedoc-plugin-markdown": "4.14.1",
     "westures": "catalog:"
   }
 }
