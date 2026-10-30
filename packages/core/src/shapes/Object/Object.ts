@@ -1618,17 +1618,16 @@ export class FabricObject<
   }
 
   /**
-   * @returns {Ancestors} ancestors (excluding `ActiveSelection`) from bottom to top
+   * @returns {Group[]} ancestors (excluding `ActiveSelection`) from bottom to top
    */
-  getAncestors(): Ancestors {
-    const ancestors: TAncestor[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let parent: TAncestor | undefined = this;
-    do {
+  getAncestors(): Group[] {
+    const ancestors: Group[] = [];
+    let parent = this.parent;
+    while (parent) {
+      ancestors.push(parent);
       parent = parent.parent;
-      parent && ancestors.push(parent);
-    } while (parent);
-    return ancestors as Ancestors;
+    }
+    return ancestors;
   }
 
   /**
@@ -1643,10 +1642,10 @@ export class FabricObject<
         fork: [],
         otherFork: [],
         common: [this, ...this.getAncestors()],
-      } as AncestryComparison;
+      };
     }
-    const ancestors = this.getAncestors();
-    const otherAncestors = other.getAncestors();
+    const ancestors = this.getAncestors() as Ancestors;
+    const otherAncestors = other.getAncestors() as Ancestors;
     //  if `this` has no ancestors and `this` is top ancestor of `other` we must handle the following case
     if (
       ancestors.length === 0 &&

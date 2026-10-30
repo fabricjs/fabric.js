@@ -41,7 +41,7 @@ describe.each([MALICIOUS, MALICIOUS2])(
           offsetY: 0,
         }),
       });
-      rect.shadow.id = payload;
+      rect.shadow!.id = payload;
 
       const svg = rect.toSVG();
       expect(svg).not.toContain('<script>');
@@ -87,6 +87,7 @@ describe.each([MALICIOUS, MALICIOUS2])(
               fill: `red ${payload}`,
               fontFamily: `Times ${payload}`,
               fontWeight: `bold ${payload}`,
+              // @ts-expect-error -- invalid font style
               fontStyle: `italic ${payload}`,
               fontSize: payload as unknown as number,
             },

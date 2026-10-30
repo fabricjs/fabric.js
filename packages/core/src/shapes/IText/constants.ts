@@ -1,6 +1,6 @@
 export type TKeyMapIText = Record<
   KeyboardEvent['keyCode'],
-  CursorHandlingMethods
+  CursorHandlingMethods | (string & {})
 >;
 
 export type CursorHandlingMethods =
