@@ -2,10 +2,6 @@ name: Node.js Package
 
 on:
   release:
-    branches:
-      - master
-      - 5.x
-      - 6.x
     types: [published]
   workflow_dispatch:
     inputs:
@@ -24,34 +20,16 @@ jobs:
   publish-npm:
     env:
       NPM_CONFIG_PROVENANCE: true
+      RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag_name }}
+      IS_PRERELEASE: ${{ github.event_name == 'release' && github.event.release.prerelease || inputs.is_prerelease || false }}
     permissions:
+      contents: read
       id-token: write
     runs-on: ubuntu-24.04
     steps:
-      - name: Resolve publish metadata
-        id: publish
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" == "release" ]]; then
-            ref_name='${{ github.event.release.tag_name }}'
-            is_prerelease='${{ github.event.release.prerelease }}'
-          else
-            ref_name='${{ inputs.tag_name }}'
-            is_prerelease='${{ inputs.is_prerelease }}'
-          fi
-
-          if [[ "$is_prerelease" == 'true' ]]; then
-            npm_tag='beta'
-          else
-            npm_tag=''
-          fi
-
-          echo "ref_name=$ref_name" >> "$GITHUB_OUTPUT"
-          echo "npm_tag=$npm_tag" >> "$GITHUB_OUTPUT"
-
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          ref: refs/tags/${{ steps.publish.outputs.ref_name }}
+          ref: refs/tags/${{ env.RELEASE_TAG }}
           persist-credentials: false
       - uses: pnpm/action-setup@v4
         with:
@@ -62,19 +40,15 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Validate release versions and npm tag
+        run: |
+          node --test scripts/publish.test.mjs
+          node scripts/publish.mjs "$RELEASE_TAG" "$IS_PRERELEASE"
       - name: Install system deps for node canvas
         run: sudo apt-get update && sudo apt-get install --yes libgif-dev libpng-dev libpango1.0-dev libjpeg-dev librsvg2-dev libcairo2-dev
       - run: pnpm install --frozen-lockfile --prefer-offline
       - run: pnpm run build
       - name: Smoke test packages
         run: pnpm run smoke:packages
-      - name: Publish package
-        shell: bash
-        run: |
-          if [[ -n "${{ steps.publish.outputs.npm_tag }}" ]]; then
-            echo "pnpm -r publish --tag ${{ steps.publish.outputs.npm_tag }} --access public --no-git-checks"
-            pnpm -r publish --tag "${{ steps.publish.outputs.npm_tag }}" --access public --no-git-checks
-          else
-            echo "pnpm -r publish --access public --no-git-checks"
-            pnpm -r publish --access public --no-git-checks
-          fi
+      - name: Publish packages
+        run: node scripts/publish.mjs "$RELEASE_TAG" "$IS_PRERELEASE" --publish

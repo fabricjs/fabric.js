@@ -1,5 +1,6 @@
 {
-  "name": "fabric-astro-7",
+  "name": "www-fabric-com",
+  "private": true,
   "type": "module",
   "version": "0.0.1",
   "scripts": {
