@@ -2,7 +2,7 @@
 
 ## [next]
 
-- docs(): add a loadFromJSON failure and cancellation recipe [#11131](https://github.com/fabricjs/fabric.js/issues/11131)
+- docs(): add a loadFromJSON failure and cancellation recipe [#11195](https://github.com/fabricjs/fabric.js/pull/11195)
 - fix(parser): ignore empty declarations in SVG style attributes instead of failing the import [#11185](https://github.com/fabricjs/fabric.js/pull/11185)
 - fix(): make unit tests typecheck finally green [#11183](https://github.com/fabricjs/fabric.js/pull/11183)
 - chore(deps-dev): bump typedoc-plugin-markdown from 4.14.0 to 4.14.1 in the typedoc group across 1 directory [#11189](https://github.com/fabricjs/fabric.js/pull/11189)
