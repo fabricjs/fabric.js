@@ -1,0 +1,115 @@
+---
+date: '2026-10-21'
+title: 'Handling failed or cancelled loadFromJSON'
+description: 'A recipe for loading saved documents safely: errors, missing images, cancellation and recovery'
+sidebar:
+  order: 450
+---
+
+`canvas.loadFromJSON()` returns a promise. This page shows how to await it, how to detect
+failures such as images that can no longer be fetched, how to cancel a load with an `AbortController`,
+and what state the canvas is in afterwards.
+
+## The basic, successful case
+
+`loadFromJSON` does not render by itself, so render once the promise resolves.
+
+```js
+try {
+  await canvas.loadFromJSON(json);
+  canvas.requestRenderAll();
+} catch (error) {
+  // see below
+}
+```
+
+## What state is the canvas in after a failure?
+
+`loadFromJSON` first creates every object, the background, the overlay and the clip path from the JSON.
+Only when all of that has finished does it clear the canvas and add the new content.
+
+- If the promise **rejects** (a strict reviver threw, the JSON is invalid, or the load was aborted),
+  the canvas has not been touched and still shows the previous document.
+- If the promise **resolves**, the canvas holds the new document, which may be missing some parts (see next section).
+
+The canvas is not rolled back after a successful replacement and Fabric does not keep a copy of the previous document.
+If you need to return to it after a later failure, serialize it yourself before loading.
+
+## Missing or unavailable images
+
+By default, an object that fails to be created (for example an `image` whose `src` returns a 404)
+is **skipped silently** and the promise still resolves. To treat that as a failure, pass a reviver
+that rethrows the error. The reviver receives the error as its third argument.
+
+```js
+const strictReviver = (serialized, instance, error) => {
+  if (error) {
+    throw error;
+  }
+};
+
+try {
+  await canvas.loadFromJSON(json, strictReviver);
+  canvas.requestRenderAll();
+} catch (error) {
+  // the canvas still has the previous document
+}
+```
+
+The reviver is only called for the entries of `objects`. A `backgroundImage`, `overlayImage` or `clipPath`
+that cannot be loaded is omitted without calling it, so a successful load does not guarantee that they are present.
+If this matters to you, check the result after loading, for example `canvas.backgroundImage`.
+
+You can also keep the document usable by returning a placeholder from the reviver instead of throwing.
+
+```js
+import { Rect } from 'fabric';
+
+const placeholderReviver = (serialized, instance, error) => {
+  if (error) {
+    return new Rect({
+      left: serialized.left,
+      top: serialized.top,
+      width: serialized.width,
+      height: serialized.height,
+      fill: '#ccc',
+    });
+  }
+};
+```
+
+## Cancelling a load
+
+Pass an `AbortSignal` in the options (third argument). Aborting rejects the promise and the canvas keeps the previous document.
+The rejection value is the abort event, not an `Error`, so don't rely on `error.name`; check `signal.aborted` instead.
+
+```js
+let controller;
+
+async function load(json) {
+  // cancel a load that is still running before starting another
+  controller?.abort();
+  const current = (controller = new AbortController());
+  try {
+    await canvas.loadFromJSON(json, strictReviver, { signal: current.signal });
+    canvas.requestRenderAll();
+  } catch (error) {
+    if (current.signal.aborted) {
+      return; // cancelled, nothing to recover
+    }
+    handleLoadError(error);
+  }
+}
+```
+
+Always abort an in-flight load before starting a new one, or before calling `clear()` or `dispose()`:
+otherwise an old load can complete late and replace newer content.
+
+## Recommended recovery steps
+
+1. Await `loadFromJSON` inside `try/catch` and render only on success.
+2. Use a strict reviver if a missing object must fail the load, or a placeholder reviver if it should not.
+3. Use an `AbortController` per load, and tell cancellation apart from failure with `signal.aborted`.
+4. On failure, the canvas still holds the previous document: keep working with it, show an error to the user and offer a retry.
+5. Keep your own serialized copy (`canvas.toJSON()`) of the last good document if you need to restore it after a load that succeeded but is not what you wanted.
+6. Check `backgroundImage`, `overlayImage` and `clipPath` after loading if your document depends on them.
