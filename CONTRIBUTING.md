@@ -112,6 +112,8 @@ It is more than likely you will be requested to change stuff and refine your wor
 
 ## Testing
 
+For npm releases, follow [Publishing Fabric packages](RELEASING.md).
+
 We use Vitest and Playwright.
 
 | Suite                                                                                                         | unit (node)                                       | e2e (browser)                                                                                        |

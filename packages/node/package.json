@@ -1,7 +1,7 @@
 {
   "name": "@fabricjs/node",
   "description": "Node.js entrypoint for Fabric.js.",
-  "version": "7.4.0",
+  "version": "7.5.0-beta.1",
   "homepage": "http://fabricjs.com/",
   "repository": {
     "type": "git",
