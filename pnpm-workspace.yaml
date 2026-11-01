@@ -3,6 +3,11 @@ packages:
 
 savePrefix: ''
 
+allowBuilds:
+  canvas: true
+  esbuild: true
+  sharp: true
+
 overrides:
   # Expressive Code still uses postcss-nested 6, which requests the vulnerable parser 6.
   'postcss-nested@6>postcss-selector-parser': 7.1.6

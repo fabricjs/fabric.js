@@ -18,7 +18,7 @@ runs:
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: 10.29.1
+        version: 11.28.10
     - name: Use Node.js v${{ inputs.node-version }}
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
