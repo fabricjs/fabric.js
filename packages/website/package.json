@@ -38,7 +38,7 @@
   "engines": {
     "node": "^20.3.0 || ^22.16.0 || ^24.8.0"
   },
-  "packageManager": "pnpm@10.29.1",
+  "packageManager": "pnpm@11.28.10",
   "devDependencies": {
     "typedoc": "catalog:",
     "typedoc-plugin-markdown": "4.14.1",

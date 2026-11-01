@@ -4,6 +4,7 @@ import {
   Point,
   iMatrix,
   Canvas,
+  type Control,
   type Transform,
 } from '@fabricjs/core';
 import {
@@ -80,14 +81,24 @@ describe('position generators', () => {
       const { rect, gradient } = prepareRectWithGradient();
       const gradientCoordPositionHandler =
         linearGradientCoordPositionHandlerGenerator(gradient, 1);
-      p1 = gradientCoordPositionHandler(new Point(), iMatrix, rect);
+      p1 = gradientCoordPositionHandler.call(
+        {} as Control,
+        new Point(),
+        iMatrix,
+        rect,
+      );
       expect(p1).toEqual({ x: 235, y: 327.5 });
     });
     test('places the controls correctly on the second coord point', () => {
       const { rect, gradient } = prepareRectWithGradient();
       const gradientCoordPositionHandler =
         linearGradientCoordPositionHandlerGenerator(gradient, 2);
-      p2 = gradientCoordPositionHandler(new Point(), iMatrix, rect);
+      p2 = gradientCoordPositionHandler.call(
+        {} as Control,
+        new Point(),
+        iMatrix,
+        rect,
+      );
       expect(p2).toEqual({ x: 415, y: 222.5 });
     });
   });
@@ -96,7 +107,12 @@ describe('position generators', () => {
       const { rect, gradient } = prepareRectWithGradient();
       const gradientColorPositionHandler =
         linearGradientColorPositionHandlerGenerator(gradient, 2);
-      color = gradientColorPositionHandler(new Point(), iMatrix, rect);
+      color = gradientColorPositionHandler.call(
+        {} as Control,
+        new Point(),
+        iMatrix,
+        rect,
+      );
       expect(color).toEqual({ x: 343, y: 264.5 });
       // CHECK RESULTS OF BEFORE TESTS
       expect(p1.lerp(p2, 0.6)).toEqual(color);

@@ -45,7 +45,7 @@
     "extensions/README.MD",
     "!extensions/**/*.ts"
   ],
-  "packageManager": "pnpm@10.29.1",
+  "packageManager": "pnpm@11.28.10",
   "scripts": {
     "docs": "typedoc --tsconfig typedoc.config.json",
     "cli": "node ./scripts/index.mjs",
@@ -111,13 +111,6 @@
     "canvas": {
       "canvas": "3.2.0"
     }
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "canvas",
-      "esbuild",
-      "sharp"
-    ]
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
