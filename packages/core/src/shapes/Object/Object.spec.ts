@@ -10,6 +10,7 @@ import {
   Canvas,
   config,
   FabricImage,
+  Gradient,
   Point,
   runningAnimations,
   StaticCanvas,
@@ -1481,6 +1482,43 @@ describe('Object', () => {
       'zoom factor Y gets updated to represent the shrink',
     ).toBe((zoomY * config.maxCacheSideLimit) / height);
   });
+
+  it.each([0.5, 2])(
+    '_setStrokeStyles with a percentage gradient keeps the stroke width and dashes at zoom %s',
+    (zoom) => {
+      const canvas = new StaticCanvas(undefined, {
+        enableRetinaScaling: false,
+        renderOnAddRemove: false,
+      });
+      canvas.setZoom(zoom);
+      const rect = new Rect({
+        width: 100,
+        height: 80,
+        scaleX: 1.5,
+        strokeWidth: 10,
+        strokeDashOffset: 3,
+        stroke: new Gradient({
+          type: 'linear',
+          gradientUnits: 'percentage',
+          coords: { x1: 0, y1: 0, x2: 1, y2: 0 },
+          colorStops: [
+            { offset: 0, color: 'red' },
+            { offset: 1, color: 'blue' },
+          ],
+        }),
+      });
+      canvas.add(rect);
+      const ctx = canvas.getContext();
+      ctx.setLineDash([4, 2]);
+      rect._setStrokeStyles(ctx, rect);
+      // the pattern for the gradient is mapped by scaling the context
+      const { a: scale } = ctx.getTransform();
+      expect(scale).toBeCloseTo(1 / zoom);
+      expect(ctx.lineWidth * scale).toBeCloseTo(10);
+      expect(ctx.getLineDash().map((value) => value * scale)).toEqual([4, 2]);
+      expect(ctx.lineDashOffset * scale).toBeCloseTo(3);
+    },
+  );
 
   it('_setShadow', () => {
     const canvas = new StaticCanvas(undefined, {
