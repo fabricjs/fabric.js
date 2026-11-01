@@ -2,6 +2,7 @@
 
 ## [next]
 
+- fix(gradient): keep the stroke width of percentage gradients when the canvas is zoomed [#11196](https://github.com/fabricjs/fabric.js/pull/11196)
 - chore(): Publish 7.5.0b1 [#11194](https://github.com/fabricjs/fabric.js/pull/11194)
 - fix(parser): ignore empty declarations in SVG style attributes instead of failing the import [#11185](https://github.com/fabricjs/fabric.js/pull/11185)
 - fix(): make unit tests typecheck finally green [#11183](https://github.com/fabricjs/fabric.js/pull/11183)
