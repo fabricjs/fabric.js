@@ -68,6 +68,7 @@
     "test:e2e": "pnpm run build && pnpm run playwright:typecheck && pnpm --dir packages/e2e run test",
     "playwright:typecheck": "pnpm --dir packages/e2e run typecheck",
     "sandbox": "node ./scripts/sandbox.mjs sandbox",
+    "versionbump": "node ./scripts/versionbump.mjs",
     "lint": "oxlint extensions packages",
     "lint:fix": "oxlint --fix extensions packages",
     "prettier:check": "oxfmt --check .",
