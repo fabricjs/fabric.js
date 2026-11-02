@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(pnpm): upgrade workspace to pnpm 11 [#11197](https://github.com/fabricjs/fabric.js/pull/11197)
 - chore(): Publish 7.5.0b1 [#11194](https://github.com/fabricjs/fabric.js/pull/11194)
 - fix(parser): ignore empty declarations in SVG style attributes instead of failing the import [#11185](https://github.com/fabricjs/fabric.js/pull/11185)
 - fix(): make unit tests typecheck finally green [#11183](https://github.com/fabricjs/fabric.js/pull/11183)
