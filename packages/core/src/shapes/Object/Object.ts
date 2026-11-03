@@ -1390,14 +1390,14 @@ export class FabricObject<
     return toDataURL(
       this.toCanvasElement(options),
       options.format || 'png',
-      options.quality || 1,
+      options.quality ?? 1,
     );
   }
   toBlob(options: toDataURLOptions = {}) {
     return toBlob(
       this.toCanvasElement(options),
       options.format || 'png',
-      options.quality || 1,
+      options.quality ?? 1,
     );
   }
 
