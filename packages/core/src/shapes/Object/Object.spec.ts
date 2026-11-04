@@ -742,6 +742,22 @@ describe('Object', () => {
     }
   });
 
+  it('toDataURL and toBlob pass quality 0 to the canvas element', async () => {
+    const cObj = new Rect({ width: 10, height: 10, fill: 'red' });
+    const canvasEl = cObj.toCanvasElement();
+    vi.spyOn(cObj, 'toCanvasElement').mockReturnValue(canvasEl);
+    const toDataURL = vi.spyOn(canvasEl, 'toDataURL').mockReturnValue('data:,');
+    const toBlob = vi
+      .spyOn(canvasEl, 'toBlob')
+      .mockImplementation((callback) => callback(null));
+
+    cObj.toDataURL({ format: 'jpeg', quality: 0 });
+    await cObj.toBlob({ format: 'jpeg', quality: 0 });
+
+    expect(toDataURL).toHaveBeenCalledWith('image/jpeg', 0);
+    expect(toBlob).toHaveBeenCalledWith(expect.any(Function), 'image/jpeg', 0);
+  });
+
   it('toDataURL & reference to canvas', () => {
     const cObj = new Rect({
       width: 100,
