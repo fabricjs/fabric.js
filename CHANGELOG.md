@@ -3,6 +3,7 @@
 ## [next]
 
 - fix(Object): keep quality 0 in toDataURL and toBlob [#11201](https://github.com/fabricjs/fabric.js/pull/11201)
+- chore(deps-dev): bump oxfmt from 0.73.0 to 0.75.0 [#11204](https://github.com/fabricjs/fabric.js/pull/11204)
 - chore(deps-dev): bump oxlint-tsgolint from 7.0.2004 to 7.0.2005 [#11203](https://github.com/fabricjs/fabric.js/pull/11203)
 - chore(pnpm): upgrade workspace to pnpm 11 [#11197](https://github.com/fabricjs/fabric.js/pull/11197)
 - chore(): Publish 7.5.0b1 [#11194](https://github.com/fabricjs/fabric.js/pull/11194)
