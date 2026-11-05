@@ -10,7 +10,6 @@ export type CursorHandlingMethods =
   | 'moveCursorRight'
   | 'exitEditing'
   | 'copy'
-  | 'cut'
   | 'cmdAll';
 
 const MOVE_CURSOR_UP: CursorHandlingMethods = 'moveCursorUp';
@@ -53,8 +52,6 @@ export const keysMapRtl: TKeyMapIText = {
  */
 export const ctrlKeysMapUp: TKeyMapIText = {
   67: 'copy',
-  // there was a reason this wasn't deleted. for now leave it here
-  88: 'cut',
 };
 
 /**

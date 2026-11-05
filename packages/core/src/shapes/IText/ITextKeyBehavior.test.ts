@@ -319,6 +319,14 @@ describe('IText move cursor', () => {
     iText.onKeyDown({ ...event, ctrlKey: true, keyCode: 1 });
     expect(fired).toEqual(['default', 'rtl', 'ctrl']);
   });
+  test('keyup of ctrl/cmd + x does not throw', () => {
+    const iText = new IText('test');
+    iText.isEditing = true;
+    const event = { keyCode: 88 } as KeyboardEvent;
+    expect(() => iText.onKeyUp({ ...event, ctrlKey: true })).not.toThrow();
+    expect(() => iText.onKeyUp({ ...event, metaKey: true })).not.toThrow();
+  });
+
   test('copy', () => {
     const { copyPasteData } = getEnv();
     const iText = new IText('test', {
