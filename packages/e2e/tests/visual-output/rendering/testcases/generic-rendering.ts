@@ -469,6 +469,39 @@ const gradientStroke: renderTestType = {
   },
 };
 
+const percentageGradientStrokeZoom: renderTestType = {
+  title: 'percentage gradient stroke keeps its width when the canvas is zoomed',
+  golden: 'percentageGradientStrokeZoom.png',
+  percentage: 0.02,
+  size: [340, 220],
+  async renderFunction(canvas, fabric) {
+    canvas.backgroundColor = 'white';
+    canvas.setZoom(0.5);
+    const rect = new fabric.Rect({
+      left: 80,
+      top: 80,
+      originX: 'left',
+      originY: 'top',
+      width: 300,
+      height: 240,
+      scaleX: 1.5,
+      fill: '',
+      strokeWidth: 40,
+      stroke: new fabric.Gradient({
+        type: 'linear',
+        gradientUnits: 'percentage',
+        coords: { x1: 0, y1: 0, x2: 1, y2: 0 },
+        colorStops: [
+          { offset: 0, color: 'red' },
+          { offset: 1, color: 'blue' },
+        ],
+      }),
+    });
+    canvas.add(rect);
+    canvas.renderAll();
+  },
+};
+
 const textGradientFill: renderTestType = {
   title: 'Use the gradient fillStyle for text',
   golden: 'textGradientFill.png',
@@ -653,6 +686,7 @@ export const genericRenderingTests = [
   toCanvasElementAndControls,
   pathWithGradient,
   gradientStroke,
+  percentageGradientStrokeZoom,
   textGradientFill,
   polygonAndPaths,
 ];

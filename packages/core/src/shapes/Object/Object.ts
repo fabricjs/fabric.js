@@ -1187,6 +1187,8 @@ export class FabricObject<
   ) {
     const dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       retinaScaling = this.getCanvasRetinaScaling(),
+      patternScaleX = dims.zoomX / this.scaleX / retinaScaling,
+      patternScaleY = dims.zoomY / this.scaleY / retinaScaling,
       width = dims.x / this.scaleX / retinaScaling,
       height = dims.y / this.scaleY / retinaScaling,
       pCanvas = createCanvasElementFor({
@@ -1207,21 +1209,20 @@ export class FabricObject<
     pCtx.lineTo(0, height);
     pCtx.closePath();
     pCtx.translate(width / 2, height / 2);
-    pCtx.scale(
-      dims.zoomX / this.scaleX / retinaScaling,
-      dims.zoomY / this.scaleY / retinaScaling,
-    );
+    pCtx.scale(patternScaleX, patternScaleY);
     this._applyPatternGradientTransform(pCtx, filler);
     pCtx.fillStyle = filler.toLive(ctx)!;
     pCtx.fill();
+    const strokeScale = Math.sqrt(Math.abs(patternScaleX * patternScaleY)),
+      lineDashOffset = ctx.lineDashOffset;
     ctx.translate(
       -this.width / 2 - this.strokeWidth / 2,
       -this.height / 2 - this.strokeWidth / 2,
     );
-    ctx.scale(
-      (retinaScaling * this.scaleX) / dims.zoomX,
-      (retinaScaling * this.scaleY) / dims.zoomY,
-    );
+    ctx.scale(1 / patternScaleX, 1 / patternScaleY);
+    ctx.lineWidth *= strokeScale;
+    ctx.setLineDash(ctx.getLineDash().map((value) => value * strokeScale));
+    ctx.lineDashOffset = lineDashOffset * strokeScale;
     ctx.strokeStyle = pCtx.createPattern(pCanvas, 'no-repeat') ?? '';
   }
 
