@@ -68,15 +68,14 @@ export class Intersection {
       );
     } else {
       // Generic case: sloped line.
-      // we check that AT has the same slope as AB
-      // for the segment case we need both the vectors to have the same direction and for AT to be lte AB in size
-      // for the infinite case we check the absolute value of the slope, since direction is meaningless
+      // we check that AT has the same slope as AB, i.e. AT = s * AB for a single
+      // scalar s (so s.x === s.y). For the segment case s must additionally lie in
+      // [0, 1]; for the infinite case any real s is accepted (s may be negative,
+      // covering the line beyond either endpoint).
       const AB = createVector(A, B);
       const AT = createVector(A, T);
       const s = AT.divide(AB);
-      return infinite
-        ? Math.abs(s.x) === Math.abs(s.y)
-        : s.x === s.y && s.x >= 0 && s.x <= 1;
+      return s.x === s.y && (infinite || (s.x >= 0 && s.x <= 1));
     }
   }
 
