@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump markdown-it from 14.3.1 to 14.3.3 [#11198](https://github.com/fabricjs/fabric.js/pull/11198)
 - chore(deps): bump the astro group across 1 directory with 5 updates [#11202](https://github.com/fabricjs/fabric.js/pull/11202)
 - chore(deps): bump zod from 4.6.5 to 4.6.7 [#11199](https://github.com/fabricjs/fabric.js/pull/11199)
 - fix(Object): keep quality 0 in toDataURL and toBlob [#11201](https://github.com/fabricjs/fabric.js/pull/11201)
