@@ -27,6 +27,7 @@ const style: fc.Arbitrary<TextStyleDeclaration> = fc.record(
     overline: fc.boolean(),
     linethrough: fc.boolean(),
     deltaY: fc.integer({ min: -10, max: 10 }),
+    custom: fc.constantFrom('a', 'b'),
   },
   { requiredKeys: [] },
 );

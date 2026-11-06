@@ -753,6 +753,20 @@ describe('FabricText', () => {
     ).toEqual([{ start: 0, end: 1, style: { textBackgroundColor: 'blue' } }]);
   });
 
+  it('text toObject keeps custom style properties', () => {
+    const text = new FabricText('xxxxx');
+
+    text.setSelectionStyles({ custom: 'a' }, 0, 2);
+    text.setSelectionStyles({ custom: 'b' }, 2, 3);
+    text.setSelectionStyles({ custom: 'b' }, 4, 5);
+
+    expect(text.toObject().styles).toEqual([
+      { start: 0, end: 2, style: { custom: 'a' } },
+      { start: 2, end: 3, style: { custom: 'b' } },
+      { start: 4, end: 5, style: { custom: 'b' } },
+    ]);
+  });
+
   it('getFontCache works with fontWeight numbers', () => {
     const text = new FabricText('xxx', { fontWeight: 400 });
 
