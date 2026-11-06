@@ -40,6 +40,24 @@ export const hasStyleChanged = (
       prevStyle.linethrough !== thisStyle.linethrough));
 
 /**
+ * Unlike {@link hasStyleChanged} this looks at every property, serialization has to keep
+ * also the ones fabric doesn't use for rendering
+ * @param {Object} prevStyle first style to compare
+ * @param {Object} thisStyle second style to compare
+ * @return {boolean} true if both styles have the same properties and values
+ */
+const isSameStyle = (
+  prevStyle: TextStyleDeclaration,
+  thisStyle: TextStyleDeclaration,
+) => {
+  const keys = Object.keys(thisStyle) as (keyof TextStyleDeclaration)[];
+  return (
+    Object.keys(prevStyle).length === keys.length &&
+    keys.every((key) => prevStyle[key] === thisStyle[key])
+  );
+};
+
+/**
  * Returns the array form of a text object's inline styles property with styles grouped in ranges
  * rather than per character. This format is less verbose, and is better suited for storage
  * so it is used in serialization (not during runtime).
@@ -73,15 +91,15 @@ export const stylesToArray = (
       const thisStyle = styles[i][c];
       //check if style exists for this character
       if (thisStyle && Object.keys(thisStyle).length > 0) {
-        if (hasStyleChanged(prevStyle, thisStyle, true)) {
+        if (isSameStyle(prevStyle, thisStyle)) {
+          //if style is the same as previous character, increase end index
+          stylesArray[stylesArray.length - 1].end++;
+        } else {
           stylesArray.push({
             start: charIndex,
             end: charIndex + 1,
             style: thisStyle,
           });
-        } else {
-          //if style is the same as previous character, increase end index
-          stylesArray[stylesArray.length - 1].end++;
         }
       }
       prevStyle = thisStyle || {};
