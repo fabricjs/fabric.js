@@ -5,10 +5,29 @@ import type {
   ObjectEvents,
   Control,
   TMat2D,
+  TOriginX,
+  TOriginY,
 } from '@fabricjs/core';
 import { controlsUtils, Point, util } from '@fabricjs/core';
 
 const { wrapWithFixedAnchor, wrapWithFireEvent } = controlsUtils;
+
+const originOffset = {
+  left: -0.5,
+  top: -0.5,
+  center: 0,
+  bottom: 0.5,
+  right: 0.5,
+};
+
+/**
+ * Resolves an origin to its offset from the center of the object.
+ * `originX`/`originY` are not always the string values they are typed as:
+ * for controls with a custom name the canvas keeps the numeric anchor
+ * returned by `Control#getTransformAnchorPoint()`.
+ */
+const originToOffset = (origin: TOriginX | TOriginY | number): number =>
+  typeof origin === 'string' ? originOffset[origin] : origin - 0.5;
 
 /**
  * Wraps a handler to swap behavior based on flip state.
@@ -385,9 +404,8 @@ const changeImageSizeWithAutoCoverGenerator =
     const isFlipped = isX ? image.flipX : image.flipY;
     const elementSize = isX ? image._element.width : image._element.height;
     const crossElementSize = isX ? image._element.height : image._element.width;
-    const isNegativeEdge = isX
-      ? transform.originX === 'right'
-      : transform.originY === 'bottom';
+    const isNegativeEdge =
+      originToOffset(isX ? transform.originX : transform.originY) > 0;
 
     const initialSize = isX ? transform.width : transform.height;
     const initialCrossSize = isX ? transform.height : transform.width;
