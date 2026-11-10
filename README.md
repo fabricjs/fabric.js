@@ -13,13 +13,12 @@ A **simple and powerful Javascript HTML5 canvas library**.
 
 Here is a section for recognition of companies or individuals that support fabricJS with a sponsorship
 
-   <a href="https://go.warp.dev/fabric">
-      <img alt="Warp sponsorship" width="300" src="https://github.com/warpdotdev/brand-assets/blob/main/Github/Sponsor/Warp-Github-LG-01.png">
+   <a href="https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=fabric.js" >
+      <img alt="Atlascloud sponsorship" width="300" height="auto" src="https://www.atlascloud.ai/logo.svg" style="background-color: white;">
    </a>
 
-### [Warp, built for coding with multiple AI agents](https://go.warp.dev/fabric)
-
-[Available for MacOS, Linux, & Windows](https://go.warp.dev/fabric)<br>
+Atlas Cloud is a full-modal AI inference platform that gives developers a single AI API to access video generation, image generation, and LLM APIs. Instead of managing multiple vendor integrations, you connect once and get unified access to 300+ curated models across all modalities.
+Check out Atlas Cloud's new coding plan promotion for more budget-friendly API access：[https://www.atlascloud.ai/console/coding-plan](https://www.atlascloud.ai/console/coding-plan?utm_source=github&utm_medium=link&utm_campaign=fabric.js)
 
 </div>
 
@@ -30,6 +29,7 @@ Here is a section for recognition of companies or individuals that support fabri
 - `JPG`, `PNG`, `JSON` and `SVG` i/o
 - Typed and modular
 - [Unit tested](CONTRIBUTING.md#-testing)
+- Security efforts [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12579/badge)](https://www.bestpractices.dev/projects/12579)
 
 #### Supported Browsers/Environments
 
@@ -48,13 +48,73 @@ Fabric.js does not use polyfills by default, or tries to keep it at minimum. the
 
 ## Installation
 
+For new applications, install the environment-specific package:
+
+```bash
+# Browser applications
+npm install @fabricjs/browser
+
+# Node.js applications
+npm install @fabricjs/node
+```
+
+The legacy `fabric` package remains supported for existing applications:
+
 ```bash
 $ npm install fabric --save
 # or use yarn
 $ yarn add fabric
 # or use pnpm
-$ pnpm install fabric
+$ pnpm add fabric
 ```
+
+## Packages and migration
+
+| Package             | Role                                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `fabric`            | Legacy compatibility facade. It re-exports `@fabricjs/browser`.                                                                 |
+| `@fabricjs/browser` | Preferred entrypoint for new browser applications.                                                                              |
+| `@fabricjs/node`    | Preferred entrypoint for new Node.js applications. It owns the Node-specific dependencies.                                      |
+| `@fabricjs/core`    | Shared, environment-neutral runtime used by the browser and Node packages. It is intended for advanced and shared dependencies. |
+| Extension packages  | Optional features imported individually, such as `@fabricjs/aligning-guidelines`.                                               |
+
+Existing imports continue to work:
+
+```js
+import { Canvas } from 'fabric';
+import { StaticCanvas } from 'fabric/node';
+```
+
+New applications should prefer the explicit entrypoints:
+
+```js
+import { Canvas } from '@fabricjs/browser';
+import { StaticCanvas } from '@fabricjs/node';
+import { AligningGuidelines } from '@fabricjs/aligning-guidelines';
+```
+
+The `fabric` and `fabric/node` facades share the same class identities as
+their corresponding workspace packages. Keep `fabric` and every
+`@fabricjs/*` package on matching versions; mixing mismatched versions can
+load separate runtimes.
+
+`@fabricjs/core` has no Node-specific runtime dependencies, but it is not a
+DOM-free API. Advanced consumers using core APIs that touch DOM or canvas must
+provide a suitable environment implementation.
+
+### Legacy distribution files
+
+The ESM `fabric` and `fabric/node` entries are small compatibility facades over
+the workspace packages. The legacy standalone files remain available for
+existing usage:
+
+- `dist/index.js` and `dist/index.min.js` are full browser UMD builds from
+  `@fabricjs/browser`, for `<script>` tags and `require('fabric')`.
+- `dist/index.node.cjs` is the legacy CommonJS compatibility build for
+  `require('fabric/node')`.
+
+New ESM applications should continue to import `@fabricjs/browser` or
+`@fabricjs/node` directly.
 
 #### Browser
 
@@ -67,7 +127,7 @@ See [browser modules][mdn_es6] for using es6 imports in the browser or use a ded
 
 We strongly recommend to run your applications only LTS versions of node.
 
-Said so the minimum supported version of node is 18.
+Said so the minimum supported version of node is 20.
 We bump up the minimum version of node with a Major release only when the dependencies force us to do so.
 
 Fabric.js depends on [node-canvas][node_canvas] for a canvas implementation (`HTMLCanvasElement` replacement) and [jsdom][jsdom] for a `window` implementation on node.
@@ -75,14 +135,61 @@ This means that you may encounter `node-canvas` limitations and [bugs][node_canv
 
 Follow these [instructions][node_canvas_install] to get `node-canvas` up and running.
 
+#### Optional Skia backend
+
+`@fabricjs/skia` is an opt-in Node.js backend using `@napi-rs/canvas` and
+jsdom 31. It does not require `node-canvas`. Install it directly when you
+only need Skia:
+
+```sh
+npm install @fabricjs/skia
+```
+
+```js
+import { StaticCanvas, Rect } from '@fabricjs/skia';
+// CommonJS is also supported:
+// const { StaticCanvas, Rect } = require('@fabricjs/skia');
+const canvas = new StaticCanvas(undefined, { width: 100, height: 100 });
+canvas.add(new Rect({ width: 50, height: 50, fill: 'red' }));
+const png = canvas.toDataURL();
+await canvas.dispose();
+```
+
+The `fabric/skia` compatibility entrypoint forwards to this package in both
+ESM and CommonJS. Skia is an optional peer dependency and is never installed
+by `fabric` automatically. To use the facade, install both packages at matching
+versions:
+
+```sh
+npm install fabric @fabricjs/skia
+```
+
+Skia requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`. The existing browser,
+`fabric/node`, and `@fabricjs/node` entrypoints retain their Node 20 minimum
+and the existing node-canvas backend. Browser and core packages do not depend
+on either server rendering backend.
+
+Choose one environment entrypoint per runtime. Skia shares `@fabricjs/core`;
+its CommonJS entrypoint forwards to the same ESM runtime, so `import`, `require`,
+and `fabric/skia` share class identities and environment state.
+Skia and node-canvas can produce different pixels and font metrics. See the
+[Skia package documentation](packages/skia/README.md) for supported APIs and
+backend differences.
+
 ## Quick Start
 
 ```js
-// v6
-import { Canvas, Rect } from 'fabric'; // browser
-import { StaticCanvas, Rect } from 'fabric/node'; // node
+// Preferred entrypoints for new applications
+import { Canvas } from '@fabricjs/browser';
+import { StaticCanvas } from '@fabricjs/node';
+```
 
-// v5
+```js
+// Supported compatibility entrypoints
+import { Canvas } from 'fabric';
+import { StaticCanvas } from 'fabric/node';
+
+// v5 compatibility
 import { fabric } from 'fabric';
 ```
 
@@ -188,7 +295,6 @@ See our ready to use [templates](./.codesandbox/templates/).
 
 ## More Resources
 
-- [WIP new fabricjs.com](https://fabricjs.github.io)
 - [Demos on `fabricjs.com`][demos]
 - [Fabric.js on `Twitter`][twitter]
 - [Fabric.js on `CodeTriage`][code_triage]

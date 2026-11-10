@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "fabric": ["./index"],
+      "fabric/node": ["./index.node"],
+      "fabric/skia": ["./index.skia"],
+      "fabric/extensions": ["./extensions/index"],
+      "@fabricjs/core": ["./packages/core/src/index"],
+      "@fabricjs/aligning-guidelines": [
+        "./packages/aligning-guidelines/src/index"
+      ],
+      "@fabricjs/browser": ["./packages/browser/src/index"],
+      "@fabricjs/cropping-controls": ["./packages/cropping-controls/src/index"],
+      "@fabricjs/data-updaters": ["./packages/data-updaters/src/index"],
+      "@fabricjs/gradient-controls": ["./packages/gradient-controls/src/index"],
+      "@fabricjs/node": ["./packages/node/src/index"],
+      "@fabricjs/skia": ["./packages/skia/src/index"],
+      "@fabricjs/westures-integration": [
+        "./packages/westures-integration/src/index"
+      ]
+    }
+  },
+  "include": ["packages/*/src/**/*.ts"],
+  "exclude": [
+    "dist",
+    "dist-extensions",
+    "node_modules",
+    "packages/website",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.fixtures.ts"
+  ]
+}

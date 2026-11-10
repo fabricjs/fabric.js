@@ -1,0 +1,19 @@
+---
+import CarbonAdReminder from './InlineCarbonAdReminder';
+import './InlineCarbonAd.css'
+
+const props = Astro.props
+---
+
+<main>
+    <div class="ads-placeholder">
+        <CarbonAdReminder client:load />
+        <script
+            key="carbonads"
+            async
+            id="_carbonads_js"
+            type="text/javascript"
+            src="//cdn.carbonads.com/carbon.js?serve=CW7ILKQ7&placement=fabricjscom&format=cover"
+        />
+    <div>
+</main>

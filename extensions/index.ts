@@ -1,34 +1,5 @@
-export { AligningGuidelines } from './aligning_guidelines';
-export type * from './aligning_guidelines/typedefs';
-
-export {
-  originUpdaterWrapper,
-  installOriginWrapperUpdater,
-} from './data_updaters/origins';
-
-export {
-  gradientUpdaterWrapper,
-  installGradientUpdater,
-} from './data_updaters/gradient';
-
-export {
-  addGestures,
-  pinchEventHandler,
-  rotateEventHandler,
-} from './westures_integration';
-
-export {
-  createImageCroppingControls,
-  createImageResizeControlsWithScaleToCover,
-} from './cropping_controls/croppingControls';
-export {
-  changeCropY,
-  changeCropX,
-  changeCropWidth,
-  changeCropHeight,
-  changeWidthAndScaleToCover,
-  changeHeightAndScaleToCover,
-  withFlip,
-} from './cropping_controls/croppingHandlers';
-export { enterCropMode } from './cropping_controls/enterCropMode';
-export { createLinearGradientControls } from './linear_gradient_controls/linearGradientControls';
+export * from '@fabricjs/aligning-guidelines';
+export * from '@fabricjs/cropping-controls';
+export * from '@fabricjs/data-updaters';
+export * from '@fabricjs/gradient-controls';
+export * from '@fabricjs/westures-integration';

@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="10cm" height="3cm" viewBox="0 0 1000 300" version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <text id="ReferencedText">
+      Referenced character data
+    </text>
+  </defs>
+  <desc>Example tref01 - inline vs reference text content</desc>
+
+  <text x="100" y="100" font-size="45" fill="blue" >
+    Inline character data
+  </text>
+  <text x="100" y="200" font-size="45" fill="red" >
+    <tref xlink:href="#ReferencedText"/>
+  </text>
+</svg>
+

@@ -1,0 +1,62 @@
+---
+date: '2013-06-22'
+title: 'Free drawing'
+description: 'Free drawing in canvas using Fabric.js'
+thumbnail: 'free-drawing.png'
+tags: ['drawing', 'brush']
+---
+
+import './index.css';
+import code from './code?raw';
+import { CodeEditor } from '../../../components/CodeEditor';
+import { FreeDrawingUI } from './FreeDrawingUI';
+
+<CodeEditor code={code} canvasId="c" client:idle>
+<div className="demo-body">
+	<canvas id="c" width="500" height="500"></canvas>
+
+    <div id="drawing-mode-options">
+    	<button id="drawing-mode" className="btn btn-info">Cancel drawing mode</button>
+    	<button id="clear-canvas" className="btn btn-info">Clear</button>
+    	<label htmlFor="drawing-mode-selector">
+    		Mode:
+    		<select id="drawing-mode-selector">
+    			<option>Pencil</option>
+    			<option>Circle</option>
+    			<option>Spray</option>
+    			<option>Pattern</option>
+    			<option>hline</option>
+    			<option>vline</option>
+    			<option>square</option>
+    			<option>diamond</option>
+    			<option>texture</option>
+    		</select>
+    	</label>
+    	<label htmlFor="drawing-line-width">
+    		Line width:
+    		<span className="info">30</span>
+    		<input type="range" min="0" max="150" id="drawing-line-width" />
+    	</label>
+    	<label htmlFor="drawing-color">
+    		Line color:
+    		<input type="color" id="drawing-color" />
+    	</label>
+    	<label htmlFor="drawing-shadow-color">
+    		Shadow color:
+    		<input type="color" id="drawing-shadow-color" />
+    	</label>
+    	<label htmlFor="drawing-shadow-width">
+    		Shadow width:
+    		<span className="info">0</span>
+    		<input type="range" min="0" max="50" id="drawing-shadow-width" />
+    	</label>
+    	<label htmlFor="drawing-shadow-offset">
+    		Shadow offset:
+    		<span className="info">0</span>
+    		<input type="range" min="0" max="50" id="drawing-shadow-offset" />
+    	</label>
+    </div>
+
+</div>
+</CodeEditor>
+<FreeDrawingUI />

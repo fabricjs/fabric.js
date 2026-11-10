@@ -1,0 +1,36 @@
+{
+  "name": "@fabricjs/core",
+  "description": "Environment-neutral Fabric.js core package.",
+  "version": "7.5.0-beta.1",
+  "homepage": "http://fabricjs.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabricjs/fabric.js.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/fabricjs/fabric.js/issues"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

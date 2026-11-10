@@ -1,0 +1,241 @@
+import path from 'path';
+import { redBright } from './scripts/colors.mjs';
+import { buildableWorkspacePackages } from './scripts/workspace-packages.mjs';
+
+const splitter = /\n|\s|,/g;
+
+const buildOutput = process.env.BUILD_OUTPUT || './dist/index.js';
+
+const dirname = path.dirname(buildOutput);
+const basename = path.basename(buildOutput, '.js');
+
+// match .browserslistrc targets for syntax lowering
+const transform = {
+  target: ['chrome88', 'safari13', 'firefox85', 'edge88'],
+};
+
+/**
+ * disallow circular deps
+ * @see https://rolldown.rs/reference/interface.inputoptions
+ * @param {*} warning
+ * @param {*} warn
+ */
+function onwarn(warning, warn) {
+  // we error at any warning.
+  // we allow-list the errors we understand are not harmful
+  if (
+    (warning.code === 'PLUGIN_WARNING' &&
+      !warning.message.includes('sourcemap')) ||
+    warning.code === 'CIRCULAR_DEPENDENCY'
+  ) {
+    console.error(redBright(warning));
+    if (process.env.CI) {
+      throw Object.assign(new Error(), warning);
+    }
+  }
+  warn(warning);
+}
+
+function workspacePackageBuildConfig({ directory, bundle }) {
+  return {
+    input: [`./packages/${directory}/src/index.ts`],
+    external: bundle.external,
+    plugins: bundle.commonjsFacade
+      ? [
+          {
+            name: 'commonjs-esm-facade',
+            generateBundle() {
+              // Skia requires a Node version supporting synchronous require(ESM).
+              // Forward to one runtime so mixed imports share classes and state.
+              this.emitFile({
+                type: 'asset',
+                fileName: 'index.cjs',
+                source: "module.exports = require('./index.mjs');\n",
+              });
+            },
+          },
+        ]
+      : [],
+    tsconfig: './tsconfig.packages.json',
+    ...(bundle.transform ? { transform } : {}),
+    output: [
+      {
+        file: path.resolve(`./packages/${directory}/dist/index.mjs`),
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  };
+}
+
+function browserStandaloneBuildConfig() {
+  return {
+    input: ['./packages/browser/src/index.ts'],
+    tsconfig: './tsconfig.packages.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./packages/browser/dist/index.js'),
+        name: 'fabric',
+        format: 'umd',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve('./packages/browser/dist/index.min.js'),
+            name: 'fabric',
+            format: 'umd',
+            sourcemap: true,
+            minify: true,
+          }
+        : null,
+    ],
+    onwarn,
+  };
+}
+
+// https://rolldown.rs/guide/getting-started
+export default [
+  {
+    input: process.env.BUILD_INPUT?.split(splitter) || ['./index.ts'],
+    external: ['@fabricjs/browser'],
+    tsconfig: './tsconfig.build.json',
+    transform,
+    output: [
+      // es module in bundle
+      {
+        file: path.resolve(dirname, `${basename}.mjs`),
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve(dirname, `${basename}.min.mjs`),
+            name: 'fabric',
+            format: 'es',
+            sourcemap: true,
+            minify: true,
+          }
+        : null,
+    ],
+    onwarn,
+  },
+  {
+    input: ['./index.ts'],
+    external: ['@fabricjs/browser'],
+    tsconfig: './tsconfig.build.json',
+    transform,
+    output: [
+      {
+        file: path.resolve(dirname, 'fabric.mjs'),
+        format: 'es',
+        sourcemap: true,
+      },
+      Number(process.env.MINIFY)
+        ? {
+            file: path.resolve(dirname, 'fabric.min.mjs'),
+            format: 'es',
+            sourcemap: true,
+            minify: true,
+          }
+        : null,
+    ],
+    onwarn,
+  },
+  {
+    input: ['./index.node.ts'],
+    tsconfig: './tsconfig.build.json',
+    output: [
+      {
+        file: path.resolve(dirname, `${basename}.node.mjs`),
+        name: 'fabric',
+        format: 'es',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+    external: ['@fabricjs/node'],
+  },
+  {
+    input: ['./packages/node/src/index.ts'],
+    tsconfig: './tsconfig.packages.json',
+    output: [
+      {
+        file: path.resolve(dirname, `${basename}.node.cjs`),
+        name: 'fabric',
+        format: 'cjs',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+    external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+  },
+  {
+    input: ['./index.skia.ts'],
+    external: ['@fabricjs/skia'],
+    tsconfig: './tsconfig.build.json',
+    output: ['es', 'cjs'].map((format) => ({
+      file: path.resolve(
+        dirname,
+        `${basename}.skia.${format === 'es' ? 'mjs' : 'cjs'}`,
+      ),
+      format,
+      sourcemap: true,
+    })),
+    onwarn,
+  },
+  // WORKSPACE PACKAGES
+  ...buildableWorkspacePackages.map(workspacePackageBuildConfig),
+  browserStandaloneBuildConfig(),
+  // EXTENSIONS
+
+  {
+    input: ['./extensions/index.ts'],
+    external: [
+      '@fabricjs/aligning-guidelines',
+      '@fabricjs/cropping-controls',
+      '@fabricjs/data-updaters',
+      '@fabricjs/gradient-controls',
+      '@fabricjs/westures-integration',
+    ],
+    tsconfig: './tsconfig-extensions.json',
+    transform,
+    output: [
+      // es modules in files
+      {
+        dir: path.resolve('./dist-extensions'),
+        format: 'es',
+        preserveModules: true,
+        preserveModulesRoot: 'extensions',
+        entryFileNames: '[name].mjs',
+        sourcemap: true,
+      },
+    ],
+    onwarn,
+  },
+  {
+    input: ['./extensions/index.ts'],
+    external: ['@fabricjs/core', 'westures'],
+    tsconfig: './tsconfig-extensions.json',
+    transform,
+    output: [
+      {
+        file: path.resolve('./dist-extensions', `fabric-extensions.min.js`),
+        name: 'fabricExtensions',
+        format: 'umd',
+        sourcemap: true,
+        globals: {
+          '@fabricjs/core': 'fabric',
+          westures: 'westures',
+        },
+        paths: {
+          '@fabricjs/core': 'fabric',
+        },
+        minify: true,
+      },
+    ],
+    onwarn,
+  },
+];

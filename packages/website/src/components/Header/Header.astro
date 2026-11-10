@@ -1,0 +1,184 @@
+<header id="site-header">
+  <a id="logo" href="/">
+    <img alt="Fabric.js logo" class="logo-dark" src="/logo.svg" width="178" height="55" />
+    <img alt="Fabric.js logo" class="logo-light" src="/logo-light.svg" width="178" height="55" />
+  </a>
+  <slot />
+  <nav>
+    <ul>
+      <li>
+        <a href="/"> Home </a>
+      </li>
+      <li>
+        <a href="/demos"> Demos </a>
+      </li>
+      <li>
+        <a href="/docs"> Docs </a>
+      </li>
+      <li>
+        <a href="/api"> Api specs </a>
+      </li>
+      <li>
+        <a href="/resources"> Resources </a>
+      </li>
+      <li>
+        <a href="/team"> Team </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  #site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    line-height: 1;
+    background: var(--sl-color-bg-nav);
+    z-index: 9;
+  }
+  #logo {
+    width: 200px;
+    display: block;
+    text-align: center;
+    align-self: flex-start;
+  }
+
+  /* Logo theme switching - only in mobile mode */
+  .logo-light {
+    display: none;
+  }
+  .logo-dark {
+    display: block;
+  }
+  @media not all and (min-width: 800px) and (orientation: landscape) {
+    :global([data-theme='dark']) .logo-light {
+      display: block;
+    }
+    :global([data-theme='dark']) .logo-dark {
+      display: none;
+    }
+  }
+
+  #site-header > nav {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: var(--bottom-nav-height);
+    /*border-top:1px solid #eee;*/
+    /*padding:0 10px;*/
+    z-index: 999;
+  }
+  #site-header > nav::before {
+    content: '';
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0 /*var(--bottom-nav-height)*/;
+    height: 80px /*var(--bottom-nav-height)*/;
+    background: -moz-linear-gradient(
+      top,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
+    background: -webkit-linear-gradient(
+      top,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.15) 100%
+    );
+    /*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#1a000000',GradientType=0 );*/
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  #site-header > nav > ul {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background-color: #fff;
+    border-radius: 15px 15px 0 0;
+    padding: 0 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+  }
+  /*#site-header>nav>ul>li{display:inline-block;width:25%}*/
+
+  #site-header > nav > ul > li > a {
+    color: var(--font-color-normal);
+    display: block;
+    height: var(--bottom-nav-height);
+    padding: 12px 0;
+    font-size: var(--font-size-smaller2);
+  }
+  #site-header > nav > ul > li > a:active {
+    color: var(--primary-color);
+    box-shadow: 0 3px 0 0 var(--primary-color) inset;
+  }
+  #site-header > nav > ul > li > a:hover {
+    color: var(--primary-color);
+  }
+
+  @media (orientation: landscape) {
+    #site-header > nav {
+      width: 300px;
+    }
+    #site-header > nav > ul {
+      border-radius: 30px 0 0;
+    }
+  }
+  @media (min-width: 800px) and (orientation: landscape) {
+    #site-header {
+      display: flex;
+      /*flex-wrap:nowrap;flex-direction:row;*/
+      flex-flow: row nowrap;
+      align-items: center; /*vertical alignment; 'stretch' will give full height*/
+      justify-content: space-between;
+
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-height);
+      padding: 0 1rem;
+      background: #fff;
+      /*border-bottom:1px solid #eee;/*#eaeaea*/
+      z-index: 9;
+    }
+    #site-header > nav {
+      /*flex-basis:*/
+      width: 50%;
+      height: unset;
+      position: unset;
+      background-color: unset;
+    }
+    #site-header > nav::before {
+      display: none;
+    }
+    #site-header > nav > ul {
+      justify-content: space-between;
+      background-color: unset;
+      border-radius: unset;
+      padding: 0;
+      box-shadow: unset;
+    }
+
+    #site-header > nav > ul > li > a {
+      height: var(--header-height);
+      padding: 24px 0;
+      font-size: unset;
+    }
+    #site-header > nav > ul > li > a:active {
+      color: var(--font-color-dark2);
+      box-shadow: 0 -3px 0 0 var(--primary-color) inset;
+    }
+  }
+</style>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="280" height="200" viewBox="0 0 280 200">
+  <defs>
+    <!-- #8515: a plain href is followed like xlink:href, also when chained -->
+    <linearGradient id="units" gradientUnits="userSpaceOnUse"/>
+    <linearGradient id="href" x1="20" y1="0" x2="260" y2="0" href="#units">
+      <stop offset="0" stop-color="black"/>
+      <stop offset="0.4" stop-color="red"/>
+      <stop offset="1" stop-color="white"/>
+    </linearGradient>
+    <linearGradient id="base" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="260" y2="0">
+      <stop offset="0" stop-color="blue"/>
+      <stop offset="1" stop-color="yellow"/>
+    </linearGradient>
+    <linearGradient id="xlink" xlink:href="#base"/>
+    <linearGradient id="chain" href="#xlink"/>
+  </defs>
+  <rect x="20" y="20" width="240" height="70" fill="url(#href)"/>
+  <rect x="20" y="110" width="240" height="70" fill="url(#chain)"/>
+</svg>

@@ -1,1 +1,1 @@
-export * from './fabric';
+export * from '@fabricjs/browser';

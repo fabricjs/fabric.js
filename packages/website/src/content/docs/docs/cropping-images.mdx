@@ -1,0 +1,199 @@
+---
+date: '2025-02-25'
+title: 'Cropping images'
+description: 'How image cropping works in Fabric.js and how to use the cropping controls from fabric/extensions'
+sidebar:
+  order: 600
+---
+
+import { CodeEditor } from '../../../components/CodeEditor';
+import code1 from './cropping-images/code1.js?raw';
+
+## How cropping works
+
+A `FabricImage` shows a rectangular window onto its source image, described by
+four properties: `cropX` and `cropY` place the top-left corner of that window in
+the source's own pixel space, while `width` and `height` set its size. The window
+is then positioned and scaled like any other object.
+
+So cropping is not a separate mode or a special object — it is just those four
+numbers. You can set them yourself at any time:
+
+```js
+image.set({ cropX: 710, cropY: 350, width: 500, height: 500 });
+```
+
+What is genuinely awkward is doing it *interactively*, because dragging a handle
+has to change `cropX`/`cropY` and `width`/`height` together, in the image's
+unrotated pixel space, while keeping the object visually anchored.
+
+## The cropping controls extension
+
+Rather than leave you to write those transform handlers, Fabric.js ships
+ready-made ones in `fabric/extensions` — a separate entry point, so nothing here
+is in the main bundle:
+
+```js
+import {
+  createImageCroppingControls,
+  createImageResizeControlsWithScaleToCover,
+  enterCropMode,
+} from 'fabric/extensions';
+```
+
+- `createImageCroppingControls()` builds a **complete control set** to replace an
+  image's handles: four side and four corner handles that move the crop window,
+  plus four that scale the source image inside a fixed window.
+- `createImageResizeControlsWithScaleToCover()` builds just **four side handles**
+  that resize the visible rectangle and, once no source pixels are left to
+  reveal, scale the image up so it keeps covering the frame. It is meant to be
+  merged into an existing set.
+- `enterCropMode()` is a convenience toggle, described below.
+
+Both are factories, returning fresh `Control` instances on each call, so every
+image can own and restyle its own handles. Assign a whole set, or merge a few
+handles into the defaults:
+
+```js
+// replace every handle
+image.controls = createImageCroppingControls();
+
+// or keep the defaults and override only the sides
+const edge = createImageResizeControlsWithScaleToCover();
+Object.assign(image.controls, {
+  ml: edge.mle,
+  mr: edge.mre,
+  mt: edge.mte,
+  mb: edge.mbe,
+});
+```
+
+Set `padding: 0` on the image when you use the full crop set: the handles that
+scale the source inside the crop window position themselves without accounting
+for padding.
+
+## Entering crop mode
+
+`enterCropMode` wires the whole experience up for you in one line, typically on
+a double click:
+
+```js
+image.once('mousedblclick', enterCropMode);
+```
+
+It swaps in the crop control set, draws a translucent ghost of the full source
+image so you can see the pixels you are hiding, turns dragging the image into
+panning of the crop window, and registers another double click to undo all of
+it.
+
+It is a convenience, not a requirement — assigning the controls yourself works
+just as well, and is usually what an application wants when crop state has to
+persist.
+
+**Double-click the dragon** to enter crop mode, then drag the handles or the
+image itself. Double-click again to leave.
+
+<CodeEditor code={code1} canvasId="crop" client:idle canvasDown>
+  <canvas width="640" height="420" id="crop"></canvas>
+</CodeEditor>
+
+The image starts as a 500×500 window onto a 1920×1200 photo, which is why there
+is space around it — that space is where the ghost appears.
+
+## How `enterCropMode` is built
+
+There is nothing privileged about this helper. It is about twenty-five lines that
+mix together events, controls and a closure — worth reading in full, because the
+technique generalises to any interaction you want to add to Fabric.js:
+
+```ts
+export const enterCropMode = function enterCropMode(
+  this: (args: TPointerEventInfo) => void,
+  { target }: TPointerEventInfo,
+) {
+  const fabricImage = target as FabricImage;
+  const { controls, padding } = fabricImage;
+  fabricImage.padding = 0;
+  fabricImage.controls = createImageCroppingControls();
+  fabricImage.on('moving', cropPanMoveHandler);
+  fabricImage.on('before:render', renderGhostImage);
+  fabricImage.setCoords();
+  const exitCropMode = () => {
+    fabricImage.padding = padding;
+    fabricImage.off('moving', cropPanMoveHandler);
+    fabricImage.off('before:render', renderGhostImage);
+    fabricImage.controls = controls;
+    fabricImage.setCoords();
+    fabricImage.once('mousedblclick', enterCropMode);
+    fabricImage.canvas?.requestRenderAll();
+  };
+  fabricImage.once('mousedblclick', exitCropMode);
+  fabricImage.canvas?.requestRenderAll();
+};
+```
+
+Read as a recipe, it is doing five things:
+
+1. **Capturing the state it is about to overwrite.** `controls` and `padding` are
+   read into local variables before anything changes, so the exit path has
+   something to restore. No extra properties are stored on the image.
+2. **Swapping the control set**, which changes what dragging a handle *means*
+   without touching the object's geometry.
+3. **Borrowing object events for the rest.** `moving` is intercepted by
+   `cropPanMoveHandler` so dragging pans the crop window instead of moving the
+   object, and `before:render` lets `renderGhostImage` draw underneath the image
+   on every frame. Neither behaviour needed a subclass — an object event was
+   enough.
+4. **Closing over the teardown.** `exitCropMode` is a closure holding the
+   original `controls` and `padding`, so it can reverse every step above. Each
+   `on` has a matching `off`.
+5. **Re-arming itself.** The last thing `exitCropMode` does is
+   `once('mousedblclick', enterCropMode)`, so the two functions hand the
+   `mousedblclick` event back and forth. That is the whole toggle — no flag, no
+   state machine.
+
+`setCoords()` after changing `padding` and the control set keeps the cached
+corner positions in sync, and `requestRenderAll()` schedules the redraw.
+
+Copy this shape whenever you want a temporary mode on an object: capture, swap,
+subscribe, and return a closure that undoes exactly what you did.
+
+## Building your own
+
+Extensions package a generic, well-understood feature so you do not have to
+write it — but they are equally meant to be read and taken apart. That is why the
+individual transform handlers are exported alongside the assembled control sets:
+
+- `changeCropX`, `changeCropY`, `changeCropWidth`, `changeCropHeight` — one crop
+  edge each.
+- `changeWidthAndScaleToCover`, `changeHeightAndScaleToCover` — resize the
+  window, then scale to keep covering it.
+- `withFlip(handler, flippedHandler, axis)` — a combinator that picks between two
+  handlers depending on whether the target is flipped on `axis`. It is how the
+  built-in set keeps working on mirrored images.
+
+So you are never limited to the two prepared sets. Map the handlers onto
+different corners, give them your own rendering, or drive one from a control that
+does something else entirely:
+
+```js
+import { Control } from 'fabric';
+import { changeCropX, changeCropWidth, withFlip } from 'fabric/extensions';
+
+// a left-edge handle that only ever crops horizontally
+image.controls.ml = new Control({
+  x: -0.5,
+  y: 0,
+  actionHandler: withFlip(changeCropX, changeCropWidth, 'flipX'),
+  actionName: 'crop',
+});
+```
+
+A few internals are still module-private, including `cropPanMoveHandler` and
+`renderGhostImage`, so the panning and the ghost cannot yet be reused outside
+`enterCropMode` — which is also why the ghost only appears when you go through
+that helper. The action handlers above, however, are all public and safe to
+recombine.
+
+For a side-by-side look at both prepared control sets, see the
+[cropping controls demo](/demos/cropping-controls).

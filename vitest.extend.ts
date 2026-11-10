@@ -1,10 +1,10 @@
-import { expect, chai } from 'vitest';
+import { expect, Snapshots } from 'vitest';
 
 import { cloneDeepWith } from 'es-toolkit/compat';
-import type { FabricObject } from './src/shapes/Object/Object';
-import type { TMat2D } from './src/typedefs';
+import type { FabricObject } from './packages/core/src/shapes/Object/Object';
+import type { TMat2D } from './packages/core/src/typedefs';
 import type { ExtendedOptions, ObjectOptions } from './vitest';
-import type { FabricImage } from './dist-extensions';
+import type { SerializedImageProps } from './packages/core/src/shapes/Image';
 
 const SVG_RE = /(SVGID|CLIPPATH|imageCrop)_[0-9]+/gm;
 const SVG_XLINK_HREF_RE = /xlink:href="([^"]*)"/gm;
@@ -14,9 +14,11 @@ function basename(link: string) {
 }
 
 function replaceLinks(value: string) {
-  return (value.match(SVG_XLINK_HREF_RE) || []).reduce(function (final, curr) {
-    return final.replace(curr, `xlink:href="assets/${basename(curr)}"`);
-  }, value);
+  return (value.match(SVG_XLINK_HREF_RE) ?? []).reduce(
+    (acc, match) =>
+      acc.replace(match, `xlink:href="assets/${basename(match)}"`),
+    value,
+  );
 }
 
 export function sanitizeSVG(value: string) {
@@ -46,13 +48,11 @@ export const roundSnapshotOptions = {
   },
 };
 
-const rawToMatchSnapshot = (chai.Assertion.prototype as any).toMatchSnapshot;
+const { toMatchSnapshot } = Snapshots;
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchObjectSnapshot',
-  function (
-    this: Chai.AssertionStatic,
+expect.extend({
+  toMatchObjectSnapshot(
+    received: unknown,
     {
       cloneDeepWith: customiser,
       includeDefaultValues,
@@ -60,21 +60,18 @@ chai.util.addMethod(
     }: ObjectOptions = {},
     hint?: string,
   ) {
-    const received = chai.util.flag(this, 'object');
-    let snap: Record<string, unknown> = received;
+    let snap = received as Record<string, unknown>;
 
     if (looksLikeFabricObject(received)) {
       const restore = received.includeDefaultValues;
-      if (typeof includeDefaultValues === 'boolean')
-        received.includeDefaultValues = includeDefaultValues;
+      received.includeDefaultValues = includeDefaultValues ?? restore;
       snap = received.toObject();
       received.includeDefaultValues = restore;
     }
     delete snap.version;
 
     const value = cloneDeepWith(snap, (v, k, obj, stack) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const c = (customiser as any)?.(v, k, obj, stack);
+      const c = customiser?.(v, k, obj, stack);
       if (c !== undefined) return c;
       if ((k === 'width' || k === 'height') && typeof v === 'number')
         return Math.round(v * 100) / 100;
@@ -82,79 +79,35 @@ chai.util.addMethod(
       if (k === 'id' && typeof v === 'number') return 0;
     });
 
-    chai.util.flag(this, 'object', value);
-    return rawToMatchSnapshot.call(this, properties, hint);
+    return toMatchSnapshot.call(this, value, properties, hint);
   },
-);
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchSnapshot',
-  function (
-    this: Chai.AssertionStatic,
-    propertiesOrHint?: ExtendedOptions | string,
+  toMatchSnapshotWithOptions(
+    received: unknown,
+    { cloneDeepWith: customiser, ...rest }: ExtendedOptions = {},
     hint?: string,
   ) {
-    const received = chai.util.flag(this, 'object');
-
-    const { cloneDeepWith: customiser, ...rest } =
-      typeof propertiesOrHint === 'object' && propertiesOrHint !== null
-        ? propertiesOrHint
-        : {};
-
-    const value =
-      typeof received === 'string'
-        ? received
-        : customiser
-          ? cloneDeepWith(received, customiser)
-          : received;
-
-    chai.util.flag(this, 'object', value);
-
-    const args: unknown[] = [];
-
-    if (typeof propertiesOrHint === 'string') {
-      args.push(propertiesOrHint);
-    } else if (propertiesOrHint && Object.keys(rest).length > 0) {
-      args.push(rest);
-      if (hint) args.push(hint);
-    } else if (hint) {
-      args.push(hint);
-    }
-
-    return rawToMatchSnapshot.apply(this, args);
+    const value = customiser ? cloneDeepWith(received, customiser) : received;
+    return Object.keys(rest).length > 0
+      ? toMatchSnapshot.call(this, value, rest, hint)
+      : toMatchSnapshot.call(this, value, hint);
   },
-);
 
-chai.util.addMethod(
-  chai.Assertion.prototype,
-  'toMatchSVGSnapshot',
-  function (
-    this: Chai.AssertionStatic,
-    propertiesOrHint?: ExtendedOptions | string,
-    hint?: string,
+  toMatchSVGSnapshot(received: string, hint?: string) {
+    return toMatchSnapshot.call(this, sanitizeSVG(received), hint);
+  },
+
+  toSameImageObject(
+    actual: SerializedImageProps,
+    expected: SerializedImageProps,
   ) {
-    const received = chai.util.flag(this, 'object');
-
-    const value = sanitizeSVG(received);
-
-    chai.util.flag(this, 'object', value);
-
-    return rawToMatchSnapshot.call(this, propertiesOrHint, hint);
-  },
-);
-
-expect.extend({
-  toSameImageObject(actual: FabricImage, expected: FabricImage) {
     const normalizedActual = {
       ...actual,
-      // @ts-expect-error -- src is protected in FabricImage class
       src: basename(actual.src),
     };
 
     const normalizedExpected = {
       ...expected,
-      // @ts-expect-error -- src is protected in FabricImage class
       src: basename(expected.src),
     };
 

@@ -1,0 +1,30 @@
+{
+  "name": "@fabricjs/e2e",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc -p ./tsconfig.playwright.json --noEmit",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@fabricjs/aligning-guidelines": "workspace:^",
+    "@fabricjs/browser": "workspace:^",
+    "@fabricjs/core": "workspace:^",
+    "@fabricjs/cropping-controls": "workspace:^",
+    "@fabricjs/data-updaters": "workspace:^",
+    "@fabricjs/gradient-controls": "workspace:^",
+    "@fabricjs/node": "workspace:^",
+    "fabric": "workspace:*",
+    "@fabricjs/skia": "workspace:^"
+  },
+  "devDependencies": {
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "8.3.5"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

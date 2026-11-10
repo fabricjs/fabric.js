@@ -2,7 +2,183 @@
 
 ## [next]
 
-- feat(): replace canvas with @napi-rs/canvas [#10854](https://github.com/fabricjs/fabric.js/pull/10854)
+- feat(): add optional Skia backend via `fabric/skia` and `@fabricjs/skia` [#10854](https://github.com/fabricjs/fabric.js/pull/10854)
+- chore(deps): bump markdown-it from 14.3.1 to 14.3.3 [#11198](https://github.com/fabricjs/fabric.js/pull/11198)
+- chore(deps): bump the astro group across 1 directory with 5 updates [#11202](https://github.com/fabricjs/fabric.js/pull/11202)
+- chore(deps): bump zod from 4.6.5 to 4.6.7 [#11199](https://github.com/fabricjs/fabric.js/pull/11199)
+- fix(Object): keep quality 0 in toDataURL and toBlob [#11201](https://github.com/fabricjs/fabric.js/pull/11201)
+- chore(deps-dev): bump oxfmt from 0.73.0 to 0.75.0 [#11204](https://github.com/fabricjs/fabric.js/pull/11204)
+- chore(deps-dev): bump oxlint-tsgolint from 7.0.2004 to 7.0.2005 [#11203](https://github.com/fabricjs/fabric.js/pull/11203)
+- chore(pnpm): upgrade workspace to pnpm 11 [#11197](https://github.com/fabricjs/fabric.js/pull/11197)
+- chore(release): add pnpm versionbump command [#11200](https://github.com/fabricjs/fabric.js/pull/11200)
+- chore(): Publish 7.5.0b1 [#11194](https://github.com/fabricjs/fabric.js/pull/11194)
+- fix(parser): ignore empty declarations in SVG style attributes instead of failing the import [#11185](https://github.com/fabricjs/fabric.js/pull/11185)
+- fix(): make unit tests typecheck finally green [#11183](https://github.com/fabricjs/fabric.js/pull/11183)
+- chore(deps-dev): bump typedoc-plugin-markdown from 4.14.0 to 4.14.1 in the typedoc group across 1 directory [#11189](https://github.com/fabricjs/fabric.js/pull/11189)
+- chore(deps): bump the astro group across 1 directory with 5 updates [#11188](https://github.com/fabricjs/fabric.js/pull/11188)
+- chore(deps-dev): bump vite from 8.3.4 to 8.3.5 in the vite group across 1 directory [#11191](https://github.com/fabricjs/fabric.js/pull/11191)
+- chore(deps-dev): bump picomatch from 2.3.2 to 4.0.7 [#11192](https://github.com/fabricjs/fabric.js/pull/11192)
+- fix(path): stop parsing at a command with missing parameters [#11186](https://github.com/fabricjs/fabric.js/pull/11186)
+- fix(parser): follow plain href on SVG gradients [#11180](https://github.com/fabricjs/fabric.js/pull/11180)
+- chore(deps): bump the astro group across 1 directory with 4 updates [#11176](https://github.com/fabricjs/fabric.js/pull/11176)
+- chore(deps): bump @codemirror/state from 6.7.1 to 6.7.6 [#11179](https://github.com/fabricjs/fabric.js/pull/11179)
+- chore(deps): bump the react group across 1 directory with 2 updates [#11175](https://github.com/fabricjs/fabric.js/pull/11175)
+- chore(deps): bump @playwright/test from 1.64.0 to 1.64.1 [#11178](https://github.com/fabricjs/fabric.js/pull/11178)
+- fix(text): keep SVG export of text on a path valid with spaces [#11174](https://github.com/fabricjs/fabric.js/pull/11174)
+- fix(text): keep textBackgroundColor inside the line with charSpacing [#11173](https://github.com/fabricjs/fabric.js/pull/11173)
+- chore(deps): group related Dependabot updates [#11172](https://github.com/fabricjs/fabric.js/pull/11172)
+- fix(canvas): dont draw the drag-selection border when it doesnt fit [#11170](https://github.com/fabricjs/fabric.js/pull/11170)
+- fix(controls): remove padding from the pointer when scaling vertically [#11171](https://github.com/fabricjs/fabric.js/pull/11171)
+- fix(text): preserve shadows on text with decorations when object caching is disabled [#11152](https://github.com/fabricjs/fabric.js/pull/11152)
+- chore(deps-dev): bump typedoc-plugin-markdown from 4.13.1 to 4.14.0 [#11169](https://github.com/fabricjs/fabric.js/pull/11169)
+- chore(deps-dev): bump oxfmt from 0.72.0 to 0.73.0 [#11168](https://github.com/fabricjs/fabric.js/pull/11168)
+- chore(): remove claude.md and refresh agents.md [#11163](https://github.com/fabricjs/fabric.js/pull/11163)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11165](https://github.com/fabricjs/fabric.js/pull/11165)
+- fix(canvas): keep the selection border dash independent of free drawing brushes [#11162](https://github.com/fabricjs/fabric.js/pull/11162)
+- test(): use typed layout event fixtures [#11154](https://github.com/fabricjs/fabric.js/pull/11154)
+- test(): update canvas event fixtures and target assertions [#11153](https://github.com/fabricjs/fabric.js/pull/11153)
+- fix(StaticCanvas): restore `renderOnAddRemove` when `loadFromJSON` is rejected or aborted
+- chore(deps-dev): bump vite from 8.3.1 to 8.3.4 in the vite group across 1 directory [#11155](https://github.com/fabricjs/fabric.js/pull/11155)
+- chore(deps): bump astro from 7.3.5 to 7.3.8 [#11156](https://github.com/fabricjs/fabric.js/pull/11156)
+- chore(deps): bump @astrojs/react from 7.0.0 to 7.0.1 [#11158](https://github.com/fabricjs/fabric.js/pull/11158)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11157](https://github.com/fabricjs/fabric.js/pull/11157)
+- chore(deps): bump @playwright/test from 1.63.0 to 1.64.0 [#11159](https://github.com/fabricjs/fabric.js/pull/11159)
+- fix(types): align revivers with enlivened object types [#11148](https://github.com/fabricjs/fabric.js/pull/11148)
+- fix(types): allow custom controls in object options [#11147](https://github.com/fabricjs/fabric.js/pull/11147)
+- fix(brushes): keep spray dots in place when finishing a stroke [#11150](https://github.com/fabricjs/fabric.js/pull/11150)
+- fix(path): draw an arc with a zero radius as a line instead of dropping it
+- test(): preserve transform names in fuzz generators [#11149](https://github.com/fabricjs/fabric.js/pull/11149)
+- fix(brushes): respect zoom and pan when limiting free drawing to the canvas size [#11143](https://github.com/fabricjs/fabric.js/pull/11143)
+- chore(): reduce type errors in spec typecheck [#11142](https://github.com/fabricjs/fabric.js/pull/11142)
+- ci(): use fetched master when resolving changelog conflicts
+- ci(): trigger changelog conflict resolution with a label
+- ci(): resolve minimal changelog conflicts on approval [#11144](https://github.com/fabricjs/fabric.js/pull/11144)
+- fix(): preserve rotation pivots on coordinate axes and text styles with CRLF line endings [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- test(path): add SVG path property tests [FUZZING] [#11138](https://github.com/fabricjs/fabric.js/pull/11138)
+- chore(): migrate eslint to oxlint [#11139](https://github.com/fabricjs/fabric.js/pull/11139)
+- fix(types): improve some types in fabric [#11115](https://github.com/fabricjs/fabric.js/pull/11115)
+- [StepSecurity] ci: Harden GitHub Actions [#11137](https://github.com/fabricjs/fabric.js/pull/11137)
+- chore(deps): update humanfs, brace-expansion, http-cache-semantics, and the docs CSS selector parser; remove unused braces dependency via picomatch
+- chore(deps): update transitive markdown-it to 14.3.1 and source-map-js to 1.2.2
+- chore(deps): update fast-uri to 3.1.8 and sharp to 0.35.5
+- fix(): Textbox resize cursor ignores lockScalingX [#11114](https://github.com/fabricjs/fabric.js/pull/11114)
+- ci(): secure SonarQube analysis for pull requests [#11125](https://github.com/fabricjs/fabric.js/pull/11125)
+- chore(): pin dependencies to exact versions and add pnpm catalog for shared dependencies [#11111](https://github.com/fabricjs/fabric.js/pull/11111)
+- chore(website): drop prettier and format the website package with oxfmt [#11112](https://github.com/fabricjs/fabric.js/pull/11112)
+- chore(website): upgrade Astro 5 → 7 and all related dependencies [#11109](https://github.com/fabricjs/fabric.js/pull/11109)
+- test(): replace custom canvas selector engines with Playwright locators [#11103](https://github.com/fabricjs/fabric.js/pull/11103)
+- chore(): remove dead code from playwright e2e setup [#11102](https://github.com/fabricjs/fabric.js/pull/11102)
+- chore(): remove inquirer and ps-list [#11100](https://github.com/fabricjs/fabric.js/pull/11100)
+- chore(): update dev deps [#11095](https://github.com/fabricjs/fabric.js/pull/11095)
+- test(): build Fabric automatically and serve Playwright scenes with vite instead of a custom compiler and import map [#11104](https://github.com/fabricjs/fabric.js/pull/11104)
+- ci(): update the pnpm cache client and skip canvas compilation dependencies
+- ci(): share one Fabric build across statistics, package smoke tests, and website checks
+- ci(): combine lint, formatting, and type checks in one job
+- ci(): build directly in the Playwright job and remove the prebuild cache handoff
+- ci(): pin build-stats checkout to master to avoid running PR code [#11085](https://github.com/fabricjs/fabric.js/pull/11085)
+- chore(deps-dev): bump typescript-eslint from 8.60.1 to 8.70.0 [#11060](https://github.com/fabricjs/fabric.js/pull/11060)
+- chore(deps): bump sharp from 0.34.5 to 0.35.4 [#11079](https://github.com/fabricjs/fabric.js/pull/11079)
+- chore(deps-dev): bump lint-staged from 17.0.5 to 17.5.0 [#11067](https://github.com/fabricjs/fabric.js/pull/11067)
+- chore(deps-dev): bump rolldown from 1.1.2 to 1.2.8 [#11069](https://github.com/fabricjs/fabric.js/pull/11069)
+- ci(): Fix the banner of the website. [#11083](https://github.com/fabricjs/fabric.js/pull/11083)
+- Ci(): Fix GitHub pages deploy [#11082](https://github.com/fabricjs/fabric.js/pull/11082)
+- ci(): add GitHub Pages deploy workflow for website [#11081](https://github.com/fabricjs/fabric.js/pull/11081)
+- Pull in docs [#11070](https://github.com/fabricjs/fabric.js/pull/11070)
+- chore(deps-dev): bump @playwright/test from 1.60.0 to 1.62.0 [#11063](https://github.com/fabricjs/fabric.js/pull/11063)
+- test(), chore(): Various things i forgot [#11065](https://github.com/fabricjs/fabric.js/pull/11065)
+- feat(): Add backend network request callback [#11064](https://github.com/fabricjs/fabric.js/pull/11064)
+- chore(deps-dev): bump es-toolkit from 1.47.0 to 1.50.0 [#11062](https://github.com/fabricjs/fabric.js/pull/11062)
+- chore(deps-dev): bump the vitest group with 4 updates [#11059](https://github.com/fabricjs/fabric.js/pull/11059)
+- refactor(): Change the standard fabric package to be a combination of the new packages [#11045](https://github.com/fabricjs/fabric.js/pull/11045)
+- chore(deps): bump postcss from 8.5.15 to 8.5.24 [#11054](https://github.com/fabricjs/fabric.js/pull/11054)
+- Fix clipped groups with child shadow offsets [#11047](https://github.com/fabricjs/fabric.js/pull/11047)
+- Refresh text measuring context when env document changes [#11046](https://github.com/fabricjs/fabric.js/pull/11046)
+- refactor(core): move implementation source into package [#11041](https://github.com/fabricjs/fabric.js/pull/11041)
+- fix(config): resolve device pixel ratio through env [#11040](https://github.com/fabricjs/fabric.js/pull/11040)
+- refactor(env): move runtime env setup to packages [#11039](https://github.com/fabricjs/fabric.js/pull/11039)
+- chore(): Monorepo follow up steps [#11033](https://github.com/fabricjs/fabric.js/pull/11033)
+- chore(deps-dev): bump rolldown from 1.1.0 to 1.1.2 [#11025](https://github.com/fabricjs/fabric.js/pull/11025)
+- fix(sandbox): restore vanilla startup with pnpm [#11012](https://github.com/fabricjs/fabric.js/pull/11012)
+- fix(): nested duplicated clipPath causes infinite recursion [#10774](https://github.com/fabricjs/fabric.js/pull/10774)
+- chore(): try native oxc minifier [#11008](https://github.com/fabricjs/fabric.js/pull/11008)
+- chore(): disable Sonar optional chaining suggestions
+- feat(): monorepo first steps with backwards compat [#11011](https://github.com/fabricjs/fabric.js/pull/11011)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11003](https://github.com/fabricjs/fabric.js/pull/11003)
+- chore(deps-dev): bump typescript-eslint from 8.59.4 to 8.60.1 [#11004](https://github.com/fabricjs/fabric.js/pull/11004)
+- chore(deps-dev): bump rolldown from 1.0.2 to 1.1.0 [#11005](https://github.com/fabricjs/fabric.js/pull/11005)
+- fix(text): correct RTL cursor positioning in `getSelectionStartFromPointer` so clicks land on the right character in RTL `IText`/`Textbox` objects
+- chore(): tackle sonar `Unexpected negated condition.` violations [#10992](https://github.com/fabricjs/fabric.js/pull/10992)
+- chore(): switch repo tooling and CI to pnpm [#11002](https://github.com/fabricjs/fabric.js/pull/11002)
+- chore(deps-dev): bump rolldown from 1.0.1 to 1.0.2 [#10998](https://github.com/fabricjs/fabric.js/pull/10998)
+- chore(deps-dev): bump es-toolkit from 1.46.1 to 1.47.0 [#10997](https://github.com/fabricjs/fabric.js/pull/10997)
+- chore(): fix some sonar issues [#10990](https://github.com/fabricjs/fabric.js/pull/10990)
+- chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#10985](https://github.com/fabricjs/fabric.js/pull/10985)
+- chore(deps): update devDependencies to latest versions [#10982](https://github.com/fabricjs/fabric.js/pull/10982)
+- chore(): address some sonar reported issues [#10981](https://github.com/fabricjs/fabric.js/pull/10981)
+
+## [7.4.0]
+
+- feat(): Support viewport rotation in getZoom, dimensions, and control coords [#10977](https://github.com/fabricjs/fabric.js/pull/10977)
+- fix(): Fix typecheck from security advisory merge [#10973](https://github.com/fabricjs/fabric.js/pull/10973)
+- fix(svg): sanitize unsafe css during SVG export CVE-2026-44311 and CWE-79, CWE-116
+- chore(deps-dev): bump rolldown from 1.0.0-rc.12 to 1.0.0-rc.16 [#10966](https://github.com/fabricjs/fabric.js/pull/10966)
+- chore(deps-dev): bump postcss from 8.5.8 to 8.5.12 [#10972](https://github.com/fabricjs/fabric.js/pull/10972)
+- chore(deps-dev): bump es-toolkit from 1.45.1 to 1.46.0 [#10971](https://github.com/fabricjs/fabric.js/pull/10971)
+- chore(deps-dev): bump the vitest group with 4 updates [#10968](https://github.com/fabricjs/fabric.js/pull/10968)
+- ci(dependabot): group vite-related npm updates [#10967](https://github.com/fabricjs/fabric.js/pull/10967)
+- chore(deps-dev): bump oxfmt from 0.42.0 to 0.45.0 [#10964](https://github.com/fabricjs/fabric.js/pull/10964)
+- chore(): fix non functional typos [#10949](https://github.com/fabricjs/fabric.js/pull/10949)
+- chore(): update major eslint to 10 [#10956](https://github.com/fabricjs/fabric.js/pull/10956)
+- ci(): Fix for publishing action [#10962](https://github.com/fabricjs/fabric.js/pull/10962)
+
+## [7.3.1]
+
+- ci(): fix the package version [#10961](https://github.com/fabricjs/fabric.js/pull/10961)
+- ci(): inline npm publish workflow and add manual dispatch [#10960](https://github.com/fabricjs/fabric.js/pull/10960)
+- ci(): Change permission model and declaration to help with OSSF scorecard. [#10959](https://github.com/fabricjs/fabric.js/pull/10959)
+- docs(): Revise security vulnerability reporting process [#10955](https://github.com/fabricjs/fabric.js/pull/10955)
+- ci(): pin workflow dependencies for scorecard hardening [#10954](https://github.com/fabricjs/fabric.js/pull/10954)
+- ci(): tighten workflow permissions for scorecard hardening [#10953](https://github.com/fabricjs/fabric.js/pull/10953)
+- feat(): Update cron schedule for scorecard workflow [#10952](https://github.com/fabricjs/fabric.js/pull/10952)
+
+## [7.3.0]
+
+- Version 7.3.0 [#10951](https://github.com/fabricjs/fabric.js/pull/10951)
+- fix(cropping): keep ghost scaling controls anchored on flipped images [#10943](https://github.com/fabricjs/fabric.js/pull/10943)
+- chore(deps): bump canvas from 3.2.2 to 3.2.3 [#10940](https://github.com/fabricjs/fabric.js/pull/10940)
+- chore(deps-dev): bump serialize-javascript from 7.0.4 to 7.0.5 in the npm_and_yarn group across 1 directory [#10936](https://github.com/fabricjs/fabric.js/pull/10936)
+- refactor(tests): Migrate to official vitest API for custom snapshot matchers [#10937](https://github.com/fabricjs/fabric.js/pull/10937)
+- refactor(test): fix dead assertions in Shadow.spec.ts [#10932](https://github.com/fabricjs/fabric.js/pull/10932)
+- chore(): update typescript to 6 [#10935](https://github.com/fabricjs/fabric.js/pull/10935)
+- chore(deps): update devDependencies to latest versions [#10929](https://github.com/fabricjs/fabric.js/pull/10929)
+- chore(deps-dev): bump picomatch from 2.3.1 to 2.3.2 in the npm_and_yarn group across 1 directory [#10928](https://github.com/fabricjs/fabric.js/pull/10928)
+- chore(deps): bump canvas from 3.2.1 to 3.2.2 [#10926](https://github.com/fabricjs/fabric.js/pull/10926)
+- refactor(tests): consolidate rectangle creation using makeRect [#10923](https://github.com/fabricjs/fabric.js/pull/10923)
+- test(e2e): stabilize drag and drop event snapshots [#10918](https://github.com/fabricjs/fabric.js/pull/10918)
+- ci(): harden privileged workflow_run actions [#10922](https://github.com/fabricjs/fabric.js/pull/10922)
+- ci(): fix SonarCloud PR changed-lines coverage [#10921](https://github.com/fabricjs/fabric.js/pull/10921)
+- refactor(tests): remove coverage merge step [#10913](https://github.com/fabricjs/fabric.js/pull/10913)
+- chore(): remove leftover babel dep [#10914](https://github.com/fabricjs/fabric.js/pull/10914)
+- chore(deps-dev): bump inquirer from 12.10.0 to 13.3.2 [#10909](https://github.com/fabricjs/fabric.js/pull/10909)
+- chore(deps): bump canvas from 3.2.0 to 3.2.1 [#10906](https://github.com/fabricjs/fabric.js/pull/10906)
+- chore(deps-dev): bump es-toolkit from 1.40.0 to 1.45.1 [#10907](https://github.com/fabricjs/fabric.js/pull/10907)
+- refactor(tests): remove coverage collection from playwright [#10912](https://github.com/fabricjs/fabric.js/pull/10912)
+- ci(): fix sonarqube lcov path after artifact download [#10910](https://github.com/fabricjs/fabric.js/pull/10910)
+- ci(): Try to enable sonarqube cloud for coverage reporting [#10903](https://github.com/fabricjs/fabric.js/pull/10903)
+- docs(agents): add repo AGENTS guide and PR skill [#10900](https://github.com/fabricjs/fabric.js/pull/10900)
+- refactor(tests): use createSVGElement helper across spec files [#10902](https://github.com/fabricjs/fabric.js/pull/10902)
+- chore(): simplify svg creation in unit tests via shared helper [#10895](https://github.com/fabricjs/fabric.js/pull/10895)
+- ci(): Move checkout step for coverage earlier [#10899](https://github.com/fabricjs/fabric.js/pull/10899)
+- ci(): fix the coverage comment action [#10898](https://github.com/fabricjs/fabric.js/pull/10898)
+- chore(): try to improve playwright tests speed [#10896](https://github.com/fabricjs/fabric.js/pull/10896)
+- chore: simplify issue templates and remove semver devDependency [#10892](https://github.com/fabricjs/fabric.js/pull/10892)
+- chore(deps-dev): bump nyc from 17.1.0 to 18.0.0 [#10883](https://github.com/fabricjs/fabric.js/pull/10883)
+- chore(deps-dev): bump @playwright/test from 1.58.1 to 1.58.2 [#10885](https://github.com/fabricjs/fabric.js/pull/10885)
+- chore(): migrate from prettier to oxfmt [#10881](https://github.com/fabricjs/fabric.js/pull/10881)
+- chore(): move transpiling building to rolldown [#10868](https://github.com/fabricjs/fabric.js/pull/10868)
+- chore(): update vitest to 4.1.0 [#10888](https://github.com/fabricjs/fabric.js/pull/10888)
+- feat(): Support textDecoration color. [#10880](https://github.com/fabricjs/fabric.js/pull/10880)
+- feat(): fix(): avoid crash if loadFromJSON load config with not existing images, feat(): allow for fallback objects [#10875](https://github.com/fabricjs/fabric.js/pull/10875)
 - Cleanup animation delay timeout [#10830](https://github.com/fabricjs/fabric.js/pull/10830)
 - chore(): Update typescript-eslint to address a recent vulnerability [#10878](https://github.com/fabricjs/fabric.js/pull/10878)
 - chore(deps-dev): bump rollup from 4.52.4 to 4.59.0 in the npm_and_yarn group across 1 directory [#10877](https://github.com/fabricjs/fabric.js/pull/10877)
@@ -102,7 +278,7 @@
 - chore(): update playwright [#10657](https://github.com/fabricjs/fabric.js/pull/10657)
 - refactor(): swap lodash with es-toolkit [#10651](https://github.com/fabricjs/fabric.js/pull/10651)
 - chore(): update vitest [#10648](https://github.com/fabricjs/fabric.js/pull/10648)
-- feat(): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
+- feat(): Add support for text decoration thickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
 - refactor(tests): introduce strict playwright typecheck and fix all type issues [#10637](https://github.com/fabricjs/fabric.js/pull/10637)
 - test(Textbox): add edge cases when wrapping line [#10639](https://github.com/fabricjs/fabric.js/pull/10639)
 - fix(): Fix regex to parse the viewbox attribute to be more strict [#10636](https://github.com/fabricjs/fabric.js/pull/10636)
@@ -112,7 +288,7 @@
 - chore(): modernize eslint config [#10624](https://github.com/fabricjs/fabric.js/pull/10624)
 - chore(): enable no-unnecessary-type-assertion lint rule [#10626](https://github.com/fabricjs/fabric.js/pull/10626)
 - fix(): Remove black border in blur and also align JS with WEBGL blur filtering [#10623](https://github.com/fabricjs/fabric.js/pull/10623)
-- chore(): investigate firefox flakyness in vitest [#10627](https://github.com/fabricjs/fabric.js/pull/10627)
+- chore(): investigate firefox flakiness in vitest [#10627](https://github.com/fabricjs/fabric.js/pull/10627)
 - chore(): try to fix firefox vitest test [#10625](https://github.com/fabricjs/fabric.js/pull/10625)
 - refactor(tests): use fixtures instead of calling setup in every test file [#10622](https://github.com/fabricjs/fabric.js/pull/10622)
 - chore(): Remove old test suite dependencies [#10621](https://github.com/fabricjs/fabric.js/pull/10621)
@@ -180,7 +356,7 @@
 - refactor(tests): move util tests from qunit to vitest [#10519](https://github.com/fabricjs/fabric.js/pull/10519)
 - refactor(tests): move canvas tests from qunit to vitest [#10499](https://github.com/fabricjs/fabric.js/pull/10499)
 - refactor(tests): move group tests from qunit to vitest [#10495](https://github.com/fabricjs/fabric.js/pull/10495)
-- ci(): New safe worflow for build stats [#10518](https://github.com/fabricjs/fabric.js/pull/10518)
+- ci(): New safe workflow for build stats [#10518](https://github.com/fabricjs/fabric.js/pull/10518)
 - ci(): Write a workflow that can comment coverage on the PR. [#10516](https://github.com/fabricjs/fabric.js/pull/10516)
 - chore(): update typescript to 5.8 [#10514](https://github.com/fabricjs/fabric.js/pull/10514)
 - ci(): Avoid failure status when the intent is to comment [#10508](https://github.com/fabricjs/fabric.js/pull/10508)
@@ -204,7 +380,7 @@
 
 ## [6.7.0]
 
-- feat(Text): Add support for text decoration tickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
+- feat(Text): Add support for text decoration thickness [#10643](https://github.com/fabricjs/fabric.js/pull/10643)
 
 ## [6.6.7]
 
@@ -397,7 +573,7 @@
 
 - chore(TS): minor changes to typescript notation to be compatible with a 5.3.3 [#9725](https://github.com/fabricjs/fabric.js/pull/9725)
 - fix(InteractiveObject): "borderOpacityWhenMoving" does not take effect on the child shapes within the group [#9374](https://github.com/fabricjs/fabric.js/issues/9734)
-- fix(SVGParser): Consider the transformMatrix of the clipPath owner as part of the clipPath trasnformation [#9750](https://github.com/fabricjs/fabric.js/pull/9750)
+- fix(SVGParser): Consider the transformMatrix of the clipPath owner as part of the clipPath transformation [#9750](https://github.com/fabricjs/fabric.js/pull/9750)
 - fix(): bubble dirty flag to parent [#9741](https://github.com/fabricjs/fabric.js/pull/9741)
 - fix(StaticCanvas): setDimensions not requesting a render if options are not passed [#9710](https://github.com/fabricjs/fabric.js/pull/9710)
 - fix(LayoutManager): wrong bounding box position when activeSelection has originX/originY that are not default left/top [#9649](https://github.com/fabricjs/fabric.js/pull/9649)
@@ -416,7 +592,7 @@
 ## [6.0.0-beta19]
 
 - feat(LayoutManager): Expose objects registration [#9661](https://github.com/fabricjs/fabric.js/pull/9661)
-- fix(Object): support specyfing toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
+- fix(Object): support specifying toCanvasElement canvas [#9652](https://github.com/fabricjs/fabric.js/pull/9652)
 - ci(): no `src` imports [#9657](https://github.com/fabricjs/fabric.js/pull/9657)
 - fix(textStyles): Split text into graphemes correctly [#9646](https://github.com/fabricjs/fabric.js/pull/9646)
 - fix(ActiveSelection): static default inheritance [#9635](https://github.com/fabricjs/fabric.js/pull/9635)
@@ -438,7 +614,7 @@
 - fix(): compositionEnd event handler is not registered correctly. (regression from f91362c ) [#9610](https://github.com/fabricjs/fabric.js/pull/9610)
 - ci(): Add a test case from the multiple selection use case for groups [#9599](https://github.com/fabricjs/fabric.js/pull/9599)
 - refactor(env): Change the way the environment and retina are initialized [#9480](https://github.com/fabricjs/fabric.js/pull/9480)
-- chore(TS): fix type of modifed event that could cause unexpected behaviour in dev code [#9596](https://github.com/fabricjs/fabric.js/pull/9596)
+- chore(TS): fix type of modified event that could cause unexpected behaviour in dev code [#9596](https://github.com/fabricjs/fabric.js/pull/9596)
 - fix(LayoutManager): remove unnecessary check [#9591](https://github.com/fabricjs/fabric.js/pull/9591)
 - fix(Text) Fix style transfer issue on a line that is not empty [#9461](https://github.com/fabricjs/fabric.js/pull/9461)
 - ci(): add a vue template [#9502](https://github.com/fabricjs/fabric.js/pull/9502)
@@ -522,7 +698,7 @@
 
 ## [6.0.0-beta13]
 
-- fix(Textbox): implemente a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
+- fix(Textbox): implemented a fix for the style shifting issues on new lines [#9197](https://github.com/fabricjs/fabric.js/pull/9197)
 - Fix(Control) fix a regression in `wrap with fixed anchor`, regression from #8400 [#9326](https://github.com/fabricjs/fabric.js/pull/9326)
 - test(e2e): improve test case for line shifting and style with more colors [#9327](https://github.com/fabricjs/fabric.js/pull/9327)
 - test(e2e): node canvas visual tests [#9134](https://github.com/fabricjs/fabric.js/pull/9134)
@@ -532,7 +708,7 @@
 - docs(): add link to contributing guide [#8393](https://github.com/fabricjs/fabric.js/pull/8393)
 - test(e2e): Drag&Drop tests [#9112](https://github.com/fabricjs/fabric.js/pull/9112)
 - fix(CanvasEvents): regression of `getPointer` usages + BREAKING: drop event data [#9186](https://github.com/fabricjs/fabric.js/pull/9186)
-- feat(Object): BREAKING rm \_setOriginToCenter and \_resetOrigin unuseful methods [#9179](https://github.com/fabricjs/fabric.js/pull/9179)
+- feat(Object): BREAKING rm \_setOriginToCenter and \_resetOrigin useless methods [#9179](https://github.com/fabricjs/fabric.js/pull/9179)
 - fix(ActiveSelection): reset positioning when cleared [#9088](https://github.com/fabricjs/fabric.js/pull/9088)
 - ci(): generate docs [#9169](https://github.com/fabricjs/fabric.js/pull/9169)
 - fix(utils) Fixes the code for the anchor point in point controls for polygons [#9178](https://github.com/fabricjs/fabric.js/pull/9178)
@@ -657,7 +833,7 @@
 - fix(Path, Polyline): fix for SVG import [#8879](https://github.com/fabricjs/fabric.js/pull/8879)
 - chore(TS) add types for loadSVGFromURl, parseSVGDocument, loadSVGFromString [#8869](https://github.com/fabricjs/fabric.js/pull/8869)
 - chore(TS): finalize Path migration [#8438](https://github.com/fabricjs/fabric.js/pull/8438)
-- fix(Path, Obect) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
+- fix(Path, Object) Fix path parsing edge case for zeroed arc command and for too small canvas patterns [#8853](https://github.com/fabricjs/fabric.js/pull/8853)
 
 ## [6.0.0-beta3]
 
@@ -728,7 +904,7 @@
 - feat(PolyControl): modify the shape of a poly with control points [#8556](https://github.com/fabricjs/fabric.js/pull/8556)
 - BREAKING: remove Object.stateful and Object.statefulCache [#8573](https://github.com/fabricjs/fabric.js/pull/8573)
 - fix(IText): refactor clearing context top logic of itext to align with brush pattern, using the canvas rendering cycle in order to guard from edge cases #8560
-- fix(Canvas): `_initRetinaScaling` initializaing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
+- fix(Canvas): `_initRetinaScaling` initializing the scaling regardless of settings in Canvas. [#8565](https://github.com/fabricjs/fabric.js/pull/8565)
 - fix(Canvas): regression of canvas migration with pointer and sendPointToPlane [#8563](https://github.com/fabricjs/fabric.js/pull/8563)
 - chore(TS): Use exports from files to build fabricJS, get rid of HEADER.js [#8549](https://github.com/fabricjs/fabric.js/pull/8549)
 - chore(): rm `fabric.filterBackend` => `getFilterBackend` [#8487](https://github.com/fabricjs/fabric.js/pull/8487)
@@ -879,7 +1055,7 @@
 - ci(typescript): transformer [#8020](https://github.com/fabricjs/fabric.js/pull/8020)
 - fix(canvas): clear transform event caching on resize [#8021](https://github.com/fabricjs/fabric.js/pull/8021)
 - fix(fabric.Canvas): `mouseout` bug [#8011](https://github.com/fabricjs/fabric.js/pull/8011)
-- refactor(object_interactivity): draw operation for borders can be overriden [#7932](https://github.com/fabricjs/fabric.js/pull/7932)
+- refactor(object_interactivity): draw operation for borders can be overridden [#7932](https://github.com/fabricjs/fabric.js/pull/7932)
 - feat(Group,canvas): remove canvas from object before firing removed event, filter insertAt for group
 - tests(): fix the visual test loop to work again on fabricjs.com [#8007](https://github.com/fabricjs/fabric.js/pull/8007)
 - fix(Group): 🛠️ layout, angle and origin ⚡ [#8004](https://github.com/fabricjs/fabric.js/pull/8004)
@@ -1148,7 +1324,7 @@
 - fix(itext): improved style handling for new lines [#6268](https://github.com/fabricjs/fabric.js/pull/6268)
 - fix(controls): Fix flip and controls and skewY and controls. [#6278](https://github.com/fabricjs/fabric.js/pull/6278)
 - fix(controls): Current position with handlers is wrong if using skew [#6267](https://github.com/fabricjs/fabric.js/pull/6267)
-- breaking: setCoords has only one argument now `skipCorners` boolean. setCoords will always update aCoords, lineCoords. If skipCorners is not specified, it will alos update oCoords();
+- breaking: setCoords has only one argument now `skipCorners` boolean. setCoords will always update aCoords, lineCoords. If skipCorners is not specified, it will also update oCoords();
 - feat(fabric.Image): Image.imageSmoothing for fabric.Image objects [#6280](https://github.com/fabricjs/fabric.js/pull/6280)
 - fix(fabric.StaticCanvas): export to dataUrl and canvasElement will respect imageSmoothingEnabled [#6280](https://github.com/fabricjs/fabric.js/pull/6280)
 - fix(fabric.Image): toSVG export with missing element won't crash [#6280](https://github.com/fabricjs/fabric.js/pull/6280)
@@ -1403,7 +1579,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Change: make canvas.getObjects() always return a shallow copy of the array [#5162](https://github.com/fabricjs/fabric.js/pull/5162)
 - Fix: Improve fabric.Pattern.toSVG to look correct on offsets and no-repeat [#5164](https://github.com/fabricjs/fabric.js/pull/5164)
 - Fix: Do not enter edit in Itext if the mouseUp is relative to a group selector [#5153](https://github.com/fabricjs/fabric.js/pull/5153)
-- Improvement: Do not require xlink namespace in front of href attribut for svgs ( is a SVG2 new spec, unsupported ) [#5156](https://github.com/fabricjs/fabric.js/pull/5156)
+- Improvement: Do not require xlink namespace in front of href attribute for svgs ( is a SVG2 new spec, unsupported ) [#5156](https://github.com/fabricjs/fabric.js/pull/5156)
 - Fix: fix resizeFilter having the wrong cached texture, also improved interaction between filters [#5165](https://github.com/fabricjs/fabric.js/pull/5165)
 
 ## [2.3.4]
@@ -1415,7 +1591,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: Blend image filter clean after refilter. [#5121](https://github.com/fabricjs/fabric.js/pull/5121)
 - Fix: Object.toDataURL should not be influenced by zoom. [#5139](https://github.com/fabricjs/fabric.js/pull/5139)
 - Improvement: requestRenderAllBound add to Canvas instance. [#5138](https://github.com/fabricjs/fabric.js/pull/5138)
-- Improvement: Make path bounding cache optional and also reacheable/cleanable [#5140](https://github.com/fabricjs/fabric.js/pull/5140)
+- Improvement: Make path bounding cache optional and also reachable/cleanable [#5140](https://github.com/fabricjs/fabric.js/pull/5140)
 - Improvement: Make the logic of isNeutralState filters work before filtering start. [#5129](https://github.com/fabricjs/fabric.js/pull/5129)
 - Improvement: Added some code to clean up some memory when canvas is disposed in nodejs. [#5142](https://github.com/fabricjs/fabric.js/pull/5142)
 - Fix: Make numeric origins work with group creation. [#5143](https://github.com/fabricjs/fabric.js/pull/5143)
@@ -1496,7 +1672,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 ## [2.0.3]
 
 - Fix: now sub target check can work with subclasses of fabric.Group [#4753](https://github.com/kangax/fabric.js/pull/4753)
-- Improvement: PencilBrush is now compexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
+- Improvement: PencilBrush is now complexity 1 instead of complexity N during draw [#4743](https://github.com/kangax/fabric.js/pull/4743)
 - Fix the cleanStyle was not checking for the right property to exist [#4751](https://github.com/kangax/fabric.js/pull/4751)
 - Fix onBeforeScaleRotate with canvas zoom [#4748](https://github.com/kangax/fabric.js/pull/4748)
 
@@ -1519,7 +1695,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
   - avoid error if iText is removed on mousedown [#4650](https://github.com/kangax/fabric.js/pull/4650)
   - fix calcOffset when text enter editing [#4649](https://github.com/kangax/fabric.js/pull/4649)
   - Gradient fix parsing floats [#4637](https://github.com/kangax/fabric.js/pull/4637)
-  - Add CrossOrigin managment to fabric.Pattern [#4618](https://github.com/kangax/fabric.js/pull/4618)
+  - Add CrossOrigin management to fabric.Pattern [#4618](https://github.com/kangax/fabric.js/pull/4618)
   - Add patternTransform toObject saving [#4626](https://github.com/kangax/fabric.js/pull/4626)
   - normalize brushes render [#4613](https://github.com/kangax/fabric.js/pull/4613)
   - avoid charspacing shortcut [#4594](https://github.com/kangax/fabric.js/pull/4594)
@@ -1527,7 +1703,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - rc3 and rc4
   - more fixes to transformMatrix memoization
   - Canvas.selectionFullyContained allows you to select objects just when full grabbed by the selections. [#4508](https://github.com/kangax/fabric.js/pull/4508)
-  - Remove some ouput of blank spaces from svg in order to avoid extra colored areas [#4524](https://github.com/kangax/fabric.js/pull/4524)
+  - Remove some output of blank spaces from svg in order to avoid extra colored areas [#4524](https://github.com/kangax/fabric.js/pull/4524)
   - Reinserted a performance shortcut for when there is no style at all [#4519](https://github.com/kangax/fabric.js/pull/4519)
   - Manage canvas resize during a freedrawing brush without wiping the brush [#4527](https://github.com/kangax/fabric.js/pull/4527)
   - Removed an extra closePath that was creating wrong visual on IntelIntegrated cards [#4549](https://github.com/kangax/fabric.js/pull/4549)
@@ -1545,7 +1721,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
   - Remove node specific code [#4470](https://github.com/kangax/fabric.js/pull/4470)
   - Improved Canvas.dispose code to leak less memory [#4471](https://github.com/kangax/fabric.js/pull/4471)
   - Remove extra padding of cache when upper limited [#4467](https://github.com/kangax/fabric.js/pull/4467)
-  - Solved 2 perfomances problems with textbox [#4466](https://github.com/kangax/fabric.js/pull/4466) [#4465](https://github.com/kangax/fabric.js/pull/4465)
+  - Solved 2 performances problems with textbox [#4466](https://github.com/kangax/fabric.js/pull/4466) [#4465](https://github.com/kangax/fabric.js/pull/4465)
   - Added justify-left justify-right and justify-center [#4437](https://github.com/kangax/fabric.js/pull/4437)
   - Fix Group fromObject and subTargetCheck [#4454](https://github.com/kangax/fabric.js/pull/4454)
   - Fix regression on IMG from SVG [#4450](https://github.com/kangax/fabric.js/pull/4450)
@@ -1561,7 +1737,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
   - Add browserShadowBlurConstant to adjust shadowBlur value [#4413](https://github.com/kangax/fabric.js/pull/4413)
   - Fix set element not clearing the cacheTexture. [#4410](https://github.com/kangax/fabric.js/pull/4410)
   - Multi selection key can be configured with an array of keys. [#4363](https://github.com/kangax/fabric.js/pull/4363)
-  - fix fast type in text loosing some style. [#4339](https://github.com/kangax/fabric.js/pull/4339)
+  - fix fast type in text losing some style. [#4339](https://github.com/kangax/fabric.js/pull/4339)
   - fixed division by zero with lockscaling flip.
   - added paintFirst ( paint-order with svg support ) [#4303](https://github.com/kangax/fabric.js/pull/4303)
 - beta7
@@ -1823,13 +1999,13 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: Selection of active group with transparency and preserveObjectStacking true or false [#3109](https://github.com/kangax/fabric.js/pull/3109)
 - Fix: pattern brush now create the same pattern seen while drawing [#3112](https://github.com/kangax/fabric.js/pull/3112)
 - Fix: Allow css merge during svg import [#3114](https://github.com/kangax/fabric.js/pull/3114)
-- Improvement: added numeric origins handling fomr 0 to 1. [#3121](https://github.com/kangax/fabric.js/pull/3121)
+- Improvement: added numeric origins handling from 0 to 1. [#3121](https://github.com/kangax/fabric.js/pull/3121)
 - Fix: Fix a defect with shadow of objects in a scaled group. [#3134](https://github.com/kangax/fabric.js/pull/3134)
-- Improvement: Do not fire unecessary selection:changed events. [#3119](https://github.com/kangax/fabric.js/pull/3119)
+- Improvement: Do not fire unnecessary selection:changed events. [#3119](https://github.com/kangax/fabric.js/pull/3119)
 - Fix: Attached hiddenTextarea to body fixes IE, thanks to @plainview. [#3137](https://github.com/kangax/fabric.js/pull/3137)
 - Fix: Shift unselect activegroup on transformed canvas. [#3144](https://github.com/kangax/fabric.js/pull/3144)
 - Added: ColorMatrix filter [#3139](https://github.com/kangax/fabric.js/pull/3139)
-- Fix: Fix condition in wich restoring from Object could cause object overwriting [#3146](https://github.com/kangax/fabric.js/pull/3146)
+- Fix: Fix condition in which restoring from Object could cause object overwriting [#3146](https://github.com/kangax/fabric.js/pull/3146)
 - Change: cloneAsImage for Object and toDataUrl for object are not retina enabled by default. Added option to enable. [#3147](https://github.com/kangax/fabric.js/pull/3147)
 - Improvement: Added textSpacing support for text/itext/textbox [#3097](https://github.com/kangax/fabric.js/pull/3097)
 - Fix: Quote font family when setting the context fontstyle [#3191](https://github.com/kangax/fabric.js/pull/3191)
@@ -1845,7 +2021,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Improvement: Added object property excludeFromExport to avoid exporting the object to JSON or to SVG. [#2976](https://github.com/kangax/fabric.js/pull/2976)
 - Improvement: Correct the calculation of text boundingbox. Improves svg import [#2992](https://github.com/kangax/fabric.js/pull/2992)
 - Added: Export id property to SVG [#2993](https://github.com/kangax/fabric.js/pull/2993)
-- Improvement: Call the callback on loadSvgFromURL on failed xml load with null agument [#2994](https://github.com/kangax/fabric.js/pull/2994)
+- Improvement: Call the callback on loadSvgFromURL on failed xml load with null argument [#2994](https://github.com/kangax/fabric.js/pull/2994)
 - Improvement: Clear only the Itext area on contextTop during cursor animation [#2996](https://github.com/kangax/fabric.js/pull/2996)
 - Added: Char widths cache has been moved to fabric level and not iText level. Added fabric.util.clearFabricCharWidthsCache(fontName) [#2995](https://github.com/kangax/fabric.js/pull/2995)
 - Fix: do not set background or overlay image if the url load fails. [#3003](https://github.com/kangax/fabric.js/pull/3003)
@@ -1868,7 +2044,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix: Allow hoverCursor on non selectable objects, moveCursor does not appear if the object is not moveable.
   Added object.moveCursor to specify a cursor for moving per object. [#2924](https://github.com/kangax/fabric.js/pull/2924)
 - Fix: Add missing stroke.live translation, allow gradientTransform for dashed line. [#2926](https://github.com/kangax/fabric.js/pull/2926)
-- Improvement: Allow customization of keys that iteract with mouse action ( multiselect key, free transform key, alternative action key, centered transform key ) [#2925](https://github.com/kangax/fabric.js/pull/2925)
+- Improvement: Allow customization of keys that interact with mouse action ( multiselect key, free transform key, alternative action key, centered transform key ) [#2925](https://github.com/kangax/fabric.js/pull/2925)
 - Added: Make iText fires object:modified on text change on exit editing [#2927](https://github.com/kangax/fabric.js/pull/2927)
 - Added: [control customization part 1] cornerDashArray, borderDashArray. Now borderScaleFactor influences both border and controls, changed default corner size to 13 [#2932](https://github.com/kangax/fabric.js/pull/2932)
 - Fix: createSVGFontFacesMarkup was failing to retrieve fonts in style [#2935](https://github.com/kangax/fabric.js/pull/2935)
@@ -1963,7 +2139,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 - Fix gradientTransform not exported in gradient toObject [#2486](https://github.com/kangax/fabric.js/pull/2486)
 - Fix object.toDataUrl with multiplier [#2487](https://github.com/kangax/fabric.js/pull/2487)
   BACK INCOMPATIBILITY: removed 'allOnTop' parameter from fabric.StaticCanvas.renderAll.
-- Fix mask filter, mask image is now streched on all image [#2543](https://github.com/kangax/fabric.js/pull/2543)
+- Fix mask filter, mask image is now stretched on all image [#2543](https://github.com/kangax/fabric.js/pull/2543)
 - Fix text onInput event to behave correctly if some text is selected [#2501](https://github.com/kangax/fabric.js/pull/2502)
 - Fix object with selectable = false could be selected with shift click [#2503](https://github.com/kangax/fabric.js/pull/2503)
 - Fix for mask filter when bigger or smaller image is used [#2534](https://github.com/kangax/fabric.js/pull/2534)
@@ -2006,7 +2182,7 @@ breaking: Canvas.onBeforeScaleRotate is removed, developers need to migrate to t
 **Edge**
 
 - Added image preserve aspect ratio attributes and functionality (fabric.Image.alignY, fabric.Image.alignY, fabric.Image.meetOrSlic )
-- Added ImageResizeFilters , option to resize dynamically or statically the images using a set of resize filter alghoritms.
+- Added ImageResizeFilters , option to resize dynamically or statically the images using a set of resize filter algorithms.
 - [BACK_INCOMPAT] `fabric.Collection#remove` doesn't return removed object -> returns `this` (chainable)
 
 - Add "mouse:over" and "mouse:out" canvas events (and corresponding "mouseover", "mouseout" object events)

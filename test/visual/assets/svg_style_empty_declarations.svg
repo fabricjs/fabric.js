@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <!-- #11184: blank declarations in a style attribute are skipped, the rest still applies -->
+  <rect x="5" y="5" width="40" height="40" style="fill:red; ;"/>
+  <rect x="55" y="5" width="40" height="40" style=" ; fill:#00f;; "/>
+  <circle cx="25" cy="75" r="20" style=" " fill="green"/>
+  <circle cx="75" cy="75" r="18" style="fill:orange;; ;stroke:black; ;stroke-width:4"/>
+</svg>

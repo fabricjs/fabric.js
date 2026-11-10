@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<svg width="400" height="400" viewBox="0 0 400 400"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <path d="M 50,175 175,50 M 200,175 M 225,50 L 350,175 M 225,200 m 125,25 -125,125 m -25,-125 m -25,125 l -125,-125 m 125,-25 M 50,175 Z"
+        fill="none" stroke="black" stroke-width="10" />
+
+</svg>

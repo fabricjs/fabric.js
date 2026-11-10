@@ -62,7 +62,7 @@ It's a good and simple way to start contributing.
 Improving **DOCS** is **SUPER** important for everyone.\
 Even if it's a small fix it is valuable **don't hesitate**!
 
-We have a website that is easy to contribute to.
+We have a website that is easy to contribute to, it lives in this repository under [packages/website][website_repo].
 
 [Adding demos](#Adding Demos) is also a great contribution.
 
@@ -86,9 +86,9 @@ Answering questions and addressing issues, as well as fixing and adding types (s
 - **Be patient** \
   Sometimes it takes time to get back to you. Someone eventually will. Having a small, concise and super clear change will make maintainers more prone to handle it quickly.
 - **Code Style** \
-  Fabric uses [`prettier`][prettier] to format files and [`eslint`][eslint] for linting (`npm run lint -- --fix`).\
+  Fabric uses [`oxfmt`][prettier] to format files and [`oxlint`][oxlint] for linting (`pnpm run lint:fix`).\
   To enjoy a seamless dev experience add the [`Prettier - Code formatter`][prettier_extension] extension via the extensions toolbar in VSCode.
-  If that doesn't work, once the PR is ready run `npm run prettier:write` and commit the changes.
+  If that doesn't work, once the PR is ready run `pnpm run prettier:write` and commit the changes.
   Do not reorder imports. Irrelevant changes in a PR that are not created by prettier aren't needed nor welcome.
 - **Tests** \
   PRs must be backed with relevant tests, follow [TESTING](#testing). If you never wrote a test or you find our tests unclear to extend, just ask for help.
@@ -112,17 +112,26 @@ It is more than likely you will be requested to change stuff and refine your wor
 
 ## Testing
 
+For npm releases, follow [Publishing Fabric packages](RELEASING.md).
+
 We use Vitest and Playwright.
 
-| Suite                                                                                                         | unit (node)                                      | e2e (browser)                                                                        |
-| ------------------------------------------------------------------------------------------------------------- | :----------------------------------------------- | :----------------------------------------------------------------------------------- |
-| Framework                                                                                                     | [`vitest`][vitest]                               | [`playwright`][playwright]                                                           |
-| Setup                                                                                                         |                                                  | <pre>npm run build -- -f -w</pre>                                                    |
-| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>npm run test:vitest -- [filters] [-w]</pre> | <pre>npm run test:e2e -- [filters] [--ui]</pre>                                      |
-| Writing Tests                                                                                                 | Add/update `src/*.(spec\|test).ts` files         | - Update tests in `e2e/tests`<br>- Create a new test based on `e2e/template`         |
-| Test Gen                                                                                                      |                                                  | <pre>npm start vanilla<br>npx playwright codegen http://localhost:1234</pre>         |
-| Test Spec                                                                                                     |                                                  | - `index.ts`: built and loaded into the web app<br> - `index.spec.ts`: test spec<br> |
-| Outputs                                                                                                       | Snapshots next to the test file                  | - Snapshots next to the test file <br>- `e2e/test-report`<br>- `e2e/test-results`    |
+| Suite                                                                                                         | unit (node)                                       | e2e (browser)                                                                                        |
+| ------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
+| Framework                                                                                                     | [`vitest`][vitest]                                | [`playwright`][playwright]                                                                           |
+| Setup                                                                                                         |                                                   | Fabric is built automatically by the test command                                                    |
+| Running Tests<br><br><pre>\<test cmd\> -- [filter] [watch]</pre><br>It is advised to use filters to save time | <pre>pnpm run test:vitest -- [filters] [-w]</pre> | <pre>pnpm run test:e2e [filters]</pre>                                                               |
+| Writing Tests                                                                                                 | Add/update `src/*.(spec\|test).ts` files          | - Update tests in `packages/e2e/tests`<br>- Create a new test based on `packages/e2e/tests/template` |
+| Test Gen                                                                                                      |                                                   | <pre>pnpm start vanilla<br>pnpm exec playwright codegen http://localhost:1234</pre>                  |
+| Test Spec                                                                                                     |                                                   | - `index.ts`: served directly by Vite in the browser<br> - `index.spec.ts`: test spec<br>            |
+| Outputs                                                                                                       | Snapshots next to the test file                   | - Snapshots next to the test file <br>- `packages/e2e/test-report`<br>- `packages/e2e/test-results`  |
+
+Run `pnpm run test:e2e` to build Fabric, typecheck the tests, and run the E2E suite.
+Playwright starts Vite automatically at `http://127.0.0.1:5173` and stops it when
+the run finishes. Vite serves test scenes directly from TypeScript; Fabric imports
+resolve to the built workspace packages. No separate build, watcher, or server
+command is needed. The `--ui` flag is optional and opens Playwright's interactive
+test runner.
 
 ## Developing
 
@@ -130,23 +139,23 @@ We use Vitest and Playwright.
 
 0. You need to be comfortable with git
 1. Fork and clone the repository
-2. Install dependencies `npm i --include=dev`
+2. Install dependencies `pnpm install`
 
 ### Starting an App
 
 ```bash
-npm start <template>
-npm start -- --help
+pnpm start <template>
+pnpm start -- --help
 ```
 
-I use `npm start vanilla` for a simple html page with a fabric canvas where i can test some changes.
+I use `pnpm start vanilla` for a simple html page with a fabric canvas where i can test some changes.
 
 You can deploy an app to codesandbox via the cli or build an app at a path of your choosing:
 
 ```bash
-npm run sandbox deploy <path/to/app>
-npm run sandbox build <template> <path/to/app>
-npm run sandbox -- --help
+pnpm run sandbox deploy <path/to/app>
+pnpm run sandbox build <template> <path/to/app>
+pnpm run sandbox -- --help
 ```
 
 Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information.
@@ -155,7 +164,7 @@ Refer to [`.codesandbox/README.md`](.codesandbox/README.md) for more information
 
 You can actively develop fabric online using [Github Codespaces][github_codespaces], [Gitpod][gitpod] or CodeSandbox:
 
-- After the Github Codespace has started run `npm start <template>` to start a prototyping app.
+- After the Github Codespace has started run `pnpm start <template>` to start a prototyping app.
 - Gitpod will start the prototyping apps and expose them as endpoints available on forwarded ports.
   `A service is available on port ...` popups will show up.
 - Codesandbox: _available soon_.
@@ -164,11 +173,11 @@ You can actively develop fabric online using [Github Codespaces][github_codespac
 
 Establish symlinking to work with a local version on separate projects.
 
-1. From `fabric.js` folder run `npm link` **OR** `yarn link`.
-1. From the project's folder run `npm link fabric` **OR** `yarn link fabric`.
+1. From `fabric.js` folder run `pnpm link --global` **OR** `yarn link`.
+1. From the project's folder run `pnpm link --global fabric` **OR** `yarn link fabric`.
 1. Consider flagging `--save` to avoid confusion regarding what version of fabric is being used by the project.
 
-See [npm link][npm_link] **OR** [yarn link][yarn_link].\
+See [pnpm link][pnpm_link] **OR** [yarn link][yarn_link].\
 Don't forget to unlink the package once you're done.
 
 [repo]: ../..
@@ -176,7 +185,7 @@ Don't forget to unlink the package once you're done.
 [discussions]: ../../discussions
 [search_issues]: ../../search?type=Issues
 [bug_report]: ../../issues/new?template=bug_report.md
-[website_repo]: https://github.com/fabricjs/fabricjs.com
+[website_repo]: packages/website
 [website]: http://fabricjs.com/
 [docs]: http://fabricjs.com/api
 [demos]: http://fabricjs.com/demos/
@@ -186,9 +195,9 @@ Don't forget to unlink the package once you're done.
 [codepens]: https://codepen.io/tag/fabricjs
 [jekyll]: https://jekyllrb.com/docs/installation/
 [wsl]: https://learn.microsoft.com/en-us/windows/wsl/
-[prettier]: https://prettier.io/
+[oxfmt]: https://oxc.rs/docs/guide/usage/formatter.html
 [prettier_extension]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
-[eslint]: https://eslint.org/
+[oxlint]: https://oxc.rs/docs/guide/usage/linter.html
 [jsdoc]: https://jsdoc.app/
 [tsjsdoc]: https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html
 [playwright]: https://playwright.dev/
@@ -197,5 +206,5 @@ Don't forget to unlink the package once you're done.
 [testem]: https://github.com/testem/testem
 [github_codespaces]: https://github.com/codespaces/new?hide_repo_select=true&ref=master&repo=712530
 [gitpod]: https://gitpod.io/from-referrer/
-[npm_link]: https://docs.npmjs.com/cli/v8/commands/npm-link
+[pnpm_link]: https://pnpm.io/cli/link
 [yarn_link]: https://yarnpkg.com/cli/link

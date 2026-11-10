@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "markdown.validate.enabled": true,
   "markdown.validate.fileLinks.enabled": "warning",
   "markdown.validate.fragmentLinks.enabled": "warning",
@@ -25,12 +25,12 @@
     "website": true,
     "coverage": true,
     ".nyc_output": true,
-    "e2e/test-results": true,
-    "e2e/test-report": true,
+    "packages/e2e/test-results": true,
+    "packages/e2e/test-report": true,
     "test/visual/assets": true
   },
   "search.useIgnoreFiles": true,
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }
