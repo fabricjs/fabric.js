@@ -1,11 +1,21 @@
 import { roundSnapshotOptions } from '../../../../../vitest.extend';
 import { IText } from './IText';
-import { describe, expect, it, beforeEach, afterEach, test, vi } from 'vitest';
+import {
+  describe,
+  expect,
+  it,
+  beforeEach,
+  afterEach,
+  onTestFinished,
+  test,
+  vi,
+} from 'vitest';
 import type { MockInstance } from 'vitest';
 
 import { ValueAnimation } from '../../util/animation/ValueAnimation';
 import { Canvas } from '../../canvas/Canvas';
 import { Point } from '../../Point';
+import { getFabricWindow } from '../../env';
 
 export function matchTextStateSnapshot(text: IText) {
   const {
@@ -112,6 +122,30 @@ describe('text imperative changes', () => {
       1,
     );
     matchTextStateSnapshot(iText);
+  });
+
+  it('insertChars and removeChars update the hidden textarea while editing', () => {
+    const iText = new IText('hello');
+    onTestFinished(() => iText.dispose());
+    iText.enterEditing();
+    iText.selectionStart = iText.selectionEnd = 5;
+    const textarea = iText.hiddenTextarea!;
+    iText.insertChars('XZ', undefined, 5);
+    expect(textarea.value).toBe('helloXZ');
+    iText.removeChars(6);
+    expect(textarea.value).toBe('helloX');
+    // the textarea caret stays at the cursor
+    expect(textarea.selectionStart).toBe(5);
+    expect(textarea.selectionEnd).toBe(5);
+    // typing does not bring back the text from before the changes
+    textarea.setRangeText('Y', 5, 5, 'end');
+    textarea.dispatchEvent(
+      new (getFabricWindow().InputEvent)('input', {
+        inputType: 'insertText',
+        data: 'Y',
+      }),
+    );
+    expect(iText.text).toBe('helloYX');
   });
 
   it('missingNewlineOffset', () => {

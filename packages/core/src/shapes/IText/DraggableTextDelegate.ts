@@ -322,7 +322,6 @@ export class DraggableTextDelegate {
         target.selectionStart + insert.length,
         target._text.length,
       );
-      target.hiddenTextarea!.value = target.text;
       target._updateTextarea();
       target.hiddenTextarea!.focus();
       target.fire(CHANGED, {
@@ -360,8 +359,6 @@ export class DraggableTextDelegate {
           if (dropEffect === 'move') {
             target.removeChars(selectionStart, selectionEnd);
             target.selectionStart = target.selectionEnd = selectionStart;
-            target.hiddenTextarea &&
-              (target.hiddenTextarea.value = target.text);
             target._updateTextarea();
             target.fire(CHANGED, {
               index: selectionStart,
