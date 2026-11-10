@@ -300,6 +300,12 @@ export class Group
         object._set(key, value);
       });
     }
+    if (key === 'subTargetCheck' && value && !prev) {
+      // the coords of the objects are not updated while subTargetCheck is off
+      (this._objects || []).forEach((object) => {
+        object.setCoords();
+      });
+    }
     return this;
   }
 
