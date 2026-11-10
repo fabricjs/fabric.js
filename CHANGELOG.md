@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump vite from 8.3.5 to 8.3.6 in the vite group across 1 directory [#11214](https://github.com/fabricjs/fabric.js/pull/11214)
 - chore(deps-dev): bump the vitest group with 4 updates [#11215](https://github.com/fabricjs/fabric.js/pull/11215)
 - chore(deps): bump markdown-it from 14.3.1 to 14.3.3 [#11198](https://github.com/fabricjs/fabric.js/pull/11198)
 - chore(deps): bump the astro group across 1 directory with 5 updates [#11202](https://github.com/fabricjs/fabric.js/pull/11202)
