@@ -34,10 +34,21 @@ test.describe('VISUAL RENDERING TESTS', () => {
         await test.step(`browser - ${testCase.title}`, async () => {
           // enable and disable this inside the loop
           config.config.updateSnapshots = 'missing';
-          const output = await page.evaluate(
-            (testTitle) => renderingTestMap.get(testTitle)!(),
-            testCase.title,
-          );
+          let output: void | string;
+          try {
+            output = await page.evaluate(
+              (testTitle) => renderingTestMap.get(testTitle)!(),
+              testCase.title,
+            );
+          } finally {
+            if (testCase.assertRendering) {
+              await config.attach('browser-rendering', {
+                body: await canvasUtil.screenshot(),
+                contentType: 'image/png',
+              });
+            }
+          }
+          if (testCase.assertRendering) return;
           if (output) {
             expect(
               dataURLOutputToBuffer(output),
@@ -69,6 +80,15 @@ test.describe('VISUAL RENDERING TESTS', () => {
           });
           try {
             const output = await testCase.renderFunction(canvas, fabric);
+            if (testCase.assertRendering) {
+              canvas.renderAll();
+              await config.attach(`${isSkia ? 'skia' : 'node'}-rendering`, {
+                body: canvas.getNodeCanvas().toBuffer('image/png'),
+                contentType: 'image/png',
+              });
+              await testCase.assertRendering(canvas, fabric);
+              return;
+            }
             if (output) {
               expect(
                 dataURLOutputToBuffer(output),

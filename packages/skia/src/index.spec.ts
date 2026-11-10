@@ -315,5 +315,46 @@ describe('Skia entrypoint integration', () => {
     expect(family.styles).not.toContainEqual(
       expect.objectContaining({ weight: 700, style: 'italic' }),
     );
+
+    compat.registerFont(resolve(fixtures, 'Ubuntu-Bold.ttf'), {
+      family: 'SkiaBoldOnly',
+      weight: 'normal',
+      style: 'normal',
+    });
+    const boldOnly = napi.GlobalFonts.families.find(
+      (entry: { family: string }) => entry.family === 'SkiaBoldOnly',
+    );
+    expect(boldOnly.styles).toEqual([
+      expect.objectContaining({ weight: 700, style: 'normal' }),
+    ]);
+    const value = canvas();
+    value.setDimensions({ width: 240, height: 70 });
+    const outputs = ['normal', 'bold'].map((fontWeight) => {
+      const text = new FabricText('Fabric Skia', {
+        fontFamily: 'SkiaBoldOnly',
+        fontWeight,
+        fontSize: 40,
+      });
+      value.clear();
+      value.add(text);
+      value.renderAll();
+      return {
+        width: text.width,
+        pixels: Buffer.from(
+          value.getContext().getImageData(0, 0, 240, 70).data,
+        ),
+      };
+    });
+    // With no regular face registered, Skia selects the available bold face
+    // for both requests; the family alias does not rewrite font metadata.
+    expect(outputs[0].width).toBe(outputs[1].width);
+    expect(outputs[0].pixels).toEqual(outputs[1].pixels);
+    expect(outputs[0].width).not.toBe(
+      new FabricText('Fabric Skia', {
+        fontFamily: 'SkiaMetadata',
+        fontWeight: 'normal',
+        fontSize: 40,
+      }).width,
+    );
   });
 });

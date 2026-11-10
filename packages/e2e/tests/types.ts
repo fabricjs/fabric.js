@@ -13,6 +13,11 @@ export type renderTestType = {
   golden: string;
   only?: boolean;
   disabled?: 'node' | 'browser' | boolean;
+  /** Assert a rendering invariant instead of comparing a cross-renderer golden. */
+  assertRendering?: (
+    canvas: Canvas,
+    fabric: FabricNamespace,
+  ) => void | Promise<void>;
   renderFunction: (
     canvas: Canvas,
     fabric: FabricNamespace,

@@ -85,7 +85,9 @@ matching napi instance. Font registration does not automatically clear Fabric's
 text caches.
 
 Weight and style come from the font file's metadata. Register each needed
-face; naming a bold file as a family does not make it a regular face. The
+face; naming a bold file as a family does not make it a regular face. If only
+a bold face is available, normal-weight requests can select that face: the
+Ubuntu-Bold-only test verifies identical normal/bold pixels and metrics. The
 `registerFont()` helper in `@napi-rs/canvas/node-canvas.js` accepts node-canvas's
 options, but likewise derives weight/style from the file. If fonts change
 after text has been measured, clear Fabric's font cache and remeasure existing
@@ -97,8 +99,8 @@ napi 1.1.0 defaults to portable FreeType text rendering. To opt into its
 platform-specific renderer, call `setTextRenderer('system')` from
 `@fabricjs/skia` before creating canvases or measuring text. That setting affects
 the whole process, including worker threads. Use separate processes, not workers,
-to compare portable and system text rendering. Register deterministic font files when comparing output across
-machines; system fonts and fallback can differ.
+to compare portable and system text rendering. Register deterministic font files
+when comparing output across machines; system fonts and fallback can differ.
 
 ## Development
 
@@ -107,7 +109,14 @@ Skia unit project. Existing Node/browser projects remain separate. Use
 `pnpm run build` and `pnpm run smoke:packages` to validate published artifacts,
 including a clean Skia-only installation without node-canvas.
 
-`pnpm run test:e2e:skia` compares the Skia renderer against the existing browser
-visual goldens. Browser-only cases are skipped and this mode never creates or
-updates snapshots. Inspect rendering differences instead of replacing browser
-baselines with Skia output.
+`pnpm run test:e2e:skia` runs the shared rendering cases with Skia; the existing
+`pnpm run test:e2e` keeps the browser and node-canvas coverage. CI runs both
+commands in separate jobs. Browser-only cases are skipped in the Skia job, and
+this mode never creates or updates snapshots.
+
+Most cases compare against the existing browser goldens. The decorated-text
+shadow regression instead compares cached/uncached RGBA within each renderer,
+checks that foreground and shadow pixels exist, and attaches the rendered PNG.
+This tests the caching invariant without depending on system-font metrics across
+renderers. It does not assert a particular font outline. Other golden comparisons
+and tolerances are unchanged.

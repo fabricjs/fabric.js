@@ -8,6 +8,7 @@ import { FabricText } from './Text';
 import { describe, expect, it, afterEach, vi } from 'vitest';
 import {
   FabricObject,
+  StaticCanvas,
   getEnv,
   getFabricDocument,
   IText,
@@ -70,14 +71,69 @@ describe('FabricText', () => {
 
     it.each(['underline', 'overline', 'linethrough'] as const)(
       'needs its own cache with %s and a shadow',
-      (decoration) => {
-        const text = new FabricText('Shadow', {
+      async (decoration) => {
+        const options = {
+          left: 190,
+          top: 10,
+          originX: 'left' as const,
+          originY: 'top' as const,
+          fontSize: 60,
           objectCaching: false,
           [decoration]: true,
           shadow: shadow(),
-        });
+        };
+        const text = new FabricText('Agyp', options);
         expect(text.needsItsOwnCache()).toBe(true);
         expect(text.shouldCache()).toBe(true);
+        const canvas = new StaticCanvas(undefined, {
+          width: 340,
+          height: 90,
+          enableRetinaScaling: false,
+          renderOnAddRemove: false,
+          backgroundColor: 'white',
+        });
+        try {
+          canvas.add(
+            new FabricText('Agyp', {
+              ...options,
+              left: 20,
+              objectCaching: true,
+            }),
+            text,
+          );
+          canvas.renderAll();
+          const context = canvas.getContext();
+          const cached = context.getImageData(0, 0, 170, 90).data;
+          const uncached = context.getImageData(170, 0, 170, 90).data;
+          expect(
+            cached.findIndex((value, index) => value !== uncached[index]),
+            'cached and uncached RGBA must match',
+          ).toBe(-1);
+          expect(
+            cached.some(
+              (_, index) =>
+                index % 4 === 0 &&
+                cached[index] < 20 &&
+                cached[index + 1] < 20 &&
+                cached[index + 2] < 20 &&
+                cached[index + 3] === 255,
+            ),
+            'black glyphs must be present',
+          ).toBe(true);
+          expect(
+            cached.some(
+              (_, index) =>
+                index % 4 === 0 &&
+                cached[index] > 235 &&
+                cached[index + 1] < 20 &&
+                cached[index + 2] < 20 &&
+                cached[index + 3] === 255,
+            ),
+            'red shadow must be present',
+          ).toBe(true);
+        } finally {
+          await canvas.dispose();
+        }
       },
     );
 
