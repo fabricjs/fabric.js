@@ -242,8 +242,8 @@ export class Gradient<
         '">\n',
       );
     } else if (this.type === 'radial') {
-      const { x1, y1, x2, y2, r1, r2 } = this
-        .coords as GradientCoords<'radial'>;
+      const { x1, y1, x2, y2, r1, r2 } =
+        this.coords as GradientCoords<'radial'>;
       const sx1 = sanitizeCoord(x1);
       const sy1 = sanitizeCoord(y1);
       const sx2 = sanitizeCoord(x2);
