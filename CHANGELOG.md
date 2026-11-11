@@ -2,6 +2,7 @@
 
 ## [next]
 
+- feat(): add @napi-rs/canvas backend [#10854](https://github.com/fabricjs/fabric.js/pull/10854)
 - feat(): add optional Skia backend [#10854](https://github.com/fabricjs/fabric.js/pull/10854)
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11212](https://github.com/fabricjs/fabric.js/pull/11212)
 - chore(deps-dev): bump vite from 8.3.5 to 8.3.6 in the vite group across 1 directory [#11214](https://github.com/fabricjs/fabric.js/pull/11214)
