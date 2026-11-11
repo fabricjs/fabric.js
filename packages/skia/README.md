@@ -118,5 +118,7 @@ Most cases compare against the existing browser goldens. The decorated-text
 shadow regression instead compares cached/uncached RGBA within each renderer,
 checks that foreground and shadow pixels exist, and attaches the rendered PNG.
 This tests the caching invariant without depending on system-font metrics across
-renderers. It does not assert a particular font outline. Other golden comparisons
-and tolerances are unchanged.
+renderers. It does not assert a particular font outline. The SVG decoration-thickness
+fixture registers the repository's Ubuntu font under its own family alias in all
+three backends and shares one browser-generated golden, avoiding system-font
+rasterization differences. Other goldens and all comparison tolerances are unchanged.

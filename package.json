@@ -82,9 +82,9 @@
     "@playwright/test": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/node": "catalog:",
-    "@vitest/browser-playwright": "5.0.5",
-    "@vitest/coverage-v8": "5.0.5",
-    "@vitest/ui": "5.0.5",
+    "@vitest/browser-playwright": "5.1.0",
+    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/ui": "5.1.0",
     "commander": "15.0.0",
     "es-toolkit": "1.52.0",
     "fast-check": "4.10.2",
@@ -96,7 +96,7 @@
     "rolldown": "1.2.9",
     "typedoc": "catalog:",
     "typescript": "catalog:",
-    "vitest": "5.0.5",
+    "vitest": "5.1.0",
     "westures": "catalog:"
   },
   "dependencies": {

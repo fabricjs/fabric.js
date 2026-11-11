@@ -133,6 +133,7 @@
     "index.ts",
     "index.node.ts",
     "index.skia.ts",
+    "packages/skia/src/jsdom.d.ts",
     "extensions"
   ]
 }

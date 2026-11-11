@@ -1,5 +1,27 @@
 import type { renderTestType } from '../../../types';
 
+// Keep this SVG's font independent of system fallbacks and other text cases.
+async function loadUnderlineFixtureFont() {
+  const family = 'FabricUnderlineFixture';
+  const source = globalThis.getFixtureName('Ubuntu-Regular.ttf');
+  if (typeof window === 'undefined') {
+    const file = require('node:url').fileURLToPath(source);
+    if (process.env.FABRIC_TEST_BACKEND === 'skia') {
+      if (
+        !require('@fabricjs/skia').GlobalFonts.registerFromPath(file, family)
+      ) {
+        throw new Error(`Unable to register fixture font: ${file}`);
+      }
+    } else {
+      require('canvas').registerFont(file, { family });
+    }
+  } else {
+    const font = new FontFace(family, `url("${source}")`);
+    document.fonts.add(await font.load());
+    await document.fonts.load(`40px ${family}`);
+  }
+}
+
 /**
  * Tests for SVG import functionality
  * These tests load SVG files and compare their rendering to golden images
@@ -17,6 +39,9 @@ const createTestFromSVG = (svgName: string): renderTestType => {
     snapshotSuffix: 'svg-import',
     size: [100, 100],
     async renderFunction(canvas, fabric) {
+      if (svgName === 'svg_text_underline_thick') {
+        await loadUnderlineFixtureFont();
+      }
       const asset = await globalThis.getAsset(`${svgName}.svg`);
       const { objects, options } = await fabric.loadSVGFromString(asset);
       const nonNullObj = objects.filter((obj) => !!obj);
