@@ -9,6 +9,7 @@
       "@fabricjs/data-updaters": ["../data-updaters/dist/index"],
       "@fabricjs/gradient-controls": ["../gradient-controls/dist/index"],
       "@fabricjs/node": ["../node/dist/index"],
+      "@fabricjs/skia": ["../skia/dist/index"],
       "fabric": ["../../dist/index"],
       "fabric/node": ["../../dist/index.node"]
     }

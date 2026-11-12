@@ -100,9 +100,32 @@ jobs:
           install-system-deps: false
       - name: Run Vitest unit test
         run: pnpm run test:vitest
-  e2e:
-    name: Playwright tests
+  vitest-skia:
+    name: Vitest Skia Node ${{ matrix.node }}
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.22.2', '24.15.0', '26.x']
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: ./.github/actions/cached-install
+        with:
+          node-version: ${{ matrix.node }}
+          install-system-deps: false
+      - name: Run Skia adapter and shared unit tests
+        run: pnpm run test:vitest:skia
+  e2e:
+    name: Playwright tests ${{ matrix.backend }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - backend: node
+            script: test:e2e
+          - backend: skia
+            script: test:e2e:skia
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - uses: ./.github/actions/cached-install
@@ -113,11 +136,11 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Run Playwright tests
-        run: xvfb-run pnpm run test:e2e
+        run: xvfb-run pnpm run ${{ matrix.script }}
       - name: Upload Test Output
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: failure()
         with:
-          name: e2e-report
+          name: e2e-report-${{ matrix.backend }}
           path: ./packages/e2e/test-report/
           include-hidden-files: true

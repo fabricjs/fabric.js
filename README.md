@@ -135,6 +135,47 @@ This means that you may encounter `node-canvas` limitations and [bugs][node_canv
 
 Follow these [instructions][node_canvas_install] to get `node-canvas` up and running.
 
+#### Optional Skia backend
+
+`@fabricjs/skia` is an opt-in Node.js backend using `@napi-rs/canvas` and
+jsdom 31. It does not require `node-canvas`. Install it directly when you
+only need Skia:
+
+```sh
+npm install @fabricjs/skia
+```
+
+```js
+import { StaticCanvas, Rect } from '@fabricjs/skia';
+// CommonJS is also supported:
+// const { StaticCanvas, Rect } = require('@fabricjs/skia');
+const canvas = new StaticCanvas(undefined, { width: 100, height: 100 });
+canvas.add(new Rect({ width: 50, height: 50, fill: 'red' }));
+const png = canvas.toDataURL();
+await canvas.dispose();
+```
+
+The `fabric/skia` compatibility entrypoint forwards to this package in both
+ESM and CommonJS. Skia is an optional peer dependency and is never installed
+by `fabric` automatically. To use the facade, install both packages at matching
+versions:
+
+```sh
+npm install fabric @fabricjs/skia
+```
+
+Skia requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`. The existing browser,
+`fabric/node`, and `@fabricjs/node` entrypoints retain their Node 20 minimum
+and the existing node-canvas backend. Browser and core packages do not depend
+on either server rendering backend.
+
+Choose one environment entrypoint per runtime. Skia shares `@fabricjs/core`;
+its CommonJS entrypoint forwards to the same ESM runtime, so `import`, `require`,
+and `fabric/skia` share class identities and environment state.
+Skia and node-canvas can produce different pixels and font metrics. See the
+[Skia package documentation](packages/skia/README.md) for supported APIs and
+backend differences.
+
 ## Quick Start
 
 ```js

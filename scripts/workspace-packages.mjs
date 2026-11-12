@@ -39,6 +39,19 @@ export const workspacePackages = [
     typeStage: 'package',
   },
   {
+    directory: 'skia',
+    importName: '@fabricjs/skia',
+    bundle: {
+      external: [
+        '@fabricjs/core',
+        /^jsdom-skia(?:\/|$)/,
+        /^@napi-rs\/canvas(?:\/|$)/,
+      ],
+      commonjsFacade: true,
+    },
+    typeStage: 'package',
+  },
+  {
     directory: 'gradient-controls',
     importName: '@fabricjs/gradient-controls',
     bundle: {

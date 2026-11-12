@@ -5,6 +5,7 @@
     "paths": {
       "fabric": ["./index"],
       "fabric/node": ["./index.node"],
+      "fabric/skia": ["./index.skia"],
       "fabric/extensions": ["./extensions/index"],
       "@fabricjs/core": ["./packages/core/src/index"],
       "@fabricjs/aligning-guidelines": [
@@ -15,6 +16,7 @@
       "@fabricjs/data-updaters": ["./packages/data-updaters/src/index"],
       "@fabricjs/gradient-controls": ["./packages/gradient-controls/src/index"],
       "@fabricjs/node": ["./packages/node/src/index"],
+      "@fabricjs/skia": ["./packages/skia/src/index"],
       "@fabricjs/westures-integration": [
         "./packages/westures-integration/src/index"
       ]

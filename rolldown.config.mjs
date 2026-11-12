@@ -40,6 +40,22 @@ function workspacePackageBuildConfig({ directory, bundle }) {
   return {
     input: [`./packages/${directory}/src/index.ts`],
     external: bundle.external,
+    plugins: bundle.commonjsFacade
+      ? [
+          {
+            name: 'commonjs-esm-facade',
+            generateBundle() {
+              // Skia requires a Node version supporting synchronous require(ESM).
+              // Forward to one runtime so mixed imports share classes and state.
+              this.emitFile({
+                type: 'asset',
+                fileName: 'index.cjs',
+                source: "module.exports = require('./index.mjs');\n",
+              });
+            },
+          },
+        ]
+      : [],
     tsconfig: './tsconfig.packages.json',
     ...(bundle.transform ? { transform } : {}),
     output: [
@@ -155,6 +171,20 @@ export default [
     ],
     onwarn,
     external: ['jsdom', 'jsdom/lib/jsdom/living/generated/utils.js', 'canvas'],
+  },
+  {
+    input: ['./index.skia.ts'],
+    external: ['@fabricjs/skia'],
+    tsconfig: './tsconfig.build.json',
+    output: ['es', 'cjs'].map((format) => ({
+      file: path.resolve(
+        dirname,
+        `${basename}.skia.${format === 'es' ? 'mjs' : 'cjs'}`,
+      ),
+      format,
+      sourcemap: true,
+    })),
+    onwarn,
   },
   // WORKSPACE PACKAGES
   ...buildableWorkspacePackages.map(workspacePackageBuildConfig),

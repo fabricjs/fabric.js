@@ -5,7 +5,12 @@
     "noEmitOnError": false,
     "allowJs": false
   },
-  "include": ["index.ts", "index.node.ts"],
+  "include": [
+    "index.ts",
+    "index.node.ts",
+    "index.skia.ts",
+    "packages/skia/src/jsdom.d.ts"
+  ],
   "exclude": [
     "dist",
     "dist-extensions",

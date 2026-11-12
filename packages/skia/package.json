@@ -1,0 +1,43 @@
+{
+  "name": "@fabricjs/skia",
+  "description": "Optional Skia-backed Node.js entrypoint for Fabric.js.",
+  "version": "7.5.0-beta.1",
+  "homepage": "http://fabricjs.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabricjs/fabric.js.git",
+    "directory": "packages/skia"
+  },
+  "bugs": {
+    "url": "https://github.com/fabricjs/fabric.js/issues"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": true,
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@fabricjs/core": "workspace:^",
+    "@napi-rs/canvas": "1.1.0",
+    "jsdom-skia": "npm:jsdom@31.0.0"
+  },
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+  },
+  "main": "./dist/index.cjs"
+}

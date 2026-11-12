@@ -74,7 +74,9 @@
     "prettier:check": "oxfmt --check .",
     "prettier:write": "oxfmt .",
     "web-dev": "pnpm run build && node ./scripts/index.mjs build -f -w & pnpm --dir packages/website run dev; kill $!",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:vitest:skia": "vitest --run --project unit-skia",
+    "test:e2e:skia": "pnpm run build && pnpm run playwright:typecheck && FABRIC_TEST_BACKEND=skia pnpm --dir packages/e2e test tests/visual-output/rendering"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
@@ -122,6 +124,9 @@
       ],
       "node": [
         "dist/index.node.d.ts"
+      ],
+      "skia": [
+        "dist/index.skia.d.ts"
       ]
     }
   },
@@ -133,7 +138,9 @@
     "./dist/fabric.mjs",
     "./dist/fabric.min.mjs",
     "./dist/index.node.mjs",
-    "./dist/index.node.cjs"
+    "./dist/index.node.cjs",
+    "./dist/index.skia.mjs",
+    "./dist/index.skia.cjs"
   ],
   "exports": {
     ".": {
@@ -161,9 +168,23 @@
       "import": "./dist-extensions/index.mjs",
       "require": null,
       "default": "./dist-extensions/fabric-extensions.min.js"
+    },
+    "./skia": {
+      "types": "./dist/index.skia.d.ts",
+      "import": "./dist/index.skia.mjs",
+      "require": "./dist/index.skia.cjs",
+      "default": "./dist/index.skia.mjs"
     }
   },
   "optionalDependencies": {
     "@fabricjs/node": "workspace:^"
+  },
+  "peerDependencies": {
+    "@fabricjs/skia": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@fabricjs/skia": {
+      "optional": true
+    }
   }
 }

@@ -1,7 +1,10 @@
 import { expect, test } from '../../../fixtures/base';
-import { TestingCanvas } from '../../../utils/createNodeSnapshot';
+import {
+  TestingCanvas,
+  fabric,
+  isSkia,
+} from '../../../utils/createNodeSnapshot';
 import { renderTests } from './renderingCases';
-import * as fabric from '@fabricjs/node';
 
 function dataURLOutputToBuffer(dataURL: string) {
   const base64Data = dataURL.replace(/^data:image\/png;base64,/, '');
@@ -18,19 +21,34 @@ test.describe('VISUAL RENDERING TESTS', () => {
     }
 
     test(testCase.title, async ({ page, canvasUtil }, config) => {
+      test.skip(
+        isSkia && testCase.disabled === 'node',
+        'This existing rendering case is browser-only',
+      );
       const goldenName = testCase.golden || `${testCase.title}.png`;
       const snapshotName = testCase.snapshotSuffix
         ? [testCase.snapshotSuffix, goldenName]
         : goldenName;
 
-      if (testCase.disabled !== 'browser') {
+      if (!isSkia && testCase.disabled !== 'browser') {
         await test.step(`browser - ${testCase.title}`, async () => {
           // enable and disable this inside the loop
           config.config.updateSnapshots = 'missing';
-          const output = await page.evaluate(
-            (testTitle) => renderingTestMap.get(testTitle)!(),
-            testCase.title,
-          );
+          let output: void | string;
+          try {
+            output = await page.evaluate(
+              (testTitle) => renderingTestMap.get(testTitle)!(),
+              testCase.title,
+            );
+          } finally {
+            if (testCase.assertRendering) {
+              await config.attach('browser-rendering', {
+                body: await canvasUtil.screenshot(),
+                contentType: 'image/png',
+              });
+            }
+          }
+          if (testCase.assertRendering) return;
           if (output) {
             expect(
               dataURLOutputToBuffer(output),
@@ -51,7 +69,7 @@ test.describe('VISUAL RENDERING TESTS', () => {
         });
       }
       if (testCase.disabled !== 'node') {
-        await test.step(`node - ${testCase.title}`, async () => {
+        await test.step(`${isSkia ? 'skia' : 'node'} - ${testCase.title}`, async () => {
           // we want the browser snapshot of a test to be committed and not the node snapshot
           config.config.updateSnapshots = 'none';
           const canvas = new TestingCanvas(undefined, {
@@ -60,25 +78,38 @@ test.describe('VISUAL RENDERING TESTS', () => {
             width: testCase.size[0],
             height: testCase.size[1],
           });
-          const output = await testCase.renderFunction(canvas, fabric);
-          if (output) {
-            expect(
-              dataURLOutputToBuffer(output),
-              `node snapshot should match browser snapshot`,
-            ).toMatchSnapshot({
-              name: snapshotName,
-              maxDiffPixelRatio: testCase.percentage,
-            });
-          } else {
-            canvas.renderAll();
-            const buffer = canvas.getNodeCanvas().toBuffer();
-            expect(
-              buffer,
-              `node snapshot should match browser snapshot`,
-            ).toMatchSnapshot({
-              name: snapshotName,
-              maxDiffPixelRatio: testCase.percentage,
-            });
+          try {
+            const output = await testCase.renderFunction(canvas, fabric);
+            if (testCase.assertRendering) {
+              canvas.renderAll();
+              await config.attach(`${isSkia ? 'skia' : 'node'}-rendering`, {
+                body: canvas.getNodeCanvas().toBuffer('image/png'),
+                contentType: 'image/png',
+              });
+              await testCase.assertRendering(canvas, fabric);
+              return;
+            }
+            if (output) {
+              expect(
+                dataURLOutputToBuffer(output),
+                `${isSkia ? 'skia' : 'node'} snapshot should match browser snapshot`,
+              ).toMatchSnapshot({
+                name: snapshotName,
+                maxDiffPixelRatio: testCase.percentage,
+              });
+            } else {
+              canvas.renderAll();
+              const buffer = canvas.getNodeCanvas().toBuffer('image/png');
+              expect(
+                buffer,
+                `${isSkia ? 'skia' : 'node'} snapshot should match browser snapshot`,
+              ).toMatchSnapshot({
+                name: snapshotName,
+                maxDiffPixelRatio: testCase.percentage,
+              });
+            }
+          } finally {
+            await canvas.dispose();
           }
         });
       }

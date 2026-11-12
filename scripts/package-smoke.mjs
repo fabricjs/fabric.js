@@ -61,17 +61,7 @@ function pack({ dir }) {
   const pkg = packageJson(dir);
   const tarball = path.join(packDir, tarballName(pkg));
   log(`Packing ${pkg.name}@${pkg.version}`);
-  if (dir === wd) {
-    runQuiet(
-      'npm',
-      ['pack', '--ignore-scripts', '--pack-destination', packDir],
-      {
-        cwd: dir,
-      },
-    );
-  } else {
-    runQuiet('pnpm', ['--dir', dir, 'pack', '--pack-destination', packDir]);
-  }
+  runQuiet('pnpm', ['--dir', dir, 'pack', '--pack-destination', packDir]);
   if (!fs.existsSync(tarball)) {
     throw new Error(`Expected tarball was not created: ${tarball}`);
   }
@@ -128,6 +118,9 @@ function verifyRootTarball(list) {
   expectIncludes(list, 'package/dist/index.min.mjs', 'fabric');
   expectIncludes(list, 'package/dist/index.min.js', 'fabric');
   expectIncludes(list, 'package/dist/index.node.mjs', 'fabric');
+  for (const extension of ['mjs', 'cjs', 'd.ts']) {
+    expectIncludes(list, `package/dist/index.skia.${extension}`, 'fabric');
+  }
   expectIncludes(list, 'package/dist-extensions/index.mjs', 'fabric');
   expectIncludes(
     list,
@@ -150,6 +143,7 @@ function verifyRootTarball(list) {
     'package/fabric.ts',
     'package/index.ts',
     'package/index.node.ts',
+    'package/index.skia.ts',
   ]) {
     if (list.includes(file)) {
       throw new Error(`fabric tarball should not include ${file}`);
@@ -210,6 +204,16 @@ function verifyRootPackageManifest(pkg) {
     expectDependency(pkg, dependency, 'fabric');
   }
   expectOptionalDependency(pkg, '@fabricjs/node', 'fabric');
+  if (
+    !pkg.peerDependencies?.['@fabricjs/skia'] ||
+    pkg.peerDependenciesMeta?.['@fabricjs/skia']?.optional !== true ||
+    pkg.optionalDependencies?.['@fabricjs/skia'] ||
+    pkg.dependencies?.['@fabricjs/skia']
+  ) {
+    throw new Error(
+      'fabric should declare Skia only as an optional peer dependency',
+    );
+  }
   log('Root fabric package manifest looks correct');
 }
 
@@ -217,6 +221,8 @@ function verifyCorePackageManifest(pkg) {
   log('Checking @fabricjs/core package manifest');
   expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/core');
   expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/core');
+  expectNoDeclaredRuntimeDependency(pkg, '@napi-rs/canvas', '@fabricjs/core');
+  expectNoDeclaredRuntimeDependency(pkg, 'jsdom-skia', '@fabricjs/core');
   log('@fabricjs/core package manifest looks correct');
 }
 
@@ -224,6 +230,12 @@ function verifyBrowserPackageManifest(pkg) {
   log('Checking @fabricjs/browser package manifest');
   expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/browser');
   expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/browser');
+  expectNoDeclaredRuntimeDependency(
+    pkg,
+    '@napi-rs/canvas',
+    '@fabricjs/browser',
+  );
+  expectNoDeclaredRuntimeDependency(pkg, 'jsdom-skia', '@fabricjs/browser');
   log('@fabricjs/browser package manifest looks correct');
 }
 
@@ -232,6 +244,25 @@ function verifyNodePackageManifest(pkg) {
   expectDependency(pkg, 'canvas', '@fabricjs/node');
   expectDependency(pkg, 'jsdom', '@fabricjs/node');
   log('@fabricjs/node package manifest looks correct');
+}
+
+function verifySkiaPackageManifest(pkg) {
+  for (const dependency of [
+    '@fabricjs/core',
+    '@napi-rs/canvas',
+    'jsdom-skia',
+  ]) {
+    expectDependency(pkg, dependency, '@fabricjs/skia');
+  }
+  expectNoDeclaredRuntimeDependency(pkg, 'canvas', '@fabricjs/skia');
+  expectNoDeclaredRuntimeDependency(pkg, 'jsdom', '@fabricjs/skia');
+  if (
+    pkg.dependencies['@napi-rs/canvas'] !== '1.1.0' ||
+    pkg.dependencies['jsdom-skia'] !== 'npm:jsdom@31.0.0' ||
+    pkg.engines.node !== '^22.22.2 || ^24.15.0 || >=26.0.0'
+  ) {
+    throw new Error('@fabricjs/skia runtime versions changed unexpectedly');
+  }
 }
 
 function verifyWorkspaceTarball(importName, list) {
@@ -243,6 +274,9 @@ function verifyWorkspaceTarball(importName, list) {
   if (importName === '@fabricjs/browser') {
     expectIncludes(list, 'package/dist/index.js', importName);
     expectIncludes(list, 'package/dist/index.min.js', importName);
+  }
+  if (importName === '@fabricjs/skia') {
+    expectIncludes(list, 'package/dist/index.cjs', importName);
   }
   expectExcludesPrefix(list, 'package/src/', importName);
   expectExcludesPrefix(list, 'package/test/', importName);
@@ -376,6 +410,190 @@ function linkWorkspacePackages(project, packed) {
   }
 }
 
+function smokePackedSkia(packed) {
+  // A real isolated pnpm install catches undeclared dependencies hidden by
+  // workspace aliases or a flat node_modules directory. Only Skia and core
+  // are installed: node-canvas must not be available to jsdom by accident.
+  const project = createSmokeProject('packed-skia-project');
+  fs.writeFileSync(
+    path.join(project.projectDir, 'package.json'),
+    JSON.stringify({
+      private: true,
+      dependencies: {
+        '@fabricjs/skia': `file:${packed.get('@fabricjs/skia').tarball}`,
+      },
+    }),
+  );
+  fs.writeFileSync(
+    path.join(project.projectDir, 'pnpm-workspace.yaml'),
+    [
+      'nodeLinker: isolated',
+      'hoist: false',
+      'autoInstallPeers: false',
+      'overrides:',
+      `  '@fabricjs/core': ${JSON.stringify(`file:${packed.get('@fabricjs/core').tarball}`)}`,
+      '',
+    ].join('\n'),
+  );
+  run('pnpm', ['install', '--ignore-scripts'], { cwd: project.projectDir });
+  expectPackageAbsent(project, 'canvas');
+  expectPackageAbsent(project, '@fabricjs/node');
+  expectPackageAbsent(project, 'jsdom');
+  smokeRequire(
+    project,
+    'Skia dependency isolation',
+    `
+    const { createRequire } = require('node:module');
+    const skiaRequire = createRequire(require.resolve('@fabricjs/skia'));
+    const jsdomRequire = createRequire(skiaRequire.resolve('jsdom-skia'));
+    try { jsdomRequire.resolve('canvas'); }
+    catch (error) { if (error.code === 'MODULE_NOT_FOUND') process.exit(0); throw error; }
+    throw new Error('Skia must work without node-canvas installed');
+  `,
+  );
+  fs.copyFileSync(
+    path.join(wd, 'test/fixtures/Ubuntu-Regular.ttf'),
+    path.join(project.projectDir, 'Ubuntu-Regular.ttf'),
+  );
+  expectPackageAbsent(project, '@napi-rs/canvas');
+  smokeImport(
+    project,
+    'standalone Skia font registration and rendering',
+    `
+    import { GlobalFonts, setTextRenderer, StaticCanvas, FabricText } from '@fabricjs/skia';
+    setTextRenderer('portable');
+    const key = GlobalFonts.registerFromPath(new URL('./Ubuntu-Regular.ttf', import.meta.url).pathname, 'PackedUbuntu');
+    if (!key || !GlobalFonts.has('PackedUbuntu')) throw new Error('Skia font registration failed');
+    const canvas = new StaticCanvas(undefined, { width: 200, height: 60 });
+    const text = new FabricText('Packed Skia', { fontFamily: 'PackedUbuntu', fontSize: 24, fill: 'red' });
+    canvas.add(text);
+    canvas.renderAll();
+    if (!Number.isFinite(text.width) || text.width <= 0) throw new Error('Skia font measurement failed');
+    const pixels = canvas.getContext().getImageData(0, 0, 200, 60).data;
+    if (!pixels.some((value, index) => index % 4 === 3 && value > 0)) throw new Error('Skia text rendering failed');
+    await canvas.dispose();
+    if (!GlobalFonts.remove(key)) throw new Error('Skia font removal failed');
+  `,
+  );
+  const render = `
+    const canvas = new StaticCanvas(undefined, { width: 8, height: 8 });
+    canvas.add(new Rect({ width: 8, height: 8, fill: 'red', strokeWidth: 0 }));
+    canvas.renderAll();
+    const pixel = canvas.getContext().getImageData(2, 2, 1, 1).data;
+    if (pixel[0] !== 255 || pixel[3] !== 255) throw new Error('Skia rendering failed');
+    if (!canvas.toDataURL().startsWith('data:image/png;base64,')) throw new Error('Skia PNG export failed');
+    canvas.dispose();
+  `;
+  // Both facades resolve runtime dependencies inside @fabricjs/skia, not
+  // from the consuming application or the root fabric package.
+  for (const name of ['@fabricjs/skia', 'fabric/skia']) {
+    if (name === 'fabric/skia')
+      linkPackage(project, 'fabric', packed.get('fabric').tarball);
+    smokeImport(
+      project,
+      name,
+      `import { StaticCanvas, Rect } from '${name}'; ${render}`,
+    );
+    smokeRequire(
+      project,
+      name,
+      `const { StaticCanvas, Rect } = require('${name}'); ${render}`,
+    );
+  }
+  smokeImport(
+    project,
+    'Skia ESM facade identity',
+    `
+    import { Rect as Direct } from '@fabricjs/skia';
+    import { Rect as Facade } from 'fabric/skia';
+    if (Direct !== Facade) throw new Error('Skia ESM facade identity mismatch');
+  `,
+  );
+  smokeRequire(
+    project,
+    'Skia CommonJS facade identity',
+    `
+    if (require('@fabricjs/skia').Rect !== require('fabric/skia').Rect)
+      throw new Error('Skia CommonJS facade identity mismatch');
+  `,
+  );
+  smokeImport(
+    project,
+    'mixed Skia ESM/CommonJS runtime identity',
+    `
+    import { createRequire } from 'node:module';
+    import * as direct from '@fabricjs/skia';
+    import * as facade from 'fabric/skia';
+    const require = createRequire(import.meta.url);
+    const commonjs = require('@fabricjs/skia');
+    const commonjsFacade = require('fabric/skia');
+    const skiaRequire = createRequire(require.resolve('@fabricjs/skia'));
+    const core = await import(skiaRequire.resolve('@fabricjs/core'));
+    const napi = skiaRequire('@napi-rs/canvas');
+    if (direct.GlobalFonts !== napi.GlobalFonts || direct.setTextRenderer !== napi.setTextRenderer)
+      throw new Error('Skia font API does not use the same native instance');
+    for (const candidate of [facade, commonjs, commonjsFacade]) {
+      for (const key of ['Rect', 'Canvas', 'StaticCanvas', 'classRegistry', 'config', 'cache', 'GlobalFonts', 'setTextRenderer']) {
+        if (candidate[key] !== direct[key]) throw new Error('Mixed Skia identity mismatch: ' + key);
+      }
+      if (candidate.getEnv() !== direct.getEnv()) throw new Error('Mixed Skia environment mismatch');
+    }
+    for (const key of ['Rect', 'classRegistry', 'config', 'cache']) {
+      if (core[key] !== direct[key]) throw new Error('Skia core identity mismatch: ' + key);
+    }
+    class SharedRect extends commonjs.Rect {}
+    commonjs.classRegistry.setClass(SharedRect, 'PackedSkiaIdentityTest');
+    if (direct.classRegistry.getClass('PackedSkiaIdentityTest') !== SharedRect)
+      throw new Error('Skia class registry state is not shared');
+    const canvas = new direct.StaticCanvas(undefined, { width: 8, height: 8 });
+    const rect = new commonjsFacade.Rect({ width: 8, height: 8, fill: 'red', strokeWidth: 0 });
+    if (!(rect instanceof direct.Rect)) throw new Error('Mixed Skia instanceof failed');
+    canvas.add(rect);
+    canvas.renderAll();
+    if (canvas.getContext().getImageData(2, 2, 1, 1).data[0] !== 255)
+      throw new Error('Mixed Skia rendering failed');
+    await canvas.dispose();
+  `,
+  );
+  // Use the installed compiler, but resolve declarations from packed files.
+  const typeSource = `
+    import { StaticCanvas, Rect, GlobalFonts, setTextRenderer } from '@fabricjs/skia';
+    import { StaticCanvas as FacadeCanvas, GlobalFonts as FacadeFonts, setTextRenderer as facadeTextRenderer } from 'fabric/skia';
+    setTextRenderer('portable');
+    facadeTextRenderer('system');
+    const fonts: typeof GlobalFonts = FacadeFonts;
+    const key = fonts.registerFromPath('Ubuntu-Regular.ttf', 'PackedUbuntu');
+    if (key) fonts.remove(key);
+    // @ts-expect-error Only supported text renderer modes are accepted.
+    setTextRenderer('invalid-renderer');
+    const canvas: StaticCanvas = new FacadeCanvas(undefined, { width: 8, height: 8 });
+    canvas.add(new Rect({ width: 2, height: 2 }));
+    canvas.toDataURL();
+    canvas.dispose();
+  `;
+  for (const extension of ['mts', 'cts']) {
+    const file = path.join(project.projectDir, `consumer.${extension}`);
+    fs.writeFileSync(file, typeSource);
+    run(
+      'node',
+      [
+        path.join(wd, 'node_modules/typescript/bin/tsc'),
+        '--noEmit',
+        '--strict',
+        '--skipLibCheck',
+        '--module',
+        'NodeNext',
+        '--moduleResolution',
+        'NodeNext',
+        '--target',
+        'ES2022',
+        file,
+      ],
+      { cwd: project.projectDir },
+    );
+  }
+}
+
 try {
   log(`Using temp directory ${tmp}`);
   const packed = new Map(
@@ -396,6 +614,7 @@ try {
   verifyCorePackageManifest(packedManifests.get('@fabricjs/core'));
   verifyBrowserPackageManifest(packedManifests.get('@fabricjs/browser'));
   verifyNodePackageManifest(packedManifests.get('@fabricjs/node'));
+  verifySkiaPackageManifest(packedManifests.get('@fabricjs/skia'));
   for (const { importName } of publishablePackages) {
     if (importName !== 'fabric') {
       verifyWorkspaceTarball(
@@ -404,6 +623,8 @@ try {
       );
     }
   }
+
+  smokePackedSkia(packed);
 
   const rootProject = createSmokeProject('root-project');
   linkPackage(rootProject, 'fabric', packed.get('fabric').tarball);

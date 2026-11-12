@@ -28,7 +28,12 @@ beforeRenderTest(
             width: renderTest.size[0],
             height: renderTest.size[1],
           });
-          return await renderTest.renderFunction(canvas, fabric);
+          const output = await renderTest.renderFunction(canvas, fabric);
+          if (renderTest.assertRendering) {
+            canvas.renderAll();
+            await renderTest.assertRendering(canvas, fabric);
+          }
+          return output;
         },
         title: renderTest.title,
       };

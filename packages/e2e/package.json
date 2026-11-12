@@ -15,7 +15,8 @@
     "@fabricjs/data-updaters": "workspace:^",
     "@fabricjs/gradient-controls": "workspace:^",
     "@fabricjs/node": "workspace:^",
-    "fabric": "workspace:*"
+    "fabric": "workspace:*",
+    "@fabricjs/skia": "workspace:^"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",

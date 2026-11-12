@@ -3,7 +3,14 @@ import { FabricNamespace, renderTestType } from '../../../types';
 
 function registerUbuntuFonts() {
   if (typeof window === 'undefined') {
-    const { registerFont } = require('canvas');
+    const registerFont =
+      process.env.FABRIC_TEST_BACKEND === 'skia'
+        ? (file: string, options: { family: string }) =>
+            require('@fabricjs/skia').GlobalFonts.registerFromPath(
+              file,
+              options.family,
+            )
+        : require('canvas').registerFont;
     const path = require('node:path');
     const dir = path.resolve(__dirname, '../../../../../../test/fixtures');
     registerFont(path.join(dir, 'Ubuntu-Regular.ttf'), {
@@ -181,6 +188,52 @@ const cases: renderTestType[] = [
     golden: 'textDecorationShadow.png',
     percentage: 0.005,
     size: [340, 270],
+    // Test #5364 within each renderer; system-font outlines are not a shared golden.
+    assertRendering(canvas) {
+      const context = canvas.getContext();
+      for (const [row, decoration] of [
+        'underline',
+        'overline',
+        'linethrough',
+      ].entries()) {
+        const height = row === 2 ? 100 : 85;
+        const cached = context.getImageData(0, row * 85, 170, height).data;
+        const uncached = context.getImageData(170, row * 85, 170, height).data;
+        let black = 0;
+        let red = 0;
+        for (let index = 0; index < cached.length; index += 4) {
+          if (
+            [0, 1, 2, 3].some(
+              (channel) =>
+                cached[index + channel] !== uncached[index + channel],
+            )
+          ) {
+            throw new Error(
+              `${decoration}: cached/uncached RGBA differ at pixel ${index / 4}`,
+            );
+          }
+          if (cached[index + 3] === 255) {
+            if (
+              cached[index] < 20 &&
+              cached[index + 1] < 20 &&
+              cached[index + 2] < 20
+            )
+              black++;
+            if (
+              cached[index] > 235 &&
+              cached[index + 1] < 20 &&
+              cached[index + 2] < 20
+            )
+              red++;
+          }
+        }
+        if (!black || !red) {
+          throw new Error(
+            `${decoration}: expected visible black glyphs and red shadow, got ${black} black and ${red} red pixels`,
+          );
+        }
+      }
+    },
     async renderFunction(canvas, fabric) {
       // #5364: each uncached text (right) must look like its cached twin (left)
       canvas.backgroundColor = 'white';

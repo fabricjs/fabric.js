@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       '@fabricjs/core': resolve(__dirname, './fabric.ts'),
       '@fabricjs/node': resolve(__dirname, './packages/node/src/index.ts'),
+      '@fabricjs/skia': resolve(__dirname, './packages/skia/src/index.ts'),
       fabric: resolve(__dirname, './fabric.ts'),
     },
   },
@@ -42,11 +43,26 @@ export default defineConfig({
             },
           },
           name: 'unit-node',
+          exclude: ['packages/skia/**', '**/node_modules/**'],
         },
       },
       {
         extends: true,
         test: {
+          name: 'unit-skia',
+          environment: './test/environments/skia.ts',
+          environmentOptions: {
+            jsdom: { resources: 'usable', url: fixturesUrl },
+          },
+          setupFiles: ['./vitest.skia.setup.ts'],
+          sequence: { setupFiles: 'list' },
+          exclude: ['packages/node/**', '**/node_modules/**'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          exclude: ['packages/skia/**', '**/node_modules/**'],
           browser: {
             provider: playwright(),
             enabled: true,
@@ -64,6 +80,7 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          exclude: ['packages/skia/**', '**/node_modules/**'],
           browser: {
             provider: playwright({
               contextOptions: {

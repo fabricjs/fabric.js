@@ -30,7 +30,10 @@ const config: PlaywrightTestConfig = {
   retries: 1,
   workers: process.env.CI ? '100%' : undefined,
   /* Do not update snapshot on CI */
-  updateSnapshots: process.env.CI ? 'none' : 'missing',
+  updateSnapshots:
+    process.env.CI || process.env.FABRIC_TEST_BACKEND === 'skia'
+      ? 'none'
+      : 'missing',
   /* Configure snapshot names to be the same across platforms for CI */
   snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
