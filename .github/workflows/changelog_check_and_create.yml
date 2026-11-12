@@ -20,12 +20,11 @@ jobs:
           fetch-depth: 0
       - name: Check CHANGELOG.md
         id: check
-        env:
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
         run: |
-          # The checkout contains both commits; avoid API rate limits and pagination.
-          files=$(git diff --name-only "$PR_BASE_SHA...$PR_HEAD_SHA" --)
+          files=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/fabricjs/fabric.js/pulls/${{github.event.number}}/files \
+            | jq -r '.[].filename')
           echo "Changed files: $files"
           if echo "$files" | grep -q "^CHANGELOG.md$"; then
             echo "OK 'CHANGELOG.md' was modified"
