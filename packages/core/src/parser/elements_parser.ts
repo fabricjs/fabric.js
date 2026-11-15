@@ -75,6 +75,9 @@ export class ElementsParser {
         this.options,
         this.cssRules,
       );
+      if (!obj) {
+        return null;
+      }
       this.resolveGradient(obj, el, FILL);
       this.resolveGradient(obj, el, STROKE);
       if (obj instanceof FabricImage && obj._originalElement) {

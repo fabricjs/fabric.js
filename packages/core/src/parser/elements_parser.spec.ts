@@ -1,5 +1,6 @@
 import { loadSVGFromString } from '../../../../fabric';
 import { Group } from '../shapes/Group';
+import { Gradient } from '../gradient/Gradient';
 import { describe, it, expect } from 'vitest';
 
 function makeSVG(defs: string, body: string, size = 100) {
@@ -133,6 +134,29 @@ describe('ElementsParser', () => {
       expect(objects).toHaveLength(1);
       expect(objects[0]!.clipPath).toBeDefined();
       expect(typeof objects[0]!.clipPath).not.toBe('string');
+    });
+  });
+
+  describe('failed image elements', () => {
+    // Regression test for https://github.com/fabricjs/fabric.js/issues/11160
+    it('should skip an image whose load fails instead of rejecting the whole parse', async () => {
+      const svg = makeSVG(
+        '<linearGradient id="g"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="blue"/></linearGradient>',
+        `<image href="http://localhost:1/linked.png" width="10" height="10"/>
+          <path d="M0 0h40v40H0z" fill="url(#g)"/>`,
+      );
+      // Abort right after parsing starts: the image load rejects, so
+      // FabricImage.fromElement resolves to null, while the other
+      // elements keep parsing.
+      const controller = new AbortController();
+      const parsing = loadSVGFromString(svg, undefined, {
+        signal: controller.signal,
+      });
+      controller.abort();
+      const { objects } = await parsing;
+      expect(objects).toHaveLength(2);
+      expect(objects[0]).toBeNull();
+      expect(objects[1]!.fill).toBeInstanceOf(Gradient);
     });
   });
 });
