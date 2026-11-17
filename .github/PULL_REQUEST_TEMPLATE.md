@@ -6,7 +6,7 @@
 
         Adding tests that verify your fix and safeguard it from unwanted loss and changes is a MUST.
 
-        Pull Requests are not always simple. Don't hesitate to ask for help (beware of [gotchas](http://fabricjs.com/fabric-gotchas) 😓).
+        Pull Requests are not always simple. Don't hesitate to ask for help (beware of [gotchas](https://fabricjs.com/docs/old-docs/gotchas/) 😓).
         We appreciate your effort and would like the process to be productive and enjoyable.
         A strong community means a strong and better product for everyone.
 
