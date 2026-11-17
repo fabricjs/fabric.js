@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump es-toolkit from 1.52.0 to 1.53.2 [#11224](https://github.com/fabricjs/fabric.js/pull/11224)
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11212](https://github.com/fabricjs/fabric.js/pull/11212)
 - chore(deps-dev): bump vite from 8.3.5 to 8.3.6 in the vite group across 1 directory [#11214](https://github.com/fabricjs/fabric.js/pull/11214)
 - chore(deps-dev): bump the vitest group with 4 updates [#11215](https://github.com/fabricjs/fabric.js/pull/11215)
