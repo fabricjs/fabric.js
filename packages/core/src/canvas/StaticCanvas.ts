@@ -1416,14 +1416,17 @@ export class StaticCanvas<
     this.width = scaledWidth;
     this.height = scaledHeight;
     this.skipControlsDrawing = true;
-    this.calcViewportBoundaries();
-    this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
-    this.viewportTransform = vp;
-    this.width = originalWidth;
-    this.height = originalHeight;
-    this.calcViewportBoundaries();
-    this.enableRetinaScaling = originalRetina;
-    this.skipControlsDrawing = originalSkipControlsDrawing;
+    try {
+      this.calcViewportBoundaries();
+      this.renderCanvas(canvasEl.getContext('2d')!, objectsToRender);
+    } finally {
+      this.viewportTransform = vp;
+      this.width = originalWidth;
+      this.height = originalHeight;
+      this.calcViewportBoundaries();
+      this.enableRetinaScaling = originalRetina;
+      this.skipControlsDrawing = originalSkipControlsDrawing;
+    }
     return canvasEl;
   }
 
