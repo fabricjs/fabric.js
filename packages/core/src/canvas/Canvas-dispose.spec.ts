@@ -1,14 +1,16 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, onTestFinished, vi } from 'vitest';
 import { config } from '../config';
 import { Canvas } from './Canvas';
 import {
   ActiveSelection,
   getFabricDocument,
+  getFabricWindow,
   runningAnimations,
   StaticCanvas,
   util,
 } from '../../../../fabric';
-import { createPointerEvent, makeRect } from '../../../../test/utils';
+import { makeRect } from '../../../../test/utils';
+import { isJSDOM } from '../../../../vitest.extend';
 
 describe('Canvas dispose', () => {
   describe.for([
@@ -535,50 +537,77 @@ describe('Canvas dispose', () => {
     }
   });
 
-  describe('disposing from a pointer event handler', () => {
-    it('does not attach document listeners when a `mouse:down` subscriber disposes the canvas', () => {
-      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
-      const addSpy = vi.spyOn(getFabricDocument(), 'addEventListener');
+  // the interactivity api needs a real browser
+  describe.skipIf(isJSDOM())('disposing from a pointer event handler', () => {
+    const createCanvas = () => {
+      const el = getFabricDocument().createElement('canvas');
+      getFabricDocument().body.appendChild(el);
+      onTestFinished(() => el.remove());
+      return new Canvas(el, { width: 200, height: 200 });
+    };
+
+    // a handler that throws on a disposed canvas throws out of the event
+    // dispatch, so it surfaces as an uncaught error and not as a rejection
+    const trackUncaughtErrors = () => {
+      const onError = vi.fn();
+      const fabricWindow = getFabricWindow();
+      fabricWindow.addEventListener('error', onError);
+      onTestFinished(() => fabricWindow.removeEventListener('error', onError));
+      return onError;
+    };
+
+    it('does not read torn down DOM when a `mouse:down` subscriber disposes the canvas', async () => {
+      const { userEvent } = await import('vitest/browser');
+      const canvas = createCanvas();
+      const onError = trackUncaughtErrors();
       canvas.on('mouse:down', () => void canvas.dispose());
 
-      expect(
-        () => canvas._onMouseDown(createPointerEvent({ button: 0 })),
-        'should not throw on torn down DOM',
-      ).not.toThrow();
+      await userEvent.pointer({
+        keys: '[MouseLeft]',
+        target: canvas.upperCanvasEl,
+      });
+
       expect(canvas.destroyed, 'should have destroyed the canvas').toBe(true);
-      expect(
-        addSpy,
-        'should not register document listeners nothing will remove',
-      ).not.toHaveBeenCalled();
+      expect(onError, 'should not have thrown').not.toHaveBeenCalled();
     });
 
-    it('does not read torn down DOM when a `mouse:up` subscriber disposes the canvas', () => {
-      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
-      canvas._onMouseDown(createPointerEvent({ button: 0 }));
+    it('does not read torn down DOM when a `mouse:up` subscriber disposes the canvas', async () => {
+      const { userEvent } = await import('vitest/browser');
+      const canvas = createCanvas();
+      const onError = trackUncaughtErrors();
       canvas.on('mouse:up', () => void canvas.dispose());
 
-      expect(() =>
-        canvas._onMouseUp(createPointerEvent({ button: 0 })),
-      ).not.toThrow();
+      await userEvent.pointer({
+        keys: '[MouseLeft]',
+        target: canvas.upperCanvasEl,
+      });
+
       expect(canvas.destroyed, 'should have destroyed the canvas').toBe(true);
+      expect(onError, 'should not have thrown').not.toHaveBeenCalled();
     });
 
     it('does not read torn down DOM when a `mouse:down` subscriber disposes the canvas on touch start', () => {
-      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      const canvas = createCanvas();
+      const onError = trackUncaughtErrors();
       const touch = new Touch({
-        clientX: 10,
-        clientY: 0,
         identifier: 1,
         target: canvas.upperCanvasEl,
-      });
-      const evt = new TouchEvent('touchstart', {
-        touches: [touch],
-        changedTouches: [touch],
+        clientX: 10,
+        clientY: 10,
       });
       canvas.on('mouse:down', () => void canvas.dispose());
 
-      expect(() => canvas._onTouchStart(evt)).not.toThrow();
+      canvas.upperCanvasEl.dispatchEvent(
+        new TouchEvent('touchstart', {
+          touches: [touch],
+          changedTouches: [touch],
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+
       expect(canvas.destroyed, 'should have destroyed the canvas').toBe(true);
+      expect(onError, 'should not have thrown').not.toHaveBeenCalled();
     });
   });
 });
