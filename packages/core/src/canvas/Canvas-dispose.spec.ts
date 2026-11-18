@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { config } from '../config';
 import { Canvas } from './Canvas';
 import {
@@ -8,7 +8,7 @@ import {
   StaticCanvas,
   util,
 } from '../../../../fabric';
-import { makeRect } from '../../../../test/utils';
+import { createPointerEvent, makeRect } from '../../../../test/utils';
 
 describe('Canvas dispose', () => {
   describe.for([
@@ -533,5 +533,52 @@ describe('Canvas dispose', () => {
         expect(el.height, 'restored height').toBe(200);
       });
     }
+  });
+
+  describe('disposing from a pointer event handler', () => {
+    it('does not attach document listeners when a `mouse:down` subscriber disposes the canvas', () => {
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      const addSpy = vi.spyOn(getFabricDocument(), 'addEventListener');
+      canvas.on('mouse:down', () => void canvas.dispose());
+
+      expect(
+        () => canvas._onMouseDown(createPointerEvent({ button: 0 })),
+        'should not throw on torn down DOM',
+      ).not.toThrow();
+      expect(canvas.destroyed, 'should have destroyed the canvas').toBe(true);
+      expect(
+        addSpy,
+        'should not register document listeners nothing will remove',
+      ).not.toHaveBeenCalled();
+    });
+
+    it('does not read torn down DOM when a `mouse:up` subscriber disposes the canvas', () => {
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      canvas._onMouseDown(createPointerEvent({ button: 0 }));
+      canvas.on('mouse:up', () => void canvas.dispose());
+
+      expect(() =>
+        canvas._onMouseUp(createPointerEvent({ button: 0 })),
+      ).not.toThrow();
+      expect(canvas.destroyed, 'should have destroyed the canvas').toBe(true);
+    });
+
+    it('does not read torn down DOM when a `mouse:down` subscriber disposes the canvas on touch start', () => {
+      const canvas = new Canvas(undefined, { renderOnAddRemove: false });
+      const touch = new Touch({
+        clientX: 10,
+        clientY: 0,
+        identifier: 1,
+        target: canvas.upperCanvasEl,
+      });
+      const evt = new TouchEvent('touchstart', {
+        touches: [touch],
+        changedTouches: [touch],
+      });
+      canvas.on('mouse:down', () => void canvas.dispose());
+
+      expect(() => canvas._onTouchStart(evt)).not.toThrow();
+      expect(canvas.destroyed, 'should have destroyed the canvas').toBe(true);
+    });
   });
 });
