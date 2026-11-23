@@ -84,7 +84,7 @@
     "@vitest/coverage-v8": "5.1.0",
     "@vitest/ui": "5.1.0",
     "commander": "15.0.0",
-    "es-toolkit": "1.52.0",
+    "es-toolkit": "1.53.2",
     "fast-check": "4.10.2",
     "husky": "9.1.7",
     "oxfmt": "0.75.0",
