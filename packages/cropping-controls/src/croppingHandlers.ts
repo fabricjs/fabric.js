@@ -385,9 +385,12 @@ const changeImageSizeWithAutoCoverGenerator =
     const isFlipped = isX ? image.flipX : image.flipY;
     const elementSize = isX ? image._element.width : image._element.height;
     const crossElementSize = isX ? image._element.height : image._element.width;
-    const isNegativeEdge = isX
-      ? transform.originX === 'right'
-      : transform.originY === 'bottom';
+    // `originX`/`originY` are not always the string values they are typed as:
+    // for controls with a custom name the canvas keeps the numeric anchor
+    // returned by `Control#getTransformAnchorPoint()`, which resolveOrigin
+    // also resolves to an offset from the center of the object.
+    const isNegativeEdge =
+      util.resolveOrigin(isX ? transform.originX : transform.originY) > 0;
 
     const initialSize = isX ? transform.width : transform.height;
     const initialCrossSize = isX ? transform.height : transform.width;
