@@ -426,6 +426,25 @@ describe('FabricImage', () => {
     );
   });
 
+  it('shouldCache', async () => {
+    const image = await createImage();
+
+    expect(image.shouldCache(), 'images do not cache by default').toBe(false);
+
+    image.objectCaching = true;
+
+    expect(image.shouldCache(), 'objectCaching true enables the cache').toBe(
+      true,
+    );
+
+    image.objectCaching = false;
+    image.clipPath = new Rect();
+
+    expect(image.shouldCache(), 'clipPath still needs its own cache').toBe(
+      true,
+    );
+  });
+
   it('toSVG', async () => {
     const image = await createImage();
 

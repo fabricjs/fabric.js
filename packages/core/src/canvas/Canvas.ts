@@ -630,6 +630,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
       this.mainTouchId = this.getPointerId(e);
     }
     this.__onMouseDown(e);
+    // a `mouse:down` subscriber may have disposed the canvas, everything below
+    // reads DOM that `dispose` has torn down and registers document listeners
+    // that `removeListeners` can no longer remove
+    if (this.disposed || this.destroyed) {
+      return;
+    }
     const { target } = this.findTarget(e);
     // after executing fabric logic for mouse down let's see
     // if we didn't change target or if we are drawing
@@ -675,6 +681,12 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _onMouseDown(e: TPointerEvent) {
     this._cacheTransformEventData(e);
     this.__onMouseDown(e);
+    // a `mouse:down` subscriber may have disposed the canvas, everything below
+    // reads DOM that `dispose` has torn down and registers document listeners
+    // that `removeListeners` can no longer remove
+    if (this.disposed || this.destroyed) {
+      return;
+    }
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     // switch from moving on the canvas element to moving on the document
@@ -744,6 +756,11 @@ export class Canvas extends SelectableCanvas implements CanvasOptions {
   _onMouseUp(e: TPointerEvent) {
     this._cacheTransformEventData(e);
     this.__onMouseUp(e);
+    // a `mouse:up` subscriber may have disposed the canvas, everything below
+    // reads DOM that `dispose` has torn down
+    if (this.disposed || this.destroyed) {
+      return;
+    }
     const canvasElement = this.upperCanvasEl,
       eventTypePrefix = this._getEventPrefix();
     if (this._isMainEvent(e)) {

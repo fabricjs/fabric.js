@@ -1,6 +1,9 @@
 import type { Transform } from '@fabricjs/core';
 import { FabricImage, Canvas, Control, Point } from '@fabricjs/core';
-import { createImageCroppingControls } from './croppingControls';
+import {
+  createImageCroppingControls,
+  createImageResizeControlsWithScaleToCover,
+} from './croppingControls';
 import {
   changeImageWidth,
   changeImageHeight,
@@ -1229,6 +1232,65 @@ describe('croppingHandlers', () => {
       expect(image.cropY).toBe(initialCropY);
       expect(image.height).toBe(200);
       expect(image.scaleY).toBe(1.4);
+    });
+  });
+
+  describe('changeImageSizeWithAutoCover with generated resize controls', () => {
+    function prepareGeneratedTransform(
+      target: FabricImage,
+      corner: string,
+    ): Transform {
+      const origin = canvas._getOriginFromCorner(target, corner);
+      return {
+        target,
+        corner,
+        originX: origin.x,
+        originY: origin.y,
+        width: target.width,
+        height: target.height,
+        original: {
+          cropX: target.cropX,
+          cropY: target.cropY,
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+        },
+      } as unknown as Transform;
+    }
+
+    beforeEach(() => {
+      image = createMockImage({
+        width: 100,
+        height: 100,
+        cropX: 100,
+        cropY: 100,
+        elementWidth: 300,
+        elementHeight: 300,
+      });
+      image.controls = {
+        ...image.controls,
+        ...createImageResizeControlsWithScaleToCover(),
+      };
+      canvas.add(image);
+    });
+
+    test('expands into cropX space from the left edge with a numeric origin', () => {
+      transform = prepareGeneratedTransform(image, 'mle');
+      // controls with a custom name keep the numeric anchor instead of 'right'
+      expect(transform.originX).toBe(1);
+
+      changeImageWidthWithAutoCover(eventData, transform, -250, 50);
+      expect(image.cropX).toBe(0);
+      expect(image.width).toBe(200); // original 100 + cropX 100
+    });
+
+    test('expands into cropY space from the top edge with a numeric origin', () => {
+      transform = prepareGeneratedTransform(image, 'mte');
+      // controls with a custom name keep the numeric anchor instead of 'bottom'
+      expect(transform.originY).toBe(1);
+
+      changeImageHeightWithAutoCover(eventData, transform, 50, -250);
+      expect(image.cropY).toBe(0);
+      expect(image.height).toBe(200); // original 100 + cropY 100
     });
   });
 });
