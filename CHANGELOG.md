@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps): bump the astro group across 1 directory with 6 updates [#11229](https://github.com/fabricjs/fabric.js/pull/11229)
 - chore(deps-dev): bump es-toolkit from 1.52.0 to 1.53.2 [#11224](https://github.com/fabricjs/fabric.js/pull/11224)
 - fix(Canvas): bail out of pointer handlers when a subscriber disposed the canvas
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11212](https://github.com/fabricjs/fabric.js/pull/11212)
