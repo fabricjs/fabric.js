@@ -5,6 +5,7 @@ import '../shapes/ActiveSelection';
 
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 import { config } from '../config';
+import { FabricError } from '../util/internals/console';
 import type {
   FabricObject,
   MultiSelectionStacking,
@@ -1155,6 +1156,27 @@ describe('Canvas', () => {
     canvas.toCanvasElement();
     expect(mockSetCtx).toHaveBeenCalledWith(undefined);
     expect(mockSetCtx).toHaveBeenCalledTimes(2);
+  });
+
+  it('restores the canvas state when toCanvasElement throws', () => {
+    const canvas = new Canvas(undefined, { width: 200, height: 100 });
+    const contextTop = canvas.contextTop;
+    const vpt = canvas.viewportTransform;
+    const error = new FabricError('render failed');
+    canvas.on('after:render', () => {
+      if (!canvas.contextTop) {
+        throw error;
+      }
+    });
+
+    expect(() => canvas.toCanvasElement(2)).toThrow(error);
+    expect(canvas.contextTop).toBe(contextTop);
+    expect(canvas.width).toBe(200);
+    expect(canvas.height).toBe(100);
+    expect(canvas.viewportTransform).toBe(vpt);
+    expect(canvas['skipControlsDrawing']).toBe(false);
+    canvas.contextTopDirty = true;
+    expect(() => canvas.renderAll()).not.toThrow();
   });
 
   it('implements toDataURL method that returns valid data URL', () => {
