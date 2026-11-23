@@ -3,10 +3,12 @@
 ## [next]
 
 - fix(cropping-controls): handle numeric control origins when resizing to cover [#11209](https://github.com/fabricjs/fabric.js/pull/11209)
+- chore(deps-dev): bump es-toolkit from 1.52.0 to 1.53.2 [#11224](https://github.com/fabricjs/fabric.js/pull/11224)
 - fix(Canvas): bail out of pointer handlers when a subscriber disposed the canvas
 - chore(deps): bump the astro group across 1 directory with 4 updates [#11212](https://github.com/fabricjs/fabric.js/pull/11212)
 - chore(deps-dev): bump vite from 8.3.5 to 8.3.6 in the vite group across 1 directory [#11214](https://github.com/fabricjs/fabric.js/pull/11214)
 - chore(deps-dev): bump the vitest group with 4 updates [#11215](https://github.com/fabricjs/fabric.js/pull/11215)
+- fix(Image): respect objectCaching [#11211](https://github.com/fabricjs/fabric.js/pull/11211)
 - chore(deps): bump markdown-it from 14.3.1 to 14.3.3 [#11198](https://github.com/fabricjs/fabric.js/pull/11198)
 - chore(deps): bump the astro group across 1 directory with 5 updates [#11202](https://github.com/fabricjs/fabric.js/pull/11202)
 - chore(deps): bump zod from 4.6.5 to 4.6.7 [#11199](https://github.com/fabricjs/fabric.js/pull/11199)
