@@ -68,6 +68,7 @@ export const imageDefaultValues: Partial<TClassProperties<FabricImage>> = {
   cropX: 0,
   cropY: 0,
   imageSmoothing: true,
+  objectCaching: false,
 };
 
 export interface SerializedImageProps extends SerializedObjectProps {
@@ -614,21 +615,6 @@ export class FabricImage<
   ) {
     ctx.imageSmoothingEnabled = this.imageSmoothing;
     super.drawCacheOnCanvas(ctx);
-  }
-
-  /**
-   * Decide if the FabricImage should cache or not. Create its own cache level
-   * needsItsOwnCache should be used when the object drawing method requires
-   * a cache step.
-   * Generally you do not cache objects in groups because the group outside is cached.
-   * This is the special Image version where we would like to avoid caching where possible.
-   * Essentially images do not benefit from caching. They may require caching, and in that
-   * case we do it. Also caching an image usually ends in a loss of details.
-   * A full performance audit should be done.
-   * @return {Boolean}
-   */
-  shouldCache() {
-    return this.needsItsOwnCache();
   }
 
   _renderFill(ctx: CanvasRenderingContext2D) {
