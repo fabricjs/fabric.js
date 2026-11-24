@@ -1045,6 +1045,7 @@ export abstract class ITextBehavior<
     this.initDimensions();
     this.setCoords();
     this._removeExtraneousStyles();
+    this._syncTextareaValue();
   }
 
   /**
@@ -1080,6 +1081,20 @@ export abstract class ITextBehavior<
     this.initDimensions();
     this.setCoords();
     this._removeExtraneousStyles();
+    this._syncTextareaValue();
+  }
+
+  /**
+   * Writes the text to the hidden textarea after a change that did not come from it,
+   * or the next input event would restore the old textarea value.
+   * @private
+   */
+  _syncTextareaValue() {
+    if (this.hiddenTextarea) {
+      this.hiddenTextarea.value = this.text;
+      // writing the value moves the textarea caret to the end
+      this._updateTextarea();
+    }
   }
 
   /**
