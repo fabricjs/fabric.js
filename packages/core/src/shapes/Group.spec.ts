@@ -844,6 +844,14 @@ describe('Group', () => {
     ).toBeTruthy();
   });
 
+  it('enabling subTargetCheck sets the coords of the objects', () => {
+    const group = makeGroupWith2Objects();
+    group.set({ subTargetCheck: true });
+    group.forEachObject((object) => {
+      expect(object.aCoords).toEqual(object.calcACoords());
+    });
+  });
+
   it('fromObject does not delete objects from source', async () => {
     const group = makeGroupWith2ObjectsWithOpacity();
     const groupObject = group.toObject();
