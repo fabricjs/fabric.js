@@ -85,7 +85,7 @@
     "@vitest/ui": "5.1.1",
     "commander": "15.0.0",
     "es-toolkit": "1.53.2",
-    "fast-check": "4.10.2",
+    "fast-check": "4.10.3",
     "husky": "9.1.7",
     "oxfmt": "0.75.0",
     "oxlint": "1.87.0",
