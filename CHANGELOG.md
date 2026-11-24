@@ -2,6 +2,7 @@
 
 ## [next]
 
+- chore(deps-dev): bump fast-check from 4.10.2 to 4.10.3 [#11232](https://github.com/fabricjs/fabric.js/pull/11232)
 - chore(deps-dev): bump the vitest group across 1 directory with 4 updates [#11230](https://github.com/fabricjs/fabric.js/pull/11230)
 - fix(IText): keep the hidden textarea in sync in insertChars and removeChars [#11217](https://github.com/fabricjs/fabric.js/pull/11217)
 - fix(Canvas): restore the canvas state when toCanvasElement throws [#11225](https://github.com/fabricjs/fabric.js/pull/11225)
