@@ -101,6 +101,7 @@ exports[`util > exports expected utility functions 1`] = `
   "removeTransformMatrixForSvgParsing": "function",
   "requestAnimFrame": "function",
   "resetObjectTransform": "function",
+  "resolveOrigin": "function",
   "rotateVector": "function",
   "saveObjectTransform": "function",
   "sendObjectToPlane": "function",
