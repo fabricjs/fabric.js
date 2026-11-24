@@ -686,6 +686,7 @@ export abstract class ITextBehavior<
     this.lockMovementY = this._savedProps.lockMovementY;
 
     if (this.canvas) {
+      this.canvas.upperCanvasEl.draggable = false;
       this.canvas.defaultCursor =
         this._savedProps.defaultCursor || this.canvas.defaultCursor;
       this.canvas.moveCursor =

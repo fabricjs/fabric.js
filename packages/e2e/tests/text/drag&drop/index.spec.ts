@@ -233,6 +233,26 @@ test('Drag & Drop', async ({ page, canvasUtil }) => {
   });
 });
 
+test('upper canvas is draggable only after pressing on the text selection', async ({
+  page,
+}) => {
+  const canvas = page.locator('canvas').nth(1);
+  await expect(canvas).not.toHaveAttribute('draggable', 'true');
+  await selectFabricInA(page);
+  await expect(canvas).not.toHaveAttribute('draggable', 'true');
+  await page.mouse.down();
+  await expect(canvas).toHaveAttribute('draggable', 'true');
+  await page.mouse.up();
+  await page.mouse.down();
+  await expect(canvas).not.toHaveAttribute('draggable', 'true');
+  await page.mouse.up();
+  await selectFabricInA(page);
+  await page.mouse.down();
+  await page.mouse.up();
+  await page.keyboard.press('Escape');
+  await expect(canvas).not.toHaveAttribute('draggable', 'true');
+});
+
 for (const options of [
   {
     disabled: 'onDragStart',

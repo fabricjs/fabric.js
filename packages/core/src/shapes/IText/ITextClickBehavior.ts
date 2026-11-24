@@ -105,7 +105,9 @@ export abstract class ITextClickBehavior<
       return;
     }
 
-    if (this.draggableTextDelegate.start(e)) {
+    const isDragStart = this.draggableTextDelegate.start(e);
+    this.canvas.upperCanvasEl.draggable = isDragStart;
+    if (isDragStart) {
       return;
     }
 

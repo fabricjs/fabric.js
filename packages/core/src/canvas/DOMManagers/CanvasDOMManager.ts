@@ -61,7 +61,6 @@ export class CanvasDOMManager extends StaticCanvasDOMManager {
     el.classList.add('upper-canvas');
     el.setAttribute('data-fabric', 'top');
     el.style.cssText = lowerCanvasEl.style.cssText;
-    el.setAttribute('draggable', 'true');
     return el;
   }
 
