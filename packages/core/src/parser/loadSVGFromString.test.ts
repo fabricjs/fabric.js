@@ -43,6 +43,25 @@ describe('loadSVGFromString', () => {
     }
   });
 
+  it('skips an image whose href fails to load without breaking sibling elements', async () => {
+    const str = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <image href="__missing_image__.png" width="10" height="10" />
+      <rect width="10" height="10" fill="red" />
+      </svg>`;
+
+    const abortController = new AbortController();
+    const parsePromise = loadSVGFromString(str, undefined, {
+      signal: abortController.signal,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    abortController.abort();
+    const parsedSvg = await parsePromise;
+    expect(parsedSvg.objects).toHaveLength(2);
+    expect(parsedSvg.objects[0]).toBeNull();
+    expect(parsedSvg.objects[1]).toBeInstanceOf(Rect);
+    expect((parsedSvg.objects[1] as Rect).fill).toBe('red');
+  });
+
   it('returns successful parse of svg with id starting with number', async () => {
     const str = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <rect id="123xyz" width="10" height="10" />
