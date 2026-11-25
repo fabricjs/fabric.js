@@ -70,11 +70,15 @@ export class ElementsParser {
   async createObject(el: Element): Promise<FabricObject | null> {
     const klass = findTag(el);
     if (klass) {
-      const obj: NotParsedFabricObject = await klass.fromElement(
+      const obj: NotParsedFabricObject | null = await klass.fromElement(
         el,
         this.options,
         this.cssRules,
       );
+      // FabricImage.fromElement resolves to null when the image fails to load
+      if (!obj) {
+        return null;
+      }
       this.resolveGradient(obj, el, FILL);
       this.resolveGradient(obj, el, STROKE);
       if (obj instanceof FabricImage && obj._originalElement) {
