@@ -383,6 +383,16 @@ describe('Intersection', () => {
         false,
         'not on line',
       );
+      checkIsPointContained(
+        // reflected across the line: same slope magnitude, opposite sign, so
+        // it must NOT be reported as contained by the infinite line
+        new Point(0, 2),
+        new Point(2, 1),
+        new Point(4, 2),
+        true,
+        false,
+        'mirrored point is not on the infinite line',
+      );
     });
   });
 
