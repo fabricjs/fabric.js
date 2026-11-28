@@ -886,5 +886,79 @@ describe('Layout Manager', () => {
       expect(child.getCenterPoint()).toMatchObject({ x: 0, y: 0 });
       expect(group.getCenterPoint()).toMatchObject({ x: 0, y: 0 });
     });
+
+    it('keeps fixed group bounds on imperative layout and accepts overrides', () => {
+      const child = new FabricObject({ width: 200, height: 50, strokeWidth: 0 });
+      const group = new Group([child], {
+        left: 50,
+        top: 60,
+        width: 100,
+        height: 100,
+        angle: 20,
+        strokeWidth: 0,
+        layoutManager: new LayoutManager(new FixedLayout()),
+      });
+      const bounds = {
+        left: group.left,
+        top: group.top,
+        width: group.width,
+        height: group.height,
+      };
+      const childCenter = child.getCenterPoint();
+
+      group.triggerLayout();
+      expect(group.left).toBeCloseTo(bounds.left);
+      expect(group.top).toBeCloseTo(bounds.top);
+      expect(group.width).toBe(bounds.width);
+      expect(group.height).toBe(bounds.height);
+      expect(child.getCenterPoint().x).toBeCloseTo(childCenter.x);
+      expect(child.getCenterPoint().y).toBeCloseTo(childCenter.y);
+
+      const center = group.getRelativeCenterPoint();
+      group.triggerLayout({ overrides: { center, size: new Point(80, 90) } });
+      expect(group.width).toBe(80);
+      expect(group.height).toBe(90);
+      expect(child.getCenterPoint().x).toBeCloseTo(childCenter.x);
+      expect(child.getCenterPoint().y).toBeCloseTo(childCenter.y);
+    });
+
+    test.each([
+      [0, 0, 50, 30],
+      [100, 0, 100, 30],
+      [0, 100, 50, 100],
+      [100, 100, 100, 100],
+    ])(
+      'initially empty fixed group %i x %i lays out to %i x %i',
+      (width, height, expectedWidth, expectedHeight) => {
+        const group = new Group([], {
+          left: 50,
+          top: 60,
+          width,
+          height,
+          strokeWidth: 0,
+          layoutManager: new LayoutManager(new FixedLayout()),
+        });
+        const child = new Rect({
+          left: 170,
+          top: 90,
+          width: 50,
+          height: 30,
+          strokeWidth: 0,
+        });
+        group.add(child);
+        const groupCenter = group.getRelativeCenterPoint();
+        const childCenter = child.getCenterPoint();
+
+        group.triggerLayout();
+
+        expect(group.width).toBe(expectedWidth);
+        expect(group.height).toBe(expectedHeight);
+        const expectedCenter = width && height ? groupCenter : childCenter;
+        expect(group.getRelativeCenterPoint().x).toBeCloseTo(expectedCenter.x);
+        expect(group.getRelativeCenterPoint().y).toBeCloseTo(expectedCenter.y);
+        expect(child.getCenterPoint().x).toBeCloseTo(childCenter.x);
+        expect(child.getCenterPoint().y).toBeCloseTo(childCenter.y);
+      },
+    );
   });
 });
